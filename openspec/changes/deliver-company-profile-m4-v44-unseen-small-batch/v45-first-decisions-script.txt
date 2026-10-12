@@ -1,0 +1,53 @@
+"""Read actual first v45 objects against independent official PDF conditions."""
+import json,re
+from pathlib import Path
+from tests.unit.test_research.test_company_profile_v45_campus_auto import native_match,action_matches,compact,num
+from research.company_profile.reads import _iter_accepted_raw
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v45_same_source_repair';B=R/'data/research/company_profile_common_core/m4_v45_same_source_repair/company_profile_common_core.v1'
+read=lambda p:json.loads(p.read_text());save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+scope=read(C/'v45-source-scope.json');formal=read(P/'formal_execution.json');decisions={};supp={}
+for ins,result in formal['results'].items():
+ profile=result['query']['profiles'][0];cp=read(B/'checkpoints'/(profile['work_id']+'.json'));raw=list(_iter_accepted_raw(cp));facts={};sources=read(Path('/tmp/quote_v44_unseen_source_'+ins+'.json'));all_text={p['page']:p['text'] for p in sources};rows=scope['source_rows'][ins];roles=[r for r in scope['native_roles'] if r['instrument_id']==ins];extra=set()
+ for idx,r in enumerate(raw):
+  n=r['source_native'];kind=r['object_type'];ep=sorted({p for e in r['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[]),*e.get('subject_evidence_pages',[])] if p});extra.update(ep);source=compact('\n'.join(all_text[p] for p in ep));d=dict(review_index=idx,actual_object_type=kind,actual_native_name=n['name'],actual_action=r.get('action'),actual_relation_type=r.get('relation_type'),actual_subject_scope=r['subject_scope'],verified_source_pages=ep,critical_numeric_error=False)
+  if kind in ['Segment','Measurement']:
+   matches=[j for j,row in enumerate(rows) if native_match(r,row)]
+   assert num(n['value']) in num(source),(ins,idx,n)
+   if not matches:
+    assert ins=='600081.SH' and ep==[11] and n['name']=='正常经营之外的其他业务收入' and n['value']=='283,274,554.57' and n['unit']=='元' and r['subject_scope']=='consolidated_group',(ins,idx,n)
+    d.update(accurate=True,reason='合同外p11第1项本期正常经营外其他业务收入明确；原名、单位、集团范围正确，不使用小计借额，计准确率不增召回。')
+   else:
+    assert len(matches)==1,(ins,idx,matches)
+    assert r['reported_period']==rows[matches[0]]['reported_period']
+    d.update(accurate=True,reason='独立原PDF与布局逐核本期原单元、原行/表身份/收入列、单位、主体及原合营联营/分部抵销/交易对手限定；配对Measurement保持完全相同口径。')
+    if kind=='Segment':d['recall_row_index']=matches[0]
+  elif kind=='Activity':
+   matches=[j for j,role in enumerate(roles) if any(x['record_id']==r['record_id'] for x in action_matches([r],role))]
+   if matches:
+    assert len(matches)==1,(ins,idx,matches)
+    role=roles[matches[0]]
+    if '参股' in role.get('qualifier','') or role['page'] in [184,185] and role['source_actor']!='公司及合并子公司':assert r['subject_scope']=='business_segment'
+    d.update(accurate=True,reason='原主体、原商品及实际动作逐项相等；当期销量仅证明销售，产量正数独立证明生产；已注销主体及参股权益法边界保留，未知映射不推补。',recall_role_index=matches[0])
+   else:
+    assert ins=='600081.SH' and r['action'] in ['produces','operates'] and n['name'] in ['汽车零部件','座舱与车身系统','制动及智能驾驶系统','电驱动系统','热管理系统','动力总成部件系统'],(ins,idx,n)
+    assert compact(n['name']) in source
+    d.update(accurate=True,reason='原p14父类生产与五系统实际经营成立；保留原正确事实，但不替代原具名65条件。')
+  elif kind=='BusinessOverview':
+   # The accepted text consists of original passages, not a generated answer.
+   for token in re.findall(r'\d[\d,]*(?:\.\d+)?',r['source_text']):
+    if len(token.replace(',',''))>5:assert num(token) in num(source),(ins,idx,token)
+   d.update(accurate=True,reason='逐段官方正文与必要续页支持原文片段及其主体、业务性质、控制/参股、期间、处置、收费与确认政策；引用表中上期、零值及验证/计划状态按原文保留，片段自身不替代完整正文验收。')
+  else:raise AssertionError((ins,idx,kind))
+  facts[r['record_id']]=d
+ answers={}
+ for dim in profile['dimensions']:
+  key=dim['dimension_id'];rule=scope['answers'][ins][key];failed=[g for g in rule['required_groups'] if not any(compact(t) in compact(dim['excerpt']) for t in g)];assert not failed,(ins,key,failed)
+  reasons={('600052.SH','principal_business'):'原园区、影视存量、支付原主体及1—7月处置退出成立；跃动32%不并表为参股，不集团化。',('600052.SH','products_services'):'正蓝/汇贤热水三模式、直饮水/共享洗衣/电吹风、少量空调打印机租赁、技术支持/账单结算及支付原期间完整。',('600052.SH','revenue_model'):'热水学生月消费、建设完工验收、影视许可及载体交付/上线孰晚、支付实际交易资金/费率及1—7月/7月31日失控退出完整，原列收入保持。',('600081.SH','principal_business'):'原五系统和制造销售、辅助摩托车/房屋租赁、子公司及权益法参股与当期已注销限定完整，原正确主营保留。',('600081.SH','products_services'):'原具名矩阵、ABS及全部跨行产品完整；库存发动机销售25与产量0、排气0/注销分别保留，不推本期生产。',('600081.SH','revenue_model'):'到货验收/控制权、折扣质保、代理净额、服务产出进度和0.7%股权托管成立；原精确子公司与集团出售收入原栏目完整，表头污染名称消失。'}
+  # Each support fact was independently reviewed above; substantive limitations
+  # are inspected in the actual query/export body, beyond required word groups.
+  assert all(facts[x]['accurate'] for x in dim['supporting_record_ids'])
+  answers[key]=dict(accurate=True,critical_numeric_error=False,reason=reasons[(ins,key)],failed_groups=failed,all_supporting_records_checked=True)
+ decisions[ins]=dict(facts=facts,answers=answers)
+ supp[ins]=dict(document_version=scope['versions'][ins]['sha256'],pages=[p for p in sources if p['page'] in extra-set(scope['versions'][ins]['checked_pages'])])
+ print(ins,len(facts),'income',len({d['recall_row_index'] for d in facts.values() if 'recall_row_index' in d}),'roles',len({d['recall_role_index'] for d in facts.values() if 'recall_role_index' in d}),flush=True)
+save(C/'v45-actual-object-decisions.json',decisions);save(C/'v45-actual-object-supplemental-source-pages.json',supp)

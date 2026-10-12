@@ -1,0 +1,24 @@
+{
+  "protected_history": {
+    "count": 2572,
+    "hashes_unchanged": true
+  },
+  "existing_modified": {
+    "count": 3,
+    "hashes_unchanged": true
+  },
+  "formal_first": {
+    "count": 18,
+    "hashes_unchanged": true
+  },
+  "formal_review": {
+    "count": 7,
+    "hashes_unchanged": true
+  },
+  "execution_code": {
+    "count": 38,
+    "hashes_unchanged": true
+  },
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

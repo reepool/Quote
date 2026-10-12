@@ -1,0 +1,26 @@
+{
+  "600052.SH": {
+    "real_owner_pages": 195,
+    "checked_fixture_pages": 33,
+    "owner_matches_fixture": true,
+    "income": 56,
+    "roles": 10,
+    "negative_count": 11,
+    "query_export_equal": true,
+    "accepted_count": 145,
+    "final_local_accepted_count": 145,
+    "final_code_regression_passed": true
+  },
+  "600081.SH": {
+    "real_owner_pages": 222,
+    "checked_fixture_pages": 38,
+    "owner_matches_fixture": true,
+    "income": 82,
+    "roles": 55,
+    "negative_count": 9,
+    "query_export_equal": true,
+    "accepted_count": 269,
+    "final_local_accepted_count": 269,
+    "final_code_regression_passed": true
+  }
+}

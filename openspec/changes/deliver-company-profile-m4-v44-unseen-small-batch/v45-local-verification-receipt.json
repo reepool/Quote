@@ -1,0 +1,28 @@
+{
+  "new_full_pages_and_identity": {
+    "command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_v45_campus_auto.py tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_full_source_business_bodies_income_and_named_actions",
+    "result": "15 passed",
+    "log": "\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[33m                                                          [100%]\u001b[0m\n============================= slowest 10 durations =============================\n9.47s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_full_source_business_bodies_income_and_named_actions[v41-pages-600079.SH]\n7.95s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_full_source_business_bodies_income_and_named_actions[v42-independent_pages-600079.SH]\n7.93s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_full_source_business_bodies_income_and_named_actions[v41-pages-600050.SH]\n7.07s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_full_source_business_bodies_income_and_named_actions[v42-pages-600079.SH]\n6.87s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_full_source_business_bodies_income_and_named_actions[v41-independent_pages-600079.SH]\n6.85s call     tests/unit/test_research/test_company_profile_v45_campus_auto.py::test_complete_native_business_delivery[independent_pages-600081.SH]\n4.88s call     tests/unit/test_research/test_company_profile_v45_campus_auto.py::test_complete_native_business_delivery[pages-600081.SH]\n4.57s call     tests/unit/test_research/test_company_profile_v41_telecom_pharma.py::test_full_source_business_bodies_income_and_named_actions[v41-independent_pages-600050.SH]\n3.52s call     tests/unit/test_research/test_company_profile_v45_campus_auto.py::test_complete_native_business_delivery[independent_pages-600052.SH]\n2.43s call     tests/unit/test_research/test_company_profile_v45_campus_auto.py::test_complete_native_business_delivery[pages-600052.SH]\n\u001b[33m\u001b[32m15 passed\u001b[0m, \u001b[33m\u001b[1m7 warnings\u001b[0m\u001b[33m in 66.77s (0:01:06)\u001b[0m\u001b[0m\n"
+  },
+  "previous_joint_sections": {
+    "command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_v44_interest_sections.py",
+    "result": "12 passed",
+    "log": "\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[32m.\u001b[0m\u001b[33m                                                             [100%]\u001b[0m\n============================= slowest 10 durations =============================\n7.72s call     tests/unit/test_research/test_company_profile_v44_interest_sections.py::test_full_owner_pages_reject_inapplicable_joint_income[pages-600051.SH]\n5.04s call     tests/unit/test_research/test_company_profile_v44_interest_sections.py::test_full_owner_pages_reject_inapplicable_joint_income[independent_pages-600051.SH]\n4.77s call     tests/unit/test_research/test_company_profile_v44_interest_sections.py::test_full_owner_pages_reject_inapplicable_joint_income[pages-600080.SH]\n4.74s call     tests/unit/test_research/test_company_profile_v44_interest_sections.py::test_v44_exact_asset_entry[False]\n3.63s call     tests/unit/test_research/test_company_profile_v44_interest_sections.py::test_full_owner_pages_reject_inapplicable_joint_income[independent_pages-600080.SH]\n1.92s call     tests/unit/test_research/test_company_profile_v44_interest_sections.py::test_v44_exact_asset_entry[between_reads]\n1.38s call     tests/unit/test_research/test_company_profile_v44_interest_sections.py::test_v44_exact_asset_entry[True]\n0.01s call     tests/unit/test_research/test_company_profile_v44_interest_sections.py::test_original_false_joint_record_cannot_match_associate_contract\n\n(2 durations < 0.005s hidden.  Use -vv to show these durations.)\n\u001b[33m\u001b[32m12 passed\u001b[0m, \u001b[33m\u001b[1m7 warnings\u001b[0m\u001b[33m in 30.65s\u001b[0m\u001b[0m\n"
+  },
+  "distinct_passed_tests": 27,
+  "full_suite_claim": false,
+  "real_owner_inputs": "OfficialAnnualReportPageSource read 195/222 actual official pages; verified all 71 frozen owner text/layout inputs and local whole-page run-query-export",
+  "review": {
+    "method": "manual scoped diff review; only current P0/P1 correctness and regressions",
+    "blocking_found_and_fixed": [
+      "PDF enumeration and actor header pollution",
+      "native current/prior and sparse company columns",
+      "group transaction direction/identity and paired Measurement",
+      "multiple/wrapped alias expansion with generic issuer and English actor compatibility"
+    ],
+    "remaining_in_scope_blocker": false,
+    "unrelated_worktree_files": "protected and excluded from diff review"
+  },
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

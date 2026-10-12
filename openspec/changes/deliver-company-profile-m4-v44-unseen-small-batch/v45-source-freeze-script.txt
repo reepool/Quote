@@ -1,0 +1,24 @@
+import json,hashlib,subprocess
+from pathlib import Path
+from datetime import datetime,timezone
+from research.company_profile.execution import default_processing_identity
+from research.company_profile.m4_next_batch import load_m4_next_batch_plan,save_m4_next_batch_plan
+from research.company_profile import core_evidence_selection as selection
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch';K=R/'data/checkpoints/company_profile_common_core';old=K/'reports/m4_v44_unseen_small_batch';new=K/'reports/m4_v45_same_source_repair';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+assert not new.exists()
+original=json.loads((C/'source-scope.json').read_text());identity={**default_processing_identity(),'revenue_sentence_repair':'v45'}
+scope={**original,'processing_identity':identity,'original_source_scope_sha256':sha(C/'source-scope.json'),'same_substantive_conditions':True}
+assert scope['source_rows']==original['source_rows'] and scope['native_roles']==original['native_roles'] and scope['answers']==original['answers'] and scope['negative_conditions']==original['negative_conditions']
+save(C/'v45-source-scope.json',scope)
+plan=load_m4_next_batch_plan(K,plan_directory=old);save_m4_next_batch_plan(K,plan,plan_directory=new)
+old_receipt=json.loads((C/'source-freeze-receipt.json').read_text());code={p:sha(R/p) for p in old_receipt['executed_code_sha256']};assert len(code)==38
+flags={name:getattr(selection,name)(identity) for name in old_receipt['repair_flags']};assert all(flags.values())
+receipt={**old_receipt,'created_at':datetime.now(timezone.utc).isoformat(),'processing_identity':identity,'plan':plan.model_dump(mode='json'),'executed_code_sha256':code,'source_scope_sha256':sha(C/'v45-source-scope.json'),'repair_flags':flags,'original_source_scope_sha256':sha(C/'source-scope.json'),'official_identity_and_cutoff_unchanged':True,'local_owner_verification_sha256':sha(C/'v45-real-owner-local-verification.json'),'fixture_sha256':sha(R/'tests/fixtures/company_profile_v45_campus_auto_frozen_pages.json'),'formal_directory':str(new.relative_to(R)),'baseline_head':'fbf06da2d32fb6500d0f799a2de6aacdaecb22a2'}
+save(C/'v45-source-freeze-receipt.json',receipt)
+paths=['research/company_profile/core_evidence_selection.py','research/company_profile/core_assessment_projection.py','research/company_profile/operations.py','research/company_profile/runtime.py']
+patch=subprocess.run(['git','diff','--',*paths],check=True,capture_output=True,text=True).stdout
+(C/'v45-execution-code.patch').write_text(patch)
+(C/'v45-execution-code-sha256.json').write_text(json.dumps(code,ensure_ascii=False,indent=2)+'\n')
+script=Path('/tmp/quote_v44_unseen_round.py').read_text().replace('m4_v44_unseen_small_batch','m4_v45_same_source_repair').replace("'v44'","'v45'").replace("'source-freeze-receipt.json'","'v45-source-freeze-receipt.json'").replace("'source-scope.json'","'v45-source-scope.json'").replace('Task 2.1: the first genuine unseen execute through second export.','Task 4.4: first same-source v45 execute through second export.')
+Path('/tmp/quote_v45_same_source_round.py').write_text(script);(C/'v45-first-execution-script.txt').write_text(script)
+print('FROZEN',plan.plan_id,identity,flags,sha(C/'v45-source-scope.json'))

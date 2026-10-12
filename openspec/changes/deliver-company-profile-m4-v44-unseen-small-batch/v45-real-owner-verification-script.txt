@@ -1,0 +1,34 @@
+import json,asyncio,hashlib
+from pathlib import Path
+from utils import config_manager
+from research.storage import ResearchStorageManager
+from research.announcement_assets import AnnouncementAssetConfig,AnnouncementAssetRepository,AnnouncementAssetService
+from research.announcement_assets.access import AnnouncementAssetAccess
+from research.business_profile_async_production import BusinessProfileWorkRepository
+from research.company_profile.operations import OfficialAnnualReportPageSource
+from tests.unit.test_research.test_company_profile_v19_closure import _drive,_answer
+from research.company_profile.reads import _iter_accepted_raw
+from tests.unit.test_research.test_company_profile_v45_campus_auto import native_match,action_matches,negative_wrong,compact
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch';f=json.loads((R/'tests/fixtures/company_profile_v45_campus_auto_frozen_pages.json').read_text())
+rc=config_manager.get_research_config();storage=ResearchStorageManager(rc)
+cfg=AnnouncementAssetConfig.from_research_config(rc,project_root=R);repo=AnnouncementAssetRepository(Path(str(rc.storage.db_path)).resolve());srv=AnnouncementAssetService(repository=repo,config=cfg,acquisition_service=None,attachment_retriever=None);access=AnnouncementAssetAccess(repository=repo,config=cfg,service=srv)
+workrepo=BusinessProfileWorkRepository(storage,checkpoint_root=R/'data/checkpoints/company_profile_common_core',shared_asset_access=access);source=OfficialAnnualReportPageSource(workrepo);out={}
+for cp in (R/'data/research/company_profile_common_core/m4_v44_unseen_small_batch/company_profile_common_core.v1/checkpoints').glob('*.json'):
+ v=json.loads(cp.read_text());i=v['report']['instrument_id'];item=workrepo.get(v['work_id']);actual=source(item);assert actual
+ pages=actual['pages'];Path('/tmp/v45-actual-owner-pages-'+i+'.json').write_text(json.dumps(pages,ensure_ascii=False,indent=2)+'\n')
+ assert actual['report'].model_dump(mode='json')==f[i]['report'],(actual['report'],f[i]['report'])
+ for expected in f[i]['pages']:
+  native=next(p for p in pages if p['page']==expected['page'])
+  assert native['text']==expected['text'],(i,expected['page'],'text')
+  assert native.get('layout_text')==expected.get('layout_text'),(i,expected['page'],'layout')
+ root=Path('/tmp/v45-real-owner-'+i);assert not root.exists()
+ q,ex=_drive(root,instrument=i,fixture=f[i],pages=pages,repair_version='v45');assert q==ex
+ raw=list(_iter_accepted_raw(json.loads(next((root/'company_profile_common_core.v1/checkpoints').glob('*.json')).read_text())))
+ Path('/tmp/v45-real-owner-raw-'+i+'.json').write_text(json.dumps(raw,ensure_ascii=False,indent=2)+'\n')
+ for row in f[i]['source_rows']:assert any(r['object_type']=='Segment' and native_match(r,row) for r in raw),(i,row['condition_id'])
+ for role in f[i]['native_roles']:assert action_matches(raw,role),(i,role['name'],role['source_actor'])
+ for n in f[i]['negative_conditions']:assert not negative_wrong(raw,n),(i,n['name'])
+ for dim,rule in f[i]['answers'].items():assert all(any(compact(t) in _answer(q,dim) for t in g) for g in rule['required_groups']),(i,dim)
+ out[i]=dict(real_owner_pages=len(pages),checked_fixture_pages=len(f[i]['pages']),owner_matches_fixture=True,income=len(f[i]['source_rows']),roles=len(f[i]['native_roles']),negative_count=len(f[i]['negative_conditions']),query_export_equal=True,accepted_count=len(raw))
+ print(i,out[i],flush=True)
+(C/'v45-real-owner-local-verification.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')

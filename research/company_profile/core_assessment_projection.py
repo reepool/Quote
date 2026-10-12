@@ -53,7 +53,7 @@ _PRODUCT_PATTERN = re.compile(
 )
 _STATEMENT_SPLIT = re.compile(r"[。；;，,\n]+")
 _REVENUE_INFLOW_PATTERN = re.compile(
-    r"(本公司电力销售在|中长期、现货、绿电交易|本公司按照业务类型确定的收入确认具体原则|本公司作为出租方|出售商品/提供劳务|合同或订单|月结|本集团的营业收入主要包括|订单模式提供|海外市场采取直销|本公司所属售电公司|市场化交易|公司电力销售客户主要为|公司煤机全年市场化交易累计成交电量|收入来[源于自]|营业收入构成|主营业务收入|"
+    r"(各业务类型收入确认和计量具体政策|本公司电力销售在|中长期、现货、绿电交易|本公司按照业务类型确定的收入确认具体原则|本公司作为出租方|出售商品/提供劳务|合同或订单|月结|本集团的营业收入主要包括|订单模式提供|海外市场采取直销|本公司所属售电公司|市场化交易|公司电力销售客户主要为|公司煤机全年市场化交易累计成交电量|收入来[源于自]|营业收入构成|主营业务收入|"
     r"通过.{0,30}(?:销售|提供).{0,30}(?:取得|获得|收取)|"
     r"取得货款|"
     r"向客户(?:销售|提供).{0,24}(?:取得|获得|收取)|"
@@ -333,6 +333,8 @@ def _assess_principal_business(
                 source_delivery_repair
                 and (
                     _NARRATIVE_BUSINESS.search(text)
+                    or "被投资公司名称" in text
+                    and "是否并表" in text
                     or re.search(r"\d+[.．、][\u4e00-\u9fff]{2,12}业务", text)
                 )
             )
@@ -393,6 +395,11 @@ def _assess_products_services(
             and record.field_id == "business_overview_source"
             and (
                 _PRODUCT_PATTERN.search(record.source_text)
+                or source_delivery_repair
+                and re.search(
+                    r"各业务类型收入确认和计量具体政策|零部件产销量",
+                    record.source_text,
+                )
                 or (
                     source_delivery_repair
                     and re.search(
@@ -531,10 +538,26 @@ def _assess_revenue_model(
                 r
                 for r in records
                 if isinstance(r, BusinessOverview)
-                and "公司丧失" in r.source_text
-                and "合并范围" in r.source_text
+                and (
+                    "公司丧失" in r.source_text
+                    and "合并范围" in r.source_text
+                    or "报告期内取得和处置子公司的情况" in r.source_text
+                    and re.search(r"仅对\d{4}年1[-—－]7月", r.source_text)
+                )
             ]
             supports.extend(r for r in [*limited, *context] if r not in supports)
+    if source_delivery_repair and any(
+        isinstance(r, BusinessOverview) and "支付渠道服务" in r.source_text
+        for r in supports
+    ):
+        supports.extend(
+            r
+            for r in records
+            if isinstance(r, BusinessOverview)
+            and "报告期内取得和处置子公司的情况" in r.source_text
+            and re.search(r"仅对\d{4}年1[-—－]7月", r.source_text)
+            and r not in supports
+        )
     if supports:
         answered = _answered("revenue_model", supports)
         if repair_revenue_sentence:

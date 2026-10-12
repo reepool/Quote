@@ -1,0 +1,45 @@
+{
+  "completed_tasks": [
+    "4.1",
+    "4.3",
+    "4.2",
+    "4.4"
+  ],
+  "business_acceptance": "formal_gates_met_pending_a_role_finite_review",
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 209,
+    "denominator": 209,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 420,
+    "denominator": 420,
+    "value": 1.0
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "actual_accepted_fact_count": 414,
+  "answered_text_count": 6,
+  "negative_passed": 20,
+  "negative_total": 20,
+  "whole_round_seconds": 201.25287298951298,
+  "tokens_used": 0,
+  "shared_token_budget": 50000,
+  "actual_five_stages_successful": true,
+  "no_reuse_or_predecessor": true,
+  "query_export_disk_equal": true,
+  "source_condition_count": 209,
+  "source_body_count": 6,
+  "income_condition_count": 138,
+  "named_action_condition_count": 65,
+  "independent_source_page_count": 83,
+  "default_identity_unchanged": true,
+  "new_change_archived": false,
+  "next_sample": "paused_pending_a_role_review",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

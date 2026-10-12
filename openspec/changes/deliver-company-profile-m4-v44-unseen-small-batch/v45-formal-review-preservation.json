@@ -1,0 +1,12 @@
+{
+  "review_file_count": 7,
+  "sha256": {
+    "openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch/v45-source-review-evidence.json": "7f0380d467f3c7f33c610a13fee3dc8f390fedbadf752de10b682f2da2858ad7",
+    "openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch/v45-actual-object-decisions.json": "110c0fdaafb17dacba32edfb3048c30c9ddbd8fcefe1e425313ae34c45d3b795",
+    "openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch/v45-negative-review-evidence.json": "207072e9ece1acd4edb1018484e2bcd9cbc9dbdb07a0b0db5bb3b4b204523c38",
+    "openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch/v45-actual-object-supplemental-source-pages.json": "6250841aa4790187f2d91f963a32f3e3bb5319dd1f71cbc5e54d3878e81aa065",
+    "openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch/v45-actual-evidence-official-source-validation.json": "9cb59a201331e7b2d0896f0ab0a1331695616f3a45f9c7c5549bf29cc9a05a42",
+    "openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch/v45-delivery-reread-validation.json": "a871184aab214e7bfbc039964eb9023439305fb84c0bf14063ecb4ca1fca8d9b",
+    "data/checkpoints/company_profile_common_core/reports/m4_v45_same_source_repair/company_profile_source_review.v1.json": "16da90888888deade1498b519da35b6d2ed4e59f0287eee523c6f485272c6920"
+  }
+}

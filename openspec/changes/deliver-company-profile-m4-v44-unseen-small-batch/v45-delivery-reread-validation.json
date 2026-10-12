@@ -1,0 +1,12 @@
+{
+  "600052.SH": {
+    "actual_disk_reread": true,
+    "query_export_disk_equal": true,
+    "accepted_count": 145
+  },
+  "600081.SH": {
+    "actual_disk_reread": true,
+    "query_export_disk_equal": true,
+    "accepted_count": 269
+  }
+}

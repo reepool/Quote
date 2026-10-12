@@ -1,0 +1,17 @@
+import json
+from pathlib import Path
+from tests.unit.test_research.test_company_profile_v19_closure import _drive,_answer
+from research.company_profile.reads import _iter_accepted_raw
+from tests.unit.test_research.test_company_profile_v45_campus_auto import native_match,action_matches,negative_wrong,compact
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch';f=json.loads((R/'tests/fixtures/company_profile_v45_campus_auto_frozen_pages.json').read_text());receipt=json.loads((C/'v45-real-owner-local-verification.json').read_text())
+for i,v in f.items():
+ pages=json.loads(Path('/tmp/v45-actual-owner-pages-'+i+'.json').read_text());root=Path('/tmp/v45-real-owner-confirmed-'+i);assert not root.exists()
+ q,ex=_drive(root,instrument=i,fixture=v,pages=pages,repair_version='v45');assert q==ex
+ raw=list(_iter_accepted_raw(json.loads(next((root/'company_profile_common_core.v1/checkpoints').glob('*.json')).read_text())))
+ for row in v['source_rows']:assert any(r['object_type']=='Segment' and native_match(r,row) for r in raw),row['condition_id']
+ for role in v['native_roles']:assert action_matches(raw,role),role
+ for n in v['negative_conditions']:assert not negative_wrong(raw,n),n['name']
+ for dim,rule in v['answers'].items():assert all(any(compact(t) in _answer(q,dim) for t in g) for g in rule['required_groups']),dim
+ receipt[i]['final_local_accepted_count']=len(raw);receipt[i]['final_code_regression_passed']=True
+ print(i,len(raw),flush=True)
+(C/'v45-real-owner-local-verification.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')

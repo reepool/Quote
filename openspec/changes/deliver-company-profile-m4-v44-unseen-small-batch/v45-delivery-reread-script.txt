@@ -1,0 +1,8 @@
+import json
+from pathlib import Path
+from research.company_profile.reads import CompanyProfileReadService
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v45_same_source_repair';formal=json.loads((P/'formal_execution.json').read_text());reads=CompanyProfileReadService(R/'data/research/company_profile_common_core/m4_v45_same_source_repair');out={}
+for i,r in formal['results'].items():
+ p=reads.query((i,),processing_identity=formal['processing_identity'])['profiles'][0];disk=json.loads(Path(r['export']['files'][0]).read_text());assert p==disk==r['query']['profiles'][0]==r['export']['profiles'][0]
+ out[i]=dict(actual_disk_reread=True,query_export_disk_equal=True,accepted_count=len(p['accepted_facts']))
+(C/'v45-delivery-reread-validation.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print(out)

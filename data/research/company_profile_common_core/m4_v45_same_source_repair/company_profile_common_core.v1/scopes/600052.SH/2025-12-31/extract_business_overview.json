@@ -1,0 +1,2179 @@
+{
+  "schema_version": "company_profile_scope_checkpoint.v1",
+  "instrument_id": "600052.SH",
+  "report_period": "2025-12-31",
+  "chapter_task": "extract_business_overview",
+  "source_digest": "954d436228efb827c337915eee45c8d4f48be3344e550ac3f36be7f61d7c7ea1",
+  "policy_version": "company_profile_common_core_mapping.v1",
+  "processing_identity": {
+    "material_input_facts": "v1",
+    "owned_page_facts": "v8",
+    "revenue_sentence_repair": "v45",
+    "rules": "company_profile_common_core.v1"
+  },
+  "task_complete": true,
+  "task_result": {
+    "schema_version": "company_profile_task_result.v1",
+    "request_id": "bp-work-46fe09beabede26fc96e6921:extract_business_overview",
+    "records": [
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-a96dcdb4513c2add:overview",
+        "field_id": "business_overview_source",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "report_default_group_scope",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-a96dcdb4513c2add",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 179,
+            "printed_page_label": null,
+            "section_title": "当期产品及服务披露",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "出售商品/提供劳务情况表\n √适用  □不适用\n                                                  单位：元    币种：人民币\n             关联方                  关联交易内容        本期发生额      上期发生额\n 跃动新能源科技（浙江）有限公司                    提供劳务         2,254,921.28613,842.53\n 浙江广厦建设职业技术大学                       提供劳务         3,848,536.061,036,959.45\n 东阳市广大后勤服务有限公司                      提供劳务         1,127,039.972,711,347.88\n              合计                      /          7,230,497.314,362,149.86\n ",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "BusinessOverview",
+        "source_text": "出售商品/提供劳务情况表\n √适用  □不适用\n                                                  单位：元    币种：人民币\n             关联方                  关联交易内容        本期发生额      上期发生额\n 跃动新能源科技（浙江）有限公司                    提供劳务         2,254,921.28613,842.53\n 浙江广厦建设职业技术大学                       提供劳务         3,848,536.061,036,959.45\n 东阳市广大后勤服务有限公司                      提供劳务         1,127,039.972,711,347.88\n              合计                      /          7,230,497.314,362,149.86\n "
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-eb3578cc5722ff3a:overview",
+        "field_id": "business_overview_source",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "report_default_group_scope",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-eb3578cc5722ff3a",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "当期产品及服务披露",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "报告期内公司从事的业务情况报告期内，公司继续维持以园区生活服务为核心、影视文化内容为补充、其他配套服务协同发展的多元化业务布局。通过聚焦校园场景的精细化运营与创新业务孵化，持续优化收入结构，强化战略业务的可持续增长能力。1、园区生活服务报告期内，公司聚焦园区综合能源服务领域，形成“核心业务+增值服务+创新探索”的梯次发展业务版图。依托子公司正蓝节能及汇贤优策，以园区生活服务为核心，开展热水供应系统投资建设及运营服务；延伸开发校园高频生活增值服务（直饮水、共享洗衣等），并试点探索光伏、电池租赁等综合能源管理及智慧校园业务，构建多层次服务体系。（1）热水供应服务公司子公司正蓝节能及汇贤优策专注于校园市场，提供园区生活服务。具体业务模式分为三种：模式①通过与客户签订热水供应系统建造及运营服务合同，投资建造供应系统，并在建设完成后投入运营，在运营期间向学生收取用水费用实现收益。运营期间热水供应系统所有权归属于公司，运营期结束后所有权移交至客户；模式②通过完成热水供应系统建造后向客户进行移交，并按照合同约定获取一次性建设收益；模式③通过与客户签订托管协议，公司负责既有热水供应项目的持续运营维护并承担项目成本，在运营期间向学生收取用水费用实现收益。（2）其他配套业务校园增值业务：包括直饮水、共享洗衣机、电吹风等高频生活服务。其他业务：依托现有校园场景资源，探索光伏发电、电池租赁、合同能源管理等业务，目前该类业务尚处于模式验证阶段，收入来源依赖个别项目资源，未形成标准化及可持续增长服务体系。2、影视剧报告期内，公司无新增影视项目投资计划，对现有自营项目严格遵循“盘活存量、严控增量”的原则，在不新增重大资金投入的前提下，通过优化运营模式、提升管理效率，稳步推进项目盘活工作。同时，公司已完成部分影视项目的转让退出，加快资金回笼。目前，影视业务仅作为存量资产盘活方向予以保留，不再作为公司战略发展的重点领域。3、支付渠道服务及其他业务报告期内，公司依托现有资源，通过出资设立合资子公司东望数智，试水支付渠道服务业务。后经公司董事会认真研究及论证，公司公开挂牌转让控股子公司东望数智51%股权。具体内容详见本报告“第五节重要事项—十二、重大关联交易—（二）资产或股权收购、出售发生的关联交易”。2025年8月，公司已完成东望数智51%股权的转让，鉴于公司股东结构发生变化，后续不再开展该项业务。同时，公司依托校园场景资源，提供空调、打印机等设备租赁服务等其他业务服务，报告期内服务仅覆盖少量院校。",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "BusinessOverview",
+        "source_text": "报告期内公司从事的业务情况报告期内，公司继续维持以园区生活服务为核心、影视文化内容为补充、其他配套服务协同发展的多元化业务布局。通过聚焦校园场景的精细化运营与创新业务孵化，持续优化收入结构，强化战略业务的可持续增长能力。1、园区生活服务报告期内，公司聚焦园区综合能源服务领域，形成“核心业务+增值服务+创新探索”的梯次发展业务版图。依托子公司正蓝节能及汇贤优策，以园区生活服务为核心，开展热水供应系统投资建设及运营服务；延伸开发校园高频生活增值服务（直饮水、共享洗衣等），并试点探索光伏、电池租赁等综合能源管理及智慧校园业务，构建多层次服务体系。（1）热水供应服务公司子公司正蓝节能及汇贤优策专注于校园市场，提供园区生活服务。具体业务模式分为三种：模式①通过与客户签订热水供应系统建造及运营服务合同，投资建造供应系统，并在建设完成后投入运营，在运营期间向学生收取用水费用实现收益。运营期间热水供应系统所有权归属于公司，运营期结束后所有权移交至客户；模式②通过完成热水供应系统建造后向客户进行移交，并按照合同约定获取一次性建设收益；模式③通过与客户签订托管协议，公司负责既有热水供应项目的持续运营维护并承担项目成本，在运营期间向学生收取用水费用实现收益。（2）其他配套业务校园增值业务：包括直饮水、共享洗衣机、电吹风等高频生活服务。其他业务：依托现有校园场景资源，探索光伏发电、电池租赁、合同能源管理等业务，目前该类业务尚处于模式验证阶段，收入来源依赖个别项目资源，未形成标准化及可持续增长服务体系。2、影视剧报告期内，公司无新增影视项目投资计划，对现有自营项目严格遵循“盘活存量、严控增量”的原则，在不新增重大资金投入的前提下，通过优化运营模式、提升管理效率，稳步推进项目盘活工作。同时，公司已完成部分影视项目的转让退出，加快资金回笼。目前，影视业务仅作为存量资产盘活方向予以保留，不再作为公司战略发展的重点领域。3、支付渠道服务及其他业务报告期内，公司依托现有资源，通过出资设立合资子公司东望数智，试水支付渠道服务业务。后经公司董事会认真研究及论证，公司公开挂牌转让控股子公司东望数智51%股权。具体内容详见本报告“第五节重要事项—十二、重大关联交易—（二）资产或股权收购、出售发生的关联交易”。2025年8月，公司已完成东望数智51%股权的转让，鉴于公司股东结构发生变化，后续不再开展该项业务。同时，公司依托校园场景资源，提供空调、打印机等设备租赁服务等其他业务服务，报告期内服务仅覆盖少量院校。"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-af49b046b6ce3431:overview",
+        "field_id": "business_overview_source",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "report_default_group_scope",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-af49b046b6ce3431",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "当期产品及服务披露",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "报告期内，公司聚焦园区综合能源服务领域，形成“核心业务+增值服务+创新探索”的梯次发展业务版图。依托子公司正蓝节能及汇贤优策，以园区生活服务为核心，开展热水供应系统投资建设及运营服务；延伸开发校园高频生活增值服务（直饮水、共享洗衣等），并试点探索光伏、电池租赁等综合能源管理及智慧校园业务，构建多层次服务体系。（1）热水供应服务公司子公司正蓝节能及汇贤优策专注于校园市场，提供园区生活服务。具体业务模式分为三种：模式①通过与客户签订热水供应系统建造及运营服务合同，投资建造供应系统，并在建设完成后投入运营，在运营期间向学生收取用水费用实现收益。运营期间热水供应系统所有权归属于公司，运营期结束后所有权移交至客户；模式②通过完成热水供应系统建造后向客户进行移交，并按照合同约定获取一次性建设收益；模式③通过与客户签订托管协议，公司负责既有热水供应项目的持续运营维护并承担项目成本，在运营期间向学生收取用水费用实现收益。（2）其他配套业务校园增值业务：包括直饮水、共享洗衣机、电吹风等高频生活服务。其他业务：依托现有校园场景资源，探索光伏发电、电池租赁、合同能源管理等业务，目前该类业务尚处于模式验证阶段，收入来源依赖个别项目资源，未形成标准化及可持续增长服务体系。2、影视剧报告期内，公司无新增影视项目投资计划，对现有自营项目严格遵循“盘活存量、严控增量”的原则，在不新增重大资金投入的前提下，通过优化运营模式、提升管理效率，稳步推进项目盘活工作。同时，公司已完成部分影视项目的转让退出，加快资金回笼。目前，影视业务仅作为存量资产盘活方向予以保留，不再作为公司战略发展的重点领域。3、支付渠道服务及其他业务报告期内，公司依托现有资源，通过出资设立合资子公司东望数智，试水支付渠道服务业务。后经公司董事会认真研究及论证，公司公开挂牌转让控股子公司东望数智51%股权。具体内容详见本报告“第五节重要事项—十二、重大关联交易—（二）资产或股权收购、出售发生的关联交易”。2025年8月，公司已完成东望数智51%股权的转让，鉴于公司股东结构发生变化，后续不再开展该项业务。同时，公司依托校园场景资源，提供空调、打印机等设备租赁服务等其他业务服务，报告期内服务仅覆盖少量院校。",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "BusinessOverview",
+        "source_text": "报告期内，公司聚焦园区综合能源服务领域，形成“核心业务+增值服务+创新探索”的梯次发展业务版图。依托子公司正蓝节能及汇贤优策，以园区生活服务为核心，开展热水供应系统投资建设及运营服务；延伸开发校园高频生活增值服务（直饮水、共享洗衣等），并试点探索光伏、电池租赁等综合能源管理及智慧校园业务，构建多层次服务体系。（1）热水供应服务公司子公司正蓝节能及汇贤优策专注于校园市场，提供园区生活服务。具体业务模式分为三种：模式①通过与客户签订热水供应系统建造及运营服务合同，投资建造供应系统，并在建设完成后投入运营，在运营期间向学生收取用水费用实现收益。运营期间热水供应系统所有权归属于公司，运营期结束后所有权移交至客户；模式②通过完成热水供应系统建造后向客户进行移交，并按照合同约定获取一次性建设收益；模式③通过与客户签订托管协议，公司负责既有热水供应项目的持续运营维护并承担项目成本，在运营期间向学生收取用水费用实现收益。（2）其他配套业务校园增值业务：包括直饮水、共享洗衣机、电吹风等高频生活服务。其他业务：依托现有校园场景资源，探索光伏发电、电池租赁、合同能源管理等业务，目前该类业务尚处于模式验证阶段，收入来源依赖个别项目资源，未形成标准化及可持续增长服务体系。2、影视剧报告期内，公司无新增影视项目投资计划，对现有自营项目严格遵循“盘活存量、严控增量”的原则，在不新增重大资金投入的前提下，通过优化运营模式、提升管理效率，稳步推进项目盘活工作。同时，公司已完成部分影视项目的转让退出，加快资金回笼。目前，影视业务仅作为存量资产盘活方向予以保留，不再作为公司战略发展的重点领域。3、支付渠道服务及其他业务报告期内，公司依托现有资源，通过出资设立合资子公司东望数智，试水支付渠道服务业务。后经公司董事会认真研究及论证，公司公开挂牌转让控股子公司东望数智51%股权。具体内容详见本报告“第五节重要事项—十二、重大关联交易—（二）资产或股权收购、出售发生的关联交易”。2025年8月，公司已完成东望数智51%股权的转让，鉴于公司股东结构发生变化，后续不再开展该项业务。同时，公司依托校园场景资源，提供空调、打印机等设备租赁服务等其他业务服务，报告期内服务仅覆盖少量院校。"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-2b65386d46f4e687:overview",
+        "field_id": "business_overview_source",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "report_default_group_scope",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-2b65386d46f4e687",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 14,
+            "printed_page_label": null,
+            "section_title": "当期产品及服务披露",
+            "continuation_pages": [
+              15
+            ],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "公司深耕主业提供了坚实的平台支撑，为股东创造可持续价值奠定了坚实基础。（二）细分领域内的高市场占有率公司通过收购热水服务企业正蓝节能与汇贤优策实现业务切换及公司转型，在高校热水供应系统管理服务领域，已成为华东区域和西南地区的龙头企业，截至报告期末，在运营的热水供应服务项目数量合计约240个，服务学生约180万人，具有较高的市场占有率。（三）全场景服务生态公司依托热水服务领域内形成的竞争优势地位，突破传统单一能源服务边界，聚焦零碳综合能源服务，延长产业链条，积极探索综合能源服务相关领域业务，通过智能化能源管理平台的深度整合，构建多能互补、动态调度的能源服务体系，具备为工商业园区、公共建筑等多元场景提供定制化综合解决方案的能力，具有良好的业务协同基础。五、报告期内主要经营情况报告期内，公司实现营业收入5.89亿元；实现归属于上市公司股东的净利润-4.62亿元；归属于上市公司股东的扣除非经常性损益的净利润-3.32亿元。截至报告期末，公司总资产26.17亿元，归属于上市公司股东的净资产21.79亿元。(一)主营业务分析1、利润表及现金流量表相关科目变动分析表单位：元币种：人民币科目本期数上年同期数变动比例（%）营业收入589,142,446.87447,463,229.6831.66营业成本482,823,405.07276,865,485.4974.39销售费用16,408,711.6410,152,874.2061.62管理费用67,411,844.3071,923,124.29-6.27财务费用-7,692,170.53-13,715,341.60不适用研发费用12,908,725.7411,832,405.089.10经营活动产生的现金流量净额165,319,456.61106,375,414.5655.41投资活动产生的现金流量净额-231,160,148.69-454,614,060.17不适用筹资活动产生的现金流量净额4,978,601.49-72,565,953.59不适用营业收入变动原因说明：主要系本期合并范围变动，支付渠道服务业务收入增加所致。营业成本变动原因说明：主要系本期合并范围变动，支付渠道服务业务收入增加，相应成本增加及园区生活服务业务成本增加所致。销售费用变动原因说明：主要系本期合并范围变动,相应的人工成本等增加所致。管理费用变动原因说明：主要系本期审计咨询费减少所致。财务费用变动原因说明：主要系本期受银行存款利率调整影响，利息收入减少所致。研发费用变动原因说明：主要系本期子公司研发项目增加所致。经营活动产生的现金流量净额变动原因说明：主要系本期合并范围变动，支付渠道服务业务收入增加所致。投资活动产生的现金流量净额变动原因说明：主要系上期担保代偿款项较多所致。筹资活动产生的现金流量净额变动原因说明：主要系本期新设子公司收到少数股东出资、利润分配较少及本期支付租赁款、收购少数股权款项减少所致。本期公司业务类型、利润构成或利润来源发生重大变动的详细说明√适用□不适用",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "BusinessOverview",
+        "source_text": "公司深耕主业提供了坚实的平台支撑，为股东创造可持续价值奠定了坚实基础。（二）细分领域内的高市场占有率公司通过收购热水服务企业正蓝节能与汇贤优策实现业务切换及公司转型，在高校热水供应系统管理服务领域，已成为华东区域和西南地区的龙头企业，截至报告期末，在运营的热水供应服务项目数量合计约240个，服务学生约180万人，具有较高的市场占有率。（三）全场景服务生态公司依托热水服务领域内形成的竞争优势地位，突破传统单一能源服务边界，聚焦零碳综合能源服务，延长产业链条，积极探索综合能源服务相关领域业务，通过智能化能源管理平台的深度整合，构建多能互补、动态调度的能源服务体系，具备为工商业园区、公共建筑等多元场景提供定制化综合解决方案的能力，具有良好的业务协同基础。五、报告期内主要经营情况报告期内，公司实现营业收入5.89亿元；实现归属于上市公司股东的净利润-4.62亿元；归属于上市公司股东的扣除非经常性损益的净利润-3.32亿元。截至报告期末，公司总资产26.17亿元，归属于上市公司股东的净资产21.79亿元。(一)主营业务分析1、利润表及现金流量表相关科目变动分析表单位：元币种：人民币科目本期数上年同期数变动比例（%）营业收入589,142,446.87447,463,229.6831.66营业成本482,823,405.07276,865,485.4974.39销售费用16,408,711.6410,152,874.2061.62管理费用67,411,844.3071,923,124.29-6.27财务费用-7,692,170.53-13,715,341.60不适用研发费用12,908,725.7411,832,405.089.10经营活动产生的现金流量净额165,319,456.61106,375,414.5655.41投资活动产生的现金流量净额-231,160,148.69-454,614,060.17不适用筹资活动产生的现金流量净额4,978,601.49-72,565,953.59不适用营业收入变动原因说明：主要系本期合并范围变动，支付渠道服务业务收入增加所致。营业成本变动原因说明：主要系本期合并范围变动，支付渠道服务业务收入增加，相应成本增加及园区生活服务业务成本增加所致。销售费用变动原因说明：主要系本期合并范围变动,相应的人工成本等增加所致。管理费用变动原因说明：主要系本期审计咨询费减少所致。财务费用变动原因说明：主要系本期受银行存款利率调整影响，利息收入减少所致。研发费用变动原因说明：主要系本期子公司研发项目增加所致。经营活动产生的现金流量净额变动原因说明：主要系本期合并范围变动，支付渠道服务业务收入增加所致。投资活动产生的现金流量净额变动原因说明：主要系上期担保代偿款项较多所致。筹资活动产生的现金流量净额变动原因说明：主要系本期新设子公司收到少数股东出资、利润分配较少及本期支付租赁款、收购少数股权款项减少所致。本期公司业务类型、利润构成或利润来源发生重大变动的详细说明√适用□不适用"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-549b8edff41a4795:overview",
+        "field_id": "business_overview_source",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "report_default_group_scope",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-549b8edff41a4795",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 16,
+            "printed_page_label": null,
+            "section_title": "当期产品及服务披露",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "主营业务分行业、分产品、分地区、分销售模式情况的说明。(1).主营业务分行业、分产品、分地区、分销售模式情况单位：元币种：人民币主营业务分行业情况分行业营业收入营业成本毛利率（%）营业收入比上年增减（%）营业成本比上年增减（%）毛利率比上年增减（%）影视业24,479,134.6414,728,360.4739.83565.48458.94增加11.47个百分点园区生活服务业357,694,201.20265,048,667.0125.90-17.31-3.35减少10.70个百分点其他206,969,111.03203,046,377.591.901,742.33不适用减少98.10个百分点主营业务分产品情况分产品营业收入营业成本毛利率（%）营业收入比上年增减（%）营业成本比上年增减（%）毛利率比上年增减（%）影视剧24,479,134.6414,728,360.4739.83565.48458.94增加11.47个百分点园区生活服务357,694,201.20265,048,667.0125.90-17.31-3.35减少10.70个百分点其他206,969,111.03203,046,377.591.901,742.33不适用减少98.10个百分点主营业务分地区情况分地区营业收入营业成本毛利率（%）营业收入比上年增减（%）营业成本比上年增减（%）毛利率比上年增减（%）浙江省内377,825,287.21312,592,127.4717.27110.83219.67减少28.16个百分点浙江省外211,317,159.66170,231,277.6019.44-21.23-4.94减少13.80个百分点主营业务分销售模式情况销售模式营业收入营业成本毛利率（%）营业收入比上年增减（%）营业成本比上年增减（%）毛利率比上年增减（%）影视业24,479,134.6414,728,360.4739.83565.48458.94增加11.47个百分点园区生活服务业357,694,201.20265,048,667.0125.90-17.31-3.35减少10.70个百分点其他206,969,111.03203,046,377.591.901,742.33不适用减少98.10个百分点主营业务分行业、分产品、分地区、分销售模式情况的说明按行业和产品划分：“影视业”收入同比增加565.48%，成本同比增加458.94%，主要系本期电影项目转让确认收入成本所致。“园区生活服务业”收入同比减少17.31%，成本同比减少3.35%，主要系本期园区生活服务业务规模减少，成本增加所致。",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "BusinessOverview",
+        "source_text": "主营业务分行业、分产品、分地区、分销售模式情况的说明。(1).主营业务分行业、分产品、分地区、分销售模式情况单位：元币种：人民币主营业务分行业情况分行业营业收入营业成本毛利率（%）营业收入比上年增减（%）营业成本比上年增减（%）毛利率比上年增减（%）影视业24,479,134.6414,728,360.4739.83565.48458.94增加11.47个百分点园区生活服务业357,694,201.20265,048,667.0125.90-17.31-3.35减少10.70个百分点其他206,969,111.03203,046,377.591.901,742.33不适用减少98.10个百分点主营业务分产品情况分产品营业收入营业成本毛利率（%）营业收入比上年增减（%）营业成本比上年增减（%）毛利率比上年增减（%）影视剧24,479,134.6414,728,360.4739.83565.48458.94增加11.47个百分点园区生活服务357,694,201.20265,048,667.0125.90-17.31-3.35减少10.70个百分点其他206,969,111.03203,046,377.591.901,742.33不适用减少98.10个百分点主营业务分地区情况分地区营业收入营业成本毛利率（%）营业收入比上年增减（%）营业成本比上年增减（%）毛利率比上年增减（%）浙江省内377,825,287.21312,592,127.4717.27110.83219.67减少28.16个百分点浙江省外211,317,159.66170,231,277.6019.44-21.23-4.94减少13.80个百分点主营业务分销售模式情况销售模式营业收入营业成本毛利率（%）营业收入比上年增减（%）营业成本比上年增减（%）毛利率比上年增减（%）影视业24,479,134.6414,728,360.4739.83565.48458.94增加11.47个百分点园区生活服务业357,694,201.20265,048,667.0125.90-17.31-3.35减少10.70个百分点其他206,969,111.03203,046,377.591.901,742.33不适用减少98.10个百分点主营业务分行业、分产品、分地区、分销售模式情况的说明按行业和产品划分：“影视业”收入同比增加565.48%，成本同比增加458.94%，主要系本期电影项目转让确认收入成本所致。“园区生活服务业”收入同比减少17.31%，成本同比减少3.35%，主要系本期园区生活服务业务规模减少，成本增加所致。"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-791dce54fc3c930d:overview",
+        "field_id": "business_overview_source",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "report_default_group_scope",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-791dce54fc3c930d",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 22,
+            "printed_page_label": null,
+            "section_title": "当期产品及服务披露",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "重大的股权投资√适用□不适用单位：元币种：人民币被投资公司名称主要业务标的是否主营投资业务投资方式投资金额持股比例是否并表报表科目（如适用）资金来源合作方（如适用）投资期限（如有）截至资产负债表日的进展情况预计收益（如有）本期损益影响是否涉诉披露日期（如有）披露索引（如有）浙江东望时代新能源科技服务有限公司充电控制设备租赁否其他50,000,000.00100%是长期股权投资自有资金-3,033,394.84否跃动新能源科技（浙江）有限公司锂离子动力电池系统及储能电池系统否增资32,000,000.0032%否长期股权投资自有资金-31,603,924.86否浙江东望时代数智科技有限公司支付渠道服务业务否增资25,500,000.0051%/长期股权投资自有资金已于2025年8月完成转让-165,632.50否合计///107,500,000.00///////-34,802,952.20///",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "BusinessOverview",
+        "source_text": "重大的股权投资√适用□不适用单位：元币种：人民币被投资公司名称主要业务标的是否主营投资业务投资方式投资金额持股比例是否并表报表科目（如适用）资金来源合作方（如适用）投资期限（如有）截至资产负债表日的进展情况预计收益（如有）本期损益影响是否涉诉披露日期（如有）披露索引（如有）浙江东望时代新能源科技服务有限公司充电控制设备租赁否其他50,000,000.00100%是长期股权投资自有资金-3,033,394.84否跃动新能源科技（浙江）有限公司锂离子动力电池系统及储能电池系统否增资32,000,000.0032%否长期股权投资自有资金-31,603,924.86否浙江东望时代数智科技有限公司支付渠道服务业务否增资25,500,000.0051%/长期股权投资自有资金已于2025年8月完成转让-165,632.50否合计///107,500,000.00///////-34,802,952.20///"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-9cf58ada371073e5:overview",
+        "field_id": "business_overview_source",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "unclear",
+        "subject_name": null,
+        "subject_basis": null,
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-9cf58ada371073e5",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 24,
+            "printed_page_label": null,
+            "section_title": "当期产品及服务披露",
+            "continuation_pages": [
+              25
+            ],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "主要控股参股公司分析√适用□不适用主要子公司及对公司净利润影响达10%以上的参股公司情况√适用□不适用单位：万元币种：人民币公司名称公司类型主要业务注册资本总资产净资产营业收入营业利润净利润正蓝节能子公司节能服务3,10034,023.1723,678.2915,255.793,251.892,784.01汇贤优策子公司节能服务6,00050,832.5943,098.0220,796.952,116.791,764.15",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "BusinessOverview",
+        "source_text": "主要控股参股公司分析√适用□不适用主要子公司及对公司净利润影响达10%以上的参股公司情况√适用□不适用单位：万元币种：人民币公司名称公司类型主要业务注册资本总资产净资产营业收入营业利润净利润正蓝节能子公司节能服务3,10034,023.1723,678.2915,255.793,251.892,784.01汇贤优策子公司节能服务6,00050,832.5943,098.0220,796.952,116.791,764.15"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-2c529a041f435ae5:overview",
+        "field_id": "business_overview_source",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "report_default_group_scope",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-2c529a041f435ae5",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 24,
+            "printed_page_label": null,
+            "section_title": "当期产品及服务披露",
+            "continuation_pages": [
+              25
+            ],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "报告期内取得和处置子公司的情况√适用□不适用公司名称报告期内取得和处置子公司方式对整体生产经营和业绩的影响东望数智新设、增资及转让经公司董事会认真研究及论证，公司公开挂牌转让东望数智51%股权，并于2025年8月完成工商变更登记手续。鉴于公司股东结构发生变化，后续不再开展该项业务，故仅对2025年1-7月业绩存在一定影响。上海千鹿注销无重大影响南京传媒转让无重大影响",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "BusinessOverview",
+        "source_text": "报告期内取得和处置子公司的情况√适用□不适用公司名称报告期内取得和处置子公司方式对整体生产经营和业绩的影响东望数智新设、增资及转让经公司董事会认真研究及论证，公司公开挂牌转让东望数智51%股权，并于2025年8月完成工商变更登记手续。鉴于公司股东结构发生变化，后续不再开展该项业务，故仅对2025年1-7月业绩存在一定影响。上海千鹿注销无重大影响南京传媒转让无重大影响"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-6ac8c38eb2f8363b:overview",
+        "field_id": "business_overview_source",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "report_default_group_scope",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-6ac8c38eb2f8363b",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 111,
+            "printed_page_label": null,
+            "section_title": "当期产品及服务披露",
+            "continuation_pages": [
+              112
+            ],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "各业务类型收入确认和计量具体政策公司有两大业务板块，一是影视制作发行，二是园区生活服务。各类业务销售收入确认的具体方法如下：（1）电视剧销售属于在某一时点履行的履约义务。对于合同中未约定上线播出时间的，在电视剧购入或完成摄制并经电影电视行政主管部门审查通过取得《电视剧发行许可证》，电视剧播映带或其他载体转移给购货方，并已取得收款权利时确认收入；对于合同中约定上线播出时间，且购货方无法主导播出时间的，在电视剧购入或完成摄制并经电影电视行政主管部门审查通过取得《电视剧发行许可证》，电视剧播映带或其他载体转移给购货方与电视剧约定上线播出时点孰晚，并已取得收款权利时确认收入。（2）园区生活服务分为热水供应系统运营管理和热水供应系统建设。①热水供应系统运营管理热水供应系统运营管理属于在某一时点履行的履约义务。公司按照学生每月消费金额在已收取价款或取得收款权利且相关的经济利益很可能流入时确认收入。②热水供应系统建设热水供应系统建设属于在某一时点履行的履约义务。公司按照项目实际完工时取得经客户确认的验收报告，在已收取价款或取得收款权利且相关的经济利益很可能流入时确认。（3）支付渠道服务是为第三方移动支付公司、终端商户等提供技术支持、账单结算等服务并收取相应的服务费用，属于在某一时点履行的履约义务。根据终端商户实际发生的交易资金和签约费用率于取得收款权利且相关的经济利益很可能流入时确认收入。",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "BusinessOverview",
+        "source_text": "各业务类型收入确认和计量具体政策公司有两大业务板块，一是影视制作发行，二是园区生活服务。各类业务销售收入确认的具体方法如下：（1）电视剧销售属于在某一时点履行的履约义务。对于合同中未约定上线播出时间的，在电视剧购入或完成摄制并经电影电视行政主管部门审查通过取得《电视剧发行许可证》，电视剧播映带或其他载体转移给购货方，并已取得收款权利时确认收入；对于合同中约定上线播出时间，且购货方无法主导播出时间的，在电视剧购入或完成摄制并经电影电视行政主管部门审查通过取得《电视剧发行许可证》，电视剧播映带或其他载体转移给购货方与电视剧约定上线播出时点孰晚，并已取得收款权利时确认收入。（2）园区生活服务分为热水供应系统运营管理和热水供应系统建设。①热水供应系统运营管理热水供应系统运营管理属于在某一时点履行的履约义务。公司按照学生每月消费金额在已收取价款或取得收款权利且相关的经济利益很可能流入时确认收入。②热水供应系统建设热水供应系统建设属于在某一时点履行的履约义务。公司按照项目实际完工时取得经客户确认的验收报告，在已收取价款或取得收款权利且相关的经济利益很可能流入时确认。（3）支付渠道服务是为第三方移动支付公司、终端商户等提供技术支持、账单结算等服务并收取相应的服务费用，属于在某一时点履行的履约义务。根据终端商户实际发生的交易资金和签约费用率于取得收款权利且相关的经济利益很可能流入时确认收入。"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-15fdd5629036937d:overview",
+        "field_id": "business_overview_source",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "report_default_group_scope",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-15fdd5629036937d",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 116,
+            "printed_page_label": null,
+            "section_title": "当期产品及服务披露",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "作为出租方的租赁分类标准和会计处理方法√适用□不适用在租赁开始日，本公司将租赁分为融资租赁和经营租赁。如果一项租赁实质上转移了与租赁资产所有权有关的几乎全部风险和报酬，出租人将该项租赁分类为融资租赁，除融资租赁以外的其他租赁分类为经营租赁。1）经营租赁会计处理在租赁期内各个期间，本公司采用直线法或其他系统合理的方法将经营租赁的租赁收款额确认为租金收入。提供免租期的，本公司将租金总额在不扣除免租期的整个租赁期内，按直线法进行分配，免租期内应当确认租金收入。本公司承担了承租人某些费用的，将该费用自租金收入总额中扣除，按扣除后的租金收入余额在租赁期内进行分配。",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "BusinessOverview",
+        "source_text": "作为出租方的租赁分类标准和会计处理方法√适用□不适用在租赁开始日，本公司将租赁分为融资租赁和经营租赁。如果一项租赁实质上转移了与租赁资产所有权有关的几乎全部风险和报酬，出租人将该项租赁分类为融资租赁，除融资租赁以外的其他租赁分类为经营租赁。1）经营租赁会计处理在租赁期内各个期间，本公司采用直线法或其他系统合理的方法将经营租赁的租赁收款额确认为租金收入。提供免租期的，本公司将租金总额在不扣除免租期的整个租赁期内，按直线法进行分配，免租期内应当确认租金收入。本公司承担了承租人某些费用的，将该费用自租金收入总额中扣除，按扣除后的租金收入余额在租赁期内进行分配。"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-525b75fe7195549e:overview",
+        "field_id": "business_overview_source",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "report_default_group_scope",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-525b75fe7195549e",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 165,
+            "printed_page_label": null,
+            "section_title": "当期产品及服务披露",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "作为出租人的经营租赁√适用□不适用单位：元币种：人民币项目租赁收入其中:未计入租赁收款额的可变租赁付款额相关的收入经营租赁542,694.05合计542,694.05",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "BusinessOverview",
+        "source_text": "作为出租人的经营租赁√适用□不适用单位：元币种：人民币项目租赁收入其中:未计入租赁收款额的可变租赁付款额相关的收入经营租赁542,694.05合计542,694.05"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-579a40f6a96f542c:overview",
+        "field_id": "business_overview_source",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "report_default_group_scope",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-579a40f6a96f542c",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 168,
+            "printed_page_label": null,
+            "section_title": "当期产品及服务披露",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "本期是否存在丧失子公司控制权的交易或事项√适用□不适用单位：元币种：人民币子公司名称丧失控制权的时点丧失控制权时点的处置价款丧失控制权时点的处置比例（%）丧失控制权时点的处置方式丧失控制权时点的判断依据处置价款与处置投资对应的合并财务报表层面享有该子公司净资产份额的差额丧失控制权之日剩余股权的比例（%）丧失控制权之日合并财务报表层面剩余股权的账面价值丧失控制权之日合并财务报表层面剩余股权的公允价值按照公允价值重新计量剩余股权产生的利得或损失丧失控制权之日合并财务报表层面剩余股权公允价值的确定方法及主要假设与原子公司股权投资相关的其他综合收益转入投资损益或留存收益的金额浙江东望时代数智科技有限公司2025年7月31日25,334,367.50100出售办妥交接确认9,496,396.710.000.000.000.00/0.00广厦（南京）文化传媒有限公司2025年5月31日3,037,126.55100出售办妥交接确认3,044,224.660.000.000.000.00/0.00",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "BusinessOverview",
+        "source_text": "本期是否存在丧失子公司控制权的交易或事项√适用□不适用单位：元币种：人民币子公司名称丧失控制权的时点丧失控制权时点的处置价款丧失控制权时点的处置比例（%）丧失控制权时点的处置方式丧失控制权时点的判断依据处置价款与处置投资对应的合并财务报表层面享有该子公司净资产份额的差额丧失控制权之日剩余股权的比例（%）丧失控制权之日合并财务报表层面剩余股权的账面价值丧失控制权之日合并财务报表层面剩余股权的公允价值按照公允价值重新计量剩余股权产生的利得或损失丧失控制权之日合并财务报表层面剩余股权公允价值的确定方法及主要假设与原子公司股权投资相关的其他综合收益转入投资损益或留存收益的金额浙江东望时代数智科技有限公司2025年7月31日25,334,367.50100出售办妥交接确认9,496,396.710.000.000.000.00/0.00广厦（南京）文化传媒有限公司2025年5月31日3,037,126.55100出售办妥交接确认3,044,224.660.000.000.000.00/0.00"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-787bc89b37873ed8:overview",
+        "field_id": "business_overview_source",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "report_default_group_scope",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-787bc89b37873ed8",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 169,
+            "printed_page_label": null,
+            "section_title": "当期产品及服务披露",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "企业集团的构成√适用□不适用单位：万元币种：人民币子公司名称主要经营地注册资本注册地业务性质持股比例(%)取得直接间接方式浙江歌画文化发展有限公司杭州10,000.00东阳影视文化业100.00非同一控制下企业合并杭州钮唯文创有限公司杭州1,000.00杭州体育文化业100.00设立东阳铄果影视传播有限公司杭州2,000.00东阳影视文化业100.00非同一控制下企业合并杭州歌画影视有限公司杭州2,000.00杭州影视文化业100.00设立浙江千鹿影业有限公司北京1,800.00东阳影视文化业51.00设立广州千鹿影业有限公司北京100.00广州影视文化业51.00设立东阳汉宁科技服务有限公司杭州20,000.00东阳服务业100.00设立浙江正蓝节能科技股份有限公司杭州3,100.00东阳科技推广和应用服务业94.361.77非同一控制下企业合并重庆汇贤优策科技有限公司重庆6,000.00重庆科技推广和应用服务业100.00非同一控制下企业合并安徽合生能源科技有限公司合肥800.00合肥科技推广和应用服务业60.00非同一控制下企业合并昆明联大优策科技有限公司昆明50.00昆明科技推广和应用服务业60.00非同一控制下企业合并杭州科贤智慧能源研究院有限公司杭州200.00杭州专业技术服务业100.00非同一控制下企业合并广西南宁汇英优策科技有限公司南宁100.00南宁科技推广和应用服务业100.00非同一控制下企业合并河南汇贤科技有限公司郑州100.00郑州科技推广和应用服务业60.00非同一控制下企业合并陕西汇贤卓益科技有限公司西安700.00西安科技推广和应用服务业100.00非同一控制下企业合并西安嘉力达节能科技有限公司西安600.00西安科技推广和应用服务业100.00非同一控制下企业合并广东本泉坊数据应用科技有限公司佛山510.00佛山科技推广和应用服务业100.00非同一控制下企业合并海口冲衡智能数据有限公司海口1,000.00海口科技推广和应用服务业100.00非同一控制下企业合并重庆优策科技有限公司重庆500.00重庆科技推广和应用服务业100.00设立浙江东望时代新能源科技服务有限公司东阳5,000.00杭州科技推广和应用服务业100.00设立浙江东望时代双碳产业研究有限公司杭州1,000.00东阳研究和试验发展100.00设立浙江横马新能源科技有限公司杭州1,500.00东阳科技推广和应用服务业100.00设立在子公司的持股比例不同于表决权比例的说明：无",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "BusinessOverview",
+        "source_text": "企业集团的构成√适用□不适用单位：万元币种：人民币子公司名称主要经营地注册资本注册地业务性质持股比例(%)取得直接间接方式浙江歌画文化发展有限公司杭州10,000.00东阳影视文化业100.00非同一控制下企业合并杭州钮唯文创有限公司杭州1,000.00杭州体育文化业100.00设立东阳铄果影视传播有限公司杭州2,000.00东阳影视文化业100.00非同一控制下企业合并杭州歌画影视有限公司杭州2,000.00杭州影视文化业100.00设立浙江千鹿影业有限公司北京1,800.00东阳影视文化业51.00设立广州千鹿影业有限公司北京100.00广州影视文化业51.00设立东阳汉宁科技服务有限公司杭州20,000.00东阳服务业100.00设立浙江正蓝节能科技股份有限公司杭州3,100.00东阳科技推广和应用服务业94.361.77非同一控制下企业合并重庆汇贤优策科技有限公司重庆6,000.00重庆科技推广和应用服务业100.00非同一控制下企业合并安徽合生能源科技有限公司合肥800.00合肥科技推广和应用服务业60.00非同一控制下企业合并昆明联大优策科技有限公司昆明50.00昆明科技推广和应用服务业60.00非同一控制下企业合并杭州科贤智慧能源研究院有限公司杭州200.00杭州专业技术服务业100.00非同一控制下企业合并广西南宁汇英优策科技有限公司南宁100.00南宁科技推广和应用服务业100.00非同一控制下企业合并河南汇贤科技有限公司郑州100.00郑州科技推广和应用服务业60.00非同一控制下企业合并陕西汇贤卓益科技有限公司西安700.00西安科技推广和应用服务业100.00非同一控制下企业合并西安嘉力达节能科技有限公司西安600.00西安科技推广和应用服务业100.00非同一控制下企业合并广东本泉坊数据应用科技有限公司佛山510.00佛山科技推广和应用服务业100.00非同一控制下企业合并海口冲衡智能数据有限公司海口1,000.00海口科技推广和应用服务业100.00非同一控制下企业合并重庆优策科技有限公司重庆500.00重庆科技推广和应用服务业100.00设立浙江东望时代新能源科技服务有限公司东阳5,000.00杭州科技推广和应用服务业100.00设立浙江东望时代双碳产业研究有限公司杭州1,000.00东阳研究和试验发展100.00设立浙江横马新能源科技有限公司杭州1,500.00东阳科技推广和应用服务业100.00设立在子公司的持股比例不同于表决权比例的说明：无"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-f321affe29e1d72b:overview",
+        "field_id": "business_overview_source",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "report_default_group_scope",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-f321affe29e1d72b",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 179,
+            "printed_page_label": null,
+            "section_title": "当期产品及服务披露",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "本公司作为出租方：□适用√不适用",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "当期产品及服务披露",
+          "value": null,
+          "unit": null,
+          "header": null,
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "BusinessOverview",
+        "source_text": "本公司作为出租方：□适用√不适用"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-d1d8000ea0bbee55:commodity:1",
+        "field_id": "explicit_activity",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "named_subsidiary",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-d1d8000ea0bbee55",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "报告期内公司从事的业务情况",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "报告期内公司从事的业务情况\n报告期内，公司继续维持以园区生活服务为核心、影视文化内容为补充、其他配套服务协同\r\n发展的多元化业务布局。通过聚焦校园场景的精细化运营与创新业务孵化，持续优化收入结构，\r\n强化战略业务的可持续增长能力。\r\n1、园区生活服务\r\n报告期内，公司聚焦园区综合能源服务领域，形成“核心业务+增值服务+创新探索”的梯次\r\n发展业务版图。依托子公司正蓝节能及汇贤优策，以园区生活服务为核心，开展热水供应系统投\r\n资建设及运营服务；延伸开发校园高频生活增值服务（直饮水、共享洗衣等），并试点探索光伏、\r\n电池租赁等综合能源管理及智慧校园业务，构建多层次服务体系。\r\n（1）热水供应服务\r\n公司子公司正蓝节能及汇贤优策专注于校园市场，提供园区生活服务。具体业务模式分为三\r\n种：模式①通过与客户签订热水供应系统建造及运营服务合同，投资建造供应系统，并在建设完\r\n成后投入运营，在运营期间向学生收取用水费用实现收益。运营期间热水供应系统所有权归属于\r\n公司，运营期结束后所有权移交至客户；模式②通过完成热水供应系统建造后向客户进行移交，\r\n并按照合同约定获取一次性建设收益；模式③通过与客户签订托管协议，公司负责既有热水供应\r\n项目的持续运营维护并承担项目成本，在运营期间向学生收取用水费用实现收益。\r\n（2）其他配套业务\r\n校园增值业务：包括直饮水、共享洗衣机、电吹风等高频生活服务。\r\n其他业务：依托现有校园场景资源，探索光伏发电、电池租赁、合同能源管理等业务，目前\r\n该类业务尚处于模式验证阶段，收入来源依赖个别项目资源，未形成标准化及可持续增长服务体\r\n系。\r\n2、影视剧\r\n报告期内，公司无新增影视项目投资计划，对现有自营项目严格遵循“盘活存量、严控增量”\r\n的原则，在不新增重大资金投入的前提下，通过优化运营模式、提升管理效率，稳步推进项目盘\r\n活工作。同时，公司已完成部分影视项目的转让退出，加快资金回笼。目前，影视业务仅作为存\r\n量资产盘活方向予以保留，不再作为公司战略发展的重点领域。\r\n3、支付渠道服务及其他业务\r\n报告期内，公司依托现有资源，通过出资设立合资子公司东望数智，试水支付渠道服务业务。\r\n后经公司董事会认真研究及论证，公司公开挂牌转让控股子公司东望数智 51%股权。具体内容详\r\n见本报告“第五节重要事项—十二、重大关联交易—（二）资产或股权收购、出售发生的关联交\r\n易”。2025 年 8 月，公司已完成东望数智 51%股权的转让，鉴于公司股东结构发生变化，后续不\r\n再开展该项业务。\r\n同时，公司依托校园场景资源，提供空调、打印机等设备租赁服务等其他业务服务，报告期\r\n内服务仅覆盖少量院校。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "热水供应",
+          "value": null,
+          "unit": null,
+          "header": "热水供应服务",
+          "qualifier": "原主体：浙江正蓝节能科技股份有限公司",
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Activity",
+        "action": "provides_service",
+        "activity_actor": "浙江正蓝节能科技股份有限公司",
+        "source_actor": "浙江正蓝节能科技股份有限公司",
+        "actor_basis": "direct_grammatical_actor",
+        "object_name": "热水供应",
+        "source_verb": "提供"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-d1d8000ea0bbee55:commodity:2",
+        "field_id": "explicit_activity",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "named_subsidiary",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-d1d8000ea0bbee55",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "报告期内公司从事的业务情况",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "报告期内公司从事的业务情况\n报告期内，公司继续维持以园区生活服务为核心、影视文化内容为补充、其他配套服务协同\r\n发展的多元化业务布局。通过聚焦校园场景的精细化运营与创新业务孵化，持续优化收入结构，\r\n强化战略业务的可持续增长能力。\r\n1、园区生活服务\r\n报告期内，公司聚焦园区综合能源服务领域，形成“核心业务+增值服务+创新探索”的梯次\r\n发展业务版图。依托子公司正蓝节能及汇贤优策，以园区生活服务为核心，开展热水供应系统投\r\n资建设及运营服务；延伸开发校园高频生活增值服务（直饮水、共享洗衣等），并试点探索光伏、\r\n电池租赁等综合能源管理及智慧校园业务，构建多层次服务体系。\r\n（1）热水供应服务\r\n公司子公司正蓝节能及汇贤优策专注于校园市场，提供园区生活服务。具体业务模式分为三\r\n种：模式①通过与客户签订热水供应系统建造及运营服务合同，投资建造供应系统，并在建设完\r\n成后投入运营，在运营期间向学生收取用水费用实现收益。运营期间热水供应系统所有权归属于\r\n公司，运营期结束后所有权移交至客户；模式②通过完成热水供应系统建造后向客户进行移交，\r\n并按照合同约定获取一次性建设收益；模式③通过与客户签订托管协议，公司负责既有热水供应\r\n项目的持续运营维护并承担项目成本，在运营期间向学生收取用水费用实现收益。\r\n（2）其他配套业务\r\n校园增值业务：包括直饮水、共享洗衣机、电吹风等高频生活服务。\r\n其他业务：依托现有校园场景资源，探索光伏发电、电池租赁、合同能源管理等业务，目前\r\n该类业务尚处于模式验证阶段，收入来源依赖个别项目资源，未形成标准化及可持续增长服务体\r\n系。\r\n2、影视剧\r\n报告期内，公司无新增影视项目投资计划，对现有自营项目严格遵循“盘活存量、严控增量”\r\n的原则，在不新增重大资金投入的前提下，通过优化运营模式、提升管理效率，稳步推进项目盘\r\n活工作。同时，公司已完成部分影视项目的转让退出，加快资金回笼。目前，影视业务仅作为存\r\n量资产盘活方向予以保留，不再作为公司战略发展的重点领域。\r\n3、支付渠道服务及其他业务\r\n报告期内，公司依托现有资源，通过出资设立合资子公司东望数智，试水支付渠道服务业务。\r\n后经公司董事会认真研究及论证，公司公开挂牌转让控股子公司东望数智 51%股权。具体内容详\r\n见本报告“第五节重要事项—十二、重大关联交易—（二）资产或股权收购、出售发生的关联交\r\n易”。2025 年 8 月，公司已完成东望数智 51%股权的转让，鉴于公司股东结构发生变化，后续不\r\n再开展该项业务。\r\n同时，公司依托校园场景资源，提供空调、打印机等设备租赁服务等其他业务服务，报告期\r\n内服务仅覆盖少量院校。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "热水供应",
+          "value": null,
+          "unit": null,
+          "header": "热水供应服务",
+          "qualifier": "原主体：重庆汇贤优策科技有限公司",
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Activity",
+        "action": "provides_service",
+        "activity_actor": "重庆汇贤优策科技有限公司",
+        "source_actor": "重庆汇贤优策科技有限公司",
+        "actor_basis": "direct_grammatical_actor",
+        "object_name": "热水供应",
+        "source_verb": "提供"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-d1d8000ea0bbee55:commodity:3",
+        "field_id": "explicit_activity",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-d1d8000ea0bbee55",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "报告期内公司从事的业务情况",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "报告期内公司从事的业务情况\n报告期内，公司继续维持以园区生活服务为核心、影视文化内容为补充、其他配套服务协同\r\n发展的多元化业务布局。通过聚焦校园场景的精细化运营与创新业务孵化，持续优化收入结构，\r\n强化战略业务的可持续增长能力。\r\n1、园区生活服务\r\n报告期内，公司聚焦园区综合能源服务领域，形成“核心业务+增值服务+创新探索”的梯次\r\n发展业务版图。依托子公司正蓝节能及汇贤优策，以园区生活服务为核心，开展热水供应系统投\r\n资建设及运营服务；延伸开发校园高频生活增值服务（直饮水、共享洗衣等），并试点探索光伏、\r\n电池租赁等综合能源管理及智慧校园业务，构建多层次服务体系。\r\n（1）热水供应服务\r\n公司子公司正蓝节能及汇贤优策专注于校园市场，提供园区生活服务。具体业务模式分为三\r\n种：模式①通过与客户签订热水供应系统建造及运营服务合同，投资建造供应系统，并在建设完\r\n成后投入运营，在运营期间向学生收取用水费用实现收益。运营期间热水供应系统所有权归属于\r\n公司，运营期结束后所有权移交至客户；模式②通过完成热水供应系统建造后向客户进行移交，\r\n并按照合同约定获取一次性建设收益；模式③通过与客户签订托管协议，公司负责既有热水供应\r\n项目的持续运营维护并承担项目成本，在运营期间向学生收取用水费用实现收益。\r\n（2）其他配套业务\r\n校园增值业务：包括直饮水、共享洗衣机、电吹风等高频生活服务。\r\n其他业务：依托现有校园场景资源，探索光伏发电、电池租赁、合同能源管理等业务，目前\r\n该类业务尚处于模式验证阶段，收入来源依赖个别项目资源，未形成标准化及可持续增长服务体\r\n系。\r\n2、影视剧\r\n报告期内，公司无新增影视项目投资计划，对现有自营项目严格遵循“盘活存量、严控增量”\r\n的原则，在不新增重大资金投入的前提下，通过优化运营模式、提升管理效率，稳步推进项目盘\r\n活工作。同时，公司已完成部分影视项目的转让退出，加快资金回笼。目前，影视业务仅作为存\r\n量资产盘活方向予以保留，不再作为公司战略发展的重点领域。\r\n3、支付渠道服务及其他业务\r\n报告期内，公司依托现有资源，通过出资设立合资子公司东望数智，试水支付渠道服务业务。\r\n后经公司董事会认真研究及论证，公司公开挂牌转让控股子公司东望数智 51%股权。具体内容详\r\n见本报告“第五节重要事项—十二、重大关联交易—（二）资产或股权收购、出售发生的关联交\r\n易”。2025 年 8 月，公司已完成东望数智 51%股权的转让，鉴于公司股东结构发生变化，后续不\r\n再开展该项业务。\r\n同时，公司依托校园场景资源，提供空调、打印机等设备租赁服务等其他业务服务，报告期\r\n内服务仅覆盖少量院校。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "直饮水",
+          "value": null,
+          "unit": null,
+          "header": "校园增值业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Activity",
+        "action": "provides_service",
+        "activity_actor": "公司及合并子公司",
+        "source_actor": "公司及合并子公司",
+        "actor_basis": "direct_grammatical_actor",
+        "object_name": "直饮水",
+        "source_verb": "提供"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-d1d8000ea0bbee55:commodity:4",
+        "field_id": "explicit_activity",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-d1d8000ea0bbee55",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "报告期内公司从事的业务情况",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "报告期内公司从事的业务情况\n报告期内，公司继续维持以园区生活服务为核心、影视文化内容为补充、其他配套服务协同\r\n发展的多元化业务布局。通过聚焦校园场景的精细化运营与创新业务孵化，持续优化收入结构，\r\n强化战略业务的可持续增长能力。\r\n1、园区生活服务\r\n报告期内，公司聚焦园区综合能源服务领域，形成“核心业务+增值服务+创新探索”的梯次\r\n发展业务版图。依托子公司正蓝节能及汇贤优策，以园区生活服务为核心，开展热水供应系统投\r\n资建设及运营服务；延伸开发校园高频生活增值服务（直饮水、共享洗衣等），并试点探索光伏、\r\n电池租赁等综合能源管理及智慧校园业务，构建多层次服务体系。\r\n（1）热水供应服务\r\n公司子公司正蓝节能及汇贤优策专注于校园市场，提供园区生活服务。具体业务模式分为三\r\n种：模式①通过与客户签订热水供应系统建造及运营服务合同，投资建造供应系统，并在建设完\r\n成后投入运营，在运营期间向学生收取用水费用实现收益。运营期间热水供应系统所有权归属于\r\n公司，运营期结束后所有权移交至客户；模式②通过完成热水供应系统建造后向客户进行移交，\r\n并按照合同约定获取一次性建设收益；模式③通过与客户签订托管协议，公司负责既有热水供应\r\n项目的持续运营维护并承担项目成本，在运营期间向学生收取用水费用实现收益。\r\n（2）其他配套业务\r\n校园增值业务：包括直饮水、共享洗衣机、电吹风等高频生活服务。\r\n其他业务：依托现有校园场景资源，探索光伏发电、电池租赁、合同能源管理等业务，目前\r\n该类业务尚处于模式验证阶段，收入来源依赖个别项目资源，未形成标准化及可持续增长服务体\r\n系。\r\n2、影视剧\r\n报告期内，公司无新增影视项目投资计划，对现有自营项目严格遵循“盘活存量、严控增量”\r\n的原则，在不新增重大资金投入的前提下，通过优化运营模式、提升管理效率，稳步推进项目盘\r\n活工作。同时，公司已完成部分影视项目的转让退出，加快资金回笼。目前，影视业务仅作为存\r\n量资产盘活方向予以保留，不再作为公司战略发展的重点领域。\r\n3、支付渠道服务及其他业务\r\n报告期内，公司依托现有资源，通过出资设立合资子公司东望数智，试水支付渠道服务业务。\r\n后经公司董事会认真研究及论证，公司公开挂牌转让控股子公司东望数智 51%股权。具体内容详\r\n见本报告“第五节重要事项—十二、重大关联交易—（二）资产或股权收购、出售发生的关联交\r\n易”。2025 年 8 月，公司已完成东望数智 51%股权的转让，鉴于公司股东结构发生变化，后续不\r\n再开展该项业务。\r\n同时，公司依托校园场景资源，提供空调、打印机等设备租赁服务等其他业务服务，报告期\r\n内服务仅覆盖少量院校。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "共享洗衣机",
+          "value": null,
+          "unit": null,
+          "header": "校园增值业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Activity",
+        "action": "provides_service",
+        "activity_actor": "公司及合并子公司",
+        "source_actor": "公司及合并子公司",
+        "actor_basis": "direct_grammatical_actor",
+        "object_name": "共享洗衣机",
+        "source_verb": "提供"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-d1d8000ea0bbee55:commodity:5",
+        "field_id": "explicit_activity",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-d1d8000ea0bbee55",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "报告期内公司从事的业务情况",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "报告期内公司从事的业务情况\n报告期内，公司继续维持以园区生活服务为核心、影视文化内容为补充、其他配套服务协同\r\n发展的多元化业务布局。通过聚焦校园场景的精细化运营与创新业务孵化，持续优化收入结构，\r\n强化战略业务的可持续增长能力。\r\n1、园区生活服务\r\n报告期内，公司聚焦园区综合能源服务领域，形成“核心业务+增值服务+创新探索”的梯次\r\n发展业务版图。依托子公司正蓝节能及汇贤优策，以园区生活服务为核心，开展热水供应系统投\r\n资建设及运营服务；延伸开发校园高频生活增值服务（直饮水、共享洗衣等），并试点探索光伏、\r\n电池租赁等综合能源管理及智慧校园业务，构建多层次服务体系。\r\n（1）热水供应服务\r\n公司子公司正蓝节能及汇贤优策专注于校园市场，提供园区生活服务。具体业务模式分为三\r\n种：模式①通过与客户签订热水供应系统建造及运营服务合同，投资建造供应系统，并在建设完\r\n成后投入运营，在运营期间向学生收取用水费用实现收益。运营期间热水供应系统所有权归属于\r\n公司，运营期结束后所有权移交至客户；模式②通过完成热水供应系统建造后向客户进行移交，\r\n并按照合同约定获取一次性建设收益；模式③通过与客户签订托管协议，公司负责既有热水供应\r\n项目的持续运营维护并承担项目成本，在运营期间向学生收取用水费用实现收益。\r\n（2）其他配套业务\r\n校园增值业务：包括直饮水、共享洗衣机、电吹风等高频生活服务。\r\n其他业务：依托现有校园场景资源，探索光伏发电、电池租赁、合同能源管理等业务，目前\r\n该类业务尚处于模式验证阶段，收入来源依赖个别项目资源，未形成标准化及可持续增长服务体\r\n系。\r\n2、影视剧\r\n报告期内，公司无新增影视项目投资计划，对现有自营项目严格遵循“盘活存量、严控增量”\r\n的原则，在不新增重大资金投入的前提下，通过优化运营模式、提升管理效率，稳步推进项目盘\r\n活工作。同时，公司已完成部分影视项目的转让退出，加快资金回笼。目前，影视业务仅作为存\r\n量资产盘活方向予以保留，不再作为公司战略发展的重点领域。\r\n3、支付渠道服务及其他业务\r\n报告期内，公司依托现有资源，通过出资设立合资子公司东望数智，试水支付渠道服务业务。\r\n后经公司董事会认真研究及论证，公司公开挂牌转让控股子公司东望数智 51%股权。具体内容详\r\n见本报告“第五节重要事项—十二、重大关联交易—（二）资产或股权收购、出售发生的关联交\r\n易”。2025 年 8 月，公司已完成东望数智 51%股权的转让，鉴于公司股东结构发生变化，后续不\r\n再开展该项业务。\r\n同时，公司依托校园场景资源，提供空调、打印机等设备租赁服务等其他业务服务，报告期\r\n内服务仅覆盖少量院校。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "电吹风",
+          "value": null,
+          "unit": null,
+          "header": "校园增值业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Activity",
+        "action": "provides_service",
+        "activity_actor": "公司及合并子公司",
+        "source_actor": "公司及合并子公司",
+        "actor_basis": "direct_grammatical_actor",
+        "object_name": "电吹风",
+        "source_verb": "提供"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-d1d8000ea0bbee55:commodity:6",
+        "field_id": "explicit_activity",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-d1d8000ea0bbee55",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "报告期内公司从事的业务情况",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "报告期内公司从事的业务情况\n报告期内，公司继续维持以园区生活服务为核心、影视文化内容为补充、其他配套服务协同\r\n发展的多元化业务布局。通过聚焦校园场景的精细化运营与创新业务孵化，持续优化收入结构，\r\n强化战略业务的可持续增长能力。\r\n1、园区生活服务\r\n报告期内，公司聚焦园区综合能源服务领域，形成“核心业务+增值服务+创新探索”的梯次\r\n发展业务版图。依托子公司正蓝节能及汇贤优策，以园区生活服务为核心，开展热水供应系统投\r\n资建设及运营服务；延伸开发校园高频生活增值服务（直饮水、共享洗衣等），并试点探索光伏、\r\n电池租赁等综合能源管理及智慧校园业务，构建多层次服务体系。\r\n（1）热水供应服务\r\n公司子公司正蓝节能及汇贤优策专注于校园市场，提供园区生活服务。具体业务模式分为三\r\n种：模式①通过与客户签订热水供应系统建造及运营服务合同，投资建造供应系统，并在建设完\r\n成后投入运营，在运营期间向学生收取用水费用实现收益。运营期间热水供应系统所有权归属于\r\n公司，运营期结束后所有权移交至客户；模式②通过完成热水供应系统建造后向客户进行移交，\r\n并按照合同约定获取一次性建设收益；模式③通过与客户签订托管协议，公司负责既有热水供应\r\n项目的持续运营维护并承担项目成本，在运营期间向学生收取用水费用实现收益。\r\n（2）其他配套业务\r\n校园增值业务：包括直饮水、共享洗衣机、电吹风等高频生活服务。\r\n其他业务：依托现有校园场景资源，探索光伏发电、电池租赁、合同能源管理等业务，目前\r\n该类业务尚处于模式验证阶段，收入来源依赖个别项目资源，未形成标准化及可持续增长服务体\r\n系。\r\n2、影视剧\r\n报告期内，公司无新增影视项目投资计划，对现有自营项目严格遵循“盘活存量、严控增量”\r\n的原则，在不新增重大资金投入的前提下，通过优化运营模式、提升管理效率，稳步推进项目盘\r\n活工作。同时，公司已完成部分影视项目的转让退出，加快资金回笼。目前，影视业务仅作为存\r\n量资产盘活方向予以保留，不再作为公司战略发展的重点领域。\r\n3、支付渠道服务及其他业务\r\n报告期内，公司依托现有资源，通过出资设立合资子公司东望数智，试水支付渠道服务业务。\r\n后经公司董事会认真研究及论证，公司公开挂牌转让控股子公司东望数智 51%股权。具体内容详\r\n见本报告“第五节重要事项—十二、重大关联交易—（二）资产或股权收购、出售发生的关联交\r\n易”。2025 年 8 月，公司已完成东望数智 51%股权的转让，鉴于公司股东结构发生变化，后续不\r\n再开展该项业务。\r\n同时，公司依托校园场景资源，提供空调、打印机等设备租赁服务等其他业务服务，报告期\r\n内服务仅覆盖少量院校。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "空调",
+          "value": null,
+          "unit": null,
+          "header": "少量院校设备租赁",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Activity",
+        "action": "provides_service",
+        "activity_actor": "公司及合并子公司",
+        "source_actor": "公司及合并子公司",
+        "actor_basis": "direct_grammatical_actor",
+        "object_name": "空调",
+        "source_verb": "租赁"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-d1d8000ea0bbee55:commodity:7",
+        "field_id": "explicit_activity",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-d1d8000ea0bbee55",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "报告期内公司从事的业务情况",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "报告期内公司从事的业务情况\n报告期内，公司继续维持以园区生活服务为核心、影视文化内容为补充、其他配套服务协同\r\n发展的多元化业务布局。通过聚焦校园场景的精细化运营与创新业务孵化，持续优化收入结构，\r\n强化战略业务的可持续增长能力。\r\n1、园区生活服务\r\n报告期内，公司聚焦园区综合能源服务领域，形成“核心业务+增值服务+创新探索”的梯次\r\n发展业务版图。依托子公司正蓝节能及汇贤优策，以园区生活服务为核心，开展热水供应系统投\r\n资建设及运营服务；延伸开发校园高频生活增值服务（直饮水、共享洗衣等），并试点探索光伏、\r\n电池租赁等综合能源管理及智慧校园业务，构建多层次服务体系。\r\n（1）热水供应服务\r\n公司子公司正蓝节能及汇贤优策专注于校园市场，提供园区生活服务。具体业务模式分为三\r\n种：模式①通过与客户签订热水供应系统建造及运营服务合同，投资建造供应系统，并在建设完\r\n成后投入运营，在运营期间向学生收取用水费用实现收益。运营期间热水供应系统所有权归属于\r\n公司，运营期结束后所有权移交至客户；模式②通过完成热水供应系统建造后向客户进行移交，\r\n并按照合同约定获取一次性建设收益；模式③通过与客户签订托管协议，公司负责既有热水供应\r\n项目的持续运营维护并承担项目成本，在运营期间向学生收取用水费用实现收益。\r\n（2）其他配套业务\r\n校园增值业务：包括直饮水、共享洗衣机、电吹风等高频生活服务。\r\n其他业务：依托现有校园场景资源，探索光伏发电、电池租赁、合同能源管理等业务，目前\r\n该类业务尚处于模式验证阶段，收入来源依赖个别项目资源，未形成标准化及可持续增长服务体\r\n系。\r\n2、影视剧\r\n报告期内，公司无新增影视项目投资计划，对现有自营项目严格遵循“盘活存量、严控增量”\r\n的原则，在不新增重大资金投入的前提下，通过优化运营模式、提升管理效率，稳步推进项目盘\r\n活工作。同时，公司已完成部分影视项目的转让退出，加快资金回笼。目前，影视业务仅作为存\r\n量资产盘活方向予以保留，不再作为公司战略发展的重点领域。\r\n3、支付渠道服务及其他业务\r\n报告期内，公司依托现有资源，通过出资设立合资子公司东望数智，试水支付渠道服务业务。\r\n后经公司董事会认真研究及论证，公司公开挂牌转让控股子公司东望数智 51%股权。具体内容详\r\n见本报告“第五节重要事项—十二、重大关联交易—（二）资产或股权收购、出售发生的关联交\r\n易”。2025 年 8 月，公司已完成东望数智 51%股权的转让，鉴于公司股东结构发生变化，后续不\r\n再开展该项业务。\r\n同时，公司依托校园场景资源，提供空调、打印机等设备租赁服务等其他业务服务，报告期\r\n内服务仅覆盖少量院校。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "打印机",
+          "value": null,
+          "unit": null,
+          "header": "少量院校设备租赁",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Activity",
+        "action": "provides_service",
+        "activity_actor": "公司及合并子公司",
+        "source_actor": "公司及合并子公司",
+        "actor_basis": "direct_grammatical_actor",
+        "object_name": "打印机",
+        "source_verb": "租赁"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-6516f1c5f1c53fcf:commodity:1",
+        "field_id": "explicit_activity",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "named_subsidiary",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-6516f1c5f1c53fcf",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "修复商品披露",
+            "continuation_pages": [
+              5
+            ],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "浙江东望时代科技股份有限公司2025 年年度报告\r\n12 / 195\r\n第三节 管理层讨论与分析\r\n一、报告期内公司从事的业务情况\r\n报告期内，公司继续维持以园区生活服务为核心、影视文化内容为补充、其他配套服务协同\r\n发展的多元化业务布局。通过聚焦校园场景的精细化运营与创新业务孵化，持续优化收入结构，\r\n强化战略业务的可持续增长能力。\r\n1、园区生活服务\r\n报告期内，公司聚焦园区综合能源服务领域，形成“核心业务+增值服务+创新探索”的梯次\r\n发展业务版图。依托子公司正蓝节能及汇贤优策，以园区生活服务为核心，开展热水供应系统投\r\n资建设及运营服务；延伸开发校园高频生活增值服务（直饮水、共享洗衣等），并试点探索光伏、\r\n电池租赁等综合能源管理及智慧校园业务，构建多层次服务体系。\r\n（1）热水供应服务\r\n公司子公司正蓝节能及汇贤优策专注于校园市场，提供园区生活服务。具体业务模式分为三\r\n种：模式①通过与客户签订热水供应系统建造及运营服务合同，投资建造供应系统，并在建设完\r\n成后投入运营，在运营期间向学生收取用水费用实现收益。运营期间热水供应系统所有权归属于\r\n公司，运营期结束后所有权移交至客户；模式②通过完成热水供应系统建造后向客户进行移交，\r\n并按照合同约定获取一次性建设收益；模式③通过与客户签订托管协议，公司负责既有热水供应\r\n项目的持续运营维护并承担项目成本，在运营期间向学生收取用水费用实现收益。\r\n（2）其他配套业务\r\n校园增值业务：包括直饮水、共享洗衣机、电吹风等高频生活服务。\r\n其他业务：依托现有校园场景资源，探索光伏发电、电池租赁、合同能源管理等业务，目前\r\n该类业务尚处于模式验证阶段，收入来源依赖个别项目资源，未形成标准化及可持续增长服务体\r\n系。\r\n2、影视剧\r\n报告期内，公司无新增影视项目投资计划，对现有自营项目严格遵循“盘活存量、严控增量”\r\n的原则，在不新增重大资金投入的前提下，通过优化运营模式、提升管理效率，稳步推进项目盘\r\n活工作。同时，公司已完成部分影视项目的转让退出，加快资金回笼。目前，影视业务仅作为存\r\n量资产盘活方向予以保留，不再作为公司战略发展的重点领域。\r\n3、支付渠道服务及其他业务\r\n报告期内，公司依托现有资源，通过出资设立合资子公司东望数智，试水支付渠道服务业务。\r\n后经公司董事会认真研究及论证，公司公开挂牌转让控股子公司东望数智 51%股权。具体内容详\r\n见本报告“第五节重要事项—十二、重大关联交易—（二）资产或股权收购、出售发生的关联交\r\n易”。2025 年 8 月，公司已完成东望数智 51%股权的转让，鉴于公司股东结构发生变化，后续不\r\n再开展该项业务。\r\n同时，公司依托校园场景资源，提供空调、打印机等设备租赁服务等其他业务服务，报告期\r\n内服务仅覆盖少量院校。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用\r\n二、报告期内公司所处行业情况\r\n2025 年 1 月，中共中央、国务院印发《教育强国建设规划纲要（2024—2035 年）》，提出“有\r\n序扩大优质本科教育招生规模，扩大研究生培养规模，稳步提高博士研究生占比，大力发展专业\r\n学位研究生教育”。2025 年 2 月，教育部办公厅印发《关于推进高校后勤高质量发展的通知》，\n正蓝节能 指 浙江正蓝节能科技股份有限公司\n汇贤优策、重庆汇贤 指\n重庆汇贤优策科技有限公司\n东望数智 指 浙江东望时代数智科技有限公司\n本期、报告期 指 2025 年 1 月 1 日至 2025 年 12 月 31 日\n广厦、东望时代\n指\n浙江东望时代科技股份有限公司，原浙江广厦股份有",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "热水供应",
+          "value": null,
+          "unit": null,
+          "header": "热水供应服务",
+          "qualifier": "原主体：浙江正蓝节能科技股份有限公司",
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Activity",
+        "action": "provides_service",
+        "activity_actor": "浙江正蓝节能科技股份有限公司",
+        "source_actor": "浙江正蓝节能科技股份有限公司",
+        "actor_basis": "direct_grammatical_actor",
+        "object_name": "热水供应",
+        "source_verb": "提供"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-6516f1c5f1c53fcf:commodity:2",
+        "field_id": "explicit_activity",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "named_subsidiary",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-6516f1c5f1c53fcf",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "修复商品披露",
+            "continuation_pages": [
+              5
+            ],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "浙江东望时代科技股份有限公司2025 年年度报告\r\n12 / 195\r\n第三节 管理层讨论与分析\r\n一、报告期内公司从事的业务情况\r\n报告期内，公司继续维持以园区生活服务为核心、影视文化内容为补充、其他配套服务协同\r\n发展的多元化业务布局。通过聚焦校园场景的精细化运营与创新业务孵化，持续优化收入结构，\r\n强化战略业务的可持续增长能力。\r\n1、园区生活服务\r\n报告期内，公司聚焦园区综合能源服务领域，形成“核心业务+增值服务+创新探索”的梯次\r\n发展业务版图。依托子公司正蓝节能及汇贤优策，以园区生活服务为核心，开展热水供应系统投\r\n资建设及运营服务；延伸开发校园高频生活增值服务（直饮水、共享洗衣等），并试点探索光伏、\r\n电池租赁等综合能源管理及智慧校园业务，构建多层次服务体系。\r\n（1）热水供应服务\r\n公司子公司正蓝节能及汇贤优策专注于校园市场，提供园区生活服务。具体业务模式分为三\r\n种：模式①通过与客户签订热水供应系统建造及运营服务合同，投资建造供应系统，并在建设完\r\n成后投入运营，在运营期间向学生收取用水费用实现收益。运营期间热水供应系统所有权归属于\r\n公司，运营期结束后所有权移交至客户；模式②通过完成热水供应系统建造后向客户进行移交，\r\n并按照合同约定获取一次性建设收益；模式③通过与客户签订托管协议，公司负责既有热水供应\r\n项目的持续运营维护并承担项目成本，在运营期间向学生收取用水费用实现收益。\r\n（2）其他配套业务\r\n校园增值业务：包括直饮水、共享洗衣机、电吹风等高频生活服务。\r\n其他业务：依托现有校园场景资源，探索光伏发电、电池租赁、合同能源管理等业务，目前\r\n该类业务尚处于模式验证阶段，收入来源依赖个别项目资源，未形成标准化及可持续增长服务体\r\n系。\r\n2、影视剧\r\n报告期内，公司无新增影视项目投资计划，对现有自营项目严格遵循“盘活存量、严控增量”\r\n的原则，在不新增重大资金投入的前提下，通过优化运营模式、提升管理效率，稳步推进项目盘\r\n活工作。同时，公司已完成部分影视项目的转让退出，加快资金回笼。目前，影视业务仅作为存\r\n量资产盘活方向予以保留，不再作为公司战略发展的重点领域。\r\n3、支付渠道服务及其他业务\r\n报告期内，公司依托现有资源，通过出资设立合资子公司东望数智，试水支付渠道服务业务。\r\n后经公司董事会认真研究及论证，公司公开挂牌转让控股子公司东望数智 51%股权。具体内容详\r\n见本报告“第五节重要事项—十二、重大关联交易—（二）资产或股权收购、出售发生的关联交\r\n易”。2025 年 8 月，公司已完成东望数智 51%股权的转让，鉴于公司股东结构发生变化，后续不\r\n再开展该项业务。\r\n同时，公司依托校园场景资源，提供空调、打印机等设备租赁服务等其他业务服务，报告期\r\n内服务仅覆盖少量院校。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用\r\n二、报告期内公司所处行业情况\r\n2025 年 1 月，中共中央、国务院印发《教育强国建设规划纲要（2024—2035 年）》，提出“有\r\n序扩大优质本科教育招生规模，扩大研究生培养规模，稳步提高博士研究生占比，大力发展专业\r\n学位研究生教育”。2025 年 2 月，教育部办公厅印发《关于推进高校后勤高质量发展的通知》，\n正蓝节能 指 浙江正蓝节能科技股份有限公司\n汇贤优策、重庆汇贤 指\n重庆汇贤优策科技有限公司\n东望数智 指 浙江东望时代数智科技有限公司\n本期、报告期 指 2025 年 1 月 1 日至 2025 年 12 月 31 日\n广厦、东望时代\n指\n浙江东望时代科技股份有限公司，原浙江广厦股份有",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "热水供应",
+          "value": null,
+          "unit": null,
+          "header": "热水供应服务",
+          "qualifier": "原主体：重庆汇贤优策科技有限公司",
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Activity",
+        "action": "provides_service",
+        "activity_actor": "重庆汇贤优策科技有限公司",
+        "source_actor": "重庆汇贤优策科技有限公司",
+        "actor_basis": "direct_grammatical_actor",
+        "object_name": "热水供应",
+        "source_verb": "提供"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-6516f1c5f1c53fcf:commodity:3",
+        "field_id": "explicit_activity",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-6516f1c5f1c53fcf",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "修复商品披露",
+            "continuation_pages": [
+              5
+            ],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "浙江东望时代科技股份有限公司2025 年年度报告\r\n12 / 195\r\n第三节 管理层讨论与分析\r\n一、报告期内公司从事的业务情况\r\n报告期内，公司继续维持以园区生活服务为核心、影视文化内容为补充、其他配套服务协同\r\n发展的多元化业务布局。通过聚焦校园场景的精细化运营与创新业务孵化，持续优化收入结构，\r\n强化战略业务的可持续增长能力。\r\n1、园区生活服务\r\n报告期内，公司聚焦园区综合能源服务领域，形成“核心业务+增值服务+创新探索”的梯次\r\n发展业务版图。依托子公司正蓝节能及汇贤优策，以园区生活服务为核心，开展热水供应系统投\r\n资建设及运营服务；延伸开发校园高频生活增值服务（直饮水、共享洗衣等），并试点探索光伏、\r\n电池租赁等综合能源管理及智慧校园业务，构建多层次服务体系。\r\n（1）热水供应服务\r\n公司子公司正蓝节能及汇贤优策专注于校园市场，提供园区生活服务。具体业务模式分为三\r\n种：模式①通过与客户签订热水供应系统建造及运营服务合同，投资建造供应系统，并在建设完\r\n成后投入运营，在运营期间向学生收取用水费用实现收益。运营期间热水供应系统所有权归属于\r\n公司，运营期结束后所有权移交至客户；模式②通过完成热水供应系统建造后向客户进行移交，\r\n并按照合同约定获取一次性建设收益；模式③通过与客户签订托管协议，公司负责既有热水供应\r\n项目的持续运营维护并承担项目成本，在运营期间向学生收取用水费用实现收益。\r\n（2）其他配套业务\r\n校园增值业务：包括直饮水、共享洗衣机、电吹风等高频生活服务。\r\n其他业务：依托现有校园场景资源，探索光伏发电、电池租赁、合同能源管理等业务，目前\r\n该类业务尚处于模式验证阶段，收入来源依赖个别项目资源，未形成标准化及可持续增长服务体\r\n系。\r\n2、影视剧\r\n报告期内，公司无新增影视项目投资计划，对现有自营项目严格遵循“盘活存量、严控增量”\r\n的原则，在不新增重大资金投入的前提下，通过优化运营模式、提升管理效率，稳步推进项目盘\r\n活工作。同时，公司已完成部分影视项目的转让退出，加快资金回笼。目前，影视业务仅作为存\r\n量资产盘活方向予以保留，不再作为公司战略发展的重点领域。\r\n3、支付渠道服务及其他业务\r\n报告期内，公司依托现有资源，通过出资设立合资子公司东望数智，试水支付渠道服务业务。\r\n后经公司董事会认真研究及论证，公司公开挂牌转让控股子公司东望数智 51%股权。具体内容详\r\n见本报告“第五节重要事项—十二、重大关联交易—（二）资产或股权收购、出售发生的关联交\r\n易”。2025 年 8 月，公司已完成东望数智 51%股权的转让，鉴于公司股东结构发生变化，后续不\r\n再开展该项业务。\r\n同时，公司依托校园场景资源，提供空调、打印机等设备租赁服务等其他业务服务，报告期\r\n内服务仅覆盖少量院校。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用\r\n二、报告期内公司所处行业情况\r\n2025 年 1 月，中共中央、国务院印发《教育强国建设规划纲要（2024—2035 年）》，提出“有\r\n序扩大优质本科教育招生规模，扩大研究生培养规模，稳步提高博士研究生占比，大力发展专业\r\n学位研究生教育”。2025 年 2 月，教育部办公厅印发《关于推进高校后勤高质量发展的通知》，\n正蓝节能 指 浙江正蓝节能科技股份有限公司\n汇贤优策、重庆汇贤 指\n重庆汇贤优策科技有限公司\n东望数智 指 浙江东望时代数智科技有限公司\n本期、报告期 指 2025 年 1 月 1 日至 2025 年 12 月 31 日\n广厦、东望时代\n指\n浙江东望时代科技股份有限公司，原浙江广厦股份有",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "直饮水",
+          "value": null,
+          "unit": null,
+          "header": "校园增值业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Activity",
+        "action": "provides_service",
+        "activity_actor": "公司及合并子公司",
+        "source_actor": "公司及合并子公司",
+        "actor_basis": "direct_grammatical_actor",
+        "object_name": "直饮水",
+        "source_verb": "提供"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-6516f1c5f1c53fcf:commodity:4",
+        "field_id": "explicit_activity",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-6516f1c5f1c53fcf",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "修复商品披露",
+            "continuation_pages": [
+              5
+            ],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "浙江东望时代科技股份有限公司2025 年年度报告\r\n12 / 195\r\n第三节 管理层讨论与分析\r\n一、报告期内公司从事的业务情况\r\n报告期内，公司继续维持以园区生活服务为核心、影视文化内容为补充、其他配套服务协同\r\n发展的多元化业务布局。通过聚焦校园场景的精细化运营与创新业务孵化，持续优化收入结构，\r\n强化战略业务的可持续增长能力。\r\n1、园区生活服务\r\n报告期内，公司聚焦园区综合能源服务领域，形成“核心业务+增值服务+创新探索”的梯次\r\n发展业务版图。依托子公司正蓝节能及汇贤优策，以园区生活服务为核心，开展热水供应系统投\r\n资建设及运营服务；延伸开发校园高频生活增值服务（直饮水、共享洗衣等），并试点探索光伏、\r\n电池租赁等综合能源管理及智慧校园业务，构建多层次服务体系。\r\n（1）热水供应服务\r\n公司子公司正蓝节能及汇贤优策专注于校园市场，提供园区生活服务。具体业务模式分为三\r\n种：模式①通过与客户签订热水供应系统建造及运营服务合同，投资建造供应系统，并在建设完\r\n成后投入运营，在运营期间向学生收取用水费用实现收益。运营期间热水供应系统所有权归属于\r\n公司，运营期结束后所有权移交至客户；模式②通过完成热水供应系统建造后向客户进行移交，\r\n并按照合同约定获取一次性建设收益；模式③通过与客户签订托管协议，公司负责既有热水供应\r\n项目的持续运营维护并承担项目成本，在运营期间向学生收取用水费用实现收益。\r\n（2）其他配套业务\r\n校园增值业务：包括直饮水、共享洗衣机、电吹风等高频生活服务。\r\n其他业务：依托现有校园场景资源，探索光伏发电、电池租赁、合同能源管理等业务，目前\r\n该类业务尚处于模式验证阶段，收入来源依赖个别项目资源，未形成标准化及可持续增长服务体\r\n系。\r\n2、影视剧\r\n报告期内，公司无新增影视项目投资计划，对现有自营项目严格遵循“盘活存量、严控增量”\r\n的原则，在不新增重大资金投入的前提下，通过优化运营模式、提升管理效率，稳步推进项目盘\r\n活工作。同时，公司已完成部分影视项目的转让退出，加快资金回笼。目前，影视业务仅作为存\r\n量资产盘活方向予以保留，不再作为公司战略发展的重点领域。\r\n3、支付渠道服务及其他业务\r\n报告期内，公司依托现有资源，通过出资设立合资子公司东望数智，试水支付渠道服务业务。\r\n后经公司董事会认真研究及论证，公司公开挂牌转让控股子公司东望数智 51%股权。具体内容详\r\n见本报告“第五节重要事项—十二、重大关联交易—（二）资产或股权收购、出售发生的关联交\r\n易”。2025 年 8 月，公司已完成东望数智 51%股权的转让，鉴于公司股东结构发生变化，后续不\r\n再开展该项业务。\r\n同时，公司依托校园场景资源，提供空调、打印机等设备租赁服务等其他业务服务，报告期\r\n内服务仅覆盖少量院校。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用\r\n二、报告期内公司所处行业情况\r\n2025 年 1 月，中共中央、国务院印发《教育强国建设规划纲要（2024—2035 年）》，提出“有\r\n序扩大优质本科教育招生规模，扩大研究生培养规模，稳步提高博士研究生占比，大力发展专业\r\n学位研究生教育”。2025 年 2 月，教育部办公厅印发《关于推进高校后勤高质量发展的通知》，\n正蓝节能 指 浙江正蓝节能科技股份有限公司\n汇贤优策、重庆汇贤 指\n重庆汇贤优策科技有限公司\n东望数智 指 浙江东望时代数智科技有限公司\n本期、报告期 指 2025 年 1 月 1 日至 2025 年 12 月 31 日\n广厦、东望时代\n指\n浙江东望时代科技股份有限公司，原浙江广厦股份有",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "共享洗衣机",
+          "value": null,
+          "unit": null,
+          "header": "校园增值业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Activity",
+        "action": "provides_service",
+        "activity_actor": "公司及合并子公司",
+        "source_actor": "公司及合并子公司",
+        "actor_basis": "direct_grammatical_actor",
+        "object_name": "共享洗衣机",
+        "source_verb": "提供"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-6516f1c5f1c53fcf:commodity:5",
+        "field_id": "explicit_activity",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-6516f1c5f1c53fcf",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "修复商品披露",
+            "continuation_pages": [
+              5
+            ],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "浙江东望时代科技股份有限公司2025 年年度报告\r\n12 / 195\r\n第三节 管理层讨论与分析\r\n一、报告期内公司从事的业务情况\r\n报告期内，公司继续维持以园区生活服务为核心、影视文化内容为补充、其他配套服务协同\r\n发展的多元化业务布局。通过聚焦校园场景的精细化运营与创新业务孵化，持续优化收入结构，\r\n强化战略业务的可持续增长能力。\r\n1、园区生活服务\r\n报告期内，公司聚焦园区综合能源服务领域，形成“核心业务+增值服务+创新探索”的梯次\r\n发展业务版图。依托子公司正蓝节能及汇贤优策，以园区生活服务为核心，开展热水供应系统投\r\n资建设及运营服务；延伸开发校园高频生活增值服务（直饮水、共享洗衣等），并试点探索光伏、\r\n电池租赁等综合能源管理及智慧校园业务，构建多层次服务体系。\r\n（1）热水供应服务\r\n公司子公司正蓝节能及汇贤优策专注于校园市场，提供园区生活服务。具体业务模式分为三\r\n种：模式①通过与客户签订热水供应系统建造及运营服务合同，投资建造供应系统，并在建设完\r\n成后投入运营，在运营期间向学生收取用水费用实现收益。运营期间热水供应系统所有权归属于\r\n公司，运营期结束后所有权移交至客户；模式②通过完成热水供应系统建造后向客户进行移交，\r\n并按照合同约定获取一次性建设收益；模式③通过与客户签订托管协议，公司负责既有热水供应\r\n项目的持续运营维护并承担项目成本，在运营期间向学生收取用水费用实现收益。\r\n（2）其他配套业务\r\n校园增值业务：包括直饮水、共享洗衣机、电吹风等高频生活服务。\r\n其他业务：依托现有校园场景资源，探索光伏发电、电池租赁、合同能源管理等业务，目前\r\n该类业务尚处于模式验证阶段，收入来源依赖个别项目资源，未形成标准化及可持续增长服务体\r\n系。\r\n2、影视剧\r\n报告期内，公司无新增影视项目投资计划，对现有自营项目严格遵循“盘活存量、严控增量”\r\n的原则，在不新增重大资金投入的前提下，通过优化运营模式、提升管理效率，稳步推进项目盘\r\n活工作。同时，公司已完成部分影视项目的转让退出，加快资金回笼。目前，影视业务仅作为存\r\n量资产盘活方向予以保留，不再作为公司战略发展的重点领域。\r\n3、支付渠道服务及其他业务\r\n报告期内，公司依托现有资源，通过出资设立合资子公司东望数智，试水支付渠道服务业务。\r\n后经公司董事会认真研究及论证，公司公开挂牌转让控股子公司东望数智 51%股权。具体内容详\r\n见本报告“第五节重要事项—十二、重大关联交易—（二）资产或股权收购、出售发生的关联交\r\n易”。2025 年 8 月，公司已完成东望数智 51%股权的转让，鉴于公司股东结构发生变化，后续不\r\n再开展该项业务。\r\n同时，公司依托校园场景资源，提供空调、打印机等设备租赁服务等其他业务服务，报告期\r\n内服务仅覆盖少量院校。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用\r\n二、报告期内公司所处行业情况\r\n2025 年 1 月，中共中央、国务院印发《教育强国建设规划纲要（2024—2035 年）》，提出“有\r\n序扩大优质本科教育招生规模，扩大研究生培养规模，稳步提高博士研究生占比，大力发展专业\r\n学位研究生教育”。2025 年 2 月，教育部办公厅印发《关于推进高校后勤高质量发展的通知》，\n正蓝节能 指 浙江正蓝节能科技股份有限公司\n汇贤优策、重庆汇贤 指\n重庆汇贤优策科技有限公司\n东望数智 指 浙江东望时代数智科技有限公司\n本期、报告期 指 2025 年 1 月 1 日至 2025 年 12 月 31 日\n广厦、东望时代\n指\n浙江东望时代科技股份有限公司，原浙江广厦股份有",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "电吹风",
+          "value": null,
+          "unit": null,
+          "header": "校园增值业务",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Activity",
+        "action": "provides_service",
+        "activity_actor": "公司及合并子公司",
+        "source_actor": "公司及合并子公司",
+        "actor_basis": "direct_grammatical_actor",
+        "object_name": "电吹风",
+        "source_verb": "提供"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-6516f1c5f1c53fcf:commodity:6",
+        "field_id": "explicit_activity",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-6516f1c5f1c53fcf",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "修复商品披露",
+            "continuation_pages": [
+              5
+            ],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "浙江东望时代科技股份有限公司2025 年年度报告\r\n12 / 195\r\n第三节 管理层讨论与分析\r\n一、报告期内公司从事的业务情况\r\n报告期内，公司继续维持以园区生活服务为核心、影视文化内容为补充、其他配套服务协同\r\n发展的多元化业务布局。通过聚焦校园场景的精细化运营与创新业务孵化，持续优化收入结构，\r\n强化战略业务的可持续增长能力。\r\n1、园区生活服务\r\n报告期内，公司聚焦园区综合能源服务领域，形成“核心业务+增值服务+创新探索”的梯次\r\n发展业务版图。依托子公司正蓝节能及汇贤优策，以园区生活服务为核心，开展热水供应系统投\r\n资建设及运营服务；延伸开发校园高频生活增值服务（直饮水、共享洗衣等），并试点探索光伏、\r\n电池租赁等综合能源管理及智慧校园业务，构建多层次服务体系。\r\n（1）热水供应服务\r\n公司子公司正蓝节能及汇贤优策专注于校园市场，提供园区生活服务。具体业务模式分为三\r\n种：模式①通过与客户签订热水供应系统建造及运营服务合同，投资建造供应系统，并在建设完\r\n成后投入运营，在运营期间向学生收取用水费用实现收益。运营期间热水供应系统所有权归属于\r\n公司，运营期结束后所有权移交至客户；模式②通过完成热水供应系统建造后向客户进行移交，\r\n并按照合同约定获取一次性建设收益；模式③通过与客户签订托管协议，公司负责既有热水供应\r\n项目的持续运营维护并承担项目成本，在运营期间向学生收取用水费用实现收益。\r\n（2）其他配套业务\r\n校园增值业务：包括直饮水、共享洗衣机、电吹风等高频生活服务。\r\n其他业务：依托现有校园场景资源，探索光伏发电、电池租赁、合同能源管理等业务，目前\r\n该类业务尚处于模式验证阶段，收入来源依赖个别项目资源，未形成标准化及可持续增长服务体\r\n系。\r\n2、影视剧\r\n报告期内，公司无新增影视项目投资计划，对现有自营项目严格遵循“盘活存量、严控增量”\r\n的原则，在不新增重大资金投入的前提下，通过优化运营模式、提升管理效率，稳步推进项目盘\r\n活工作。同时，公司已完成部分影视项目的转让退出，加快资金回笼。目前，影视业务仅作为存\r\n量资产盘活方向予以保留，不再作为公司战略发展的重点领域。\r\n3、支付渠道服务及其他业务\r\n报告期内，公司依托现有资源，通过出资设立合资子公司东望数智，试水支付渠道服务业务。\r\n后经公司董事会认真研究及论证，公司公开挂牌转让控股子公司东望数智 51%股权。具体内容详\r\n见本报告“第五节重要事项—十二、重大关联交易—（二）资产或股权收购、出售发生的关联交\r\n易”。2025 年 8 月，公司已完成东望数智 51%股权的转让，鉴于公司股东结构发生变化，后续不\r\n再开展该项业务。\r\n同时，公司依托校园场景资源，提供空调、打印机等设备租赁服务等其他业务服务，报告期\r\n内服务仅覆盖少量院校。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用\r\n二、报告期内公司所处行业情况\r\n2025 年 1 月，中共中央、国务院印发《教育强国建设规划纲要（2024—2035 年）》，提出“有\r\n序扩大优质本科教育招生规模，扩大研究生培养规模，稳步提高博士研究生占比，大力发展专业\r\n学位研究生教育”。2025 年 2 月，教育部办公厅印发《关于推进高校后勤高质量发展的通知》，\n正蓝节能 指 浙江正蓝节能科技股份有限公司\n汇贤优策、重庆汇贤 指\n重庆汇贤优策科技有限公司\n东望数智 指 浙江东望时代数智科技有限公司\n本期、报告期 指 2025 年 1 月 1 日至 2025 年 12 月 31 日\n广厦、东望时代\n指\n浙江东望时代科技股份有限公司，原浙江广厦股份有",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "空调",
+          "value": null,
+          "unit": null,
+          "header": "少量院校设备租赁",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Activity",
+        "action": "provides_service",
+        "activity_actor": "公司及合并子公司",
+        "source_actor": "公司及合并子公司",
+        "actor_basis": "direct_grammatical_actor",
+        "object_name": "空调",
+        "source_verb": "租赁"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-6516f1c5f1c53fcf:commodity:7",
+        "field_id": "explicit_activity",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-6516f1c5f1c53fcf",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 12,
+            "printed_page_label": null,
+            "section_title": "修复商品披露",
+            "continuation_pages": [
+              5
+            ],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "浙江东望时代科技股份有限公司2025 年年度报告\r\n12 / 195\r\n第三节 管理层讨论与分析\r\n一、报告期内公司从事的业务情况\r\n报告期内，公司继续维持以园区生活服务为核心、影视文化内容为补充、其他配套服务协同\r\n发展的多元化业务布局。通过聚焦校园场景的精细化运营与创新业务孵化，持续优化收入结构，\r\n强化战略业务的可持续增长能力。\r\n1、园区生活服务\r\n报告期内，公司聚焦园区综合能源服务领域，形成“核心业务+增值服务+创新探索”的梯次\r\n发展业务版图。依托子公司正蓝节能及汇贤优策，以园区生活服务为核心，开展热水供应系统投\r\n资建设及运营服务；延伸开发校园高频生活增值服务（直饮水、共享洗衣等），并试点探索光伏、\r\n电池租赁等综合能源管理及智慧校园业务，构建多层次服务体系。\r\n（1）热水供应服务\r\n公司子公司正蓝节能及汇贤优策专注于校园市场，提供园区生活服务。具体业务模式分为三\r\n种：模式①通过与客户签订热水供应系统建造及运营服务合同，投资建造供应系统，并在建设完\r\n成后投入运营，在运营期间向学生收取用水费用实现收益。运营期间热水供应系统所有权归属于\r\n公司，运营期结束后所有权移交至客户；模式②通过完成热水供应系统建造后向客户进行移交，\r\n并按照合同约定获取一次性建设收益；模式③通过与客户签订托管协议，公司负责既有热水供应\r\n项目的持续运营维护并承担项目成本，在运营期间向学生收取用水费用实现收益。\r\n（2）其他配套业务\r\n校园增值业务：包括直饮水、共享洗衣机、电吹风等高频生活服务。\r\n其他业务：依托现有校园场景资源，探索光伏发电、电池租赁、合同能源管理等业务，目前\r\n该类业务尚处于模式验证阶段，收入来源依赖个别项目资源，未形成标准化及可持续增长服务体\r\n系。\r\n2、影视剧\r\n报告期内，公司无新增影视项目投资计划，对现有自营项目严格遵循“盘活存量、严控增量”\r\n的原则，在不新增重大资金投入的前提下，通过优化运营模式、提升管理效率，稳步推进项目盘\r\n活工作。同时，公司已完成部分影视项目的转让退出，加快资金回笼。目前，影视业务仅作为存\r\n量资产盘活方向予以保留，不再作为公司战略发展的重点领域。\r\n3、支付渠道服务及其他业务\r\n报告期内，公司依托现有资源，通过出资设立合资子公司东望数智，试水支付渠道服务业务。\r\n后经公司董事会认真研究及论证，公司公开挂牌转让控股子公司东望数智 51%股权。具体内容详\r\n见本报告“第五节重要事项—十二、重大关联交易—（二）资产或股权收购、出售发生的关联交\r\n易”。2025 年 8 月，公司已完成东望数智 51%股权的转让，鉴于公司股东结构发生变化，后续不\r\n再开展该项业务。\r\n同时，公司依托校园场景资源，提供空调、打印机等设备租赁服务等其他业务服务，报告期\r\n内服务仅覆盖少量院校。\r\n报告期内公司新增重要非主营业务的说明\r\n□适用 √不适用\r\n二、报告期内公司所处行业情况\r\n2025 年 1 月，中共中央、国务院印发《教育强国建设规划纲要（2024—2035 年）》，提出“有\r\n序扩大优质本科教育招生规模，扩大研究生培养规模，稳步提高博士研究生占比，大力发展专业\r\n学位研究生教育”。2025 年 2 月，教育部办公厅印发《关于推进高校后勤高质量发展的通知》，\n正蓝节能 指 浙江正蓝节能科技股份有限公司\n汇贤优策、重庆汇贤 指\n重庆汇贤优策科技有限公司\n东望数智 指 浙江东望时代数智科技有限公司\n本期、报告期 指 2025 年 1 月 1 日至 2025 年 12 月 31 日\n广厦、东望时代\n指\n浙江东望时代科技股份有限公司，原浙江广厦股份有",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "打印机",
+          "value": null,
+          "unit": null,
+          "header": "少量院校设备租赁",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Activity",
+        "action": "provides_service",
+        "activity_actor": "公司及合并子公司",
+        "source_actor": "公司及合并子公司",
+        "actor_basis": "direct_grammatical_actor",
+        "object_name": "打印机",
+        "source_verb": "租赁"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-b7536e5277b19cbd:commodity:1",
+        "field_id": "explicit_activity",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-b7536e5277b19cbd",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 19,
+            "printed_page_label": null,
+            "section_title": "修复商品披露",
+            "continuation_pages": [
+              5
+            ],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "浙江东望时代科技股份有限公司2025 年年度报告\r\n19 / 195\r\nD.报告期内公司存在贸易业务收入\r\n√适用 □不适用\r\n单位：元 币种：人民币\r\n贸易业务开展情况 本期营业收入 上期营业收入\r\n本期营业收入比上年\r\n同期增减（%）\r\n设备销售 114,516.43 9,255,416.82 -98.76\r\n贸易业务占营业收入比例超过 10%前五名销售客户\r\n□适用 √不适用\r\n贸易业务收入占营业收入比例超过 10%前五名供应商\r\n□适用 √不适用\r\n其他说明：无\r\n3、 费用\r\n√适用 □不适用\r\n费用情况及变动分析详见“1.利润表及现金流量表相关科目变动分析表”。\r\n4、 研发投入\r\n(1).研发投入情况表\r\n√适用 □不适用\r\n单位：元 币种：人民币\r\n本期费用化研发投入 12,908,725.74\r\n本期资本化研发投入 - 研发投入合计 12,908,725.74\r\n研发投入总额占营业收入比例（%） 2.19\r\n研发投入资本化的比重（%） -\r\n(2).研发人员情况表\r\n√适用 □不适用\r\n公司研发人员的数量 67\r\n研发人员数量占公司总人数的比例（%） 15.06\r\n研发人员学历结构\r\n学历结构类别 学历结构人数\r\n博士研究生 1\r\n硕士研究生 1\r\n本科 26\r\n专科 36\r\n高中及以下 3\r\n研发人员年龄结构\r\n年龄结构类别 年龄结构人数\r\n30 岁以下（不含 30 岁） 7\r\n30-40 岁（含 30 岁，不含 40 岁） 30\r\n40-50 岁（含 40 岁，不含 50 岁） 19\r\n50-60 岁（含 50 岁，不含 60 岁） 11\r\n60 岁及以上 0\r\n(3).情况说明\n本期、报告期 指 2025 年 1 月 1 日至 2025 年 12 月 31 日\n本期、报告期 指 2025 年 1 月 1 日至 2025 年 12 月 31 日\n广厦、东望时代\n指\n浙江东望时代科技股份有限公司，原浙江广厦股份有",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "设备",
+          "value": null,
+          "unit": null,
+          "header": "贸易业务/本期营业收入",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Activity",
+        "action": "sells",
+        "activity_actor": "公司及合并子公司",
+        "source_actor": "公司及合并子公司",
+        "actor_basis": "direct_grammatical_actor",
+        "object_name": "设备",
+        "source_verb": "销售"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-7ee6e078d121d1ea:commodity:1",
+        "field_id": "explicit_activity",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-7ee6e078d121d1ea",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 56,
+            "printed_page_label": null,
+            "section_title": "修复商品披露",
+            "continuation_pages": [
+              5
+            ],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "浙江东望时代科技股份有限公司2025 年年度报告\r\n56 / 195\r\n事项概述 查询索引\r\n2025 年 3 月 14 日，公司第十二届董事会第九次会议及第十二届\r\n监事会第七次会议审议通过了《关于公司 2025 年度日常关联交易预\r\n计的公告》，其中包括子议案《与东阳市金投控股集团有限公司及其\r\n控制企业日常关联交易预计的议案》《与跃动新能源科技（浙江）有\r\n限公司日常关联交易预计的议案》及《与浙江复维设备制造有限公司\r\n及其子公司及关联方日常关联交易预计的议案》。\r\n2025 年 4 月 27 日，公司召开第十二届董事会第十次会议及第十\r\n二届监事会第八次会议对 2025 年度日常关联交易预计进行调整。会\r\n议审议通过了《关于调整公司 2025 年度日常关联交易预计的议案》，\r\n其中包括子议案《关于调整与东阳金投及其控制企业日常关联交易\r\n预计的议案》《关于调整与跃动新能源日常关联交易预计的议案》及\r\n《关于调整与浙江复维及其子公司及关联方日常关联交易预计的议\r\n案》。前述议案已经公司 2024 年度股东大会审议通过。\r\n具体内容详见公司在上交所网站上\r\n披露的《第十二届董事会第九次会议决\r\n议公告》《第十二届监事会第七次会议决\r\n议公告》《关于公司 2025 年度日常关联\r\n交易预计的公告》《第十二届董事会第十\r\n次会议决议公告》《第十二届监事会第八\r\n次会议决议公告》《关于调整公司 2025\r\n年度日常关联交易预计的公告》《2024 年\r\n年度股东大会决议公告》，公告编号：临\r\n2025-033、临 2025-034、临 2025-038、\r\n临 2025-067、临 2025-068、临 2025-076、\r\n临 2025-088。\r\n2025 年 12 月 12 日，公司第十二届董事会第十六次会议审议通\r\n过了《关于公司 2026 年度日常关联交易预计的议案》，其中包括子\r\n议案《与东阳金投及其控制企业日常关联交易预计的议案》及《与跃\r\n动新能源日常关联交易预计的议案》，该议案已经公司 2025 年第五\r\n次临时股东会审议通过。\r\n具体内容详见公司在上交所网站上\r\n披露的《第十二届董事会第十六次会议\r\n决议公告》《关于公司 2026 年度日常关\r\n联交易预计的公告》《2025 年第五次临\r\n时股东会决议公告》（公告编号：临 2025-\r\n141、临 2025-143、临 2025-152）。\r\n2、 已在临时公告披露，但有后续实施的进展或变化的事项\r\n□适用 √不适用\r\n3、 临时公告未披露的事项\r\n√适用 □不适用\r\n单位：元 币种：人民币\r\n关联交易方 关联关系\r\n关联交易\r\n类型\r\n关联交易内容\r\n关联交易\r\n定价原则\r\n关联交\r\n易价格\r\n关联交易金额\r\n占同类交易\r\n金额的比例\r\n(%)\r\n关联交\r\n易结算\r\n方式\r\n市场\r\n价格\r\n交易价格与\r\n市场参考价\r\n格差异较大\r\n的原因\r\n浙江广厦建设职\r\n业技术大学\r\n其他关联人 购买商品 热水水电费 市场定价 477,580.24 0.09\r\n东阳市广大后勤\r\n服务有限公司\r\n其他关联人 购买商品 热水水电费 市场定价 320,994.00 0.06\r\n东阳市广大后勤\r\n服务有限公司\r\n其他关联人 购买商品 洗衣房水电费 市场定价 35,926.00 0.01\r\n东阳市广大后勤\r\n服务有限公司\r\n其他关联人 接受劳务 洗衣房管理费 市场定价 582,568.80 0.11\r\n东阳千艺信息技\r\n术服务有限公司\r\n其他关联人 购买商品 渠道服务费 市场定价 694,983.17 0.13\r\n上海加岩信息科\r\n技有限公司\r\n其他关联人 购买商品 采购机具 市场定价 9,589,079.53 1.80\r\n上海旺壹科技服\r\n务有限公司\r\n其他关联人 购买商品 采购无形资产 市场定价 943,396.22 0.18\r\n跃动新能源科技\r\n（浙江）有限公司\r\n参股子公司 提供劳务 光伏发电收入 市场定价 2,254,921.28 0.38\r\n东阳市广大后勤\r\n服务有限公司\r\n其他关联人 提供劳务 热水供应 市场定价 621,063.53 0.11\r\n东阳市广大后勤\r\n服务有限公司\r\n其他关联人 提供劳务 洗衣机服务等 市场定价 505,976.44 0.09\r\n浙江广厦建设职\r\n业技术大学\r\n其他关联人 提供劳务 光伏发电 市场定价 1,359,639.09 0.23\r\n浙江广厦建设职\r\n业技术大学\r\n其他关联人 提供劳务 零碳项目 市场定价 154,826.59 0.03\n东阳金投 指 东阳市金投控股集团有限公司\n广厦建设 指 广厦建设集团有限责任公司\n浙江复维 指 浙江复维设备制造有限公司\n跃动新能源 指 跃动新能源科技（浙江）有限公司\n上交所 指 上海证券交易所\n上交所网站 指 上海证券交易所官方网站 www.sse.com.cn\n广厦、东望时代\n指\n浙江东望时代科技股份有限公司，原浙江广厦股份有\n广厦、东望时代\n指\n浙江东望时代科技股份有限公司，原浙江广厦股份有",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "机具",
+          "value": null,
+          "unit": null,
+          "header": "实际关联购买",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Activity",
+        "action": "purchases",
+        "activity_actor": "公司及合并子公司",
+        "source_actor": "公司及合并子公司",
+        "actor_basis": "direct_grammatical_actor",
+        "object_name": "机具",
+        "source_verb": "购买"
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-7ee6e078d121d1ea:commodity:2",
+        "field_id": "explicit_activity",
+        "chapter_task": "extract_business_overview",
+        "report": {
+          "instrument_id": "600052.SH",
+          "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+          "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-27T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "consolidated_group",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-7ee6e078d121d1ea",
+            "report": {
+              "instrument_id": "600052.SH",
+              "report_id": "asset_ac970424c626ae6ca7e17b8bb125742d",
+              "document_version": "e8376f7ec47c8acb16c2dcd8269d5e168fed8cfdaa12cadf553f6d13487957ea",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-27T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 56,
+            "printed_page_label": null,
+            "section_title": "修复商品披露",
+            "continuation_pages": [
+              5
+            ],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "浙江东望时代科技股份有限公司2025 年年度报告\r\n56 / 195\r\n事项概述 查询索引\r\n2025 年 3 月 14 日，公司第十二届董事会第九次会议及第十二届\r\n监事会第七次会议审议通过了《关于公司 2025 年度日常关联交易预\r\n计的公告》，其中包括子议案《与东阳市金投控股集团有限公司及其\r\n控制企业日常关联交易预计的议案》《与跃动新能源科技（浙江）有\r\n限公司日常关联交易预计的议案》及《与浙江复维设备制造有限公司\r\n及其子公司及关联方日常关联交易预计的议案》。\r\n2025 年 4 月 27 日，公司召开第十二届董事会第十次会议及第十\r\n二届监事会第八次会议对 2025 年度日常关联交易预计进行调整。会\r\n议审议通过了《关于调整公司 2025 年度日常关联交易预计的议案》，\r\n其中包括子议案《关于调整与东阳金投及其控制企业日常关联交易\r\n预计的议案》《关于调整与跃动新能源日常关联交易预计的议案》及\r\n《关于调整与浙江复维及其子公司及关联方日常关联交易预计的议\r\n案》。前述议案已经公司 2024 年度股东大会审议通过。\r\n具体内容详见公司在上交所网站上\r\n披露的《第十二届董事会第九次会议决\r\n议公告》《第十二届监事会第七次会议决\r\n议公告》《关于公司 2025 年度日常关联\r\n交易预计的公告》《第十二届董事会第十\r\n次会议决议公告》《第十二届监事会第八\r\n次会议决议公告》《关于调整公司 2025\r\n年度日常关联交易预计的公告》《2024 年\r\n年度股东大会决议公告》，公告编号：临\r\n2025-033、临 2025-034、临 2025-038、\r\n临 2025-067、临 2025-068、临 2025-076、\r\n临 2025-088。\r\n2025 年 12 月 12 日，公司第十二届董事会第十六次会议审议通\r\n过了《关于公司 2026 年度日常关联交易预计的议案》，其中包括子\r\n议案《与东阳金投及其控制企业日常关联交易预计的议案》及《与跃\r\n动新能源日常关联交易预计的议案》，该议案已经公司 2025 年第五\r\n次临时股东会审议通过。\r\n具体内容详见公司在上交所网站上\r\n披露的《第十二届董事会第十六次会议\r\n决议公告》《关于公司 2026 年度日常关\r\n联交易预计的公告》《2025 年第五次临\r\n时股东会决议公告》（公告编号：临 2025-\r\n141、临 2025-143、临 2025-152）。\r\n2、 已在临时公告披露，但有后续实施的进展或变化的事项\r\n□适用 √不适用\r\n3、 临时公告未披露的事项\r\n√适用 □不适用\r\n单位：元 币种：人民币\r\n关联交易方 关联关系\r\n关联交易\r\n类型\r\n关联交易内容\r\n关联交易\r\n定价原则\r\n关联交\r\n易价格\r\n关联交易金额\r\n占同类交易\r\n金额的比例\r\n(%)\r\n关联交\r\n易结算\r\n方式\r\n市场\r\n价格\r\n交易价格与\r\n市场参考价\r\n格差异较大\r\n的原因\r\n浙江广厦建设职\r\n业技术大学\r\n其他关联人 购买商品 热水水电费 市场定价 477,580.24 0.09\r\n东阳市广大后勤\r\n服务有限公司\r\n其他关联人 购买商品 热水水电费 市场定价 320,994.00 0.06\r\n东阳市广大后勤\r\n服务有限公司\r\n其他关联人 购买商品 洗衣房水电费 市场定价 35,926.00 0.01\r\n东阳市广大后勤\r\n服务有限公司\r\n其他关联人 接受劳务 洗衣房管理费 市场定价 582,568.80 0.11\r\n东阳千艺信息技\r\n术服务有限公司\r\n其他关联人 购买商品 渠道服务费 市场定价 694,983.17 0.13\r\n上海加岩信息科\r\n技有限公司\r\n其他关联人 购买商品 采购机具 市场定价 9,589,079.53 1.80\r\n上海旺壹科技服\r\n务有限公司\r\n其他关联人 购买商品 采购无形资产 市场定价 943,396.22 0.18\r\n跃动新能源科技\r\n（浙江）有限公司\r\n参股子公司 提供劳务 光伏发电收入 市场定价 2,254,921.28 0.38\r\n东阳市广大后勤\r\n服务有限公司\r\n其他关联人 提供劳务 热水供应 市场定价 621,063.53 0.11\r\n东阳市广大后勤\r\n服务有限公司\r\n其他关联人 提供劳务 洗衣机服务等 市场定价 505,976.44 0.09\r\n浙江广厦建设职\r\n业技术大学\r\n其他关联人 提供劳务 光伏发电 市场定价 1,359,639.09 0.23\r\n浙江广厦建设职\r\n业技术大学\r\n其他关联人 提供劳务 零碳项目 市场定价 154,826.59 0.03\n东阳金投 指 东阳市金投控股集团有限公司\n广厦建设 指 广厦建设集团有限责任公司\n浙江复维 指 浙江复维设备制造有限公司\n跃动新能源 指 跃动新能源科技（浙江）有限公司\n上交所 指 上海证券交易所\n上交所网站 指 上海证券交易所官方网站 www.sse.com.cn\n广厦、东望时代\n指\n浙江东望时代科技股份有限公司，原浙江广厦股份有\n广厦、东望时代\n指\n浙江东望时代科技股份有限公司，原浙江广厦股份有",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "光伏发电",
+          "value": null,
+          "unit": null,
+          "header": "个别项目实际劳务收入/模式验证",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Activity",
+        "action": "provides_service",
+        "activity_actor": "公司及合并子公司",
+        "source_actor": "公司及合并子公司",
+        "actor_basis": "direct_grammatical_actor",
+        "object_name": "光伏发电",
+        "source_verb": "提供劳务"
+      }
+    ],
+    "dispositions": [
+      {
+        "target_id": "owned:core-ev-15fdd5629036937d:overview",
+        "field_id": "business_overview_source",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-2b65386d46f4e687:overview",
+        "field_id": "business_overview_source",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-2c529a041f435ae5:overview",
+        "field_id": "business_overview_source",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-525b75fe7195549e:overview",
+        "field_id": "business_overview_source",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-549b8edff41a4795:overview",
+        "field_id": "business_overview_source",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-579a40f6a96f542c:overview",
+        "field_id": "business_overview_source",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-6516f1c5f1c53fcf:commodity:1",
+        "field_id": "explicit_activity",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-6516f1c5f1c53fcf:commodity:2",
+        "field_id": "explicit_activity",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-6516f1c5f1c53fcf:commodity:3",
+        "field_id": "explicit_activity",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-6516f1c5f1c53fcf:commodity:4",
+        "field_id": "explicit_activity",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-6516f1c5f1c53fcf:commodity:5",
+        "field_id": "explicit_activity",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-6516f1c5f1c53fcf:commodity:6",
+        "field_id": "explicit_activity",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-6516f1c5f1c53fcf:commodity:7",
+        "field_id": "explicit_activity",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-6ac8c38eb2f8363b:overview",
+        "field_id": "business_overview_source",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-787bc89b37873ed8:overview",
+        "field_id": "business_overview_source",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-791dce54fc3c930d:overview",
+        "field_id": "business_overview_source",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-7ee6e078d121d1ea:commodity:1",
+        "field_id": "explicit_activity",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-7ee6e078d121d1ea:commodity:2",
+        "field_id": "explicit_activity",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-9cf58ada371073e5:overview",
+        "field_id": "business_overview_source",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-a96dcdb4513c2add:overview",
+        "field_id": "business_overview_source",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-af49b046b6ce3431:overview",
+        "field_id": "business_overview_source",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-b7536e5277b19cbd:commodity:1",
+        "field_id": "explicit_activity",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-d1d8000ea0bbee55:commodity:1",
+        "field_id": "explicit_activity",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-d1d8000ea0bbee55:commodity:2",
+        "field_id": "explicit_activity",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-d1d8000ea0bbee55:commodity:3",
+        "field_id": "explicit_activity",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-d1d8000ea0bbee55:commodity:4",
+        "field_id": "explicit_activity",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-d1d8000ea0bbee55:commodity:5",
+        "field_id": "explicit_activity",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-d1d8000ea0bbee55:commodity:6",
+        "field_id": "explicit_activity",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-d1d8000ea0bbee55:commodity:7",
+        "field_id": "explicit_activity",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-eb3578cc5722ff3a:overview",
+        "field_id": "business_overview_source",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-f321affe29e1d72b:overview",
+        "field_id": "business_overview_source",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      }
+    ],
+    "coverage": [
+      {
+        "schema_version": "company_profile_coverage_result.v1",
+        "field_id": "business_overview_source",
+        "chapter_task": "extract_business_overview",
+        "requirement_level": "required",
+        "status": "observed",
+        "reason_code": null,
+        "reason": null,
+        "evidence": [],
+        "reason_evidence_text": null
+      },
+      {
+        "schema_version": "company_profile_coverage_result.v1",
+        "field_id": "explicit_activity",
+        "chapter_task": "extract_business_overview",
+        "requirement_level": "conditional",
+        "status": "observed",
+        "reason_code": null,
+        "reason": null,
+        "evidence": [],
+        "reason_evidence_text": null
+      }
+    ],
+    "human_review_items": [],
+    "task_complete": true,
+    "provider_calls": [],
+    "production_authorization": "not_authorized"
+  }
+}

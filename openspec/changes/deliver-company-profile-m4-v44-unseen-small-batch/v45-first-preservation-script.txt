@@ -1,0 +1,8 @@
+import json,hashlib
+from pathlib import Path
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v44-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v45_same_source_repair';B=R/'data/research/company_profile_common_core/m4_v45_same_source_repair';E=R/'data/exports/m4_v45_same_source_repair';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert (P/'formal_execution.json').exists()
+paths=[p for p in [*P.rglob('*.json'),*B.rglob('*.json'),*E.rglob('*')] if p.is_file()];hashes={str(p.relative_to(R)):sha(p) for p in paths};assert not (C/'v45-first-formal-delivery-preservation.json').exists()
+(C/'v45-first-formal-delivery-preservation.json').write_text(json.dumps(dict(formal_execution_index=1,sha256=hashes),ensure_ascii=False,indent=2)+'\n')
+baseline=json.loads((C/'v45-initial-baseline.json').read_text());assert all(sha(R/p)==h for p,h in baseline['protected_sha256'].items());assert all(sha(R/p)==h for p,h in baseline['existing_modified_sha256'].items())
+print('FIRST',len(hashes),'HISTORY',len(baseline['protected_sha256']),'UNCHANGED')

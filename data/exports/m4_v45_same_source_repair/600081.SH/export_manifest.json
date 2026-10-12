@@ -1,0 +1,24 @@
+{
+  "schema_version": "company_profile_common_core_export.v1",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "profile_state": "found",
+  "delivered": 1,
+  "restricted_delivered": 0,
+  "profiles": [
+    {
+      "instrument_id": "600081.SH",
+      "report_period": "2025-12-31",
+      "file": "600081.SH_2025-12-31.json"
+    }
+  ],
+  "restricted_views": [],
+  "files": [
+    "/home/python/Quote/data/exports/m4_v45_same_source_repair/600081.SH/600081.SH_2025-12-31.json",
+    "/home/python/Quote/data/exports/m4_v45_same_source_repair/600081.SH/profiles.csv",
+    "/home/python/Quote/data/exports/m4_v45_same_source_repair/600081.SH/export_manifest.json"
+  ],
+  "legacy_export_used": false
+}
