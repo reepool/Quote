@@ -104,3 +104,19 @@ Native wrapped product labels, company names and counterparty names MUST be rejo
 - **WHEN** the current related-party sale table uses company/group self-reference and separate relationship categories
 - **THEN** income keeps the seller's original consolidated-group scope and the counterparty category without making the category a subsidiary seller
 - **AND** contract-segment columns, parent income, joint ventures and associates remain distinct and are not accumulated across bases
+
+
+### Requirement: Wrapped company and related-sales rows retain native identity and current blank boundaries
+Company rows MUST use their own native name/type/business cells and printed current income column. Wrapped full company names,footnote markers and table headings MUST NOT contaminate adjacent identities. Blank company income MUST NOT borrow profit. Related-sales rows MUST distinguish content continuation from counterparty continuation and preserve the row current/prior placement even when column offsets change. Prior-only rows MUST produce neither invented current zero nor current Segment/Measurement; same-page legitimate current amounts and printed zeros MUST remain. Native product-grade,channel,region,consolidated/parent and segment tables MUST preserve their own labels,units,eliminations and current values. Composite source classifications MAY map to existing enum only while native table basis and exact actors remain queryable.
+
+#### Scenario: A company name wraps across several physical lines
+- **WHEN** the company row supplies its own six financial cells and full native name
+- **THEN** Segment and paired Measurement retain that exact company and current income without next-row heading text or profit substitution
+
+#### Scenario: A counterparty tail shares the next physical line
+- **WHEN** a related-sales row continues with公司or限公司and a following row has a blank current cell
+- **THEN** the suffix stays with the preceding original party,and the blank row does not borrow a prior or following amount
+
+#### Scenario: Several native sales tables use different units or bases
+- **WHEN** product-grade,channel,region or pre-elimination rows disclose different native values
+- **THEN** all affected paired facts preserve source basis and original unit without cross-table borrowing or forced aggregation

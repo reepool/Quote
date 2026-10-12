@@ -272,3 +272,19 @@ Owned-page body continuations MUST preserve the substantive principal business, 
 #### Scenario: Applicability follows a purchase-table heading
 - **WHEN** a purchase heading is followed by not-applicable/yes-no status text without a commodity row
 - **THEN** that status text generates no named purchase Activity and legitimate current purchase rows remain eligible
+
+
+### Requirement: Continued operating mechanisms and named current actions retain native scope
+The owner MUST retain substantive continued narratives through acceptance,query and export,including operating versus preliminary or trial project state,partial equipment rental/sales,actual SaaS service expansion,original subsidiaries and revenue confirmation/payment mechanisms. A service enumeration MUST keep the native composite planning condition distinct from its lawful operating fragments. Online sales channel text MUST NOT enter the commodity name. Procurement,planting,production,processing and sales MUST follow separate current affirmative source cells or clauses; purchase MUST NOT imply actual input and brand/trial equipment MUST NOT become affirmative goods sales.
+
+#### Scenario: Part of a trial equipment portfolio is rented or sold
+- **WHEN** the source reports public testing and only partial product rental or sale
+- **THEN** final bodies retain that qualification without assigning each named trial item a sale or production action
+
+#### Scenario: Online channel follows a real named good
+- **WHEN** the source states旅游商品在线销售and separately names platform,media and OTA activities
+- **THEN** the good remains旅游商品,online remains channel,and platform/media/OTA retain their own names rather than repeated aliases
+
+#### Scenario: Procurement and native current quantity columns are disclosed independently
+- **WHEN** packaging procurement and separate product production/sales columns are disclosed
+- **THEN** actual purchases,production,processing and sales remain separately supported with original actors,and procurement does not become material input

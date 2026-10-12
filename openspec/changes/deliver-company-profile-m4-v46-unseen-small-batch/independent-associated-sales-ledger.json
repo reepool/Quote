@@ -1,0 +1,1427 @@
+{
+  "rows": [
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "厦门象盛商业保理有限责任公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "9,174.31",
+      "layout_line": "厦门象盛商业保理有限责任公司                     销售商品                           9,174.31",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "厦门象瀚投资有限公司",
+      "content": "销售商品",
+      "current": "2,381,974,997.17",
+      "prior": null,
+      "layout_line": "厦门象瀚投资有限公司                         销售商品       2,381,974,997.17",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "辽宁象屿铝业有限公司",
+      "content": "销售商品",
+      "current": "1,765,638,539.07",
+      "prior": null,
+      "layout_line": "辽宁象屿铝业有限公司                         销售商品       1,765,638,539.07",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "厦门象沧铝业有限公司",
+      "content": "销售商品",
+      "current": "407,883,476.07",
+      "prior": null,
+      "layout_line": "厦门象沧铝业有限公司                         销售商品        407,883,476.07",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "山东省港口集团有限公司及其子公司",
+      "content": "销售商品",
+      "current": "187,261,320.10",
+      "prior": null,
+      "layout_line": "山东省港口集团有限公司及其子公司                   销售商品        187,261,320.10",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "内蒙古浩通环保科技有限公司及其子公司",
+      "content": "销售商品",
+      "current": "127,085,400.32",
+      "prior": "356,779,303.45",
+      "layout_line": "内蒙古浩通环保科技有限公司及其子公司                 销售商品        127,085,400.32 356,779,303.45",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "厦门嘉廷企业管理有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "3,669.72",
+      "layout_line": "厦门嘉廷企业管理有限公司                       销售商品                           3,669.72",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "厦门象嘉置业有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "1,467.89",
+      "layout_line": "厦门象嘉置业有限公司                         销售商品                           1,467.89",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "厦门象鸿企业管理有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "15,045.87",
+      "layout_line": "厦门象鸿企业管理有限公司                       销售商品                           15,045.87",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "苏州象拓房地产开发有限公司",
+      "content": "销售商品",
+      "current": "1,834.86",
+      "prior": null,
+      "layout_line": "苏州象拓房地产开发有限公司                      销售商品             1,834.86",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "江苏象屿物业管理有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "4,403.67",
+      "layout_line": "江苏象屿物业管理有限公司                       销售商品                           4,403.67",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "南京屿发房地产开发有限公司",
+      "content": "销售商品",
+      "current": "4,403.67",
+      "prior": null,
+      "layout_line": "南京屿发房地产开发有限公司                      销售商品             4,403.67",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "沈阳象屿新材料技术有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "16,513.76",
+      "layout_line": "沈阳象屿新材料技术有限公司                      销售商品                           16,513.76",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "厦门象屿跨境电商有限责任公司",
+      "content": "销售商品",
+      "current": "1,467.89",
+      "prior": "1,467.89",
+      "layout_line": "厦门象屿跨境电商有限责任公司                     销售商品             1,467.89      1,467.89",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "苏州象泽企业管理咨询有限公司",
+      "content": "销售商品",
+      "current": "55,779.82",
+      "prior": "7,339.45",
+      "layout_line": "苏州象泽企业管理咨询有限公司                     销售商品            55,779.82      7,339.45",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "象融兴（重庆）置业有限公司",
+      "content": "销售商品",
+      "current": "7,339.45",
+      "prior": "9,174.31",
+      "layout_line": "象融兴（重庆）置业有限公司                      销售商品             7,339.45      9,174.31",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "上海屿同房地产开发有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "55,045.88",
+      "layout_line": "上海屿同房地产开发有限公司                      销售商品                           55,045.88",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "上海象昀房地产开发有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "55,045.87",
+      "layout_line": "上海象昀房地产开发有限公司                      销售商品                           55,045.87",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "象屿宝元（徐州）智能制造有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "28,017,559.49",
+      "layout_line": "象屿宝元（徐州）智能制造有限公司                   销售商品                        28,017,559.49",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "福建登云房地产开发有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "1,100.92",
+      "layout_line": "福建登云房地产开发有限公司                      销售商品                           1,100.92",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "厦门金融租赁有限公司",
+      "content": "销售商品",
+      "current": "465,317,474.93",
+      "prior": "2,201.83",
+      "layout_line": "厦门金融租赁有限公司                         销售商品        465,317,474.93     2,201.83",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "哈尔滨城屿商业运营有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "3,302.75",
+      "layout_line": "哈尔滨城屿商业运营有限公司                      销售商品                           3,302.75",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "辽阳象屿铝业有限公司",
+      "content": "销售商品",
+      "current": "88,937,463.31",
+      "prior": "36,190,719.63",
+      "layout_line": "辽阳象屿铝业有限公司                         销售商品         88,937,463.31  36,190,719.63",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "营口象屿精制铝业有限责任公司",
+      "content": "销售商品",
+      "current": "52,956,318.53",
+      "prior": "10,180,881.74",
+      "layout_line": "营口象屿精制铝业有限责任公司                     销售商品         52,956,318.53  10,180,881.74",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "营口象屿炭素有限公司",
+      "content": "销售商品",
+      "current": "613,603,658.84",
+      "prior": "28,890,004.61",
+      "layout_line": "营口象屿炭素有限公司                         销售商品        613,603,658.84  28,890,004.61",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 278,
+      "party": "天津象屿铝业有限公司",
+      "content": "销售商品",
+      "current": "277,316,461.55",
+      "prior": "72,732,392.73",
+      "layout_line": "天津象屿铝业有限公司                         销售商品        277,316,461.55  72,732,392.73",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "营口象屿铝业有限公司",
+      "content": "销售商品",
+      "current": "601,480,247.12",
+      "prior": "871,510,178.52",
+      "layout_line": "营口象屿铝业有限公司                       销售商品        601,480,247.12 871,510,178.52",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "开曼铝业（三门峡）有限公司及其子公司",
+      "content": "销售商品",
+      "current": "209,775,676.73",
+      "prior": "1,374,522,344.15",
+      "layout_line": "开曼铝业（三门峡）有限公司及其子公司               销售商品        209,775,676.731,374,522,344.15",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "湖北国贸鹭岛供应链有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "199,570,752.52",
+      "layout_line": "湖北国贸鹭岛供应链有限公司                    销售商品                       199,570,752.52",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "河南宏象铝业有限公司",
+      "content": "销售商品",
+      "current": "3,226,212.80",
+      "prior": null,
+      "layout_line": "河南宏象铝业有限公司                       销售商品          3,226,212.80",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门铁路物流投资有限责任公司",
+      "content": "销售商品",
+      "current": "8,073.39",
+      "prior": null,
+      "layout_line": "厦门铁路物流投资有限责任公司                   销售商品             8,073.39",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "北安象屿金谷生化科技有限公司",
+      "content": "销售商品",
+      "current": "150,932,873.17",
+      "prior": "173,640,334.86",
+      "layout_line": "北安象屿金谷生化科技有限公司                   销售商品        150,932,873.17 173,640,334.86",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门富嘉企业管理有限公司",
+      "content": "销售商品",
+      "current": "466,563.30",
+      "prior": null,
+      "layout_line": "厦门富嘉企业管理有限公司                     销售商品           466,563.30",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "富锦象屿金谷生化科技有限公司",
+      "content": "销售商品",
+      "current": "442,126,791.34",
+      "prior": "227,988,522.71",
+      "layout_line": "富锦象屿金谷生化科技有限公司                   销售商品        442,126,791.34 227,988,522.71",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "PT Obsidian Stainless Steel",
+      "content": "销售商品",
+      "current": "73,791,289.64",
+      "prior": "461,681,088.57",
+      "layout_line": "PTObsidianStainlessSteel         销售商品         73,791,289.64 461,681,088.57",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "绥化象屿金谷生化科技有限公司",
+      "content": "销售商品",
+      "current": "394,864,886.34",
+      "prior": "332,966,465.50",
+      "layout_line": "绥化象屿金谷生化科技有限公司                   销售商品        394,864,886.34 332,966,465.50",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门市闽台中心渔港建设发展有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "14,678.90",
+      "layout_line": "厦门市闽台中心渔港建设发展有限公司                销售商品                           14,678.90",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门象屿金象控股集团有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "51,009.17",
+      "layout_line": "厦门象屿金象控股集团有限公司                   销售商品                           51,009.17",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门象屿自贸区开发有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "22,752.29",
+      "layout_line": "厦门象屿自贸区开发有限公司                    销售商品                           22,752.29",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门象屿资产管理运营有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "59,449.54",
+      "layout_line": "厦门象屿资产管理运营有限公司                   销售商品                           59,449.54",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "江苏象屿房地产开发有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "52,110.09",
+      "layout_line": "江苏象屿房地产开发有限公司                    销售商品                           52,110.09",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门象屿产业开发运营有限公司",
+      "content": "销售商品",
+      "current": "7,339.45",
+      "prior": null,
+      "layout_line": "厦门象屿产业开发运营有限公司                   销售商品             7,339.45",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门象隆置业有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "6,238.53",
+      "layout_line": "厦门象隆置业有限公司                       销售商品                           6,238.53",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门象屿创业投资管理有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "12,844.04",
+      "layout_line": "厦门象屿创业投资管理有限公司                   销售商品                           12,844.04",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门象屿金象融资租赁有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "17,247.71",
+      "layout_line": "厦门象屿金象融资租赁有限公司                   销售商品                           17,247.71",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门象屿商业发展有限责任公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "9,541.28",
+      "layout_line": "厦门象屿商业发展有限责任公司                   销售商品                           9,541.28",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "苏州高辰置业有限公司",
+      "content": "销售商品",
+      "current": "5,504.59",
+      "prior": null,
+      "layout_line": "苏州高辰置业有限公司                       销售商品             5,504.59",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "上海象屿物业管理有限公司",
+      "content": "销售商品",
+      "current": "15,963.30",
+      "prior": "116,045.85",
+      "layout_line": "上海象屿物业管理有限公司                     销售商品            15,963.30     116,045.85",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "深圳象屿商业保理有限责任公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "8,440.37",
+      "layout_line": "深圳象屿商业保理有限责任公司                   销售商品                           8,440.37",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "黑龙江金象生化有限责任公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "31,687.61",
+      "layout_line": "黑龙江金象生化有限责任公司                    销售商品                           31,687.61",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "高安成晖供应链有限责任公司",
+      "content": "销售商品",
+      "current": "11,770,934.81",
+      "prior": "15,679,448.08",
+      "layout_line": "高安成晖供应链有限责任公司                    销售商品         11,770,934.81  15,679,448.08",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门象屿产业发展集团有限公司",
+      "content": "销售商品",
+      "current": "7,339.45",
+      "prior": null,
+      "layout_line": "厦门象屿产业发展集团有限公司                   销售商品             7,339.45",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门象屿科技有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "2,201.83",
+      "layout_line": "厦门象屿科技有限公司                       销售商品                           2,201.83",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "象屿地产集团有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "39,633.03",
+      "layout_line": "象屿地产集团有限公司                       销售商品                           39,633.03",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "天津天安泛科技园开发有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "1,834.86",
+      "layout_line": "天津天安泛科技园开发有限公司                   销售商品                           1,834.86",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "北京象昌兴盛科技服务有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "7,339.45",
+      "layout_line": "北京象昌兴盛科技服务有限公司                   销售商品                           7,339.45",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门东坪山旅游发展有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "25,412.85",
+      "layout_line": "厦门东坪山旅游发展有限公司                    销售商品                           25,412.85",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门象屿物业服务有限公司",
+      "content": "销售商品",
+      "current": "63,512.75",
+      "prior": "18,348.62",
+      "layout_line": "厦门象屿物业服务有限公司                     销售商品            63,512.75      18,348.62",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门象屿盈信信息科技有限公司",
+      "content": "销售商品",
+      "current": "61,834.86",
+      "prior": "45,871.56",
+      "layout_line": "厦门象屿盈信信息科技有限公司                   销售商品            61,834.86      45,871.56",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门象屿智慧供应链有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "17,247.70",
+      "layout_line": "厦门象屿智慧供应链有限公司                    销售商品                           17,247.70",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "绥化象屿能源有限公司",
+      "content": "销售商品",
+      "current": "1,868,724.83",
+      "prior": "10,534,477.98",
+      "layout_line": "绥化象屿能源有限公司                       销售商品          1,868,724.83  10,534,477.98",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门泓屿供应链有限责任公司",
+      "content": "销售商品",
+      "current": "649,008.85",
+      "prior": "55,360,396.70",
+      "layout_line": "厦门泓屿供应链有限责任公司                    销售商品           649,008.85   55,360,396.70",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门瑞廷公寓管理有限公司",
+      "content": "销售商品",
+      "current": "839,442.66",
+      "prior": "575,122.92",
+      "layout_line": "厦门瑞廷公寓管理有限公司                     销售商品           839,442.66     575,122.92",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门市象欣创业投资有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "15,779.82",
+      "layout_line": "厦门市象欣创业投资有限公司                    销售商品                           15,779.82",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门顺欣恒晟科技服务有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "3,669.72",
+      "layout_line": "厦门顺欣恒晟科技服务有限公司                   销售商品                           3,669.72",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "上海顺禧恒昇科技服务有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "3,669.72",
+      "layout_line": "上海顺禧恒昇科技服务有限公司                   销售商品                           3,669.72",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "苏州象弘房地产开发有限公司",
+      "content": "销售商品",
+      "current": "7,706.42",
+      "prior": null,
+      "layout_line": "苏州象弘房地产开发有限公司                    销售商品             7,706.42",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "锦州港象屿粮食物流有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "1,110,091.74",
+      "layout_line": "锦州港象屿粮食物流有限公司                    销售商品                        1,110,091.74",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门和平码头有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "348.62",
+      "layout_line": "厦门和平码头有限公司                       销售商品                             348.62",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "苏州象昊房地产开发有限公司",
+      "content": "销售商品",
+      "current": "9,174.31",
+      "prior": null,
+      "layout_line": "苏州象昊房地产开发有限公司                    销售商品             9,174.31",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "厦门轮渡有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "3,486.24",
+      "layout_line": "厦门轮渡有限公司                         销售商品                           3,486.24",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "南京象鸿房地产开发有限公司",
+      "content": "销售商品",
+      "current": "6,605.50",
+      "prior": null,
+      "layout_line": "南京象鸿房地产开发有限公司                    销售商品             6,605.50",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "榆林象道物流有限公司",
+      "content": "销售商品",
+      "current": "1,397,266.88",
+      "prior": "953,250.38",
+      "layout_line": "榆林象道物流有限公司                       销售商品          1,397,266.88    953,250.38",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "江苏德龙镍业有限公司",
+      "content": "销售商品",
+      "current": "21,128,657.36",
+      "prior": "2,851,341.84",
+      "layout_line": "江苏德龙镍业有限公司                       销售商品         21,128,657.36  2,851,341.84",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 279,
+      "party": "营口忠旺铝业有限公司",
+      "content": "销售商品",
+      "current": null,
+      "prior": "128,805.30",
+      "layout_line": "营口忠旺铝业有限公司                       销售商品                          128,805.30",
+      "column_boundary": 59
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "招商局集团有限公司及其子公司",
+      "content": "提供劳务",
+      "current": "6,137,633.07",
+      "prior": null,
+      "layout_line": "招商局集团有限公司及其子公司                     提供劳务          6,137,633.07",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "山东省港口集团有限公司及其子公司",
+      "content": "提供劳务",
+      "current": "3,438,892.49",
+      "prior": null,
+      "layout_line": "山东省港口集团有限公司及其子公司                   提供劳务          3,438,892.49",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "厦门东坪山旅游发展有限公司",
+      "content": "提供劳务",
+      "current": null,
+      "prior": "337,785.28",
+      "layout_line": "厦门东坪山旅游发展有限公司                      提供劳务                          337,785.28",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "厦门象瀚投资有限公司",
+      "content": "提供劳务",
+      "current": "53,910,286.52",
+      "prior": null,
+      "layout_line": "厦门象瀚投资有限公司                         提供劳务         53,910,286.52",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "营口象屿精制铝业有限责任公司",
+      "content": "提供劳务",
+      "current": "52,332,296.18",
+      "prior": null,
+      "layout_line": "营口象屿精制铝业有限责任公司                     提供劳务         52,332,296.18",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "厦门和平码头有限公司",
+      "content": "提供劳务",
+      "current": "1,886.79",
+      "prior": null,
+      "layout_line": "厦门和平码头有限公司                         提供劳务             1,886.79",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "天津环屿再生资源利用有限公司",
+      "content": "提供劳务",
+      "current": "319,793.57",
+      "prior": null,
+      "layout_line": "天津环屿再生资源利用有限公司                     提供劳务           319,793.57",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "上海象屿机电有限公司",
+      "content": "提供劳务",
+      "current": "5,525.93",
+      "prior": null,
+      "layout_line": "上海象屿机电有限公司                         提供劳务             5,525.93",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "上海象屿商业发展集团有限公司",
+      "content": "提供劳务",
+      "current": "3,597.57",
+      "prior": null,
+      "layout_line": "上海象屿商业发展集团有限公司                     提供劳务             3,597.57",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "厦门象沧铝业有限公司",
+      "content": "提供劳务",
+      "current": "139,312.72",
+      "prior": null,
+      "layout_line": "厦门象沧铝业有限公司                         提供劳务           139,312.72",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "开曼铝业（三门峡）有限公司及其子公司",
+      "content": "提供劳务",
+      "current": "47,825,138.60",
+      "prior": null,
+      "layout_line": "开曼铝业（三门峡）有限公司及其子公司                 提供劳务         47,825,138.60",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "响水巨合金属制品有限公司",
+      "content": "提供劳务",
+      "current": "5,041,026.69",
+      "prior": null,
+      "layout_line": "响水巨合金属制品有限公司                       提供劳务          5,041,026.69",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "江苏德龙镍业有限公司",
+      "content": "提供劳务",
+      "current": "5,521,226.70",
+      "prior": null,
+      "layout_line": "江苏德龙镍业有限公司                         提供劳务          5,521,226.70",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "响水德丰金属材料有限公司",
+      "content": "提供劳务",
+      "current": "1,351.35",
+      "prior": null,
+      "layout_line": "响水德丰金属材料有限公司                       提供劳务             1,351.35",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "厦门供应链数智创新有限公司",
+      "content": "提供劳务",
+      "current": "351,987.00",
+      "prior": null,
+      "layout_line": "厦门供应链数智创新有限公司                      提供劳务           351,987.00",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "北安象屿金谷生化科技有限公司",
+      "content": "提供劳务",
+      "current": "46,776,082.20",
+      "prior": "26,139,320.09",
+      "layout_line": "北安象屿金谷生化科技有限公司                     提供劳务         46,776,082.20  26,139,320.09",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "富锦象屿金谷生化科技有限公司",
+      "content": "提供劳务",
+      "current": "25,440,127.08",
+      "prior": "13,018,403.56",
+      "layout_line": "富锦象屿金谷生化科技有限公司                     提供劳务         25,440,127.08  13,018,403.56",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "辽宁象屿铝业有限公司",
+      "content": "提供劳务",
+      "current": "6,250,315.57",
+      "prior": null,
+      "layout_line": "辽宁象屿铝业有限公司                         提供劳务          6,250,315.57",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "厦门象盛镍业有限公司",
+      "content": "提供劳务",
+      "current": "145,465,671.33",
+      "prior": "130,422,410.04",
+      "layout_line": "厦门象盛镍业有限公司                         提供劳务        145,465,671.33 130,422,410.04",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "厦门闽台商贸有限公司",
+      "content": "提供劳务",
+      "current": "37,487.42",
+      "prior": "32,137.81",
+      "layout_line": "厦门闽台商贸有限公司                         提供劳务            37,487.42      32,137.81",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "香港象正贸易有限公司",
+      "content": "提供劳务",
+      "current": "19,991,753.12",
+      "prior": "9,560,198.75",
+      "layout_line": "香港象正贸易有限公司                         提供劳务         19,991,753.12   9,560,198.75",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "厦门象屿商业管理有限责任公司",
+      "content": "提供劳务",
+      "current": null,
+      "prior": "148,143.02",
+      "layout_line": "厦门象屿商业管理有限责任公司                     提供劳务                          148,143.02",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "厦门象屿酒业有限公司",
+      "content": "提供劳务",
+      "current": "741,522.64",
+      "prior": "2,443.87",
+      "layout_line": "厦门象屿酒业有限公司                         提供劳务           741,522.64       2,443.87",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "厦门象屿生物科技有限责任公司",
+      "content": "提供劳务",
+      "current": "4,598.11",
+      "prior": "900.00",
+      "layout_line": "厦门象屿生物科技有限责任公司                     提供劳务             4,598.11        900.00",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "厦门象屿机电有限公司",
+      "content": "提供劳务",
+      "current": "187,823.44",
+      "prior": "263,056.24",
+      "layout_line": "厦门象屿机电有限公司                         提供劳务           187,823.44     263,056.24",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "厦门象屿医疗设备有限责任公司",
+      "content": "提供劳务",
+      "current": "46,097.66",
+      "prior": "101,341.88",
+      "layout_line": "厦门象屿医疗设备有限责任公司                     提供劳务            46,097.66     101,341.88",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "厦门象屿资产管理运营有限公司",
+      "content": "提供劳务",
+      "current": "202,073.38",
+      "prior": "97,450.30",
+      "layout_line": "厦门象屿资产管理运营有限公司                     提供劳务           202,073.38      97,450.30",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "湖州象屿产业发展有限责任公司",
+      "content": "提供劳务",
+      "current": null,
+      "prior": "9,904.45",
+      "layout_line": "湖州象屿产业发展有限责任公司                     提供劳务                            9,904.45",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "象屿集团",
+      "content": "提供劳务",
+      "current": "29,732.36",
+      "prior": "11,663.74",
+      "layout_line": "象屿集团                               提供劳务            29,732.36      11,663.74",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "福建象屿医疗器械有限责任公司",
+      "content": "提供劳务",
+      "current": "10,720.05",
+      "prior": "839.29",
+      "layout_line": "福建象屿医疗器械有限责任公司                     提供劳务            10,720.05        839.29",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "湖北国贸鹭岛供应链有限公司",
+      "content": "提供劳务",
+      "current": "17,766.67",
+      "prior": "419,168.27",
+      "layout_line": "湖北国贸鹭岛供应链有限公司                      提供劳务            17,766.67     419,168.27",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "PT Xiangyu Shipping Line（印尼象屿航运有限公司）",
+      "content": "提供劳务",
+      "current": "883,564.90",
+      "prior": "4,223,810.28",
+      "layout_line": "PTXiangyuShippingLine（印尼象屿航运有      提供劳务           883,564.90    4,223,810.28",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "哈尔滨农村商业银行股份有限公司",
+      "content": "提供劳务",
+      "current": "171,916.73",
+      "prior": "8,844.59",
+      "layout_line": "哈尔滨农村商业银行股份有限公司                    提供劳务           171,916.73       8,844.59",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "天津象屿铝业有限公司",
+      "content": "提供劳务",
+      "current": "32,595,578.45",
+      "prior": "1,414,157.52",
+      "layout_line": "天津象屿铝业有限公司                         提供劳务         32,595,578.45   1,414,157.52",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "辽阳象屿铝业有限公司",
+      "content": "提供劳务",
+      "current": "1,068,192.51",
+      "prior": "89,704.23",
+      "layout_line": "辽阳象屿铝业有限公司                         提供劳务          1,068,192.51     89,704.23",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "江苏晨安投资管理有限责任公司",
+      "content": "提供劳务",
+      "current": "2,781,589.53",
+      "prior": null,
+      "layout_line": "江苏晨安投资管理有限责任公司                     提供劳务          2,781,589.53",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "黑龙江金象生化有限责任公司",
+      "content": "提供劳务",
+      "current": "3,922,180.14",
+      "prior": "9,365,002.95",
+      "layout_line": "黑龙江金象生化有限责任公司                      提供劳务          3,922,180.14   9,365,002.95",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "PT Obsidian Stainless Steel",
+      "content": "提供劳务",
+      "current": "38,291,200.37",
+      "prior": "68,404,988.74",
+      "layout_line": "PTObsidianStainlessSteel           提供劳务         38,291,200.37  68,404,988.74",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "福建象屿壳牌石油有限责任公司",
+      "content": "提供劳务",
+      "current": "2,459,009.72",
+      "prior": "1,368,949.66",
+      "layout_line": "福建象屿壳牌石油有限责任公司                     提供劳务          2,459,009.72   1,368,949.66",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "厦门铁路物流投资有限责任公司",
+      "content": "提供劳务",
+      "current": "3,262,393.96",
+      "prior": "2,864.10",
+      "layout_line": "厦门铁路物流投资有限责任公司                     提供劳务          3,262,393.96      2,864.10",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "绥化象屿金谷生化科技有限公司",
+      "content": "提供劳务",
+      "current": "60,882,682.73",
+      "prior": "42,850,931.19",
+      "layout_line": "绥化象屿金谷生化科技有限公司                     提供劳务         60,882,682.73  42,850,931.19",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "厦门象屿跨境电商有限责任公司",
+      "content": "提供劳务",
+      "current": "14,080.41",
+      "prior": "200,418.61",
+      "layout_line": "厦门象屿跨境电商有限责任公司                     提供劳务            14,080.41     200,418.61",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "厦门象屿兴泓科技发展有限公司",
+      "content": "提供劳务",
+      "current": null,
+      "prior": "10,856.68",
+      "layout_line": "厦门象屿兴泓科技发展有限公司                     提供劳务                           10,856.68",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "厦门象屿智慧供应链有限公司",
+      "content": "提供劳务",
+      "current": "2,983,303.66",
+      "prior": "103,446.13",
+      "layout_line": "厦门象屿智慧供应链有限公司                      提供劳务          2,983,303.66    103,446.13",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "厦门象屿自贸区开发有限公司",
+      "content": "提供劳务",
+      "current": null,
+      "prior": "3,084,581.38",
+      "layout_line": "厦门象屿自贸区开发有限公司                      提供劳务                         3,084,581.38",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "沈阳象屿新材料技术有限公司",
+      "content": "提供劳务",
+      "current": "103,716.62",
+      "prior": "510,179.67",
+      "layout_line": "沈阳象屿新材料技术有限公司                      提供劳务           103,716.62     510,179.67",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "高安成晖供应链有限责任公司",
+      "content": "提供劳务",
+      "current": "9,849.83",
+      "prior": null,
+      "layout_line": "高安成晖供应链有限责任公司                      提供劳务             9,849.83",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 280,
+      "party": "黑龙江象屿小额贷款有限公司",
+      "content": "提供劳务",
+      "current": "226,415.09",
+      "prior": "226,415.09",
+      "layout_line": "黑龙江象屿小额贷款有限公司                      提供劳务           226,415.09     226,415.09",
+      "column_boundary": 61
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 281,
+      "party": "厦门泓屿供应链有限责任公司",
+      "content": "提供劳务",
+      "current": "974.24",
+      "prior": null,
+      "layout_line": "厦门泓屿供应链有限责任公司                 提供劳务            974.24",
+      "column_boundary": 54
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 281,
+      "party": "厦门市闽台中心渔港建设发展有限公司",
+      "content": "提供劳务",
+      "current": null,
+      "prior": "79,662.17",
+      "layout_line": "厦门市闽台中心渔港建设发展有限公司             提供劳务                      79,662.17",
+      "column_boundary": 54
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 281,
+      "party": "厦门象屿金象融资租赁有限公司",
+      "content": "提供劳务",
+      "current": "28,301.89",
+      "prior": "28,301.89",
+      "layout_line": "厦门象屿金象融资租赁有限公司                提供劳务          28,301.89   28,301.89",
+      "column_boundary": 54
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 281,
+      "party": "厦门易象通网络科技有限公司",
+      "content": "提供劳务",
+      "current": "4,105,605.43",
+      "prior": "3,418,170.00",
+      "layout_line": "厦门易象通网络科技有限公司                 提供劳务        4,105,605.43 3,418,170.00",
+      "column_boundary": 54
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 281,
+      "party": "香港象屿投资有限公司",
+      "content": "提供劳务",
+      "current": "1,634,254.65",
+      "prior": "1,423,494.16",
+      "layout_line": "香港象屿投资有限公司                    提供劳务        1,634,254.65 1,423,494.16",
+      "column_boundary": 54
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 281,
+      "party": "榆林象道物流有限公司",
+      "content": "提供劳务",
+      "current": "123,853,818.35",
+      "prior": "108,912,941.12",
+      "layout_line": "榆林象道物流有限公司                    提供劳务      123,853,818.35108,912,941.12",
+      "column_boundary": 54
+    },
+    {
+      "instrument_id": "600057.SH",
+      "page": 281,
+      "party": "厦门金融租赁有限公司",
+      "content": "提供劳务",
+      "current": null,
+      "prior": "2,452.83",
+      "layout_line": "厦门金融租赁有限公司                    提供劳务                       2,452.83",
+      "column_boundary": 54
+    },
+    {
+      "instrument_id": "600085.SH",
+      "page": 189,
+      "party": "北京同仁堂健康药业股份有限公司",
+      "content": "销货",
+      "current": "19,998.02",
+      "prior": "29,211.31",
+      "layout_line": "    北京同仁堂健康药业股份有限公司                     销货          19,998.0229,211.31",
+      "column_boundary": 60
+    },
+    {
+      "instrument_id": "600085.SH",
+      "page": 189,
+      "party": "北京同仁堂医养投资股份有限公司",
+      "content": "销货及提供服务",
+      "current": "8,981.38",
+      "prior": "8,494.81",
+      "layout_line": "    北京同仁堂医养投资股份有限公司                  销货及提供服务        8,981.38 8,494.81",
+      "column_boundary": 60
+    },
+    {
+      "instrument_id": "600085.SH",
+      "page": 189,
+      "party": "北京同仁堂制药有限公司",
+      "content": "销货及提供服务",
+      "current": "923.68",
+      "prior": "359.93",
+      "layout_line": "    北京同仁堂制药有限公司                      销货及提供服务          923.68   359.93",
+      "column_boundary": 60
+    },
+    {
+      "instrument_id": "600085.SH",
+      "page": 189,
+      "party": "天津同仁堂集团股份有限公司",
+      "content": "销货及提供服务",
+      "current": "185.11",
+      "prior": null,
+      "layout_line": "    天津同仁堂集团股份有限公司                    销货及提供服务          185.11",
+      "column_boundary": 60
+    },
+    {
+      "instrument_id": "600085.SH",
+      "page": 189,
+      "party": "中国北京同仁堂（集团）有限责任公司",
+      "content": "销货及提供服务",
+      "current": "63.36",
+      "prior": "258.71",
+      "layout_line": "    中国北京同仁堂（集团）有限责任公司                销货及提供服务          63.36    258.71",
+      "column_boundary": 60
+    },
+    {
+      "instrument_id": "600085.SH",
+      "page": 189,
+      "party": "北京市中药科学研究所有限公司",
+      "content": "销货及提供服务",
+      "current": "29.42",
+      "prior": null,
+      "layout_line": "    北京市中药科学研究所有限公司                   销货及提供服务          29.42",
+      "column_boundary": 60
+    },
+    {
+      "instrument_id": "600085.SH",
+      "page": 189,
+      "party": "北京同仁堂（泰国）有限公司",
+      "content": "销货",
+      "current": "14.03",
+      "prior": "36.94",
+      "layout_line": "    北京同仁堂（泰国）有限公司                       销货            14.03    36.94",
+      "column_boundary": 60
+    },
+    {
+      "instrument_id": "600085.SH",
+      "page": 189,
+      "party": "北京同仁堂康养产业发展有限公司",
+      "content": "销货",
+      "current": "12.67",
+      "prior": "5.83",
+      "layout_line": "    北京同仁堂康养产业发展有限公司                     销货            12.67     5.83",
+      "column_boundary": 60
+    },
+    {
+      "instrument_id": "600085.SH",
+      "page": 189,
+      "party": "北京同仁堂伊利食品有限责任公司",
+      "content": "销货及提供服务",
+      "current": "12.03",
+      "prior": null,
+      "layout_line": "    北京同仁堂伊利食品有限责任公司                  销货及提供服务          12.03",
+      "column_boundary": 60
+    },
+    {
+      "instrument_id": "600085.SH",
+      "page": 189,
+      "party": "北京同仁堂第二中医医院有限责任公司",
+      "content": "销货及提供服务",
+      "current": null,
+      "prior": "128.64",
+      "layout_line": "    北京同仁堂第二中医医院有限责任公司                销货及提供服务                   128.64",
+      "column_boundary": 60
+    },
+    {
+      "instrument_id": "600085.SH",
+      "page": 189,
+      "party": "耀康国际有限公司",
+      "content": "销货",
+      "current": "32.45",
+      "prior": "25.36",
+      "layout_line": "    耀康国际有限公司                            销货            32.45    25.36",
+      "column_boundary": 60
+    },
+    {
+      "instrument_id": "600085.SH",
+      "page": 189,
+      "party": "北京同仁堂国际（香港）医疗健康有限公司",
+      "content": "销货",
+      "current": null,
+      "prior": "45.80",
+      "layout_line": "    北京同仁堂国际（香港）医疗健康有限公司                 销货                     45.80",
+      "column_boundary": 60
+    }
+  ],
+  "current_count": 97,
+  "prior_only_count": 45,
+  "method": "independent official layout aligned column positions, no profile extraction used"
+}

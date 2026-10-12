@@ -1,0 +1,27 @@
+{
+  "a_role_finite_acceptance": true,
+  "accepted_at": "2026-10-12T08:46:04.096099+00:00",
+  "scope": "600054.SH/600084.SH official2025 reports; original211 positive+51negative conditions and actual checked output",
+  "source_recall": {
+    "numerator": 211,
+    "denominator": 211
+  },
+  "source_accuracy": {
+    "numerator": 437,
+    "denominator": 437,
+    "actual_facts": 431,
+    "answered_bodies": 6
+  },
+  "critical_numeric_errors": 0,
+  "negative_count": 51,
+  "negative_passed": 51,
+  "whole_round_seconds": 212.11928485427052,
+  "tokens_used": 0,
+  "shared_budget": 50000,
+  "actual_five_stages_no_reuse_or_predecessor": true,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "original_failure_preserved": "112/211;254/283",
+  "first_results_not_rerun": true,
+  "next_pair_separate_source_contract": true
+}

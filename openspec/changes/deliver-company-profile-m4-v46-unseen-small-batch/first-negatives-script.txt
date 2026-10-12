@@ -1,0 +1,50 @@
+"""Evaluate frozen negatives on protected accepted facts AND actual answered text."""
+import json,re
+from pathlib import Path
+C=Path('openspec/changes/deliver-company-profile-m4-v46-unseen-small-batch');read=lambda p:json.loads(p.read_text());s=read(C/'source-scope.json');co=lambda x:re.sub(r'\s+','',x or '').replace(',','').replace('（','(').replace('）',')');raw={i:read(Path('/tmp/v46_unseen_actual_'+i+'.json')) for i in s['versions']};profiles={i:read(Path('data/exports/m4_v46_unseen_small_batch')/i/(i+'_2025-12-31.json')) for i in s['versions']};out=[]
+for n in s['negative_conditions']:
+ i=n['instrument_id'];rr=raw[i];f=[r for r in rr if r['object_type'] in ['Segment','Measurement']];a=[r for r in rr if r['object_type'] in ['Activity','Relationship']];rule=n['name'];wrong=[];wrong_answers=[];note=''
+ if rule.startswith('仅上期关联:'):
+  wrong=[r for r in f if co(r['source_native'].get('qualifier'))==co('交易对方：'+n['counterparty']) and '出售商品' in (r['source_native'].get('header')or'') and co(r['source_native']['name'])==co(n['content'])];note='独立layout原本期空，逐核原交易对手＋内容；正文只引用原双年列表和空本期，无肯定本期收入，不凭同额否定其他合法交易。'
+ elif rule.startswith('仅上期出租:'):
+  wrong=[r for r in f if co(r['source_native'].get('qualifier'))==co('承租方：'+n['counterparty']) and '本公司作为出租方' in (r['source_native'].get('header')or'')];note='原三仅上期出租未生成本期事实/零；正文原表保留双年格，未把上期改成本期。'
+ elif rule=='空分部格不借相邻':
+  wrong=[r for r in f if r['source_native']['name']=='分部间抵销' and co(r['source_native']['value'])=='1725618.51' and any(e['page']==195 for e in r['evidence'])]
+  body=profiles[i]['dimensions'];wrong_answers=[d['dimension_id'] for d in body if '分部间抵销（非同级业务，不累计）' in d['excerpt'] and '营业收入 1,725,618.51万元' in d['excerpt']]
+  assert len(wrong)==2 and wrong_answers==['revenue_model'];note='对外收入合计左移到空抵销格，Segment及Measurement错误；收入正文也肯定该错误抵销金额。内部交易512028.94原抵销额保留，不因同额重复误拒。'
+ elif rule=='母公司境外收入空':
+  wrong=[r for r in f if r['subject_scope']=='issuer' and r.get('dimension',r.get('segment_dimension'))=='region' and '境外' in r['source_native']['name']];note='象屿母公司境外空未造零、未借境内；实际境内及地区合计保留。'
+ elif rule=='重要合营联营不适用':
+  wrong=[r for r in f if any(x in (r['source_native'].get('header')or'') for x in ['重要合营','重要联营'])];note='原不适用状态无合营联营收入事实或肯定正文；非重要投资价值/利润不当营收。'
+ elif rule=='报告分部不适用':
+  wrong=[r for r in f if '报告分部' in (r['source_native'].get('header')or'')];note='象屿母公司收入与子公司不同原表，未生成报告分部。'
+ elif rule=='费用表边界':
+  wrong=[r for r in f if any(x in (r['source_native'].get('header')or'') for x in ['税金及附加','销售费用','管理费用','财务费用'])];note='实际本期收入原格逐核；原费用章节未生成营收事实或肯定正文。'
+ elif rule in ['承租费用非收入','关联承租非出租','未来租金非当期营收','支付品牌费非营业收入','母公司投资收益非收入','投资收益非营业收入','成本表非收入','期现毛利非营业收入']:
+  forbidden={'承租费用非收入':['70047647.01','16275050.04','243174411.00'],'关联承租非出租':(['59923512.04','3253157.61'] if i=='600085.SH' else []),'未来租金非当期营收':[],'支付品牌费非营业收入':['35579378.85','1023.88'],'母公司投资收益非收入':['286094507.50'],'投资收益非营业收入':['801302014.92'],'成本表非收入':['399316.53','12168.72','762494.02'],'期现毛利非营业收入':['-18.03']}[rule]
+  wrong=[r for r in f if co(r['source_native']['value']) in forbidden or any(x in (r['source_native'].get('header')or'') for x in ['作为承租人/租金','承租支出','投资收益','资产处置收益','营业成本','期现毛利','未折现租金收款'])]
+  # The unrelated genuine rental cells were matched to their exact original rows in the object review.
+  note='逐核原非收入数字/章节与全量实际收入格，未把承租、未来收款、成本、投资/处置收益或毛利肯定为本期营业收入；合法出租收入独立保留。'
+ elif rule=='客户排名非销售渠道':
+  wrong=[r for r in f if r.get('dimension',r.get('segment_dimension'))=='sales_mode'];note='象屿客户/供应商排名未生成销售渠道或采购营收；贸易营收3852亿元为独立真实原列。'
+ elif rule=='订单计划非已销售':
+  wrong=[r for r in a if any(t in r['source_native']['name'] for t in ['53艘','114艘','2029','待满产'])];note='未把订单/排产数量肯定为本期已交付；正文该原状态遗漏属于正向正文缺口。'
+ elif rule=='控股股东制造非发行人制造':
+  wrong=[r for r in a if r.get('action') in ['produces','processes'] and any(t in r['source_native']['name'] for t in ['不锈钢','铝','玉米'])];note='原控股股东制造协同限定在原经营片段/正文保留，未转发行人具名制造。'
+ elif rule=='未来五年盈利模式不当前化':
+  wrong=[r for r in a if any(t in r['source_native']['name'] for t in ['2026','2030','未来五年'])];note='未来盈利结构未作为本期新收入；当前p13盈利机制未答属于正向缺口。'
+ elif rule=='主要子公司表无收入列':
+  wrong=[r for r in f if any(e['page']==32 for e in r['evidence'])];note='p32原总资产/净资产/净利润未生成收入；正文原完整表引用有列名，不肯定为营业收入，p179本期三子公司收入保留。'
+ elif rule=='受托不适用':
+  wrong=[r for r in f if any(t in (r['source_native'].get('header')or'') for t in ['受托','托管'])];note='同仁堂不适用受托章节未借出租表生成托管收入；象屿有真实受托不跨公司拒绝。'
+ elif rule=='采购不推投入':
+  wrong=[r for r in a if r.get('relation_type')=='material_input'];note='零售采购未推公司实际制造投入；原药品类别占比未作营收金额。'
+ elif rule=='注册许可非销售':
+  wrong=[r for r in a if r.get('action')=='sells' and any(t in r['source_native']['name'] for t in ['金钗石斛散','芪参颗粒','加拿大许可','香港注册'])];note='研发长表保留上市后研究/临床状态，不将注册许可或Ⅱ期入组转为当前销售。'
+ elif rule=='注销不维持当前子公司':
+  names=['宝鸡达吉康','安国）中药材物流','圣盖博加洲','本草药业科技','同仁九州']
+  wrong=[r for r in a if any(t in ((r.get('source_actor')or'')+r['source_native']['name']) for t in names)];note='已交付企业集团表无五注销主体当前经营；天成元增资取得保留但控制时间/资产购买缺失计正向正文遗漏，不把遗漏当肯定全年控制。'
+ else:raise AssertionError(rule)
+ out.append(dict(condition=n,evaluation_status='evaluated',actual_profile_exists=True,accepted_facts_and_all_answered_texts_checked=True,answered_dimension_ids=[d['dimension_id'] for d in profiles[i]['dimensions'] if d['answered']],passed=not wrong and not wrong_answers,wrong_accepted_object_ids=[r['record_id'] for r in wrong],wrong_answer_dimension_ids=wrong_answers,reason=note))
+assert len(out)==72
+(C/'negative-review-evidence.json').write_text(json.dumps(dict(conditions=out,negative_count=len(out),actually_evaluated_count=len(out),passed_count=sum(r['passed'] for r in out),failed_count=sum(not r['passed'] for r in out),unevaluable_count=0,original_contract_unchanged=True,contract_external_wrong_coke_purchase_scored_in_accuracy_not_added_to_original_negatives=True),ensure_ascii=False,indent=2)+'\n');print('NEGATIVES',sum(r['passed'] for r in out),'/',len(out))

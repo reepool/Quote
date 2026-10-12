@@ -1,0 +1,18 @@
+{
+  "historical_file_count": 2752,
+  "historical_hashes_unchanged": true,
+  "first_artifact_count": 18,
+  "first_artifact_hashes_unchanged": true,
+  "review_file_count": 9,
+  "review_hashes_protected": true,
+  "execution_module_count": 38,
+  "execution_modules_reconstructed": true,
+  "archived_original_file_count": 78,
+  "archived_original_hashes_unchanged": true,
+  "existing_modified_files_unchanged": true,
+  "query_export_disk_equal": true,
+  "formal_execution_count": 1,
+  "business_code_changed": false,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

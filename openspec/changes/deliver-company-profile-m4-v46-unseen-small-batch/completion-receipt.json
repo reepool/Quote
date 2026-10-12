@@ -1,0 +1,35 @@
+{
+  "archive_card_completed": true,
+  "old_change_archived": "openspec/changes/archive/2026-10-12-deliver-company-profile-m4-v45-unseen-small-batch",
+  "old_v46_finite_acceptance_preserved": true,
+  "new_change": "deliver-company-profile-m4-v46-unseen-small-batch",
+  "first_execution_and_failure_review_completed": true,
+  "business_acceptance_passed": false,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 104,
+    "denominator": 331,
+    "value": 0.31419939577039274
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 250,
+    "denominator": 301,
+    "value": 0.8305647840531561
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 3
+  },
+  "negative_passed": 71,
+  "negative_count": 72,
+  "whole_round_seconds": 219.23978225979954,
+  "tokens_used": 0,
+  "formal_execution_count": 1,
+  "business_code_changed": false,
+  "repair_cards_registered_but_unimplemented": true,
+  "next_batch": "paused_on_formal_failure",
+  "current_change_archived": false,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

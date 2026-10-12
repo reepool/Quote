@@ -1,0 +1,151 @@
+"""Independently read official source cells and explicit actions before any execute."""
+import json, hashlib, re
+from pathlib import Path
+from datetime import datetime, timezone
+R=Path.cwd(); C=R/'openspec/changes/deliver-company-profile-m4-v46-unseen-small-batch'
+read=lambda p:json.loads(p.read_text()); save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest(); compact=lambda s:re.sub(r'\s+','',s or '')
+f=read(C/'freeze-receipt.json'); plan=f['plan']; a,b='600057.SH','600085.SH'
+full={i:read(Path('/tmp/quote_v46_unseen_source_'+i+'.json')) for i in [a,b]}; layout=read(Path('/tmp/quote_v46_unseen_layout.json'))
+rows={a:[],b:[]}; roles=[]; neg=[]; ledgers=[]
+checked={a:set([5,11,12,13,14,15,16,17,18,19,20,23,24,25,26,34,36,37,64,65,122,123,153,154,155,156,225,226,227,240,241,246,259,260,261,262,263,276,277,278,279,280,281,282,283,307,317,318]), b:set([5,10,11,12,13,14,15,16,17,18,22,23,24,25,26,27,28,29,30,31,32,33,34,59,86,106,107,158,159,170,171,172,173,174,175,176,177,178,179,180,181,188,189,190,191,195,196,203,204])}
+def quote(i,p,cont=()):
+ checked[i].update([p,*cont]); return '\n'.join(full[i][n-1]['text'] for n in [p,*cont])
+def row(i,p,dim,n,v,actor='公司及合并子公司',counterparty='',header='',unit='元',continuation=(),qualifier='',aliases=(),column='本期营业收入'):
+ q=quote(i,p,continuation)
+ assert compact(n) in compact(q) or any(compact(x) in compact(q) for x in aliases),(i,p,n)
+ assert compact(v).replace(',','') in compact(q).replace(',',''),(i,p,n,v)
+ rows[i].append(dict(condition_id=f'{i}:income:{len(rows[i])+1:03}',page=p,dimension=dim,name=n,native_aliases=[n,*aliases],value=v,unit=unit,source_actor=actor,counterparty=counterparty,header=header,column=column,source_quote=q,qualifier=qualifier,reported_period='2025-12-31',continuation_pages=list(continuation)))
+def batch(i,p,dim,ns,vs,**kw):
+ for n,v in zip(ns.split('|'),vs.split('|'),strict=True):row(i,p,dim,n,v,**kw)
+batch(a,15,'product','大宗商品经营|金属矿产|能源化工|农产品|新能源','3,852|2,141|1,031|472|181',header='年度主要业务数据/大宗商品经营',unit='亿元',qualifier='原四舍五入收入列，与精确MD&A表各自保存，不将货量或期现毛利当收入')
+for n,v,actor in [('大宗商品物流','117','公司及合并子公司'),('专业物流','87','公司及合并子公司'),('综合物流','54','公司及合并子公司'),('铁路物流','33','象道物流集团有限公司'),('产业物流','30','公司及合并子公司'),('新能源物流','13','厦门象屿新能源有限责任公司'),('铝产业物流','11','厦门象屿铝联国际物流有限公司'),('农产品物流','6','黑龙江象屿农业物产有限公司')]:
+ row(a,16,'service',n,v,actor=actor,header='年度主要业务数据/大宗商品物流',unit='亿元',continuation=(5,),qualifier='对外市场化收入，专业与产业分类重叠不跨维累计；综合物流为速传及其他物流公司')
+row(a,17,'business_segment','生产制造','127',header='年度主要业务数据/生产制造',unit='亿元')
+row(a,17,'business_segment','造船','64',actor='南通象屿海洋装备股份有限公司',header='年度主要业务数据/生产制造',unit='亿元',continuation=(5,))
+batch(a,24,'industry','大宗商品经营与物流|大宗商品经营|大宗商品物流|其他','3,969.15|3,852.00|117.15|127.33',header='主营业务分行业',unit='亿元')
+batch(a,24,'product','金属矿产|能源化工|农产品|新能源|其他','2,141.27|1,030.62|471.53|181.27|27.31',header='主营业务分产品',unit='亿元',qualifier='仅指大宗商品经营，不含物流/制造')
+batch(a,24,'region','境内|境外','2,447.36|1,649.12',header='主营业务分地区',unit='亿元')
+row(a,26,'business_type','大宗商品经营','3,852.00',header='贸易业务开展情况',unit='亿元')
+row(a,34,'business_segment','象屿海装（合并）','646,286.94',actor='南通象屿海洋装备股份有限公司（合并）',header='主要控股参股公司分析',unit='万元',continuation=(5,))
+batch(a,225,'business_type','主营业务|其他业务|合计','409,648,147,492.26|643,075,316.23|410,291,222,808.49',header='合并营业收入和营业成本')
+batch(a,226,'product','大宗商品经营及物流服务|其他','397,187,535,285.99|13,103,687,522.50',header='合同分类/商品类型')
+batch(a,226,'region','境内|境外|合计','245,371,423,994.59|164,919,798,813.90|410,291,222,808.49',header='合同分类/按经营地区分类')
+row(a,226,'revenue_timing','在一段时间履约确认收入','3,435,490,589.89',header='合同收入/商品转让时间',qualifier='原句时段收入；不计算未明示时点金额',aliases=('在一段时间履约确认收入的金额',))
+row(a,241,'service','转租使用权资产取得的收入','9,652,755.86',header='作为承租人/转租收入',continuation=(240,),qualifier='转租收入与承租费用分开')
+row(a,241,'service','租赁收入','507,160,790.26',header='作为出租人的经营租赁')
+for n,v,actor in [('象屿物流','35,548,293.62','厦门象屿物流集团有限责任公司（合并）'),('象屿海装','646,286.94','南通象屿海洋装备股份有限公司（合并）')]:row(a,260,'business_segment',n,v,actor=actor,header='重要非全资子公司的主要财务信息',unit='万元',continuation=(5,259))
+# Related sales cells: original PDF layout positions, not production extraction or output.
+def related(i,ps,thresholds,content_pattern,unit):
+ for pg in layout[i]:
+  if pg['page'] not in ps:continue
+  lines=pg['text'].splitlines(); active=pg['page']!=ps[0]
+  for j,line in enumerate(lines):
+   if '出售商品/提供劳务情况表' in line:active=True;continue
+   if active and any(s in line for s in ['购销商品、提供和接受劳务的关联交易说明','关联受托管理']):break
+   m=re.search(content_pattern,line)
+   if not active or not m:continue
+   party=compact(line[:m.start()]); content=m.group()
+   if i==a and party.startswith('PTXiangyuShippingLine'):party='PT Xiangyu Shipping Line（印尼象屿航运有限公司）'
+   if i==a and party=='PTObsidianStainlessSteel':party='PT Obsidian Stainless Steel'
+   amounts=list(re.finditer(r'-?\d[\d,]*\.\d{2}',line[m.end():])); cells=[(m.end()+x.start(),x.group()) for x in amounts]
+   curr=[v for pos,v in cells if pos<thresholds[pg['page']]];prev=[v for pos,v in cells if pos>=thresholds[pg['page']]]
+   assert len(curr)<=1 and len(prev)<=1,(pg['page'],line,cells)
+   rec=dict(instrument_id=i,page=pg['page'],party=party,content=content,current=curr[0] if curr else None,prior=prev[0] if prev else None,layout_line=line,column_boundary=thresholds[pg['page']]);ledgers.append(rec)
+   if curr:row(i,pg['page'],'product' if content in ['销售商品','销货'] else 'service',content,curr[0],counterparty=party,unit=unit,header='出售商品/提供劳务',continuation=(ps[0],) if pg['page']!=ps[0] else (),qualifier='原当期格，交易方及原复合内容完整；本期空不左移')
+related(a,[278,279,280,281],{278:61,279:59,280:61,281:54},r'销售商品|提供劳务','元')
+for party,n,v in [('象屿集团①','其他资产托管','1,226,415.10'),('象屿集团②','其他资产托管','424,528.30'),('厦门象屿投资有限公司③','其他资产托管','5,094,339.68')]:
+ row(a,281,'service',n,v,actor='象道物流集团有限公司' if '③' in party else '厦门象屿物流配送中心有限公司',counterparty=party,header='本公司受托管理/承包',qualifier='分别为智慧供应链/铁路物流投资/榆林象道原受托资产；三笔不按同名合并')
+rent_a=[('北安象屿金谷生化科技有限公司','投资性房地产、固定资产','1,844,038.73'),('福建象屿医疗器械有限责任公司','投资性房地产','40,989.36'),('富锦象屿金谷生化科技有限公司','投资性房地产、固定资产','946,053.32'),('黑龙江金象生化有限责任公司','固定资产','440,064.07'),('辽宁象屿铝业有限公司','投资性房地产','113,400.00'),('厦门国际邮轮母港集团有限公司','投资性房地产','2,154,081.03'),('厦门和平码头有限公司','投资性房地产','459,877.39'),('厦门嘉盛恒数字科技有限公司','投资性房地产','100,937.15'),('厦门闽台商贸有限公司','固定资产','593,445.90'),('厦门象盛镍业有限公司','投资性房地产','24,685.68'),('厦门象盛置业有限公司','投资性房地产','6,857.16'),('厦门象屿采颐商业投资有限公司','投资性房地产','317,291.43'),('象屿集团','投资性房地产','2,610,697.20'),('厦门象屿医疗设备有限责任公司','投资性房地产','41,280.00'),('厦门象屿置业有限公司','投资性房地产','1,077,131.41'),('上海象屿商业发展集团有限公司','投资性房地产','5,094.38'),('绥化象屿金谷生化科技有限公司','投资性房地产','2,703,211.08'),('象屿地产集团有限公司','投资性房地产','4.76'),('PT Xiangyu Shipping Line（印尼象屿航运有限公司）','投资性房地产','133,878.99'),('屿见（厦门）文旅有限公司','投资性房地产','321,394.31')]
+for party,n,v in rent_a:row(a,282,'service',n,v,counterparty=party,header='本公司作为出租方',continuation=(281,),qualifier='精确承租方和合并多行资产；上期列独立')
+batch(a,317,'business_type','主营业务|其他业务|合计','242,902,179.81|111,096,353.20|353,998,533.01',actor='厦门象屿股份有限公司（母公司）',header='母公司营业收入和营业成本')
+row(a,317,'product','大宗商品经营及物流服务','353,998,533.01',actor='厦门象屿股份有限公司（母公司）',header='母公司合同分类/商品类型')
+batch(a,317,'region','境内|合计','353,998,533.01|353,998,533.01',actor='厦门象屿股份有限公司（母公司）',header='母公司合同分类/按经营地区分类')
+batch(b,16,'industry','医药工业主营业务|医药商业主营业务|其他行业主营业务|行业间抵消|主营业务合计','1,071,782.97|1,047,775.38|11,405.26|-415,189.30|1,715,774.31',header='主营业务分行业',unit='万元',qualifier='原抵销负值及原分类；与分部抵销打印正额不互换')
+row(b,16,'product','医药工业前五名系列','472,437.55',header='主营业务分产品',unit='万元')
+batch(b,16,'region','中国境内|中国境外|主营业务合计','1,592,339.24|123,435.07|1,715,774.31',header='主营业务分地区',unit='万元')
+batch(b,16,'sales_mode','零售|批发|主营业务合计','645,306.58|1,070,467.73|1,715,774.31',header='主营业务分销售模式',unit='万元',continuation=(17,))
+batch(b,25,'product','心脑血管类|补益类|清热类|妇科类|其他|合计','409,319.42|236,003.07|76,774.19|53,705.31|295,980.98|1,071,782.97',header='按治疗领域分类的经营数据',unit='万元')
+batch(b,158,'business_type','主营业务|其他业务|合计','17,157,743,105.21|98,442,018.61|17,256,185,123.82',header='合并营业收入和营业成本')
+batch(b,158,'region','境内销售|境外销售','15,923,392,357.50|1,234,350,747.71',header='合同分类/按经营地区分类',qualifier='原主营业务口径，非营业总额')
+row(b,159,'region','合计','17,157,743,105.21',header='合同分类/按经营地区分类',continuation=(158,))
+for n,v in [('北京同仁堂科技发展股份有限公司','648,387.53'),('北京同仁堂商业投资集团有限公司','972,781.70'),('北京同仁堂国药有限公司','138,791.70')]:row(b,179,'business_segment',n,v,actor=n,header='重要非全资子公司的主要财务信息',unit='万元',continuation=(178,))
+row(b,171,'service','房屋建筑物','12,694,919.97',header='作为出租人的经营租赁')
+related(b,[189],{189:60},r'销货及提供服务|销货','万元')
+for party,n,v in [('北京同仁堂健康药业股份有限公司','房屋及建筑物','1,924,860.38'),('北京同仁堂医养投资股份有限公司','房屋及建筑物','1,770,231.19'),('天津同仁堂集团股份有限公司','车辆','38,230.09'),('中国北京同仁堂（集团）有限责任公司','房屋及建筑物','1,532,438.90')]:row(b,189,'service',n,v,counterparty=party,header='本公司作为出租方')
+row(b,191,'service','商标使用费','8.46',actor='北京同仁堂国药有限公司',counterparty='合营公司',header='其他关联交易/收取商标使用费',unit='万元',qualifier='原子公司收取8.46，不取集团支付35,579,378.85；交易原文不推合营公司营收')
+names=['本公司','科技公司','商业公司','其他','分部间抵销','合计'];actors=['北京同仁堂股份有限公司（母公司）','北京同仁堂科技发展股份有限公司','北京同仁堂商业投资集团有限公司','其他分部','公司及合并子公司','公司及合并子公司']
+for label,vs in [('营业收入','464,916.61|648,387.53|972,781.70|151,561.61|512,028.94|1,725,618.51'),('主营业务收入','463,930.04|647,130.56|964,728.78|149,066.03|509,081.10|1,715,774.31'),('对外营业收入','236,096.49|440,435.46|947,476.54|101,610.02||1,725,618.51'),('分部间交易收入','228,820.12|207,952.07|25,305.16|49,951.59|512,028.94|')]:
+ for n,v,actor in zip(names,vs.split('|'),actors,strict=True):
+  if v:row(b,195,'adjustment' if n=='分部间抵销' else 'business_segment',n,v,actor=actor,header='报告分部财务信息/'+label,unit='万元',qualifier='原项目行和原分部列；抵销打印正额不自行改负；对外/内部/总收入不累计',column=n)
+batch(b,196,'region','中国境内|中国境外|合计','15,923,392,357.50|1,234,350,747.71|17,157,743,105.21',header='分部地理信息/对外主营业务收入',unit='元')
+batch(b,204,'business_type','主营业务|其他业务|合计','4,639,300,372.11|9,865,768.56|4,649,166,140.67',actor='北京同仁堂股份有限公司（母公司）',header='母公司营业收入和营业成本',continuation=(203,))
+batch(b,204,'region','境内主营业务销售|境外主营业务销售|合计','4,639,147,494.62|152,877.49|4,639,300,372.11',actor='北京同仁堂股份有限公司（母公司）',header='母公司合同分类/按经营地区分类')
+def role(i,p,n,action,actor='公司及合并子公司',aliases=(),cont=(),qualifier=''):
+ q=quote(i,p,cont);assert compact(n) in compact(q) or any(compact(x) in compact(q) for x in aliases),(i,p,n)
+ roles.append(dict(condition_id=f'{i}:action:{sum(x["instrument_id"]==i for x in roles)+1:03}',instrument_id=i,name=n,native_aliases=[n,*aliases],source_actions=[action] if action!='material_input' else [],source_relation_types=['material_input'] if action=='material_input' else [],role='product_sales' if action=='sells' else 'raw_material_procurement' if action=='purchases' else 'service_provision' if action=='provides_service' else 'product_production' if action=='produces' else 'native_operating_action',page=p,source_quote=q,source_actor=actor,reported_period='2025-12-31',qualifier=qualifier,continuation_pages=list(cont),quantity_acceptance='仅原具名动作；不扩量价'))
+for n in ['黑色金属','铝','不锈钢','新能源','煤炭','油品','谷物原粮']:role(a,11,n,'operates',qualifier='当前七核心品类经营，不由经营直接推每项生产')
+for n in ['原辅材料采购供应','产成品分销','物流配送','供应链金融','信息咨询']:role(a,11,n,'provides_service',qualifier='原制造业客户一体化服务，服务采购不自动升为采购每类原材料')
+role(a,17,'船舶','produces',actor='南通象屿海洋装备股份有限公司',cont=(5,),aliases=('造船',),qualifier='当前建造交付；订单不当作当期收入')
+role(a,17,'船舶','sells',actor='南通象屿海洋装备股份有限公司',cont=(5,),qualifier='2025年交付28艘，仅证明具名船舶交付销售，不推每种在手订单已交付')
+for n in ['选矿','油脂加工']:role(a,17,n,'processes',cont=(11,),qualifier='当前三制造板块，不从控股股东制造产业反推发行人生产')
+for n,actor in [('铁路物流','象道物流集团有限公司'),('新能源物流','厦门象屿新能源有限责任公司'),('铝产业物流','厦门象屿铝联国际物流有限公司'),('农产品物流','黑龙江象屿农业物产有限公司')]:role(a,16,n,'provides_service',actor=actor,cont=(5,17))
+for n in ['国际航线','国际班列','内河水运','公路运输','海内外仓储']:role(a,16,n,'provides_service',actor='厦门象屿速传供应链发展股份有限公司及其他物流子公司',cont=(5,))
+for n in ['钢坯','铝板','铝卷']:role(a,65,n,'purchases',qualifier='原本公司及控股子公司关联采购，不推制造投入')
+for n in ['硅铁','硅锰','无烟煤','氧化铝','铝锭','镍铁','铬铁']:role(a,65,n,'sells',qualifier='本公司及控股子公司实际关联销售具体商品')
+for n in ['仓储','装卸','配送','运输','烘干']:role(a,64,n,'provides_service',qualifier='集团向金象生化及子公司实际提供物流服务',cont=(65,))
+for n in ['租箱','设备租赁']:role(a,64,n,'provides_service',qualifier='集团向榆林象道实际提供服务',cont=(65,))
+role(a,64,'租船','provides_service',cont=(65,),qualifier='向象盛镍业提供物流服务，不推船舶出售')
+for n in ['厦门象屿智慧供应链有限公司','厦门铁路物流投资有限责任公司']:role(a,281,n,'operates',actor='厦门象屿物流配送中心有限公司',qualifier='受托经营管理，不据此纳入合并')
+role(a,281,'榆林象道物流有限公司','operates',actor='象道物流集团有限公司',qualifier='原受托经营，不据此成为并表子公司')
+for n in ['安宫牛黄丸','同仁牛黄清心丸','同仁大活络丸','六味地黄丸','金匮肾气丸']:
+ for act in ['produces','sells']:role(b,10,n,act,qualifier='当前主营中成药生产销售及代表产品矩阵，不使用纯药品注册反推实际销售')
+for n in ['安宫牛黄系列','同仁牛黄清心系列','同仁乌鸡白凤系列','六味地黄系列','牛黄解毒系列','同仁大活络系列','愈风宁心滴丸','偏瘫复原丸','金匮肾气系列','阿胶系列','五子衍宗系列','归芍地黄系列','柏子养心系列','感冒清热系列','牛黄清胃系列','连翘败毒丸系列','坤宝丸','调经促孕丸']:role(b,25,n,'sells',cont=(24,),qualifier='本期销售序列代表品种，不将治疗领域拆成独立具体药品')
+for n in ['中西成药及饮片','保健品及食品','医疗器械']:role(b,23,n,'sells',actor='北京同仁堂商业投资集团有限公司',cont=(5,22),qualifier='原商业子公司零售药店销售，不仅集团父类')
+role(b,23,'中西成药及饮片','purchases',actor='北京同仁堂商业投资集团有限公司',cont=(5,),qualifier='原报告期供应商采购42.42亿元，不推药店制造投入')
+for n in ['人参','山茱萸','甘草','黄芪']:role(b,30,n,'purchases',qualifier='原药材种植基地供应是公司原材料采购；不自动推每种已实际耗用')
+for n in ['中药产品','食品','化妆品']:
+ for act in ['produces','sells']:role(b,32,n,act,actor='北京同仁堂科技发展股份有限公司',qualifier='原子公司生产及销售业务的产品领域，不按公司名称推集团')
+for act in ['produces','sells']:role(b,32,'中药产品',act,actor='北京同仁堂国药有限公司',qualifier='海外制造销售原主体')
+for n in ['中成药','中药饮片','化学药制剂','生化药品']:role(b,32,n,'operates',actor='北京同仁堂商业投资集团有限公司',qualifier='原经营，不把经营字样替代具名销售')
+answers={a:{
+ 'principal_business':dict(source_pages=[11,12,14,16,17,19,20,34,259,261,262],required_groups=[['供应链'],['制造业'],['采购'],['分销'],['物流'],['造船'],['选矿'],['油脂']],substance='大宗供应链主业及制造业客户，全产业链服务＋生产制造；七核心品类；公铁水仓和专业/产业物流；造船/选矿/油脂加工、海装及原物流子公司；控制合并与控股股东制造协同/非重要参股分开，待满产和未来投资不能当前化。'),
+ 'products_services':dict(source_pages=[5,11,12,14,15,16,17,20,64,65,281],required_groups=[['黑色金属'],['铝'],['不锈钢'],['煤炭'],['油品'],['谷物'],['供应链金融'],['信息咨询'],['物流'],['加工'],['船舶']],substance='七核心商品与全链采购供应/分销/库存管理/仓储物流/金融/咨询/加工服务；象道/速传/新能源/铝联/农产主体；海装船舶当前交付与订单区分；关联钢坯铝板铝卷采购和硅铁硅锰无烟煤氧化铝铝锭镍铁铬铁销售；托管物流原主体，控股股东制造不归发行人。'),
+ 'revenue_model':dict(source_pages=[13,15,16,17,24,64,65,153,154,155,156,225,226,241,260,278,279,280,281,282,317],required_groups=[['服务费'],['集拼','集中采购'],['价差'],['货权'],['凭据'],['劳务'],['履约进度'],['完工交付'],['主要责任人'],['代理人'],['租赁']],substance='服务收益/规模集拼/价差三盈利机制；一揽子服务商品成果与市场化物流独立核算；货权及转移凭据/收款证据、劳务已提供/收款、造船时段进度或完工交付；总额/代理净额及代第三方收款除外；托管收益和出租/转租，合并母公司、亿元/元、MD&A与合同口径不能混算；租赁相关费用非出租收入。')},b:{
+ 'principal_business':dict(source_pages=[10,11,12,13,14,22,23,30,31,32,173,174,178],required_groups=[['中成药'],['种植'],['加工'],['研发'],['生产'],['销售'],['批发'],['零售'],['子公司']],substance='种植/药材加工/研发/生产/物流配送/批发零售全链，医药工业/医药商业；原科技/商业/国药海外主体及控制半数以下仍并表原因；商业零售/院内/电商渠道；注销和增资控制时间限定，芪参颗粒Ⅱ期入组与注册许可/未来探索不作已售。'),
+ 'products_services':dict(source_pages=[10,11,14,17,23,24,25,26,27,30,32,106,174],required_groups=[['安宫牛黄'],['同仁牛黄清心'],['同仁大活络'],['六味地黄'],['金匮肾气'],['乌鸡白凤'],['牛黄解毒'],['中药饮片'],['医疗器械'],['人参'],['甘草']],substance='代表药丸及五名系列、心脑血管/补益/清热/妇科对应品种矩阵；原子公司中药产品/食品/化妆品/海外分销和商业中西成药饮片、保健食品、器械；原材料采购人参山茱萸甘草黄芪与投入区别；医疗/非药服务及广告当前服务，上市后研究/新药临床/境外注册不能替代销售事实。'),
+ 'revenue_model':dict(source_pages=[11,14,16,23,25,59,106,158,159,179,189,190,191,195,196,203,204],required_groups=[['零售'],['批发'],['电商','线上'],['验收'],['折扣'],['流水单'],['现金缴款单'],['刷卡记录'],['广告'],['抵销','抵消']],substance='生产制造收到货物验收合同价扣估计折扣；零售药交付客户系统转出＋流水单/现金缴款/刷卡记录；广告服务期间；线下/医疗/电商销售渠道与批发零售口径、关联定价及现金结算；工业商业抵消、分部总/主营/对外/内部及抵销打印正额各口径；合并母公司地区、国药商标费收款与集团品牌使用费支出分开，空列不借上期。') }}
+def negative(i,p,n,rule,cont=(),**kw):neg.append(dict(condition_id=f'{i}:negative:{sum(r["instrument_id"]==i for r in neg)+1:03}',instrument_id=i,page=p,name=n,rule=rule,source_quote=quote(i,p,cont),continuation_pages=list(cont),**kw))
+for rec in ledgers:
+ if rec['current'] is None:negative(rec['instrument_id'],rec['page'],'仅上期关联:'+rec['party']+':'+rec['content'],'原关联交易本期空，不左移上期、不造零或本期收入',counterparty=rec['party'],content=rec['content'],prior_value=rec['prior'],cont=(278,) if rec['instrument_id']==a and rec['page']!=278 else ())
+for party,v in [('厦门市闽台中心渔港建设发展有限公司','151,926.60'),('厦门自贸投资发展有限公司','476.19'),('厦门碧海红帆文旅发展有限公司','239,759.04')]:negative(a,282,'仅上期出租:'+party,'原出租本期为空，保持其他20筆合法本期租金',counterparty=party,prior_value=v,cont=(281,))
+negative(a,317,'母公司境外收入空','原母公司境外空不造零、不借境内金额')
+negative(a,262,'重要合营联营不适用','不得把非重要联营投资价值/利润或后续政府补助生成收入',cont=(261,263))
+negative(a,307,'报告分部不适用','不能将后续母公司收入当报告分部')
+negative(a,226,'费用表边界','税金及附加和后续费用不当营业收入',cont=(227,))
+negative(a,240,'承租费用非收入','70047647.01及16275050.04和现金流243174411.00非出租收入；转租9652755.86合法',cont=(241,))
+negative(a,283,'关联承租非出租','原承租租金/利息/使用权资产非出租收入',cont=(282,))
+negative(a,26,'客户排名非销售渠道','客户销售额与供应商采购额不同，不能分类销售模式或将采购变收入')
+negative(a,17,'订单计划非已销售','订单53艘及114艘/2029排产/待满产不能推其全部本期交付；实际交付28保留')
+negative(a,11,'控股股东制造非发行人制造','不锈钢铝玉米为控股股东协同，不推发行人逐项制造',cont=(12,17,65))
+negative(a,36,'未来五年盈利模式不当前化','2026—2030未来盈利结构不能替代2025现有服务/集拼/价差结构或作为本期实际新收入',cont=(13,37))
+negative(a,317,'投资收益非营业收入','801302014.92股利收入非营业收入',cont=(318,))
+negative(a,15,'期现毛利非营业收入','新能源负18.03为期现毛利非负营业收入；本期未交付利润不能当前化')
+negative(b,32,'主要子公司表无收入列','原表总资产净资产净利润不作营业收入；p179三合法子公司收入保留',cont=(179,))
+negative(b,180,'重要合营联营不适用','不重要合营联营投资价值/利润非营业收入，不读后续收益表',cont=(181,))
+negative(b,189,'受托不适用','不能借后续租赁表生成托管收入')
+negative(b,171,'未来租金非当期营收','未折现租金收款和承租费用不是当期收入，原经营出租12694919.97保留')
+negative(b,190,'关联承租非出租','原支付59923512.04/3253157.61非出租收入',cont=(189,))
+negative(b,204,'母公司投资收益非收入','286094507.50非营业收入；母公司本期合法六项保留')
+negative(b,17,'成本表非收入','原材料399316.53/燃料12168.72/采购762494.02为成本不作营收',cont=(16,))
+negative(b,23,'采购不推投入','零售采购中西成药饮片不推公司实际制造投入；销售类别占比不作金额')
+negative(b,27,'注册许可非销售','金钗石斛散境外注册许可不能单独证明已实际出售；p13许可和p12芪参Ⅱ期入组不销售',cont=(12,13,26))
+negative(b,173,'注销不维持当前子公司','保留注销及天成元9月28取得控制/资产收购非业务合并限定')
+negative(b,191,'支付品牌费非营业收入','35579378.85为支付，拆迁补偿1023.88万元为资产处置收益，国药收取8.46万元原边界保留')
+negative(b,195,'空分部格不借相邻','对外收入抵销格空、分部交易合计格空；不能从512028.94/1725618.51借格',cont=(196,))
+versions={r['instrument_id']:dict(sha256=r['document_version'],pdf=str(Path('data/filings/announcements/blobs')/r['document_version'][:2]/(r['document_version']+'.pdf')),checked_pages=sorted(checked[r['instrument_id']])) for r in plan['reports']}
+scope=dict(created_at=datetime.now(timezone.utc).isoformat(),fixed_before_formal_execution=True,plan_id=plan['plan_id'],processing_identity=f['processing_identity'],knowledge_cutoff=plan['knowledge_cutoff'],shared_token_budget=50000,official_reports=plan['reports'],versions=versions,answers=answers,source_rows=rows,native_roles=roles,negative_conditions=neg,denominator_method='六实质正文＋本轮独立原表重要本期格（页/栏目/主体/单位/分部项目独立）＋原具名当前动作；Measurement只准确率，别名/多证据不重复召回。新分母不继承211/437、不由输出生成。',income_sampling_policy='原MD&A行业/产品/地区、年度三板块分层收入、贸易收入、合并及母公司三收入及合同各分类、重要非全資子公司、本期关联销售劳务、出租/转租、受托和国药商标收益、同仁堂分部四种原项目及地理收入；排名客户/主营合并重复总额非新增条件，不声明全年报完整。',dimension_mapping={'recognition_time':'revenue_timing','consumes':'material_input'},acceptance_thresholds=dict(recall=1.0,accuracy=1.0,critical_numeric_errors=0,whole_round_seconds=300,shared_tokens=50000),production_authorization='not_authorized',scale_quality_claim_allowed=False)
+assert not (R/'data/checkpoints/company_profile_common_core/reports/m4_v46_unseen_small_batch/formal_execution.json').exists()
+save(C/'source-scope.json',scope);save(C/'independent-frozen-source-pages.json',{i:dict(document_version=versions[i]['sha256'],pdf=versions[i]['pdf'],pages=[p for p in full[i] if p['page'] in checked[i]]) for i in [a,b]});save(C/'independent-income-layout-pages.json',layout);save(C/'independent-associated-sales-ledger.json',dict(rows=ledgers,current_count=sum(r['current'] is not None for r in ledgers),prior_only_count=sum(r['current'] is None for r in ledgers),method='independent official layout aligned column positions, no profile extraction used'))
+counts=dict(answers=6,income_conditions=sum(map(len,rows.values())),native_roles=len(roles));save(C/'source-freeze-receipt.json',dict(created_at=datetime.now(timezone.utc).isoformat(),processing_identity=f['processing_identity'],plan=plan,executed_code_sha256=f['executed_code_sha256'],source_scope_sha256=sha(C/'source-scope.json'),source_pages_sha256=sha(C/'independent-frozen-source-pages.json'),source_layout_sha256=sha(C/'independent-income-layout-pages.json'),source_condition_count=sum(counts.values()),counts=counts,negative_count=len(neg),fixed_before_formal_execution=True,scores_prefilled=False,accuracy_denominator_prefilled=False,repair_flags=f['repair_flags'],default_identity_unchanged=True,official_page_count=sum(map(len,checked.values()))))
+print('SOURCE_FIXED',counts,'total',sum(counts.values()),'income_by_company',{i:len(v) for i,v in rows.items()},'roles_by_company',{i:sum(r['instrument_id']==i for r in roles) for i in [a,b]},'negatives',len(neg),'ledger',len(ledgers))

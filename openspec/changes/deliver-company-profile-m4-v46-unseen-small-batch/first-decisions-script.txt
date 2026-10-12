@@ -1,0 +1,86 @@
+"""Review protected first output against independent official sources; never execute profiles."""
+import json,re
+from decimal import Decimal
+from pathlib import Path
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v46-unseen-small-batch'
+read=lambda p:json.loads(p.read_text());save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+compact=lambda s:re.sub(r'\s+','',s or '').replace('（','(').replace('）',')')
+num=lambda s:Decimal(compact(s).replace(',',''))
+s=read(C/'source-scope.json');sources={i:read(Path('/tmp/quote_v46_unseen_source_'+i+'.json')) for i in s['versions']}
+errors={'600057.SH':{12:'原名谷物原粮被拼入枚举尾文，七大核心品类说明不是商品名',**{j:'产业、环节、地域组合及挖掘价值为经营理念，不是具名经营商品' for j in range(13,17)},33:'p269国际原油、乙烯、焦炭等上游原料价格影响为风险说明，不支持公司实际采购焦炭',**{j:'p281–282出租续行/页码污染承租方或截断多行资产；本期金额单位正确但原行身份错误' for j in [88,89,90,91,92,93,94,95,124,125]}},'600085.SH':{**{j:'p10内外妇儿科是产品类别，不能升为集团具名诊疗经营Activity' for j in range(3,7)},10:'金匮肾气丸后拼入为代表的产品，原商品身份错误',11:'众多经典药品家喻户晓为宣传表述，不是具名商品经营',12:'蜚声海内外为宣传表述，不是具名商品经营',**{j:'p158合同地区合计等于主营业务收入，全部营业收入限定错误；金额单位正确' for j in range(71,75)},**{j:'p195对外营业收入原栏目被丢失，错误标作营业收入，与总收入不同口径' for j in range(105,113)},113:'p195对外营业收入分部间抵销本期空白，1,725,618.51万元属于合计，不得左移',114:'配对Measurement同样将原合计金额放入空抵销格',**{j:'p204母公司合同地区只含主营业务，全部营业收入限定与原栏目冲突；金额单位正确' for j in range(133,139)},141:'p189租赁表头租赁收入混入北京同仁堂健康药业股份有限公司承租方名',142:'配对Measurement同样沿用表头污染的承租方'}}
+# Match original columns independently. Exact amount alone never chooses a contract row.
+def match(r,row):
+ n=r['source_native'];ep={p for e in r['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[])] if p}
+ if row['page'] not in ep or compact(n['name']) not in set(map(compact,row['native_aliases'])) or num(n['value'])!=num(row['value']) or n['unit']!=row['unit']:return False
+ dim=r.get('dimension',r.get('segment_dimension'));h=n.get('header') or '';q=compact(n.get('qualifier'));expected=row['dimension'];rh=row['header'];actor=row['source_actor']
+ if rh=='本公司作为出租方':
+  return dim=='lease' and h=='本公司作为出租方/本期确认的租赁收入' and q==compact('承租方：'+row['counterparty']) and r['subject_scope']=='consolidated_group'
+ if rh=='出售商品/提供劳务':
+  return dim in [expected,'service'] and h=='出售商品/提供劳务/本期发生额' and q==compact('交易对方：'+row['counterparty']) and r['subject_scope']=='consolidated_group'
+ alias=row['name']=='合计' and expected=='region' and dim=='business_type'
+ if dim!=expected and not alias:return False
+ if rh.startswith('主营业务分'):ok=h in ['', '主营业务收入']
+ elif rh in ['合并营业收入和营业成本','母公司营业收入和营业成本']:ok=h=='营业收入'
+ elif rh=='贸易业务开展情况':ok=h=='本期营业收入'
+ elif rh=='主要控股参股公司分析':ok=h=='控股参股公司/营业收入' and q==compact('子公司：'+row['name'])
+ elif rh=='重要非全资子公司的主要财务信息':ok=h=='重要非全资子公司/本期营业收入' and q==compact('原子公司：'+row['name'])
+ elif rh=='作为出租人的经营租赁':ok=h=='作为出租人的经营租赁/租赁收入'
+ elif rh=='按治疗领域分类的经营数据':ok=h=='治疗领域收入/主营业务'
+ elif rh.startswith('报告分部财务信息/'):
+  return h==rh.split('/')[-1] and r['subject_scope']=='consolidated_group'
+ elif rh=='母公司合同分类/商品类型':ok=h=='全部营业收入/商品类型'
+ elif rh=='母公司合同分类/按经营地区分类':ok=h in ['全部营业收入/经营地区','营业收入/全部营业收入/经营地区']
+ else:ok=False
+ if not ok:return False
+ if actor=='公司及合并子公司':return r['subject_scope']=='consolidated_group'
+ if '（母公司）' in actor:return r['subject_scope']=='issuer'
+ return r['subject_scope']=='named_subsidiary' and (rh in ['主要控股参股公司分析','重要非全资子公司的主要财务信息'])
+answer_reasons={
+ '600057.SH':{
+ 'principal_business':'原大宗供应链和造船/选矿/油脂加工父链正确；缺p16专业与产业物流细分及原子公司服务、p17当前交付和订单/待满产状态，不以子公司构成长表或主业关键词替代原完整正文。',
+ 'products_services':'原七类商品背景、采购供应/分销/物流/金融/咨询片段正确；缺p16子公司专业/产业物流矩阵及p64–65当前具名服务、购销产品，原采购和销售区别未完整交付。',
+ 'revenue_model':'货权转移凭据/收款、劳务、建造履约进度/交船及主责代理规则已答；缺p13服务费、规模集拼及价差三核心盈利机制，原重要收入口径未完整说明。'},
+ '600085.SH':{
+ 'principal_business':'原中药全链及科技/商业/国药子公司业务和半数以下仍控制原因保留；缺p11/14现有零售/院内/电商渠道模式、海外许可与现有经营边界，p173注销及天成元9月28取得控制和非业务资产购买限定未答。',
+ 'products_services':'原代表药丸、研发状态及原子公司父类产品保留；缺p25完整治疗领域代表品种，p23商业中西成药饮片/保健食品/器械销售及p30具名药材采购矩阵，不能用原子公司表或研发长表代替。',
+ 'revenue_model':'未答p106收货验收扣折扣、零售系统转出及流水单/缴款/刷卡、广告期间等实际确认机制，渠道与现金结算未完整答；并将p195原对外收入合计1,725,618.51万元肯定列入空抵销格，正文关键数字错误。'}}
+decisions={};supp={};quote_checks=[]
+for ins in s['versions']:
+ raw=read(Path('/tmp/v46_unseen_actual_'+ins+'.json'));facts={};extra=set();roles=[r for r in s['native_roles'] if r['instrument_id']==ins]
+ for idx,r in enumerate(raw):
+  n=r['source_native'];kind=r['object_type'];ep=sorted({p for e in r['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[]),*e.get('subject_evidence_pages',[])] if p});extra.update(ep);source=compact('\n'.join(sources[ins][p-1]['text'] for p in ep));d=dict(review_index=idx,verified_source_pages=ep,actual_object_type=kind,actual_native_name=n['name'],actual_action=r.get('action'),actual_relation_type=r.get('relation_type'),actual_subject_scope=r['subject_scope'],critical_numeric_error=ins=='600085.SH' and idx in [113,114])
+  if idx in errors[ins]:d.update(accurate=False,reason=errors[ins][idx])
+  elif kind in ['Segment','Measurement']:
+   assert compact(n['value']).replace(',','') in source.replace(',',''),(ins,idx,n)
+   matches=[j for j,row in enumerate(s['source_rows'][ins]) if match(r,row)]
+   assert len(matches)==1,(ins,idx,n,matches)
+   d.update(accurate=True,reason='独立官方原页/布局核本期取列、原金额单位、栏目、交易方/子公司或原具名分部列；不同口径不凭同额合并。',matched_source_condition_id=s['source_rows'][ins][matches[0]]['condition_id'])
+   if kind=='Segment':d['recall_row_index']=matches[0]
+  elif kind=='BusinessOverview':
+   text=r['source_text'];tokens=re.findall(r'\d[\d,]*(?:\.\d+)?',text)
+   for t in tokens:
+    if len(t.replace(',',''))>5:assert compact(t).replace(',','') in source.replace(',',''),(ins,idx,t)
+   exact=compact(text) in source
+   d.update(accurate=True,reason='原plain/layout直接片段的当前经营/政策/研发/原表引用，按原顺序和限定核原数字；表内上期值不等于肯定本期营收，片段准确不替代完整最终正文。',exact_compact_quote_in_source=exact)
+   quote_checks.append(dict(instrument_id=ins,index=idx,exact_plain_quote=exact,all_large_numeric_tokens_in_source=True))
+  elif kind=='Activity':
+   allowed=range(1,12) if ins=='600057.SH' else [1,2,7,8,9,29,30,31,32]
+   if ins=='600057.SH':allowed=[*allowed,32]
+   assert idx in allowed and r['subject_scope']=='consolidated_group',(ins,idx,r)
+   d.update(accurate=True,reason='原页当前具名服务/商品经营或产品生产/实际销售支持原动作；保留父类经营，不能替代原更具体药品生产/销售或采购条件。')
+   name=compact(n['name']).strip('“”');name={'为其提供大宗原辅材料采购供应':'原辅材料采购供应'}.get(name,name)
+   for j,role in enumerate(roles):
+    action=r['action'] in role['source_actions'] or (ins=='600057.SH' and idx in [2,3,4,5] and r['action']=='operates' and role['source_actions']==['provides_service'])
+    if name in set(map(compact,role['native_aliases'])) and action and role['page'] in ep and role['source_actor']=='公司及合并子公司':d['recall_role_index']=j
+  else:raise AssertionError((ins,idx,kind))
+  assert r['record_id'] not in facts;facts[r['record_id']]=d
+ for r in raw:
+  if r['object_type']=='Measurement':assert any(v['object_type']=='Segment' and v['source_native']==r['source_native'] and v['subject_scope']==r['subject_scope'] and v['reported_period']==r['reported_period'] and v.get('dimension')==r.get('segment_dimension') for v in raw),r['record_id']
+ p=read(R/'data/exports/m4_v46_unseen_small_batch'/ins/(ins+'_2025-12-31.json'));answers={}
+ for dim in p['dimensions']:
+  key=dim['dimension_id'];rule=s['answers'][ins][key];txt=compact(dim['excerpt']);failed=[g for g in rule['required_groups'] if not any(compact(t) in txt for t in g)]
+  answers[key]=dict(accurate=False,critical_numeric_error=ins=='600085.SH' and key=='revenue_model',reason=answer_reasons[ins][key],failed_groups=failed,all_supporting_records_checked=True)
+ decisions[ins]=dict(facts=facts,answers=answers);frozen=set(s['versions'][ins]['checked_pages']);supp[ins]=dict(document_version=s['versions'][ins]['sha256'],pages=[p for p in sources[ins] if p['page'] in extra-frozen])
+ print(ins,'facts',len(raw),'correct',sum(d['accurate'] for d in facts.values()),'income',len(set(d['recall_row_index'] for d in facts.values() if 'recall_row_index'in d)),'roles',len(set(d['recall_role_index'] for d in facts.values() if 'recall_role_index'in d)))
+save(C/'actual-object-decisions.json',decisions);save(C/'actual-object-supplemental-source-pages.json',supp);save(C/'actual-quote-and-numeric-validation.json',quote_checks)
+save(C/'source-contract-interpretation.json',dict(original_scope_unchanged=True,substance_or_denominator_changed=False,dimension_aliases={'出租原service':'lease表达原资产租赁服务，原精确资产/承租方/本期值必须一致','出售商品/提供劳务product':'service统一原复合栏目；必须保留原销货对象/集团及交易方，不改实际销售方向','报告分部原具名主体':'consolidated_group为报告范围，business_segment原列名+原项目标题明确母公司/科技/商业/其他/合计身份，可一一映射；对外不得变总收入','象屿母公司经营地区合计region':'business_type且header含经营地区，接受同一原合计列表示；不借母公司总收入额替代'},action_aliases={'引号黑色金属':'仅去开引号，无尾文别名','为其提供大宗原辅材料采购供应':'原辅材料采购供应同一服务，不推公司商品采购','operates产成品分销/物流配送/供应链金融':'p11当前提供服务，与provides_service同一实质'},accuracy_policy='295实际record_id＋6已答正文动态唯一；配对Measurement仅计准确率；精确原栏目/金额/单位/交易方和主体逐核；任何合同外输出也计准确率',answer_policy='required_groups只辅助；按冻结substance判正文完整；引用完整表格不是其中所有值的当前肯定收入；错抵销金额正文单独计数字错误'))

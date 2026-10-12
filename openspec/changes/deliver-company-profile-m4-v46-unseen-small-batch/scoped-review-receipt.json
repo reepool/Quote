@@ -1,0 +1,23 @@
+{
+  "review_method": "人工范围Review：本轮规格/归档/冻结及首次正式输出逐对象原文复核、脚本与计分审阅、哈希/三路验证；未运行codex review或pytest",
+  "scope": [
+    "deliver-company-profile-m4-v46-unseen-small-batch",
+    "old v46 finite archive",
+    "three main specs"
+  ],
+  "business_findings_class_A": [
+    "本轮新样本正文缺失、收入栏目/空抵销格/出租身份、伪动作及具名遗漏"
+  ],
+  "class_A_handling": "按用户失败分支要求仅登记4.1–4.4待修卡，保留首次，不在本轮修代码或扩批；因此业务验收明确失败",
+  "delivery_scope_blockers_remaining": false,
+  "class_B": "行业/量价/正文精简/性能/框架建议后置，不扩范围",
+  "class_C": "既有无关工作区和旧失败未处理",
+  "frozen_contract_positive_count": 331,
+  "frozen_contract_negative_count": 72,
+  "all_actual_objects_reviewed": 301,
+  "accuracy_denominator_dynamic": true,
+  "critical_numeric_answer_scored": true,
+  "original_output_and_scope_unchanged": true,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

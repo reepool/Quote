@@ -1,0 +1,24 @@
+{
+  "openspec_strict_validation_passed": [
+    "deliver-company-profile-m4-v46-unseen-small-batch",
+    "deliver-company-profile-m4-v45-unseen-small-batch",
+    "company-profile-common-core-owned-page-facts",
+    "company-profile-common-core-company-total-and-income-mix"
+  ],
+  "git_diff_check_main_specs_passed": true,
+  "official_plain_pages": 123,
+  "official_layout_pages": 32,
+  "official_source_text_and_layout_equal": true,
+  "first_formal_delivery_hashes_unchanged": 18,
+  "formal_review_sha256_count": 9,
+  "owner_review_hashes_unchanged": true,
+  "historical_hashes_unchanged": 2752,
+  "old_archived_original_hashes_unchanged": 78,
+  "execution_modules_reconstructed": 38,
+  "query_export_disk_reread_equal": true,
+  "business_code_modified": false,
+  "pytest_run_this_round": false,
+  "old_v46_32_tests_not_new_pair_acceptance": true,
+  "static_code_checks_not_required_no_code_change": true,
+  "existing_workspace_changes_unchanged": true
+}
