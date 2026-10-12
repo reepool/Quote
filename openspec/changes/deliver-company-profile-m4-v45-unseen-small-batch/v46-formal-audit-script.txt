@@ -1,0 +1,14 @@
+import json,hashlib,importlib.util
+from pathlib import Path
+from research.company_profile.reads import _iter_accepted_raw
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v45-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v46_same_source_repair';B=R/'data/research/company_profile_common_core/m4_v46_same_source_repair/company_profile_common_core.v1'
+read=lambda p:json.loads(p.read_text());save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+spec=importlib.util.spec_from_file_location('actual_v46_audit','/tmp/quote_v46_decisions.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+formal=read(P/'formal_execution.json');decisions={};negatives=[];quotes={};supp={}
+for ins,r in formal['results'].items():
+ profile=r['query']['profiles'][0];assert profile==r['export']['profiles'][0]==read(Path(r['export']['files'][0]));raw=list(_iter_accepted_raw(read(B/'checkpoints'/(profile['work_id']+'.json'))));assert {x['record_id'] for x in raw}=={x['record_id'] for x in profile['accepted_facts']}
+ Path('/tmp/v46-formal-raw-'+ins+'.json').write_text(json.dumps(raw,ensure_ascii=False,indent=2)+'\n')
+ decisions[ins],ns,quotes[ins]=m.audit(ins,raw,profile);negatives+=ns
+ used={p for d in decisions[ins]['facts'].values() for p in d['verified_source_pages']};pages=m.fixture[ins]['independent_pages'];supp[ins]=dict(document_version=m.scope['versions'][ins]['sha256'],pages=[p for p in pages if p['page'] in used-set(m.scope['versions'][ins]['checked_pages'])])
+ print('DYNAMIC_ACTUAL',ins,len(raw),flush=True)
+save(C/'v46-actual-object-decisions.json',decisions);save(C/'v46-negative-review-evidence.json',dict(conditions=negatives,negative_count=len(negatives),actually_evaluated_count=len(negatives),passed_count=sum(n['passed'] for n in negatives),failed_count=sum(not n['passed'] for n in negatives),unevaluable_count=0,original_contract_unchanged=True));save(C/'v46-actual-object-supplemental-source-pages.json',supp);save(C/'v46-actual-quote-validation.json',quotes)

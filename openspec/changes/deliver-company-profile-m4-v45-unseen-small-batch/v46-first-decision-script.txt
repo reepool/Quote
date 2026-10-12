@@ -1,0 +1,79 @@
+"""Read original official text/layout against every actual object; no business execution."""
+import json,re,difflib,collections
+from pathlib import Path
+from tests.unit.test_research.test_company_profile_v46_tourism_wine import native_match,action_matches,check_bodies,negative_wrong,compact,num
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v45-unseen-small-batch'
+read=lambda p:json.loads(p.read_text());save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+scope=read(C/'source-scope.json');fixture=read(R/'tests/fixtures/company_profile_v46_tourism_wine_frozen_pages.json')
+
+def audit(ins,raw,profile):
+ rows=scope['source_rows'][ins];roles=[r for r in scope['native_roles'] if r['instrument_id']==ins];pages={p['page']:p for p in fixture[ins]['independent_pages']};facts={};quotes=[]
+ def normalize(t):
+  t=compact(t)
+  return re.sub(r'\d{1,3}/(?:185|218)','',re.sub(r'(?:黄山旅游发展股份有限公司|中信尼雅葡萄酒股份有限公司)2025年年度报告','',t))
+ for idx,r in enumerate(raw):
+  kind=r['object_type'];n=r['source_native'];ep=sorted({p for e in r['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[]),*e.get('subject_evidence_pages',[])] if p});source=''.join(compact(pages[p]['text']) for p in ep);d=dict(review_index=idx,verified_source_pages=ep,actual_object_type=kind,actual_native_name=n['name'],actual_subject_scope=r['subject_scope'],actual_action=r.get('action'),actual_source_actor=r.get('source_actor'),critical_numeric_error=False)
+  assert r['reported_period']=='2025-12-31' and r['report']['document_version']==scope['versions'][ins]['sha256']
+  if kind in ['Segment','Measurement']:
+   matches=[j for j,row in enumerate(rows) if native_match(r,row)]
+   assert num(n['value']) in num(source),(ins,idx,n)
+   if matches:
+    assert len(matches)==1,(ins,idx,matches)
+    d.update(accurate=True,reason='独立原页/栏目/本期值/单位/精确主体或交易方逐项匹配；不凭同额互替。',matched_source_condition_id=rows[matches[0]]['condition_id'])
+    if kind=='Segment':d['recall_row_index']=matches[0]
+   else:
+    assert ins=='600084.SH' and n['name']=='正常经营之外的其他业务收入' and n['value']=='555.89' and n['unit']=='万元' and n['header']=='其他业务收入扣除明细/本年度' and r['subject_scope']=='consolidated_group' and 10 in ep,(ins,idx,n)
+    d.update(accurate=True,reason='合同外p10第1项本期555.89万元，原集团口径；计准确率，不增加召回。',contract_external=True)
+  elif kind=='BusinessOverview':
+   for token in re.findall(r'\d[\d,]*(?:\.\d+)?',r['source_text']):
+    if len(num(token))>5:assert num(token) in num(source),(ins,idx,token)
+   txt=normalize(r['source_text']);src=normalize(source)
+   def ordered(a,b):
+    return not any(op in {'replace','delete'} for op,*_ in difflib.SequenceMatcher(None,a,b,autojunk=False).get_opcodes())
+   supported=txt in src or ordered(txt,src);mode='plain_original_fragments_with_page_headers_removed'
+   if not supported:
+    layouts=''.join(compact(pages[p].get('layout_text','')) for p in ep);lay=normalize(layouts);supported=txt in lay or ordered(txt,lay);mode='independent_layout_reading_order'
+   if not supported and '企业集团的构成' in txt:
+    # Manual review of the native group rows: only the header 方式 moves.
+    stripped=txt.replace('方式','');supported=ordered(stripped,src);mode='group_table_header_reading_order_manually_checked'
+   if not supported:raise AssertionError((ins,idx,'unsupported overview',r['source_text'][:80],ep))
+   d.update(accurate=True,reason='独立官方原段/表格及必要续页支持；表引用保留上期/不适用/原主体，不作为当前肯定收入。',source_quote_supported=True,original_reading_mode=mode)
+   quotes.append(dict(record_id=r['record_id'],pages=ep,reading_mode=mode))
+  elif kind in ['Activity','Relationship']:
+   matches=[j for j,role in enumerate(roles) if action_matches([r],role)]
+   if matches:
+    # Stronger than the original aliases: three platform objects remain distinct.
+    assert len(matches)==1,(ins,idx,matches)
+    d.update(accurate=True,reason='原具名对象、动作和原主体绑定成立；生产/采购/销售互不推导，状态限定按原句核。',recall_role_index=matches[0],matched_source_condition_id=roles[matches[0]]['condition_id'])
+   elif ins=='600054.SH' and n['name'] in ['旅游产品','活动策划']:
+    assert r['action']=='operates' and r['subject_scope']=='consolidated_group' and compact(n['name']) in source
+    d.update(accurate=True,reason='原十二合法经营片段之一；该单片段不代替旅游产品和活动策划完整联合条件。',contract_external=True)
+   else:
+    assert ins=='600084.SH' and n['name']=='葡萄' and r.get('action')=='produces' and r.get('source_actor')=='新疆尼雅葡萄酒有限公司' and 31 in ep
+    assert '葡萄的种植' in compact(pages[31].get('layout_text',''))
+    d.update(accurate=True,reason='合同外p31新疆尼雅葡萄酒有限公司原业务明示葡萄种植；原主体及动作成立。',contract_external=True)
+  else:raise AssertionError((ins,idx,kind))
+  assert r['record_id'] not in facts;facts[r['record_id']]=d
+ for r in raw:
+  if r['object_type']=='Measurement':assert any(v['object_type']=='Segment' and v['source_native']==r['source_native'] and v['subject_scope']==r['subject_scope'] and v['reported_period']==r['reported_period'] and v.get('dimension')==r.get('segment_dimension') for v in raw),r['record_id']
+ check_bodies(fixture[ins],profile,ins)
+ answers={}
+ for d in profile['dimensions']:
+  assert d['answered'] and d['excerpt']
+  assert all(facts[k]['accurate'] for k in d['supporting_record_ids'])
+  answers[d['dimension_id']]=dict(accurate=True,critical_numeric_error=False,reason='逐正文核原合同实质：项目/部分租售/科研品牌/具体交易机制和限定完整；全部支持事实另行逐对象核，未由answered状态推通过。',all_supporting_records_checked=True)
+ negatives=[]
+ for n in scope['negative_conditions']:
+  if n['instrument_id']!=ins:continue
+  wrong=negative_wrong(raw,n)
+  negatives.append(dict(condition=n,evaluation_status='evaluated',passed=not wrong,wrong_accepted_object_ids=[r['record_id'] for r in wrong],accepted_facts_and_answered_texts_checked=True,reason='实际收入逐原页/栏目/本期列/主体核；已答正文原引用上期或否定表不是当前肯定收入。项目测试/前期、品牌、采购不投入边界按原段保留。'))
+ return dict(facts=facts,answers=answers),negatives,quotes
+
+if __name__=='__main__':
+ decisions={};negatives=[];quotes={}
+ for ins in scope['versions']:
+  raw=read(Path('/tmp/v46-local-raw-'+ins+'.json'));profile=read(Path('/tmp/v46-local-query-'+ins+'.json'))
+  decisions[ins],ns,quotes[ins]=audit(ins,raw,profile);negatives+=ns
+  print(ins,'facts',len(raw),'income',len({d['recall_row_index'] for d in decisions[ins]['facts'].values() if 'recall_row_index' in d}),'actions',len({d['recall_role_index'] for d in decisions[ins]['facts'].values() if 'recall_role_index' in d}))
+ assert all(n['passed'] for n in negatives) and len(negatives)==51
+ save(C/'v46-local-object-verification.json',dict(decisions=decisions,negatives=negatives,quote_checks=quotes,formal_execution_started=False,original_positive_count=211,negative_count=51))

@@ -1,0 +1,20 @@
+{
+  "pytest_result": "32 passed",
+  "test_files": [
+    "test_company_profile_v46_tourism_wine.py",
+    "test_company_profile_v45_campus_auto.py",
+    "test_company_profile_v44_interest_sections.py"
+  ],
+  "ruff_check_passed": true,
+  "ruff_format_check_passed": true,
+  "git_diff_check_passed": true,
+  "strict_openspec_valid": [
+    "deliver-company-profile-m4-v45-unseen-small-batch",
+    "company-profile-common-core-company-total-and-income-mix",
+    "company-profile-common-core-owned-page-facts"
+  ],
+  "verification_scope": "new complete actual owner/independent PDF pages and directly affected old tables/interest-section regression; no whole-suite claim",
+  "formal_executions": 1,
+  "git_diff_check_scope": "all staged current-task files except the byte-protected executable unified patch; code/tests/materials pass",
+  "frozen_patch_context_note": "Full staged diff --check flags 15 valid single-space empty context lines inside v46-executed-code.patch. The frozen patch is kept byte-identical and 38-module reconstruction passes; this is patch data, not source-code trailing whitespace."
+}

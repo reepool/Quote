@@ -1,0 +1,1403 @@
+{
+  "ledger_sha256": "fd8d847b4c0812477013e940f1ab6936b1a4c083098329b81e16b85a0b43dffb",
+  "current_rows": 69,
+  "paired_accepted_objects": 138,
+  "prior_only_blank_rows": 30,
+  "rows": [
+    {
+      "original_row": {
+        "page": 191,
+        "party": "北京大昌行管理咨询有限公司",
+        "current": "6,621.27",
+        "prior": null,
+        "layout_line": "北京大昌行管理咨询有限公司                 酒销售等               6,621.27"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:0",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:0"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "北京国安宾馆有限公司",
+        "current": "530,311.73",
+        "prior": "538,503.29",
+        "layout_line": "北京国安宾馆有限公司                    酒销售等             530,311.73     538,503.29"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:1",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:1"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "北京国安城市物业管理有限公司",
+        "current": null,
+        "prior": "-445,984.05",
+        "layout_line": "北京国安城市物业管理有限公司                酒销售等                           -445,984.05"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "北京国安恒通科技开发有限公司",
+        "current": "76,545.04",
+        "prior": "299,261.96",
+        "layout_line": "北京国安恒通科技开发有限公司                酒销售等              76,545.04     299,261.96"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:2",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:2"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "北京国安控股有限公司",
+        "current": "25,837.17",
+        "prior": "83,895.57",
+        "layout_line": "北京国安控股有限公司                    酒销售等              25,837.17     83,895.57"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:3",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:3"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "北京国安农业发展有限公司",
+        "current": null,
+        "prior": "383.19",
+        "layout_line": "北京国安农业发展有限公司                  酒销售等                              383.19"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "北京国安投资有限公司",
+        "current": null,
+        "prior": "18,396.46",
+        "layout_line": "北京国安投资有限公司                    酒销售等                            18,396.46"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "北京国安养老产业投资管理有限公司",
+        "current": "10,555.74",
+        "prior": null,
+        "layout_line": "北京国安养老产业投资管理有限公司              酒销售等              10,555.74"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:4",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:4"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "北京国都大饭店有限公司",
+        "current": null,
+        "prior": "1,800.00",
+        "layout_line": "北京国都大饭店有限公司                   酒销售等                             1,800.00"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "北京鸿联九五信息产业有限公司",
+        "current": "166,693.78",
+        "prior": "566,665.48",
+        "layout_line": "北京鸿联九五信息产业有限公司                酒销售等             166,693.78     566,665.48"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:5",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:5"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "北京信隆酒店物业管理有限公司",
+        "current": "123,722.41",
+        "prior": "125,792.90",
+        "layout_line": "北京信隆酒店物业管理有限公司                酒销售等             123,722.41     125,792.90"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:6",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:6"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "北京中信书店有限责任公司",
+        "current": "98,180.57",
+        "prior": "55,835.97",
+        "layout_line": "北京中信书店有限责任公司                  酒销售等              98,180.57     55,835.97"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:7",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:7"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "成都中信城市建设有限公司",
+        "current": null,
+        "prior": "1,210.62",
+        "layout_line": "成都中信城市建设有限公司                  酒销售等                             1,210.62"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "广东鸿联九五信息产业有限公司",
+        "current": null,
+        "prior": "68,176.99",
+        "layout_line": "广东鸿联九五信息产业有限公司                酒销售等                            68,176.99"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "国安（北京）资本管理有限公司",
+        "current": null,
+        "prior": "8,293.81",
+        "layout_line": "国安（北京）资本管理有限公司                酒销售等                             8,293.81"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "国安第一城（香河）酒店管理有限公司",
+        "current": null,
+        "prior": "23,946.91",
+        "layout_line": "国安第一城（香河）酒店管理有限公司             酒销售等                            23,946.91"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "国安水清木华房地产开发有限公司",
+        "current": "884.96",
+        "prior": null,
+        "layout_line": "国安水清木华房地产开发有限公司               酒销售等                884.96"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:8",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:8"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "杭州整形医院有限公司",
+        "current": "7,008.84",
+        "prior": null,
+        "layout_line": "杭州整形医院有限公司                    酒销售等               7,008.84"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:9",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:9"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "河北国安第一城景区管理有限公司",
+        "current": "1,137,989.40",
+        "prior": "2,083,084.97",
+        "layout_line": "河北国安第一城景区管理有限公司               酒销售等            1,137,989.40  2,083,084.97"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:10",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:10"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "河南九域博大科技有限公司",
+        "current": "76,214.16",
+        "prior": null,
+        "layout_line": "河南九域博大科技有限公司                  酒销售等              76,214.16"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:11",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:11"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "湖北中特新化能科技有限公司",
+        "current": null,
+        "prior": "50,654.87",
+        "layout_line": "湖北中特新化能科技有限公司                 酒销售等                            50,654.87"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "华融金融租赁股份有限公司",
+        "current": "722.13",
+        "prior": null,
+        "layout_line": "华融金融租赁股份有限公司                  酒销售等                722.13"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:12",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:12"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "江阴兴澄特种钢铁有限公司",
+        "current": "188,028.30",
+        "prior": "764,138.05",
+        "layout_line": "江阴兴澄特种钢铁有限公司                  酒销售等             188,028.30     764,138.05"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:13",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:13"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "京城俱乐部有限公司",
+        "current": "29,706.19",
+        "prior": null,
+        "layout_line": "京城俱乐部有限公司                     酒销售等              29,706.19"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:14",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:14"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "靖江特殊钢有限公司",
+        "current": null,
+        "prior": "955.75",
+        "layout_line": "靖江特殊钢有限公司                     酒销售等                              955.75"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "洛阳矿山机械工程设计研究院有限责任公司",
+        "current": "3,185.84",
+        "prior": null,
+        "layout_line": "洛阳矿山机械工程设计研究院有限责任             酒销售等               3,185.84"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:15",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:15"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "南京钢铁集团有限公司",
+        "current": "113,840.70",
+        "prior": "47,203.54",
+        "layout_line": "南京钢铁集团有限公司                    酒销售等             113,840.70     47,203.54"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:16",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:16"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "宁波国际大厦有限公司",
+        "current": null,
+        "prior": "4,683.19",
+        "layout_line": "宁波国际大厦有限公司                    酒销售等                             4,683.19"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "青岛特殊钢铁有限公司",
+        "current": "44,601.77",
+        "prior": "89,203.54",
+        "layout_line": "青岛特殊钢铁有限公司                    酒销售等              44,601.77     89,203.54"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:17",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:17"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "青海中信国安科技发展有限公司",
+        "current": "17,775.22",
+        "prior": null,
+        "layout_line": "青海中信国安科技发展有限公司                酒销售等              17,775.22"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:18",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:18"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "青海中信国安锂业发展有限公司",
+        "current": "384,477.02",
+        "prior": "1,194,176.98",
+        "layout_line": "青海中信国安锂业发展有限公司                酒销售等             384,477.02   1,194,176.98"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:19",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:19"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "山西锻造科技有限公司",
+        "current": "2,007.08",
+        "prior": null,
+        "layout_line": "山西锻造科技有限公司                    酒销售等               2,007.08"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:20",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:20"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "山西华晋新材料科技有限公司",
+        "current": "27,525.67",
+        "prior": null,
+        "layout_line": "山西华晋新材料科技有限公司                 酒销售等              27,525.67"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:21",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:21"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "山西中设华晋铸造有限公司",
+        "current": "59,782.30",
+        "prior": "88,550.44",
+        "layout_line": "山西中设华晋铸造有限公司                  酒销售等              59,782.30     88,550.44"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:22",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:22"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "上海殷诚信息技术服务有限公司",
+        "current": "71,247.79",
+        "prior": "21,203.56",
+        "layout_line": "上海殷诚信息技术服务有限公司                酒销售等              71,247.79     21,203.56"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:23",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:23"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "深圳市航运集团有限公司",
+        "current": "6,053.10",
+        "prior": "13,592.92",
+        "layout_line": "深圳市航运集团有限公司                   酒销售等               6,053.10     13,592.92"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:24",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:24"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "深圳市鹏星船务有限公司",
+        "current": "175,115.05",
+        "prior": null,
+        "layout_line": "深圳市鹏星船务有限公司                   酒销售等             175,115.05"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:25",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:25"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "视京呈通信（上海）有限公司",
+        "current": null,
+        "prior": "16,888.50",
+        "layout_line": "视京呈通信（上海）有限公司                 酒销售等                            16,888.50"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 191,
+        "party": "泰富资源(中国)贸易有限公司",
+        "current": null,
+        "prior": "3,281.42",
+        "layout_line": "泰富资源(中国)贸易有限公司                酒销售等                             3,281.42"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "天津钢管钢铁贸易有限公司",
+        "current": null,
+        "prior": "87,292.04",
+        "layout_line": "天津钢管钢铁贸易有限公司                 酒销售等                            87,292.04"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "铜陵泰富特种材料有限公司",
+        "current": null,
+        "prior": "48,637.17",
+        "layout_line": "铜陵泰富特种材料有限公司                 酒销售等                            48,637.17"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "新疆新力能源开发有限公司",
+        "current": null,
+        "prior": "6,339.82",
+        "layout_line": "新疆新力能源开发有限公司                 酒销售等                             6,339.82"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "信银（深圳）股权投资基金管理有限公司",
+        "current": "1,784.07",
+        "prior": null,
+        "layout_line": "信银（深圳）股权投资基金管理有限公            酒销售等               1,784.07"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:26",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:26"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "信银振华（北京）股权投资基金管理有限公司",
+        "current": "2,109.73",
+        "prior": "10,812.39",
+        "layout_line": "信银振华（北京）股权投资基金管理有            酒销售等               2,109.73     10,812.39"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:27",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:27"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "信之云国际贸易（上海）有限公司",
+        "current": "129,398.22",
+        "prior": null,
+        "layout_line": "信之云国际贸易（上海）有限公司              酒销售等             129,398.22"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:28",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:28"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "邮电国际旅行社有限责任公司",
+        "current": null,
+        "prior": "2,017.70",
+        "layout_line": "邮电国际旅行社有限责任公司                酒销售等                             2,017.70"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中安国信(北京)贸易有限公司",
+        "current": "80,764.56",
+        "prior": "71,107.97",
+        "layout_line": "中安国信(北京)贸易有限公司               酒销售等              80,764.56     71,107.97"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:29",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:29"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中国市政工程中南设计研究总院有限公司",
+        "current": "876.11",
+        "prior": "74,086.73",
+        "layout_line": "中国市政工程中南设计研究总院有限公            酒销售等                876.11      74,086.73"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:30",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:30"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中国中信集团有限公司",
+        "current": null,
+        "prior": "40,605.29",
+        "layout_line": "中国中信集团有限公司                   酒销售等                            40,605.29"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中国中信金融资产管理股份有限公司",
+        "current": "75,838.92",
+        "prior": null,
+        "layout_line": "中国中信金融资产管理股份有限公司             酒销售等              75,838.92"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:31",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:31"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信百信银行股份有限公司",
+        "current": null,
+        "prior": "1,242.48",
+        "layout_line": "中信百信银行股份有限公司                 酒销售等                             1,242.48"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信保诚基金管理有限公司",
+        "current": null,
+        "prior": "605.31",
+        "layout_line": "中信保诚基金管理有限公司                 酒销售等                              605.31"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信保诚人寿保险有限公司",
+        "current": "248,768.11",
+        "prior": "106,194.70",
+        "layout_line": "中信保诚人寿保险有限公司                 酒销售等             248,768.11    106,194.70"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:32",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:32"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信保诚资产管理有限责任公司",
+        "current": "3,769.91",
+        "prior": null,
+        "layout_line": "中信保诚资产管理有限责任公司               酒销售等               3,769.91"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:33",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:33"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信城开(深圳)有限公司",
+        "current": "9,684.96",
+        "prior": "2,421.24",
+        "layout_line": "中信城开(深圳)有限公司                 酒销售等               9,684.96      2,421.24"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:34",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:34"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信城开成都投资有限公司",
+        "current": "10,895.58",
+        "prior": "12,106.20",
+        "layout_line": "中信城开成都投资有限公司                 酒销售等              10,895.58     12,106.20"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:35",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:35"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信城开投资集团有限公司",
+        "current": null,
+        "prior": "2,824.78",
+        "layout_line": "中信城开投资集团有限公司                 酒销售等                             2,824.78"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信城市建设开发(上海)有限公司",
+        "current": "2,017.70",
+        "prior": null,
+        "layout_line": "中信城市建设开发(上海)有限公司             酒销售等               2,017.70"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:36",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:36"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信戴卡股份有限公司",
+        "current": "8,484.95",
+        "prior": null,
+        "layout_line": "中信戴卡股份有限公司                   酒销售等               8,484.95"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:37",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:37"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信国安实业集团有限公司",
+        "current": "140,833.57",
+        "prior": "205,631.81",
+        "layout_line": "中信国安实业集团有限公司                 酒销售等             140,833.57    205,631.81"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:38",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:38"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信国安信息产业股份有限公司",
+        "current": "6,516.82",
+        "prior": "13,356.63",
+        "layout_line": "中信国安信息产业股份有限公司               酒销售等               6,516.82     13,356.63"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:39",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:39"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信国际招标有限公司",
+        "current": "23,766.37",
+        "prior": "3,185.84",
+        "layout_line": "中信国际招标有限公司                   酒销售等              23,766.37      3,185.84"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:40",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:40"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信海洋直升机股份有限公司",
+        "current": "18,477.87",
+        "prior": null,
+        "layout_line": "中信海洋直升机股份有限公司                酒销售等              18,477.87"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:41",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:41"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信浩华资产管理有限公司",
+        "current": null,
+        "prior": "892.04",
+        "layout_line": "中信浩华资产管理有限公司                 酒销售等                              892.04"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信和业投资有限公司",
+        "current": "9,398.23",
+        "prior": "46,176.99",
+        "layout_line": "中信和业投资有限公司                   酒销售等               9,398.23     46,176.99"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:42",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:42"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信环境投资集团有限公司",
+        "current": "12,679.65",
+        "prior": "1,582.30",
+        "layout_line": "中信环境投资集团有限公司                 酒销售等              12,679.65      1,582.30"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:43",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:43"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信机电供应链（山西）有限公司",
+        "current": "313,029.20",
+        "prior": null,
+        "layout_line": "中信机电供应链（山西）有限公司              酒销售等             313,029.20"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:44",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:44"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信机电精密机械（山西）有限公司",
+        "current": "7,311.51",
+        "prior": null,
+        "layout_line": "中信机电精密机械（山西）有限公司             酒销售等               7,311.51"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:45",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:45"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信机电科研设计院（山西）有限公司",
+        "current": "286.72",
+        "prior": null,
+        "layout_line": "中信机电科研设计院（山西）有限公司            酒销售等                286.72"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:46",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:46"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信机电特种装备（山西）有限公司",
+        "current": "28,959.29",
+        "prior": null,
+        "layout_line": "中信机电特种装备（山西）有限公司             酒销售等              28,959.29"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:47",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:47"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信机电新材料科技（山西）有限公司",
+        "current": "13,619.47",
+        "prior": null,
+        "layout_line": "中信机电新材料科技（山西）有限公司            酒销售等              13,619.47"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:48",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:48"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信机电制造集团有限公司",
+        "current": "20,775.22",
+        "prior": null,
+        "layout_line": "中信机电制造集团有限公司                 酒销售等              20,775.22"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:49",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:49"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信建设有限责任公司",
+        "current": "103,017.70",
+        "prior": "55,300.87",
+        "layout_line": "中信建设有限责任公司                   酒销售等             103,017.70     55,300.87"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:50",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:50"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信建投基金管理有限公司",
+        "current": null,
+        "prior": "58,821.25",
+        "layout_line": "中信建投基金管理有限公司                 酒销售等                            58,821.25"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信建投期货有限公司",
+        "current": null,
+        "prior": "37,313.27",
+        "layout_line": "中信建投期货有限公司                   酒销售等                            37,313.27"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信建投证券股份有限公司",
+        "current": null,
+        "prior": "547,885.90",
+        "layout_line": "中信建投证券股份有限公司                 酒销售等                           547,885.90"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信建投资本管理有限公司",
+        "current": null,
+        "prior": "46,155.74",
+        "layout_line": "中信建投资本管理有限公司                 酒销售等                            46,155.74"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信金属股份有限公司",
+        "current": "1,582.30",
+        "prior": null,
+        "layout_line": "中信金属股份有限公司                   酒销售等               1,582.30"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:51",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:51"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信金属宁波能源有限公司",
+        "current": "2,649.56",
+        "prior": "4,099.12",
+        "layout_line": "中信金属宁波能源有限公司                 酒销售等               2,649.56      4,099.12"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:52",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:52"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信锦州金属股份有限公司",
+        "current": "467.26",
+        "prior": "4,077.87",
+        "layout_line": "中信锦州金属股份有限公司                 酒销售等                467.26       4,077.87"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:53",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:53"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信井冈山培训中心",
+        "current": null,
+        "prior": "13,592.93",
+        "layout_line": "中信井冈山培训中心                    酒销售等                            13,592.93"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信科技发展有限公司",
+        "current": "10,311.55",
+        "prior": null,
+        "layout_line": "中信科技发展有限公司                   酒销售等              10,311.55"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:54",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:54"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信科佳信(北京)电气技术研究院有限公司",
+        "current": "41,165.04",
+        "prior": null,
+        "layout_line": "中信科佳信(北京)电气技术研究院有限           酒销售等              41,165.04"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:55",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:55"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 192,
+        "party": "中信缅香(北京)咨询服务有限责任公司",
+        "current": "7,805.32",
+        "prior": "29,766.35",
+        "layout_line": "中信缅香(北京)咨询服务有限责任公司           酒销售等               7,805.32     29,766.35"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:56",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:56"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 193,
+        "party": "中信期货有限公司",
+        "current": "3,419.47",
+        "prior": "1,582.30",
+        "layout_line": "中信期货有限公司                      酒销售等               3,419.47      1,582.30"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:57",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:57"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 193,
+        "party": "中信数字科技集团有限公司",
+        "current": "69,628.29",
+        "prior": "43,854.87",
+        "layout_line": "中信数字科技集团有限公司                  酒销售等              69,628.29     43,854.87"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:58",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:58"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 193,
+        "party": "中信私募基金管理有限公司",
+        "current": null,
+        "prior": "16,502.65",
+        "layout_line": "中信私募基金管理有限公司                  酒销售等                            16,502.65"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 193,
+        "party": "中信泰富（中国）投资有限公司",
+        "current": null,
+        "prior": "998.23",
+        "layout_line": "中信泰富（中国）投资有限公司                酒销售等                              998.23"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 193,
+        "party": "中信投资控股有限公司",
+        "current": "6,339.82",
+        "prior": "9,504.42",
+        "layout_line": "中信投资控股有限公司                    酒销售等               6,339.82      9,504.42"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:59",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:59"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 193,
+        "party": "中信信托有限责任公司",
+        "current": "2,591.15",
+        "prior": "1,854.87",
+        "layout_line": "中信信托有限责任公司                    酒销售等               2,591.15      1,854.87"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:60",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:60"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 193,
+        "party": "中信易家电子商务有限公司",
+        "current": "1,485,516.36",
+        "prior": "1,775,687.39",
+        "layout_line": "中信易家电子商务有限公司                  酒销售等            1,485,516.36  1,775,687.39"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:61",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:61"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 193,
+        "party": "中信银行股份有限公司",
+        "current": "19,792,563.39",
+        "prior": "19,344,736.54",
+        "layout_line": "中信银行股份有限公司                    酒销售等           19,792,563.39 19,344,736.54"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:62",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:62"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 193,
+        "party": "中信证券股份有限公司",
+        "current": "23,279.65",
+        "prior": "50,253.09",
+        "layout_line": "中信证券股份有限公司                    酒销售等              23,279.65     50,253.09"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:63",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:63"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 193,
+        "party": "中信置业有限公司",
+        "current": null,
+        "prior": "3,164.60",
+        "layout_line": "中信置业有限公司                      酒销售等                             3,164.60"
+      },
+      "actual_record_ids": [],
+      "original_current_blank": true,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 193,
+        "party": "中信重工机械股份有限公司",
+        "current": "827,782.28",
+        "prior": "871,476.11",
+        "layout_line": "中信重工机械股份有限公司                  酒销售等             827,782.28    871,476.11"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:64",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:64"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 193,
+        "party": "中信重工开诚智能装备有限公司",
+        "current": "115,871.68",
+        "prior": "27,212.38",
+        "layout_line": "中信重工开诚智能装备有限公司                酒销售等             115,871.68     27,212.38"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:65",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:65"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 193,
+        "party": "中信重工洛阳重铸铁业有限责任公司",
+        "current": "8,761.06",
+        "prior": null,
+        "layout_line": "中信重工洛阳重铸铁业有限责任公司              酒销售等               8,761.06"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:66",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:66"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 193,
+        "party": "中信重工装备制造(漳州)有限公司",
+        "current": "14,625.64",
+        "prior": "44,060.18",
+        "layout_line": "中信重工装备制造(漳州)有限公司              酒销售等              14,625.64     44,060.18"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:67",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:67"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    },
+    {
+      "original_row": {
+        "page": 193,
+        "party": "中信资产运营有限公司",
+        "current": "58,321.54",
+        "prior": "57,064.45",
+        "layout_line": "中信资产运营有限公司                    酒销售等              58,321.54     57,064.45"
+      },
+      "actual_record_ids": [
+        "owned:core-ev-0cc5ba53ba5f79aa:Segment:service:酒销售等:出售商品/提供劳务/本期发生额:row:68",
+        "owned:core-ev-717cdf27b6f8cb75:Measurement:service:酒销售等:出售商品/提供劳务/本期发生额:row:68"
+      ],
+      "original_current_blank": false,
+      "matched": true
+    }
+  ]
+}

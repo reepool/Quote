@@ -1,0 +1,21 @@
+{
+  "historical_file_count": 2632,
+  "historical_hashes_unchanged": true,
+  "original_change_file_count": 47,
+  "original_change_hashes_unchanged": true,
+  "original_first_artifact_count": 18,
+  "original_first_artifact_hashes_unchanged": true,
+  "first_artifact_count": 18,
+  "first_artifact_hashes_unchanged": true,
+  "review_file_count": 10,
+  "review_hashes_protected": true,
+  "execution_module_count": 38,
+  "execution_modules_reconstructed": true,
+  "archived_original_file_count": 68,
+  "archived_original_hashes_unchanged": true,
+  "existing_modified_files_unchanged": true,
+  "query_export_disk_equal": true,
+  "formal_execution_count": 1,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

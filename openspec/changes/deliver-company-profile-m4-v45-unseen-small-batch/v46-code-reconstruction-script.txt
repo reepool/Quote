@@ -1,0 +1,9 @@
+import json,hashlib,subprocess,tempfile
+from pathlib import Path
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v45-unseen-small-batch';read=lambda p:json.loads(p.read_text());f=read(C/'v46-source-freeze-receipt.json');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+root=Path(tempfile.mkdtemp(prefix='v46-code-reconstruct-'))
+for p in f['executed_code_sha256']:
+ target=root/p;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(subprocess.run(['git','show',f['execution_baseline_head']+':'+p],check=True,capture_output=True).stdout)
+subprocess.run(['git','apply',str(C/'v46-executed-code.patch')],cwd=root,check=True)
+assert all(sha(root/p)==h==sha(R/p) for p,h in f['executed_code_sha256'].items())
+(C/'v46-execution-code-reconstruction.json').write_text(json.dumps(dict(baseline_head=f['execution_baseline_head'],patch_required=True,patch_sha256=sha(C/'v46-executed-code.patch'),business_code_changed=True,module_count=38,all_modules_reconstructed=True,reconstructed_sha256=f['executed_code_sha256']),ensure_ascii=False,indent=2)+'\n');print('38 MODULES REBUILT')

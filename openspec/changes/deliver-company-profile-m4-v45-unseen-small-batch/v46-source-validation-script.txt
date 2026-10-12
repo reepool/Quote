@@ -1,0 +1,20 @@
+import json,hashlib,re,collections
+from pathlib import Path
+from pypdf import PdfReader
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v45-unseen-small-batch';read=lambda p:json.loads(p.read_text());fixture=read(R/'tests/fixtures/company_profile_v46_tourism_wine_frozen_pages.json');scope=read(C/'v46-source-scope.json');decisions=read(C/'v46-actual-object-decisions.json');out={};context_layout=read(C/'actual-context-layout-pages.json')
+for ins,v in scope['versions'].items():
+ h=v['sha256'];pdf=R/'data/filings/announcements/blobs'/h[:2]/(h+'.pdf');assert hashlib.sha256(pdf.read_bytes()).hexdigest()==h
+ reader=PdfReader(pdf);independent={p['page']:p for p in fixture[ins]['independent_pages']};owner={p['page']:p for p in fixture[ins]['pages']}
+ actual={p for d in decisions[ins]['facts'].values() for p in d['verified_source_pages']};checked=actual|set(v['checked_pages']);verified=[];layouts=[]
+ for p in sorted(checked):
+  text=reader.pages[p-1].extract_text() or '';assert text==independent[p]['text'],(ins,p,'independent official text')
+  official_compact=re.sub(r'\s+','',text);owner_compact=re.sub(r'\s+','',owner[p]['text']);header_move=None
+  if official_compact!=owner_compact:
+   header_move={('600054.SH',153):'方式',('600054.SH',168):'注*',('600054.SH',173):'价值',('600084.SH',176):'方式',('600084.SH',208):'价值'}.get((ins,p))
+   assert header_move and collections.Counter(official_compact)==collections.Counter(owner_compact) and official_compact.replace(header_move,'')==owner_compact.replace(header_move,''),(ins,p,'unreviewed owner source difference')
+  verified.append(dict(page=p,independent_text_sha256=hashlib.sha256(text.encode()).hexdigest(),official_equal=True,owner_equal_after_whitespace_normalization=header_move is None,manually_verified_header_relocation=header_move,owner_text_sha256=hashlib.sha256(owner[p]["text"].encode()).hexdigest()))
+  expected_layout=independent[p].get('layout_text') or next((q['text'] for q in context_layout[ins] if q['page']==p),None)
+  if expected_layout:
+   layout=reader.pages[p-1].extract_text(extraction_mode='layout') or '';assert layout==expected_layout,(ins,p,'official layout');layouts.append(p)
+ out[ins]=dict(pdf=str(pdf.relative_to(R)),document_version=h,official_pdf_sha256_valid=True,total_pages=len(reader.pages),verified_pages=verified,verified_layout_pages=layouts,actual_source_pages=sorted(actual),original_contract_source_pages=v['checked_pages'],newline_note='owner CRLF, LF and soft table line breaks are normalized as whitespace for comparison; five explicitly checked table header/footnote relocations are recorded separately; raw byte identity is not claimed')
+(C/'v46-official-source-validation.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print('OFFICIAL TEXT/LAYOUT',sum(len(v['verified_pages']) for v in out.values()),sum(len(v['verified_layout_pages']) for v in out.values()))

@@ -1,0 +1,18 @@
+{
+  "original_scope_sha256": "731d85f5aae4804a524f0332cd5b9b1b9ec8efff8a984fe9c0b04d8f30e03522",
+  "original_positive_conditions": 211,
+  "original_negative_conditions": 51,
+  "substance_and_denominators_unchanged": true,
+  "dimension_aliases": {
+    "出售商品/提供劳务product": "source-native复合交易栏service，继承已保存的原解释；交易方/商品/本期值/单位/集团范围全部严格核",
+    "成品酒小计product": "total，保留小计限定"
+  },
+  "action_aliases": {
+    "涵盖国内/入境/出境/定制/疗休养": "原合法operates可对应该具名服务的provides_service，不推销售生产"
+  },
+  "corrected_alias_boundary": "原合同新媒体/OTA误重复黄山旅游平台别名，不修改原合同；按原真实名称逐对象严格核，三实质条件仍分别成立且52分母不变",
+  "joint_planning": "旅游产品和活动策划完整条件只召回一次；两条合法经营片段只计实际准确率",
+  "financial_blank_boundary": "30仅上期关联销售及徐州利润不变本期收入；打印零按原收入格保留",
+  "accuracy_method": "本轮全部431实际record_id＋6正文唯一计分；Measurement配对只准确率，合同外555.89万元及原具名种植/经营片段同样计准确率，分母不预填",
+  "source_layout_note": "owner完整页与独立PDF仅声明规范空白及5处明确表头/脚注移位的核验；无原字节相等声明"
+}

@@ -1,0 +1,23 @@
+{
+  "review_scope": "本人4执行模块、新完整页fixture/测试及v46合同冻结/首轮实际交付/逐对象复核；不含既有脏文档",
+  "review_method": "逐块diff手工Review，真实官方页、严格栏目和主体匹配、Measurement配对、原51负例、完整正文及原合同外输出动态唯一核验",
+  "blocking_findings_fixed": [
+    "旧东风参股公司列起点及原销售商品栏目兼容",
+    "旧宁波带注释公司名称边界",
+    "局部材料必须保留实际截取续页证据",
+    "平台/新媒体/OTA不同对象不采用原重复别名"
+  ],
+  "remaining_blocking_findings": [],
+  "business_acceptance": "pending_a_role_finite_review",
+  "nonblocking_deferred": [
+    "行业增强",
+    "量价成本",
+    "正文精简",
+    "性能",
+    "框架",
+    "无关旧问题"
+  ],
+  "original_worktree_modifications_untouched": true,
+  "pytest_command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest tests/unit/test_research/test_company_profile_v46_tourism_wine.py tests/unit/test_research/test_company_profile_v45_campus_auto.py tests/unit/test_research/test_company_profile_v44_interest_sections.py -q --disable-warnings --maxfail=2",
+  "pytest_result": "32 passed"
+}

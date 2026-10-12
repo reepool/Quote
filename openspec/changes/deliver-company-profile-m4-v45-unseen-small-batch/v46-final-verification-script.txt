@@ -1,0 +1,61 @@
+"""Read-only final reread, protection and concrete finite submission; never rerun."""
+import json,hashlib,subprocess,shutil
+from pathlib import Path
+from research.company_profile.reads import CompanyProfileReadService
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v45-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v46_same_source_repair';A=R/'openspec/changes/archive/2026-10-12-deliver-company-profile-m4-v44-unseen-small-batch'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+formal=read(P/'formal_execution.json');e=read(C/'v46-source-review-evidence.json');n=read(C/'v46-negative-review-evidence.json');f=read(C/'v46-source-freeze-receipt.json');base=read(C/'v46-initial-baseline.json');sources=read(C/'v46-official-source-validation.json')
+reads=CompanyProfileReadService(R/'data/research/company_profile_common_core/m4_v46_same_source_repair');reread={}
+for ins,r in formal['results'].items():
+ profile=reads.query((ins,),processing_identity=formal['processing_identity'])['profiles'][0];assert profile==r['query']['profiles'][0]==r['export']['profiles'][0]==read(Path(r['export']['files'][0]));reread[ins]=dict(actual_disk_reread=True,query_export_disk_equal=True,accepted_count=len(profile['accepted_facts']))
+save(C/'v46-delivery-reread-validation.json',reread)
+assert len(e['object_reviews'])==len({(o['instrument_id'],o['object_id']) for o in e['object_reviews']})
+assert len(e['source_disclosures'])==211 and n['actually_evaluated_count']==51
+assert e['actual_runtime_no_reuse'] and all(set(r['stage_results'])=={'acquire','parse','semantic','verify','publish'} for r in e['runtime_evidence'])
+for snap in [read(C/'protection-baseline.json'),read(C/'first-formal-delivery-preservation.json')['sha256'],read(C/'v46-first-formal-delivery-preservation.json')['sha256'],base['existing_modified_sha256']]:
+ for p,h in snap.items():assert sha(R/p)==h,p
+for p,h in base['original_change_sha256'].items():assert sha(C/p)==h,p
+original=read(A/'v45-archive-preservation.json')['original_files_sha256'];assert all(sha(A/p)==h for p,h in original.items())
+assert all(sha(R/p)==h for p,h in f['executed_code_sha256'].items())
+assert read(C/'v46-execution-code-reconstruction.json')['all_modules_reconstructed']
+conditions=read(C/'source-scope.json');successor=read(C/'v46-source-scope.json');assert all(successor[k]==conditions[k] for k in ['source_rows','native_roles','answers','negative_conditions','official_reports','versions'])
+recall=sum(d['present'] for d in e['source_disclosures']);correct=sum(o['accurate'] for o in e['object_reviews']);denominator=len(e['object_reviews']);numeric=sum(o['critical_numeric_error'] for o in e['object_reviews']);gate=recall==211 and correct==denominator and numeric==0 and n['passed_count']==51 and formal['whole_round_seconds']<=300 and e['workload']['tokens_used']['value']<=50000
+components={k:dict(present=sum(d['present'] for d in e['source_disclosures'] if d['kind']==k),total=sum(d['kind']==k for d in e['source_disclosures'])) for k in ['answer_substance','native_income_cell','native_role']}
+for src,dst in [('/tmp/quote_v46_formal_audit.py','v46-formal-audit-script.txt'),('/tmp/quote_v46_review.py','v46-first-review-script.txt'),('/tmp/quote_v46_sources_validate.py','v46-source-validation-script.txt'),('/tmp/quote_v46_reconstruct.py','v46-code-reconstruction-script.txt'),('/tmp/quote_v46_finish.py','v46-final-verification-script.txt'),('/tmp/quote_v46_roles_validate.py','v46-formal-role-validation-script.txt'),('/tmp/quote_v46_ledger_validate.py','v46-associated-sales-validation-script.txt')]:shutil.copyfile(src,C/dst)
+record_files=['v46-source-review-evidence.json','v46-actual-object-decisions.json','v46-negative-review-evidence.json','v46-actual-quote-validation.json','v46-formal-role-validation.json','v46-associated-sales-validation.json','v46-actual-object-supplemental-source-pages.json','v46-official-source-validation.json','v46-delivery-reread-validation.json','v46-execution-code-reconstruction.json']
+save(C/'v46-formal-result-preservation.json',dict(first_review_index=1,first_output_sha256=read(C/'v46-first-formal-delivery-preservation.json')['sha256'],formal_review_sha256={p:sha(C/p) for p in record_files},owner_review_files_sha256={str(p.relative_to(R)):sha(p) for p in [P/'source_review.json',P/'source_review.md'] if p.exists()}))
+save(C/'v46-final-protection-verification.json',dict(historical_file_count=len(read(C/'protection-baseline.json')),historical_hashes_unchanged=True,original_change_file_count=len(base['original_change_sha256']),original_change_hashes_unchanged=True,original_first_artifact_count=len(read(C/'first-formal-delivery-preservation.json')['sha256']),original_first_artifact_hashes_unchanged=True,first_artifact_count=len(read(C/'v46-first-formal-delivery-preservation.json')['sha256']),first_artifact_hashes_unchanged=True,review_file_count=len(record_files),review_hashes_protected=True,execution_module_count=38,execution_modules_reconstructed=True,archived_original_file_count=len(original),archived_original_hashes_unchanged=True,existing_modified_files_unchanged=True,query_export_disk_equal=True,formal_execution_count=1,production_authorization='not_authorized',scale_quality_claim_allowed=False))
+tests=Path('/tmp/v46-targeted-tests.log').read_text();assert '32 passed' in tests and 'failed' not in tests
+save(C/'v46-scoped-review-receipt.json',dict(review_scope='本人4执行模块、新完整页fixture/测试及v46合同冻结/首轮实际交付/逐对象复核；不含既有脏文档',review_method='逐块diff手工Review，真实官方页、严格栏目和主体匹配、Measurement配对、原51负例、完整正文及原合同外输出动态唯一核验',blocking_findings_fixed=['旧东风参股公司列起点及原销售商品栏目兼容','旧宁波带注释公司名称边界','局部材料必须保留实际截取续页证据','平台/新媒体/OTA不同对象不采用原重复别名'],remaining_blocking_findings=[],business_acceptance='pending_a_role_finite_review' if gate else 'failed',nonblocking_deferred=['行业增强','量价成本','正文精简','性能','框架','无关旧问题'],original_worktree_modifications_untouched=True,pytest_command='PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest tests/unit/test_research/test_company_profile_v46_tourism_wine.py tests/unit/test_research/test_company_profile_v45_campus_auto.py tests/unit/test_research/test_company_profile_v44_interest_sections.py -q --disable-warnings --maxfail=2',pytest_result='32 passed'))
+text=f'''# v46同源首次正式交付及有限审核提交
+
+原change继续不归档、不扩批；原v45失败112/211、254/283及首次制品保持原字节。生产仍为`not_authorized`，规模声明仍为false。
+
+## 提交结论
+
+{'本轮正式结果达到声明门槛，提交A角有限审核；尚未将A角验收预判为通过。' if gate else '本轮首次正式结果未达到门槛，保留失败并继续暂停。'} 范围限于黄山旅游600054.SH／中信尼雅600084.SH原官方2025年报、cutoff2026-09-17、211正向及51负例与本轮全部实际输出。
+
+- 召回：**{recall}/211**＝{components['answer_substance']['present']}/6正文＋{components['native_income_cell']['present']}/153收入＋{components['native_role']['present']}/52具名动作。
+- 动态唯一准确率：**{correct}/{denominator}**＝{e['actual_accepted_fact_count']}条事实＋{e['answered_text_count']}正文；关键数字错误**{numeric}**，负例**{n['passed_count']}/51**实际评估。
+- 整轮**{formal['whole_round_seconds']:.2f}秒**，共享**{e['workload']['tokens_used']['value']}/50000 token**；从首execute至第二export连续计时，含实际PDF/布局读取和全部重试。已有PDF解析缓存，耗时不能作为冷缓存或规模性能结论。
+- 两家五阶段实际成功，无章节复用、无前驱继承；正式query、export、磁盘及只读重新读取一致。
+
+原211＋51实质条件一一保留。完整v46身份继承五累积修复及精确资产入队/主体展开，默认身份不变。旅游商品与在线渠道分开；十二合法经营片段、联合旅游产品和活动策划、SaaS已拓展/部分装备租售、原包装采购与种植/加工/销售分别保留。平台、新媒体、OTA按真实不同对象核，不沿用原错误重复别名替换对象。
+
+原收入名称、五公司及四交易方准确恢复；原153收入全部按页/栏目/本期值/单位/原主体核。69本期关联销售和30仅上期空位分开，打印零与负抵销保持，费用/采购/代收不营收化。合同外555.89万元及真实额外种植/经营事实仍计准确率。Measurement配对唯一计准确率；同条件多证据不重复召回。金额正确不代替身份正确。
+
+## 验证与材料
+
+新样本真实owner完整页及独立PDF完整页回归、旧东风/宁波/金花业务回归合计**32 passed**；Ruff、格式及OpenSpec严格校验另见静态验证回执。独立官方文本校验{sum(len(v['verified_pages']) for v in sources.values())}页、布局{sum(len(v['verified_layout_pages']) for v in sources.values())}页。原owner与独立PDF文本存在CRLF/软折行，以及5页表头/脚注阅读顺序差异；逐页分别记录规范空白比对与具体移位核验，不宣称原字节相等。
+
+- 合同/身份/38模块执行hash：`v46-source-scope.json`、`v46-source-freeze-receipt.json`。
+- 原始正式轮脚本：`v46-first-formal-script.txt`；新目录`m4_v46_same_source_repair`。
+- 逐实际对象、负例、来源和运行证据：`v46-source-review-evidence.json`、`v46-actual-object-decisions.json`、`v46-negative-review-evidence.json`、`v46-official-source-validation.json`。
+- 代码可从`{base['head']}`＋`v46-executed-code.patch`重建全部38模块，见`v46-execution-code-reconstruction.json`。
+- 原2632历史文件、原change材料、旧归档68份材料及原首次18制品均保护；v46首次结果立即保护，正式复核hash旁挂，见`v46-final-protection-verification.json`。
+
+无需继续扩大本轮修复或建设框架。行业增强、量价成本、正文精简、性能与无关旧失败后置。A角确认有限通过后才规划规格同步与归档。
+'''
+(C/'v46-review-submission.md').write_text(text)
+tasks=C/'tasks.md';t=tasks.read_text().replace('- [ ] 4.4','- [x] 4.4');t+=f'\n4.4正式回执：v46全新目录同源首次run→query→export；{recall}/211召回、{correct}/{denominator}动态唯一准确率、数字{numeric}、{n["passed_count"]}/51负例，{formal["whole_round_seconds"]:.2f}秒／{e["workload"]["tokens_used"]["value"]}/50000token。五阶段实际成功且无复用/前驱，query/export/磁盘及重新读取一致；全部首次与原失败保护。{"达到门槛，提交A角有限审核" if gate else "未达到门槛，首次失败保留"}，尚未归档或扩批。\n';tasks.write_text(t)
+print('FINAL',recall,correct,denominator,numeric,n['passed_count'],formal['whole_round_seconds'],'GATE',gate)

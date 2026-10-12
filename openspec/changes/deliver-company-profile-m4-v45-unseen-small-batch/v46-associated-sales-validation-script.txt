@@ -1,0 +1,12 @@
+import json,hashlib
+from pathlib import Path
+from tests.unit.test_research.test_company_profile_v46_tourism_wine import compact,num
+C=Path('openspec/changes/deliver-company-profile-m4-v45-unseen-small-batch');ledger=json.loads((C/'independent-associated-sales-ledger.json').read_text());raw=json.loads(Path('/tmp/v46-formal-raw-600084.SH.json').read_text());out=[]
+for row in ledger['rows']:
+ matches=[r for r in raw if r['object_type'] in {'Segment','Measurement'} and r['source_native'].get('header')=='出售商品/提供劳务/本期发生额' and compact(r['source_native'].get('qualifier'))==compact('交易对方：'+row['party'])]
+ if row['current'] is None:assert not matches,row
+ else:
+  assert len(matches)==2 and {r['object_type'] for r in matches}=={'Segment','Measurement'} and all(num(r['source_native']['value'])==num(row['current']) and r['source_native']['unit']=='元' and r['subject_scope']=='consolidated_group' and row['page'] in {p for e in r['evidence'] for p in [e['page'],*e.get('continuation_pages',[])]} for r in matches),row
+ out.append(dict(original_row=row,actual_record_ids=[r['record_id'] for r in matches],original_current_blank=row['current'] is None,matched=True))
+assert len(out)==99 and sum(not r['original_current_blank'] for r in out)==69
+(C/'v46-associated-sales-validation.json').write_text(json.dumps(dict(ledger_sha256=hashlib.sha256((C/'independent-associated-sales-ledger.json').read_bytes()).hexdigest(),current_rows=69,paired_accepted_objects=138,prior_only_blank_rows=30,rows=out),ensure_ascii=False,indent=2)+'\n');print('LEDGER MATCHED 69 CURRENT + 30 PRIOR ONLY; 138 OBJECTS')

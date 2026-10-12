@@ -1,0 +1,574 @@
+[
+  {
+    "condition_id": "600054.SH:action:001",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:commodity:1",
+      "owned:core-ev-db448a7d3eec7243:commodity:1"
+    ],
+    "actual_role": "native_operating_action",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:002",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:commodity:2",
+      "owned:core-ev-db448a7d3eec7243:commodity:2"
+    ],
+    "actual_role": "native_operating_action",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:003",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:commodity:3",
+      "owned:core-ev-db448a7d3eec7243:commodity:3"
+    ],
+    "actual_role": "native_operating_action",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:004",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:commodity:4",
+      "owned:core-ev-db448a7d3eec7243:commodity:4"
+    ],
+    "actual_role": "native_operating_action",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:005",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:commodity:5",
+      "owned:core-ev-db448a7d3eec7243:commodity:5"
+    ],
+    "actual_role": "native_operating_action",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:006",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:commodity:6",
+      "owned:core-ev-db448a7d3eec7243:commodity:6"
+    ],
+    "actual_role": "native_operating_action",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:007",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:commodity:7",
+      "owned:core-ev-db448a7d3eec7243:commodity:7"
+    ],
+    "actual_role": "native_operating_action",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:008",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:commodity:8",
+      "owned:core-ev-db448a7d3eec7243:commodity:8"
+    ],
+    "actual_role": "service_provision",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:009",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:commodity:9",
+      "owned:core-ev-db448a7d3eec7243:commodity:9"
+    ],
+    "actual_role": "service_provision",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:010",
+    "matched_source_record_ids": [
+      "owned:core-ev-2e3d5d396b103a0d:commodity:1",
+      "owned:core-ev-6239a81b6d4cefd6:commodity:10",
+      "owned:core-ev-db448a7d3eec7243:commodity:10"
+    ],
+    "actual_role": "service_provision",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:011",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:activity:1"
+    ],
+    "actual_role": "service_provision",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:012",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:activity:2"
+    ],
+    "actual_role": "service_provision",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:013",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:activity:3"
+    ],
+    "actual_role": "service_provision",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:014",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:activity:4"
+    ],
+    "actual_role": "service_provision",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:015",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:activity:5"
+    ],
+    "actual_role": "service_provision",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:016",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:activity:6"
+    ],
+    "actual_role": "service_provision",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:017",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:activity:7"
+    ],
+    "actual_role": "native_operating_action",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:018",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:activity:8"
+    ],
+    "actual_role": "native_operating_action",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:019",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:activity:9"
+    ],
+    "actual_role": "native_operating_action",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:020",
+    "matched_source_record_ids": [
+      "owned:core-ev-2e3d5d396b103a0d:commodity:2",
+      "owned:core-ev-6239a81b6d4cefd6:commodity:11",
+      "owned:core-ev-db448a7d3eec7243:commodity:11"
+    ],
+    "actual_role": "service_provision",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:021",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:activity:12"
+    ],
+    "actual_role": "service_provision",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:022",
+    "matched_source_record_ids": [
+      "owned:core-ev-6239a81b6d4cefd6:activity:13"
+    ],
+    "actual_role": "product_sales",
+    "direct_activity_acceptance": false,
+    "projected_exposure_ids": [
+      "commodity-exposure-aba0a362a439d4d1cbd315d1"
+    ],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:023",
+    "matched_source_record_ids": [
+      "owned:core-ev-1d123fd1e9376e65:commodity:1"
+    ],
+    "actual_role": "service_provision",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:024",
+    "matched_source_record_ids": [
+      "owned:core-ev-dcb34cf0fdd7983c:commodity:2"
+    ],
+    "actual_role": "service_provision",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:025",
+    "matched_source_record_ids": [
+      "owned:core-ev-dcb34cf0fdd7983c:commodity:3"
+    ],
+    "actual_role": "service_provision",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:026",
+    "matched_source_record_ids": [
+      "owned:core-ev-dcb34cf0fdd7983c:commodity:4"
+    ],
+    "actual_role": "product_sales",
+    "direct_activity_acceptance": false,
+    "projected_exposure_ids": [
+      "commodity-exposure-bd3cc29628374468f12bc455"
+    ],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:027",
+    "matched_source_record_ids": [
+      "owned:core-ev-dcb34cf0fdd7983c:commodity:1"
+    ],
+    "actual_role": "raw_material_procurement",
+    "direct_activity_acceptance": false,
+    "projected_exposure_ids": [
+      "commodity-exposure-220af1abd5aa5ee6bd4700da"
+    ],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600054.SH:action:028",
+    "matched_source_record_ids": [
+      "owned:core-ev-80e57151231f5419:commodity:1"
+    ],
+    "actual_role": "service_provision",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:001",
+    "matched_source_record_ids": [
+      "owned:core-ev-674e2cbea9c62656:commodity:1"
+    ],
+    "actual_role": "product_production",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:002",
+    "matched_source_record_ids": [
+      "owned:core-ev-674e2cbea9c62656:commodity:2"
+    ],
+    "actual_role": "product_sales",
+    "direct_activity_acceptance": false,
+    "projected_exposure_ids": [
+      "commodity-exposure-7fe58fdaefecc39c6992f25c"
+    ],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:003",
+    "matched_source_record_ids": [
+      "owned:core-ev-674e2cbea9c62656:commodity:3"
+    ],
+    "actual_role": "product_production",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:004",
+    "matched_source_record_ids": [
+      "owned:core-ev-674e2cbea9c62656:commodity:4"
+    ],
+    "actual_role": "product_sales",
+    "direct_activity_acceptance": false,
+    "projected_exposure_ids": [
+      "commodity-exposure-d0abc14381a86b196edc1407"
+    ],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:005",
+    "matched_source_record_ids": [
+      "owned:core-ev-cb213245720f69b1:commodity:3"
+    ],
+    "actual_role": "product_production",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:006",
+    "matched_source_record_ids": [
+      "owned:core-ev-cb213245720f69b1:commodity:4"
+    ],
+    "actual_role": "product_sales",
+    "direct_activity_acceptance": false,
+    "projected_exposure_ids": [
+      "commodity-exposure-0151c1cc8bd354d0e47ff6f2"
+    ],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:007",
+    "matched_source_record_ids": [
+      "owned:core-ev-cb213245720f69b1:commodity:5"
+    ],
+    "actual_role": "product_production",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:008",
+    "matched_source_record_ids": [
+      "owned:core-ev-cb213245720f69b1:commodity:6"
+    ],
+    "actual_role": "product_sales",
+    "direct_activity_acceptance": false,
+    "projected_exposure_ids": [
+      "commodity-exposure-f997c76af7d92e919c3fe5ca"
+    ],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:009",
+    "matched_source_record_ids": [
+      "owned:core-ev-9530102bc968e082:commodity:2",
+      "owned:core-ev-a6bc3c8c5b936715:commodity:2",
+      "owned:core-ev-cb213245720f69b1:commodity:1"
+    ],
+    "actual_role": "raw_material_procurement",
+    "direct_activity_acceptance": false,
+    "projected_exposure_ids": [
+      "commodity-exposure-6a393063a9a08c78c081ae7b",
+      "commodity-exposure-23b5c64e5c78164d7f827876",
+      "commodity-exposure-8f53a88a79c0c1a7e736bdf5"
+    ],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:010",
+    "matched_source_record_ids": [
+      "owned:core-ev-9530102bc968e082:commodity:1",
+      "owned:core-ev-a6bc3c8c5b936715:commodity:1"
+    ],
+    "actual_role": "product_production",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:011",
+    "matched_source_record_ids": [
+      "owned:core-ev-9530102bc968e082:commodity:3",
+      "owned:core-ev-a6bc3c8c5b936715:commodity:3",
+      "owned:core-ev-cb213245720f69b1:commodity:2"
+    ],
+    "actual_role": "service_provision",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:012",
+    "matched_source_record_ids": [
+      "owned:core-ev-839ea62a3093a2a3:commodity:1"
+    ],
+    "actual_role": "raw_material_procurement",
+    "direct_activity_acceptance": false,
+    "projected_exposure_ids": [
+      "commodity-exposure-87e9743b68558b54e56f2ac2"
+    ],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:013",
+    "matched_source_record_ids": [
+      "owned:core-ev-9c2d3232505a77c3:commodity:1"
+    ],
+    "actual_role": "product_production",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:014",
+    "matched_source_record_ids": [
+      "owned:core-ev-9c2d3232505a77c3:commodity:2"
+    ],
+    "actual_role": "native_operating_action",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:015",
+    "matched_source_record_ids": [
+      "owned:core-ev-9c2d3232505a77c3:commodity:3"
+    ],
+    "actual_role": "product_sales",
+    "direct_activity_acceptance": false,
+    "projected_exposure_ids": [
+      "commodity-exposure-0afacb8262dfde9fb8e3c8b6"
+    ],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:016",
+    "matched_source_record_ids": [
+      "owned:core-ev-9c2d3232505a77c3:commodity:5"
+    ],
+    "actual_role": "product_production",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:017",
+    "matched_source_record_ids": [
+      "owned:core-ev-9c2d3232505a77c3:commodity:6"
+    ],
+    "actual_role": "product_production",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:018",
+    "matched_source_record_ids": [
+      "owned:core-ev-9c2d3232505a77c3:commodity:7"
+    ],
+    "actual_role": "product_production",
+    "direct_activity_acceptance": true,
+    "projected_exposure_ids": [],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:019",
+    "matched_source_record_ids": [
+      "owned:core-ev-9c2d3232505a77c3:commodity:8"
+    ],
+    "actual_role": "raw_material_procurement",
+    "direct_activity_acceptance": false,
+    "projected_exposure_ids": [
+      "commodity-exposure-b2f32202ad4ec0edf379c459"
+    ],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:020",
+    "matched_source_record_ids": [
+      "owned:core-ev-9c2d3232505a77c3:commodity:9"
+    ],
+    "actual_role": "product_sales",
+    "direct_activity_acceptance": false,
+    "projected_exposure_ids": [
+      "commodity-exposure-199d485aac3713dbce76ef48"
+    ],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:021",
+    "matched_source_record_ids": [
+      "owned:core-ev-9c2d3232505a77c3:commodity:11"
+    ],
+    "actual_role": "product_sales",
+    "direct_activity_acceptance": false,
+    "projected_exposure_ids": [
+      "commodity-exposure-2f7605de37d5bd7e35ccd077"
+    ],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:022",
+    "matched_source_record_ids": [
+      "owned:core-ev-9c2d3232505a77c3:commodity:12"
+    ],
+    "actual_role": "product_sales",
+    "direct_activity_acceptance": false,
+    "projected_exposure_ids": [
+      "commodity-exposure-a7ffd84d4e1edd4e41e9f069"
+    ],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:023",
+    "matched_source_record_ids": [
+      "owned:core-ev-9c2d3232505a77c3:commodity:10"
+    ],
+    "actual_role": "product_sales",
+    "direct_activity_acceptance": false,
+    "projected_exposure_ids": [
+      "commodity-exposure-bf52780147d587d48ce2adc0"
+    ],
+    "query_export_role_passed": true
+  },
+  {
+    "condition_id": "600084.SH:action:024",
+    "matched_source_record_ids": [
+      "owned:core-ev-9c6791e9a7a0804c:commodity:1"
+    ],
+    "actual_role": "product_sales",
+    "direct_activity_acceptance": false,
+    "projected_exposure_ids": [
+      "commodity-exposure-1b7c441ab23f94a2b2aff18a"
+    ],
+    "query_export_role_passed": true
+  }
+]

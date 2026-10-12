@@ -1,0 +1,15 @@
+import json
+from pathlib import Path
+from tests.unit.test_research.test_company_profile_v46_tourism_wine import action_matches
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v45-unseen-small-batch';formal=json.loads((R/'data/checkpoints/company_profile_common_core/reports/m4_v46_same_source_repair/formal_execution.json').read_text());scope=json.loads((C/'source-scope.json').read_text());out=[]
+for ins,result in formal['results'].items():
+ raw=json.loads(Path('/tmp/v46-formal-raw-'+ins+'.json').read_text());profile=result['query']['profiles'][0]
+ for role in [r for r in scope['native_roles'] if r['instrument_id']==ins]:
+  matches=action_matches(raw,role);assert matches
+  direct=role['role'] in {'product_production','product_processing','native_operating_action','service_provision'}
+  ids={r['record_id'] for r in matches};assert ids & {r['record_id'] for r in profile['accepted_facts']}
+  expected={'raw_material_procurement':'raw_material_input','operating_energy_input':'energy_consumption'}.get(role['role'],role['role'])
+  exposures=[x['exposure_id'] for x in profile['commodity_exposure']['assessment']['exposures'] if set(x['source_record_ids']) & ids and x['role']==expected]
+  assert direct or exposures,role['condition_id']
+  out.append(dict(condition_id=role['condition_id'],matched_source_record_ids=sorted(ids),actual_role=role['role'],direct_activity_acceptance=direct,projected_exposure_ids=exposures,query_export_role_passed=True))
+(C/'v46-formal-role-validation.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print('REAL QUERY/EXPORT ROLES',len(out))
