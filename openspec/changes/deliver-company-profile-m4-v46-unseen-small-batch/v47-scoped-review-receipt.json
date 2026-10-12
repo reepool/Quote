@@ -1,0 +1,34 @@
+{
+  "review_scope": [
+    "research/company_profile/core_evidence_selection.py",
+    "research/company_profile/core_assessment_projection.py",
+    "research/company_profile/operations.py",
+    "research/company_profile/runtime.py",
+    "tests/unit/test_research/test_company_profile_v47_supply_chain_pharma.py"
+  ],
+  "review_type": "scoped_uncommitted_diff_and_actual_formal_source_review",
+  "blocking_findings_remaining": [],
+  "resolved_blocking_boundaries": [
+    "p195空抵销格/对外标题及真实抵销保留",
+    "主营/全部地区收入口径与前表状态",
+    "跨页关联表列宽、仅上期空位和承租方/资产原行",
+    "原枚举/风险/宣传尾文与原药品主体",
+    "完整正文、注册/临床/订单/控制/注销状态接续",
+    "具名子公司/托管、采购/生产/加工/销售原动作方向"
+  ],
+  "nonblocking_existing": [
+    {
+      "path": "tests/unit/test_research/test_company_profile_v41_telecom_pharma.py",
+      "issue": "人福p233红江店续行旧失败，基线和当前解析结果相同",
+      "receipt": "v47-existing-failure-baseline-validation.json",
+      "action": "deferred_no_code_change"
+    }
+  ],
+  "unrelated_existing_worktree_changes_touched": false,
+  "industry_price_cost_performance_framework_scope_added": false,
+  "finite_a_role_acceptance": "pending",
+  "change_archived": false,
+  "batch_expansion": "paused",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

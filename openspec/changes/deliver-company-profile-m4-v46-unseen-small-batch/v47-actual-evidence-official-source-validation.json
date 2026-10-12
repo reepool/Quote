@@ -1,0 +1,57 @@
+{
+  "instruments": {
+    "600057.SH": {
+      "document_version": "c48dfe8909030d4b19b43ee4e7ed367e7619cd65e77607090edeccdff4a61386",
+      "official_pdf_hash_equal": true,
+      "frozen_plain_pages": 48,
+      "additional_actual_evidence_pages": [
+        27,
+        28,
+        29,
+        30,
+        31,
+        35,
+        40,
+        162,
+        243,
+        244,
+        247,
+        248,
+        249,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255,
+        308
+      ],
+      "total_distinct_verified_pages": 68,
+      "layout_pages": 17,
+      "all_plain_and_layout_equal_official": true
+    },
+    "600085.SH": {
+      "document_version": "18ed343e40092dc0cb4559e6d7747e07453a094967db61480bf1b86c1ddf19f9",
+      "official_pdf_hash_equal": true,
+      "frozen_plain_pages": 49,
+      "additional_actual_evidence_pages": [
+        19,
+        20,
+        21,
+        51,
+        109,
+        197,
+        205
+      ],
+      "total_distinct_verified_pages": 56,
+      "layout_pages": 15,
+      "all_plain_and_layout_equal_official": true
+    }
+  },
+  "frozen_plain_page_count": 97,
+  "additional_plain_page_count": 27,
+  "total_distinct_verified_pages": 124,
+  "layout_page_count": 32,
+  "actual_quotes_layout_only": "出租原layout及企业集团表头次序经官方核验；版式不同不修改原独立plain合同",
+  "no_business_execution": true
+}

@@ -1,0 +1,33 @@
+{
+  "original_scope_unchanged": true,
+  "substance_or_denominator_changed": false,
+  "dimension_aliases": {
+    "出租原service": "lease表达原资产租赁服务，原精确资产/承租方/本期值必须一致",
+    "出售商品/提供劳务product": "service统一原复合栏目；必须保留原销货对象/集团及交易方，不改实际销售方向",
+    "报告分部原具名主体": "consolidated_group为报告范围，business_segment原列名+原项目标题明确母公司/科技/商业/其他/合计身份，可一一映射；对外不得变总收入",
+    "象屿母公司经营地区合计region": "business_type且header含经营地区，接受同一原合计列表示；不借母公司总收入额替代"
+  },
+  "action_aliases": {
+    "引号黑色金属": "仅去开引号，无尾文别名",
+    "为其提供大宗原辅材料采购供应": "原辅材料采购供应同一服务，不推公司商品采购",
+    "operates产成品分销/物流配送/供应链金融": "p11当前提供服务，与provides_service同一实质"
+  },
+  "accuracy_policy": "295实际record_id＋6已答正文动态唯一；配对Measurement仅计准确率；精确原栏目/金额/单位/交易方和主体逐核；任何合同外输出也计准确率",
+  "answer_policy": "required_groups只辅助；按冻结substance判正文完整；引用完整表格不是其中所有值的当前肯定收入；错抵销金额正文单独计数字错误",
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v47"
+  },
+  "original_source_scope_sha256": "5bdbf9d2bbe6cacf4f8fc51011c55e111896c11d789a1bfd123d0692bd98a535",
+  "positive_count_unchanged": 331,
+  "negative_count_unchanged": 72,
+  "service_and_operating_conditions": "原service_provision/native_operating_action以实际接受Activity贯通query/export核，不强行变更commodity_exposure模型；销售及原材料采购核原角色导出。",
+  "additional_native_column_forms": {
+    "行业间抵消industry": "adjustment保存原负数/行业栏目与分部间抵销限定，原主营合计独立保存",
+    "同仁堂地区": "原境内/境外合计等于打印主营，保存主营限定；象屿合并/母公司保持全部营业收入",
+    "单列转租": "接续p240原元单位与p241本期单列；不得把同页承租费用当收入",
+    "受托资产": "具名受托子公司和委托方逐项保存，经营不据此转并表"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "pytest_commands": [
+    {
+      "command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest tests/unit/test_research/test_company_profile_v47_supply_chain_pharma.py -q",
+      "passed": 9,
+      "log": "v47-local-and-entry-regression.log"
+    },
+    {
+      "command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest tests/unit/test_research/test_company_profile_v46_tourism_wine.py tests/unit/test_research/test_company_profile_v44_interest_sections.py -q",
+      "passed": 25,
+      "log": "v47-old-sample-regression.log"
+    }
+  ],
+  "targeted_passed_total": 34,
+  "full_suite_pass_not_claimed": true,
+  "ruff_check_passed": true,
+  "ruff_format_check_passed": true,
+  "openspec_strict_validation_passed": [
+    "deliver-company-profile-m4-v46-unseen-small-batch",
+    "deliver-company-profile-m4-v45-unseen-small-batch",
+    "company-profile-common-core-owned-page-facts",
+    "company-profile-common-core-company-total-and-income-mix"
+  ],
+  "git_diff_check_passed": true,
+  "official_distinct_pages": 124,
+  "official_layout_pages": 32,
+  "first_formal_execution_count": 1,
+  "source_condition_count": 331,
+  "negative_condition_count": 72,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 331,
+    "denominator": 331,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 661,
+    "denominator": 661,
+    "value": 1.0
+  },
+  "critical_numeric_errors": 0,
+  "whole_round_seconds": 216.56022868864238,
+  "tokens_consumed": {
+    "status": "assessed",
+    "value": 0
+  },
+  "historical_file_count": 2812,
+  "original_change_file_count": 41,
+  "first_artifact_count": 18,
+  "execution_module_count": 38,
+  "related_sale_objects_matched": 194,
+  "baseline_head": "d75799105bd82eb917502eaa9c22e3c1df5b762b",
+  "existing_workspace_changes_unchanged": true,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

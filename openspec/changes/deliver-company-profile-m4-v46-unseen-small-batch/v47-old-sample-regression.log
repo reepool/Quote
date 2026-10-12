@@ -1,0 +1,13 @@
+[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[33m                                                [100%][0m
+============================= slowest 10 durations =============================
+11.84s call     tests/unit/test_research/test_company_profile_v46_tourism_wine.py::test_complete_native_bodies[independent_pages-600084.SH]
+9.67s call     tests/unit/test_research/test_company_profile_v46_tourism_wine.py::test_complete_native_bodies[pages-600084.SH]
+9.50s call     tests/unit/test_research/test_company_profile_v46_tourism_wine.py::test_complete_named_actions[independent_pages-600084.SH]
+9.41s call     tests/unit/test_research/test_company_profile_v46_tourism_wine.py::test_native_income_pairs_and_negatives[independent_pages-600084.SH]
+9.05s call     tests/unit/test_research/test_company_profile_v46_tourism_wine.py::test_complete_named_actions[pages-600084.SH]
+8.53s call     tests/unit/test_research/test_company_profile_v46_tourism_wine.py::test_native_income_pairs_and_negatives[pages-600084.SH]
+8.40s call     tests/unit/test_research/test_company_profile_v46_tourism_wine.py::test_complete_native_bodies[independent_pages-600054.SH]
+8.26s call     tests/unit/test_research/test_company_profile_v46_tourism_wine.py::test_complete_named_actions[pages-600054.SH]
+8.24s call     tests/unit/test_research/test_company_profile_v46_tourism_wine.py::test_complete_native_bodies[pages-600054.SH]
+7.85s call     tests/unit/test_research/test_company_profile_v46_tourism_wine.py::test_native_income_pairs_and_negatives[pages-600054.SH]
+[33m[32m25 passed[0m, [33m[1m7 warnings[0m[33m in 132.04s (0:02:12)[0m[0m

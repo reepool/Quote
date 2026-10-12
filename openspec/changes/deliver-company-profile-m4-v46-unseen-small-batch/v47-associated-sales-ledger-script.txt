@@ -1,0 +1,16 @@
+"""Independently match every formal related-sale fact to the frozen layout ledger."""
+import json,re
+from pathlib import Path
+C=Path('openspec/changes/deliver-company-profile-m4-v46-unseen-small-batch');read=lambda p:json.loads(p.read_text());co=lambda s:re.sub(r'\s+','',s or '').replace(',','').replace('（','(').replace('）',')')
+ledger=read(C/'independent-associated-sales-ledger.json');matches=[];seen=set()
+for ins in ['600057.SH','600085.SH']:
+ raw=read(Path('/tmp/v47_unseen_actual_'+ins+'.json'))
+ for r in raw:
+  n=r['source_native']
+  if r['object_type'] not in {'Segment','Measurement'} or n.get('header')!='出售商品/提供劳务/本期发生额':continue
+  candidates=[(j,x) for j,x in enumerate(ledger['rows']) if x['instrument_id']==ins and x['current'] is not None and co(n['name'])==co(x['content']) and co(n['value'])==co(x['current']) and co(n.get('qualifier'))==co('交易对方：'+x['party'])]
+  assert len(candidates)==1,(ins,n,candidates);j,x=candidates[0];assert r['subject_scope']=='consolidated_group';assert n['unit']==('元' if ins=='600057.SH' else '万元')
+  matches.append(dict(instrument_id=ins,record_id=r['record_id'],object_type=r['object_type'],ledger_index=j,original_page=x['page'],original_party=x['party'],original_content=x['content'],current_value=x['current'],unit=n['unit'],subject_scope=r['subject_scope'],matched=True));seen.add(j)
+assert len(seen)==ledger['current_count']==97
+receipt=dict(actual_related_sale_object_count=len(matches),current_ledger_row_count=97,all_current_rows_delivered=True,prior_only_ledger_row_count=ledger['prior_only_count'],all_actual_related_sale_objects_match_independent_ledger=True,matched_objects=matches)
+(C/'v47-associated-sales-ledger-validation.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n');print('LEDGER',len(matches),len(seen),ledger['prior_only_count'])

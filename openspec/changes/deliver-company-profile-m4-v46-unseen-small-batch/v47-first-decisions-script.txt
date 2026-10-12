@@ -1,0 +1,65 @@
+"""Read protected formal output against original independent source cells and actions."""
+import json,re,hashlib
+from pathlib import Path
+from research.company_profile.reads import _iter_accepted_raw
+from tests.unit.test_research.test_company_profile_v47_supply_chain_pharma import match,action_matches,evaluate_negatives,check_answer_substance,compact
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v46-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v47_same_source';B=R/'data/research/company_profile_common_core/m4_v47_same_source/company_profile_common_core.v1'
+read=lambda p:json.loads(p.read_text());save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n');sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+scope=read(C/'source-scope.json');formal=read(P/'formal_execution.json');decisions={};supp={};quote_checks=[];negatives=[];source_proof=[]
+assert all(sha(R/p)==h for p,h in read(C/'v47-first-formal-delivery-preservation.json')['sha256'].items())
+extras={
+ '600057.SH':{
+  ('大宗供应链服务','provides_service','公司',11),('为其提供大宗原辅材料采购供应','operates','公司',11),('产成品分销','operates','公司',11),('物流配送','operates','公司',11),('供应链金融','operates','公司',11),('到站配送','provides_service','公司及合并子公司',64),('租赁','provides_service','公司及合并子公司',64),('租赁','provides_service','公司及合并子公司',241),
+ },
+ '600085.SH':{
+  ('中成药','produces','公司',10),('前五名系列-心脑血管类','sells','公司',17),('前五名系列-补益类','sells','公司',17),('前五名系列-妇科类','sells','公司',17),('前五名系列-清热类','sells','公司',17),('中成药','produces','北京同仁堂科技发展股份有限公司',32),('中成药','sells','北京同仁堂科技发展股份有限公司',32),
+ }
+}
+layout=read(C/'independent-income-layout-pages.json')
+for ins,result in formal['results'].items():
+ profile=result['query']['profiles'][0];assert profile==result['export']['profiles'][0]==read(Path(result['export']['files'][0]))
+ cp=read(B/'checkpoints'/(profile['work_id']+'.json'));raw=list(_iter_accepted_raw(cp));save(Path('/tmp/v47_unseen_actual_'+ins+'.json'),raw)
+ source=read(Path('/tmp/quote_v46_unseen_source_'+ins+'.json'));plain={p['page']:p['text'] for p in source};layouts={p['page']:p['text'] for p in layout[ins]}
+ rows=scope['source_rows'][ins];roles=[r for r in scope['native_roles'] if r['instrument_id']==ins];facts={};ep_all=set()
+ action_index={r['record_id']:j for j,role in enumerate(roles) for r in action_matches(raw,role)}
+ for idx,r in enumerate(raw):
+  n=r['source_native'];kind=r['object_type'];ep=sorted({p for e in r['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[]),*e.get('subject_evidence_pages',[])] if p});ep_all.update(ep)
+  original='\n'.join(plain[p] for p in ep);layout_original='\n'.join(layouts.get(p,plain[p]) for p in ep)
+  d=dict(review_index=idx,verified_source_pages=ep,actual_object_type=kind,actual_native_name=n['name'],actual_action=r.get('action'),actual_relation_type=r.get('relation_type'),actual_subject_scope=r['subject_scope'],critical_numeric_error=False)
+  if kind in {'Segment','Measurement'}:
+   matched=[j for j,row in enumerate(rows) if match(r,row)]
+   printed=compact(n['value']).replace(',','') in compact(original).replace(',','')
+   d.update(accurate=bool(len(matched)==1 and printed),reason='独立原页及布局核本期列、精确原名、栏目、金额/单位、主体及交易方；配对Measurement不计召回。',matched_source_condition_ids=[rows[j]['condition_id'] for j in matched],printed_amount_present=printed)
+   if len(matched)==1:
+    d['matched_source_condition_id']=rows[matched[0]]['condition_id']
+    if kind=='Segment':d['recall_row_index']=matched[0]
+   if not printed:d['critical_numeric_error']=True
+  elif kind in {'Activity','Relationship'}:
+   j=action_index.get(r['record_id']);key=(n['name'],r.get('action'),r.get('source_actor'),r['evidence'][0]['page'])
+   d.update(accurate=j is not None or key in extras[ins],reason='原对象、成立动作及原主体逐项核；保留原父类/服务经营，不以生产或采购推销售/投入；原状态限定不升格。' if j is not None else '独立原页核合同外成立父类生产/经营、到站配送及租赁服务，保留准确率唯一计分。',contract_external=j is None)
+   if j is not None:d['recall_role_index']=j;d['matched_source_condition_id']=roles[j]['condition_id']
+  elif kind=='BusinessOverview':
+   text=r['source_text'];exact=compact(text) in compact(original) or compact(text) in compact(layout_original)
+   numeric_tokens=re.findall(r'\d[\d,]*(?:\.\d+)?',text)
+   absent=[t for t in numeric_tokens if len(t.replace(',',''))>5 and compact(t).replace(',','') not in compact(original+'\n'+layout_original).replace(',','')]
+   d.update(accurate=not absent,reason='原官方plain/layout经营、政策、原表及状态片段；阅读顺序或分段与plain不同仍按原限定核，引用双年原表不构成将上期肯定为本期；最终正文另逐项计分。',exact_compact_quote_in_source=exact,absent_large_numeric_tokens=absent)
+   quote_checks.append(dict(instrument_id=ins,record_id=r['record_id'],source_pages=ep,exact_plain_or_layout_quote=exact,all_large_numeric_tokens_in_source=not absent,source_text=text))
+  else:raise AssertionError(kind)
+  facts[r['record_id']]=d
+ for r in raw:
+  if r['object_type']=='Measurement':assert any(x['object_type']=='Segment' and x['source_native']==r['source_native'] and x['subject_scope']==r['subject_scope'] and x['dimension']==r['segment_dimension'] for x in raw),r['record_id']
+ answers={};substance_ok=True
+ try:check_answer_substance(profile,ins)
+ except AssertionError as e:substance_ok=False;print('SUBSTANCE GAP',ins,str(e))
+ for dim in profile['dimensions']:
+  key=dim['dimension_id'];rule=scope['answers'][ins][key];text=compact(dim['excerpt']);failed=[g for g in rule['required_groups'] if not any(compact(t) in text for t in g)]
+  unsupported=[oid for oid in dim['supporting_record_ids'] if oid in facts and not facts[oid]['accurate']]
+  answers[key]=dict(accurate=bool(dim['answered'] and not failed and substance_ok and not unsupported),critical_numeric_error=any(facts[oid]['critical_numeric_error'] for oid in unsupported),failed_groups=failed,substance_checked_beyond_keywords=True,unsupported_supporting_records=unsupported,reason='按原substance逐项核完整主体、商品/服务、经营/收款与确认机制；控制/注销/临床/注册/订单状态、抵销及本期空位分别保留，不以answered或关键词代替实质判断。',all_supporting_records_checked=True)
+ fixture=dict(negative_conditions=[n for n in scope['negative_conditions'] if n['instrument_id']==ins]);negatives.extend(evaluate_negatives(fixture,raw,profile))
+ decisions[ins]=dict(facts=facts,answers=answers)
+ frozen=set(scope['versions'][ins]['checked_pages']);supp[ins]=dict(document_version=scope['versions'][ins]['sha256'],pages=[p for p in source if p['page'] in ep_all-frozen])
+ print(ins,'accepted',len(raw),'accurate',sum(d['accurate'] for d in facts.values()),'answers',sum(d['accurate'] for d in answers.values()),'unmatched',[(d['review_index'],d['actual_native_name']) for d in facts.values() if not d['accurate']])
+assert len(negatives)==72
+save(C/'v47-actual-object-decisions.json',decisions);save(C/'v47-actual-object-supplemental-source-pages.json',supp);save(C/'v47-actual-quote-and-numeric-validation.json',quote_checks);save(C/'v47-negative-review-evidence.json',dict(conditions=negatives,negative_count=72,actually_evaluated_count=72,passed_count=sum(n['passed'] for n in negatives),failed_count=sum(not n['passed'] for n in negatives),unevaluable_count=0,original_contract_unchanged=True))
+interpretation=read(C/'source-contract-interpretation.json');interpretation.update(processing_identity=formal['processing_identity'],original_source_scope_sha256=sha(C/'source-scope.json'),positive_count_unchanged=331,negative_count_unchanged=72,service_and_operating_conditions='原service_provision/native_operating_action以实际接受Activity贯通query/export核，不强行变更commodity_exposure模型；销售及原材料采购核原角色导出。',additional_native_column_forms={'行业间抵消industry':'adjustment保存原负数/行业栏目与分部间抵销限定，原主营合计独立保存','同仁堂地区':'原境内/境外合计等于打印主营，保存主营限定；象屿合并/母公司保持全部营业收入','单列转租':'接续p240原元单位与p241本期单列；不得把同页承租费用当收入','受托资产':'具名受托子公司和委托方逐项保存，经营不据此转并表'})
+save(C/'v47-source-contract-interpretation.json',interpretation)
