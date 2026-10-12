@@ -1,0 +1,14 @@
+{
+  "all_protected_hashes_equal": true,
+  "verified_sets": {
+    "historical": 3580,
+    "first_formal": 20,
+    "preexisting_modified": 3,
+    "executed_code": 38
+  },
+  "original_v43_report_immutable": true,
+  "original_v43_report_sha256": "a5f25774f3389f1d2d55f08f38aed6eba2ca450fe3ecd1964da295d5ea4035e5",
+  "a_role_supplement_sha256": "93f63b005f59a85d0b0ca4cf67f8dabbf71c10c621d60d5df1ac2805ca34849c",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

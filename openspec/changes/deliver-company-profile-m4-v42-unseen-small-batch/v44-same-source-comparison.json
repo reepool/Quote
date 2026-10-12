@@ -1,0 +1,126 @@
+{
+  "changes": [
+    {
+      "instrument_id": "600051.SH",
+      "old_actual_fact_count": 417,
+      "new_actual_fact_count": 416,
+      "semantic_values_added": [],
+      "semantic_values_removed_or_duplicate_reduced": [
+        {
+          "semantic_value": {
+            "action": null,
+            "object_type": "Segment",
+            "relation_type": null,
+            "source_actor": null,
+            "source_native": {
+              "footnote_refs": [],
+              "header": "重要联营企业/本期营业收入",
+              "name": "宁波青峙化工码头有限公司",
+              "qualifier": "联营企业：宁波青峙化工码头有限公司",
+              "source_aliases": [],
+              "unit": "元",
+              "value": "267,644,558.85"
+            },
+            "source_text": null,
+            "subject_scope": "business_segment"
+          },
+          "old_object_count": 2,
+          "new_object_count": 1
+        }
+      ],
+      "formal_raw_equal_to_final_official_owner_local": true,
+      "answers": {
+        "principal_business": {
+          "original_equal": true,
+          "old_length": 9433,
+          "new_length": 9433
+        },
+        "products_services": {
+          "original_equal": true,
+          "old_length": 9433,
+          "new_length": 9433
+        },
+        "revenue_model": {
+          "original_equal": true,
+          "old_length": 7898,
+          "new_length": 7898
+        }
+      }
+    },
+    {
+      "instrument_id": "600080.SH",
+      "old_actual_fact_count": 183,
+      "new_actual_fact_count": 181,
+      "semantic_values_added": [],
+      "semantic_values_removed_or_duplicate_reduced": [
+        {
+          "semantic_value": {
+            "action": null,
+            "object_type": "Segment",
+            "relation_type": null,
+            "source_actor": null,
+            "source_native": {
+              "footnote_refs": [],
+              "header": "重要合营企业/本期营业收入",
+              "name": "常州华森医疗器械股份有限公司",
+              "qualifier": "合营企业：常州华森医疗器械股份有限公司",
+              "source_aliases": [],
+              "unit": "元",
+              "value": "338,506,572.72"
+            },
+            "source_text": null,
+            "subject_scope": "business_segment"
+          },
+          "old_object_count": 1,
+          "new_object_count": 0
+        },
+        {
+          "semantic_value": {
+            "action": null,
+            "object_type": "Measurement",
+            "relation_type": null,
+            "source_actor": null,
+            "source_native": {
+              "footnote_refs": [],
+              "header": "重要合营企业/本期营业收入",
+              "name": "常州华森医疗器械股份有限公司",
+              "qualifier": "合营企业：常州华森医疗器械股份有限公司",
+              "source_aliases": [],
+              "unit": "元",
+              "value": "338,506,572.72"
+            },
+            "source_text": null,
+            "subject_scope": "business_segment"
+          },
+          "old_object_count": 1,
+          "new_object_count": 0
+        }
+      ],
+      "formal_raw_equal_to_final_official_owner_local": true,
+      "answers": {
+        "principal_business": {
+          "original_equal": true,
+          "old_length": 7977,
+          "new_length": 7977
+        },
+        "products_services": {
+          "original_equal": true,
+          "old_length": 7977,
+          "new_length": 7977
+        },
+        "revenue_model": {
+          "original_equal": false,
+          "old_length": 4977,
+          "new_length": 4948
+        }
+      }
+    }
+  ],
+  "positive_contract_unchanged": true,
+  "notes": [
+    "金花2条伪合营事实消失，正确联营两配对事实及销售仍成立",
+    "宁波同一联营收入原有2条同值Segment来自越界重复选取，章节收紧后保留1条及对应Measurement，原222收入分母不变",
+    "其余全部事实业务字段保留，五个正文原字节相同，金花收入正文只去除伪合营描述",
+    "准确率603分母来自正式597事实＋6答案，不继承606或按预期减法填写"
+  ]
+}

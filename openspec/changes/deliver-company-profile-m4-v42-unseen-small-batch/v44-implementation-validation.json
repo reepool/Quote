@@ -1,0 +1,55 @@
+{
+  "created_at": "2026-10-12T02:13:01.783400+00:00",
+  "completed_tasks": [
+    "5.1",
+    "5.2",
+    "5.3"
+  ],
+  "review_classification": {
+    "blocking_fixed": [
+      "不适用合营段越界读取联营收入",
+      "计分匹配漏检关系栏目及限定",
+      "章节限定丢失联通报告单位（执行前回归修正）"
+    ],
+    "remaining_blocking": [],
+    "nonblocking_deferred": [
+      "行业增强、量价成本、正文精简、性能、框架和无关旧失败"
+    ],
+    "unrelated_untouched": "3份既有修改文档及全部既有未跟踪内容"
+  },
+  "validation": [
+    {
+      "command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_v44_interest_sections.py",
+      "result": "12 passed"
+    },
+    {
+      "command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_v41_telecom_pharma.py -k 'full_source and 600050'",
+      "result": "4 passed, 32 deselected after report-unit compatibility fix"
+    },
+    {
+      "scope": "v43/v30/v41/v42旧完整页组合，单位修正前",
+      "result": "16 passed, 4 failed, 47 deselected; 四项失败即联通单位携带问题，修正后以上4项复验通过，不称全部旧代码通过"
+    },
+    {
+      "scope": "错误真实制品转入固定fixture，避免归档路径依赖",
+      "result": "1 passed, 11 deselected"
+    },
+    {
+      "scope": "两家公司隔离真实官方owner五阶段/查询/导出/磁盘",
+      "result": "passed, 原222收入/25动作/六正文/19负例及补充边界全通过"
+    },
+    {
+      "scope": "87官方页文本＋layout重读",
+      "result": "87/87 exact"
+    },
+    {
+      "scope": "38执行模块：844ca40f＋冻结patch重建",
+      "result": "38/38 hashes equal"
+    }
+  ],
+  "full_suite_pass_claimed": false,
+  "formal_gate": true,
+  "a_role_acceptance": "pending_finite_review",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

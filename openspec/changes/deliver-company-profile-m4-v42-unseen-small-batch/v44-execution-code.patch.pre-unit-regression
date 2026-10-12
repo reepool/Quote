@@ -1,0 +1,163 @@
+diff --git a/research/company_profile/core_evidence_selection.py b/research/company_profile/core_evidence_selection.py
+index 6d7de01b..ca0b4914 100644
+--- a/research/company_profile/core_evidence_selection.py
++++ b/research/company_profile/core_evidence_selection.py
+@@ -1322,6 +1322,7 @@ REVENUE_SENTENCE_REPAIR_V40 = "v40"
+ REVENUE_SENTENCE_REPAIR_V41 = "v41"
+ REVENUE_SENTENCE_REPAIR_V42 = "v42"
+ REVENUE_SENTENCE_REPAIR_V43 = "v43"
++REVENUE_SENTENCE_REPAIR_V44 = "v44"
+ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
+     {
+         REVENUE_SENTENCE_REPAIR_V1,
+@@ -1367,6 +1368,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
+         REVENUE_SENTENCE_REPAIR_V41,
+         REVENUE_SENTENCE_REPAIR_V42,
+         REVENUE_SENTENCE_REPAIR_V43,
++        REVENUE_SENTENCE_REPAIR_V44,
+     }
+ )
+ 
+@@ -1435,6 +1437,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
+         REVENUE_SENTENCE_REPAIR_V41,
+         REVENUE_SENTENCE_REPAIR_V42,
+         REVENUE_SENTENCE_REPAIR_V43,
++        REVENUE_SENTENCE_REPAIR_V44,
+     }
+ 
+ 
+@@ -1486,6 +1489,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
+         REVENUE_SENTENCE_REPAIR_V41,
+         REVENUE_SENTENCE_REPAIR_V42,
+         REVENUE_SENTENCE_REPAIR_V43,
++        REVENUE_SENTENCE_REPAIR_V44,
+     }
+ 
+ 
+@@ -1537,6 +1541,7 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
+         REVENUE_SENTENCE_REPAIR_V41,
+         REVENUE_SENTENCE_REPAIR_V42,
+         REVENUE_SENTENCE_REPAIR_V43,
++        REVENUE_SENTENCE_REPAIR_V44,
+     }
+ 
+ 
+@@ -1589,6 +1594,7 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
+         REVENUE_SENTENCE_REPAIR_V41,
+         REVENUE_SENTENCE_REPAIR_V42,
+         REVENUE_SENTENCE_REPAIR_V43,
++        REVENUE_SENTENCE_REPAIR_V44,
+     }
+ 
+ 
+@@ -5328,12 +5334,25 @@ def _native_income_spans(pages: Sequence[ReportPageText]) -> list[CoreEvidenceSp
+             )
+             table = text[start:parent_start] if parent_start > start else text[start:]
+             continuations = []
++            if title in {"联营企业收入", "合营企业收入"}:
++                # Applicability belongs to this heading, never the next entity
++                # relationship's section on the same page.
++                table = table.split(cue, 1)[-1]
++                if re.match(r"\s*□适用\s*√不适用", table):
++                    continue
++                table = cue + table
+             if (
+                 title
+                 in {"主体营业收入", "联营企业收入", "合营企业收入", "非全资子公司收入"}
+                 or cue == "营业收入明细："
+             ):
+                 stop = r"报告期内取得和处置子公司的情况|[（(]4[)）]\.?(?:不重要的合营|使用企业集团)|营业成本分解信息|营业收入、营业成本的分解信息|\n\s*\d+、\s*(?:不重要|重要合营|重要联营|在合营)"
++                if title in {"联营企业收入", "合营企业收入"}:
++                    stop += (
++                        r"|\n\s*[（(]\d+[)）]\.?\s*|重要(?:合营|联营)企业的主要财务信息"
++                    )
++                    # Exclude the current heading from the boundary search.
++                    table = table.split(cue, 1)[-1]
+                 cursor = page.page + 1
+                 while not re.search(stop, table):
+                     nxt = next(
+@@ -5353,6 +5372,8 @@ def _native_income_spans(pages: Sequence[ReportPageText]) -> list[CoreEvidenceSp
+                     table = re.split(r"营业成本分解信息", table, maxsplit=1)[0]
+                 else:
+                     table = re.split(stop, table, maxsplit=1)[0]
++                if title in {"联营企业收入", "合营企业收入"}:
++                    table = cue + table
+             if title == "治疗领域收入":
+                 table = re.split(r"\n\s*情况说明", table, maxsplit=1)[0]
+                 table = re.sub(r"详见\s*情\s*况\s*说明", "", table)
+@@ -6648,6 +6669,19 @@ def _project_native_income_span(
+         if title == "收入确认交叉单元"
+         else _join_native_income_cells(span.excerpt)
+     )
++    if title in {"联营企业收入", "合营企业收入"}:
++        kind = title.removesuffix("收入")
++        cue = "重要" + kind + "的主要财务信息"
++        if cue in text:
++            active = text.split(cue, 1)[1]
++            active = re.split(
++                r"重要(?:合营|联营)企业的主要财务信息|\n\s*[（(]\d+[)）]\.?\s*",
++                active,
++                maxsplit=1,
++            )[0]
++            if re.match(r"\s*□适用\s*√不适用", active):
++                return ()
++            text = cue + active
+     text = re.sub(
+         r"((?:主营|其他)业务\s+(?:[-/]\s+){3}[-/])\s+(?=(?:主营|其他)业务)",
+         r"\1\n",
+@@ -7039,14 +7073,14 @@ def _project_native_income_span(
+                         "business_segment",
+                         name,
+                         value,
+-                        "重要联营企业/本期营业收入",
++                        "重要" + kind + "/本期营业收入",
+                         None,
+-                        "联营企业：" + name,
++                        kind + "：" + name,
+                     )
+                     for name, value in zip(names[:2], cells[:2])
+                 )
+     if title in {"联营企业收入", "合营企业收入"} and not rows:
+-        active = re.split(r"重要(?:联营|合营)企业的主要财务信息", text, maxsplit=1)[-1]
++        active = text.split("重要" + kind + "的主要财务信息", 1)[-1]
+         if re.search(r"√适用\s*□不适用", active[:50]):
+             header = re.search(
+                 r"期末余额/本期发生额\s+期初余额/上期发生额(?P<names>[\s\S]+?)(?=流动资产)",
+@@ -7097,9 +7131,9 @@ def _project_native_income_span(
+                                 "business_segment",
+                                 name,
+                                 values[0],
+-                                "重要联营企业/本期营业收入",
++                                "重要" + kind + "/本期营业收入",
+                                 None,
+-                                "联营企业：" + name,
++                                kind + "：" + name,
+                             )
+                         )
+     if title == "主营业务分业务":
+diff --git a/research/company_profile/operations.py b/research/company_profile/operations.py
+index 3797e4fd..8eb2475a 100644
+--- a/research/company_profile/operations.py
++++ b/research/company_profile/operations.py
+@@ -1150,7 +1150,7 @@ class CompanyProfileTaskService:
+         elif enqueue and not (limit_drain_to_enqueued and not instrument_ids):
+             if batch_plan is not None and self.processing_identity.get(
+                 "revenue_sentence_repair"
+-            ) in {"v41", "v42", "v43"}:
++            ) in {"v41", "v42", "v43", "v44"}:
+                 from research.business_profile_production_operations import (
+                     register_business_profile_shared_annual_report_asset,
+                 )
+diff --git a/research/company_profile/runtime.py b/research/company_profile/runtime.py
+index 08fb35ca..9f8eb31f 100644
+--- a/research/company_profile/runtime.py
++++ b/research/company_profile/runtime.py
+@@ -491,7 +491,7 @@ class CompanyProfileStageRuntime:
+                         expand_actor_aliases=state.processing_identity.get(
+                             "revenue_sentence_repair"
+                         )
+-                        in {"v41", "v42", "v43"},
++                        in {"v41", "v42", "v43", "v44"},
+                     ),
+                 )
+             )

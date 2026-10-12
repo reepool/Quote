@@ -1,0 +1,22 @@
+{
+  "original_report_immutable": true,
+  "a_role_acceptance": "failed_finite_review",
+  "source_recall": {
+    "numerator": 252,
+    "denominator": 253
+  },
+  "source_accuracy": {
+    "numerator": 603,
+    "denominator": 606
+  },
+  "critical_numeric_errors": 0,
+  "negative_pass_count": 19,
+  "wrong_object_ids": [
+    "owned:core-ev-d05a46a95f38bf8f:Segment:business_segment:常州华森医疗器械股份有限公司:重要合营企业/本期营业收入:row:0",
+    "owned:core-ev-89baf4114b26d97e:Measurement:business_segment:常州华森医疗器械股份有限公司:重要合营企业/本期营业收入:row:0"
+  ],
+  "wrong_answer": "600080.SH:answer:revenue_model",
+  "cause": "p156重要合营财务信息不适用，被读取为后续联营表收入；原匹配函数未核关系栏目和限定",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

@@ -33,13 +33,13 @@ def page_numbers(record):
     }
 
 
-def delivered(root, instrument, pages):
+def delivered(root, instrument, pages, repair_version="v43"):
     query, exported = _drive(
         root,
         instrument=instrument,
         fixture=fixture(instrument),
         pages=pages,
-        repair_version="v43",
+        repair_version=repair_version,
     )
     assert query == exported
     cp = json.loads(
@@ -56,6 +56,10 @@ def income_matches(raw, row):
         "service": "lease" if "出租" in row["header"] else "service",
         "customer_type": "region",
     }.get(row["dimension"], row["dimension"])
+    relationship = next(
+        (kind for kind in ("联营企业", "合营企业") if kind in row["header"]),
+        None,
+    )
     return [
         r
         for r in raw
@@ -66,6 +70,15 @@ def income_matches(raw, row):
         and compact(r["source_native"]["value"]) == compact(row["value"])
         and r["source_native"]["unit"] == row["unit"]
         and row["page"] in page_numbers(r)
+        and (
+            relationship is None
+            or (
+                r["source_native"].get("header")
+                == "重要" + relationship + "/本期营业收入"
+                and compact(r["source_native"].get("qualifier"))
+                == compact(relationship + "：" + row["source_actor"])
+            )
+        )
         and (
             not row.get("counterparty")
             or compact(row["counterparty"])

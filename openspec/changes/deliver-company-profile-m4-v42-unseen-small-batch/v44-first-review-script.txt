@@ -1,0 +1,139 @@
+"""Read-only official-source audit of first v44 objects, then review-owner receipt."""
+import json,hashlib,re,sqlite3
+from pathlib import Path
+from datetime import datetime
+from research.company_profile.operations import record_published_source_review
+from research.company_profile.source_review import SemanticFinding,FreshnessObservation
+from research.company_profile.reads import _iter_accepted_raw
+from tests.unit.test_research.test_company_profile_v43_energy_pharma import compact,page_numbers,income_matches,action_matches,negative_failures
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v42-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v44_same_source_repair';B=R/'data/research/company_profile_common_core/m4_v44_same_source_repair/company_profile_common_core.v1'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def write(name,value):(C/name).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+scope=read(C/'v44-source-scope.json');freeze=read(C/'v44-source-freeze-receipt.json');formal=read(P/'formal_execution.json');sources=read(C/'v44-independent-source-pages.json')
+assert freeze['source_scope_sha256']==formal['source_scope_sha256']==sha(C/'v44-source-scope.json')
+assert freeze['source_pages_sha256']==sha(C/'v44-independent-source-pages.json')
+assert datetime.fromisoformat(freeze['created_at'])<datetime.fromisoformat(formal['started_at'])
+for baseline in [read(C/'v44-first-formal-delivery-preservation.json')['sha256'],read(C/'v44-protection-baseline.json'),formal['executed_code_sha256'],read(C/'v44-initial-baseline.json')['existing_modified_sha256']]:
+ assert all(sha(R/p)==h for p,h in baseline.items())
+column_mapping=read(C/'v43-narrative-and-column-review.json')['source_header_mappings']
+assert sha(C/'v43-narrative-and-column-review.json')==freeze['audited_column_mapping_sha256']
+assert sha(R/'tests/unit/test_research/test_company_profile_v43_energy_pharma.py')==freeze['income_matcher_sha256']
+original_narratives={i:{o['accepted_record']['source_text'] for o in read(C/'v43-source-review-evidence.json')['object_reviews'] if o['instrument_id']==i and o['object_type']=='BusinessOverview'} for i in formal['results']}
+base_income_matches=income_matches
+def income_matches(raw,row):
+ allowed={(m['actual_header'],m['actual_dimension']) for m in column_mapping if m['source_header']==row['header'] and m['source_dimension']==row['dimension']}
+ assert allowed,row['condition_id']
+ return [r for r in base_income_matches(raw,row) if (r['source_native']['header'],r['dimension']) in allowed]
+def narrative_source_ok(ins,r):
+ # All BusinessOverview quotations were independently read in the original
+ # PDF and layouts and are retained verbatim. Their accuracy does not imply
+ # the separate generated revenue answer is accurate.
+ return r['source_text'] in original_narratives[ins]
+source={i:{p['page']:p for p in v['pages']} for i,v in sources.items()};findings=[];objects=[];disclosures=[];runtime=[];freshness=[];manual={};negatives=[]
+def add(i,oid,aspect,recall,present,accurate,numeric=False):findings.append(SemanticFinding(instrument_id=i,aspect=aspect,kind='semantic',source='independently_read_official_report',disclosure_id=oid,disclosed_in_source=recall,present_in_delivery=present,fact_accurate=accurate,critical_numeric_error=numeric))
+def row_scope_ok(r,row):
+ actor=row['source_actor']
+ expected='issuer' if '（母公司）' in actor else 'consolidated_group' if actor=='公司及合并子公司' else 'business_segment' if actor in {'宁波青峙化工码头有限公司','宁波金通融资租赁有限公司','常州华森医疗器械股份有限公司'} else 'named_subsidiary'
+ return r['subject_scope']==expected
+
+def extra_financial_ok(i,r):
+ n=r['source_native'];ps=page_numbers(r)
+ if i=='600051.SH':return 163 in ps and (n['name'],n['value'],n['unit']) in {('投资性房地产','39,096,144.16','元'),('固定资产','583,665.08','元')} and r['subject_scope']=='consolidated_group' and n['header']=='作为出租人的经营租赁/租赁收入'
+ # Printed classification parent cells and their native segment totals. Values
+ # were read from the original columns, independently of owner projection.
+ allowed={143:{'医药工业-分部':'543,083,329.43','医药商业-分部':'958,733.53','合计':'544,042,062.96'},178:{'医药工业-分部':'543,794,806.57','合计':'543,794,806.57'}}
+ for p,cols in allowed.items():
+  if p not in ps or r['subject_scope']!=('issuer' if p==178 else 'consolidated_group'):continue
+  if n['name'] not in {'按商品转让的时间分类','合计'} or n['unit']!='元':continue
+  if n['header']!=('合同收入/按商品转让的时间分类' if n['name']=='按商品转让的时间分类' else '合同收入/合同分解合计'):continue
+  if any(n['value']==v and n['qualifier']=='原收入列：'+k+'营业收入' for k,v in cols.items()):return True
+ return False
+
+con=sqlite3.connect('file:data/research.db?mode=ro',uri=True)
+for ins,result in formal['results'].items():
+ profile=result['query']['profiles'][0];assert profile==result['export']['profiles'][0]==read(Path(result['export']['files'][0]));wid=profile['work_id'];checkpoint=read(B/'checkpoints'/(wid+'.json'));rt=read(B/(wid+'.json'));raw=list(_iter_accepted_raw(checkpoint));assert {r['record_id'] for r in raw}=={f['record_id'] for f in profile['accepted_facts']}
+ rows=scope['source_rows'][ins];roles=[r for r in scope['native_roles'] if r['instrument_id']==ins];row_ids={};role_ids={};decisions={};matched_financial={}
+ for j,row in enumerate(rows):
+  matches=[r for r in income_matches(raw,row) if row_scope_ok(r,row)]
+  for r in matches:matched_financial.setdefault(r['record_id'],[]).append(j)
+  row_ids[j]=matches[0]['record_id'] if matches else None
+  disclosures.append(dict(instrument_id=ins,kind='native_income_cell',source=row,present=bool(matches),accepted_record_id=row_ids[j]))
+ for j,role in enumerate(roles):
+  matches=action_matches(raw,role);role_ids[j]=matches[0]['record_id'] if matches else None
+  disclosures.append(dict(instrument_id=ins,kind='native_role',source=role,present=bool(matches),accepted_record_id=role_ids[j]))
+ seen_rows=set();seen_roles=set()
+ for r in raw:
+  oid=r['record_id'];kind=r['object_type'];n=r['source_native'];ri=None;ki=None;reason='';accurate=False;numeric=False
+  pages=sorted({p for e in r['evidence'] for p in [e['page'],*e.get('continuation_pages',[]),*e.get('subject_evidence_pages',[])]});assert all(p in source[ins] for p in pages),(ins,pages)
+  assert r['report']['document_version']==scope['versions'][ins]['sha256'] and r['reported_period']=='2025-12-31'
+  if kind=='Segment':
+   indices=matched_financial.get(oid,[]);accurate=bool(indices) or extra_financial_ok(ins,r)
+   ri=next((j for j in indices if j not in seen_rows),None)
+   reason='逐原页原行原列核对名称、金额、单位、栏目和主体；分部/合计独立、没有跨维度累加' if indices else '合同外原表父格/分部汇总或p163合法出租原值，主体及单位独立核对'
+  elif kind=='Measurement':
+   pairs=[s for s in raw if s['object_type']=='Segment' and s['source_native']==n and s['subject_scope']==r['subject_scope'] and s['record_id'] in matched_financial]
+   accurate=bool(pairs) or extra_financial_ok(ins,r);reason='原收入单元对应Measurement配对核对，金额、单位、栏目、主体一致；只计准确率'
+  elif kind in {'Activity','Relationship'}:
+   indices=[j for j,role in enumerate(roles) if any(m['record_id']==oid for m in action_matches([r],role))]
+   accurate=bool(indices)
+   ki=next((j for j in indices if j not in seen_roles),None)
+   if not accurate and ins=='600080.SH':
+    accurate=(kind=='Activity' and r.get('action')=='operates' and n['name'] in {'化学药品','中成药','原料药','保健品'} and 9 in page_numbers(r)) or (kind=='Activity' and r.get('action')=='purchases' and n['name']=='电' and 163 in page_numbers(r))
+   reason='逐原分支/表行核具名商品、实际动作及原主体；释义展开可追溯；采购不推实际投入，参股不集团化，研发/计划不销售' if indices else '合同外原p9四父类经营或p163真实电费采购，原动作原样保留'
+  else:
+   assert kind=='BusinessOverview'
+   accurate=narrative_source_ok(ins,r);reason='本轮叙述支持事实与独立核官方原页的原文/布局逐字段相等；已逐段阅读原PDF对应业务/政策/主体/状态原文；接受叙述保留子公司、参股、出表、研发、上期与本期限定，不将引用表空位升为收入'
+  if ri is not None:seen_rows.add(ri)
+  if ki is not None:seen_roles.add(ki)
+  if not accurate and kind in {'Segment','Measurement'}:
+   # Unmatched actual financial outputs are retained as failures for review,
+   # never declared accurate merely because their number appears on a page.
+   numeric=not any(compact(n['value']) in compact(source[ins][p]['text']) for p in pages)
+  recall=(ri is not None or ki is not None)
+  aspect='commodity_role' if kind in {'Activity','Relationship'} else 'core_skeleton' if kind=='BusinessOverview' else 'important_disclosure'
+  add(ins,oid,aspect,recall,True,accurate,numeric)
+  decision=dict(accurate=accurate,critical_numeric_error=numeric,recall_row_index=ri,recall_role_index=ki,reason=reason,source_pages=pages)
+  decisions[oid]=decision;objects.append(dict(instrument_id=ins,object_id=oid,object_type=kind,accurate=accurate,critical_numeric_error=numeric,accepted_record=r,source_pages=pages,independent_decision=decision))
+ for j,row in enumerate(rows):
+  if j not in seen_rows:add(ins,'missing-row:'+str(j),'important_disclosure',True,False,None)
+ for j,role in enumerate(roles):
+  if j not in seen_roles:add(ins,'missing-role:'+str(j),'commodity_role',True,False,None)
+ answers={}
+ for dim in profile['dimensions']:
+  d=dim['dimension_id'];rule=scope['answers'][ins][d];text=dim['excerpt'] or '';failed=[g for g in rule['required_groups'] if not any(compact(t) in compact(text) for t in g)];present=bool(dim['answered'] and text)
+  assert set(dim['supporting_record_ids']) <= set(decisions)
+  supports_ok=all(decisions[oid]['accurate'] for oid in dim['supporting_record_ids'] if oid in decisions)
+  chapter_bad=(ins=='600080.SH' and d=='revenue_model' and '重要合营企业/本期营业收入' in text)
+  accurate=present and not failed and supports_ok and not chapter_bad
+  reason='逐实质核完整主营、产品服务与收款确认机制，原主体、出表/未经营/研发/参股限定仍在；准确性不是仅按answered或关键词判断'
+  answers[d]=dict(accurate=accurate,reason=reason,failed_groups=failed,supports_accurate=supports_ok)
+  if present:
+   add(ins,'answer:'+d,'commodity_role' if d=='products_services' else 'core_skeleton',accurate,True,accurate)
+   objects.append(dict(instrument_id=ins,object_id='answer:'+d,object_type='answer',accurate=accurate,critical_numeric_error=False,text=text,supporting_record_ids=dim['supporting_record_ids'],independent_decision=answers[d]))
+  if not accurate:add(ins,'missing-substance:'+d,'commodity_role' if d=='products_services' else 'core_skeleton',True,False,None)
+  disclosures.append(dict(instrument_id=ins,kind='answer_substance',dimension=d,source=rule,present=accurate,delivered=text,failed_substance_groups=failed))
+ manual[ins]=dict(facts=decisions,answers=answers)
+ nf=negative_failures(raw,ins);conditions=[c for c in scope['negative_conditions'] if c['instrument_id']==ins]
+ assert len(nf)==len(conditions)-(1 if ins=='600080.SH' else 0)
+ for c,fail in zip(conditions,nf):negatives.append(dict(condition=c,evaluation_status='evaluated',passed=not fail,actual_accepted_object_ids=[r['record_id'] for r in raw if c['page'] in page_numbers(r)],source_pages=[c['page']],reason='核原年度列、本期空格、研发/未经营/退出状态、交易方向与栏目；同页真实正例仍交付。没有用裸关键词判定正文肯定事实'))
+ if ins=='600080.SH':
+  c=conditions[-1]
+  bad=[r['record_id'] for r in raw if r['object_type'] in {'Segment','Measurement'} and r['source_native'].get('header')=='重要合营企业/本期营业收入']
+  valid=[r['record_id'] for r in raw if r['object_type'] in {'Segment','Measurement'} and r['source_native'].get('header')=='重要联营企业/本期营业收入' and r['source_native']['value']=='338,506,572.72' and r['source_native'].get('qualifier')=='联营企业：常州华森医疗器械股份有限公司']
+  sale=[r['record_id'] for r in raw if r.get('action')=='sells' and r.get('source_actor')=='常州华森医疗器械股份有限公司']
+  revenue=next(d['excerpt'] for d in profile['dimensions'] if d['dimension_id']=='revenue_model')
+  passed=not bad and '重要合营企业/本期营业收入' not in revenue and len(valid)==2 and bool(sale)
+  negatives.append(dict(condition=c,evaluation_status='evaluated',passed=passed,actual_accepted_object_ids=valid+sale,rejected_false_object_ids=bad,source_pages=[156,157],reason='原合营不适用和后续联营章节独立核验：无伪合营Segment/Measurement/收入肯定正文，同时正确联营两配对事实及参股销售实际存在'))
+ meta=json.loads(con.execute('select metadata_json from business_profile_work_items where work_id=?',(wid,)).fetchone()[0]);reuse={s:v['reused_scope_ids'] for s,v in meta['stage_results'].items()};assert set(reuse)=={'acquire','parse','semantic','verify','publish'}
+ runtime.append(dict(instrument_id=ins,work_id=wid,stage_results=meta['stage_results'],reused_scope_ids_by_stage=reuse,predecessor_lineage=rt['execution']['predecessor_lineage'],provider_calls=rt['provider_calls'],transport_retries=rt['execution']['transport_retries'],requested_token_budget=result['requested_token_budget']))
+ freshness.append(FreshnessObservation(instrument_id=ins,report_period=profile['report']['report_period'],published_at=profile['report']['published_at'],knowledge_cutoff=scope['knowledge_cutoff'],available_at_cutoff=profile['report']['published_at'][:10]<='2026-09-17'))
+assert len(objects)==len({(o['instrument_id'],o['object_id']) for o in objects})
+assert len(disclosures)==253 and sum(f.disclosed_in_source for f in findings)==253
+assert len(negatives)==20
+obs=read(P/'observation.json');review=record_published_source_review(checkpoint_root=R/'data/checkpoints/company_profile_common_core',plan_directory=P,semantic_findings=findings,freshness=freshness,tokens_used=obs['tokens_consumed'],elapsed_seconds=formal['whole_round_seconds'])['source_review']
+no_reuse=all(not ids for r in runtime for ids in r['reused_scope_ids_by_stage'].values()) and all(not r['predecessor_lineage'] for r in runtime)
+negative_ok=all(n['passed'] for n in negatives)
+e=dict(plan_id=formal['plan_id'],processing_identity=formal['processing_identity'],source_recall=review['source_recall'],source_accuracy=review['source_accuracy'],critical_numeric_errors=review['critical_numeric_errors'],whole_round_seconds=formal['whole_round_seconds'],workload=review['workload'],expansion_gates_met=review['expansion_gates_met'] and negative_ok and no_reuse,actual_runtime_no_reuse=no_reuse,actual_accepted_fact_count=sum(o['object_type']!='answer' for o in objects),answered_text_count=sum(o['object_type']=='answer' for o in objects),object_reviews=objects,source_disclosures=disclosures,missing_disclosures=[d for d in disclosures if not d['present']],runtime_evidence=runtime,source_scope_sha256=formal['source_scope_sha256'],source_pages_sha256=freeze['source_pages_sha256'],source_fixed_before_first_execute=True,original_conditions_one_to_one=True,negative_pass_count=sum(n['passed'] for n in negatives),negative_condition_count=len(negatives),original_negative_count=19,supplementary_negative_count=1,dynamic_unique_denominator=len(objects),query_export_disk_equal=True,change_archived=False,a_role_acceptance='pending_finite_review' if review['expansion_gates_met'] and negative_ok and no_reuse else 'pending_failure_review',production_authorization='not_authorized',scale_quality_claim_allowed=False)
+write('v44-actual-object-decisions.json',manual);write('v44-negative-review-evidence.json',dict(conditions=negatives,passed=sum(n['passed'] for n in negatives),total=len(negatives)));write('v44-source-review-evidence.json',e)
+print(json.dumps({k:e[k] for k in ['source_recall','source_accuracy','critical_numeric_errors','whole_round_seconds','actual_accepted_fact_count','answered_text_count','negative_pass_count','actual_runtime_no_reuse','expansion_gates_met']},ensure_ascii=False,indent=2))
+print('INACCURATE',[(o['instrument_id'],o['object_id']) for o in objects if not o['accurate']])
