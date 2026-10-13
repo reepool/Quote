@@ -1,0 +1,14 @@
+{
+  "original_history_and_existing_changes_unchanged": true,
+  "formal_first_19_artifacts_and_review_unchanged": true,
+  "formal_execution_code_rebuilt_modules": 38,
+  "local_correction_code_rebuilt_modules": 38,
+  "distinct_code_snapshots_preserved": true,
+  "formal_execution_count": 1,
+  "formal_failure_not_overwritten_by_local_correction": true,
+  "new_first_hashes_taken_after_write_return": true,
+  "change_archived": false,
+  "next_batch": "paused_pending_a_role_failure_and_local_correction_review",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

@@ -1,0 +1,35 @@
+{
+  "created_at": "2026-10-13T06:41:23.729722+00:00",
+  "formal_run_started": false,
+  "positive_contract_unchanged": true,
+  "source_scope_sha256": "48ffa9899660c723d9753a3db0a4098b1e9e87210993a92b534739c0c32f314e",
+  "results": {
+    "600058.SH": {
+      "income_conditions": 274,
+      "action_conditions": 74,
+      "substantive_answers": 3,
+      "accurate_local_fact_objects": 776,
+      "incorrect_objects": 0,
+      "audit_unclear_copies": 0
+    },
+    "600089.SH": {
+      "income_conditions": 97,
+      "action_conditions": 81,
+      "substantive_answers": 3,
+      "accurate_local_fact_objects": 468,
+      "incorrect_objects": 0,
+      "audit_unclear_copies": 0
+    }
+  },
+  "local_negatives_passed": 80,
+  "tests": {
+    "new_owner_and_independent_pdf_complete_pages": "5 passed",
+    "old_v47_v44_directly_affected": "21 passed"
+  },
+  "review": {
+    "blocking_findings_remaining": 0,
+    "scope": "审计章节/合法续表、当前空位、精确交易方、母公司原栏目/物理列、具名动作和原主体、完整正文；不治理旧无关问题"
+  },
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

@@ -1,0 +1,22 @@
+import json,hashlib,re,difflib
+from pathlib import Path
+from pypdf import PdfReader
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v47-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v48_same_source';B=R/'data/research/company_profile_common_core/m4_v48_same_source/company_profile_common_core.v1';read=lambda p:json.loads(Path(p).read_text());sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+s=read(C/'source-scope.json');f=read(P/'formal_execution.json');frozen=read(C/'independent-frozen-source-pages.json');layouts=read(C/'independent-source-layout-pages.json');extras={};results={}
+for i,v in s['versions'].items():
+ assert sha(v['pdf'])==v['sha256'];pdf=PdfReader(v['pdf']);full=read('/tmp/quote_v47_unseen_source_'+i+'.json');rs=read('/tmp/v48formalraw_'+i+'.json');q=f['results'][i]['query']['profiles'][0];cp=read(B/'checkpoints'/(q['work_id']+'.json'));owned=sorted({p for r in rs for e in r['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[]),*e.get('subject_evidence_pages',[])] if p is not None});numbers=sorted(set(v['checked_pages'])|set(owned));actual_pages={p['page']:p for p in cp['pages']};verified_layout={};owner_differences=[]
+ for p in numbers:
+  actual=pdf.pages[p-1].extract_text();assert actual==full[p-1]['text'],(i,p,'independent plain');owner=actual_pages[p]['text'];a=re.sub(r'\s+','',owner);b=re.sub(r'\s+','',actual)
+  if a!=b:
+   assert (i,p) in {('600058.SH',220),('600058.SH',223),('600058.SH',226),('600058.SH',283),('600089.SH',8),('600089.SH',325),('600089.SH',326),('600089.SH',327)},(i,p)
+   assert sorted(a)==sorted(b)
+   assert re.findall(r'-?\d[\d,]*\.\d+',a)==re.findall(r'-?\d[\d,]*\.\d+',b)
+   owner_differences.append(dict(page=p,classification='人工复核原PDF和owner读取顺序：仅多层表头文本块前后次序；主体行及全部数值顺序不变',owner_text=owner,independent_text=actual,owner_compact_sha256=hashlib.sha256(a.encode()).hexdigest(),pdf_compact_sha256=hashlib.sha256(b.encode()).hexdigest(),character_content_equal=True,amount_order_equal=True,original_layout_retained=bool(actual_pages[p].get('layout_text'))))
+ for row in frozen[i]['pages']:assert row['text']==full[row['page']-1]['text']
+ for p,t in layouts[i].items():assert pdf.pages[int(p)-1].extract_text(extraction_mode='layout')==t,(i,p,'frozen layout')
+ for p,pg in actual_pages.items():
+  if pg.get('layout_text'):
+   official=pdf.pages[p-1].extract_text(extraction_mode='layout');assert official==pg['layout_text'],(i,p,'owner layout');verified_layout[str(p)]=official
+ extras[i]=dict(document_version=v['sha256'],reason='v48实际来源及布局核验；原532/80合同与首次失败原件不变',pages=[full[p-1] for p in numbers if p not in v['checked_pages']],owner_layout_pages=verified_layout,owner_text_layout_differences=owner_differences)
+ results[i]=dict(pdf_sha256=v['sha256'],frozen_pages=len(v['checked_pages']),owned_evidence_pages=len(owned),total_verified_pages=len(numbers),frozen_layout_pages=len(layouts[i]),owner_layout_pages=len(verified_layout),plain_equal=True,owner_plain_exact_equal=False,owner_whitespace_and_checked_header_reflow_only=True,owner_header_reflow_page_count=len(owner_differences),layout_equal=True)
+(C/'v48-independent-supplemental-source-pages.json').write_text(json.dumps(extras,ensure_ascii=False,indent=2)+'\n');(C/'v48-official-source-validation.json').write_text(json.dumps(results,ensure_ascii=False,indent=2)+'\n');print(results,flush=True)

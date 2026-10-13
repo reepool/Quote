@@ -1,0 +1,24 @@
+{
+  "scope": "当前四个领域模块的同源业务修复、v48首次正式失败及局部采购布局补正；对应完整页/独立PDF及受影响旧样本回归",
+  "blocking_findings": [
+    {
+      "priority": "P0",
+      "finding": "采购表p343布局未进真实官方owner，正式缺16具名采购",
+      "resolution": "原正式失败保留，现有page source真实采购入口与续页读取已补正；真实资产输入局部532/80全通过",
+      "formal_revalidation_status": "pending_a_role_failure_and_local_correction_review"
+    }
+  ],
+  "remaining_known_local_code_blockers": [],
+  "nonblocking_scope_expanded": false,
+  "unrelated_existing_changes_touched": false,
+  "test_results": {
+    "full_page_contract": 5,
+    "direct_v47_v44_regression": 21,
+    "official_owner_input_after_correction": 2,
+    "whole_suite_claim": false
+  },
+  "source_owner_whitespace_and_heading_reflow_limit_declared": true,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "diff_check_scope": "代码、测试、任务和审核文档；执行patch的原上下文空白按冻结字节保留，不格式化patch"
+}

@@ -1,0 +1,10 @@
+[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[33m                                                                    [100%][0m
+============================= slowest 10 durations =============================
+65.10s call     tests/unit/test_research/test_company_profile_v48_metal_equipment.py::test_complete_official_contract[pages-600058.SH]
+61.26s call     tests/unit/test_research/test_company_profile_v48_metal_equipment.py::test_complete_official_contract[independent_pages-600058.SH]
+19.00s call     tests/unit/test_research/test_company_profile_v48_metal_equipment.py::test_complete_official_contract[pages-600089.SH]
+18.73s call     tests/unit/test_research/test_company_profile_v48_metal_equipment.py::test_complete_official_contract[independent_pages-600089.SH]
+0.11s setup    tests/unit/test_research/test_company_profile_v48_metal_equipment.py::test_complete_official_contract[independent_pages-600089.SH]
+
+(5 durations < 0.005s hidden.  Use -vv to show these durations.)
+[33m[32m5 passed[0m, [33m[1m7 warnings[0m[33m in 165.75s (0:02:45)[0m[0m

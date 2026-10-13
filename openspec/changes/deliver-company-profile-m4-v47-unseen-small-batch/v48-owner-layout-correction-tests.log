@@ -1,0 +1,7 @@
+[32m.[0m[32m.[0m[33m                                                                       [100%][0m
+============================= slowest 10 durations =============================
+63.05s call     tests/unit/test_research/test_company_profile_v48_metal_equipment.py::test_official_owner_recovers_purchase_layout_before_full_delivery[600058.SH]
+16.57s call     tests/unit/test_research/test_company_profile_v48_metal_equipment.py::test_official_owner_recovers_purchase_layout_before_full_delivery[600089.SH]
+
+(4 durations < 0.005s hidden.  Use -vv to show these durations.)
+[33m[32m2 passed[0m, [33m[1m5 deselected[0m, [33m[1m7 warnings[0m[33m in 80.97s (0:01:20)[0m[0m

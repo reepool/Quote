@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/tmp/v48_verify_sources.py", line 9, in <module>
+    actual=pdf.pages[p-1].extract_text();assert actual==full[p-1]['text'],(i,p,'independent plain');assert actual_pages[p]['text']==actual,(i,p,'owner plain')
+                                                                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('600058.SH', 5, 'owner plain')

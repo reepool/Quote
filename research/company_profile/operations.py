@@ -285,6 +285,7 @@ class OfficialAnnualReportPageSource:
             or "收入确认时间" in p["text"]
             or "营业收入、营业成本的分解" in p["text"]
             or "主要控股参股公司分析" in p["text"]
+            or "公司名称 公司类型 主要业务 注册资本" in p["text"]
             or "报告期内房地产销售和结转情况" in p["text"]
             or "合同分类" in p["text"]
             or "重要非全资子公司的主要财务信息" in p["text"]
@@ -299,7 +300,7 @@ class OfficialAnnualReportPageSource:
                 )
                 if following and following not in project_pages:
                     project_pages.append(following)
-            if "合同分类" in page["text"]:
+            if "合同分类" in page["text"] or "营业收入、营业成本的分解" in page["text"]:
                 cursor = page["page"] + 1
                 while cursor <= page["page"] + 4:
                     following = next((p for p in pages if p["page"] == cursor), None)
@@ -315,13 +316,23 @@ class OfficialAnnualReportPageSource:
                     cursor += 1
         lease_active = False
         seller_active = False
+        purchaser_active = False
         for page in pages:
+            if "采购商品/接受劳务情况表" in page["text"]:
+                purchaser_active = True
             if "出售商品/提供劳务情况表" in page["text"]:
                 seller_active = True
             if "本公司作为出租方" in page["text"]:
                 lease_active = True
-            if (lease_active or seller_active) and page not in project_pages:
+            if (
+                lease_active or seller_active or purchaser_active
+            ) and page not in project_pages:
                 project_pages.append(page)
+            if purchaser_active and re.search(
+                r"出售商品/提供劳务情况表|采购资产|关联租赁情况|购销商品、提供和接受劳务的关联交易说明",
+                page["text"],
+            ):
+                purchaser_active = False
             if seller_active and re.search(
                 r"采购资产|关联租赁情况|购销商品、提供和接受劳务的关联交易说明",
                 page["text"],
@@ -1169,7 +1180,7 @@ class CompanyProfileTaskService:
         elif enqueue and not (limit_drain_to_enqueued and not instrument_ids):
             if batch_plan is not None and self.processing_identity.get(
                 "revenue_sentence_repair"
-            ) in {"v41", "v42", "v43", "v44", "v45", "v46", "v47"}:
+            ) in {"v41", "v42", "v43", "v44", "v45", "v46", "v47", "v48"}:
                 from research.business_profile_production_operations import (
                     register_business_profile_shared_annual_report_asset,
                 )

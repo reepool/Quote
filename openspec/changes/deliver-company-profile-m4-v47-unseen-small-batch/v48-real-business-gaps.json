@@ -1,0 +1,75 @@
+{
+  "created_at": "2026-10-13T06:58:06.846475+00:00",
+  "original_contract_unchanged": true,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 516,
+    "denominator": 532,
+    "value": 0.9699248120300752
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 1234,
+    "denominator": 1234,
+    "value": 1.0
+  },
+  "critical_numeric_errors": 0,
+  "positive_count": 532,
+  "negative_count": 80,
+  "negative_passed": 80,
+  "whole_round_seconds": 267.9193862192333,
+  "tokens_consumed": 0,
+  "formal_execution_count": 1,
+  "real_business_gaps": [
+    {
+      "priority": "P0",
+      "description": "特变p343采购续页未进入OfficialAnnualReportPageSource布局读取，16项具名采购漏召回",
+      "condition_ids": [
+        "600089.SH-action-063",
+        "600089.SH-action-064",
+        "600089.SH-action-065",
+        "600089.SH-action-066",
+        "600089.SH-action-067",
+        "600089.SH-action-068",
+        "600089.SH-action-069",
+        "600089.SH-action-070",
+        "600089.SH-action-071",
+        "600089.SH-action-072",
+        "600089.SH-action-073",
+        "600089.SH-action-074",
+        "600089.SH-action-075",
+        "600089.SH-action-076",
+        "600089.SH-action-077",
+        "600089.SH-action-078"
+      ],
+      "names": [
+        "变压器配件",
+        "铜排",
+        "铁芯",
+        "压力释放阀",
+        "蝶阀",
+        "显示器",
+        "风力发电机组钢制塔筒",
+        "铝土矿",
+        "箱变外壳",
+        "预制舱",
+        "铝锭",
+        "支架",
+        "底板",
+        "夹件",
+        "固定式光伏支架",
+        "托盘式垂直弯通"
+      ],
+      "root_cause": "此前布局读取只激活出售商品/提供劳务和出租表；采购标题p342未激活跨页读取；局部夹具手工已有p343布局掩盖了真实输入缺口",
+      "repair": "在现有官方page source中限定真实采购表入口并续至其章节结束；用真实page source产出的完整输入重新跑局部owner闭环"
+    }
+  ],
+  "six_answers_passed": true,
+  "income_conditions_passed": 371,
+  "named_actions_passed": 139,
+  "correct_contract_external_outputs_retained": true,
+  "next_batch": "paused_on_formal_failure",
+  "change_archived": false,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

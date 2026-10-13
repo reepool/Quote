@@ -1,0 +1,18 @@
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-13 14:56:37][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-13 14:56:37][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-13 14:56:37][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.00s
+[INFO][2026-10-13 14:56:38][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-13 14:56:38][tgbot.py:15] - [tgbot] Reading system configuration...
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+[INFO][2026-10-13 14:56:40][proxy_patch_bootstrap.py:55] - restored unpatched curl_cffi.requests.Session for Chrome TLS clients
+[INFO][2026-10-13 14:56:40][proxy_patch_bootstrap.py:157] - akshare proxy patch installed early (token=202602***)
+[INFO][2026-10-13 14:56:41][business_profile_pdf_artifacts.py:1222] - business-profile pdf artifact cache hit source_file_id=shared-asset:asset_bfba4bb8be91cd994ff1104883f8f51b bytes=6113008 pages=287 timings={'hash_read_seconds': 0.003743, 'cache_read_seconds': 0.04724, 'extract_seconds': 0.0, 'write_seconds': 0.0, 'total_seconds': 0.050983} path=/home/python/Quote/data/filings/announcements/blobs/93/derived/business_profile_pdfium_recovery.v4/939c129c541d08cd63f7084b747bddbda276459d22e90840f925b231aecc8a56_57e1dd4f16ef40ff.json.gz
+600058.SH 776 [30, 206, 207, 208, 225, 226, 227, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 274, 284, 285]
+[INFO][2026-10-13 14:57:47][business_profile_pdf_artifacts.py:1222] - business-profile pdf artifact cache hit source_file_id=shared-asset:asset_db7f8e25f6d16a269d07de2572c02be9 bytes=4038937 pages=387 timings={'hash_read_seconds': 0.001682, 'cache_read_seconds': 0.047418, 'extract_seconds': 0.0, 'write_seconds': 0.0, 'total_seconds': 0.0491} path=/home/python/Quote/data/filings/announcements/blobs/84/derived/business_profile_pdfium_recovery.v4/84d08386c5ad48875d48aeb32d611f75832ab0c6cef9d7fc15df1f3bec186c17_57e1dd4f16ef40ff.json.gz
+600089.SH 468 [53, 54, 169, 170, 171, 172, 173, 291, 292, 293, 329, 330, 342, 343, 344, 345, 346, 347, 348, 367, 383, 384]

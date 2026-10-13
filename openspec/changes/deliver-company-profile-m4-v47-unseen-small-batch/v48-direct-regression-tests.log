@@ -1,0 +1,13 @@
+[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[33m                                                    [100%][0m
+============================= slowest 10 durations =============================
+25.42s call     tests/unit/test_research/test_company_profile_v47_supply_chain_pharma.py::test_complete_original_contract[independent_pages-600057.SH]
+24.12s call     tests/unit/test_research/test_company_profile_v47_supply_chain_pharma.py::test_complete_original_contract[pages-600057.SH]
+18.01s call     tests/unit/test_research/test_company_profile_v47_supply_chain_pharma.py::test_complete_original_contract[independent_pages-600085.SH]
+12.79s call     tests/unit/test_research/test_company_profile_v47_supply_chain_pharma.py::test_complete_original_contract[pages-600085.SH]
+9.35s call     tests/unit/test_research/test_company_profile_v47_supply_chain_pharma.py::test_successor_exact_asset_binding[False]
+7.27s call     tests/unit/test_research/test_company_profile_v44_interest_sections.py::test_full_owner_pages_reject_inapplicable_joint_income[independent_pages-600051.SH]
+6.75s call     tests/unit/test_research/test_company_profile_v44_interest_sections.py::test_full_owner_pages_reject_inapplicable_joint_income[pages-600051.SH]
+3.80s call     tests/unit/test_research/test_company_profile_v44_interest_sections.py::test_full_owner_pages_reject_inapplicable_joint_income[independent_pages-600080.SH]
+3.65s call     tests/unit/test_research/test_company_profile_v44_interest_sections.py::test_full_owner_pages_reject_inapplicable_joint_income[pages-600080.SH]
+2.63s call     tests/unit/test_research/test_company_profile_v47_supply_chain_pharma.py::test_successor_keeps_prior_telecom_units_and_subjects[600050.SH]
+[33m[32m21 passed[0m, [33m[1m7 warnings[0m[33m in 124.83s (0:02:04)[0m[0m

@@ -1,0 +1,31 @@
+import json,hashlib
+from pathlib import Path
+from research.company_profile.reads import CompanyProfileReadService
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v47-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v48_same_source';read=lambda p:json.loads(Path(p).read_text());sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();save=lambda p,v:Path(p).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+f=read(P/'formal_execution.json');receipt=read(C/'v48-source-freeze-receipt.json');reads=CompanyProfileReadService(R/'data/research/company_profile_common_core/m4_v48_same_source');delivery={}
+for i,r in f['results'].items():
+ profile=reads.query((i,),processing_identity=f['processing_identity'])['profiles'][0];disk=read(r['export']['files'][0]);assert profile==disk==r['query']['profiles'][0]==r['export']['profiles'][0]
+ delivery[i]=dict(actual_disk_reread=True,query_export_disk_equal=True,accepted_count=len(profile['accepted_facts']))
+save(C/'v48-delivery-reread-validation.json',delivery)
+base=read(C/'v48-initial-workspace-baseline.json');history=read(C/'protection-baseline.json');original=base['original_change_sha256'];prior_first=read(C/'first-formal-delivery-preservation-completion.json')['completed_sha256'];first=read(C/'v48-first-formal-delivery-preservation.json')['completed_sha256']
+for baseline in [base['existing_modified_sha256'],history,prior_first,first,original,receipt['executed_code_sha256']]:
+ for p,h in baseline.items():
+  if p.endswith('/tasks.md'):continue
+  assert sha(R/p)==h,p
+archive=R/'openspec/changes/archive/2026-10-13-deliver-company-profile-m4-v46-unseen-small-batch';a=read(archive/'v47-archive-preservation.json')['immutable_sha256_by_relative_path'];assert all(sha(archive/p)==h for p,h in a.items())
+for k,p in [('source_scope_sha256','source-scope.json'),('source_pages_sha256','independent-frozen-source-pages.json'),('source_interpretation_sha256','source-contract-interpretation.json')]:assert sha(C/p)==receipt[k]
+e=read(C/'v48-source-review-evidence.json');quotes=read(C/'v48-source-review-quote-bank.json');assert len(e['object_reviews'])==len({(o['instrument_id'],o['object_id']) for o in e['object_reviews']})
+for obj in e['object_reviews']:
+ if obj['object_type']=='answer':continue
+ def restore(x):
+  if isinstance(x,list):return [restore(v) for v in x]
+  if isinstance(x,dict):return {('bounded_quote' if k=='bounded_quote_sha256' else k):(quotes[v] if k=='bounded_quote_sha256' else restore(v)) for k,v in x.items()}
+  return x
+ raw=restore(obj['accepted_record_summary']);assert hashlib.sha256(json.dumps(raw,ensure_ascii=False,sort_keys=True).encode()).hexdigest()==obj['accepted_record_canonical_sha256'];assert raw['record_id']==obj['record_id']
+n=read(C/'v48-negative-review-evidence.json');assert n['evaluated']==80
+assert e['source_scope_sha256']==sha(C/'source-scope.json');assert not read(C/'v48-unresolved-object-decisions.json')
+review_files=['v48-source-review-evidence.json','v48-source-review-quote-bank.json','v48-actual-object-decisions.json','v48-negative-review-evidence.json','v48-independent-supplemental-source-pages.json','v48-official-source-validation.json','v48-delivery-reread-validation.json','v48-execution-code-reconstruction.json','v48-source-freeze-receipt.json','v48-contract-external-income-source-ledger.json']
+assert not (C/'v48-formal-result-preservation.json').exists()
+save(C/'v48-formal-result-preservation.json',dict(first_review_index=1,first_output_sha256=first,formal_review_sha256={p:sha(C/p) for p in review_files},owner_review_files_sha256={str((P/'company_profile_source_review.v1.json').relative_to(R)):sha(P/'company_profile_source_review.v1.json')}))
+save(C/'v48-final-protection-verification.json',dict(historical_file_count=len(history),historical_hashes_unchanged=True,original_change_immutable_file_count=len(original)-sum(p.endswith('/tasks.md') for p in original),original_change_hashes_unchanged=True,prior_archive_file_count=len(a),prior_archive_hashes_unchanged=True,original_first_artifact_count=len(prior_first),original_first_hashes_unchanged=True,new_first_artifact_count=len(first),new_first_artifact_hashes_unchanged=True,new_first_index_written_before_hash=True,original_empty_index_observation_retained=True,formal_review_file_count=len(review_files),review_hashes_protected=True,execution_module_count=38,execution_modules_reconstructed=read(C/'v48-execution-code-reconstruction.json')['all_modules_reconstructed'],existing_modified_files_unchanged=True,query_export_disk_equal=True,compact_review_raw_records_reconstructible=True,formal_execution_count=1,production_authorization='not_authorized',scale_quality_claim_allowed=False))
+print('VERIFIED',len(history),len(original),len(prior_first),len(first),len(a),len(e['object_reviews']),n['passed'])

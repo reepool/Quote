@@ -1,0 +1,38 @@
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-13 14:48:59][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-13 14:48:59][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-13 14:48:59][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.00s
+[INFO][2026-10-13 14:49:00][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-13 14:49:00][tgbot.py:15] - [tgbot] Reading system configuration...
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+{
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 516,
+    "denominator": 532,
+    "value": 0.9699248120300752
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 1234,
+    "denominator": 1234,
+    "value": 1.0
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "whole_round_seconds": 267.9193862192333,
+  "actual_runtime_no_reuse": true,
+  "actual_accepted_fact_count": 1228,
+  "answered_text_count": 6,
+  "expansion_gates_met": false,
+  "protected_historical_files_unchanged": 2872,
+  "first_formal_artifacts_unchanged": 19
+}
+COMPONENTS [('answer_substance', 6, 6), ('native_income_cell', 371, 371), ('native_role', 139, 155)]
