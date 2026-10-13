@@ -120,3 +120,19 @@ Company rows MUST use their own native name/type/business cells and printed curr
 #### Scenario: Several native sales tables use different units or bases
 - **WHEN** product-grade,channel,region or pre-elimination rows disclose different native values
 - **THEN** all affected paired facts preserve source basis and original unit without cross-table borrowing or forced aggregation
+
+
+### Requirement: Native segment and continued rental income preserve physical column and original identity
+Original total,main-business,external and internal income columns MUST remain independently queryable in paired Segment and Measurement. An empty elimination cell MUST NOT borrow an external-income total; genuine elimination amounts MUST remain. A main-business region table MUST NOT become all-income classification. Continued related-sale layouts MUST recalibrate current/prior placement to each physical page,and prior-only cells MUST stay absent rather than become invented current zero. Rental asset and tenant fragments MUST rejoin only their original row. A single current sublease column MAY retain the preceding source-declared unit; trustee and entrusting actors MUST remain distinct without inferring consolidation.
+
+#### Scenario: External segment income has a blank elimination cell
+- **WHEN** Tongrentang p195 prints external-income total1,725,618.51万元 and a blank elimination cell while internal income prints actual elimination512,028.94万元
+- **THEN** no elimination Segment,Measurement or affirmative body borrows the external total,and genuine internal elimination remains
+
+#### Scenario: Related sale positions change across continuation pages
+- **WHEN** a physical continuation page shifts annual column offsets and preserves prior-only rows
+- **THEN**97current rows retain their paired194objects while45prior-only transactions produce no current income
+
+#### Scenario: A continued sublease table has one current column
+- **WHEN** Xiangyu p240declares元 and p241continues current sublease receipts separately from lessee expense
+- **THEN** original元,current receipts and tenant identity survive without promoting lessee expense to income

@@ -1,0 +1,25 @@
+{
+  "acceptance_date": "2026-10-13",
+  "authority": "user_provided_A_role_conclusion",
+  "instrument_ids": [
+    "600057.SH",
+    "600085.SH"
+  ],
+  "positive_conditions": 331,
+  "recall": 331,
+  "accurate_objects": 661,
+  "actual_objects": 661,
+  "fact_count": 655,
+  "answer_count": 6,
+  "numeric_errors": 0,
+  "negative_passed": 72,
+  "negative_count": 72,
+  "whole_round_seconds": 216.56022868864238,
+  "shared_tokens": 0,
+  "shared_token_limit": 50000,
+  "independent_tests_passed": 34,
+  "scope_blockers": [],
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "scope": "original source contract and checked output only"
+}

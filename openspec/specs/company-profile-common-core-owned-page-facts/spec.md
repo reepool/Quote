@@ -288,3 +288,19 @@ The owner MUST retain substantive continued narratives through acceptance,query 
 #### Scenario: Procurement and native current quantity columns are disclosed independently
 - **WHEN** packaging procurement and separate product production/sales columns are disclosed
 - **THEN** actual purchases,production,processing and sales remain separately supported with original actors,and procurement does not become material input
+
+
+### Requirement: Continued supply-chain and medicine narratives preserve actual status and direction
+Owned-page acceptance,query and export MUST preserve full native business and income mechanisms,original subsidiary actors,control dates,cancellation,overseas registration and clinical states. Actual delivered goods MUST remain distinct from orders and future production schedules. Enumerations,risk narratives,operating slogans and promotional suffixes MUST NOT become commodities or operating actions. Named procurement,material input,production,processing,sales and services MUST each retain their own current affirmative source direction; procurement MUST NOT imply manufacturing input. Source-grounded actor expansion and exact shared-asset enqueue MUST continue under explicitly registered successor identities without changing default identity.
+
+#### Scenario: Ship deliveries and outstanding orders are separately disclosed
+- **WHEN** the current source reports28delivered vessels,53new orders,114outstanding orders and schedules through2029
+- **THEN** final bodies retain all states without turning orders or plans into actual current sales
+
+#### Scenario: A medicine has registration or clinical evidence only
+- **WHEN** an original passage describes overseas registration or phase-II clinical enrollment
+- **THEN** that state survives in business answers without becoming a current named sale
+
+#### Scenario: Retail receipt evidence defines revenue confirmation
+- **WHEN** goods acceptance less estimated discounts,system goods transfer,cash deposit and card records,or advertising service periods are disclosed
+- **THEN** the native confirmation/payment mechanism remains substantive through all three delivery paths

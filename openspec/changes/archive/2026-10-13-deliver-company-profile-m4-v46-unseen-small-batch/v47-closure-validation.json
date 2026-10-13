@@ -1,0 +1,12 @@
+{
+  "main_specs_strict_valid": [
+    "openspec/specs/deliver-company-profile-m4-v46-unseen-small-batch/spec.md",
+    "openspec/specs/company-profile-common-core-owned-page-facts/spec.md",
+    "openspec/specs/company-profile-common-core-company-total-and-income-mix/spec.md"
+  ],
+  "archive_immutable_files": 77,
+  "all_archive_hashes_unchanged": true,
+  "same_source_formal_rerun": false,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

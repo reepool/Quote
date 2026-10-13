@@ -1,0 +1,10 @@
+{
+  "corrects_file": "v47-source-contract-interpretation.json",
+  "frozen_file_sha256": "853999ba10562386f5c1f90e9e2720974dffe94475f2ff10686fc491ea754620",
+  "field": "accuracy_policy",
+  "original_wording": "295实际record_id＋6已答正文动态唯一",
+  "corrected_wording": "655实际record_id＋6已答正文动态唯一，661/661",
+  "reason": "从首次失败295事实复制的说明残留；正式输出/计分已正确为655事实＋6正文，条件/分母/判定/业务输出不变",
+  "original_artifact_preserved": true,
+  "substance_or_score_changed": false
+}
