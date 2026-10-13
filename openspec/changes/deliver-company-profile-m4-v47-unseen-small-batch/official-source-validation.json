@@ -1,0 +1,20 @@
+{
+  "600058.SH": {
+    "pdf_sha256": "939c129c541d08cd63f7084b747bddbda276459d22e90840f925b231aecc8a56",
+    "frozen_pages": 59,
+    "owned_evidence_pages": 175,
+    "total_verified_pages": 191,
+    "layout_pages": 15,
+    "plain_equal": true,
+    "layout_equal": true
+  },
+  "600089.SH": {
+    "pdf_sha256": "84d08386c5ad48875d48aeb32d611f75832ab0c6cef9d7fc15df1f3bec186c17",
+    "frozen_pages": 60,
+    "owned_evidence_pages": 39,
+    "total_verified_pages": 66,
+    "layout_pages": 17,
+    "plain_equal": true,
+    "layout_equal": true
+  }
+}

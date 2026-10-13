@@ -1,0 +1,50 @@
+{
+  "validation_commands": [
+    {
+      "command": "openspec validate deliver-company-profile-m4-v47-unseen-small-batch --type change --strict",
+      "exit_code": 0
+    },
+    {
+      "command": "openspec validate deliver-company-profile-m4-v46-unseen-small-batch --type spec --strict",
+      "exit_code": 0
+    },
+    {
+      "command": "openspec validate company-profile-common-core-owned-page-facts --type spec --strict",
+      "exit_code": 0
+    },
+    {
+      "command": "openspec validate company-profile-common-core-company-total-and-income-mix --type spec --strict",
+      "exit_code": 0
+    },
+    {
+      "command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python /tmp/v47_final_verify.py",
+      "exit_code": 0
+    },
+    {
+      "command": "/home/python/miniconda3/envs/Quote/bin/python /tmp/v47_validate_sources.py",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "source_text_pages_verified": 257,
+  "source_frozen_pages": 119,
+  "source_layout_pages": 32,
+  "history_count": 2872,
+  "prior_archive_immutable_count": 77,
+  "execution_modules_reconstructed": 38,
+  "first_business_files_unchanged": 17,
+  "completed_first_formal_index_protected": true,
+  "observer_zero_byte_receipt_retained": true,
+  "actual_dynamic_unique_objects": 1124,
+  "negative_count": 80,
+  "negative_evaluated": 80,
+  "negative_passed": 80,
+  "business_code_changed": false,
+  "pytest_run": false,
+  "previous_34_tests_used_as_new_acceptance": false,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

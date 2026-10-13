@@ -1,0 +1,21 @@
+{
+  "created_before_first_execute": true,
+  "substance_or_denominator_changed": false,
+  "positive_count": 532,
+  "negative_count": 80,
+  "income_scope_aliases": {
+    "named_joint_venture": "现有business_segment枚举+原合营企业栏目+精确原企业限定，非集团或并表子公司",
+    "named_associate": "现有business_segment枚举+原联营企业栏目+精确原企业限定，非集团或并表子公司",
+    "原industry行业抵消": "允许adjustment但必须保留原行业/主营口径与抵消限定",
+    "report_segment": "现有business_segment或consolidated_group只在原分部列名与收入原项目标题完整时表达同一实质；不得跨外/内/总收入",
+    "受托管理": "p255表列原五矿发展，p256补充明确实际受托方改五矿贸易；必须保留原受托子公司与委托方，不推并表"
+  },
+  "dimension_aliases": {
+    "service出售商品/提供劳务": "可保留复合原交易内容为product/service，但原栏目本期额、主体、交易对方及完整名必须相同",
+    "material_input": "映射现有Relationship relation_type=material_input，不将p343采购自动当投入",
+    "主营合同分类": "特变p291/292及p383/384为主营范围，不能标全部收入；五矿p207/284分类覆盖全部收入，不能借主营口径",
+    "多分部合同": "五矿p207贸易/物流服务/其他原分部列单独保存，原行合计独立，不跨列累加"
+  },
+  "accuracy_policy": "实际record_id＋实际已答正文唯一，未知分母不得预填；金额正确不能抵消栏目/主体/期间/原名错误；配对Measurement跟随完整原义单独核，所有合同外输出亦核",
+  "recall_policy": "每个原收入格仅由一个准确Segment满足；具名动作原对象/动作/主体匹配，不用父角色替代；六正文以实质判断，关键词只是辅助"
+}

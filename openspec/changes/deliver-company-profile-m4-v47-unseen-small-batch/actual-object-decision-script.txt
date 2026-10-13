@@ -1,0 +1,86 @@
+import json,re,sys
+from pathlib import Path
+from collections import Counter
+sys.path.insert(0,'/tmp')
+from quote_v47_next_matching import match as oldmatch,action_match,pages,co,num
+C=Path('openspec/changes/deliver-company-profile-m4-v47-unseen-small-batch');load=lambda p:json.loads(Path(p).read_text());save=lambda p,x:Path(p).write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\n')
+s=load(C/'source-scope.json');ledger=load(C/'related-sales-independent-ledger.json');out={};supp=[];unresolved=[]
+def match(r,row):
+ rr=dict(r)
+ # Existing business_segment is the native company/report column model, as frozen sidecar permits.
+ if row['header'] in ['主要控股参股公司分析','重要非全资子公司的主要财务信息'] and rr.get('dimension',rr.get('segment_dimension'))=='business_segment':
+  rr['dimension']=row['dimension'];rr['segment_dimension']=row['dimension']
+ if row['header'].startswith('报告分部财务信息/') and rr.get('dimension',rr.get('segment_dimension'))=='business_segment':rr['dimension']='business_type';rr['segment_dimension']='business_type'
+ return oldmatch(rr,row)
+# Source-only physical table cells, including contract-external printed subtotals and individual columns.
+for ins,ns,cols in [('600058.SH',[207,284],None),('600089.SH',[291,292],['分部','合计'])]:
+ layouts=load('/tmp/quote_v47_layout_'+ins+'.json')
+ for p in ns:
+  lines=layouts[str(p)].splitlines();start=next(j for j,l in enumerate(lines) if '合同分类' in l);lines=lines[start:];cs=cols or (['贸易','物流服务','其他','合计'] if p==207 else ['贸易分部','其他','合计']);anchors=None;basis='商品类型';records=[]
+  for line in lines:
+   if '其他说明' in line:break
+   ms=list(re.finditer(r'-?\d[\d,]*\.\d{2}',line))
+   if not ms:continue
+   name=co(line[:ms[0].start()]);
+   if name=='商品类型' or anchors is None:anchors=[m.end() for m in ms]
+   if p==284:anchors=[40,58,73,82,100,117]
+   assert anchors is not None,(ins,p,line)
+   if name in ['按经营地区分类','按商品转让的时间分','按商品转让的时间分类']:basis='按经营地区分类' if name=='按经营地区分类' else '按商品转让的时间分类'
+   if name=='合计':basis='合同分解合计'
+   # Two wrapping labels are explicitly joined from official next line, not delivered names.
+   if name=='新能源产品及工':name='新能源产品及工程'
+   if name=='铝电子新材料、铝':name='铝电子新材料、铝及合金制品'
+   if name=='按商品转让的时间分':name='按商品转让的时间分类'
+   for m in ms:
+    k=min(range(len(anchors)),key=lambda k:abs(m.end()-anchors[k]));
+    if k%2:continue
+    records.append(dict(instrument_id=ins,page=p,name=name,value=m.group(),unit='元',header='合同收入/'+basis,qualifier='原收入列：'+cs[k//2]+'营业收入',subject_scope='issuer' if p==284 else 'consolidated_group',dimension={'商品类型':'product','按经营地区分类':'region','按商品转让的时间分类':'revenue_timing','合同分解合计':'business_segment'}[basis]))
+  supp+=records
+# Verbatim other current figures outside important recall denominator.
+supp.append(dict(instrument_id='600058.SH',page=9,name='正常经营之外的其他业务收入',value='5,241.10',unit='万元',header='其他业务收入扣除明细/本年度',qualifier='',subject_scope='consolidated_group',dimension='business_type'))
+supp.append(dict(instrument_id='600089.SH',page=37,name='贸易业务',value='24,724.67',unit='万元',header='本期营业收入',qualifier='',subject_scope='consolidated_group',dimension='business_type'))
+for ins in s['versions']:
+ rs=load('/tmp/v47_unseen_actual_'+ins+'.json');facts={};source_rows=s['source_rows'][ins];roles=[r for r in s['native_roles'] if r['instrument_id']==ins]
+ for j,r in enumerate(rs):
+  n=r['source_native'];kind=r['object_type'];decision=dict(accurate=False,reason='',critical_numeric_error=False,actual_index=j)
+  if kind=='BusinessOverview':
+   decision.update(accurate=True,reason='原页正文/布局忠实摘录，原具名主体、适用或不适用和期间仍在原文；此原文片段不替代最终三维实质答案。混合审计长片段未独立肯定具名交易主体，后续收入对象另按集团范围严格核。')
+  elif kind in ['Activity','Relationship']:
+   roles_matched=[k for k,v in enumerate(roles) if action_match(r,v)]
+   if roles_matched:decision.update(accurate=True,reason='原对象/成立动作/原主体/页逐项匹配执行前具名条件',recall_role_index=roles_matched[0])
+   elif ins=='600058.SH' and j==19:decision.update(accurate=True,reason='p219作为出租人的经营租赁明确成立，合法合同外服务事实；不替代74项具名动作')
+   elif ins=='600089.SH' and j in [20,21,22,23]:
+    # Original procurement table actually contains all four names at p343: purchases only.
+    t=co(''.join(x['text'] for x in load('/tmp/quote_v47_unseen_source_'+ins+'.json')[341:343]));assert co(n['name']) in t
+    decision.update(accurate=True,reason='p342-343原关联采购表当前购入'+n['name']+'，集团采购方向成立；商品房/零星材料为合法合同外，不推投入')
+   else:unresolved.append((ins,j,kind,n))
+  elif kind in ['Segment','Measurement']:
+   matches=[k for k,v in enumerate(source_rows) if match(r,v)]
+   if matches:decision.update(accurate=True,reason='冻结原本期行、金额、单位、栏目、维度、精确主体/交易方/限定完整一致',recall_row_index=matches[0])
+   elif n.get('header')=='出售商品/提供劳务/本期发生额':
+    if r['subject_scope']!='consolidated_group':decision['reason']='审计p101跨至p255关联表后未建立集团范围，实际关联销售主体仍unclear；金额不能代替原集团主体'
+    elif n['name']=='合计' and num(n['value'])==num(ledger[ins][-1]['value']):decision.update(accurate=True,reason='原本期关联销售表合计，合计字段仅为聚合表身份，无具名交易对手；不增加召回')
+    else:
+     candidates=[v for v in ledger[ins] if v['kind']=='transaction' and v['current_value'] is not None and num(v['current_value'])==num(n['value'])]
+     assert candidates,(ins,j,n)
+     decision.update(reason='原行商品/服务或交易对方跨行截断/串行污染；金额相同仍不准确',expected_source_candidates=candidates)
+   else:
+    extra=[v for v in supp if v['instrument_id']==ins and v['page'] in pages(r) and co(v['name'])==co(n['name']) and num(v['value'])==num(n['value']) and v['unit']==n.get('unit') and v['header']==n.get('header') and co(v['qualifier'])==co(n.get('qualifier')) and v['subject_scope']==r['subject_scope'] and v['dimension']==r.get('dimension',r.get('segment_dimension'))]
+    if extra:decision.update(accurate=True,reason='独立官方布局原物理收入列/打印分类合计与原单位/主体一致，合同外补充台账逐格匹配',supplement_source=extra[0])
+    elif ins=='600089.SH' and (70<=j<=73 or 82<=j<=85 or j in [140,141,146,147]):decision['reason']='p291-292原产品跨行尾字未接续，新能源产品及工程/铝电子新材料、铝及合金制品截断'
+    elif ins=='600089.SH' and (110<=j<=121 or 160<=j<=165):decision['reason']='p292原按商品转让时间栏目继承旧经营地区状态，时间条件错为地区；分类行尾字还被截断'
+    elif ins=='600089.SH' and 176<=j<=181:decision['reason']='p383母公司主营合同分类错误继承为全部营业收入/其他业务栏目，原数值未抄错但原收入分类及限定错误'
+    elif ins=='600058.SH' and j in [624,625]:decision.update(accurate=True,reason='p219原集团经营租赁收入19,128,949.78元，实际service租赁对象与原lease语义相同',recall_row_index=next(k for k,row in enumerate(source_rows) if row['header']=='作为出租人的经营租赁'))
+    elif ins=='600089.SH' and j in [270,271,274,275]:decision['reason']='p347原承租方/租赁资产跨行名称未接续，主体或资产截断'
+    else:unresolved.append((ins,j,kind,n))
+  else:raise AssertionError(kind)
+  facts[r['record_id']]=decision
+ answers={}
+ if ins=='600058.SH':
+  reasons={'principal_business':(False,'原三主业及退出/注销多数片段保留，但p255托管旧五矿发展受托表没有p256补充协议变更为五矿贸易的关键限定；主营主体实质未完整。'), 'products_services':(True,'原11-12页完整资源/金属/供应链产品与服务矩阵及五家原子公司经营链保留，实际采购/销售方向原句完整；交割库资质仍以资质原文表达，未逐品肯定销售。'), 'revenue_model':(False,'原定价/账期/内外贸确认存在，但遗漏p256真正受托方变更并引入污染商品及交易对手收入摘要，未完整准确贯通。')}
+ else:
+  reasons={'principal_business':(False,'四主业原文保留且注销日期在，但未覆盖p23现有交付与签约订单/未确认或待履行工程的区分，完整链条实质未满足。'), 'products_services':(False,'p12部分产品和13页原文保留，但14-17页产品型号/组件/系统集成/储能矩阵及p60原材料实际所需未进入答案；不能仅因关键词全中算完整。'), 'revenue_model':(False,'原控制权/工程/电价/总净额机制保留，但收入摘要将时间栏目列为地区、截断新能源与铝产品名，原栏目/身份污染，未满足冻结实质。')}
+ for dim,(accurate,reason) in reasons.items():answers[dim]=dict(accurate=accurate,reason=reason,critical_numeric_error=False)
+ out[ins]=dict(facts=facts,answers=answers)
+save('/tmp/v47_unresolved.json',unresolved);save(C/'contract-external-income-source-ledger.json',supp);save('/tmp/v47_decisions_draft.json',out)
+print('unresolved',len(unresolved),unresolved[:4]);print('counts',[(i,Counter((r['accurate'],r['reason'][:20]) for r in o['facts'].values())) for i,o in out.items()])

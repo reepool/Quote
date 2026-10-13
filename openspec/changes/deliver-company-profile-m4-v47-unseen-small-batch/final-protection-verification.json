@@ -1,0 +1,23 @@
+{
+  "historical_file_count": 2872,
+  "historical_hashes_unchanged": true,
+  "prior_archive_file_count": 77,
+  "prior_archive_hashes_unchanged": true,
+  "first_business_artifact_count": 17,
+  "first_business_artifact_hashes_unchanged": true,
+  "completed_formal_index_preserved": true,
+  "original_zero_byte_observer_receipt_retained": true,
+  "completed_first_artifact_count": 18,
+  "first_artifact_hashes_unchanged": true,
+  "review_file_count": 11,
+  "review_hashes_protected": true,
+  "execution_module_count": 38,
+  "execution_modules_reconstructed": true,
+  "existing_modified_files_unchanged": true,
+  "query_export_disk_equal": true,
+  "compact_review_raw_records_reconstructible": true,
+  "formal_execution_count": 1,
+  "business_code_changed": false,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

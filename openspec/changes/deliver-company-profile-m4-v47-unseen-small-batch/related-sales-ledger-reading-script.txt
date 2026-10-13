@@ -1,0 +1,50 @@
+import json,re,statistics
+from pathlib import Path
+from decimal import Decimal
+P=Path('/tmp');num=re.compile(r'-?\d[\d,]*\.\d{2}')
+co=lambda x:re.sub(r'\s+','',x or '')
+out={}
+for ins,ns in [('600058.SH',range(248,256)),('600089.SH',range(345,348))]:
+ pages=json.loads((P/f'quote_v47_unseen_source_{ins}.json').read_text());layouts=json.loads((P/f'quote_v47_layout_{ins}.json').read_text());ledger=[]
+ for n in ns:
+  text=pages[n-1]['text'];layout=layouts[str(n)]
+  if n==248:
+   text=text.split('出售商品/提供劳务情况表',1)[1];layout=layout.split('出售商品/提供劳务情况表',1)[1]
+  if n==255:text=text.split('购销商品、提供和接受劳务的关联交易说明')[0];layout=layout.split('购销商品、提供和接受劳务的关联交易说明')[0]
+  if n==347:text=text.split('购销商品、提供和接受劳务的关联交易说明')[0];layout=layout.split('购销商品、提供和接受劳务的关联交易说明')[0]
+  pairs=[[m for m in num.finditer(l)] for l in layout.splitlines() if len(num.findall(l))==2]
+  current_end=statistics.median(ms[0].end() for ms in pairs);prior_end=statistics.median(ms[1].end() for ms in pairs);cut=(current_end+prior_end)/2
+  lrows=[]
+  for line in layout.splitlines():
+   ms=list(num.finditer(line))
+   if ms:lrows.append((tuple(m.group() for m in ms),bool(ms[0].end()<cut)))
+  buf=[];idx=0
+  for line in text.splitlines():
+   if any(x in line for x in ['年度报告',' / 287','/ 387','单位：','√适用','关联方 关联交易内容','本期发生额 上期发生额']):continue
+   ms=list(num.finditer(line))
+   if not ms:
+    if line.strip():buf.append(line.strip())
+    continue
+   vals=tuple(m.group() for m in ms)
+   assert lrows[idx][0]==vals,(ins,n,idx,lrows[idx],vals)
+   current=lrows[idx][1];idx+=1
+   native=co(''.join(buf)+line[:ms[0].start()]);buf=[]
+   if native in ['小计','合计']:ledger.append(dict(page=n,kind='subtotal',name=native,value=vals[0],prior=vals[1] if len(vals)>1 else None));continue
+   # Original plain cell order supplies complete wrapped names; layout fixes annual placement.
+   if ins=='600058.SH':
+    if '有限公司' in native:pos=native.index('有限公司')+len('有限公司')
+    elif '有限责任公司' in native:pos=native.index('有限责任公司')+len('有限责任公司')
+    elif '股份公司' in native:pos=native.index('股份公司')+len('股份公司')
+    elif '公司' in native:pos=native.index('公司')+2
+    else:
+     terms=['提供代理服务','提供招标服务','提供信息技术服务'];pos=min([native.find(t) for t in terms if t in native],default=-1);assert pos>0,(n,native)
+    party,content=native[:pos],native[pos:]
+   else:
+    verbs=re.search('提供|销售',native);assert verbs,(n,native);pos=verbs.start();party,content=native[:pos],native[pos:]
+   assert party and content,(n,native)
+   ledger.append(dict(page=n,kind='transaction',counterparty=party,content=content,current_value=vals[0] if current else None,prior_value=(vals[1] if len(vals)>1 else vals[0] if not current else None),native= native,layout_current_end=current_end,layout_prior_end=prior_end))
+  assert idx==len(lrows),(ins,n,idx,len(lrows))
+ out[ins]=ledger
+ transactions=[x for x in ledger if x['kind']=='transaction'];curr=[x for x in transactions if x['current_value'] is not None];prior=[x for x in transactions if x['current_value'] is None]
+ print(ins,'CURRENT',len(curr),'PRIOR',len(prior),'CURRENT_SUM',sum(Decimal(x['current_value'].replace(',','')) for x in curr),'ALL_TOTAL',ledger[-1])
+Path('/tmp/quote_v47_related_source_ledger.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')

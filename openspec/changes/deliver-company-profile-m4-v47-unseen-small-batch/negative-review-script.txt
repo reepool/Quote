@@ -1,0 +1,69 @@
+import json,re,sys
+from pathlib import Path
+sys.path.insert(0,'/tmp')
+from quote_v47_next_matching import co,pages,num
+C=Path('openspec/changes/deliver-company-profile-m4-v47-unseen-small-batch');load=lambda p:json.loads(Path(p).read_text());scope=load(C/'source-scope.json');result=[]
+for n in scope['negative_conditions']:
+ i=n['instrument_id'];rs=load('/tmp/v47_unseen_actual_'+i+'.json');ds=load('/tmp/v47_unseen_answers_'+i+'.json');fin=[r for r in rs if r['object_type'] in ['Segment','Measurement']];acts=[r for r in rs if r['object_type'] in ['Activity','Relationship']];bad=[];checked=[];name=n['name']
+ if name=='仅上期关联':
+  for r in fin:
+   f=r['source_native']
+   if f.get('header')=='出售商品/提供劳务/本期发生额' and n['page'] in pages(r):
+    checked.append(r['record_id'])
+    if co(n['counterparty'])==co((f.get('qualifier')or'').removeprefix('交易对方：')) and co(n['content'])==co(f['name']) or num(f['value'])==num(n['prior_value']):bad.append(r['record_id'])
+  reason='原布局本期空、上期有额；检查全部本期结构化关联收入及配对Measurement和答案的本期收入摘要，未生成该交易本期肯定事实。原引用保留上期列不作为本期事实；同交易方不同本期交易独立保留。'
+ elif name=='空分部格不借相邻':
+  for r in fin:
+   f=r['source_native'];checked.append(r['record_id'])
+   if n['page'] in pages(r) and any(f['name']==c['name'] and f.get('header')==c['header'] for c in n['forbidden_cells']):bad.append(r['record_id'])
+  reason='对外抵销空位与内部合计空位没有Segment/Measurement；收入摘要只保留有额外部/内部原列。'
+ elif name=='母公司合同空分类':
+  for r in fin:
+   if n['page'] in pages(r):
+    checked.append(r['record_id'])
+    if any(h in (r['source_native'].get('header')or'') for h in n['headers']):bad.append(r['record_id'])
+  reason='原母公司空分类未生成本期收入，合法钢铁/服务/地区物理列及原空行引用保留。'
+ elif name=='扣除空项目':
+  for r in fin:
+   if n['page'] in pages(r) and '扣除' in (r['source_native'].get('header')or''):
+    checked.append(r['record_id']);assert r['source_native']['name']=='正常经营之外的其他业务收入' and num(r['source_native']['value'])==num(n['valid_current_value'])
+  reason='仅正常经营之外的其他业务收入5241.10万元生成；第2-6空行没有借额或造零。'
+ elif name in ['风险非具名采购','交割资质非逐品销售','采购不推投入']:
+  for r in acts:
+   checked.append(r['record_id']);target=co(r['source_native']['name']) in {co(x) for x in n['names']}
+   direction= r.get('action')=='purchases' if name=='风险非具名采购' else r.get('action')=='sells' if name=='交割资质非逐品销售' else r.get('relation_type')=='material_input'
+   if target and direction:bad.append(r['record_id'])
+  reason='实际全部动作/关系逐对象无禁止方向；正文保留风险/资质原句且未改为逐品销售或材料投入。真实采购另按原表核。'
+ elif name in ['清算注销边界','注销主体边界']:
+  for d in ds:
+   t=co(d['excerpt']);checked.append('answer:'+d['dimension_id'])
+   assert all(co(x) in t for x in n['names']) and all(co(x) in t for x in n.get('dates',[n.get('date','')]))
+   assert '注销' in t
+  reason='六答案中的公司原名、注销原日期及原退出语句保留，未肯定全年并表；其历史身份原句不删除。'
+ elif name in ['委托支出非收入','承租支出非收入','政府补助非营业收入','投资收益非收入','2026目标非本期收入']:
+  for r in fin:
+   checked.append(r['record_id'])
+   if any(num(r['source_native']['value'])==num(x) for x in n['values']) and (name!='2026目标非本期收入' or r['source_native']['unit']==n['unit']):bad.append(r['record_id'])
+  reason='逐一核原支出/补助/投资收益/未来目标金额，未生成当期营业收入事实或肯定收入摘要。原页引用的原标题保留。'
+ elif name=='客户排名非销售渠道':
+  for r in fin:
+   checked.append(r['record_id'])
+   if r.get('dimension',r.get('segment_dimension'))=='sales_mode' and r['source_native']['name'] in n['names']:bad.append(r['record_id'])
+  reason='客户A-E排名未升格销售渠道，实际直销原栏目保留。'
+ elif 'forbidden_headers' in n:
+  for r in fin:
+   checked.append(r['record_id'])
+   if any(h in (r['source_native'].get('header')or'') for h in n['forbidden_headers']):bad.append(r['record_id'])
+  reason='核全部金融对象原栏目，未将不适用章节、费用/成本转为收入；实际关联出租不同适用表保留。母公司错误全部/其他分类另记准确率错误，不等于报告分部事实。'
+ elif name=='订单非已销售':
+  for r in fin:
+   if n['page'] in pages(r):
+    checked.append(r['record_id'])
+    if r['source_native']['unit']=='亿美元' or num(r['source_native']['value']) in [num('2000000000'),num('5000000000')]:bad.append(r['record_id'])
+  reason='20亿美元签约/50亿美元未确认或待履行没有生成本期收入；正文遗漏订单区分另记实质漏召回，不把未提及当作成立交付。'
+ else:raise AssertionError(name)
+ source=load('/tmp/quote_v47_unseen_source_'+i+'.json');quote=source[n['page']-1]['text']
+ result.append(dict(condition_id=n['condition_id'],instrument_id=i,source_condition=n,source_text=quote,checked_actual_object_ids=checked,answered_dimensions_checked=[d['dimension_id'] for d in ds],evaluated=True,passed=not bad,violating_object_ids=bad,reason=reason))
+assert len(result)==80
+(C/'negative-review-evidence.json').write_text(json.dumps(dict(condition_count=80,passed=sum(x['passed'] for x in result),evaluated=80,negative_reviews=result),ensure_ascii=False,indent=2)+'\n')
+print('negative',sum(x['passed'] for x in result),'/80');print('failures',[(x['condition_id'],x['violating_object_ids']) for x in result if not x['passed']])

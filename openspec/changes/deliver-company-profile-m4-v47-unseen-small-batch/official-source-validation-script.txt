@@ -1,0 +1,13 @@
+import json,hashlib
+from pathlib import Path
+from pypdf import PdfReader
+C=Path('openspec/changes/deliver-company-profile-m4-v47-unseen-small-batch');load=lambda p:json.loads(Path(p).read_text());sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();s=load(C/'source-scope.json');frozen=load(C/'independent-frozen-source-pages.json');layouts=load(C/'independent-source-layout-pages.json');extras={};results={}
+for i,v in s['versions'].items():
+ assert sha(v['pdf'])==v['sha256'];pdf=PdfReader(v['pdf']);full=load('/tmp/quote_v47_unseen_source_'+i+'.json');rs=load('/tmp/v47_unseen_actual_'+i+'.json');owned=sorted({p for r in rs for e in r['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[]),*e.get('subject_evidence_pages',[])] if p is not None});numbers=sorted(set(v['checked_pages'])|set(owned))
+ for p in numbers:
+  actual=pdf.pages[p-1].extract_text();assert actual==full[p-1]['text'],(i,p,'plain')
+ for row in frozen[i]['pages']:assert row['text']==full[row['page']-1]['text']
+ for p,t in layouts[i].items():assert pdf.pages[int(p)-1].extract_text(extraction_mode='layout')==t,(i,p,'layout')
+ extras[i]=dict(document_version=v['sha256'],reason='实际输出审计长段与合同外对象证据补充；不修改执行前119声明页/532条件/80负例',pages=[full[p-1] for p in numbers if p not in v['checked_pages']])
+ results[i]=dict(pdf_sha256=v['sha256'],frozen_pages=len(v['checked_pages']),owned_evidence_pages=len(owned),total_verified_pages=len(numbers),layout_pages=len(layouts[i]),plain_equal=True,layout_equal=True)
+(C/'independent-supplemental-source-pages.json').write_text(json.dumps(extras,ensure_ascii=False,indent=2)+'\n');(C/'official-source-validation.json').write_text(json.dumps(results,ensure_ascii=False,indent=2)+'\n');print(results,flush=True)

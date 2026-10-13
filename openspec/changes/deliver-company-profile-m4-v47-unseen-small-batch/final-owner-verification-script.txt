@@ -1,0 +1,36 @@
+import json,hashlib,subprocess,tempfile
+from pathlib import Path
+from research.company_profile.reads import CompanyProfileReadService
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v47-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v47_unseen_small_batch';read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+formal=read(P/'formal_execution.json');reads=CompanyProfileReadService(R/'data/research/company_profile_common_core/m4_v47_unseen_small_batch');out={}
+for i,r in formal['results'].items():
+ profile=reads.query((i,),processing_identity=formal['processing_identity'])['profiles'][0];disk=read(Path(r['export']['files'][0]));assert profile==disk==r['query']['profiles'][0]==r['export']['profiles'][0]
+ out[i]=dict(actual_disk_reread=True,query_export_disk_equal=True,accepted_count=len(profile['accepted_facts']))
+save(C/'delivery-reread-validation.json',out)
+base=read(C/'initial-workspace-baseline.json');rebuilt={}
+with tempfile.TemporaryDirectory(prefix='v47-unseen-code-reconstruction-') as task_dir:
+ root=Path(task_dir)
+ for p,h in formal['executed_code_sha256'].items():
+  destination=root/p;destination.parent.mkdir(parents=True,exist_ok=True);destination.write_bytes(subprocess.run(['git','show',base['head']+':'+p],check=True,capture_output=True).stdout)
+  assert sha(destination)==h==sha(R/p);rebuilt[p]=h
+save(C/'execution-code-reconstruction.json',dict(baseline_head=base['head'],patch_required=False,business_code_changed=False,module_count=len(rebuilt),all_modules_reconstructed=True,reconstructed_sha256=rebuilt))
+first=read(C/'first-formal-delivery-preservation-completion.json')['completed_sha256'];history=read(C/'protection-baseline.json');existing=base['existing_modified_sha256']
+for snapshot in [first,history,existing]:assert all(sha(R/p)==h for p,h in snapshot.items())
+archive=R/'openspec/changes/archive/2026-10-13-deliver-company-profile-m4-v46-unseen-small-batch';a=read(archive/'v47-archive-preservation.json')['immutable_sha256_by_relative_path'];assert all(sha(archive/p)==h for p,h in a.items())
+freeze=read(C/'source-freeze-receipt.json');assert sha(C/'source-scope.json')==freeze['source_scope_sha256'];assert sha(C/'independent-frozen-source-pages.json')==freeze['source_pages_sha256'];assert sha(C/'source-contract-interpretation.json')==freeze['source_interpretation_sha256']
+quote_bank=read(C/'source-review-quote-bank.json');e=read(C/'source-review-evidence.json');assert len(e['object_reviews'])==len({(x['instrument_id'],x['object_id']) for x in e['object_reviews']})==1124
+# Compact review summaries reproduce each complete original raw object with the immutable quote bank.
+for obj in e['object_reviews']:
+ if obj['object_type']=='answer':continue
+ def restore(x):
+  if isinstance(x,list):return [restore(v) for v in x]
+  if isinstance(x,dict):return {('bounded_quote' if k=='bounded_quote_sha256' else k):(quote_bank[v] if k=='bounded_quote_sha256' else restore(v)) for k,v in x.items()}
+  return x
+ raw=restore(obj['accepted_record_summary']);assert hashlib.sha256(json.dumps(raw,ensure_ascii=False,sort_keys=True).encode()).hexdigest()==obj['accepted_record_canonical_sha256']
+ assert raw['record_id']==obj['record_id']
+negative=read(C/'negative-review-evidence.json');assert negative['evaluated']==negative['passed']==80
+review_files=['source-review-evidence.json','source-review-quote-bank.json','actual-object-decisions.json','negative-review-evidence.json','independent-supplemental-source-pages.json','official-source-validation.json','delivery-reread-validation.json','execution-code-reconstruction.json','first-formal-delivery-preservation-completion.json','source-contract-interpretation.json','contract-external-income-source-ledger.json']
+assert not (C/'formal-result-preservation.json').exists()
+save(C/'formal-result-preservation.json',dict(first_review_index=1,first_output_sha256=first,original_zero_byte_observation_sha256=sha(C/'first-formal-delivery-preservation.json'),formal_review_sha256={p:sha(C/p) for p in review_files},owner_review_files_sha256={str(p.relative_to(R)):sha(p) for p in [P/'company_profile_source_review.v1.json'] if p.exists()}))
+save(C/'final-protection-verification.json',dict(historical_file_count=len(history),historical_hashes_unchanged=True,prior_archive_file_count=len(a),prior_archive_hashes_unchanged=True,first_business_artifact_count=17,first_business_artifact_hashes_unchanged=True,completed_formal_index_preserved=True,original_zero_byte_observer_receipt_retained=True,completed_first_artifact_count=len(first),first_artifact_hashes_unchanged=True,review_file_count=len(review_files),review_hashes_protected=True,execution_module_count=len(rebuilt),execution_modules_reconstructed=True,existing_modified_files_unchanged=True,query_export_disk_equal=True,compact_review_raw_records_reconstructible=True,formal_execution_count=1,business_code_changed=False,production_authorization='not_authorized',scale_quality_claim_allowed=False))
+print('VERIFIED',len(history),len(first),len(a),len(rebuilt),len(e['object_reviews']),flush=True)
