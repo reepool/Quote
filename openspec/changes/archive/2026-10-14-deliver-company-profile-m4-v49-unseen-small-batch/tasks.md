@@ -24,8 +24,8 @@
 
 ## 5. 有限通过后的收口
 
-- [ ] 5.1 条件卡: 后继正式轮获得A角有限通过后，才同步成立规则与有限范围、保护首次失败和补正并归档。production=not_authorized，scale_quality_claim_allowed=false；行业/量价成本/性能/框架/正文精简/无关旧问题后置。
+- [x] 5.1 条件卡: 后继正式轮获得A角有限通过后，才同步成立规则与有限范围、保护首次失败和补正并归档。production=not_authorized，scale_quality_claim_allowed=false；行业/量价成本/性能/框架/正文精简/无关旧问题后置。
 
-## 6. v50正式结果（待A角有限审核）
+## 6. v50正式结果（A角有限通过）
 
-v50同源首次正式轮：364/364＝6正文＋207收入＋151动作；669/669＝663事实＋6正文，数字错误0，41/41负例实际通过。244.06265446264297秒、0/50000 token；两家五阶段成功且无复用/前驱，查询/导出/磁盘一致。原v49失败及原合同不改写，v50首次19份制品已完整写入后保护。见`v50-review-submission.md`。5.1保持未勾选，当前不归档、不扩批；production=not_authorized，scale_quality_claim_allowed=false。
+v50同源首次正式轮：364/364＝6正文＋207收入＋151动作；669/669＝663事实＋6正文，数字错误0，41/41负例实际通过。244.06265446264297秒、0/50000 token；两家五阶段成功且无复用/前驱，查询/导出/磁盘一致。原v49失败及原合同不改写，v50首次19份制品已完整写入后保护。见`v50-review-submission.md`。A角已有限通过，5.1同步并归档；批量扩展继续暂停；production=not_authorized，scale_quality_claim_allowed=false。

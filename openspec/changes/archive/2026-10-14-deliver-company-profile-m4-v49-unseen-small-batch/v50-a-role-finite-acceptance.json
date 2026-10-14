@@ -1,0 +1,22 @@
+{
+  "accepted_at": "2026-10-14T04:04:27.055211+00:00",
+  "reviewer": "user_A_role",
+  "scope": [
+    "600064.SH",
+    "600096.SH"
+  ],
+  "source_conditions": 364,
+  "negative_conditions": 41,
+  "recall": "364/364",
+  "accuracy": "669/669",
+  "accepted_facts": 663,
+  "answered_bodies": 6,
+  "critical_numeric_errors": 0,
+  "whole_round_seconds": 244.06265446264297,
+  "elapsed_scope": "existing_PDF_parse_cache",
+  "tokens_used": 0,
+  "token_budget": 50000,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "archive_authorized": true
+}

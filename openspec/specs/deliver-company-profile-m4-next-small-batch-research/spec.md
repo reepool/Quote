@@ -66,3 +66,10 @@ For each delivered company, principal business, products or services, and revenu
 - **WHEN** the source review for this batch is written
 - **THEN** its denominator comes from the two new reports
 - **AND** the historical 8/9 and 9/9 values are not reused as this batch's score
+
+### Requirement: Successor finite acceptance permits archive without rewriting failures
+A first failed business round MUST preserve its original contract, scores, artifacts and code and pause subsequent samples while unresolved. A later independently reviewed same-source successor MAY close the change only after finite A-role acceptance, specification synchronization and archive-path protection checks. Historical failed scores MUST NOT be replaced with the successor score. The accepted scope MUST name its official sources and positive and negative conditions; elapsed conclusions MUST state actual PDF-cache conditions. Production MUST remain not_authorized and scale_quality_claim_allowed MUST remain false.
+
+#### Scenario: A finite successor passes after a retained first failure
+- **WHEN** A-role accepts the later same-source delivery within the frozen source contract
+- **THEN** synchronized specifications and path-mapped protection allow archive while the original failure stays byte-identical and no production or scale claim is enabled

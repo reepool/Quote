@@ -320,3 +320,18 @@ The official asset page source MUST activate procurement layout selection at the
 #### Scenario: Current deliveries and future orders coexist
 - **WHEN** original disclosure distinguishes actual delivered products or services from signed contracts, outstanding orders or planned delivery
 - **THEN** final bodies preserve those states and only current affirmative actions satisfy current named-action conditions
+
+### Requirement: Shared-object enumerations and native income rows remain exact
+The existing owned-page owner MUST bind enumerated operating verbs to their nonempty original object, preserving real development, operation and sales without placeholder names, swallowed errors or skipped pages. Fee or raw-material wording MUST NOT become a goods action; true service charges MUST remain eligible. Native transaction parties, split subsidiary names, current rental rows and units MUST remain attached to their own printed rows. Printed zero MUST remain distinct from an absent current cell and MUST NOT imply an affirmative sales or procurement action. Same-amount income rows under different native table headers MUST remain separately identified with paired Measurements; layout continuations MUST preserve actor and current-column boundaries.
+
+#### Scenario: Several operating verbs share one real-estate object
+- **WHEN** an official sentence enumerates real-estate development, operation and sales
+- **THEN** current supported verbs retain the original real-estate object and no empty Activity terminates the company delivery
+
+#### Scenario: Equal amounts occur under different original income headers
+- **WHEN** a report prints the same five amounts in income composition and industry tables
+- **THEN** both native table identities survive acceptance, query and export without duplication within either identity
+
+#### Scenario: Fees and current blank cells share real transaction tables
+- **WHEN** printed service fees, raw materials, zero values and prior-only amounts occur on actual owner pages
+- **THEN** true service income remains eligible, fee text does not invent goods, zeros remain printed zeros and current blanks do not borrow prior values

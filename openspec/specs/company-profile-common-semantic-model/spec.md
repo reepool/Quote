@@ -202,3 +202,14 @@ When an approved Evidence bundle explicitly states an expected completion, compl
 - **WHEN** the prepared Evidence reports new or under-construction capacity without an expected completion statement
 - **THEN** the qualifier remains empty or preserves only other explicit source wording
 - **AND** the system does not insert a completion year from Gold or convention
+
+### Requirement: Substantive answers retain original control and operating periods
+Three-dimensional business answers MUST preserve original subsidiary and investee relationships, control or exit boundaries, industry and product matrices, actual versus planned activity, transaction mechanisms and revenue confirmation. Evidence-based period restrictions MUST survive acceptance, query and export; answered status or keyword hits alone MUST NOT establish substantive completeness.
+
+#### Scenario: A commodity business stops during the report year
+- **WHEN** the original report states soybean operation stopped after September and separately describes current sales and service-charge mechanisms
+- **THEN** final answers retain that period limitation and distinguish goods from supported service charges
+
+#### Scenario: Related-party scope changes while current procurement continues
+- **WHEN** source evidence distinguishes full-year procurement, January-February approved amounts and a later nonrelated-party period
+- **THEN** the answer retains those native periods and actors without combining approved limits with actual income
