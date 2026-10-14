@@ -1,0 +1,13 @@
+import json
+from pathlib import Path
+from research.company_profile.reads import _iter_accepted_raw
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v50-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v50_unseen_small_batch';B=R/'data/research/company_profile_common_core/m4_v50_unseen_small_batch/company_profile_common_core.v1'
+f=json.loads((P/'formal_execution.json').read_text())
+for i,v in f['results'].items():
+ if not v['query'].get('profiles'):
+  for kind in ['raw','answers']:Path('/tmp/v50new'+kind+'_'+i+'.json').write_text('[]')
+  continue
+ q=v['query']['profiles'][0];raw=list(_iter_accepted_raw(json.loads((B/'checkpoints'/(q['work_id']+'.json')).read_text())))
+ assert set(r['record_id'] for r in raw)==set(r['record_id'] for r in q['accepted_facts'])
+ for kind,data in [('raw',raw),('profile',q),('answers',q['dimensions'])]:Path('/tmp/v50new'+kind+'_'+i+'.json').write_text(json.dumps(data,ensure_ascii=False))
+ print(i,len(raw),len(q['accepted_facts']))

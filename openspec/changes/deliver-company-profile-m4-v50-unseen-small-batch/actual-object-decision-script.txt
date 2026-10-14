@@ -1,0 +1,41 @@
+import json,re,hashlib
+from pathlib import Path
+from quote_v50_new_matching import co,pages,match,action_match,num
+C=Path('openspec/changes/deliver-company-profile-m4-v50-unseen-small-batch');read=lambda p:json.loads(Path(p).read_text());save=lambda p,v:Path(p).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+s=read(C/'source-scope.json');out=read('/tmp/v50new_predecisions.json');sp=read(C/'independent-frozen-source-pages.json');layout=read(C/'independent-source-layout-pages.json');bad=[];overview_audit=[];outside=[]
+manual_overview={
+'owned:core-ev-a203848f1b9f9eeb:overview':'p25逐格读序：咨询服务、增资1亿元、100%并表、完成工商变更均原表；表头和换行重排没有改变原格',
+'owned:core-ev-6f360d524deff970:overview':'p168小节标题和不适用分别换行；拼接仍准确',
+'owned:core-ev-25f5fcccc81aa1b9:overview':'p172逐个子公司原名、注册资本、持股和业务性质匹配；取得方式/直接间接表头读序差异未改变关系，p173不适用限定保留',
+'owned:core-ev-ce8458d069cd2453:overview':'p17标题编号1、被去除，原不适用未改变',
+'owned:core-ev-a6d308176ebd1714:overview':'p132经营租赁2129586.82及可变租赁相同金额原列匹配，表头换行未改变',
+'owned:core-ev-18653cabc6f0b0d1:overview':'p133–134逐子公司原名、资本、业务和持股匹配，取得方式/直接间接表头读序差异；亚太/康隆51%合并子公司保留'}
+for i in s['versions']:
+ raw=read('/tmp/v50newraw_'+i+'.json');src={p['page']:p['text'] for p in sp[i]['pages']};roles=[v for v in s['native_roles'] if v['instrument_id']==i]
+ for r in raw:
+  d=out[i]['facts'][r['record_id']];n=r['source_native'];name=n['name'];kind=r['object_type']
+  if kind=='BusinessOverview':
+   ps=sorted(pages(r));exact=co(r['source_text']) in co(''.join(src.get(p,'') for p in ps));lay=co(r['source_text']) in co(''.join(layout[i].get(str(p),'') for p in ps));assert exact or lay or r['record_id'] in manual_overview,r['record_id'];reason='独立官方原页文字连续匹配' if exact else '独立官方layout连续匹配，保留本期空和上期列的原证据，不等同肯定本期金额' if lay else manual_overview[r['record_id']];d.update(accurate=True,reason=reason);overview_audit.append(dict(instrument_id=i,record_id=r['record_id'],source_pages=ps,source_text=r['source_text'],exact_text=exact,exact_layout=lay,reason=reason));continue
+  if d['accurate']:
+   if kind in ['Activity','Relationship']:
+    d['independent_source_pages']=[16] if i=='600082.SH' else [12];d['reason']+='；独立实际原页补证海泰p16本期房产销售/开创p12非零产销，同商品多副本仅唯一召回'
+   continue
+  if i=='600082.SH':
+   if name=='房地产结转收入合计':assert num(n['value'])==0 and n['unit']=='万元';d.update(accurate=True,reason='合同外p23五个项目与合计打印0，真实房地产本期结转合计0万元，不反推销售动作');outside.append(dict(instrument_id=i,record_id=r['record_id'],page=23,amount='0',unit='万元',reason=d['reason']));continue
+   if name in ['在某一时点确认','在某一时段内确认']:d.update(reason='p157收入确认时间被标成业务分部及合同分解合计，金额正确不能抵消原栏目/维度错误',error_type='revenue_timing_misclassified')
+   else:assert n.get('header')=='出售商品/提供劳务/本期发生额';d.update(reason='p182本期空、打印金额仅上期，且交易对手跨行污染；不得借列或造零',critical_numeric_error=True,error_type='prior_only_amount_and_counterparty')
+  else:
+   if kind=='Activity':assert name=='远洋渔业捕捞、水产品';d.update(reason='p8捕捞和水产品销售两个方向被合成伪销售对象，不是具体原商品',error_type='compound_pseudo_commodity')
+   elif name=='经营租赁':assert num(n['value'])==num('2129586.82');d.update(accurate=True,reason='合同外p132出租人经营租赁收入2129586.82元真实成立');outside.append(dict(instrument_id=i,record_id=r['record_id'],page=132,amount='2129586.82',unit='元',reason=d['reason']));continue
+   elif name=='舟山环太海洋食品有限公司':d.update(reason='p18环太营业收入应422469539.59元；818099682.13属卡洛斯•阿尔博的孩子们有限公司，原主体配额错误',critical_numeric_error=True,error_type='subsidiary_amount_misattached')
+   elif name=='金枪鱼销':d.update(reason='p122跨行金枪鱼销售收入截断为金枪鱼销，商品身份不完整',error_type='truncated_product_name')
+   elif name=='按经营地':d.update(reason='p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品',error_type='regional_header_as_product')
+   else:
+    assert name in ['国内','国外'];numeric=name=='国内' and (num(n['value'])==num('23054591.66') or num(n['value'])<0);d.update(reason='p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留',critical_numeric_error=numeric,error_type='regional_dimension_and_columns')
+  assert d.get('reason');bad.append(dict(instrument_id=i,record_id=r['record_id'],object_type=kind,native=n,decision=d,source_pages=sorted(pages(r))))
+ for a in read('/tmp/v50newanswers_'+i+'.json'):
+  dim=a['dimension_id'];ok=dim=='principal_business';reason='逐内容核实主营产业链、原子公司和控制/退出限定完整，实际原句保留' if ok else ('海泰缺政策咨询、资源对接和用工服务' if i=='600082.SH' and dim=='products_services' else '开创缺沙丁鱼、鱿鱼、鲭鱼产品矩阵' if dim=='products_services' else '海泰收入正文肯定栏目中的原期错交易并误分确认时间，未保持本期空边界' if i=='600082.SH' else '开创收入正文缺大副收据/结算单/内销/航次结束、母公司与分部边界，产品地区和收入主体错误')
+  out[i]['answers'][dim]=dict(accurate=ok,critical_numeric_error=False,reason=reason,numeric_note='肯定摘要未陈述错配金额；原quote保留原表本期/上期，不把原证据引用等同错误数字断言')
+assert len(bad)==65 and sum(x['decision']['critical_numeric_error'] for x in bad)==14
+save(C/'actual-object-decisions.json',out);save(C/'incorrect-fact-objects.json',bad);save(C/'business-overview-source-audit.json',overview_audit);save(C/'contract-external-accurate-income.json',outside)
+print('DECISIONS',[(i,sum(d['accurate'] for d in out[i]['facts'].values()),len(out[i]['facts'])) for i in out],'bad',len(bad),'numeric',sum(x['decision']['critical_numeric_error'] for x in bad))

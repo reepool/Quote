@@ -1,0 +1,12 @@
+import json,hashlib,re
+from pathlib import Path
+from pypdf import PdfReader
+plan=json.loads(Path('data/checkpoints/company_profile_common_core/reports/m4_v50_unseen_small_batch/plan.json').read_text())
+for r in plan['reports']:
+ h=r['document_version'];p=Path('data/filings/announcements/blobs')/h[:2]/(h+'.pdf');assert hashlib.sha256(p.read_bytes()).hexdigest()==h
+ reader=PdfReader(p);pages=[dict(page=i+1,text=page.extract_text() or '',readable=True) for i,page in enumerate(reader.pages)]
+ Path('/tmp/quote_v50_unseen_source_'+r['instrument_id']+'.json').write_text(json.dumps(pages,ensure_ascii=False,indent=2)+'\n')
+ terms='主要业务|经营模式|分行业|分产品|分地区|销售模式|产销量|主要原材料|主要能源|营业收入|合营企业|联营企业|关联交易|出租方'
+ lines=[f"p{pg['page']}: "+' / '.join(line.strip() for line in pg['text'].splitlines() if re.search(terms,line))[:450] for pg in pages if re.search(terms,pg['text'])]
+ Path('/tmp/quote_v50_unseen_index_'+r['instrument_id']+'.txt').write_text('\n'.join(lines))
+ print(r['instrument_id'],len(pages),'pages',h,flush=True)

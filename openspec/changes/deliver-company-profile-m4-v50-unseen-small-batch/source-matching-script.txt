@@ -1,0 +1,36 @@
+import re
+from decimal import Decimal
+co=lambda x:re.sub(r'\s+','',x or '').replace('（','(').replace('）',')')
+num=lambda x:Decimal(co(x).replace(',',''))
+def pages(r):return {p for e in r['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[])] if p is not None}
+def actor_ok(r,row):
+ if r['subject_scope']!=row['subject_scope']:return False
+ if row['subject_scope'] in ['issuer','consolidated_group']:return True
+ q=co(r['source_native'].get('qualifier'));actor=co(row['source_actor'])
+ return q in {co('子公司：'+row['source_actor']),co('原子公司：'+row['source_actor'])}
+def match(r,row):
+ n=r['source_native'];h=n.get('header')or'';q=co(n.get('qualifier'));d=r.get('dimension',r.get('segment_dimension'));rh=row['header'];name=co(n['name']);expected=co(row['name']);aliases={co(x) for x in row['native_aliases']}
+ if row['page'] not in pages(r) or n.get('unit')!=row['unit'] or num(n.get('value'))!=num(row['value']) or not actor_ok(r,row):return False
+ if rh.startswith('合同收入分解/') and row['dimension']=='product':aliases|={expected.removesuffix('收入'),expected.removesuffix('销售收入')}
+ if name not in aliases:return False
+ if row['source_segment'] is not None:
+  if q!=co('原收入列：'+row['source_segment']+'营业收入'):return False
+  if rh.endswith('/商品类型'):return h=='合同收入/商品类型' and d=='product'
+  return h=='合同收入/合同分解合计' and name=='合计' and d=='business_segment' or h=='合同收入/经营地区' and d in ['region','business_segment']
+ if rh=='出售商品/提供劳务':return d in ['product','service'] and h=='出售商品/提供劳务/本期发生额' and q==co('交易对方：'+row['counterparty'])
+ if rh=='主要控股参股公司分析':return d in ['business_segment','business_type'] and h=='控股参股公司/营业收入'
+ if rh=='重要非全资子公司的主要财务信息':return d in ['business_segment','business_type'] and h=='重要非全资子公司/本期营业收入'
+ if rh in ['合并营业收入和营业成本','母公司营业收入和营业成本']:return d==row['dimension'] and h=='营业收入'
+ if rh=='合并营业收入明细':return h.startswith('营业收入明细') and (name=='客户合同产生的收入' and d in ['service','business_type'] or d in ['lease','business_type'] or name=='合计')
+ if rh=='合同收入分解/业务类型':return name=='合计' and d=='business_segment' and h=='合同收入/合同分解合计' or d=='product' and h in ['合同收入/商品类型','合同收入/业务类型']
+ if rh=='合同收入分解/商品转让时间':return d=='revenue_timing' and h in ['合同收入/收入确认时间','合同收入/商品转让时间']
+ if d!=row['dimension']:return False
+ if rh.startswith('主营业务分'):return h in ['', '主营业务收入']
+ if rh=='贸易业务开展情况':return h=='本期营业收入'
+ return False
+
+def action_match(r,role):
+ n=r['source_native']
+ if co(n['name']) not in {co(a) for a in role['native_aliases']} or r['subject_scope']!=role['subject_scope']:return False
+ if role['source_actor']!='公司及合并子公司' and co(r.get('source_actor')) not in {co(a) for a in role['actor_aliases']}:return False
+ return r.get('relation_type')=='material_input' if role['source_actions']==['material_input'] else r.get('action') in role['source_actions']

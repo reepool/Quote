@@ -1,0 +1,49 @@
+{
+  "created_at": "2026-10-14T04:40:17.864859+00:00",
+  "review_method": "人工范围Review：核逐对象实际来源、原合同冻结时序、动态唯一计分、负例、保护和唯一owner调用；未启动业务重跑",
+  "current_business_blockers": {
+    "incorrect_facts": 65,
+    "incorrect_answers": 4,
+    "numeric_error_objects": 14,
+    "missing_positive_conditions": 94,
+    "failed_negative_conditions": 4
+  },
+  "contract_ruling_needed": "十项重要收入执行前漏冻，旁挂不改原160合同及首次分数，须A角裁决后继口径",
+  "material_blockers_remaining": 0,
+  "unrelated_issues_modified": false,
+  "business_code_modified": false,
+  "actual_checks": [
+    {
+      "command": "openspec validate deliver-company-profile-m4-v50-unseen-small-batch --type change --strict",
+      "result": "passed"
+    },
+    {
+      "command": "openspec validate {company-profile-common-core-owned-page-facts,company-profile-common-semantic-model,deliver-company-profile-m4-next-small-batch-research} --type spec --strict（分别执行）",
+      "result": "3 passed"
+    },
+    {
+      "command": "git diff --check",
+      "result": "git diff --check与精确暂存后的git diff --cached --check均通过；本人新spec末尾多余空行已去除，冻结合同与首次材料未改"
+    },
+    {
+      "command": "all change JSON load and frozen script compile",
+      "result": "全部JSON及冻结脚本语法通过；首次26份JSON，材料收口另附两保护/Review回执"
+    },
+    {
+      "command": "quote_v50_new_verify.py",
+      "result": "passed；局部核验脚本status应按现有success枚举，已修正核验断言，不影响业务/首次输出"
+    }
+  ],
+  "pytest_run": false,
+  "old_tests_used_as_new_acceptance": false,
+  "formal_observation_count": 1,
+  "successor_formal_rerun_count": 0,
+  "active_development_seconds": null,
+  "handoff_wait_seconds": null,
+  "time_accounting": "unknown, not represented by business run time",
+  "first_score_preserved": true,
+  "existing_modified_files_verified": 19,
+  "workflow": "A/B v1已读取；在途原失败停止卡未改，后续需A角显式授权",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

@@ -1,0 +1,1516 @@
+[
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-d8adc5d4c6b7d298:Segment:business_segment:在某一时点确认:合同收入/合同分解合计:row:2",
+    "object_type": "Segment",
+    "native": {
+      "name": "在某一时点确认",
+      "value": "419,135,369.86",
+      "unit": "元",
+      "header": "合同收入/合同分解合计",
+      "qualifier": "原收入列：本集团营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p157收入确认时间被标成业务分部及合同分解合计，金额正确不能抵消原栏目/维度错误",
+      "error_type": "revenue_timing_misclassified"
+    },
+    "source_pages": [
+      156,
+      157,
+      158
+    ]
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-17ef254a75e47584:Measurement:business_segment:在某一时点确认:合同收入/合同分解合计:row:2",
+    "object_type": "Measurement",
+    "native": {
+      "name": "在某一时点确认",
+      "value": "419,135,369.86",
+      "unit": "元",
+      "header": "合同收入/合同分解合计",
+      "qualifier": "原收入列：本集团营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p157收入确认时间被标成业务分部及合同分解合计，金额正确不能抵消原栏目/维度错误",
+      "error_type": "revenue_timing_misclassified"
+    },
+    "source_pages": [
+      156,
+      157,
+      158
+    ]
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-d8adc5d4c6b7d298:Segment:business_segment:在某一时点确认:合同收入/合同分解合计:row:3",
+    "object_type": "Segment",
+    "native": {
+      "name": "在某一时点确认",
+      "value": "419,135,369.86",
+      "unit": "元",
+      "header": "合同收入/合同分解合计",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p157收入确认时间被标成业务分部及合同分解合计，金额正确不能抵消原栏目/维度错误",
+      "error_type": "revenue_timing_misclassified"
+    },
+    "source_pages": [
+      156,
+      157,
+      158
+    ]
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-17ef254a75e47584:Measurement:business_segment:在某一时点确认:合同收入/合同分解合计:row:3",
+    "object_type": "Measurement",
+    "native": {
+      "name": "在某一时点确认",
+      "value": "419,135,369.86",
+      "unit": "元",
+      "header": "合同收入/合同分解合计",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p157收入确认时间被标成业务分部及合同分解合计，金额正确不能抵消原栏目/维度错误",
+      "error_type": "revenue_timing_misclassified"
+    },
+    "source_pages": [
+      156,
+      157,
+      158
+    ]
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-d8adc5d4c6b7d298:Segment:business_segment:在某一时段内确认:合同收入/合同分解合计:row:4",
+    "object_type": "Segment",
+    "native": {
+      "name": "在某一时段内确认",
+      "value": "43,468.30",
+      "unit": "元",
+      "header": "合同收入/合同分解合计",
+      "qualifier": "原收入列：本集团营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p157收入确认时间被标成业务分部及合同分解合计，金额正确不能抵消原栏目/维度错误",
+      "error_type": "revenue_timing_misclassified"
+    },
+    "source_pages": [
+      156,
+      157,
+      158
+    ]
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-17ef254a75e47584:Measurement:business_segment:在某一时段内确认:合同收入/合同分解合计:row:4",
+    "object_type": "Measurement",
+    "native": {
+      "name": "在某一时段内确认",
+      "value": "43,468.30",
+      "unit": "元",
+      "header": "合同收入/合同分解合计",
+      "qualifier": "原收入列：本集团营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p157收入确认时间被标成业务分部及合同分解合计，金额正确不能抵消原栏目/维度错误",
+      "error_type": "revenue_timing_misclassified"
+    },
+    "source_pages": [
+      156,
+      157,
+      158
+    ]
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-d8adc5d4c6b7d298:Segment:business_segment:在某一时段内确认:合同收入/合同分解合计:row:5",
+    "object_type": "Segment",
+    "native": {
+      "name": "在某一时段内确认",
+      "value": "43,468.30",
+      "unit": "元",
+      "header": "合同收入/合同分解合计",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p157收入确认时间被标成业务分部及合同分解合计，金额正确不能抵消原栏目/维度错误",
+      "error_type": "revenue_timing_misclassified"
+    },
+    "source_pages": [
+      156,
+      157,
+      158
+    ]
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-17ef254a75e47584:Measurement:business_segment:在某一时段内确认:合同收入/合同分解合计:row:5",
+    "object_type": "Measurement",
+    "native": {
+      "name": "在某一时段内确认",
+      "value": "43,468.30",
+      "unit": "元",
+      "header": "合同收入/合同分解合计",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p157收入确认时间被标成业务分部及合同分解合计，金额正确不能抵消原栏目/维度错误",
+      "error_type": "revenue_timing_misclassified"
+    },
+    "source_pages": [
+      156,
+      157,
+      158
+    ]
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-32b91f5b854cc99e:Segment:service:服务费:出售商品/提供劳务/本期发生额:row:0",
+    "object_type": "Segment",
+    "native": {
+      "name": "服务费",
+      "value": "2,352,476.19",
+      "unit": "元",
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": "交易对方：天津滨海高新区物业管",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": true,
+      "reason": "p182本期空、打印金额仅上期，且交易对手跨行污染；不得借列或造零",
+      "error_type": "prior_only_amount_and_counterparty"
+    },
+    "source_pages": [
+      182
+    ]
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-b00ceab6d8f5408c:Measurement:service:服务费:出售商品/提供劳务/本期发生额:row:0",
+    "object_type": "Measurement",
+    "native": {
+      "name": "服务费",
+      "value": "2,352,476.19",
+      "unit": "元",
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": "交易对方：天津滨海高新区物业管",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": true,
+      "reason": "p182本期空、打印金额仅上期，且交易对手跨行污染；不得借列或造零",
+      "error_type": "prior_only_amount_and_counterparty"
+    },
+    "source_pages": [
+      182
+    ]
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-32b91f5b854cc99e:Segment:service:销售房产:出售商品/提供劳务/本期发生额:row:1",
+    "object_type": "Segment",
+    "native": {
+      "name": "销售房产",
+      "value": "294,862,583.36",
+      "unit": "元",
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": "交易对方：理有限公司天津滨海高新区企业创",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": true,
+      "reason": "p182本期空、打印金额仅上期，且交易对手跨行污染；不得借列或造零",
+      "error_type": "prior_only_amount_and_counterparty"
+    },
+    "source_pages": [
+      182
+    ]
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-b00ceab6d8f5408c:Measurement:service:销售房产:出售商品/提供劳务/本期发生额:row:1",
+    "object_type": "Measurement",
+    "native": {
+      "name": "销售房产",
+      "value": "294,862,583.36",
+      "unit": "元",
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": "交易对方：理有限公司天津滨海高新区企业创",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": true,
+      "reason": "p182本期空、打印金额仅上期，且交易对手跨行污染；不得借列或造零",
+      "error_type": "prior_only_amount_and_counterparty"
+    },
+    "source_pages": [
+      182
+    ]
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-32b91f5b854cc99e:Segment:service:服务费:出售商品/提供劳务/本期发生额:row:2",
+    "object_type": "Segment",
+    "native": {
+      "name": "服务费",
+      "value": "44,232.08",
+      "unit": "元",
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": "交易对方：新服务有限公司滨海高新区开发建设有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": true,
+      "reason": "p182本期空、打印金额仅上期，且交易对手跨行污染；不得借列或造零",
+      "error_type": "prior_only_amount_and_counterparty"
+    },
+    "source_pages": [
+      182
+    ]
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-b00ceab6d8f5408c:Measurement:service:服务费:出售商品/提供劳务/本期发生额:row:2",
+    "object_type": "Measurement",
+    "native": {
+      "name": "服务费",
+      "value": "44,232.08",
+      "unit": "元",
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": "交易对方：新服务有限公司滨海高新区开发建设有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": true,
+      "reason": "p182本期空、打印金额仅上期，且交易对手跨行污染；不得借列或造零",
+      "error_type": "prior_only_amount_and_counterparty"
+    },
+    "source_pages": [
+      182
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-7b1e1f60e15fe1a2:activity:1",
+    "object_type": "Activity",
+    "native": {
+      "name": "远洋渔业捕捞、水产品",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p8捕捞和水产品销售两个方向被合成伪销售对象，不是具体原商品",
+      "error_type": "compound_pseudo_commodity"
+    },
+    "source_pages": [
+      8,
+      9
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-f10f873ef6ee88a7:Segment:business_segment:舟山环太海洋食品有限公司:控股参股公司/营业收入:row:5",
+    "object_type": "Segment",
+    "native": {
+      "name": "舟山环太海洋食品有限公司",
+      "value": "818,099,682.13",
+      "unit": "元",
+      "header": "控股参股公司/营业收入",
+      "qualifier": "子公司：舟山环太海洋食品有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": true,
+      "reason": "p18环太营业收入应422469539.59元；818099682.13属卡洛斯•阿尔博的孩子们有限公司，原主体配额错误",
+      "error_type": "subsidiary_amount_misattached"
+    },
+    "source_pages": [
+      18,
+      19
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-68e458fd823bb15c:Measurement:business_segment:舟山环太海洋食品有限公司:控股参股公司/营业收入:row:5",
+    "object_type": "Measurement",
+    "native": {
+      "name": "舟山环太海洋食品有限公司",
+      "value": "818,099,682.13",
+      "unit": "元",
+      "header": "控股参股公司/营业收入",
+      "qualifier": "子公司：舟山环太海洋食品有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": true,
+      "reason": "p18环太营业收入应422469539.59元；818099682.13属卡洛斯•阿尔博的孩子们有限公司，原主体配额错误",
+      "error_type": "subsidiary_amount_misattached"
+    },
+    "source_pages": [
+      18,
+      19
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-47d92ec950dabef1:Segment:product:金枪鱼销:合同收入/商品类型:row:5",
+    "object_type": "Segment",
+    "native": {
+      "name": "金枪鱼销",
+      "value": "796,979,841.53",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：远洋捕捞分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122跨行金枪鱼销售收入截断为金枪鱼销，商品身份不完整",
+      "error_type": "truncated_product_name"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:金枪鱼销:合同收入/商品类型:row:5",
+    "object_type": "Measurement",
+    "native": {
+      "name": "金枪鱼销",
+      "value": "796,979,841.53",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：远洋捕捞分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122跨行金枪鱼销售收入截断为金枪鱼销，商品身份不完整",
+      "error_type": "truncated_product_name"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-47d92ec950dabef1:Segment:product:金枪鱼销:合同收入/商品类型:row:6",
+    "object_type": "Segment",
+    "native": {
+      "name": "金枪鱼销",
+      "value": "796,979,841.53",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122跨行金枪鱼销售收入截断为金枪鱼销，商品身份不完整",
+      "error_type": "truncated_product_name"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:金枪鱼销:合同收入/商品类型:row:6",
+    "object_type": "Measurement",
+    "native": {
+      "name": "金枪鱼销",
+      "value": "796,979,841.53",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122跨行金枪鱼销售收入截断为金枪鱼销，商品身份不完整",
+      "error_type": "truncated_product_name"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-47d92ec950dabef1:Segment:product:按经营地:合同收入/商品类型:row:17",
+    "object_type": "Segment",
+    "native": {
+      "name": "按经营地",
+      "value": "950,763,559.03",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：远洋捕捞分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+      "error_type": "regional_header_as_product"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:按经营地:合同收入/商品类型:row:17",
+    "object_type": "Measurement",
+    "native": {
+      "name": "按经营地",
+      "value": "950,763,559.03",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：远洋捕捞分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+      "error_type": "regional_header_as_product"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-47d92ec950dabef1:Segment:product:按经营地:合同收入/商品类型:row:18",
+    "object_type": "Segment",
+    "native": {
+      "name": "按经营地",
+      "value": "1,054,611,208.73",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：食品加工分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+      "error_type": "regional_header_as_product"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:按经营地:合同收入/商品类型:row:18",
+    "object_type": "Measurement",
+    "native": {
+      "name": "按经营地",
+      "value": "1,054,611,208.73",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：食品加工分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+      "error_type": "regional_header_as_product"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-47d92ec950dabef1:Segment:product:按经营地:合同收入/商品类型:row:19",
+    "object_type": "Segment",
+    "native": {
+      "name": "按经营地",
+      "value": "318,671,971.02",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：渔货贸易分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+      "error_type": "regional_header_as_product"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:按经营地:合同收入/商品类型:row:19",
+    "object_type": "Measurement",
+    "native": {
+      "name": "按经营地",
+      "value": "318,671,971.02",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：渔货贸易分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+      "error_type": "regional_header_as_product"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-47d92ec950dabef1:Segment:product:按经营地:合同收入/商品类型:row:20",
+    "object_type": "Segment",
+    "native": {
+      "name": "按经营地",
+      "value": "6,765,806.04",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：海上运输分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+      "error_type": "regional_header_as_product"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:按经营地:合同收入/商品类型:row:20",
+    "object_type": "Measurement",
+    "native": {
+      "name": "按经营地",
+      "value": "6,765,806.04",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：海上运输分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+      "error_type": "regional_header_as_product"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-47d92ec950dabef1:Segment:product:按经营地:合同收入/商品类型:row:21",
+    "object_type": "Segment",
+    "native": {
+      "name": "按经营地",
+      "value": "2,330,812,544.82",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+      "error_type": "regional_header_as_product"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:按经营地:合同收入/商品类型:row:21",
+    "object_type": "Measurement",
+    "native": {
+      "name": "按经营地",
+      "value": "2,330,812,544.82",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+      "error_type": "regional_header_as_product"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-47d92ec950dabef1:Segment:product:国内:合同收入/商品类型:row:22",
+    "object_type": "Segment",
+    "native": {
+      "name": "国内",
+      "value": "927,559,806.67",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：远洋捕捞分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:国内:合同收入/商品类型:row:22",
+    "object_type": "Measurement",
+    "native": {
+      "name": "国内",
+      "value": "927,559,806.67",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：远洋捕捞分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-47d92ec950dabef1:Segment:product:国内:合同收入/商品类型:row:23",
+    "object_type": "Segment",
+    "native": {
+      "name": "国内",
+      "value": "76,206,629.65",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：食品加工分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:国内:合同收入/商品类型:row:23",
+    "object_type": "Measurement",
+    "native": {
+      "name": "国内",
+      "value": "76,206,629.65",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：食品加工分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-47d92ec950dabef1:Segment:product:国内:合同收入/商品类型:row:24",
+    "object_type": "Segment",
+    "native": {
+      "name": "国内",
+      "value": "23,054,591.66",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：海上运输分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": true,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:国内:合同收入/商品类型:row:24",
+    "object_type": "Measurement",
+    "native": {
+      "name": "国内",
+      "value": "23,054,591.66",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：海上运输分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": true,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-47d92ec950dabef1:Segment:product:国内:合同收入/商品类型:row:25",
+    "object_type": "Segment",
+    "native": {
+      "name": "国内",
+      "value": "-1,028,359,860.15",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": true,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:国内:合同收入/商品类型:row:25",
+    "object_type": "Measurement",
+    "native": {
+      "name": "国内",
+      "value": "-1,028,359,860.15",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": true,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-47d92ec950dabef1:Segment:product:国外:合同收入/商品类型:row:26",
+    "object_type": "Segment",
+    "native": {
+      "name": "国外",
+      "value": "23,203,752.36",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：远洋捕捞分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:国外:合同收入/商品类型:row:26",
+    "object_type": "Measurement",
+    "native": {
+      "name": "国外",
+      "value": "23,203,752.36",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：远洋捕捞分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-47d92ec950dabef1:Segment:product:国外:合同收入/商品类型:row:27",
+    "object_type": "Segment",
+    "native": {
+      "name": "国外",
+      "value": "978,404,579.08",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：食品加工分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:国外:合同收入/商品类型:row:27",
+    "object_type": "Measurement",
+    "native": {
+      "name": "国外",
+      "value": "978,404,579.08",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：食品加工分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-47d92ec950dabef1:Segment:product:国外:合同收入/商品类型:row:28",
+    "object_type": "Segment",
+    "native": {
+      "name": "国外",
+      "value": "294,078,547.19",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：渔货贸易分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:国外:合同收入/商品类型:row:28",
+    "object_type": "Measurement",
+    "native": {
+      "name": "国外",
+      "value": "294,078,547.19",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：渔货贸易分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-47d92ec950dabef1:Segment:product:国外:合同收入/商品类型:row:29",
+    "object_type": "Segment",
+    "native": {
+      "name": "国外",
+      "value": "6,765,806.04",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：海上运输分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:国外:合同收入/商品类型:row:29",
+    "object_type": "Measurement",
+    "native": {
+      "name": "国外",
+      "value": "6,765,806.04",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：海上运输分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-47d92ec950dabef1:Segment:product:国外:合同收入/商品类型:row:30",
+    "object_type": "Segment",
+    "native": {
+      "name": "国外",
+      "value": "1,302,452,684.67",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:国外:合同收入/商品类型:row:30",
+    "object_type": "Measurement",
+    "native": {
+      "name": "国外",
+      "value": "1,302,452,684.67",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-086747acd98a25b1:Segment:product:金枪鱼销:合同收入/商品类型:row:5",
+    "object_type": "Segment",
+    "native": {
+      "name": "金枪鱼销",
+      "value": "796,979,841.53",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：远洋捕捞分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122跨行金枪鱼销售收入截断为金枪鱼销，商品身份不完整",
+      "error_type": "truncated_product_name"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-086747acd98a25b1:Segment:product:金枪鱼销:合同收入/商品类型:row:6",
+    "object_type": "Segment",
+    "native": {
+      "name": "金枪鱼销",
+      "value": "796,979,841.53",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122跨行金枪鱼销售收入截断为金枪鱼销，商品身份不完整",
+      "error_type": "truncated_product_name"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-086747acd98a25b1:Segment:product:按经营地:合同收入/商品类型:row:17",
+    "object_type": "Segment",
+    "native": {
+      "name": "按经营地",
+      "value": "950,763,559.03",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：远洋捕捞分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+      "error_type": "regional_header_as_product"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-086747acd98a25b1:Segment:product:按经营地:合同收入/商品类型:row:18",
+    "object_type": "Segment",
+    "native": {
+      "name": "按经营地",
+      "value": "1,054,611,208.73",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：食品加工分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+      "error_type": "regional_header_as_product"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-086747acd98a25b1:Segment:product:按经营地:合同收入/商品类型:row:19",
+    "object_type": "Segment",
+    "native": {
+      "name": "按经营地",
+      "value": "318,671,971.02",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：渔货贸易分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+      "error_type": "regional_header_as_product"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-086747acd98a25b1:Segment:product:按经营地:合同收入/商品类型:row:20",
+    "object_type": "Segment",
+    "native": {
+      "name": "按经营地",
+      "value": "6,765,806.04",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：海上运输分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+      "error_type": "regional_header_as_product"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-086747acd98a25b1:Segment:product:按经营地:合同收入/商品类型:row:21",
+    "object_type": "Segment",
+    "native": {
+      "name": "按经营地",
+      "value": "2,330,812,544.82",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+      "error_type": "regional_header_as_product"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-086747acd98a25b1:Segment:product:国内:合同收入/商品类型:row:22",
+    "object_type": "Segment",
+    "native": {
+      "name": "国内",
+      "value": "927,559,806.67",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：远洋捕捞分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-086747acd98a25b1:Segment:product:国内:合同收入/商品类型:row:23",
+    "object_type": "Segment",
+    "native": {
+      "name": "国内",
+      "value": "76,206,629.65",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：食品加工分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-086747acd98a25b1:Segment:product:国内:合同收入/商品类型:row:24",
+    "object_type": "Segment",
+    "native": {
+      "name": "国内",
+      "value": "23,054,591.66",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：海上运输分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": true,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-086747acd98a25b1:Segment:product:国内:合同收入/商品类型:row:25",
+    "object_type": "Segment",
+    "native": {
+      "name": "国内",
+      "value": "-1,028,359,860.15",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": true,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-086747acd98a25b1:Segment:product:国外:合同收入/商品类型:row:26",
+    "object_type": "Segment",
+    "native": {
+      "name": "国外",
+      "value": "23,203,752.36",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：远洋捕捞分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-086747acd98a25b1:Segment:product:国外:合同收入/商品类型:row:27",
+    "object_type": "Segment",
+    "native": {
+      "name": "国外",
+      "value": "978,404,579.08",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：食品加工分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-086747acd98a25b1:Segment:product:国外:合同收入/商品类型:row:28",
+    "object_type": "Segment",
+    "native": {
+      "name": "国外",
+      "value": "294,078,547.19",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：渔货贸易分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-086747acd98a25b1:Segment:product:国外:合同收入/商品类型:row:29",
+    "object_type": "Segment",
+    "native": {
+      "name": "国外",
+      "value": "6,765,806.04",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：海上运输分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-086747acd98a25b1:Segment:product:国外:合同收入/商品类型:row:30",
+    "object_type": "Segment",
+    "native": {
+      "name": "国外",
+      "value": "1,302,452,684.67",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": false,
+      "critical_numeric_error": false,
+      "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+      "error_type": "regional_dimension_and_columns"
+    },
+    "source_pages": [
+      122
+    ]
+  }
+]

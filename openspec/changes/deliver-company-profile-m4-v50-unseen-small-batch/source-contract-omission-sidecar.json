@@ -1,0 +1,120 @@
+{
+  "discovered_after_first_formal_execution": true,
+  "recorded_at": "2026-10-14T04:37:27.426074+00:00",
+  "original_contract_sha256": "3d71176590e9c4219c396ccb5d0ab8ede7ffc624046545e25f48a4ddc87ab3ba",
+  "original_positive_denominator": 160,
+  "original_negative_denominator": 31,
+  "omitted_source_supported_conditions": [
+    {
+      "instrument_id": "600082.SH",
+      "page": 23,
+      "name": "海泰绿色产业基地",
+      "header": "房地产销售和结转/结转收入金额",
+      "value": "0",
+      "unit": "万元",
+      "reported_period": "2025-12-31",
+      "subject_scope": "consolidated_group",
+      "current_printed_zero": true
+    },
+    {
+      "instrument_id": "600082.SH",
+      "page": 23,
+      "name": "海泰创新基地",
+      "header": "房地产销售和结转/结转收入金额",
+      "value": "0",
+      "unit": "万元",
+      "reported_period": "2025-12-31",
+      "subject_scope": "consolidated_group",
+      "current_printed_zero": true
+    },
+    {
+      "instrument_id": "600082.SH",
+      "page": 23,
+      "name": "BPO基地",
+      "header": "房地产销售和结转/结转收入金额",
+      "value": "0",
+      "unit": "万元",
+      "reported_period": "2025-12-31",
+      "subject_scope": "consolidated_group",
+      "current_printed_zero": true
+    },
+    {
+      "instrument_id": "600082.SH",
+      "page": 23,
+      "name": "海泰精工国际",
+      "header": "房地产销售和结转/结转收入金额",
+      "value": "0",
+      "unit": "万元",
+      "reported_period": "2025-12-31",
+      "subject_scope": "consolidated_group",
+      "current_printed_zero": true
+    },
+    {
+      "instrument_id": "600082.SH",
+      "page": 23,
+      "name": "海泰创意科技园",
+      "header": "房地产销售和结转/结转收入金额",
+      "value": "0",
+      "unit": "万元",
+      "reported_period": "2025-12-31",
+      "subject_scope": "consolidated_group",
+      "current_printed_zero": true
+    },
+    {
+      "instrument_id": "600082.SH",
+      "page": 24,
+      "name": "海泰绿色产业基地",
+      "header": "报告期内房地产出租情况/出租房地产的租金收入",
+      "value": "464.97",
+      "unit": "万元",
+      "reported_period": "2025-12-31",
+      "subject_scope": "consolidated_group"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "page": 24,
+      "name": "BPO基地",
+      "header": "报告期内房地产出租情况/出租房地产的租金收入",
+      "value": "1850.99",
+      "unit": "万元",
+      "reported_period": "2025-12-31",
+      "subject_scope": "consolidated_group"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "page": 24,
+      "name": "海泰国际公寓",
+      "header": "报告期内房地产出租情况/出租房地产的租金收入",
+      "value": "254.24",
+      "unit": "万元",
+      "reported_period": "2025-12-31",
+      "subject_scope": "consolidated_group"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "page": 24,
+      "name": "蓝海科技园",
+      "header": "报告期内房地产出租情况/出租房地产的租金收入",
+      "value": "406.49",
+      "unit": "万元",
+      "reported_period": "2025-12-31",
+      "subject_scope": "consolidated_group"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "page": 24,
+      "name": "海泰精工国际",
+      "header": "报告期内房地产出租情况/出租房地产的租金收入",
+      "value": "29.48",
+      "unit": "万元",
+      "reported_period": "2025-12-31",
+      "subject_scope": "consolidated_group"
+    }
+  ],
+  "omitted_condition_count": 10,
+  "original_contract_and_first_score_unchanged": true,
+  "not_added_to_recall": true,
+  "requires_a_role_contract_ruling": true,
+  "recommended_successor_contract": "保留原160逐项条件，A角裁决后另冻十项原收入格并建立对应；不把首次66/160重计成后继口径，也不以实际输出反推冻结条件",
+  "business_output_observation": "五项项目结转0和五项项目租金均未独立输出；实际合同外房地产结转合计0准确，但合计不能替代五个项目条件。经营表零结转与财务报表非零收入按原表差异分别保留，不强行勾稽。"
+}

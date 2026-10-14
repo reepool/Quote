@@ -1,0 +1,22 @@
+import json
+from pathlib import Path
+from quote_v50_new_matching import match,action_match
+C=Path('openspec/changes/deliver-company-profile-m4-v50-unseen-small-batch');read=lambda p:json.loads(Path(p).read_text());s=read(C/'source-scope.json');out={};unresolved=[]
+for i in s['versions']:
+ rs=read('/tmp/v50newraw_'+i+'.json');roles=[v for v in s['native_roles'] if v['instrument_id']==i];facts={}
+ for r in rs:
+  kind=r['object_type'];d={'accurate':False,'critical_numeric_error':False}
+  if kind in ['Segment','Measurement']:
+   matched=[k for k,v in enumerate(s['source_rows'][i]) if match(r,v)]
+   if matched:d.update(accurate=True,reason='本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验',recall_row_index=matched[0])
+  elif kind in ['Activity','Relationship']:
+   matched=[k for k,v in enumerate(roles) if action_match(r,v)]
+   if matched:d.update(accurate=True,reason='具名对象、独立方向、原主体和当期来源实际成立',recall_role_index=matched[0])
+  if not d['accurate']:unresolved.append({'instrument_id':i,'record_id':r['record_id'],'kind':kind,'native':r['source_native'],'dimension':r.get('dimension',r.get('segment_dimension'))})
+  facts[r['record_id']]=d
+ out[i]={'facts':facts,'answers':{}}
+Path('/tmp/v50new_predecisions.json').write_text(json.dumps(out,ensure_ascii=False,indent=2));Path('/tmp/v50new_unresolved.json').write_text(json.dumps(unresolved,ensure_ascii=False,indent=2))
+for i in s['versions']:print(i,len(out[i]['facts']),sum(x['instrument_id']==i for x in unresolved))
+for x in unresolved:
+ if x['kind']=='BusinessOverview':continue
+ print(x['instrument_id'],x['kind'],x['record_id'],x['dimension'],x['native'])

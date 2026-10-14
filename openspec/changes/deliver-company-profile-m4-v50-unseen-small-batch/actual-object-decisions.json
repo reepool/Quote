@@ -1,0 +1,1583 @@
+{
+  "600082.SH": {
+    "facts": {
+      "owned:core-ev-28d19c45efe79bd7:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方layout连续匹配，保留本期空和上期列的原证据，不等同肯定本期金额"
+      },
+      "owned:core-ev-83c015b15ff3f1c6:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-338b40e2e7958bc1:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-a203848f1b9f9eeb:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p25逐格读序：咨询服务、增资1亿元、100%并表、完成工商变更均原表；表头和换行重排没有改变原格"
+      },
+      "owned:core-ev-2e46e6c51217fc05:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-3a99a86294280a2c:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-5670b86a92b564df:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-20e6458ebe196001:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-68e9d0c1ffcab91a:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-3f14e9ffd2a8b230:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-6f360d524deff970:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p168小节标题和不适用分别换行；拼接仍准确"
+      },
+      "owned:core-ev-900c13c713186134:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-f1c1fbc615d8e782:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-25f5fcccc81aa1b9:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p172逐个子公司原名、注册资本、持股和业务性质匹配；取得方式/直接间接表头读序差异未改变关系，p173不适用限定保留"
+      },
+      "owned:core-ev-a8e8ae5418ecc62c:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-5f676beaa2c9dc9c:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-9b8de6cf7a3a50e9:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-ccc937eaa7eb9d32:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "具名对象、独立方向、原主体和当期来源实际成立；独立实际原页补证海泰p16本期房产销售/开创p12非零产销，同商品多副本仅唯一召回",
+        "recall_role_index": 7,
+        "independent_source_pages": [
+          16
+        ]
+      },
+      "owned:core-ev-f19cc3f231c4118f:Segment:business_type:商品销售业务:本期营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 10
+      },
+      "owned:core-ev-1bdb31a21f19604c:Measurement:business_type:商品销售业务:本期营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 10
+      },
+      "owned:core-ev-199fa847ee530e1e:Segment:business_segment:天津海泰创意科技园投资有限公司:控股参股公司/营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 11
+      },
+      "owned:core-ev-98643126a695400a:Measurement:business_segment:天津海泰创意科技园投资有限公司:控股参股公司/营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 11
+      },
+      "owned:core-ev-199fa847ee530e1e:Segment:business_segment:天津百竹科技产业发展有限公司:控股参股公司/营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 12
+      },
+      "owned:core-ev-98643126a695400a:Measurement:business_segment:天津百竹科技产业发展有限公司:控股参股公司/营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 12
+      },
+      "owned:core-ev-e96c7361ce521e7b:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 14
+      },
+      "owned:core-ev-15d16cfba7167134:Measurement:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 14
+      },
+      "owned:core-ev-c06f12c0f5a6a4af:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 14
+      },
+      "owned:core-ev-c06f12c0f5a6a4af:Segment:business_type:合计:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 15
+      },
+      "owned:core-ev-2dc811a16cf7cfbb:Measurement:business_type:合计:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 15
+      },
+      "owned:core-ev-c06f12c0f5a6a4af:Segment:service:客户合同产生的收入:营业收入明细/客户合同收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 16
+      },
+      "owned:core-ev-2dc811a16cf7cfbb:Measurement:service:客户合同产生的收入:营业收入明细/客户合同收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 16
+      },
+      "owned:core-ev-d8adc5d4c6b7d298:Segment:business_segment:合计:合同收入/合同分解合计:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 22
+      },
+      "owned:core-ev-17ef254a75e47584:Measurement:business_segment:合计:合同收入/合同分解合计:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 22
+      },
+      "owned:core-ev-d8adc5d4c6b7d298:Segment:business_segment:合计:合同收入/合同分解合计:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 22
+      },
+      "owned:core-ev-17ef254a75e47584:Measurement:business_segment:合计:合同收入/合同分解合计:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 22
+      },
+      "owned:core-ev-d8adc5d4c6b7d298:Segment:business_segment:在某一时点确认:合同收入/合同分解合计:row:2": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p157收入确认时间被标成业务分部及合同分解合计，金额正确不能抵消原栏目/维度错误",
+        "error_type": "revenue_timing_misclassified"
+      },
+      "owned:core-ev-17ef254a75e47584:Measurement:business_segment:在某一时点确认:合同收入/合同分解合计:row:2": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p157收入确认时间被标成业务分部及合同分解合计，金额正确不能抵消原栏目/维度错误",
+        "error_type": "revenue_timing_misclassified"
+      },
+      "owned:core-ev-d8adc5d4c6b7d298:Segment:business_segment:在某一时点确认:合同收入/合同分解合计:row:3": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p157收入确认时间被标成业务分部及合同分解合计，金额正确不能抵消原栏目/维度错误",
+        "error_type": "revenue_timing_misclassified"
+      },
+      "owned:core-ev-17ef254a75e47584:Measurement:business_segment:在某一时点确认:合同收入/合同分解合计:row:3": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p157收入确认时间被标成业务分部及合同分解合计，金额正确不能抵消原栏目/维度错误",
+        "error_type": "revenue_timing_misclassified"
+      },
+      "owned:core-ev-d8adc5d4c6b7d298:Segment:business_segment:在某一时段内确认:合同收入/合同分解合计:row:4": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p157收入确认时间被标成业务分部及合同分解合计，金额正确不能抵消原栏目/维度错误",
+        "error_type": "revenue_timing_misclassified"
+      },
+      "owned:core-ev-17ef254a75e47584:Measurement:business_segment:在某一时段内确认:合同收入/合同分解合计:row:4": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p157收入确认时间被标成业务分部及合同分解合计，金额正确不能抵消原栏目/维度错误",
+        "error_type": "revenue_timing_misclassified"
+      },
+      "owned:core-ev-d8adc5d4c6b7d298:Segment:business_segment:在某一时段内确认:合同收入/合同分解合计:row:5": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p157收入确认时间被标成业务分部及合同分解合计，金额正确不能抵消原栏目/维度错误",
+        "error_type": "revenue_timing_misclassified"
+      },
+      "owned:core-ev-17ef254a75e47584:Measurement:business_segment:在某一时段内确认:合同收入/合同分解合计:row:5": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p157收入确认时间被标成业务分部及合同分解合计，金额正确不能抵消原栏目/维度错误",
+        "error_type": "revenue_timing_misclassified"
+      },
+      "owned:core-ev-bc8cf18ac2dac77e:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 26
+      },
+      "owned:core-ev-90695eead934d5cd:Measurement:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 26
+      },
+      "owned:core-ev-f4c92b01d0ad63f7:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 26
+      },
+      "owned:core-ev-f4c92b01d0ad63f7:Segment:business_type:合计:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 27
+      },
+      "owned:core-ev-7689b100a5b41e92:Measurement:business_type:合计:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 27
+      },
+      "owned:core-ev-4682a4ce10b37eb2:Segment:business_type:房地产结转收入合计:房地产销售和结转/本期合计:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外p23五个项目与合计打印0，真实房地产本期结转合计0万元，不反推销售动作"
+      },
+      "owned:core-ev-15b10db257929e6c:Measurement:business_type:房地产结转收入合计:房地产销售和结转/本期合计:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外p23五个项目与合计打印0，真实房地产本期结转合计0万元，不反推销售动作"
+      },
+      "owned:core-ev-32b91f5b854cc99e:Segment:service:服务费:出售商品/提供劳务/本期发生额:row:0": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p182本期空、打印金额仅上期，且交易对手跨行污染；不得借列或造零",
+        "error_type": "prior_only_amount_and_counterparty"
+      },
+      "owned:core-ev-b00ceab6d8f5408c:Measurement:service:服务费:出售商品/提供劳务/本期发生额:row:0": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p182本期空、打印金额仅上期，且交易对手跨行污染；不得借列或造零",
+        "error_type": "prior_only_amount_and_counterparty"
+      },
+      "owned:core-ev-32b91f5b854cc99e:Segment:service:销售房产:出售商品/提供劳务/本期发生额:row:1": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p182本期空、打印金额仅上期，且交易对手跨行污染；不得借列或造零",
+        "error_type": "prior_only_amount_and_counterparty"
+      },
+      "owned:core-ev-b00ceab6d8f5408c:Measurement:service:销售房产:出售商品/提供劳务/本期发生额:row:1": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p182本期空、打印金额仅上期，且交易对手跨行污染；不得借列或造零",
+        "error_type": "prior_only_amount_and_counterparty"
+      },
+      "owned:core-ev-32b91f5b854cc99e:Segment:service:服务费:出售商品/提供劳务/本期发生额:row:2": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p182本期空、打印金额仅上期，且交易对手跨行污染；不得借列或造零",
+        "error_type": "prior_only_amount_and_counterparty"
+      },
+      "owned:core-ev-b00ceab6d8f5408c:Measurement:service:服务费:出售商品/提供劳务/本期发生额:row:2": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p182本期空、打印金额仅上期，且交易对手跨行污染；不得借列或造零",
+        "error_type": "prior_only_amount_and_counterparty"
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐内容核实主营产业链、原子公司和控制/退出限定完整，实际原句保留",
+        "numeric_note": "肯定摘要未陈述错配金额；原quote保留原表本期/上期，不把原证据引用等同错误数字断言"
+      },
+      "products_services": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "海泰缺政策咨询、资源对接和用工服务",
+        "numeric_note": "肯定摘要未陈述错配金额；原quote保留原表本期/上期，不把原证据引用等同错误数字断言"
+      },
+      "revenue_model": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "海泰收入正文肯定栏目中的原期错交易并误分确认时间，未保持本期空边界",
+        "numeric_note": "肯定摘要未陈述错配金额；原quote保留原表本期/上期，不把原证据引用等同错误数字断言"
+      }
+    }
+  },
+  "600097.SH": {
+    "facts": {
+      "owned:core-ev-485075c062f91353:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-7b1e1f60e15fe1a2:activity:1": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p8捕捞和水产品销售两个方向被合成伪销售对象，不是具体原商品",
+        "error_type": "compound_pseudo_commodity"
+      },
+      "owned:core-ev-3684f7a3b4727167:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方layout连续匹配，保留本期空和上期列的原证据，不等同肯定本期金额"
+      },
+      "owned:core-ev-49b24f6377e30e79:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-aa451f12e96ebef7:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-ce8458d069cd2453:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p17标题编号1、被去除，原不适用未改变"
+      },
+      "owned:core-ev-7d0468c4ae76a315:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-6f7b6b2007a81e61:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-4c3f79b46e7acb78:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-a6d308176ebd1714:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p132经营租赁2129586.82及可变租赁相同金额原列匹配，表头换行未改变"
+      },
+      "owned:core-ev-6e873c340637a054:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-2ab885e575872aeb:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-18653cabc6f0b0d1:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "p133–134逐子公司原名、资本、业务和持股匹配，取得方式/直接间接表头读序差异；亚太/康隆51%合并子公司保留"
+      },
+      "owned:core-ev-4e61cc75fe63790e:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-43ee1647d536a215:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-561e892ae41183a1:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立官方原页文字连续匹配"
+      },
+      "owned:core-ev-0b34dc47442cb7a5:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "具名对象、独立方向、原主体和当期来源实际成立；独立实际原页补证海泰p16本期房产销售/开创p12非零产销，同商品多副本仅唯一召回",
+        "recall_role_index": 4,
+        "independent_source_pages": [
+          12
+        ]
+      },
+      "owned:core-ev-0b34dc47442cb7a5:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "具名对象、独立方向、原主体和当期来源实际成立；独立实际原页补证海泰p16本期房产销售/开创p12非零产销，同商品多副本仅唯一召回",
+        "recall_role_index": 8,
+        "independent_source_pages": [
+          12
+        ]
+      },
+      "owned:core-ev-0b34dc47442cb7a5:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "具名对象、独立方向、原主体和当期来源实际成立；独立实际原页补证海泰p16本期房产销售/开创p12非零产销，同商品多副本仅唯一召回",
+        "recall_role_index": 0,
+        "independent_source_pages": [
+          12
+        ]
+      },
+      "owned:core-ev-0b34dc47442cb7a5:commodity:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "具名对象、独立方向、原主体和当期来源实际成立；独立实际原页补证海泰p16本期房产销售/开创p12非零产销，同商品多副本仅唯一召回",
+        "recall_role_index": 4,
+        "independent_source_pages": [
+          12
+        ]
+      },
+      "owned:core-ev-0b34dc47442cb7a5:commodity:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "具名对象、独立方向、原主体和当期来源实际成立；独立实际原页补证海泰p16本期房产销售/开创p12非零产销，同商品多副本仅唯一召回",
+        "recall_role_index": 7,
+        "independent_source_pages": [
+          12
+        ]
+      },
+      "owned:core-ev-0b34dc47442cb7a5:commodity:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "具名对象、独立方向、原主体和当期来源实际成立；独立实际原页补证海泰p16本期房产销售/开创p12非零产销，同商品多副本仅唯一召回",
+        "recall_role_index": 8,
+        "independent_source_pages": [
+          12
+        ]
+      },
+      "owned:core-ev-0b34dc47442cb7a5:commodity:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "具名对象、独立方向、原主体和当期来源实际成立；独立实际原页补证海泰p16本期房产销售/开创p12非零产销，同商品多副本仅唯一召回",
+        "recall_role_index": 0,
+        "independent_source_pages": [
+          12
+        ]
+      },
+      "owned:core-ev-0b34dc47442cb7a5:commodity:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "具名对象、独立方向、原主体和当期来源实际成立；独立实际原页补证海泰p16本期房产销售/开创p12非零产销，同商品多副本仅唯一召回",
+        "recall_role_index": 4,
+        "independent_source_pages": [
+          12
+        ]
+      },
+      "owned:core-ev-0b34dc47442cb7a5:commodity:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "具名对象、独立方向、原主体和当期来源实际成立；独立实际原页补证海泰p16本期房产销售/开创p12非零产销，同商品多副本仅唯一召回",
+        "recall_role_index": 7,
+        "independent_source_pages": [
+          12
+        ]
+      },
+      "owned:core-ev-0b34dc47442cb7a5:commodity:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "具名对象、独立方向、原主体和当期来源实际成立；独立实际原页补证海泰p16本期房产销售/开创p12非零产销，同商品多副本仅唯一召回",
+        "recall_role_index": 8,
+        "independent_source_pages": [
+          12
+        ]
+      },
+      "owned:core-ev-1ff3a256d2f50e4c:segment:industry:海洋捕捞:table:主营业务收入:row:24": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 0
+      },
+      "owned:core-ev-8a9dbf96f5f229d5:revenue:industry:海洋捕捞:table:主营业务收入:row:24": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 0
+      },
+      "owned:core-ev-1ff3a256d2f50e4c:segment:industry:食品加工:table:主营业务收入:row:25": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 1
+      },
+      "owned:core-ev-8a9dbf96f5f229d5:revenue:industry:食品加工:table:主营业务收入:row:25": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 1
+      },
+      "owned:core-ev-1ff3a256d2f50e4c:segment:industry:渔货贸易:table:主营业务收入:row:26": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 2
+      },
+      "owned:core-ev-8a9dbf96f5f229d5:revenue:industry:渔货贸易:table:主营业务收入:row:26": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 2
+      },
+      "owned:core-ev-1ff3a256d2f50e4c:segment:industry:海上运输:table:主营业务收入:row:27": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 3
+      },
+      "owned:core-ev-8a9dbf96f5f229d5:revenue:industry:海上运输:table:主营业务收入:row:27": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 3
+      },
+      "owned:core-ev-1ff3a256d2f50e4c:segment:product:金枪鱼销售:table:主营业务收入:row:39": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 5
+      },
+      "owned:core-ev-8a9dbf96f5f229d5:revenue:product:金枪鱼销售:table:主营业务收入:row:39": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 5
+      },
+      "owned:core-ev-1ff3a256d2f50e4c:segment:product:零星鱼种销售:table:主营业务收入:row:40": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 6
+      },
+      "owned:core-ev-8a9dbf96f5f229d5:revenue:product:零星鱼种销售:table:主营业务收入:row:40": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 6
+      },
+      "owned:core-ev-1ff3a256d2f50e4c:segment:product:罐头食品销售:table:主营业务收入:row:41": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 7
+      },
+      "owned:core-ev-8a9dbf96f5f229d5:revenue:product:罐头食品销售:table:主营业务收入:row:41": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 7
+      },
+      "owned:core-ev-1ff3a256d2f50e4c:segment:product:鱼柳加工销售:table:主营业务收入:row:42": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 8
+      },
+      "owned:core-ev-8a9dbf96f5f229d5:revenue:product:鱼柳加工销售:table:主营业务收入:row:42": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 8
+      },
+      "owned:core-ev-1ff3a256d2f50e4c:segment:product:渔货贸易:table:主营业务收入:row:43": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 9
+      },
+      "owned:core-ev-8a9dbf96f5f229d5:revenue:product:渔货贸易:table:主营业务收入:row:43": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 9
+      },
+      "owned:core-ev-1ff3a256d2f50e4c:segment:product:海上运输:table:主营业务收入:row:44": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 10
+      },
+      "owned:core-ev-8a9dbf96f5f229d5:revenue:product:海上运输:table:主营业务收入:row:44": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 10
+      },
+      "owned:core-ev-1ff3a256d2f50e4c:segment:region:国内:table:主营业务收入:row:56": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 12
+      },
+      "owned:core-ev-8a9dbf96f5f229d5:revenue:region:国内:table:主营业务收入:row:56": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 12
+      },
+      "owned:core-ev-1ff3a256d2f50e4c:segment:region:国外:table:主营业务收入:row:57": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 13
+      },
+      "owned:core-ev-8a9dbf96f5f229d5:revenue:region:国外:table:主营业务收入:row:57": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 13
+      },
+      "owned:core-ev-1ff3a256d2f50e4c:segment:sales_mode:直销:table:主营业务收入:row:70": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 15
+      },
+      "owned:core-ev-8a9dbf96f5f229d5:revenue:sales_mode:直销:table:主营业务收入:row:70": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 15
+      },
+      "owned:core-ev-358e73b28dd9f6cf:Segment:business_type:渔货贸易:本期营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 17
+      },
+      "owned:core-ev-9a8ddc32dbfa4410:Measurement:business_type:渔货贸易:本期营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 17
+      },
+      "owned:core-ev-f10f873ef6ee88a7:Segment:business_segment:上海开创远洋渔业有限公司:控股参股公司/营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 18
+      },
+      "owned:core-ev-68e458fd823bb15c:Measurement:business_segment:上海开创远洋渔业有限公司:控股参股公司/营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 18
+      },
+      "owned:core-ev-f10f873ef6ee88a7:Segment:business_segment:泛太食品（马绍尔群岛）有限公司:控股参股公司/营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 19
+      },
+      "owned:core-ev-68e458fd823bb15c:Measurement:business_segment:泛太食品（马绍尔群岛）有限公司:控股参股公司/营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 19
+      },
+      "owned:core-ev-f10f873ef6ee88a7:Segment:business_segment:泛太渔业（马绍尔群岛）有限公司:控股参股公司/营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 20
+      },
+      "owned:core-ev-68e458fd823bb15c:Measurement:business_segment:泛太渔业（马绍尔群岛）有限公司:控股参股公司/营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 20
+      },
+      "owned:core-ev-f10f873ef6ee88a7:Segment:business_segment:文森特（密克罗尼西亚）渔业有限公司:控股参股公司/营业收入:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 21
+      },
+      "owned:core-ev-68e458fd823bb15c:Measurement:business_segment:文森特（密克罗尼西亚）渔业有限公司:控股参股公司/营业收入:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 21
+      },
+      "owned:core-ev-f10f873ef6ee88a7:Segment:business_segment:亚太金枪鱼私人有限公司:控股参股公司/营业收入:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 22
+      },
+      "owned:core-ev-68e458fd823bb15c:Measurement:business_segment:亚太金枪鱼私人有限公司:控股参股公司/营业收入:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 22
+      },
+      "owned:core-ev-f10f873ef6ee88a7:Segment:business_segment:舟山环太海洋食品有限公司:控股参股公司/营业收入:row:5": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p18环太营业收入应422469539.59元；818099682.13属卡洛斯•阿尔博的孩子们有限公司，原主体配额错误",
+        "error_type": "subsidiary_amount_misattached"
+      },
+      "owned:core-ev-68e458fd823bb15c:Measurement:business_segment:舟山环太海洋食品有限公司:控股参股公司/营业收入:row:5": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p18环太营业收入应422469539.59元；818099682.13属卡洛斯•阿尔博的孩子们有限公司，原主体配额错误",
+        "error_type": "subsidiary_amount_misattached"
+      },
+      "owned:core-ev-f10f873ef6ee88a7:Segment:business_segment:康隆（香港）航运有限公司:控股参股公司/营业收入:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 25
+      },
+      "owned:core-ev-68e458fd823bb15c:Measurement:business_segment:康隆（香港）航运有限公司:控股参股公司/营业收入:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 25
+      },
+      "owned:core-ev-f10f873ef6ee88a7:Segment:business_segment:法国小溪海鲜公司:控股参股公司/营业收入:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 26
+      },
+      "owned:core-ev-68e458fd823bb15c:Measurement:business_segment:法国小溪海鲜公司:控股参股公司/营业收入:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 26
+      },
+      "owned:core-ev-f10f873ef6ee88a7:Segment:business_segment:艾斯特拉斯贸易有限公司:控股参股公司/营业收入:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 27
+      },
+      "owned:core-ev-68e458fd823bb15c:Measurement:business_segment:艾斯特拉斯贸易有限公司:控股参股公司/营业收入:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 27
+      },
+      "owned:core-ev-1cbfc6e2684d9df9:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 28
+      },
+      "owned:core-ev-15b1c527829b2e09:Measurement:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 28
+      },
+      "owned:core-ev-1cbfc6e2684d9df9:Segment:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 29
+      },
+      "owned:core-ev-15b1c527829b2e09:Measurement:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 29
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:商品类型:合同收入/商品类型:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 31
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:商品类型:合同收入/商品类型:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 31
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:商品类型:合同收入/商品类型:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 32
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:商品类型:合同收入/商品类型:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 32
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:商品类型:合同收入/商品类型:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 33
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:商品类型:合同收入/商品类型:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 33
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:商品类型:合同收入/商品类型:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 34
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:商品类型:合同收入/商品类型:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 34
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:商品类型:合同收入/商品类型:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 35
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:商品类型:合同收入/商品类型:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 35
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:金枪鱼销:合同收入/商品类型:row:5": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122跨行金枪鱼销售收入截断为金枪鱼销，商品身份不完整",
+        "error_type": "truncated_product_name"
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:金枪鱼销:合同收入/商品类型:row:5": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122跨行金枪鱼销售收入截断为金枪鱼销，商品身份不完整",
+        "error_type": "truncated_product_name"
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:金枪鱼销:合同收入/商品类型:row:6": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122跨行金枪鱼销售收入截断为金枪鱼销，商品身份不完整",
+        "error_type": "truncated_product_name"
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:金枪鱼销:合同收入/商品类型:row:6": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122跨行金枪鱼销售收入截断为金枪鱼销，商品身份不完整",
+        "error_type": "truncated_product_name"
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:其他鱼种:合同收入/商品类型:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 48
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:其他鱼种:合同收入/商品类型:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 48
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:其他鱼种:合同收入/商品类型:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 49
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:其他鱼种:合同收入/商品类型:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 49
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:罐头销售:合同收入/商品类型:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 50
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:罐头销售:合同收入/商品类型:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 50
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:罐头销售:合同收入/商品类型:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 51
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:罐头销售:合同收入/商品类型:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 51
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:鱼柳加工:合同收入/商品类型:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 52
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:鱼柳加工:合同收入/商品类型:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 52
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:鱼柳加工:合同收入/商品类型:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 53
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:鱼柳加工:合同收入/商品类型:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 53
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:渔货贸易:合同收入/商品类型:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 54
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:渔货贸易:合同收入/商品类型:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 54
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:渔货贸易:合同收入/商品类型:row:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 55
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:渔货贸易:合同收入/商品类型:row:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 55
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:海上运输:合同收入/商品类型:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 56
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:海上运输:合同收入/商品类型:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 56
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:海上运输:合同收入/商品类型:row:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 57
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:海上运输:合同收入/商品类型:row:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 57
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:按经营地:合同收入/商品类型:row:17": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+        "error_type": "regional_header_as_product"
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:按经营地:合同收入/商品类型:row:17": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+        "error_type": "regional_header_as_product"
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:按经营地:合同收入/商品类型:row:18": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+        "error_type": "regional_header_as_product"
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:按经营地:合同收入/商品类型:row:18": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+        "error_type": "regional_header_as_product"
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:按经营地:合同收入/商品类型:row:19": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+        "error_type": "regional_header_as_product"
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:按经营地:合同收入/商品类型:row:19": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+        "error_type": "regional_header_as_product"
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:按经营地:合同收入/商品类型:row:20": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+        "error_type": "regional_header_as_product"
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:按经营地:合同收入/商品类型:row:20": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+        "error_type": "regional_header_as_product"
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:按经营地:合同收入/商品类型:row:21": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+        "error_type": "regional_header_as_product"
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:按经营地:合同收入/商品类型:row:21": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+        "error_type": "regional_header_as_product"
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:国内:合同收入/商品类型:row:22": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:国内:合同收入/商品类型:row:22": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:国内:合同收入/商品类型:row:23": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:国内:合同收入/商品类型:row:23": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:国内:合同收入/商品类型:row:24": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:国内:合同收入/商品类型:row:24": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:国内:合同收入/商品类型:row:25": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:国内:合同收入/商品类型:row:25": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:国外:合同收入/商品类型:row:26": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:国外:合同收入/商品类型:row:26": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:国外:合同收入/商品类型:row:27": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:国外:合同收入/商品类型:row:27": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:国外:合同收入/商品类型:row:28": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:国外:合同收入/商品类型:row:28": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:国外:合同收入/商品类型:row:29": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:国外:合同收入/商品类型:row:29": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:product:国外:合同收入/商品类型:row:30": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:product:国外:合同收入/商品类型:row:30": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:business_segment:合计:合同收入/合同分解合计:row:31": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 41
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:business_segment:合计:合同收入/合同分解合计:row:31": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 41
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:business_segment:合计:合同收入/合同分解合计:row:32": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 42
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:business_segment:合计:合同收入/合同分解合计:row:32": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 42
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:business_segment:合计:合同收入/合同分解合计:row:33": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 43
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:business_segment:合计:合同收入/合同分解合计:row:33": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 43
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:business_segment:合计:合同收入/合同分解合计:row:34": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 44
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:business_segment:合计:合同收入/合同分解合计:row:34": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 44
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:business_segment:合计:合同收入/合同分解合计:row:35": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 45
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:business_segment:合计:合同收入/合同分解合计:row:35": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 45
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:business_type:主营业务:营业收入:row:36": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 28
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:business_type:其他业务:营业收入:row:37": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 29
+      },
+      "owned:core-ev-47d92ec950dabef1:Segment:business_type:合计:营业收入:row:38": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 30
+      },
+      "owned:core-ev-0c3ecdab9b61b02a:Measurement:business_type:合计:营业收入:row:38": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 30
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:商品类型:合同收入/商品类型:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 31
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:商品类型:合同收入/商品类型:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 32
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:商品类型:合同收入/商品类型:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 33
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:商品类型:合同收入/商品类型:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 34
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:商品类型:合同收入/商品类型:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 35
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:金枪鱼销:合同收入/商品类型:row:5": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122跨行金枪鱼销售收入截断为金枪鱼销，商品身份不完整",
+        "error_type": "truncated_product_name"
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:金枪鱼销:合同收入/商品类型:row:6": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122跨行金枪鱼销售收入截断为金枪鱼销，商品身份不完整",
+        "error_type": "truncated_product_name"
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:其他鱼种:合同收入/商品类型:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 48
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:其他鱼种:合同收入/商品类型:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 49
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:罐头销售:合同收入/商品类型:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 50
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:罐头销售:合同收入/商品类型:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 51
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:鱼柳加工:合同收入/商品类型:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 52
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:鱼柳加工:合同收入/商品类型:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 53
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:渔货贸易:合同收入/商品类型:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 54
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:渔货贸易:合同收入/商品类型:row:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 55
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:海上运输:合同收入/商品类型:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 56
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:海上运输:合同收入/商品类型:row:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 57
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:按经营地:合同收入/商品类型:row:17": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+        "error_type": "regional_header_as_product"
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:按经营地:合同收入/商品类型:row:18": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+        "error_type": "regional_header_as_product"
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:按经营地:合同收入/商品类型:row:19": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+        "error_type": "regional_header_as_product"
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:按经营地:合同收入/商品类型:row:20": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+        "error_type": "regional_header_as_product"
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:按经营地:合同收入/商品类型:row:21": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122按经营地区分类被截断并标商品类型/产品；是地区分类合计而非商品",
+        "error_type": "regional_header_as_product"
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:国内:合同收入/商品类型:row:22": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:国内:合同收入/商品类型:row:23": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:国内:合同收入/商品类型:row:24": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:国内:合同收入/商品类型:row:25": {
+        "accurate": false,
+        "critical_numeric_error": true,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:国外:合同收入/商品类型:row:26": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:国外:合同收入/商品类型:row:27": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:国外:合同收入/商品类型:row:28": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:国外:合同收入/商品类型:row:29": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:product:国外:合同收入/商品类型:row:30": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p122经营地区国内/国外被标商品类型/product；国内成本23054591.66错配空海上运输收入、合计正数被误负，各原栏目/列须保留",
+        "error_type": "regional_dimension_and_columns"
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:business_segment:合计:合同收入/合同分解合计:row:31": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 41
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:business_segment:合计:合同收入/合同分解合计:row:32": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 42
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:business_segment:合计:合同收入/合同分解合计:row:33": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 43
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:business_segment:合计:合同收入/合同分解合计:row:34": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 44
+      },
+      "owned:core-ev-086747acd98a25b1:Segment:business_segment:合计:合同收入/合同分解合计:row:35": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 45
+      },
+      "owned:core-ev-0ef443c502c23730:Segment:business_segment:亚太金枪鱼私人有限公司:重要非全资子公司/本期营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 67
+      },
+      "owned:core-ev-cb5d2b6965e59681:Measurement:business_segment:亚太金枪鱼私人有限公司:重要非全资子公司/本期营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 67
+      },
+      "owned:core-ev-0ef443c502c23730:Segment:business_segment:康隆（香港）航运有限公司:重要非全资子公司/本期营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 68
+      },
+      "owned:core-ev-cb5d2b6965e59681:Measurement:business_segment:康隆（香港）航运有限公司:重要非全资子公司/本期营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 68
+      },
+      "owned:core-ev-7ac6b63a48a7204d:Segment:service:经营租赁:作为出租人的经营租赁/租赁收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外p132出租人经营租赁收入2129586.82元真实成立"
+      },
+      "owned:core-ev-5ed9dbfb794d722f:Measurement:service:经营租赁:作为出租人的经营租赁/租赁收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外p132出租人经营租赁收入2129586.82元真实成立"
+      },
+      "owned:core-ev-fef19b4117bf860d:Segment:service:出售商品:出售商品/提供劳务/本期发生额:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 69
+      },
+      "owned:core-ev-d075527932ca8542:Measurement:service:出售商品:出售商品/提供劳务/本期发生额:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 69
+      },
+      "owned:core-ev-fef19b4117bf860d:Segment:service:出售商品:出售商品/提供劳务/本期发生额:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 70
+      },
+      "owned:core-ev-d075527932ca8542:Measurement:service:出售商品:出售商品/提供劳务/本期发生额:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 70
+      },
+      "owned:core-ev-fef19b4117bf860d:Segment:service:出售商品:出售商品/提供劳务/本期发生额:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 71
+      },
+      "owned:core-ev-d075527932ca8542:Measurement:service:出售商品:出售商品/提供劳务/本期发生额:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "本期原格、原名、单位、栏目、分部列和主体匹配；同义栏目按来源语义校验",
+        "recall_row_index": 71
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "逐内容核实主营产业链、原子公司和控制/退出限定完整，实际原句保留",
+        "numeric_note": "肯定摘要未陈述错配金额；原quote保留原表本期/上期，不把原证据引用等同错误数字断言"
+      },
+      "products_services": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "开创缺沙丁鱼、鱿鱼、鲭鱼产品矩阵",
+        "numeric_note": "肯定摘要未陈述错配金额；原quote保留原表本期/上期，不把原证据引用等同错误数字断言"
+      },
+      "revenue_model": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "开创收入正文缺大副收据/结算单/内销/航次结束、母公司与分部边界，产品地区和收入主体错误",
+        "numeric_note": "肯定摘要未陈述错配金额；原quote保留原表本期/上期，不把原证据引用等同错误数字断言"
+      }
+    }
+  }
+}

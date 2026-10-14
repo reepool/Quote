@@ -1,0 +1,76 @@
+{
+  "600082.SH": [
+    {
+      "page": 182,
+      "counterparty": "天津滨海高新区物业管理有限公司",
+      "content": "服务费",
+      "current_value": null,
+      "prior_value": "2,352,476.19",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 182
+    },
+    {
+      "page": 182,
+      "counterparty": "天津滨海高新区企业创新服务有限公司",
+      "content": "销售房产",
+      "current_value": null,
+      "prior_value": "294,862,583.36",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 182
+    },
+    {
+      "page": 182,
+      "counterparty": "滨海高新区开发建设有限公司",
+      "content": "服务费",
+      "current_value": null,
+      "prior_value": "44,232.08",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 182
+    }
+  ],
+  "600097.SH": [
+    {
+      "page": 144,
+      "counterparty": "上海水产集团龙门食品有限公司",
+      "content": "出售商品",
+      "current_value": "2,018,807.63",
+      "prior_value": "1,012.50",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 144
+    },
+    {
+      "page": 144,
+      "counterparty": "城市管家（上海）电子商务有限公司",
+      "content": "出售商品",
+      "current_value": "8,424.00",
+      "prior_value": null,
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 144
+    },
+    {
+      "page": 144,
+      "counterparty": "上海水产集团有限公司",
+      "content": "出售商品",
+      "current_value": "2,461.00",
+      "prior_value": "3,423.01",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 144
+    },
+    {
+      "page": 144,
+      "counterparty": "上海菜管家电子商务有限公司",
+      "content": "出售商品",
+      "current_value": null,
+      "prior_value": "431,886.72",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 144
+    }
+  ]
+}

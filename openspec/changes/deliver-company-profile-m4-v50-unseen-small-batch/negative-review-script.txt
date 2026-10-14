@@ -1,0 +1,31 @@
+import json
+from pathlib import Path
+from quote_v50_new_matching import co,pages,num
+C=Path('openspec/changes/deliver-company-profile-m4-v50-unseen-small-batch');read=lambda p:json.loads(Path(p).read_text());s=read(C/'source-scope.json');out=[]
+for n in s['negative_conditions']:
+ i=n['instrument_id'];rs=read('/tmp/v50newraw_'+i+'.json');ds=read('/tmp/v50newanswers_'+i+'.json');fin=[r for r in rs if r['object_type'] in ['Segment','Measurement']];acts=[r for r in rs if r['object_type'] in ['Activity','Relationship']];name=n['name'];bad=[];reason='';checked=[r['record_id'] for r in fin]
+ if name=='仅上期关联销售':bad=[r['record_id'] for r in fin if n['page'] in pages(r) and num(r['source_native']['value'])==num(n['prior_value'])];reason='逐原layout确认本期空、金额仅上期；核全部本期收入，不以受污染对手名逃避检验'
+ elif name=='海上运输国内收入空':bad=[r['record_id'] for r in fin if n['page'] in pages(r) and r['source_native']['name']=='国内' and '海上运输' in (r['source_native'].get('qualifier')or'')];reason='p122国内海上运输收入两横杠为空；实际23054591.66来自渔货贸易成本，三对象违规'
+ elif 'forbidden_headers' in n:
+  bad=[r['record_id'] for r in fin if any(h in (r['source_native'].get('header')or'') for h in n['forbidden_headers']) and (name!='销售模式不适用' or r['source_native']['name'] in n['forbidden_names'])]
+  if name=='合并其他业务本期空':bad=[r['record_id'] for r in fin if r['subject_scope']=='consolidated_group' and r['source_native']['name']=='其他业务' and 156 in pages(r)]
+  if name=='母公司营业收入不适用':bad += [r['record_id'] for r in fin if r['subject_scope']=='issuer' or num(r['source_native']['value'])==num('50000000')]
+  reason='独立原页适用性/费用列核全部收入原栏目与主体；未生成禁止收入'
+ elif name=='母公司其他业务本期空':bad=[r['record_id'] for r in fin if r['subject_scope']=='issuer' and r['source_native']['name']=='其他业务'];reason='母公司本期其他业务空未补零或借上期'
+ elif name=='业务类型成本空':bad=[r['record_id'] for r in fin if '成本' in (r['source_native'].get('header')or'') and 157 in pages(r)];reason='424569.35合法收入保留，未生成商品销售成本格'
+ elif name in ['采购本期空','会展本期空']:
+  checked += [r['record_id'] for r in acts];bad=[r['record_id'] for r in fin if num(r['source_native']['value'])==num(n['prior_value'])];bad += [r['record_id'] for r in acts if r.get('action')=='purchases' and (co(n['counterparty']) in co(r.get('source_actor')) or co(n['counterparty']) in co(r['source_native'].get('qualifier')))];reason='仅上期服务采购未升格当期采购/营业收入'
+ elif 'values' in n:bad=[r['record_id'] for r in fin if any(num(r['source_native']['value'])==num(v) for v in n['values'])];reason='原接受劳务/承租支出/未来收入或目标不作2025营业收入；逐金额查全部输出'
+ elif name=='历史更正非2025收入':bad=[r['record_id'] for r in fin if pages(r)&set(n['checked_pages'])];reason='2022/2023更正页未生成2025收入'
+ elif name=='方信退出边界':
+  checked=[r['record_id'] for r in rs];txt=co(''.join(d['excerpt'] for d in ds));assert '2025/9/30' in txt;bad=[r['record_id'] for r in acts if co(r.get('source_actor'))==co(n['actor']) and r['subject_scope']=='consolidated_group'];reason='原2025/9/30失控原句保留，未生成方信全年/期末受控肯定动作'
+ elif name=='百竹增资期后事项':bad=[r['record_id'] for r in fin if num(r['source_native']['value'])==num('20000') and r['source_native'].get('unit')=='万元'];reason='2026年3月债转股20000万元只保留原quote，未生成为2025收入/商品动作'
+ elif name in ['参股投资不集团商品生产','成本列表不反推采购','服务收费不成商品']:
+  checked=[r['record_id'] for r in acts];targets={co(x) for x in n['names']};bad=[r['record_id'] for r in acts if co(r['source_native']['name']) in targets and (r.get('action') in ['produces','sells'] if name!='成本列表不反推采购' else r.get('action')=='purchases')];reason='基金参股、成本列表或服务收费未升格当前实体商品动作；p12实际金枪鱼/鱼柳产销保留'
+ elif name=='客户排名非渠道':bad=[r['record_id'] for r in fin if r.get('dimension',r.get('segment_dimension'))=='sales_channel' and r['source_native']['name']!='直销'];reason='客户/供应商排名未作为销售渠道，合法直销成立'
+ elif name=='普通子公司不变联营':bad=[r['record_id'] for r in fin if any(x in co(r['source_native']['name']) for x in ['亚太','康隆']) and r['subject_scope']=='group_associated_entity'];reason='亚太/康隆51%合并子公司未误联营，原表主体子公司保留'
+ else:raise AssertionError(name)
+ # All six affirmative excerpts inspected; source quotes retaining original empty/current/prior columns are not affirmative new income assertions.
+ out.append(dict(condition_id=n['condition_id'],instrument_id=i,source_condition=n,source_text=read('/tmp/quote_v50_unseen_source_'+i+'.json')[n['page']-1]['text'],evaluated=True,passed=not bad,violating_object_ids=bad,checked_actual_object_ids=checked,answered_dimensions_checked=[d['dimension_id'] for d in ds],reason=reason))
+result=dict(condition_count=len(out),passed=sum(x['passed'] for x in out),evaluated=len(out),unevaluable=0,negative_reviews=out);assert result['condition_count']==31 and result['passed']==27
+(C/'negative-review-evidence.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n');print({k:v for k,v in result.items() if k!='negative_reviews'})

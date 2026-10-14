@@ -1,0 +1,36 @@
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-14 12:35:49][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-14 12:35:49][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-14 12:35:49][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.00s
+[INFO][2026-10-14 12:35:50][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-14 12:35:50][tgbot.py:15] - [tgbot] Reading system configuration...
+{
+  "historical_files_verified": 3182,
+  "historical_hashes_unchanged": true,
+  "prior_archive_original_files_verified": 72,
+  "prior_archive_hashes_unchanged": true,
+  "first_formal_artifacts_verified": 18,
+  "first_hashes_unchanged": true,
+  "first_index_written_before_hash": true,
+  "empty_first_artifacts": 0,
+  "execution_modules_verified": 38,
+  "execution_reconstructed_from_commit": "7e25d8ad29162d876b6eda246e615c27b10f1a68",
+  "existing_modified_files_verified": 19,
+  "existing_modified_files_unchanged": true,
+  "unique_fact_and_answer_objects": 262,
+  "unique_positive_conditions": 160,
+  "source_contract_unchanged": true,
+  "source_frozen_before_execution": true,
+  "official_text_pages": 101,
+  "official_layout_pages": 34,
+  "actual_complete_published_companies": 2,
+  "query_export_disk_agree": true,
+  "actual_five_stages_succeeded": true,
+  "actual_no_reuse_or_predecessor": true,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

@@ -1,0 +1,38 @@
+import json,hashlib,subprocess
+from pathlib import Path
+from datetime import datetime
+from pypdf import PdfReader
+from research.company_profile.reads import CompanyProfileReadService
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v50-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v50_unseen_small_batch';read=lambda p:json.loads(Path(p).read_text());sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();save=lambda p,v:Path(p).write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+s=read(C/'source-scope.json');f=read(P/'formal_execution.json');freeze=read(C/'source-freeze-receipt.json');e=read(C/'source-review-evidence.json');n=read(C/'negative-review-evidence.json');first=read(C/'first-formal-delivery-preservation-completion.json')['completed_sha256'];hist=read(C/'protection-baseline.json');baseline=read(C/'initial-workspace-baseline.json');sp=read(C/'independent-frozen-source-pages.json');layout=read(C/'independent-source-layout-pages.json');supp={};val={};deliver={};reads=CompanyProfileReadService(R/'data/research/company_profile_common_core/m4_v50_unseen_small_batch')
+assert datetime.fromisoformat(freeze['created_at'])<datetime.fromisoformat(f['started_at'])
+for i,v in s['versions'].items():
+ pdf=R/v['pdf'];assert sha(pdf)==v['sha256'];reader=PdfReader(pdf);src=read('/tmp/quote_v50_unseen_source_'+i+'.json');raw=read('/tmp/v50newraw_'+i+'.json');actual={p for r in raw for ev in r['evidence'] for p in [ev.get('page'),*ev.get('continuation_pages',[]),*ev.get('subject_evidence_pages',[])] if p};actual|=set(v['checked_pages']);extra=sorted(actual-set(v['checked_pages']))
+ for p in actual:assert reader.pages[p-1].extract_text()==src[p-1]['text'],(i,p)
+ for p,t in layout[i].items():assert reader.pages[int(p)-1].extract_text(extraction_mode='layout')==t,(i,p)
+ extra_layout_pages=sorted(set(([25,168,172,173,23,24] if i=='600082.SH' else [17,132,133,134]))-set(map(int,layout[i])))
+ supp[i]=dict(document_version=v['sha256'],pages=[src[p-1] for p in extra],layout_pages={str(p):reader.pages[p-1].extract_text(extraction_mode='layout') for p in extra_layout_pages},purpose='实际输出合同外与源表读序核验；原source-scope、分母及首次输出不变')
+ val[i]=dict(document_version=v['sha256'],official_pdf_sha256_verified=True,independent_text_page_count=len(actual),independent_layout_page_count=len(layout[i])+len(extra_layout_pages),all_text_equal_official_pdf=True,all_layout_equal_official_pdf=True,checked_page_numbers=sorted(actual),supplemental_page_numbers=extra)
+ q=reads.query((i,),processing_identity=f['processing_identity']);result=f['results'][i];assert all(q[k]==result['query'][k] for k in ['state','profiles','requested_instrument_ids','missing_instrument_ids','delivered']),i
+ profile=q['profiles'][0];assert profile==result['export']['profiles'][0]==read(result['export']['files'][0]);deliver[i]=dict(readonly_reread_equal=True,query_export_disk_equal=True,published=True,accepted_count=len(profile['accepted_facts']),answered_count=sum(d['answered'] for d in profile['dimensions']))
+for group in [hist,first,baseline['existing_modified_sha256'],freeze['executed_code_sha256']]:
+ for p,h in group.items():assert sha(R/p)==h,p
+archive=R/'openspec/changes/archive/2026-10-14-deliver-company-profile-m4-v49-unseen-small-batch';ar=read(archive/'v50-archive-preservation.json');ah=ar['unchanged_change_originals'];assert all(sha(archive/p)==h for p,h in ah.items())
+code=read(C/'execution-code-reconstruction.json');commit=code['baseline_commit']
+for p,h in freeze['executed_code_sha256'].items():assert hashlib.sha256(subprocess.check_output(['git','show',commit+':'+p])).hexdigest()==h
+for key,p in [('source_scope_sha256','source-scope.json'),('source_pages_sha256','independent-frozen-source-pages.json'),('source_layout_sha256','independent-source-layout-pages.json'),('related_ledger_sha256','related-sales-independent-ledger.json')]:assert freeze[key]==sha(C/p)
+assert len(e['object_reviews'])==262==len({(o['instrument_id'],o['object_id']) for o in e['object_reviews']});assert len(e['source_disclosures'])==160;assert e['source_recall']['numerator']==66;assert e['source_accuracy']['numerator']==193;assert e['critical_numeric_errors']['value']==14;assert n['passed']==27 and n['evaluated']==31 and n['unevaluable']==0;assert e['actual_runtime_no_reuse'] and not e['expansion_gates_met']
+for rt in e['runtime_evidence']:
+ assert set(rt['stage_results'])=={'acquire','parse','semantic','verify','publish'}
+ assert all(v['status']=='success' for v in rt['stage_results'].values()),rt['stage_results']
+quotes=read(C/'source-review-quote-bank.json')
+def restore(x):
+ if isinstance(x,list):return [restore(v) for v in x]
+ if isinstance(x,dict):return {('bounded_quote' if k=='bounded_quote_sha256' else k):(quotes[v] if k=='bounded_quote_sha256' else restore(v)) for k,v in x.items()}
+ return x
+for o in e['object_reviews']:
+ if o['object_type']=='answer':continue
+ r=restore(o['accepted_record_summary']);assert hashlib.sha256(json.dumps(r,ensure_ascii=False,sort_keys=True).encode()).hexdigest()==o['accepted_record_canonical_sha256']
+save(C/'independent-supplemental-source-pages.json',supp);save(C/'official-source-validation.json',val);save(C/'delivery-reread-validation.json',deliver)
+receipt=dict(historical_files_verified=len(hist),historical_hashes_unchanged=True,prior_archive_original_files_verified=len(ah),prior_archive_hashes_unchanged=True,first_formal_artifacts_verified=len(first),first_hashes_unchanged=True,first_index_written_before_hash=True,empty_first_artifacts=0,execution_modules_verified=len(freeze['executed_code_sha256']),execution_reconstructed_from_commit=commit,existing_modified_files_verified=len(baseline['existing_modified_sha256']),existing_modified_files_unchanged=True,unique_fact_and_answer_objects=262,unique_positive_conditions=160,source_contract_unchanged=True,source_frozen_before_execution=True,official_text_pages=sum(v['independent_text_page_count'] for v in val.values()),official_layout_pages=sum(v['independent_layout_page_count'] for v in val.values()),actual_complete_published_companies=2,query_export_disk_agree=True,actual_five_stages_succeeded=True,actual_no_reuse_or_predecessor=True,production_authorization='not_authorized',scale_quality_claim_allowed=False)
+save(C/'final-protection-verification.json',receipt);print(json.dumps(receipt,ensure_ascii=False,indent=2))

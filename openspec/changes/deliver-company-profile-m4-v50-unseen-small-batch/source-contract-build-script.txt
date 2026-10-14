@@ -1,0 +1,105 @@
+import json,hashlib,re
+from pathlib import Path
+from datetime import datetime,timezone
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v50-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v50_unseen_small_batch'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');co=lambda s:re.sub(r'\s+','',s or '').replace('（','(').replace('）',')')
+assert not (P/'formal_execution.json').exists() and not (C/'source-scope.json').exists()
+plan=read(P/'plan.json');fr=read(C/'freeze-receipt.json');sources={i:read(Path('/tmp/quote_v50_unseen_source_'+i+'.json')) for i in ['600082.SH','600097.SH']};layouts={i:read(Path('/tmp/quote_v50_layout_'+i+'.json')) for i in sources}
+rows={i:[] for i in sources};roles=[];neg=[];ledger={i:[] for i in sources}
+actor_aliases={'上海开创远洋渔业有限公司':['开创远洋','全资子公司'],'舟山环太海洋食品有限公司':['舟山环太','岱山加工厂','环太公司'],'卡洛斯•阿尔博的孩子们有限公司':['ALBO公司','HIJOS DE CARLOS ALBO，S.L.U'],'法国小溪海鲜公司':['FCS公司','FRENCH CREEK SEAFOOD LTD.'],'艾斯特拉斯贸易有限公司':['ESTELAS公司','Estelas贸易公司','ESTELAS TRADING,S.L.U'],'康隆（香港）航运有限公司':['康隆公司'],'天津海泰企业孵化服务有限公司':['海泰孵化器']}
+def row(i,p,n,v,d,h,u='元',actor='公司及合并子公司',party=None,column='本期营业收入',scope=None,alias=(),segment=None):
+ src=co(sources[i][p-1]['text']);assert v.replace(',','') in src.replace(',',''),(i,p,n,v)
+ assert co(n) in src or segment is not None,(i,p,n)
+ sc=scope or ('consolidated_group' if actor=='公司及合并子公司' else 'issuer' if '（母公司）' in actor else 'named_subsidiary')
+ rows[i].append(dict(condition_id=f'{i}-income-{len(rows[i])+1:03}',instrument_id=i,page=p,name=n,native_aliases=[n,*alias],value=v,unit=u,dimension=d,header=h,source_column=column,source_actor=actor,subject_scope=sc,counterparty=party,source_segment=segment,reported_period='2025-12-31',period_state='current_printed',table_basis=h))
+def many(i,p,items,d,h,u='元',actor='公司及合并子公司'):
+ for n,v in items:row(i,p,n,v,d,h,u,actor)
+def role(i,p,n,a,actor='公司及合并子公司',sc=None,alias=(),qualifier=None):
+ assert co(n) in co(sources[i][p-1]['text']),(i,p,n)
+ if any(r['instrument_id']==i and r['name']==n and r['source_actions']==[a] and r['source_actor']==actor for r in roles):return
+ roles.append(dict(condition_id=f'{i}-action-{1+sum(r["instrument_id"]==i for r in roles):03}',instrument_id=i,page=p,name=n,native_aliases=[n,*alias],source_actions=[a],source_actor=actor,actor_aliases=[actor,*actor_aliases.get(actor,[])],subject_scope=sc or ('consolidated_group' if actor=='公司及合并子公司' else 'named_subsidiary'),state='current_affirmative',reported_period='2025-12-31',qualifier=qualifier))
+def negative(i,p,n,**kw):neg.append(dict(condition_id=f'{i}-negative-{sum(r["instrument_id"]==i for r in neg)+1:03}',instrument_id=i,page=p,name=n,**kw))
+i='600082.SH'
+base=[('科技园区开发','418,710,800.51'),('科技园区运营','30,105,192.48'),('商品销售业务','424,569.35'),('合计','449,240,562.34')]
+for d,h in [('industry','主营业务分行业'),('product','主营业务分产品')]:many(i,15,base,d,h)
+many(i,15,[('内销','449,240,562.34'),('合计','449,240,562.34')],'region','主营业务分地区')
+row(i,18,'商品销售业务','42.46','business_type','贸易业务开展情况','万元')
+for n,v in [('天津海泰创意科技园投资有限公司','418,714,190.51'),('天津百竹科技产业发展有限公司','4,064,919.11'),('天津海泰企业孵化服务有限公司','1,214,660.29')]:row(i,27,n,v,'business_type','主要控股参股公司分析',actor=n)
+many(i,156,[('主营业务','449,240,562.34'),('合计','449,240,562.34')],'business_type','合并营业收入和营业成本')
+row(i,156,'客户合同产生的收入','419,178,838.16','business_type','合并营业收入明细')
+many(i,157,[('租赁收入','30,061,724.18'),('合计','449,240,562.34')],'business_type','合并营业收入明细')
+many(i,157,[('商品销售','424,569.35'),('房产销售','418,710,800.51'),('服务收入','43,468.30'),('合计','419,178,838.16')],'product','合同收入分解/业务类型')
+many(i,157,[('在某一时点确认','419,135,369.86'),('在某一时段内确认','43,468.30'),('合计','419,178,838.16')],'revenue_timing','合同收入分解/商品转让时间')
+many(i,200,[('主营业务','26,002,442.90'),('合计','26,002,442.90')],'business_type','母公司营业收入和营业成本',actor='天津海泰科技发展股份有限公司（母公司）')
+for party,n,v in [('天津滨海高新区物业管理有限公司','服务费','2,352,476.19'),('天津滨海高新区企业创新服务有限公司','销售房产','294,862,583.36'),('滨海高新区开发建设有限公司','服务费','44,232.08')]:
+ ledger[i].append(dict(page=182,counterparty=party,content=n,current_value=None,prior_value=v,unit='元',kind='transaction',source_layout_page=182))
+ negative(i,182,'仅上期关联销售',counterparty=party,content=n,prior_value=v,forbidden='不得生成本期Segment/Measurement/肯定正文，不借列不造零')
+role(i,11,'工业园区','operates',alias=['工业园区运营','园区运营'])
+role(i,11,'产业投资','operates')
+for n in ['咨询','培训']:role(i,11,n,'provides_service','天津海泰企业孵化服务有限公司',alias=[n+'服务'])
+for n in ['资源对接','用工保障']:role(i,12,n,'provides_service')
+role(i,13,'政策咨询','provides_service','天津海泰企业孵化服务有限公司',alias=['政策咨询服务'])
+role(i,16,'房产','sells',alias=['房地产','房产销售'])
+role(i,16,'房产租赁','provides_service',alias=['房产租赁业务'])
+for n in ['天津海泰方圆投资有限公司','天津海泰方成投资有限公司','天津海泰创意科技园投资有限公司','天津百竹科技产业发展有限公司']:role(i,172,'房地产开发','operates',n)
+role(i,172,'商品销售业务','sells','天津海泰方通投资有限公司',alias=['商品销售','商品'])
+role(i,172,'物业服务','provides_service','天津海发物业管理有限公司')
+for p,n,kw in [(15,'销售模式不适用',dict(forbidden_headers=['主营业务分销售模式'],forbidden_names=['不适用'])),(156,'合并其他业务本期空',dict(names=['其他业务'],forbidden_headers=['营业收入'])),(200,'母公司其他业务本期空',dict(names=['其他业务'],subject_scope='issuer')),(157,'业务类型成本空',dict(names=['商品销售'],state='商品销售本期424569.35是收入；成本空，不左移或造零；本集团和合计同义镜像不重复条件')),(172,'重要非全资不适用',dict(forbidden_headers=['重要非全资子公司'])),(173,'合营联营不适用',dict(forbidden_headers=['重要联营','重要合营'])),(182,'受托和出租均不适用',dict(forbidden_headers=['受托管理','委托管理','本公司作为出租方'])),(182,'采购本期空',dict(counterparty='天津海泰科技创新服务有限公司',prior_value='45,004.72',forbidden='不得依据仅上期服务费生成本期收入或当前采购')),(53,'接受劳务非收入',dict(checked_pages=[53,54],values=['1108235.94','2135.92','752663.00','9731.23','1543448.59','-124452.55','123258.27','3509113.76','6924134.16'])),(49,'历史更正非2025收入',dict(checked_pages=[49,50,51,187,188,189],state='2022/2023收入会计差错更正不能当本期收入')),(170,'方信退出边界',dict(actor='天津海发方信置地有限公司',state='2025年9月30日工商变更完成失控；不能肯定全年并表或期末控制')),(27,'百竹增资期后事项',dict(state='2026年3月债转股20,000万元不变2025营业收入或当前商品活动')),(12,'参股投资不集团商品生产',dict(names=['半导体','集成电路'],state='基金已投项目和园区集聚不得生成为本公司商品生产销售')),(17,'成本费用非营业收入',dict(checked_pages=[16,17,158,159,160],forbidden_headers=['营业成本','税金及附加','销售费用','管理费用','财务费用']))]:negative(i,p,n,**kw)
+i='600097.SH'
+industry=[('海洋捕捞','950,763,559.03'),('食品加工','1,054,611,208.73'),('渔货贸易','318,671,971.02'),('海上运输','6,765,806.04'),('合计','2,330,812,544.82')]
+products=[('金枪鱼销售','796,979,841.53'),('零星鱼种销售','153,783,717.50'),('罐头食品销售','816,352,061.87'),('鱼柳加工销售','238,259,146.86'),('渔货贸易','318,671,971.02'),('海上运输','6,765,806.04'),('合计','2,330,812,544.82')]
+many(i,11,industry,'industry','主营业务分行业');many(i,11,products,'product','主营业务分产品');many(i,11,[('国内','1,028,359,860.15'),('国外','1,302,452,684.67'),('合计','2,330,812,544.82')],'region','主营业务分地区');many(i,12,[('直销','2,330,812,544.82'),('合计','2,330,812,544.82')],'sales_mode','主营业务分销售模式');row(i,13,'渔货贸易','318,671,971.02','business_type','贸易业务开展情况')
+for p,n,v in [(18,'上海开创远洋渔业有限公司','1,175,618,816.17'),(18,'泛太食品（马绍尔群岛）有限公司','75,194,260.04'),(18,'泛太渔业（马绍尔群岛）有限公司','497,631,583.01'),(18,'文森特（密克罗尼西亚）渔业有限公司','3,554.30'),(18,'亚太金枪鱼私人有限公司','355,430.00'),(18,'舟山环太海洋食品有限公司','422,469,539.59'),(18,'卡洛斯•阿尔博的孩子们有限公司','818,099,682.13'),(19,'康隆（香港）航运有限公司','65,305,692.59'),(19,'法国小溪海鲜公司','100,605,939.19'),(19,'艾斯特拉斯贸易有限公司','202,368,570.79')]:row(i,p,n,v,'business_type','主要控股参股公司分析',actor=n)
+many(i,122,[('主营业务','2,330,812,544.82'),('其他业务','5,690,497.87'),('合计','2,336,503,042.69')],'business_type','合并营业收入和营业成本')
+segments=['远洋捕捞分部','食品加工分部','渔货贸易分部','海上运输分部','合计'];totals=['950,763,559.03','1,054,611,208.73','318,671,971.02','6,765,806.04','2,330,812,544.82']
+for h in ['商品类型','按经营地区分类','合计']:
+ for sg,v in zip(segments,totals):row(i,122,h,v,'business_type','合同收入分解/'+('商品类型' if h=='商品类型' else '经营地区'),segment=sg,column=sg+'/营业收入')
+for n,v,sg in [('金枪鱼销售收入','796,979,841.53',segments[0]),('其他鱼种销售收入','153,783,717.50',segments[0]),('罐头销售收入','816,352,061.87',segments[1]),('鱼柳加工销售收入','238,259,146.86',segments[1]),('渔货贸易销售收入','318,671,971.02',segments[2]),('海上运输收入','6,765,806.04',segments[3])]:
+ for col in [sg,'合计']:row(i,122,n,v,'product','合同收入分解/商品类型',segment=col,column=col+'/营业收入')
+for n,vals in [('国内',['927,559,806.67','76,206,629.65','24,593,423.83',None,'1,028,359,860.15']),('国外',['23,203,752.36','978,404,579.08','294,078,547.19','6,765,806.04','1,302,452,684.67'])]:
+ for sg,v in zip(segments,vals):
+  if v:row(i,122,n,v,'region','合同收入分解/经营地区',segment=sg,column=sg+'/营业收入')
+for n,v in [('亚太金枪鱼私人有限公司','35.54'),('康隆（香港）航运有限公司','6,530.57')]:row(i,135,n,v,'business_type','重要非全资子公司的主要财务信息','万元',n)
+for party,n,v,old in [('上海水产集团龙门食品有限公司','出售商品','2,018,807.63','1,012.50'),('城市管家（上海）电子商务有限公司','出售商品','8,424.00',None),('上海水产集团有限公司','出售商品','2,461.00','3,423.01'),('上海菜管家电子商务有限公司','出售商品',None,'431,886.72')]:
+ ledger[i].append(dict(page=144,counterparty=party,content=n,current_value=v,prior_value=old,unit='元',kind='transaction',source_layout_page=144))
+ if v:row(i,144,n,v,'service','出售商品/提供劳务',party=party,column='本期发生额')
+ else:negative(i,144,'仅上期关联销售',counterparty=party,content=n,prior_value=old,forbidden='不得生成本期Segment/Measurement或肯定正文，不借列不造零')
+# 明示捕捞、加工、销售和实际加工投入分别冻结。
+for n in ['金枪鱼','鲣鱼','黄鳍','磷虾']:role(i,8,n,'produces',alias=['南极磷虾'] if n=='磷虾' else [],qualifier='金枪鱼船队中西太平洋；磷虾为江苏深蓝合作南极项目')
+for n in ['金枪鱼','罐头食品','鱼柳']:
+ for a in ['produces','sells']:role(i,12,n,a)
+role(i,11,'磷虾粉','produces',actor='公司及合并子公司',alias=['虾粉'],qualifier='深蓝轮加工，合作项目，非独立自产母公司主体')
+role(i,84,'磷虾','sells',alias=['南极磷虾']);role(i,84,'磷虾粉','sells',alias=['虾粉'])
+for n in ['金枪鱼罐头','罐头方便食品']:role(i,8,n,'processes','卡洛斯•阿尔博的孩子们有限公司')
+role(i,8,'金枪鱼原料鱼','material_input','舟山环太海洋食品有限公司',alias=['金枪鱼','原料鱼'])
+role(i,8,'鱼柳','processes','舟山环太海洋食品有限公司');role(i,8,'鱼柳','sells','舟山环太海洋食品有限公司')
+for n in ['冷冻金枪鱼运输','人员和物资等转运']:role(i,8,n,'provides_service',alias=['冷冻金枪鱼','人员和物资转运'])
+for n in ['沙丁鱼','鱿鱼','黄鳍金枪鱼']:role(i,9,n,'sells','卡洛斯•阿尔博的孩子们有限公司',alias=[n+'罐头'])
+for n in ['金枪鱼','鲭鱼']:role(i,9,n,'sells','艾斯特拉斯贸易有限公司',qualifier='原境外贸易平台与生产企业协同，不扩大为本期捕捞生产')
+for n in ['远洋捕捞']:
+ for actor in ['上海开创远洋渔业有限公司','泛太食品（马绍尔群岛）有限公司','泛太渔业（马绍尔群岛）有限公司','文森特（密克罗尼西亚）渔业有限公司']:role(i,18,n,'operates',actor)
+role(i,18,'食品加工业','operates','泛太食品（马绍尔群岛）有限公司',alias=['食品加工'])
+for n in ['鱼类','鱼产品']:role(i,134,n,'sells','亚太金枪鱼私人有限公司')
+for a in ['processes','sells']:role(i,134,'水产品',a,'舟山环太海洋食品有限公司')
+role(i,134,'罐头食品','processes','卡洛斯•阿尔博的孩子们有限公司')
+role(i,134,'海上运输','provides_service','康隆（香港）航运有限公司')
+for a in ['purchases','processes','sells']:role(i,134,'鱼产品',a,'法国小溪海鲜公司',alias=['海鲜'])
+role(i,134,'渔货','sells','艾斯特拉斯贸易有限公司',alias=['渔货贸易'])
+for p,n,kw in [(122,'海上运输国内收入空',dict(source_segment='海上运输分部',names=['国内'],forbidden='不得借国外6765806.04或造零本期收入')),(122,'未履约非本期收入',dict(values=['376912.41'],state='预计2026确认，不变2025收入')),(135,'合营联营不适用',dict(forbidden_headers=['重要合营','重要联营'])),(144,'受托出租不适用',dict(forbidden_headers=['受托管理','委托管理','本公司作为出租方'])),(156,'母公司营业收入不适用',dict(forbidden_headers=['母公司营业收入'],state='不可用子公司或合并主营填母公司；成本法投资收益50000000元非营业收入')),(143,'会展本期空',dict(counterparty='上海东艺会展服务有限公司',prior_value='279,520.00',forbidden='不得生成本期采购或收入')),(145,'承租租金非营业收入',dict(values=['15565300.00','11675875.50','100375.00','76979.00','4804338.79','1794414.23','13143.52'])),(14,'客户排名非渠道',dict(state='FRINSA等客户与供货商不是销售模式；主营模式为直销')),(13,'成本列表不反推采购',dict(names=['燃料','原料鱼','辅料','铁罐头','渔用物资','船用物资'],state='成本构成不独立推采购或具名供应商；p8金枪鱼加工实际投入保留')),(20,'2026经营目标非实际',dict(values=['27.25','1.17'],state='未来营业收入和利润目标不是2025实际')),(143,'服务收费不成商品',dict(names=['船员服务费','餐费','会展服务费','接受劳务'],state='原服务采购和船员配套可保留，不生成实体商品销售生产')),(133,'普通子公司不变联营',dict(checked_pages=[133,134],state='亚太/康隆51%合并子公司不因重要非全资而变集团外联营')),(123,'成本费用非收入',dict(checked_pages=[12,13,123,124],forbidden_headers=['营业成本','税金及附加','销售费用','管理费用']))]:negative(i,p,n,**kw)
+answers={'600082.SH':{
+'principal_business':dict(pages=[11,12,13,17,27,28,170,172],required_groups=[['工业园区','园区运营'],['产业投资'],['孵化'],['招投联动','招商'],['方信'],['9月30日','9 月30 日','2025/9/30']],substance='园区运营核心、产业投资增量、孵化服务与招商投资孵化模式、参股产业基金原边界；子公司房地产开发商品销售物业咨询，方信2025-9-30失控退出非全年。'),
+'products_services':dict(pages=[11,12,13,16,27,172],required_groups=[['园区'],['咨询'],['培训'],['政策'],['资源对接'],['用工'],['物业'],['房产','房地产'],['代理人']],substance='园区载体租售和数字服务平台、旗下孵化咨询培训政策、资源对接和用工服务、物业子公司；商品贸易报告期仅代理净额，不集团化基金/入园企业商品。'),
+'revenue_model':dict(pages=[15,16,18,106,107,111,156,157,182,200],required_groups=[['竣工'],['验收'],['购房款'],['交接','交付通知'],['控制权'],['佣金','手续费'],['直线法'],['租金'],['某一时点','时点'],['某一时段','时段']],substance='房地产竣工验收合同购房款交接或交付通知签收期满，商品交付控制权主责总额/代理佣金净额且报告期仅代理；经营租赁期间直线租金，时点419135369.86/时段43468.30，集团与母公司栏目不借额、关联本期空。')},
+'600097.SH':{
+'principal_business':dict(pages=[8,9,18,19,133,134],required_groups=[['金枪鱼'],['磷虾'],['捕捞'],['加工'],['贸易'],['运输'],['中西太平洋'],['南极'],['合作'],['ALBO','阿尔博']],substance='一鱼一虾、捕捞加工贸易运输一体化、中西太平洋围网/南极江苏深蓝合作，境内环太境外ALBO/FCS/Estelas/康隆原子公司控制，制造分类不替代实际渔业语义。'),
+'products_services':dict(pages=[8,9,11,12,18,19,134],required_groups=[['鲣鱼'],['黄鳍'],['冻虾'],['虾粉'],['金枪鱼罐头'],['罐头方便食品'],['鱼柳'],['沙丁鱼'],['鱿鱼'],['鲭鱼'],['运输']],substance='具名鱼种、冻虾虾粉、罐头食品和方便食品、鱼柳、ALBO沙丁鱼鱿鱼黄鳍罐头、冷冻金枪鱼运输人员物资转运及海外贸易；岱山原料鱼加工投入、采购加工销售分别明确。'),
+'revenue_model':dict(pages=[11,12,13,84,85,122,135,144,145,156],required_groups=[['直销'],['大副收据'],['结算单'],['控制权'],['内销'],['外销'],['航次结束'],['分部'],['母公司']],substance='主营直销，海外渔货交接单大副收据与国内结算单、虾粉控制权、罐头鱼柳内外交付、贸易控制权、运输航次结束；收入分部交叉与重要非全资主体、母公司收入不适用，本期空和租金费用不升级收入。')}}
+checked={'600082.SH':sorted(set([4,5,6,9,10,11,12,13,14,15,16,17,18,27,28,49,50,51,53,54,55,65,74,76,106,107,110,111,112,156,157,158,159,160,169,170,171,172,173,180,181,182,183,184,187,188,189,199,200])), '600097.SH':sorted(set([5,6,7,8,9,10,11,12,13,14,18,19,20,35,37,44,51,52,53,54,84,85,88,89,122,123,124,133,134,135,142,143,144,145,146,147,156]))}
+versions={r['instrument_id']:dict(sha256=r['document_version'],pdf=str(Path('data/filings/announcements/blobs')/r['document_version'][:2]/(r['document_version']+'.pdf')),checked_pages=checked[r['instrument_id']]) for r in plan['reports']}
+created=datetime.now(timezone.utc).isoformat();scope=dict(created_at=created,fixed_before_formal_execution=True,plan_id=plan['plan_id'],processing_identity=fr['processing_identity'],knowledge_cutoff=plan['knowledge_cutoff'],shared_token_budget=50000,official_reports=plan['reports'],versions=versions,source_rows=rows,native_roles=roles,actor_aliases=actor_aliases,answers=answers,negative_conditions=neg,denominator_method='独立新官方本期收入原格＋具名成立动作＋六实质正文；分部交叉保留原列，镜像的本集团/合计同一实质不重复，不继承364/669，不依据输出回填；Measurement只计准确率。',positive_count=sum(map(len,rows.values()))+len(roles)+6,negative_count=len(neg))
+for i,v in versions.items():assert sha(R/v['pdf'])==v['sha256']
+code={str(p):sha(p) for p in sorted(Path('research/company_profile').rglob('*.py'))};assert len(code)==38
+save(C/'source-scope.json',scope);save(C/'independent-frozen-source-pages.json',{i:dict(pdf=v['pdf'],document_version=v['sha256'],pages=[sources[i][n-1] for n in v['checked_pages']]) for i,v in versions.items()});save(C/'independent-source-layout-pages.json',layouts);save(C/'related-sales-independent-ledger.json',ledger)
+freeze=dict(created_at=created,source_scope_sha256=sha(C/'source-scope.json'),source_pages_sha256=sha(C/'independent-frozen-source-pages.json'),source_layout_sha256=sha(C/'independent-source-layout-pages.json'),related_ledger_sha256=sha(C/'related-sales-independent-ledger.json'),source_condition_count=scope['positive_count'],negative_count=len(neg),income_condition_counts={i:len(v) for i,v in rows.items()},action_condition_counts={i:sum(r['instrument_id']==i for r in roles) for i in versions},executed_code_sha256=code,processing_identity=fr['processing_identity'],official_reports=plan['reports'],created_before_first_execute=True,actual_accuracy_denominator_prefilled=False,production_authorization='not_authorized',scale_quality_claim_allowed=False)
+save(C/'source-freeze-receipt.json',freeze);(C/'tasks.md').write_text((C/'tasks.md').read_text().replace('- [ ] 1.1','- [x] 1.1').replace('- [ ] 1.2','- [x] 1.2'))
+print(json.dumps({k:freeze[k] for k in ['source_condition_count','negative_count','income_condition_counts','action_condition_counts']},ensure_ascii=False))

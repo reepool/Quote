@@ -1,0 +1,34 @@
+[
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-4682a4ce10b37eb2:Segment:business_type:房地产结转收入合计:房地产销售和结转/本期合计:row:0",
+    "page": 23,
+    "amount": "0",
+    "unit": "万元",
+    "reason": "合同外p23五个项目与合计打印0，真实房地产本期结转合计0万元，不反推销售动作"
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-15b10db257929e6c:Measurement:business_type:房地产结转收入合计:房地产销售和结转/本期合计:row:0",
+    "page": 23,
+    "amount": "0",
+    "unit": "万元",
+    "reason": "合同外p23五个项目与合计打印0，真实房地产本期结转合计0万元，不反推销售动作"
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-7ac6b63a48a7204d:Segment:service:经营租赁:作为出租人的经营租赁/租赁收入:row:0",
+    "page": 132,
+    "amount": "2129586.82",
+    "unit": "元",
+    "reason": "合同外p132出租人经营租赁收入2129586.82元真实成立"
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-5ed9dbfb794d722f:Measurement:service:经营租赁:作为出租人的经营租赁/租赁收入:row:0",
+    "page": 132,
+    "amount": "2129586.82",
+    "unit": "元",
+    "reason": "合同外p132出租人经营租赁收入2129586.82元真实成立"
+  }
+]
