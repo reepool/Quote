@@ -232,3 +232,7 @@ CLI / API / Scheduler / Telegram / Operator Script
 - OpenSpec tasks、program 状态、提交和推送形成闭环。
 
 满足以上条件后结束，不继续为了抽象完整性扩大范围。
+
+## 12. A/B 角色协作
+
+A/B 开发、审核及交接的唯一流程说明为 `docs/development/ab_role_development_workflow.md`（current）。该流程通过下一次 A 角审核推进回复及后续任务卡告知和启用，不追溯改变在途合同。具体业务范围、验收阈值及权限仍由用户授权和当前 OpenSpec / 任务卡确定。

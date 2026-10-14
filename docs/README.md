@@ -5,6 +5,7 @@
 ## 开发总纲
 
 - `docs/development/project_development_governance.md`：长期开发、架构边界、复用、单一执行链和生产稳定性约束
+- `docs/development/ab_role_development_workflow.md`：current；A/B 职责、自主修复、独立业务审核和交接流程；下次审核推进时告知并写入后续任务卡
 - `docs/development/framework_refactoring_program.md`：框架改造总需求、工作流、依赖、验收和 OpenSpec change 矩阵
 - `docs/development/README.md`：当前开发入口和文档使用规则
 - `AGENTS.md`：所有 AI 和开发任务必须遵守的仓库级规则
