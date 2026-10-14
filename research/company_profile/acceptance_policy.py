@@ -74,6 +74,16 @@ _SENSITIVE_TYPES = (Measurement, Relationship)
 def usage_policy(record: SemanticRecord) -> dict[str, bool | str]:
     """Return the closed downstream-use decision for one accepted record."""
 
+    if any(
+        "official_income_unit_conflict:unclear" in item for item in record.uncertainty
+    ):
+        return {
+            "display": True,
+            "consolidated_aggregation": False,
+            "ranking": False,
+            "cross_company_comparison": False,
+            "restriction_reason": "unclear_official_income_unit",
+        }
     subject = record.subject_scope
     basis = record.subject_basis
     is_group = subject == SubjectScope.CONSOLIDATED_GROUP and basis in _GROUP_BASES

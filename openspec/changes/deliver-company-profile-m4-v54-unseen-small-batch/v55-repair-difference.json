@@ -1,0 +1,54 @@
+{
+  "first_business_objects": 315,
+  "successor_business_objects": 712,
+  "first_scores_immutable": {
+    "source_recall": {
+      "present": 95,
+      "total": 307
+    },
+    "source_accuracy": {
+      "correct": 259,
+      "total": 315
+    },
+    "critical_numeric_errors": 10
+  },
+  "successor": {
+    "source_recall": {
+      "present": 307,
+      "total": 307
+    },
+    "source_accuracy": {
+      "correct": 712,
+      "total": 712
+    },
+    "critical_numeric_errors": 0,
+    "components": {
+      "600094.SH": {
+        "income": 66,
+        "action": 47,
+        "unclear_rows": 9,
+        "answers": 3
+      },
+      "600103.SH": {
+        "income": 68,
+        "action": 111,
+        "unclear_rows": 0,
+        "answers": 3
+      }
+    },
+    "negative_passed": 44,
+    "negative_total": 44
+  },
+  "change_categories": [
+    "毛利率说明不金额化；空分部不借合计/成本；集团母公司原收入分类与单字纸保留",
+    "完整项目结转、原租赁续表及可变收入，九冲突行及18配对对象unclear并禁止确定答案与下游聚合",
+    "关联采购本期/获批额度/上期分离，跨行交易方完整；服务与商品分开，不采购反推投入",
+    "母子产品矩阵、实际林业采运/机械维修/投入方向；参股报告日与未并表/筹备/研发限定",
+    "佰才邦正文成立说明接同报告参股原句、业务范围为business_segment、不继续后续投资节",
+    "六正文完整确认机制/产品矩阵，原适用与不适用状态保留"
+  ],
+  "source_scope_unchanged": true,
+  "source_scope_sha256": "52d2b6ad2904352959182c5392588b17e590528741b9483b0df061c056ab6c45",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

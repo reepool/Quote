@@ -27,3 +27,7 @@ A已有限通过旧v54并授权本包；A/B流程v1允许卡内连续修复，�
 ## Open Questions
 
 大名城p23出租表打印万元，但九笔原值合计与p151开发物业租赁及运营元值完全一致。证据及建议见source-unit-conflict-evidence.json；九项行身份和单位结论待A裁决，正式合同与执行尚未冻结/启动。其余条件已独立形成草稿。
+
+## Current source treatment and successor delivery
+
+The preceding Open Questions text is the retained pre-execution state. User source judgment and frozen source-scope.json retain nine original p23 rental cells as unclear unit conclusions; p151 yuan income is independently supported. No official unit correction is asserted. Original 307 positives and 44 negatives remain immutable. v55 successor B self-review meets 307/307 and dynamic 712/712 with zero numeric errors, pending A finite review; no archive or expansion is authorized at this stage.

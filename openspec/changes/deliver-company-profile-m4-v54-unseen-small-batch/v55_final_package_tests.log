@@ -1,0 +1,13 @@
+[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[33m                                                         [100%][0m
+============================= slowest 10 durations =============================
+27.52s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600103.SH]
+22.75s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600094.SH]
+17.59s call     tests/unit/test_research/test_company_profile_v54_media_machinery.py::test_complete_official_contract[600088.SH]
+13.67s call     tests/unit/test_research/test_company_profile_v53_source_conflict.py::test_v53_complete_official_owner_contract_and_source_conflict[600097.SH]
+10.39s call     tests/unit/test_research/test_company_profile_v54_media_machinery.py::test_complete_official_contract[600099.SH]
+5.52s call     tests/unit/test_research/test_company_profile_v53_source_conflict.py::test_v53_complete_official_owner_contract_and_source_conflict[600082.SH]
+0.12s call     tests/unit/test_research/test_company_profile_v53_source_conflict.py::test_normal_technology_business_is_not_removed[\u5e94\u7528\u8f6f\u4ef6]
+0.05s call     tests/unit/test_research/test_company_profile_v53_source_conflict.py::test_normal_technology_business_is_not_removed[\u96c6\u6210\u7535\u8def]
+0.02s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_wrapped_trade_row_keeps_original_identity
+0.02s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_wrapped_purchase_services_do_not_become_goods
+[33m[32m16 passed[0m, [33m[1m7 warnings[0m[33m in 99.31s (0:01:39)[0m[0m

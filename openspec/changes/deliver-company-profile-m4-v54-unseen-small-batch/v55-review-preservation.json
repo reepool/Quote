@@ -1,0 +1,14 @@
+{
+  "openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch/v55-actual-object-decisions.json": "a7dafa3a3c76fb2997e38ee8a91deb681bc6ef91f9b1184a781ddba7f6da38eb",
+  "openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch/v55-source-review-evidence.json": "e59beaaa07392ccc03c4407f99ba3e7e562dc438bd6cd3390695260fa76ba426",
+  "openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch/v55-negative-review-evidence.json": "c1497d897981ed15f9cc897e726a5cc2cdf3adba39dc50a5ae59c2ea6548ba65",
+  "openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch/v55-source-review-owner-receipt.json": "502e26f4ae6afa128c9a6a14c37f6dab677f09449dfb2646b1a755721763d704",
+  "openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch/v55-requery-receipt.json": "3df459c622534dbed24edabee9128c135710569207460c554eae2a981f051341",
+  "openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch/v55-readonly-verification-receipt.json": "921a2f1dab296ad71c54cfce8dea3ceb1f4d8339a6d786698e92d570b3a1fcb5",
+  "openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch/v55-local-business-overview-semantic-audit.json": "c394438ec7c8227722c0d2a88c36311ac6fa8a3f7ede3f118d51e6dd914e1cf2",
+  "openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch/v55-business-audit-script.txt": "6345dc6fcc6b6430315b036769cca55ae2eb23a4ddacc62572f76e29cdd73f81",
+  "openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch/v55-repair-difference.json": "73a377c5cce1b6495cd205738e4cab9e1cf1b8eeb621551b677569cf060beebb",
+  "openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch/v55-validation-review-receipt.json": "ce39a14c9bbe84d9ce35bddfc53c7820e53fbc830ec870441d5db79eb13bebfc",
+  "openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch/v55-executed-code-snapshot.json": "09da89d70f9931d0738659bf124d8cbb2712931320057cf43bde2f8e4929e499",
+  "openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch/v55-source-freeze-receipt.json": "ba358725b5d5e54cd1b9e21428b2b379a201102be129261308abce67b34e60e2"
+}

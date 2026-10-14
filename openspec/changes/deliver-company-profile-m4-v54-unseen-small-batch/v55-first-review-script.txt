@@ -1,0 +1,55 @@
+"""B source self-review; writes only new v55 review artifacts and its owner report."""
+import json,hashlib,sys,importlib.util
+from pathlib import Path
+from research.company_profile.reads import _iter_accepted_raw
+from research.company_profile.operations import record_published_source_review
+from research.company_profile.source_review import SemanticFinding
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v55_same_source_repair';O=R/'data/research/company_profile_common_core/m4_v55_same_source_repair/company_profile_common_core.v1'
+load=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+# Exact reviewed local source semantics are reused only for matching new facts.
+spec=importlib.util.spec_from_file_location('v55businessaudit',C/'v55-business-audit-script.txt',loader=__import__('importlib.machinery').machinery.SourceFileLoader('v55businessaudit',str(C/'v55-business-audit-script.txt')));audit=importlib.util.module_from_spec(spec);spec.loader.exec_module(audit)
+scope=load(C/'source-scope.json');formal=load(P/'formal_execution.json');decisions={};objects=[];findings=[];bindings={};missing=[];components={}
+for ins,res in formal['results'].items():
+ profile=res['query']['profiles'][0];assert profile==res['export']['profiles'][0]==load(Path(res['export']['files'][0]));raw=list(_iter_accepted_raw(load(O/'checkpoints'/(profile['work_id']+'.json'))));assert {r['record_id'] for r in raw}=={r['record_id'] for r in profile['accepted_facts']};assert len(raw)==len({r['record_id'] for r in raw})
+ for name,data in [('raw',raw),('profile',profile)]:Path('/tmp/v55_formal_'+name+'_'+ins+'.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+ d=audit.evaluate(ins,raw,profile);decisions[ins]=d
+ conditions={};aspects={};byrid={r['record_id']:r for r in raw}
+ for r in raw:
+  fd=d['facts'][r['record_id']]
+  if r['object_type']=='Segment':
+   for cid in fd.get('matched_income_conditions',[])+fd.get('matched_unclear_conditions',[]):conditions.setdefault(cid,[]).append(r['record_id']);aspects[cid]='important_disclosure'
+  if r['object_type'] in ['Activity','Relationship']:
+   for cid in fd.get('matched_role_conditions',[]):conditions.setdefault(cid,[]).append(r['record_id']);aspects[cid]='commodity_role'
+ expected={v['condition_id'] for v in scope['source_rows'][ins]}|{v['condition_id'] for v in scope['native_roles'] if v['instrument_id']==ins}|{v['condition_id'] for v in scope['source_uncertainty_conditions'] if v['instrument_id']==ins}
+ # Maximum one-to-one assignment: recall conditions never duplicate an accuracy object.
+ assigned={}
+ def augment(cid,visited):
+  for rid in conditions.get(cid,[]):
+   if rid in visited:continue
+   visited.add(rid)
+   if rid not in assigned or augment(assigned[rid],visited):assigned[rid]=cid;return True
+  return False
+ for cid in sorted(expected):
+  if not augment(cid,set()):missing.append({'instrument_id':ins,'condition_id':cid})
+ bindings[ins]=dict(assigned)
+ for r in raw:
+  rid=r['record_id'];fd=d['facts'][rid];cid=assigned.get(rid);aspect=aspects[cid] if cid else ('commodity_role' if r['object_type'] in ['Activity','Relationship'] else 'core_skeleton' if r['object_type']=='BusinessOverview' else 'important_disclosure')
+  findings.append(SemanticFinding(instrument_id=ins,aspect=aspect,kind='semantic',source='independently_read_official_report',disclosure_id=cid or 'actual:'+rid,disclosed_in_source=cid is not None,present_in_delivery=True,fact_accurate=fd['accurate'],critical_numeric_error=fd['critical_numeric_error']))
+  objects.append({'instrument_id':ins,'object_id':rid,'object_type':r['object_type'],'record':r,'decision':fd,'source_condition_id':cid})
+ for a in profile['dimensions']:
+  aid=a['dimension_id'];ad=d['answers'][aid];cid='answer:'+ins+':'+aid
+  findings.append(SemanticFinding(instrument_id=ins,aspect='core_skeleton',kind='semantic',source='independently_read_official_report',disclosure_id=cid,disclosed_in_source=True,present_in_delivery=ad['accurate'],fact_accurate=ad['accurate'],critical_numeric_error=ad['critical_numeric_error']))
+  # Incorrect answered bodies remain actual objects in the standalone accuracy;
+  # only fully correct output is submitted through source_review without duplicate body findings.
+  objects.append({'instrument_id':ins,'object_id':'answer:'+aid,'object_type':'answer','text':a['excerpt'],'decision':ad})
+  if not ad['accurate']:missing.append({'instrument_id':ins,'condition_id':cid})
+ components[ins]={'income':sum(any(v['condition_id'] in x.get('matched_income_conditions',[]) for x in d['facts'].values()) for v in scope['source_rows'][ins]),'action':sum(any(v['condition_id'] in x.get('matched_role_conditions',[]) for x in d['facts'].values()) for v in scope['native_roles'] if v['instrument_id']==ins),'unclear_rows':sum(any(v['condition_id'] in x.get('matched_unclear_conditions',[]) for x in d['facts'].values()) for v in scope['source_uncertainty_conditions'] if v['instrument_id']==ins),'answers':sum(v['accurate'] for v in d['answers'].values())}
+for m in missing:
+ if not m['condition_id'].startswith('answer:'):findings.append(SemanticFinding(instrument_id=m['instrument_id'],aspect=aspects.get(m['condition_id'],'important_disclosure'),kind='semantic',source='independently_read_official_report',disclosure_id=m['condition_id'],disclosed_in_source=True,present_in_delivery=False,fact_accurate=None,critical_numeric_error=False))
+neg=[n for d in decisions.values() for n in d['negatives']]
+score={'source_recall':{'present':307-len(missing),'total':307},'source_accuracy':{'correct':sum(o['decision']['accurate'] for o in objects),'total':len(objects)},'critical_numeric_errors':sum(o['decision']['critical_numeric_error'] for o in objects),'components':components,'negative_passed':sum(n['passed'] for n in neg),'negative_total':len(neg),'object_reviews':objects,'missing_conditions':missing,'recall_one_to_one_bindings':bindings,'a_role_acceptance':'not_granted','whole_round_seconds':formal['whole_round_seconds'],'formal_successor_index':1}
+for name,data in [('v55-actual-object-decisions.json',decisions),('v55-source-review-evidence.json',score),('v55-negative-review-evidence.json',{'passed':sum(n['passed'] for n in neg),'total':len(neg),'conditions':neg})]:
+ p=C/name;assert not p.exists();p.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+if all(o['decision']['accurate'] for o in objects):
+ obs=load(P/'observation.json');report=record_published_source_review(checkpoint_root=R/'data/checkpoints/company_profile_common_core',plan_directory=P,semantic_findings=tuple(findings),tokens_used=obs['tokens_consumed'],elapsed_seconds=formal['whole_round_seconds']);(C/'v55-source-review-owner-receipt.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n');assert report['source_review']['source_recall']['denominator']==307;assert report['source_review']['source_accuracy']['denominator']==len(objects)
+print({k:v for k,v in score.items() if k not in ['object_reviews','missing_conditions','recall_one_to_one_bindings']});print('MISSING',missing);print('WRONG',[(o['instrument_id'],o['object_id'],o['decision']) for o in objects if not o['decision']['accurate']])

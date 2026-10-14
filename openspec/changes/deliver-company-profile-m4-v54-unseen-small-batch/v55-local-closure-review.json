@@ -1,0 +1,19 @@
+{
+  "business_contract": "307正向=6正文+134确定收入+9冲突租金保留/unclear+158动作；44负例",
+  "local_facts": {
+    "600094.SH": 314,
+    "600103.SH": 392
+  },
+  "local_answers": 6,
+  "negative_passed": 44,
+  "formal_score": false,
+  "scope_review": "未发现剩余范围内阻塞；本次Review修正服务采购分类、佰才邦正文参股主体及下一节停止边界；旧无关失败继续后置",
+  "tests": [
+    "最终新样本及v54/v53组合16 passed",
+    "直接v50/v54/v53组合11 passed,12 deselected；之后仅修成立说明参股分支，新输入及v54/v53已重验"
+  ],
+  "limitations": [
+    "局部报告身份为测试入口，正式用真实官方资产身份",
+    "原先组合失败及服务测试输入遗漏布局失败均已定位修正；不声明全套pytest通过"
+  ]
+}

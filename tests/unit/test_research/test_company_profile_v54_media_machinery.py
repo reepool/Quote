@@ -205,11 +205,14 @@ def negative_violations(n, rs, ds):
             and n["counterparty"] in str(r["source_native"].get("qualifier", ""))
         ]
     elif name == "零采购不推动作":
+        # The same supplier has positive current labour and zero goods on
+        # separate native rows; the zero-goods condition cannot reject labour.
         bad = [
             r
             for r in relevant
             if r in acts
             and r.get("action") == "purchases"
+            and r["source_native"]["name"] in {"商品", "采购商品"}
             and any(
                 p in str(r["source_native"].get("qualifier", ""))
                 for p in n["counterparties"]

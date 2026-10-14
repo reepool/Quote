@@ -1,0 +1,81 @@
+import json,re,hashlib
+from decimal import Decimal
+from pathlib import Path
+B=Path('openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch');scope=json.loads((B/'source-scope.json').read_text());co=lambda s:re.sub(r'\s+','',s or '').replace('（','(').replace('）',')');num=lambda s:Decimal(co(s).replace(',',''));pages=lambda r:{p for e in r['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[]),*e.get('subject_evidence_pages',[])] if p is not None}
+def match(r,v):
+ n=r['source_native'];h=n.get('header') or '';q=co(n.get('qualifier'));d=r.get('dimension',r.get('segment_dimension'))
+ if v['page'] not in pages(r) or n.get('unit')!=v['unit'] or n.get('value') is None or num(n['value'])!=num(v['value']):return False
+ if co(n['name']).removeprefix('其中：')!=co(v['name']):return False
+ if r['subject_scope']!=('business_segment' if v['subject_scope']=='group_associated_entity' else v['subject_scope']):return False
+ rh=v['header']
+ if rh.startswith('主营业务分'):return d==v['dimension'] and h=='主营业务收入'
+ if rh in ['合并营业收入和营业成本','母公司营业收入和营业成本']:return h=='营业收入' and d=='business_type'
+ if rh=='主要控股参股公司分析':return h=='控股参股公司/营业收入' and q==co('子公司：'+v['source_actor'])
+ if rh=='重要非全资子公司的主要财务信息':return h=='重要非全资子公司/本期营业收入' and q==co('原子公司：'+v['source_actor'])
+ if rh=='重要联营企业的主要财务信息':return h=='重要联营企业/营业收入' and co(v['source_actor']) in q
+ if rh=='作为出租人的经营租赁':return h=='作为出租人的经营租赁/租赁收入' and d in ['service','lease','business_type']
+ if rh=='作为出租人的经营租赁/可变租赁收入':return '可变' in h
+ if rh=='关联租赁/本公司作为出租方':return h=='本公司作为出租方/本期确认的租赁收入' and q==co('承租方：'+v['counterparty'])
+ if rh=='关联交易/出售商品及提供劳务':return h=='出售商品/提供劳务/本期发生额' and q==co('交易对方：'+v['counterparty'])
+ if rh=='报告期内房地产销售和结转情况':return h=='房地产销售和结转/结转收入金额'
+ if '合同收入分解/' in rh:
+  return h.startswith('合同收入/') and ('原收入列：'+co(v.get('source_segment') or '')) in q and ('经营地区' in h if v['dimension']=='region' else '商品类型' in h if v['dimension']=='product' else True)
+ if rh=='报告分部的财务信息':return '分部' in h and d in ['industry','business_segment']
+ return False
+def rolematch(r,v):
+ if co(r['source_native']['name']) not in {co(z) for z in v['native_aliases']}:return False
+ scope_expected='business_segment' if v['subject_scope']=='group_associated_entity' else v['subject_scope']
+ if r['subject_scope']!=scope_expected:return False
+ if v['source_actor'] not in ['公司及合并子公司','公司子公司'] and co(r.get('source_actor')) not in {co(z) for z in v['actor_aliases']}:return False
+ verbs=[{'procures':'purchases','manufactures':'produces'}.get(a,a) for a in v['source_actions']]
+ if verbs==['uses_material']:return r.get('relation_type')=='material_input'
+ return r.get('action') in verbs and v['page'] in pages(r)
+if __name__=='__main__':
+ decisions={};allobj=[];missing=[];summaries={}
+ for i in scope['versions']:
+  raw=json.loads(Path('/tmp/v54new_actual_raw_'+i+'.json').read_text());profile=json.loads(Path('/tmp/v54new_actual_profile_'+i+'.json').read_text());rows=scope['source_rows'][i];roles=[r for r in scope['native_roles'] if r['instrument_id']==i];seenr={};seenk={};ds={}
+  for r in raw:
+   kind=r['object_type'];n=r['source_native'];d={'accurate':False,'critical_numeric_error':False,'reason':'原栏目/具名原行/状态未匹配，需逐对象修复'}
+   if kind in ['Segment','Measurement']:
+    hits=[j for j,v in enumerate(rows) if match(r,v)]
+    if hits:
+     d.update(accurate=True,reason='独立PDF原格：原名/本期值/单位/主体/原栏目/交易方匹配',recall_row_index=hits[0])
+     if kind=='Segment':seenr.setdefault(hits[0],r['record_id'])
+    elif i=='600094.SH' and n.get('value') in ['21.79','21.57','6.89']:
+     d.update(critical_numeric_error=bool(n.get('unit')=='元'),reason='p16毛利率百分比不是营业收入金额；有元或收入计量的对象属数字错误')
+    elif i=='600094.SH' and n['name']=='合计' and n.get('value')=='2,231,200,274.53' and '营业收入' in (n.get('header') or ''):
+     d.update(critical_numeric_error=True,reason='p151第一房地产分部2231200274.53被读成总合计；真实合计2246548569.51')
+   elif kind in ['Activity','Relationship']:
+    hits=[j for j,v in enumerate(roles) if rolematch(r,v)]
+    if hits:d.update(accurate=True,reason='原具名对象/原主体及实际动作方向，未由采购反推投入',recall_role_index=hits[0]);seenk.setdefault(hits[0],r['record_id'])
+    elif i=='600094.SH' and n['name']=='房地产开发' and r.get('action')=='operates' and r['subject_scope']=='named_subsidiary':d.update(accurate=True,reason='合同外：p163正规存续子公司业务性质房地产开发，保持具名主体，非替代具名销售')
+    elif i=='600103.SH' and r['subject_scope']=='unclear' and n['name'] in ['竹木浆','溶解浆','纸袋纸','纸制品','光电子产品','医药产品','林木产品','环保纸袋纸','精制牛皮纸','风油精','光器件','光模块']:d.update(accurate=True,reason='p9明确经营父类，主体仍unclear，保留合法原经营但不满足确定具名产销动作')
+    elif i=='600103.SH' and n['name']=='维修' and r.get('action')=='purchases':d.update(accurate=True,reason='合同外：本期接受物业及维修劳务，原采购方向；不替代完整具名原行')
+    elif i=='600103.SH' and n['name'] in ['风油香精','精油皂','手工皂','洗衣液'] and r.get('action')=='purchases':d.update(accurate=True,reason='合同外：p200实际本期采购原枚举商品，允许拆分但不替代完整原条件')
+   elif kind=='BusinessOverview':
+    # Each record checked as retained original disclosure; answers separately judge completeness and semantic use.
+    q=''.join(e['anchor']['bounded_quote'] for e in r['evidence'])
+    d.update(accurate=co(r['source_text']) in co(q),reason='逐原页保留披露和主体/期间/状态；不将原引用命中等同六正文实质完整')
+   ds[r['record_id']]=d;allobj.append({'instrument_id':i,'object_id':r['record_id'],'object_type':kind,'record':r,'decision':d})
+  ads={}
+  for a in profile['dimensions']:
+   rule=scope['answers'][i][a['dimension_id']];txt=co(a['excerpt']);bad=[g for g in rule['required_groups'] if not any(co(t) in txt for t in g)]
+   # First bodies still omit current named products and mechanisms; report quote tables cannot substitute missing substance.
+   correct=not bad
+   if i=='600094.SH':correct=False
+   if i=='600103.SH' and a['dimension_id']=='products_services':correct=False
+   if i=='600103.SH' and a['dimension_id']=='revenue_model':correct=False
+   d={'accurate':correct,'critical_numeric_error':i=='600094.SH' and a['dimension_id']=='revenue_model','failed_substance_groups':bad,'reason':'独立核实质及主体/期间；大名城缺金控、参股/筹备、物业/算力完整机制；青山产品矩阵和木材/机电机制缺项'}
+   ads[a['dimension_id']]=d;allobj.append({'instrument_id':i,'object_id':'answer:'+a['dimension_id'],'object_type':'answer','text':a['excerpt'],'decision':d})
+  for j,v in enumerate(rows):
+   if j not in seenr:missing.append({'instrument_id':i,'kind':'income','source':v})
+  for j,v in enumerate(roles):
+   if j not in seenk:missing.append({'instrument_id':i,'kind':'action','source':v})
+  for a,d in ads.items():
+   if not d['accurate']:missing.append({'instrument_id':i,'kind':'answer','dimension':a,'source':scope['answers'][i][a]})
+  for v in scope['source_uncertainty_conditions']:
+   if v['instrument_id']==i:missing.append({'instrument_id':i,'kind':'source_uncertainty','source':v})
+  decisions[i]={'facts':ds,'answers':ads};summaries[i]={'income':len(seenr),'income_total':len(rows),'action':len(seenk),'action_total':len(roles),'answers':sum(d['accurate'] for d in ads.values())}
+ score={'source_recall':{'present':307-len(missing),'total':307},'source_accuracy':{'correct':sum(o['decision']['accurate'] for o in allobj),'total':len(allobj)},'critical_numeric_errors':sum(o['decision']['critical_numeric_error'] for o in allobj),'components':summaries,'formal_first_attempt':True,'a_role_acceptance':'not_granted','object_reviews':allobj,'missing_conditions':missing}
+ for name,data in [('actual-object-decisions.json',decisions),('first-source-review-evidence.json',score)]:assert not (B/name).exists();(B/name).write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+ print({k:v for k,v in score.items() if k not in ['object_reviews','missing_conditions']})

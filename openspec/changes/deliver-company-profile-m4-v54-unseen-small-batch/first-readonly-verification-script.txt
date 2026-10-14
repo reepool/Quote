@@ -1,0 +1,45 @@
+import json,re,hashlib,sqlite3,sys
+from pathlib import Path
+sys.path.insert(0,'/tmp')
+from v54new_first_score import pages,co,num
+R=Path.cwd(); C=R/'openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch';load=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+def negative_violations(n,rs,ds):
+ relevant=[r for r in rs if n['page'] in pages(r)];fin=[r for r in relevant if r['object_type'] in ['Segment','Measurement']];acts=[r for r in relevant if r['object_type'] in ['Activity','Relationship']];name=n['name'];bad=[]
+ if name in ['仅上期关联销售','仅上期商标使用费','仅上期采购','污水设备本期空']:
+  bad=[r for r in fin+acts if co(n['content'])==co(r['source_native']['name']) and co(n['counterparty']) in co(str(r)) and (r in acts or n.get('prior_value') and r['source_native'].get('value') and num(r['source_native']['value'])==num(n['prior_value']))]
+ elif n.get('values'):
+  bad=[r for r in fin if r['source_native'].get('value') and num(r['source_native']['value']) in [num(v) for v in n['values']]]
+ elif name in ['本期收入空','本期结转收入空','研究分部收入空']:
+  bad=[r for r in fin if co(n['content'])==co(r['source_native']['name'])]
+ elif name in ['子公司本期营业收入空','杭州普润星融本期收入空','金控营业收入空']:
+  bad=[r for r in fin if co(n['actor']) in co(str(r['source_native']))]
+ elif name in ['合营章节不适用','合营联营财务不适用','集团合同分解不适用','母公司合同分解不适用','关联销售不适用']:
+  cue={'合营章节不适用':'合营企业/营业收入','合营联营财务不适用':'企业/营业收入','集团合同分解不适用':'合同收入/','母公司合同分解不适用':'合同收入/','关联销售不适用':'出售商品/提供劳务/本期发生额'}[name]
+  bad=[r for r in fin if cue in (r['source_native'].get('header') or '')]
+ elif name=='注销边界':
+  bad=[r for r in acts if any(co(a) in co(r.get('source_actor') or '') for a in n['actors']) and not re.search('注销|退出',co(r['source_native'].get('qualifier')))]
+ elif name=='经营范围与计划非当前动作':bad=[r for r in acts if co(n['actor']) in co(r.get('source_actor') or '') and r.get('action') in ['produces','sells']]
+ elif name=='参股及筹备边界':bad=[r for r in acts if any(co(a) in co(str(r)) for a in n['actors']) and r['subject_scope']=='consolidated_group']
+ elif name=='下游用途不是公司制造':bad=[r for r in acts if n['content'] in r['source_native']['name'] and r.get('action')=='produces']
+ elif name=='研发注册非销售':bad=[r for r in acts if n['content'] in r['source_native']['name'] and r.get('action')=='sells']
+ elif name=='采购不反推投入':bad=[r for r in acts if r.get('relation_type')=='material_input' and re.search('燃料|设备',r['source_native']['name'])]
+ elif name=='冲突单位不得确定收入化':
+  bad=[r for r in fin if r['source_native'].get('header')=='房地产出租/租金收入' and not any('unclear' in u for u in r.get('uncertainty',[]))]
+ else:raise AssertionError(name)
+ return [r['record_id'] for r in bad]
+if __name__=='__main__':
+ s=load(C/'source-scope.json');formal=load(R/'data/checkpoints/company_profile_common_core/reports/m4_v54_unseen_small_batch/formal_execution.json');out=[];runtime=[]
+ for n in s['negative_conditions']:
+  i=n['instrument_id'];rs=load(Path('/tmp/v54new_actual_raw_'+i+'.json'));ds=load(Path('/tmp/v54new_actual_profile_'+i+'.json'))['dimensions'];bad=negative_violations(n,rs,ds);out.append(dict(**n,evaluated=True,passed=not bad,violating_record_ids=bad))
+ con=sqlite3.connect('file:data/research.db?mode=ro',uri=True); B=R/'data/research/company_profile_common_core/m4_v54_unseen_small_batch/company_profile_common_core.v1'
+ for i,res in formal['results'].items():
+  q=res['query']['profiles'][0];assert q==res['export']['profiles'][0]==load(Path(res['export']['files'][0]));rt=load(B/(q['work_id']+'.json'));row=con.execute('select status,metadata_json from business_profile_work_items where work_id=?',(q['work_id'],)).fetchone();assert row[0]=='completed';st=load(Path('/dev/null')) if False else json.loads(row[1])['stage_results'];assert set(st)=={'acquire','parse','semantic','verify','publish'} and all(not v['reused_scope_ids'] for v in st.values());assert not rt['execution']['predecessor_lineage'];runtime.append(dict(instrument_id=i,work_id=q['work_id'],stage_results=st,predecessor_lineage=[],query_export_disk_equal=True,tokens=rt['execution']['token_budget']))
+ counts={}
+ for name,base in [('first',load(C/'first-formal-delivery-preservation-completion.json')['completed_sha256']),('history',load(C/'protection-baseline.json')),('existing',load(C/'initial-workspace-baseline.json')['existing_modified_sha256']),('code',formal['executed_code_sha256'])]:
+  assert all(sha(R/p)==h for p,h in base.items()),name;counts[name]=len(base)
+ obs=load(R/'data/checkpoints/company_profile_common_core/reports/m4_v54_unseen_small_batch/observation.json');receipt=dict(verified=True,runtime=runtime,counts=counts,whole_round_seconds=formal['whole_round_seconds'],tokens_used=obs['tokens_consumed'],first_attempts_used=1,successors_used=0,successors_authorized=2)
+ neg=dict(passed=sum(n['passed'] for n in out),total=len(out),conditions=out)
+ for name,data in [('first-negative-review-evidence.json',neg),('first-readonly-verification-receipt.json',receipt)]:
+  p=C/name;assert not p.exists();p.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+ print('negatives',neg['passed'],neg['total']);print([(n['name'],n['content'] if 'content' in n else '',n['violating_record_ids']) for n in out if not n['passed']]);print(counts)
+ protected={str((C/n).relative_to(R)):sha(C/n) for n in ['source-scope.json','source-freeze-receipt.json','actual-object-decisions.json','first-source-review-evidence.json','first-negative-review-evidence.json','first-readonly-verification-receipt.json']};(C/'first-review-preservation.json').write_text(json.dumps(protected,ensure_ascii=False,indent=2)+'\n')

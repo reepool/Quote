@@ -1,0 +1,44 @@
+{
+  "ruff_check": "passed on five task Python files",
+  "ruff_format_check": "5 files already formatted",
+  "diff_check": "passed",
+  "openspec_strict": [
+    "deliver-company-profile-m4-v54-unseen-small-batch",
+    "company-profile-common-core-owned-page-facts",
+    "company-profile-common-core-company-total-and-income-mix",
+    "company-profile-m4-first-expansion"
+  ],
+  "test_results": [
+    {
+      "command": "pytest -q tests/unit/test_research/test_company_profile_v55_property_paper.py tests/unit/test_research/test_company_profile_v54_media_machinery.py tests/unit/test_research/test_company_profile_v53_source_conflict.py",
+      "result": "16 passed",
+      "log": "v55_final_package_tests.log"
+    },
+    {
+      "command": "pytest -q tests/unit/test_research/test_company_profile_v54_media_machinery.py tests/unit/test_research/test_company_profile_v53_source_conflict.py tests/unit/test_research/test_company_profile_v50_realestate_chemical.py -k \"complete_official or normal_technology or purchase or yun\"",
+      "result": "11 passed,12 deselected; overlaps 6 old-source cases with final combo, do not claim 27 unique cases",
+      "log": "v55_final_old_regression.log"
+    }
+  ],
+  "failed_checks_then_resolved": [
+    "Earlier combined regression found existing purchaser parsing affected by changed branch, fixed and old-source closure passed",
+    "New purchase service test initially used plain text while owner uses actual layout; changed test to same official layout, passed",
+    "Source-note identity test caught whitespace-split 参股项目 guard; compact evidence guard now passes complete official input",
+    "Read-only source verifier initially assumed fitz/pdftotext; actual installed source mechanisms are pdfium text with pypdf fallback and pypdf layout. Frozen pages verified using those original methods",
+    "Validation initially guessed nonexistent company-profile-source-review spec; actual affected specs listed above all strict pass"
+  ],
+  "review": {
+    "blocking_findings_fixed": [
+      "服务采购分类",
+      "参股正文集团默认范围及下一节污染"
+    ],
+    "remaining_in_scope_blockers": 0,
+    "unrelated_failures": "旧无关失败及全套pytest后置，不声明全套通过"
+  },
+  "formal_attempts": {
+    "first": 1,
+    "successors_used": 1,
+    "successors_authorized": 2,
+    "second_successor_run": false
+  }
+}

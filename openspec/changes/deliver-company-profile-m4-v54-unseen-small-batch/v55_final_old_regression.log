@@ -1,0 +1,13 @@
+[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[33m                                                              [100%][0m
+============================= slowest 10 durations =============================
+86.98s call     tests/unit/test_research/test_company_profile_v50_realestate_chemical.py::test_complete_official_contract[pages-600096.SH]
+86.50s call     tests/unit/test_research/test_company_profile_v50_realestate_chemical.py::test_complete_official_contract[independent_pages-600096.SH]
+21.54s call     tests/unit/test_research/test_company_profile_v50_realestate_chemical.py::test_complete_official_contract[pages-600064.SH]
+20.60s call     tests/unit/test_research/test_company_profile_v50_realestate_chemical.py::test_complete_official_contract[independent_pages-600064.SH]
+19.07s call     tests/unit/test_research/test_company_profile_v54_media_machinery.py::test_complete_official_contract[600088.SH]
+14.39s call     tests/unit/test_research/test_company_profile_v53_source_conflict.py::test_v53_complete_official_owner_contract_and_source_conflict[600097.SH]
+10.25s call     tests/unit/test_research/test_company_profile_v54_media_machinery.py::test_complete_official_contract[600099.SH]
+5.65s call     tests/unit/test_research/test_company_profile_v53_source_conflict.py::test_v53_complete_official_owner_contract_and_source_conflict[600082.SH]
+0.12s call     tests/unit/test_research/test_company_profile_v53_source_conflict.py::test_normal_technology_business_is_not_removed[\u5e94\u7528\u8f6f\u4ef6]
+0.05s call     tests/unit/test_research/test_company_profile_v53_source_conflict.py::test_normal_technology_business_is_not_removed[\u96c6\u6210\u7535\u8def]
+[33m[32m11 passed[0m, [33m[1m12 deselected[0m, [33m[1m7 warnings[0m[33m in 266.63s (0:04:26)[0m[0m
