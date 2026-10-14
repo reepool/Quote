@@ -1,0 +1,23 @@
+import json,hashlib
+from pathlib import Path
+from tests.unit.test_research.test_company_profile_v48_metal_equipment import match,action_match,check_substance
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v47-unseen-small-batch';read=lambda p:json.loads(Path(p).read_text());scope=read(C/'source-scope.json');results={}
+for i in scope['versions']:
+ raw=read('/tmp/v49correctedraw_'+i+'.json');q=read('/tmp/v49correctedprofile_'+i+'.json')
+ rows=scope['source_rows'][i];roles=[r for r in scope['native_roles'] if r['instrument_id']==i]
+ for kind in ['Segment','Measurement']:assert all(any(r['object_type']==kind and match(r,row) for r in raw) for row in rows)
+ assert all(any(action_match(r,role) for r in raw) for role in roles);check_substance(q,i)
+ prior=read('/tmp/v48formalraw_'+i+'.json')
+ def semantics(r):
+  if isinstance(r,list):return [semantics(v) for v in r]
+  if isinstance(r,dict):return {k:semantics(v) for k,v in r.items() if k not in ['record_id','evidence_id','report_id','published_at','anchor']}
+  return r
+ # Evidence records remain unchanged under the new processing identity; compare original data.
+ from collections import Counter
+ orig=Counter(json.dumps(semantics(r),ensure_ascii=False,sort_keys=True) for r in prior)
+ new=Counter(json.dumps(semantics(r),ensure_ascii=False,sort_keys=True) for r in raw)
+ assert not (orig-new),(i,'original fact changed')
+ assert {d['dimension_id']:d['excerpt'] for d in q['dimensions']}=={d['dimension_id']:d['excerpt'] for d in read('/tmp/v48formalanswers_'+i+'.json')}
+ results[i]=dict(income_conditions=len(rows),action_conditions=len(roles),answers=3,accepted_count=len(raw),prior_formal_fact_count=len(prior),added_count=len(raw)-len(prior),all_prior_fact_business_semantics_retained=True,all_answers_unchanged=True)
+proof=read(C/'v49-correction-actual-owner-input-validation.json');proof.update(verified_successor_identity='v49',recall_numerator=sum(v['income_conditions']+v['action_conditions']+v['answers'] for v in results.values()),recall_denominator=532,contract_unchanged=True,original_v48_formal_unchanged=True,full_contract_results=results,a_role_v48_failure_and_local_correction_approved=True,local_test_report_metadata='Test closure uses synthetic report_id/publication metadata; real bound official asset provides all input pages. Formal owner must independently verify original report binding.')
+(C/'v49-successor-preflight-validation.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');print(results)

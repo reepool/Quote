@@ -1,0 +1,23 @@
+import json,tempfile,sqlite3
+from pathlib import Path
+from utils import config_manager
+from research.storage import ResearchStorageManager
+from research.announcement_assets import AnnouncementAssetConfig,AnnouncementAssetRepository,AnnouncementAssetService
+from research.announcement_assets.access import AnnouncementAssetAccess
+from research.business_profile_async_production import BusinessProfileWorkRepository
+from research.company_profile.operations import OfficialAnnualReportPageSource
+from research.company_profile.reads import _iter_accepted_raw
+from tests.unit.test_research.test_company_profile_v19_closure import _drive
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v47-unseen-small-batch';F=json.loads((R/'data/checkpoints/company_profile_common_core/reports/m4_v48_same_source/formal_execution.json').read_text());rc=config_manager.get_research_config();storage=ResearchStorageManager(rc);cfg=AnnouncementAssetConfig.from_research_config(rc,project_root=R);ar=AnnouncementAssetRepository(Path(str(rc.storage.db_path)).resolve());service=AnnouncementAssetService(repository=ar,config=cfg,acquisition_service=None,attachment_retriever=None);access=AnnouncementAssetAccess(repository=ar,config=cfg,service=service);repo=BusinessProfileWorkRepository(storage,checkpoint_root=R/'data/checkpoints/company_profile_common_core',shared_asset_access=access);page_source=OfficialAnnualReportPageSource(repo);proof={}
+con=sqlite3.connect('file:'+str(Path(str(rc.storage.db_path)).resolve())+'?mode=ro',uri=True);before=con.execute('select work_id from business_profile_work_items order by work_id').fetchall()
+for i,r in F['results'].items():
+ item=repo.get(r['query']['profiles'][0]['work_id']);source=page_source(item);assert source is not None
+ assert all(p.get('layout_text') for p in source['pages'] if i=='600089.SH' and p['page'] in {342,343,344})
+ root=Path(tempfile.mkdtemp(prefix='v49-corrected-actual-owner-'))
+ q,e=_drive(root,instrument=i,fixture={'document_version':source['report'].document_version},pages=source['pages'],repair_version='v49');assert q==e
+ raw=list(_iter_accepted_raw(json.loads(next(root.glob('company_profile_common_core.v1/checkpoints/*.json')).read_text())))
+ for kind,data in [('raw',raw),('profile',q),('answers',q['dimensions'])]:Path('/tmp/v49corrected'+kind+'_'+i+'.json').write_text(json.dumps(data,ensure_ascii=False))
+ proof[i]=dict(input_method='real_OfficialAnnualReportPageSource_reads_exact_bound_asset_no_layout_injection',all_owner_pages=len(source['pages']),owner_layout_pages=[p['page'] for p in source['pages'] if p.get('layout_text')],accepted_count=len(raw),five_stage_local_owner=True,query_export_equal=True)
+ print(i,len(raw),proof[i]['owner_layout_pages'],flush=True)
+assert con.execute('select work_id from business_profile_work_items order by work_id').fetchall()==before
+(C/'v49-correction-actual-owner-input-validation.json').write_text(json.dumps(dict(formal_execution_count_still=1,queue_unchanged=True,results=proof),ensure_ascii=False,indent=2)+'\n')

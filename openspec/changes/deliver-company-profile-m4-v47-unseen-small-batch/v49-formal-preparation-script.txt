@@ -1,0 +1,34 @@
+import json,hashlib,subprocess
+from datetime import datetime,timezone
+from pathlib import Path
+from research.company_profile.execution import default_processing_identity
+from research.company_profile import core_evidence_selection as cs
+from research.company_profile.m4_next_batch import load_m4_next_batch_plan,save_m4_next_batch_plan
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v47-unseen-small-batch';K=R/'data/checkpoints/company_profile_common_core';P=K/'reports/m4_v49_same_source';read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+base=read(C/'v49-initial-workspace-baseline.json')
+for d in [base['existing_modified_sha256'],base['original_change_sha256'],read(C/'protection-baseline.json'),read(C/'first-formal-delivery-preservation-completion.json')['completed_sha256']]:
+ for p,h in d.items():
+  if p.endswith('/tasks.md'):continue
+  assert sha(R/p)==h,p
+old=read(C/'source-freeze-receipt.json');identity={**default_processing_identity(),'revenue_sentence_repair':'v49'}
+assert all(getattr(cs,f)(identity) for f in ['revenue_sentence_repair_requested','named_role_repair_requested','service_operating_energy_requested','core_answer_repair_requested','source_delivery_repair_requested']);assert default_processing_identity().get('revenue_sentence_repair')!='v49'
+assert not P.exists();assert not (R/'data/research/company_profile_common_core/m4_v49_same_source').exists();assert not (R/'data/exports/m4_v49_same_source').exists()
+plan=load_m4_next_batch_plan(K,plan_directory=K/'reports/m4_v47_unseen_small_batch');save_m4_next_batch_plan(K,plan,plan_directory=P);assert load_m4_next_batch_plan(K,plan_directory=P)==plan
+code={p:sha(R/p) for p in old['executed_code_sha256']};assert len(code)==38
+patch=subprocess.run(['git','diff',base['head'],'--',*code],check=True,capture_output=True).stdout;(C/'v49-execution-code.patch').write_bytes(patch)
+receipt={**old,'created_at':datetime.now(timezone.utc).isoformat(),'processing_identity':identity,'executed_code_sha256':code,'baseline_head':base['head'],'execution_patch_sha256':sha(C/'v49-execution-code.patch'),'original_contract_identity':old['processing_identity'],'original_contract_unchanged':True,'plan_directory':str(P),'plan_sha256':sha(P/'plan.json'),'independent_fixture_sha256':sha(R/'tests/fixtures/company_profile_v48_metal_equipment_frozen_pages.json'),'additional_contract_external_ledger_sha256':sha(C/'v48-contract-external-income-source-ledger.json'),'source_condition_count':532,'negative_count':80,'source_interpretation_sha256':sha(C/'source-contract-interpretation.json'),'production_authorization':'not_authorized','scale_quality_claim_allowed':False}
+save(C/'v49-source-freeze-receipt.json',receipt)
+script=Path('/tmp/quote_v47_next_execute.py').read_text().replace('m4_v47_unseen_small_batch','m4_v49_same_source').replace("'revenue_sentence_repair':'v47'","'revenue_sentence_repair':'v49'").replace("CHANGE/'source-freeze-receipt.json'","CHANGE/'v49-source-freeze-receipt.json'")
+script=script.replace("print('WHOLE_ROUND_SECONDS',elapsed,flush=True)","preserve_first_delivery()\n print('WHOLE_ROUND_SECONDS',elapsed,flush=True)")
+script=script.replace("if __name__=='__main__':asyncio.run(main())",'''def preserve_first_delivery():
+ import hashlib
+ paths=[p for root in (PLAN,OUTPUT,EXPORT) for p in root.rglob('*') if p.is_file()]
+ assert all(p.stat().st_size>0 for p in paths)
+ manifest=dict(created_at=datetime.now(timezone.utc).isoformat(),method='all_owner_returns_and_formal_index_write_text_return_before_hash',file_count=len(paths),completed_sha256={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(paths)})
+ target=CHANGE/'v49-first-formal-delivery-preservation.json'
+ assert not target.exists()
+ target.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\\n')
+ print('FIRST_ARTIFACTS_PROTECTED',len(paths),flush=True)
+if __name__=='__main__':asyncio.run(main())''')
+Path('/tmp/v49_execute.py').write_text(script);(C/'v49-first-execution-script.txt').write_text(script)
+print('PREPARED',plan.plan_id,identity, len(code))

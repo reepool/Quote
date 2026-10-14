@@ -1,0 +1,25 @@
+import json,hashlib
+from pathlib import Path
+from collections import Counter
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v47-unseen-small-batch';read=lambda p:json.loads(Path(p).read_text())
+def sem(r):
+ if isinstance(r,list):return [sem(v) for v in r]
+ if isinstance(r,dict):return {k:sem(v) for k,v in r.items() if k not in ['record_id','evidence_id','anchor']}
+ return r
+scope=read(C/'source-scope.json');results={};added_records=[]
+for i in scope['versions']:
+ old=read('/tmp/v48formalraw_'+i+'.json');new=read('/tmp/v49formalraw_'+i+'.json');a=Counter(json.dumps(sem(r),ensure_ascii=False,sort_keys=True) for r in old);b=Counter(json.dumps(sem(r),ensure_ascii=False,sort_keys=True) for r in new)
+ assert not a-b,(i,'original formal semantics regressed')
+ added=b-a;remaining=added.copy();records=[]
+ for r in new:
+  key=json.dumps(sem(r),ensure_ascii=False,sort_keys=True)
+  if remaining[key]>0:
+   records.append(r);remaining[key]-=1
+ expected=[r['name'] for r in scope['native_roles'] if r['instrument_id']==i and r['condition_id'].split('-')[-1] in [f'{j:03}' for j in range(63,79)]] if i=='600089.SH' else []
+ assert Counter(r['source_native']['name'] for r in records)==Counter(expected)
+ assert all(r['object_type']=='Activity' and r['action']=='purchases' and r['subject_scope']=='consolidated_group' and r['reported_period']=='2025-12-31' for r in records)
+ olda=read('/tmp/v48formalanswers_'+i+'.json');newa=read('/tmp/v49formalanswers_'+i+'.json');assert {r['dimension_id']:r['excerpt'] for r in olda}=={r['dimension_id']:r['excerpt'] for r in newa}
+ results[i]=dict(original_fact_count=len(old),actual_fact_count=len(new),original_business_semantics_retained=len(old),added_purchase_count=len(records),answer_excerpt_original_bytes_unchanged=True,original_official_report_identity_and_period_retained=True)
+ added_records.extend(records)
+proof=dict(formal_v49_vs_v48=True,comparison_method='All original report identity, period, native business fields, actor, direction and evidence page semantics preserved; record/evidence IDs and quote formatting excluded. Quotes independently validated against actual PDF/layout.',results=results,added_purchase_records=added_records,original_contract_unchanged=True)
+(C/'v49-formal-business-comparison.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n');print(results)

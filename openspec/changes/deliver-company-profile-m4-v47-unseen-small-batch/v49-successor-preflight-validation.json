@@ -1,0 +1,97 @@
+{
+  "formal_execution_count_still": 1,
+  "queue_unchanged": true,
+  "results": {
+    "600058.SH": {
+      "input_method": "real_OfficialAnnualReportPageSource_reads_exact_bound_asset_no_layout_injection",
+      "all_owner_pages": 287,
+      "owner_layout_pages": [
+        30,
+        206,
+        207,
+        208,
+        225,
+        226,
+        227,
+        246,
+        247,
+        248,
+        249,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255,
+        256,
+        257,
+        274,
+        284,
+        285
+      ],
+      "accepted_count": 776,
+      "five_stage_local_owner": true,
+      "query_export_equal": true
+    },
+    "600089.SH": {
+      "input_method": "real_OfficialAnnualReportPageSource_reads_exact_bound_asset_no_layout_injection",
+      "all_owner_pages": 387,
+      "owner_layout_pages": [
+        53,
+        54,
+        169,
+        170,
+        171,
+        172,
+        173,
+        291,
+        292,
+        293,
+        329,
+        330,
+        342,
+        343,
+        344,
+        345,
+        346,
+        347,
+        348,
+        367,
+        383,
+        384
+      ],
+      "accepted_count": 468,
+      "five_stage_local_owner": true,
+      "query_export_equal": true
+    }
+  },
+  "verified_successor_identity": "v49",
+  "recall_numerator": 532,
+  "recall_denominator": 532,
+  "contract_unchanged": true,
+  "original_v48_formal_unchanged": true,
+  "full_contract_results": {
+    "600058.SH": {
+      "income_conditions": 274,
+      "action_conditions": 74,
+      "answers": 3,
+      "accepted_count": 776,
+      "prior_formal_fact_count": 776,
+      "added_count": 0,
+      "all_prior_fact_business_semantics_retained": true,
+      "all_answers_unchanged": true
+    },
+    "600089.SH": {
+      "income_conditions": 97,
+      "action_conditions": 81,
+      "answers": 3,
+      "accepted_count": 468,
+      "prior_formal_fact_count": 452,
+      "added_count": 16,
+      "all_prior_fact_business_semantics_retained": true,
+      "all_answers_unchanged": true
+    }
+  },
+  "a_role_v48_failure_and_local_correction_approved": true,
+  "local_test_report_metadata": "Test closure uses synthetic report_id/publication metadata; real bound official asset provides all input pages. Formal owner must independently verify original report binding."
+}

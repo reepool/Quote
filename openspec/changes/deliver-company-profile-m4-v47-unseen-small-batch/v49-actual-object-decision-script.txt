@@ -1,0 +1,40 @@
+import json,sys
+from pathlib import Path
+sys.path.insert(0,'/tmp')
+from tests.unit.test_research.test_company_profile_v48_metal_equipment import match,action_match,co,num,pages,check_substance
+C=Path('openspec/changes/deliver-company-profile-m4-v47-unseen-small-batch');read=lambda p:json.loads(Path(p).read_text());s=read(C/'source-scope.json');extras=read(C/'contract-external-income-source-ledger.json')+read(C/'v48-contract-external-income-source-ledger.json');ledger=read(C/'related-sales-independent-ledger.json');out={};unresolved=[]
+for i in s['versions']:
+ rs=read('/tmp/v49formalraw_'+i+'.json');roles=[v for v in s['native_roles'] if v['instrument_id']==i];facts={}
+ for r in rs:
+  n=r['source_native'];kind=r['object_type'];d={'accurate':False,'critical_numeric_error':False}
+  if kind=='BusinessOverview':d.update(accurate=True,reason='完整原页所支持的业务原文及已验证主体释义展开；最终正文按实质另核')
+  elif kind in ['Segment','Measurement']:
+   matched=[k for k,v in enumerate(s['source_rows'][i]) if match(r,v)]
+   if matched:d.update(accurate=True,reason='原本期对象、金额、单位、栏目、主体及限定逐项匹配',recall_row_index=matched[0])
+   else:
+    extra=[v for v in extras if v['instrument_id']==i and v['page'] in pages(r) and co(v['name'])==co(n['name']) and num(v['value'])==num(n['value']) and v['unit']==n.get('unit') and v['header']==n.get('header') and co(v['qualifier'])==co(n.get('qualifier')) and v['subject_scope']==r['subject_scope'] and v['dimension']==r.get('dimension',r.get('segment_dimension'))]
+    if extra:d.update(accurate=True,reason='独立原布局合同外收入物理列/小计匹配',supplement_source=extra[0])
+    elif n.get('header')=='出售商品/提供劳务/本期发生额' and r['subject_scope']=='consolidated_group':
+     vals=[v for v in ledger[i] if v['kind']=='transaction' and v['current_value'] is not None and num(v['current_value'])==num(n['value']) and co(v['content'])==co(n['name']) and co('交易对方：'+v['counterparty'])==co(n.get('qualifier'))]
+     if vals:d.update(accurate=True,reason='独立关联收入台账本期原行、交易方和原复合商品/服务严格匹配',source_ledger=vals[0])
+     else:
+      subtotal=[v for v in ledger[i] if v['kind']!='transaction' and num(v['value'])==num(n['value']) and n['name']==v['kind'].replace('subtotal','小计').replace('total','合计')]
+      if subtotal:d.update(accurate=True,reason='原关联销售本期小计或合计匹配，不增加召回',source_ledger=subtotal[0])
+  else:
+   matched=[k for k,v in enumerate(roles) if action_match(r,v)]
+   if matched:d.update(accurate=True,reason='原具名对象/独立动作/原主体/来源页匹配',recall_role_index=matched[0])
+   elif i=='600058.SH' and 62 in pages(r) and r['subject_scope']=='consolidated_group' and r.get('action')=='purchases' and n['name'] in ['铬铁','锰矿砂','铁矿石','焦炭','型材','热轧板材','钢筋','铬矿砂及精矿']:
+    d.update(accurate=True,reason='原p62本期明确购买商品行；合同外真实采购，未推投入')
+   elif i=='600058.SH' and n.get('header')=='出售商品/提供劳务/本期发生额' and r['subject_scope']=='consolidated_group' and r.get('action')=='sells' and n['name'] in ['煤炭','铁矿石']:
+    d.update(accurate=True,reason='原关联销售表当前货品销售；合同外页面重复支持不重复召回')
+   elif i=='600058.SH' and r['subject_scope']=='consolidated_group' and n['name']=='租赁' and r.get('action')=='provides_service':d.update(accurate=True,reason='原作为出租人的经营租赁服务')
+   elif i=='600089.SH' and bool(pages(r)&{343,344}) and r['subject_scope']=='consolidated_group' and r.get('action')=='purchases' and n['name'] in ['商品房','零星材料','材料']:
+    d.update(accurate=True,reason='原p343-344明确当前购买原行，合同外合法采购，不推投入')
+  if not d['accurate']:unresolved.append({'instrument_id':i,'kind':kind,'record_id':r['record_id'],'native':n,'subject_scope':r['subject_scope'],'pages':sorted(pages(r)),'dimension':r.get('dimension',r.get('segment_dimension')),'action':r.get('action'),'actor':r.get('source_actor')})
+  facts[r['record_id']]=d
+ q=read('/tmp/v49formalprofile_'+i+'.json');
+ try:check_substance(q,i);substance=True
+ except AssertionError:substance=False
+ answers={d['dimension_id']:{'accurate':substance,'critical_numeric_error':False,'reason':'独立实质核对原业务全链、完整产品/服务矩阵、当前与计划/退出限定和收入机制'} for d in q['dimensions']}
+ out[i]={'facts':facts,'answers':answers};print(i,len(facts),'unresolved',sum(x['instrument_id']==i for x in unresolved),'answers',substance)
+(C/'v49-actual-object-decisions.json').write_text(json.dumps(out,ensure_ascii=False,indent=2));(C/'v49-unresolved-object-decisions.json').write_text(json.dumps(unresolved,ensure_ascii=False,indent=2));print(unresolved[:6])
