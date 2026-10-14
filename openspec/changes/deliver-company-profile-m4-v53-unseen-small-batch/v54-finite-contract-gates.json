@@ -1,0 +1,32 @@
+{
+  "contract_positive_count": 207,
+  "contract_negative_count": 32,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 207,
+    "denominator": 207,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 593,
+    "denominator": 593,
+    "value": 1.0
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "negative_passed": 32,
+  "whole_round_seconds": 231.75049244984984,
+  "tokens_used": 0,
+  "whole_round_limit": 300,
+  "shared_token_limit": 50000,
+  "frozen_contract_gates_met": true,
+  "original_expansion_gates_met": false,
+  "original_elapsed_threshold_seconds": 184.85084899608046,
+  "explanation": "原owner用最后一家剩余执行时间作为复核阈值；本卡冻结整轮300秒，231.75秒达标。仅旁挂解释，不改原字段，不授权扩批。",
+  "a_role_finite_acceptance": "pending",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

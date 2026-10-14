@@ -213,3 +213,14 @@ Three-dimensional business answers MUST preserve original subsidiary and investe
 #### Scenario: Related-party scope changes while current procurement continues
 - **WHEN** source evidence distinguishes full-year procurement, January-February approved amounts and a later nonrelated-party period
 - **THEN** the answer retains those native periods and actors without combining approved limits with actual income
+
+### Requirement: Unexplained official business conflicts remain uncertain in answers
+Official wording that conflicts with independently checked same-report business and revenue disclosures and cannot be explained MUST retain its native Evidence and source wording with existing unclear uncertainty semantics. It MUST NOT support deterministic principal-business, products-services or revenue-model answers or be reused as resolved core evidence. Source quote equality alone MUST NOT establish business accuracy. Correct same-report sources MUST continue to support substantive answers; ordinary source-supported software and integrated-circuit business MUST NOT be removed merely because of product words.
+
+#### Scenario: A native segment description conflicts with the report's actual business
+- **WHEN** a segment product description names software and integrated circuits while checked principal-business and revenue disclosures describe fishing, fish processing and transport and the contradiction remains unexplained
+- **THEN** the original description remains available as unclear Evidence and exits deterministic three-dimensional answers and their support IDs while correct business content remains
+
+#### Scenario: A report consistently describes a software business
+- **WHEN** the source-supported business and income context consistently supports software or integrated circuits
+- **THEN** normal evidence and substantive answers remain eligible without a word blacklist

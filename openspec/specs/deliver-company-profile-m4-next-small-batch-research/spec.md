@@ -73,3 +73,10 @@ A first failed business round MUST preserve its original contract, scores, artif
 #### Scenario: A finite successor passes after a retained first failure
 - **WHEN** A-role accepts the later same-source delivery within the frozen source contract
 - **THEN** synchronized specifications and path-mapped protection allow archive while the original failure stays byte-identical and no production or scale claim is enabled
+
+### Requirement: Finite v53 acceptance retains corrected contracts and earlier self-review
+The accepted v53 scope MUST remain limited to the frozen 海泰发展 and 开创国际 reports, 170 positive conditions and 32 actually evaluated negatives. Original 160-condition contracts, ten-condition supplementation rulings, all first results and code, v52 B self-review scores and A body-conflict blocking conclusions MUST remain byte-identical. The accepted result is 170/170 recall, 448/448 unique accuracy from 442 facts and six bodies, zero numeric errors and 32/32 negatives, with 217.742779 seconds and zero tokens under existing PDF parse-cache conditions. The original expansion_gates_met=false and its recorded timing explanation MUST remain retained. Finite archive MUST NOT authorize production or scale claims.
+
+#### Scenario: A independently accepts the corrected uncertain-source successor
+- **WHEN** v53 passes within the declared two-report scope after retained failed and blocked rounds
+- **THEN** specification synchronization and path-mapped protection permit finite archive with production not_authorized and scale_quality_claim_allowed false

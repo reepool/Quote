@@ -1,0 +1,36 @@
+import json
+from pathlib import Path
+from v53new_match import match,action_match,co,pages
+C=Path('openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch');s=json.loads((C/'v54-source-scope.json').read_text())
+def decisions(raw,answers,i):
+ facts={};roles=[x for x in s['native_roles'] if x['instrument_id']==i]
+ for r in raw:
+  kind=r['object_type'];d=dict(accurate=False,critical_numeric_error=False);n=r['source_native']
+  if kind in ['Segment','Measurement']:
+   hits=[k for k,v in enumerate(s['source_rows'][i]) if match(r,v)]
+   if hits:d.update(accurate=True,reason='原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率',recall_row_index=hits[0])
+   elif i=='600088.SH' and n['name']=='正常经营之外的其他业务收入' and n['value']=='1,221,197.91' and n['unit']=='元' and n['header']=='其他业务收入扣除明细/本年度' and r['subject_scope']=='consolidated_group' and 8 in pages(r):d.update(accurate=True,reason='合同外：中视p8本期原扣除表项目1221197.91元，保留原栏目，不强行变成新收入正向')
+  elif kind in ['Activity','Relationship']:
+   hits=[k for k,v in enumerate(roles) if action_match(r,v)]
+   if hits:d.update(accurate=True,reason='原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定',recall_role_index=hits[0])
+   elif r['subject_scope']=='consolidated_group':
+    if i=='600088.SH' and n['name']=='设备' and r.get('action')=='provides_service' and 11 in pages(r):d.update(accurate=True,reason='合同外：p11公司为影视节目提供包括设备、机房、演播室运维的全流程技术服务，非设备制造/销售')
+    elif i=='600088.SH' and n['name'] in ['影视业务','广告业务','旅游业务','基金业务'] and r.get('action')=='sells' and n['header']=='出售商品/提供劳务/本期发生额' and 154 in pages(r):d.update(accurate=True,reason='合同外合法关联销售/提供劳务父类，保留实际交易栏目；不替代具名产品动作')
+    elif i=='600099.SH' and n['name']=='特种车辆' and r.get('action')=='sells' and 22 in pages(r):d.update(accurate=True,reason='合同外：p22特种车辆实际销售23429辆，原产品及方向成立')
+    elif i=='600099.SH' and n['name']=='租赁' and r.get('action')=='provides_service' and 164 in pages(r):d.update(accurate=True,reason='合同外：p164当期经营租赁收入与出租业务成立')
+    elif i=='600099.SH' and n['name']=='设备' and r.get('action')=='purchases' and 176 in pages(r):d.update(accurate=True,reason='合同外：p176天津工程机械研究院设备本期采购371681.42元，仅采购不推投入')
+  elif kind=='BusinessOverview':
+   quoted=''.join(e['anchor']['bounded_quote'] for e in r['evidence']);assert co(r['source_text']) in co(quoted),r['record_id']
+   d.update(accurate=True,reason='独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验')
+  facts[r['record_id']]=d
+ ads={}
+ for a in answers:
+  rule=s['answers'][i][a['dimension_id']];bad=[g for g in rule['required_groups'] if not any(co(x) in co(a['excerpt']) for x in g)]
+  ads[a['dimension_id']]=dict(accurate=not bad,critical_numeric_error=False,failed_substance_groups=bad,reason='逐原文实质核：中视影视广告旅游基金及受托不付管理费；林海机械矩阵/以销定产经销/内外销签验FOB折扣租赁及参股边界')
+ return dict(facts=facts,answers=ads)
+if __name__=='__main__':
+ out={}
+ for i in s['versions']:
+  raw=json.loads(Path('/tmp/v54formalraw_'+i+'.json').read_text());p=json.loads(Path('/tmp/v54formalprofile_'+i+'.json').read_text());out[i]=decisions(raw,p['dimensions'],i)
+  bad=[rid for rid,d in out[i]['facts'].items() if not d['accurate']];print(i,len(raw),'BAD',bad)
+ (C/'v54-actual-object-decisions.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')

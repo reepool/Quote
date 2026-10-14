@@ -505,6 +505,8 @@ class CompanyProfileStageRuntime:
                             "v51",
                             "v52",
                             "v53",
+                            "v54",
+                            "v55",
                         },
                     ),
                 )

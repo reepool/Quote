@@ -1,0 +1,19 @@
+{
+  "tests_command": "PYTHONPATH=. /home/python/miniconda3/envs/Quote/bin/python -m pytest tests/unit/test_research/test_company_profile_v54_media_machinery.py tests/unit/test_research/test_company_profile_v53_source_conflict.py tests/unit/test_research/test_company_profile_v51_park_fishery.py tests/unit/test_research/test_company_profile_v50_realestate_chemical.py -q",
+  "tests_passed": 33,
+  "tests_warnings": 7,
+  "tests_seconds": 238.87,
+  "full_suite_claimed": false,
+  "ruff_check": "passed: four changed business modules + new test",
+  "ruff_format_check": "passed: 5 files",
+  "openspec_strict": "passed: current change, three synchronized v53 main specifications, archived v53 change using temporary read-only path alias removed after validation",
+  "scoped_diff_check": "passed",
+  "review_method": "当前未提交范围diff＋真实官方页完整局部＋直接受影响旧样本正反例；正式逐对象/正文自检，A仍独立核语义",
+  "resolved_p1_findings": [
+    "影视制作销售短后缀重复对象",
+    "公司表/采购入口续页布局遗漏",
+    "另一收入附注分支小数相邻借上期额"
+  ],
+  "remaining_p0_p1": [],
+  "excluded_existing_changes": 19
+}

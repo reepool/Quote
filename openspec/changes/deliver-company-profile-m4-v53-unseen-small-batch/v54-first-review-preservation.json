@@ -1,0 +1,13 @@
+{
+  "completed_at": "2026-10-14T11:39:04.262125+00:00",
+  "review_artifacts_sha256": {
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/v54-actual-object-decisions.json": "6019edc250caa0e77c3bbbdc9ce1f4abe5b7e0ad7728645ddd2b675c0311e5c3",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/v54-source-review-evidence.json": "7a82bbc9057ea9f6603af4875c6f9210c084262a6dc99749e1196a393cf67355",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/v54-source-review-quote-bank.json": "aa78e185c115cfc871e5620c6712dc0ad7941fc1f8e50cb8c19a55ffe923bc16",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/v54-negative-review-evidence.json": "196b1f49a9d08b8f5982f018c739caadbc13884f971b824a681fb29b446d1d4a",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/v54-first-formal-execution.log": "b54313954e62f71030a17ea92527c0221d8ba7ec3c28267469767a25345625ab",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/v54-first-formal-review.log": "90c6b4ef0aba1ff5fc17ebfb5c2a87128cd334bf3bd42730096b66a387d01307"
+  },
+  "original_first_review_unchanged": true,
+  "side_effect": "只保护新正式复核文件，不覆盖原200首次/制品"
+}

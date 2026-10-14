@@ -335,3 +335,10 @@ The existing owned-page owner MUST bind enumerated operating verbs to their none
 #### Scenario: Fees and current blank cells share real transaction tables
 - **WHEN** printed service fees, raw materials, zero values and prior-only amounts occur on actual owner pages
 - **THEN** true service income remains eligible, fee text does not invent goods, zeros remain printed zeros and current blanks do not borrow prior values
+
+### Requirement: Native income columns and cached total rows preserve identity
+The owned-page owner MUST preserve printed current values, zeros, blank cells, original transaction parties, rental assets, revenue-confirmation-time dimensions and revenue-versus-cost columns across native layout continuations. A prior-only amount MUST NOT fill a current blank. Cached extraction that appends a total-row label to the preceding line MUST preserve the separately printed total and its original column identity. Legitimate contract-external totals and rental income MUST remain included in accuracy review.
+
+#### Scenario: Cached text joins a total label to the previous row
+- **WHEN** the official layout prints a separate current total while cached text joins its label to the preceding row
+- **THEN** the owner retains both native row identities and amounts without borrowing an absent cell or treating costs as revenue

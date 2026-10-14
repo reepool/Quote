@@ -1,0 +1,5222 @@
+{
+  "created_at": "2026-10-14T10:40:00.637112+00:00",
+  "fixed_before_formal_execution": true,
+  "plan_id": "83ebb8a54c5e4a67459a36287c558d51a70d702d30b8aa70f7df5d0fd4404ead",
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v54"
+  },
+  "knowledge_cutoff": "2026-09-17",
+  "shared_token_budget": 50000,
+  "official_reports": [
+    {
+      "instrument_id": "600088.SH",
+      "asset_id": "asset_689e4779d6a0fa36993fc913da46facf",
+      "report_id": "1225118832",
+      "report_period": "2025-12-31",
+      "document_version": "5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c",
+      "disclosure_form": "service"
+    },
+    {
+      "instrument_id": "600099.SH",
+      "asset_id": "asset_224ce992ad64fd5a827f031bb43d8ad1",
+      "report_id": "1225042363",
+      "report_period": "2025-12-31",
+      "document_version": "3dbe17e87d3b79bb5327d821786eb7a971ef367b24fd37ac3511da4a212cf07c",
+      "disclosure_form": "manufacturing"
+    }
+  ],
+  "versions": {
+    "600088.SH": {
+      "sha256": "5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c",
+      "pdf": "data/filings/announcements/blobs/5a/5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c.pdf",
+      "checked_pages": [
+        5,
+        8,
+        9,
+        11,
+        12,
+        13,
+        14,
+        16,
+        17,
+        18,
+        23,
+        24,
+        46,
+        47,
+        48,
+        59,
+        60,
+        91,
+        92,
+        95,
+        113,
+        131,
+        132,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        173,
+        174,
+        175,
+        176
+      ]
+    },
+    "600099.SH": {
+      "sha256": "3dbe17e87d3b79bb5327d821786eb7a971ef367b24fd37ac3511da4a212cf07c",
+      "pdf": "data/filings/announcements/blobs/3d/3dbe17e87d3b79bb5327d821786eb7a971ef367b24fd37ac3511da4a212cf07c.pdf",
+      "checked_pages": [
+        5,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        21,
+        22,
+        23,
+        24,
+        30,
+        31,
+        32,
+        109,
+        110,
+        111,
+        113,
+        153,
+        154,
+        164,
+        166,
+        174,
+        175,
+        176,
+        177,
+        178,
+        179,
+        190,
+        191,
+        192
+      ]
+    }
+  },
+  "source_rows": {
+    "600088.SH": [
+      {
+        "condition_id": "600088.SH-income-001",
+        "instrument_id": "600088.SH",
+        "page": 16,
+        "name": "影视业务",
+        "native_aliases": [
+          "影视业务"
+        ],
+        "value": "597,703,872.09",
+        "unit": "元",
+        "dimension": "industry",
+        "header": "主营业务分行业",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分行业",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-002",
+        "instrument_id": "600088.SH",
+        "page": 16,
+        "name": "广告业务",
+        "native_aliases": [
+          "广告业务"
+        ],
+        "value": "289,904,563.86",
+        "unit": "元",
+        "dimension": "industry",
+        "header": "主营业务分行业",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分行业",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-003",
+        "instrument_id": "600088.SH",
+        "page": 16,
+        "name": "旅游业务",
+        "native_aliases": [
+          "旅游业务"
+        ],
+        "value": "147,151,456.42",
+        "unit": "元",
+        "dimension": "industry",
+        "header": "主营业务分行业",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分行业",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-004",
+        "instrument_id": "600088.SH",
+        "page": 16,
+        "name": "基金业务",
+        "native_aliases": [
+          "基金业务"
+        ],
+        "value": "1,503,221.93",
+        "unit": "元",
+        "dimension": "industry",
+        "header": "主营业务分行业",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分行业",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-005",
+        "instrument_id": "600088.SH",
+        "page": 17,
+        "name": "上海",
+        "native_aliases": [
+          "上海"
+        ],
+        "value": "242,121,065.72",
+        "unit": "元",
+        "dimension": "region",
+        "header": "主营业务分地区",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-006",
+        "instrument_id": "600088.SH",
+        "page": 17,
+        "name": "无锡",
+        "native_aliases": [
+          "无锡"
+        ],
+        "value": "124,148,585.98",
+        "unit": "元",
+        "dimension": "region",
+        "header": "主营业务分地区",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-007",
+        "instrument_id": "600088.SH",
+        "page": 17,
+        "name": "北京",
+        "native_aliases": [
+          "北京"
+        ],
+        "value": "642,811,084.51",
+        "unit": "元",
+        "dimension": "region",
+        "header": "主营业务分地区",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-008",
+        "instrument_id": "600088.SH",
+        "page": 17,
+        "name": "佛山",
+        "native_aliases": [
+          "佛山"
+        ],
+        "value": "25,679,156.16",
+        "unit": "元",
+        "dimension": "region",
+        "header": "主营业务分地区",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-009",
+        "instrument_id": "600088.SH",
+        "page": 17,
+        "name": "宁波",
+        "native_aliases": [
+          "宁波"
+        ],
+        "value": "1,503,221.93",
+        "unit": "元",
+        "dimension": "region",
+        "header": "主营业务分地区",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-010",
+        "instrument_id": "600088.SH",
+        "page": 23,
+        "name": "上海中视国际广告有限公司",
+        "native_aliases": [
+          "上海中视国际广告有限公司"
+        ],
+        "value": "226,011,922.35",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "主要控股参股公司分析",
+        "source_column": "本期营业收入",
+        "source_actor": "上海中视国际广告有限公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主要控股参股公司分析",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-011",
+        "instrument_id": "600088.SH",
+        "page": 23,
+        "name": "北京中视北方影视制作有限公司",
+        "native_aliases": [
+          "北京中视北方影视制作有限公司"
+        ],
+        "value": "437,781,183.83",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "主要控股参股公司分析",
+        "source_column": "本期营业收入",
+        "source_actor": "北京中视北方影视制作有限公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主要控股参股公司分析",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-012",
+        "instrument_id": "600088.SH",
+        "page": 131,
+        "name": "主营业务",
+        "native_aliases": [
+          "主营业务"
+        ],
+        "value": "1,036,263,114.30",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合并营业收入和营业成本",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合并营业收入和营业成本",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-013",
+        "instrument_id": "600088.SH",
+        "page": 131,
+        "name": "其他业务",
+        "native_aliases": [
+          "其他业务"
+        ],
+        "value": "1,221,197.91",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合并营业收入和营业成本",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合并营业收入和营业成本",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-014",
+        "instrument_id": "600088.SH",
+        "page": 132,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "1,037,484,312.21",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合并营业收入和营业成本",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合并营业收入和营业成本",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-015",
+        "instrument_id": "600088.SH",
+        "page": 132,
+        "name": "上海",
+        "native_aliases": [
+          "上海"
+        ],
+        "value": "242,281,957.18",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "按经营地区分类/营业收入（合计为同义镜像，不重复条件）",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-016",
+        "instrument_id": "600088.SH",
+        "page": 132,
+        "name": "无锡",
+        "native_aliases": [
+          "无锡"
+        ],
+        "value": "124,960,820.22",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "按经营地区分类/营业收入（合计为同义镜像，不重复条件）",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-017",
+        "instrument_id": "600088.SH",
+        "page": 132,
+        "name": "北京",
+        "native_aliases": [
+          "北京"
+        ],
+        "value": "642,811,084.51",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "按经营地区分类/营业收入（合计为同义镜像，不重复条件）",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-018",
+        "instrument_id": "600088.SH",
+        "page": 132,
+        "name": "佛山",
+        "native_aliases": [
+          "佛山"
+        ],
+        "value": "25,927,228.37",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "按经营地区分类/营业收入（合计为同义镜像，不重复条件）",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-019",
+        "instrument_id": "600088.SH",
+        "page": 132,
+        "name": "宁波",
+        "native_aliases": [
+          "宁波"
+        ],
+        "value": "1,503,221.93",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "按经营地区分类/营业收入（合计为同义镜像，不重复条件）",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-020",
+        "instrument_id": "600088.SH",
+        "page": 132,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "1,037,484,312.21",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "按经营地区分类/营业收入（合计为同义镜像，不重复条件）",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-021",
+        "instrument_id": "600088.SH",
+        "page": 144,
+        "name": "北京中视北方影视制作有限公司",
+        "native_aliases": [
+          "北京中视北方影视制作有限公司"
+        ],
+        "value": "437,781,183.83",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "重要非全资子公司的主要财务信息",
+        "source_column": "本期营业收入",
+        "source_actor": "北京中视北方影视制作有限公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "重要非全资子公司的主要财务信息",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-022",
+        "instrument_id": "600088.SH",
+        "page": 144,
+        "name": "上海中视国际广告有限公司",
+        "native_aliases": [
+          "上海中视国际广告有限公司"
+        ],
+        "value": "226,011,922.35",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "重要非全资子公司的主要财务信息",
+        "source_column": "本期营业收入",
+        "source_actor": "上海中视国际广告有限公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "重要非全资子公司的主要财务信息",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-023",
+        "instrument_id": "600088.SH",
+        "page": 175,
+        "name": "主营业务",
+        "native_aliases": [
+          "主营业务"
+        ],
+        "value": "371,136,597.51",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "母公司营业收入和营业成本",
+        "source_column": "本期营业收入",
+        "source_actor": "中视传媒股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "母公司营业收入和营业成本",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-024",
+        "instrument_id": "600088.SH",
+        "page": 175,
+        "name": "其他业务",
+        "native_aliases": [
+          "其他业务"
+        ],
+        "value": "1,221,197.91",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "母公司营业收入和营业成本",
+        "source_column": "本期营业收入",
+        "source_actor": "中视传媒股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "母公司营业收入和营业成本",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-025",
+        "instrument_id": "600088.SH",
+        "page": 175,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "372,357,795.42",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "母公司营业收入和营业成本",
+        "source_column": "本期营业收入",
+        "source_actor": "中视传媒股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "母公司营业收入和营业成本",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-026",
+        "instrument_id": "600088.SH",
+        "page": 175,
+        "name": "上海",
+        "native_aliases": [
+          "上海",
+          "其中：上海"
+        ],
+        "value": "16,270,034.83",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "按经营地区分类/营业收入（合计为同义镜像）",
+        "source_actor": "中视传媒股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-027",
+        "instrument_id": "600088.SH",
+        "page": 175,
+        "name": "无锡",
+        "native_aliases": [
+          "无锡",
+          "其中：上海"
+        ],
+        "value": "124,960,820.22",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "按经营地区分类/营业收入（合计为同义镜像）",
+        "source_actor": "中视传媒股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-028",
+        "instrument_id": "600088.SH",
+        "page": 175,
+        "name": "北京",
+        "native_aliases": [
+          "北京",
+          "其中：上海"
+        ],
+        "value": "205,199,712.00",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "按经营地区分类/营业收入（合计为同义镜像）",
+        "source_actor": "中视传媒股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-029",
+        "instrument_id": "600088.SH",
+        "page": 175,
+        "name": "佛山",
+        "native_aliases": [
+          "佛山",
+          "其中：上海"
+        ],
+        "value": "25,927,228.37",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "按经营地区分类/营业收入（合计为同义镜像）",
+        "source_actor": "中视传媒股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-030",
+        "instrument_id": "600088.SH",
+        "page": 175,
+        "name": "合计",
+        "native_aliases": [
+          "合计",
+          "其中：上海"
+        ],
+        "value": "372,357,795.42",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "按经营地区分类/营业收入（合计为同义镜像）",
+        "source_actor": "中视传媒股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-031",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "影视业务",
+        "native_aliases": [
+          "影视业务"
+        ],
+        "value": "527,216,100.57",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "中央广播电视总台",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-032",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "影视业务",
+        "native_aliases": [
+          "影视业务"
+        ],
+        "value": "698,113.21",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "北京中视广经文化发展有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-033",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "影视业务",
+        "native_aliases": [
+          "影视业务"
+        ],
+        "value": "672,439.41",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "中视前卫影视传媒有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-034",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "影视业务",
+        "native_aliases": [
+          "影视业务"
+        ],
+        "value": "636,792.45",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "央拓国际融合传播集团有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-035",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "影视业务",
+        "native_aliases": [
+          "影视业务"
+        ],
+        "value": "584,905.66",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "央视频融媒体发展有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-036",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "影视业务",
+        "native_aliases": [
+          "影视业务"
+        ],
+        "value": "377,358.49",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "央视创造传媒有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-037",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "影视业务",
+        "native_aliases": [
+          "影视业务"
+        ],
+        "value": "367,924.53",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "中视国际传媒（北京）有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-038",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "影视业务",
+        "native_aliases": [
+          "影视业务"
+        ],
+        "value": "236,083.98",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "央视（北京）娱乐传媒有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-039",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "影视业务",
+        "native_aliases": [
+          "影视业务"
+        ],
+        "value": "235,849.06",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "国际传媒港（上海）文化发展有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-040",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "影视业务",
+        "native_aliases": [
+          "影视业务"
+        ],
+        "value": "199,528.31",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "北京中广影视融媒体发展有限责任公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-041",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "影视业务",
+        "native_aliases": [
+          "影视业务"
+        ],
+        "value": "196,226.42",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "中国电视剧制作中心有限责任公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-042",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "影视业务",
+        "native_aliases": [
+          "影视业务"
+        ],
+        "value": "122,641.51",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "中广影视卫星有限责任公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-043",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "影视业务",
+        "native_aliases": [
+          "影视业务"
+        ],
+        "value": "108,679.24",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "中国环球广播电视有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-044",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "影视业务",
+        "native_aliases": [
+          "影视业务"
+        ],
+        "value": "18,867.92",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "梅地亚电视中心有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-045",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "广告业务",
+        "native_aliases": [
+          "广告业务"
+        ],
+        "value": "133,278,798.11",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "中央广播电视总台",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-046",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "广告业务",
+        "native_aliases": [
+          "广告业务"
+        ],
+        "value": "424,528.30",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "央拓国际融合传播集团有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-047",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "广告业务",
+        "native_aliases": [
+          "广告业务"
+        ],
+        "value": "344,217.66",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "央视频融媒体发展有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-048",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "广告业务",
+        "native_aliases": [
+          "广告业务"
+        ],
+        "value": "94,339.62",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "中视科华有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-049",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "旅游业务",
+        "native_aliases": [
+          "旅游业务"
+        ],
+        "value": "8,018.86",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "中视前卫影视传媒有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-050",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "旅游业务",
+        "native_aliases": [
+          "旅游业务"
+        ],
+        "value": "5,882.65",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "中央电视台无锡太湖影视城有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-051",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "旅游业务",
+        "native_aliases": [
+          "旅游业务"
+        ],
+        "value": "5,597.10",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "央视国际网络无锡有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-052",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "旅游业务",
+        "native_aliases": [
+          "旅游业务"
+        ],
+        "value": "2,846.05",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "梅地亚电视中心有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-053",
+        "instrument_id": "600088.SH",
+        "page": 154,
+        "name": "基金业务",
+        "native_aliases": [
+          "基金业务"
+        ],
+        "value": "339,622.64",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "中视融合（上海）企业管理合伙企业（有限合伙）",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-054",
+        "instrument_id": "600088.SH",
+        "page": 155,
+        "name": "基金业务",
+        "native_aliases": [
+          "基金业务"
+        ],
+        "value": "50,147.74",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "宁波梅山保税港区琦林股权投资合伙企业（有限合伙）",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-income-055",
+        "instrument_id": "600088.SH",
+        "page": 155,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "666,225,509.49",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-supplemental-income-1",
+        "instrument_id": "600088.SH",
+        "page": 141,
+        "name": "设备租赁",
+        "value": "17,842,144.74",
+        "unit": "元",
+        "dimension": "service",
+        "header": "作为出租人的经营租赁/租赁收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_column": "租赁收入",
+        "period_state": "current_printed",
+        "reported_period": "2025-12-31",
+        "counterparty": null,
+        "source_segment": null,
+        "native_aliases": [
+          "设备租赁"
+        ],
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-supplemental-income-2",
+        "instrument_id": "600088.SH",
+        "page": 141,
+        "name": "土地租赁",
+        "value": "11,434,035.92",
+        "unit": "元",
+        "dimension": "service",
+        "header": "作为出租人的经营租赁/租赁收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_column": "租赁收入",
+        "period_state": "current_printed",
+        "reported_period": "2025-12-31",
+        "counterparty": null,
+        "source_segment": null,
+        "native_aliases": [
+          "土地租赁"
+        ],
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-supplemental-income-3",
+        "instrument_id": "600088.SH",
+        "page": 141,
+        "name": "房屋租赁",
+        "value": "9,274,875.37",
+        "unit": "元",
+        "dimension": "service",
+        "header": "作为出租人的经营租赁/租赁收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_column": "租赁收入",
+        "period_state": "current_printed",
+        "reported_period": "2025-12-31",
+        "counterparty": null,
+        "source_segment": null,
+        "native_aliases": [
+          "房屋租赁"
+        ],
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-supplemental-income-4",
+        "instrument_id": "600088.SH",
+        "page": 141,
+        "name": "其他",
+        "value": "244,574.75",
+        "unit": "元",
+        "dimension": "service",
+        "header": "作为出租人的经营租赁/租赁收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_column": "租赁收入",
+        "period_state": "current_printed",
+        "reported_period": "2025-12-31",
+        "counterparty": null,
+        "source_segment": null,
+        "native_aliases": [
+          "其他"
+        ],
+        "qualifier": null
+      },
+      {
+        "condition_id": "600088.SH-supplemental-income-5",
+        "instrument_id": "600088.SH",
+        "page": 141,
+        "name": "合计",
+        "value": "38,795,630.78",
+        "unit": "元",
+        "dimension": "service",
+        "header": "作为出租人的经营租赁/租赁收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_column": "租赁收入",
+        "period_state": "current_printed",
+        "reported_period": "2025-12-31",
+        "counterparty": null,
+        "source_segment": null,
+        "native_aliases": [
+          "合计"
+        ],
+        "qualifier": null
+      }
+    ],
+    "600099.SH": [
+      {
+        "condition_id": "600099.SH-income-001",
+        "instrument_id": "600099.SH",
+        "page": 21,
+        "name": "特种车辆行业",
+        "native_aliases": [
+          "特种车辆行业"
+        ],
+        "value": "467,207,688.51",
+        "unit": "元",
+        "dimension": "industry",
+        "header": "主营业务分行业",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分行业",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-002",
+        "instrument_id": "600099.SH",
+        "page": 21,
+        "name": "农业机械行业",
+        "native_aliases": [
+          "农业机械行业"
+        ],
+        "value": "283,722,402.61",
+        "unit": "元",
+        "dimension": "industry",
+        "header": "主营业务分行业",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分行业",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-003",
+        "instrument_id": "600099.SH",
+        "page": 21,
+        "name": "森林消防机械行业",
+        "native_aliases": [
+          "森林消防机械行业"
+        ],
+        "value": "248,582,445.60",
+        "unit": "元",
+        "dimension": "industry",
+        "header": "主营业务分行业",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分行业",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-004",
+        "instrument_id": "600099.SH",
+        "page": 21,
+        "name": "摩托车行业",
+        "native_aliases": [
+          "摩托车行业"
+        ],
+        "value": "125,340,298.09",
+        "unit": "元",
+        "dimension": "industry",
+        "header": "主营业务分行业",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分行业",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-005",
+        "instrument_id": "600099.SH",
+        "page": 21,
+        "name": "特种车辆",
+        "native_aliases": [
+          "特种车辆"
+        ],
+        "value": "467,207,688.51",
+        "unit": "元",
+        "dimension": "product",
+        "header": "主营业务分产品",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分产品",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-006",
+        "instrument_id": "600099.SH",
+        "page": 21,
+        "name": "农业机械",
+        "native_aliases": [
+          "农业机械"
+        ],
+        "value": "283,722,402.61",
+        "unit": "元",
+        "dimension": "product",
+        "header": "主营业务分产品",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分产品",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-007",
+        "instrument_id": "600099.SH",
+        "page": 21,
+        "name": "森林消防机械",
+        "native_aliases": [
+          "森林消防机械"
+        ],
+        "value": "248,582,445.60",
+        "unit": "元",
+        "dimension": "product",
+        "header": "主营业务分产品",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分产品",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-008",
+        "instrument_id": "600099.SH",
+        "page": 21,
+        "name": "摩托车",
+        "native_aliases": [
+          "摩托车"
+        ],
+        "value": "125,340,298.09",
+        "unit": "元",
+        "dimension": "product",
+        "header": "主营业务分产品",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分产品",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-009",
+        "instrument_id": "600099.SH",
+        "page": 21,
+        "name": "国内市场",
+        "native_aliases": [
+          "国内市场"
+        ],
+        "value": "545,846,527.89",
+        "unit": "元",
+        "dimension": "region",
+        "header": "主营业务分地区",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-010",
+        "instrument_id": "600099.SH",
+        "page": 21,
+        "name": "国外市场",
+        "native_aliases": [
+          "国外市场"
+        ],
+        "value": "579,006,306.92",
+        "unit": "元",
+        "dimension": "region",
+        "header": "主营业务分地区",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-011",
+        "instrument_id": "600099.SH",
+        "page": 31,
+        "name": "江苏福马高新动力机械有限公司",
+        "native_aliases": [
+          "江苏福马高新动力机械有限公司"
+        ],
+        "value": "42,091.36",
+        "unit": "万元",
+        "dimension": "business_type",
+        "header": "主要控股参股公司分析",
+        "source_column": "本期营业收入",
+        "source_actor": "江苏福马高新动力机械有限公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主要控股参股公司分析",
+        "qualifier": "合并子公司"
+      },
+      {
+        "condition_id": "600099.SH-income-012",
+        "instrument_id": "600099.SH",
+        "page": 31,
+        "name": "江苏联海动力机械有限公司",
+        "native_aliases": [
+          "江苏联海动力机械有限公司"
+        ],
+        "value": "19,957.09",
+        "unit": "万元",
+        "dimension": "business_type",
+        "header": "主要控股参股公司分析",
+        "source_column": "本期营业收入",
+        "source_actor": "江苏联海动力机械有限公司",
+        "subject_scope": "group_associated_entity",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主要控股参股公司分析",
+        "qualifier": "参股公司"
+      },
+      {
+        "condition_id": "600099.SH-income-013",
+        "instrument_id": "600099.SH",
+        "page": 31,
+        "name": "福马新能（北京）科技有限公司",
+        "native_aliases": [
+          "福马新能（北京）科技有限公司"
+        ],
+        "value": "524.08",
+        "unit": "万元",
+        "dimension": "business_type",
+        "header": "主要控股参股公司分析",
+        "source_column": "本期营业收入",
+        "source_actor": "福马新能（北京）科技有限公司",
+        "subject_scope": "group_associated_entity",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主要控股参股公司分析",
+        "qualifier": "参股公司"
+      },
+      {
+        "condition_id": "600099.SH-income-014",
+        "instrument_id": "600099.SH",
+        "page": 153,
+        "name": "主营业务",
+        "native_aliases": [
+          "主营业务"
+        ],
+        "value": "1,117,132,005.73",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合并营业收入和营业成本",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合并营业收入和营业成本",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-015",
+        "instrument_id": "600099.SH",
+        "page": 153,
+        "name": "其他业务",
+        "native_aliases": [
+          "其他业务"
+        ],
+        "value": "14,114,939.20",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合并营业收入和营业成本",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合并营业收入和营业成本",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-016",
+        "instrument_id": "600099.SH",
+        "page": 153,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "1,131,246,944.93",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合并营业收入和营业成本",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合并营业收入和营业成本",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-017",
+        "instrument_id": "600099.SH",
+        "page": 153,
+        "name": "特种车",
+        "native_aliases": [
+          "特种车"
+        ],
+        "value": "467,207,688.51",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-018",
+        "instrument_id": "600099.SH",
+        "page": 153,
+        "name": "农业机械",
+        "native_aliases": [
+          "农业机械"
+        ],
+        "value": "283,722,402.61",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-019",
+        "instrument_id": "600099.SH",
+        "page": 153,
+        "name": "森林消防机械",
+        "native_aliases": [
+          "森林消防机械"
+        ],
+        "value": "248,582,445.60",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-020",
+        "instrument_id": "600099.SH",
+        "page": 153,
+        "name": "摩托车",
+        "native_aliases": [
+          "摩托车"
+        ],
+        "value": "125,340,298.09",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-021",
+        "instrument_id": "600099.SH",
+        "page": 153,
+        "name": "其他",
+        "native_aliases": [
+          "其他"
+        ],
+        "value": "6,394,110.12",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-022",
+        "instrument_id": "600099.SH",
+        "page": 153,
+        "name": "商品类型",
+        "native_aliases": [
+          "商品类型"
+        ],
+        "value": "1,131,246,944.93",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合同收入分解/商品类型",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-023",
+        "instrument_id": "600099.SH",
+        "page": 153,
+        "name": "按经营地区分类",
+        "native_aliases": [
+          "按经营地区分类"
+        ],
+        "value": "1,131,246,944.93",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-024",
+        "instrument_id": "600099.SH",
+        "page": 153,
+        "name": "国内销售",
+        "native_aliases": [
+          "国内销售"
+        ],
+        "value": "552,240,638.01",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-025",
+        "instrument_id": "600099.SH",
+        "page": 153,
+        "name": "国外销售",
+        "native_aliases": [
+          "国外销售"
+        ],
+        "value": "579,006,306.92",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-026",
+        "instrument_id": "600099.SH",
+        "page": 153,
+        "name": "按商品转让的时间分类",
+        "native_aliases": [
+          "按商品转让的时间分类"
+        ],
+        "value": "1,131,246,944.93",
+        "unit": "元",
+        "dimension": "revenue_timing",
+        "header": "合同收入分解/商品转让时间",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品转让时间",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-027",
+        "instrument_id": "600099.SH",
+        "page": 153,
+        "name": "在某一时点转让",
+        "native_aliases": [
+          "在某一时点转让"
+        ],
+        "value": "1,131,246,944.93",
+        "unit": "元",
+        "dimension": "revenue_timing",
+        "header": "合同收入分解/商品转让时间",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品转让时间",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-028",
+        "instrument_id": "600099.SH",
+        "page": 153,
+        "name": "在某一时段内转让",
+        "native_aliases": [
+          "在某一时段内转让"
+        ],
+        "value": "0.00",
+        "unit": "元",
+        "dimension": "revenue_timing",
+        "header": "合同收入分解/商品转让时间",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品转让时间",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-029",
+        "instrument_id": "600099.SH",
+        "page": 153,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "1,131,246,944.93",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合同收入分解/合计",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/合计",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-030",
+        "instrument_id": "600099.SH",
+        "page": 191,
+        "name": "特种车",
+        "native_aliases": [
+          "特种车"
+        ],
+        "value": "483,862,821.26",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "本期营业收入",
+        "source_actor": "林海股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-031",
+        "instrument_id": "600099.SH",
+        "page": 191,
+        "name": "农业机械",
+        "native_aliases": [
+          "农业机械"
+        ],
+        "value": "256,687,886.00",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "本期营业收入",
+        "source_actor": "林海股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-032",
+        "instrument_id": "600099.SH",
+        "page": 191,
+        "name": "森林消防机械",
+        "native_aliases": [
+          "森林消防机械"
+        ],
+        "value": "123,808,001.33",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "本期营业收入",
+        "source_actor": "林海股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-033",
+        "instrument_id": "600099.SH",
+        "page": 191,
+        "name": "摩托车",
+        "native_aliases": [
+          "摩托车"
+        ],
+        "value": "125,340,298.09",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "本期营业收入",
+        "source_actor": "林海股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-034",
+        "instrument_id": "600099.SH",
+        "page": 191,
+        "name": "其他",
+        "native_aliases": [
+          "其他"
+        ],
+        "value": "6,087,232.87",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "本期营业收入",
+        "source_actor": "林海股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-035",
+        "instrument_id": "600099.SH",
+        "page": 191,
+        "name": "商品类型",
+        "native_aliases": [
+          "商品类型"
+        ],
+        "value": "995,786,239.55",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合同收入分解/商品类型",
+        "source_column": "本期营业收入",
+        "source_actor": "林海股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-036",
+        "instrument_id": "600099.SH",
+        "page": 191,
+        "name": "按经营地区分类",
+        "native_aliases": [
+          "按经营地区分类"
+        ],
+        "value": "995,786,239.55",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "本期营业收入",
+        "source_actor": "林海股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-037",
+        "instrument_id": "600099.SH",
+        "page": 191,
+        "name": "国内销售",
+        "native_aliases": [
+          "国内销售"
+        ],
+        "value": "416,779,932.63",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "本期营业收入",
+        "source_actor": "林海股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-038",
+        "instrument_id": "600099.SH",
+        "page": 191,
+        "name": "国外销售",
+        "native_aliases": [
+          "国外销售"
+        ],
+        "value": "579,006,306.92",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "本期营业收入",
+        "source_actor": "林海股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-039",
+        "instrument_id": "600099.SH",
+        "page": 191,
+        "name": "按商品转让的时间分类",
+        "native_aliases": [
+          "按商品转让的时间分类"
+        ],
+        "value": "995,786,239.55",
+        "unit": "元",
+        "dimension": "revenue_timing",
+        "header": "合同收入分解/商品转让时间",
+        "source_column": "本期营业收入",
+        "source_actor": "林海股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品转让时间",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-040",
+        "instrument_id": "600099.SH",
+        "page": 191,
+        "name": "在某一时点转让",
+        "native_aliases": [
+          "在某一时点转让"
+        ],
+        "value": "995,786,239.55",
+        "unit": "元",
+        "dimension": "revenue_timing",
+        "header": "合同收入分解/商品转让时间",
+        "source_column": "本期营业收入",
+        "source_actor": "林海股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品转让时间",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-041",
+        "instrument_id": "600099.SH",
+        "page": 191,
+        "name": "在某一时段内转让",
+        "native_aliases": [
+          "在某一时段内转让"
+        ],
+        "value": "0.00",
+        "unit": "元",
+        "dimension": "revenue_timing",
+        "header": "合同收入分解/商品转让时间",
+        "source_column": "本期营业收入",
+        "source_actor": "林海股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品转让时间",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-042",
+        "instrument_id": "600099.SH",
+        "page": 191,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "995,786,239.55",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合同收入分解/合计",
+        "source_column": "本期营业收入",
+        "source_actor": "林海股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/合计",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-043",
+        "instrument_id": "600099.SH",
+        "page": 191,
+        "name": "主营业务",
+        "native_aliases": [
+          "主营业务"
+        ],
+        "value": "984,062,639.63",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "母公司营业收入和营业成本",
+        "source_column": "本期营业收入",
+        "source_actor": "林海股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "母公司营业收入和营业成本",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-044",
+        "instrument_id": "600099.SH",
+        "page": 191,
+        "name": "其他业务",
+        "native_aliases": [
+          "其他业务"
+        ],
+        "value": "11,723,599.92",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "母公司营业收入和营业成本",
+        "source_column": "本期营业收入",
+        "source_actor": "林海股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "母公司营业收入和营业成本",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-045",
+        "instrument_id": "600099.SH",
+        "page": 191,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "995,786,239.55",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "母公司营业收入和营业成本",
+        "source_column": "本期营业收入",
+        "source_actor": "林海股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "母公司营业收入和营业成本",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-046",
+        "instrument_id": "600099.SH",
+        "page": 177,
+        "name": "销售商品、提供劳务",
+        "native_aliases": [
+          "销售商品、提供劳务"
+        ],
+        "value": "1,444,575.48",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "中国机械工业集团有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-047",
+        "instrument_id": "600099.SH",
+        "page": 177,
+        "name": "销售商品",
+        "native_aliases": [
+          "销售商品"
+        ],
+        "value": "534,466.48",
+        "unit": "元",
+        "dimension": "product",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "国机重工集团国际装备有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-048",
+        "instrument_id": "600099.SH",
+        "page": 177,
+        "name": "销售商品",
+        "native_aliases": [
+          "销售商品"
+        ],
+        "value": "243,119.27",
+        "unit": "元",
+        "dimension": "product",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "国机海南发展有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-049",
+        "instrument_id": "600099.SH",
+        "page": 177,
+        "name": "销售商品",
+        "native_aliases": [
+          "销售商品"
+        ],
+        "value": "0.00",
+        "unit": "元",
+        "dimension": "product",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "天津工程机械研究院有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-050",
+        "instrument_id": "600099.SH",
+        "page": 177,
+        "name": "销售商品",
+        "native_aliases": [
+          "销售商品"
+        ],
+        "value": "1,832,900.73",
+        "unit": "元",
+        "dimension": "product",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "江苏林海智能装备有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-051",
+        "instrument_id": "600099.SH",
+        "page": 177,
+        "name": "销售商品、提供劳务",
+        "native_aliases": [
+          "销售商品、提供劳务"
+        ],
+        "value": "1,534,499.16",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "江苏林海动力机械集团有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-052",
+        "instrument_id": "600099.SH",
+        "page": 177,
+        "name": "销售商品、提供劳务",
+        "native_aliases": [
+          "销售商品、提供劳务"
+        ],
+        "value": "65,187.31",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "天津林工机械有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-053",
+        "instrument_id": "600099.SH",
+        "page": 177,
+        "name": "销售商品",
+        "native_aliases": [
+          "销售商品"
+        ],
+        "value": "50,283.08",
+        "unit": "元",
+        "dimension": "product",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "江苏联海动力机械有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-054",
+        "instrument_id": "600099.SH",
+        "page": 177,
+        "name": "销售商品",
+        "native_aliases": [
+          "销售商品"
+        ],
+        "value": "1,309.73",
+        "unit": "元",
+        "dimension": "product",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "中国福马林业机械上海有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-income-055",
+        "instrument_id": "600099.SH",
+        "page": 177,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "5,706,341.24",
+        "unit": "元",
+        "dimension": "product",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务",
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-supplemental-income-1",
+        "instrument_id": "600099.SH",
+        "page": 164,
+        "name": "房屋建筑物及设备租赁收入",
+        "value": "3,797,837.32",
+        "unit": "元",
+        "dimension": "service",
+        "header": "作为出租人的经营租赁/租赁收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_column": "租赁收入",
+        "period_state": "current_printed",
+        "reported_period": "2025-12-31",
+        "counterparty": null,
+        "source_segment": null,
+        "native_aliases": [
+          "房屋建筑物及设备租赁收入"
+        ],
+        "qualifier": null
+      },
+      {
+        "condition_id": "600099.SH-supplemental-income-2",
+        "instrument_id": "600099.SH",
+        "page": 164,
+        "name": "合计",
+        "value": "3,797,837.32",
+        "unit": "元",
+        "dimension": "service",
+        "header": "作为出租人的经营租赁/租赁收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_column": "租赁收入",
+        "period_state": "current_printed",
+        "reported_period": "2025-12-31",
+        "counterparty": null,
+        "source_segment": null,
+        "native_aliases": [
+          "合计"
+        ],
+        "qualifier": null
+      }
+    ]
+  },
+  "native_roles": [
+    {
+      "condition_id": "600088.SH-action-001",
+      "instrument_id": "600088.SH",
+      "page": 11,
+      "name": "电视节目",
+      "native_aliases": [
+        "电视节目",
+        "电视节目制作"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-002",
+      "instrument_id": "600088.SH",
+      "page": 11,
+      "name": "电视节目",
+      "native_aliases": [
+        "电视节目",
+        "电视节目制作"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-003",
+      "instrument_id": "600088.SH",
+      "page": 11,
+      "name": "影视库存剧",
+      "native_aliases": [
+        "影视库存剧"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-004",
+      "instrument_id": "600088.SH",
+      "page": 11,
+      "name": "影视技术服务",
+      "native_aliases": [
+        "影视技术服务"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-005",
+      "instrument_id": "600088.SH",
+      "page": 11,
+      "name": "设备租赁",
+      "native_aliases": [
+        "设备租赁"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-006",
+      "instrument_id": "600088.SH",
+      "page": 11,
+      "name": "剪辑",
+      "native_aliases": [
+        "剪辑"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-007",
+      "instrument_id": "600088.SH",
+      "page": 11,
+      "name": "包装",
+      "native_aliases": [
+        "包装"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-008",
+      "instrument_id": "600088.SH",
+      "page": 11,
+      "name": "调色",
+      "native_aliases": [
+        "调色"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-009",
+      "instrument_id": "600088.SH",
+      "page": 11,
+      "name": "机房",
+      "native_aliases": [
+        "机房"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-010",
+      "instrument_id": "600088.SH",
+      "page": 11,
+      "name": "演播室运维",
+      "native_aliases": [
+        "演播室运维"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-011",
+      "instrument_id": "600088.SH",
+      "page": 11,
+      "name": "新媒体直播",
+      "native_aliases": [
+        "新媒体直播"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-012",
+      "instrument_id": "600088.SH",
+      "page": 11,
+      "name": "宣传推广",
+      "native_aliases": [
+        "宣传推广"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-013",
+      "instrument_id": "600088.SH",
+      "page": 11,
+      "name": "短视频制作",
+      "native_aliases": [
+        "短视频制作"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-014",
+      "instrument_id": "600088.SH",
+      "page": 11,
+      "name": "媒体广告代理",
+      "native_aliases": [
+        "媒体广告代理"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-015",
+      "instrument_id": "600088.SH",
+      "page": 11,
+      "name": "旅游门票",
+      "native_aliases": [
+        "旅游门票",
+        "旅游门票销售"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-016",
+      "instrument_id": "600088.SH",
+      "page": 11,
+      "name": "园内经营",
+      "native_aliases": [
+        "园内经营"
+      ],
+      "source_actions": [
+        "operates"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-017",
+      "instrument_id": "600088.SH",
+      "page": 11,
+      "name": "影视拍摄服务",
+      "native_aliases": [
+        "影视拍摄服务"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-018",
+      "instrument_id": "600088.SH",
+      "page": 12,
+      "name": "影视拍摄",
+      "native_aliases": [
+        "影视拍摄"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "南海影视城经营，不扩大其他公司主体",
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-019",
+      "instrument_id": "600088.SH",
+      "page": 12,
+      "name": "休闲旅游",
+      "native_aliases": [
+        "休闲旅游"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "南海影视城经营，不扩大其他公司主体",
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-020",
+      "instrument_id": "600088.SH",
+      "page": 12,
+      "name": "研学教育",
+      "native_aliases": [
+        "研学教育"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "南海影视城经营，不扩大其他公司主体",
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-021",
+      "instrument_id": "600088.SH",
+      "page": 12,
+      "name": "户外拓展",
+      "native_aliases": [
+        "户外拓展"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "南海影视城经营，不扩大其他公司主体",
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-022",
+      "instrument_id": "600088.SH",
+      "page": 12,
+      "name": "婚纱摄影",
+      "native_aliases": [
+        "婚纱摄影"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "南海影视城经营，不扩大其他公司主体",
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-023",
+      "instrument_id": "600088.SH",
+      "page": 12,
+      "name": "品牌展示",
+      "native_aliases": [
+        "品牌展示"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "南海影视城经营，不扩大其他公司主体",
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-024",
+      "instrument_id": "600088.SH",
+      "page": 12,
+      "name": "基金投资",
+      "native_aliases": [
+        "基金投资"
+      ],
+      "source_actions": [
+        "operates"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "原参股/专项及产业基金关系，不上升为被投企业商品经营",
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-025",
+      "instrument_id": "600088.SH",
+      "page": 23,
+      "name": "节目制作",
+      "native_aliases": [
+        "节目制作"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "北京中视北方影视制作有限公司",
+      "actor_aliases": [
+        "北京中视北方影视制作有限公司",
+        "中视北方"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-026",
+      "instrument_id": "600088.SH",
+      "page": 23,
+      "name": "技术开发服务",
+      "native_aliases": [
+        "技术开发服务"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "北京中视北方影视制作有限公司",
+      "actor_aliases": [
+        "北京中视北方影视制作有限公司",
+        "中视北方"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-027",
+      "instrument_id": "600088.SH",
+      "page": 23,
+      "name": "影视设备租赁",
+      "native_aliases": [
+        "影视设备租赁"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "北京中视北方影视制作有限公司",
+      "actor_aliases": [
+        "北京中视北方影视制作有限公司",
+        "中视北方"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-028",
+      "instrument_id": "600088.SH",
+      "page": 23,
+      "name": "广告业务",
+      "native_aliases": [
+        "广告业务"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "上海中视国际广告有限公司",
+      "actor_aliases": [
+        "上海中视国际广告有限公司",
+        "中视广告"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "设计、制作、发布、代理各类广告",
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-029",
+      "instrument_id": "600088.SH",
+      "page": 143,
+      "name": "投资管理",
+      "native_aliases": [
+        "投资管理"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "宁波梅山保税港区国视融媒投资管理有限公司",
+      "actor_aliases": [
+        "宁波梅山保税港区国视融媒投资管理有限公司",
+        "国视融媒"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-030",
+      "instrument_id": "600088.SH",
+      "page": 143,
+      "name": "资产管理",
+      "native_aliases": [
+        "资产管理"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "宁波梅山保税港区国视融媒投资管理有限公司",
+      "actor_aliases": [
+        "宁波梅山保税港区国视融媒投资管理有限公司",
+        "国视融媒"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-031",
+      "instrument_id": "600088.SH",
+      "page": 143,
+      "name": "投资咨询",
+      "native_aliases": [
+        "投资咨询"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "宁波梅山保税港区国视融媒投资管理有限公司",
+      "actor_aliases": [
+        "宁波梅山保税港区国视融媒投资管理有限公司",
+        "国视融媒"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null,
+      "context_pages": []
+    },
+    {
+      "condition_id": "600088.SH-action-032",
+      "instrument_id": "600088.SH",
+      "page": 17,
+      "name": "科教频道整频道电视广告资源",
+      "native_aliases": [
+        "科教频道整频道电视广告资源"
+      ],
+      "source_actions": [
+        "purchases"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "向中央广播电视总台购买频道广告资源，非实体商品",
+      "context_pages": [
+        11
+      ]
+    },
+    {
+      "condition_id": "600088.SH-action-033",
+      "instrument_id": "600088.SH",
+      "page": 17,
+      "name": "农业农村频道整频道广告资源",
+      "native_aliases": [
+        "农业农村频道整频道广告资源"
+      ],
+      "source_actions": [
+        "purchases"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "向中央广播电视总台购买频道广告资源，非实体商品",
+      "context_pages": [
+        11
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-001",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "森林消防机械",
+      "native_aliases": [
+        "森林消防机械"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-002",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "森林消防机械",
+      "native_aliases": [
+        "森林消防机械"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-003",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "农业机械",
+      "native_aliases": [
+        "农业机械"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-004",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "农业机械",
+      "native_aliases": [
+        "农业机械"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-005",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "特种车辆（全地形车）",
+      "native_aliases": [
+        "特种车辆（全地形车）"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-006",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "特种车辆（全地形车）",
+      "native_aliases": [
+        "特种车辆（全地形车）"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-007",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "摩托车",
+      "native_aliases": [
+        "摩托车"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-008",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "摩托车",
+      "native_aliases": [
+        "摩托车"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-009",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "配件",
+      "native_aliases": [
+        "配件"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-010",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "配件",
+      "native_aliases": [
+        "配件"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-011",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "全地形消防车",
+      "native_aliases": [
+        "全地形消防车"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-012",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "全地形消防车",
+      "native_aliases": [
+        "全地形消防车"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-013",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "消防泵",
+      "native_aliases": [
+        "消防泵"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-014",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "消防泵",
+      "native_aliases": [
+        "消防泵"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-015",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "离心泵",
+      "native_aliases": [
+        "离心泵"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-016",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "离心泵",
+      "native_aliases": [
+        "离心泵"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-017",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "便携式高扬程森林泵",
+      "native_aliases": [
+        "便携式高扬程森林泵"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-018",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "便携式高扬程森林泵",
+      "native_aliases": [
+        "便携式高扬程森林泵"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-019",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "超高扬程隔膜泵",
+      "native_aliases": [
+        "超高扬程隔膜泵"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-020",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "超高扬程隔膜泵",
+      "native_aliases": [
+        "超高扬程隔膜泵"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-021",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "智能串联森林消防泵",
+      "native_aliases": [
+        "智能串联森林消防泵"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-022",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "智能串联森林消防泵",
+      "native_aliases": [
+        "智能串联森林消防泵"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-023",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "大排量隔膜泵",
+      "native_aliases": [
+        "大排量隔膜泵"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-024",
+      "instrument_id": "600099.SH",
+      "page": 8,
+      "name": "大排量隔膜泵",
+      "native_aliases": [
+        "大排量隔膜泵"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-025",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "风力灭火机",
+      "native_aliases": [
+        "风力灭火机"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-026",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "风力灭火机",
+      "native_aliases": [
+        "风力灭火机"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-027",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "插秧机",
+      "native_aliases": [
+        "插秧机"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-028",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "插秧机",
+      "native_aliases": [
+        "插秧机"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-029",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "高速插秧机",
+      "native_aliases": [
+        "高速插秧机"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-030",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "高速插秧机",
+      "native_aliases": [
+        "高速插秧机"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-031",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "抛秧机",
+      "native_aliases": [
+        "抛秧机"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-032",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "抛秧机",
+      "native_aliases": [
+        "抛秧机"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-033",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "智能高速插秧机",
+      "native_aliases": [
+        "智能高速插秧机"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-034",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "智能高速插秧机",
+      "native_aliases": [
+        "智能高速插秧机"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-035",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "宽窄行高速插秧机",
+      "native_aliases": [
+        "宽窄行高速插秧机"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-036",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "宽窄行高速插秧机",
+      "native_aliases": [
+        "宽窄行高速插秧机"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-037",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "大功率、大马力高速插秧机",
+      "native_aliases": [
+        "大功率、大马力高速插秧机"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-038",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "大功率、大马力高速插秧机",
+      "native_aliases": [
+        "大功率、大马力高速插秧机"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-039",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "收割机",
+      "native_aliases": [
+        "收割机"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-040",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "收割机",
+      "native_aliases": [
+        "收割机"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-041",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "ATV全地形车",
+      "native_aliases": [
+        "ATV全地形车"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-042",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "ATV全地形车",
+      "native_aliases": [
+        "ATV全地形车"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-043",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "电动ATV",
+      "native_aliases": [
+        "电动ATV"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-044",
+      "instrument_id": "600099.SH",
+      "page": 9,
+      "name": "电动ATV",
+      "native_aliases": [
+        "电动ATV"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-045",
+      "instrument_id": "600099.SH",
+      "page": 22,
+      "name": "油锯",
+      "native_aliases": [
+        "油锯"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-046",
+      "instrument_id": "600099.SH",
+      "page": 22,
+      "name": "油锯",
+      "native_aliases": [
+        "油锯"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+      "context_pages": [
+        8
+      ]
+    },
+    {
+      "condition_id": "600099.SH-action-047",
+      "instrument_id": "600099.SH",
+      "page": 31,
+      "name": "机械",
+      "native_aliases": [
+        "机械"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "江苏福马高新动力机械有限公司",
+      "actor_aliases": [
+        "江苏福马高新动力机械有限公司",
+        "福马高新"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "合并全资子公司",
+      "context_pages": []
+    },
+    {
+      "condition_id": "600099.SH-action-048",
+      "instrument_id": "600099.SH",
+      "page": 31,
+      "name": "机械",
+      "native_aliases": [
+        "机械"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "江苏福马高新动力机械有限公司",
+      "actor_aliases": [
+        "江苏福马高新动力机械有限公司",
+        "福马高新"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "合并全资子公司",
+      "context_pages": []
+    },
+    {
+      "condition_id": "600099.SH-action-049",
+      "instrument_id": "600099.SH",
+      "page": 31,
+      "name": "机械",
+      "native_aliases": [
+        "机械"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "江苏联海动力机械有限公司",
+      "actor_aliases": [
+        "江苏联海动力机械有限公司",
+        "联海动力"
+      ],
+      "subject_scope": "group_associated_entity",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "参股公司，不扩大合并/母公司",
+      "context_pages": []
+    },
+    {
+      "condition_id": "600099.SH-action-050",
+      "instrument_id": "600099.SH",
+      "page": 31,
+      "name": "机械",
+      "native_aliases": [
+        "机械"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "江苏联海动力机械有限公司",
+      "actor_aliases": [
+        "江苏联海动力机械有限公司",
+        "联海动力"
+      ],
+      "subject_scope": "group_associated_entity",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "参股公司，不扩大合并/母公司",
+      "context_pages": []
+    },
+    {
+      "condition_id": "600099.SH-action-051",
+      "instrument_id": "600099.SH",
+      "page": 31,
+      "name": "服务托管",
+      "native_aliases": [
+        "服务托管"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "福马新能（北京）科技有限公司",
+      "actor_aliases": [
+        "福马新能（北京）科技有限公司",
+        "福马新能"
+      ],
+      "subject_scope": "group_associated_entity",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "参股公司，非合并子公司",
+      "context_pages": []
+    }
+  ],
+  "actor_aliases": {
+    "北京中视北方影视制作有限公司": [
+      "中视北方"
+    ],
+    "上海中视国际广告有限公司": [
+      "中视广告"
+    ],
+    "宁波梅山保税港区国视融媒投资管理有限公司": [
+      "国视融媒"
+    ],
+    "江苏福马高新动力机械有限公司": [
+      "福马高新"
+    ],
+    "江苏联海动力机械有限公司": [
+      "联海动力"
+    ],
+    "福马新能（北京）科技有限公司": [
+      "福马新能"
+    ]
+  },
+  "answers": {
+    "600088.SH": {
+      "principal_business": {
+        "pages": [
+          11,
+          12,
+          13,
+          14,
+          23,
+          142,
+          143,
+          145
+        ],
+        "required_groups": [
+          [
+            "影视"
+          ],
+          [
+            "广告"
+          ],
+          [
+            "旅游"
+          ],
+          [
+            "基金"
+          ],
+          [
+            "北方"
+          ],
+          [
+            "国视融媒"
+          ],
+          [
+            "参股",
+            "基金投资"
+          ]
+        ],
+        "substance": "影视电视节目制作销售/技术租赁库存剧、媒体广告代理、两影视基地旅游门票园内经营拍摄服务、原全资国视融媒基金投资管理与参股限定；不能把被投企业产品经营并入集团。"
+      },
+      "products_services": {
+        "pages": [
+          11,
+          12,
+          13,
+          14,
+          23,
+          143
+        ],
+        "required_groups": [
+          [
+            "剪辑"
+          ],
+          [
+            "包装"
+          ],
+          [
+            "调色"
+          ],
+          [
+            "运维"
+          ],
+          [
+            "租赁"
+          ],
+          [
+            "库存剧"
+          ],
+          [
+            "科教"
+          ],
+          [
+            "农业农村"
+          ],
+          [
+            "三国城"
+          ],
+          [
+            "水浒城"
+          ],
+          [
+            "南海"
+          ],
+          [
+            "研学"
+          ],
+          [
+            "婚纱"
+          ],
+          [
+            "咨询"
+          ]
+        ],
+        "substance": "电视纪录片栏目晚会宣传片全链制作、新媒体直播短视频、前后期技术和设备机房演播室运维租赁、库存剧销售、广告频道资源、两基地多元旅游/研学/婚纱摄影和国视融媒投资咨询。"
+      },
+      "revenue_model": {
+        "pages": [
+          11,
+          14,
+          16,
+          17,
+          91,
+          92,
+          131,
+          132,
+          154,
+          155,
+          175
+        ],
+        "required_groups": [
+          [
+            "履约期间"
+          ],
+          [
+            "交付验收",
+            "交付",
+            "验收"
+          ],
+          [
+            "版权"
+          ],
+          [
+            "控制权"
+          ],
+          [
+            "履约进度"
+          ],
+          [
+            "门票"
+          ],
+          [
+            "收款权利",
+            "现金"
+          ],
+          [
+            "不就受托资产支付",
+            "不支付",
+            "任何费用"
+          ]
+        ],
+        "substance": "租赁按履约期间、制作完成交付验收、影视版权转移控制权、广告按履约进度、门票售出并提供服务现金或收款权利；南海受托资产自主经营自负盈亏但总台不付佣金管理费，原集团/母公司/关联栏目及仅上期空分开。"
+      }
+    },
+    "600099.SH": {
+      "principal_business": {
+        "pages": [
+          8,
+          9,
+          10,
+          12,
+          13,
+          14,
+          15,
+          16,
+          31,
+          166
+        ],
+        "required_groups": [
+          [
+            "森林消防"
+          ],
+          [
+            "农业机械"
+          ],
+          [
+            "特种"
+          ],
+          [
+            "摩托车"
+          ],
+          [
+            "配件"
+          ],
+          [
+            "以销定产"
+          ],
+          [
+            "经销"
+          ],
+          [
+            "福马"
+          ],
+          [
+            "参股"
+          ]
+        ],
+        "substance": "四大机械车辆与配件制造销售，以销定产订单/销售计划下达生产适度备货，经销为主，国内外网络；福马全资及联海/福马新能参股边界。"
+      },
+      "products_services": {
+        "pages": [
+          8,
+          9,
+          10,
+          14,
+          15,
+          22,
+          31
+        ],
+        "required_groups": [
+          [
+            "全地形消防车"
+          ],
+          [
+            "消防泵"
+          ],
+          [
+            "离心泵"
+          ],
+          [
+            "隔膜泵"
+          ],
+          [
+            "智能串联"
+          ],
+          [
+            "风力灭火机"
+          ],
+          [
+            "插秧机"
+          ],
+          [
+            "抛秧机"
+          ],
+          [
+            "收割机"
+          ],
+          [
+            "电动"
+          ],
+          [
+            "摩托车"
+          ],
+          [
+            "油锯"
+          ]
+        ],
+        "substance": "主要产品表完整森林消防车辆泵系列/灭火机、插秧/抛秧系列收割机、燃油/电动ATV与摩托车及配件；油锯实际产销量、原子公司机械制造与参股托管服务。研发、内部工具及未来电动农机不升当前销售。"
+      },
+      "revenue_model": {
+        "pages": [
+          10,
+          21,
+          109,
+          110,
+          111,
+          153,
+          177,
+          191
+        ],
+        "required_groups": [
+          [
+            "经销"
+          ],
+          [
+            "签字验收"
+          ],
+          [
+            "送货单"
+          ],
+          [
+            "FOB"
+          ],
+          [
+            "出口报关"
+          ],
+          [
+            "海运提单"
+          ],
+          [
+            "折扣"
+          ],
+          [
+            "场地"
+          ],
+          [
+            "房屋"
+          ],
+          [
+            "收费时间"
+          ]
+        ],
+        "substance": "销售计划/订单以销定产，国内指定地点客户签验送货单含自提，出口FOB合格货装运港报关装船海运提单，数量折扣最可能金额限重大转回重估，场地房屋让渡使用权按合同收费时间方法；集团/母公司原栏目、时段打印零及关联零销售不得反推动作。"
+      }
+    }
+  },
+  "negative_conditions": [
+    {
+      "condition_id": "600088.SH-negative-1",
+      "instrument_id": "600088.SH",
+      "page": 154,
+      "name": "仅上期关联销售",
+      "counterparty": "环球国际视频通讯社有限公司",
+      "content": "影视业务",
+      "prior_value": "1,856,132.08",
+      "forbidden": "本期收入/肯定正文，不借列不造零"
+    },
+    {
+      "condition_id": "600088.SH-negative-2",
+      "instrument_id": "600088.SH",
+      "page": 154,
+      "name": "仅上期关联销售",
+      "counterparty": "央视国际网络有限公司",
+      "content": "影视业务",
+      "prior_value": "566,037.74",
+      "forbidden": "本期收入/肯定正文，不借列不造零"
+    },
+    {
+      "condition_id": "600088.SH-negative-3",
+      "instrument_id": "600088.SH",
+      "page": 154,
+      "name": "仅上期关联销售",
+      "counterparty": "北京中电高科技电视发展有限公司",
+      "content": "影视业务",
+      "prior_value": "109,622.64",
+      "forbidden": "本期收入/肯定正文，不借列不造零"
+    },
+    {
+      "condition_id": "600088.SH-negative-4",
+      "instrument_id": "600088.SH",
+      "page": 154,
+      "name": "仅上期关联销售",
+      "counterparty": "北京中视广经文化发展有限公司",
+      "content": "广告业务",
+      "prior_value": "27,452.83",
+      "forbidden": "本期收入/肯定正文，不借列不造零"
+    },
+    {
+      "condition_id": "600088.SH-negative-5",
+      "instrument_id": "600088.SH",
+      "page": 154,
+      "name": "仅上期关联销售",
+      "counterparty": "央视国际网络有限公司",
+      "content": "广告业务",
+      "prior_value": "1,683.96",
+      "forbidden": "本期收入/肯定正文，不借列不造零"
+    },
+    {
+      "condition_id": "600088.SH-negative-6",
+      "instrument_id": "600088.SH",
+      "page": 17,
+      "name": "分产品分销售模式未列",
+      "forbidden_headers": [
+        "主营业务分产品",
+        "主营业务分销售模式"
+      ]
+    },
+    {
+      "condition_id": "600088.SH-negative-7",
+      "instrument_id": "600088.SH",
+      "page": 145,
+      "name": "不适用合营",
+      "forbidden_headers": [
+        "重要合营企业"
+      ]
+    },
+    {
+      "condition_id": "600088.SH-negative-8",
+      "instrument_id": "600088.SH",
+      "page": 145,
+      "name": "两联营营业收入本期空",
+      "actors": [
+        "朴盈国视",
+        "朴华惠新"
+      ],
+      "forbidden": "不得以净利润/投资余额填收入"
+    },
+    {
+      "condition_id": "600088.SH-negative-9",
+      "instrument_id": "600088.SH",
+      "page": 155,
+      "name": "出租不适用",
+      "forbidden_headers": [
+        "本公司作为出租方"
+      ]
+    },
+    {
+      "condition_id": "600088.SH-negative-10",
+      "instrument_id": "600088.SH",
+      "page": 155,
+      "name": "受托无费用",
+      "actor": "中央广播电视总台",
+      "forbidden": "南海影视城受托不得生成佣金或管理费收入；自主经营门票收入保留"
+    },
+    {
+      "condition_id": "600088.SH-negative-11",
+      "instrument_id": "600088.SH",
+      "page": 156,
+      "name": "承租费用非收入",
+      "forbidden_headers": [
+        "本公司作为承租方/营业收入"
+      ]
+    },
+    {
+      "condition_id": "600088.SH-negative-12",
+      "instrument_id": "600088.SH",
+      "page": 132,
+      "name": "未履约非本期收入",
+      "values": [
+        "153828964.93",
+        "147351438.88"
+      ]
+    },
+    {
+      "condition_id": "600088.SH-negative-13",
+      "instrument_id": "600088.SH",
+      "page": 175,
+      "name": "母公司未履约非收入",
+      "values": [
+        "32786229.05",
+        "26333776.87"
+      ]
+    },
+    {
+      "condition_id": "600088.SH-negative-14",
+      "instrument_id": "600088.SH",
+      "page": 113,
+      "name": "联营注销边界",
+      "actor": "中视星选客（佛山）网络科技有限公司",
+      "state": "2025-10-24注销，不升为期末合并子公司或当前影视经营"
+    },
+    {
+      "condition_id": "600088.SH-negative-15",
+      "instrument_id": "600088.SH",
+      "page": 12,
+      "name": "行业趋势非本公司动作",
+      "names": [
+        "AIGC",
+        "VR/AR",
+        "微短剧"
+      ],
+      "state": "行业趋势不能生成为已销售产品；实际影视业务保留"
+    },
+    {
+      "condition_id": "600088.SH-negative-16",
+      "instrument_id": "600088.SH",
+      "page": 14,
+      "name": "基金减持非营业收入",
+      "names": [
+        "海看股份",
+        "无线传媒"
+      ],
+      "state": "基金减持/投资收益不是本公司商品销售收入"
+    },
+    {
+      "condition_id": "600088.SH-negative-17",
+      "instrument_id": "600088.SH",
+      "page": 17,
+      "name": "成本不反推商品",
+      "names": [
+        "职工薪酬",
+        "技术服务费",
+        "劳务费",
+        "制作费",
+        "房水电费"
+      ],
+      "state": "成本费用不生成实体商品/收入；真实技术服务保留"
+    },
+    {
+      "condition_id": "600099.SH-negative-1",
+      "instrument_id": "600099.SH",
+      "page": 177,
+      "name": "零销售不推当前销售",
+      "counterparty": "天津工程机械研究院有限公司",
+      "current_value": "0.00"
+    },
+    {
+      "condition_id": "600099.SH-negative-2",
+      "instrument_id": "600099.SH",
+      "page": 176,
+      "name": "零采购不推动作",
+      "counterparties": [
+        "江苏林海智能装备有限公司",
+        "中国福马林业机械上海有限公司",
+        "江苏林海商贸有限公司"
+      ],
+      "current_value": "0.00"
+    },
+    {
+      "condition_id": "600099.SH-negative-3",
+      "instrument_id": "600099.SH",
+      "page": 176,
+      "name": "接受劳务不成商品",
+      "names": [
+        "接受劳务"
+      ],
+      "state": "真实劳务采购保留，不推商品生产销售/实际制造投入"
+    },
+    {
+      "condition_id": "600099.SH-negative-4",
+      "instrument_id": "600099.SH",
+      "page": 22,
+      "name": "成本不反推采购投入",
+      "names": [
+        "原材料",
+        "人工成本",
+        "燃料动力",
+        "制造费用"
+      ],
+      "state": "无具名采购投入依据，不反推"
+    },
+    {
+      "condition_id": "600099.SH-negative-5",
+      "instrument_id": "600099.SH",
+      "page": 166,
+      "name": "非全资不适用",
+      "forbidden_headers": [
+        "重要非全资子公司"
+      ]
+    },
+    {
+      "condition_id": "600099.SH-negative-6",
+      "instrument_id": "600099.SH",
+      "page": 166,
+      "name": "合营联营不适用",
+      "forbidden_headers": [
+        "重要合营企业",
+        "重要联营企业"
+      ]
+    },
+    {
+      "condition_id": "600099.SH-negative-7",
+      "instrument_id": "600099.SH",
+      "page": 177,
+      "name": "出租受托不适用",
+      "forbidden_headers": [
+        "本公司作为出租方",
+        "受托管理"
+      ]
+    },
+    {
+      "condition_id": "600099.SH-negative-8",
+      "instrument_id": "600099.SH",
+      "page": 178,
+      "name": "承租费用非收入",
+      "values": [
+        "2033882.55",
+        "2197804.08",
+        "722658.57",
+        "758791.50",
+        "455714.29",
+        "478500.00"
+      ]
+    },
+    {
+      "condition_id": "600099.SH-negative-9",
+      "instrument_id": "600099.SH",
+      "page": 153,
+      "name": "时段打印零不是空",
+      "value": "0.00",
+      "state": "保留零收入，不推时段经营或销售"
+    },
+    {
+      "condition_id": "600099.SH-negative-10",
+      "instrument_id": "600099.SH",
+      "page": 31,
+      "name": "参股不集团化",
+      "actors": [
+        "江苏联海动力机械有限公司",
+        "福马新能（北京）科技有限公司"
+      ],
+      "state": "不改为合并子公司或母公司"
+    },
+    {
+      "condition_id": "600099.SH-negative-11",
+      "instrument_id": "600099.SH",
+      "page": 176,
+      "name": "注销采购打印零",
+      "actor": "江苏林海商贸有限公司",
+      "state": "2024已注销，2025零不推当前经营"
+    },
+    {
+      "condition_id": "600099.SH-negative-12",
+      "instrument_id": "600099.SH",
+      "page": 10,
+      "name": "行业销量非公司销量",
+      "values": [
+        "56964",
+        "60500"
+      ],
+      "names": [
+        "久保田",
+        "星莱和",
+        "沃得"
+      ],
+      "state": "不得生成本公司产品/动作/收入"
+    },
+    {
+      "condition_id": "600099.SH-negative-13",
+      "instrument_id": "600099.SH",
+      "page": 31,
+      "name": "未来电动农业机械非当前销售",
+      "names": [
+        "电动农业机械"
+      ],
+      "state": "探索开发及未来战略不是本期实际销售"
+    },
+    {
+      "condition_id": "600099.SH-negative-14",
+      "instrument_id": "600099.SH",
+      "page": 15,
+      "name": "加工中心实验室非对外产品",
+      "names": [
+        "加工中心项目",
+        "ERP系统"
+      ],
+      "state": "内部管理工具不变外售商品"
+    },
+    {
+      "condition_id": "600099.SH-negative-15",
+      "instrument_id": "600099.SH",
+      "page": 191,
+      "name": "投资收益非收入",
+      "forbidden_headers": [
+        "投资收益/营业收入"
+      ]
+    }
+  ],
+  "denominator_method": "独立官方本期原格＋具名动作＋六正文；合同分解同义镜像列不重复，同额不同原表分别计；摘要四舍五入及headline合计复述不独立重复；Measurement只计准确率；不从输出回填，不继承旧分母",
+  "positive_count": 207,
+  "negative_count": 32,
+  "formal_authorization": {
+    "first_observation": 1,
+    "same_source_successors_at_most": 2
+  },
+  "original_positive_count": 200,
+  "original_contract_sha256": "01aefae292c2930aba39dd1392bbdbb21897bd752a990c90a703764fd866bbb2",
+  "a_role_ruling": "用户明确同意207＋32及参股主体元数据补正；前一205裁决已由207裁决替代",
+  "successor_contract": true
+}

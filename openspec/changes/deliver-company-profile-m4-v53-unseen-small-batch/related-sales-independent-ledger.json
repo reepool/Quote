@@ -1,0 +1,386 @@
+{
+  "600088.SH": [
+    {
+      "page": 154,
+      "counterparty": "中央广播电视总台",
+      "content": "影视业务",
+      "current_value": "527,216,100.57",
+      "prior_value": "499,774,821.43",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "北京中视广经文化发展有限公司",
+      "content": "影视业务",
+      "current_value": "698,113.21",
+      "prior_value": "75,471.70",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "中视前卫影视传媒有限公司",
+      "content": "影视业务",
+      "current_value": "672,439.41",
+      "prior_value": "1,810,040.96",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "央拓国际融合传播集团有限公司",
+      "content": "影视业务",
+      "current_value": "636,792.45",
+      "prior_value": "2,245,283.02",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "央视频融媒体发展有限公司",
+      "content": "影视业务",
+      "current_value": "584,905.66",
+      "prior_value": "6,942,542.18",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "央视创造传媒有限公司",
+      "content": "影视业务",
+      "current_value": "377,358.49",
+      "prior_value": null,
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "中视国际传媒（北京）有限公司",
+      "content": "影视业务",
+      "current_value": "367,924.53",
+      "prior_value": null,
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "央视（北京）娱乐传媒有限公司",
+      "content": "影视业务",
+      "current_value": "236,083.98",
+      "prior_value": "47,169.81",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "国际传媒港（上海）文化发展有限公司",
+      "content": "影视业务",
+      "current_value": "235,849.06",
+      "prior_value": null,
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "北京中广影视融媒体发展有限责任公司",
+      "content": "影视业务",
+      "current_value": "199,528.31",
+      "prior_value": null,
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "中国电视剧制作中心有限责任公司",
+      "content": "影视业务",
+      "current_value": "196,226.42",
+      "prior_value": "196,226.42",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "中广影视卫星有限责任公司",
+      "content": "影视业务",
+      "current_value": "122,641.51",
+      "prior_value": null,
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "中国环球广播电视有限公司",
+      "content": "影视业务",
+      "current_value": "108,679.24",
+      "prior_value": "87,735.85",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "梅地亚电视中心有限公司",
+      "content": "影视业务",
+      "current_value": "18,867.92",
+      "prior_value": null,
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "环球国际视频通讯社有限公司",
+      "content": "影视业务",
+      "current_value": null,
+      "prior_value": "1,856,132.08",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "央视国际网络有限公司",
+      "content": "影视业务",
+      "current_value": null,
+      "prior_value": "566,037.74",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "北京中电高科技电视发展有限公司",
+      "content": "影视业务",
+      "current_value": null,
+      "prior_value": "109,622.64",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "中央广播电视总台",
+      "content": "广告业务",
+      "current_value": "133,278,798.11",
+      "prior_value": "171,127,962.25",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "央拓国际融合传播集团有限公司",
+      "content": "广告业务",
+      "current_value": "424,528.30",
+      "prior_value": null,
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "央视频融媒体发展有限公司",
+      "content": "广告业务",
+      "current_value": "344,217.66",
+      "prior_value": "328,490.59",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "中视科华有限公司",
+      "content": "广告业务",
+      "current_value": "94,339.62",
+      "prior_value": null,
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "北京中视广经文化发展有限公司",
+      "content": "广告业务",
+      "current_value": null,
+      "prior_value": "27,452.83",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "央视国际网络有限公司",
+      "content": "广告业务",
+      "current_value": null,
+      "prior_value": "1,683.96",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "中视前卫影视传媒有限公司",
+      "content": "旅游业务",
+      "current_value": "8,018.86",
+      "prior_value": null,
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "中央电视台无锡太湖影视城有限公司",
+      "content": "旅游业务",
+      "current_value": "5,882.65",
+      "prior_value": "5,899.18",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "央视国际网络无锡有限公司",
+      "content": "旅游业务",
+      "current_value": "5,597.10",
+      "prior_value": null,
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "梅地亚电视中心有限公司",
+      "content": "旅游业务",
+      "current_value": "2,846.05",
+      "prior_value": null,
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 154,
+      "counterparty": "中视融合（上海）企业管理合伙企业（有限合伙）",
+      "content": "基金业务",
+      "current_value": "339,622.64",
+      "prior_value": "339,622.64",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 154
+    },
+    {
+      "page": 155,
+      "counterparty": "宁波梅山保税港区琦林股权投资合伙企业（有限合伙）",
+      "content": "基金业务",
+      "current_value": "50,147.74",
+      "prior_value": "50,147.74",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 155
+    }
+  ],
+  "600099.SH": [
+    {
+      "page": 177,
+      "counterparty": "中国机械工业集团有限公司",
+      "content": "销售商品、提供劳务",
+      "current_value": "1,444,575.48",
+      "prior_value": "228,773.58",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 177
+    },
+    {
+      "page": 177,
+      "counterparty": "国机重工集团国际装备有限公司",
+      "content": "销售商品",
+      "current_value": "534,466.48",
+      "prior_value": "0.00",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 177
+    },
+    {
+      "page": 177,
+      "counterparty": "国机海南发展有限公司",
+      "content": "销售商品",
+      "current_value": "243,119.27",
+      "prior_value": "205,504.59",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 177
+    },
+    {
+      "page": 177,
+      "counterparty": "天津工程机械研究院有限公司",
+      "content": "销售商品",
+      "current_value": "0.00",
+      "prior_value": "460.18",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 177
+    },
+    {
+      "page": 177,
+      "counterparty": "江苏林海智能装备有限公司",
+      "content": "销售商品",
+      "current_value": "1,832,900.73",
+      "prior_value": "0.00",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 177
+    },
+    {
+      "page": 177,
+      "counterparty": "江苏林海动力机械集团有限公司",
+      "content": "销售商品、提供劳务",
+      "current_value": "1,534,499.16",
+      "prior_value": "2,821,991.16",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 177
+    },
+    {
+      "page": 177,
+      "counterparty": "天津林工机械有限公司",
+      "content": "销售商品、提供劳务",
+      "current_value": "65,187.31",
+      "prior_value": "133,440.37",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 177
+    },
+    {
+      "page": 177,
+      "counterparty": "江苏联海动力机械有限公司",
+      "content": "销售商品",
+      "current_value": "50,283.08",
+      "prior_value": "0.00",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 177
+    },
+    {
+      "page": 177,
+      "counterparty": "中国福马林业机械上海有限公司",
+      "content": "销售商品",
+      "current_value": "1,309.73",
+      "prior_value": "5,008.85",
+      "unit": "元",
+      "kind": "transaction",
+      "source_layout_page": 177
+    }
+  ]
+}

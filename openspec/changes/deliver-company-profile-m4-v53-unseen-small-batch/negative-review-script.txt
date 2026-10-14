@@ -1,0 +1,28 @@
+import json,re
+from pathlib import Path
+from v53new_match import co,num,pages
+
+def negative_violations(n,rs,ds):
+ fin=[r for r in rs if r['object_type'] in ['Segment','Measurement']];acts=[r for r in rs if r['object_type'] in ['Activity','Relationship']];name=n['name'];bad=[]
+ relevant=[r for r in rs if n['page'] in pages(r)]
+ if name=='仅上期关联销售':bad=[r for r in relevant if r in fin and num(r['source_native']['value'])==num(n['prior_value'])]
+ elif 'forbidden_headers' in n:bad=[r for r in relevant if r in fin and any(h in (r['source_native'].get('header') or '') for h in n['forbidden_headers'])]
+ elif name=='两联营营业收入本期空':bad=[r for r in relevant if r in fin and any(a in co(str(r['source_native'])) for a in n['actors']) and '营业收入' in (r['source_native'].get('header') or '')]
+ elif name=='受托无费用':bad=[r for r in relevant if r in fin and re.search('佣金|管理费',r['source_native']['name'])]
+ elif name in ['未履约非本期收入','母公司未履约非收入','承租费用非收入','行业销量非公司销量']:bad=[r for r in relevant if r in fin and num(r['source_native']['value']) in [num(v) for v in n['values']]]
+ elif name in ['联营注销边界','注销采购打印零']:bad=[r for r in relevant if r in acts and n['actor'] in str(r.get('source_actor',''))+str(r['source_native'].get('qualifier','')) and r.get('action') in ['sells','produces','purchases','operates']]
+ elif name=='零销售不推当前销售':bad=[r for r in relevant if r in acts and r.get('action')=='sells' and n['counterparty'] in str(r['source_native'].get('qualifier',''))]
+ elif name=='零采购不推动作':bad=[r for r in relevant if r in acts and r.get('action')=='purchases' and any(p in str(r['source_native'].get('qualifier','')) for p in n['counterparties'])]
+ elif name=='接受劳务不成商品':bad=[r for r in relevant if r in acts and r['source_native']['name']=='接受劳务' and (r.get('action') in ['produces','sells'] or r.get('relation_type')=='material_input')]
+ elif name=='时段打印零不是空':bad=[r for r in relevant if r in acts and '时段' in r['source_native']['name']]
+ elif name=='参股不集团化':bad=[r for r in relevant if any(a in str(r.get('source_actor',''))+str(r['source_native'].get('qualifier',''))+str(r['source_native']['name']) for a in n['actors']) and r['subject_scope'] in ['issuer','consolidated_group','named_subsidiary']]
+ elif 'names' in n:bad=[r for r in relevant if r in acts and any(x==r['source_native']['name'] for x in n['names'])]
+ else:raise ValueError(name)
+ return [r['record_id'] for r in bad]
+if __name__=='__main__':
+ C=Path('openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch');s=json.loads((C/'source-scope.json').read_text());out=[]
+ for n in s['negative_conditions']:
+  i=n['instrument_id'];rs=json.loads(Path('/tmp/v53newraw_'+i+'.json').read_text());ds=json.loads(Path('/tmp/v53newanswers_'+i+'.json').read_text());bad=negative_violations(n,rs,ds)
+  out.append(dict(**n,evaluated=True,checked_fact_ids=[r['record_id'] for r in rs if n['page'] in pages(r)],checked_answer_ids=[d['dimension_id'] for d in ds],violations=bad,passed=not bad,source_basis='独立官方原页及布局核对原声明边界；实际接受输出逐项检索'))
+ p=C/'negative-review-evidence-corrected.json';assert not p.exists();p.write_text(json.dumps(dict(passed=sum(x['passed'] for x in out),total=len(out),conditions=out),ensure_ascii=False,indent=2)+'\n')
+ print('FIRST NEGATIVES',sum(x['passed'] for x in out),len(out))

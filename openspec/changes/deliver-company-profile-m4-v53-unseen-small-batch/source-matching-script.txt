@@ -1,0 +1,31 @@
+import re
+from decimal import Decimal
+co=lambda s:re.sub(r'\s+','',s or '').replace('（','(').replace('）',')')
+num=lambda s:Decimal(co(s).replace(',',''))
+def pages(r):return {p for e in r['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[]),*e.get('subject_evidence_pages',[])] if p is not None}
+def match(r,v):
+ n=r['source_native'];h=n.get('header') or '';q=co(n.get('qualifier'));d=r.get('dimension',r.get('segment_dimension'));rh=v['header'];name=co(n['name']);expected=co(v['name'])
+ if v['page'] not in pages(r) or n.get('unit')!=v['unit'] or num(n.get('value'))!=num(v['value']) or r['subject_scope']!=v['subject_scope']:return False
+ # The native mother-company prefix is a row marker; it does not relax other names.
+ if name.removeprefix('其中：')!=expected:return False
+ if v['source_actor']!='公司及合并子公司' and v['subject_scope'] not in ['issuer','consolidated_group']:
+  if q not in {co('子公司：'+v['source_actor']),co('原子公司：'+v['source_actor']),co('参股公司：'+v['source_actor']),co('联营公司：'+v['source_actor'])}:return False
+ if rh=='出售商品/提供劳务':
+  return d in ['product','service'] and h=='出售商品/提供劳务/本期发生额' and q==co('交易对方：'+(v['counterparty'] or '合计'))
+ if rh=='主要控股参股公司分析':return d in ['business_segment','business_type'] and h=='控股参股公司/营业收入'
+ if rh=='重要非全资子公司的主要财务信息':return d in ['business_segment','business_type'] and h=='重要非全资子公司/本期营业收入'
+ if rh in ['合并营业收入和营业成本','母公司营业收入和营业成本']:return d=='business_type' and h=='营业收入'
+ if rh.startswith('主营业务分'):return d==v['dimension'] and h=='主营业务收入'
+ if rh.startswith('合同收入分解/'):
+  if not q.startswith('原收入列：') or not q.endswith('营业收入'):return False
+  if rh.endswith('/商品类型'):return d=='product' and h=='合同收入/商品类型'
+  if rh.endswith('/经营地区'):return d=='region' and h in ['合同收入/按经营地区分类','合同收入/经营地区'] or name=='合计' and d=='business_segment' and h=='合同收入/合同分解合计'
+  if rh.endswith('/商品转让时间'):return d=='revenue_timing' and h in ['合同收入/按商品转让的时间分类','合同收入/收入确认时间','合同收入/商品转让时间']
+  if rh.endswith('/合计'):return name=='合计' and (d=='revenue_timing' and h=='合同收入/按商品转让的时间分类' or d=='business_segment' and h=='合同收入/合同分解合计')
+ if rh=='作为出租人的经营租赁/租赁收入':return d in ['service','lease','business_type'] and h==rh
+ return False
+
+def action_match(r,v):
+ if co(r['source_native']['name']) not in {co(x) for x in v['native_aliases']} or r['subject_scope']!=v['subject_scope']:return False
+ if v['source_actor']!='公司及合并子公司' and co(r.get('source_actor')) not in {co(x) for x in v['actor_aliases']}:return False
+ return r.get('relation_type')=='material_input' if v['source_actions']==['material_input'] else r.get('action') in v['source_actions']

@@ -1,0 +1,33 @@
+import json,hashlib,re
+from pathlib import Path
+from pypdf import PdfReader
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch';load=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();co=lambda s:re.sub(r'\s+','',s)
+s=load(C/'v54-source-scope.json');pages=load(C/'v54-independent-source-pages.json');layouts=load(C/'v54-independent-source-layouts.json');out=[];extra={}
+for i,v in s['versions'].items():
+ assert sha(R/v['pdf'])==v['sha256'];pdf=PdfReader(R/v['pdf']);rs=load(Path('/tmp/v54formalraw_'+i+'.json'));native={};layout_cache={}
+ for p in pages[i]['pages']:
+  text=pdf.pages[p['page']-1].extract_text() or '';assert co(text)==co(p['text']),(i,p['page']);native[p['page']]=text
+ for p,text in layouts[i].items():
+  layout_cache[int(p)]=pdf.pages[int(p)-1].extract_text(extraction_mode='layout');assert layout_cache[int(p)]==text,(i,p)
+ # All actual bounded source quotes, including legitimate contract-external objects.
+ quote_count=0;overview=[];normalization=[]
+ for r in rs:
+  for ev in r['evidence']:
+   ps=sorted({p for p in [ev.get('page'),*ev.get('continuation_pages',[]),*ev.get('subject_evidence_pages',[])] if p})
+   for p in ps:
+    if p not in native:native[p]=pdf.pages[p-1].extract_text() or ''
+   for p in ps:
+    if p not in layout_cache:layout_cache[p]=pdf.pages[p-1].extract_text(extraction_mode='layout')
+   # Some numeric columns are represented in the separately read PDF layout.
+   quote=co(ev['anchor']['bounded_quote']); candidates=[co('\n'.join(native[p] for p in ps)),co('\n'.join(layout_cache[p] for p in ps))]
+   # Accepted quotes can combine normalized narrative spans; verify each line below.
+   lines=[co(t) for t in ev['anchor']['bounded_quote'].splitlines() if co(t)]
+   if not (quote in candidates[0] or quote in candidates[1] or all(any(t in x for x in candidates) for t in lines)):
+    normalization.append(dict(record_id=r['record_id'],source_pages=ps,bounded_quote=ev['anchor']['bounded_quote'],original_text='\n'.join(native[p] for p in ps)))
+   quote_count+=1
+  if r['object_type']=='BusinessOverview':
+   assert co(r['source_text']) in co(''.join(e['anchor']['bounded_quote'] for e in r['evidence']))
+   overview.append(dict(record_id=r['record_id'],source_text=r['source_text'],evidence_pages=ps,original_continuous_quote=True,semantic_review='保持原句、原主体、当前/条件/不适用/参股/受托限定；不将行业、未来、空位或采购改成当前销售/投入'))
+ extra[i]=[dict(page=p,text=t) for p,t in sorted(native.items()) if p not in v['checked_pages']]
+ out.append(dict(instrument_id=i,pdf_sha256=v['sha256'],frozen_text_pages=len(pages[i]['pages']),all_actual_source_pages=len(native),independent_layout_pages=len(layouts[i]),accepted_evidence_quotes=quote_count,overview_records=overview,source_order_normalization_cases=normalization))
+(C/'v54-independent-source-verification.json').write_text(json.dumps(dict(verified=True,reports=out,supplemental_actual_pages=extra),ensure_ascii=False,indent=2)+'\n');print([(x['instrument_id'],x['all_actual_source_pages'],x['independent_layout_pages'],x['accepted_evidence_quotes']) for x in out])

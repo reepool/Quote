@@ -1,0 +1,25 @@
+import json,tempfile
+from pathlib import Path
+from utils import config_manager
+from research.storage import ResearchStorageManager
+from research.announcement_assets import AnnouncementAssetConfig,AnnouncementAssetRepository,AnnouncementAssetService
+from research.announcement_assets.access import AnnouncementAssetAccess
+from research.business_profile_async_production import BusinessProfileWorkRepository
+from research.company_profile.operations import OfficialAnnualReportPageSource
+from tests.unit.test_research.test_company_profile_v19_closure import _drive
+from research.company_profile.reads import _iter_accepted_raw
+from v53new_match import match,action_match,co
+C=Path('openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch');s=json.loads((C/'v54-source-scope.json').read_text());f=json.loads(Path('data/checkpoints/company_profile_common_core/reports/m4_v53_unseen_small_batch/formal_execution.json').read_text())
+rc=config_manager.get_research_config();storage=ResearchStorageManager(rc);cfg=AnnouncementAssetConfig.from_research_config(rc,project_root=Path.cwd());repository=AnnouncementAssetRepository(Path(str(rc.storage.db_path)).resolve());service=AnnouncementAssetService(repository=repository,config=cfg,acquisition_service=None,attachment_retriever=None);access=AnnouncementAssetAccess(repository=repository,config=cfg,service=service);work=BusinessProfileWorkRepository(storage,checkpoint_root='data/checkpoints/company_profile_common_core',shared_asset_access=access);source=OfficialAnnualReportPageSource(work)
+for i in s['versions']:
+ item=work.get(f['results'][i]['query']['profiles'][0]['work_id']);payload=source(item);assert payload
+ Path('/tmp/v54official_input_'+i+'.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2,default=lambda v:v.model_dump(mode='json')));ps=payload['pages'];root=Path(tempfile.mkdtemp(prefix='v54-official-local-'));q,e=_drive(root,instrument=i,fixture=dict(document_version=s['versions'][i]['sha256']),pages=ps,repair_version='v54');assert q==e
+ ck=json.loads((root/'company_profile_common_core.v1/checkpoints'/('work-'+i+'.json')).read_text());rs=list(_iter_accepted_raw(ck))
+ for name,value in [('raw',rs),('profile',q)]:Path('/tmp/v54official_'+name+'_'+i+'.json').write_text(json.dumps(value,ensure_ascii=False,indent=2))
+ print('OFFICIAL_LOCAL',i,len(rs),'pages',len(ps),'layout',sum(bool(p.get('layout_text')) for p in ps),flush=True)
+ for v in s['source_rows'][i]:
+  if not any(r['object_type']=='Segment' and match(r,v) for r in rs):print('MISS INCOME',v['page'],v['name'],v['value'],v['subject_scope'],flush=True)
+ for v in s['native_roles']:
+  if v['instrument_id']==i and not any(r['object_type'] in ['Activity','Relationship'] and action_match(r,v) for r in rs):print('MISS ACTION',v['page'],v['name'],v['source_actions'],v['source_actor'],flush=True)
+ for d in q['dimensions']:
+  bad=[g for g in s['answers'][i][d['dimension_id']]['required_groups'] if not any(co(x) in co(d['excerpt']) for x in g)];print('ANSWER',d['dimension_id'],'MISSING',bad,flush=True)

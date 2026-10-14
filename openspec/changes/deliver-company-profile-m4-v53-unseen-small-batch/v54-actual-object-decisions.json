@@ -1,0 +1,3522 @@
+{
+  "600088.SH": {
+    "facts": {
+      "owned:core-ev-fe979b5d5cbb26c2:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-fe979b5d5cbb26c2:revenue:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-e307eacf627f24b4:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-8e09d19d3682b7c2:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-33895eab2fea0695:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-77e40df1ca7deb0a:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-fdc534aa33a0ea17:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-3ca43278a935c481:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-97fe5cb51607e6ba:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-fb43cc0fd6e97b47:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-aa7efaf02c26361e:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-cfdcbc2107d13fbf:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-f6dca092c6398105:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-0581dec2fbdb6431:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-adf75e502f0590e5:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-3df83c1c9b616e2d:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-734bb4a747b9fb92:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-6c8b00897cd88244:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-3a3820de861a568f:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-e9a4c3f020fabb9b:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-6ef21240e9c1dc4c:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-b659578b7343acea:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 0
+      },
+      "owned:core-ev-b659578b7343acea:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 1
+      },
+      "owned:core-ev-b659578b7343acea:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 3
+      },
+      "owned:core-ev-b659578b7343acea:commodity:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 4
+      },
+      "owned:core-ev-b659578b7343acea:commodity:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 2
+      },
+      "owned:core-ev-b659578b7343acea:commodity:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 5
+      },
+      "owned:core-ev-b659578b7343acea:commodity:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 6
+      },
+      "owned:core-ev-b659578b7343acea:commodity:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 7
+      },
+      "owned:core-ev-b659578b7343acea:commodity:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外：p11公司为影视节目提供包括设备、机房、演播室运维的全流程技术服务，非设备制造/销售"
+      },
+      "owned:core-ev-b659578b7343acea:commodity:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 8
+      },
+      "owned:core-ev-b659578b7343acea:commodity:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 9
+      },
+      "owned:core-ev-b659578b7343acea:commodity:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 10
+      },
+      "owned:core-ev-b659578b7343acea:commodity:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 11
+      },
+      "owned:core-ev-b659578b7343acea:commodity:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 12
+      },
+      "owned:core-ev-b659578b7343acea:commodity:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 13
+      },
+      "owned:core-ev-b659578b7343acea:commodity:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 14
+      },
+      "owned:core-ev-b659578b7343acea:commodity:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 15
+      },
+      "owned:core-ev-b659578b7343acea:commodity:18": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 16
+      },
+      "owned:core-ev-b659578b7343acea:commodity:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 17
+      },
+      "owned:core-ev-b659578b7343acea:commodity:20": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 18
+      },
+      "owned:core-ev-b659578b7343acea:commodity:21": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 19
+      },
+      "owned:core-ev-b659578b7343acea:commodity:22": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 20
+      },
+      "owned:core-ev-b659578b7343acea:commodity:23": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 21
+      },
+      "owned:core-ev-b659578b7343acea:commodity:24": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 22
+      },
+      "owned:core-ev-b659578b7343acea:commodity:25": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 23
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 0
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 3
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 4
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 5
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 6
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 7
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外：p11公司为影视节目提供包括设备、机房、演播室运维的全流程技术服务，非设备制造/销售"
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 8
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 9
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 10
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 11
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 12
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 13
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 15
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:18": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 16
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 17
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:20": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 18
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:21": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 19
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:22": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 20
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:23": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 21
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:24": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 22
+      },
+      "owned:core-ev-923dc253bc92993f:commodity:25": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 23
+      },
+      "owned:core-ev-bf51fa27c93b99c1:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 17
+      },
+      "owned:core-ev-bf51fa27c93b99c1:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 18
+      },
+      "owned:core-ev-bf51fa27c93b99c1:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 19
+      },
+      "owned:core-ev-bf51fa27c93b99c1:commodity:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 20
+      },
+      "owned:core-ev-bf51fa27c93b99c1:commodity:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 21
+      },
+      "owned:core-ev-bf51fa27c93b99c1:commodity:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 22
+      },
+      "owned:core-ev-bf51fa27c93b99c1:commodity:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 23
+      },
+      "owned:core-ev-ec53bf76338131e5:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 31
+      },
+      "owned:core-ev-ec53bf76338131e5:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 32
+      },
+      "owned:core-ev-fa81f2a52a80bcc4:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 27
+      },
+      "owned:core-ev-fa81f2a52a80bcc4:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 24
+      },
+      "owned:core-ev-fa81f2a52a80bcc4:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 25
+      },
+      "owned:core-ev-fa81f2a52a80bcc4:commodity:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 26
+      },
+      "owned:core-ev-3f2ac4bed11c6d24:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 28
+      },
+      "owned:core-ev-3f2ac4bed11c6d24:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 29
+      },
+      "owned:core-ev-3f2ac4bed11c6d24:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 30
+      },
+      "owned:core-ev-8eaa7c1985fa835a:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 28
+      },
+      "owned:core-ev-8eaa7c1985fa835a:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 29
+      },
+      "owned:core-ev-8eaa7c1985fa835a:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 30
+      },
+      "owned:core-ev-a5f0e294044c508d:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外合法关联销售/提供劳务父类，保留实际交易栏目；不替代具名产品动作"
+      },
+      "owned:core-ev-a5f0e294044c508d:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外合法关联销售/提供劳务父类，保留实际交易栏目；不替代具名产品动作"
+      },
+      "owned:core-ev-a5f0e294044c508d:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外合法关联销售/提供劳务父类，保留实际交易栏目；不替代具名产品动作"
+      },
+      "owned:core-ev-a5f0e294044c508d:commodity:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外合法关联销售/提供劳务父类，保留实际交易栏目；不替代具名产品动作"
+      },
+      "owned:core-ev-30c712be53f11f2e:segment:industry:影视业务:table:主营业务收入:row:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 0
+      },
+      "owned:core-ev-d868b92453c5ea1f:revenue:industry:影视业务:table:主营业务收入:row:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 0
+      },
+      "owned:core-ev-30c712be53f11f2e:segment:industry:广告业务:table:主营业务收入:row:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 1
+      },
+      "owned:core-ev-d868b92453c5ea1f:revenue:industry:广告业务:table:主营业务收入:row:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 1
+      },
+      "owned:core-ev-30c712be53f11f2e:segment:industry:旅游业务:table:主营业务收入:row:18": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 2
+      },
+      "owned:core-ev-d868b92453c5ea1f:revenue:industry:旅游业务:table:主营业务收入:row:18": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 2
+      },
+      "owned:core-ev-30c712be53f11f2e:segment:industry:基金业务:table:主营业务收入:row:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 3
+      },
+      "owned:core-ev-d868b92453c5ea1f:revenue:industry:基金业务:table:主营业务收入:row:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 3
+      },
+      "owned:core-ev-30c712be53f11f2e:segment:region:上海:table:主营业务收入:row:33": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 4
+      },
+      "owned:core-ev-d868b92453c5ea1f:revenue:region:上海:table:主营业务收入:row:33": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 4
+      },
+      "owned:core-ev-30c712be53f11f2e:segment:region:无锡:table:主营业务收入:row:34": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 5
+      },
+      "owned:core-ev-d868b92453c5ea1f:revenue:region:无锡:table:主营业务收入:row:34": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 5
+      },
+      "owned:core-ev-30c712be53f11f2e:segment:region:北京:table:主营业务收入:row:35": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 6
+      },
+      "owned:core-ev-d868b92453c5ea1f:revenue:region:北京:table:主营业务收入:row:35": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 6
+      },
+      "owned:core-ev-30c712be53f11f2e:segment:region:佛山:table:主营业务收入:row:36": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 7
+      },
+      "owned:core-ev-d868b92453c5ea1f:revenue:region:佛山:table:主营业务收入:row:36": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 7
+      },
+      "owned:core-ev-30c712be53f11f2e:segment:region:宁波:table:主营业务收入:row:37": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 8
+      },
+      "owned:core-ev-d868b92453c5ea1f:revenue:region:宁波:table:主营业务收入:row:37": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 8
+      },
+      "owned:core-ev-db2d68c5172fcfc2:Segment:business_type:正常经营之外的其他业务收入:其他业务收入扣除明细/本年度:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外：中视p8本期原扣除表项目1221197.91元，保留原栏目，不强行变成新收入正向"
+      },
+      "owned:core-ev-d0f7e4c8d871e46f:Measurement:business_type:正常经营之外的其他业务收入:其他业务收入扣除明细/本年度:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外：中视p8本期原扣除表项目1221197.91元，保留原栏目，不强行变成新收入正向"
+      },
+      "owned:core-ev-4181da54073c825d:Segment:business_segment:上海中视国际广告有限公司:控股参股公司/营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 9
+      },
+      "owned:core-ev-bdc3bc93e9367379:Measurement:business_segment:上海中视国际广告有限公司:控股参股公司/营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 9
+      },
+      "owned:core-ev-4181da54073c825d:Segment:business_segment:北京中视北方影视制作有限公司:控股参股公司/营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 10
+      },
+      "owned:core-ev-bdc3bc93e9367379:Measurement:business_segment:北京中视北方影视制作有限公司:控股参股公司/营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 10
+      },
+      "owned:core-ev-4ded4bf961c7651f:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 11
+      },
+      "owned:core-ev-c7ccf749f75e2b72:Measurement:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 11
+      },
+      "owned:core-ev-4ded4bf961c7651f:Segment:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 12
+      },
+      "owned:core-ev-c7ccf749f75e2b72:Measurement:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 12
+      },
+      "owned:core-ev-4ded4bf961c7651f:Segment:business_type:合计:营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 13
+      },
+      "owned:core-ev-c7ccf749f75e2b72:Measurement:business_type:合计:营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 13
+      },
+      "owned:core-ev-5dc54429c47ca22e:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 11
+      },
+      "owned:core-ev-5dc54429c47ca22e:Segment:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 12
+      },
+      "owned:core-ev-0deafabdc7b554aa:Segment:region:上海:合同收入/按经营地区分类:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 14
+      },
+      "owned:core-ev-1f485ddc102eff44:Measurement:region:上海:合同收入/按经营地区分类:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 14
+      },
+      "owned:core-ev-0deafabdc7b554aa:Segment:region:上海:合同收入/按经营地区分类:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 14
+      },
+      "owned:core-ev-1f485ddc102eff44:Measurement:region:上海:合同收入/按经营地区分类:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 14
+      },
+      "owned:core-ev-0deafabdc7b554aa:Segment:region:无锡:合同收入/按经营地区分类:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 15
+      },
+      "owned:core-ev-1f485ddc102eff44:Measurement:region:无锡:合同收入/按经营地区分类:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 15
+      },
+      "owned:core-ev-0deafabdc7b554aa:Segment:region:无锡:合同收入/按经营地区分类:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 15
+      },
+      "owned:core-ev-1f485ddc102eff44:Measurement:region:无锡:合同收入/按经营地区分类:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 15
+      },
+      "owned:core-ev-0deafabdc7b554aa:Segment:region:北京:合同收入/按经营地区分类:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 16
+      },
+      "owned:core-ev-1f485ddc102eff44:Measurement:region:北京:合同收入/按经营地区分类:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 16
+      },
+      "owned:core-ev-0deafabdc7b554aa:Segment:region:北京:合同收入/按经营地区分类:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 16
+      },
+      "owned:core-ev-1f485ddc102eff44:Measurement:region:北京:合同收入/按经营地区分类:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 16
+      },
+      "owned:core-ev-0deafabdc7b554aa:Segment:region:佛山:合同收入/按经营地区分类:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 17
+      },
+      "owned:core-ev-1f485ddc102eff44:Measurement:region:佛山:合同收入/按经营地区分类:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 17
+      },
+      "owned:core-ev-0deafabdc7b554aa:Segment:region:佛山:合同收入/按经营地区分类:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 17
+      },
+      "owned:core-ev-1f485ddc102eff44:Measurement:region:佛山:合同收入/按经营地区分类:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 17
+      },
+      "owned:core-ev-0deafabdc7b554aa:Segment:region:宁波:合同收入/按经营地区分类:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 18
+      },
+      "owned:core-ev-1f485ddc102eff44:Measurement:region:宁波:合同收入/按经营地区分类:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 18
+      },
+      "owned:core-ev-0deafabdc7b554aa:Segment:region:宁波:合同收入/按经营地区分类:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 18
+      },
+      "owned:core-ev-1f485ddc102eff44:Measurement:region:宁波:合同收入/按经营地区分类:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 18
+      },
+      "owned:core-ev-0deafabdc7b554aa:Segment:business_segment:合计:合同收入/合同分解合计:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 19
+      },
+      "owned:core-ev-1f485ddc102eff44:Measurement:business_segment:合计:合同收入/合同分解合计:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 19
+      },
+      "owned:core-ev-0deafabdc7b554aa:Segment:business_segment:合计:合同收入/合同分解合计:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 19
+      },
+      "owned:core-ev-1f485ddc102eff44:Measurement:business_segment:合计:合同收入/合同分解合计:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 19
+      },
+      "owned:core-ev-518f46f4a49bc1e2:Segment:business_segment:北京中视北方影视制作有限公司:重要非全资子公司/本期营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 20
+      },
+      "owned:core-ev-171d4496a00ce9b2:Measurement:business_segment:北京中视北方影视制作有限公司:重要非全资子公司/本期营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 20
+      },
+      "owned:core-ev-518f46f4a49bc1e2:Segment:business_segment:上海中视国际广告有限公司:重要非全资子公司/本期营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 21
+      },
+      "owned:core-ev-171d4496a00ce9b2:Measurement:business_segment:上海中视国际广告有限公司:重要非全资子公司/本期营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 21
+      },
+      "owned:core-ev-03d05b0474f01a43:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 22
+      },
+      "owned:core-ev-1d8e2a89551edf8d:Measurement:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 22
+      },
+      "owned:core-ev-03d05b0474f01a43:Segment:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 23
+      },
+      "owned:core-ev-1d8e2a89551edf8d:Measurement:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 23
+      },
+      "owned:core-ev-03d05b0474f01a43:Segment:business_type:合计:营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 24
+      },
+      "owned:core-ev-1d8e2a89551edf8d:Measurement:business_type:合计:营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 24
+      },
+      "owned:core-ev-d75dd76dddf5d357:Segment:region:上海:合同收入/按经营地区分类:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 25
+      },
+      "owned:core-ev-9dc6ce9b1f9093f9:Measurement:region:上海:合同收入/按经营地区分类:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 25
+      },
+      "owned:core-ev-d75dd76dddf5d357:Segment:region:上海:合同收入/按经营地区分类:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 25
+      },
+      "owned:core-ev-9dc6ce9b1f9093f9:Measurement:region:上海:合同收入/按经营地区分类:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 25
+      },
+      "owned:core-ev-d75dd76dddf5d357:Segment:region:无锡:合同收入/按经营地区分类:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 26
+      },
+      "owned:core-ev-9dc6ce9b1f9093f9:Measurement:region:无锡:合同收入/按经营地区分类:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 26
+      },
+      "owned:core-ev-d75dd76dddf5d357:Segment:region:无锡:合同收入/按经营地区分类:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 26
+      },
+      "owned:core-ev-9dc6ce9b1f9093f9:Measurement:region:无锡:合同收入/按经营地区分类:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 26
+      },
+      "owned:core-ev-d75dd76dddf5d357:Segment:region:北京:合同收入/按经营地区分类:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 27
+      },
+      "owned:core-ev-9dc6ce9b1f9093f9:Measurement:region:北京:合同收入/按经营地区分类:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 27
+      },
+      "owned:core-ev-d75dd76dddf5d357:Segment:region:北京:合同收入/按经营地区分类:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 27
+      },
+      "owned:core-ev-9dc6ce9b1f9093f9:Measurement:region:北京:合同收入/按经营地区分类:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 27
+      },
+      "owned:core-ev-d75dd76dddf5d357:Segment:region:佛山:合同收入/按经营地区分类:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 28
+      },
+      "owned:core-ev-9dc6ce9b1f9093f9:Measurement:region:佛山:合同收入/按经营地区分类:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 28
+      },
+      "owned:core-ev-d75dd76dddf5d357:Segment:region:佛山:合同收入/按经营地区分类:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 28
+      },
+      "owned:core-ev-9dc6ce9b1f9093f9:Measurement:region:佛山:合同收入/按经营地区分类:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 28
+      },
+      "owned:core-ev-d75dd76dddf5d357:Segment:business_segment:合计:合同收入/合同分解合计:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 29
+      },
+      "owned:core-ev-9dc6ce9b1f9093f9:Measurement:business_segment:合计:合同收入/合同分解合计:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 29
+      },
+      "owned:core-ev-d75dd76dddf5d357:Segment:business_segment:合计:合同收入/合同分解合计:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 29
+      },
+      "owned:core-ev-9dc6ce9b1f9093f9:Measurement:business_segment:合计:合同收入/合同分解合计:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 29
+      },
+      "owned:core-ev-d75dd76dddf5d357:Segment:business_type:主营业务:营业收入:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 22
+      },
+      "owned:core-ev-d75dd76dddf5d357:Segment:business_type:其他业务:营业收入:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 23
+      },
+      "owned:core-ev-d75dd76dddf5d357:Segment:business_type:合计:营业收入:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 24
+      },
+      "owned:core-ev-19207a2294550124:Segment:region:上海:合同收入/按经营地区分类:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 25
+      },
+      "owned:core-ev-19207a2294550124:Segment:region:上海:合同收入/按经营地区分类:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 25
+      },
+      "owned:core-ev-19207a2294550124:Segment:region:无锡:合同收入/按经营地区分类:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 26
+      },
+      "owned:core-ev-19207a2294550124:Segment:region:无锡:合同收入/按经营地区分类:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 26
+      },
+      "owned:core-ev-19207a2294550124:Segment:region:北京:合同收入/按经营地区分类:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 27
+      },
+      "owned:core-ev-19207a2294550124:Segment:region:北京:合同收入/按经营地区分类:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 27
+      },
+      "owned:core-ev-19207a2294550124:Segment:region:佛山:合同收入/按经营地区分类:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 28
+      },
+      "owned:core-ev-19207a2294550124:Segment:region:佛山:合同收入/按经营地区分类:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 28
+      },
+      "owned:core-ev-19207a2294550124:Segment:business_segment:合计:合同收入/合同分解合计:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 29
+      },
+      "owned:core-ev-19207a2294550124:Segment:business_segment:合计:合同收入/合同分解合计:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 29
+      },
+      "owned:core-ev-d61cf1615359660c:segment:industry:影视业务:table:主营业务收入:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 0
+      },
+      "owned:core-ev-d61cf1615359660c:segment:industry:广告业务:table:主营业务收入:row:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 1
+      },
+      "owned:core-ev-d61cf1615359660c:segment:industry:旅游业务:table:主营业务收入:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 2
+      },
+      "owned:core-ev-d61cf1615359660c:segment:industry:基金业务:table:主营业务收入:row:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 3
+      },
+      "owned:core-ev-9d076047b3f5bc43:Segment:service:设备租赁:作为出租人的经营租赁/租赁收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 55
+      },
+      "owned:core-ev-c4a4ccc2cb203414:Measurement:service:设备租赁:作为出租人的经营租赁/租赁收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 55
+      },
+      "owned:core-ev-9d076047b3f5bc43:Segment:service:土地租赁:作为出租人的经营租赁/租赁收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 56
+      },
+      "owned:core-ev-c4a4ccc2cb203414:Measurement:service:土地租赁:作为出租人的经营租赁/租赁收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 56
+      },
+      "owned:core-ev-9d076047b3f5bc43:Segment:service:房屋租赁:作为出租人的经营租赁/租赁收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 57
+      },
+      "owned:core-ev-c4a4ccc2cb203414:Measurement:service:房屋租赁:作为出租人的经营租赁/租赁收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 57
+      },
+      "owned:core-ev-9d076047b3f5bc43:Segment:service:其他:作为出租人的经营租赁/租赁收入:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 58
+      },
+      "owned:core-ev-c4a4ccc2cb203414:Measurement:service:其他:作为出租人的经营租赁/租赁收入:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 58
+      },
+      "owned:core-ev-9d076047b3f5bc43:Segment:service:合计:作为出租人的经营租赁/租赁收入:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 59
+      },
+      "owned:core-ev-c4a4ccc2cb203414:Measurement:service:合计:作为出租人的经营租赁/租赁收入:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 59
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:影视业务:出售商品/提供劳务/本期发生额:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 30
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:影视业务:出售商品/提供劳务/本期发生额:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 30
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:影视业务:出售商品/提供劳务/本期发生额:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 31
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:影视业务:出售商品/提供劳务/本期发生额:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 31
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:影视业务:出售商品/提供劳务/本期发生额:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 32
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:影视业务:出售商品/提供劳务/本期发生额:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 32
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:影视业务:出售商品/提供劳务/本期发生额:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 33
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:影视业务:出售商品/提供劳务/本期发生额:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 33
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:影视业务:出售商品/提供劳务/本期发生额:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 34
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:影视业务:出售商品/提供劳务/本期发生额:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 34
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:影视业务:出售商品/提供劳务/本期发生额:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 35
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:影视业务:出售商品/提供劳务/本期发生额:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 35
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:影视业务:出售商品/提供劳务/本期发生额:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 36
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:影视业务:出售商品/提供劳务/本期发生额:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 36
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:影视业务:出售商品/提供劳务/本期发生额:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 37
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:影视业务:出售商品/提供劳务/本期发生额:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 37
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:影视业务:出售商品/提供劳务/本期发生额:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 38
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:影视业务:出售商品/提供劳务/本期发生额:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 38
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:影视业务:出售商品/提供劳务/本期发生额:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 39
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:影视业务:出售商品/提供劳务/本期发生额:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 39
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:影视业务:出售商品/提供劳务/本期发生额:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 40
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:影视业务:出售商品/提供劳务/本期发生额:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 40
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:影视业务:出售商品/提供劳务/本期发生额:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 41
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:影视业务:出售商品/提供劳务/本期发生额:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 41
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:影视业务:出售商品/提供劳务/本期发生额:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 42
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:影视业务:出售商品/提供劳务/本期发生额:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 42
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:影视业务:出售商品/提供劳务/本期发生额:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 43
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:影视业务:出售商品/提供劳务/本期发生额:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 43
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:广告业务:出售商品/提供劳务/本期发生额:row:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 44
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:广告业务:出售商品/提供劳务/本期发生额:row:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 44
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:广告业务:出售商品/提供劳务/本期发生额:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 45
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:广告业务:出售商品/提供劳务/本期发生额:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 45
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:广告业务:出售商品/提供劳务/本期发生额:row:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 46
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:广告业务:出售商品/提供劳务/本期发生额:row:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 46
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:广告业务:出售商品/提供劳务/本期发生额:row:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 47
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:广告业务:出售商品/提供劳务/本期发生额:row:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 47
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:旅游业务:出售商品/提供劳务/本期发生额:row:18": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 48
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:旅游业务:出售商品/提供劳务/本期发生额:row:18": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 48
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:旅游业务:出售商品/提供劳务/本期发生额:row:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 49
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:旅游业务:出售商品/提供劳务/本期发生额:row:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 49
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:旅游业务:出售商品/提供劳务/本期发生额:row:20": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 50
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:旅游业务:出售商品/提供劳务/本期发生额:row:20": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 50
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:旅游业务:出售商品/提供劳务/本期发生额:row:21": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 51
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:旅游业务:出售商品/提供劳务/本期发生额:row:21": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 51
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:基金业务:出售商品/提供劳务/本期发生额:row:22": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 52
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:基金业务:出售商品/提供劳务/本期发生额:row:22": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 52
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:基金业务:出售商品/提供劳务/本期发生额:row:23": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 53
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:基金业务:出售商品/提供劳务/本期发生额:row:23": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 53
+      },
+      "owned:core-ev-aee1c860af327740:Segment:service:合计:出售商品/提供劳务/本期发生额:row:24": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 54
+      },
+      "owned:core-ev-ce50a9e4ac34f686:Measurement:service:合计:出售商品/提供劳务/本期发生额:row:24": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 54
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "failed_substance_groups": [],
+        "reason": "逐原文实质核：中视影视广告旅游基金及受托不付管理费；林海机械矩阵/以销定产经销/内外销签验FOB折扣租赁及参股边界"
+      },
+      "products_services": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "failed_substance_groups": [],
+        "reason": "逐原文实质核：中视影视广告旅游基金及受托不付管理费；林海机械矩阵/以销定产经销/内外销签验FOB折扣租赁及参股边界"
+      },
+      "revenue_model": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "failed_substance_groups": [],
+        "reason": "逐原文实质核：中视影视广告旅游基金及受托不付管理费；林海机械矩阵/以销定产经销/内外销签验FOB折扣租赁及参股边界"
+      }
+    }
+  },
+  "600099.SH": {
+    "facts": {
+      "owned:core-ev-957e9b1fdce8b10b:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-4f31af6972156041:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-2f3bb6b559c9955b:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-15316635ab0711ef:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-4b50fa8447256a34:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-ef94560926326dcb:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-2593e2bc85676919:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-c3b5e4a7f2f2b4be:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-f652029f199d6ca5:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-fd8dac025dd7e886:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-68d0c2e9976b06a8:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-a6b5a6dcb473c82d:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-44d585beab2b3b3f:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-694d18075ba51534:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-e74a91776c595de9:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-190bb3b0adc87b54:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-832f3c1bc8a4d182:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-8bbe4bfe6168c839:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "独立核原页连续披露及原关系/期间/状态，保留原证据；六正文另作实质核验"
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 0
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 1
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 2
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 3
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 4
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 5
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 6
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 7
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 8
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 9
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 14
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 15
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 16
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 17
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 18
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 19
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 20
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:18": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 21
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 22
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:20": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 23
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:21": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 30
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:22": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 31
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:23": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 32
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:24": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 33
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:25": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 34
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:26": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 35
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:27": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 36
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:28": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 37
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:29": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 10
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:30": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 11
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:31": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 12
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:32": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 13
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:33": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 24
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:34": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 25
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:35": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 26
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:36": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 27
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:37": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 38
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:38": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 39
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:39": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 40
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:40": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 41
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:41": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 42
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:42": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 43
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:43": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 28
+      },
+      "owned:core-ev-84aab5cf2cd81ea2:commodity:44": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 29
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 0
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 2
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 4
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 6
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 8
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 14
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 16
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 18
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 20
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 22
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:21": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 30
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:23": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 32
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:25": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 34
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:27": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 36
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:29": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 10
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:31": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 12
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:33": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 24
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:35": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 26
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:37": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 38
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:39": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 40
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:41": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 42
+      },
+      "owned:core-ev-a6cc87d1b28eb6f3:commodity:43": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 28
+      },
+      "owned:core-ev-a59465d1541ad166:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外：p22特种车辆实际销售23429辆，原产品及方向成立"
+      },
+      "owned:core-ev-a59465d1541ad166:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 3
+      },
+      "owned:core-ev-a59465d1541ad166:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 1
+      },
+      "owned:core-ev-a59465d1541ad166:commodity:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 7
+      },
+      "owned:core-ev-a59465d1541ad166:commodity:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 24
+      },
+      "owned:core-ev-a59465d1541ad166:commodity:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 25
+      },
+      "owned:core-ev-a59465d1541ad166:commodity:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 44
+      },
+      "owned:core-ev-a59465d1541ad166:commodity:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 45
+      },
+      "owned:core-ev-a2123bfba0a7ea03:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 46
+      },
+      "owned:core-ev-a2123bfba0a7ea03:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 47
+      },
+      "owned:core-ev-a2123bfba0a7ea03:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 48
+      },
+      "owned:core-ev-a2123bfba0a7ea03:commodity:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 49
+      },
+      "owned:core-ev-a2123bfba0a7ea03:commodity:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原句具名对象及动作方向、原主体和参股关系匹配；非从收入/成本推定",
+        "recall_role_index": 50
+      },
+      "owned:core-ev-bdcd20e552fbf25b:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外：p164当期经营租赁收入与出租业务成立"
+      },
+      "owned:core-ev-8438dd7345d3e686:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外：p176天津工程机械研究院设备本期采购371681.42元，仅采购不推投入"
+      },
+      "owned:core-ev-59127747a47fe89b:segment:industry:特种车辆行业:table:主营业务收入:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 0
+      },
+      "owned:core-ev-c4d6addf32f799dd:revenue:industry:特种车辆行业:table:主营业务收入:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 0
+      },
+      "owned:core-ev-59127747a47fe89b:segment:industry:农业机械行业:table:主营业务收入:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 1
+      },
+      "owned:core-ev-c4d6addf32f799dd:revenue:industry:农业机械行业:table:主营业务收入:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 1
+      },
+      "owned:core-ev-59127747a47fe89b:segment:industry:森林消防机械行业:table:主营业务收入:row:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 2
+      },
+      "owned:core-ev-c4d6addf32f799dd:revenue:industry:森林消防机械行业:table:主营业务收入:row:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 2
+      },
+      "owned:core-ev-59127747a47fe89b:segment:industry:摩托车行业:table:主营业务收入:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 3
+      },
+      "owned:core-ev-c4d6addf32f799dd:revenue:industry:摩托车行业:table:主营业务收入:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 3
+      },
+      "owned:core-ev-59127747a47fe89b:segment:product:特种车辆:table:主营业务收入:row:24": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 4
+      },
+      "owned:core-ev-c4d6addf32f799dd:revenue:product:特种车辆:table:主营业务收入:row:24": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 4
+      },
+      "owned:core-ev-59127747a47fe89b:segment:product:农业机械:table:主营业务收入:row:25": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 5
+      },
+      "owned:core-ev-c4d6addf32f799dd:revenue:product:农业机械:table:主营业务收入:row:25": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 5
+      },
+      "owned:core-ev-59127747a47fe89b:segment:product:森林消防机械:table:主营业务收入:row:26": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 6
+      },
+      "owned:core-ev-c4d6addf32f799dd:revenue:product:森林消防机械:table:主营业务收入:row:26": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 6
+      },
+      "owned:core-ev-59127747a47fe89b:segment:product:摩托车:table:主营业务收入:row:27": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 7
+      },
+      "owned:core-ev-c4d6addf32f799dd:revenue:product:摩托车:table:主营业务收入:row:27": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 7
+      },
+      "owned:core-ev-59127747a47fe89b:segment:region:国内市场:table:主营业务收入:row:36": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 8
+      },
+      "owned:core-ev-c4d6addf32f799dd:revenue:region:国内市场:table:主营业务收入:row:36": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 8
+      },
+      "owned:core-ev-59127747a47fe89b:segment:region:国外市场:table:主营业务收入:row:37": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 9
+      },
+      "owned:core-ev-c4d6addf32f799dd:revenue:region:国外市场:table:主营业务收入:row:37": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 9
+      },
+      "owned:core-ev-7b947ec2d5d2c69e:Segment:business_segment:江苏福马高新动力机械有限公司:控股参股公司/营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 10
+      },
+      "owned:core-ev-8934d13f2ddaf072:Measurement:business_segment:江苏福马高新动力机械有限公司:控股参股公司/营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 10
+      },
+      "owned:core-ev-7b947ec2d5d2c69e:Segment:business_segment:江苏联海动力机械有限公司:控股参股公司/营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 11
+      },
+      "owned:core-ev-8934d13f2ddaf072:Measurement:business_segment:江苏联海动力机械有限公司:控股参股公司/营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 11
+      },
+      "owned:core-ev-7b947ec2d5d2c69e:Segment:business_segment:福马新能（北京）科技有限公司:控股参股公司/营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 12
+      },
+      "owned:core-ev-8934d13f2ddaf072:Measurement:business_segment:福马新能（北京）科技有限公司:控股参股公司/营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 12
+      },
+      "owned:core-ev-149a3369e103a681:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 13
+      },
+      "owned:core-ev-ce69a696aae90776:Measurement:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 13
+      },
+      "owned:core-ev-149a3369e103a681:Segment:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 14
+      },
+      "owned:core-ev-ce69a696aae90776:Measurement:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 14
+      },
+      "owned:core-ev-149a3369e103a681:Segment:business_type:合计:营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 15
+      },
+      "owned:core-ev-ce69a696aae90776:Measurement:business_type:合计:营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 15
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:product:商品类型:合同收入/商品类型:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 21
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:product:商品类型:合同收入/商品类型:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 21
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:product:商品类型:合同收入/商品类型:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 21
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:product:商品类型:合同收入/商品类型:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 21
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:product:特种车:合同收入/商品类型:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 16
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:product:特种车:合同收入/商品类型:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 16
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:product:特种车:合同收入/商品类型:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 16
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:product:特种车:合同收入/商品类型:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 16
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:product:农业机械:合同收入/商品类型:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 17
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:product:农业机械:合同收入/商品类型:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 17
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:product:农业机械:合同收入/商品类型:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 17
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:product:农业机械:合同收入/商品类型:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 17
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:product:森林消防机械:合同收入/商品类型:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 18
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:product:森林消防机械:合同收入/商品类型:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 18
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:product:森林消防机械:合同收入/商品类型:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 18
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:product:森林消防机械:合同收入/商品类型:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 18
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:product:摩托车:合同收入/商品类型:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 19
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:product:摩托车:合同收入/商品类型:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 19
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:product:摩托车:合同收入/商品类型:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 19
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:product:摩托车:合同收入/商品类型:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 19
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:product:其他:合同收入/商品类型:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 20
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:product:其他:合同收入/商品类型:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 20
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:product:其他:合同收入/商品类型:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 20
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:product:其他:合同收入/商品类型:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 20
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:region:按经营地区分类:合同收入/按经营地区分类:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 22
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:region:按经营地区分类:合同收入/按经营地区分类:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 22
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:region:按经营地区分类:合同收入/按经营地区分类:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 22
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:region:按经营地区分类:合同收入/按经营地区分类:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 22
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:region:国内销售:合同收入/按经营地区分类:row:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 23
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:region:国内销售:合同收入/按经营地区分类:row:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 23
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:region:国内销售:合同收入/按经营地区分类:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 23
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:region:国内销售:合同收入/按经营地区分类:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 23
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:region:国外销售:合同收入/按经营地区分类:row:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 24
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:region:国外销售:合同收入/按经营地区分类:row:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 24
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:region:国外销售:合同收入/按经营地区分类:row:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 24
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:region:国外销售:合同收入/按经营地区分类:row:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 24
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:revenue_timing:按商品转让的时间分类:合同收入/按商品转让的时间分类:row:18": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 25
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:revenue_timing:按商品转让的时间分类:合同收入/按商品转让的时间分类:row:18": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 25
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:revenue_timing:按商品转让的时间分类:合同收入/按商品转让的时间分类:row:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 25
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:revenue_timing:按商品转让的时间分类:合同收入/按商品转让的时间分类:row:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 25
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:revenue_timing:在某一时点转让:合同收入/按商品转让的时间分类:row:20": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 26
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:revenue_timing:在某一时点转让:合同收入/按商品转让的时间分类:row:20": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 26
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:revenue_timing:在某一时点转让:合同收入/按商品转让的时间分类:row:21": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 26
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:revenue_timing:在某一时点转让:合同收入/按商品转让的时间分类:row:21": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 26
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:revenue_timing:在某一时段内转让:合同收入/按商品转让的时间分类:row:22": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 27
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:revenue_timing:在某一时段内转让:合同收入/按商品转让的时间分类:row:22": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 27
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:revenue_timing:在某一时段内转让:合同收入/按商品转让的时间分类:row:23": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 27
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:revenue_timing:在某一时段内转让:合同收入/按商品转让的时间分类:row:23": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 27
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:revenue_timing:合计:合同收入/按商品转让的时间分类:row:24": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 28
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:revenue_timing:合计:合同收入/按商品转让的时间分类:row:24": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 28
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:revenue_timing:合计:合同收入/按商品转让的时间分类:row:25": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 28
+      },
+      "owned:core-ev-971b31c1da009ce9:Measurement:revenue_timing:合计:合同收入/按商品转让的时间分类:row:25": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 28
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:business_type:主营业务:营业收入:row:26": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 13
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:business_type:其他业务:营业收入:row:27": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 14
+      },
+      "owned:core-ev-5a781c6e97ae51f4:Segment:business_type:合计:营业收入:row:28": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 15
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:product:商品类型:合同收入/商品类型:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 21
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:product:商品类型:合同收入/商品类型:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 21
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:product:特种车:合同收入/商品类型:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 16
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:product:特种车:合同收入/商品类型:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 16
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:product:农业机械:合同收入/商品类型:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 17
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:product:农业机械:合同收入/商品类型:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 17
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:product:森林消防机械:合同收入/商品类型:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 18
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:product:森林消防机械:合同收入/商品类型:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 18
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:product:摩托车:合同收入/商品类型:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 19
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:product:摩托车:合同收入/商品类型:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 19
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:product:其他:合同收入/商品类型:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 20
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:product:其他:合同收入/商品类型:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 20
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:region:按经营地区分类:合同收入/按经营地区分类:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 22
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:region:按经营地区分类:合同收入/按经营地区分类:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 22
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:region:国内销售:合同收入/按经营地区分类:row:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 23
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:region:国内销售:合同收入/按经营地区分类:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 23
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:region:国外销售:合同收入/按经营地区分类:row:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 24
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:region:国外销售:合同收入/按经营地区分类:row:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 24
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:revenue_timing:按商品转让的时间分类:合同收入/按商品转让的时间分类:row:18": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 25
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:revenue_timing:按商品转让的时间分类:合同收入/按商品转让的时间分类:row:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 25
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:revenue_timing:在某一时点转让:合同收入/按商品转让的时间分类:row:20": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 26
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:revenue_timing:在某一时点转让:合同收入/按商品转让的时间分类:row:21": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 26
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:revenue_timing:在某一时段内转让:合同收入/按商品转让的时间分类:row:22": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 27
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:revenue_timing:在某一时段内转让:合同收入/按商品转让的时间分类:row:23": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 27
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:revenue_timing:合计:合同收入/按商品转让的时间分类:row:24": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 28
+      },
+      "owned:core-ev-cfd0ed636ea6251a:Segment:revenue_timing:合计:合同收入/按商品转让的时间分类:row:25": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 28
+      },
+      "owned:core-ev-e2ecc7995d4f77f3:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 42
+      },
+      "owned:core-ev-903e2c2406d1d449:Measurement:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 42
+      },
+      "owned:core-ev-e2ecc7995d4f77f3:Segment:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 43
+      },
+      "owned:core-ev-903e2c2406d1d449:Measurement:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 43
+      },
+      "owned:core-ev-e2ecc7995d4f77f3:Segment:business_type:合计:营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 44
+      },
+      "owned:core-ev-903e2c2406d1d449:Measurement:business_type:合计:营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 44
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:product:商品类型:合同收入/商品类型:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 34
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:product:商品类型:合同收入/商品类型:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 34
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:product:商品类型:合同收入/商品类型:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 34
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:product:商品类型:合同收入/商品类型:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 34
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:product:特种车:合同收入/商品类型:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 29
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:product:特种车:合同收入/商品类型:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 29
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:product:特种车:合同收入/商品类型:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 29
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:product:特种车:合同收入/商品类型:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 29
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:product:农业机械:合同收入/商品类型:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 30
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:product:农业机械:合同收入/商品类型:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 30
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:product:农业机械:合同收入/商品类型:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 30
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:product:农业机械:合同收入/商品类型:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 30
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:product:森林消防机械:合同收入/商品类型:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 31
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:product:森林消防机械:合同收入/商品类型:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 31
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:product:森林消防机械:合同收入/商品类型:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 31
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:product:森林消防机械:合同收入/商品类型:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 31
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:product:摩托车:合同收入/商品类型:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 32
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:product:摩托车:合同收入/商品类型:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 32
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:product:摩托车:合同收入/商品类型:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 32
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:product:摩托车:合同收入/商品类型:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 32
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:product:其他:合同收入/商品类型:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 33
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:product:其他:合同收入/商品类型:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 33
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:product:其他:合同收入/商品类型:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 33
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:product:其他:合同收入/商品类型:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 33
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:region:按经营地区分类:合同收入/按经营地区分类:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 35
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:region:按经营地区分类:合同收入/按经营地区分类:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 35
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:region:按经营地区分类:合同收入/按经营地区分类:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 35
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:region:按经营地区分类:合同收入/按经营地区分类:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 35
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:region:国内销售:合同收入/按经营地区分类:row:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 36
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:region:国内销售:合同收入/按经营地区分类:row:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 36
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:region:国内销售:合同收入/按经营地区分类:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 36
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:region:国内销售:合同收入/按经营地区分类:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 36
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:region:国外销售:合同收入/按经营地区分类:row:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 37
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:region:国外销售:合同收入/按经营地区分类:row:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 37
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:region:国外销售:合同收入/按经营地区分类:row:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 37
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:region:国外销售:合同收入/按经营地区分类:row:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 37
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:revenue_timing:按商品转让的时间分类:合同收入/按商品转让的时间分类:row:18": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 38
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:revenue_timing:按商品转让的时间分类:合同收入/按商品转让的时间分类:row:18": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 38
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:revenue_timing:按商品转让的时间分类:合同收入/按商品转让的时间分类:row:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 38
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:revenue_timing:按商品转让的时间分类:合同收入/按商品转让的时间分类:row:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 38
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:revenue_timing:在某一时点转让:合同收入/按商品转让的时间分类:row:20": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 39
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:revenue_timing:在某一时点转让:合同收入/按商品转让的时间分类:row:20": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 39
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:revenue_timing:在某一时点转让:合同收入/按商品转让的时间分类:row:21": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 39
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:revenue_timing:在某一时点转让:合同收入/按商品转让的时间分类:row:21": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 39
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:revenue_timing:在某一时段内转让:合同收入/按商品转让的时间分类:row:22": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 40
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:revenue_timing:在某一时段内转让:合同收入/按商品转让的时间分类:row:22": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 40
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:revenue_timing:在某一时段内转让:合同收入/按商品转让的时间分类:row:23": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 40
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:revenue_timing:在某一时段内转让:合同收入/按商品转让的时间分类:row:23": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 40
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:revenue_timing:合计:合同收入/按商品转让的时间分类:row:24": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 41
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:revenue_timing:合计:合同收入/按商品转让的时间分类:row:24": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 41
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:revenue_timing:合计:合同收入/按商品转让的时间分类:row:25": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 41
+      },
+      "owned:core-ev-a42be7fb67abeb3e:Measurement:revenue_timing:合计:合同收入/按商品转让的时间分类:row:25": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 41
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:business_type:主营业务:营业收入:row:26": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 42
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:business_type:其他业务:营业收入:row:27": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 43
+      },
+      "owned:core-ev-e05d45d125d0a72f:Segment:business_type:合计:营业收入:row:28": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 44
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:product:商品类型:合同收入/商品类型:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 34
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:product:商品类型:合同收入/商品类型:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 34
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:product:特种车:合同收入/商品类型:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 29
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:product:特种车:合同收入/商品类型:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 29
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:product:农业机械:合同收入/商品类型:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 30
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:product:农业机械:合同收入/商品类型:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 30
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:product:森林消防机械:合同收入/商品类型:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 31
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:product:森林消防机械:合同收入/商品类型:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 31
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:product:摩托车:合同收入/商品类型:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 32
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:product:摩托车:合同收入/商品类型:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 32
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:product:其他:合同收入/商品类型:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 33
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:product:其他:合同收入/商品类型:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 33
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:region:按经营地区分类:合同收入/按经营地区分类:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 35
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:region:按经营地区分类:合同收入/按经营地区分类:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 35
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:region:国内销售:合同收入/按经营地区分类:row:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 36
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:region:国内销售:合同收入/按经营地区分类:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 36
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:region:国外销售:合同收入/按经营地区分类:row:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 37
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:region:国外销售:合同收入/按经营地区分类:row:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 37
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:revenue_timing:按商品转让的时间分类:合同收入/按商品转让的时间分类:row:18": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 38
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:revenue_timing:按商品转让的时间分类:合同收入/按商品转让的时间分类:row:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 38
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:revenue_timing:在某一时点转让:合同收入/按商品转让的时间分类:row:20": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 39
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:revenue_timing:在某一时点转让:合同收入/按商品转让的时间分类:row:21": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 39
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:revenue_timing:在某一时段内转让:合同收入/按商品转让的时间分类:row:22": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 40
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:revenue_timing:在某一时段内转让:合同收入/按商品转让的时间分类:row:23": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 40
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:revenue_timing:合计:合同收入/按商品转让的时间分类:row:24": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 41
+      },
+      "owned:core-ev-342e4d8a27937287:Segment:revenue_timing:合计:合同收入/按商品转让的时间分类:row:25": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 41
+      },
+      "owned:core-ev-3c588974f2b7a660:segment:industry:特种车辆行业:table:主营业务收入:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 0
+      },
+      "owned:core-ev-3c588974f2b7a660:segment:industry:农业机械行业:table:主营业务收入:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 1
+      },
+      "owned:core-ev-3c588974f2b7a660:segment:industry:森林消防机械行业:table:主营业务收入:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 2
+      },
+      "owned:core-ev-3c588974f2b7a660:segment:industry:摩托车行业:table:主营业务收入:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 3
+      },
+      "owned:core-ev-3c588974f2b7a660:segment:product:特种车辆:table:主营业务收入:row:21": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 4
+      },
+      "owned:core-ev-3c588974f2b7a660:segment:product:农业机械:table:主营业务收入:row:22": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 5
+      },
+      "owned:core-ev-3c588974f2b7a660:segment:product:森林消防机械:table:主营业务收入:row:23": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 6
+      },
+      "owned:core-ev-3c588974f2b7a660:segment:product:摩托车:table:主营业务收入:row:24": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 7
+      },
+      "owned:core-ev-3c588974f2b7a660:segment:region:国内市场:table:主营业务收入:row:33": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 8
+      },
+      "owned:core-ev-3c588974f2b7a660:segment:region:国外市场:table:主营业务收入:row:34": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 9
+      },
+      "owned:core-ev-1fc584774c9c7d42:Segment:service:房屋建筑物及设备租赁收入:作为出租人的经营租赁/租赁收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 55
+      },
+      "owned:core-ev-ff3a7dd83dbb0867:Measurement:service:房屋建筑物及设备租赁收入:作为出租人的经营租赁/租赁收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 55
+      },
+      "owned:core-ev-1fc584774c9c7d42:Segment:service:合计:作为出租人的经营租赁/租赁收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 56
+      },
+      "owned:core-ev-ff3a7dd83dbb0867:Measurement:service:合计:作为出租人的经营租赁/租赁收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 56
+      },
+      "owned:core-ev-cc4914f2d7cd4a08:Segment:service:销售商品、提供劳务:出售商品/提供劳务/本期发生额:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 45
+      },
+      "owned:core-ev-65b31d235e15ce08:Measurement:service:销售商品、提供劳务:出售商品/提供劳务/本期发生额:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 45
+      },
+      "owned:core-ev-cc4914f2d7cd4a08:Segment:service:销售商品:出售商品/提供劳务/本期发生额:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 46
+      },
+      "owned:core-ev-65b31d235e15ce08:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 46
+      },
+      "owned:core-ev-cc4914f2d7cd4a08:Segment:service:销售商品:出售商品/提供劳务/本期发生额:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 47
+      },
+      "owned:core-ev-65b31d235e15ce08:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 47
+      },
+      "owned:core-ev-cc4914f2d7cd4a08:Segment:service:销售商品:出售商品/提供劳务/本期发生额:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 48
+      },
+      "owned:core-ev-65b31d235e15ce08:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 48
+      },
+      "owned:core-ev-cc4914f2d7cd4a08:Segment:service:销售商品:出售商品/提供劳务/本期发生额:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 49
+      },
+      "owned:core-ev-65b31d235e15ce08:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 49
+      },
+      "owned:core-ev-cc4914f2d7cd4a08:Segment:service:销售商品、提供劳务:出售商品/提供劳务/本期发生额:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 50
+      },
+      "owned:core-ev-65b31d235e15ce08:Measurement:service:销售商品、提供劳务:出售商品/提供劳务/本期发生额:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 50
+      },
+      "owned:core-ev-cc4914f2d7cd4a08:Segment:service:销售商品、提供劳务:出售商品/提供劳务/本期发生额:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 51
+      },
+      "owned:core-ev-65b31d235e15ce08:Measurement:service:销售商品、提供劳务:出售商品/提供劳务/本期发生额:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 51
+      },
+      "owned:core-ev-cc4914f2d7cd4a08:Segment:service:销售商品:出售商品/提供劳务/本期发生额:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 52
+      },
+      "owned:core-ev-65b31d235e15ce08:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 52
+      },
+      "owned:core-ev-cc4914f2d7cd4a08:Segment:service:销售商品:出售商品/提供劳务/本期发生额:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 53
+      },
+      "owned:core-ev-65b31d235e15ce08:Measurement:service:销售商品:出售商品/提供劳务/本期发生额:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 53
+      },
+      "owned:core-ev-cc4914f2d7cd4a08:Segment:service:合计:出售商品/提供劳务/本期发生额:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 54
+      },
+      "owned:core-ev-65b31d235e15ce08:Measurement:service:合计:出售商品/提供劳务/本期发生额:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF逐格台账：原名/主体/期间/单位/本期值/栏目/限定匹配；同义镜像也计准确率",
+        "recall_row_index": 54
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "failed_substance_groups": [],
+        "reason": "逐原文实质核：中视影视广告旅游基金及受托不付管理费；林海机械矩阵/以销定产经销/内外销签验FOB折扣租赁及参股边界"
+      },
+      "products_services": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "failed_substance_groups": [],
+        "reason": "逐原文实质核：中视影视广告旅游基金及受托不付管理费；林海机械矩阵/以销定产经销/内外销签验FOB折扣租赁及参股边界"
+      },
+      "revenue_model": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "failed_substance_groups": [],
+        "reason": "逐原文实质核：中视影视广告旅游基金及受托不付管理费；林海机械矩阵/以销定产经销/内外销签验FOB折扣租赁及参股边界"
+      }
+    }
+  }
+}

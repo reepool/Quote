@@ -1,0 +1,11 @@
+import json,hashlib,tempfile,subprocess
+from pathlib import Path
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch';f=json.loads((C/'v54-source-freeze-receipt.json').read_text());baseline=json.loads((C/'initial-workspace-baseline.json').read_text())['head'];sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+with tempfile.TemporaryDirectory(prefix='v54-rebuild-') as tmp:
+ root=Path(tmp)
+ for p,h in f['executed_code_sha256'].items():
+  out=root/p;out.parent.mkdir(parents=True,exist_ok=True);out.write_bytes(subprocess.check_output(['git','show',baseline+':'+p]))
+ subprocess.run(['git','apply','--unsafe-paths',str(C/'v54-executed-code.patch')],cwd=root,check=True)
+ assert all(sha(root/p)==h for p,h in f['executed_code_sha256'].items())
+ receipt=dict(baseline_commit=baseline,patch_sha256=sha(C/'v54-executed-code.patch'),executed_code_sha256=f['executed_code_sha256'],reconstructed_module_count=len(f['executed_code_sha256']),reconstructed_match=True)
+ (C/'v54-execution-code-reconstruction.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n');print('RECONSTRUCTED',len(f['executed_code_sha256']))

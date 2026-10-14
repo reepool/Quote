@@ -1,0 +1,21 @@
+{
+  "reviewer": "user_A_role",
+  "scope": [
+    "600082.SH",
+    "600097.SH"
+  ],
+  "positive_conditions": 170,
+  "negative_conditions": 32,
+  "recall": "170/170",
+  "accuracy": "448/448",
+  "facts": 442,
+  "bodies": 6,
+  "numeric_errors": 0,
+  "seconds": 217.74277905281633,
+  "tokens": 0,
+  "elapsed_scope": "existing_PDF_parse_cache",
+  "expansion_gates_met": false,
+  "production": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "archive_authorized": true
+}

@@ -1,0 +1,36 @@
+import json
+from pathlib import Path
+from v53new_match import match,action_match,co,pages
+C=Path('openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch');s=json.loads((C/'source-scope.json').read_text());out={};unresolved=[]
+external={'600088.SH':[(141,'设备租赁','17,842,144.74'),(141,'土地租赁','11,434,035.92'),(141,'房屋租赁','9,274,875.37'),(141,'其他','244,574.75'),(8,'正常经营之外的其他业务收入','1,221,197.91')], '600099.SH':[(164,'房屋建筑物及设备租赁收入','3,797,837.32')]}
+for i in s['versions']:
+ rs=json.loads(Path('/tmp/v53newraw_'+i+'.json').read_text());roles=[x for x in s['native_roles'] if x['instrument_id']==i];facts={}
+ for r in rs:
+  kind=r['object_type'];d=dict(accurate=False,critical_numeric_error=False)
+  if kind in ['Segment','Measurement']:
+   matches=[k for k,v in enumerate(s['source_rows'][i]) if match(r,v)]
+   if matches:d.update(accurate=True,reason='原名/主体/期间/单位/本期值/原栏目和限定匹配独立原PDF台账',recall_row_index=matches[0])
+   elif any(p in pages(r) and co(r['source_native']['name'])==co(n) and r['source_native']['value']==v and r['source_native']['unit']=='元' and r['subject_scope']=='consolidated_group' for p,n,v in external[i]):d.update(accurate=True,reason='独立补读官方原页合同外合法本期出租/其他业务，仍计准确率')
+  elif kind in ['Activity','Relationship']:
+   matches=[k for k,v in enumerate(roles) if action_match(r,v)]
+   if matches:d.update(accurate=True,reason='具名对象、方向及原主体当期明示成立',recall_role_index=matches[0])
+   elif i=='600088.SH' and r['source_native']['name'] in ['天朝宫殿区','江南水乡区','港澳文化区','休闲游乐区','休闲旅游','研学教育','户外拓展','婚纱摄影','品牌展示','影视业务','广告业务','旅游业务','基金业务'] and r['subject_scope']=='consolidated_group':d.update(accurate=True,reason='p11–12原南海经营领域/分区及p154真实销售服务父类成立，父类不替代具名条件')
+   elif i=='600099.SH' and r['source_native']['name'] in ['设备','租赁'] and r['subject_scope']=='consolidated_group':d.update(accurate=True,reason='p176真实采购设备或p164当前经营租赁合同外成立，不反推制造投入')
+  elif kind=='BusinessOverview':d.update(accurate=True,reason='独立核官方原页，原始披露及主体期间状态保留；完整正文另按实质审核')
+  if not d['accurate']:unresolved.append(dict(instrument_id=i,record_id=r['record_id'],kind=kind,source_native=r['source_native'],dimension=r.get('dimension',r.get('segment_dimension'))))
+  facts[r['record_id']]=d
+ answers={}
+ for a in json.loads(Path('/tmp/v53newanswers_'+i+'.json').read_text()):
+  rule=s['answers'][i][a['dimension_id']];failed=[g for g in rule['required_groups'] if not any(co(x) in co(a['excerpt']) for x in g)]
+  answers[a['dimension_id']]=dict(accurate=not failed,critical_numeric_error=False,reason='逐原文语义核实完整业务、产品、机制及主体限定' if not failed else '实质内容缺失：'+str(failed),failed_substance_groups=failed)
+ out[i]=dict(facts=facts,answers=answers)
+Path('/tmp/v53new_predecisions.json').write_text(json.dumps(out,ensure_ascii=False,indent=2));Path('/tmp/v53new_unresolved.json').write_text(json.dumps(unresolved,ensure_ascii=False,indent=2))
+for x in unresolved:print(x['instrument_id'],x['kind'],x['dimension'],x['source_native'])
+import json,hashlib
+from pathlib import Path
+C=Path('openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch');read=lambda p:json.loads(Path(p).read_text());save=lambda p,d:Path(p).write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n')
+d=read('/tmp/v53new_predecisions.json')
+for i,items in d.items():
+ for rid,x in items['facts'].items():
+  if '主营业务371,136,597.51308,563,992.74' in rid:x.update(critical_numeric_error=True,reason='中视p175母公司本期主营371136597.51元被错误绑定上期342224094.84元，同时污染原名')
+save(C/'actual-object-decisions.json',d)

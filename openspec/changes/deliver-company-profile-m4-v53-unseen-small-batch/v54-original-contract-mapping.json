@@ -1,0 +1,1381 @@
+{
+  "original_sha256": "01aefae292c2930aba39dd1392bbdbb21897bd752a990c90a703764fd866bbb2",
+  "successor_sha256": "a7671450a629ef95cb054812da0965cc2c104115e83b162d6c951692c367364c",
+  "original_200": [
+    {
+      "original_condition_id": "600088.SH-income-001",
+      "successor_condition_id": "600088.SH-income-001",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-002",
+      "successor_condition_id": "600088.SH-income-002",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-003",
+      "successor_condition_id": "600088.SH-income-003",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-004",
+      "successor_condition_id": "600088.SH-income-004",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-005",
+      "successor_condition_id": "600088.SH-income-005",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-006",
+      "successor_condition_id": "600088.SH-income-006",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-007",
+      "successor_condition_id": "600088.SH-income-007",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-008",
+      "successor_condition_id": "600088.SH-income-008",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-009",
+      "successor_condition_id": "600088.SH-income-009",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-010",
+      "successor_condition_id": "600088.SH-income-010",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-011",
+      "successor_condition_id": "600088.SH-income-011",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-012",
+      "successor_condition_id": "600088.SH-income-012",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-013",
+      "successor_condition_id": "600088.SH-income-013",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-014",
+      "successor_condition_id": "600088.SH-income-014",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-015",
+      "successor_condition_id": "600088.SH-income-015",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-016",
+      "successor_condition_id": "600088.SH-income-016",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-017",
+      "successor_condition_id": "600088.SH-income-017",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-018",
+      "successor_condition_id": "600088.SH-income-018",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-019",
+      "successor_condition_id": "600088.SH-income-019",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-020",
+      "successor_condition_id": "600088.SH-income-020",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-021",
+      "successor_condition_id": "600088.SH-income-021",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-022",
+      "successor_condition_id": "600088.SH-income-022",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-023",
+      "successor_condition_id": "600088.SH-income-023",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-024",
+      "successor_condition_id": "600088.SH-income-024",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-025",
+      "successor_condition_id": "600088.SH-income-025",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-026",
+      "successor_condition_id": "600088.SH-income-026",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-027",
+      "successor_condition_id": "600088.SH-income-027",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-028",
+      "successor_condition_id": "600088.SH-income-028",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-029",
+      "successor_condition_id": "600088.SH-income-029",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-030",
+      "successor_condition_id": "600088.SH-income-030",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-031",
+      "successor_condition_id": "600088.SH-income-031",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-032",
+      "successor_condition_id": "600088.SH-income-032",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-033",
+      "successor_condition_id": "600088.SH-income-033",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-034",
+      "successor_condition_id": "600088.SH-income-034",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-035",
+      "successor_condition_id": "600088.SH-income-035",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-036",
+      "successor_condition_id": "600088.SH-income-036",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-037",
+      "successor_condition_id": "600088.SH-income-037",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-038",
+      "successor_condition_id": "600088.SH-income-038",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-039",
+      "successor_condition_id": "600088.SH-income-039",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-040",
+      "successor_condition_id": "600088.SH-income-040",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-041",
+      "successor_condition_id": "600088.SH-income-041",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-042",
+      "successor_condition_id": "600088.SH-income-042",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-043",
+      "successor_condition_id": "600088.SH-income-043",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-044",
+      "successor_condition_id": "600088.SH-income-044",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-045",
+      "successor_condition_id": "600088.SH-income-045",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-046",
+      "successor_condition_id": "600088.SH-income-046",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-047",
+      "successor_condition_id": "600088.SH-income-047",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-048",
+      "successor_condition_id": "600088.SH-income-048",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-049",
+      "successor_condition_id": "600088.SH-income-049",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-050",
+      "successor_condition_id": "600088.SH-income-050",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-051",
+      "successor_condition_id": "600088.SH-income-051",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-052",
+      "successor_condition_id": "600088.SH-income-052",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-053",
+      "successor_condition_id": "600088.SH-income-053",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-054",
+      "successor_condition_id": "600088.SH-income-054",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-income-055",
+      "successor_condition_id": "600088.SH-income-055",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-001",
+      "successor_condition_id": "600099.SH-income-001",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-002",
+      "successor_condition_id": "600099.SH-income-002",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-003",
+      "successor_condition_id": "600099.SH-income-003",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-004",
+      "successor_condition_id": "600099.SH-income-004",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-005",
+      "successor_condition_id": "600099.SH-income-005",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-006",
+      "successor_condition_id": "600099.SH-income-006",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-007",
+      "successor_condition_id": "600099.SH-income-007",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-008",
+      "successor_condition_id": "600099.SH-income-008",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-009",
+      "successor_condition_id": "600099.SH-income-009",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-010",
+      "successor_condition_id": "600099.SH-income-010",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-011",
+      "successor_condition_id": "600099.SH-income-011",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-012",
+      "successor_condition_id": "600099.SH-income-012",
+      "changes": {
+        "subject_scope": [
+          "named_subsidiary",
+          "group_associated_entity"
+        ]
+      },
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-013",
+      "successor_condition_id": "600099.SH-income-013",
+      "changes": {
+        "subject_scope": [
+          "named_subsidiary",
+          "group_associated_entity"
+        ]
+      },
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-014",
+      "successor_condition_id": "600099.SH-income-014",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-015",
+      "successor_condition_id": "600099.SH-income-015",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-016",
+      "successor_condition_id": "600099.SH-income-016",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-017",
+      "successor_condition_id": "600099.SH-income-017",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-018",
+      "successor_condition_id": "600099.SH-income-018",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-019",
+      "successor_condition_id": "600099.SH-income-019",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-020",
+      "successor_condition_id": "600099.SH-income-020",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-021",
+      "successor_condition_id": "600099.SH-income-021",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-022",
+      "successor_condition_id": "600099.SH-income-022",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-023",
+      "successor_condition_id": "600099.SH-income-023",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-024",
+      "successor_condition_id": "600099.SH-income-024",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-025",
+      "successor_condition_id": "600099.SH-income-025",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-026",
+      "successor_condition_id": "600099.SH-income-026",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-027",
+      "successor_condition_id": "600099.SH-income-027",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-028",
+      "successor_condition_id": "600099.SH-income-028",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-029",
+      "successor_condition_id": "600099.SH-income-029",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-030",
+      "successor_condition_id": "600099.SH-income-030",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-031",
+      "successor_condition_id": "600099.SH-income-031",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-032",
+      "successor_condition_id": "600099.SH-income-032",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-033",
+      "successor_condition_id": "600099.SH-income-033",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-034",
+      "successor_condition_id": "600099.SH-income-034",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-035",
+      "successor_condition_id": "600099.SH-income-035",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-036",
+      "successor_condition_id": "600099.SH-income-036",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-037",
+      "successor_condition_id": "600099.SH-income-037",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-038",
+      "successor_condition_id": "600099.SH-income-038",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-039",
+      "successor_condition_id": "600099.SH-income-039",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-040",
+      "successor_condition_id": "600099.SH-income-040",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-041",
+      "successor_condition_id": "600099.SH-income-041",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-042",
+      "successor_condition_id": "600099.SH-income-042",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-043",
+      "successor_condition_id": "600099.SH-income-043",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-044",
+      "successor_condition_id": "600099.SH-income-044",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-045",
+      "successor_condition_id": "600099.SH-income-045",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-046",
+      "successor_condition_id": "600099.SH-income-046",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-047",
+      "successor_condition_id": "600099.SH-income-047",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-048",
+      "successor_condition_id": "600099.SH-income-048",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-049",
+      "successor_condition_id": "600099.SH-income-049",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-050",
+      "successor_condition_id": "600099.SH-income-050",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-051",
+      "successor_condition_id": "600099.SH-income-051",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-052",
+      "successor_condition_id": "600099.SH-income-052",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-053",
+      "successor_condition_id": "600099.SH-income-053",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-054",
+      "successor_condition_id": "600099.SH-income-054",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600099.SH-income-055",
+      "successor_condition_id": "600099.SH-income-055",
+      "changes": {},
+      "kind": "income"
+    },
+    {
+      "original_condition_id": "600088.SH-action-001",
+      "successor_condition_id": "600088.SH-action-001",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-002",
+      "successor_condition_id": "600088.SH-action-002",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-003",
+      "successor_condition_id": "600088.SH-action-003",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-004",
+      "successor_condition_id": "600088.SH-action-004",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-005",
+      "successor_condition_id": "600088.SH-action-005",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-006",
+      "successor_condition_id": "600088.SH-action-006",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-007",
+      "successor_condition_id": "600088.SH-action-007",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-008",
+      "successor_condition_id": "600088.SH-action-008",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-009",
+      "successor_condition_id": "600088.SH-action-009",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-010",
+      "successor_condition_id": "600088.SH-action-010",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-011",
+      "successor_condition_id": "600088.SH-action-011",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-012",
+      "successor_condition_id": "600088.SH-action-012",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-013",
+      "successor_condition_id": "600088.SH-action-013",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-014",
+      "successor_condition_id": "600088.SH-action-014",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-015",
+      "successor_condition_id": "600088.SH-action-015",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-016",
+      "successor_condition_id": "600088.SH-action-016",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-017",
+      "successor_condition_id": "600088.SH-action-017",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-018",
+      "successor_condition_id": "600088.SH-action-018",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-019",
+      "successor_condition_id": "600088.SH-action-019",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-020",
+      "successor_condition_id": "600088.SH-action-020",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-021",
+      "successor_condition_id": "600088.SH-action-021",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-022",
+      "successor_condition_id": "600088.SH-action-022",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-023",
+      "successor_condition_id": "600088.SH-action-023",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-024",
+      "successor_condition_id": "600088.SH-action-024",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-025",
+      "successor_condition_id": "600088.SH-action-025",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-026",
+      "successor_condition_id": "600088.SH-action-026",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-027",
+      "successor_condition_id": "600088.SH-action-027",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-028",
+      "successor_condition_id": "600088.SH-action-028",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-029",
+      "successor_condition_id": "600088.SH-action-029",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-030",
+      "successor_condition_id": "600088.SH-action-030",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-031",
+      "successor_condition_id": "600088.SH-action-031",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-032",
+      "successor_condition_id": "600088.SH-action-032",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-action-033",
+      "successor_condition_id": "600088.SH-action-033",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-001",
+      "successor_condition_id": "600099.SH-action-001",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-002",
+      "successor_condition_id": "600099.SH-action-002",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-003",
+      "successor_condition_id": "600099.SH-action-003",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-004",
+      "successor_condition_id": "600099.SH-action-004",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-005",
+      "successor_condition_id": "600099.SH-action-005",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-006",
+      "successor_condition_id": "600099.SH-action-006",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-007",
+      "successor_condition_id": "600099.SH-action-007",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-008",
+      "successor_condition_id": "600099.SH-action-008",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-009",
+      "successor_condition_id": "600099.SH-action-009",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-010",
+      "successor_condition_id": "600099.SH-action-010",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-011",
+      "successor_condition_id": "600099.SH-action-011",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-012",
+      "successor_condition_id": "600099.SH-action-012",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-013",
+      "successor_condition_id": "600099.SH-action-013",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-014",
+      "successor_condition_id": "600099.SH-action-014",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-015",
+      "successor_condition_id": "600099.SH-action-015",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-016",
+      "successor_condition_id": "600099.SH-action-016",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-017",
+      "successor_condition_id": "600099.SH-action-017",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-018",
+      "successor_condition_id": "600099.SH-action-018",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-019",
+      "successor_condition_id": "600099.SH-action-019",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-020",
+      "successor_condition_id": "600099.SH-action-020",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-021",
+      "successor_condition_id": "600099.SH-action-021",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-022",
+      "successor_condition_id": "600099.SH-action-022",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-023",
+      "successor_condition_id": "600099.SH-action-023",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-024",
+      "successor_condition_id": "600099.SH-action-024",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-025",
+      "successor_condition_id": "600099.SH-action-025",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-026",
+      "successor_condition_id": "600099.SH-action-026",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-027",
+      "successor_condition_id": "600099.SH-action-027",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-028",
+      "successor_condition_id": "600099.SH-action-028",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-029",
+      "successor_condition_id": "600099.SH-action-029",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-030",
+      "successor_condition_id": "600099.SH-action-030",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-031",
+      "successor_condition_id": "600099.SH-action-031",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-032",
+      "successor_condition_id": "600099.SH-action-032",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-033",
+      "successor_condition_id": "600099.SH-action-033",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-034",
+      "successor_condition_id": "600099.SH-action-034",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-035",
+      "successor_condition_id": "600099.SH-action-035",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-036",
+      "successor_condition_id": "600099.SH-action-036",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-037",
+      "successor_condition_id": "600099.SH-action-037",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-038",
+      "successor_condition_id": "600099.SH-action-038",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-039",
+      "successor_condition_id": "600099.SH-action-039",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-040",
+      "successor_condition_id": "600099.SH-action-040",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-041",
+      "successor_condition_id": "600099.SH-action-041",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-042",
+      "successor_condition_id": "600099.SH-action-042",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-043",
+      "successor_condition_id": "600099.SH-action-043",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-044",
+      "successor_condition_id": "600099.SH-action-044",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-045",
+      "successor_condition_id": "600099.SH-action-045",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-046",
+      "successor_condition_id": "600099.SH-action-046",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-047",
+      "successor_condition_id": "600099.SH-action-047",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-048",
+      "successor_condition_id": "600099.SH-action-048",
+      "changes": {},
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-049",
+      "successor_condition_id": "600099.SH-action-049",
+      "changes": {
+        "subject_scope": [
+          "named_subsidiary",
+          "group_associated_entity"
+        ]
+      },
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-050",
+      "successor_condition_id": "600099.SH-action-050",
+      "changes": {
+        "subject_scope": [
+          "named_subsidiary",
+          "group_associated_entity"
+        ]
+      },
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600099.SH-action-051",
+      "successor_condition_id": "600099.SH-action-051",
+      "changes": {
+        "subject_scope": [
+          "named_subsidiary",
+          "group_associated_entity"
+        ]
+      },
+      "kind": "action"
+    },
+    {
+      "original_condition_id": "600088.SH-principal_business",
+      "successor_condition_id": "600088.SH-principal_business",
+      "changes": {},
+      "kind": "answer"
+    },
+    {
+      "original_condition_id": "600088.SH-products_services",
+      "successor_condition_id": "600088.SH-products_services",
+      "changes": {},
+      "kind": "answer"
+    },
+    {
+      "original_condition_id": "600088.SH-revenue_model",
+      "successor_condition_id": "600088.SH-revenue_model",
+      "changes": {},
+      "kind": "answer"
+    },
+    {
+      "original_condition_id": "600099.SH-principal_business",
+      "successor_condition_id": "600099.SH-principal_business",
+      "changes": {},
+      "kind": "answer"
+    },
+    {
+      "original_condition_id": "600099.SH-products_services",
+      "successor_condition_id": "600099.SH-products_services",
+      "changes": {},
+      "kind": "answer"
+    },
+    {
+      "original_condition_id": "600099.SH-revenue_model",
+      "successor_condition_id": "600099.SH-revenue_model",
+      "changes": {},
+      "kind": "answer"
+    }
+  ],
+  "added_7": [
+    {
+      "condition_id": "600088.SH-supplemental-income-1",
+      "instrument_id": "600088.SH",
+      "page": 141,
+      "name": "设备租赁",
+      "value": "17,842,144.74",
+      "unit": "元",
+      "dimension": "service",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "source_actor": "公司及合并子公司",
+      "subject_scope": "consolidated_group",
+      "source_column": "租赁收入",
+      "period_state": "current_printed",
+      "reported_period": "2025-12-31",
+      "counterparty": null,
+      "source_segment": null,
+      "native_aliases": [
+        "设备租赁"
+      ],
+      "qualifier": null
+    },
+    {
+      "condition_id": "600088.SH-supplemental-income-2",
+      "instrument_id": "600088.SH",
+      "page": 141,
+      "name": "土地租赁",
+      "value": "11,434,035.92",
+      "unit": "元",
+      "dimension": "service",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "source_actor": "公司及合并子公司",
+      "subject_scope": "consolidated_group",
+      "source_column": "租赁收入",
+      "period_state": "current_printed",
+      "reported_period": "2025-12-31",
+      "counterparty": null,
+      "source_segment": null,
+      "native_aliases": [
+        "土地租赁"
+      ],
+      "qualifier": null
+    },
+    {
+      "condition_id": "600088.SH-supplemental-income-3",
+      "instrument_id": "600088.SH",
+      "page": 141,
+      "name": "房屋租赁",
+      "value": "9,274,875.37",
+      "unit": "元",
+      "dimension": "service",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "source_actor": "公司及合并子公司",
+      "subject_scope": "consolidated_group",
+      "source_column": "租赁收入",
+      "period_state": "current_printed",
+      "reported_period": "2025-12-31",
+      "counterparty": null,
+      "source_segment": null,
+      "native_aliases": [
+        "房屋租赁"
+      ],
+      "qualifier": null
+    },
+    {
+      "condition_id": "600088.SH-supplemental-income-4",
+      "instrument_id": "600088.SH",
+      "page": 141,
+      "name": "其他",
+      "value": "244,574.75",
+      "unit": "元",
+      "dimension": "service",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "source_actor": "公司及合并子公司",
+      "subject_scope": "consolidated_group",
+      "source_column": "租赁收入",
+      "period_state": "current_printed",
+      "reported_period": "2025-12-31",
+      "counterparty": null,
+      "source_segment": null,
+      "native_aliases": [
+        "其他"
+      ],
+      "qualifier": null
+    },
+    {
+      "condition_id": "600088.SH-supplemental-income-5",
+      "instrument_id": "600088.SH",
+      "page": 141,
+      "name": "合计",
+      "value": "38,795,630.78",
+      "unit": "元",
+      "dimension": "service",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "source_actor": "公司及合并子公司",
+      "subject_scope": "consolidated_group",
+      "source_column": "租赁收入",
+      "period_state": "current_printed",
+      "reported_period": "2025-12-31",
+      "counterparty": null,
+      "source_segment": null,
+      "native_aliases": [
+        "合计"
+      ],
+      "qualifier": null
+    },
+    {
+      "condition_id": "600099.SH-supplemental-income-1",
+      "instrument_id": "600099.SH",
+      "page": 164,
+      "name": "房屋建筑物及设备租赁收入",
+      "value": "3,797,837.32",
+      "unit": "元",
+      "dimension": "service",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "source_actor": "公司及合并子公司",
+      "subject_scope": "consolidated_group",
+      "source_column": "租赁收入",
+      "period_state": "current_printed",
+      "reported_period": "2025-12-31",
+      "counterparty": null,
+      "source_segment": null,
+      "native_aliases": [
+        "房屋建筑物及设备租赁收入"
+      ],
+      "qualifier": null
+    },
+    {
+      "condition_id": "600099.SH-supplemental-income-2",
+      "instrument_id": "600099.SH",
+      "page": 164,
+      "name": "合计",
+      "value": "3,797,837.32",
+      "unit": "元",
+      "dimension": "service",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "source_actor": "公司及合并子公司",
+      "subject_scope": "consolidated_group",
+      "source_column": "租赁收入",
+      "period_state": "current_printed",
+      "reported_period": "2025-12-31",
+      "counterparty": null,
+      "source_segment": null,
+      "native_aliases": [
+        "合计"
+      ],
+      "qualifier": null
+    }
+  ],
+  "a_role_ruling": "用户明确同意207＋32及参股主体元数据补正；前一205裁决已由207裁决替代"
+}

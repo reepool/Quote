@@ -1,0 +1,23 @@
+{
+  "reports": [
+    {
+      "instrument_id": "600088.SH",
+      "requery_export_disk_equal": true,
+      "work_id": "bp-work-da89b71081b875d37641aeb2",
+      "fact_count": 254
+    },
+    {
+      "instrument_id": "600099.SH",
+      "requery_export_disk_equal": true,
+      "work_id": "bp-work-a7e024b09c3cff18d4eb2d6c",
+      "fact_count": 333
+    }
+  ],
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v54"
+  },
+  "readonly_query": true
+}

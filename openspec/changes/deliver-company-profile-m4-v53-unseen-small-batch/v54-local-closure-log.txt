@@ -1,0 +1,24 @@
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-14 19:18:54][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-14 19:18:54][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-14 19:18:54][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.00s
+[INFO][2026-10-14 19:18:55][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-14 19:18:55][tgbot.py:15] - [tgbot] Reading system configuration...
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+[INFO][2026-10-14 19:18:56][proxy_patch_bootstrap.py:55] - restored unpatched curl_cffi.requests.Session for Chrome TLS clients
+[INFO][2026-10-14 19:18:56][proxy_patch_bootstrap.py:157] - akshare proxy patch installed early (token=202602***)
+[INFO][2026-10-14 19:18:57][business_profile_pdf_artifacts.py:1222] - business-profile pdf artifact cache hit source_file_id=shared-asset:asset_689e4779d6a0fa36993fc913da46facf bytes=1338901 pages=177 timings={'hash_read_seconds': 0.000369, 'cache_read_seconds': 0.030441, 'extract_seconds': 0.0, 'write_seconds': 0.0, 'total_seconds': 0.03081} path=/home/python/Quote/data/filings/announcements/blobs/5a/derived/business_profile_pdfium_recovery.v4/5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c_57e1dd4f16ef40ff.json.gz
+OFFICIAL_LOCAL 600088.SH 254 pages 177 layout 25
+ANSWER principal_business MISSING []
+ANSWER products_services MISSING []
+ANSWER revenue_model MISSING []
+[INFO][2026-10-14 19:19:20][business_profile_pdf_artifacts.py:1222] - business-profile pdf artifact cache hit source_file_id=shared-asset:asset_224ce992ad64fd5a827f031bb43d8ad1 bytes=1783383 pages=194 timings={'hash_read_seconds': 0.00089, 'cache_read_seconds': 0.06416, 'extract_seconds': 0.0, 'write_seconds': 0.0, 'total_seconds': 0.06505} path=/home/python/Quote/data/filings/announcements/blobs/3d/derived/business_profile_pdfium_recovery.v4/3dbe17e87d3b79bb5327d821786eb7a971ef367b24fd37ac3511da4a212cf07c_57e1dd4f16ef40ff.json.gz
+OFFICIAL_LOCAL 600099.SH 333 pages 194 layout 21
+ANSWER principal_business MISSING []
+ANSWER products_services MISSING []
+ANSWER revenue_model MISSING []

@@ -295,8 +295,23 @@ class OfficialAnnualReportPageSource:
             or "企业集团的构成" in p["text"]
             or "业务性质" in p["text"]
             or "主要原材料的基本情况" in p["text"]
+            or "已签订的重大采购合同截至本报告期的履行情况" in p["text"]
         ]
         for page in list(project_pages):
+            if (
+                "主要控股参股公司分析" in page["text"]
+                and "报告期内取得和处置子公司的情况" not in page["text"]
+            ):
+                cursor = page["page"] + 1
+                while cursor <= page["page"] + 4:
+                    following = next((p for p in pages if p["page"] == cursor), None)
+                    if not following:
+                        break
+                    if following not in project_pages:
+                        project_pages.append(following)
+                    if "报告期内取得和处置子公司的情况" in following["text"]:
+                        break
+                    cursor += 1
             if any(
                 cue in page["text"]
                 for cue in (
@@ -1235,6 +1250,8 @@ class CompanyProfileTaskService:
                 "v51",
                 "v52",
                 "v53",
+                "v54",
+                "v55",
             }:
                 from research.business_profile_production_operations import (
                     register_business_profile_shared_annual_report_asset,

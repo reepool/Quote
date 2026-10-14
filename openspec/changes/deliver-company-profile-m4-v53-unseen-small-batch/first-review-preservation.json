@@ -1,0 +1,14 @@
+{
+  "sha256": {
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/source-scope.json": "01aefae292c2930aba39dd1392bbdbb21897bd752a990c90a703764fd866bbb2",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/source-freeze-receipt.json": "5c2d82a19dc090556de4d84cabfcc2ff3adeaf578a7f851b05d21b3eb776333c",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/actual-object-decisions.json": "9964c66cbcad99a03c1a3454a46441bfc450efe5017888b2750c0cd1de45baee",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/source-review-evidence.json": "492ebaa98c2f964f0dbb753b6241183eb7832fa92deeda33dbfd1fe2f81f71ba",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/source-review-quote-bank.json": "d9e7298b6340527181d5573f92ba294027f5210f39acf1793590b623dbbc7f9d",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/first-formal-execution.log": "bc2fd9cb8a9ac6914b40f48a82cb8f6ea56b45eae3c03363e523d75742dcf541",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/first-formal-review.log": "828822e99bc586127d127487adeff346e61b821e575dcb65a91c82c0d9e0ded2",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/negative-review-evidence.json": "3bcd26c86458bc95dd0ae5e49e42193f291632c3a6986ef5f8bb35dc898d3202",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/negative-review-evidence-corrected.json": "cdf49395977426d9f66bc1515a2e76c15a68408dda90fc7c848af514a99afcc3"
+  },
+  "negative_correction": "首版30/32误以整页引用中的零交易方判断设备采购；补充按事实主体/限定核，实际32/32；原件保留"
+}

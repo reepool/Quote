@@ -1,0 +1,23 @@
+{
+  "verified": true,
+  "snapshot_sha256": {
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/v54-business-overview-source-audit.json": "a262ef60464b2568449b83ea60965ee3ed63d661de337518cb014d2999ae9e5e",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/v54-delivery-read-consistency.json": "abe007d3f0736c6b71daf51c599ef866d24e8120f335c556433dccf0e810952b",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/v54-independent-source-verification.json": "36c60beb90c15b059f5a455529b2cdc39373c3802177a7cd535326d53769356e",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/v54-execution-code-reconstruction.json": "f15501922803f1220536bfb41314ffad4c90001d507877c9d3bcf0e5cff4cb04",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/v54-readonly-verification-receipt.json": "a59cf2849f387b41488abc8d3add9ca5ff63aa361942bd3e92a3370c7c23bfb9",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/v54-validation-receipt.json": "1ece3d6e6a8977e5ca11bf5e84f0d2a7081e8a3ffddc0ccc67844f7dca5b12ea",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/v54-finite-contract-gates.json": "1917282f322630e27b992c6592f8012a6dc63fa65054477de1745f84d644b15f",
+    "openspec/changes/deliver-company-profile-m4-v53-unseen-small-batch/v54-original-contract-mapping.json": "0dd3d2c2a69bf7c37e6783829f9abfbf69efb02b678220172f2f6a4280b3f962"
+  },
+  "tests_passed": 33,
+  "original_first_contract_and_results_retained": true,
+  "formal_successors_used": 1,
+  "formal_successors_authorized": 2,
+  "remaining_p0_p1": [],
+  "a_role_finite_acceptance": "pending",
+  "current_change_archived": false,
+  "next_pair_started": false,
+  "production": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

@@ -1,0 +1,12 @@
+import json,hashlib,re
+from pathlib import Path
+from pypdf import PdfReader
+p=json.loads(Path('data/checkpoints/company_profile_common_core/reports/m4_v53_unseen_small_batch/plan.json').read_text())
+for r in p['reports']:
+ h=r['document_version'];path=Path('data/filings/announcements/blobs')/h[:2]/(h+'.pdf');assert hashlib.sha256(path.read_bytes()).hexdigest()==h
+ pages=[dict(page=i+1,text=x.extract_text() or '',readable=True) for i,x in enumerate(PdfReader(path).pages)]
+ Path('/tmp/v53new_source_'+r['instrument_id']+'.json').write_text(json.dumps(pages,ensure_ascii=False,indent=2)+'\n')
+ terms='主要业务|经营模式|分行业|分产品|分地区|销售模式|产销量|主要原材料|主要能源|营业收入|合营企业|联营企业|关联交易|出租方'
+ lines=[f"p{x['page']}: "+' / '.join(y.strip() for y in x['text'].splitlines() if re.search(terms,y))[:550] for x in pages if re.search(terms,x['text'])]
+ Path('/tmp/v53new_index_'+r['instrument_id']+'.txt').write_text('\n'.join(lines))
+ print(r['instrument_id'],len(pages),'pages',flush=True)

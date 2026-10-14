@@ -1,0 +1,166 @@
+{
+  "original_contract_sha256": "01aefae292c2930aba39dd1392bbdbb21897bd752a990c90a703764fd866bbb2",
+  "original_positive": 200,
+  "original_negative": 32,
+  "omitted_income": [
+    {
+      "condition_id": "600088.SH-supplemental-income-1",
+      "instrument_id": "600088.SH",
+      "page": 141,
+      "name": "设备租赁",
+      "value": "17,842,144.74",
+      "unit": "元",
+      "dimension": "service",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "source_actor": "公司及合并子公司",
+      "subject_scope": "consolidated_group",
+      "source_column": "租赁收入",
+      "period_state": "current_printed",
+      "reported_period": "2025-12-31",
+      "counterparty": null,
+      "source_segment": null,
+      "native_aliases": [
+        "设备租赁"
+      ],
+      "qualifier": null
+    },
+    {
+      "condition_id": "600088.SH-supplemental-income-2",
+      "instrument_id": "600088.SH",
+      "page": 141,
+      "name": "土地租赁",
+      "value": "11,434,035.92",
+      "unit": "元",
+      "dimension": "service",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "source_actor": "公司及合并子公司",
+      "subject_scope": "consolidated_group",
+      "source_column": "租赁收入",
+      "period_state": "current_printed",
+      "reported_period": "2025-12-31",
+      "counterparty": null,
+      "source_segment": null,
+      "native_aliases": [
+        "土地租赁"
+      ],
+      "qualifier": null
+    },
+    {
+      "condition_id": "600088.SH-supplemental-income-3",
+      "instrument_id": "600088.SH",
+      "page": 141,
+      "name": "房屋租赁",
+      "value": "9,274,875.37",
+      "unit": "元",
+      "dimension": "service",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "source_actor": "公司及合并子公司",
+      "subject_scope": "consolidated_group",
+      "source_column": "租赁收入",
+      "period_state": "current_printed",
+      "reported_period": "2025-12-31",
+      "counterparty": null,
+      "source_segment": null,
+      "native_aliases": [
+        "房屋租赁"
+      ],
+      "qualifier": null
+    },
+    {
+      "condition_id": "600088.SH-supplemental-income-4",
+      "instrument_id": "600088.SH",
+      "page": 141,
+      "name": "其他",
+      "value": "244,574.75",
+      "unit": "元",
+      "dimension": "service",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "source_actor": "公司及合并子公司",
+      "subject_scope": "consolidated_group",
+      "source_column": "租赁收入",
+      "period_state": "current_printed",
+      "reported_period": "2025-12-31",
+      "counterparty": null,
+      "source_segment": null,
+      "native_aliases": [
+        "其他"
+      ],
+      "qualifier": null
+    },
+    {
+      "condition_id": "600088.SH-supplemental-income-5",
+      "instrument_id": "600088.SH",
+      "page": 141,
+      "name": "合计",
+      "value": "38,795,630.78",
+      "unit": "元",
+      "dimension": "service",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "source_actor": "公司及合并子公司",
+      "subject_scope": "consolidated_group",
+      "source_column": "租赁收入",
+      "period_state": "current_printed",
+      "reported_period": "2025-12-31",
+      "counterparty": null,
+      "source_segment": null,
+      "native_aliases": [
+        "合计"
+      ],
+      "qualifier": null
+    },
+    {
+      "condition_id": "600099.SH-supplemental-income-1",
+      "instrument_id": "600099.SH",
+      "page": 164,
+      "name": "房屋建筑物及设备租赁收入",
+      "value": "3,797,837.32",
+      "unit": "元",
+      "dimension": "service",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "source_actor": "公司及合并子公司",
+      "subject_scope": "consolidated_group",
+      "source_column": "租赁收入",
+      "period_state": "current_printed",
+      "reported_period": "2025-12-31",
+      "counterparty": null,
+      "source_segment": null,
+      "native_aliases": [
+        "房屋建筑物及设备租赁收入"
+      ],
+      "qualifier": null
+    },
+    {
+      "condition_id": "600099.SH-supplemental-income-2",
+      "instrument_id": "600099.SH",
+      "page": 164,
+      "name": "合计",
+      "value": "3,797,837.32",
+      "unit": "元",
+      "dimension": "service",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "source_actor": "公司及合并子公司",
+      "subject_scope": "consolidated_group",
+      "source_column": "租赁收入",
+      "period_state": "current_printed",
+      "reported_period": "2025-12-31",
+      "counterparty": null,
+      "source_segment": null,
+      "native_aliases": [
+        "合计"
+      ],
+      "qualifier": null
+    }
+  ],
+  "original_actor_metadata_conflict": [
+    "江苏联海动力机械有限公司",
+    "福马新能（北京）科技有限公司"
+  ],
+  "a_role_ruling": "用户明确同意207＋32及参股主体元数据补正；前一205裁决已由207裁决替代",
+  "successor_positive": 207,
+  "successor_income": 117,
+  "successor_actions": 84,
+  "successor_bodies": 6,
+  "successor_negatives": 32,
+  "subject_scope_correction": "group_associated_entity",
+  "original_first_score_unchanged": true
+}
