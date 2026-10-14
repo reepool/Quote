@@ -1,0 +1,499 @@
+[
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-3a23b3447cd09c9f:commodity:1",
+    "source_native": {
+      "name": "房产租赁",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "action": "provides_service",
+    "source_actor": "公司及合并子公司",
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        4,
+        17
+      ],
+      "reason": "p17当前房产租赁业务增加原句，合法同名服务副本；原p16条件只唯一召回"
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-2b8a2d0907c72f8f:commodity:1",
+    "source_native": {
+      "name": "商品销售",
+      "value": null,
+      "unit": null,
+      "header": "本期营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "action": "sells",
+    "source_actor": "公司",
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        4,
+        18
+      ],
+      "reason": "p18集团本期商品销售42.46万元原列成立，p16报告期仅代理净额限定保留；父类不代替具名子公司条件"
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-db4633268f5d6588:commodity:1",
+    "source_native": {
+      "name": "房地产开发",
+      "value": null,
+      "unit": null,
+      "header": "控股参股公司原业务",
+      "qualifier": "原主体：天津海泰创意科技园投资有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "action": "operates",
+    "source_actor": "天津海泰创意科技园投资有限公司",
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        4,
+        27
+      ],
+      "reason": "p18或p133–134原公司/权益表具名主体及业务格匹配；51%亚太/康隆维持合并子公司；同语义不同证据对象计准确率、不重复召回"
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-db4633268f5d6588:commodity:2",
+    "source_native": {
+      "name": "房地产开发",
+      "value": null,
+      "unit": null,
+      "header": "控股参股公司原业务",
+      "qualifier": "原主体：天津百竹科技产业发展有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "action": "operates",
+    "source_actor": "天津百竹科技产业发展有限公司",
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        4,
+        27
+      ],
+      "reason": "p18或p133–134原公司/权益表具名主体及业务格匹配；51%亚太/康隆维持合并子公司；同语义不同证据对象计准确率、不重复召回"
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-4682a4ce10b37eb2:Segment:business_type:房地产结转收入合计:房地产销售和结转/本期合计:row:5",
+    "source_native": {
+      "name": "房地产结转收入合计",
+      "value": "0",
+      "unit": "万元",
+      "header": "房地产销售和结转/本期合计",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        23
+      ],
+      "reason": "p23五项目及合计打印零；合同外结转合计0万元，不替代五项目召回，不与财务表勾稽"
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-15b10db257929e6c:Measurement:business_type:房地产结转收入合计:房地产销售和结转/本期合计:row:5",
+    "source_native": {
+      "name": "房地产结转收入合计",
+      "value": "0",
+      "unit": "万元",
+      "header": "房地产销售和结转/本期合计",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        23
+      ],
+      "reason": "p23五项目及合计打印零；合同外结转合计0万元，不替代五项目召回，不与财务表勾稽"
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-7b1e1f60e15fe1a2:activity:1",
+    "source_native": {
+      "name": "水产品",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "action": "sells",
+    "source_actor": "公司",
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        8,
+        9
+      ],
+      "reason": "p8集团水产品加工销售合法父类；捕捞未混入商品身份"
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-0b34dc47442cb7a5:commodity:3",
+    "source_native": {
+      "name": "金枪鱼",
+      "value": null,
+      "unit": null,
+      "header": "产销量/本期",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "action": "produces",
+    "source_actor": "公司及合并子公司",
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        5,
+        12
+      ],
+      "reason": "p12金枪鱼本期生产量/产销量原格为非零；合同外合法生产保留"
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-0b34dc47442cb7a5:commodity:9",
+    "source_native": {
+      "name": "金枪鱼",
+      "value": null,
+      "unit": null,
+      "header": "产销量/本期生产量",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "action": "produces",
+    "source_actor": "公司及合并子公司",
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        5,
+        12
+      ],
+      "reason": "p12金枪鱼本期生产量/产销量原格为非零；合同外合法生产保留"
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-08a5904d6ce65ce4:commodity:6",
+    "source_native": {
+      "name": "鱼类",
+      "value": null,
+      "unit": null,
+      "header": "控股参股公司原业务",
+      "qualifier": "原主体：亚太金枪鱼私人有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "action": "sells",
+    "source_actor": "亚太金枪鱼私人有限公司",
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        5,
+        18
+      ],
+      "reason": "p18或p133–134原公司/权益表具名主体及业务格匹配；51%亚太/康隆维持合并子公司；同语义不同证据对象计准确率、不重复召回"
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-08a5904d6ce65ce4:commodity:7",
+    "source_native": {
+      "name": "鱼产品",
+      "value": null,
+      "unit": null,
+      "header": "控股参股公司原业务",
+      "qualifier": "原主体：亚太金枪鱼私人有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "action": "sells",
+    "source_actor": "亚太金枪鱼私人有限公司",
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        5,
+        18
+      ],
+      "reason": "p18或p133–134原公司/权益表具名主体及业务格匹配；51%亚太/康隆维持合并子公司；同语义不同证据对象计准确率、不重复召回"
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-08a5904d6ce65ce4:commodity:8",
+    "source_native": {
+      "name": "水产品",
+      "value": null,
+      "unit": null,
+      "header": "控股参股公司原业务",
+      "qualifier": "原主体：舟山环太海洋食品有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "action": "processes",
+    "source_actor": "舟山环太海洋食品有限公司",
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        5,
+        18
+      ],
+      "reason": "p18或p133–134原公司/权益表具名主体及业务格匹配；51%亚太/康隆维持合并子公司；同语义不同证据对象计准确率、不重复召回"
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-08a5904d6ce65ce4:commodity:9",
+    "source_native": {
+      "name": "水产品",
+      "value": null,
+      "unit": null,
+      "header": "控股参股公司原业务",
+      "qualifier": "原主体：舟山环太海洋食品有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "action": "sells",
+    "source_actor": "舟山环太海洋食品有限公司",
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        5,
+        18
+      ],
+      "reason": "p18或p133–134原公司/权益表具名主体及业务格匹配；51%亚太/康隆维持合并子公司；同语义不同证据对象计准确率、不重复召回"
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-08a5904d6ce65ce4:commodity:10",
+    "source_native": {
+      "name": "罐头食品",
+      "value": null,
+      "unit": null,
+      "header": "控股参股公司原业务",
+      "qualifier": "原主体：卡洛斯•阿尔博的孩子们有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "action": "processes",
+    "source_actor": "卡洛斯•阿尔博的孩子们有限公司",
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        5,
+        18
+      ],
+      "reason": "p18或p133–134原公司/权益表具名主体及业务格匹配；51%亚太/康隆维持合并子公司；同语义不同证据对象计准确率、不重复召回"
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-cc01037cbc630f38:commodity:1",
+    "source_native": {
+      "name": "远洋捕捞",
+      "value": null,
+      "unit": null,
+      "header": "原子公司业务性质",
+      "qualifier": "原主体：上海开创远洋渔业有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "action": "operates",
+    "source_actor": "上海开创远洋渔业有限公司",
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        5,
+        133,
+        134
+      ],
+      "reason": "p18或p133–134原公司/权益表具名主体及业务格匹配；51%亚太/康隆维持合并子公司；同语义不同证据对象计准确率、不重复召回"
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-cc01037cbc630f38:commodity:2",
+    "source_native": {
+      "name": "远洋捕捞",
+      "value": null,
+      "unit": null,
+      "header": "原子公司业务性质",
+      "qualifier": "原主体：泛太食品（马绍尔群岛）有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "action": "operates",
+    "source_actor": "泛太食品（马绍尔群岛）有限公司",
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        5,
+        133,
+        134
+      ],
+      "reason": "p18或p133–134原公司/权益表具名主体及业务格匹配；51%亚太/康隆维持合并子公司；同语义不同证据对象计准确率、不重复召回"
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-cc01037cbc630f38:commodity:3",
+    "source_native": {
+      "name": "食品加工业",
+      "value": null,
+      "unit": null,
+      "header": "原子公司业务性质",
+      "qualifier": "原主体：泛太食品（马绍尔群岛）有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "action": "operates",
+    "source_actor": "泛太食品（马绍尔群岛）有限公司",
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        5,
+        133,
+        134
+      ],
+      "reason": "p18或p133–134原公司/权益表具名主体及业务格匹配；51%亚太/康隆维持合并子公司；同语义不同证据对象计准确率、不重复召回"
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-cc01037cbc630f38:commodity:4",
+    "source_native": {
+      "name": "远洋捕捞",
+      "value": null,
+      "unit": null,
+      "header": "原子公司业务性质",
+      "qualifier": "原主体：泛太渔业（马绍尔群岛）有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "action": "operates",
+    "source_actor": "泛太渔业（马绍尔群岛）有限公司",
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        5,
+        133,
+        134
+      ],
+      "reason": "p18或p133–134原公司/权益表具名主体及业务格匹配；51%亚太/康隆维持合并子公司；同语义不同证据对象计准确率、不重复召回"
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-cc01037cbc630f38:commodity:5",
+    "source_native": {
+      "name": "远洋捕捞",
+      "value": null,
+      "unit": null,
+      "header": "原子公司业务性质",
+      "qualifier": "原主体：文森特（密克罗尼西亚）渔业有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "action": "operates",
+    "source_actor": "文森特（密克罗尼西亚）渔业有限公司",
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        5,
+        133,
+        134
+      ],
+      "reason": "p18或p133–134原公司/权益表具名主体及业务格匹配；51%亚太/康隆维持合并子公司；同语义不同证据对象计准确率、不重复召回"
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-7ac6b63a48a7204d:Segment:service:经营租赁:作为出租人的经营租赁/租赁收入:row:0",
+    "source_native": {
+      "name": "经营租赁",
+      "value": "2,129,586.82",
+      "unit": "元",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        132
+      ],
+      "reason": "p132出租人经营租赁2129586.82元原行；合同外合法收入"
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-5ed9dbfb794d722f:Measurement:service:经营租赁:作为出租人的经营租赁/租赁收入:row:0",
+    "source_native": {
+      "name": "经营租赁",
+      "value": "2,129,586.82",
+      "unit": "元",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        132
+      ],
+      "reason": "p132出租人经营租赁2129586.82元原行；合同外合法收入"
+    }
+  }
+]

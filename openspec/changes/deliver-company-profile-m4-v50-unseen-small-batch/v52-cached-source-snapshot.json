@@ -1,0 +1,11 @@
+{
+  "cached_artifact": "data/filings/announcements/blobs/97/derived/business_profile_pdfium_recovery.v4/979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad_57e1dd4f16ef40ff.json.gz",
+  "cached_artifact_sha256": "2307c0280b73ce8fd89ebaae8f42c50fc1b75f3efa4ed575f3ac0268a900bf5b",
+  "fixture_sha256": "433e613f3e788e85fa3bbde08f07d6bfdbbdf616ac83609245a821baf5463c59",
+  "page": 15,
+  "cached_text_exact": true,
+  "original_pdf_sha256": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+  "official_layout_reference": "independent-source-layout-pages.json / 600082.SH / 15",
+  "issue": "cached numeric row carries 合计 at its tail; next numeric row belongs to total",
+  "resolved_rule": "split printed total tail before joining numeric cells; keep each native table dimension"
+}

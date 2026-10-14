@@ -1,0 +1,15 @@
+"""Read-only application re-query; writes only a separate verification receipt."""
+import asyncio,json
+from pathlib import Path
+from research.company_profile.operations import execute_published_task
+from research.company_profile.execution import default_processing_identity
+from utils import config_manager
+from research.storage import ResearchStorageManager
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v50-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v52_same_source_repair';O=R/'data/research/company_profile_common_core/m4_v52_same_source_repair';identity={**default_processing_identity(),'revenue_sentence_repair':'v52'}
+async def main():
+ formal=json.loads((P/'formal_execution.json').read_text());storage=ResearchStorageManager(config_manager.get_research_config());rows=[]
+ for i,res in formal['results'].items():
+  q=await execute_published_task(action='query',storage=storage,instrument_ids=(i,),checkpoint_root=R/'data/checkpoints/company_profile_common_core',output_root=O,processing_identity=identity,plan_directory=P,knowledge_cutoff='2026-09-17')
+  same=q['profiles']==res['query']['profiles']==res['export']['profiles'];disk=json.loads(Path(res['export']['files'][0]).read_text());assert same and q['profiles'][0]==disk;rows.append(dict(instrument_id=i,requery_export_disk_equal=True,work_id=disk['work_id'],fact_count=len(disk['accepted_facts'])))
+ (C/'v52-delivery-read-consistency.json').write_text(json.dumps(dict(reports=rows,processing_identity=identity,readonly_query=True),ensure_ascii=False,indent=2)+'\n');print(rows)
+asyncio.run(main())

@@ -1221,7 +1221,20 @@ class CompanyProfileTaskService:
         elif enqueue and not (limit_drain_to_enqueued and not instrument_ids):
             if batch_plan is not None and self.processing_identity.get(
                 "revenue_sentence_repair"
-            ) in {"v41", "v42", "v43", "v44", "v45", "v46", "v47", "v48", "v49", "v50"}:
+            ) in {
+                "v41",
+                "v42",
+                "v43",
+                "v44",
+                "v45",
+                "v46",
+                "v47",
+                "v48",
+                "v49",
+                "v50",
+                "v51",
+                "v52",
+            }:
                 from research.business_profile_production_operations import (
                     register_business_profile_shared_annual_report_asset,
                 )

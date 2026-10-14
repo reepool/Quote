@@ -15,7 +15,7 @@ Independent official PDF text,continuations and necessary layout MUST establish 
 - **THEN** the original conditions,source hashes and freeze timestamp precede first execute under completev50identity
 
 ### Requirement: First actual delivery is uniquely reviewed and retained
-The unique business owner MUST first run-query-export both reports with continuous whole-round timing including PDF/layout and retries and shared remaining tokens. First results MUST be protected immediately. Every actual accepted fact including contract-external output and every answered body MUST be uniquely reviewed against original meaning. Measurement MUST count only for accuracy;aliases,parent roles and multiple evidence MUST NOT duplicate recall. Full frozen-contract recall,100percent accuracy,zero critical numeric errors,all actually evaluated negatives passed,whole round<=300seconds and sharedtokens<=50000 MUST precede finite A-role submission. Both actual five-stage results,no reuse/predecessor and query/export/disk agreement MUST be checked. Failure MUST remain immutable and pause later samples with only real P0/P1repairs registered;the unresolved change MUST remain unarchived. Production MUST staynot_authorized and scalequalityfalse.
+The unique business owner MUST first run-query-export both reports with continuous whole-round timing including PDF/layout and retries and shared remaining tokens. First results MUST be protected immediately. Every actual accepted fact including contract-external output and every answered body MUST be uniquely reviewed against original meaning. Measurement MUST count only for accuracy;aliases,parent roles and multiple evidence MUST NOT duplicate recall. Full frozen-contract recall,100percent accuracy,zero critical numeric errors,all actually evaluated negatives passed,whole round<=300seconds and sharedtokens<=50000 MUST precede finite A-role submission. Both actual five-stage results,no reuse/predecessor and query/export/disk agreement MUST be checked. Failure MUST remain immutable and pause later samples;the unresolved change MUST remain unarchived. The A-authorized successor repair package MUST follow A/B workflow v1 continuously through local correction, regression and at most two successor formal rounds. Each round MUST separately satisfy <=300seconds and sharedtokens<=50000;budgets MUST NOT be transferred. The second round MUST follow diagnosed local correction and regression. Success MUST be submitted to A-role before archive or expansion. Production MUST staynot_authorized and scalequalityfalse.
 
 #### Scenario: First unseen delivery fails business substance
 - **WHEN** actual independent review finds omissions,inaccuracies,unevaluable negatives or unmet resource gates
@@ -24,3 +24,11 @@ The unique business owner MUST first run-query-export both reports with continuo
 #### Scenario: New source and actual-output gates pass
 - **WHEN** every frozen condition and all actual-output/resource checks pass
 - **THEN** finite evidence is submitted to A-role without full-report,production or scale-quality claims
+
+
+### Requirement: Authorized successor preserves the original contract and adds omitted printed income
+The v51 successor MUST independently freeze170positive conditions,six bodies,110income and54actions,and retain all31negatives. Each original160condition MUST map unchanged to the successor;five printed-zero settlement projects and five rental rows on the original official pages23and24 MUST be added. Original160contract,66/160recall,193/262accuracy and first output MUST remain byte-identical. Official PDFs,cutoff2026-09-17,default identity,not_authorized production and false scale claim MUST remain unchanged.
+
+#### Scenario: Successor contract is fixed before authorized repair verification
+- **WHEN** the A-role approves the omitted ten source-supported current income conditions
+- **THEN** the separate170plus31contract and original-condition mapping are frozen before successor formal execution without rewriting first observation

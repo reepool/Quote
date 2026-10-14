@@ -1,0 +1,18 @@
+[
+  {
+    "instrument_id": "600082.SH",
+    "fact_count": 156,
+    "income_missing": [],
+    "roles_missing": [],
+    "negative_failed": [],
+    "query_export_equal": true
+  },
+  {
+    "instrument_id": "600097.SH",
+    "fact_count": 286,
+    "income_missing": [],
+    "roles_missing": [],
+    "negative_failed": [],
+    "query_export_equal": true
+  }
+]

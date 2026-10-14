@@ -1,0 +1,323 @@
+{
+  "reports": [
+    {
+      "instrument_id": "600082.SH",
+      "original_fact_count": 152,
+      "new_fact_count": 156,
+      "same_semantics": 152,
+      "removed": [],
+      "added": [
+        {
+          "schema_version": "company_profile_semantic_object.v1",
+          "record_id": "owned:core-ev-b29513aa0f7b4ac4:segment:industry:合计:table:主营业务收入:row:16",
+          "field_id": "segment_dimension",
+          "chapter_task": "extract_segment_financials",
+          "report": {
+            "instrument_id": "600082.SH",
+            "report_id": "asset_1026249e4e7681de9039d09fe8641c02",
+            "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-28T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "subject_scope": "consolidated_group",
+          "subject_name": null,
+          "subject_basis": "report_default_group_scope",
+          "reported_period": "2025-12-31",
+          "period_type": "duration",
+          "knowledge_time": null,
+          "assertion_class": "reported_fact",
+          "evidence": [
+            {
+              "evidence_id": "core-ev-b29513aa0f7b4ac4",
+              "report": {
+                "instrument_id": "600082.SH",
+                "report_id": "asset_1026249e4e7681de9039d09fe8641c02",
+                "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+                "report_period": "2025-12-31",
+                "published_at": "2026-04-28T16:00:00+00:00",
+                "document_type": "annual_report"
+              },
+              "page": 15,
+              "printed_page_label": null,
+              "section_title": "主营业务原表",
+              "continuation_pages": [],
+              "subject_evidence_pages": [],
+              "anchor": {
+                "anchor_type": "text",
+                "bounded_quote": "\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n科技园区\n开发 418,710,800.51 341,118,587.17 18.53 35.15 112.60 减少 29.68\n个百分点\n科技园区\n运营 30,105,192.48 14,372,966.79 52.26 11.60 17.02 减少 2.21\n个百分点\n商品销售\n业务 424,569.35 - - -49.75 -\n合计 449,240,562.34 355,491,553.96 20.87 33.06 105.81 减少 27.97\n个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n科技园区\n开发 418,710,800.51 341,118,587.17 18.53 35.15 112.60 减少 29.68\n个百分点\n科技园区\n运营 30,105,192.48 14,372,966.79 52.26 11.60 17.02 减少 2.21\n个百分点\n商品销售\n业务 424,569.35 - - -49.75 -\n合计 449,240,562.34 355,491,553.96 20.87 33.06 105.81 减少 27.97\n个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n内销 449,240,562.34 355,491,553.96 20.87 33.06 105.81 减少 27.97\n个百分点\n合计 449,240,562.34 355,491,553.96 20.87 33.06 105.81 减少 27.97\n个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n不适用",
+                "context_before": null,
+                "context_after": null,
+                "match_index": 0
+              }
+            }
+          ],
+          "source_native": {
+            "name": "合计",
+            "value": "449,240,562.34",
+            "unit": "元",
+            "header": "主营业务收入",
+            "qualifier": null,
+            "footnote_refs": [],
+            "source_aliases": []
+          },
+          "uncertainty": [],
+          "data_status": "research_fixture",
+          "object_type": "Segment",
+          "dimension": "industry",
+          "label": "合计",
+          "row_class": null
+        },
+        {
+          "schema_version": "company_profile_semantic_object.v1",
+          "record_id": "owned:core-ev-b0073ddbd8bcf468:revenue:industry:合计:table:主营业务收入:row:16",
+          "field_id": "operating_revenue",
+          "chapter_task": "extract_segment_financials",
+          "report": {
+            "instrument_id": "600082.SH",
+            "report_id": "asset_1026249e4e7681de9039d09fe8641c02",
+            "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-28T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "subject_scope": "consolidated_group",
+          "subject_name": null,
+          "subject_basis": "report_default_group_scope",
+          "reported_period": "2025-12-31",
+          "period_type": "duration",
+          "knowledge_time": null,
+          "assertion_class": "reported_fact",
+          "evidence": [
+            {
+              "evidence_id": "core-ev-b0073ddbd8bcf468",
+              "report": {
+                "instrument_id": "600082.SH",
+                "report_id": "asset_1026249e4e7681de9039d09fe8641c02",
+                "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+                "report_period": "2025-12-31",
+                "published_at": "2026-04-28T16:00:00+00:00",
+                "document_type": "annual_report"
+              },
+              "page": 15,
+              "printed_page_label": null,
+              "section_title": "主营业务原表",
+              "continuation_pages": [],
+              "subject_evidence_pages": [],
+              "anchor": {
+                "anchor_type": "text",
+                "bounded_quote": "\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n科技园区\n开发 418,710,800.51 341,118,587.17 18.53 35.15 112.60 减少 29.68\n个百分点\n科技园区\n运营 30,105,192.48 14,372,966.79 52.26 11.60 17.02 减少 2.21\n个百分点\n商品销售\n业务 424,569.35 - - -49.75 -\n合计 449,240,562.34 355,491,553.96 20.87 33.06 105.81 减少 27.97\n个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n科技园区\n开发 418,710,800.51 341,118,587.17 18.53 35.15 112.60 减少 29.68\n个百分点\n科技园区\n运营 30,105,192.48 14,372,966.79 52.26 11.60 17.02 减少 2.21\n个百分点\n商品销售\n业务 424,569.35 - - -49.75 -\n合计 449,240,562.34 355,491,553.96 20.87 33.06 105.81 减少 27.97\n个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n内销 449,240,562.34 355,491,553.96 20.87 33.06 105.81 减少 27.97\n个百分点\n合计 449,240,562.34 355,491,553.96 20.87 33.06 105.81 减少 27.97\n个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n不适用",
+                "context_before": null,
+                "context_after": null,
+                "match_index": 0
+              }
+            }
+          ],
+          "source_native": {
+            "name": "合计",
+            "value": "449,240,562.34",
+            "unit": "元",
+            "header": "主营业务收入",
+            "qualifier": null,
+            "footnote_refs": [],
+            "source_aliases": []
+          },
+          "uncertainty": [],
+          "data_status": "research_fixture",
+          "object_type": "Measurement",
+          "metric_type": "operating_revenue",
+          "logical_slot": "revenue",
+          "measured_object": "合计",
+          "segment_dimension": "industry",
+          "segment_label": "合计",
+          "capacity_kind": null,
+          "processing_direction": null,
+          "row_class": null,
+          "is_restated_comparative": false,
+          "comparison_basis": null,
+          "relationship_context": null
+        },
+        {
+          "schema_version": "company_profile_semantic_object.v1",
+          "record_id": "owned:core-ev-b29513aa0f7b4ac4:segment:product:合计:table:主营业务收入:row:33",
+          "field_id": "segment_dimension",
+          "chapter_task": "extract_segment_financials",
+          "report": {
+            "instrument_id": "600082.SH",
+            "report_id": "asset_1026249e4e7681de9039d09fe8641c02",
+            "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-28T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "subject_scope": "consolidated_group",
+          "subject_name": null,
+          "subject_basis": "report_default_group_scope",
+          "reported_period": "2025-12-31",
+          "period_type": "duration",
+          "knowledge_time": null,
+          "assertion_class": "reported_fact",
+          "evidence": [
+            {
+              "evidence_id": "core-ev-b29513aa0f7b4ac4",
+              "report": {
+                "instrument_id": "600082.SH",
+                "report_id": "asset_1026249e4e7681de9039d09fe8641c02",
+                "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+                "report_period": "2025-12-31",
+                "published_at": "2026-04-28T16:00:00+00:00",
+                "document_type": "annual_report"
+              },
+              "page": 15,
+              "printed_page_label": null,
+              "section_title": "主营业务原表",
+              "continuation_pages": [],
+              "subject_evidence_pages": [],
+              "anchor": {
+                "anchor_type": "text",
+                "bounded_quote": "\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n科技园区\n开发 418,710,800.51 341,118,587.17 18.53 35.15 112.60 减少 29.68\n个百分点\n科技园区\n运营 30,105,192.48 14,372,966.79 52.26 11.60 17.02 减少 2.21\n个百分点\n商品销售\n业务 424,569.35 - - -49.75 -\n合计 449,240,562.34 355,491,553.96 20.87 33.06 105.81 减少 27.97\n个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n科技园区\n开发 418,710,800.51 341,118,587.17 18.53 35.15 112.60 减少 29.68\n个百分点\n科技园区\n运营 30,105,192.48 14,372,966.79 52.26 11.60 17.02 减少 2.21\n个百分点\n商品销售\n业务 424,569.35 - - -49.75 -\n合计 449,240,562.34 355,491,553.96 20.87 33.06 105.81 减少 27.97\n个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n内销 449,240,562.34 355,491,553.96 20.87 33.06 105.81 减少 27.97\n个百分点\n合计 449,240,562.34 355,491,553.96 20.87 33.06 105.81 减少 27.97\n个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n不适用",
+                "context_before": null,
+                "context_after": null,
+                "match_index": 0
+              }
+            }
+          ],
+          "source_native": {
+            "name": "合计",
+            "value": "449,240,562.34",
+            "unit": "元",
+            "header": "主营业务收入",
+            "qualifier": null,
+            "footnote_refs": [],
+            "source_aliases": []
+          },
+          "uncertainty": [],
+          "data_status": "research_fixture",
+          "object_type": "Segment",
+          "dimension": "product",
+          "label": "合计",
+          "row_class": null
+        },
+        {
+          "schema_version": "company_profile_semantic_object.v1",
+          "record_id": "owned:core-ev-b0073ddbd8bcf468:revenue:product:合计:table:主营业务收入:row:33",
+          "field_id": "operating_revenue",
+          "chapter_task": "extract_segment_financials",
+          "report": {
+            "instrument_id": "600082.SH",
+            "report_id": "asset_1026249e4e7681de9039d09fe8641c02",
+            "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-28T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "subject_scope": "consolidated_group",
+          "subject_name": null,
+          "subject_basis": "report_default_group_scope",
+          "reported_period": "2025-12-31",
+          "period_type": "duration",
+          "knowledge_time": null,
+          "assertion_class": "reported_fact",
+          "evidence": [
+            {
+              "evidence_id": "core-ev-b0073ddbd8bcf468",
+              "report": {
+                "instrument_id": "600082.SH",
+                "report_id": "asset_1026249e4e7681de9039d09fe8641c02",
+                "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+                "report_period": "2025-12-31",
+                "published_at": "2026-04-28T16:00:00+00:00",
+                "document_type": "annual_report"
+              },
+              "page": 15,
+              "printed_page_label": null,
+              "section_title": "主营业务原表",
+              "continuation_pages": [],
+              "subject_evidence_pages": [],
+              "anchor": {
+                "anchor_type": "text",
+                "bounded_quote": "\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n科技园区\n开发 418,710,800.51 341,118,587.17 18.53 35.15 112.60 减少 29.68\n个百分点\n科技园区\n运营 30,105,192.48 14,372,966.79 52.26 11.60 17.02 减少 2.21\n个百分点\n商品销售\n业务 424,569.35 - - -49.75 -\n合计 449,240,562.34 355,491,553.96 20.87 33.06 105.81 减少 27.97\n个百分点\n主营业务分产品情况\n分产品 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n科技园区\n开发 418,710,800.51 341,118,587.17 18.53 35.15 112.60 减少 29.68\n个百分点\n科技园区\n运营 30,105,192.48 14,372,966.79 52.26 11.60 17.02 减少 2.21\n个百分点\n商品销售\n业务 424,569.35 - - -49.75 -\n合计 449,240,562.34 355,491,553.96 20.87 33.06 105.81 减少 27.97\n个百分点\n主营业务分地区情况\n分地区 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n内销 449,240,562.34 355,491,553.96 20.87 33.06 105.81 减少 27.97\n个百分点\n合计 449,240,562.34 355,491,553.96 20.87 33.06 105.81 减少 27.97\n个百分点\n主营业务分销售模式情况\n销售模式 营业收入 营业成本\n毛利率\n（%）\n营业收入\n比上年增\n减（%）\n营业成本\n比上年增\n减（%）\n毛利率比\n上年增减\n（%）\n不适用",
+                "context_before": null,
+                "context_after": null,
+                "match_index": 0
+              }
+            }
+          ],
+          "source_native": {
+            "name": "合计",
+            "value": "449,240,562.34",
+            "unit": "元",
+            "header": "主营业务收入",
+            "qualifier": null,
+            "footnote_refs": [],
+            "source_aliases": []
+          },
+          "uncertainty": [],
+          "data_status": "research_fixture",
+          "object_type": "Measurement",
+          "metric_type": "operating_revenue",
+          "logical_slot": "revenue",
+          "measured_object": "合计",
+          "segment_dimension": "product",
+          "segment_label": "合计",
+          "capacity_kind": null,
+          "processing_direction": null,
+          "row_class": null,
+          "is_restated_comparative": false,
+          "comparison_basis": null,
+          "relationship_context": null
+        }
+      ],
+      "answers": [
+        {
+          "dimension": "principal_business",
+          "same_bytes": true,
+          "old_sha256": "1a66342ec512a4fa07ce6cdcb9e6793415e266b93eb860e375fc13d2746e10b6",
+          "new_sha256": "1a66342ec512a4fa07ce6cdcb9e6793415e266b93eb860e375fc13d2746e10b6"
+        },
+        {
+          "dimension": "products_services",
+          "same_bytes": true,
+          "old_sha256": "2247d591e51a4d021bccb8ec7377f6eecc08f771122b77d29bcf4fc79d0a6ce3",
+          "new_sha256": "2247d591e51a4d021bccb8ec7377f6eecc08f771122b77d29bcf4fc79d0a6ce3"
+        },
+        {
+          "dimension": "revenue_model",
+          "same_bytes": true,
+          "old_sha256": "01e77fcfd5cf11f963641ec0354934302830c4dcc063dd3e5d97fce622e5cd85",
+          "new_sha256": "01e77fcfd5cf11f963641ec0354934302830c4dcc063dd3e5d97fce622e5cd85"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600097.SH",
+      "original_fact_count": 286,
+      "new_fact_count": 286,
+      "same_semantics": 286,
+      "removed": [],
+      "added": [],
+      "answers": [
+        {
+          "dimension": "principal_business",
+          "same_bytes": true,
+          "old_sha256": "f92c057f7eedb5de81a62fa0aa218e4e41851e08fe183dae722f7d4b7a2a42b5",
+          "new_sha256": "f92c057f7eedb5de81a62fa0aa218e4e41851e08fe183dae722f7d4b7a2a42b5"
+        },
+        {
+          "dimension": "products_services",
+          "same_bytes": true,
+          "old_sha256": "f92c057f7eedb5de81a62fa0aa218e4e41851e08fe183dae722f7d4b7a2a42b5",
+          "new_sha256": "f92c057f7eedb5de81a62fa0aa218e4e41851e08fe183dae722f7d4b7a2a42b5"
+        },
+        {
+          "dimension": "revenue_model",
+          "same_bytes": true,
+          "old_sha256": "6ef2b57830bde48592eb9443ff83eb6ec22ef113a9cb899ff18686f827889b57",
+          "new_sha256": "6ef2b57830bde48592eb9443ff83eb6ec22ef113a9cb899ff18686f827889b57"
+        }
+      ]
+    }
+  ],
+  "only_four_native_total_facts_added": true,
+  "six_answer_bytes_unchanged": true
+}

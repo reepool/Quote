@@ -1,0 +1,4278 @@
+{
+  "created_at": "2026-10-14T04:17:15.655083+00:00",
+  "fixed_before_formal_execution": true,
+  "plan_id": "09a3ce48de867f3e905ea0bb38a434065151fce30342d8b41654dcc075488f67",
+  "processing_identity": {
+    "rules": "company_profile_common_core.v1",
+    "owned_page_facts": "v8",
+    "material_input_facts": "v1",
+    "revenue_sentence_repair": "v51"
+  },
+  "knowledge_cutoff": "2026-09-17",
+  "shared_token_budget": 50000,
+  "official_reports": [
+    {
+      "instrument_id": "600082.SH",
+      "asset_id": "asset_1026249e4e7681de9039d09fe8641c02",
+      "report_id": "1225246039",
+      "report_period": "2025-12-31",
+      "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+      "disclosure_form": "service"
+    },
+    {
+      "instrument_id": "600097.SH",
+      "asset_id": "asset_4cd5bdbf271ccb38ee1523d580503cb8",
+      "report_id": "1225039976",
+      "report_period": "2025-12-31",
+      "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+      "disclosure_form": "manufacturing"
+    }
+  ],
+  "versions": {
+    "600082.SH": {
+      "sha256": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+      "pdf": "data/filings/announcements/blobs/97/979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad.pdf",
+      "checked_pages": [
+        4,
+        5,
+        6,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        27,
+        28,
+        49,
+        50,
+        51,
+        53,
+        54,
+        55,
+        65,
+        74,
+        76,
+        106,
+        107,
+        110,
+        111,
+        112,
+        156,
+        157,
+        158,
+        159,
+        160,
+        169,
+        170,
+        171,
+        172,
+        173,
+        180,
+        181,
+        182,
+        183,
+        184,
+        187,
+        188,
+        189,
+        199,
+        200
+      ]
+    },
+    "600097.SH": {
+      "sha256": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+      "pdf": "data/filings/announcements/blobs/4c/4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c.pdf",
+      "checked_pages": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        18,
+        19,
+        20,
+        35,
+        37,
+        44,
+        51,
+        52,
+        53,
+        54,
+        84,
+        85,
+        88,
+        89,
+        122,
+        123,
+        124,
+        133,
+        134,
+        135,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        156
+      ]
+    }
+  },
+  "source_rows": {
+    "600082.SH": [
+      {
+        "condition_id": "600082.SH-income-001",
+        "instrument_id": "600082.SH",
+        "page": 15,
+        "name": "科技园区开发",
+        "native_aliases": [
+          "科技园区开发"
+        ],
+        "value": "418,710,800.51",
+        "unit": "元",
+        "dimension": "industry",
+        "header": "主营业务分行业",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分行业"
+      },
+      {
+        "condition_id": "600082.SH-income-002",
+        "instrument_id": "600082.SH",
+        "page": 15,
+        "name": "科技园区运营",
+        "native_aliases": [
+          "科技园区运营"
+        ],
+        "value": "30,105,192.48",
+        "unit": "元",
+        "dimension": "industry",
+        "header": "主营业务分行业",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分行业"
+      },
+      {
+        "condition_id": "600082.SH-income-003",
+        "instrument_id": "600082.SH",
+        "page": 15,
+        "name": "商品销售业务",
+        "native_aliases": [
+          "商品销售业务"
+        ],
+        "value": "424,569.35",
+        "unit": "元",
+        "dimension": "industry",
+        "header": "主营业务分行业",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分行业"
+      },
+      {
+        "condition_id": "600082.SH-income-004",
+        "instrument_id": "600082.SH",
+        "page": 15,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "449,240,562.34",
+        "unit": "元",
+        "dimension": "industry",
+        "header": "主营业务分行业",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分行业"
+      },
+      {
+        "condition_id": "600082.SH-income-005",
+        "instrument_id": "600082.SH",
+        "page": 15,
+        "name": "科技园区开发",
+        "native_aliases": [
+          "科技园区开发"
+        ],
+        "value": "418,710,800.51",
+        "unit": "元",
+        "dimension": "product",
+        "header": "主营业务分产品",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分产品"
+      },
+      {
+        "condition_id": "600082.SH-income-006",
+        "instrument_id": "600082.SH",
+        "page": 15,
+        "name": "科技园区运营",
+        "native_aliases": [
+          "科技园区运营"
+        ],
+        "value": "30,105,192.48",
+        "unit": "元",
+        "dimension": "product",
+        "header": "主营业务分产品",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分产品"
+      },
+      {
+        "condition_id": "600082.SH-income-007",
+        "instrument_id": "600082.SH",
+        "page": 15,
+        "name": "商品销售业务",
+        "native_aliases": [
+          "商品销售业务"
+        ],
+        "value": "424,569.35",
+        "unit": "元",
+        "dimension": "product",
+        "header": "主营业务分产品",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分产品"
+      },
+      {
+        "condition_id": "600082.SH-income-008",
+        "instrument_id": "600082.SH",
+        "page": 15,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "449,240,562.34",
+        "unit": "元",
+        "dimension": "product",
+        "header": "主营业务分产品",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分产品"
+      },
+      {
+        "condition_id": "600082.SH-income-009",
+        "instrument_id": "600082.SH",
+        "page": 15,
+        "name": "内销",
+        "native_aliases": [
+          "内销"
+        ],
+        "value": "449,240,562.34",
+        "unit": "元",
+        "dimension": "region",
+        "header": "主营业务分地区",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分地区"
+      },
+      {
+        "condition_id": "600082.SH-income-010",
+        "instrument_id": "600082.SH",
+        "page": 15,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "449,240,562.34",
+        "unit": "元",
+        "dimension": "region",
+        "header": "主营业务分地区",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分地区"
+      },
+      {
+        "condition_id": "600082.SH-income-011",
+        "instrument_id": "600082.SH",
+        "page": 18,
+        "name": "商品销售业务",
+        "native_aliases": [
+          "商品销售业务"
+        ],
+        "value": "42.46",
+        "unit": "万元",
+        "dimension": "business_type",
+        "header": "贸易业务开展情况",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "贸易业务开展情况"
+      },
+      {
+        "condition_id": "600082.SH-income-012",
+        "instrument_id": "600082.SH",
+        "page": 27,
+        "name": "天津海泰创意科技园投资有限公司",
+        "native_aliases": [
+          "天津海泰创意科技园投资有限公司"
+        ],
+        "value": "418,714,190.51",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "主要控股参股公司分析",
+        "source_column": "本期营业收入",
+        "source_actor": "天津海泰创意科技园投资有限公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主要控股参股公司分析"
+      },
+      {
+        "condition_id": "600082.SH-income-013",
+        "instrument_id": "600082.SH",
+        "page": 27,
+        "name": "天津百竹科技产业发展有限公司",
+        "native_aliases": [
+          "天津百竹科技产业发展有限公司"
+        ],
+        "value": "4,064,919.11",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "主要控股参股公司分析",
+        "source_column": "本期营业收入",
+        "source_actor": "天津百竹科技产业发展有限公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主要控股参股公司分析"
+      },
+      {
+        "condition_id": "600082.SH-income-014",
+        "instrument_id": "600082.SH",
+        "page": 27,
+        "name": "天津海泰企业孵化服务有限公司",
+        "native_aliases": [
+          "天津海泰企业孵化服务有限公司"
+        ],
+        "value": "1,214,660.29",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "主要控股参股公司分析",
+        "source_column": "本期营业收入",
+        "source_actor": "天津海泰企业孵化服务有限公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主要控股参股公司分析"
+      },
+      {
+        "condition_id": "600082.SH-income-015",
+        "instrument_id": "600082.SH",
+        "page": 156,
+        "name": "主营业务",
+        "native_aliases": [
+          "主营业务"
+        ],
+        "value": "449,240,562.34",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合并营业收入和营业成本",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合并营业收入和营业成本"
+      },
+      {
+        "condition_id": "600082.SH-income-016",
+        "instrument_id": "600082.SH",
+        "page": 156,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "449,240,562.34",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合并营业收入和营业成本",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合并营业收入和营业成本"
+      },
+      {
+        "condition_id": "600082.SH-income-017",
+        "instrument_id": "600082.SH",
+        "page": 156,
+        "name": "客户合同产生的收入",
+        "native_aliases": [
+          "客户合同产生的收入"
+        ],
+        "value": "419,178,838.16",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合并营业收入明细",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合并营业收入明细"
+      },
+      {
+        "condition_id": "600082.SH-income-018",
+        "instrument_id": "600082.SH",
+        "page": 157,
+        "name": "租赁收入",
+        "native_aliases": [
+          "租赁收入"
+        ],
+        "value": "30,061,724.18",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合并营业收入明细",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合并营业收入明细"
+      },
+      {
+        "condition_id": "600082.SH-income-019",
+        "instrument_id": "600082.SH",
+        "page": 157,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "449,240,562.34",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合并营业收入明细",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合并营业收入明细"
+      },
+      {
+        "condition_id": "600082.SH-income-020",
+        "instrument_id": "600082.SH",
+        "page": 157,
+        "name": "商品销售",
+        "native_aliases": [
+          "商品销售"
+        ],
+        "value": "424,569.35",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/业务类型",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/业务类型"
+      },
+      {
+        "condition_id": "600082.SH-income-021",
+        "instrument_id": "600082.SH",
+        "page": 157,
+        "name": "房产销售",
+        "native_aliases": [
+          "房产销售"
+        ],
+        "value": "418,710,800.51",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/业务类型",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/业务类型"
+      },
+      {
+        "condition_id": "600082.SH-income-022",
+        "instrument_id": "600082.SH",
+        "page": 157,
+        "name": "服务收入",
+        "native_aliases": [
+          "服务收入"
+        ],
+        "value": "43,468.30",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/业务类型",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/业务类型"
+      },
+      {
+        "condition_id": "600082.SH-income-023",
+        "instrument_id": "600082.SH",
+        "page": 157,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "419,178,838.16",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/业务类型",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/业务类型"
+      },
+      {
+        "condition_id": "600082.SH-income-024",
+        "instrument_id": "600082.SH",
+        "page": 157,
+        "name": "在某一时点确认",
+        "native_aliases": [
+          "在某一时点确认"
+        ],
+        "value": "419,135,369.86",
+        "unit": "元",
+        "dimension": "revenue_timing",
+        "header": "合同收入分解/商品转让时间",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品转让时间"
+      },
+      {
+        "condition_id": "600082.SH-income-025",
+        "instrument_id": "600082.SH",
+        "page": 157,
+        "name": "在某一时段内确认",
+        "native_aliases": [
+          "在某一时段内确认"
+        ],
+        "value": "43,468.30",
+        "unit": "元",
+        "dimension": "revenue_timing",
+        "header": "合同收入分解/商品转让时间",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品转让时间"
+      },
+      {
+        "condition_id": "600082.SH-income-026",
+        "instrument_id": "600082.SH",
+        "page": 157,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "419,178,838.16",
+        "unit": "元",
+        "dimension": "revenue_timing",
+        "header": "合同收入分解/商品转让时间",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品转让时间"
+      },
+      {
+        "condition_id": "600082.SH-income-027",
+        "instrument_id": "600082.SH",
+        "page": 200,
+        "name": "主营业务",
+        "native_aliases": [
+          "主营业务"
+        ],
+        "value": "26,002,442.90",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "母公司营业收入和营业成本",
+        "source_column": "本期营业收入",
+        "source_actor": "天津海泰科技发展股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "母公司营业收入和营业成本"
+      },
+      {
+        "condition_id": "600082.SH-income-028",
+        "instrument_id": "600082.SH",
+        "page": 200,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "26,002,442.90",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "母公司营业收入和营业成本",
+        "source_column": "本期营业收入",
+        "source_actor": "天津海泰科技发展股份有限公司（母公司）",
+        "subject_scope": "issuer",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "母公司营业收入和营业成本"
+      },
+      {
+        "page": 23,
+        "name": "海泰绿色产业基地",
+        "value": "0",
+        "unit": "万元",
+        "header": "房地产销售和结转/结转收入金额",
+        "dimension": "project",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "海泰绿色产业基地"
+        ],
+        "condition_id": "600082.SH-income-029",
+        "instrument_id": "600082.SH",
+        "source_column": "本期结转收入金额",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "房地产销售和结转/结转收入金额"
+      },
+      {
+        "page": 23,
+        "name": "海泰创新基地",
+        "value": "0",
+        "unit": "万元",
+        "header": "房地产销售和结转/结转收入金额",
+        "dimension": "project",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "海泰创新基地"
+        ],
+        "condition_id": "600082.SH-income-030",
+        "instrument_id": "600082.SH",
+        "source_column": "本期结转收入金额",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "房地产销售和结转/结转收入金额"
+      },
+      {
+        "page": 23,
+        "name": "BPO基地",
+        "value": "0",
+        "unit": "万元",
+        "header": "房地产销售和结转/结转收入金额",
+        "dimension": "project",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "BPO基地"
+        ],
+        "condition_id": "600082.SH-income-031",
+        "instrument_id": "600082.SH",
+        "source_column": "本期结转收入金额",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "房地产销售和结转/结转收入金额"
+      },
+      {
+        "page": 23,
+        "name": "海泰精工国际",
+        "value": "0",
+        "unit": "万元",
+        "header": "房地产销售和结转/结转收入金额",
+        "dimension": "project",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "海泰精工国际"
+        ],
+        "condition_id": "600082.SH-income-032",
+        "instrument_id": "600082.SH",
+        "source_column": "本期结转收入金额",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "房地产销售和结转/结转收入金额"
+      },
+      {
+        "page": 23,
+        "name": "海泰创意科技园",
+        "value": "0",
+        "unit": "万元",
+        "header": "房地产销售和结转/结转收入金额",
+        "dimension": "project",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "海泰创意科技园"
+        ],
+        "condition_id": "600082.SH-income-033",
+        "instrument_id": "600082.SH",
+        "source_column": "本期结转收入金额",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "房地产销售和结转/结转收入金额"
+      },
+      {
+        "page": 24,
+        "name": "海泰绿色产业基地",
+        "value": "464.97",
+        "unit": "万元",
+        "header": "报告期内房地产出租情况/出租房地产的租金收入",
+        "dimension": "lease",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "海泰绿色产业基地"
+        ],
+        "condition_id": "600082.SH-income-034",
+        "instrument_id": "600082.SH",
+        "source_column": "本期出租房地产的租金收入",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "报告期内房地产出租情况/出租房地产的租金收入"
+      },
+      {
+        "page": 24,
+        "name": "BPO基地",
+        "value": "1850.99",
+        "unit": "万元",
+        "header": "报告期内房地产出租情况/出租房地产的租金收入",
+        "dimension": "lease",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "BPO基地"
+        ],
+        "condition_id": "600082.SH-income-035",
+        "instrument_id": "600082.SH",
+        "source_column": "本期出租房地产的租金收入",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "报告期内房地产出租情况/出租房地产的租金收入"
+      },
+      {
+        "page": 24,
+        "name": "海泰国际公寓",
+        "value": "254.24",
+        "unit": "万元",
+        "header": "报告期内房地产出租情况/出租房地产的租金收入",
+        "dimension": "lease",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "海泰国际公寓"
+        ],
+        "condition_id": "600082.SH-income-036",
+        "instrument_id": "600082.SH",
+        "source_column": "本期出租房地产的租金收入",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "报告期内房地产出租情况/出租房地产的租金收入"
+      },
+      {
+        "page": 24,
+        "name": "蓝海科技园",
+        "value": "406.49",
+        "unit": "万元",
+        "header": "报告期内房地产出租情况/出租房地产的租金收入",
+        "dimension": "lease",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "蓝海科技园"
+        ],
+        "condition_id": "600082.SH-income-037",
+        "instrument_id": "600082.SH",
+        "source_column": "本期出租房地产的租金收入",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "报告期内房地产出租情况/出租房地产的租金收入"
+      },
+      {
+        "page": 24,
+        "name": "海泰精工国际",
+        "value": "29.48",
+        "unit": "万元",
+        "header": "报告期内房地产出租情况/出租房地产的租金收入",
+        "dimension": "lease",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "海泰精工国际"
+        ],
+        "condition_id": "600082.SH-income-038",
+        "instrument_id": "600082.SH",
+        "source_column": "本期出租房地产的租金收入",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "报告期内房地产出租情况/出租房地产的租金收入"
+      }
+    ],
+    "600097.SH": [
+      {
+        "condition_id": "600097.SH-income-001",
+        "instrument_id": "600097.SH",
+        "page": 11,
+        "name": "海洋捕捞",
+        "native_aliases": [
+          "海洋捕捞"
+        ],
+        "value": "950,763,559.03",
+        "unit": "元",
+        "dimension": "industry",
+        "header": "主营业务分行业",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分行业"
+      },
+      {
+        "condition_id": "600097.SH-income-002",
+        "instrument_id": "600097.SH",
+        "page": 11,
+        "name": "食品加工",
+        "native_aliases": [
+          "食品加工"
+        ],
+        "value": "1,054,611,208.73",
+        "unit": "元",
+        "dimension": "industry",
+        "header": "主营业务分行业",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分行业"
+      },
+      {
+        "condition_id": "600097.SH-income-003",
+        "instrument_id": "600097.SH",
+        "page": 11,
+        "name": "渔货贸易",
+        "native_aliases": [
+          "渔货贸易"
+        ],
+        "value": "318,671,971.02",
+        "unit": "元",
+        "dimension": "industry",
+        "header": "主营业务分行业",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分行业"
+      },
+      {
+        "condition_id": "600097.SH-income-004",
+        "instrument_id": "600097.SH",
+        "page": 11,
+        "name": "海上运输",
+        "native_aliases": [
+          "海上运输"
+        ],
+        "value": "6,765,806.04",
+        "unit": "元",
+        "dimension": "industry",
+        "header": "主营业务分行业",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分行业"
+      },
+      {
+        "condition_id": "600097.SH-income-005",
+        "instrument_id": "600097.SH",
+        "page": 11,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "2,330,812,544.82",
+        "unit": "元",
+        "dimension": "industry",
+        "header": "主营业务分行业",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分行业"
+      },
+      {
+        "condition_id": "600097.SH-income-006",
+        "instrument_id": "600097.SH",
+        "page": 11,
+        "name": "金枪鱼销售",
+        "native_aliases": [
+          "金枪鱼销售"
+        ],
+        "value": "796,979,841.53",
+        "unit": "元",
+        "dimension": "product",
+        "header": "主营业务分产品",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分产品"
+      },
+      {
+        "condition_id": "600097.SH-income-007",
+        "instrument_id": "600097.SH",
+        "page": 11,
+        "name": "零星鱼种销售",
+        "native_aliases": [
+          "零星鱼种销售"
+        ],
+        "value": "153,783,717.50",
+        "unit": "元",
+        "dimension": "product",
+        "header": "主营业务分产品",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分产品"
+      },
+      {
+        "condition_id": "600097.SH-income-008",
+        "instrument_id": "600097.SH",
+        "page": 11,
+        "name": "罐头食品销售",
+        "native_aliases": [
+          "罐头食品销售"
+        ],
+        "value": "816,352,061.87",
+        "unit": "元",
+        "dimension": "product",
+        "header": "主营业务分产品",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分产品"
+      },
+      {
+        "condition_id": "600097.SH-income-009",
+        "instrument_id": "600097.SH",
+        "page": 11,
+        "name": "鱼柳加工销售",
+        "native_aliases": [
+          "鱼柳加工销售"
+        ],
+        "value": "238,259,146.86",
+        "unit": "元",
+        "dimension": "product",
+        "header": "主营业务分产品",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分产品"
+      },
+      {
+        "condition_id": "600097.SH-income-010",
+        "instrument_id": "600097.SH",
+        "page": 11,
+        "name": "渔货贸易",
+        "native_aliases": [
+          "渔货贸易"
+        ],
+        "value": "318,671,971.02",
+        "unit": "元",
+        "dimension": "product",
+        "header": "主营业务分产品",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分产品"
+      },
+      {
+        "condition_id": "600097.SH-income-011",
+        "instrument_id": "600097.SH",
+        "page": 11,
+        "name": "海上运输",
+        "native_aliases": [
+          "海上运输"
+        ],
+        "value": "6,765,806.04",
+        "unit": "元",
+        "dimension": "product",
+        "header": "主营业务分产品",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分产品"
+      },
+      {
+        "condition_id": "600097.SH-income-012",
+        "instrument_id": "600097.SH",
+        "page": 11,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "2,330,812,544.82",
+        "unit": "元",
+        "dimension": "product",
+        "header": "主营业务分产品",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分产品"
+      },
+      {
+        "condition_id": "600097.SH-income-013",
+        "instrument_id": "600097.SH",
+        "page": 11,
+        "name": "国内",
+        "native_aliases": [
+          "国内"
+        ],
+        "value": "1,028,359,860.15",
+        "unit": "元",
+        "dimension": "region",
+        "header": "主营业务分地区",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分地区"
+      },
+      {
+        "condition_id": "600097.SH-income-014",
+        "instrument_id": "600097.SH",
+        "page": 11,
+        "name": "国外",
+        "native_aliases": [
+          "国外"
+        ],
+        "value": "1,302,452,684.67",
+        "unit": "元",
+        "dimension": "region",
+        "header": "主营业务分地区",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分地区"
+      },
+      {
+        "condition_id": "600097.SH-income-015",
+        "instrument_id": "600097.SH",
+        "page": 11,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "2,330,812,544.82",
+        "unit": "元",
+        "dimension": "region",
+        "header": "主营业务分地区",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分地区"
+      },
+      {
+        "condition_id": "600097.SH-income-016",
+        "instrument_id": "600097.SH",
+        "page": 12,
+        "name": "直销",
+        "native_aliases": [
+          "直销"
+        ],
+        "value": "2,330,812,544.82",
+        "unit": "元",
+        "dimension": "sales_mode",
+        "header": "主营业务分销售模式",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分销售模式"
+      },
+      {
+        "condition_id": "600097.SH-income-017",
+        "instrument_id": "600097.SH",
+        "page": 12,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "2,330,812,544.82",
+        "unit": "元",
+        "dimension": "sales_mode",
+        "header": "主营业务分销售模式",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主营业务分销售模式"
+      },
+      {
+        "condition_id": "600097.SH-income-018",
+        "instrument_id": "600097.SH",
+        "page": 13,
+        "name": "渔货贸易",
+        "native_aliases": [
+          "渔货贸易"
+        ],
+        "value": "318,671,971.02",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "贸易业务开展情况",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "贸易业务开展情况"
+      },
+      {
+        "condition_id": "600097.SH-income-019",
+        "instrument_id": "600097.SH",
+        "page": 18,
+        "name": "上海开创远洋渔业有限公司",
+        "native_aliases": [
+          "上海开创远洋渔业有限公司"
+        ],
+        "value": "1,175,618,816.17",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "主要控股参股公司分析",
+        "source_column": "本期营业收入",
+        "source_actor": "上海开创远洋渔业有限公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主要控股参股公司分析"
+      },
+      {
+        "condition_id": "600097.SH-income-020",
+        "instrument_id": "600097.SH",
+        "page": 18,
+        "name": "泛太食品（马绍尔群岛）有限公司",
+        "native_aliases": [
+          "泛太食品（马绍尔群岛）有限公司"
+        ],
+        "value": "75,194,260.04",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "主要控股参股公司分析",
+        "source_column": "本期营业收入",
+        "source_actor": "泛太食品（马绍尔群岛）有限公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主要控股参股公司分析"
+      },
+      {
+        "condition_id": "600097.SH-income-021",
+        "instrument_id": "600097.SH",
+        "page": 18,
+        "name": "泛太渔业（马绍尔群岛）有限公司",
+        "native_aliases": [
+          "泛太渔业（马绍尔群岛）有限公司"
+        ],
+        "value": "497,631,583.01",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "主要控股参股公司分析",
+        "source_column": "本期营业收入",
+        "source_actor": "泛太渔业（马绍尔群岛）有限公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主要控股参股公司分析"
+      },
+      {
+        "condition_id": "600097.SH-income-022",
+        "instrument_id": "600097.SH",
+        "page": 18,
+        "name": "文森特（密克罗尼西亚）渔业有限公司",
+        "native_aliases": [
+          "文森特（密克罗尼西亚）渔业有限公司"
+        ],
+        "value": "3,554.30",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "主要控股参股公司分析",
+        "source_column": "本期营业收入",
+        "source_actor": "文森特（密克罗尼西亚）渔业有限公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主要控股参股公司分析"
+      },
+      {
+        "condition_id": "600097.SH-income-023",
+        "instrument_id": "600097.SH",
+        "page": 18,
+        "name": "亚太金枪鱼私人有限公司",
+        "native_aliases": [
+          "亚太金枪鱼私人有限公司"
+        ],
+        "value": "355,430.00",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "主要控股参股公司分析",
+        "source_column": "本期营业收入",
+        "source_actor": "亚太金枪鱼私人有限公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主要控股参股公司分析"
+      },
+      {
+        "condition_id": "600097.SH-income-024",
+        "instrument_id": "600097.SH",
+        "page": 18,
+        "name": "舟山环太海洋食品有限公司",
+        "native_aliases": [
+          "舟山环太海洋食品有限公司"
+        ],
+        "value": "422,469,539.59",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "主要控股参股公司分析",
+        "source_column": "本期营业收入",
+        "source_actor": "舟山环太海洋食品有限公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主要控股参股公司分析"
+      },
+      {
+        "condition_id": "600097.SH-income-025",
+        "instrument_id": "600097.SH",
+        "page": 18,
+        "name": "卡洛斯•阿尔博的孩子们有限公司",
+        "native_aliases": [
+          "卡洛斯•阿尔博的孩子们有限公司"
+        ],
+        "value": "818,099,682.13",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "主要控股参股公司分析",
+        "source_column": "本期营业收入",
+        "source_actor": "卡洛斯•阿尔博的孩子们有限公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主要控股参股公司分析"
+      },
+      {
+        "condition_id": "600097.SH-income-026",
+        "instrument_id": "600097.SH",
+        "page": 19,
+        "name": "康隆（香港）航运有限公司",
+        "native_aliases": [
+          "康隆（香港）航运有限公司"
+        ],
+        "value": "65,305,692.59",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "主要控股参股公司分析",
+        "source_column": "本期营业收入",
+        "source_actor": "康隆（香港）航运有限公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主要控股参股公司分析"
+      },
+      {
+        "condition_id": "600097.SH-income-027",
+        "instrument_id": "600097.SH",
+        "page": 19,
+        "name": "法国小溪海鲜公司",
+        "native_aliases": [
+          "法国小溪海鲜公司"
+        ],
+        "value": "100,605,939.19",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "主要控股参股公司分析",
+        "source_column": "本期营业收入",
+        "source_actor": "法国小溪海鲜公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主要控股参股公司分析"
+      },
+      {
+        "condition_id": "600097.SH-income-028",
+        "instrument_id": "600097.SH",
+        "page": 19,
+        "name": "艾斯特拉斯贸易有限公司",
+        "native_aliases": [
+          "艾斯特拉斯贸易有限公司"
+        ],
+        "value": "202,368,570.79",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "主要控股参股公司分析",
+        "source_column": "本期营业收入",
+        "source_actor": "艾斯特拉斯贸易有限公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "主要控股参股公司分析"
+      },
+      {
+        "condition_id": "600097.SH-income-029",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "主营业务",
+        "native_aliases": [
+          "主营业务"
+        ],
+        "value": "2,330,812,544.82",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合并营业收入和营业成本",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合并营业收入和营业成本"
+      },
+      {
+        "condition_id": "600097.SH-income-030",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "其他业务",
+        "native_aliases": [
+          "其他业务"
+        ],
+        "value": "5,690,497.87",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合并营业收入和营业成本",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合并营业收入和营业成本"
+      },
+      {
+        "condition_id": "600097.SH-income-031",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "2,336,503,042.69",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合并营业收入和营业成本",
+        "source_column": "本期营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合并营业收入和营业成本"
+      },
+      {
+        "condition_id": "600097.SH-income-032",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "商品类型",
+        "native_aliases": [
+          "商品类型"
+        ],
+        "value": "950,763,559.03",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合同收入分解/商品类型",
+        "source_column": "远洋捕捞分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "远洋捕捞分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型"
+      },
+      {
+        "condition_id": "600097.SH-income-033",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "商品类型",
+        "native_aliases": [
+          "商品类型"
+        ],
+        "value": "1,054,611,208.73",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合同收入分解/商品类型",
+        "source_column": "食品加工分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "食品加工分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型"
+      },
+      {
+        "condition_id": "600097.SH-income-034",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "商品类型",
+        "native_aliases": [
+          "商品类型"
+        ],
+        "value": "318,671,971.02",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合同收入分解/商品类型",
+        "source_column": "渔货贸易分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "渔货贸易分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型"
+      },
+      {
+        "condition_id": "600097.SH-income-035",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "商品类型",
+        "native_aliases": [
+          "商品类型"
+        ],
+        "value": "6,765,806.04",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合同收入分解/商品类型",
+        "source_column": "海上运输分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "海上运输分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型"
+      },
+      {
+        "condition_id": "600097.SH-income-036",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "商品类型",
+        "native_aliases": [
+          "商品类型"
+        ],
+        "value": "2,330,812,544.82",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合同收入分解/商品类型",
+        "source_column": "合计/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "合计",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型"
+      },
+      {
+        "condition_id": "600097.SH-income-037",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "按经营地区分类",
+        "native_aliases": [
+          "按经营地区分类"
+        ],
+        "value": "950,763,559.03",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合同收入分解/经营地区",
+        "source_column": "远洋捕捞分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "远洋捕捞分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区"
+      },
+      {
+        "condition_id": "600097.SH-income-038",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "按经营地区分类",
+        "native_aliases": [
+          "按经营地区分类"
+        ],
+        "value": "1,054,611,208.73",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合同收入分解/经营地区",
+        "source_column": "食品加工分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "食品加工分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区"
+      },
+      {
+        "condition_id": "600097.SH-income-039",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "按经营地区分类",
+        "native_aliases": [
+          "按经营地区分类"
+        ],
+        "value": "318,671,971.02",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合同收入分解/经营地区",
+        "source_column": "渔货贸易分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "渔货贸易分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区"
+      },
+      {
+        "condition_id": "600097.SH-income-040",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "按经营地区分类",
+        "native_aliases": [
+          "按经营地区分类"
+        ],
+        "value": "6,765,806.04",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合同收入分解/经营地区",
+        "source_column": "海上运输分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "海上运输分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区"
+      },
+      {
+        "condition_id": "600097.SH-income-041",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "按经营地区分类",
+        "native_aliases": [
+          "按经营地区分类"
+        ],
+        "value": "2,330,812,544.82",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合同收入分解/经营地区",
+        "source_column": "合计/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "合计",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区"
+      },
+      {
+        "condition_id": "600097.SH-income-042",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "950,763,559.03",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合同收入分解/经营地区",
+        "source_column": "远洋捕捞分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "远洋捕捞分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区"
+      },
+      {
+        "condition_id": "600097.SH-income-043",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "1,054,611,208.73",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合同收入分解/经营地区",
+        "source_column": "食品加工分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "食品加工分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区"
+      },
+      {
+        "condition_id": "600097.SH-income-044",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "318,671,971.02",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合同收入分解/经营地区",
+        "source_column": "渔货贸易分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "渔货贸易分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区"
+      },
+      {
+        "condition_id": "600097.SH-income-045",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "6,765,806.04",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合同收入分解/经营地区",
+        "source_column": "海上运输分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "海上运输分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区"
+      },
+      {
+        "condition_id": "600097.SH-income-046",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "合计",
+        "native_aliases": [
+          "合计"
+        ],
+        "value": "2,330,812,544.82",
+        "unit": "元",
+        "dimension": "business_type",
+        "header": "合同收入分解/经营地区",
+        "source_column": "合计/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "合计",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区"
+      },
+      {
+        "condition_id": "600097.SH-income-047",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "金枪鱼销售收入",
+        "native_aliases": [
+          "金枪鱼销售收入"
+        ],
+        "value": "796,979,841.53",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "远洋捕捞分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "远洋捕捞分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型"
+      },
+      {
+        "condition_id": "600097.SH-income-048",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "金枪鱼销售收入",
+        "native_aliases": [
+          "金枪鱼销售收入"
+        ],
+        "value": "796,979,841.53",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "合计/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "合计",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型"
+      },
+      {
+        "condition_id": "600097.SH-income-049",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "其他鱼种销售收入",
+        "native_aliases": [
+          "其他鱼种销售收入"
+        ],
+        "value": "153,783,717.50",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "远洋捕捞分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "远洋捕捞分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型"
+      },
+      {
+        "condition_id": "600097.SH-income-050",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "其他鱼种销售收入",
+        "native_aliases": [
+          "其他鱼种销售收入"
+        ],
+        "value": "153,783,717.50",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "合计/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "合计",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型"
+      },
+      {
+        "condition_id": "600097.SH-income-051",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "罐头销售收入",
+        "native_aliases": [
+          "罐头销售收入"
+        ],
+        "value": "816,352,061.87",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "食品加工分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "食品加工分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型"
+      },
+      {
+        "condition_id": "600097.SH-income-052",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "罐头销售收入",
+        "native_aliases": [
+          "罐头销售收入"
+        ],
+        "value": "816,352,061.87",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "合计/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "合计",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型"
+      },
+      {
+        "condition_id": "600097.SH-income-053",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "鱼柳加工销售收入",
+        "native_aliases": [
+          "鱼柳加工销售收入"
+        ],
+        "value": "238,259,146.86",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "食品加工分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "食品加工分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型"
+      },
+      {
+        "condition_id": "600097.SH-income-054",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "鱼柳加工销售收入",
+        "native_aliases": [
+          "鱼柳加工销售收入"
+        ],
+        "value": "238,259,146.86",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "合计/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "合计",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型"
+      },
+      {
+        "condition_id": "600097.SH-income-055",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "渔货贸易销售收入",
+        "native_aliases": [
+          "渔货贸易销售收入"
+        ],
+        "value": "318,671,971.02",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "渔货贸易分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "渔货贸易分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型"
+      },
+      {
+        "condition_id": "600097.SH-income-056",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "渔货贸易销售收入",
+        "native_aliases": [
+          "渔货贸易销售收入"
+        ],
+        "value": "318,671,971.02",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "合计/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "合计",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型"
+      },
+      {
+        "condition_id": "600097.SH-income-057",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "海上运输收入",
+        "native_aliases": [
+          "海上运输收入"
+        ],
+        "value": "6,765,806.04",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "海上运输分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "海上运输分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型"
+      },
+      {
+        "condition_id": "600097.SH-income-058",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "海上运输收入",
+        "native_aliases": [
+          "海上运输收入"
+        ],
+        "value": "6,765,806.04",
+        "unit": "元",
+        "dimension": "product",
+        "header": "合同收入分解/商品类型",
+        "source_column": "合计/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "合计",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/商品类型"
+      },
+      {
+        "condition_id": "600097.SH-income-059",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "国内",
+        "native_aliases": [
+          "国内"
+        ],
+        "value": "927,559,806.67",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "远洋捕捞分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "远洋捕捞分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区"
+      },
+      {
+        "condition_id": "600097.SH-income-060",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "国内",
+        "native_aliases": [
+          "国内"
+        ],
+        "value": "76,206,629.65",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "食品加工分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "食品加工分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区"
+      },
+      {
+        "condition_id": "600097.SH-income-061",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "国内",
+        "native_aliases": [
+          "国内"
+        ],
+        "value": "24,593,423.83",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "渔货贸易分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "渔货贸易分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区"
+      },
+      {
+        "condition_id": "600097.SH-income-062",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "国内",
+        "native_aliases": [
+          "国内"
+        ],
+        "value": "1,028,359,860.15",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "合计/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "合计",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区"
+      },
+      {
+        "condition_id": "600097.SH-income-063",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "国外",
+        "native_aliases": [
+          "国外"
+        ],
+        "value": "23,203,752.36",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "远洋捕捞分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "远洋捕捞分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区"
+      },
+      {
+        "condition_id": "600097.SH-income-064",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "国外",
+        "native_aliases": [
+          "国外"
+        ],
+        "value": "978,404,579.08",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "食品加工分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "食品加工分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区"
+      },
+      {
+        "condition_id": "600097.SH-income-065",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "国外",
+        "native_aliases": [
+          "国外"
+        ],
+        "value": "294,078,547.19",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "渔货贸易分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "渔货贸易分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区"
+      },
+      {
+        "condition_id": "600097.SH-income-066",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "国外",
+        "native_aliases": [
+          "国外"
+        ],
+        "value": "6,765,806.04",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "海上运输分部/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "海上运输分部",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区"
+      },
+      {
+        "condition_id": "600097.SH-income-067",
+        "instrument_id": "600097.SH",
+        "page": 122,
+        "name": "国外",
+        "native_aliases": [
+          "国外"
+        ],
+        "value": "1,302,452,684.67",
+        "unit": "元",
+        "dimension": "region",
+        "header": "合同收入分解/经营地区",
+        "source_column": "合计/营业收入",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": null,
+        "source_segment": "合计",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "合同收入分解/经营地区"
+      },
+      {
+        "condition_id": "600097.SH-income-068",
+        "instrument_id": "600097.SH",
+        "page": 135,
+        "name": "亚太金枪鱼私人有限公司",
+        "native_aliases": [
+          "亚太金枪鱼私人有限公司"
+        ],
+        "value": "35.54",
+        "unit": "万元",
+        "dimension": "business_type",
+        "header": "重要非全资子公司的主要财务信息",
+        "source_column": "本期营业收入",
+        "source_actor": "亚太金枪鱼私人有限公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "重要非全资子公司的主要财务信息"
+      },
+      {
+        "condition_id": "600097.SH-income-069",
+        "instrument_id": "600097.SH",
+        "page": 135,
+        "name": "康隆（香港）航运有限公司",
+        "native_aliases": [
+          "康隆（香港）航运有限公司"
+        ],
+        "value": "6,530.57",
+        "unit": "万元",
+        "dimension": "business_type",
+        "header": "重要非全资子公司的主要财务信息",
+        "source_column": "本期营业收入",
+        "source_actor": "康隆（香港）航运有限公司",
+        "subject_scope": "named_subsidiary",
+        "counterparty": null,
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "重要非全资子公司的主要财务信息"
+      },
+      {
+        "condition_id": "600097.SH-income-070",
+        "instrument_id": "600097.SH",
+        "page": 144,
+        "name": "出售商品",
+        "native_aliases": [
+          "出售商品"
+        ],
+        "value": "2,018,807.63",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "上海水产集团龙门食品有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务"
+      },
+      {
+        "condition_id": "600097.SH-income-071",
+        "instrument_id": "600097.SH",
+        "page": 144,
+        "name": "出售商品",
+        "native_aliases": [
+          "出售商品"
+        ],
+        "value": "8,424.00",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "城市管家（上海）电子商务有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务"
+      },
+      {
+        "condition_id": "600097.SH-income-072",
+        "instrument_id": "600097.SH",
+        "page": 144,
+        "name": "出售商品",
+        "native_aliases": [
+          "出售商品"
+        ],
+        "value": "2,461.00",
+        "unit": "元",
+        "dimension": "service",
+        "header": "出售商品/提供劳务",
+        "source_column": "本期发生额",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "counterparty": "上海水产集团有限公司",
+        "source_segment": null,
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "出售商品/提供劳务"
+      }
+    ]
+  },
+  "native_roles": [
+    {
+      "condition_id": "600082.SH-action-001",
+      "instrument_id": "600082.SH",
+      "page": 11,
+      "name": "工业园区",
+      "native_aliases": [
+        "工业园区",
+        "工业园区运营",
+        "园区运营"
+      ],
+      "source_actions": [
+        "operates"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600082.SH-action-002",
+      "instrument_id": "600082.SH",
+      "page": 11,
+      "name": "产业投资",
+      "native_aliases": [
+        "产业投资"
+      ],
+      "source_actions": [
+        "operates"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600082.SH-action-003",
+      "instrument_id": "600082.SH",
+      "page": 11,
+      "name": "咨询",
+      "native_aliases": [
+        "咨询",
+        "咨询服务"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "天津海泰企业孵化服务有限公司",
+      "actor_aliases": [
+        "天津海泰企业孵化服务有限公司",
+        "海泰孵化器"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600082.SH-action-004",
+      "instrument_id": "600082.SH",
+      "page": 11,
+      "name": "培训",
+      "native_aliases": [
+        "培训",
+        "培训服务"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "天津海泰企业孵化服务有限公司",
+      "actor_aliases": [
+        "天津海泰企业孵化服务有限公司",
+        "海泰孵化器"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600082.SH-action-005",
+      "instrument_id": "600082.SH",
+      "page": 12,
+      "name": "资源对接",
+      "native_aliases": [
+        "资源对接"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600082.SH-action-006",
+      "instrument_id": "600082.SH",
+      "page": 12,
+      "name": "用工保障",
+      "native_aliases": [
+        "用工保障"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600082.SH-action-007",
+      "instrument_id": "600082.SH",
+      "page": 13,
+      "name": "政策咨询",
+      "native_aliases": [
+        "政策咨询",
+        "政策咨询服务"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "天津海泰企业孵化服务有限公司",
+      "actor_aliases": [
+        "天津海泰企业孵化服务有限公司",
+        "海泰孵化器"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600082.SH-action-008",
+      "instrument_id": "600082.SH",
+      "page": 16,
+      "name": "房产",
+      "native_aliases": [
+        "房产",
+        "房地产",
+        "房产销售"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600082.SH-action-009",
+      "instrument_id": "600082.SH",
+      "page": 16,
+      "name": "房产租赁",
+      "native_aliases": [
+        "房产租赁",
+        "房产租赁业务"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600082.SH-action-010",
+      "instrument_id": "600082.SH",
+      "page": 172,
+      "name": "房地产开发",
+      "native_aliases": [
+        "房地产开发"
+      ],
+      "source_actions": [
+        "operates"
+      ],
+      "source_actor": "天津海泰方圆投资有限公司",
+      "actor_aliases": [
+        "天津海泰方圆投资有限公司"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600082.SH-action-011",
+      "instrument_id": "600082.SH",
+      "page": 172,
+      "name": "房地产开发",
+      "native_aliases": [
+        "房地产开发"
+      ],
+      "source_actions": [
+        "operates"
+      ],
+      "source_actor": "天津海泰方成投资有限公司",
+      "actor_aliases": [
+        "天津海泰方成投资有限公司"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600082.SH-action-012",
+      "instrument_id": "600082.SH",
+      "page": 172,
+      "name": "房地产开发",
+      "native_aliases": [
+        "房地产开发"
+      ],
+      "source_actions": [
+        "operates"
+      ],
+      "source_actor": "天津海泰创意科技园投资有限公司",
+      "actor_aliases": [
+        "天津海泰创意科技园投资有限公司"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600082.SH-action-013",
+      "instrument_id": "600082.SH",
+      "page": 172,
+      "name": "房地产开发",
+      "native_aliases": [
+        "房地产开发"
+      ],
+      "source_actions": [
+        "operates"
+      ],
+      "source_actor": "天津百竹科技产业发展有限公司",
+      "actor_aliases": [
+        "天津百竹科技产业发展有限公司"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600082.SH-action-014",
+      "instrument_id": "600082.SH",
+      "page": 172,
+      "name": "商品销售业务",
+      "native_aliases": [
+        "商品销售业务",
+        "商品销售",
+        "商品"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "天津海泰方通投资有限公司",
+      "actor_aliases": [
+        "天津海泰方通投资有限公司"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600082.SH-action-015",
+      "instrument_id": "600082.SH",
+      "page": 172,
+      "name": "物业服务",
+      "native_aliases": [
+        "物业服务"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "天津海发物业管理有限公司",
+      "actor_aliases": [
+        "天津海发物业管理有限公司"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-001",
+      "instrument_id": "600097.SH",
+      "page": 8,
+      "name": "金枪鱼",
+      "native_aliases": [
+        "金枪鱼"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "金枪鱼船队中西太平洋；磷虾为江苏深蓝合作南极项目"
+    },
+    {
+      "condition_id": "600097.SH-action-002",
+      "instrument_id": "600097.SH",
+      "page": 8,
+      "name": "鲣鱼",
+      "native_aliases": [
+        "鲣鱼"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "金枪鱼船队中西太平洋；磷虾为江苏深蓝合作南极项目"
+    },
+    {
+      "condition_id": "600097.SH-action-003",
+      "instrument_id": "600097.SH",
+      "page": 8,
+      "name": "黄鳍",
+      "native_aliases": [
+        "黄鳍"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "金枪鱼船队中西太平洋；磷虾为江苏深蓝合作南极项目"
+    },
+    {
+      "condition_id": "600097.SH-action-004",
+      "instrument_id": "600097.SH",
+      "page": 8,
+      "name": "磷虾",
+      "native_aliases": [
+        "磷虾",
+        "南极磷虾"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "金枪鱼船队中西太平洋；磷虾为江苏深蓝合作南极项目"
+    },
+    {
+      "condition_id": "600097.SH-action-005",
+      "instrument_id": "600097.SH",
+      "page": 12,
+      "name": "金枪鱼",
+      "native_aliases": [
+        "金枪鱼"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-006",
+      "instrument_id": "600097.SH",
+      "page": 12,
+      "name": "罐头食品",
+      "native_aliases": [
+        "罐头食品"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-007",
+      "instrument_id": "600097.SH",
+      "page": 12,
+      "name": "罐头食品",
+      "native_aliases": [
+        "罐头食品"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-008",
+      "instrument_id": "600097.SH",
+      "page": 12,
+      "name": "鱼柳",
+      "native_aliases": [
+        "鱼柳"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-009",
+      "instrument_id": "600097.SH",
+      "page": 12,
+      "name": "鱼柳",
+      "native_aliases": [
+        "鱼柳"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-010",
+      "instrument_id": "600097.SH",
+      "page": 11,
+      "name": "磷虾粉",
+      "native_aliases": [
+        "磷虾粉",
+        "虾粉"
+      ],
+      "source_actions": [
+        "produces"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "深蓝轮加工，合作项目，非独立自产母公司主体"
+    },
+    {
+      "condition_id": "600097.SH-action-011",
+      "instrument_id": "600097.SH",
+      "page": 84,
+      "name": "磷虾",
+      "native_aliases": [
+        "磷虾",
+        "南极磷虾"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-012",
+      "instrument_id": "600097.SH",
+      "page": 84,
+      "name": "磷虾粉",
+      "native_aliases": [
+        "磷虾粉",
+        "虾粉"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-013",
+      "instrument_id": "600097.SH",
+      "page": 8,
+      "name": "金枪鱼罐头",
+      "native_aliases": [
+        "金枪鱼罐头"
+      ],
+      "source_actions": [
+        "processes"
+      ],
+      "source_actor": "卡洛斯•阿尔博的孩子们有限公司",
+      "actor_aliases": [
+        "卡洛斯•阿尔博的孩子们有限公司",
+        "ALBO公司",
+        "HIJOS DE CARLOS ALBO，S.L.U"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-014",
+      "instrument_id": "600097.SH",
+      "page": 8,
+      "name": "罐头方便食品",
+      "native_aliases": [
+        "罐头方便食品"
+      ],
+      "source_actions": [
+        "processes"
+      ],
+      "source_actor": "卡洛斯•阿尔博的孩子们有限公司",
+      "actor_aliases": [
+        "卡洛斯•阿尔博的孩子们有限公司",
+        "ALBO公司",
+        "HIJOS DE CARLOS ALBO，S.L.U"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-015",
+      "instrument_id": "600097.SH",
+      "page": 8,
+      "name": "金枪鱼原料鱼",
+      "native_aliases": [
+        "金枪鱼原料鱼",
+        "金枪鱼",
+        "原料鱼"
+      ],
+      "source_actions": [
+        "material_input"
+      ],
+      "source_actor": "舟山环太海洋食品有限公司",
+      "actor_aliases": [
+        "舟山环太海洋食品有限公司",
+        "舟山环太",
+        "岱山加工厂",
+        "环太公司"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-016",
+      "instrument_id": "600097.SH",
+      "page": 8,
+      "name": "鱼柳",
+      "native_aliases": [
+        "鱼柳"
+      ],
+      "source_actions": [
+        "processes"
+      ],
+      "source_actor": "舟山环太海洋食品有限公司",
+      "actor_aliases": [
+        "舟山环太海洋食品有限公司",
+        "舟山环太",
+        "岱山加工厂",
+        "环太公司"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-017",
+      "instrument_id": "600097.SH",
+      "page": 8,
+      "name": "鱼柳",
+      "native_aliases": [
+        "鱼柳"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "舟山环太海洋食品有限公司",
+      "actor_aliases": [
+        "舟山环太海洋食品有限公司",
+        "舟山环太",
+        "岱山加工厂",
+        "环太公司"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-018",
+      "instrument_id": "600097.SH",
+      "page": 8,
+      "name": "冷冻金枪鱼运输",
+      "native_aliases": [
+        "冷冻金枪鱼运输",
+        "冷冻金枪鱼",
+        "人员和物资转运"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-019",
+      "instrument_id": "600097.SH",
+      "page": 8,
+      "name": "人员和物资等转运",
+      "native_aliases": [
+        "人员和物资等转运",
+        "冷冻金枪鱼",
+        "人员和物资转运"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-020",
+      "instrument_id": "600097.SH",
+      "page": 9,
+      "name": "沙丁鱼",
+      "native_aliases": [
+        "沙丁鱼",
+        "沙丁鱼罐头"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "卡洛斯•阿尔博的孩子们有限公司",
+      "actor_aliases": [
+        "卡洛斯•阿尔博的孩子们有限公司",
+        "ALBO公司",
+        "HIJOS DE CARLOS ALBO，S.L.U"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-021",
+      "instrument_id": "600097.SH",
+      "page": 9,
+      "name": "鱿鱼",
+      "native_aliases": [
+        "鱿鱼",
+        "鱿鱼罐头"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "卡洛斯•阿尔博的孩子们有限公司",
+      "actor_aliases": [
+        "卡洛斯•阿尔博的孩子们有限公司",
+        "ALBO公司",
+        "HIJOS DE CARLOS ALBO，S.L.U"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-022",
+      "instrument_id": "600097.SH",
+      "page": 9,
+      "name": "黄鳍金枪鱼",
+      "native_aliases": [
+        "黄鳍金枪鱼",
+        "黄鳍金枪鱼罐头"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "卡洛斯•阿尔博的孩子们有限公司",
+      "actor_aliases": [
+        "卡洛斯•阿尔博的孩子们有限公司",
+        "ALBO公司",
+        "HIJOS DE CARLOS ALBO，S.L.U"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-023",
+      "instrument_id": "600097.SH",
+      "page": 9,
+      "name": "金枪鱼",
+      "native_aliases": [
+        "金枪鱼"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "艾斯特拉斯贸易有限公司",
+      "actor_aliases": [
+        "艾斯特拉斯贸易有限公司",
+        "ESTELAS公司",
+        "Estelas贸易公司",
+        "ESTELAS TRADING,S.L.U"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "原境外贸易平台与生产企业协同，不扩大为本期捕捞生产"
+    },
+    {
+      "condition_id": "600097.SH-action-024",
+      "instrument_id": "600097.SH",
+      "page": 9,
+      "name": "鲭鱼",
+      "native_aliases": [
+        "鲭鱼"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "艾斯特拉斯贸易有限公司",
+      "actor_aliases": [
+        "艾斯特拉斯贸易有限公司",
+        "ESTELAS公司",
+        "Estelas贸易公司",
+        "ESTELAS TRADING,S.L.U"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": "原境外贸易平台与生产企业协同，不扩大为本期捕捞生产"
+    },
+    {
+      "condition_id": "600097.SH-action-025",
+      "instrument_id": "600097.SH",
+      "page": 18,
+      "name": "远洋捕捞",
+      "native_aliases": [
+        "远洋捕捞"
+      ],
+      "source_actions": [
+        "operates"
+      ],
+      "source_actor": "上海开创远洋渔业有限公司",
+      "actor_aliases": [
+        "上海开创远洋渔业有限公司",
+        "开创远洋",
+        "全资子公司"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-026",
+      "instrument_id": "600097.SH",
+      "page": 18,
+      "name": "远洋捕捞",
+      "native_aliases": [
+        "远洋捕捞"
+      ],
+      "source_actions": [
+        "operates"
+      ],
+      "source_actor": "泛太食品（马绍尔群岛）有限公司",
+      "actor_aliases": [
+        "泛太食品（马绍尔群岛）有限公司"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-027",
+      "instrument_id": "600097.SH",
+      "page": 18,
+      "name": "远洋捕捞",
+      "native_aliases": [
+        "远洋捕捞"
+      ],
+      "source_actions": [
+        "operates"
+      ],
+      "source_actor": "泛太渔业（马绍尔群岛）有限公司",
+      "actor_aliases": [
+        "泛太渔业（马绍尔群岛）有限公司"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-028",
+      "instrument_id": "600097.SH",
+      "page": 18,
+      "name": "远洋捕捞",
+      "native_aliases": [
+        "远洋捕捞"
+      ],
+      "source_actions": [
+        "operates"
+      ],
+      "source_actor": "文森特（密克罗尼西亚）渔业有限公司",
+      "actor_aliases": [
+        "文森特（密克罗尼西亚）渔业有限公司"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-029",
+      "instrument_id": "600097.SH",
+      "page": 18,
+      "name": "食品加工业",
+      "native_aliases": [
+        "食品加工业",
+        "食品加工"
+      ],
+      "source_actions": [
+        "operates"
+      ],
+      "source_actor": "泛太食品（马绍尔群岛）有限公司",
+      "actor_aliases": [
+        "泛太食品（马绍尔群岛）有限公司"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-030",
+      "instrument_id": "600097.SH",
+      "page": 134,
+      "name": "鱼类",
+      "native_aliases": [
+        "鱼类"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "亚太金枪鱼私人有限公司",
+      "actor_aliases": [
+        "亚太金枪鱼私人有限公司"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-031",
+      "instrument_id": "600097.SH",
+      "page": 134,
+      "name": "鱼产品",
+      "native_aliases": [
+        "鱼产品"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "亚太金枪鱼私人有限公司",
+      "actor_aliases": [
+        "亚太金枪鱼私人有限公司"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-032",
+      "instrument_id": "600097.SH",
+      "page": 134,
+      "name": "水产品",
+      "native_aliases": [
+        "水产品"
+      ],
+      "source_actions": [
+        "processes"
+      ],
+      "source_actor": "舟山环太海洋食品有限公司",
+      "actor_aliases": [
+        "舟山环太海洋食品有限公司",
+        "舟山环太",
+        "岱山加工厂",
+        "环太公司"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-033",
+      "instrument_id": "600097.SH",
+      "page": 134,
+      "name": "水产品",
+      "native_aliases": [
+        "水产品"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "舟山环太海洋食品有限公司",
+      "actor_aliases": [
+        "舟山环太海洋食品有限公司",
+        "舟山环太",
+        "岱山加工厂",
+        "环太公司"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-034",
+      "instrument_id": "600097.SH",
+      "page": 134,
+      "name": "罐头食品",
+      "native_aliases": [
+        "罐头食品"
+      ],
+      "source_actions": [
+        "processes"
+      ],
+      "source_actor": "卡洛斯•阿尔博的孩子们有限公司",
+      "actor_aliases": [
+        "卡洛斯•阿尔博的孩子们有限公司",
+        "ALBO公司",
+        "HIJOS DE CARLOS ALBO，S.L.U"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-035",
+      "instrument_id": "600097.SH",
+      "page": 134,
+      "name": "海上运输",
+      "native_aliases": [
+        "海上运输"
+      ],
+      "source_actions": [
+        "provides_service"
+      ],
+      "source_actor": "康隆（香港）航运有限公司",
+      "actor_aliases": [
+        "康隆（香港）航运有限公司",
+        "康隆公司"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-036",
+      "instrument_id": "600097.SH",
+      "page": 134,
+      "name": "鱼产品",
+      "native_aliases": [
+        "鱼产品",
+        "海鲜"
+      ],
+      "source_actions": [
+        "purchases"
+      ],
+      "source_actor": "法国小溪海鲜公司",
+      "actor_aliases": [
+        "法国小溪海鲜公司",
+        "FCS公司",
+        "FRENCH CREEK SEAFOOD LTD."
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-037",
+      "instrument_id": "600097.SH",
+      "page": 134,
+      "name": "鱼产品",
+      "native_aliases": [
+        "鱼产品",
+        "海鲜"
+      ],
+      "source_actions": [
+        "processes"
+      ],
+      "source_actor": "法国小溪海鲜公司",
+      "actor_aliases": [
+        "法国小溪海鲜公司",
+        "FCS公司",
+        "FRENCH CREEK SEAFOOD LTD."
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-038",
+      "instrument_id": "600097.SH",
+      "page": 134,
+      "name": "鱼产品",
+      "native_aliases": [
+        "鱼产品",
+        "海鲜"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "法国小溪海鲜公司",
+      "actor_aliases": [
+        "法国小溪海鲜公司",
+        "FCS公司",
+        "FRENCH CREEK SEAFOOD LTD."
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    },
+    {
+      "condition_id": "600097.SH-action-039",
+      "instrument_id": "600097.SH",
+      "page": 134,
+      "name": "渔货",
+      "native_aliases": [
+        "渔货",
+        "渔货贸易"
+      ],
+      "source_actions": [
+        "sells"
+      ],
+      "source_actor": "艾斯特拉斯贸易有限公司",
+      "actor_aliases": [
+        "艾斯特拉斯贸易有限公司",
+        "ESTELAS公司",
+        "Estelas贸易公司",
+        "ESTELAS TRADING,S.L.U"
+      ],
+      "subject_scope": "named_subsidiary",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31",
+      "qualifier": null
+    }
+  ],
+  "actor_aliases": {
+    "上海开创远洋渔业有限公司": [
+      "开创远洋",
+      "全资子公司"
+    ],
+    "舟山环太海洋食品有限公司": [
+      "舟山环太",
+      "岱山加工厂",
+      "环太公司"
+    ],
+    "卡洛斯•阿尔博的孩子们有限公司": [
+      "ALBO公司",
+      "HIJOS DE CARLOS ALBO，S.L.U"
+    ],
+    "法国小溪海鲜公司": [
+      "FCS公司",
+      "FRENCH CREEK SEAFOOD LTD."
+    ],
+    "艾斯特拉斯贸易有限公司": [
+      "ESTELAS公司",
+      "Estelas贸易公司",
+      "ESTELAS TRADING,S.L.U"
+    ],
+    "康隆（香港）航运有限公司": [
+      "康隆公司"
+    ],
+    "天津海泰企业孵化服务有限公司": [
+      "海泰孵化器"
+    ]
+  },
+  "answers": {
+    "600082.SH": {
+      "principal_business": {
+        "pages": [
+          11,
+          12,
+          13,
+          17,
+          27,
+          28,
+          170,
+          172
+        ],
+        "required_groups": [
+          [
+            "工业园区",
+            "园区运营"
+          ],
+          [
+            "产业投资"
+          ],
+          [
+            "孵化"
+          ],
+          [
+            "招投联动",
+            "招商"
+          ],
+          [
+            "方信"
+          ],
+          [
+            "9月30日",
+            "9 月30 日",
+            "2025/9/30"
+          ]
+        ],
+        "substance": "园区运营核心、产业投资增量、孵化服务与招商投资孵化模式、参股产业基金原边界；子公司房地产开发商品销售物业咨询，方信2025-9-30失控退出非全年。"
+      },
+      "products_services": {
+        "pages": [
+          11,
+          12,
+          13,
+          16,
+          27,
+          172
+        ],
+        "required_groups": [
+          [
+            "园区"
+          ],
+          [
+            "咨询"
+          ],
+          [
+            "培训"
+          ],
+          [
+            "政策"
+          ],
+          [
+            "资源对接"
+          ],
+          [
+            "用工"
+          ],
+          [
+            "物业"
+          ],
+          [
+            "房产",
+            "房地产"
+          ],
+          [
+            "代理人"
+          ]
+        ],
+        "substance": "园区载体租售和数字服务平台、旗下孵化咨询培训政策、资源对接和用工服务、物业子公司；商品贸易报告期仅代理净额，不集团化基金/入园企业商品。"
+      },
+      "revenue_model": {
+        "pages": [
+          15,
+          16,
+          18,
+          106,
+          107,
+          111,
+          156,
+          157,
+          182,
+          200
+        ],
+        "required_groups": [
+          [
+            "竣工"
+          ],
+          [
+            "验收"
+          ],
+          [
+            "购房款"
+          ],
+          [
+            "交接",
+            "交付通知"
+          ],
+          [
+            "控制权"
+          ],
+          [
+            "佣金",
+            "手续费"
+          ],
+          [
+            "直线法"
+          ],
+          [
+            "租金"
+          ],
+          [
+            "某一时点",
+            "时点"
+          ],
+          [
+            "某一时段",
+            "时段"
+          ]
+        ],
+        "substance": "房地产竣工验收合同购房款交接或交付通知签收期满，商品交付控制权主责总额/代理佣金净额且报告期仅代理；经营租赁期间直线租金，时点419135369.86/时段43468.30，集团与母公司栏目不借额、关联本期空。"
+      }
+    },
+    "600097.SH": {
+      "principal_business": {
+        "pages": [
+          8,
+          9,
+          18,
+          19,
+          133,
+          134
+        ],
+        "required_groups": [
+          [
+            "金枪鱼"
+          ],
+          [
+            "磷虾"
+          ],
+          [
+            "捕捞"
+          ],
+          [
+            "加工"
+          ],
+          [
+            "贸易"
+          ],
+          [
+            "运输"
+          ],
+          [
+            "中西太平洋"
+          ],
+          [
+            "南极"
+          ],
+          [
+            "合作"
+          ],
+          [
+            "ALBO",
+            "阿尔博"
+          ]
+        ],
+        "substance": "一鱼一虾、捕捞加工贸易运输一体化、中西太平洋围网/南极江苏深蓝合作，境内环太境外ALBO/FCS/Estelas/康隆原子公司控制，制造分类不替代实际渔业语义。"
+      },
+      "products_services": {
+        "pages": [
+          8,
+          9,
+          11,
+          12,
+          18,
+          19,
+          134
+        ],
+        "required_groups": [
+          [
+            "鲣鱼"
+          ],
+          [
+            "黄鳍"
+          ],
+          [
+            "冻虾"
+          ],
+          [
+            "虾粉"
+          ],
+          [
+            "金枪鱼罐头"
+          ],
+          [
+            "罐头方便食品"
+          ],
+          [
+            "鱼柳"
+          ],
+          [
+            "沙丁鱼"
+          ],
+          [
+            "鱿鱼"
+          ],
+          [
+            "鲭鱼"
+          ],
+          [
+            "运输"
+          ]
+        ],
+        "substance": "具名鱼种、冻虾虾粉、罐头食品和方便食品、鱼柳、ALBO沙丁鱼鱿鱼黄鳍罐头、冷冻金枪鱼运输人员物资转运及海外贸易；岱山原料鱼加工投入、采购加工销售分别明确。"
+      },
+      "revenue_model": {
+        "pages": [
+          11,
+          12,
+          13,
+          84,
+          85,
+          122,
+          135,
+          144,
+          145,
+          156
+        ],
+        "required_groups": [
+          [
+            "直销"
+          ],
+          [
+            "大副收据"
+          ],
+          [
+            "结算单"
+          ],
+          [
+            "控制权"
+          ],
+          [
+            "内销"
+          ],
+          [
+            "外销"
+          ],
+          [
+            "航次结束"
+          ],
+          [
+            "分部"
+          ],
+          [
+            "母公司"
+          ]
+        ],
+        "substance": "主营直销，海外渔货交接单大副收据与国内结算单、虾粉控制权、罐头鱼柳内外交付、贸易控制权、运输航次结束；收入分部交叉与重要非全资主体、母公司收入不适用，本期空和租金费用不升级收入。"
+      }
+    }
+  },
+  "negative_conditions": [
+    {
+      "condition_id": "600082.SH-negative-001",
+      "instrument_id": "600082.SH",
+      "page": 182,
+      "name": "仅上期关联销售",
+      "counterparty": "天津滨海高新区物业管理有限公司",
+      "content": "服务费",
+      "prior_value": "2,352,476.19",
+      "forbidden": "不得生成本期Segment/Measurement/肯定正文，不借列不造零"
+    },
+    {
+      "condition_id": "600082.SH-negative-002",
+      "instrument_id": "600082.SH",
+      "page": 182,
+      "name": "仅上期关联销售",
+      "counterparty": "天津滨海高新区企业创新服务有限公司",
+      "content": "销售房产",
+      "prior_value": "294,862,583.36",
+      "forbidden": "不得生成本期Segment/Measurement/肯定正文，不借列不造零"
+    },
+    {
+      "condition_id": "600082.SH-negative-003",
+      "instrument_id": "600082.SH",
+      "page": 182,
+      "name": "仅上期关联销售",
+      "counterparty": "滨海高新区开发建设有限公司",
+      "content": "服务费",
+      "prior_value": "44,232.08",
+      "forbidden": "不得生成本期Segment/Measurement/肯定正文，不借列不造零"
+    },
+    {
+      "condition_id": "600082.SH-negative-004",
+      "instrument_id": "600082.SH",
+      "page": 15,
+      "name": "销售模式不适用",
+      "forbidden_headers": [
+        "主营业务分销售模式"
+      ],
+      "forbidden_names": [
+        "不适用"
+      ]
+    },
+    {
+      "condition_id": "600082.SH-negative-005",
+      "instrument_id": "600082.SH",
+      "page": 156,
+      "name": "合并其他业务本期空",
+      "names": [
+        "其他业务"
+      ],
+      "forbidden_headers": [
+        "营业收入"
+      ]
+    },
+    {
+      "condition_id": "600082.SH-negative-006",
+      "instrument_id": "600082.SH",
+      "page": 200,
+      "name": "母公司其他业务本期空",
+      "names": [
+        "其他业务"
+      ],
+      "subject_scope": "issuer"
+    },
+    {
+      "condition_id": "600082.SH-negative-007",
+      "instrument_id": "600082.SH",
+      "page": 157,
+      "name": "业务类型成本空",
+      "names": [
+        "商品销售"
+      ],
+      "state": "商品销售本期424569.35是收入；成本空，不左移或造零；本集团和合计同义镜像不重复条件"
+    },
+    {
+      "condition_id": "600082.SH-negative-008",
+      "instrument_id": "600082.SH",
+      "page": 172,
+      "name": "重要非全资不适用",
+      "forbidden_headers": [
+        "重要非全资子公司"
+      ]
+    },
+    {
+      "condition_id": "600082.SH-negative-009",
+      "instrument_id": "600082.SH",
+      "page": 173,
+      "name": "合营联营不适用",
+      "forbidden_headers": [
+        "重要联营",
+        "重要合营"
+      ]
+    },
+    {
+      "condition_id": "600082.SH-negative-010",
+      "instrument_id": "600082.SH",
+      "page": 182,
+      "name": "受托和出租均不适用",
+      "forbidden_headers": [
+        "受托管理",
+        "委托管理",
+        "本公司作为出租方"
+      ]
+    },
+    {
+      "condition_id": "600082.SH-negative-011",
+      "instrument_id": "600082.SH",
+      "page": 182,
+      "name": "采购本期空",
+      "counterparty": "天津海泰科技创新服务有限公司",
+      "prior_value": "45,004.72",
+      "forbidden": "不得依据仅上期服务费生成本期收入或当前采购"
+    },
+    {
+      "condition_id": "600082.SH-negative-012",
+      "instrument_id": "600082.SH",
+      "page": 53,
+      "name": "接受劳务非收入",
+      "checked_pages": [
+        53,
+        54
+      ],
+      "values": [
+        "1108235.94",
+        "2135.92",
+        "752663.00",
+        "9731.23",
+        "1543448.59",
+        "-124452.55",
+        "123258.27",
+        "3509113.76",
+        "6924134.16"
+      ]
+    },
+    {
+      "condition_id": "600082.SH-negative-013",
+      "instrument_id": "600082.SH",
+      "page": 49,
+      "name": "历史更正非2025收入",
+      "checked_pages": [
+        49,
+        50,
+        51,
+        187,
+        188,
+        189
+      ],
+      "state": "2022/2023收入会计差错更正不能当本期收入"
+    },
+    {
+      "condition_id": "600082.SH-negative-014",
+      "instrument_id": "600082.SH",
+      "page": 170,
+      "name": "方信退出边界",
+      "actor": "天津海发方信置地有限公司",
+      "state": "2025年9月30日工商变更完成失控；不能肯定全年并表或期末控制"
+    },
+    {
+      "condition_id": "600082.SH-negative-015",
+      "instrument_id": "600082.SH",
+      "page": 27,
+      "name": "百竹增资期后事项",
+      "state": "2026年3月债转股20,000万元不变2025营业收入或当前商品活动"
+    },
+    {
+      "condition_id": "600082.SH-negative-016",
+      "instrument_id": "600082.SH",
+      "page": 12,
+      "name": "参股投资不集团商品生产",
+      "names": [
+        "半导体",
+        "集成电路"
+      ],
+      "state": "基金已投项目和园区集聚不得生成为本公司商品生产销售"
+    },
+    {
+      "condition_id": "600082.SH-negative-017",
+      "instrument_id": "600082.SH",
+      "page": 17,
+      "name": "成本费用非营业收入",
+      "checked_pages": [
+        16,
+        17,
+        158,
+        159,
+        160
+      ],
+      "forbidden_headers": [
+        "营业成本",
+        "税金及附加",
+        "销售费用",
+        "管理费用",
+        "财务费用"
+      ]
+    },
+    {
+      "condition_id": "600097.SH-negative-001",
+      "instrument_id": "600097.SH",
+      "page": 144,
+      "name": "仅上期关联销售",
+      "counterparty": "上海菜管家电子商务有限公司",
+      "content": "出售商品",
+      "prior_value": "431,886.72",
+      "forbidden": "不得生成本期Segment/Measurement或肯定正文，不借列不造零"
+    },
+    {
+      "condition_id": "600097.SH-negative-002",
+      "instrument_id": "600097.SH",
+      "page": 122,
+      "name": "海上运输国内收入空",
+      "source_segment": "海上运输分部",
+      "names": [
+        "国内"
+      ],
+      "forbidden": "不得借国外6765806.04或造零本期收入"
+    },
+    {
+      "condition_id": "600097.SH-negative-003",
+      "instrument_id": "600097.SH",
+      "page": 122,
+      "name": "未履约非本期收入",
+      "values": [
+        "376912.41"
+      ],
+      "state": "预计2026确认，不变2025收入"
+    },
+    {
+      "condition_id": "600097.SH-negative-004",
+      "instrument_id": "600097.SH",
+      "page": 135,
+      "name": "合营联营不适用",
+      "forbidden_headers": [
+        "重要合营",
+        "重要联营"
+      ]
+    },
+    {
+      "condition_id": "600097.SH-negative-005",
+      "instrument_id": "600097.SH",
+      "page": 144,
+      "name": "受托出租不适用",
+      "forbidden_headers": [
+        "受托管理",
+        "委托管理",
+        "本公司作为出租方"
+      ]
+    },
+    {
+      "condition_id": "600097.SH-negative-006",
+      "instrument_id": "600097.SH",
+      "page": 156,
+      "name": "母公司营业收入不适用",
+      "forbidden_headers": [
+        "母公司营业收入"
+      ],
+      "state": "不可用子公司或合并主营填母公司；成本法投资收益50000000元非营业收入"
+    },
+    {
+      "condition_id": "600097.SH-negative-007",
+      "instrument_id": "600097.SH",
+      "page": 143,
+      "name": "会展本期空",
+      "counterparty": "上海东艺会展服务有限公司",
+      "prior_value": "279,520.00",
+      "forbidden": "不得生成本期采购或收入"
+    },
+    {
+      "condition_id": "600097.SH-negative-008",
+      "instrument_id": "600097.SH",
+      "page": 145,
+      "name": "承租租金非营业收入",
+      "values": [
+        "15565300.00",
+        "11675875.50",
+        "100375.00",
+        "76979.00",
+        "4804338.79",
+        "1794414.23",
+        "13143.52"
+      ]
+    },
+    {
+      "condition_id": "600097.SH-negative-009",
+      "instrument_id": "600097.SH",
+      "page": 14,
+      "name": "客户排名非渠道",
+      "state": "FRINSA等客户与供货商不是销售模式；主营模式为直销"
+    },
+    {
+      "condition_id": "600097.SH-negative-010",
+      "instrument_id": "600097.SH",
+      "page": 13,
+      "name": "成本列表不反推采购",
+      "names": [
+        "燃料",
+        "原料鱼",
+        "辅料",
+        "铁罐头",
+        "渔用物资",
+        "船用物资"
+      ],
+      "state": "成本构成不独立推采购或具名供应商；p8金枪鱼加工实际投入保留"
+    },
+    {
+      "condition_id": "600097.SH-negative-011",
+      "instrument_id": "600097.SH",
+      "page": 20,
+      "name": "2026经营目标非实际",
+      "values": [
+        "27.25",
+        "1.17"
+      ],
+      "state": "未来营业收入和利润目标不是2025实际"
+    },
+    {
+      "condition_id": "600097.SH-negative-012",
+      "instrument_id": "600097.SH",
+      "page": 143,
+      "name": "服务收费不成商品",
+      "names": [
+        "船员服务费",
+        "餐费",
+        "会展服务费",
+        "接受劳务"
+      ],
+      "state": "原服务采购和船员配套可保留，不生成实体商品销售生产"
+    },
+    {
+      "condition_id": "600097.SH-negative-013",
+      "instrument_id": "600097.SH",
+      "page": 133,
+      "name": "普通子公司不变联营",
+      "checked_pages": [
+        133,
+        134
+      ],
+      "state": "亚太/康隆51%合并子公司不因重要非全资而变集团外联营"
+    },
+    {
+      "condition_id": "600097.SH-negative-014",
+      "instrument_id": "600097.SH",
+      "page": 123,
+      "name": "成本费用非收入",
+      "checked_pages": [
+        12,
+        13,
+        123,
+        124
+      ],
+      "forbidden_headers": [
+        "营业成本",
+        "税金及附加",
+        "销售费用",
+        "管理费用"
+      ]
+    }
+  ],
+  "denominator_method": "独立新官方本期收入原格＋具名成立动作＋六实质正文；分部交叉保留原列，镜像的本集团/合计同一实质不重复，不继承364/669，不依据输出回填；Measurement只计准确率。 后继依据A裁决独立增加海泰五打印零结转项目与五万元租金；原160与首次分数原样保留。",
+  "positive_count": 170,
+  "negative_count": 31,
+  "successor_contract_authorization": {
+    "workflow": "docs/development/ab_role_development_workflow.md v1",
+    "a_role_message": "本次A角裁决170正向＋31负例并授权连续同源修复；最多两次后继正式轮，每轮≤300秒且共享≤50000token，不互借",
+    "created_at": "2026-10-14T04:57:44.037165+00:00",
+    "original_contract_sha256": "3d71176590e9c4219c396ccb5d0ab8ede7ffc624046545e25f48a4ddc87ab3ba",
+    "original_denominator": 160,
+    "successor_denominator": 170,
+    "negative_denominator": 31,
+    "max_successor_formal_rounds": 2,
+    "production_authorization": "not_authorized",
+    "scale_quality_claim_allowed": false
+  }
+}

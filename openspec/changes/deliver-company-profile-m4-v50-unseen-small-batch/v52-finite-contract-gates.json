@@ -1,0 +1,30 @@
+{
+  "frozen_whole_round_seconds_limit": 300,
+  "frozen_shared_token_limit": 50000,
+  "measured_whole_round_seconds": 215.68091830518097,
+  "measured_tokens": 0,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 170,
+    "denominator": 170,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 448,
+    "denominator": 448,
+    "value": 1.0
+  },
+  "numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "negative_passed": 31,
+  "successor_contract_gates_met": true,
+  "source_review_expansion_gates_met": false,
+  "source_review_elapsed_limit": 192.3673534458503,
+  "reason": "per-company remaining execution time persisted as existing merged source_review expansion threshold; retain original report and independently check authorized frozen whole-round300seconds",
+  "archive_not_authorized_until_a_finite_acceptance": true,
+  "production": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

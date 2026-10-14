@@ -1,0 +1,21 @@
+{
+  "created_at": "2026-10-14T05:38:08.270446+00:00",
+  "reports": {
+    "600082.SH": {
+      "pdf_sha256": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+      "text_pages": 59,
+      "layout_pages": 15,
+      "official_text_exact": true,
+      "fixture_layout_exact": true
+    },
+    "600097.SH": {
+      "pdf_sha256": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+      "text_pages": 39,
+      "layout_pages": 14,
+      "official_text_exact": true,
+      "fixture_layout_exact": true
+    }
+  },
+  "text_file_sha256": "7694f11b408e5c03b2cb10126568075fdf5c16d5c114e6cec22ababde95c8dd8",
+  "layout_file_sha256": "6345bbe0d033545747d9f3a4889b4e3583320d8f84c1516b8fb225c0bdbe8417"
+}

@@ -1,0 +1,902 @@
+diff --git a/research/company_profile/core_assessment_projection.py b/research/company_profile/core_assessment_projection.py
+index d8c5fd05..d4396ccb 100644
+--- a/research/company_profile/core_assessment_projection.py
++++ b/research/company_profile/core_assessment_projection.py
+@@ -44,7 +44,7 @@ _COMPLETE_COMPANY_BUSINESS = re.compile(
+ )
+ _STEEL_BUSINESS = re.compile(r"公司是.{8,260}主要产品有.{2,80}")
+ _NARRATIVE_BUSINESS = re.compile(
+-    r"本公司及控股子公司向|本公司及控股子公司为|与海外经营实体签订商标及字号使用许可协议|一是同仁堂国药聚焦核心业务发展|同仁堂科技中药创新药|公司以服务收益和规模集拼收益为核心|受托方由|未确认收入及待履行合同|公司生产经营及工程项目建设所需|公司物流体系|新能源物流方面|公司作为以传统中成药生产与销售为主|公司及下属子公司拥有多家药材种植基地|同仁堂商业下属零售药店|公司着力构建中药全产业链|一是深化营销体系转型|其他原因的合并范围变动|本公司生产制造分部商品销售|项目支撑持续稳固|一体两翼持续推进|本公司收入确认的具体方法|本公司主要通过线下、线上|本公司没有重要的合营|代收代付事项处理|风景名胜资源有偿使用费|采购金额|公司作为国内领先的集|产品情况|公司沿用的采购模式|公司的销售系统及其下属子公司|公司与经销商每年|公司销售系统与经销商签订销售合同|业务包含|报告期内公司从事的业务情况|公司所从事的主要业务|不再纳入合并财务报表范围|报告期内，公司共实现营业收入|上年同期处置全资子公司|主要研发项目基本情况|公司核心产品|作为出租人的经营租赁|转租使用权资产取得的收入|增量配网售电企业|电力设施校验|联网通信发展稳健|公司已成长为|公司药[（(]产[)）]品销售情况|本集团的收入主要来自于|本集团对于提供的|本集团在履行了合同|综合服务包括|主营业务的其他收入系|公司深耕|不动产经营方面|公司立足|目前公司的|未实质控制|未将其纳入本期合并范围|公司的收入主要包括|公司营业收入主要包括|主要系公司战略调整|公司不再纳入公司财务报表合并范围|公司聚焦|公司主要从事|公路投资运营方面|公司持续深化|本期是否存在丧失子公司控制权|天欣公司不再纳入|作为出租方的租赁分类|公司不同销售方式下收入|公司参股子公司|报告期内取得和处置子公司的情况|产能释放阶段|并网发电|吸收合并|一体化电视方案|全力办好|紧抓政企业务|主营业务分行业、分产品、分地区、分销售模式情况的说明|产销量情况说明|主要控股参股公司分析|企业集团的构成|公司主要负责|两大核心领域|循环经济产业链|公司已建成|公司开发了|公司生产的产品|公司全资子公司|具体收入确认方式|作为出租人|管道杆路租赁收入|紧抓政企业务|本次交易完成|公司饲料贸易业务板块|公司是[^。]+所属的专业从事[^。]+综合型能源企业|锂电池业务本期仅统计|公司丧失对[^。]+控制权|本公司受托管理/承包情况表|本公司作为出租方|出售商品/提供劳务|作为[^。]{2,80}(?:上市公司|工业企业)[^。]{2,}研发制造|公司坚持以[^。]{2,150}为核心[^。]*。公司持续深耕"
++    r"本公司及控股子公司向|本公司及控股子公司为|与海外经营实体签订商标及字号使用许可协议|一是同仁堂国药聚焦核心业务发展|同仁堂科技中药创新药|公司以服务收益和规模集拼收益为核心|受托方由|未确认收入及待履行合同|公司生产经营及工程项目建设所需|公司物流体系|新能源物流方面|公司作为以传统中成药生产与销售为主|公司及下属子公司拥有多家药材种植基地|同仁堂商业下属零售药店|公司着力构建中药全产业链|一是深化营销体系转型|其他原因的合并范围变动|本公司生产制造分部商品销售|项目支撑持续稳固|一体两翼持续推进|本公司收入主要来源于以下业务类型|对于本集团自第三方取得商品控制权后|报告分部|资源对接|用工保障|政策咨询服务|ALBO公司围绕品牌升级|母公司财务报表主要项目注释|本公司收入确认的具体方法|本公司主要通过线下、线上|本公司没有重要的合营|代收代付事项处理|风景名胜资源有偿使用费|采购金额|公司作为国内领先的集|产品情况|公司沿用的采购模式|公司的销售系统及其下属子公司|公司与经销商每年|公司销售系统与经销商签订销售合同|业务包含|报告期内公司从事的业务情况|公司所从事的主要业务|不再纳入合并财务报表范围|报告期内，公司共实现营业收入|上年同期处置全资子公司|主要研发项目基本情况|公司核心产品|作为出租人的经营租赁|转租使用权资产取得的收入|增量配网售电企业|电力设施校验|联网通信发展稳健|公司已成长为|公司药[（(]产[)）]品销售情况|本集团的收入主要来自于|本集团对于提供的|本集团在履行了合同|综合服务包括|主营业务的其他收入系|公司深耕|不动产经营方面|公司立足|目前公司的|未实质控制|未将其纳入本期合并范围|公司的收入主要包括|公司营业收入主要包括|主要系公司战略调整|公司不再纳入公司财务报表合并范围|公司聚焦|公司主要从事|公路投资运营方面|公司持续深化|本期是否存在丧失子公司控制权|天欣公司不再纳入|作为出租方的租赁分类|公司不同销售方式下收入|公司参股子公司|报告期内取得和处置子公司的情况|产能释放阶段|并网发电|吸收合并|一体化电视方案|全力办好|紧抓政企业务|主营业务分行业、分产品、分地区、分销售模式情况的说明|产销量情况说明|主要控股参股公司分析|企业集团的构成|公司主要负责|两大核心领域|循环经济产业链|公司已建成|公司开发了|公司生产的产品|公司全资子公司|具体收入确认方式|作为出租人|管道杆路租赁收入|紧抓政企业务|本次交易完成|公司饲料贸易业务板块|公司是[^。]+所属的专业从事[^。]+综合型能源企业|锂电池业务本期仅统计|公司丧失对[^。]+控制权|本公司受托管理/承包情况表|本公司作为出租方|出售商品/提供劳务|作为[^。]{2,80}(?:上市公司|工业企业)[^。]{2,}研发制造|公司坚持以[^。]{2,150}为核心[^。]*。公司持续深耕"
+ )
+ _SPEC_PRODUCT = re.compile(r"^(?:厚度|宽度|长度)")
+ _PRODUCT_PATTERN = re.compile(
+@@ -70,7 +70,7 @@ _REVENUE_BLOCK_PATTERN = re.compile(
+ )
+ _REVENUE_NEGATION_PREFIX = re.compile(r"(尚未|还未|仍未|并未|没有|未|不|拟|计划)$")
+ _REPAIR_REVENUE_INFLOW_PATTERN = re.compile(
+-    r"(本公司及控股子公司向|本公司及控股子公司为|与海外经营实体签订商标及字号使用许可协议|一是同仁堂国药聚焦核心业务发展|同仁堂科技中药创新药|公司以服务收益和规模集拼收益为核心|受托方由|未确认收入及待履行合同|公司生产经营及工程项目建设所需|公司物流体系|新能源物流方面|公司作为以传统中成药生产与销售为主|公司及下属子公司拥有多家药材种植基地|同仁堂商业下属零售药店|公司着力构建中药全产业链|一是深化营销体系转型|其他原因的合并范围变动|本公司生产制造分部商品销售|项目支撑持续稳固|一体两翼持续推进|本公司收入确认的具体方法|本公司主要通过线下、线上|本公司没有重要的合营|代收代付事项处理|风景名胜资源有偿使用费|采购金额|公司作为国内领先的集|产品情况|公司沿用的采购模式|公司的销售系统及其下属子公司|公司与经销商每年|公司销售系统与经销商签订销售合同|业务包含|报告期内公司从事的业务情况|公司所从事的主要业务|不再纳入合并财务报表范围|报告期内，公司共实现营业收入|上年同期处置全资子公司|主要研发项目基本情况|公司核心产品|作为出租人的经营租赁|转租使用权资产取得的收入|增量配网售电企业|电力设施校验|联网通信发展稳健|公司已成长为|公司药[（(]产[)）]品销售情况|本集团的收入主要来自于|本集团对于提供的|本集团在履行了合同|综合服务包括|主营业务的其他收入系|公司深耕|不动产经营方面|公司立足|目前公司的|未实质控制|未将其纳入本期合并范围|公司的收入主要包括|公司营业收入主要包括|主要系公司战略调整|公司不再纳入公司财务报表合并范围|公司主要从事|本期是否存在丧失子公司控制权|天欣公司不再纳入|公司不同销售方式下收入|作为出租方的租赁分类|全部营业收入|按销售渠道|直销|经销|公司以全资子公司|管道杆路租赁收入|租赁分类|本公司作为出租人|具体收入确认方式|固定的周期性利率|信用等级|公司生产的产品|具体会计政策描述如下|公司定价和竞价|进行销售|主要责任人|重要的支付条款|款到发货|公司通过招投标|在某一时点确认收入|本公司受托管理/承包情况表|本公司电力销售在|中长期、现货、绿电交易|本公司按照业务类型确定的收入确认具体原则|本公司与[^。]+购销商品、提供服务的关联交易|本公司作为出租方|出售商品/提供劳务|对外交易收入|产品定价按照|年度供货框架协议|票款收入|运输服务交易价格|常旅客里程奖励计划|租金收入|清算补偿费收入|本集团利用自有及控制的船舶开展|公司盈利主要来自发电收入|营业收入主要来源于|"
++    r"(本公司及控股子公司向|本公司及控股子公司为|与海外经营实体签订商标及字号使用许可协议|一是同仁堂国药聚焦核心业务发展|同仁堂科技中药创新药|公司以服务收益和规模集拼收益为核心|受托方由|未确认收入及待履行合同|公司生产经营及工程项目建设所需|公司物流体系|新能源物流方面|公司作为以传统中成药生产与销售为主|公司及下属子公司拥有多家药材种植基地|同仁堂商业下属零售药店|公司着力构建中药全产业链|一是深化营销体系转型|其他原因的合并范围变动|本公司生产制造分部商品销售|项目支撑持续稳固|一体两翼持续推进|本公司收入主要来源于以下业务类型|对于本集团自第三方取得商品控制权后|报告分部|资源对接|用工保障|政策咨询服务|ALBO公司围绕品牌升级|母公司财务报表主要项目注释|本公司收入确认的具体方法|本公司主要通过线下、线上|本公司没有重要的合营|代收代付事项处理|风景名胜资源有偿使用费|采购金额|公司作为国内领先的集|产品情况|公司沿用的采购模式|公司的销售系统及其下属子公司|公司与经销商每年|公司销售系统与经销商签订销售合同|业务包含|报告期内公司从事的业务情况|公司所从事的主要业务|不再纳入合并财务报表范围|报告期内，公司共实现营业收入|上年同期处置全资子公司|主要研发项目基本情况|公司核心产品|作为出租人的经营租赁|转租使用权资产取得的收入|增量配网售电企业|电力设施校验|联网通信发展稳健|公司已成长为|公司药[（(]产[)）]品销售情况|本集团的收入主要来自于|本集团对于提供的|本集团在履行了合同|综合服务包括|主营业务的其他收入系|公司深耕|不动产经营方面|公司立足|目前公司的|未实质控制|未将其纳入本期合并范围|公司的收入主要包括|公司营业收入主要包括|主要系公司战略调整|公司不再纳入公司财务报表合并范围|公司主要从事|本期是否存在丧失子公司控制权|天欣公司不再纳入|公司不同销售方式下收入|作为出租方的租赁分类|全部营业收入|按销售渠道|直销|经销|公司以全资子公司|管道杆路租赁收入|租赁分类|本公司作为出租人|具体收入确认方式|固定的周期性利率|信用等级|公司生产的产品|具体会计政策描述如下|公司定价和竞价|进行销售|主要责任人|重要的支付条款|款到发货|公司通过招投标|在某一时点确认收入|本公司受托管理/承包情况表|本公司电力销售在|中长期、现货、绿电交易|本公司按照业务类型确定的收入确认具体原则|本公司与[^。]+购销商品、提供服务的关联交易|本公司作为出租方|出售商品/提供劳务|对外交易收入|产品定价按照|年度供货框架协议|票款收入|运输服务交易价格|常旅客里程奖励计划|租金收入|清算补偿费收入|本集团利用自有及控制的船舶开展|公司盈利主要来自发电收入|营业收入主要来源于|"
+     + _REVENUE_INFLOW_PATTERN.pattern[1:]
+ )
+ _PRODUCT_ACTIONS = frozenset(
+@@ -407,7 +407,7 @@ def _assess_products_services(
+                 or (
+                     source_delivery_repair
+                     and re.search(
+-                        r"本公司及控股子公司向|本公司及控股子公司为|与海外经营实体签订商标及字号使用许可协议|一是同仁堂国药聚焦核心业务发展|同仁堂科技中药创新药|公司以服务收益和规模集拼收益为核心|受托方由|未确认收入及待履行合同|公司生产经营及工程项目建设所需|公司物流体系|新能源物流方面|公司作为以传统中成药生产与销售为主|公司及下属子公司拥有多家药材种植基地|同仁堂商业下属零售药店|公司着力构建中药全产业链|一是深化营销体系转型|其他原因的合并范围变动|本公司生产制造分部商品销售|项目支撑持续稳固|一体两翼持续推进|本公司收入确认的具体方法|本公司主要通过线下、线上|本公司没有重要的合营|代收代付事项处理|风景名胜资源有偿使用费|采购金额|公司作为国内领先的集|产品情况|公司沿用的采购模式|公司的销售系统及其下属子公司|公司与经销商每年|公司销售系统与经销商签订销售合同|业务包含|报告期内公司从事的业务情况|公司所从事的主要业务|不再纳入合并财务报表范围|报告期内，公司共实现营业收入|上年同期处置全资子公司|主要研发项目基本情况|公司核心产品|作为出租人的经营租赁|转租使用权资产取得的收入|增量配网售电企业|电力设施校验|联网通信发展稳健|公司已成长为|公司药[（(]产[)）]品销售情况|本集团的收入主要来自于|本集团对于提供的|本集团在履行了合同|综合服务包括|主营业务的其他收入系|公司深耕|不动产经营方面|公司立足|目前公司的|未实质控制|未将其纳入本期合并范围|公司的收入主要包括|公司营业收入主要包括|主要系公司战略调整|公司不再纳入公司财务报表合并范围|公司聚焦|公司主要从事|公路投资运营方面|公司持续深化|本期是否存在丧失子公司控制权|天欣公司不再纳入|作为出租方的租赁分类|公司不同销售方式下收入|公司参股子公司|报告期内取得和处置子公司的情况|产能释放阶段|并网发电|吸收合并|一体化电视方案|全力办好|紧抓政企业务|主营业务分行业、分产品、分地区、分销售模式情况的说明|产销量情况说明|主要控股参股公司分析|企业集团的构成|公司主要负责|两大核心领域|循环经济产业链|公司已建成|公司开发了|公司生产的产品|公司全资子公司|具体收入确认方式|作为出租人|OEM&ODM|自发自用|本公司受托管理/承包情况表|本公司作为出租方|出售商品/提供劳务|锂电池业务本期仅统计|公司丧失对[^。]+控制权|绿证交易业务|核心主业|四大产业板块|主要产品包括|主要业务是|主要业务为|主要从事|主营业务为|主要经营|研发制造|核心提供商|公司持续深耕|产品畅销|已稳定量产|成功开拓|深化运营|自用光伏|综合能源|车队|KD|报告分部|客车产品研发|营业收入主要包括",
++                        r"本公司及控股子公司向|本公司及控股子公司为|与海外经营实体签订商标及字号使用许可协议|一是同仁堂国药聚焦核心业务发展|同仁堂科技中药创新药|公司以服务收益和规模集拼收益为核心|受托方由|未确认收入及待履行合同|公司生产经营及工程项目建设所需|公司物流体系|新能源物流方面|公司作为以传统中成药生产与销售为主|公司及下属子公司拥有多家药材种植基地|同仁堂商业下属零售药店|公司着力构建中药全产业链|一是深化营销体系转型|其他原因的合并范围变动|本公司生产制造分部商品销售|项目支撑持续稳固|一体两翼持续推进|本公司收入主要来源于以下业务类型|对于本集团自第三方取得商品控制权后|报告分部|资源对接|用工保障|政策咨询服务|ALBO公司围绕品牌升级|母公司财务报表主要项目注释|本公司收入确认的具体方法|本公司主要通过线下、线上|本公司没有重要的合营|代收代付事项处理|风景名胜资源有偿使用费|采购金额|公司作为国内领先的集|产品情况|公司沿用的采购模式|公司的销售系统及其下属子公司|公司与经销商每年|公司销售系统与经销商签订销售合同|业务包含|报告期内公司从事的业务情况|公司所从事的主要业务|不再纳入合并财务报表范围|报告期内，公司共实现营业收入|上年同期处置全资子公司|主要研发项目基本情况|公司核心产品|作为出租人的经营租赁|转租使用权资产取得的收入|增量配网售电企业|电力设施校验|联网通信发展稳健|公司已成长为|公司药[（(]产[)）]品销售情况|本集团的收入主要来自于|本集团对于提供的|本集团在履行了合同|综合服务包括|主营业务的其他收入系|公司深耕|不动产经营方面|公司立足|目前公司的|未实质控制|未将其纳入本期合并范围|公司的收入主要包括|公司营业收入主要包括|主要系公司战略调整|公司不再纳入公司财务报表合并范围|公司聚焦|公司主要从事|公路投资运营方面|公司持续深化|本期是否存在丧失子公司控制权|天欣公司不再纳入|作为出租方的租赁分类|公司不同销售方式下收入|公司参股子公司|报告期内取得和处置子公司的情况|产能释放阶段|并网发电|吸收合并|一体化电视方案|全力办好|紧抓政企业务|主营业务分行业、分产品、分地区、分销售模式情况的说明|产销量情况说明|主要控股参股公司分析|企业集团的构成|公司主要负责|两大核心领域|循环经济产业链|公司已建成|公司开发了|公司生产的产品|公司全资子公司|具体收入确认方式|作为出租人|OEM&ODM|自发自用|本公司受托管理/承包情况表|本公司作为出租方|出售商品/提供劳务|锂电池业务本期仅统计|公司丧失对[^。]+控制权|绿证交易业务|核心主业|四大产业板块|主要产品包括|主要业务是|主要业务为|主要从事|主营业务为|主要经营|研发制造|核心提供商|公司持续深耕|产品畅销|已稳定量产|成功开拓|深化运营|自用光伏|综合能源|车队|KD|报告分部|客车产品研发|营业收入主要包括",
+                         record.source_text or "",
+                     )
+                 )
+@@ -420,7 +420,7 @@ def _assess_products_services(
+             for record in supports
+             if isinstance(record, BusinessOverview)
+             and re.search(
+-                r"本公司及控股子公司向|本公司及控股子公司为|与海外经营实体签订商标及字号使用许可协议|一是同仁堂国药聚焦核心业务发展|同仁堂科技中药创新药|公司以服务收益和规模集拼收益为核心|受托方由|未确认收入及待履行合同|公司生产经营及工程项目建设所需|公司物流体系|新能源物流方面|公司作为以传统中成药生产与销售为主|公司及下属子公司拥有多家药材种植基地|同仁堂商业下属零售药店|公司着力构建中药全产业链|一是深化营销体系转型|其他原因的合并范围变动|本公司生产制造分部商品销售|项目支撑持续稳固|一体两翼持续推进|本公司收入确认的具体方法|本公司主要通过线下、线上|本公司没有重要的合营|代收代付事项处理|风景名胜资源有偿使用费|采购金额|公司作为国内领先的集|产品情况|公司沿用的采购模式|公司的销售系统及其下属子公司|公司与经销商每年|公司销售系统与经销商签订销售合同|业务包含|报告期内公司从事的业务情况|公司所从事的主要业务|不再纳入合并财务报表范围|报告期内，公司共实现营业收入|上年同期处置全资子公司|主要研发项目基本情况|公司核心产品|作为出租人的经营租赁|转租使用权资产取得的收入|增量配网售电企业|电力设施校验|联网通信发展稳健|公司已成长为|公司药[（(]产[)）]品销售情况|本集团的收入主要来自于|本集团对于提供的|本集团在履行了合同|综合服务包括|主营业务的其他收入系|公司深耕|不动产经营方面|公司立足|目前公司的|未实质控制|未将其纳入本期合并范围|公司的收入主要包括|公司营业收入主要包括|主要系公司战略调整|公司不再纳入公司财务报表合并范围|公司聚焦|公司主要从事|公路投资运营方面|公司持续深化|本期是否存在丧失子公司控制权|天欣公司不再纳入|作为出租方的租赁分类|公司不同销售方式下收入|公司参股子公司|报告期内取得和处置子公司的情况|产能释放阶段|并网发电|吸收合并|一体化电视方案|全力办好|紧抓政企业务|主营业务分行业、分产品、分地区、分销售模式情况的说明|产销量情况说明|主要控股参股公司分析|企业集团的构成|公司主要负责|两大核心领域|循环经济产业链|公司已建成|公司开发了|公司生产的产品|公司全资子公司|具体收入确认方式|作为出租人|OEM&ODM|自发自用|本公司受托管理/承包情况表|本公司作为出租方|出售商品/提供劳务|锂电池业务本期仅统计|公司丧失对[^。]+控制权|绿证交易业务|核心主业|四大产业板块|主要产品包括|主要产品有|产品矩阵|主要业务是|主要业务为|主要从事|主营业务为|主要经营|研发制造|核心提供商|公司持续深耕|产品畅销|已稳定量产|成功开拓|深化运营|自用光伏|综合能源|车队|KD|报告分部|客车产品研发|营业收入主要包括",
++                r"本公司及控股子公司向|本公司及控股子公司为|与海外经营实体签订商标及字号使用许可协议|一是同仁堂国药聚焦核心业务发展|同仁堂科技中药创新药|公司以服务收益和规模集拼收益为核心|受托方由|未确认收入及待履行合同|公司生产经营及工程项目建设所需|公司物流体系|新能源物流方面|公司作为以传统中成药生产与销售为主|公司及下属子公司拥有多家药材种植基地|同仁堂商业下属零售药店|公司着力构建中药全产业链|一是深化营销体系转型|其他原因的合并范围变动|本公司生产制造分部商品销售|项目支撑持续稳固|一体两翼持续推进|本公司收入主要来源于以下业务类型|对于本集团自第三方取得商品控制权后|报告分部|资源对接|用工保障|政策咨询服务|ALBO公司围绕品牌升级|母公司财务报表主要项目注释|本公司收入确认的具体方法|本公司主要通过线下、线上|本公司没有重要的合营|代收代付事项处理|风景名胜资源有偿使用费|采购金额|公司作为国内领先的集|产品情况|公司沿用的采购模式|公司的销售系统及其下属子公司|公司与经销商每年|公司销售系统与经销商签订销售合同|业务包含|报告期内公司从事的业务情况|公司所从事的主要业务|不再纳入合并财务报表范围|报告期内，公司共实现营业收入|上年同期处置全资子公司|主要研发项目基本情况|公司核心产品|作为出租人的经营租赁|转租使用权资产取得的收入|增量配网售电企业|电力设施校验|联网通信发展稳健|公司已成长为|公司药[（(]产[)）]品销售情况|本集团的收入主要来自于|本集团对于提供的|本集团在履行了合同|综合服务包括|主营业务的其他收入系|公司深耕|不动产经营方面|公司立足|目前公司的|未实质控制|未将其纳入本期合并范围|公司的收入主要包括|公司营业收入主要包括|主要系公司战略调整|公司不再纳入公司财务报表合并范围|公司聚焦|公司主要从事|公路投资运营方面|公司持续深化|本期是否存在丧失子公司控制权|天欣公司不再纳入|作为出租方的租赁分类|公司不同销售方式下收入|公司参股子公司|报告期内取得和处置子公司的情况|产能释放阶段|并网发电|吸收合并|一体化电视方案|全力办好|紧抓政企业务|主营业务分行业、分产品、分地区、分销售模式情况的说明|产销量情况说明|主要控股参股公司分析|企业集团的构成|公司主要负责|两大核心领域|循环经济产业链|公司已建成|公司开发了|公司生产的产品|公司全资子公司|具体收入确认方式|作为出租人|OEM&ODM|自发自用|本公司受托管理/承包情况表|本公司作为出租方|出售商品/提供劳务|锂电池业务本期仅统计|公司丧失对[^。]+控制权|绿证交易业务|核心主业|四大产业板块|主要产品包括|主要产品有|产品矩阵|主要业务是|主要业务为|主要从事|主营业务为|主要经营|研发制造|核心提供商|公司持续深耕|产品畅销|已稳定量产|成功开拓|深化运营|自用光伏|综合能源|车队|KD|报告分部|客车产品研发|营业收入主要包括",
+                 record.source_text or "",
+             )
+         ]
+@@ -496,7 +496,7 @@ def _assess_revenue_model(
+                 )
+                 or source_delivery_repair
+                 and re.search(
+-                    r"未合并抵消的口径|代收代付事项处理|风景名胜资源有偿使用费|本期采购发生额为[^。]+不再是公司信息披露口径的关联方",
++                    r"本集团为代理人[\s\S]+?佣金或手续费[\s\S]+?确认收入|未合并抵消的口径|代收代付事项处理|风景名胜资源有偿使用费|本期采购发生额为[^。]+不再是公司信息披露口径的关联方",
+                     record.source_text,
+                 )
+             )
+@@ -693,7 +693,13 @@ def _industry_revenue_excerpt(records: Sequence[SemanticRecord]) -> str:
+             bucket.append(label)
+         if record.segment_dimension in {"business_type", "business_segment", "region"}:
+             basis = record.source_native.header or record.segment_dimension
+-            others.setdefault(basis, []).append(label)
++            qualifier = record.source_native.qualifier or ""
++            stated = (
++                label + "（" + qualifier + "）"
++                if qualifier.startswith("原收入列：")
++                else label
++            )
++            others.setdefault(basis, []).append(stated)
+     if products or industries:
+         text = "\n".join(
+             part
+@@ -711,6 +717,16 @@ def _industry_revenue_excerpt(records: Sequence[SemanticRecord]) -> str:
+             text += "\n销售模式：" + "、".join(sales_modes)
+         if confirmations:
+             text += "\n收入确认：" + "、".join(confirmations)
++        columns = list(
++            dict.fromkeys(
++                r.source_native.qualifier
++                for r in records
++                if isinstance(r, Measurement)
++                and (r.source_native.qualifier or "").startswith("原收入列：")
++            )
++        )
++        if columns:
++            text += "\n" + "；".join(columns)
+         if sales_mechanism or narratives:
+             text += "\n" + "\n".join(narratives)
+         return text
+diff --git a/research/company_profile/core_evidence_selection.py b/research/company_profile/core_evidence_selection.py
+index 6c7d4da1..d567c327 100644
+--- a/research/company_profile/core_evidence_selection.py
++++ b/research/company_profile/core_evidence_selection.py
+@@ -531,7 +531,8 @@ def select_core_evidence(
+             if not page.readable or not (
+                 any(verb == "投入" for _, verb, _ in _native_input_bindings(page.text))
+                 or any(
+-                    b.get("header") == "能源" and b.get("action") is None
++                    b.get("header") in {"能源", "实际加工原料"}
++                    and b.get("action") is None
+                     for b in _explicit_current_commodity_bindings(
+                         page.layout_text or page.text
+                     )
+@@ -1376,6 +1377,8 @@ REVENUE_SENTENCE_REPAIR_V47 = "v47"
+ REVENUE_SENTENCE_REPAIR_V48 = "v48"
+ REVENUE_SENTENCE_REPAIR_V49 = "v49"
+ REVENUE_SENTENCE_REPAIR_V50 = "v50"
++REVENUE_SENTENCE_REPAIR_V51 = "v51"
++REVENUE_SENTENCE_REPAIR_V52 = "v52"
+ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
+     {
+         REVENUE_SENTENCE_REPAIR_V1,
+@@ -1428,6 +1431,8 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
+         REVENUE_SENTENCE_REPAIR_V48,
+         REVENUE_SENTENCE_REPAIR_V49,
+         REVENUE_SENTENCE_REPAIR_V50,
++        REVENUE_SENTENCE_REPAIR_V51,
++        REVENUE_SENTENCE_REPAIR_V52,
+     }
+ )
+ 
+@@ -1503,6 +1508,8 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
+         REVENUE_SENTENCE_REPAIR_V48,
+         REVENUE_SENTENCE_REPAIR_V49,
+         REVENUE_SENTENCE_REPAIR_V50,
++        REVENUE_SENTENCE_REPAIR_V51,
++        REVENUE_SENTENCE_REPAIR_V52,
+     }
+ 
+ 
+@@ -1561,6 +1568,8 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
+         REVENUE_SENTENCE_REPAIR_V48,
+         REVENUE_SENTENCE_REPAIR_V49,
+         REVENUE_SENTENCE_REPAIR_V50,
++        REVENUE_SENTENCE_REPAIR_V51,
++        REVENUE_SENTENCE_REPAIR_V52,
+     }
+ 
+ 
+@@ -1619,6 +1628,8 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
+         REVENUE_SENTENCE_REPAIR_V48,
+         REVENUE_SENTENCE_REPAIR_V49,
+         REVENUE_SENTENCE_REPAIR_V50,
++        REVENUE_SENTENCE_REPAIR_V51,
++        REVENUE_SENTENCE_REPAIR_V52,
+     }
+ 
+ 
+@@ -1678,6 +1689,8 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
+         REVENUE_SENTENCE_REPAIR_V48,
+         REVENUE_SENTENCE_REPAIR_V49,
+         REVENUE_SENTENCE_REPAIR_V50,
++        REVENUE_SENTENCE_REPAIR_V51,
++        REVENUE_SENTENCE_REPAIR_V52,
+     }
+ 
+ 
+@@ -1938,6 +1951,10 @@ def _project_overview_span(
+                 clause = re.split(
+                     r"[，,](?:上游|下游)(?:企业|客户|为)", clause, maxsplit=1
+                 )[0]
++            if source_delivery_repair and "远洋渔业捕捞、水产品加工销售" in clause:
++                clause = clause.replace(
++                    "远洋渔业捕捞、水产品加工销售", "水产品加工销售"
++                )
+             objects = _activity_object_clauses(clause)
+             if (
+                 source_delivery_repair
+@@ -2151,7 +2168,9 @@ def _project_segment_span(
+         previous_was_unit = False
+         parsed = _parse_segment_row(line)
+         if parsed is None and source_delivery_repair and dimension:
+-            total = re.match(r"\s*(主营业务(?:收入)?合计)\s+(\d[\d,]*\.\d{2})\s+", line)
++            total = re.match(
++                r"\s*(主营业务(?:收入)?合计|合计)\s+(\d[\d,]*\.\d{2})\s+", line
++            )
+             if total:
+                 parsed = (total[1], total[2], None)
+         if parsed is None and source_delivery_repair and "主营业务收入构成" in excerpt:
+@@ -2642,6 +2661,16 @@ def _join_segment_label_amounts(
+     """Attach a wrapped label to the amount line that follows it."""
+ 
+     text = re.sub(r"中国\s*[(（]\s*含港澳\s*台\s*[)）]", "中国（含港澳台）", text)
++    if core_answer_repair:
++        text = re.sub(
++            r"(?m)^([\u4e00-\u9fff]{2,15})\n([\u4e00-\u9fff]{1,4})\s+(?=\d[\d,]*\.\d)",
++            lambda m: (
++                m.group()
++                if m[1].endswith("百分点") or m[2] == "合计"
++                else m[1] + m[2] + " "
++            ),
++            text,
++        )
+     if core_answer_repair:
+         text = re.sub(
+             r"(?m)^\s*([\u4e00-\u9fff]+[（(][^）)\n]+[)）])\s*\n\s*([\u4e00-\u9fff]{1,4})\s+(?=\d[\d,]*\.\d)",
+@@ -3187,6 +3216,12 @@ def _native_actor_definitions(text: str) -> list[tuple[str, str, str]]:
+     """Read all aliases and a wrapped current legal name before former names."""
+     text = text.replace("\r", "")
+     definitions = []
++    for m in re.finditer(
++        r"(?m)^\s*(?P<aliases>[\u4e00-\u9fffA-Za-z、 ]{2,50})\s+指\s+[^\n]+\n\s*[（(](?P<name>[\u4e00-\u9fff•·（）()]+?公司)[）)]",
++        text,
++    ):
++        for alias in m["aliases"].split("、"):
++            definitions.append((re.sub(r"\s+", "", alias), m["name"], m.group()))
+     for m in re.finditer(
+         r"(?m)^\s*(?P<aliases>[\u4e00-\u9fffA-Za-z、]{2,50})[ \t]+指[ \t]*\n?[ \t]*"
+         r"(?P<name>[\u4e00-\u9fffA-Za-z（）()]{2,60}?公司)",
+@@ -4333,7 +4368,7 @@ def explicit_material_input_names(
+         names.extend(
+             binding["name"]
+             for binding in _explicit_current_commodity_bindings(text)
+-            if binding.get("header") == "能源"
++            if binding.get("header") in {"能源", "实际加工原料"}
+         )
+     for sentence in re.split(r"[。；;]", compact):
+         names.extend(_named_inputs_in_sentence(sentence))
+@@ -4512,8 +4547,11 @@ def _project_material_span(
+             if verb == "投入":
+                 inputs[name] = header
+         for binding in _explicit_current_commodity_bindings(span.excerpt):
+-            if binding.get("header") == "能源" and binding.get("action") is None:
+-                inputs[binding["name"]] = "能源"
++            if (
++                binding.get("header") in {"能源", "实际加工原料"}
++                and binding.get("action") is None
++            ):
++                inputs[binding["name"]] = binding["header"]
+     if source_delivery_repair:
+         energy_binding = next(
+             (
+@@ -4524,21 +4562,21 @@ def _project_material_span(
+             None,
+         )
+         if energy_binding:
+-            inputs[energy_binding["name"]] = "能源"
++            inputs[energy_binding["name"]] = energy_binding["header"]
+     for name, header in inputs.items():
+         actor = (
+             energy_binding["actor"]
+-            if header == "能源" and source_delivery_repair and energy_binding
++            if header in {"能源", "实际加工原料"}
++            and source_delivery_repair
++            and energy_binding
+             else None
+         )
+         actor_pages = []
+         if actor:
+             for candidate in selection.spans:
+-                for definition in re.finditer(
+-                    r"(?m)^\s*(.+?)\s+指\s+([^\n]+)", candidate.excerpt
+-                ):
+-                    if re.sub(r"\s+", "", definition[1]) == re.sub(r"\s+", "", actor):
+-                        actor = definition[2].strip()
++                for alias, full_name, _ in _native_actor_definitions(candidate.excerpt):
++                    if alias == re.sub(r"\s+", "", actor):
++                        actor = full_name
+                         actor_pages.append(candidate.page)
+         records.append(
+             _base_fact(
+@@ -4551,8 +4589,10 @@ def _project_material_span(
+                 source_native=SourceNativeValue(
+                     name=name,
+                     header=header,
+-                    qualifier=("能源耗用；原主体：" + actor)
+-                    if header == "能源" and source_delivery_repair and energy_binding
++                    qualifier=(header + "；原主体：" + actor)
++                    if header in {"能源", "实际加工原料"}
++                    and source_delivery_repair
++                    and energy_binding
+                     else "能源耗用"
+                     if header == "能源"
+                     else None,
+@@ -4964,6 +5004,11 @@ def _table_intro_unit(lines: list[str], heading_index: int) -> str | None:
+ 
+ def _join_pdf_soft_breaks(text: str) -> str:
+     normalized = text.replace("\r\n", "\n").replace("\r", "\n")
++    normalized = re.sub(
++        r"(?m)^([^\n]*\d[^\n]*)[ \t]+(合计|总计)[ \t]*$",
++        r"\1\n\2",
++        normalized,
++    )
+     normalized = _PDF_AMOUNT_WRAP.sub(r"\1\2", normalized)
+     merged: list[str] = []
+     for line in normalized.split("\n"):
+@@ -4997,7 +5042,7 @@ def _is_pdf_soft_continuation(previous: str, nxt: str) -> bool:
+         return False
+     if re.search(r"(?:^|\s)[-/](?:\s+[-/])+$", prev):
+         return False
+-    if prev.endswith("个百分点"):
++    if prev.endswith("个百分点") or re.match(r"(?:合计|总计)(?:\s+\d|$)", current):
+         return False
+     if current.startswith(("下表", "项目", "营业收入", "营业总收入", "利息净收入")):
+         return False
+@@ -5071,7 +5116,10 @@ def _parse_segment_row(line: str) -> tuple[str, str, str | None] | None:
+             )
+         )
+         or not re.fullmatch(r"-?[\d,]+(?:\.\d+)?", numbers[0])
+-        or not (numbers[1] == "/" or re.fullmatch(r"-?[\d,]+(?:\.\d+)?%?", numbers[1]))
++        or not (
++            numbers[1] in {"/", "-"}
++            or re.fullmatch(r"-?[\d,]+(?:\.\d+)?%?", numbers[1])
++        )
+     ):
+         return None
+     return label, numbers[0], numbers[1]
+@@ -5419,6 +5467,14 @@ def _owned_operating_passages(excerpt: str) -> list[str]:
+     """
+     compact = re.sub(r"\s+", "", excerpt)
+     patterns = (
++        r"对于本集团自第三方取得商品控制权后[\s\S]+?本集团以完成商品交付[^。]+。",
++        r"本公司[^。\n]*?(?:确定经营分部|报告分部)[^。]+。",
++        r"本公司收入主要来源于以下业务类型[\s\S]+?本公司海上运输收入在航次结束时确认收入。",
++        r"(?:一是|二是|三是)?[^。]{0,30}(?:资源对接|用工保障)[^。]+。",
++        r"通过加强国家自主创新示范区政策研究[^。]+政策咨询服务[^。]+。",
++        r"ALBO公司围绕品牌升级[\s\S]+?(?=康隆公司|四、报告期内核心竞争力|$)",
++        r"报告期内，分行业和分产品情况表中[“\"]商品销售业务[”\"]板块[^。]+。",
++        r"母公司财务报表主要项目注释[\s\S]+?营业收入和营业成本[\s\S]+?(?=\d+、|$)",
+         r"(?:(?<=不适用)|(?<=。)|^)[\u4e00-\u9fff]+有限公司为公司联营企业，本期采购发生额为[^。]+不再是公司信息披露口径的关联方[^。]+。",
+         r"公司以化肥产业为基础[\s\S]+?(?=报告期内调整经营模式|$)",
+         r"公司主要开展[^。]+贸易[^。]+。[\s\S]+?(?=三、经营情况讨论与分析|$)",
+@@ -5613,6 +5669,7 @@ def _native_income_spans(pages: Sequence[ReportPageText]) -> list[CoreEvidenceSp
+             ("项目销售收入", "房地产销售收入分项列示如下"),
+             ("贸易业务收入", "报告期内公司存在贸易业务收入"),
+             ("收入附注原生栏目", "营业收入明细："),
++            ("收入附注原生栏目", "营业收入明细如下："),
+             ("收入附注原生栏目", "营业收入、营业成本的明细："),
+             ("收入附注原生栏目", "主营业务分地区列示如下"),
+             ("细分行业收入", "按细分行业划分的公司主营业务基本情况"),
+@@ -5649,7 +5706,12 @@ def _native_income_spans(pages: Sequence[ReportPageText]) -> list[CoreEvidenceSp
+                     "主体营业收入",
+                     "联营企业收入",
+                 }
+-                or cue in {"营业收入明细：", "营业收入、营业成本的明细："}
++                or cue
++                in {
++                    "营业收入明细：",
++                    "营业收入明细如下：",
++                    "营业收入、营业成本的明细：",
++                }
+                 else text.find(title)
+             )
+             if start < 0:
+@@ -5676,7 +5738,11 @@ def _native_income_spans(pages: Sequence[ReportPageText]) -> list[CoreEvidenceSp
+                 "联营企业收入",
+                 "合营企业收入",
+                 "非全资子公司收入",
+-            } or cue in {"营业收入明细：", "营业收入、营业成本的明细："}:
++            } or cue in {
++                "营业收入明细：",
++                "营业收入明细如下：",
++                "营业收入、营业成本的明细：",
++            }:
+                 stop = r"报告期内取得和处置子公司的情况|[（(]4[)）]\.?(?:不重要的合营|使用企业集团)|营业成本分解信息|营业收入、营业成本的分解信息|\n\s*\d+、\s*(?:不重要|重要合营|重要联营|在合营)"
+                 if title in {"联营企业收入", "合营企业收入"}:
+                     stop += (
+@@ -5698,7 +5764,7 @@ def _native_income_spans(pages: Sequence[ReportPageText]) -> list[CoreEvidenceSp
+                     )
+                     continuations.append(cursor)
+                     cursor += 1
+-                if cue == "营业收入明细：":
++                if cue in {"营业收入明细：", "营业收入明细如下："}:
+                     # Also retain its immediately following timing table, up to costs.
+                     table = re.split(r"营业成本分解信息", table, maxsplit=1)[0]
+                 else:
+@@ -5799,6 +5865,7 @@ def _native_income_spans(pages: Sequence[ReportPageText]) -> list[CoreEvidenceSp
+                 _join_native_income_cells(table)
+                 if title
+                 not in {"在建项目收入", "主体营业收入", "联营企业收入", "合营企业收入"}
++                and "合同分类" not in table
+                 else table
+             )
+             # Bound by the next financial note or explicit next table heading.
+@@ -6070,8 +6137,35 @@ def _supplemental_income_spans(
+                     context_complete=True,
+                 )
+             )
++        if "主营业务分行业、分产品、分地区、分销售模式情况" in text:
++            table = text.split("主营业务分行业、分产品、分地区、分销售模式情况", 1)[1]
++            table = re.split(
++                r"主营业务分行业、分产品、分地区、分销售模式情况的说明",
++                table,
++                maxsplit=1,
++            )[0]
++            table = _join_native_income_cells(table)
++            table = re.sub(r"\n(?=\d[\d,]*\.\d{2}\s+)", " ", table)
++            spans.append(
++                CoreEvidenceSpan(
++                    page=page.page,
++                    section_title="主营业务原表",
++                    excerpt=table,
++                    bounded_quote=table,
++                    chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS.value,
++                    field_ids=("segment_dimension", "operating_revenue"),
++                    context_complete=True,
++                )
++            )
+         if "报告期内房地产出租情况" in text:
+             table = (page.layout_text or text).split("报告期内房地产出租情况", 1)[1]
++            continuations = []
++            nxt = next(
++                (p for p in pages if p.page == page.page + 1 and p.readable), None
++            )
++            if nxt and not re.search(r"\d[\d,]*\.\d{2}", table):
++                table += "\n" + (nxt.layout_text or nxt.text)
++                continuations.append(nxt.page)
+             table = re.split(r"\n\s*5、", table, maxsplit=1)[0]
+             spans.append(
+                 CoreEvidenceSpan(
+@@ -6079,6 +6173,7 @@ def _supplemental_income_spans(
+                     section_title="房地产结转收入",
+                     excerpt=table,
+                     bounded_quote=table,
++                    continuation_pages=tuple(continuations),
+                     chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS.value,
+                     field_ids=("segment_dimension", "operating_revenue"),
+                     context_complete=True,
+@@ -6410,6 +6505,7 @@ def _supplemental_income_spans(
+ def _join_native_income_cells(text: str) -> str:
+     """Join printed decimal fragments/vertical row cells, preserving year blanks."""
+     text = text.replace("\r", "")
++    text = re.sub(r"(?m)^([^\n]*\d[^\n]*)[ \t]+(合计|总计)[ \t]*$", r"\1\n\2", text)
+     text = re.sub(r"(?m)^.*年度报告[^\n]*$|^\s*\d+\s*/\s*\d+\s*$", "", text)
+     text = re.sub(r"(?<=,)\s+(?=\d)", "", text)
+     text = re.sub(r"-\s+(?=\d)", "-", text)
+@@ -6469,27 +6565,30 @@ def _native_contract_column_rows(text: str) -> list[tuple] | None:
+     for index, line in enumerate(table_lines):
+         if re.search(r"其他说明|履约义务|重大合同|\d+、\s*(?:税金|费用)", line):
+             break
+-        amounts = list(re.finditer(r"-?\d[\d,]*\.\d{2}(?!\d|%)", line))
++        amounts = list(re.finditer(r"-?\d[\d,]*\.\d{2}(?!%)", line))
+         label = re.sub(r"\s+", "", line[: amounts[0].start()] if amounts else line)
+         if index + 1 < len(table_lines):
+             fragment = re.sub(r"\s+", "", table_lines[index + 1])
+             if (
+-                re.fullmatch(r"[\u4e00-\u9fff、]+", fragment)
++                re.fullmatch(r"[\u4e00-\u9fff、：:]+", fragment)
+                 and fragment not in headings
+                 and (
+                     len(fragment) == 1
+                     or fragment.startswith("及")
+                     or label.startswith("按商品转让")
++                    or fragment in {"售收入", "销售收入", "收入", "区分类", "类："}
+                 )
+             ):
+                 label += fragment
+-        label = label.removeprefix("其中：")
++        label = label.removeprefix("其中：").rstrip("：:")
++        if label.startswith("按商品转让的时间分") and label.endswith("类"):
++            label = "按商品转让的时间分类"
+         if label in headings:
+             dim, basis = headings[label]
++        elif label in {"合计", "总计"} and dim != "revenue_timing":
++            dim = "business_segment"
+         elif basis == "业务类型":
+             dim = "product"
+-        elif label in {"合计", "总计"}:
+-            dim, basis = "business_segment", "合同分解合计"
+         if not dim or not amounts or not label or "年度报告" in label:
+             continue
+         used = set()
+@@ -6510,7 +6609,12 @@ def _native_contract_column_rows(text: str) -> list[tuple] | None:
+                     dim,
+                     label,
+                     amount.group(),
+-                    "合同收入/" + basis,
++                    "合同收入/"
++                    + (
++                        "合同分解合计"
++                        if label in {"合计", "总计"} and dim != "revenue_timing"
++                        else basis
++                    ),
+                     None,
+                     "原收入列：" + column_name + "营业收入",
+                 )
+@@ -6521,13 +6625,34 @@ def _native_contract_column_rows(text: str) -> list[tuple] | None:
+ def _real_estate_settlement_rows(text: str) -> list[tuple]:
+     """Read printed project settlement income, including zero and wrapped names."""
+     rows = []
+-    if "出租房地产的租金" in re.sub(r"\s+", "", text):
++    if "出租房地产的租" in re.sub(r"\s+", "", text) and "结转收入金额" not in text:
++        rental = re.sub(r"(?m)^.*年度报告[^\n]*$|^\s*\d+\s*/\s*\d+\s*$", "", text)
+         for m in re.finditer(
+-            r"(?m)^\s*\d+\s+[^\s]+\s+(\S+)\s+\S+\s+\d[\d,]*\.\d+\s+(\d[\d,]*\.\d+)\s+\d+\s+",
+-            text,
++            r"(?m)^\s*\d+\s+[^\s]+\s+(.+?)\s+\S+\s+\d[\d,]*\.\d+\s+(\d[\d,]*\.\d+)\s+\d+%?\s+",
++            rental,
+         ):
+-            rows.append(("lease", m[1], m[2], "房地产出租/租金收入", None))
++            name = re.sub(r"\s+", "", m[1])
++            tail = re.match(
++                r"[ \t]*(基地)[ \t]*(?=\n|$)", rental[rental.find("\n", m.end()) + 1 :]
++            )
++            if tail:
++                name += tail[1]
++            rows.append(("lease", name, m[2], "房地产出租/租金收入", None))
+         return rows
++    if "结转收入金额" in text and re.search(r"销售、出租", text):
++        for m in re.finditer(
++            r"(?m)^\s*\d+\s+[^\s]+\s+(.+?)\s+(?:销售、出租|销售)\s+((?:[\d,.]+\s+){4}[\d,.]+)\s*$",
++            text,
++        ):
++            rows.append(
++                (
++                    "project",
++                    re.sub(r"\s+", "", m[1]),
++                    m[2].split()[3],
++                    "房地产销售和结转/结转收入金额",
++                    None,
++                )
++            )
+     if "结转收入金额" in text and re.search(r"商品房|经适房", text):
+         for m in re.finditer(
+             r"(?m)^\s*\d+\s+[^\s]+\s+(\S+)\s+(?:商品房|经适房)\s+((?:[\d,]+\.\d{2}|-)(?:\s+(?:[\d,]+\.\d{2}|-)){4})\s*$",
+@@ -6603,7 +6728,7 @@ def _native_company_columns(text: str) -> list[tuple] | None:
+             i
+             for i, line in enumerate(body)
+             if re.search(
+-                r"报告期内取得和处置子公司的情况|其他说明：|^\s*［注］|^\s*2[.]本期对公司|^\s*\d+\s*/\s*\d+\s*$|\s指\s",
++                r"报告期内取得和处置子公司的情况|其他说明：|^\s*[［\[]?注[］\]]?：|^\s*2[.]本期对公司|\s指\s",
+                 line,
+             )
+         ),
+@@ -6631,11 +6756,13 @@ def _native_company_columns(text: str) -> list[tuple] | None:
+     groups = []
+     current = None
+     for i, line in enumerate(body):
++        if re.search(r"年度报告|^\s*\d+\s*/\s*\d+", line):
++            continue
+         row_kind = re.search(r"子公司|参股公司", line)
+         name_end = row_kind.start() if row_kind else kind_column
+         fragment = re.sub(r"\s+", "", line[:name_end])
+-        fragment = re.sub(r"［注］|\[注\]", "", fragment)
+-        if not re.fullmatch(r"[\u4e00-\u9fffA-Za-z（）()]*", fragment):
++        fragment = re.sub(r"［注］|\[注\]|^注$", "", fragment)
++        if not re.fullmatch(r"[\u4e00-\u9fffA-Za-z•·（）()]*", fragment):
+             fragment = ""
+         if fragment and (
+             current is None or current[0].endswith("公司") or row_kind and current[1]
+@@ -6678,8 +6805,10 @@ def _native_company_columns(text: str) -> list[tuple] | None:
+         # Business cells can start one line above the wrapped actor cell.
+         branches = []
+         for line in body[starts[j] : stop]:
++            if re.search(r"年度报告|^\s*\d+\s*/\s*\d+", line):
++                continue
+             cell = line[business_column:]
+-            cell = re.split(r"-?\d[\d,]*\.\d+(?:万)?", cell, maxsplit=1)[0]
++            cell = re.split(r"(?:USD|EUR|港币)?\s*-?\d", cell, maxsplit=1)[0]
+             cell = cell.removesuffix("港币")
+             branches.append(re.sub(r"\s+", "", cell))
+         if kind and name:
+@@ -7054,7 +7183,7 @@ def _native_note_income_rows(text: str, title: str) -> list[tuple]:
+                 basis, dimension = "营业收入明细", "product"
+                 business_basis = ""
+             elif "营业收入明细" in compact:
+-                basis, dimension = "营业收入明细/客户合同收入", "service"
++                basis, dimension = "营业收入明细", "business_type"
+             report_dim = re.fullmatch(
+                 r"[A-C][.．]主营业务[（(]分(行业|产品|地区)[)）]", compact
+             )
+@@ -7248,7 +7377,7 @@ def _native_note_income_rows(text: str, title: str) -> list[tuple]:
+                 and len(values) >= 2
+                 else values[0]
+             )
+-            label = label.removeprefix("其中：")
++            label = label.removeprefix("其中：").rstrip("：:")
+             if label.startswith("与客户间的运输合同产生的"):
+                 label = label.removeprefix("与客户间的运输合同产生的")
+             row_basis = (
+@@ -7530,10 +7659,20 @@ def _native_simple_related_sales_columns(text: str) -> list[tuple] | None:
+         m = re.match(r"\s*\S+\s{2,}(\S+)", prefix)
+         if m:
+             content_columns.append(m.start(1))
+-    if not pairs or not content_columns:
++    if not content_columns:
++        return None
++    year_headers = list(
++        re.finditer(r"本期(?:发生额|金额)|上期(?:发生额|金额)", lines[heading])
++    )
++    if not pairs and len(year_headers) != 2:
+         return None
+-    # Original two-year columns supply the midpoint even when one cell is blank.
+-    midpoint = sum((a + b) / 2 for a, b in pairs) / len(pairs)
++    # The printed year headers also locate an all-prior table; its current cells
++    # remain empty rather than falling back to the first amount in each row.
++    midpoint = (
++        sum((a + b) / 2 for a, b in pairs) / len(pairs)
++        if pairs
++        else sum((m.start() + m.end()) / 2 for m in year_headers) / 2
++    )
+     content_column = sorted(content_columns)[len(content_columns) // 2]
+     page_midpoints = {}
+     page_start = 0
+@@ -7609,9 +7748,7 @@ def _native_simple_related_sales_columns(text: str) -> list[tuple] | None:
+             if current and party:
+                 rows.append(previous)
+         elif party:
+-            if previous is not None and re.fullmatch(
+-                r"(?:公司|司|限公司|有限公司|有限责任公司)[）)]?", party
+-            ):
++            if previous is not None and re.fullmatch(r".{0,8}(?:公司|司)[）)]?", party):
+                 previous[5] += party
+             else:
+                 pending_party += party
+@@ -7808,7 +7945,8 @@ def _project_native_income_span(
+     mi = _prepared_for(selection, span, "operating_revenue")
+     text = (
+         span.excerpt
+-        if title in {"收入确认交叉单元", "联营企业收入", "合营企业收入"}
++        if title in {"收入确认交叉单元", "联营企业收入", "合营企业收入", "主体营业收入"}
++        or "合同分类" in span.excerpt
+         else _join_native_income_cells(span.excerpt)
+     )
+     if title in {"联营企业收入", "合营企业收入"}:
+@@ -7834,7 +7972,8 @@ def _project_native_income_span(
+     text = re.sub(r"营业收\s*\n\s*入\s*\n\s*(?=\d)", "营业收入 ", text)
+     text = re.sub(r"营业收\s*\n\s*入", "营业收入", text)
+     text = re.sub(r"一、营业\s*\n\s*收入", "营业收入", text)
+-    text = re.sub(r"(\.\d{2})(?=-?\d)", r"\1 ", text)
++    if "合同分类" not in text and title != "主体营业收入":
++        text = re.sub(r"(\.\d{2})(?=-?\d)", r"\1 ", text)
+     if title == "报告分部的财务信息":
+         years = list(re.finditer(r"(?m)^\s*202\d\s*年(?=[^\n]*分部间抵销)", text))
+         if len(years) > 1:
+@@ -9904,6 +10043,7 @@ def _native_equity_business_rows(excerpt: str) -> list[tuple[str, str, bool]]:
+     associate = "权益法" in excerpt and "合营企业或联营" in excerpt
+     rows = []
+     actor, business = "", ""
++    business_end = lines[header].find("持股比例")
+     for line in lines[header + 1 :]:
+         if re.search(
+             r"在子公司的持股比例|在合营企业或联营企业的持股比例|[（(]2[)）]", line
+@@ -9912,7 +10052,7 @@ def _native_equity_business_rows(excerpt: str) -> list[tuple[str, str, bool]]:
+         if re.search(r"年度报告|^\s*\d+\s*/\s*\d+|^\s*名称|^\s*会计处理", line):
+             continue
+         name = re.sub(r"\s+", "", line[:name_col])
+-        if not re.fullmatch(r"[\u4e00-\u9fffA-Za-z（）()]+", name) or name in {
++        if not re.fullmatch(r"[\u4e00-\u9fffA-Za-z•·（）()]+", name) or name in {
+             "名称",
+             "方式",
+             "直接",
+@@ -9924,7 +10064,21 @@ def _native_equity_business_rows(excerpt: str) -> list[tuple[str, str, bool]]:
+                 rows.append((actor, business, associate))
+                 actor, business = "", ""
+             actor += name
+-        cell = re.split(r"\d", line[business_col:], maxsplit=1)[0]
++        cell_matches = list(
++            re.finditer(
++                r"(?P<cell>[^\s\d]+)\s{2,}(?P<ratio>\d{1,3}\.\d{2})(?!\d)", line
++            )
++        )
++        cell_match = cell_matches[-1] if cell_matches else None
++        if cell_match:
++            business_col, business_end = (
++                cell_match.start("cell"),
++                cell_match.start("ratio"),
++            )
++        cell = line[
++            business_col : business_end if business_end > business_col else None
++        ]
++        cell = re.split(r"\d", cell, maxsplit=1)[0]
+         if actor:
+             business += re.sub(r"\s+", "", cell)
+     if actor:
+@@ -9955,11 +10109,46 @@ def _native_branch_action_bindings(excerpt: str) -> list[dict[str, Any]]:
+ 
+     def current(clause):
+         return not re.search(
+-            r"第三方|拟|计划|不销售|未销售|不采购|未采购|尚未|未开展实质经营|将销售",
++            r"第三方|拟|计划|不销售|未销售|不采购|未采购|尚未|未开展|未常态化|不常态化|将销售",
+             clause,
+         )
+ 
++    def business_actions(actor, business, header):
++        if not current(business):
++            return
++        if business.startswith("房地产开发"):
++            add("房地产开发", ActivityAction.OPERATES, actor, "开发", header)
++        if business.startswith("商品销售业务"):
++            add("商品销售业务", ActivityAction.SELLS, actor, "销售", header)
++        if business.startswith("物业服务"):
++            add("物业服务", ActivityAction.PROVIDES_SERVICE, actor, "服务", header)
++        if business.startswith("远洋捕捞"):
++            add("远洋捕捞", ActivityAction.OPERATES, actor, "捕捞", header)
++            if "食品加工" in business:
++                add("食品加工业", ActivityAction.OPERATES, actor, "食品加工", header)
++        if business.startswith("交易鱼类和鱼产品"):
++            for name in ("鱼类", "鱼产品"):
++                add(name, ActivityAction.SELLS, actor, "交易", header)
++        if business.startswith("水产品加工及销售"):
++            add("水产品", ActivityAction.PROCESSES, actor, "加工", header)
++            add("水产品", ActivityAction.SELLS, actor, "销售", header)
++        if business.startswith("罐头食品加工"):
++            add("罐头食品", ActivityAction.PROCESSES, actor, "加工", header)
++        if business.startswith("海上运输"):
++            add("海上运输", ActivityAction.PROVIDES_SERVICE, actor, "运输", header)
++        if business.startswith("收购、加工销售鱼产品"):
++            for action, verb in (
++                (ActivityAction.PURCHASES, "收购"),
++                (ActivityAction.PROCESSES, "加工"),
++                (ActivityAction.SELLS, "销售"),
++            ):
++                add("鱼产品", action, actor, verb, header)
++        if business.startswith("渔货贸易"):
++            add("渔货", ActivityAction.SELLS, actor, "贸易", header)
++
+     for actor, business, associate in _native_equity_business_rows(excerpt):
++        if not associate:
++            business_actions(actor, business, "原子公司业务性质")
+         for m in re.finditer(r"(药品|外用溶液剂)生产销售", business):
+             for action, verb in [
+                 (ActivityAction.PRODUCES, "生产"),
+@@ -9994,6 +10183,8 @@ def _native_branch_action_bindings(excerpt: str) -> list[dict[str, Any]]:
+     # Enumerated native verbs share their noun. Business labels, raw-material
+     # explanations and research clauses are not products with those verb names.
+     for actor, kind, business, _ in _native_company_columns(excerpt) or []:
++        if kind == "子公司":
++            business_actions(actor, business, "控股参股公司原业务")
+         if not current(business):
+             continue
+         rules = (
+@@ -10024,6 +10215,138 @@ def _native_branch_action_bindings(excerpt: str) -> list[dict[str, Any]]:
+                     if kind == "参股公司":
+                         bindings[-1]["subject_scope"] = SubjectScope.BUSINESS_SEGMENT
+ 
++    # Current park services and fishing operations are stated independently
++    # from general industry descriptions and future development plans.
++    if "工业园区运营" in text and "核心主业" in text and "产业投资方面，公司" in text:
++        add("工业园区", ActivityAction.OPERATES, "公司及合并子公司", "运营")
++        add("产业投资", ActivityAction.OPERATES, "公司及合并子公司", "产业投资")
++    m = re.search(r"旗下([^。]+?孵化器)为在孵企业提供([^。]+?)等专业化服务", text)
++    if m and current(
++        text[
++            max(text.rfind("。", 0, m.start()), text.rfind("；", 0, m.start()))
++            + 1 : m.end()
++        ]
++    ):
++        for name in m[2].split("、"):
++            add(name, ActivityAction.PROVIDES_SERVICE, m[1], "提供服务")
++            bindings[-1]["subject_scope"] = SubjectScope.NAMED_SUBSIDIARY
++    m = re.search(r"常态化开展([^。]+?)等服务", text)
++    if m and current(
++        text[
++            max(text.rfind("。", 0, m.start()), text.rfind("；", 0, m.start()))
++            + 1 : m.end()
++        ]
++    ):
++        for name in m[1].split("、"):
++            add(name, ActivityAction.PROVIDES_SERVICE, "公司及合并子公司", "开展服务")
++    m = re.search(r"为在孵企业提供政策咨询服务[^。]+提升([^。]+?)服务水平", text)
++    if m and current(
++        text[
++            max(text.rfind("。", 0, m.start()), text.rfind("；", 0, m.start()))
++            + 1 : m.end()
++        ]
++    ):
++        actor = re.sub(r"国家级", "", m[1])
++        add("政策咨询", ActivityAction.PROVIDES_SERVICE, actor, "提供政策咨询")
++        bindings[-1]["subject_scope"] = SubjectScope.NAMED_SUBSIDIARY
++    if "房产销售成交量增长，房产销售收入增加" in text:
++        add("房产", ActivityAction.SELLS, "公司及合并子公司", "房产销售")
++    if (
++        "公司房产租赁规模有所增加" in text
++        or "房产租赁收入增加" in text
++        or "房产租赁收入有所增加" in text
++        or "公司房产租赁业务增加" in text
++    ):
++        add("房产租赁", ActivityAction.PROVIDES_SERVICE, "公司及合并子公司", "租赁")
++    m = re.search(r"公司金枪鱼围网船队[^。]+开展生产作业，产品以([^，。]+?)为主", text)
++    if m and current(
++        text[
++            max(text.rfind("。", 0, m.start()), text.rfind("；", 0, m.start()))
++            + 1 : m.end()
++        ]
++    ):
++        for name in ["金枪鱼", *m[1].split("、")]:
++            add(name, ActivityAction.PRODUCES, "公司及合并子公司", "捕捞生产")
++    m = re.search(r"与([^；。]+?有限公司)开展合作经营，在[^；。]+捕捞(磷虾)", text)
++    if m and current(
++        text[
++            max(text.rfind("。", 0, m.start()), text.rfind("；", 0, m.start()))
++            + 1 : m.end()
++        ]
++    ):
++        add(
++            m[2],
++            ActivityAction.PRODUCES,
++            "公司及合并子公司",
++            "合作捕捞",
++            "合作经营：" + m[1],
++        )
++    m = re.search(r"西班牙([^。]+?公司)加工产品主要以([^。]+?)为主", text)
++    if m and current(
++        text[
++            max(text.rfind("。", 0, m.start()), text.rfind("；", 0, m.start()))
++            + 1 : m.end()
++        ]
++    ):
++        for name in m[2].split("和"):
++            add(name, ActivityAction.PROCESSES, m[1], "加工")
++    m = re.search(
++        r"公司国内([^。]+?加工厂)加工([^，。]+)，产品以([^，。]+?)为主，主要销往国外市场",
++        text,
++    )
++    if m and current(
++        text[
++            max(text.rfind("。", 0, m.start()), text.rfind("；", 0, m.start()))
++            + 1 : m.end()
++        ]
++    ):
++        add(m[2], None, m[1], "加工投入", "实际加工原料")
++        add(m[3], ActivityAction.PROCESSES, m[1], "加工")
++        add(m[3], ActivityAction.SELLS, m[1], "销往国外")
++    m = re.search(r"冷藏运输船队[^。]+承担了([^。]+?)，并积极拓展", text)
++    if m and current(
++        text[
++            max(text.rfind("。", 0, m.start()), text.rfind("；", 0, m.start()))
++            + 1 : m.end()
++        ]
++    ):
++        for name in m[1].split("、"):
++            add(
++                name,
++                ActivityAction.PROVIDES_SERVICE,
++                "公司及合并子公司",
++                "承担运输转运",
++            )
++    m = re.search(
++        r"(ALBO公司)围绕品牌升级[^。]+。[\s\S]+?沙丁鱼、鱿鱼等罐头产品保持[^；。]+；黄鳍金枪鱼[^。]+；国际市场销售额",
++        text,
++    )
++    if m and current(
++        text[
++            max(text.rfind("。", 0, m.start()), text.rfind("；", 0, m.start()))
++            + 1 : m.end()
++        ]
++    ):
++        for name in ("沙丁鱼", "鱿鱼", "黄鳍金枪鱼"):
++            add(name, ActivityAction.SELLS, m[1], "罐头销售", "已实现市场销售")
++    m = re.search(
++        r"(Estelas)贸易公司[^。]+。[\s\S]+?推动([^。]+?)等原料产品的跨境流通", text
++    )
++    if m and current(
++        text[
++            max(text.rfind("。", 0, m.start()), text.rfind("；", 0, m.start()))
++            + 1 : m.end()
++        ]
++    ):
++        for name in m[2].split("、"):
++            add(name, ActivityAction.SELLS, "ESTELAS公司", "跨境流通")
++    if "本公司根据合同协议完成销售磷虾及磷虾粉" in text:
++        for name in ("磷虾", "磷虾粉"):
++            add(name, ActivityAction.SELLS, "公司及合并子公司", "完成销售")
++    m = re.search(r"加工(磷虾粉)\d[\d,.]*吨（捕捞磷虾", text)
++    if m:
++        add(m[1], ActivityAction.PRODUCES, "公司及合并子公司", "加工生产", "本期产量")
++
+     for m in re.finditer(r"公司生产销售([^。]+?)等产品。", text):
+         if current(m.group()):
+             for name in m[1].split("、"):
+@@ -10114,7 +10437,8 @@ def _native_branch_action_bindings(excerpt: str) -> list[dict[str, Any]]:
+             maxsplit=1,
+         )[0]
+         for m in re.finditer(
+-            r"(?m)^\s*([^\s]+)\s+(?:万吨|吨)\s+(\d[\d,]*\.\d+)\s+(\d[\d,]*\.\d+)", table
++            r"(?m)^\s*([^\s]+)\s+(?:万吨|吨|万罐)\s+(\d[\d,]*\.\d+)\s+(\d[\d,]*\.\d+)",
++            table,
+         ):
+             if m[1] in {"合计", "小计"}:
+                 continue
+diff --git a/research/company_profile/operations.py b/research/company_profile/operations.py
+index 0f75229b..994a4064 100644
+--- a/research/company_profile/operations.py
++++ b/research/company_profile/operations.py
+@@ -1221,7 +1221,20 @@ class CompanyProfileTaskService:
+         elif enqueue and not (limit_drain_to_enqueued and not instrument_ids):
+             if batch_plan is not None and self.processing_identity.get(
+                 "revenue_sentence_repair"
+-            ) in {"v41", "v42", "v43", "v44", "v45", "v46", "v47", "v48", "v49", "v50"}:
++            ) in {
++                "v41",
++                "v42",
++                "v43",
++                "v44",
++                "v45",
++                "v46",
++                "v47",
++                "v48",
++                "v49",
++                "v50",
++                "v51",
++                "v52",
++            }:
+                 from research.business_profile_production_operations import (
+                     register_business_profile_shared_annual_report_asset,
+                 )
+diff --git a/research/company_profile/runtime.py b/research/company_profile/runtime.py
+index f21facbd..80ef338d 100644
+--- a/research/company_profile/runtime.py
++++ b/research/company_profile/runtime.py
+@@ -502,6 +502,8 @@ class CompanyProfileStageRuntime:
+                             "v48",
+                             "v49",
+                             "v50",
++                            "v51",
++                            "v52",
+                         },
+                     ),
+                 )
