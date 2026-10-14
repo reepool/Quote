@@ -1,0 +1,29 @@
+{
+  "scope": "本轮独立来源冻结/首次执行/动态业务复核/失败留存及旧v49归档；未修改业务代码",
+  "review_method": "逐原页/原列核合同、实际255接受事实＋3已答正文唯一计分、完整checkpoint记录重建、资源/数据库/三路核验、保护哈希及change严格校验",
+  "blocking_material_defects": [],
+  "actual_business_blockers_registered": [
+    "南京Activity空对象名终止语义交付",
+    "六实质正文漏交付",
+    "114收入遗漏、6收入身份错误",
+    "136动作遗漏、9伪动作"
+  ],
+  "new_source_repairs_implemented": false,
+  "pure_style_or_framework_changes": false,
+  "unrelated_existing_failures_deferred": true,
+  "pytest_run": false,
+  "pytest_reason": "本轮仅沿现有owner首次受控业务验证及来源材料，未改业务代码或测试；不以旧v49测试代表新样本",
+  "checks": {
+    "new_source_contract_and_actual_result_validation": "passed",
+    "official_text_98_pages_and_layout_40_pages": "passed",
+    "history_3072_and_prior_archive_136_originals": "passed",
+    "first_artifacts_12_nonempty_and_review_protection": "passed",
+    "execution_modules_38_reconstructed": "passed",
+    "openspec_strict_change": "passed",
+    "scoped_material_review": "passed",
+    "diff_check": "passed"
+  },
+  "existing_modified_files_unchanged": true,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

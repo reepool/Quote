@@ -1,0 +1,242 @@
+[
+  {
+    "instrument_id": "600096.SH",
+    "record_id": "owned:core-ev-6eed44c618df9c80:activity:1",
+    "object_type": "Activity",
+    "source_native": {
+      "name": "天然气为主要原料",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "reason": "p9为以煤炭、天然气为原料生产尿素，不生产天然气为主要原料这一伪商品",
+    "critical_numeric_error": false
+  },
+  {
+    "instrument_id": "600096.SH",
+    "record_id": "owned:core-ev-a9bfba53d9e72f67:commodity:1",
+    "object_type": "Activity",
+    "source_native": {
+      "name": "商贸",
+      "value": null,
+      "unit": null,
+      "header": "本期营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "reason": "p25贸易业务行是收入业务类别，不是具名可销售商品",
+    "critical_numeric_error": false
+  },
+  {
+    "instrument_id": "600096.SH",
+    "record_id": "owned:core-ev-1ed182466f2696b6:commodity:5",
+    "object_type": "Activity",
+    "source_native": {
+      "name": "新材料的研发及产品",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": "原主体：云南水富云天化有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "reason": "p42水富研发/产品生产销售复合短语污染商品身份，不得以该串作为商品",
+    "critical_numeric_error": false
+  },
+  {
+    "instrument_id": "600096.SH",
+    "record_id": "owned:core-ev-1ed182466f2696b6:commodity:6",
+    "object_type": "Activity",
+    "source_native": {
+      "name": "新材料的研发及产品",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": "原主体：云南水富云天化有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "reason": "p42水富研发/产品生产销售复合短语污染商品身份，不得以该串作为商品",
+    "critical_numeric_error": false
+  },
+  {
+    "instrument_id": "600096.SH",
+    "record_id": "owned:core-ev-1ed182466f2696b6:commodity:10",
+    "object_type": "Activity",
+    "source_native": {
+      "name": "；国际货",
+      "value": null,
+      "unit": null,
+      "header": "控股公司原业务",
+      "qualifier": "原主体：云南云天化联合商务有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "reason": "p42联合商务跨行国际货运代理名称截断，不能作完整经营对象",
+    "critical_numeric_error": false
+  },
+  {
+    "instrument_id": "600096.SH",
+    "record_id": "owned:core-ev-93863a1d05eec45b:commodity:9",
+    "object_type": "Activity",
+    "source_native": {
+      "name": "维修费",
+      "value": null,
+      "unit": null,
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "reason": "p246维修服务的收费不是销售维修费商品",
+    "critical_numeric_error": false
+  },
+  {
+    "instrument_id": "600096.SH",
+    "record_id": "owned:core-ev-93863a1d05eec45b:commodity:11",
+    "object_type": "Activity",
+    "source_native": {
+      "name": "消防费用及消防器材",
+      "value": null,
+      "unit": null,
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "reason": "p246费用与消防器材复合行不得合为销售商品",
+    "critical_numeric_error": false
+  },
+  {
+    "instrument_id": "600096.SH",
+    "record_id": "owned:core-ev-eec4fbe1c8d75e07:commodity:13",
+    "object_type": "Activity",
+    "source_native": {
+      "name": "电费",
+      "value": null,
+      "unit": null,
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "reason": "p247电力收费与电费商品身份不同，不可销售电费",
+    "critical_numeric_error": false
+  },
+  {
+    "instrument_id": "600096.SH",
+    "record_id": "owned:core-ev-eec4fbe1c8d75e07:commodity:17",
+    "object_type": "Activity",
+    "source_native": {
+      "name": "检测费",
+      "value": null,
+      "unit": null,
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "reason": "p247检测服务费不是销售检测费商品",
+    "critical_numeric_error": false
+  },
+  {
+    "instrument_id": "600096.SH",
+    "record_id": "owned:core-ev-017eb0d71d22f350:Segment:service:季戊四醇:出售商品/提供劳务/本期发生额:row:34",
+    "object_type": "Segment",
+    "source_native": {
+      "name": "季戊四醇",
+      "value": "57,106.80",
+      "unit": "元",
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": "交易对方：CPICAbahsainFiberglassW.L.L.(巴林阿巴桑玻璃纤维有",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "reason": "p247 CPIC完整交易方应为CPICAbahsainFiberglassW.L.L.(巴林阿巴桑玻璃纤维有限公司)，续行尾字丢失",
+    "critical_numeric_error": false
+  },
+  {
+    "instrument_id": "600096.SH",
+    "record_id": "owned:core-ev-24a56c14cb4f69ab:Measurement:service:季戊四醇:出售商品/提供劳务/本期发生额:row:34",
+    "object_type": "Measurement",
+    "source_native": {
+      "name": "季戊四醇",
+      "value": "57,106.80",
+      "unit": "元",
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": "交易对方：CPICAbahsainFiberglassW.L.L.(巴林阿巴桑玻璃纤维有",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "reason": "p247 CPIC完整交易方应为CPICAbahsainFiberglassW.L.L.(巴林阿巴桑玻璃纤维有限公司)，续行尾字丢失",
+    "critical_numeric_error": false
+  },
+  {
+    "instrument_id": "600096.SH",
+    "record_id": "owned:core-ev-017eb0d71d22f350:Segment:service:检测费:出售商品/提供劳务/本期发生额:row:35",
+    "object_type": "Segment",
+    "source_native": {
+      "name": "检测费",
+      "value": "49,607.81",
+      "unit": "元",
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": "交易对方：限公司)云南省化工产品质量监督检验站",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "reason": "p247上一行CPIC的限公司)应归上一行，不得污染云南省化工产品质量监督检验站",
+    "critical_numeric_error": false
+  },
+  {
+    "instrument_id": "600096.SH",
+    "record_id": "owned:core-ev-24a56c14cb4f69ab:Measurement:service:检测费:出售商品/提供劳务/本期发生额:row:35",
+    "object_type": "Measurement",
+    "source_native": {
+      "name": "检测费",
+      "value": "49,607.81",
+      "unit": "元",
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": "交易对方：限公司)云南省化工产品质量监督检验站",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "reason": "p247上一行CPIC的限公司)应归上一行，不得污染云南省化工产品质量监督检验站",
+    "critical_numeric_error": false
+  },
+  {
+    "instrument_id": "600096.SH",
+    "record_id": "owned:core-ev-30ffdf03194ec54a:Segment:lease:房屋租赁、设备租赁房屋租赁:本公司作为出租方/本期确认的租赁收入:row:2",
+    "object_type": "Segment",
+    "source_native": {
+      "name": "房屋租赁、设备租赁房屋租赁",
+      "value": "794,687.48",
+      "unit": "元",
+      "header": "本公司作为出租方/本期确认的租赁收入",
+      "qualifier": "承租方：云南氟磷电子科技有限公司云天化集团有限责任公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "reason": "p249氟磷电子与云天化集团两独立出租行错误拼接；794687.48仅氟磷电子房屋/设备收入，428571.42集团另一行应独立",
+    "critical_numeric_error": false
+  },
+  {
+    "instrument_id": "600096.SH",
+    "record_id": "owned:core-ev-6b9912390cb5f592:Measurement:lease:房屋租赁、设备租赁房屋租赁:本公司作为出租方/本期确认的租赁收入:row:2",
+    "object_type": "Measurement",
+    "source_native": {
+      "name": "房屋租赁、设备租赁房屋租赁",
+      "value": "794,687.48",
+      "unit": "元",
+      "header": "本公司作为出租方/本期确认的租赁收入",
+      "qualifier": "承租方：云南氟磷电子科技有限公司云天化集团有限责任公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "reason": "p249氟磷电子与云天化集团两独立出租行错误拼接；794687.48仅氟磷电子房屋/设备收入，428571.42集团另一行应独立",
+    "critical_numeric_error": false
+  }
+]

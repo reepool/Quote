@@ -1,0 +1,18 @@
+{
+  "original_contract_unchanged": true,
+  "positive_count_unchanged": 364,
+  "negative_count_unchanged": 41,
+  "notes": [
+    {
+      "instrument_id": "600096.SH",
+      "page": 25,
+      "condition_id": "600096.SH-income-020",
+      "frozen_display_name": "贸易业务",
+      "native_row_name": "商贸业务",
+      "source": "原p25贸易业务开展情况的唯一收入行商贸业务；原冻结项金额、单位、栏目、主体和期间均不变，不增删条件；标题简称不作为商品销售"
+    },
+    {
+      "rule": "重要公司和非全资子公司原业务主体分类对应现有business_segment维度，联营对应business_segment范围，原关系限定和主体必须匹配；渠道收入/主营业务对应原p37渠道主营栏目；辅助拼写映射不改变原实质条件"
+    }
+  ]
+}

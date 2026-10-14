@@ -1,0 +1,1754 @@
+{
+  "600064.SH": {
+    "facts": {},
+    "answers": {}
+  },
+  "600096.SH": {
+    "facts": {
+      "owned:core-ev-9b0ada369e6cfc57:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核",
+        "source_original_pages": [
+          8,
+          9,
+          10
+        ],
+        "source_exact_after_whitespace": true,
+        "layout_order_note": null
+      },
+      "owned:core-ev-6eed44c618df9c80:activity:1": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p9为以煤炭、天然气为原料生产尿素，不生产天然气为主要原料这一伪商品"
+      },
+      "owned:core-ev-ce6f6f1d783b6ae5:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核",
+        "source_original_pages": [
+          246,
+          247,
+          248,
+          249
+        ],
+        "source_exact_after_whitespace": true,
+        "layout_order_note": null
+      },
+      "owned:core-ev-d299101c0c7092cd:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核",
+        "source_original_pages": [
+          249,
+          250
+        ],
+        "source_exact_after_whitespace": true,
+        "layout_order_note": null
+      },
+      "owned:core-ev-cd15f50bba2f9aa5:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核",
+        "source_original_pages": [
+          249
+        ],
+        "source_exact_after_whitespace": true,
+        "layout_order_note": null
+      },
+      "owned:core-ev-0d4b56e19630876d:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核",
+        "source_original_pages": [
+          8,
+          9
+        ],
+        "source_exact_after_whitespace": true,
+        "layout_order_note": null
+      },
+      "owned:core-ev-767d9b80b6c5d73f:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核",
+        "source_original_pages": [
+          22
+        ],
+        "source_exact_after_whitespace": true,
+        "layout_order_note": null
+      },
+      "owned:core-ev-d1d1edb9a79a63f8:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核",
+        "source_original_pages": [
+          22
+        ],
+        "source_exact_after_whitespace": true,
+        "layout_order_note": null
+      },
+      "owned:core-ev-c8eedc526e8bada5:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核",
+        "source_original_pages": [
+          38
+        ],
+        "source_exact_after_whitespace": true,
+        "layout_order_note": null
+      },
+      "owned:core-ev-dc9aa5f143bf7095:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核",
+        "source_original_pages": [
+          41,
+          42
+        ],
+        "source_exact_after_whitespace": true,
+        "layout_order_note": null
+      },
+      "owned:core-ev-a83305eab5160f24:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核",
+        "source_original_pages": [
+          43
+        ],
+        "source_exact_after_whitespace": true,
+        "layout_order_note": null
+      },
+      "owned:core-ev-7df0e56538e552fe:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核",
+        "source_original_pages": [
+          151,
+          152
+        ],
+        "source_exact_after_whitespace": true,
+        "layout_order_note": null
+      },
+      "owned:core-ev-c3d26abe9d60e409:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核",
+        "source_original_pages": [
+          156
+        ],
+        "source_exact_after_whitespace": true,
+        "layout_order_note": null
+      },
+      "owned:core-ev-be9745dd621c2f6a:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核",
+        "source_original_pages": [
+          222
+        ],
+        "source_exact_after_whitespace": true,
+        "layout_order_note": null
+      },
+      "owned:core-ev-a8bbc763809c1cfa:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核",
+        "source_original_pages": [
+          225
+        ],
+        "source_exact_after_whitespace": true,
+        "layout_order_note": null
+      },
+      "owned:core-ev-51468e58e429b224:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核",
+        "source_original_pages": [
+          225
+        ],
+        "source_exact_after_whitespace": true,
+        "layout_order_note": null
+      },
+      "owned:core-ev-176de961c1cb5cef:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核",
+        "source_original_pages": [
+          226,
+          227,
+          228
+        ],
+        "source_exact_after_whitespace": false,
+        "layout_order_note": "p226取得方式与直接/间接表头读序不同；逐行原公司、比例、业务性质及p228控制解释均一致，无新增肯定动作"
+      },
+      "owned:core-ev-61ba41bc402b0d66:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核",
+        "source_original_pages": [
+          246
+        ],
+        "source_exact_after_whitespace": true,
+        "layout_order_note": null
+      },
+      "owned:core-ev-69fd48289cddb61e:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核",
+        "source_original_pages": [
+          249
+        ],
+        "source_exact_after_whitespace": true,
+        "layout_order_note": null
+      },
+      "owned:core-ev-dddb709f75bb16f6:overview": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核",
+        "source_original_pages": [
+          249
+        ],
+        "source_exact_after_whitespace": true,
+        "layout_order_note": null
+      },
+      "owned:core-ev-19140dc59520cd52:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原具名对象、独立方向、原主体和来源页匹配",
+        "recall_role_index": 1
+      },
+      "owned:core-ev-19140dc59520cd52:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原具名对象、独立方向、原主体和来源页匹配",
+        "recall_role_index": 3
+      },
+      "owned:core-ev-19140dc59520cd52:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原具名对象、独立方向、原主体和来源页匹配",
+        "recall_role_index": 5
+      },
+      "owned:core-ev-19140dc59520cd52:commodity:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原具名对象、独立方向、原主体和来源页匹配",
+        "recall_role_index": 7
+      },
+      "owned:core-ev-19140dc59520cd52:commodity:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原具名对象、独立方向、原主体和来源页匹配",
+        "recall_role_index": 9
+      },
+      "owned:core-ev-19140dc59520cd52:commodity:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原具名对象、独立方向、原主体和来源页匹配",
+        "recall_role_index": 11
+      },
+      "owned:core-ev-19140dc59520cd52:commodity:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原具名对象、独立方向、原主体和来源页匹配",
+        "recall_role_index": 13
+      },
+      "owned:core-ev-a9bfba53d9e72f67:commodity:1": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p25贸易业务行是收入业务类别，不是具名可销售商品"
+      },
+      "owned:core-ev-1ed182466f2696b6:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外原p42合法父类生产/销售/经营或关联表非零本期具名商品销售；不据零行反推动作，不重复召回",
+        "source_original_pages": [
+          4,
+          41,
+          42
+        ]
+      },
+      "owned:core-ev-1ed182466f2696b6:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外原p42合法父类生产/销售/经营或关联表非零本期具名商品销售；不据零行反推动作，不重复召回",
+        "source_original_pages": [
+          4,
+          41,
+          42
+        ]
+      },
+      "owned:core-ev-1ed182466f2696b6:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外原p42合法父类生产/销售/经营或关联表非零本期具名商品销售；不据零行反推动作，不重复召回",
+        "source_original_pages": [
+          4,
+          41,
+          42
+        ]
+      },
+      "owned:core-ev-1ed182466f2696b6:commodity:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外原p42合法父类生产/销售/经营或关联表非零本期具名商品销售；不据零行反推动作，不重复召回",
+        "source_original_pages": [
+          4,
+          41,
+          42
+        ]
+      },
+      "owned:core-ev-1ed182466f2696b6:commodity:5": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p42水富研发/产品生产销售复合短语污染商品身份，不得以该串作为商品"
+      },
+      "owned:core-ev-1ed182466f2696b6:commodity:6": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p42水富研发/产品生产销售复合短语污染商品身份，不得以该串作为商品"
+      },
+      "owned:core-ev-1ed182466f2696b6:commodity:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外原p42合法父类生产/销售/经营或关联表非零本期具名商品销售；不据零行反推动作，不重复召回",
+        "source_original_pages": [
+          4,
+          41,
+          42
+        ]
+      },
+      "owned:core-ev-1ed182466f2696b6:commodity:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外原p42合法父类生产/销售/经营或关联表非零本期具名商品销售；不据零行反推动作，不重复召回",
+        "source_original_pages": [
+          4,
+          41,
+          42
+        ]
+      },
+      "owned:core-ev-1ed182466f2696b6:commodity:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外原p42合法父类生产/销售/经营或关联表非零本期具名商品销售；不据零行反推动作，不重复召回",
+        "source_original_pages": [
+          4,
+          41,
+          42
+        ]
+      },
+      "owned:core-ev-1ed182466f2696b6:commodity:10": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p42联合商务跨行国际货运代理名称截断，不能作完整经营对象"
+      },
+      "owned:core-ev-93863a1d05eec45b:commodity:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外原p42合法父类生产/销售/经营或关联表非零本期具名商品销售；不据零行反推动作，不重复召回",
+        "source_original_pages": [
+          4,
+          245,
+          246,
+          247,
+          248,
+          249
+        ]
+      },
+      "owned:core-ev-93863a1d05eec45b:commodity:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原具名对象、独立方向、原主体和来源页匹配",
+        "recall_role_index": 119
+      },
+      "owned:core-ev-93863a1d05eec45b:commodity:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原具名对象、独立方向、原主体和来源页匹配",
+        "recall_role_index": 120
+      },
+      "owned:core-ev-93863a1d05eec45b:commodity:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原具名对象、独立方向、原主体和来源页匹配",
+        "recall_role_index": 121
+      },
+      "owned:core-ev-93863a1d05eec45b:commodity:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原具名对象、独立方向、原主体和来源页匹配",
+        "recall_role_index": 122
+      },
+      "owned:core-ev-93863a1d05eec45b:commodity:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原具名对象、独立方向、原主体和来源页匹配",
+        "recall_role_index": 123
+      },
+      "owned:core-ev-93863a1d05eec45b:commodity:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外原p42合法父类生产/销售/经营或关联表非零本期具名商品销售；不据零行反推动作，不重复召回",
+        "source_original_pages": [
+          4,
+          245,
+          246,
+          247,
+          248,
+          249
+        ]
+      },
+      "owned:core-ev-93863a1d05eec45b:commodity:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外原p42合法父类生产/销售/经营或关联表非零本期具名商品销售；不据零行反推动作，不重复召回",
+        "source_original_pages": [
+          4,
+          245,
+          246,
+          247,
+          248,
+          249
+        ]
+      },
+      "owned:core-ev-93863a1d05eec45b:commodity:9": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p246维修服务的收费不是销售维修费商品"
+      },
+      "owned:core-ev-93863a1d05eec45b:commodity:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原具名对象、独立方向、原主体和来源页匹配",
+        "recall_role_index": 126
+      },
+      "owned:core-ev-93863a1d05eec45b:commodity:11": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p246费用与消防器材复合行不得合为销售商品"
+      },
+      "owned:core-ev-93863a1d05eec45b:commodity:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原具名对象、独立方向、原主体和来源页匹配",
+        "recall_role_index": 128
+      },
+      "owned:core-ev-93863a1d05eec45b:commodity:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原具名对象、独立方向、原主体和来源页匹配",
+        "recall_role_index": 108
+      },
+      "owned:core-ev-eec4fbe1c8d75e07:commodity:13": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p247电力收费与电费商品身份不同，不可销售电费"
+      },
+      "owned:core-ev-eec4fbe1c8d75e07:commodity:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外原p42合法父类生产/销售/经营或关联表非零本期具名商品销售；不据零行反推动作，不重复召回",
+        "source_original_pages": [
+          4,
+          246,
+          247,
+          248,
+          249
+        ]
+      },
+      "owned:core-ev-eec4fbe1c8d75e07:commodity:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外原p42合法父类生产/销售/经营或关联表非零本期具名商品销售；不据零行反推动作，不重复召回",
+        "source_original_pages": [
+          4,
+          246,
+          247,
+          248,
+          249
+        ]
+      },
+      "owned:core-ev-eec4fbe1c8d75e07:commodity:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外原p42合法父类生产/销售/经营或关联表非零本期具名商品销售；不据零行反推动作，不重复召回",
+        "source_original_pages": [
+          4,
+          246,
+          247,
+          248,
+          249
+        ]
+      },
+      "owned:core-ev-eec4fbe1c8d75e07:commodity:17": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p247检测服务费不是销售检测费商品"
+      },
+      "owned:core-ev-eec4fbe1c8d75e07:commodity:18": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外原p42合法父类生产/销售/经营或关联表非零本期具名商品销售；不据零行反推动作，不重复召回",
+        "source_original_pages": [
+          4,
+          246,
+          247,
+          248,
+          249
+        ]
+      },
+      "owned:core-ev-24aa867f3556f290:segment:industry:化肥:table:None:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 0
+      },
+      "owned:core-ev-16dcc26d3457919d:revenue:industry:化肥:table:None:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 0
+      },
+      "owned:core-ev-24aa867f3556f290:segment:industry:工程材料:table:None:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 1
+      },
+      "owned:core-ev-16dcc26d3457919d:revenue:industry:工程材料:table:None:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 1
+      },
+      "owned:core-ev-24aa867f3556f290:segment:industry:磷矿采选:table:None:row:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 2
+      },
+      "owned:core-ev-16dcc26d3457919d:revenue:industry:磷矿采选:table:None:row:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 2
+      },
+      "owned:core-ev-24aa867f3556f290:segment:industry:煤炭采掘:table:None:row:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 3
+      },
+      "owned:core-ev-16dcc26d3457919d:revenue:industry:煤炭采掘:table:None:row:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 3
+      },
+      "owned:core-ev-24aa867f3556f290:segment:industry:商贸物流:table:None:row:21": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 4
+      },
+      "owned:core-ev-16dcc26d3457919d:revenue:industry:商贸物流:table:None:row:21": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 4
+      },
+      "owned:core-ev-24aa867f3556f290:segment:industry:磷化工:table:None:row:23": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 5
+      },
+      "owned:core-ev-16dcc26d3457919d:revenue:industry:磷化工:table:None:row:23": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 5
+      },
+      "owned:core-ev-24aa867f3556f290:segment:industry:新能源材料:table:None:row:25": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 6
+      },
+      "owned:core-ev-16dcc26d3457919d:revenue:industry:新能源材料:table:None:row:25": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 6
+      },
+      "owned:core-ev-24aa867f3556f290:segment:industry:其他:table:None:row:27": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 7
+      },
+      "owned:core-ev-16dcc26d3457919d:revenue:industry:其他:table:None:row:27": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 7
+      },
+      "owned:core-ev-24aa867f3556f290:segment:product:磷肥:table:主营业务收入:row:38": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 8
+      },
+      "owned:core-ev-16dcc26d3457919d:revenue:product:磷肥:table:主营业务收入:row:38": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 8
+      },
+      "owned:core-ev-24aa867f3556f290:segment:product:尿素:table:主营业务收入:row:41": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 9
+      },
+      "owned:core-ev-16dcc26d3457919d:revenue:product:尿素:table:主营业务收入:row:41": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 9
+      },
+      "owned:core-ev-24aa867f3556f290:segment:product:聚甲醛:table:主营业务收入:row:47": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 11
+      },
+      "owned:core-ev-16dcc26d3457919d:revenue:product:聚甲醛:table:主营业务收入:row:47": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 11
+      },
+      "owned:core-ev-24aa867f3556f290:segment:product:饲料磷酸氢钙:table:主营业务收入:row:49": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 12
+      },
+      "owned:core-ev-16dcc26d3457919d:revenue:product:饲料磷酸氢钙:table:主营业务收入:row:49": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 12
+      },
+      "owned:core-ev-24aa867f3556f290:segment:region:自产产品国内销售:table:主营业务收入:row:60": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 13
+      },
+      "owned:core-ev-16dcc26d3457919d:revenue:region:自产产品国内销售:table:主营业务收入:row:60": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 13
+      },
+      "owned:core-ev-24aa867f3556f290:segment:region:自产产品国外销售:table:主营业务收入:row:62": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 14
+      },
+      "owned:core-ev-16dcc26d3457919d:revenue:region:自产产品国外销售:table:主营业务收入:row:62": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 14
+      },
+      "owned:core-ev-24aa867f3556f290:segment:region:商贸业务:table:主营业务收入:row:64": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 15
+      },
+      "owned:core-ev-16dcc26d3457919d:revenue:region:商贸业务:table:主营业务收入:row:64": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 15
+      },
+      "owned:core-ev-24aa867f3556f290:segment:sales_mode:自产产品直销:table:None:row:75": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 16
+      },
+      "owned:core-ev-16dcc26d3457919d:revenue:sales_mode:自产产品直销:table:None:row:75": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 16
+      },
+      "owned:core-ev-24aa867f3556f290:segment:sales_mode:自产产品分销:table:None:row:77": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 17
+      },
+      "owned:core-ev-16dcc26d3457919d:revenue:sales_mode:自产产品分销:table:None:row:77": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 17
+      },
+      "owned:core-ev-24aa867f3556f290:segment:sales_mode:商贸业务:table:None:row:79": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 18
+      },
+      "owned:core-ev-16dcc26d3457919d:revenue:sales_mode:商贸业务:table:None:row:79": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 18
+      },
+      "owned:core-ev-a5929bba5a463237:Segment:business_type:商贸业务:本期营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 19
+      },
+      "owned:core-ev-20a0827a0861460a:Measurement:business_type:商贸业务:本期营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 19
+      },
+      "owned:core-ev-182378a5deb8c715:Segment:sales_mode:自产产品直销:渠道收入/主营业务:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 20
+      },
+      "owned:core-ev-6276a7cc90541198:Measurement:sales_mode:自产产品直销:渠道收入/主营业务:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 20
+      },
+      "owned:core-ev-182378a5deb8c715:Segment:sales_mode:自产产品分销:渠道收入/主营业务:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 21
+      },
+      "owned:core-ev-6276a7cc90541198:Measurement:sales_mode:自产产品分销:渠道收入/主营业务:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 21
+      },
+      "owned:core-ev-85243501f22024b1:Segment:business_segment:磷化集团:控股参股公司/营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 24
+      },
+      "owned:core-ev-db24a676fd400e16:Measurement:business_segment:磷化集团:控股参股公司/营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 24
+      },
+      "owned:core-ev-85243501f22024b1:Segment:business_segment:天宁矿业:控股参股公司/营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 25
+      },
+      "owned:core-ev-db24a676fd400e16:Measurement:business_segment:天宁矿业:控股参股公司/营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 25
+      },
+      "owned:core-ev-85243501f22024b1:Segment:business_segment:天安化工:控股参股公司/营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 26
+      },
+      "owned:core-ev-db24a676fd400e16:Measurement:business_segment:天安化工:控股参股公司/营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 26
+      },
+      "owned:core-ev-85243501f22024b1:Segment:business_segment:三环中化:控股参股公司/营业收入:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 27
+      },
+      "owned:core-ev-db24a676fd400e16:Measurement:business_segment:三环中化:控股参股公司/营业收入:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 27
+      },
+      "owned:core-ev-85243501f22024b1:Segment:business_segment:红磷化工:控股参股公司/营业收入:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 28
+      },
+      "owned:core-ev-db24a676fd400e16:Measurement:business_segment:红磷化工:控股参股公司/营业收入:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 28
+      },
+      "owned:core-ev-85243501f22024b1:Segment:business_segment:云峰化工:控股参股公司/营业收入:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 29
+      },
+      "owned:core-ev-db24a676fd400e16:Measurement:business_segment:云峰化工:控股参股公司/营业收入:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 29
+      },
+      "owned:core-ev-85243501f22024b1:Segment:business_segment:水富云天化:控股参股公司/营业收入:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 30
+      },
+      "owned:core-ev-db24a676fd400e16:Measurement:business_segment:水富云天化:控股参股公司/营业收入:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 30
+      },
+      "owned:core-ev-85243501f22024b1:Segment:business_segment:金新化工:控股参股公司/营业收入:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 31
+      },
+      "owned:core-ev-db24a676fd400e16:Measurement:business_segment:金新化工:控股参股公司/营业收入:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 31
+      },
+      "owned:core-ev-85243501f22024b1:Segment:business_segment:青海云天化:控股参股公司/营业收入:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 32
+      },
+      "owned:core-ev-db24a676fd400e16:Measurement:business_segment:青海云天化:控股参股公司/营业收入:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 32
+      },
+      "owned:core-ev-85243501f22024b1:Segment:business_segment:大为制氨:控股参股公司/营业收入:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 33
+      },
+      "owned:core-ev-db24a676fd400e16:Measurement:business_segment:大为制氨:控股参股公司/营业收入:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 33
+      },
+      "owned:core-ev-85243501f22024b1:Segment:business_segment:联合商务:控股参股公司/营业收入:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 34
+      },
+      "owned:core-ev-db24a676fd400e16:Measurement:business_segment:联合商务:控股参股公司/营业收入:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 34
+      },
+      "owned:core-ev-85243501f22024b1:Segment:business_segment:农资连锁:控股参股公司/营业收入:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 35
+      },
+      "owned:core-ev-db24a676fd400e16:Measurement:business_segment:农资连锁:控股参股公司/营业收入:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 35
+      },
+      "owned:core-ev-85243501f22024b1:Segment:business_segment:海口磷业:控股参股公司/营业收入:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 36
+      },
+      "owned:core-ev-db24a676fd400e16:Measurement:business_segment:海口磷业:控股参股公司/营业收入:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 36
+      },
+      "owned:core-ev-3e7ead44536773f5:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 37
+      },
+      "owned:core-ev-6bb114054f3e782d:Measurement:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 37
+      },
+      "owned:core-ev-3e7ead44536773f5:Segment:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 38
+      },
+      "owned:core-ev-6bb114054f3e782d:Measurement:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 38
+      },
+      "owned:core-ev-7488284383ee02e4:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 37
+      },
+      "owned:core-ev-7488284383ee02e4:Segment:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 38
+      },
+      "owned:core-ev-7488284383ee02e4:Segment:business_type:合计:营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 39
+      },
+      "owned:core-ev-6423b08bd617be14:Measurement:business_type:合计:营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 39
+      },
+      "owned:core-ev-e7ad7ae7248d3a81:Segment:business_segment:金新化工:重要非全资子公司/本期营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 40
+      },
+      "owned:core-ev-c17b1c098782ef2f:Measurement:business_segment:金新化工:重要非全资子公司/本期营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 40
+      },
+      "owned:core-ev-e7ad7ae7248d3a81:Segment:business_segment:三环中化:重要非全资子公司/本期营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 41
+      },
+      "owned:core-ev-c17b1c098782ef2f:Measurement:business_segment:三环中化:重要非全资子公司/本期营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 41
+      },
+      "owned:core-ev-e7ad7ae7248d3a81:Segment:business_segment:天宁矿业:重要非全资子公司/本期营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 42
+      },
+      "owned:core-ev-c17b1c098782ef2f:Measurement:business_segment:天宁矿业:重要非全资子公司/本期营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 42
+      },
+      "owned:core-ev-e7ad7ae7248d3a81:Segment:business_segment:青海云天化:重要非全资子公司/本期营业收入:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 43
+      },
+      "owned:core-ev-c17b1c098782ef2f:Measurement:business_segment:青海云天化:重要非全资子公司/本期营业收入:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 43
+      },
+      "owned:core-ev-000e44da5ee6847b:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 145
+      },
+      "owned:core-ev-cf06dcf174ad10e5:Measurement:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 145
+      },
+      "owned:core-ev-000e44da5ee6847b:Segment:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 146
+      },
+      "owned:core-ev-cf06dcf174ad10e5:Measurement:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 146
+      },
+      "owned:core-ev-a4013d89389fa94a:Segment:business_type:主营业务:营业收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 145
+      },
+      "owned:core-ev-a4013d89389fa94a:Segment:business_type:其他业务:营业收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 146
+      },
+      "owned:core-ev-a4013d89389fa94a:Segment:business_type:合计:营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 147
+      },
+      "owned:core-ev-849dae0665618a12:Measurement:business_type:合计:营业收入:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 147
+      },
+      "owned:core-ev-e48e668aebb7bd44:Segment:service:土地房屋车辆等:作为出租人的经营租赁/租赁收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外合法经营租赁原p222本期收入，不增加召回",
+        "supplement_source": {
+          "page": 222,
+          "name": "土地房屋车辆等",
+          "value": "88,139,460.13",
+          "unit": "元",
+          "column": "租赁收入"
+        }
+      },
+      "owned:core-ev-232e49e828702875:Measurement:service:土地房屋车辆等:作为出租人的经营租赁/租赁收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "合同外合法经营租赁原p222本期收入，不增加召回",
+        "supplement_source": {
+          "page": 222,
+          "name": "土地房屋车辆等",
+          "value": "88,139,460.13",
+          "unit": "元",
+          "column": "租赁收入"
+        }
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:硫磺、液氨、物流服务费、水电费、磷肥产品、矿山爆破工程、原煤、浮选试剂:出售商品/提供劳务/本期发生额:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 47
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:硫磺、液氨、物流服务费、水电费、磷肥产品、矿山爆破工程、原煤、浮选试剂:出售商品/提供劳务/本期发生额:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 47
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:液氨、硫酸、液碱、中压蒸汽、外购电、氮气等:出售商品/提供劳务/本期发生额:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 48
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:液氨、硫酸、液碱、中压蒸汽、外购电、氮气等:出售商品/提供劳务/本期发生额:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 48
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:黄磷、磷酸、运输服务:出售商品/提供劳务/本期发生额:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 49
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:黄磷、磷酸、运输服务:出售商品/提供劳务/本期发生额:row:2": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 49
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:水电气、服务费:出售商品/提供劳务/本期发生额:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 50
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:水电气、服务费:出售商品/提供劳务/本期发生额:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 50
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:氟硅酸:出售商品/提供劳务/本期发生额:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 51
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:氟硅酸:出售商品/提供劳务/本期发生额:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 51
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:水电气、维修费:出售商品/提供劳务/本期发生额:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 52
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:水电气、维修费:出售商品/提供劳务/本期发生额:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 52
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:运输服务:出售商品/提供劳务/本期发生额:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 53
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:运输服务:出售商品/提供劳务/本期发生额:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 53
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:车用尿素、季戊四醇、运输服务等:出售商品/提供劳务/本期发生额:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 54
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:车用尿素、季戊四醇、运输服务等:出售商品/提供劳务/本期发生额:row:7": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 54
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:销售食品磷酸:出售商品/提供劳务/本期发生额:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 55
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:销售食品磷酸:出售商品/提供劳务/本期发生额:row:8": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 55
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:运输服务:出售商品/提供劳务/本期发生额:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 56
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:运输服务:出售商品/提供劳务/本期发生额:row:9": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 56
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:水电气、氟硅酸、消防费用及消防器材:出售商品/提供劳务/本期发生额:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 58
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:水电气、氟硅酸、消防费用及消防器材:出售商品/提供劳务/本期发生额:row:10": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 58
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:运输服务:出售商品/提供劳务/本期发生额:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 60
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:运输服务:出售商品/提供劳务/本期发生额:row:11": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 60
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:硝酸铵水溶液:出售商品/提供劳务/本期发生额:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 61
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:硝酸铵水溶液:出售商品/提供劳务/本期发生额:row:12": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 61
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:硝酸铵水溶液:出售商品/提供劳务/本期发生额:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 62
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:硝酸铵水溶液:出售商品/提供劳务/本期发生额:row:13": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 62
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:电费:出售商品/提供劳务/本期发生额:row:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 63
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:电费:出售商品/提供劳务/本期发生额:row:14": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 63
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:硝酸铵水溶液:出售商品/提供劳务/本期发生额:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 64
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:硝酸铵水溶液:出售商品/提供劳务/本期发生额:row:15": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 64
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:硝酸铵水溶液:出售商品/提供劳务/本期发生额:row:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 65
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:硝酸铵水溶液:出售商品/提供劳务/本期发生额:row:16": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 65
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:化肥产品、办公用品:出售商品/提供劳务/本期发生额:row:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 66
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:化肥产品、办公用品:出售商品/提供劳务/本期发生额:row:17": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 66
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:劳务服务:出售商品/提供劳务/本期发生额:row:18": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 67
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:劳务服务:出售商品/提供劳务/本期发生额:row:18": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 67
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:硝酸铵水溶液:出售商品/提供劳务/本期发生额:row:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 68
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:硝酸铵水溶液:出售商品/提供劳务/本期发生额:row:19": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 68
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:绿化服务、绿化工程、办公用品、委托管理等:出售商品/提供劳务/本期发生额:row:20": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 69
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:绿化服务、绿化工程、办公用品、委托管理等:出售商品/提供劳务/本期发生额:row:20": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 69
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:办公用品:出售商品/提供劳务/本期发生额:row:21": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 70
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:办公用品:出售商品/提供劳务/本期发生额:row:21": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 70
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:材料等维修:出售商品/提供劳务/本期发生额:row:22": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 71
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:材料等维修:出售商品/提供劳务/本期发生额:row:22": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 71
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:技术服务:出售商品/提供劳务/本期发生额:row:23": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 72
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:技术服务:出售商品/提供劳务/本期发生额:row:23": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 72
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:水电气、办公用品、维修服务等:出售商品/提供劳务/本期发生额:row:24": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 73
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:水电气、办公用品、维修服务等:出售商品/提供劳务/本期发生额:row:24": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 73
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:办公用品、租金等:出售商品/提供劳务/本期发生额:row:25": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 74
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:办公用品、租金等:出售商品/提供劳务/本期发生额:row:25": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 74
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:办公用品:出售商品/提供劳务/本期发生额:row:26": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 75
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:办公用品:出售商品/提供劳务/本期发生额:row:26": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 75
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:办公用品:出售商品/提供劳务/本期发生额:row:27": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 76
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:办公用品:出售商品/提供劳务/本期发生额:row:27": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 76
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:技术服务、绿化服务、绿化工程、办公用品:出售商品/提供劳务/本期发生额:row:28": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 77
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:技术服务、绿化服务、绿化工程、办公用品:出售商品/提供劳务/本期发生额:row:28": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 77
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:办公用品:出售商品/提供劳务/本期发生额:row:29": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 78
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:办公用品:出售商品/提供劳务/本期发生额:row:29": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 78
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:硝酸铵水溶液:出售商品/提供劳务/本期发生额:row:30": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 79
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:硝酸铵水溶液:出售商品/提供劳务/本期发生额:row:30": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 79
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:硝酸铵水溶液:出售商品/提供劳务/本期发生额:row:31": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 80
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:硝酸铵水溶液:出售商品/提供劳务/本期发生额:row:31": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 80
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:绿化服务、办公用品:出售商品/提供劳务/本期发生额:row:32": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 81
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:绿化服务、办公用品:出售商品/提供劳务/本期发生额:row:32": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 81
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:技术服务、添加剂:出售商品/提供劳务/本期发生额:row:33": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 82
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:技术服务、添加剂:出售商品/提供劳务/本期发生额:row:33": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 82
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:季戊四醇:出售商品/提供劳务/本期发生额:row:34": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p247 CPIC完整交易方应为CPICAbahsainFiberglassW.L.L.(巴林阿巴桑玻璃纤维有限公司)，续行尾字丢失"
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:季戊四醇:出售商品/提供劳务/本期发生额:row:34": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p247 CPIC完整交易方应为CPICAbahsainFiberglassW.L.L.(巴林阿巴桑玻璃纤维有限公司)，续行尾字丢失"
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:检测费:出售商品/提供劳务/本期发生额:row:35": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p247上一行CPIC的限公司)应归上一行，不得污染云南省化工产品质量监督检验站"
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:检测费:出售商品/提供劳务/本期发生额:row:35": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p247上一行CPIC的限公司)应归上一行，不得污染云南省化工产品质量监督检验站"
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:办公用品:出售商品/提供劳务/本期发生额:row:36": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 85
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:办公用品:出售商品/提供劳务/本期发生额:row:36": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 85
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:办公用品:出售商品/提供劳务/本期发生额:row:37": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 86
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:办公用品:出售商品/提供劳务/本期发生额:row:37": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 86
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:办公用品、水电:出售商品/提供劳务/本期发生额:row:38": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 87
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:办公用品、水电:出售商品/提供劳务/本期发生额:row:38": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 87
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:办公用品:出售商品/提供劳务/本期发生额:row:39": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 88
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:办公用品:出售商品/提供劳务/本期发生额:row:39": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 88
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:办公用品:出售商品/提供劳务/本期发生额:row:40": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 89
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:办公用品:出售商品/提供劳务/本期发生额:row:40": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 89
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:水电气:出售商品/提供劳务/本期发生额:row:41": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 90
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:水电气:出售商品/提供劳务/本期发生额:row:41": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 90
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:办公用品:出售商品/提供劳务/本期发生额:row:42": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 91
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:办公用品:出售商品/提供劳务/本期发生额:row:42": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 91
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:办公用品:出售商品/提供劳务/本期发生额:row:43": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 92
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:办公用品:出售商品/提供劳务/本期发生额:row:43": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 92
+      },
+      "owned:core-ev-017eb0d71d22f350:Segment:service:办公用品:出售商品/提供劳务/本期发生额:row:44": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 93
+      },
+      "owned:core-ev-24a56c14cb4f69ab:Measurement:service:办公用品:出售商品/提供劳务/本期发生额:row:44": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 93
+      },
+      "owned:core-ev-30ffdf03194ec54a:Segment:lease:罐车、房屋等租赁:本公司作为出租方/本期确认的租赁收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 107
+      },
+      "owned:core-ev-6b9912390cb5f592:Measurement:lease:罐车、房屋等租赁:本公司作为出租方/本期确认的租赁收入:row:0": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 107
+      },
+      "owned:core-ev-30ffdf03194ec54a:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 108
+      },
+      "owned:core-ev-6b9912390cb5f592:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:1": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 108
+      },
+      "owned:core-ev-30ffdf03194ec54a:Segment:lease:房屋租赁、设备租赁房屋租赁:本公司作为出租方/本期确认的租赁收入:row:2": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p249氟磷电子与云天化集团两独立出租行错误拼接；794687.48仅氟磷电子房屋/设备收入，428571.42集团另一行应独立"
+      },
+      "owned:core-ev-6b9912390cb5f592:Measurement:lease:房屋租赁、设备租赁房屋租赁:本公司作为出租方/本期确认的租赁收入:row:2": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "p249氟磷电子与云天化集团两独立出租行错误拼接；794687.48仅氟磷电子房屋/设备收入，428571.42集团另一行应独立"
+      },
+      "owned:core-ev-30ffdf03194ec54a:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 111
+      },
+      "owned:core-ev-6b9912390cb5f592:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:3": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 111
+      },
+      "owned:core-ev-30ffdf03194ec54a:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 112
+      },
+      "owned:core-ev-6b9912390cb5f592:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:4": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 112
+      },
+      "owned:core-ev-30ffdf03194ec54a:Segment:lease:车辆:本公司作为出租方/本期确认的租赁收入:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 113
+      },
+      "owned:core-ev-6b9912390cb5f592:Measurement:lease:车辆:本公司作为出租方/本期确认的租赁收入:row:5": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 113
+      },
+      "owned:core-ev-30ffdf03194ec54a:Segment:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 114
+      },
+      "owned:core-ev-6b9912390cb5f592:Measurement:lease:房屋租赁:本公司作为出租方/本期确认的租赁收入:row:6": {
+        "accurate": true,
+        "critical_numeric_error": false,
+        "reason": "原本期对象、金额、单位、栏目、主体与限定逐项匹配",
+        "recall_row_index": 114
+      }
+    },
+    "answers": {
+      "principal_business": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "正文未完整覆盖冻结原业务链条/产品矩阵/经营及收费机制，不能以已答状态和部分关键词通过",
+        "missing_substance_groups": [
+          [
+            "大豆"
+          ],
+          [
+            "9月",
+            "9 月"
+          ]
+        ],
+        "source_required_substance": "四主业完整链，自有磷矿煤炭及磷矿外购、统一销售和物流/贸易；大豆9月后停止，清算退出控制及红海40%控制、海口参股期间，母公司统购销独立。"
+      },
+      "products_services": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "正文未完整覆盖冻结原业务链条/产品矩阵/经营及收费机制，不能以已答状态和部分关键词通过",
+        "missing_substance_groups": [
+          [
+            "五氧化二磷"
+          ],
+          [
+            "阻燃剂"
+          ],
+          [
+            "聚磷酸"
+          ],
+          [
+            "磷酸铁"
+          ],
+          [
+            "甲醇"
+          ],
+          [
+            "仓储"
+          ]
+        ],
+        "source_required_substance": "全矩阵产品及原材料实际用途、氟化精细链参股与产能限定、两基地甲醇来源和用销分别、物流运输仓储联运出口；下游用途/医用研发不可成销售。"
+      },
+      "revenue_model": {
+        "accurate": false,
+        "critical_numeric_error": false,
+        "reason": "正文未完整覆盖冻结原业务链条/产品矩阵/经营及收费机制，不能以已答状态和部分关键词通过",
+        "missing_substance_groups": [
+          [
+            "大宗采购"
+          ],
+          [
+            "分批销售"
+          ]
+        ],
+        "source_required_substance": "化肥大宗采购分批销售、经销商分销/直销出口、供应链贸易物流；国内交付接受收款权利/风险，出口报关控制权，转口装船寄提单总额法；租赁托管/集团母公司主营全部原栏目零与空分别。"
+      }
+    }
+  }
+}

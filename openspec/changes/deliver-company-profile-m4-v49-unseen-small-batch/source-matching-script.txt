@@ -1,0 +1,40 @@
+import re
+from decimal import Decimal
+co=lambda x:re.sub(r'\s+','',x or '').replace('（','(').replace('）',')')
+num=lambda x:Decimal(co(x).replace(',',''))
+def pages(r):return {p for e in r['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[])] if p is not None}
+def actor_ok(r,row):
+ sc=row['subject_scope'];actual=r['subject_scope'];n=r['source_native'];q=co(n.get('qualifier'));actor=co(row['source_actor'])
+ if sc=='consolidated_group':return actual==sc
+ if sc=='issuer':return actual=='issuer'
+ if sc=='named_associate':return actual=='business_segment' and q in {co('联营企业：'+a) for a in [row['name'],row['source_actor'],*row['native_aliases']]} if row['header']=='重要联营企业的主要财务信息' else actual in ['business_segment','named_subsidiary'] and q in {co(prefix+a) for prefix in ['子公司：','参股公司：'] for a in row['native_aliases']}
+ return actual=='named_subsidiary' and (actor in q or any(co(a) in q for a in row['native_aliases']) or co(r.get('source_actor'))==actor)
+def match(r,row):
+ n=r['source_native'];h=n.get('header') or '';q=co(n.get('qualifier'));d=r.get('dimension',r.get('segment_dimension'));rh=row['header'];name=co(n['name'])
+ if row['page'] not in pages(r) or n.get('unit')!=row['unit'] or num(n.get('value'))!=num(row['value']):return False
+ if name not in {co(s) for s in row['native_aliases']} and not (rh=='贸易业务开展情况' and name=='商贸业务' and row['name']=='贸易业务'):return False
+ if rh=='出售商品/提供劳务':return d in ['product','service'] and h=='出售商品/提供劳务/本期发生额' and q==co('交易对方：'+row['counterparty']) and r['subject_scope']=='consolidated_group'
+ if rh=='本公司作为出租方':return d=='lease' and h=='本公司作为出租方/本期确认的租赁收入' and q==co('承租方：'+row['counterparty']) and r['subject_scope']=='consolidated_group'
+ if rh=='受托管理/承包':return d=='service' and '托管' in h and co(row['counterparty']) in q and co(row['source_actor']) in q and r['subject_scope']==row['subject_scope']
+ if rh=='重要联营企业的主要财务信息':return h=='重要联营企业/本期营业收入' and actor_ok(r,row)
+ if d!=row['dimension'] and not (rh in ['主要控股参股公司分析','重要非全资子公司的主要财务信息'] and d=='business_segment'):return False
+ if rh.startswith('主营业务分'):ok=h in ['', '主营业务收入']
+ elif rh=='主营业务收入构成':ok=h in ['', '主营业务收入','主营业务收入构成']
+ elif rh in ['合并营业收入和营业成本','母公司营业收入和营业成本']:ok=h=='营业收入'
+ elif rh=='贸易业务开展情况':ok=h=='本期营业收入'
+ elif rh=='主要控股参股公司分析':ok=h=='控股参股公司/营业收入'
+ elif rh=='重要非全资子公司的主要财务信息':ok=h=='重要非全资子公司/本期营业收入'
+ elif rh.endswith('营业收入明细'):ok=h in ['营业收入','营业收入明细','主营业务收入']
+ elif rh.startswith('报告分部/'):ok=h in ['主营业务收入',rh.split('/')[-1],rh,'报告分部/主营业务收入']
+ elif rh=='按销售渠道划分的公司主营业务基本情况':ok=h in ['主营业务收入','主营业务收入/销售渠道','营业收入','渠道收入/主营业务']
+ elif rh=='房地产销售和结转情况':ok='结转' in h
+ elif rh=='房地产出租情况':ok='租金' in h or '租赁' in h
+ elif rh.startswith('经营讨论/'):ok='营业收入' in h or '结转' in h
+ else:ok=False
+ return ok and actor_ok(r,row)
+def action_match(r,role):
+ n=r['source_native']
+ if role['page'] not in pages(r) or co(n['name']) not in {co(a) for a in role['native_aliases']}:return False
+ if r['subject_scope']!=role['subject_scope']:return False
+ if role['source_actor']!='公司及合并子公司' and co(r.get('source_actor')) not in {co(a) for a in role.get('actor_aliases',[role['source_actor']])}:return False
+ return r.get('relation_type')=='material_input' if role['source_actions']==['material_input'] else r.get('action') in role['source_actions']

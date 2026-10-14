@@ -1,0 +1,46 @@
+import json
+from pathlib import Path
+from quote_v49_new_matching import co,pages,num
+C=Path('openspec/changes/deliver-company-profile-m4-v49-unseen-small-batch');load=lambda p:json.loads(Path(p).read_text());s=load(C/'source-scope.json');f=load(Path('data/checkpoints/company_profile_common_core/reports/m4_v49_unseen_small_batch/formal_execution.json'));ledger=load(C/'related-sales-independent-ledger.json');out=[]
+for n in s['negative_conditions']:
+ i=n['instrument_id'];rs=load('/tmp/v49newraw_'+i+'.json');ds=load('/tmp/v49newanswers_'+i+'.json');fin=[r for r in rs if r['object_type'] in ['Segment','Measurement']];acts=[r for r in rs if r['object_type'] in ['Activity','Relationship']];source=load('/tmp/quote_v49_unseen_source_'+i+'.json')[n['page']-1]['text'];bad=[];checked=[];reason=''
+ if not f['results'][i]['query'].get('profiles'):
+  out.append(dict(condition_id=n['condition_id'],instrument_id=i,source_condition=n,source_text=source,evaluated=False,passed=False,violating_object_ids=[],checked_actual_object_ids=[],reason='semantic终止未publish，负例不可用空结果宣称通过。'))
+  continue
+ name=n['name']
+ if name=='重要合营不适用':
+  checked=[r['record_id'] for r in fin];bad=[r['record_id'] for r in fin if '重要合营' in (r['source_native'].get('header')or'')];reason='p231合营不适用后联营适用，检查所有收入栏目无伪合营；原联营未完整交付属正向漏召回。'
+ elif name in ['承租租金非收入','投资收益非收入']:
+  checked=[r['record_id'] for r in fin];bad=[r['record_id'] for r in fin if any(num(r['source_native']['value'])==num(v) for v in n['values'])];reason='原支出租金和投资收益不得营业收入化；所有实际收入与肯定摘要未生成这些金额。'
+ elif name=='报告分部主营不升级全部外内抵销':
+  checked=[r['record_id'] for r in fin];bad=[r['record_id'] for r in fin if pages(r)&{258,259} and any(v in (r['source_native'].get('header')or'') for v in ['对外交易','内部交易','分部间抵销','全部营业'])];reason='报告分部本期行业产品地区实为主营；本轮该原表漏交付，未生成伪对外/内部/抵销。'
+ elif name=='费用成本非营业收入':
+  checked=[r['record_id'] for r in fin];bad=[r['record_id'] for r in fin if any(v in (r['source_native'].get('header')or'') for v in n['forbidden_headers'])];reason='费用成本列未生成本期营业收入；错误费类Activity另计准确率，不等同收入数字事实。'
+ elif name in ['参股氟化产品非集团','子公司产能非当前销售','下游用途非自产商品','医用聚甲醛研发非销售']:
+  checked=[r['record_id'] for r in acts];targets={co(v) for v in n['names']}
+  for r in acts:
+   if co(r['source_native']['name']) in targets and r.get('action') in ['produces','sells'] and (name!='参股氟化产品非集团' or r['subject_scope']=='consolidated_group') and (name!='子公司产能非当前销售' or r.get('action')=='sells'):bad.append(r['record_id'])
+  reason='所有当前动作及肯定正文没有将参股/产能/下游用途/研发升格为集团当前销售生产。原正向矩阵未完整另记遗漏。'
+ elif name=='打印零采购不推动作':
+  checked=[r['record_id'] for r in acts];bad=[r['record_id'] for r in acts if co(r['source_native']['name']) in {co(x) for x in n['names']} and r.get('action')=='purchases' and any(co(v) in co(r['source_native'].get('qualifier')) for v in n['counterparties'])];reason='本期打印零的关联两采购行不生成该交易采购；合法其他原页/本期采购条件独立保留。'
+ elif name=='零收入不推销售动作':
+  checked=[r['record_id'] for r in acts];valid_nonzero=[x for x in ledger[i] if x['current_value'] not in [None,'0']]
+  zero_names={co(v).removeprefix('销售') for v in n['content'].split('、')}
+  for r in acts:
+   rn=co(r['source_native']['name']);qual=co(r['source_native'].get('qualifier'))
+   if r.get('action')!='sells' or rn not in zero_names:continue
+   if co(n['counterparty']) in qual:bad.append(r['record_id'])
+   elif r['source_native'].get('header')=='出售商品/提供劳务/本期发生额' and not any(rn in co(x['content']) for x in valid_nonzero):bad.append(r['record_id'])
+  reason='该零收入本期格保持为0；活动若同商品有其他明确非零交易独立依据，则不因本零交易禁掉；无该零对手肯定销售。'
+ elif name in ['退出合并状态','红海40仍控制','大豆9月后不开展','供应链探索不升格全面现有服务','海口关联口径期间']:
+  checked=[r['record_id'] for r in rs]+['answer:'+d['dimension_id'] for d in ds]
+  if name=='退出合并状态':
+   assert all(x in co(''.join(d['excerpt'] for d in ds)) for x in ['河南云天化','云农科技','不再纳入公司合并范围','上海云天化国际贸易有限公司完成清算注销'])
+   bad=[r['record_id'] for r in acts if co(r.get('source_actor')) in {co(v) for v in n['names']}]
+  if name=='红海40仍控制':assert '能够对其控制' in co(''.join(d['excerpt'] for d in ds))
+  if name=='大豆9月后不开展':bad=[r['record_id'] for r in acts if co(r['source_native']['name'])=='大豆' and '9月' not in co(r['source_native'].get('qualifier'))]
+  reason='逐对象及完整实际答案未肯定原文禁止的期间/主体/状态。已交付退出及红海控制原句保留；大豆/供应链/海口期间遗漏在正文或正向条件中报告，不能作为成立补全。'
+ else:raise AssertionError(name)
+ out.append(dict(condition_id=n['condition_id'],instrument_id=i,source_condition=n,source_text=source,evaluated=True,passed=not bad,violating_object_ids=bad,checked_actual_object_ids=checked,answered_dimensions_checked=[d['dimension_id'] for d in ds],reason=reason))
+result=dict(condition_count=len(out),passed=sum(x['passed'] for x in out),evaluated=sum(x['evaluated'] for x in out),unevaluable=sum(not x['evaluated'] for x in out),negative_reviews=out)
+(C/'negative-review-evidence.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n');print({k:v for k,v in result.items() if k!='negative_reviews'});print('BAD',[(v['condition_id'],v['violating_object_ids']) for v in out if v['evaluated'] and not v['passed']])

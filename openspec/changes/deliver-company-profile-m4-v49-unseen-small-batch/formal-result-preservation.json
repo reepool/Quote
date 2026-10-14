@@ -1,0 +1,25 @@
+{
+  "first_review_index": 1,
+  "formal_review_sha256": {
+    "source-review-evidence.json": "e8ebd0c414afb0b4f3680bbb7527cff2e18cdf50c73724e256dd38a10c44b9dd",
+    "source-review-quote-bank.json": "cef19b068facadc5393a42dd8b239e3215cf8cc0e07cd5ffce2dc85e69a8b959",
+    "actual-object-decisions.json": "741e3df8d1af9439f37fc90b045060a6cf99c8d43fdab6be621f40ac048e3367",
+    "negative-review-evidence.json": "208cf8d513f9bd0f40131548edbd72d3cfd5f51fccba2ef305506ad682600440",
+    "incorrect-fact-objects.json": "49205dea51763cc3815f3f43bfbf6aa61293c97c345d2ba837546dd6bbc3584f",
+    "source-label-and-enum-audit.json": "0f3d7ba36f6ed048d9d42d22d680b094420adbf1e5c91c52c6195a9e21e2c2fc",
+    "first-formal-execution.log": "8bb71bd4994d9a59099593779d75d02672e7a93a1faadef52dea9903fb2401c2",
+    "first-formal-review.log": "4059b7e2a563331775b57c0576b886076c7bb2efcea6889eb3438865a3fd3280",
+    "execution-code-reconstruction.json": "427c75970063b0e2112b06df13edb51e17119b5b19ae09c53bdc7d006ae25b00",
+    "official-source-validation.json": "ff717ef815011212e5b6a17900c1378b0eb0dc067fa27ddac83017a1579f5439",
+    "independent-supplemental-source-pages.json": "ba66669267227af3a638d028b9324ed686d2382683422ba4818a36017b253a08",
+    "delivery-reread-validation.json": "486e26e4e662184456fa8396290084c57031e40eae72f9f20d33b3e66cc6bd13",
+    "final-protection-verification.json": "035fc8413cf2a39bba640adf6f5adb06830f2dc28d889ef0a0b87d7aae4926b4",
+    "real-business-gaps.json": "ecdea5ade95599adb2357fcf659c77bfba04e352f17dd18a6cdc848fc4975823"
+  },
+  "owner_review_sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v49_unseen_small_batch/company_profile_source_review.v1.json": "09894f72dc6a6427815761d95f95286fb9bc54533da214624bd59551133cfb52"
+  },
+  "source_scope_sha256": "5c8acdff0036a7f8dab43232ee9db4d27b26cdc208ece06ae2e2996c0d71513e",
+  "actual_scored_objects": 258,
+  "immutable_first_result_retained": true
+}

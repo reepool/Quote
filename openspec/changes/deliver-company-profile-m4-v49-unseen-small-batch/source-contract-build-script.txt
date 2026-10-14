@@ -1,0 +1,122 @@
+import json,hashlib,re
+from pathlib import Path
+from datetime import datetime,timezone
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v49-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v49_unseen_small_batch'
+read=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();save=lambda p,d:p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n');co=lambda s:re.sub(r'\s+','',s or '').replace('（','(').replace('）',')')
+assert not (P/'formal_execution.json').exists() and not (C/'source-scope.json').exists()
+plan=read(P/'plan.json');fr=read(C/'freeze-receipt.json');sources={i:read(Path('/tmp/quote_v49_unseen_source_'+i+'.json')) for i in ['600064.SH','600096.SH']};layouts={i:read(Path('/tmp/quote_v49_layout_'+i+'.json')) for i in sources}
+rows={i:[] for i in sources};roles=[];neg=[];ledger={i:[] for i in sources}
+aliases={}
+for line in sources['600096.SH'][3]['text'].splitlines():
+ m=re.match(r'(.+?)\s+指\s+(.+)',line)
+ if m:aliases[m[1]]=m[2]
+def row(i,p,n,v,d,h,u='元',actor='公司及合并子公司',party=None,column='本期营业收入',scope=None,alias=()):
+ src=co(sources[i][p-1]['text']);assert v.replace(',','') in src.replace(',',''),(i,p,n,v)
+ assert co(n) in src or h.startswith('报告分部') or h=='受托管理/承包',(i,p,n)
+ sc=scope or ('consolidated_group' if actor=='公司及合并子公司' else 'issuer' if '（母公司）' in actor else 'named_associate' if h=='重要联营企业的主要财务信息' else 'named_subsidiary')
+ rows[i].append(dict(condition_id=f'{i}-income-{len(rows[i])+1:03}',instrument_id=i,page=p,name=n,native_aliases=[n,*alias],value=v,unit=u,dimension=d,header=h,source_column=column,source_actor=actor,subject_scope=sc,counterparty=party,reported_period='2025-12-31',period_state='current_printed',table_basis=h))
+def many(i,p,items,d,h,u='元',actor='公司及合并子公司'):
+ for n,v in items:row(i,p,n,v,d,h,u,actor)
+def role(i,p,n,a,actor='公司及合并子公司',sc=None,alias=(),qualifier=None):
+ assert co(n) in co(sources[i][p-1]['text']),(i,p,n)
+ if any(r['instrument_id']==i and r['name']==n and r['source_actions']==[a] and r['source_actor']==actor for r in roles):return
+ roles.append(dict(condition_id=f'{i}-action-{1+sum(r["instrument_id"]==i for r in roles):03}',instrument_id=i,page=p,name=n,native_aliases=[n,*alias],source_actions=[a],source_actor=actor,actor_aliases=[actor,*[k for k,v in aliases.items() if v==actor]],subject_scope=sc or ('consolidated_group' if actor=='公司及合并子公司' else 'named_subsidiary'),state='current_affirmative',reported_period='2025-12-31',qualifier=qualifier))
+def negative(i,p,n,**kw):neg.append(dict(condition_id=f'{i}-negative-{sum(r["instrument_id"]==i for r in neg)+1:03}',instrument_id=i,page=p,name=n,**kw))
+i='600064.SH'
+main=[('房地产开发销售','2,065,547,958.80'),('市政基础设施承建','446,473,893.20'),('园区管理及服务','298,193,028.63'),('土地成片开发转让','64,275,349.50'),('药品销售','538,213,642.36')]
+many(i,16,[('主营业务收入合计','3,412,703,872.49'),*main],'industry','主营业务收入构成')
+many(i,17,main,'industry','主营业务分行业');many(i,17,[('江苏南京','2,881,264,448.75'),('其他','531,439,423.74')],'region','主营业务分地区')
+many(i,12,[('房地产开发销售','206,554.80'),('商品房','186,635.05'),('经济适用房','18,651.31'),('委建代建','1,268.44')],'business_type','经营讨论/房地产结转收入','万元');row(i,13,'市政业务','80,894.23','business_type','经营讨论/市政营业收入','万元')
+for p,n,v in [(23,'紫麟景院','92,494.04'),(23,'紫尧星院','71,212.45'),(23,'迈上品院','16,272.18'),(24,'紫星堂','3,451.92'),(24,'紫星荣院','2,743.46'),(24,'龙岸花园','18,564.93')]:row(i,p,n,v,'product','房地产销售和结转情况','万元',column='结转收入金额')
+for n,v in [('东城汇','755.42'),('高科中心','2,760.37'),('开发区厂房','2,732.04')]:row(i,24,n,v,'lease','房地产出租情况','万元',column='出租房地产的租金收入')
+for n,v in [('南京高科置业有限公司','123,285.55'),('南京高科建设发展有限公司','85,678.65'),('南京高科城市发展有限公司','93,124.54'),('江苏晨牌药业集团股份有限公司','53,821.36'),('南京银行股份有限公司','5,554,191.60')]:row(i,29,n,v,'business_type','主要控股参股公司分析','万元',n,scope='named_associate' if '银行' in n else None)
+many(i,162,[('主营业务','3,412,703,872.49'),('合计','3,412,703,872.49')],'business_type','合并营业收入和营业成本');many(i,162,[*main,('合计','3,412,703,872.49')],'product','合并营业收入明细')
+row(i,178,'南京高科置业有限公司','123,285.55','business_type','重要非全资子公司的主要财务信息','万元','南京高科置业有限公司')
+for p,n,v in [(179,'鑫元基金管理有限公司','54,155.83'),(179,'南京LG新港新技术有限公司','723,073.67'),(181,'南京银行股份有限公司','5,554,191.60')]:row(i,p,n,v,'business_type','重要联营企业的主要财务信息','万元',n)
+for party,n,v,old in [('南京新港开发有限公司','提供劳务','6,441,550.50',None),('南京LG新港新技术有限公司','出售商品或提供劳务','465,355.28','479,152.72'),('南京华新有色金属有限公司','出售商品','1,130,381.00','970,532.96'),('南京新尧新城开发建设有限公司','提供劳务',None,'9,124,600.01'),('南京新港红枫建设发展有限公司','出售商品或提供劳务',None,'2,121,013.40'),('南京新港东区建设发展有限公司','出售商品或提供劳务','35,509,079.47','7,945,702.46'),('南京新港产业投资发展有限公司','出售商品','109,973.56','143,834.36'),('南京经开国有资产控股集团有限公司','出售商品','181,842.56','306,443.69'),('南京尚吉增材制造研究院有限公司','出售商品','1,472.01',None),('金埔园林股份有限公司','提供劳务','10,046,480.83',None)]:
+ ledger[i].append(dict(page=189,counterparty=party,content=n,current_value=v,prior_value=old,unit='元',kind='transaction'))
+ if v is not None:row(i,189,n,v,'service','出售商品/提供劳务',party=party,column='本期发生额')
+ else:negative(i,189,'仅上期关联',counterparty=party,content=n,prior_value=old,forbidden='本期Segment/Measurement/肯定正文，不借列不造零')
+for party,v in [('南京银行股份有限公司','4,699,667.38'),('南京高科新浚投资管理有限公司','14,773.80')]:row(i,189,'房屋',v,'lease','本公司作为出租方',party=party,column='本期确认的租赁收入')
+many(i,205,[('主营业务','126,625,688.98'),('合计','126,625,688.98')],'business_type','母公司营业收入和营业成本',actor='南京高科股份有限公司（母公司）');many(i,205,[('园区管理及服务','62,350,339.48'),('土地成片开发转让','64,275,349.50'),('合计','126,625,688.98')],'product','母公司营业收入明细',actor='南京高科股份有限公司（母公司）')
+for n in ['住宅开发','政府代建','商业运营','物业管理','房建','市政施工总承包','监理','园区管理','土地成片开发转让']:role(i,10,n,'provides_service')
+role(i,13,'污水处理','provides_service');role(i,29,'药品','produces','江苏晨牌药业集团股份有限公司');role(i,29,'药品','sells','江苏晨牌药业集团股份有限公司');role(i,176,'药品','produces','江苏汉晨药业有限公司');role(i,176,'药品','sells','江苏汉晨药业有限公司')
+for a in ['produces','sells']:role(i,176,'外用溶液剂',a,'江苏晨牌邦德药业有限公司')
+role(i,176,'技术服务','provides_service','南京迈德森医药科技有限公司')
+for n in ['显示器','LCD电视机']:role(i,178,n,'produces','南京LG新港新技术有限公司','business_segment',qualifier='权益法联营企业，不是集团生产')
+for n in ['基金募集','基金销售','特定客户资产管理']:role(i,178,n,'provides_service','鑫元基金管理有限公司','business_segment',qualifier='权益法联营企业')
+for p,n,kw in [(24,'项目结转空位',dict(names=['江悦堂','荣境东院'],forbidden_values=['4336.08','3160.70'])),(29,'新创营业收入空位',dict(names=['南京高科新创投资有限公司'],forbidden_values=['-8763.10','-7097.15'])),(162,'合并其他业务本期空',dict(names=['其他业务'])),(205,'母公司其他业务本期空',dict(names=['其他业务'])),(179,'重要合营不适用',dict(forbidden_headers=['重要合营'],values=['54155.83','723073.67','5554191.60'])),(180,'联营成长创信收入空',dict(names=['南京高科新浚成长一期股权投资合伙企业（有限合伙）','南京高科新浚创信股权投资合伙企业（有限合伙）'],forbidden_values=['-11163.66','-1011.06'])),(181,'联营创新收入空',dict(names=['南京高科新浚创新股权投资合伙企业（有限合伙）'],forbidden_values=['-16736.48'])),(189,'受托不适用委托费非收入',dict(values=['0'],forbidden_headers=['受托','委托管理/出包'])),(13,'股权收益非营业收入',dict(values=['199889.71','-21104.68'])),(10,'被投行业非集团具名生产销售',dict(names=['生物医药','半导体新材料'])),(178,'联营生产不升格集团',dict(names=['显示器','LCD电视机'],actor='南京LG新港新技术有限公司'))]:negative(i,p,n,**kw)
+# Yunnan's original tables and related-sales layout.
+i='600096.SH'
+industry=[('化肥','27,098,370,170.83'),('工程材料','1,331,999,161.50'),('磷矿采选','526,884,505.78'),('煤炭采掘','410,799,675.27'),('商贸物流','11,849,933,760.77'),('磷化工','3,383,125,807.10'),('新能源材料','1,320,963,410.76'),('其他','2,081,569,263.20')]
+products=[('磷肥','15,479,422,516.38'),('尿素','4,989,677,452.86'),('复合（混）肥','6,548,317,266.89'),('聚甲醛','1,126,355,140.96'),('饲料磷酸氢钙','2,551,835,803.36')]
+many(i,21,industry,'industry','主营业务分行业');row(i,21,*products[0],'product','主营业务分产品');many(i,22,products[1:],'product','主营业务分产品');many(i,22,[('自产产品国内销售','29,766,701,581.02'),('自产产品国外销售','6,387,010,413.43'),('商贸业务','11,849,933,760.77')],'region','主营业务分地区');many(i,22,[('自产产品直销','4,067,344,891.26'),('自产产品分销','32,086,367,103.19'),('商贸业务','11,849,933,760.77')],'sales_mode','主营业务分销售模式');row(i,25,'贸易业务','11,849,933,760.77','business_type','贸易业务开展情况')
+many(i,37,[('自产产品直销','4,067,344,891.26'),('自产产品分销','32,086,367,103.19'),('商贸物流行业-国外分销','5,098,702,807.13'),('商贸物流行业-国内分销','6,751,230,953.64')],'sales_mode','按销售渠道划分的公司主营业务基本情况')
+subs=[('磷化集团','797,220.87'),('天宁矿业','97,055.39'),('天安化工','783,769.59'),('三环中化','501,785.75'),('红磷化工','385,477.36'),('云峰化工','229,375.34'),('水富云天化','254,031.85'),('金新化工','240,072.99'),('青海云天化','291,374.78'),('大为制氨','175,098.05'),('联合商务','1,943,997.81'),('农资连锁','2,409,018.48'),('海口磷业','499,549.44')]
+for n,v in subs:row(i,42,n,v,'business_type','主要控股参股公司分析','万元',aliases[n],scope='named_associate' if n=='海口磷业' else None,alias=[aliases[n]])
+many(i,213,[('主营业务','48,003,645,755.21'),('其他业务','411,277,986.57'),('合计','48,414,923,741.78')],'business_type','合并营业收入和营业成本')
+for n,v in [('金新化工','240,072.99'),('三环中化','501,785.75'),('天宁矿业','97,055.39'),('青海云天化','291,374.78')]:row(i,229,n,v,'business_type','重要非全资子公司的主要财务信息','万元',aliases[n],alias=[aliases[n]])
+for n,v in [('海口磷业','4,995,494,449.48'),('大地云天','3,135,337,243.28'),('瓮福云天化','325,707,570.44')]:row(i,231,n,v,'business_type','重要联营企业的主要财务信息',actor=aliases[n],alias=[aliases[n]])
+for p in [246,247,248]:
+ lines=sources[i][p-1]['text'].splitlines();active=p!=246;j=0
+ while j<len(lines):
+  line=lines[j].strip();j+=1
+  if '出售商品/提供劳务情况表' in line:active=True;continue
+  if not active:continue
+  if (line.startswith('CPICAbahsain') or line.startswith('云南磷化集团海口磷业有限公司')) and not re.search(r'\d,?\d*\.\d{2}',line):line+=lines[j].strip();j+=1
+  m=re.match(r'(.+?)\s+(.+?)\s+([\d,]+\.\d{2}|0)\s+([\d,]+\.\d{2}|0|-)\s*$',line)
+  if not m:continue
+  party,n,v,old=m.groups()
+  if party=='云南磷化集团海口磷业有限公司':n='硫磺、液氨、物流服务费、水电费、磷肥产品、矿山爆破工程、原煤、浮选试剂'
+  ledger[i].append(dict(page=p,counterparty=party,content=n,current_value=v,prior_value=old,unit='元',kind='transaction',current_state='printed_zero' if v=='0' else 'printed_current',source_layout_page=p))
+  row(i,p,n,v,'service','出售商品/提供劳务',party=party,column='本期发生额')
+assert len(ledger[i])==57,len(ledger[i])
+for actor,v in [('云南云天化股份有限公司','1,957,547.17'),('云南水富云天化有限公司','47,169.81'),('云南磷化集团有限公司','47,169.81')]:row(i,249,'股权托管',v,'service','受托管理/承包',actor=actor,party='云天化集团有限责任公司',column='本期确认的托管收益/承包收益',scope='issuer' if actor=='云南云天化股份有限公司' else 'named_subsidiary')
+for party,n,v in [('云南磷化集团海口磷业有限公司','罐车、房屋等租赁','29,439,114.37'),('云南云天化石化有限公司','房屋租赁','2,339,187.42'),('云南氟磷电子科技有限公司','房屋租赁、设备租赁','794,687.48'),('云天化集团有限责任公司','房屋租赁','428,571.42'),('云南云天墨睿科技有限公司','房屋租赁','163,904.76'),('云南云天化无损检测有限公司','房屋租赁','152,761.90'),('云南云天化聚磷新材料有限公司','车辆','69,679.21'),('云南天鸿化工工程股份有限公司','房屋租赁','66,889.52'),('云南瓮福云天化氟化工科技有限公司','房屋租赁','0'),('云天化集团有限责任公司水富分公司','停车场租赁','0')]:row(i,249,n,v,'lease','本公司作为出租方',party=party,column='本期确认的租赁收入')
+many(i,258,[*industry,('合计','48,003,645,755.21')],'industry','报告分部/主营业务分行业')
+prods258=[('磷肥','15,479,422,516.38'),('商品粮食','5,610,015,974.84'),('其他商贸物流','1,129,233,112.63'),('商贸化肥','5,110,684,673.30'),('复合（混）肥','6,548,317,266.89'),('尿素','4,989,677,452.86'),('聚甲醛','1,126,355,140.96'),('煤炭','410,799,675.27'),('饲料级磷酸钙盐','2,551,835,803.36')]
+many(i,258,prods258,'product','报告分部/主营业务分产品');many(i,259,[('磷矿石','526,884,505.78'),('黄磷','364,049,613.32'),('磷酸','320,410,159.56'),('液氨','453,212,566.20'),('季戊四醇','186,095,747.05'),('其他','3,196,651,546.81'),('合计','48,003,645,755.21')],'product','报告分部/主营业务分产品');many(i,259,[('国内地区','36,517,932,534.65'),('国外地区','11,485,713,220.56'),('合计','48,003,645,755.21')],'region','报告分部/主营业务分地区')
+many(i,270,[('主营业务','25,188,404,356.75'),('其他业务','31,895,991.90'),('合计','25,220,300,348.65')],'business_type','母公司营业收入和营业成本',actor='云南云天化股份有限公司（母公司）')
+for n in ['磷肥','尿素','复合肥','聚甲醛','饲料级磷酸钙盐','黄磷','磷酸铁']:
+ for a in ['produces','sells']:role(i,22,n,a)
+for n in ['饲料级磷酸氢钙','五氧化二磷','磷系阻燃剂','聚磷酸','食品级磷酸']:
+ for a in ['produces','sells']:role(i,30,n,a)
+for a in ['purchases','produces','material_input']:role(i,30,'磷矿石',a)
+for n in ['精制磷酸','磷酸一铵','氨水','双氧水','硫酸亚铁','氟硅酸']:role(i,30,n,'material_input')
+role(i,30,'硫酸亚铁','purchases')
+for n in ['季戊四醇','甲醇']:
+ for a in ['produces','sells']:role(i,31,n,a)
+role(i,31,'煤','purchases');role(i,31,'煤','material_input');role(i,31,'甲醇','purchases');role(i,31,'甲醇','material_input')
+role(i,17,'大豆','purchases',qualifier='来源南美，2025年9月后不再开展贸易');role(i,17,'大豆','sells',qualifier='向国内压榨企业，2025年9月后不再开展贸易');role(i,17,'化肥','purchases');role(i,17,'化肥','sells')
+for n in ['运输','仓储','工厂发运','港口中转','区域销售配送']:role(i,17,n,'provides_service')
+for n in ['硫磺','天然气','液氨','原料煤','甲醇','电','燃料煤']:
+ for a in ['purchases','material_input']:role(i,36,n,a)
+for n,goods,actions in [('磷化集团',['磷矿石'],['processes','sells']),('天宁矿业',['磷矿石'],['processes','sells']),('天安化工',['液氨'],['produces','sells']),('三环中化',['化肥','化工产品'],['produces','operates']),('红磷化工',['化肥','化工产品'],['produces','operates']),('云峰化工',['化肥','化工产品'],['produces','operates']),('金新化工',['尿素','煤炭'],['produces','sells']),('青海云天化',['尿素','复合肥','液氨'],['produces','sells']),('大为制氨',['液氨','尿素'],['produces','sells']),('海口磷业',['磷矿石','化肥','磷化工'],['produces','sells'])]:
+ for g in goods:
+  for a in actions:role(i,42,g,a,aliases[n],'business_segment' if n=='海口磷业' else 'named_subsidiary',qualifier='参股联营，不并为集团生产销售' if n=='海口磷业' else None)
+# Explicit related purchases are purchases, not inferred manufacturing inputs.
+for p,goods in [(245,['磷肥产品','磷酸','液硫','氯化钾','洗涤用品','磷酸二氢钾','煤焦','包装袋','炸药','爆破器材','包装材料','冷凝液','微量元素肥料','助剂','玻纤']),(246,['大米','备品备件','机械加工配件'])]:
+ for g in goods:role(i,p,g,'purchases')
+for n in ['硫酸','液碱','中压蒸汽','外购电','氮气','浮选试剂','车用尿素','食品磷酸','消防器材']:role(i,246,n,'sells')
+role(i,247,'硝酸铵水溶液','sells')
+for p,n,kw in [(231,'重要合营不适用',dict(forbidden_headers=['重要合营'],values=['4995494449.48','3135337243.28','325707570.44'])),(225,'退出合并状态',dict(names=['河南云天化','云农科技','上海云天化国际贸易有限公司'],state='前两家破产法院指定管理人不再并表；上海清算注销，不肯定全年')),(228,'红海40仍控制',dict(names=['红海磷肥'],state='40%第一大股东及其他股东无关联，仍控制，不能判为联营')),(17,'大豆9月后不开展',dict(names=['大豆'],state='本期前段购销成立，不肯定9月后或全年持续经营')),(30,'参股氟化产品非集团',dict(names=['无水氟化氢','氟化铝','六氟磷酸锂'],state='参股公司生产销售不得集团化')),(30,'子公司产能非当前销售',dict(names=['氟硅酸镁','含氟硝基苯'],state='产能不推销售')),(32,'下游用途非自产商品',dict(names=['脲醛树脂','三氯化磷','五硫化二磷','三氯氧化磷'],state='用途不可生成集团生产销售')),(33,'医用聚甲醛研发非销售',dict(names=['医用级聚甲醛'],state='研发申报入选不变本期销售')),(246,'打印零采购不推动作',dict(names=['磷矿石','辅料'],counterparties=['云南江川天湖化工有限公司','云南氟磷电子科技有限公司'],state='零额关联采购不反推此交易成立；p30合法外购磷矿石保留')),(250,'承租租金非收入',dict(values=['20892054.86','7295238.09','6516169.48','2115667.79','801775.22','634319.83','476190.50','24547.62','21506.47','15714.29','6528.00'])),(270,'投资收益非收入',dict(values=['2514347456.00','1989368162.00','489696818.82','-2183221.90','2100000.00','35365697.08'])),(258,'报告分部主营不升级全部外内抵销',dict(state='分行业/产品/地区栏目为主营，不生成对外/内部/抵销列')),(31,'供应链探索不升格全面现有服务',dict(state='合作加工定制供应链出口模式为探索')),(249,'海口关联口径期间',dict(counterparty='云南磷化集团海口磷业有限公司',state='2025年3月后不再信息披露口径关联方，全年本期采购与1至2月获批额度分别保留'))]:negative(i,p,n,**kw)
+for r in ledger[i]:
+ if r['current_value']=='0':negative(i,r['page'],'零收入不推销售动作',counterparty=r['counterparty'],content=r['content'],state='原零本期收入须交付，不能据本零交易推商品销售')
+for i,ps in [('600064.SH',[18,163,164,165,166,167]),('600096.SH',[23,214,215,216,217])]:negative(i,ps[0],'费用成本非营业收入',checked_pages=ps,forbidden_headers=['营业成本','销售费用','管理费用','财务费用','税金及附加'])
+answers={'600064.SH':{
+'principal_business':dict(pages=[10,11,12,13,29,176,177,178],required_groups=[['房地产'],['市政'],['股权投资'],['晨牌'],['高科新浚'],['高科新创'],['42.88'],['控制']],substance='两主业、房地产市政链条和投资平台/投后退出、药品子公司；晨牌42.88%却控制经营财务及4/7董事，联营不集团化。'),
+'products_services':dict(pages=[10,12,13,29,176,178],required_groups=[['住宅'],['代建'],['商业运营'],['物业'],['监理'],['园区'],['土地'],['污水'],['药品'],['外用溶液剂']],substance='开发/代建/商业/物业、房建市政总承包监理、园区水处理土地、原药品子公司和外用溶液剂；现有去化/出租与在建状态、联营显示器边界。'),
+'revenue_model':dict(pages=[12,13,16,17,23,24,110,111,112,162,179,180,181,189,205],required_groups=[['付款证明'],['实物移交'],['产出法'],['工程量'],['劳务'],['土地'],['药品'],['收款'],['主要责任人'],['代理人']],substance='房地产四条件时点、市政产出法工程量时段及可补偿成本例外、园区劳务进度、土地手续和付款证明、药品发出收到收款；主责总额代理佣金，投资收益非营业收入，单位和主体表格不借列。')},
+'600096.SH':{
+'principal_business':dict(pages=[9,17,30,31,42,225,228,230,249,270],required_groups=[['化肥'],['磷矿'],['磷化工'],['新材料'],['商贸'],['物流'],['大豆'],['9月','9 月'],['破产'],['不再纳入','不再纳']],substance='四主业完整链，自有磷矿煤炭及磷矿外购、统一销售和物流/贸易；大豆9月后停止，清算退出控制及红海40%控制、海口参股期间，母公司统购销独立。'),
+'products_services':dict(pages=[17,22,30,31,32,33,35,36,42,245,246],required_groups=[['磷肥'],['尿素'],['复合肥'],['饲料'],['五氧化二磷'],['阻燃剂'],['聚磷酸'],['食品级磷酸','食品磷酸'],['磷酸铁'],['聚甲醛'],['季戊四醇'],['甲醇'],['氟硅酸'],['参股'],['仓储']],substance='全矩阵产品及原材料实际用途、氟化精细链参股与产能限定、两基地甲醇来源和用销分别、物流运输仓储联运出口；下游用途/医用研发不可成销售。'),
+'revenue_model':dict(pages=[17,30,31,36,37,151,152,213,229,231,246,247,248,249,250,258,259,270],required_groups=[['大宗采购'],['分批销售'],['分销'],['出口'],['交付'],['接受'],['收款'],['报关'],['提单'],['总额法'],['控制权']],substance='化肥大宗采购分批销售、经销商分销/直销出口、供应链贸易物流；国内交付接受收款权利/风险，出口报关控制权，转口装船寄提单总额法；租赁托管/集团母公司主营全部原栏目零与空分别。')}}
+checked={'600064.SH':sorted(set([4,5,9,10,11,12,13,14,15,16,17,18,23,24,28,29,110,111,112,162,163,164,165,166,167,174,175,176,177,178,179,180,181,182,188,189,205,206])), '600096.SH':sorted(set([4,5,9,10,11,12,13,14,15,16,17,18,21,22,23,25,30,31,32,33,34,35,36,37,41,42,151,152,213,214,215,216,217,225,226,227,228,229,230,231,232,245,246,247,248,249,250,258,259,270]))}
+versions={r['instrument_id']:dict(sha256=r['document_version'],pdf=str(Path('data/filings/announcements/blobs')/r['document_version'][:2]/(r['document_version']+'.pdf')),checked_pages=checked[r['instrument_id']]) for r in plan['reports']}
+created=datetime.now(timezone.utc).isoformat();scope=dict(created_at=created,fixed_before_formal_execution=True,plan_id=plan['plan_id'],processing_identity=fr['processing_identity'],knowledge_cutoff=plan['knowledge_cutoff'],shared_token_budget=50000,official_reports=plan['reports'],versions=versions,source_rows=rows,native_roles=roles,actor_aliases=aliases,answers=answers,negative_conditions=neg,denominator_method='独立新官方本期收入原格＋具名成立动作＋六个实质正文；不同原表分别核，重复证据不增加计分，不继承532/1250，Measurement只计准确率。',positive_count=sum(map(len,rows.values()))+len(roles)+6,negative_count=len(neg))
+for i,v in versions.items():assert sha(R/v['pdf'])==v['sha256']
+code={str(p):sha(p) for p in sorted(Path('research/company_profile').rglob('*.py'))};assert len(code)==38
+save(C/'source-scope.json',scope);save(C/'independent-frozen-source-pages.json',{i:dict(pdf=v['pdf'],document_version=v['sha256'],pages=[sources[i][n-1] for n in v['checked_pages']]) for i,v in versions.items()});save(C/'independent-source-layout-pages.json',layouts);save(C/'related-sales-independent-ledger.json',ledger)
+freeze=dict(created_at=created,source_scope_sha256=sha(C/'source-scope.json'),source_pages_sha256=sha(C/'independent-frozen-source-pages.json'),source_layout_sha256=sha(C/'independent-source-layout-pages.json'),related_ledger_sha256=sha(C/'related-sales-independent-ledger.json'),source_condition_count=scope['positive_count'],negative_count=len(neg),income_condition_counts={i:len(v) for i,v in rows.items()},action_condition_counts={i:sum(r['instrument_id']==i for r in roles) for i in versions},executed_code_sha256=code,processing_identity=fr['processing_identity'],official_reports=plan['reports'],created_before_first_execute=True,actual_accuracy_denominator_prefilled=False,production_authorization='not_authorized',scale_quality_claim_allowed=False)
+save(C/'source-freeze-receipt.json',freeze);(C/'tasks.md').write_text((C/'tasks.md').read_text().replace('- [ ] 1.1','- [x] 1.1').replace('- [ ] 1.2','- [x] 1.2'))
+print(json.dumps({k:freeze[k] for k in ['source_condition_count','negative_count','income_condition_counts','action_condition_counts']},ensure_ascii=False))

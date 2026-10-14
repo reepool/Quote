@@ -1,0 +1,38 @@
+import json,re
+from pathlib import Path
+from quote_v49_new_matching import co,pages
+C=Path('openspec/changes/deliver-company-profile-m4-v49-unseen-small-batch');read=lambda p:json.loads(Path(p).read_text());s=read(C/'source-scope.json');out=read('/tmp/v49new_predecisions.json');extra=[];errors=[]
+for i in s['versions']:
+ rs=read('/tmp/v49newraw_'+i+'.json');source=read('/tmp/quote_v49_unseen_source_'+i+'.json');layout=read('/tmp/quote_v49_layout_'+i+'.json')
+ for r in rs:
+  d=out[i]['facts'][r['record_id']]
+  if d['accurate']:continue
+  n=r['source_native'];kind=r['object_type'];name=n['name']
+  if kind=='BusinessOverview':
+   ep=pages(r);t=co(r['source_text']);textbank=co(''.join(source[p-1]['text'] for p in sorted(ep)));layoutbank=co(''.join(layout.get(str(p),'') for p in sorted(ep)))
+   direct=t in textbank or t in layoutbank
+   assert direct or r['record_id']=='owned:core-ev-176de961c1cb5cef:overview'
+   d.update(accurate=True,reason='原PDF页的原文/完整布局表块，保留本期上期、子公司/联营及不适用状态；作为源事实成立，六正文实质完整性另核',source_original_pages=sorted(ep),source_exact_after_whitespace=direct,layout_order_note=None if direct else 'p226取得方式与直接/间接表头读序不同；逐行原公司、比例、业务性质及p228控制解释均一致，无新增肯定动作')
+  elif kind in ['Segment','Measurement']:
+   if name=='土地房屋车辆等' and n['value']=='88,139,460.13' and n['unit']=='元' and n['header']=='作为出租人的经营租赁/租赁收入' and r['subject_scope']=='consolidated_group' and 222 in pages(r):
+    d.update(accurate=True,reason='合同外合法经营租赁原p222本期收入，不增加召回',supplement_source=dict(page=222,name=name,value=n['value'],unit='元',column='租赁收入'))
+    extra.append(dict(instrument_id=i,page=222,name=name,value=n['value'],unit='元',header=n['header'],dimension=r.get('dimension',r.get('segment_dimension')),subject_scope=r['subject_scope']))
+   elif name=='季戊四醇':d.update(reason='p247 CPIC完整交易方应为CPICAbahsainFiberglassW.L.L.(巴林阿巴桑玻璃纤维有限公司)，续行尾字丢失')
+   elif name=='检测费':d.update(reason='p247上一行CPIC的限公司)应归上一行，不得污染云南省化工产品质量监督检验站')
+   elif name=='房屋租赁、设备租赁房屋租赁':d.update(reason='p249氟磷电子与云天化集团两独立出租行错误拼接；794687.48仅氟磷电子房屋/设备收入，428571.42集团另一行应独立')
+   else:raise AssertionError(r)
+  elif kind in ['Activity','Relationship']:
+   bad={'天然气为主要原料':'p9为以煤炭、天然气为原料生产尿素，不生产天然气为主要原料这一伪商品','商贸':'p25贸易业务行是收入业务类别，不是具名可销售商品','新材料的研发及产品':'p42水富研发/产品生产销售复合短语污染商品身份，不得以该串作为商品','；国际货':'p42联合商务跨行国际货运代理名称截断，不能作完整经营对象','维修费':'p246维修服务的收费不是销售维修费商品','消防费用及消防器材':'p246费用与消防器材复合行不得合为销售商品','电费':'p247电力收费与电费商品身份不同，不可销售电费','检测费':'p247检测服务费不是销售检测费商品'}
+   if name in bad:d.update(reason=bad[name])
+   else:
+    valid={'化肥','化工原料','化肥和化工产品等','液氨','氟硅酸','水电气','化肥产品','办公用品','季戊四醇','水电'}
+    assert name in valid,(name,r)
+    d.update(accurate=True,reason='合同外原p42合法父类生产/销售/经营或关联表非零本期具名商品销售；不据零行反推动作，不重复召回',source_original_pages=sorted(pages(r)))
+  else:raise AssertionError(r)
+  if not d['accurate']:errors.append(dict(instrument_id=i,record_id=r['record_id'],object_type=kind,source_native=n,reason=d['reason'],critical_numeric_error=False))
+ for dim in read('/tmp/v49newanswers_'+i+'.json'):
+  rule=s['answers'][i][dim['dimension_id']];text=co(dim['excerpt']);missing=[g for g in rule['required_groups'] if not any(co(x) in text for x in g)];assert missing
+  out[i]['answers'][dim['dimension_id']]=dict(accurate=False,critical_numeric_error=False,reason='正文未完整覆盖冻结原业务链条/产品矩阵/经营及收费机制，不能以已答状态和部分关键词通过',missing_substance_groups=missing,source_required_substance=rule['substance'])
+(C/'actual-object-decisions.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');(C/'incorrect-fact-objects.json').write_text(json.dumps(errors,ensure_ascii=False,indent=2)+'\n');(C/'contract-external-income-source-ledger.json').write_text(json.dumps(extra,ensure_ascii=False,indent=2)+'\n')
+(C/'source-label-and-enum-audit.json').write_text(json.dumps(dict(original_contract_unchanged=True,positive_count_unchanged=364,negative_count_unchanged=41,notes=[dict(instrument_id='600096.SH',page=25,condition_id='600096.SH-income-020',frozen_display_name='贸易业务',native_row_name='商贸业务',source='原p25贸易业务开展情况的唯一收入行商贸业务；原冻结项金额、单位、栏目、主体和期间均不变，不增删条件；标题简称不作为商品销售'),dict(rule='重要公司和非全资子公司原业务主体分类对应现有business_segment维度，联营对应business_segment范围，原关系限定和主体必须匹配；渠道收入/主营业务对应原p37渠道主营栏目；辅助拼写映射不改变原实质条件')]),ensure_ascii=False,indent=2)+'\n')
+print('WRONG FACTS',len(errors),'ANSWERS',sum(len(x['answers']) for x in out.values()),'ACCURATE_FACTS',sum(d['accurate'] for v in out.values() for d in v['facts'].values()))

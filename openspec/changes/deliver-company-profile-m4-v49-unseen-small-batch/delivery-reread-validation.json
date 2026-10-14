@@ -1,0 +1,16 @@
+{
+  "600064.SH": {
+    "readonly_reread_equal": true,
+    "query_export_disk_agree_on_absent": true,
+    "published": false,
+    "actual_first_state": "not_found",
+    "not_complete_delivery": true
+  },
+  "600096.SH": {
+    "readonly_reread_equal": true,
+    "query_export_disk_equal": true,
+    "published": true,
+    "accepted_count": 255,
+    "answered_count": 3
+  }
+}

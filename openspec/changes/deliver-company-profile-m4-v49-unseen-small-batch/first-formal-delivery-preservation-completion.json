@@ -1,0 +1,19 @@
+{
+  "completed_at": "2026-10-14T02:08:30.528252+00:00",
+  "completed_sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v49_unseen_small_batch/company_profile_live_run.v1.json": "01d9afc4d783f10c5583e02c86130be32f1203396e4779e987344c025a54c2da",
+    "data/checkpoints/company_profile_common_core/reports/m4_v49_unseen_small_batch/formal_execution.json": "d790acbb41d0bddd41df921a87c4c287c4736e53d31c288d84b2fb4acae8321f",
+    "data/checkpoints/company_profile_common_core/reports/m4_v49_unseen_small_batch/observation.json": "765f3ac2afa6060a7d7b8e65a71963b917aab3859baf6138c7c10a5adce9fd07",
+    "data/checkpoints/company_profile_common_core/reports/m4_v49_unseen_small_batch/plan.json": "93edbbf60beef37f953f902075dc3aaa3656c472cb2e2fe3cea1eccf35e2ff44",
+    "data/exports/m4_v49_unseen_small_batch/600096.SH/600096.SH_2025-12-31.json": "c84d78c555ef9f1a27a281f1fdea1b54c4d39d96d6107249274fcb6d11920ab0",
+    "data/exports/m4_v49_unseen_small_batch/600096.SH/export_manifest.json": "499ddd4983054f0ebf3bcfad8fa11e2a4d68c2f657617cbdba73b64f292fd5c6",
+    "data/exports/m4_v49_unseen_small_batch/600096.SH/profiles.csv": "62bcef609673736a6a44f05e2a22dad3535a76b4d1c11e59c7f5c4355da31fab",
+    "data/research/company_profile_common_core/m4_v49_unseen_small_batch/company_profile_common_core.v1/bp-work-43fdae4de0c60a35bf858f0c.json": "13880f84086bb2920cf8c6503bd3271e7bb8f5491b6081fceea883ddd91bdeb5",
+    "data/research/company_profile_common_core/m4_v49_unseen_small_batch/company_profile_common_core.v1/checkpoints/bp-work-43fdae4de0c60a35bf858f0c.json": "5557f88abca6be7170767e0f0da5afe1dcbe75f602cfac7a16d7000773196b76",
+    "data/research/company_profile_common_core/m4_v49_unseen_small_batch/company_profile_common_core.v1/checkpoints/bp-work-660ee2298c52ba22df61ca4a.json": "21b8868baaf229ad94d838d06222406dfbe598338fcafa5324c6c198a5eb6734",
+    "data/research/company_profile_common_core/m4_v49_unseen_small_batch/company_profile_common_core.v1/scopes/600096.SH/2025-12-31/extract_business_overview.json": "71a5a26464d97573d1a3de33458b14dd09d86597a0a8518cf88e74ddca511a92",
+    "data/research/company_profile_common_core/m4_v49_unseen_small_batch/company_profile_common_core.v1/scopes/600096.SH/2025-12-31/extract_segment_financials.json": "7a23cfad46baafaea52fadc94664e01385787db7023c0d084849ab62900939cb"
+  },
+  "protected_after_formal_execution_index_write": true,
+  "empty_file_count": 0
+}
