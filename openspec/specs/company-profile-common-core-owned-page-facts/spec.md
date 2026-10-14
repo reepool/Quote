@@ -304,3 +304,19 @@ Owned-page acceptance,query and export MUST preserve full native business and in
 #### Scenario: Retail receipt evidence defines revenue confirmation
 - **WHEN** goods acceptance less estimated discounts,system goods transfer,cash deposit and card records,or advertising service periods are disclosed
 - **THEN** the native confirmation/payment mechanism remains substantive through all three delivery paths
+
+
+### Requirement: Official procurement layouts and qualified business continuations reach the same owner
+The official asset page source MUST activate procurement layout selection at the native purchase-goods/receive-services heading and retain necessary continuation pages. Procurement state MUST stop at the sales heading, asset purchases, related leases or the native transaction-explanation boundary; a boundary page MAY contain separate valid native sections without transferring procurement identity to their rows. Wrapped commodity names MUST retain their own current purchase row, original actor and direction; purchase MUST NOT imply material input or sales. Complete v49 identity MUST enable the five cumulative repair switches, precise shared-asset enqueue and source-grounded actor expansion while the default identity remains unchanged. Qualified business bodies MUST preserve trustee/entrusting actors, transferred rights and obligations, original group/subsidiary scope and actual delivery versus signed or outstanding orders through acceptance, query and export.
+
+#### Scenario: Procurement title and named rows occupy different official pages
+- **WHEN** 特变 p342 opens the purchase table and its original p343–344 layouts contain continued commodity rows before the sales boundary
+- **THEN** the real bound official page source returns those layouts and the owner delivers the 16 original named purchases without turning later sales rows into purchases or purchases into inputs
+
+#### Scenario: Trustee rights move to a named subsidiary
+- **WHEN** 五矿 p256 states that the trustee changes from 五矿发展 to 五矿贸易 and all related rights and obligations transfer to 五矿贸易
+- **THEN** the substantive bodies retain the transfer and original named actor instead of presenting its income mechanism as unrestricted parent-company activity
+
+#### Scenario: Current deliveries and future orders coexist
+- **WHEN** original disclosure distinguishes actual delivered products or services from signed contracts, outstanding orders or planned delivery
+- **THEN** final bodies preserve those states and only current affirmative actions satisfy current named-action conditions

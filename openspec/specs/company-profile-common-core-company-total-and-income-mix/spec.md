@@ -136,3 +136,19 @@ Original total,main-business,external and internal income columns MUST remain in
 #### Scenario: A continued sublease table has one current column
 - **WHEN** Xiangyu p240declares元 and p241continues current sublease receipts separately from lessee expense
 - **THEN** original元,current receipts and tenant identity survive without promoting lessee expense to income
+
+
+### Requirement: Audit sections stop before independent native income notes
+An audit discussion MUST NOT carry its relation-table parsing state across intervening sections into later financial notes. Native related-income continuations MUST instead start from their own section heading and retain complete original commodity and counterparty rows, current column placement, printed unit and group/parent/issuer scope through paired Segment and Measurement. Genuine continued tables MUST remain eligible. Mother-company main-business, all-income, region and revenue-timing columns MUST remain distinct. Contract/category subtotals and contract total columns MUST preserve their own table identity and original column qualifiers; equal amounts across categories or columns MUST NOT authorize cross-basis accumulation. Rental asset and tenant continuations MUST remain attached to their original row without header pollution.
+
+#### Scenario: Earlier audit text precedes independent related-sales notes
+- **WHEN** 五矿 p101 audit text and p248–255 native financial-note related-sales tables occur in the same report
+- **THEN** the audit span generates no later unclear-subject income copies, while regular consolidated-group income rows remain with their native commodities and counterparties
+
+#### Scenario: A contract table repeats totals under several classifications
+- **WHEN** 特变 p383–384 prints contract commodity, region or transfer-time category subtotals and separate 分部营业收入 and 合计营业收入 columns
+- **THEN** paired Segment and Measurement preserve each source table, original current column, scope and unit independently without replacing classifications or summing equal amounts across bases
+
+#### Scenario: A legitimate native related-income table continues across pages
+- **WHEN** the original section continues its current rows, wrapped counterparties or rental identities on the next physical page
+- **THEN** supported row continuations remain complete without inheriting an unrelated audit section, following-row identity or prior-only amount

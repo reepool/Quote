@@ -1,0 +1,30 @@
+{
+  "acceptance_date": "2026-10-14",
+  "authority": "user_provided_A_role_finite_conclusion",
+  "instrument_ids": [
+    "600058.SH",
+    "600089.SH"
+  ],
+  "source_positive_conditions": 532,
+  "income_conditions": 371,
+  "action_conditions": 155,
+  "answers": 6,
+  "source_recall": 532,
+  "actual_unique_objects": 1250,
+  "accurate_unique_objects": 1250,
+  "fact_count": 1244,
+  "numeric_errors": 0,
+  "negative_count": 80,
+  "negative_passed": 80,
+  "whole_round_seconds": 280.6659848773852,
+  "timing_scope": "actual continuous first execute through second export including PDF/layout/retries under existing PDF parse cache",
+  "shared_tokens": 0,
+  "shared_token_limit": 50000,
+  "independent_tests_passed": 3,
+  "all_five_stages_success": true,
+  "no_reuse_or_predecessor": true,
+  "query_export_disk_equal": true,
+  "scope": "original report versions, frozen532positive80negative and checked actual delivery only",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}
