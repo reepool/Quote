@@ -1,0 +1,12 @@
+import json
+from pathlib import Path
+from pypdf import PdfReader
+plan=json.loads(Path('data/checkpoints/company_profile_common_core/reports/m4_v54_unseen_small_batch/plan.json').read_text())
+ns={'600094.SH':[5,9,10,11,12,13,47,108,109,160,161,162,163,164], '600103.SH':[5,9,11,15,34,35,128,129,184,185,188,209]}
+for r in plan['reports']:
+ i=r['instrument_id'];h=r['document_version'];d=PdfReader(f'data/filings/announcements/blobs/{h[:2]}/{h}.pdf')
+ p=Path('/tmp/v54new_layout_'+i+'.json');x=json.loads(p.read_text())
+ for n in ns[i]:
+  if str(n) not in x:x[str(n)]=d.pages[n-1].extract_text(extraction_mode='layout')
+  Path(f'/tmp/v54new_layout_{i}_{n}.txt').write_text(x[str(n)])
+ p.write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\n');print(i,len(x),flush=True)

@@ -1,0 +1,114 @@
+import json,hashlib
+from pathlib import Path
+from datetime import datetime,timezone
+base=Path('openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch');plan=json.loads(Path('data/checkpoints/company_profile_common_core/reports/m4_v54_unseen_small_batch/plan.json').read_text())
+D='600094.SH';Q='600103.SH';rows={D:[],Q:[]};roles=[];neg=[];group='公司及合并子公司'
+def income(i,page,name,val,header,dim='business_type',unit='元',actor=group,scope='consolidated_group',counterparty=None,segment=None,qual=None,column='本期营业收入'):
+ rows[i].append(dict(condition_id=f'{i}-income-{len(rows[i])+1:03}',instrument_id=i,page=page,name=name,native_aliases=[name],value=val,unit=unit,dimension=dim,header=header,source_column=column,source_actor=actor,subject_scope=scope,counterparty=counterparty,source_segment=segment,reported_period='2025-12-31',period_state='current_printed',table_basis=header,qualifier=qual))
+def action(i,page,name,verb,actor=group,scope='consolidated_group',qual=None,context=[]):
+ num=sum(r['instrument_id']==i for r in roles)+1
+ roles.append(dict(condition_id=f'{i}-action-{num:03}',instrument_id=i,page=page,name=name,native_aliases=[name],source_actions=[verb],source_actor=actor,actor_aliases=[actor],subject_scope=scope,state='current_affirmative',reported_period='2025-12-31',qualifier=qual,context_pages=context))
+def negative(i,page,name,**kw):
+ num=sum(r['instrument_id']==i for r in neg)+1;neg.append(dict(condition_id=f'{i}-negative-{num:03}',instrument_id=i,page=page,name=name,**kw))
+# Each tuple manually transcribed from independent original PDF text and layout, before business output.
+for header,dim,rr in [('主营业务分行业','industry',[('房地产板块','2231200274.53'),('算力服务板块','15348294.98')]),('主营业务分产品','product',[('物业开发销售及运营','2231200274.53'),('算力服务','15348294.98')]),('主营业务分地区','region',[('华东区域','1601285038.35'),('东南区域','373786834.45'),('西北区域','256128401.73')])]:
+ for name,v in rr:income(D,16,name,v,header,dim)
+projects=[(22,'上海大名城名郡','294.76'),(22,'上海紫金九号','467.43'),(22,'杭州大名城','126.61'),(22,'南京大名城','30.28'),(22,'映云间','152.72'),(22,'映湖','1698.21'),(22,'映晖','924.18'),(22,'映玥','464.49'),(22,'映园','249.76'),(22,'兰州东部科技新城一期','1510.75'),(22,'兰州东部科技新城二期','14923.93'),(22,'兰州名城城市广场','2442.63'),(22,'名城港湾','25108.72'),(22,'永泰东部旅游新城','55.88'),(22,'长乐大名城','263.70'),(22,'福清大名城','294.55'),(23,'南昌大名城','1385.28'),(23,'福州紫金九号','1145.41'),(23,'映雨江南（庄行）','22214.25'),(23,'映园二期','1291.67'),(23,'映辰','5309.60'),(23,'映辰二期（毛家角）','123454.54'),(23,'映蓝（蓝湾三期）','22426.35')]
+for page,n,v in projects:
+ assoc=n=='映蓝（蓝湾三期）';income(D,page,n,v,'报告期内房地产销售和结转情况','product','万元',actor='映蓝联营项目' if assoc else group,scope='group_associated_entity' if assoc else 'consolidated_group',qual='联营项目；不含在集团20.42亿元结转合计内' if assoc else None,column='结转收入金额')
+for n,v in [('主营业务','2246548569.51'),('合计','2246548569.51')]:income(D,151,n,v,'合并营业收入和营业成本')
+# Segment subtotal rows retain both native segment and contract classification; total mirrors not double counted.
+for head,dim in [('商品类型','product'),('按经营地区分类','region')]:
+ for seg,v in [('房地产板块','2231200274.53'),('算力服务板块','15348294.98'),('合计','2246548569.51')]:income(D,151,head,v,'合同收入分解/'+head,dim,segment=seg,column=seg+'分部/营业收入')
+for n,v,seg in [('算力服务收入','15348294.98','算力服务板块'),('房地产销售收入','2042181135.99','房地产板块'),('开发物业租赁及运营','189019138.54','房地产板块')]:income(D,151,n,v,'合同收入分解/商品类型','product',segment=seg,column=seg+'分部/营业收入（合计镜像不重复）')
+for seg,v in [('房地产板块','2231200274.53'),('算力服务板块','15348294.98'),('合计','2246548569.51')]:income(D,151,'境内',v,'合同收入分解/经营地区','region',segment=seg,column=seg+'分部/营业收入')
+for n,v in [('商业综合体','84666676.27'),('社区配套商业','17255975.13'),('工业园','8382983.55'),('出租公寓','11409793.71'),('其他','167613.20')]:income(D,160,n,v,'作为出租人的经营租赁','business_type',column='租赁收入')
+income(D,160,'商业综合体','1060636.41','作为出租人的经营租赁/可变租赁收入',column='未计入租赁收款额的可变租赁付款额相关的收入',qual='其中口径，不与全额租赁收入累加')
+income(D,161,'合计','121883041.86','作为出租人的经营租赁',column='租赁收入',qual='表承接p160，非未来未折现租赁收款额')
+income(D,165,'黄河财产保险股份有限公司','1685355008.99','重要联营企业的主要财务信息',actor='黄河财产保险股份有限公司',scope='group_associated_entity',qual='14%联营；非本集团营业收入')
+for cp,v in [('上海英家皇道物业管理服务有限公司','141516.32'),('福州云璟商业管理有限公司','1031655.05'),('福建大名城物业管理有限公司','828584.22'),('福州齐缘服务管理有限公司','13073.39')]:income(D,176,'商务办公用房',v,'关联租赁/本公司作为出租方',counterparty=cp,column='本期确认的租赁收入')
+for n,v in [('主营业务','7849159.08'),('其他业务','13835970.05'),('合计','21685129.13')]:income(D,191,n,v,'母公司营业收入和营业成本',actor='上海大名城企业股份有限公司（母公司）',scope='issuer')
+for n,v,h,dim in [('商品类型','21685129.13','商品类型','product'),('房地产销售收入','4087732.00','商品类型','product'),('开发物业租赁及运营','3761427.08','商品类型','product'),('其他','13835970.05','商品类型','product'),('按经营地区分类','21685129.13','经营地区','region'),('境内','21685129.13','经营地区','region'),('合计','21685129.13','合同收入分解','business_type')]:income(D,192,n,v,'母公司合同收入分解/'+h,dim,actor='上海大名城企业股份有限公司（母公司）',scope='issuer',segment='其他分部',column='其他分部/营业收入（合计镜像不重复）')
+# Qingshan native current revenues
+ind=[(16,'纸行业','1197089976.81'),(16,'浆行业','358768319.71'),(16,'纸制品加工行业','284450942.34'),(16,'医药行业','303680631.79'),(16,'光电子行业','206025784.54'),(17,'营林业','30598132.37'),(17,'商贸业','2034990.83'),(17,'环保业','63795075.10'),(17,'机电维修安装','53693710.43'),(17,'内部抵销','-167760870.27'),(17,'合计','2332376693.65')]
+for p,n,v in ind:income(Q,p,n,v,'主营业务分行业','industry',qual='真实负数调整，不取绝对值' if n=='内部抵销' else None)
+prod=[('纸','1195472819.30'),('浆粕','166061100.93'),('浆板','192707218.78'),('纸板、纸箱','284450942.34'),('副产品','1617157.51'),('医药','303680631.79'),('光电子','206025784.54'),('木材','30598132.37'),('商贸','2034990.83'),('环保服务等','63795075.10'),('机电维修安装','53693710.43'),('内部抵销','-167760870.27'),('合计','2332376693.65')]
+for n,v in prod:income(Q,17,n,v,'主营业务分产品','product')
+for n,v,p in [('国内','2154870243.36',17),('国外','177506450.29',17),('合计','2332376693.65',18)]:income(Q,p,n,v,'主营业务分地区','region')
+for n,v in [('直销','2028696061.86'),('经销','303680631.79'),('合计','2332376693.65')]:income(Q,18,n,v,'主营业务分销售模式','sales_mode')
+subs=[(31,'漳州水仙药业股份有限公司','30377.59'),(31,'深圳市恒宝通光电子股份有限公司','20695.02'),(31,'福建省泰宁青杉林场有限责任公司','772.48'),(31,'福建省明溪青珩林场有限责任公司','779.51'),(31,'福建青嘉实业有限公司','49.12'),(31,'深圳市龙岗闽环实业有限公司','29403.23'),(31,'三明青阳环保科技有限公司','6379.51'),(31,'福建省青纸机电工程有限公司','6991.46'),(32,'沙县青晨贸易有限公司','9214.84'),(32,'福建青铙山新材料有限公司','2066.23'),(32,'广东青纸包装材料有限公司','2245.92'),(32,'福建省青山林业发展有限公司','1514.77')]
+for p,n,v in subs:income(Q,p,n,v,'主要控股参股公司分析',unit='万元',actor=n,scope='named_subsidiary',qual='公司类型子公司；非母公司收入')
+for n,v in [('主营业务','2332376693.65'),('其他业务','86613527.52'),('合计','2418990221.17')]:income(Q,174,n,v,'合并营业收入和营业成本')
+for n in ['房屋租赁','合计']:income(Q,184,n,'4121219.15','作为出租人的经营租赁',column='租赁收入')
+income(Q,190,'漳州水仙药业股份有限公司','30377.59','重要非全资子公司的主要财务信息',unit='万元',actor='漳州水仙药业股份有限公司',scope='named_subsidiary',column='本期发生额/营业收入',qual='表头与单位承接p189；非期末资产')
+seg=[('纸浆行业','165017.91'),('纸制品加工行业','29403.23'),('医药行业','30377.59'),('光电子行业','20695.02'),('营林行业','3066.77'),('商贸行业','9263.96'),('机电维修安装行业','6991.46'),('环保行业','6379.51'),('减：分部间抵销','29296.43'),('合计','241899.02')]
+for n,v in seg:income(Q,210,n,v,'报告分部的财务信息','industry','万元',segment=n,column='营业收入/'+n,qual='p209表头/单位；扣减列打印正数，不能与加项累加或改写打印值' if n=='减：分部间抵销' else 'p209表头/单位；研究及技术服务行业本期收入格空')
+sales=[(200,'浙江兆山包装有限公司','纸产品','25551176.30'),(200,'厦门厦钨新能源材料股份有限公司','工程服务、维修劳务','186928.60'),(200,'福建晶华生物科技有限公司','药品','62639.00'),(200,'福建海峡科化股份有限公司','药品','7270.00'),(200,'福建海峡军民融合产业发展有限公司厦门分公司','药品','2270.00'),(201,'福建晶华生物科技有限公司','纸产品','810.00')]
+for p,cp,n,v in sales:income(Q,p,n,v,'关联交易/出售商品及提供劳务',counterparty=cp,column='本期发生额')
+income(Q,201,'房屋','362700.00','关联租赁/本公司作为出租方',counterparty='福建省盐业集团有限责任公司',column='本期确认的租赁收入')
+for n,v in [('主营业务','1512843120.67'),('其他业务','94214491.87'),('合计','1607057612.54')]:income(Q,218,n,v,'母公司营业收入和营业成本',actor='福建省青山纸业股份有限公司（母公司）',scope='issuer')
+# Named actual directions. Registered scope and plans alone are negatives, not positive actions.
+for n in ['房地产','物业服务','租赁服务','算力服务']:action(D,105,n,'sells' if n=='房地产' else 'provides_service',context=[104,151])
+for n in ['股权投资','金融中介服务','创业投资','投资管理','投资咨询']:action(D,9,n,'provides_service',actor='深圳名城金控（集团）有限公司',scope='named_subsidiary',qual='日常经营性投资业务；不等于营业收入')
+for n in ['算力服务','存储服务']:action(D,47,n,'procures',actor='福建名城数字科技有限公司',scope='named_subsidiary',qual='向联营福建数产名商科技有限公司采购；不反推投入',context=[176])
+for p,n,_ in projects:
+ action(D,p,n,'sells',actor='映蓝联营项目' if n=='映蓝（蓝湾三期）' else group,scope='group_associated_entity' if n=='映蓝（蓝湾三期）' else 'consolidated_group',qual='本期结转收入支撑；映蓝为联营项目，不升格集团')
+for n in ['社区配套商业','商业综合体','出租公寓','工业园','酒店']:action(D,23,n,'provides_service',qual='真实出租动作有租赁行与面积；金额单位冲突待A，不推确定收入')
+for cp in ['兰州英家皇道物业管理服务有限公司','上海英家皇道物业管理服务有限公司','福建大名城物业管理有限公司']:action(D,176,'物业服务','procures',qual='接受劳务，原供应方'+cp)
+action(D,176,'商品','procures',qual='向联营六妙白茶采购；未明示商品名，不替换为白茶')
+for n in ['4G/5G/6G通信解决方案','SaaS服务']:action(D,25,n,'provides_service',actor='北京佰才邦技术股份有限公司',scope='group_associated_entity',qual='报告日参股未纳入合并，非集团本期经营',context=[13,26])
+for n in ['DFE芯片','射频芯片']:action(D,25,n,'develops',actor='北京佰才邦技术股份有限公司',scope='group_associated_entity',qual='自主研发；不推本期生产销售')
+# Q mother product matrix + group sales supported by p9,10; each direction explicit.
+for n in ['本色木浆','漂白木浆（针叶、阔叶）','本色竹浆','漂白竹浆','木溶解浆','竹溶解浆','纸袋纸','复合原纸','手提袋纸','牛皮卡纸']:
+ for verb in ['produces','sells']:action(Q,10,n,verb,actor='福建省青山纸业股份有限公司（母公司）',scope='issuer',context=[9,11])
+for n in ['纸箱','纸板','纸袋','风油精','无极膏','软脉灵','光电子器件','木材','竹材']:
+ for verb in ['produces','sells']:action(Q,10,n,verb,actor='公司子公司',scope='named_subsidiary',qual='原产品表仅标子公司，不能自动指定任一具名子公司',context=[9])
+for n in ['伸性纸袋纸','环保纸袋纸','精制牛皮纸','溶解浆','竹木浆','光器件','光模块']:
+ for verb in ['produces','sells']:action(Q,9,n,verb,context=[10,11])
+for n in ['木片','竹片']:action(Q,11,n,'procures',actor='福建省青山纸业股份有限公司（母公司）',scope='issuer',qual='国内挂牌采购，不仅依采购推投入')
+for n in ['木片','竹片','漂白助剂']:action(Q,10,n,'uses_material',actor='福建省青山纸业股份有限公司（母公司）',scope='issuer',qual='原产品工艺实际保留纤维/加入漂白助剂，投入制浆')
+for n in ['大宗原材料','燃料','设备']:action(Q,11,n,'procures',qual='公开招标/竞争性谈判采购')
+for n in ['纸','浆粕','浆板','纸箱/纸板','光电子模块','风油精系列产品']:
+ for verb in ['produces','sells']:action(Q,18 if n in ['纸','浆粕','浆板'] else 19,n,verb,context=[18,19])
+for n,actor,verb in [('风油精','漳州水仙药业股份有限公司','produces'),('无极膏','漳州水仙药业股份有限公司','produces'),('香精','漳州水仙药业股份有限公司','produces'),('光电子器件','深圳市恒宝通光电子股份有限公司','produces'),('光模块','深圳市恒宝通光电子股份有限公司','sells'),('电口模块','深圳市恒宝通光电子股份有限公司','produces'),('机械维修','福建省青纸机电工程有限公司','provides_service'),('机械','福建省青纸机电工程有限公司','manufactures'),('污水处理服务','三明青阳环保科技有限公司','provides_service')]:
+ action(Q,32 if n=='光模块' else (16 if n=='电口模块' else 31),n,verb,actor=actor,scope='named_subsidiary',context=[188,189])
+for actor in ['福建省泰宁青杉林场有限责任公司','福建省明溪青珩林场有限责任公司','福建省连城青山林场有限公司']:
+ action(Q,31,'森林培育','provides_service',actor=actor,scope='named_subsidiary')
+ action(Q,31,'木竹','produces',actor=actor,scope='named_subsidiary',qual='原文木竹采运，不推本期销售；连城本期收入空')
+for n,cp,p in [('ESG咨询服务','中碳（福建）生态科技有限公司',199),('十五五生态环境保护规划咨询','中碳（福建）生态科技有限公司',199),('清洁生产审核编制咨询','中碳（福建）生态科技有限公司',199),('废纸袋','浙江兆山包装有限公司',199),('食用油','福建省盐业进出口有限公司',199),('信息化服务','福建省轻纺（控股）有限责任公司',199),('第三方招聘测试','福建省轻纺（控股）有限责任公司',199),('堆场建设项目','福建省轻安工程建设有限公司',199),('物业服务及维修','福建省金皇物业有限公司',200),('化学品原料','福建省金皇环保科技有限公司',200),('大气污染治理资金申报服务','福建省金皇环保科技有限公司',200),('漂白和木片仓废气治理工程','福建省金皇环保科技有限公司',200),('纸浆检测','福建省浆纸质量检验检测有限公司',200),('工程项目承包及其他咨询服务','福建省建筑轻纺设计院有限公司',200),('风油香精、精油皂等原料和商品','福建晶华生物科技有限公司',200),('手工皂、洗衣液等','福建晶华生物科技有限公司',200),('石灰粉原料','福建福维股份有限公司',200)]:action(Q,p,n,'procures',qual='实际本期采购/接受劳务；供应方'+cp+'；不反推生产投入')
+for p,cp,n,v in sales:action(Q,p,n,'provides_service' if '劳务' in n else 'sells',qual='向'+cp+'实际本期出售商品/提供劳务')
+action(Q,201,'房屋租赁','provides_service',qual='本公司为出租人，承租方福建省盐业集团有限责任公司')
+# Original-source negatives. Separate empty current rows from printed zero or prior amounts.
+for n in ['金控板块','金融投资']:negative(D,16,'本期收入空',content=n,forbidden='不得造零、借利润或上期值')
+for n in ['常州大名城','杭州随塘','杭州雍澜府','福州名城城市广场']:negative(D,22,'本期结转收入空',content=n,forbidden='已售含预售或待结转面积不能生成本期结转收入')
+negative(D,27,'金控营业收入空',actor='深圳名城金控（集团）有限公司',values=['3.38','3.37'],forbidden='利润不转为收入')
+negative(D,165,'合营章节不适用',actor='黄河财产保险股份有限公司',forbidden='不得生成合营收入，保留正确联营')
+negative(D,165,'杭州普润星融本期收入空',actor='杭州普润星融股权投资合伙企业（有限合伙）',forbidden='上期主体及资产/投资金额不得作为本期收入')
+negative(D,176,'关联销售不适用',forbidden='采购/接受劳务不转为销售或收入')
+negative(D,151,'未履约非本期收入',values=['369285599.74'],forbidden='含税待交付交易价格不得作为本期营业收入')
+negative(D,160,'承租费用非收入',values=['2724185.03','5065356.25'],forbidden='承租短期费用与现金流出不转出租收入')
+negative(D,161,'未来收款非本期收入',values=['138483642.32','142584132.76','133046633.64','101019146.51','89387358.37','416646738.07'],forbidden='未来未折现租赁收款额不得当本期')
+negative(D,9,'投资收益非营业收入',values=['350739992.54'],forbidden='日常投资收益仍非营业收入')
+negative(D,13,'参股及筹备边界',actors=['北京佰才邦技术股份有限公司','香港名城移动通信有限公司'],forbidden='参股不并表、不升格集团当前通信生产销售；新子公司前期筹备不升格当前运营')
+negative(D,25,'经营范围与计划非当前动作',actor='福建城际低空机场投资有限公司',forbidden='注册经营范围不得当已制造销售无人飞行器/雷达/新能源汽车设备')
+negative(D,162,'注销边界',actors=['浙江绿维新能源有限公司','厦门金榕茂安投资有限公司','上海大名城商业管理有限公司'],forbidden='不得作为期末仍存续子公司经营')
+negative(D,192,'权益投资收益非母公司营业收入',values=['4765817.18','-746703.74','4019113.44'],forbidden='投资收益不得收入化')
+for cp,n,v in [('福建海峡军民融合产业发展有限公司','生活用纸','340.81'),('福建海峡军民融合产业发展有限公司','药品','2320.00'),('福建海峡融和实业有限公司','药品','7680.00'),('福建省轻安工程建设有限公司','水电','160.23'),('福建省盐业进出口有限公司','药品','7270.00')]:negative(Q,201,'仅上期关联销售',counterparty=cp,content=n,prior_value=v,forbidden='本期格空；不得借列造零或推本期销售')
+negative(Q,203,'仅上期商标使用费',counterparty='福建晶华生物科技有限公司',content='商标使用费',prior_value='10000.00',forbidden='本期空位不得借上期')
+for p,cp,n,v in [(199,'福建省永安煤业有限责任公司','煤炭原料','44043191.15'),(199,'福建省盐业进出口有限公司','盐产品','70861.68'),(199,'福建省轻纺（控股）有限责任公司','咨询服务','840000.00'),(200,'福建省金皇贸易有限责任公司','煤炭原料','3297183.42'),(200,'福建省金皇贸易有限责任公司','木片原料','44520913.52'),(200,'福建闽盐食品科技有限公司','盐礼盒','27600.00')]:negative(Q,p,'仅上期采购',counterparty=cp,content=n,prior_value=v,forbidden='不借上期/获批额度，不生成本期该采购动作或收入')
+negative(Q,200,'污水设备本期空',counterparty='福建省金皇环保科技有限公司',content='污水沉砂池设备',forbidden='本期与上期均空，不由商品名反推采购')
+for cp in ['福建省连城青山林场有限公司','福建省三明青山超声波技术研究院有限公司']:negative(Q,31 if '连城' in cp else 32,'子公司本期营业收入空',actor=cp,forbidden='利润/资产/注册资本不填营业收入')
+negative(Q,210,'研究分部收入空',content='研究及技术服务行业',forbidden='不得左移环保6397/其他分部金额或负营业利润')
+negative(Q,191,'合营联营财务不适用',forbidden='投资余额/净利润/超额亏损不是营业收入')
+negative(Q,174,'集团合同分解不适用',forbidden='不复制其他公司合同分解或以成本分解为收入')
+negative(Q,218,'母公司合同分解不适用',forbidden='不把集团行业/产品表当母公司')
+negative(Q,202,'承租费用非出租收入',counterparty='福建华厦房地产开发有限公司',content='房屋',values=['104328.00'],forbidden='租赁方向不能倒置')
+negative(Q,184,'租赁支出非收入',values=['392523.85','3019701.37'],forbidden='不将短租费用或现金流出作收入')
+negative(Q,10,'下游用途不是公司制造',content='粘胶纤维',forbidden='溶解浆用途不推本公司制造粘胶纤维')
+negative(Q,185,'研发注册非销售',content='夫西地酸乳膏',forbidden='试生产/获得批件与预计上市利润不得推当前销售')
+negative(Q,11,'采购不反推投入',content='燃料/设备',forbidden='采购动作不等同实际投入；木竹片工艺实际投入单列保留')
+negative(Q,176,'投资及补助收益非营业收入',values=['28892523.26','11733659.42'],forbidden='投资收益/其他收益不作为主营或营业收入')
+answers={D:{'principal_business':{'pages':[9,10,13,47,163,164,165],'required_groups':[['房地产'],['金控'],['算力'],['佰才邦'],['参股'],['筹备']],'substance':'房地产开发销售、物业出租运营与金融投资/中介/创业投资/管理咨询，控股名城数字算力运营及采购先进计算服务；佰才邦为参股不并表，对2025暂无重大影响，移动通信仍前期筹备；投资低空与未来建设不升格当前集团制造。'},'products_services':{'pages':[9,10,13,22,23,25,26,47,151,160],'required_groups':[['物业'],['算力'],['存储'],['SaaS'],['通信'],['联营']],'substance':'住房/商住/商办项目结转，社区商业/综合体/公寓/工业园/酒店出租，物业管理和算力服务；金控金融中介/管理咨询；佰才邦4G/5G/6G解决方案、云端SaaS、卫星/基站/DFE射频芯片严格原参股及研发/试点限定。p23九项单位冲突待A，不肯定任一单位。'},'revenue_model':{'pages':[104,105,108,109,151,160,161,165,176,191,192],'required_groups':[['履约进度'],['完工'],['验收'],['控制权'],['提供'],['直线法'],['母公司']],'substance':'地产满足时段条件按履约进度，其他完工验收并满足约定交付控制权；物业/租赁/算力提供过程中确认，经营租赁直线法；保留集团与母公司、联营、关联及原栏目，股权处置损益不营业收入化，未履约/未来收款非本期。p23单位冲突待A。'}},Q:{'principal_business':{'pages':[9,10,11,31,32,188,189,190,191],'required_groups':[['制浆'],['造纸'],['热电'],['碱回收'],['医药'],['光电子'],['林业'],['直销'],['以销定产']],'substance':'林浆纸、热电联产/碱回收、纸箱纸袋、医药、光电子及林业等经营链，自主生产，招标谈判/挂牌采购木竹片，产品直销以销定产；原母子公司与具名水仙/恒宝通/闽环/青纸机电/林场等保留，参股合营不升格。'},'products_services':{'pages':[9,10,16,18,19,31,32,126,127],'required_groups':[['本色木浆'],['漂白木浆'],['本色竹浆'],['漂白竹浆'],['木溶解浆'],['竹溶解浆'],['纸袋纸'],['复合原纸'],['手提袋纸'],['牛皮卡纸'],['风油精'],['无极膏'],['软脉灵'],['光电子'],['木材'],['竹材'],['维修']],'substance':'完整母公司六浆/四纸矩阵与子公司纸箱/板/袋、风油精/无极膏/软脉灵、光器件/模块、木竹材；机械维修安装/运维及污水处理服务；木竹片和漂白助剂实际工艺投入与采购分开；夫西地酸仅试生产获批，不升级销售，粘胶纤维仅下游用途。'},'revenue_model':{'pages':[11,125,126,127,128,129,174,184,200,201,210,218],'required_groups':[['签收'],['FOB'],['CIF'],['报关'],['验收'],['采伐'],['预缴'],['投入法'],['服务数量']],'substance':'内销原纸/纸制品/浆签收收货凭据，出口FOB/CIF检验合格报关交付；药品签收单，光电子内销验收/外销报关；木材采伐证公开招标、中标预缴款保证金、监督和预计出材量结算；机电短项目调试验收一次结转/跨期成本比例投入法，配件控制权，运维固定额期间平均/单价按服务量；经营租赁与承租费用、母公司与集团、关联现期/仅上期分开。'}}}
+x=dict(created_at=datetime.now(timezone.utc).isoformat(),fixed_before_formal_execution=False,status='draft_awaiting_source_unit_ruling',plan_id=plan['plan_id'],processing_identity={'rules':'company_profile_common_core.v1','owned_page_facts':'v8','material_input_facts':'v1','revenue_sentence_repair':'v54'},knowledge_cutoff='2026-09-17',shared_token_budget=50000,official_reports=plan['reports'],source_rows=rows,native_roles=roles,answers=answers,negative_conditions=neg,positive_count=sum(map(len,rows.values()))+len(roles)+6,negative_count=len(neg),denominator_method='收入原栏目/主体/分部/本期单元独立；同列合计镜像去重，Measurement不计召回，合同外全量实际输出计准确率；九项冲突未裁决，不冻结最终分母',pending_conflict='source-unit-conflict-evidence.json',pending_source_rows=[dict(instrument_id=D,page=23,region=r,name=n,printed_value=v,printed_unit='万元',status='awaiting_A') for r,n,v in [('东南','社区配套商业','5095522.14'),('东南','商业综合体','58322708.81'),('西北','社区配套商业','3022092.46'),('西北','其他','18370618.82'),('西北','商业综合体','45962588.13'),('华东','出租公寓','11998492.78'),('华东','工业园','11992918.56'),('华东','社区配套商业','6420979.20'),('东南','酒店','27833217.64')]],formal_authorization={'first_observation':1,'same_source_successors_max':2,'first_used':0,'successors_used':0,'whole_round_seconds':300,'production':'not_authorized','scale_quality_claim_allowed':False})
+(base/'source-scope-draft.json').write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps({'income':{i:len(r) for i,r in rows.items()},'actions':{i:sum(a['instrument_id']==i for a in roles) for i in rows},'answers':6,'draft_positive_count':x['positive_count'],'negative_count':len(neg),'pending_unit_rows':9},ensure_ascii=False))

@@ -1,0 +1,69 @@
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-14 21:08:57][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-14 21:08:57][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-14 21:08:57][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.00s
+[INFO][2026-10-14 21:08:58][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-14 21:08:58][tgbot.py:15] - [tgbot] Reading system configuration...
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+FREEZE_STEP: rc
+FREEZE_STEP: storage
+FREEZE_STEP: service
+FREEZE_STEP: plan
+FREEZE_STEP: plan2
+Timeout (0:00:45)!
+Thread 0x00007efcc7172740 (most recent call first):
+  File "/home/python/Quote/research/announcement_assets/repository.py", line 1099 in list_candidate_rows
+  File "/home/python/Quote/research/announcement_assets/service.py", line 1232 in resolve_effective_reports
+  File "/home/python/Quote/research/announcement_assets/service.py", line 1317 in resolve_effective_report
+  File "/home/python/Quote/research/announcement_assets/access.py", line 288 in get_effective_asset
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 257 in lookup
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 556 in _invoke_report_lookup
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 235 in <dictcomp>
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 234 in load_a_share_candidate_registry
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 278 in load_official_task_candidate_registry
+  File "/home/python/Quote/research/company_profile/operations.py", line 945 in freeze_m4_next_batch_plan
+  File "/tmp/v54new_freeze_resume.py", line 48 in <module>
+Timeout (0:00:45)!
+Thread 0x00007efcc7172740 (most recent call first):
+  File "/home/python/Quote/research/announcement_assets/repository.py", line 1388 in get_blob
+  File "/home/python/Quote/research/company_profile/operations.py", line 994 in _m4_report_is_locally_readable
+  File "/home/python/Quote/research/company_profile/m4_next_batch.py", line 346 in _first_legal_report
+  File "/home/python/Quote/research/company_profile/m4_next_batch.py", line 287 in select_m4_next_batch_reports
+  File "/home/python/Quote/research/company_profile/m4_next_batch.py", line 309 in build_m4_next_batch_plan
+  File "/home/python/Quote/research/company_profile/operations.py", line 965 in freeze_m4_next_batch_plan
+  File "/tmp/v54new_freeze_resume.py", line 48 in <module>
+Timeout (0:00:45)!
+Thread 0x00007efcc7172740 (most recent call first):
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/pathlib.py", line 1051 in read_bytes
+  File "/tmp/v54new_freeze_resume.py", line 53 in <genexpr>
+  File "/tmp/v54new_freeze_resume.py", line 53 in <module>
+FROZEN {
+  "plan_id": "8b8b666d3a32a9c1093dd2353cd841eadf39c8ba48309ea3b2c1f252f9a96da1",
+  "knowledge_cutoff": "2026-09-17",
+  "max_companies_this_round": 2,
+  "token_budget": 50000,
+  "reports": [
+    {
+      "instrument_id": "600094.SH",
+      "asset_id": "asset_58c8e984b72f9cde783a515e16a13727",
+      "report_id": "1225155390",
+      "report_period": "2025-12-31",
+      "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+      "disclosure_form": "service"
+    },
+    {
+      "instrument_id": "600103.SH",
+      "asset_id": "asset_8b9f5d55d0b4994730a369e372efb3d0",
+      "report_id": "1225099218",
+      "report_period": "2025-12-31",
+      "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+      "disclosure_form": "manufacturing"
+    }
+  ]
+}
+HISTORY_UNCHANGED 3519 QUEUE_UNCHANGED 208

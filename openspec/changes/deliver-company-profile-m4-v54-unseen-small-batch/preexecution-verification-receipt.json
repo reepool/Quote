@@ -1,0 +1,28 @@
+{
+  "scope": "execution-before-source-contract-conflict",
+  "strict_openspec_passed": true,
+  "business_execution_started": false,
+  "formal_attempts_used": {
+    "first": 0,
+    "successors": 0
+  },
+  "existing_worktree_files_unchanged": 19,
+  "draft_income_count": 134,
+  "draft_action_count": 158,
+  "draft_answer_count": 6,
+  "draft_negative_count": 43,
+  "pending_unit_rows": 9,
+  "semantic_review": "p23 official unit conflict retained pending A; current/prior, mother/group/associated identity and rent continuation independently reviewed; no business scores declared",
+  "not_a_business_acceptance_receipt": true,
+  "production": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "scope_review": {
+    "blocking_for_formal_execution": [
+      "官方出租单位冲突，等待A裁决；不是业务代码缺陷"
+    ],
+    "nonblocking_suggestions": [],
+    "unrelated_existing_changes": "19项保持原哈希，未触碰",
+    "business_code_changed": false,
+    "pytest_run": false
+  }
+}
