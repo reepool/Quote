@@ -1,0 +1,241 @@
+diff --git a/research/company_profile/acceptance_policy.py b/research/company_profile/acceptance_policy.py
+index 8bba564e..7a0e7f72 100644
+--- a/research/company_profile/acceptance_policy.py
++++ b/research/company_profile/acceptance_policy.py
+@@ -12,6 +12,7 @@ from enum import Enum
+ from typing import Any
+ 
+ from .contracts import DispositionStatus
++from .core_assessment_projection import business_description_is_unclear
+ from .models import (
+     Activity,
+     BusinessEvent,
+@@ -91,7 +92,11 @@ def usage_policy(record: SemanticRecord) -> dict[str, bool | str]:
+             "consolidated_aggregation": False,
+             "ranking": False,
+             "cross_company_comparison": False,
+-            "restriction_reason": "non_numeric_research_fact",
++            "restriction_reason": (
++                "unclear_official_business_description"
++                if business_description_is_unclear(record)
++                else "non_numeric_research_fact"
++            ),
+         }
+     if isinstance(record, Segment):
+         return {
+@@ -141,7 +146,7 @@ def derive_confidence(
+     status = disposition.value if isinstance(disposition, Enum) else str(disposition)
+     if status != DispositionStatus.ACCEPTED_FOR_REVIEW.value:
+         return "rejected"
+-    if contradiction:
++    if contradiction or business_description_is_unclear(record):
+         return "low"
+     if not record.evidence:
+         return "low"
+diff --git a/research/company_profile/core_assessment_projection.py b/research/company_profile/core_assessment_projection.py
+index d4396ccb..c4e095ab 100644
+--- a/research/company_profile/core_assessment_projection.py
++++ b/research/company_profile/core_assessment_projection.py
+@@ -30,6 +30,17 @@ from .models import (
+     TextAnchor,
+ )
+ 
++BUSINESS_DESCRIPTION_CONFLICT = "official_business_description_conflict"
++
++
++def business_description_is_unclear(record: SemanticRecord) -> bool:
++    """Return whether native business wording has an unresolved source conflict."""
++    return isinstance(record, BusinessOverview) and any(
++        reason.startswith(BUSINESS_DESCRIPTION_CONFLICT + ":")
++        for reason in record.uncertainty
++    )
++
++
+ COMMON_CORE_MAPPING_VERSION = "company_profile_common_core_mapping.v1"
+ CORE_DIMENSION_IDS = (
+     "principal_business",
+@@ -175,6 +186,8 @@ def overview_dimension_hits(text: str) -> tuple[str, ...]:
+ def core_record_is_reusable(record: SemanticRecord) -> bool:
+     """Return whether one accepted record can stand in for its own core field."""
+ 
++    if business_description_is_unclear(record):
++        return False
+     if (
+         isinstance(record, BusinessOverview)
+         and record.field_id == "business_overview_source"
+@@ -282,6 +295,7 @@ def project_core_assessment(
+             if (
+                 statuses.get(record.record_id) == DispositionStatus.ACCEPTED_FOR_REVIEW
+                 and record.data_status == "research_fixture"
++                and not business_description_is_unclear(record)
+             ):
+                 accepted.append(record)
+ 
+diff --git a/research/company_profile/core_evidence_selection.py b/research/company_profile/core_evidence_selection.py
+index d567c327..f9050413 100644
+--- a/research/company_profile/core_evidence_selection.py
++++ b/research/company_profile/core_evidence_selection.py
+@@ -18,6 +18,7 @@ from pydantic import BaseModel, ConfigDict, Field
+ from .contracts import PreparedEvidence
+ from .core_assessment_projection import (
+     _REVENUE_BLOCK_PATTERN,
++    BUSINESS_DESCRIPTION_CONFLICT,
+     COMMON_CORE_MAPPING_VERSION,
+     _overview_states_revenue,
+     core_record_is_reusable,
+@@ -1379,6 +1380,7 @@ REVENUE_SENTENCE_REPAIR_V49 = "v49"
+ REVENUE_SENTENCE_REPAIR_V50 = "v50"
+ REVENUE_SENTENCE_REPAIR_V51 = "v51"
+ REVENUE_SENTENCE_REPAIR_V52 = "v52"
++REVENUE_SENTENCE_REPAIR_V53 = "v53"
+ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
+     {
+         REVENUE_SENTENCE_REPAIR_V1,
+@@ -1433,6 +1435,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
+         REVENUE_SENTENCE_REPAIR_V50,
+         REVENUE_SENTENCE_REPAIR_V51,
+         REVENUE_SENTENCE_REPAIR_V52,
++        REVENUE_SENTENCE_REPAIR_V53,
+     }
+ )
+ 
+@@ -1510,6 +1513,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
+         REVENUE_SENTENCE_REPAIR_V50,
+         REVENUE_SENTENCE_REPAIR_V51,
+         REVENUE_SENTENCE_REPAIR_V52,
++        REVENUE_SENTENCE_REPAIR_V53,
+     }
+ 
+ 
+@@ -1570,6 +1574,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
+         REVENUE_SENTENCE_REPAIR_V50,
+         REVENUE_SENTENCE_REPAIR_V51,
+         REVENUE_SENTENCE_REPAIR_V52,
++        REVENUE_SENTENCE_REPAIR_V53,
+     }
+ 
+ 
+@@ -1630,6 +1635,7 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
+         REVENUE_SENTENCE_REPAIR_V50,
+         REVENUE_SENTENCE_REPAIR_V51,
+         REVENUE_SENTENCE_REPAIR_V52,
++        REVENUE_SENTENCE_REPAIR_V53,
+     }
+ 
+ 
+@@ -1691,6 +1697,7 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
+         REVENUE_SENTENCE_REPAIR_V50,
+         REVENUE_SENTENCE_REPAIR_V51,
+         REVENUE_SENTENCE_REPAIR_V52,
++        REVENUE_SENTENCE_REPAIR_V53,
+     }
+ 
+ 
+@@ -1757,9 +1764,67 @@ def project_owned_page_facts(
+                     expand_actor_aliases=expand_actor_aliases,
+                 )
+             )
++    if source_delivery_repair:
++        records = _retain_unclear_segment_descriptions(selection, records)
+     return _dedupe_owned_records(records)
+ 
+ 
++def _retain_unclear_segment_descriptions(
++    selection: CoreEvidenceSelection,
++    records: list[SemanticRecord],
++) -> list[SemanticRecord]:
++    """Retain conflicting native descriptions without affirming their business.
++
++    A named product-sales segment can describe an unrelated produced/sold
++    object. Require positive same-report main-business or revenue context for
++    the segment's product, then check whether that other context supports the
++    described object. Absence alone, or a product word alone, is not a conflict.
++    """
++    corroborating = [
++        span
++        for span in selection.spans
++        if "报告分部包括" not in span.excerpt
++        and re.search(
++            r"(?:公司|本公司)(?:主要从事|产品销售主要包括|收入主要来源于)",
++            re.sub(r"\s+", "", span.excerpt),
++        )
++    ]
++    context = re.sub(r"\s+", "", "\n".join(s.excerpt for s in corroborating))
++    retained: list[SemanticRecord] = []
++    for record in records:
++        if not isinstance(record, BusinessOverview):
++            retained.append(record)
++            continue
++        text = re.sub(r"\s+", "", record.source_text)
++        conflicts = []
++        if "报告分部包括" in text:
++            for match in re.finditer(
++                r"[（(]\d+[)）]([^；。()（）]{2,30}?)产品销售分部[，,]"
++                r"生产及销售([^；。]+)",
++                text,
++            ):
++                native_product, described = match.groups()
++                stem = native_product[:2]
++                if (
++                    stem in context
++                    and stem not in described
++                    and described.removesuffix("及相关产品") not in context
++                ):
++                    pages = sorted({s.page for s in corroborating if stem in s.excerpt})
++                    conflicts.append(
++                        f"{BUSINESS_DESCRIPTION_CONFLICT}:unclear:"
++                        f"原产品分部={native_product}；原描述={described}；"
++                        f"同报告主营及收入来源页={pages}"
++                    )
++        if conflicts:
++            # Evidence and source_text remain the exact original statement.
++            record = record.model_copy(
++                update={"uncertainty": (*record.uncertainty, *conflicts)}
++            )
++        retained.append(record)
++    return retained
++
++
+ def _prepared_for(
+     selection: CoreEvidenceSelection,
+     span: CoreEvidenceSpan,
+diff --git a/research/company_profile/operations.py b/research/company_profile/operations.py
+index 994a4064..1e4a7c5e 100644
+--- a/research/company_profile/operations.py
++++ b/research/company_profile/operations.py
+@@ -1234,6 +1234,7 @@ class CompanyProfileTaskService:
+                 "v50",
+                 "v51",
+                 "v52",
++                "v53",
+             }:
+                 from research.business_profile_production_operations import (
+                     register_business_profile_shared_annual_report_asset,
+diff --git a/research/company_profile/reads.py b/research/company_profile/reads.py
+index b73239cd..910a4895 100644
+--- a/research/company_profile/reads.py
++++ b/research/company_profile/reads.py
+@@ -469,6 +469,11 @@ def _append_fact(
+             "source_native_unit": native_map.get("unit"),
+             "knowledge_time": payload.get("knowledge_time"),
+             "reported_period": payload.get("reported_period"),
++            **(
++                {"uncertainty": payload["uncertainty"]}
++                if payload.get("uncertainty")
++                else {}
++            ),
+             "evidence": evidence,
+         }
+     )
+diff --git a/research/company_profile/runtime.py b/research/company_profile/runtime.py
+index 80ef338d..50b0ae45 100644
+--- a/research/company_profile/runtime.py
++++ b/research/company_profile/runtime.py
+@@ -504,6 +504,7 @@ class CompanyProfileStageRuntime:
+                             "v50",
+                             "v51",
+                             "v52",
++                            "v53",
+                         },
+                     ),
+                 )

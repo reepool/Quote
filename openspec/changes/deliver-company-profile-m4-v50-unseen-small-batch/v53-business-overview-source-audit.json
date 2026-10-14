@@ -1,0 +1,711 @@
+[
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-28d19c45efe79bd7:overview",
+    "source_text": "出售商品/提供劳务情况表\n√适用 □不适用\n                                                 单位：元    币种：人民币\n      关联方            关联交易内容           本期发生额            上期发生额\n天津滨海高新区物业管        服务费                                     2,352,476.19\n理有限公司\n天津滨海高新区企业创        销售房产                                   294,862,583.36\n新服务有限公司\n滨海高新区开发建设有        服务费                                       44,232.08\n限公司\n\n",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        182
+      ],
+      "reason": "官方布局连续匹配，原表时点、空位和上期引用不是肯定本期收入",
+      "source_text_exact": false,
+      "source_layout_exact": true
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-83c015b15ff3f1c6:overview",
+    "source_text": "报告期内公司从事的业务情况报告期内，公司作为天津滨海高新区唯一的国有控股上市公司，深度践行区域发展战略，以工业园区运营为核心主业，形成“园区运营为存量根基、产业投资为增量引擎”的双轮驱动架构，稳步转型产业园区运营商及科技服务提供商，发挥国有资本引领支撑作用，助力高新区建设国家自主创新示范区“升级版”。园区运营方面，公司以战略思维构筑核心竞争优势，紧抓“117项目”全面盘活的重大机遇，主动承接天开园科技转化成果，以市场化、专业化招商模式盘活存量资产、激活发展动能。通过创新提出“科创合伙人”理念、重点打造“科创园中园”项目，引领园区运营向专业化、协同化升级。立足企业全生命周期需求，加强科创园区建设，搭建数字化服务平台、组建产业服务联盟，营造协同共生、活力迸发的产业发展生态，全力打造高质量园区运营标杆，为区域产业升级筑牢载体支撑。产业投资方面，公司紧扣滨海高新区“113X”产业体系，深化产业投资模式创新，实现招投联动。在坚守园区运营核心业务基础上，通过参与布局以新质生产力为投资方向的产业基金，聚焦园区主导产业及优质科创企业开展投资。通过资本服务化和服务场景化，实现产业投资与产业招商的高效联动，既为企业提供资本支撑，也为公司培育长期投资回报，实现国有资产保值增值与产业协同效益双向提升。孵化服务方面，公司深化高效能载体建设，坚守孵化器核心职能。旗下海泰孵化器为在孵企业提供咨询、培训等专业化服务，公司依托园区产业及企业集群优势，优化配套服务，提升孵化器服务能力与影响力，为区域产业升级注入创新动能。",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        11
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-71440c16de1eb254:overview",
+    "source_text": "三是完善全方位服务体系建设，常态化开展资源对接、用工保障等服务，组建海泰发展产业服务联盟，切实解决企业发展需求，高效推进园区基础设施升级改造与软服务提质增效，切实解决企业发展诉求，全方位提升企业归属感与满意度，构建起良性循环的产业生态。",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        12,
+        13
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-94ad59a0ea37e5f4:overview",
+    "source_text": "通过加强国家自主创新示范区政策研究，更好地为在孵企业提供政策咨询服务，创建更优的企业成长环境，提升海泰国家级孵化器服务水平，不断扩大公司孵化器的招商影响力。",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        13
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-338b40e2e7958bc1:overview",
+    "source_text": "主营业务分行业、分产品、分地区、分销售模式情况的说明报告期内，分行业和分产品情况表中“科技园区开发”板块营业收入和营业成本增加，主要原因是报告期内公司通过优化调整定价策略，房产销售成交量增长，房产销售收入增加。“科技",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        15
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": true
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-fedf15e7d29dcbf0:overview",
+    "source_text": "报告期内，分行业和分产品情况表中“商品销售业务”板块营业收入减少，主要原因是报告期内公司仅作为代理人开展净额法贸易业务量减少。",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        16
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": true
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-a203848f1b9f9eeb:overview",
+    "source_text": "重大的股权投资√适用□不适用单位：亿元币种：人民币被投资公司名称主要业务标的是否主营投资业务投资方式投资金额持股比例是否并表报表科目（如适用）资金来源合作方（如适用）投资期限（如有）截至资产负债表日的进展情况预计收益（如有）本期损益影响是否涉诉披露日期（如有）披露索引（如有）天津海泰企业孵化服务有限公司咨询服务否增资1100%是/自有资金//增资款已投出，天津海泰企业孵化服务有限公司完成工商登记变更//否//合计///1///////////",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        25
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-2e46e6c51217fc05:overview",
+    "source_text": "主要控股参股公司分析√适用□不适用主要子公司及对公司净利润影响达10%以上的参股公司情况√适用□不适用单位：元币种：人民币公司名称公司类型主要业务注册资本总资产净资产营业收入营业利润净利润天津海泰创意科技园投资有限公司子公司房地产开发75,000,000.00138,524,336.26122,773,936.76418,714,190.5146,542,049.4035,352,048.05天津百竹科技产业发展有限公司注子公司房地产开发62,936,739.00640,547,307.21-4,265,299.724,064,919.11-2,744,861.85-3,007,898.85天津海泰企业孵化服务有限公司子公司咨询服务252,000,000.00236,450,606.89234,832,866.201,214,660.29328,457.38214,011.20注：经公司2026年3月6日，第十一届董事会第二十一次（临时）会议审议通过《关于以债转股方式向全资子公司增资的议案》，对天津百竹科技产业发展有限公司增资20,000万元，增资款已投出，正在履行工商变更程序。详见公司于2026年3月7日披露的相关公告。",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        27,
+        28
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-3a99a86294280a2c:overview",
+    "source_text": "报告期内取得和处置子公司的情况√适用□不适用公司名称报告期内取得和处置子公司方式对整体生产经营和业绩的影响天津海泰科技发展股份有限公司2025年年度报告28/203天津海发方信置地有限公司转让100%股权本期投资收益增加",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        27,
+        28
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-0552a6d6a42d33de:overview",
+    "source_text": "对于本集团自第三方取得商品控制权后，再转让给客户，本集团有权自主决定所交易商品的价格，即本集团在向客户转让商品前能够控制该商品，因此本集团是主要责任人，按照已收或应收对价总额确认收入。否则，本集团为代理人，按照预期有权收取的佣金或手续费的金额确认收入，该金额应当按照已收或应收对价总额扣除应支付给其他相关方的价款后的净额，或者按照既定的佣金金额或比例等确定。本集团以完成商品交付并同时满足上述收入确认条件时予以确认。",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        105,
+        106,
+        107
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-5670b86a92b564df:overview",
+    "source_text": "本集团在履行了合同中的履约义务，即在客户取得相关商品或服务控制权时确认收入。取得相关商品或服务控制权，是指能够主导该商品或服务的使用并从中获得几乎全部的经济利益。合同中包含两项或多项履约义务的，本集团在合同开始日，按照各单项履约义务所承诺商品或服务的单独售价的相对比例，将交易价格分摊至各单项履约义务。本集团按照分摊至各单项履约义务的交易价格计量收入。交易价格是指本集团因向客户转让商品或服务而预期有权收取的对价金额，不包括代第三方收取的款项以及预期将退还给客户的款项。本集团根据合同条款，结合其以往的习惯做法确定交易价格，并在确定交易价格时，考虑可变对价、合同中存在的重大融资成分、非现金对价、应付客户对价等因素的影响。本集团以不超过在相关不确定性消除时累计已确认收入极可能不会发生重大转回的金额确定包含可变对价的交易价格。合同中存在重大融资成分的，本集团按照假定客户在取得商品或服务控制权时即以现金支付的应付金额确定交易价格，并在合同期间内采用实际利率法摊销该交易价格与合同对价之间的差额。满足下列条件之一的，属于在某一时段内履行履约义务，否则，属于在某一时点履行履约义务：（1）客户在本集团履约的同时即取得并消耗本集团履约所带来的经济利益。（2）客户能够控制本集团履约过程中在建的商品。（3）本集团履约过程中所产出的商品具有不可替代用途，且本集团在整个合同期内有权就累计至今已完成的履约部分收取款项。对于在某一时段内履行的履约义务，本集团在该段时间内按照履约进度确认收入，但是，履约进度不能合理确定的除外。本集团考虑商品或服务的性质，采用产出法或投入法确定履约进度。当履约进度不能合理确定时，已经发生的成本预计能够得到补偿的，本集团按照已经发生的成本金额确认收入，直到履约进度能够合理确定为止。对于在某一时点履行的履约义务，本集团在客户取得相关商品或服务控制权时点确认收入。在判断客户是否已取得商品或服务控制权时，本集团考虑下列迹象：（1）本集团就该商品或服务享有现时收款权利，即客户就该商品或服务负有现时付款义务。（2）本集团已将该商品的法定所有权转移给客户，即客户已拥有该商品的法定所有权。（3）本集团已将该商品实物转移给客户，即客户已实物占有该商品。（4）本集团已将该商品所有权上的主要风险和报酬转移给客户，即客户已取得该商品所有权上的主要风险和报酬。（5）客户已接受该商品或服务等。本集团根据在向客户转让商品或服务前是否拥有对该商品或服务的控制权，来判断从事交易时本集团的身份是主要责任人还是代理人。本集团在向客户转让商品或服务前能够控制该商品或天津海泰科技发展股份有限公司2025年年度报告107/203服务的，本集团为主要责任人，按照已收或应收对价总额确认收入；否则，本集团为代理人，按照预期有权收取的佣金或手续费的金额确认收入。2.按照业务类型披露具体收入确认方式及计量方法（1）房地产销售收入本集团与客户之间的销售商品合同通常仅包含转让商品的履约义务，本集团在客户取得商品控制权时点确认收入。具体为：房地产销售收入在工程已竣工并经有关部门验收合格，买卖双方签订具有法律约束力的销售合同，买方按照销售合同付款条件支付了约定的购房款项，双方办妥房屋交接手续或本集团已按合同约定发放房屋交付通知且客户签收期满。（2）商品销售收入对于本集团自第三方取得商品控制权后，再转让给客户，本集团有权自主决定所交易商品的价格，即本集团在向客户转让商品前能够控制该商品，因此本集团是主要责任人，按照已收或应收对价总额确认收入。否则，本集团为代理人，按照预期有权收取的佣金或手续费的金额确认收入，该金额应当按照已收或应收对价总额扣除应支付给其他相关方的价款后的净额，或者按照既定的佣金金额或比例等确定。本集团以完成商品交付并同时满足上述收入确认条件时予以确认。(2).同类业务采用不同经营模式涉及不同收入确认方式及计量方法□适用√不适用",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        105,
+        106,
+        107
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-20e6458ebe196001:overview",
+    "source_text": "按照业务类型披露具体收入确认方式及计量方法（1）房地产销售收入本集团与客户之间的销售商品合同通常仅包含转让商品的履约义务，本集团在客户取得商品控制权时点确认收入。具体为：房地产销售收入在工程已竣工并经有关部门验收合格，买卖双方签订具有法律约束力的销售合同，买方按照销售合同付款条件支付了约定的购房款项，双方办妥房屋交接手续或本集团已按合同约定发放房屋交付通知且客户签收期满。",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        105,
+        106,
+        107
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-68e9d0c1ffcab91a:overview",
+    "source_text": "本集团在履行了合同中的履约义务，即在客户取得相关商品或服务控制权时确认收入。取得相关商品或服务控制权，是指能够主导该商品或服务的使用并从中获得几乎全部的经济利益。合同中包含两项或多项履约义务的，本集团在合同开始日，按照各单项履约义务所承诺商品或服务的单独售价的相对比例，将交易价格分摊至各单项履约义务。本集团按照分摊至各单项履约义务的交易价格计量收入。交易价格是指本集团因向客户转让商品或服务而预期有权收取的对价金额，不包括代第三方收取的款项以及预期将退还给客户的款项。本集团根据合同条款，结合其以往的习惯做法确定交易价格，并在确定交易价格时，考虑可变对价、合同中存在的重大融资成分、非现金对价、应付客户对价等因素的影响。本集团以不超过在相关不确定性消除时累计已确认收入极可能不会发生重大转回的金额确定包含可变对价的交易价格。合同中存在重大融资成分的，本集团按照假定客户在取得商品或服务控制权时即以现金支付的应付金额确定交易价格，并在合同期间内采用实际利率法摊销该交易价格与合同对价之间的差额。满足下列条件之一的，属于在某一时段内履行履约义务，否则，属于在某一时点履行履约义务：（1）客户在本集团履约的同时即取得并消耗本集团履约所带来的经济利益。（2）客户能够控制本集团履约过程中在建的商品。（3）本集团履约过程中所产出的商品具有不可替代用途，且本集团在整个合同期内有权就累计至今已完成的履约部分收取款项。对于在某一时段内履行的履约义务，本集团在该段时间内按照履约进度确认收入，但是，履约进度不能合理确定的除外。本集团考虑商品或服务的性质，采用产出法或投入法确定履约进度。当履约进度不能合理确定时，已经发生的成本预计能够得到补偿的，本集团按照已经发生的成本金额确认收入，直到履约进度能够合理确定为止。对于在某一时点履行的履约义务，本集团在客户取得相关商品或服务控制权时点确认收入。在判断客户是否已取得商品或服务控制权时，本集团考虑下列迹象：（1）本集团就该商品或服务享有现时收款权利，即客户就该商品或服务负有现时付款义务。（2）本集团已将该商品的法定所有权转移给客户，即客户已拥有该商品的法定所有权。（3）本集团已将该商品实物转移给客户，即客户已实物占有该商品。（4）本集团已将该商品所有权上的主要风险和报酬转移给客户，即客户已取得该商品所有权上的主要风险和报酬。（5）客户已接受该商品或服务等。本集团根据在向客户转让商品或服务前是否拥有对该商品或服务的控制权，来判断从事交易时本集团的身份是主要责任人还是代理人。本集团在向客户转让商品或服务前能够控制该商品或",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        106
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-3f14e9ffd2a8b230:overview",
+    "source_text": "作为出租方的租赁分类标准和会计处理方法√适用□不适用本集团作为出租人在租赁开始日，本集团将租赁分为融资租赁和经营租赁。融资租赁，是指无论所有权最终是否转移，但实质上转移了与租赁资产所有权有关的几乎全部风险和报酬的租赁。经营租赁，是指除融资租赁以外的其他租赁。本集团作为转租出租人时，基于原租赁产生的使用权资产对转租赁进行分类。（1）经营租赁会计处理经营租赁的租赁收款额在租赁期内各个期间按照直线法确认为租金收入。本集团将发生的与经营租赁有关的初始直接费用予以资本化，在租赁期内按照与租金收入确认相同的基础分摊计入当期损益。未计入租赁收款额的可变租赁付款额在实际发生时计入当期损益。经营租赁发生变更的，公司自变更生效日起将其作为一项新租赁进行会计处理，与变更前租赁有关的预收或应收租赁收款额视为新租赁的收款额。（2）融资租赁会计处理在租赁开始日，本集团对融资租赁确认应收融资租赁款，并终止确认融资租赁资产。本集团对应收融资租赁款进行初始计量时，将租赁投资净额作为应收融资租赁款的入账价值。租赁投资净额为未担保余值和租赁期开始日尚未收到的租赁收款额按照租赁内含利率折现的现值之和。",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        111
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-6f360d524deff970:overview",
+    "source_text": "作为出租人的经营租赁□适用√不适用",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        168
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": true
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-900c13c713186134:overview",
+    "source_text": "本期是否存在丧失子公司控制权的交易或事项√适用□不适用单位：万元币种：人民币子公司名称丧失控制权的时点丧失控制权时点的处置价款丧失控制权时点的处置比例（%）丧失控制权时点的处置方式丧失控制权时点的判断依据处置价款与处置投资对应的合并财务报表层面享有该子公司净资产份额的差额丧失控制权之日剩余股权的比例（%）丧失控制权之日合并财务报表层面剩余股权的账面价值丧失控制权之日合并财务报表层面剩余股权的公允价值按照公允价值重新计量剩余股权产生的利得或损失丧失控制权之日合并财务报表层面剩余股权公允价值的确定方法及主要假设与原子公司股权投资相关的其他综合收益转入投资损益或留存收益的金额天津海发方信置地有限公司2025/9/309,065.95100.00协议转让工商变更完成73.89",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        170
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-f1c1fbc615d8e782:overview",
+    "source_text": "其他原因的合并范围变动说明其他原因导致的合并范围变动（如，新设子公司、清算子公司等）及其相关情况：□适用√不适用",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        171
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-25f5fcccc81aa1b9:overview",
+    "source_text": "企业集团的构成√适用□不适用单位：万元币种：人民币子公司名称主要经营地注册资本注册地业务性质持股比例(%)取得直接间接方式天津海泰企业孵化服务有限公司天津市25,200.00天津市咨询服务100.00投资设立天津海泰方圆投资有限公司天津市3,000.00天津市房地产开发100.00投资设立天津海泰方通投资有限公司天津市15,000.00天津市商品销售业务100.00投资设立天津海泰方成投资有限公司天津市6,735.00天津市房地产开发100.00同一控制下企业合并天津海泰创意科技园投资有限公司天津市7,500.00天津市房地产开发100.00投资设立天津百竹科技产业发展有限公司天津市6,293.67天津市房地产开发100.00同一控制下企业合并天津海发物业管理有限公司天津市500.00天津市物业服务100.00投资设立(2).重要的非全资子公司□适用√不适用(3).重要非全资子公司的主要财务信息□适用√不适用天津海泰科技发展股份有限公司2025年年度报告173/203(4).使用企业集团资产和清偿企业集团债务的重大限制□适用√不适用(5).向纳入合并财务报表范围的结构化主体提供的财务支持或其他支持□适用√不适用其他说明：□适用√不适用",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        179,
+        180
+      ],
+      "reason": "p172逐个子公司原名、注册资本、持股和业务性质匹配；取得方式/直接间接表头读序差异未改变关系，p173不适用限定保留；同字节源quote复核，原表布局取序核验沿用，未改变业务输出",
+      "source_text_exact": false,
+      "source_layout_exact": false,
+      "original_immutable_audit": "business-overview-source-audit.json",
+      "original_source_text_sha256": "0de56889d673611ca7a489cf52b77b496d8f28d230d487883e87f01e405c2c5e"
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-a8e8ae5418ecc62c:overview",
+    "source_text": "关联托管/承包情况说明\r\n□适用 √不适用",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        182
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": true
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-5f676beaa2c9dc9c:overview",
+    "source_text": "出售商品/提供劳务情况表√适用□不适用单位：元币种：人民币关联方关联交易内容本期发生额上期发生额天津滨海高新区物业管理有限公司服务费2,352,476.19天津滨海高新区企业创新服务有限公司销售房产294,862,583.36滨海高新区开发建设有限公司服务费44,232.08",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        182
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600082.SH",
+    "record_id": "owned:core-ev-9b8de6cf7a3a50e9:overview",
+    "source_text": "本公司作为出租方：□适用√不适用",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        182
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": true
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-485075c062f91353:overview",
+    "source_text": "报告期内公司从事的业务情况\n公司主要从事远洋渔业捕捞、水产品加工销售及相关贸易，围绕“一鱼一虾”（金枪鱼、南\r\n极磷虾）核心主业，深耕远洋捕捞，构建金枪鱼产业链发展，形成捕捞、加工、贸易、运输一体\r\n化格局。",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        8,
+        9
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-3684f7a3b4727167:overview",
+    "source_text": "出售商品/提供劳务情况表\n       √适用   □不适用\n                                                     单位：元   币种：人民币\n                                    143/158\n               上海开创国际海洋资源股份有限公司2025   年年度报告\n\n\n          关联方             关联交易内容       本期发生额       上期发生额\n上海水产集团龙门食品有限公司              出售商品       2,018,807.63    1,012.50\n城市管家（上海）电子商务有限公司            出售商品          8,424.00\n上海水产集团有限公司                  出售商品          2,461.00     3,423.01\n上海菜管家电子商务有限公司               出售商品                     431,886.72\n\n",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        143,
+        144
+      ],
+      "reason": "官方布局连续匹配，原表时点、空位和上期引用不是肯定本期收入",
+      "source_text_exact": false,
+      "source_layout_exact": true
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-49b24f6377e30e79:overview",
+    "source_text": "报告期内公司从事的业务情况公司主要从事远洋渔业捕捞、水产品加工销售及相关贸易，围绕“一鱼一虾”（金枪鱼、南极磷虾）核心主业，深耕远洋捕捞，构建金枪鱼产业链发展，形成捕捞、加工、贸易、运输一体化格局。远洋捕捞：报告期内，公司金枪鱼围网船队11艘船舶全负荷运营，在中西太平洋开展生产作业，产品以鲣鱼、黄鳍为主，船队规模以及捕捞产量位居国内领先水平；与江苏深蓝远洋渔业有限公司开展合作经营，在南极海域捕捞磷虾，产品以冻虾和虾粉为主。加工业务：西班牙ALBO公司加工产品主要以金枪鱼罐头和罐头方便食品为主，且部分产品在当地具有较高的市场占有率以及品牌知名度。公司国内岱山加工厂加工金枪鱼原料鱼，产品以鱼柳为主，主要销往国外市场。海上运输：冷藏运输船队主要与金枪鱼围网船队作业配套，承担了冷冻金枪鱼运输、人员和物资等转运，并积极拓展其他运输业务。贸易业务：公司贸易业务以远洋渔货及水产品加工品为核心，外销主要面向国际市场，依托“捕捞—加工—贸易”全产业链开展运营，持续拓展水产品贸易业务。",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        8
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-7a53f3a4ad30b9ae:overview",
+    "source_text": "ALBO公司围绕品牌升级与产品创新持续发力，优化金枪鱼、沙丁鱼等核心产品结构，强化品质管控和可持续渔业标准，提升生产效率与供应链稳定性。同时积极拓展欧洲及海外市场，加强与美国市场合作，进一步巩固百年海产品罐头品牌的国际影响力和市场竞争力。沙丁鱼、鱿鱼等罐头产品保持西班牙市占率第一；黄鳍金枪鱼品类罐头品牌市占率提升，稳定在第二位；国际市场销售额增幅126%，其中北美市场成为最大增长点。环太公司在关税战带来的外部冲击下，市场环境持续波动，产品销售受到一定影响，公司通过持续提升加工能力，实现平稳运营。贸易业务受关税政策冲击、资源环境变化等多重因素影响，业务成本上升，利润有所下滑。加拿大FCS公司优化供应链管理，积极拓展采购销售渠道，推进多品类拓展，部分核心产品规模有所增长；Estelas贸易公司依托母公司海产品资源优势，继续发挥欧洲贸易平台桥头堡作用，持续推进金枪鱼等水产品的国际贸易业务，强化与舟山环太食品等生产企业及终端市场的协同合作。公司不断优化供应链管理，拓展北非及亚洲市场渠道，推动金枪鱼、鲭鱼等原料产品的跨境流通，实现贸易规模和市场覆盖的稳步增长。",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        9,
+        10
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-aa451f12e96ebef7:overview",
+    "source_text": "产销量情况说明：金枪鱼转移24,300.45吨至后续鱼柳加工",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        12
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": true
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-ce8458d069cd2453:overview",
+    "source_text": "重大的股权投资□适用√不适用",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        17
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": true
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-7d0468c4ae76a315:overview",
+    "source_text": "主要控股参股公司分析√适用□不适用主要子公司及对公司净利润影响达10%以上的参股公司情况√适用□不适用单位：元币种：人民币公司名称公司类型主要业务注册资本总资产净资产营业收入营业利润净利润上海开创远洋渔业有限公司子公司远洋捕捞41,000万元2,285,441,824.091,256,665,939.841,175,618,816.176,221,355.665,751,113.30泛太食品（马绍尔群岛）有限公司子公司远洋捕捞及食品加工业USD800万元48,323,536.72-14,548,944.1975,194,260.0451,747.4711,314.46泛太渔业（马绍尔群岛）有限公司子公司远洋捕捞USD200万元851,620,998.36760,709,687.97497,631,583.0154,525,033.4453,819,378.64文森特（密克罗尼西亚）渔业有限公司子公司远洋捕捞USD5万元36,129,238.6332,209,367.543,554.301,426.061,426.06亚太金枪鱼私人有限公司子公司交易鱼类和鱼产品USD100万元10,397,188.919,420,447.60355,430.0067,030.4764,788.20舟山环太海洋食品有限公司子公司水产品加工及销售10,000万元402,580,718.20180,125,259.17422,469,539.59299,915.77568,536.50卡洛斯•阿尔博的孩子们有限公司子公司罐头食品加工EUR180万元873,176,191.32462,143,432.72818,099,682.1322,342,384.8919,242,607.54上海开创国际海洋资源股份有限公司2025年年度报告19/158康隆（香港）航运有限公司子公司海上运输等USD1万元158,330,969.7250,999,867.6765,305,692.598,483,778.578,413,720.47法国小溪海鲜公司子公司海鲜加工和批发业务92.34万加元42,144,503.0939,905,477.23100,605,939.19350,953.83218,290.96艾斯特拉斯贸易有限公司子公司渔货贸易EUR3,000.00115,561,454.0111,237,905.20202,368,570.792,318,210.491,854,461.53",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        18,
+        19
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-6f7b6b2007a81e61:overview",
+    "source_text": "报告期内取得和处置子公司的情况□适用√不适用",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        18,
+        19
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": true
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-42d6248b50a791a6:overview",
+    "source_text": "本公司收入主要来源于以下业务类型：金枪鱼及其他鱼种销售收入、罐头销售收入、鱼柳加工销售收入、渔货贸易销售收入、海上运输收入等。销售商品产品销售收入：本公司产品销售主要包括金枪鱼、鱼柳、磷虾、罐头食品等；①本公司销售金枪鱼：本公司海外直接渔货销售业务，由生产船直接卸货给购买方的运输船，生产船和运输船双方确认卸货销售数量并开具交接单（大副收据）后确认收入。本公司国内陆地渔货销售业务，由生产船或运输船卸货至指定地点，双方确认卸货销售数量并开具结算单后确认收入。②本公司销售磷虾：本公司根据合同协议完成销售磷虾及磷虾粉，商品控制权转移确认收入。③本公司销售罐头、加工鱼柳：内销产品，公司根据合同约定将产品交付给客户且客户已接受该商品，商品的控制权已转移时确认收入。外销产品，公司按照约定的贸易方式已交付，商品的控制权已转移时确认收入。④本公司渔货贸易销售：本公司渔获贸易均是在控制权转移时进行收入确认。提供运输服务本公司海上运输收入在航次结束时确认收入。",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        84,
+        85
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-4c3f79b46e7acb78:overview",
+    "source_text": "作为出租方的租赁分类标准和会计处理方法√适用□不适用本公司作为出租人时，将实质上转移了与资产所有权有关的全部风险和报酬的租赁确认为融资租赁，除融资租赁之外的其他租赁确认为经营租赁。融资租赁融资租赁中，在租赁期开始日本公司按租赁投资净额作为应收融资租赁款的入账价值，租赁投资净额为未担保余值和租赁期开始日尚未收到的租赁收款额按照租赁内含利率折现的现值之和。本公司作为出租人按照固定的周期性利率计算并确认租赁期内各个期间的利息收入。本公司作为出租人取得的未纳入租赁投资净额计量的可变租赁付款额在实际发生时计入当期损益。",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        88
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-a6d308176ebd1714:overview",
+    "source_text": "作为出租人的经营租赁√适用□不适用单位：元币种：人民币项目租赁收入其中:未计入租赁收款额的可变租赁付款额相关的收入经营租赁2,129,586.822,129,586.82合计2,129,586.822,129,586.82",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        132
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": true
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-6e873c340637a054:overview",
+    "source_text": "其他原因的合并范围变动说明其他原因导致的合并范围变动（如，新设子公司、清算子公司等）及其相关情况：□适用√不适用",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        133,
+        134
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": true
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-2ab885e575872aeb:overview",
+    "source_text": "本期是否存在丧失子公司控制权的交易或事项□适用√不适用",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        133,
+        134
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": true
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-18653cabc6f0b0d1:overview",
+    "source_text": "企业集团的构成√适用□不适用单位：元币种：人民币子公司名称主要经营地注册资本注册地业务性质持股比例(%)取得直接间接方式上海开创远洋渔业有限公司上海市41,000万元上海市远洋捕捞等100.00设立泛太食品（马绍尔群岛）有限公司马绍尔群岛USD800万元马绍尔群岛远洋捕捞及食品加工业100.00设立上海开创国际海洋资源股份有限公司2025年年度报告134/158泛太渔业（马绍尔群岛）有限公司马绍尔群岛USD200万元马绍尔群岛远洋捕捞等100.00设立文森特（密克罗尼西亚）渔业有限公司密克罗尼西亚联邦USD5万元密克罗尼西亚联邦远洋捕捞等100.00设立亚太金枪鱼私人有限公司新加坡USD100万元新加坡交易鱼类和鱼产品51.00设立舟山环太海洋食品有限公司舟山市10,000万元舟山市水产品加工及销售100.00设立卡洛斯•阿尔博的孩子们有限公司西班牙EUR180万元西班牙罐头食品加工100.00非同一控制下企业合并康隆（香港）航运有限公司香港USD1万元香港海上运输等51.00设立法国小溪海鲜公司加拿大92.34万加元加拿大收购、加工销售鱼产品100.00非同一控制下企业合并艾斯特拉斯贸易有限公司西班牙EUR3,000.00西班牙渔货贸易100.00设立在子公司的持股比例不同于表决权比例的说明：不适用持有半数或以下表决权但仍控制被投资单位、以及持有半数以上表决权但不控制被投资单位的依据：不适用对于纳入合并范围的重要的结构化主体，控制的依据：不适用确定公司是代理人还是委托人的依据：不适用",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        133,
+        134
+      ],
+      "reason": "p133–134逐子公司原名、资本、业务和持股匹配，取得方式/直接间接表头读序差异；亚太/康隆51%合并子公司保留；同字节源quote复核，原表布局取序核验沿用，未改变业务输出",
+      "source_text_exact": false,
+      "source_layout_exact": false,
+      "original_immutable_audit": "business-overview-source-audit.json",
+      "original_source_text_sha256": "52cb9edabd1e25b439c2f95ad6ec40cd24e2bddcf4f19ad6d29e8284fea514e1"
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-4e61cc75fe63790e:overview",
+    "source_text": "出售商品/提供劳务情况表√适用□不适用单位：元币种：人民币",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        143
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": true
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-43ee1647d536a215:overview",
+    "source_text": "关联托管/承包情况说明\r\n□适用 √不适用",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        144
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": true
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-561e892ae41183a1:overview",
+    "source_text": "本公司作为出租方：□适用√不适用",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        144
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": true
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-c105df8ecce26704:overview",
+    "source_text": "本公司的内部组织结构、管理要求及内部报告制度确定了4个报告分部，分别为远洋捕捞板块、罐头鱼产品销售板块、渔货贸易板块及海上运输板块。",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        149,
+        150
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-64f8bd83b4428d44:overview",
+    "source_text": "本公司的各个报告分部分别提供不同的产品或服务。",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        149,
+        150
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-41dc8c524fb9f8c6:overview",
+    "source_text": "本公司管理层分别单独管理各个报告分部的经营活动，定期评价这些报告分部的经营成果，以决定向其分配资源及评价其业绩。",
+    "uncertainty": [],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        149,
+        150
+      ],
+      "reason": "官方原文连续匹配",
+      "source_text_exact": true,
+      "source_layout_exact": false
+    }
+  },
+  {
+    "instrument_id": "600097.SH",
+    "record_id": "owned:core-ev-af60b2f8100d772a:overview",
+    "source_text": "本公司报告分部包括：（1）远洋捕捞分部，捕捞及销售金枪鱼、磷虾及磷虾粉；（2）罐头鱼产品销售分部，生产及销售应用软件；（3）渔货贸易分部，生产及销售集成电路及相关产品；（4）海上运输服务分部，提供进出口服务。",
+    "uncertainty": [
+      "official_business_description_conflict:unclear:原产品分部=罐头鱼；原描述=应用软件；同报告主营及收入来源页=[8, 84]"
+    ],
+    "decision": {
+      "accurate": true,
+      "critical_numeric_error": false,
+      "source_pages": [
+        149,
+        150
+      ],
+      "reason": "官方原文和Evidence保留；p149产品分部描述与p8–9及p84真实鱼业产品/收入不符，无法解释保持unclear；不作为三维确定经营依据",
+      "source_text_exact": true,
+      "source_layout_exact": false,
+      "source_conflict_unclear": true
+    }
+  }
+]

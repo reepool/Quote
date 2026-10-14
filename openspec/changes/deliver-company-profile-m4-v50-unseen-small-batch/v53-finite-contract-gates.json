@@ -1,0 +1,55 @@
+{
+  "frozen_whole_round_seconds_limit": 300,
+  "frozen_shared_token_limit": 50000,
+  "measured_whole_round_seconds": 217.74277905281633,
+  "measured_tokens": 0,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 170,
+    "denominator": 170,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 448,
+    "denominator": 448,
+    "value": 1.0
+  },
+  "numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "negative_passed": 32,
+  "positive_conditions": 170,
+  "negative_conditions": 32,
+  "actual_five_stage_success": true,
+  "no_reuse_or_predecessor": true,
+  "query_export_disk_and_requery_equal": true,
+  "successor_contract_gates_met": true,
+  "source_review_expansion_gates_met": false,
+  "source_review_expansion_thresholds": {
+    "numeric_thresholds_basis": "operator_cost_constraint",
+    "min_independently_reviewed_reports": 2,
+    "min_occupied_strata_reviewed": 2,
+    "min_source_recall_ratio": 1.0,
+    "min_source_accuracy_ratio": 1.0,
+    "max_critical_numeric_errors": 0,
+    "max_tokens": 50000,
+    "max_elapsed_seconds": 195.84604974277318,
+    "max_companies_this_expansion": 2,
+    "scale_quality_claim_allowed": false,
+    "fitted_from_observed_results": false,
+    "fixture_guards_are_not_live_quality": true,
+    "gold24_equality_is_not_a_threshold": true,
+    "untriggered_negatives_are_not_passes": true,
+    "expansion_requires_independent_source_review": true
+  },
+  "source_review_threshold_explanation": "original remaining-per-company elapsed budget is persisted as existing merged expansion threshold; retain false field; independent frozen whole-round300seconds gate passes",
+  "original_authorization_used": 2,
+  "additional_authorization_used": 1,
+  "additional_authorization_limit": 1,
+  "production": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "archive_requires_a_finite_acceptance": true,
+  "source_review_elapsed_limit": 195.84604974277318
+}

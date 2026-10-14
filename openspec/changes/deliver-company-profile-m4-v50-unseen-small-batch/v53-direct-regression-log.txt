@@ -1,0 +1,13 @@
+[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[33m                                        [100%][0m
+============================= slowest 10 durations =============================
+128.80s call     tests/unit/test_research/test_company_profile_v49_successor.py::test_v49_official_page_source_full_contract[600058.SH]
+60.67s call     tests/unit/test_research/test_company_profile_v50_realestate_chemical.py::test_complete_official_contract[pages-600096.SH]
+59.54s call     tests/unit/test_research/test_company_profile_v50_realestate_chemical.py::test_complete_official_contract[independent_pages-600096.SH]
+26.74s call     tests/unit/test_research/test_company_profile_v49_successor.py::test_v49_official_page_source_full_contract[600089.SH]
+15.30s call     tests/unit/test_research/test_company_profile_v50_realestate_chemical.py::test_complete_official_contract[independent_pages-600064.SH]
+14.15s call     tests/unit/test_research/test_company_profile_v50_realestate_chemical.py::test_complete_official_contract[pages-600064.SH]
+7.67s call     tests/unit/test_research/test_company_profile_v53_source_conflict.py::test_v53_complete_official_owner_contract_and_source_conflict[600097.SH]
+7.22s call     tests/unit/test_research/test_company_profile_v51_park_fishery.py::test_full_official_pages_deliver_native_contract[600097.SH]
+6.63s call     tests/unit/test_research/test_company_profile_v51_park_fishery.py::test_official_page_owner_requests_actual_table_layouts[600097.SH]
+5.58s call     tests/unit/test_research/test_company_profile_v50_realestate_chemical.py::test_successor_exact_asset_binding[False]
+[33m[32m33 passed[0m, [33m[1m7 warnings[0m[33m in 354.80s (0:05:54)[0m[0m

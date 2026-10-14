@@ -1,0 +1,152 @@
+{
+  "created_at": "2026-10-14T08:19:18.589490+00:00",
+  "checks": [
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "--",
+        "research/company_profile",
+        "openspec/changes/deliver-company-profile-m4-v50-unseen-small-batch"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "/home/python/.nvm/versions/node/v24.7.0/bin/openspec",
+        "validate",
+        "deliver-company-profile-m4-v50-unseen-small-batch",
+        "--strict"
+      ],
+      "exit_code": 0,
+      "output": "Change 'deliver-company-profile-m4-v50-unseen-small-batch' is valid\n"
+    },
+    {
+      "command": [
+        "/home/python/.nvm/versions/node/v24.7.0/bin/openspec",
+        "validate",
+        "company-profile-common-core-owned-page-facts",
+        "--strict",
+        "--type",
+        "spec"
+      ],
+      "exit_code": 0,
+      "output": "Specification 'company-profile-common-core-owned-page-facts' is valid\n"
+    },
+    {
+      "command": [
+        "/home/python/.nvm/versions/node/v24.7.0/bin/openspec",
+        "validate",
+        "company-profile-common-semantic-model",
+        "--strict",
+        "--type",
+        "spec"
+      ],
+      "exit_code": 0,
+      "output": "Specification 'company-profile-common-semantic-model' is valid\n"
+    },
+    {
+      "command": [
+        "/home/python/.nvm/versions/node/v24.7.0/bin/openspec",
+        "validate",
+        "deliver-company-profile-m4-next-small-batch-research",
+        "--strict",
+        "--type",
+        "spec"
+      ],
+      "exit_code": 0,
+      "output": "Specification 'deliver-company-profile-m4-next-small-batch-research' is valid\n"
+    }
+  ],
+  "protected_previous_material_count": 3340,
+  "existing_workspace_hash_count": 19,
+  "formal_first_artifact_count": 19,
+  "formal_review_artifact_count": 8,
+  "executed_code_sha256": {
+    "research/company_profile/__init__.py": "41e5f0c5c3562e789053ce756fe342d1cb8b2c34f4049920eb246855bdbf1364",
+    "research/company_profile/acceptance_policy.py": "55514e2253ebdd992ea0c1eca5fdc01ee3d10bbaeba9b128bf57d485e4beece0",
+    "research/company_profile/candidate_registry.py": "2d94bb5cf58957e895449c3a5ec0584360eba2285725bf1f452a4251b93217d6",
+    "research/company_profile/commodity_exposure.py": "15d4cbf467013c23bb65db1fe0d8b9a69f68f323abefe2b0ccd1786c3652b063",
+    "research/company_profile/contracts.py": "3552379634e8ecd9514b97650ec32c224f48b590f17a56d2785a64f0e8c41527",
+    "research/company_profile/core_assessment_projection.py": "ba8597027989e4382412141542f012dba5b49fd1b1ace6a855c19234db8801e7",
+    "research/company_profile/core_evidence_selection.py": "0acf35692f4a33e148d10d71dd1e9a355b3fa8c7e7200596db5a459213f8dd08",
+    "research/company_profile/core_skeleton.py": "7361026c9436a72c7feaab4dc6445499c2b622ab6004b75d146588388d30cf6d",
+    "research/company_profile/counterparty_research.py": "83a3779d2e6c044acfe3f4e560b59b4a8d631bdcc03af8e8a4b686962b17fd83",
+    "research/company_profile/execution.py": "8649d1c31e081e168994a7fe433fa0b1d41616ea2039b78449b99e96065e2267",
+    "research/company_profile/first_expansion.py": "a37fef38017082f82e71036d470462f08a92ed05324a4685b21572fef91bf661",
+    "research/company_profile/legacy_retirement.py": "3e01e1a88369f866790e65a7c4b04a3e9e5e4480fc099eef55303a5e34386b0c",
+    "research/company_profile/live_plan.py": "12b442cd3334e65d4de050daa70043e02b2cb9271b0b90708be36fdd8e0dd856",
+    "research/company_profile/live_run.py": "ee7208f40879a12f2e87270743475a91aaf178a7bc2ec979cb36e059b4fb1933",
+    "research/company_profile/m4_next_batch.py": "a23249872610f38d1294a9945478cacf609455bfd453790044268c3bd9dc565a",
+    "research/company_profile/material_input_research.py": "1e903edfe38d1b0d569299436e59a150ca909570de5ac14c496630831d4d37ab",
+    "research/company_profile/models.py": "34be82906d9f8ec4d1f7a865ddaa5a5203da534d40c3573a6d85a2c9e08a4f03",
+    "research/company_profile/operating_quantity_research.py": "d2dfadb2a88a5c2267daea7fda53b2147c47af2c1fe43a8eaa96c147452a029d",
+    "research/company_profile/operations.py": "00a6f8de6a83bdc1804c91d2cd9a529d84f18783362ad386e57586556f025fdd",
+    "research/company_profile/operator_closure.py": "529dd42b014449c0ac20c0e5be3180c8c21b4f9df3cb509d5334fe65bb0232dd",
+    "research/company_profile/projection.py": "504f8446256d157219e1d21ce35474b323f3c625a799d5f0a22809d3e656536c",
+    "research/company_profile/publication.py": "d2c43d7a6199f0fbab64915beec8768a65c11df7d67d6615b25bff76300c6f36",
+    "research/company_profile/reads.py": "b8789b876349485a8b1a888a97b286f83c6a5618d559d7facbf2df3b1a9f91a5",
+    "research/company_profile/runtime.py": "9ec04220cfd2fca27c43dfcce1c02bd97b5f21d9a5a915237b81730abef7e250",
+    "research/company_profile/segment_financial_research.py": "1c0e27469a670e68fb289b4ad3dd86e643189c3874186f724c34f763e04a8d1f",
+    "research/company_profile/shadow_batch.py": "155e54e72c43a841683833e0ec46135ebde8e2572a195284b87b6a23340e4792",
+    "research/company_profile/shadow_batch_audit.py": "04f12d98d3819bfc02c683b3620e83c753be66c6377610ae8076c5153157a2ad",
+    "research/company_profile/shadow_batch_service.py": "bc3be4bd327b49f4abbec98d83cbbd6108993f9ac1253ecf2b42620c0a5dec74",
+    "research/company_profile/shadow_evidence.py": "dc580e45feb9eb55b63e0bea608fe63c4f50bef0e8553eb0ba879da88602970b",
+    "research/company_profile/source_review.py": "4da6bcb7b1aa1be459cb1b232df59a65acef535afc8b8593d8852f26ebe02bf9",
+    "research/company_profile/stage4_restricted_read.py": "f29e14ad0754dd42a0bd950171fb077ebaf7f7175aef12bd55771a82619ccbaf",
+    "research/company_profile/stage5.py": "47de653324c80e1eb1d615e179c2818eafdf568abd328698e92459122244da0c",
+    "research/company_profile/stage5_adjudication.py": "0897c27651a83f86da877d3940c7b21af5ddcc06e92b0ca32ffad94752037773",
+    "research/company_profile/stage5_benchmark.py": "c7cc313671af27e7c66687faf8ff8e774a993c47dd7fd97b2dbf83833d27290c",
+    "research/company_profile/stage5_bundle.py": "91f688ff51ee4310c05d994856dd1a25b442345a6402e3c414ddf396fb91a92a",
+    "research/company_profile/stage5_provider.py": "279a6dcd3e623f2b83238662bb55b595a8837f84b6a11769601e3fb65fa1ba72",
+    "research/company_profile/stage5_service.py": "e53776bfe200ab3341f88d22207a41508020b6867ef03c3312ec9ec250957b11",
+    "research/company_profile/workflow.py": "96d45ea6990deb382e039783ea353354db84c92deb35063d355e15dc79e54470"
+  },
+  "readonly_receipt_sha256": "294c86d56fbec045260909b4070d820bda96bfc1ba4a19ef47f1376f5bff8e79",
+  "actual_five_stage_success": true,
+  "source_conflict_boundary_verified": true,
+  "original_authorization_used": 2,
+  "additional_authorization_used": 1,
+  "additional_authorization_max": 1,
+  "archive_not_performed": true,
+  "next_sample_not_started": true,
+  "production": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "waiting_a_finite_acceptance": true,
+  "remaining_known_p0_p1": [],
+  "review": "direct code-diff and source-trigger review plus real official source and unchanged native-fact multiset; no full-suite claim",
+  "staged_diff_check": {
+    "command": [
+      "git",
+      "diff",
+      "--cached",
+      "--check",
+      "--",
+      ".",
+      ":(exclude)openspec/changes/deliver-company-profile-m4-v50-unseen-small-batch/v53-executed-code.patch"
+    ],
+    "exit_code": 0,
+    "full_staged_check_exit_code": 2,
+    "frozen_patch_blank_context_lines": [
+      7,
+      42,
+      60,
+      73,
+      101,
+      108,
+      109,
+      116,
+      117,
+      124,
+      125,
+      132,
+      133,
+      141,
+      142
+    ],
+    "frozen_patch_sha256": "5547ba5397ae873d79fd622a983e8f64843626d1662179675957597b692a8d6f",
+    "note": "Only the frozen unified patch blank context markers are flagged; each is exactly one required space. Original patch bytes retained. All other staged paths pass."
+  }
+}

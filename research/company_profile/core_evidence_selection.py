@@ -18,6 +18,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from .contracts import PreparedEvidence
 from .core_assessment_projection import (
     _REVENUE_BLOCK_PATTERN,
+    BUSINESS_DESCRIPTION_CONFLICT,
     COMMON_CORE_MAPPING_VERSION,
     _overview_states_revenue,
     core_record_is_reusable,
@@ -1379,6 +1380,7 @@ REVENUE_SENTENCE_REPAIR_V49 = "v49"
 REVENUE_SENTENCE_REPAIR_V50 = "v50"
 REVENUE_SENTENCE_REPAIR_V51 = "v51"
 REVENUE_SENTENCE_REPAIR_V52 = "v52"
+REVENUE_SENTENCE_REPAIR_V53 = "v53"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
@@ -1433,6 +1435,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
         REVENUE_SENTENCE_REPAIR_V50,
         REVENUE_SENTENCE_REPAIR_V51,
         REVENUE_SENTENCE_REPAIR_V52,
+        REVENUE_SENTENCE_REPAIR_V53,
     }
 )
 
@@ -1510,6 +1513,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V50,
         REVENUE_SENTENCE_REPAIR_V51,
         REVENUE_SENTENCE_REPAIR_V52,
+        REVENUE_SENTENCE_REPAIR_V53,
     }
 
 
@@ -1570,6 +1574,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
         REVENUE_SENTENCE_REPAIR_V50,
         REVENUE_SENTENCE_REPAIR_V51,
         REVENUE_SENTENCE_REPAIR_V52,
+        REVENUE_SENTENCE_REPAIR_V53,
     }
 
 
@@ -1630,6 +1635,7 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V50,
         REVENUE_SENTENCE_REPAIR_V51,
         REVENUE_SENTENCE_REPAIR_V52,
+        REVENUE_SENTENCE_REPAIR_V53,
     }
 
 
@@ -1691,6 +1697,7 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
         REVENUE_SENTENCE_REPAIR_V50,
         REVENUE_SENTENCE_REPAIR_V51,
         REVENUE_SENTENCE_REPAIR_V52,
+        REVENUE_SENTENCE_REPAIR_V53,
     }
 
 
@@ -1757,7 +1764,65 @@ def project_owned_page_facts(
                     expand_actor_aliases=expand_actor_aliases,
                 )
             )
+    if source_delivery_repair:
+        records = _retain_unclear_segment_descriptions(selection, records)
     return _dedupe_owned_records(records)
+
+
+def _retain_unclear_segment_descriptions(
+    selection: CoreEvidenceSelection,
+    records: list[SemanticRecord],
+) -> list[SemanticRecord]:
+    """Retain conflicting native descriptions without affirming their business.
+
+    A named product-sales segment can describe an unrelated produced/sold
+    object. Require positive same-report main-business or revenue context for
+    the segment's product, then check whether that other context supports the
+    described object. Absence alone, or a product word alone, is not a conflict.
+    """
+    corroborating = [
+        span
+        for span in selection.spans
+        if "报告分部包括" not in span.excerpt
+        and re.search(
+            r"(?:公司|本公司)(?:主要从事|产品销售主要包括|收入主要来源于)",
+            re.sub(r"\s+", "", span.excerpt),
+        )
+    ]
+    context = re.sub(r"\s+", "", "\n".join(s.excerpt for s in corroborating))
+    retained: list[SemanticRecord] = []
+    for record in records:
+        if not isinstance(record, BusinessOverview):
+            retained.append(record)
+            continue
+        text = re.sub(r"\s+", "", record.source_text)
+        conflicts = []
+        if "报告分部包括" in text:
+            for match in re.finditer(
+                r"[（(]\d+[)）]([^；。()（）]{2,30}?)产品销售分部[，,]"
+                r"生产及销售([^；。]+)",
+                text,
+            ):
+                native_product, described = match.groups()
+                stem = native_product[:2]
+                if (
+                    stem in context
+                    and stem not in described
+                    and described.removesuffix("及相关产品") not in context
+                ):
+                    pages = sorted({s.page for s in corroborating if stem in s.excerpt})
+                    conflicts.append(
+                        f"{BUSINESS_DESCRIPTION_CONFLICT}:unclear:"
+                        f"原产品分部={native_product}；原描述={described}；"
+                        f"同报告主营及收入来源页={pages}"
+                    )
+        if conflicts:
+            # Evidence and source_text remain the exact original statement.
+            record = record.model_copy(
+                update={"uncertainty": (*record.uncertainty, *conflicts)}
+            )
+        retained.append(record)
+    return retained
 
 
 def _prepared_for(

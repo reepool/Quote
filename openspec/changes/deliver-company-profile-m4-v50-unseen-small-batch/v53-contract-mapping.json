@@ -1,0 +1,1321 @@
+{
+  "original_contract_sha256": "3d71176590e9c4219c396ccb5d0ab8ede7ffc624046545e25f48a4ddc87ab3ba",
+  "successor_contract_sha256": "c9597f72e72a254335906290b9d5eb1a9e89f5717d1a5ec445254b8e5fc536b5",
+  "unchanged_original_conditions": [
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 0,
+      "successor_index": 0,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 1,
+      "successor_index": 1,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 2,
+      "successor_index": 2,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 3,
+      "successor_index": 3,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 4,
+      "successor_index": 4,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 5,
+      "successor_index": 5,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 6,
+      "successor_index": 6,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 7,
+      "successor_index": 7,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 8,
+      "successor_index": 8,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 9,
+      "successor_index": 9,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 10,
+      "successor_index": 10,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 11,
+      "successor_index": 11,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 12,
+      "successor_index": 12,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 13,
+      "successor_index": 13,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 14,
+      "successor_index": 14,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 15,
+      "successor_index": 15,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 16,
+      "successor_index": 16,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 17,
+      "successor_index": 17,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 18,
+      "successor_index": 18,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 19,
+      "successor_index": 19,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 20,
+      "successor_index": 20,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 21,
+      "successor_index": 21,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 22,
+      "successor_index": 22,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 23,
+      "successor_index": 23,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 24,
+      "successor_index": 24,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 25,
+      "successor_index": 25,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 26,
+      "successor_index": 26,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600082.SH",
+      "original_index": 27,
+      "successor_index": 27,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 0,
+      "successor_index": 0,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 1,
+      "successor_index": 1,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 2,
+      "successor_index": 2,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 3,
+      "successor_index": 3,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 4,
+      "successor_index": 4,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 5,
+      "successor_index": 5,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 6,
+      "successor_index": 6,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 7,
+      "successor_index": 7,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 8,
+      "successor_index": 8,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 9,
+      "successor_index": 9,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 10,
+      "successor_index": 10,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 11,
+      "successor_index": 11,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 12,
+      "successor_index": 12,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 13,
+      "successor_index": 13,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 14,
+      "successor_index": 14,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 15,
+      "successor_index": 15,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 16,
+      "successor_index": 16,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 17,
+      "successor_index": 17,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 18,
+      "successor_index": 18,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 19,
+      "successor_index": 19,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 20,
+      "successor_index": 20,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 21,
+      "successor_index": 21,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 22,
+      "successor_index": 22,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 23,
+      "successor_index": 23,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 24,
+      "successor_index": 24,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 25,
+      "successor_index": 25,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 26,
+      "successor_index": 26,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 27,
+      "successor_index": 27,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 28,
+      "successor_index": 28,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 29,
+      "successor_index": 29,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 30,
+      "successor_index": 30,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 31,
+      "successor_index": 31,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 32,
+      "successor_index": 32,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 33,
+      "successor_index": 33,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 34,
+      "successor_index": 34,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 35,
+      "successor_index": 35,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 36,
+      "successor_index": 36,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 37,
+      "successor_index": 37,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 38,
+      "successor_index": 38,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 39,
+      "successor_index": 39,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 40,
+      "successor_index": 40,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 41,
+      "successor_index": 41,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 42,
+      "successor_index": 42,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 43,
+      "successor_index": 43,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 44,
+      "successor_index": 44,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 45,
+      "successor_index": 45,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 46,
+      "successor_index": 46,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 47,
+      "successor_index": 47,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 48,
+      "successor_index": 48,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 49,
+      "successor_index": 49,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 50,
+      "successor_index": 50,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 51,
+      "successor_index": 51,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 52,
+      "successor_index": 52,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 53,
+      "successor_index": 53,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 54,
+      "successor_index": 54,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 55,
+      "successor_index": 55,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 56,
+      "successor_index": 56,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 57,
+      "successor_index": 57,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 58,
+      "successor_index": 58,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 59,
+      "successor_index": 59,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 60,
+      "successor_index": 60,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 61,
+      "successor_index": 61,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 62,
+      "successor_index": 62,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 63,
+      "successor_index": 63,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 64,
+      "successor_index": 64,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 65,
+      "successor_index": 65,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 66,
+      "successor_index": 66,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 67,
+      "successor_index": 67,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 68,
+      "successor_index": 68,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 69,
+      "successor_index": 69,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 70,
+      "successor_index": 70,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "income",
+      "instrument_id": "600097.SH",
+      "original_index": 71,
+      "successor_index": 71,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 0,
+      "successor_index": 0,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 1,
+      "successor_index": 1,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 2,
+      "successor_index": 2,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 3,
+      "successor_index": 3,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 4,
+      "successor_index": 4,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 5,
+      "successor_index": 5,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 6,
+      "successor_index": 6,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 7,
+      "successor_index": 7,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 8,
+      "successor_index": 8,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 9,
+      "successor_index": 9,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 10,
+      "successor_index": 10,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 11,
+      "successor_index": 11,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 12,
+      "successor_index": 12,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 13,
+      "successor_index": 13,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 14,
+      "successor_index": 14,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 15,
+      "successor_index": 15,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 16,
+      "successor_index": 16,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 17,
+      "successor_index": 17,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 18,
+      "successor_index": 18,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 19,
+      "successor_index": 19,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 20,
+      "successor_index": 20,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 21,
+      "successor_index": 21,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 22,
+      "successor_index": 22,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 23,
+      "successor_index": 23,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 24,
+      "successor_index": 24,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 25,
+      "successor_index": 25,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 26,
+      "successor_index": 26,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 27,
+      "successor_index": 27,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 28,
+      "successor_index": 28,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 29,
+      "successor_index": 29,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 30,
+      "successor_index": 30,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 31,
+      "successor_index": 31,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 32,
+      "successor_index": 32,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 33,
+      "successor_index": 33,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 34,
+      "successor_index": 34,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 35,
+      "successor_index": 35,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 36,
+      "successor_index": 36,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 37,
+      "successor_index": 37,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 38,
+      "successor_index": 38,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 39,
+      "successor_index": 39,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 40,
+      "successor_index": 40,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 41,
+      "successor_index": 41,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 42,
+      "successor_index": 42,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 43,
+      "successor_index": 43,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 44,
+      "successor_index": 44,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 45,
+      "successor_index": 45,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 46,
+      "successor_index": 46,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 47,
+      "successor_index": 47,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 48,
+      "successor_index": 48,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 49,
+      "successor_index": 49,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 50,
+      "successor_index": 50,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 51,
+      "successor_index": 51,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 52,
+      "successor_index": 52,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "action",
+      "original_index": 53,
+      "successor_index": 53,
+      "condition_unchanged": true
+    },
+    {
+      "kind": "answer",
+      "instrument_id": "600082.SH",
+      "dimension": "principal_business",
+      "condition_unchanged": true
+    },
+    {
+      "kind": "answer",
+      "instrument_id": "600082.SH",
+      "dimension": "products_services",
+      "condition_unchanged": true
+    },
+    {
+      "kind": "answer",
+      "instrument_id": "600082.SH",
+      "dimension": "revenue_model",
+      "condition_unchanged": true
+    },
+    {
+      "kind": "answer",
+      "instrument_id": "600097.SH",
+      "dimension": "principal_business",
+      "condition_unchanged": true
+    },
+    {
+      "kind": "answer",
+      "instrument_id": "600097.SH",
+      "dimension": "products_services",
+      "condition_unchanged": true
+    },
+    {
+      "kind": "answer",
+      "instrument_id": "600097.SH",
+      "dimension": "revenue_model",
+      "condition_unchanged": true
+    }
+  ],
+  "added_conditions": [
+    {
+      "successor_index": 28,
+      "source": {
+        "page": 23,
+        "name": "海泰绿色产业基地",
+        "value": "0",
+        "unit": "万元",
+        "header": "房地产销售和结转/结转收入金额",
+        "dimension": "project",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "海泰绿色产业基地"
+        ],
+        "condition_id": "600082.SH-income-029",
+        "instrument_id": "600082.SH",
+        "source_column": "本期结转收入金额",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "房地产销售和结转/结转收入金额"
+      }
+    },
+    {
+      "successor_index": 29,
+      "source": {
+        "page": 23,
+        "name": "海泰创新基地",
+        "value": "0",
+        "unit": "万元",
+        "header": "房地产销售和结转/结转收入金额",
+        "dimension": "project",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "海泰创新基地"
+        ],
+        "condition_id": "600082.SH-income-030",
+        "instrument_id": "600082.SH",
+        "source_column": "本期结转收入金额",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "房地产销售和结转/结转收入金额"
+      }
+    },
+    {
+      "successor_index": 30,
+      "source": {
+        "page": 23,
+        "name": "BPO基地",
+        "value": "0",
+        "unit": "万元",
+        "header": "房地产销售和结转/结转收入金额",
+        "dimension": "project",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "BPO基地"
+        ],
+        "condition_id": "600082.SH-income-031",
+        "instrument_id": "600082.SH",
+        "source_column": "本期结转收入金额",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "房地产销售和结转/结转收入金额"
+      }
+    },
+    {
+      "successor_index": 31,
+      "source": {
+        "page": 23,
+        "name": "海泰精工国际",
+        "value": "0",
+        "unit": "万元",
+        "header": "房地产销售和结转/结转收入金额",
+        "dimension": "project",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "海泰精工国际"
+        ],
+        "condition_id": "600082.SH-income-032",
+        "instrument_id": "600082.SH",
+        "source_column": "本期结转收入金额",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "房地产销售和结转/结转收入金额"
+      }
+    },
+    {
+      "successor_index": 32,
+      "source": {
+        "page": 23,
+        "name": "海泰创意科技园",
+        "value": "0",
+        "unit": "万元",
+        "header": "房地产销售和结转/结转收入金额",
+        "dimension": "project",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "海泰创意科技园"
+        ],
+        "condition_id": "600082.SH-income-033",
+        "instrument_id": "600082.SH",
+        "source_column": "本期结转收入金额",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "房地产销售和结转/结转收入金额"
+      }
+    },
+    {
+      "successor_index": 33,
+      "source": {
+        "page": 24,
+        "name": "海泰绿色产业基地",
+        "value": "464.97",
+        "unit": "万元",
+        "header": "报告期内房地产出租情况/出租房地产的租金收入",
+        "dimension": "lease",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "海泰绿色产业基地"
+        ],
+        "condition_id": "600082.SH-income-034",
+        "instrument_id": "600082.SH",
+        "source_column": "本期出租房地产的租金收入",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "报告期内房地产出租情况/出租房地产的租金收入"
+      }
+    },
+    {
+      "successor_index": 34,
+      "source": {
+        "page": 24,
+        "name": "BPO基地",
+        "value": "1850.99",
+        "unit": "万元",
+        "header": "报告期内房地产出租情况/出租房地产的租金收入",
+        "dimension": "lease",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "BPO基地"
+        ],
+        "condition_id": "600082.SH-income-035",
+        "instrument_id": "600082.SH",
+        "source_column": "本期出租房地产的租金收入",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "报告期内房地产出租情况/出租房地产的租金收入"
+      }
+    },
+    {
+      "successor_index": 35,
+      "source": {
+        "page": 24,
+        "name": "海泰国际公寓",
+        "value": "254.24",
+        "unit": "万元",
+        "header": "报告期内房地产出租情况/出租房地产的租金收入",
+        "dimension": "lease",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "海泰国际公寓"
+        ],
+        "condition_id": "600082.SH-income-036",
+        "instrument_id": "600082.SH",
+        "source_column": "本期出租房地产的租金收入",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "报告期内房地产出租情况/出租房地产的租金收入"
+      }
+    },
+    {
+      "successor_index": 36,
+      "source": {
+        "page": 24,
+        "name": "蓝海科技园",
+        "value": "406.49",
+        "unit": "万元",
+        "header": "报告期内房地产出租情况/出租房地产的租金收入",
+        "dimension": "lease",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "蓝海科技园"
+        ],
+        "condition_id": "600082.SH-income-037",
+        "instrument_id": "600082.SH",
+        "source_column": "本期出租房地产的租金收入",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "报告期内房地产出租情况/出租房地产的租金收入"
+      }
+    },
+    {
+      "successor_index": 37,
+      "source": {
+        "page": 24,
+        "name": "海泰精工国际",
+        "value": "29.48",
+        "unit": "万元",
+        "header": "报告期内房地产出租情况/出租房地产的租金收入",
+        "dimension": "lease",
+        "source_actor": "公司及合并子公司",
+        "subject_scope": "consolidated_group",
+        "source_segment": null,
+        "counterparty": null,
+        "native_aliases": [
+          "海泰精工国际"
+        ],
+        "condition_id": "600082.SH-income-038",
+        "instrument_id": "600082.SH",
+        "source_column": "本期出租房地产的租金收入",
+        "reported_period": "2025-12-31",
+        "period_state": "current_printed",
+        "table_basis": "报告期内房地产出租情况/出租房地产的租金收入"
+      }
+    }
+  ],
+  "negative_conditions_unchanged": true,
+  "source_versions_unchanged": true,
+  "original_first_scores_retained": {
+    "recall": "66/160",
+    "accuracy": "193/262",
+    "numeric_errors": 14,
+    "negative": "27/31"
+  },
+  "original170_conditions_preserved_from_v51": true,
+  "v51_contract_sha256": "1c826419e8b02e5bf13412c2c34f995c8b77306ad233e25f6b75f3922a7ed1a6",
+  "v52_contract_sha256": "febc2d118b498f114be9ad7b474728615d03cf6d945245eb657e19d7fdd7b5a5",
+  "original170_positive_and31_negative_conditions_unchanged": true,
+  "new_negative_condition_id": "600097.SH-negative-015"
+}

@@ -469,6 +469,11 @@ def _append_fact(
             "source_native_unit": native_map.get("unit"),
             "knowledge_time": payload.get("knowledge_time"),
             "reported_period": payload.get("reported_period"),
+            **(
+                {"uncertainty": payload["uncertainty"]}
+                if payload.get("uncertainty")
+                else {}
+            ),
             "evidence": evidence,
         }
     )

@@ -1,0 +1,34 @@
+"""Read-only mechanical receipt for the frozen v53 snapshot; no task run or writes."""
+import json,hashlib,sqlite3
+from collections import Counter
+from pathlib import Path
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v50-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v53_same_source_repair';B=R/'data/research/company_profile_common_core/m4_v53_same_source_repair/company_profile_common_core.v1'
+sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();load=lambda p:json.loads(Path(p).read_text())
+base=load(C/'v53-repair-baseline.json');counts={}
+for key in ['protected_materials','existing_workspace']:
+ assert all(sha(R/p)==h for p,h in base[key].items());counts[key]=len(base[key])
+first=load(C/'v53-first-formal-delivery-preservation.json')['completed_sha256'];assert all(sha(R/p)==h for p,h in first.items());counts['v53_first_artifacts']=len(first)
+review_first=load(C/'v53-first-review-preservation.json')['review_artifacts_sha256'];assert all(sha(R/p)==h for p,h in review_first.items());counts['v53_first_review_artifacts']=len(review_first)
+s=load(C/'v53-source-scope.json');old=load(C/'v52-source-scope.json');assert s['positive_count']==170 and s['negative_count']==32 and s['source_rows']==old['source_rows'] and s['native_roles']==old['native_roles'] and s['answers']==old['answers'] and s['negative_conditions'][:31]==old['negative_conditions']
+f=load(C/'v53-source-freeze-receipt.json');assert all(sha(R/p)==h for p,h in f['executed_code_sha256'].items());assert f['source_scope_sha256']==sha(C/'v53-source-scope.json') and f['source_pages_sha256']==sha(C/'v53-independent-source-pages.json') and f['source_layout_sha256']==sha(C/'v53-independent-source-layouts.json');assert f['contract_mapping_sha256']==sha(C/'v53-contract-mapping.json') and f['execution_script_sha256']==sha(C/'v53-first-execution-script.txt');assert all(sha(R/v['pdf'])==v['sha256'] for v in s['versions'].values())
+formal=load(P/'formal_execution.json');assert formal['processing_identity']==s['processing_identity'];assert formal['whole_round_seconds']<=300;assert formal['additional_formal_execution_index']==formal['max_additional_formal_rounds']==1 and formal['original_authorization_used']==2
+import contextlib,io
+# Keep optional import-time diagnostic output out of the JSON mechanical receipt.
+with contextlib.redirect_stdout(io.StringIO()):
+ from research.company_profile.reads import _iter_accepted_raw
+con=sqlite3.connect('file:data/research.db?mode=ro',uri=True);runtime=[];actual_keys=[];unclear=[]
+for i,res in formal['results'].items():
+ q=res['query']['profiles'][0];assert q==res['export']['profiles'][0]==load(res['export']['files'][0]);disk=load(B/(q['work_id']+'.json'));meta=json.loads(con.execute('select metadata_json from business_profile_work_items where work_id=?',(q['work_id'],)).fetchone()[0]);st=meta['stage_results'];assert set(st)=={'acquire','parse','semantic','verify','publish'};assert all(not v['reused_scope_ids'] for v in st.values());assert not disk['execution']['predecessor_lineage'];raw=list(_iter_accepted_raw(load(B/'checkpoints'/(q['work_id']+'.json'))));assert len(raw)==len(q['accepted_facts'])
+ conflict=[r for r in raw if r['object_type']=='BusinessOverview' and any(x.startswith('official_business_description_conflict:unclear:') for x in r.get('uncertainty',[]))]
+ if i=='600097.SH':
+  assert conflict
+  for r in conflict:
+   delivered=next(a for a in q['accepted_facts'] if a['record_id']==r['record_id']);assert delivered['uncertainty']==r['uncertainty'] and delivered['source_text']==r['source_text'];assert any(e['page']==149 for e in r['evidence']);unclear.append({'record_id':r['record_id'],'source_text':r['source_text'],'uncertainty':r['uncertainty'],'evidence_pages':[e['page'] for e in r['evidence']]})
+  for dim in q['dimensions']:
+   assert dim['answered'] and not any(phrase in dim['excerpt'] for phrase in ['应用软件','集成电路']);assert not {r['record_id'] for r in conflict}.intersection(dim['supporting_record_ids'])
+ actual_keys.extend((i,a['record_id']) for a in q['accepted_facts']);actual_keys.extend((i,'answer:'+d['dimension_id']) for d in q['dimensions'] if d['answered'] and d['excerpt'])
+ runtime.append(dict(instrument_id=i,work_id=q['work_id'],stage_results=st,predecessor_lineage=disk['execution']['predecessor_lineage'],query_export_disk_equal=True,accepted_fact_count=len(raw)))
+review=load(C/'v53-source-review-evidence.json');assert len(actual_keys)==len(set(actual_keys))==len(review['object_reviews']);assert set(actual_keys)=={(v['instrument_id'],v['object_id']) for v in review['object_reviews']};assert review['source_recall']['numerator']==review['source_recall']['denominator']==170;assert review['source_accuracy']['value']==1 and review['critical_numeric_errors']['value']==0
+neg=load(C/'v53-negative-review-evidence.json');assert neg['condition_count']==neg['passed']==neg['evaluated']==32 and all(n['passed'] and n['evaluated'] for n in neg['negative_reviews']);assert {n['condition_id'] for n in neg['negative_reviews']}=={n['condition_id'] for n in s['negative_conditions']}
+obs=load(P/'observation.json');assert obs['tokens_consumed']<=50000
+print(json.dumps(dict(verified=True,counts=counts,executed_modules=len(f['executed_code_sha256']),old170_positive31_negative_unchanged=True,new_negative_count=1,positive_count=170,negative_count=32,unique_actual_accuracy_objects=len(actual_keys),unclear_original_records=unclear,runtime=runtime,formal_seconds=formal['whole_round_seconds'],tokens_used=obs['tokens_consumed'],original_two_rounds_used=2,additional_rounds_used=1,additional_rounds_limit=1,production='not_authorized',scale_quality_claim_allowed=False),ensure_ascii=False,indent=2))

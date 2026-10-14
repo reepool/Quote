@@ -30,6 +30,17 @@ from .models import (
     TextAnchor,
 )
 
+BUSINESS_DESCRIPTION_CONFLICT = "official_business_description_conflict"
+
+
+def business_description_is_unclear(record: SemanticRecord) -> bool:
+    """Return whether native business wording has an unresolved source conflict."""
+    return isinstance(record, BusinessOverview) and any(
+        reason.startswith(BUSINESS_DESCRIPTION_CONFLICT + ":")
+        for reason in record.uncertainty
+    )
+
+
 COMMON_CORE_MAPPING_VERSION = "company_profile_common_core_mapping.v1"
 CORE_DIMENSION_IDS = (
     "principal_business",
@@ -175,6 +186,8 @@ def overview_dimension_hits(text: str) -> tuple[str, ...]:
 def core_record_is_reusable(record: SemanticRecord) -> bool:
     """Return whether one accepted record can stand in for its own core field."""
 
+    if business_description_is_unclear(record):
+        return False
     if (
         isinstance(record, BusinessOverview)
         and record.field_id == "business_overview_source"
@@ -282,6 +295,7 @@ def project_core_assessment(
             if (
                 statuses.get(record.record_id) == DispositionStatus.ACCEPTED_FOR_REVIEW
                 and record.data_status == "research_fixture"
+                and not business_description_is_unclear(record)
             ):
                 accepted.append(record)
 

@@ -12,6 +12,7 @@ from enum import Enum
 from typing import Any
 
 from .contracts import DispositionStatus
+from .core_assessment_projection import business_description_is_unclear
 from .models import (
     Activity,
     BusinessEvent,
@@ -91,7 +92,11 @@ def usage_policy(record: SemanticRecord) -> dict[str, bool | str]:
             "consolidated_aggregation": False,
             "ranking": False,
             "cross_company_comparison": False,
-            "restriction_reason": "non_numeric_research_fact",
+            "restriction_reason": (
+                "unclear_official_business_description"
+                if business_description_is_unclear(record)
+                else "non_numeric_research_fact"
+            ),
         }
     if isinstance(record, Segment):
         return {
@@ -141,7 +146,7 @@ def derive_confidence(
     status = disposition.value if isinstance(disposition, Enum) else str(disposition)
     if status != DispositionStatus.ACCEPTED_FOR_REVIEW.value:
         return "rejected"
-    if contradiction:
+    if contradiction or business_description_is_unclear(record):
         return "low"
     if not record.evidence:
         return "low"

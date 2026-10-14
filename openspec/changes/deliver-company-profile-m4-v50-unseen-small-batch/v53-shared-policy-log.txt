@@ -1,0 +1,13 @@
+[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[33m                       [100%][0m
+============================= slowest 10 durations =============================
+0.07s call     tests/unit/test_research/test_company_profile_core_assessment_projection.py::test_mapping_reuses_six_chapter_tasks_and_registers_projection_schema
+0.01s call     tests/unit/test_research/test_company_profile_core_assessment_projection.py::test_one_overview_does_not_auto_answer_all_three_dimensions
+0.01s call     tests/unit/test_research/test_company_profile_core_assessment_projection.py::test_research_view_keeps_other_object_gap_regardless_of_scope_order
+0.01s call     tests/unit/test_research/test_company_profile_core_assessment_projection.py::test_shared_evidence_id_does_not_merge_different_objects
+0.01s call     tests/unit/test_research/test_company_profile_core_assessment_projection.py::test_research_view_keeps_distinct_coverage_gaps
+0.01s call     tests/unit/test_research/test_company_profile_core_assessment_projection.py::test_same_report_comparison_columns_are_not_the_same_identity
+0.01s call     tests/unit/test_research/test_company_profile_core_assessment_projection.py::test_elimination_revenue_does_not_answer_revenue_model
+0.01s call     tests/unit/test_research/test_company_profile_core_assessment_projection.py::test_sales_proceeds_narrative_answers_revenue_model
+0.01s call     tests/unit/test_research/test_company_profile_core_assessment_projection.py::test_region_segment_does_not_answer_products_services
+0.01s call     tests/unit/test_research/test_company_profile_core_assessment_projection.py::test_blocked_activity_does_not_drop_accepted_overview
+[33m[32m50 passed[0m, [33m[1m6 warnings[0m[33m in 2.04s[0m[0m

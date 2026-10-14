@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-10-14T07:59:59.247624+00:00",
+  "unchanged98text29layout_snapshot_reference": "v52-independent-source-verification.json",
+  "source_text_sha256": "7694f11b408e5c03b2cb10126568075fdf5c16d5c114e6cec22ababde95c8dd8",
+  "source_layout_sha256": "6345bbe0d033545747d9f3a4889b4e3583320d8f84c1516b8fb225c0bdbe8417",
+  "previous_text_sha256": "7694f11b408e5c03b2cb10126568075fdf5c16d5c114e6cec22ababde95c8dd8",
+  "previous_layout_sha256": "6345bbe0d033545747d9f3a4889b4e3583320d8f84c1516b8fb225c0bdbe8417",
+  "same_source_bytes": true,
+  "new_official_p149_fixture_sha256": "02bf7b342ac1faad93be4cbbed878cc70d636a858810a1bf34ecca62a1fde7aa",
+  "new_fixture_direct_pdf_text_and_layout_read": true,
+  "independent_semantic_checks": [
+    "p8–9当期远洋捕捞、罐头食品加工与贸易运输业务",
+    "p84鱼种/罐头/鱼柳/贸易/运输收入及各自交付确认",
+    "p149原分部标签为远洋捕捞、罐头鱼产品、渔货贸易、海上运输，但两具体产销描述出现软件/集成电路，无法解释，不订正原文"
+  ],
+  "no_corrected_original_wording_created": true
+}
