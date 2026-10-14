@@ -1,0 +1,24 @@
+[
+  {
+    "instrument_id": "600096.SH",
+    "record_id": "owned:core-ev-e48e668aebb7bd44:Segment:service:土地房屋车辆等:作为出租人的经营租赁/租赁收入:row:0",
+    "source": {
+      "page": 222,
+      "name": "土地房屋车辆等",
+      "value": "88,139,460.13",
+      "unit": "元",
+      "column": "租赁收入"
+    }
+  },
+  {
+    "instrument_id": "600096.SH",
+    "record_id": "owned:core-ev-232e49e828702875:Measurement:service:土地房屋车辆等:作为出租人的经营租赁/租赁收入:row:0",
+    "source": {
+      "page": 222,
+      "name": "土地房屋车辆等",
+      "value": "88,139,460.13",
+      "unit": "元",
+      "column": "租赁收入"
+    }
+  }
+]

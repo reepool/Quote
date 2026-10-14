@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-10-14T03:36:00.273647+00:00",
+  "completed_sha256": {
+    "openspec/changes/deliver-company-profile-m4-v49-unseen-small-batch/v50-actual-object-decisions.json": "d31d8f389a97a03c54f682d2f0192d6198736e21af5d484ec0b9495cbd99becf",
+    "openspec/changes/deliver-company-profile-m4-v49-unseen-small-batch/v50-source-review-evidence.json": "a9a03eb389eef39ae5df29c5ff7ef56b65dcd1acad0be913e1a16c2dda7f8eb8",
+    "openspec/changes/deliver-company-profile-m4-v49-unseen-small-batch/v50-source-review-quote-bank.json": "d90e93c7a41e10a90f53629baf8500be28c647f7aa2b9268b5da63573289b728",
+    "openspec/changes/deliver-company-profile-m4-v49-unseen-small-batch/v50-negative-review-evidence.json": "2e51d36d26d503db1f302ef636057f9bd4bfe87ebe4d905382fb50f19815c701",
+    "openspec/changes/deliver-company-profile-m4-v49-unseen-small-batch/v50-contract-external-income-source-ledger.json": "e292e2952a380430ff0091bebac65bc0fd1a6abacb2334a40d922c7eaeec5363"
+  }
+}

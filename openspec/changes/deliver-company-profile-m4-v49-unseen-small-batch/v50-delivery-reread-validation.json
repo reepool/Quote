@@ -1,0 +1,14 @@
+{
+  "600064.SH": {
+    "readonly_reread_equal": true,
+    "query_export_disk_equal": true,
+    "accepted_count": 172,
+    "answered_count": 3
+  },
+  "600096.SH": {
+    "readonly_reread_equal": true,
+    "query_export_disk_equal": true,
+    "accepted_count": 491,
+    "answered_count": 3
+  }
+}

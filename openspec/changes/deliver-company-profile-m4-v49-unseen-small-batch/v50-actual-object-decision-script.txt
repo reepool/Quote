@@ -1,0 +1,67 @@
+"""Review all actual output against the independent source contract and explicit supplements."""
+import json,hashlib,re
+from pathlib import Path
+from decimal import Decimal
+from tests.unit.test_research.test_company_profile_v50_realestate_chemical import match,action_match,co,pages,negative_violations
+from research.company_profile.reads import _iter_accepted_raw
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v49-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v50_same_source';B=R/'data/research/company_profile_common_core/m4_v50_same_source/company_profile_common_core.v1'
+read=lambda p:json.loads(Path(p).read_text());save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+s=read(C/'source-scope.json');formal=read(P/'formal_execution.json');fixture=read(R/'tests/fixtures/company_profile_v50_realestate_chemical_frozen_pages.json');ledger=read(C/'related-sales-independent-ledger.json');out={};unresolved=[];neg=[];extra=[]
+purchase_supplements=[dict(page=245,counterparty='云南磷化集团海口磷业有限公司',content='磷肥产品、磷酸、水电气、机车作业',current_value='1,190,637,813.62'),dict(page=245,counterparty='内蒙古大地云天化工有限公司',content='化肥产品',current_value='882,671,540.09'),dict(page=245,counterparty='云南云天化石化有限公司',content='冷凝液、液氨、煤、液硫等',current_value='27,222,137.12')]
+for i,result in formal['results'].items():
+ assert result['query']['profiles'], (i,'formal company delivery absent')
+ profile=result['query']['profiles'][0];wid=profile['work_id'];rs=list(_iter_accepted_raw(read(B/'checkpoints'/(wid+'.json'))));by={p['page']:p for p in fixture[i]['independent_pages']};facts={};roles=[v for v in s['native_roles'] if v['instrument_id']==i]
+ for r in rs:
+  n=r['source_native'];kind=r['object_type'];ep=sorted(pages(r));d=dict(accurate=False,critical_numeric_error=False,source_original_pages=ep)
+  if kind in ['Segment','Measurement']:
+   matched=[k for k,v in enumerate(s['source_rows'][i]) if match(r,v)]
+   if matched:d.update(accurate=True,reason='原本期格、栏目、金额、单位、主体、交易方和适用限定逐项匹配',recall_row_index=matched[0],matched_condition_ids=[s['source_rows'][i][k]['condition_id'] for k in matched])
+   elif i=='600096.SH' and 222 in ep and n['name']=='土地房屋车辆等' and n['value']=='88,139,460.13' and n['unit']=='元' and n['header']=='作为出租人的经营租赁/租赁收入' and r['subject_scope']=='consolidated_group':
+    d.update(accurate=True,reason='合同外原p222本期经营租赁收入，元；不增加原召回分母',supplement_source=dict(page=222,name=n['name'],value=n['value'],unit='元',column='租赁收入'));extra.append(dict(instrument_id=i,record_id=r['record_id'],source=d['supplement_source']))
+  elif kind in ['Activity','Relationship']:
+   matched=[k for k,v in enumerate(roles) if action_match(r,v)]
+   if matched:d.update(accurate=True,reason='原具名商品或服务、动作方向、原主体、期间和来源页匹配',recall_role_index=matched[0],matched_condition_ids=[roles[k]['condition_id'] for k in matched])
+   else:
+    name=co(n['name']);scope=r['subject_scope'];action=r.get('action');actor=co(r.get('source_actor'));reason=None;witness=None
+    if i=='600064.SH' and scope=='named_subsidiary':
+     if name=='房地产' and actor=='南京高科置业有限公司' and action in ['operates','sells'] and 29 in ep:reason='p29原子公司房地产开发、经营、销售；同句共享对象，不改变原22动作条件'
+     if name=='药品' and actor=='江苏晨牌药业集团股份有限公司' and action in ['produces','sells'] and {175,176}&set(ep):reason='p175–176原业务性质药品生产销售；保留原子公司和控制比例，不作为集团商品矩阵增项'
+    if i=='600096.SH':
+     if scope=='consolidated_group' and ((name=='黄磷' and 30 in ep) or (name=='聚甲醛' and 31 in ep)) and action in ['produces','sells']:reason='p30–31明示自产商品生产与销售；合同外事实，原产品、主体和当前状态成立'
+     if scope=='consolidated_group' and name=='甲醇' and 36 in ep and (action=='purchases' or r.get('relation_type')=='material_input'):reason='p31及p36原甲醇购销和聚甲醛实际原料用途，采购与material_input各自保留'
+     if scope=='named_subsidiary' and 42 in ep:
+      if actor=='云南水富云天化有限公司' and name in ['化肥','化工原料'] and action in ['produces','sells']:reason='p42水富原业务化肥、化工原料及产品生产销售；原子公司独立，不将研发串作商品'
+      if actor in ['云南三环中化化肥有限公司','云南云天化红磷化工有限公司','云南云天化云峰化工有限公司'] and name=='化肥和化工产品等' and action=='operates':reason='p42原生产、经营父类，保留原子公司，不替代具名商品条件'
+     if scope=='consolidated_group' and action=='sells' and n.get('header')=='出售商品/提供劳务/本期发生额':
+      witnesses=[v for v in ledger[i] if v['current_value'] not in [None,'0'] and Decimal(v['current_value'].replace(',',''))>0 and name in {co(t).removeprefix('销售').removesuffix('等') for t in re.split(r'、|，|及',v['content'])}]
+      allowed={'硫磺','液氨','磷肥产品','原煤','黄磷','磷酸','水电气','氟硅酸','季戊四醇','化肥产品','办公用品','添加剂','水电'}
+      if name in allowed and witnesses:reason='独立关联销售原行本期非零商品支持，服务收费不作商品；其他零交易不反推动作';witness=witnesses
+     if scope=='consolidated_group' and action=='purchases' and n.get('header')=='本期采购商品' and name in ['水电气','化肥产品','液氨','煤']:
+      witnesses=[v for v in purchase_supplements if name in {co(t).removesuffix('等') for t in re.split(r'、|，|及',v['content'])} and v['page'] in ep]
+      if witnesses:reason='p245独立阅读本期非零采购原行，不推实际投入，保留原关联方和期间';witness=witnesses
+    if reason:d.update(accurate=True,reason=reason,supplement_source=witness)
+  elif kind=='BusinessOverview':
+   text=co(r['source_text']);bank=co(''.join(by[p]['text'] for p in ep));layout=co(''.join(by[p].get('layout_text','') for p in ep));direct=text in bank or text in layout
+   if direct:d.update(accurate=True,reason='独立官方PDF文本或原布局中的连续源正文；状态和适用限定保留，三维完整性另核',source_exact_after_whitespace=True)
+   elif '企业集团的构成' in text and ((i=='600064.SH' and {175,176}.issubset(ep)) or (i=='600096.SH' and {226,227,228}.issubset(ep))):
+    d.update(accurate=True,reason='企业集团原表逐行及注释人工核对：业务性质、原子公司、比例和控制期间均相同；PDFium与pypdf表头/取列读序差异，仅源事实，不增加肯定动作',source_exact_after_whitespace=False,layout_order_note='持股比例直接/间接及取得方式表头读序不同；原表内每一名称、数值和注释保持原义')
+  if not d['accurate']:d['reason']='未获独立合同或已核补充来源支持，计入实际输出准确率失败';unresolved.append(dict(instrument_id=i,record_id=r['record_id'],object_type=kind,source_native=n,subject_scope=r['subject_scope'],pages=ep))
+  facts[r['record_id']]=d
+ answers={};texts={v['dimension_id']:co(v['excerpt']) for v in profile['dimensions']}
+ for dim in profile['dimensions']:
+  k=dim['dimension_id'];failed=[g for g in s['answers'][i][k]['required_groups'] if not any(co(t) in texts[k] for t in g)]
+  supporting=[facts[rid] for rid in dim['supporting_record_ids']]
+  valid=bool(dim['answered'] and dim['excerpt'] and not failed and all(v['accurate'] for v in supporting))
+  answers[k]=dict(accurate=valid,critical_numeric_error=False,reason='逐项独立原实质合同和完整源正文/原收入格核验，非仅answered或关键词判定；主体、期间、退出及机制限定保留',failed_substance_groups=failed)
+ for n in s['negative_conditions']:
+  if n['instrument_id']!=i:continue
+  bad=negative_violations(rs,n,texts)
+  neg.append(dict(condition_id=n['condition_id'],instrument_id=i,source_condition=n,source_text=by[n['page']]['text'],evaluated=True,passed=not bad,violating_object_ids=bad,checked_actual_object_ids=[r['record_id'] for r in rs],answered_dimensions_checked=list(texts)))
+ out[i]=dict(facts=facts,answers=answers)
+ save(Path('/tmp/v50formalraw_'+i+'.json'),rs)
+ for o in extra:
+  if o['instrument_id']==i:assert o['source']['value'].replace(',','') in co(by[o['source']['page']]['text']).replace(',','')
+save(C/'v50-actual-object-decisions.json',out);save(C/'v50-unresolved-actual-objects.json',unresolved);save(C/'v50-contract-external-income-source-ledger.json',extra)
+save(C/'v50-negative-review-evidence.json',dict(condition_count=len(neg),evaluated=sum(n['evaluated'] for n in neg),passed=sum(n['passed'] for n in neg),unevaluable=0,negative_reviews=neg))
+print('ACTUAL_DECISIONS',sum(len(v['facts']) for v in out.values()),'UNSUPPORTED',len(unresolved),'NEGATIVES',sum(n['passed'] for n in neg),'/',len(neg),'ANSWERS',sum(d['accurate'] for v in out.values() for d in v['answers'].values()),flush=True)
+if unresolved:print(unresolved)

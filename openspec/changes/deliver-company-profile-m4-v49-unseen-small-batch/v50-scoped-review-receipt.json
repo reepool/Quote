@@ -1,0 +1,46 @@
+{
+  "review_scope": [
+    "四个现有业务模块",
+    "新完整页测试/夹具",
+    "v50追加材料及任务状态"
+  ],
+  "baseline_head": "b92d6e05",
+  "blocking_findings_fixed": [
+    {
+      "issue": "空房地产对象终止南京整家semantic",
+      "classification": "A/P0",
+      "fix": "同句开发/经营/销售共享原对象"
+    },
+    {
+      "issue": "伪商品/动作及收入主体和租赁行污染",
+      "classification": "A/P1",
+      "fix": "原栏目/原主体/正向动作拆分，真实layout入口"
+    },
+    {
+      "issue": "本轮拆分及续行导致旧商品回归",
+      "classification": "A/P1",
+      "fix": "保留铬矿砂及精矿、原商品枚举/商品名和子公司前置业务行"
+    },
+    {
+      "issue": "南京p16/p17同额原栏目合并及Measurement去重",
+      "classification": "A/P1",
+      "fix": "保留原表身份并收紧复核匹配，59项收入分别成立"
+    }
+  ],
+  "nonblocking_scope_expansion": false,
+  "unrelated_preexisting_changes_untouched": true,
+  "tests": {
+    "new_official_full_owner_and_independent_pdf": "12 passed",
+    "prior_v49_full_owner": "3 passed",
+    "prior_sections_telecom_binding": "12 passed, 9 deselected"
+  },
+  "static_checks": {
+    "ruff": "passed",
+    "format": "passed",
+    "openspec_change_and_three_primary_specs": "passed",
+    "diff": "passed on task code, tests and documents; immutable unified patch context blank lines excluded"
+  },
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "formal_business_result": "364/364;669/669;numeric_errors=0;41/41 negative conditions;244.06265446264297 seconds;0/50000 tokens;pending A-role finite acceptance"
+}

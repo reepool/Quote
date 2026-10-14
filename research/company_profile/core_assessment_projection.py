@@ -496,7 +496,7 @@ def _assess_revenue_model(
                 )
                 or source_delivery_repair
                 and re.search(
-                    r"未合并抵消的口径|代收代付事项处理|风景名胜资源有偿使用费",
+                    r"未合并抵消的口径|代收代付事项处理|风景名胜资源有偿使用费|本期采购发生额为[^。]+不再是公司信息披露口径的关联方",
                     record.source_text,
                 )
             )

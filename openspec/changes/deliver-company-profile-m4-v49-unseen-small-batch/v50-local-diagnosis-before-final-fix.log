@@ -1,0 +1,25 @@
+[32m.[0m[31mF[0m[32m.[0m[31mF[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[31m                                                              [100%][0m
+=================================== FAILURES ===================================
+[31m[1m_______________ test_complete_official_contract[pages-600096.SH] _______________[0m
+[1m[31mtests/unit/test_research/test_company_profile_v50_realestate_chemical.py[0m:360: in test_complete_official_contract
+    [0m[94massert[39;49;00m [95mnot[39;49;00m missing, missing[90m[39;49;00m
+[1m[31mE   AssertionError: ['600096.SH-action-110', '600096.SH-action-111'][0m
+[1m[31mE   assert not ['600096.SH-action-110', '600096.SH-action-111'][0m
+[31m[1m_________ test_complete_official_contract[independent_pages-600096.SH] _________[0m
+[1m[31mtests/unit/test_research/test_company_profile_v50_realestate_chemical.py[0m:360: in test_complete_official_contract
+    [0m[94massert[39;49;00m [95mnot[39;49;00m missing, missing[90m[39;49;00m
+[1m[31mE   AssertionError: ['600096.SH-action-110', '600096.SH-action-111'][0m
+[1m[31mE   assert not ['600096.SH-action-110', '600096.SH-action-111'][0m
+============================= slowest 10 durations =============================
+72.21s call     tests/unit/test_research/test_company_profile_v49_successor.py::test_v49_official_page_source_full_contract[600058.SH]
+40.23s call     tests/unit/test_research/test_company_profile_v50_realestate_chemical.py::test_complete_official_contract[pages-600096.SH]
+39.33s call     tests/unit/test_research/test_company_profile_v50_realestate_chemical.py::test_complete_official_contract[independent_pages-600096.SH]
+20.57s call     tests/unit/test_research/test_company_profile_v49_successor.py::test_v49_official_page_source_full_contract[600089.SH]
+14.00s call     tests/unit/test_research/test_company_profile_v50_realestate_chemical.py::test_complete_official_contract[pages-600064.SH]
+12.01s call     tests/unit/test_research/test_company_profile_v50_realestate_chemical.py::test_complete_official_contract[independent_pages-600064.SH]
+
+(4 durations < 0.005s hidden.  Use -vv to show these durations.)
+[36m[1m=========================== short test summary info ============================[0m
+[31mFAILED[0m tests/unit/test_research/test_company_profile_v50_realestate_chemical.py::[1mtest_complete_official_contract[pages-600096.SH][0m - AssertionError: ['600096.SH-action-110', '600096.SH-action-111']
+[31mFAILED[0m tests/unit/test_research/test_company_profile_v50_realestate_chemical.py::[1mtest_complete_official_contract[independent_pages-600096.SH][0m - AssertionError: ['600096.SH-action-110', '600096.SH-action-111']
+[31m[31m[1m2 failed[0m, [32m9 passed[0m, [33m7 warnings[0m[31m in 200.03s (0:03:20)[0m[0m

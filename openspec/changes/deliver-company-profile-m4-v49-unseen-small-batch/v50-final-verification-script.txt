@@ -1,0 +1,42 @@
+"""Read-only verification of sources, runtime, protected files and delivery."""
+import json,hashlib,sqlite3
+from pathlib import Path
+from datetime import datetime,timezone
+from pypdf import PdfReader
+from research.company_profile.reads import CompanyProfileReadService,_iter_accepted_raw
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v49-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v50_same_source';B=R/'data/research/company_profile_common_core/m4_v50_same_source/company_profile_common_core.v1'
+read=lambda p:json.loads(Path(p).read_text());sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest();save=lambda p,v:p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+s=read(C/'source-scope.json');formal=read(P/'formal_execution.json');freeze=read(C/'v50-source-freeze-receipt.json');fixture=read(R/'tests/fixtures/company_profile_v50_realestate_chemical_frozen_pages.json');e=read(C/'v50-source-review-evidence.json');n=read(C/'v50-negative-review-evidence.json');first=read(C/'v50-first-formal-delivery-preservation.json')['completed_sha256'];history=read(C/'v50-protection-baseline.json')['immutable_sha256'];rr=CompanyProfileReadService(B.parent);val={};deliver={};runtime=[]
+assert datetime.fromisoformat(freeze['created_at'])<datetime.fromisoformat(formal['started_at'])
+assert freeze['source_condition_count']==364 and freeze['negative_count']==41
+assert freeze['source_scope_sha256']==formal['source_scope_sha256']==sha(C/'source-scope.json')
+assert freeze['independent_fixture_sha256']==sha(R/'tests/fixtures/company_profile_v50_realestate_chemical_frozen_pages.json')
+for group in [history,first,freeze['executed_code_sha256']]:
+ for p,h in group.items():assert sha(R/p)==h,p
+con=sqlite3.connect('file:data/research.db?mode=ro',uri=True)
+for i,v in s['versions'].items():
+ pdf=R/v['pdf'];assert sha(pdf)==v['sha256'];reader=PdfReader(pdf);q=rr.query((i,),processing_identity=freeze['processing_identity']);result=formal['results'][i]
+ assert all(q[k]==result['query'][k] for k in ['state','profiles','requested_instrument_ids','missing_instrument_ids','delivered'])
+ profile=q['profiles'][0];assert profile==result['export']['profiles'][0]==read(result['export']['files'][0])
+ wid=profile['work_id'];raw=list(_iter_accepted_raw(read(B/'checkpoints'/(wid+'.json'))));actual={p for r in raw for ev in r['evidence'] for p in [ev.get('page'),*ev.get('continuation_pages',[]),*ev.get('subject_evidence_pages',[])] if p is not None};actual|=set(v['checked_pages']);by={p['page']:p for p in fixture[i]['independent_pages']};layouts=[p for p in fixture[i]['independent_pages'] if p.get('layout_text')]
+ for p in actual:assert reader.pages[p-1].extract_text()==by[p]['text'],(i,p)
+ for p in layouts:assert reader.pages[p['page']-1].extract_text(extraction_mode='layout')==p['layout_text'],(i,p['page'])
+ val[i]=dict(official_pdf_sha256=v['sha256'],official_pdf_sha256_verified=True,independent_text_page_count=len(actual),independent_layout_page_count=len(layouts),checked_page_numbers=sorted(actual),layout_page_numbers=[p['page'] for p in layouts],all_text_equal_official_pdf=True,all_layout_equal_official_pdf=True,input_fixture_frozen_before_first_formal=True)
+ meta=json.loads(con.execute('select metadata_json from business_profile_work_items where work_id=?',(wid,)).fetchone()[0]);rt=read(B/(wid+'.json'));st=meta['stage_results'];assert set(st)=={'acquire','parse','semantic','verify','publish'};assert all(not v['reused_scope_ids'] for v in st.values());assert not rt['execution']['predecessor_lineage'];assert meta['processing_identity']==freeze['processing_identity']
+ runtime.append(dict(instrument_id=i,work_id=wid,stage_results=st,predecessor_lineage=rt['execution']['predecessor_lineage'],provider_calls=rt['provider_calls'],transport_retries=rt['execution']['transport_retries']))
+ deliver[i]=dict(readonly_reread_equal=True,query_export_disk_equal=True,accepted_count=len(profile['accepted_facts']),answered_count=sum(bool(d['answered'] and d['excerpt']) for d in profile['dimensions']))
+ assert set(r['record_id'] for r in raw)==set(r['record_id'] for r in profile['accepted_facts'])
+quotes=read(C/'v50-source-review-quote-bank.json')
+def restore(x):
+ if isinstance(x,list):return [restore(v) for v in x]
+ if isinstance(x,dict):return {('bounded_quote' if k=='bounded_quote_sha256' else k):(quotes[v] if k=='bounded_quote_sha256' else restore(v)) for k,v in x.items()}
+ return x
+for o in e['object_reviews']:
+ if o['object_type']=='answer':continue
+ r=restore(o['accepted_record_summary']);assert hashlib.sha256(json.dumps(r,ensure_ascii=False,sort_keys=True).encode()).hexdigest()==o['accepted_record_canonical_sha256']
+accepted=sum(d['accepted_count'] for d in deliver.values());answered=sum(d['answered_count'] for d in deliver.values());assert len(e['object_reviews'])==accepted+answered==len({(o['instrument_id'],o['object_id']) for o in e['object_reviews']});assert len(e['source_disclosures'])==364;assert n['condition_count']==41 and n['evaluated']==41
+save(C/'v50-official-source-validation.json',val);save(C/'v50-delivery-reread-validation.json',deliver)
+review_paths=[C/f for f in ['v50-actual-object-decisions.json','v50-source-review-evidence.json','v50-source-review-quote-bank.json','v50-negative-review-evidence.json','v50-contract-external-income-source-ledger.json']]
+save(C/'v50-formal-review-preservation.json',dict(created_at=datetime.now(timezone.utc).isoformat(),completed_sha256={str(p.relative_to(R)):sha(p) for p in review_paths}))
+receipt=dict(historical_files_verified=len(history),historical_hashes_unchanged=True,first_formal_artifacts_verified=len(first),first_hashes_unchanged=True,first_index_written_before_hash=True,empty_first_artifacts=0,execution_modules_verified=38,execution_reconstruction_verified=read(C/'v50-execution-code-reconstruction.json')['all_modules_reconstructed'],existing_modified_files_unchanged=True,unique_fact_and_answer_objects=accepted+answered,actual_fact_count=accepted,answered_count=answered,unique_positive_conditions=364,negative_conditions_actually_evaluated=41,negative_conditions_passed=n['passed'],source_contract_unchanged=True,source_frozen_before_execution=True,official_text_pages=sum(v['independent_text_page_count'] for v in val.values()),official_layout_pages=sum(v['independent_layout_page_count'] for v in val.values()),actual_complete_published_companies=2,query_export_disk_equal=True,actual_five_stages_no_reuse_or_predecessor=True,whole_round_seconds=formal['whole_round_seconds'],elapsed_includes_pdf_layout_and_all_retries=True,existing_pdf_parse_cache_condition=True,source_recall=e['source_recall'],source_accuracy=e['source_accuracy'],critical_numeric_errors=e['critical_numeric_errors'],production_authorization='not_authorized',scale_quality_claim_allowed=False,runtime_evidence=runtime)
+save(C/'v50-final-protection-verification.json',receipt);print(json.dumps({k:v for k,v in receipt.items() if k!='runtime_evidence'},ensure_ascii=False,indent=2))

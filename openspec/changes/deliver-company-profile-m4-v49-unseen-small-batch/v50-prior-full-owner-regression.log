@@ -1,0 +1,7 @@
+[32m.[0m[32m.[0m[32m.[0m[33m                                                                      [100%][0m
+============================= slowest 10 durations =============================
+72.82s call     tests/unit/test_research/test_company_profile_v49_successor.py::test_v49_official_page_source_full_contract[600058.SH]
+21.93s call     tests/unit/test_research/test_company_profile_v49_successor.py::test_v49_official_page_source_full_contract[600089.SH]
+
+(7 durations < 0.005s hidden.  Use -vv to show these durations.)
+[33m[32m3 passed[0m, [33m[1m7 warnings[0m[33m in 96.03s (0:01:36)[0m[0m

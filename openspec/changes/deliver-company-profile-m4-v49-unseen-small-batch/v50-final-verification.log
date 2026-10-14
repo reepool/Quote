@@ -1,0 +1,57 @@
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-14 11:35:36][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-14 11:35:36][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-14 11:35:36][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.00s
+[INFO][2026-10-14 11:35:37][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-14 11:35:37][tgbot.py:15] - [tgbot] Reading system configuration...
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+{
+  "historical_files_verified": 3128,
+  "historical_hashes_unchanged": true,
+  "first_formal_artifacts_verified": 19,
+  "first_hashes_unchanged": true,
+  "first_index_written_before_hash": true,
+  "empty_first_artifacts": 0,
+  "execution_modules_verified": 38,
+  "execution_reconstruction_verified": true,
+  "existing_modified_files_unchanged": true,
+  "unique_fact_and_answer_objects": 669,
+  "actual_fact_count": 663,
+  "answered_count": 6,
+  "unique_positive_conditions": 364,
+  "negative_conditions_actually_evaluated": 41,
+  "negative_conditions_passed": 41,
+  "source_contract_unchanged": true,
+  "source_frozen_before_execution": true,
+  "official_text_pages": 107,
+  "official_layout_pages": 43,
+  "actual_complete_published_companies": 2,
+  "query_export_disk_equal": true,
+  "actual_five_stages_no_reuse_or_predecessor": true,
+  "whole_round_seconds": 244.06265446264297,
+  "elapsed_includes_pdf_layout_and_all_retries": true,
+  "existing_pdf_parse_cache_condition": true,
+  "source_recall": {
+    "status": "assessed",
+    "numerator": 364,
+    "denominator": 364,
+    "value": 1.0
+  },
+  "source_accuracy": {
+    "status": "assessed",
+    "numerator": 669,
+    "denominator": 669,
+    "value": 1.0
+  },
+  "critical_numeric_errors": {
+    "status": "assessed",
+    "value": 0
+  },
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

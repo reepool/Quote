@@ -292,8 +292,49 @@ class OfficialAnnualReportPageSource:
             or "重要合营企业的主要财务信息" in p["text"]
             or "重要联营企业的主要财务信息" in p["text"]
             or "报告分部的财务信息" in p["text"]
+            or "企业集团的构成" in p["text"]
+            or "业务性质" in p["text"]
+            or "主要原材料的基本情况" in p["text"]
         ]
         for page in list(project_pages):
+            if any(
+                cue in page["text"]
+                for cue in (
+                    "重要联营企业的主要财务信息",
+                    "重要合营企业的主要财务信息",
+                    "报告分部的财务信息",
+                )
+            ):
+                cursor = page["page"] + 1
+                stop = (
+                    r"\n\s*[（(][3-9][)）]\.?"
+                    if "报告分部的财务信息" in page["text"]
+                    else r"\n\s*[（(][4-9][)）]\.?|不重要的合营企业和联营企业"
+                )
+                current_text = (
+                    page["text"].split("主要财务信息", 1)[-1]
+                    if "主要财务信息" in page["text"]
+                    else page["text"].split("报告分部的财务信息", 1)[-1]
+                )
+                while not re.search(stop, current_text) and cursor <= page["page"] + 4:
+                    following = next((p for p in pages if p["page"] == cursor), None)
+                    if not following:
+                        break
+                    if following not in project_pages:
+                        project_pages.append(following)
+                    current_text = following["text"]
+                    cursor += 1
+            if "企业集团的构成" in page["text"]:
+                cursor = page["page"] + 1
+                while cursor <= page["page"] + 4:
+                    following = next((p for p in pages if p["page"] == cursor), None)
+                    if not following:
+                        break
+                    if following not in project_pages:
+                        project_pages.append(following)
+                    if "在子公司的持股比例不同于表决权比例" in following["text"]:
+                        break
+                    cursor += 1
             if "报告期内房地产销售和结转情况" in page["text"]:
                 following = next(
                     (p for p in pages if p["page"] == page["page"] + 1), None
@@ -1180,7 +1221,7 @@ class CompanyProfileTaskService:
         elif enqueue and not (limit_drain_to_enqueued and not instrument_ids):
             if batch_plan is not None and self.processing_identity.get(
                 "revenue_sentence_repair"
-            ) in {"v41", "v42", "v43", "v44", "v45", "v46", "v47", "v48", "v49"}:
+            ) in {"v41", "v42", "v43", "v44", "v45", "v46", "v47", "v48", "v49", "v50"}:
                 from research.business_profile_production_operations import (
                     register_business_profile_shared_annual_report_asset,
                 )

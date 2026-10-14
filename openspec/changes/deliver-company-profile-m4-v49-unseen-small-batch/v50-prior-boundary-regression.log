@@ -1,0 +1,13 @@
+[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[33m                                                             [100%][0m
+============================= slowest 10 durations =============================
+3.29s call     tests/unit/test_research/test_company_profile_v44_interest_sections.py::test_v44_exact_asset_entry[False]
+2.39s call     tests/unit/test_research/test_company_profile_v47_supply_chain_pharma.py::test_successor_keeps_prior_telecom_units_and_subjects[600050.SH]
+1.39s call     tests/unit/test_research/test_company_profile_v47_supply_chain_pharma.py::test_successor_exact_asset_binding[False]
+1.08s call     tests/unit/test_research/test_company_profile_v47_supply_chain_pharma.py::test_successor_exact_asset_binding[True]
+1.04s call     tests/unit/test_research/test_company_profile_v47_supply_chain_pharma.py::test_successor_exact_asset_binding[between_reads]
+1.00s call     tests/unit/test_research/test_company_profile_v44_interest_sections.py::test_v44_exact_asset_entry[True]
+1.00s call     tests/unit/test_research/test_company_profile_v44_interest_sections.py::test_v44_exact_asset_entry[between_reads]
+0.02s call     tests/unit/test_research/test_company_profile_v44_interest_sections.py::test_original_false_joint_record_cannot_match_associate_contract
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+[33m[32m12 passed[0m, [33m[1m9 deselected[0m, [33m[1m7 warnings[0m[33m in 12.59s[0m[0m

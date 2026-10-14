@@ -1,0 +1,63 @@
+{
+  "600064.SH": {
+    "document_version": "e7cc58d36f905a9a45cbbacfc26bfa3eba9868453cc12d0ec3fe4600295bfe94",
+    "page_count": 207,
+    "layout_page_numbers": [
+      23,
+      24,
+      28,
+      29,
+      162,
+      163,
+      175,
+      176,
+      177,
+      178,
+      179,
+      180,
+      181,
+      187,
+      188,
+      189,
+      194,
+      205,
+      206
+    ],
+    "input": "OfficialAnnualReportPageSource bound original official shared asset; no enqueue or profile rehearsal",
+    "official_owner_input_sha256": "82526a231b395cb4fc2849c0f57f4085e1cd6e5c303d227bb29c3404eb96aa2f",
+    "independent_input": "pypdf original PDF text and layout; original positive and negative conditions unchanged"
+  },
+  "600096.SH": {
+    "document_version": "0bed1fed6ab1c6e2ceb468901acb537f44594670cc066378f57a92a89cf537fe",
+    "page_count": 272,
+    "layout_page_numbers": [
+      36,
+      41,
+      42,
+      212,
+      213,
+      214,
+      226,
+      227,
+      228,
+      229,
+      230,
+      231,
+      232,
+      242,
+      245,
+      246,
+      247,
+      248,
+      249,
+      250,
+      258,
+      259,
+      270,
+      271
+    ],
+    "input": "OfficialAnnualReportPageSource bound original official shared asset; no enqueue or profile rehearsal",
+    "official_owner_input_sha256": "192beb7bb271531188a3a77a34e58d7b7ec452fd8a6efcfe584c2bafeabe5e97",
+    "independent_input": "pypdf original PDF text and layout; original positive and negative conditions unchanged"
+  }
+}
