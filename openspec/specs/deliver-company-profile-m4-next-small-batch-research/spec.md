@@ -80,3 +80,10 @@ The accepted v53 scope MUST remain limited to the frozen 海泰发展 and 开创
 #### Scenario: A independently accepts the corrected uncertain-source successor
 - **WHEN** v53 passes within the declared two-report scope after retained failed and blocked rounds
 - **THEN** specification synchronization and path-mapped protection permit finite archive with production not_authorized and scale_quality_claim_allowed false
+
+### Requirement: Finite v54 acceptance preserves the first contract and approved supplementation
+The accepted v54 scope MUST remain limited to the frozen 2025 annual reports of 中视传媒 (600088.SH) and 林海股份 (600099.SH), cutoff 2026-09-17, 207 positive conditions (six bodies, 117 revenue conditions and 84 actions) and 32 actually evaluated negatives. The original 200-condition contract, 96/200 first recall, 384/431 first accuracy, two numeric errors, first artifacts, initial negative review and its separate correction MUST remain byte-identical. A-approved seven lease additions, original-condition mapping and two associated-actor metadata corrections MUST remain traceable without rewriting that first observation. Accepted results are 207/207 recall, 593/593 dynamic unique accuracy (587 facts and six bodies), zero numeric errors and 32/32 negatives, with 231.75049244984984 seconds and zero of 50000 tokens under existing PDF parse-cache conditions. The original expansion_gates_met=false and its whole-round-versus-remaining-time explanation MUST remain retained. Specification synchronization and archive-path protection MUST precede finite archive; production MUST remain not_authorized and scale_quality_claim_allowed MUST remain false. The unused second successor attempt MUST NOT be run merely to consume its authorization.
+
+#### Scenario: A accepts the supplemented same-source successor
+- **WHEN** A independently accepts v54 within the declared two-source 207-positive and 32-negative contract
+- **THEN** finite synchronization and archive preserve the original failed contract and results, the supplementary mapping, all formal artifacts and original gate fields without authorizing production or scale quality

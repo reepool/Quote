@@ -1,0 +1,26 @@
+{
+  "reviewer": "user_A_role",
+  "scope": [
+    "600088.SH",
+    "600099.SH"
+  ],
+  "positive_conditions": 207,
+  "negative_conditions": 32,
+  "recall": "207/207",
+  "accuracy": "593/593",
+  "facts": 587,
+  "bodies": 6,
+  "numeric_errors": 0,
+  "seconds": 231.75049244984984,
+  "tokens": 0,
+  "elapsed_scope": "existing_PDF_parse_cache",
+  "expansion_gates_met": false,
+  "production": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "archive_authorized": true,
+  "new_p0_p1": 0,
+  "review_active_minutes_estimate": 15,
+  "next_pair_exclusions": 62,
+  "next_first_observations": 1,
+  "next_successors_at_most": 2
+}

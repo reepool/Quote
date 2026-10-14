@@ -342,3 +342,29 @@ The owned-page owner MUST preserve printed current values, zeros, blank cells, o
 #### Scenario: Cached text joins a total label to the previous row
 - **WHEN** the official layout prints a separate current total while cached text joins its label to the preceding row
 - **THEN** the owner retains both native row identities and amounts without borrowing an absent cell or treating costs as revenue
+
+### Requirement: Adjacent amounts and wrapped native rows retain original identity
+The existing owned-page owner MUST separate adjacent decimal amount cells according to the native table columns without replacing current revenue with a prior amount. Wrapped product names, revenue-confirmation-time labels, company types and counterparty names MUST remain complete and attached to their own row. A partnership-name continuation MUST complete its preceding party, while a total or a new row MUST stop that continuation. Native operating-revenue and operating-lease totals MUST retain their original category and scope rather than merge with a component row. Real official page selection MUST include the necessary company-table and procurement continuation layouts.
+
+#### Scenario: Current and prior amounts have no extracted separator
+- **WHEN** 中视传媒 p175 extracts the current 371,136,597.51 and the prior 342,224,094.84 next to other table amounts
+- **THEN** Segment, Measurement and the revenue answer retain the actual current amount without a prior-period duplicate
+
+#### Scenario: A partnership name continues onto the next page
+- **WHEN** a native partnership party wraps across pages before a total or another transaction row
+- **THEN** the full original party remains attached to its own income row and later rows retain their own names
+
+#### Scenario: Operating lease tables disclose components and a total
+- **WHEN** 中视传媒 p141 and 林海股份 p164 print current operating-lease rows and their totals
+- **THEN** the owner delivers the seven native income conditions with original actors, units and categories, including totals without treating them as additional goods sales
+
+### Requirement: Current manufacturing matrices and substantive mechanisms stay source bound
+A current affirmative manufacturing-and-sales declaration MAY bind the current named principal-product matrix in the same owned business disclosure. It MUST NOT turn industry descriptions, future plans, procurement, trial status or mere zero values into current production or sales. Original production and sales quantity columns, including 台 units, MUST remain distinct. The six business bodies MUST preserve complete source-grounded product/service matrices and mechanisms, including film delivery and acceptance, copyright control, performance period and progress, ticket collection rights, entrusted operations without commission or management fees, demand-driven production and distribution, domestic delivery acceptance, FOB, discounts and rental. Complete v54 identity MUST continue the five cumulative repair switches, exact asset enqueue and source-grounded actor expansion without changing default identity.
+
+#### Scenario: Current production and sales explicitly cover the principal product matrix
+- **WHEN** an official current-business declaration names manufacturing and sales and its product matrix names forestry and vehicle machinery
+- **THEN** named current actions retain full original product and actor identities, while procurement and unsupported future products remain separate
+
+#### Scenario: Entrusted operations exclude management fees
+- **WHEN** the source states a named subsidiary operates entrusted resources without commission or management fees in 2023–2025
+- **THEN** substantive answers retain the original actor, period and fee exclusion rather than inventing a service-charge mechanism

@@ -224,3 +224,10 @@ Official wording that conflicts with independently checked same-report business 
 #### Scenario: A report consistently describes a software business
 - **WHEN** the source-supported business and income context consistently supports software or integrated circuits
 - **THEN** normal evidence and substantive answers remain eligible without a word blacklist
+
+### Requirement: Associated company metadata preserves native nonconsolidated scope
+An independently frozen contract MAY name associated entities as group_associated_entity, but delivery MUST use the existing native business_segment scope with the complete named actor and source-native associated/nonconsolidated qualifier. It MUST NOT add a model enum solely for the contract label or promote the associated entity's business to consolidated group operations. Company-type or name continuations MUST preserve exact identity; original subsidiaries and associated entities MUST remain distinguishable through acceptance, query and export.
+
+#### Scenario: A frozen actor label is corrected to match an associated company
+- **WHEN** the source identifies 江苏联海动力机械有限公司 and 福马新能（北京）科技有限公司 as associated and not consolidated, and A approves correcting the successor contract metadata
+- **THEN** their complete native actors and nonconsolidation qualifiers use business_segment scope without rewriting the retained original contract or inferring group operation
