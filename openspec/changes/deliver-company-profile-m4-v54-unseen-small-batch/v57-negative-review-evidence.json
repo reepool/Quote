@@ -1,0 +1,549 @@
+{
+  "passed": 44,
+  "total": 44,
+  "conditions": [
+    {
+      "condition_id": "600094.SH-negative-001",
+      "instrument_id": "600094.SH",
+      "page": 16,
+      "name": "本期收入空",
+      "content": "金控板块",
+      "forbidden": "不得造零、借利润或上期值",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600094.SH-negative-002",
+      "instrument_id": "600094.SH",
+      "page": 16,
+      "name": "本期收入空",
+      "content": "金融投资",
+      "forbidden": "不得造零、借利润或上期值",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600094.SH-negative-003",
+      "instrument_id": "600094.SH",
+      "page": 22,
+      "name": "本期结转收入空",
+      "content": "常州大名城",
+      "forbidden": "已售含预售或待结转面积不能生成本期结转收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600094.SH-negative-004",
+      "instrument_id": "600094.SH",
+      "page": 22,
+      "name": "本期结转收入空",
+      "content": "杭州随塘",
+      "forbidden": "已售含预售或待结转面积不能生成本期结转收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600094.SH-negative-005",
+      "instrument_id": "600094.SH",
+      "page": 22,
+      "name": "本期结转收入空",
+      "content": "杭州雍澜府",
+      "forbidden": "已售含预售或待结转面积不能生成本期结转收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600094.SH-negative-006",
+      "instrument_id": "600094.SH",
+      "page": 22,
+      "name": "本期结转收入空",
+      "content": "福州名城城市广场",
+      "forbidden": "已售含预售或待结转面积不能生成本期结转收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600094.SH-negative-007",
+      "instrument_id": "600094.SH",
+      "page": 27,
+      "name": "金控营业收入空",
+      "actor": "深圳名城金控（集团）有限公司",
+      "values": [
+        "3.38",
+        "3.37"
+      ],
+      "forbidden": "利润不转为收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600094.SH-negative-008",
+      "instrument_id": "600094.SH",
+      "page": 165,
+      "name": "合营章节不适用",
+      "actor": "黄河财产保险股份有限公司",
+      "forbidden": "不得生成合营收入，保留正确联营",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600094.SH-negative-009",
+      "instrument_id": "600094.SH",
+      "page": 165,
+      "name": "杭州普润星融本期收入空",
+      "actor": "杭州普润星融股权投资合伙企业（有限合伙）",
+      "forbidden": "上期主体及资产/投资金额不得作为本期收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600094.SH-negative-010",
+      "instrument_id": "600094.SH",
+      "page": 176,
+      "name": "关联销售不适用",
+      "forbidden": "采购/接受劳务不转为销售或收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600094.SH-negative-011",
+      "instrument_id": "600094.SH",
+      "page": 151,
+      "name": "未履约非本期收入",
+      "values": [
+        "369285599.74"
+      ],
+      "forbidden": "含税待交付交易价格不得作为本期营业收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600094.SH-negative-012",
+      "instrument_id": "600094.SH",
+      "page": 160,
+      "name": "承租费用非收入",
+      "values": [
+        "2724185.03",
+        "5065356.25"
+      ],
+      "forbidden": "承租短期费用与现金流出不转出租收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600094.SH-negative-013",
+      "instrument_id": "600094.SH",
+      "page": 161,
+      "name": "未来收款非本期收入",
+      "values": [
+        "138483642.32",
+        "142584132.76",
+        "133046633.64",
+        "101019146.51",
+        "89387358.37",
+        "416646738.07"
+      ],
+      "forbidden": "未来未折现租赁收款额不得当本期",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600094.SH-negative-014",
+      "instrument_id": "600094.SH",
+      "page": 9,
+      "name": "投资收益非营业收入",
+      "values": [
+        "350739992.54"
+      ],
+      "forbidden": "日常投资收益仍非营业收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600094.SH-negative-015",
+      "instrument_id": "600094.SH",
+      "page": 13,
+      "name": "参股及筹备边界",
+      "actors": [
+        "北京佰才邦技术股份有限公司",
+        "香港名城移动通信有限公司"
+      ],
+      "forbidden": "参股不并表、不升格集团当前通信生产销售；新子公司前期筹备不升格当前运营",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600094.SH-negative-016",
+      "instrument_id": "600094.SH",
+      "page": 25,
+      "name": "经营范围与计划非当前动作",
+      "actor": "福建城际低空机场投资有限公司",
+      "forbidden": "注册经营范围不得当已制造销售无人飞行器/雷达/新能源汽车设备",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600094.SH-negative-017",
+      "instrument_id": "600094.SH",
+      "page": 162,
+      "name": "注销边界",
+      "actors": [
+        "浙江绿维新能源有限公司",
+        "厦门金榕茂安投资有限公司",
+        "上海大名城商业管理有限公司"
+      ],
+      "forbidden": "不得作为期末仍存续子公司经营",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600094.SH-negative-018",
+      "instrument_id": "600094.SH",
+      "page": 192,
+      "name": "权益投资收益非母公司营业收入",
+      "values": [
+        "4765817.18",
+        "-746703.74",
+        "4019113.44"
+      ],
+      "forbidden": "投资收益不得收入化",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600094.SH-negative-unit-conflict",
+      "instrument_id": "600094.SH",
+      "page": 23,
+      "name": "冲突单位不得确定收入化",
+      "forbidden": "九笔出租数据不得无保留断言万元收入、擅造官方元更正，或将其直接纳入确定性三维答案；p151独立正确元值不受影响",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-001",
+      "instrument_id": "600103.SH",
+      "page": 201,
+      "name": "仅上期关联销售",
+      "counterparty": "福建海峡军民融合产业发展有限公司",
+      "content": "生活用纸",
+      "prior_value": "340.81",
+      "forbidden": "本期格空；不得借列造零或推本期销售",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-002",
+      "instrument_id": "600103.SH",
+      "page": 201,
+      "name": "仅上期关联销售",
+      "counterparty": "福建海峡军民融合产业发展有限公司",
+      "content": "药品",
+      "prior_value": "2320.00",
+      "forbidden": "本期格空；不得借列造零或推本期销售",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-003",
+      "instrument_id": "600103.SH",
+      "page": 201,
+      "name": "仅上期关联销售",
+      "counterparty": "福建海峡融和实业有限公司",
+      "content": "药品",
+      "prior_value": "7680.00",
+      "forbidden": "本期格空；不得借列造零或推本期销售",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-004",
+      "instrument_id": "600103.SH",
+      "page": 201,
+      "name": "仅上期关联销售",
+      "counterparty": "福建省轻安工程建设有限公司",
+      "content": "水电",
+      "prior_value": "160.23",
+      "forbidden": "本期格空；不得借列造零或推本期销售",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-005",
+      "instrument_id": "600103.SH",
+      "page": 201,
+      "name": "仅上期关联销售",
+      "counterparty": "福建省盐业进出口有限公司",
+      "content": "药品",
+      "prior_value": "7270.00",
+      "forbidden": "本期格空；不得借列造零或推本期销售",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-006",
+      "instrument_id": "600103.SH",
+      "page": 203,
+      "name": "仅上期商标使用费",
+      "counterparty": "福建晶华生物科技有限公司",
+      "content": "商标使用费",
+      "prior_value": "10000.00",
+      "forbidden": "本期空位不得借上期",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-007",
+      "instrument_id": "600103.SH",
+      "page": 199,
+      "name": "仅上期采购",
+      "counterparty": "福建省永安煤业有限责任公司",
+      "content": "煤炭原料",
+      "prior_value": "44043191.15",
+      "forbidden": "不借上期/获批额度，不生成本期该采购动作或收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-008",
+      "instrument_id": "600103.SH",
+      "page": 199,
+      "name": "仅上期采购",
+      "counterparty": "福建省盐业进出口有限公司",
+      "content": "盐产品",
+      "prior_value": "70861.68",
+      "forbidden": "不借上期/获批额度，不生成本期该采购动作或收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-009",
+      "instrument_id": "600103.SH",
+      "page": 199,
+      "name": "仅上期采购",
+      "counterparty": "福建省轻纺（控股）有限责任公司",
+      "content": "咨询服务",
+      "prior_value": "840000.00",
+      "forbidden": "不借上期/获批额度，不生成本期该采购动作或收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-010",
+      "instrument_id": "600103.SH",
+      "page": 200,
+      "name": "仅上期采购",
+      "counterparty": "福建省金皇贸易有限责任公司",
+      "content": "煤炭原料",
+      "prior_value": "3297183.42",
+      "forbidden": "不借上期/获批额度，不生成本期该采购动作或收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-011",
+      "instrument_id": "600103.SH",
+      "page": 200,
+      "name": "仅上期采购",
+      "counterparty": "福建省金皇贸易有限责任公司",
+      "content": "木片原料",
+      "prior_value": "44520913.52",
+      "forbidden": "不借上期/获批额度，不生成本期该采购动作或收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-012",
+      "instrument_id": "600103.SH",
+      "page": 200,
+      "name": "仅上期采购",
+      "counterparty": "福建闽盐食品科技有限公司",
+      "content": "盐礼盒",
+      "prior_value": "27600.00",
+      "forbidden": "不借上期/获批额度，不生成本期该采购动作或收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-013",
+      "instrument_id": "600103.SH",
+      "page": 200,
+      "name": "污水设备本期空",
+      "counterparty": "福建省金皇环保科技有限公司",
+      "content": "污水沉砂池设备",
+      "forbidden": "本期与上期均空，不由商品名反推采购",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-014",
+      "instrument_id": "600103.SH",
+      "page": 31,
+      "name": "子公司本期营业收入空",
+      "actor": "福建省连城青山林场有限公司",
+      "forbidden": "利润/资产/注册资本不填营业收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-015",
+      "instrument_id": "600103.SH",
+      "page": 32,
+      "name": "子公司本期营业收入空",
+      "actor": "福建省三明青山超声波技术研究院有限公司",
+      "forbidden": "利润/资产/注册资本不填营业收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-016",
+      "instrument_id": "600103.SH",
+      "page": 210,
+      "name": "研究分部收入空",
+      "content": "研究及技术服务行业",
+      "forbidden": "不得左移环保6397/其他分部金额或负营业利润",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-017",
+      "instrument_id": "600103.SH",
+      "page": 191,
+      "name": "合营联营财务不适用",
+      "forbidden": "投资余额/净利润/超额亏损不是营业收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-018",
+      "instrument_id": "600103.SH",
+      "page": 174,
+      "name": "集团合同分解不适用",
+      "forbidden": "不复制其他公司合同分解或以成本分解为收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-019",
+      "instrument_id": "600103.SH",
+      "page": 218,
+      "name": "母公司合同分解不适用",
+      "forbidden": "不把集团行业/产品表当母公司",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-020",
+      "instrument_id": "600103.SH",
+      "page": 202,
+      "name": "承租费用非出租收入",
+      "counterparty": "福建省陶瓷工业公司",
+      "content": "房屋",
+      "values": [
+        "104328.00"
+      ],
+      "forbidden": "租赁方向不能倒置",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-021",
+      "instrument_id": "600103.SH",
+      "page": 184,
+      "name": "租赁支出非收入",
+      "values": [
+        "392523.85",
+        "3019701.37"
+      ],
+      "forbidden": "不将短租费用或现金流出作收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-022",
+      "instrument_id": "600103.SH",
+      "page": 10,
+      "name": "下游用途不是公司制造",
+      "content": "粘胶纤维",
+      "forbidden": "溶解浆用途不推本公司制造粘胶纤维",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-023",
+      "instrument_id": "600103.SH",
+      "page": 185,
+      "name": "研发注册非销售",
+      "content": "夫西地酸乳膏",
+      "forbidden": "试生产/获得批件与预计上市利润不得推当前销售",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-024",
+      "instrument_id": "600103.SH",
+      "page": 11,
+      "name": "采购不反推投入",
+      "content": "燃料/设备",
+      "forbidden": "采购动作不等同实际投入；木竹片工艺实际投入单列保留",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    },
+    {
+      "condition_id": "600103.SH-negative-025",
+      "instrument_id": "600103.SH",
+      "page": 176,
+      "name": "投资及补助收益非营业收入",
+      "values": [
+        "28892523.26",
+        "11733659.42"
+      ],
+      "forbidden": "投资收益/其他收益不作为主营或营业收入",
+      "evaluated": true,
+      "passed": true,
+      "violating_record_ids": []
+    }
+  ]
+}

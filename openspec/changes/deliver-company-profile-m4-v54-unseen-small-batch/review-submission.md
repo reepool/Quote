@@ -1,53 +1,43 @@
-# v56最后一次正式尝试超时：次数用尽提交A裁决
+# v57专项正式复验：提交A有限审核
 
-**4.5采购分类与评分漏检已局部修复；4.6正式复验未达标。v56已使用剩余一次正式授权，后继2/2用尽，不再运行。** 当前不申请有限通过、不归档、不扩批、不启动下一对；5.1继续等待A通过，production=not_authorized、scale_quality_claim_allowed=false。
+B正式自检达标，等待A有限验收。原后继 **2/2** 保持耗尽；A另授权专项 **1/1** 已使用，未新增执行。当前不归档、不扩批、不启动下一对，5.1仍待A通过；生产 `not_authorized`，规模声明 `false`。
 
-## 正式失败及证据限制
+## 正式结果及范围
 
-沿唯一owner以完整v56身份、新目录m4_v56_same_source_repair启动两家正式轮。启动标记之后，300秒门槛已超过，仍未返回第一家公司完整交付；中断进程，退出码130。以最后一次写入启动标记的日志时间2026-10-15T01:39:28.841382543Z和工具UTC时钟01:44:38核对，**中断前墙钟已至少309.16秒**。这不是完整monotonic耗时；脚本没有返回第二次export，不能捏造精确完成秒数。
+大名城600094.SH／青山纸业600103.SH，原两份2025官方PDF、cutoff 2026-09-17、原 **307正向＋44负例** 和四条采购分类断言不变。
 
-只读数据库按冻结processing_identity_hash核查：v56工作项0条；新输出目录、导出目录及observation.json均不存在。计划已保存，运行日志最后一行为V56_FIRST_SUCCESSOR_EXECUTE_START，无成功返回和调用栈。现有入口在服务构造、入队前会读取候选registry，但**具体阻塞调用及根因尚未确认**，不把推断当结论，也不把这次超时说成采购业务断言失败。
+**307/307召回、712/712动态唯一准确率＝706事实＋六正文、数字错误0、44/44负例、四分类断言4/4。** 分母取本轮全部实际接受事实和已答正文，合同外输出计准确率，Measurement不重复计召回；逐对象与checkpoint唯一绑定。
 
-因此本轮无正式召回、动态准确率、数字错误或token回执；44项负例及四分类断言未实际正式评估，不判通过。局部307/307、712/712不得代替正式成绩。正式预算按启动即使用计，**首次1/1、后继2/2已用尽**，不重置计时、不追加或换身份重跑。超时后的操作只读核查与保存证据，不执行run/query/export。
+- [全量正式对象、成绩及分类断言](v57-source-review-evidence.json)、[逐事实与正文决定](v57-actual-object-decisions.json)、[负例](v57-negative-review-evidence.json)
+- [正式执行](../../../data/checkpoints/company_profile_common_core/reports/m4_v57_same_source_repair/formal_execution.json)、[监督回执](v57-special-formal-supervisor-receipt.json)、[首次制品保护](v57-formal-delivery-preservation-completion.json)
+- [正式差异](v57-repair-difference.json)、[只读重查与来源核验](v57-readonly-verification-receipt.json)、[唯一复核owner回执](v57-source-review-owner-receipt.json)
 
-- [正式失败回执](v56-formal-failure-receipt.json)、[保留的运行日志](v56_formal_execute.log)
-- [4份现有尝试制品保护](v56-formal-delivery-preservation-completion.json)、[失败留存脚本](v56-failure-capture-script.txt)
-- [冻结后的正式执行脚本](v56-first-execution-script.txt)、[代码/来源冻结](v56-source-freeze-receipt.json)、[38模块源码](v56-executed-code-snapshot.json)
+相对v55仅四条采购栏目修正，706事实其余原生语义及Evidence不变、六正文逐字相同。咨询、招聘测试及建设项目保持服务/工程采购，商品及仅上期采购边界保留。九笔单位冲突租金继续保留原值和unclear，退出确定答案支持；原合同与金额未修改。
 
-原v56正式评分和只读脚本作为执行前冻结材料保留，但没有在缺失正式交付时运行，不生成伪正式分数或机械通过回执。
+整轮 **204.54724270秒、0/50000 token**；监督进程总计205.22935227秒。计时从进程启动开始，包含首次registry、服务构造、PDF、布局和全部重试，到第二次export返回，没有把准备耗时移出。两家五阶段均成功、无复用/前驱；查询、导出、磁盘及现有唯一read owner的只读重查一致。耗时仅代表已有PDF解析缓存；原 `expansion_gates_met=false` 及计时解释保留，不因此修改门槛字段。
 
-## 4.5实现与局部实质验证
+## 4.7的诊断、局部修复及证据限制
 
-独立从原PDF重建青山p199–200完整布局，四条原项目分别认定咨询服务采购、招聘测试服务采购及建设工程采购。现有owner整行与拆分分支使用一致规则，保留原完整名称、供应方、本期purchases方向、期间和Evidence，四条栏目改为“本期采购服务”。未建设分类框架。
+没有在诊断中调用正式run。先以SQLite mode=ro、隔离子进程限时执行，保留进度、调用栈和SQL。全市场registry共5,564家；原路径实测106.679秒，其中行业48.474秒、官方报告逐家公司读取54.359秒。重复连接建立是本次证实的集中开销，未发现本次需要处理的慢SQL或锁等待证据。
 
-完整官方输入真实接受→查询→导出局部闭环：**307/307、712/712（706事实＋六正文）、44/44负例和四分类断言4/4**。与实际v55正式输出逐原生字段比较，除四条采购栏目外全部语义不变；六正文原字节相同，收入、金额、单位、主体、Evidence及缓存合计行不回归。九租金原值、万元表头及unclear保持，仍退出确定答案支持和聚合/排序/跨公司比较。
+仅在资产repository添加同次registry的只读连接复用，退出即关闭、清除线程本地状态，不缓存数据、不固定事务快照、不新增索引，也未修改ResearchStorageManager。修复后registry52.159秒，官方报告循环4.051秒；全部5,564家、所有分类/资产字段与原路径 **完整hash相同**。默认身份、全市场分母、官方版本/字节校验和业务语义保持不变。正式入口将registry及服务构造时间扣入内部剩余预算；外部监督器也覆盖同步阻塞。
 
-工程项目承包及其他咨询服务仍为服务；手工皂、洗衣液、风油香精、精油皂仍为商品。仅上期煤炭原料、木片原料、咨询服务、盐产品/礼盒，以及本期空位污水设备均不生成本期采购。
+隔离新库服务构造4.466秒；人为同步阻塞在约1.5秒被终止并留下栈。详见[诊断回执及日志索引](v57-entry-diagnosis-receipt.json)、[同步阻塞回执](v57-synchronous-block-proof-supervisor-receipt.json)、[栈](v57-synchronous-block-proof-stacks.log)、[正式前Review](v57-entry-recovery-review-receipt.json)。正式日志另记录registry加载、服务构造及各阶段实际经过。
 
-评分核采购栏目后再判动作；合同内及合同外p199–200采购均受检查。四服务→商品变异必须失败，正常服务和商品正例通过。新评分器只读核对v55原输出恰好拒绝A指出的四错，得到708/712，不覆盖原报告。见[新评分器](v56-business-audit-script.txt)、[v55原输出只读校正](v56-checker-v55-replay-receipt.json)、[四项单列断言](v56-supplemental-classification-assertions.json)、[完整局部及差异回执](v56-local-closure-receipt.json)、[局部逐对象](v56-local-object-decisions.json)。完整PDF中跨列换行以独立读取的原名碎片核对，不伪造连续原文。
+**不能追认v56的具体历史阻塞调用**，当时未取得栈；本次证明当前路径的集中开销与恢复，不把推测写成v56根因。两次带定期异步faulthandler转储的诊断探针以signal11结束，已保留，不能算恢复证据；对应不定期转储的完整前后只读探针均正常完成。隔离服务构造耗时不冒充生产库构造耗时。初次新测试缺as-of getter、诊断脚本解释器和副本历史键的局部问题也均保留说明，不影响正式代码或业务成绩。
 
-## 合同、身份和历史保留
+## 验证、Review与原件保护
 
-两份原2025官方PDF、大名城600094.SH／青山纸业600103.SH、cutoff2026-09-17、原**307正向＋44负例**未变。307＝六正文＋134确定收入＋九冲突租金原行保留/unclear＋158动作；九冲突条件不称确定收入。四分类断言执行前单列冻结，不增减原分母。
+新入口专项 **4 passed**；完整官方owner v56/v57两版本及分类边界12项在组合中通过，另以独立保留目录重验v57两家公司 **2 passed、10 deselected**，实际局部全量307/307、712/712、44负例及四断言通过。candidate registry全部用例在组合中通过。Ruff七文件、六文件格式加registry改动范围、范围diff及当前change和三份主规格严格校验通过。不声明全套测试通过。
 
-v56接续五开关、精确资产入队和runtime主体释义展开，默认身份不变。最初局部测试发现主体展开名单未接v56，导致五个简称未展开；已在正式前修复并重验完整输入，没有用正式次数调试。
+入口直接回归21 passed、5 failed；同五项在HEAD的repository/registry/operations定义下失败完全相同（[基线比较](v57-old-tests-baseline-comparison.log)），按C类既有模拟测试问题后置，未改预期或顺手修复。Review修复A类实际问题：重复资产连接开销及入口预算遗漏；线程隔离、嵌套/异常清理、作用域外写入恢复和预算耗尽不入队均验证。未观察到本轮剩余B侧P0/P1阻塞，A仍须独立核原文语义。
 
-原首次95/307、259/315、数字错误10、初版负例43/44及旁挂42/44更正保留。**v55原B声明307/307、712/712、数字0、44/44继续原字节保留，但A未通过，四错使准确率至多708/712。** [v55原审核入口](v55-review-submission-original.md)、[A旁挂更正](v55-a-review-correction.json)、[v55原正式分数](v55-source-review-evidence.json)、[v55原保护](v55-review-preservation.json)均保留。v56未生成新的正式成绩。
+[代码冻结](v57-source-freeze-receipt.json)保留原38个company-profile模块，加本次直接修改的资产repository共39模块；[源码快照](v57-executed-code-snapshot.json)可重建。完整v57身份接续五开关、精确入队及主体展开，默认身份未改。
 
-原expansion_gates_met=false及v55计时口径说明保留；本次没有新的source_review owner回执。生产/规模声明不改变。
+原首次95/307、259/315、数字10及旁挂负例更正保持；v55原B的712/712与A四错更正分别保留；v56超过309.16秒、无正式分数及token未知的超时回执保留。[v56原审核入口](v56-review-submission-original.md)与原保护哈希一致，当前入口路径映射另列，未改历史原件。3519项历史使用相同快照的v56只读机械回执；本次重核首次/复核/失败制品、旧源码重建、当前执行源码及19项既有改动，不宣称再次重哈希全部历史集合。详见[v57最终保护](v57-final-protection-verification.json)。
 
-## 验证与范围Review
+只提交本任务可隔离改动并普通推送；提交哈希和结果在任务回复中报告。19项任务前既有改动未触碰。行业增强、量价、性能治理、正文精简、框架及无关旧问题继续后置。B活跃开发与交接等待时间未精确计量，不用业务0token代表开发/审核消耗。一个入口交A有限审核，专项结束后不自行再运行。
 
-- 新样本最终定向**10 passed**：两家完整owner输入、四条分类变异、服务/商品正例及仅上期负例。
-- 旧v54/v53 **12 passed**：在相同最终分类实现下通过；runtime后续仅增加v56身份，不影响旧身份。
-- 旧v50完整页、独立PDF页及采购拆分 **5 passed、7 deselected**。
+只读核验说明：首次加只读SQLite guard的核验阻止了官方资产owner创建受控读取lease；失败日志保留，未写业务库。最终核验改用现有read owner只读重查，核正式绑定和PDF原字节、独立73页文本/73布局，并复用同源未改的v55完整输入等价回执；不宣称本次再次只读调用了带lease写入的page source。原冻结脚本、两次核验脚本及差异均保留于validation-review回执。监督回执stack_dump_requested_on_deadline_approach是启用配置，正常正式轮未触发信号；同步阻塞证明实际触发了信号和终止。
 
-首次组合中两个新样本失败来自v56主体展开遗漏，修复后新样本10项全部重验通过；20 passed/2 failed的原日志保留。不合并重复用例虚增数量，不声明全套pytest通过。Ruff、五文件格式、范围diff及当前change/三份直接主规格OpenSpec严格校验通过。范围Review修复采购分类、评分漏检及身份接续，4.5无已知剩余代码阻塞；4.6正式未满足且具体运行根因未知。详见[正式前验证与Review](v56-preformal-validation-review-receipt.json)、[本次最终回执](v56-validation-review-receipt.json)。
-
-正式前3519历史、18原首次、6原复核、19既有、19份v55首次、12份v55复核保护及最初/v55各38模块重建通过。正式中止后保护现有失败制品并再核关键原件与冻结代码；历史大集合的正式前回执按相同快照复用，最终核验范围在[v56保护核验](v56-final-protection-verification.json)明确，不混称完成了新的全量历史重哈希。[复核保护](v56-review-preservation.json)绑定全部本次证据。A可复用同快照机械回执，仍独立审核原文语义。
-
-## 停止点与交接
-
-继续执行A/B流程v1。4.5完成，4.6因超时未满足；未勾选不表示还有次数。后继2/2用尽，现交A裁决后续处理，**不自行重跑、不归档、不扩批**。行业、性能、框架、正文精简及旧无关问题后置，不为本次运行停滞另开工程建设。
-
-本次仅正常提交/推送本人可隔离的业务代码、测试和change材料；19项既有改动未触碰。提交哈希及推送结果在任务回复记录。活跃开发时间未精确计量；本次恢复、测试和运行等待分别保留日志，不把等待称开发时间，也不以旧业务0token代表本次资源。
+范围diff检查通过；完整staged默认检查另外标记原生CSV的4个CRLF行尾及signal11截断栈的1处尾空白。按保护要求保留原字节；使用cr-at-eol识别并排除该单一不可变栈原件后的检查通过，不整理历史格式。

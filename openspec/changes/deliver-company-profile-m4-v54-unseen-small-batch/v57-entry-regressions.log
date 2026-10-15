@@ -1,0 +1,48 @@
+[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[31mF[0m[32m.[0m[32m.[0m[31mF[0m[32m.[0m[32m.[0m[32m.[0m[31mF[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[31mF[0m[31mF[0m[32m.[0m[32m.[0m[32m.[0m[31m                                               [100%][0m
+=================================== FAILURES ===================================
+[31m[1m______ test_budget_limited_live_run_saves_one_company_without_batch_rerun ______[0m
+[1m[31mtests/unit/test_research/test_company_profile_live_run.py[0m:258: in test_budget_limited_live_run_saves_one_company_without_batch_rerun
+    [0m[94massert[39;49;00m first_calls == [94m1[39;49;00m[90m[39;49;00m
+[1m[31mE   assert 0 == 1[0m
+[31m[1m_____________ test_live_run_does_not_drain_preexisting_queue_work ______________[0m
+[1m[31mtests/unit/test_research/test_company_profile_live_run.py[0m:462: in test_live_run_does_not_drain_preexisting_queue_work
+    [0m[94massert[39;49;00m provider.extract_calls == [94m1[39;49;00m[90m[39;49;00m
+[1m[31mE   assert 0 == 1[0m
+[1m[31mE    +  where 0 = <tests.unit.test_research.test_company_profile_runtime._RequestBoundOverviewProvider object at 0x7f77df53a3d0>.extract_calls[0m
+[31m[1m______________ test_duplicate_named_ids_count_as_one_live_company ______________[0m
+[1m[31mtests/unit/test_research/test_company_profile_live_run.py[0m:658: in test_duplicate_named_ids_count_as_one_live_company
+    [0m[94massert[39;49;00m provider.extract_calls == [94m1[39;49;00m[90m[39;49;00m
+[1m[31mE   assert 0 == 1[0m
+[1m[31mE    +  where 0 = <tests.unit.test_research.test_company_profile_runtime._RequestBoundOverviewProvider object at 0x7f77df652f50>.extract_calls[0m
+[31m[1m__ test_in_flight_official_run_stops_publish_after_publication_switch[pause] ___[0m
+[1m[31mtests/unit/test_research/test_company_profile_publication.py[0m:285: in test_in_flight_official_run_stops_publish_after_publication_switch
+    [0m[94massert[39;49;00m result[[33m"[39;49;00m[33mstate[39;49;00m[33m"[39;49;00m] == [33m"[39;49;00m[33mpaused[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'completed' == 'paused'[0m
+[1m[31mE     [0m
+[1m[31mE     - paused[0m
+[1m[31mE     + completed[0m
+[31m[1m_ test_in_flight_official_run_stops_publish_after_publication_switch[rollback] _[0m
+[1m[31mtests/unit/test_research/test_company_profile_publication.py[0m:285: in test_in_flight_official_run_stops_publish_after_publication_switch
+    [0m[94massert[39;49;00m result[[33m"[39;49;00m[33mstate[39;49;00m[33m"[39;49;00m] == [33m"[39;49;00m[33mpaused[39;49;00m[33m"[39;49;00m[90m[39;49;00m
+[1m[31mE   AssertionError: assert 'completed' == 'paused'[0m
+[1m[31mE     [0m
+[1m[31mE     - paused[0m
+[1m[31mE     + completed[0m
+============================= slowest 10 durations =============================
+4.49s call     tests/unit/test_research/test_company_profile_live_run.py::test_published_run_loads_official_registry_without_caller_injection
+3.03s call     tests/unit/test_research/test_company_profile_live_run.py::test_live_run_does_not_drain_preexisting_queue_work
+2.47s call     tests/unit/test_research/test_company_profile_live_run.py::test_budget_limited_live_run_saves_one_company_without_batch_rerun
+1.67s call     tests/unit/test_research/test_company_profile_publication.py::test_publish_claimed_publication_stop_stays_resumable[pause]
+1.58s call     tests/unit/test_research/test_company_profile_publication.py::test_publish_claimed_publication_stop_stays_resumable[rollback]
+1.49s call     tests/unit/test_research/test_company_profile_live_run.py::test_duplicate_named_ids_count_as_one_live_company
+1.46s call     tests/unit/test_research/test_company_profile_live_run.py::test_live_run_outcomes_ignore_historical_profiles_and_parser_crashes
+1.43s call     tests/unit/test_research/test_company_profile_publication.py::test_in_flight_official_run_stops_publish_after_publication_switch[pause]
+1.36s call     tests/unit/test_research/test_company_profile_publication.py::test_in_flight_official_run_stops_publish_after_publication_switch[rollback]
+1.07s call     tests/unit/test_research/test_company_profile_live_run.py::test_empty_live_selection_does_not_enqueue_the_full_frontier
+[36m[1m=========================== short test summary info ============================[0m
+[31mFAILED[0m tests/unit/test_research/test_company_profile_live_run.py::[1mtest_budget_limited_live_run_saves_one_company_without_batch_rerun[0m - assert 0 == 1
+[31mFAILED[0m tests/unit/test_research/test_company_profile_live_run.py::[1mtest_live_run_does_not_drain_preexisting_queue_work[0m - assert 0 == 1
+[31mFAILED[0m tests/unit/test_research/test_company_profile_live_run.py::[1mtest_duplicate_named_ids_count_as_one_live_company[0m - assert 0 == 1
+[31mFAILED[0m tests/unit/test_research/test_company_profile_publication.py::[1mtest_in_flight_official_run_stops_publish_after_publication_switch[pause][0m - AssertionError: assert 'completed' == 'paused'
+[31mFAILED[0m tests/unit/test_research/test_company_profile_publication.py::[1mtest_in_flight_official_run_stops_publish_after_publication_switch[rollback][0m - AssertionError: assert 'completed' == 'paused'
+[31m[31m[1m5 failed[0m, [32m21 passed[0m, [33m7 warnings[0m[31m in 23.43s[0m[0m

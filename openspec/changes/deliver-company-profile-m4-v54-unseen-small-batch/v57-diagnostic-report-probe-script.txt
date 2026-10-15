@@ -1,0 +1,72 @@
+import faulthandler,json,sqlite3,time
+from pathlib import Path
+start=time.monotonic()
+def mark(event,**data):print(json.dumps(dict(event=event,elapsed=time.monotonic()-start,**data),ensure_ascii=False),flush=True)
+faulthandler.dump_traceback_later(8,repeat=True)
+original_connect=sqlite3.connect
+last_progress=0
+sql_count=0
+class ReadOnlyConnection(sqlite3.Connection):
+ def __init__(self,*args,**kwargs):
+  super().__init__(*args,**kwargs)
+  self.set_trace_callback(self.trace)
+  self.set_progress_handler(self.progress,100000)
+ def trace(self,sql):
+  global sql_count
+  sql_count+=1;self.last_sql=sql
+ def progress(self):
+  global last_progress
+  now=time.monotonic()
+  if now-last_progress>2:
+   mark('sql_progress',sql=self.last_sql,sql_count=sql_count);last_progress=now
+  return 0
+def readonly_connect(database,*args,**kwargs):
+ db=str(database)
+ if db!=':memory:':db=Path(db).resolve().as_uri()+'?mode=ro'
+ kwargs.update(uri=True,factory=ReadOnlyConnection)
+ return original_connect(db,*args,**kwargs)
+sqlite3.connect=readonly_connect
+mark('imports_start')
+from utils import config_manager
+from research.storage import ResearchStorageManager
+from research.announcement_assets import AnnouncementAssetConfig,AnnouncementAssetRepository,AnnouncementAssetService
+from research.announcement_assets.access import AnnouncementAssetAccess
+import research.company_profile.candidate_registry as cr
+mark('imports_done')
+rc=config_manager.get_research_config();storage=ResearchStorageManager(rc)
+cfg=AnnouncementAssetConfig.from_research_config(rc,project_root=Path.cwd())
+repo=AnnouncementAssetRepository(Path(str(rc.storage.db_path)).resolve())
+svc=AnnouncementAssetService(repository=repo,config=cfg,acquisition_service=None,attachment_retriever=None)
+access=AnnouncementAssetAccess(repository=repo,config=cfg,service=svc)
+mark('dependencies_constructed',database=str(repo.db_path))
+for name in ['_resolve_universe_snapshot','build_a_share_candidate_registry']:
+ fn=getattr(cr,name)
+ def wrapper(*a,_fn=fn,_name=name,**kw):
+  mark(_name+'_start');s=time.monotonic();result=_fn(*a,**kw);mark(_name+'_end',seconds=time.monotonic()-s);return result
+ setattr(cr,name,wrapper)
+for name in ['_storage_industry_lookup','announcement_access_report_lookup']:
+ fn=getattr(cr,name)
+ def factory(*a,_fn=fn,_name=name,**kw):
+  lookup=_fn(*a,**kw);n=0;s=time.monotonic()
+  def counted(*a,**kw):
+   nonlocal n
+   if n==0:mark(_name+'_start')
+   result=lookup(*a,**kw);n+=1
+   if n%100==0:mark(_name+'_progress',count=n,seconds=time.monotonic()-s)
+   return result
+  return counted
+ setattr(cr,name,factory)
+mark('report_probes_start')
+loaded,_=cr._resolve_universe_snapshot(repo,as_of='2026-09-17',snapshot=None)
+rows=cr._snapshot_rows(loaded,'instruments','instrument_rows')
+mark('full_market_snapshot',count=len(rows))
+lookup=cr.announcement_access_report_lookup(access)
+for row in rows[:3]:
+ ins=cr._instrument_id(row);mark('report_probe_start',instrument_id=ins)
+ s=time.monotonic();r=lookup(ins,'2026-09-17');mark('report_probe_end',instrument_id=ins,seconds=time.monotonic()-s,asset_id=r.get('asset_id') if r else None)
+faulthandler.cancel_dump_traceback_later()
+raise SystemExit(0)
+mark('registry_start')
+registry=cr.load_official_task_candidate_registry(as_of='2026-09-17',storage=storage,shared_asset_access=access)
+mark('registry_done',counts=registry.counts,candidates=len(registry.candidates),sql_count=sql_count)
+faulthandler.cancel_dump_traceback_later()

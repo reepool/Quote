@@ -1,0 +1,31 @@
+{
+  "completed_at": "2026-10-15T02:30:49.042768+00:00",
+  "completed_sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v57_same_source_repair/company_profile_live_run.v1.json": "31576e13e2e63b0359f22e63b885ab500e7252a821e37c5fde411e37af6ba63a",
+    "data/checkpoints/company_profile_common_core/reports/m4_v57_same_source_repair/formal_execution.json": "c38d4b0c15ba3786d739375d765d5e07ca6e348ceb2a8b1acbfe45f5911fc482",
+    "data/checkpoints/company_profile_common_core/reports/m4_v57_same_source_repair/observation.json": "61e199a6c295ea7d158cf957f8c43800d4e4fa09571c6444b9f469844ed8a1d0",
+    "data/checkpoints/company_profile_common_core/reports/m4_v57_same_source_repair/plan.json": "1877264918bb5b0143f2be21404b7c8ec2b4f8142ea39a1ee87fea88d9a6e29e",
+    "data/exports/m4_v57_same_source_repair/600094.SH/600094.SH_2025-12-31.json": "42c68820421a51abc427a48f7fae25b963b3e54cbcfb842d6db1eca8a7d4e02e",
+    "data/exports/m4_v57_same_source_repair/600094.SH/export_manifest.json": "49fd8f649d220f50ef2cfa80b089e55d212e8cd243f7ca2144191b3afffc91f1",
+    "data/exports/m4_v57_same_source_repair/600094.SH/profiles.csv": "d53fc2167e7c50b6d2225028e59d11b9b42186d99572619a8e227a73f217c8bf",
+    "data/exports/m4_v57_same_source_repair/600103.SH/600103.SH_2025-12-31.json": "9efe5d67cde8bce27751ad841f10d3bf3f99e7d235c40dbf29201a105aff045b",
+    "data/exports/m4_v57_same_source_repair/600103.SH/export_manifest.json": "b77ca18f902cc2280c44439d3c89d037cb67181f49bb82ccfe4b437a6a2cb487",
+    "data/exports/m4_v57_same_source_repair/600103.SH/profiles.csv": "e66d2d4193ddfc7fd77ea965978f02c2b9bf16828af174c94cf9cf3bcc836155",
+    "data/research/company_profile_common_core/m4_v57_same_source_repair/company_profile_common_core.v1/bp-work-203efb9f5f1f1f8cad1aeff3.json": "c4fc0d550a9b7e98727c6acf31fea6c433fbc77f69b059b14484b5b20e099e84",
+    "data/research/company_profile_common_core/m4_v57_same_source_repair/company_profile_common_core.v1/bp-work-3d29676ac996bea74155f5ee.json": "bd55b2d4a7e21c42664e69d593f0fbfae02f95f3ae554294bdc38b616ba7c7a9",
+    "data/research/company_profile_common_core/m4_v57_same_source_repair/company_profile_common_core.v1/checkpoints/bp-work-203efb9f5f1f1f8cad1aeff3.json": "6fd4d9842a6e91b7b484ecb32f53a3e1bb54ea26255f069bc424432a674fab3a",
+    "data/research/company_profile_common_core/m4_v57_same_source_repair/company_profile_common_core.v1/checkpoints/bp-work-3d29676ac996bea74155f5ee.json": "18b5455365bbac2d440a77f8805c3a6b22a027c7372ef1f333f8f14c1e5145b3",
+    "data/research/company_profile_common_core/m4_v57_same_source_repair/company_profile_common_core.v1/scopes/600094.SH/2025-12-31/extract_business_overview.json": "f2b0609dce7233b7c68589b3ad323de02e741f7783c33597a7d821345d8a1ba5",
+    "data/research/company_profile_common_core/m4_v57_same_source_repair/company_profile_common_core.v1/scopes/600094.SH/2025-12-31/extract_segment_financials.json": "c49affb97b50889927cc6ee1401b4ea9c0602f7525ee49aad1557f74cd27d50c",
+    "data/research/company_profile_common_core/m4_v57_same_source_repair/company_profile_common_core.v1/scopes/600103.SH/2025-12-31/extract_business_overview.json": "bfae927044c220929096b608ddaa65e7284ecd49986a8d297486e511b4458697",
+    "data/research/company_profile_common_core/m4_v57_same_source_repair/company_profile_common_core.v1/scopes/600103.SH/2025-12-31/extract_material_inputs.json": "f2f1888482757a9d8ec13dfa756fa857068274ee206ef9f7681ae79566cb66c7",
+    "data/research/company_profile_common_core/m4_v57_same_source_repair/company_profile_common_core.v1/scopes/600103.SH/2025-12-31/extract_segment_financials.json": "0a995a5952a2a53ba6ef025da5291cc253a2cefc425b27a3d9479a9c714fc4fd",
+    "openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch/v57-special-attempt-start.json": "1a03e40f133ea02f00bdca097b5e972cae3ccc9a4c48594379a407832e8a5292",
+    "openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch/v57-special-formal-stacks.log": "4eca268062c6d031070b8da0e666dbab8de089a0f4b972feb7cbc14ed5f02a93",
+    "openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch/v57-special-formal-supervisor-receipt.json": "9fae347243eef52401f9dfa1737b0bab643fbc5aa1755c8a139829f0ce11c879",
+    "openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch/v57-special-formal.log": "913a8092a6066913eaa7d75889cdc491b141268a277f1186a00f0f14a1e9a1a4"
+  },
+  "protected_after_all_writers_ended": true,
+  "empty_paths": [],
+  "special_attempt_used": 1
+}

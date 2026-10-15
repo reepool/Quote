@@ -1,0 +1,96 @@
+{
+  "official_comparison": {
+    "600094.SH": {
+      "old_facts": 314,
+      "new_facts": 314,
+      "all_fields_except_category_and_record_id_equal": true,
+      "changed_categories": [],
+      "added_semantic_count": 0,
+      "removed_semantic_count": 0,
+      "six_answer_body_byte_equality": {
+        "answer:principal_business": true,
+        "answer:products_services": true,
+        "answer:revenue_model": true
+      }
+    },
+    "600103.SH": {
+      "old_facts": 392,
+      "new_facts": 392,
+      "all_fields_except_category_and_record_id_equal": true,
+      "changed_categories": [
+        {
+          "name": "十五五生态环境保护规划咨询",
+          "old_header": "本期采购商品",
+          "new_headers": [
+            "本期采购服务"
+          ],
+          "supplier": "交易对方：中碳（福建）生态科技有限公司"
+        },
+        {
+          "name": "清洁生产审核编制咨询",
+          "old_header": "本期采购商品",
+          "new_headers": [
+            "本期采购服务"
+          ],
+          "supplier": "交易对方：中碳（福建）生态科技有限公司"
+        },
+        {
+          "name": "第三方招聘测试",
+          "old_header": "本期采购商品",
+          "new_headers": [
+            "本期采购服务"
+          ],
+          "supplier": "交易对方：福建省轻纺（控股）有限责任公司"
+        },
+        {
+          "name": "堆场建设项目",
+          "old_header": "本期采购商品",
+          "new_headers": [
+            "本期采购服务"
+          ],
+          "supplier": "交易对方：福建省轻安工程建设有限公司"
+        }
+      ],
+      "added_semantic_count": 4,
+      "removed_semantic_count": 4,
+      "six_answer_body_byte_equality": {
+        "answer:principal_business": true,
+        "answer:products_services": true,
+        "answer:revenue_model": true
+      }
+    }
+  },
+  "source_scope_sha256": "52d2b6ad2904352959182c5392588b17e590528741b9483b0df061c056ab6c45",
+  "original_v55_b_score_preserved": {
+    "source_recall": {
+      "present": 307,
+      "total": 307
+    },
+    "source_accuracy": {
+      "correct": 712,
+      "total": 712
+    },
+    "critical_numeric_errors": 0
+  },
+  "a_correction": "v55-a-review-correction.json",
+  "v57_score": {
+    "source_recall": {
+      "present": 307,
+      "total": 307
+    },
+    "source_accuracy": {
+      "correct": 712,
+      "total": 712
+    },
+    "critical_numeric_errors": 0,
+    "negative_passed": 44,
+    "negative_total": 44,
+    "supplemental_classification_passed": 4
+  },
+  "old_successors_used": 2,
+  "old_successors_authorized": 2,
+  "special_attempt_used": 1,
+  "special_attempt_authorized": 1,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

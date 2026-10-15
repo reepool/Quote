@@ -1,0 +1,17 @@
+import faulthandler,json,time
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from copy import deepcopy
+from utils import config_manager
+from research.storage import ResearchStorageManager
+from research.company_profile.operations import CompanyProfileTaskService
+faulthandler.dump_traceback_later(5,repeat=True)
+with TemporaryDirectory(prefix='v57-service-') as d:
+ rc=deepcopy(config_manager.get_research_config())
+ for field in ['db_path','financials_db_path','valuation_db_path','interests_db_path']:
+  setattr(rc.storage,field,str(Path(d)/(field+'.db')))
+ rc.storage.attach_quotes_db=False
+ storage=ResearchStorageManager(rc)
+ start=time.monotonic();service=CompanyProfileTaskService(storage=storage,output_root=Path(d)/'out',checkpoint_root=Path(d)/'checkpoint')
+ print(json.dumps(dict(service_construction_seconds=time.monotonic()-start,isolated_directory=d,formal_run_called=False,live_database_access=False,initialization_performed=True)),flush=True)
+faulthandler.cancel_dump_traceback_later()

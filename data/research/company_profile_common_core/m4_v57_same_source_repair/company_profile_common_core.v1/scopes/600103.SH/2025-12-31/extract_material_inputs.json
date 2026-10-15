@@ -1,0 +1,244 @@
+{
+  "schema_version": "company_profile_scope_checkpoint.v1",
+  "instrument_id": "600103.SH",
+  "report_period": "2025-12-31",
+  "chapter_task": "extract_material_inputs",
+  "source_digest": "fe7fb0ad95b3cdfc8f8effd64d471aa8ffa201c4482b5abc4c204f8940373e5f",
+  "policy_version": "company_profile_common_core_mapping.v1",
+  "processing_identity": {
+    "material_input_facts": "v1",
+    "owned_page_facts": "v8",
+    "revenue_sentence_repair": "v57",
+    "rules": "company_profile_common_core.v1"
+  },
+  "task_complete": true,
+  "task_result": {
+    "schema_version": "company_profile_task_result.v1",
+    "request_id": "bp-work-3d29676ac996bea74155f5ee:extract_material_inputs",
+    "records": [
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-cd5203d24a3449ed:material:木片",
+        "field_id": "material_input",
+        "chapter_task": "extract_material_inputs",
+        "report": {
+          "instrument_id": "600103.SH",
+          "report_id": "asset_8b9f5d55d0b4994730a369e372efb3d0",
+          "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-13T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "issuer",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-cd5203d24a3449ed",
+            "report": {
+              "instrument_id": "600103.SH",
+              "report_id": "asset_8b9f5d55d0b4994730a369e372efb3d0",
+              "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-13T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 10,
+            "printed_page_label": null,
+            "section_title": "主要原材料",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "福建省青山纸业股份有限公司2025 年年度报告\r\n10 / 220\r\n性纸袋纸被评为制造业单项冠军产品，市场占有率位居全国第一；“水仙牌”风油精系国内传统\r\n品牌，家喻户晓，被列入“福建省制造业单项冠军产品名录”；竹溶解浆为国内首创以毛竹为原\r\n料的溶解浆产品，公司充分发挥已成功研发并规模投产竹溶解浆这一经验优势和市场优势，不断\r\n向纵深拓展浆纸的其他高端化运用场景。\r\n报告期内，公司所从事的主要业务未发生重大变化，公司及子公司主要产品及用途如下：\r\n序号 行业类型 母子公司 产品名称 产品说明及用途\r\n1 制浆行业 母公司\r\n本色木浆\r\n保留木片纤维中纤维素和半纤维素，去除部分木质素\r\n获得的硫酸盐法化学浆，用于抄造各种纸张、纸浆模\r\n塑及其他纸制品。\r\n漂白木浆\r\n（针叶、阔叶）\r\n保留木片纤维中纤维素和半纤维素，加入漂白助剂，\r\n去除木质素获得的硫酸盐法化学浆，用于抄造白色纸\r\n张、纸浆模塑、各种卫生用品的绒毛浆及其他纸制品。\r\n本色竹浆\r\n保留竹片纤维中纤维素和半纤维素，去除部分木质素\r\n获得的硫酸盐法化学浆，用于抄造本色纸张、纸浆模\r\n塑及其他纸制品。\r\n漂白竹浆\r\n保留竹片纤维中纤维素和半纤维素，加入漂白助剂，\r\n去除木质素获得的硫酸盐法化学浆，用于抄造白色纸\r\n张、纸浆模塑及其他纸制品。\r\n木溶解浆\r\n保留木片纤维中纤维素，去除大部分半纤维素，去除\r\n全部木质素获得的高甲纤漂白浆料，用于纺织用粘胶\r\n纤维。\r\n竹溶解浆\r\n保留竹片纤维中纤维素，去除大部分半纤维素，去除\r\n全部木质素获得的高甲纤漂白浆料，用于纺织用粘胶\r\n纤维。\r\n2 造纸行业 母公司\r\n纸袋纸\r\n广泛用于水泥、化工、建材、食品、工业、饲料等包\r\n装用纸。\r\n复合原纸\r\n广泛用于水泥、化工、建材、食品、工业、饲料等包\r\n装用纸。\r\n手提袋纸 用于制作各种款式的手提袋子。\r\n牛皮卡纸 用于纸箱、纸袋用纸。\r\n3 纸制品加工 子公司\r\n纸箱 产品包装用。\r\n纸板 制作纸箱用，或用于建材。\r\n纸袋\r\n广泛用于水泥、化工、建材、食品、工业、饲料等包\r\n装用。\r\n4 医药行业 子公司\r\n风油精 清凉、止痛、驱风、止痒。\r\n无极膏 消炎、镇痛、止痒、抗菌、局部麻醉作用。\r\n软脉灵 滋补肝肾，益气活血，软化血管。\r\n5 电子通讯行\r\n业\r\n子公司 光电子器件\r\n为数据中心、数据通信等光纤传输、接入系统提供高\r\n速光模块产品。\r\n6 林业 子公司 木材、竹材 森林培育、营造、管护，木材、竹材生产销售。\r\n2、公司的主要经营模式",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "木片",
+          "value": null,
+          "unit": null,
+          "header": "母公司产品生产工艺原料",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Relationship",
+        "relation_type": "material_input",
+        "object_name": "木片",
+        "identity_class": null,
+        "external_entity_id": null
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-cd5203d24a3449ed:material:竹片",
+        "field_id": "material_input",
+        "chapter_task": "extract_material_inputs",
+        "report": {
+          "instrument_id": "600103.SH",
+          "report_id": "asset_8b9f5d55d0b4994730a369e372efb3d0",
+          "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-13T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "issuer",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-cd5203d24a3449ed",
+            "report": {
+              "instrument_id": "600103.SH",
+              "report_id": "asset_8b9f5d55d0b4994730a369e372efb3d0",
+              "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-13T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 10,
+            "printed_page_label": null,
+            "section_title": "主要原材料",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "福建省青山纸业股份有限公司2025 年年度报告\r\n10 / 220\r\n性纸袋纸被评为制造业单项冠军产品，市场占有率位居全国第一；“水仙牌”风油精系国内传统\r\n品牌，家喻户晓，被列入“福建省制造业单项冠军产品名录”；竹溶解浆为国内首创以毛竹为原\r\n料的溶解浆产品，公司充分发挥已成功研发并规模投产竹溶解浆这一经验优势和市场优势，不断\r\n向纵深拓展浆纸的其他高端化运用场景。\r\n报告期内，公司所从事的主要业务未发生重大变化，公司及子公司主要产品及用途如下：\r\n序号 行业类型 母子公司 产品名称 产品说明及用途\r\n1 制浆行业 母公司\r\n本色木浆\r\n保留木片纤维中纤维素和半纤维素，去除部分木质素\r\n获得的硫酸盐法化学浆，用于抄造各种纸张、纸浆模\r\n塑及其他纸制品。\r\n漂白木浆\r\n（针叶、阔叶）\r\n保留木片纤维中纤维素和半纤维素，加入漂白助剂，\r\n去除木质素获得的硫酸盐法化学浆，用于抄造白色纸\r\n张、纸浆模塑、各种卫生用品的绒毛浆及其他纸制品。\r\n本色竹浆\r\n保留竹片纤维中纤维素和半纤维素，去除部分木质素\r\n获得的硫酸盐法化学浆，用于抄造本色纸张、纸浆模\r\n塑及其他纸制品。\r\n漂白竹浆\r\n保留竹片纤维中纤维素和半纤维素，加入漂白助剂，\r\n去除木质素获得的硫酸盐法化学浆，用于抄造白色纸\r\n张、纸浆模塑及其他纸制品。\r\n木溶解浆\r\n保留木片纤维中纤维素，去除大部分半纤维素，去除\r\n全部木质素获得的高甲纤漂白浆料，用于纺织用粘胶\r\n纤维。\r\n竹溶解浆\r\n保留竹片纤维中纤维素，去除大部分半纤维素，去除\r\n全部木质素获得的高甲纤漂白浆料，用于纺织用粘胶\r\n纤维。\r\n2 造纸行业 母公司\r\n纸袋纸\r\n广泛用于水泥、化工、建材、食品、工业、饲料等包\r\n装用纸。\r\n复合原纸\r\n广泛用于水泥、化工、建材、食品、工业、饲料等包\r\n装用纸。\r\n手提袋纸 用于制作各种款式的手提袋子。\r\n牛皮卡纸 用于纸箱、纸袋用纸。\r\n3 纸制品加工 子公司\r\n纸箱 产品包装用。\r\n纸板 制作纸箱用，或用于建材。\r\n纸袋\r\n广泛用于水泥、化工、建材、食品、工业、饲料等包\r\n装用。\r\n4 医药行业 子公司\r\n风油精 清凉、止痛、驱风、止痒。\r\n无极膏 消炎、镇痛、止痒、抗菌、局部麻醉作用。\r\n软脉灵 滋补肝肾，益气活血，软化血管。\r\n5 电子通讯行\r\n业\r\n子公司 光电子器件\r\n为数据中心、数据通信等光纤传输、接入系统提供高\r\n速光模块产品。\r\n6 林业 子公司 木材、竹材 森林培育、营造、管护，木材、竹材生产销售。\r\n2、公司的主要经营模式",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "竹片",
+          "value": null,
+          "unit": null,
+          "header": "母公司产品生产工艺原料",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Relationship",
+        "relation_type": "material_input",
+        "object_name": "竹片",
+        "identity_class": null,
+        "external_entity_id": null
+      },
+      {
+        "schema_version": "company_profile_semantic_object.v1",
+        "record_id": "owned:core-ev-cd5203d24a3449ed:material:漂白助剂",
+        "field_id": "material_input",
+        "chapter_task": "extract_material_inputs",
+        "report": {
+          "instrument_id": "600103.SH",
+          "report_id": "asset_8b9f5d55d0b4994730a369e372efb3d0",
+          "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+          "report_period": "2025-12-31",
+          "published_at": "2026-04-13T16:00:00+00:00",
+          "document_type": "annual_report"
+        },
+        "subject_scope": "issuer",
+        "subject_name": null,
+        "subject_basis": "direct_source_wording",
+        "reported_period": "2025-12-31",
+        "period_type": "duration",
+        "knowledge_time": null,
+        "assertion_class": "reported_fact",
+        "evidence": [
+          {
+            "evidence_id": "core-ev-cd5203d24a3449ed",
+            "report": {
+              "instrument_id": "600103.SH",
+              "report_id": "asset_8b9f5d55d0b4994730a369e372efb3d0",
+              "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+              "report_period": "2025-12-31",
+              "published_at": "2026-04-13T16:00:00+00:00",
+              "document_type": "annual_report"
+            },
+            "page": 10,
+            "printed_page_label": null,
+            "section_title": "主要原材料",
+            "continuation_pages": [],
+            "subject_evidence_pages": [],
+            "anchor": {
+              "anchor_type": "text",
+              "bounded_quote": "福建省青山纸业股份有限公司2025 年年度报告\r\n10 / 220\r\n性纸袋纸被评为制造业单项冠军产品，市场占有率位居全国第一；“水仙牌”风油精系国内传统\r\n品牌，家喻户晓，被列入“福建省制造业单项冠军产品名录”；竹溶解浆为国内首创以毛竹为原\r\n料的溶解浆产品，公司充分发挥已成功研发并规模投产竹溶解浆这一经验优势和市场优势，不断\r\n向纵深拓展浆纸的其他高端化运用场景。\r\n报告期内，公司所从事的主要业务未发生重大变化，公司及子公司主要产品及用途如下：\r\n序号 行业类型 母子公司 产品名称 产品说明及用途\r\n1 制浆行业 母公司\r\n本色木浆\r\n保留木片纤维中纤维素和半纤维素，去除部分木质素\r\n获得的硫酸盐法化学浆，用于抄造各种纸张、纸浆模\r\n塑及其他纸制品。\r\n漂白木浆\r\n（针叶、阔叶）\r\n保留木片纤维中纤维素和半纤维素，加入漂白助剂，\r\n去除木质素获得的硫酸盐法化学浆，用于抄造白色纸\r\n张、纸浆模塑、各种卫生用品的绒毛浆及其他纸制品。\r\n本色竹浆\r\n保留竹片纤维中纤维素和半纤维素，去除部分木质素\r\n获得的硫酸盐法化学浆，用于抄造本色纸张、纸浆模\r\n塑及其他纸制品。\r\n漂白竹浆\r\n保留竹片纤维中纤维素和半纤维素，加入漂白助剂，\r\n去除木质素获得的硫酸盐法化学浆，用于抄造白色纸\r\n张、纸浆模塑及其他纸制品。\r\n木溶解浆\r\n保留木片纤维中纤维素，去除大部分半纤维素，去除\r\n全部木质素获得的高甲纤漂白浆料，用于纺织用粘胶\r\n纤维。\r\n竹溶解浆\r\n保留竹片纤维中纤维素，去除大部分半纤维素，去除\r\n全部木质素获得的高甲纤漂白浆料，用于纺织用粘胶\r\n纤维。\r\n2 造纸行业 母公司\r\n纸袋纸\r\n广泛用于水泥、化工、建材、食品、工业、饲料等包\r\n装用纸。\r\n复合原纸\r\n广泛用于水泥、化工、建材、食品、工业、饲料等包\r\n装用纸。\r\n手提袋纸 用于制作各种款式的手提袋子。\r\n牛皮卡纸 用于纸箱、纸袋用纸。\r\n3 纸制品加工 子公司\r\n纸箱 产品包装用。\r\n纸板 制作纸箱用，或用于建材。\r\n纸袋\r\n广泛用于水泥、化工、建材、食品、工业、饲料等包\r\n装用。\r\n4 医药行业 子公司\r\n风油精 清凉、止痛、驱风、止痒。\r\n无极膏 消炎、镇痛、止痒、抗菌、局部麻醉作用。\r\n软脉灵 滋补肝肾，益气活血，软化血管。\r\n5 电子通讯行\r\n业\r\n子公司 光电子器件\r\n为数据中心、数据通信等光纤传输、接入系统提供高\r\n速光模块产品。\r\n6 林业 子公司 木材、竹材 森林培育、营造、管护，木材、竹材生产销售。\r\n2、公司的主要经营模式",
+              "context_before": null,
+              "context_after": null,
+              "match_index": 0
+            }
+          }
+        ],
+        "source_native": {
+          "name": "漂白助剂",
+          "value": null,
+          "unit": null,
+          "header": "母公司产品生产工艺原料",
+          "qualifier": null,
+          "footnote_refs": [],
+          "source_aliases": []
+        },
+        "uncertainty": [],
+        "data_status": "research_fixture",
+        "object_type": "Relationship",
+        "relation_type": "material_input",
+        "object_name": "漂白助剂",
+        "identity_class": null,
+        "external_entity_id": null
+      }
+    ],
+    "dispositions": [
+      {
+        "target_id": "owned:core-ev-cd5203d24a3449ed:material:木片",
+        "field_id": "material_input",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-cd5203d24a3449ed:material:漂白助剂",
+        "field_id": "material_input",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      },
+      {
+        "target_id": "owned:core-ev-cd5203d24a3449ed:material:竹片",
+        "field_id": "material_input",
+        "status": "accepted_for_review",
+        "reason_codes": []
+      }
+    ],
+    "coverage": [
+      {
+        "schema_version": "company_profile_coverage_result.v1",
+        "field_id": "material_input",
+        "chapter_task": "extract_material_inputs",
+        "requirement_level": "conditional",
+        "status": "observed",
+        "reason_code": null,
+        "reason": null,
+        "evidence": [],
+        "reason_evidence_text": null
+      }
+    ],
+    "human_review_items": [],
+    "task_complete": true,
+    "provider_calls": [],
+    "production_authorization": "not_authorized"
+  }
+}

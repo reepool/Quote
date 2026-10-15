@@ -1,0 +1,30 @@
+[32m.[0m[31mF[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[31m                                    [100%][0m
+=================================== FAILURES ===================================
+[31m[1m_____ test_registry_read_scope_preserves_full_denominator_and_every_lookup _____[0m
+[1m[31mtests/unit/test_research/test_company_profile_entry_recovery.py[0m:78: in test_registry_read_scope_preserves_full_denominator_and_every_lookup
+    [0mscoped = load_official_task_candidate_registry([90m[39;49;00m
+[1m[31mresearch/company_profile/candidate_registry.py[0m:281: in load_official_task_candidate_registry
+    [0m[94mreturn[39;49;00m load_a_share_candidate_registry([90m[39;49;00m
+[1m[31mresearch/company_profile/candidate_registry.py[0m:211: in load_a_share_candidate_registry
+    [0mloaded, coverage_guarantee = _resolve_universe_snapshot([90m[39;49;00m
+[1m[31mresearch/company_profile/candidate_registry.py[0m:497: in _resolve_universe_snapshot
+    [0mloaded = as_of_full(as_of)[90m[39;49;00m
+[1m[31mresearch/announcement_assets/repository.py[0m:4467: in get_full_market_universe_snapshot_as_of
+    [0m[94mreturn[39;49;00m [96mself[39;49;00m._select_full_market_universe_snapshot(as_of=[96mstr[39;49;00m(as_of).strip())[90m[39;49;00m
+[1m[31mresearch/announcement_assets/repository.py[0m:4495: in _select_full_market_universe_snapshot
+    [0mrows = conn.execute([90m[39;49;00m
+[1m[31mE   sqlite3.OperationalError: no such table: official_asset_universe_snapshots[0m
+============================= slowest 10 durations =============================
+32.37s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600103.SH-v56]
+28.56s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600103.SH-v57]
+25.90s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600094.SH-v56]
+22.61s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600094.SH-v57]
+0.42s call     tests/unit/test_research/test_company_profile_entry_recovery.py::test_asset_read_scope_reuses_connection_and_restores_after_exception
+0.31s call     tests/unit/test_research/test_company_profile_candidate_registry.py::test_schema_manifest_is_registered_before_use
+0.02s call     tests/unit/test_research/test_company_profile_candidate_registry.py::test_official_history_code_resolves_bank_l1_to_finance
+0.02s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_wrapped_trade_row_keeps_original_identity
+0.02s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_wrapped_purchase_services_do_not_become_goods
+0.02s call     tests/unit/test_research/test_company_profile_entry_recovery.py::test_registry_read_scope_preserves_full_denominator_and_every_lookup
+[36m[1m=========================== short test summary info ============================[0m
+[31mFAILED[0m tests/unit/test_research/test_company_profile_entry_recovery.py::[1mtest_registry_read_scope_preserves_full_denominator_and_every_lookup[0m - sqlite3.OperationalError: no such table: official_asset_universe_snapshots
+[31m[31m[1m1 failed[0m, [32m36 passed[0m, [33m7 warnings[0m[31m in 114.26s (0:01:54)[0m[0m

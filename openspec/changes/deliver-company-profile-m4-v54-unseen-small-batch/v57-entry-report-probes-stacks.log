@@ -1,0 +1,43 @@
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+Timeout (0:00:08)!
+Thread 0x00007fc831ea3740 (most recent call first):
+  File "/home/python/Quote/research/storage.py", line 10705 in _apply_pragmas
+  File "/home/python/Quote/research/storage.py", line 8842 in resolve_industry_taxonomy_l1_name
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 645 in _with_taxonomy_l1_name
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 292 in lookup
+  File "/tmp/v57_entry_diagnostic.py", line 54 in counted
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 231 in <dictcomp>
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 230 in load_a_share_candidate_registry
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 278 in load_official_task_candidate_registry
+  File "/tmp/v57_entry_diagnostic.py", line 60 in <module>
+Timeout (0:00:08)!
+Thread 0x00007fc831ea3740 (most recent call first):
+  File "/home/python/Quote/research/storage.py", line 10705 in _apply_pragmas
+  File "/home/python/Quote/research/storage.py", line 8745 in get_industry_membership_as_of
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 290 in lookup
+  File "/tmp/v57_entry_diagnostic.py", line 54 in counted
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 231 in <dictcomp>
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 230 in load_a_share_candidate_registry
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 278 in load_official_task_candidate_registry
+  File "/tmp/v57_entry_diagnostic.py", line 60 in <module>
+Timeout (0:00:08)!
+Thread 0x00007fc831ea3740 (most recent call first):
+  File "/home/python/Quote/research/storage.py", line 8746 in get_industry_membership_as_of
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 290 in lookup
+  File "/tmp/v57_entry_diagnostic.py", line 54 in counted
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 231 in <dictcomp>
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 230 in load_a_share_candidate_registry
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 278 in load_official_task_candidate_registry
+  File "/tmp/v57_entry_diagnostic.py", line 60 in <module>
+Timeout (0:00:08)!
+Thread 0x00007fc831ea3740 (most recent call first):
+  File "/home/python/Quote/research/storage.py", line 633 in get_connection
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/contextlib.py", line 144 in __exit__
+  File "/home/python/Quote/research/storage.py", line 8744 in get_industry_membership_as_of
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 290 in lookup
+  File "/tmp/v57_entry_diagnostic.py", line 54 in counted
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 231 in <dictcomp>
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 230 in load_a_share_candidate_registry
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 278 in load_official_task_candidate_registry
+  File "/tmp/v57_entry_diagnostic.py", line 60 in <module>

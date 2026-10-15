@@ -1,0 +1,6 @@
+import importlib,subprocess,pytest
+for name,path in [('research.announcement_assets.repository','research/announcement_assets/repository.py'),('research.company_profile.candidate_registry','research/company_profile/candidate_registry.py'),('research.company_profile.operations','research/company_profile/operations.py')]:
+ module=importlib.import_module(name)
+ source=subprocess.check_output(['git','show','HEAD:'+path],text=True)
+ exec(compile(source,path,'exec'),module.__dict__)
+raise SystemExit(pytest.main(['-q','tests/unit/test_research/test_company_profile_live_run.py','tests/unit/test_research/test_company_profile_publication.py','-k','budget_limited_live_run_saves or live_run_does_not_drain or duplicate_named_ids or in_flight_official_run_stops']))

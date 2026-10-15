@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import inspect
 from collections.abc import Callable, Mapping, Sequence
+from contextlib import nullcontext
 from typing import Any, Literal, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -275,12 +276,16 @@ def load_official_task_candidate_registry(
     repository = getattr(shared_asset_access, "repository", None)
     if repository is None:
         raise ValueError("official live run requires a universe repository")
-    return load_a_share_candidate_registry(
-        universe_repository=repository,
-        industry_lookup=_storage_industry_lookup(storage),
-        effective_report_lookup=announcement_access_report_lookup(shared_asset_access),
-        as_of=as_of,
-    )
+    read_scope = getattr(repository, "read_connection_scope", None)
+    with read_scope() if callable(read_scope) else nullcontext():
+        return load_a_share_candidate_registry(
+            universe_repository=repository,
+            industry_lookup=_storage_industry_lookup(storage),
+            effective_report_lookup=announcement_access_report_lookup(
+                shared_asset_access
+            ),
+            as_of=as_of,
+        )
 
 
 def _storage_industry_lookup(storage: Any) -> IndustryLookup:

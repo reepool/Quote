@@ -34,3 +34,14 @@ Current related-party purchases MUST preserve the disclosed content category alo
 #### Scenario: A current consulting purchase is present
 - **WHEN** the complete p199–200 purchase table discloses a current consulting, recruitment testing or construction purchase
 - **THEN** the accepted/query/export object retains the complete name and supplier as a service or construction purchase, while real goods and prior-only blanks preserve their original treatment
+
+### Requirement: Bounded entry recovery precedes the separate special attempt
+After v56 timed out without formal scores, B MUST diagnose the pre-enqueue path with bounded read-only probes and preserved timing, stack or SQL evidence, without calling formal run. Only an evidenced local blocker MAY be corrected. Full-market membership, official source validation, the default identity and business semantics MUST remain unchanged. Isolated validation MUST demonstrate recovery and termination with evidence when a synchronous call blocks. Registry and service-construction time MUST consume the run budget.
+
+#### Scenario: The restored entry is ready for the special attempt
+- **WHEN** diagnosis, isolated recovery, direct regression and scoped Review pass
+- **THEN** B may use A's separately authorized single special formal attempt with a new complete identity and directory, retaining original successors at 2/2, unchanged 307 positives, 44 negatives and four purchase-category assertions, whole-round time <=300 seconds including registry/PDF/layout/retries and shared tokens <=50000
+
+#### Scenario: The special attempt finishes or fails
+- **WHEN** the separate special attempt has been started once
+- **THEN** it is counted 1/1, all available results are protected and submitted to A without another run, archive, expansion or next pair

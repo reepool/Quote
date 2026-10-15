@@ -1,0 +1,7 @@
+[32m.[0m[32m.[0m[33m                                                                       [100%][0m
+============================= slowest 10 durations =============================
+28.09s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600103.SH-v57]
+21.70s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600094.SH-v57]
+
+(4 durations < 0.005s hidden.  Use -vv to show these durations.)
+[33m[32m2 passed[0m, [33m[1m10 deselected[0m, [33m[1m7 warnings[0m[33m in 51.16s[0m[0m

@@ -41,3 +41,8 @@ Tasks 4.5/4.6 follow A/B workflow v1 continuously: current-owner purchase classi
 ## Final successor failed to complete within the authorized budget
 
 v56 was started once as successor 2/2. More than 300 seconds elapsed after the flushed start marker without a new identity work item or output; it was interrupted and all available attempt artifacts were protected. No formal scores, token total or completed first-run-to-second-export timing exist. Local 307/307 and 712/712 are not formal results. The blocking call was not stack-captured; the precise operational cause is unknown. No new performance/framework work or another execution is authorized. 4.6 and finite acceptance remain unmet, 5.1 remains conditional, and exhausted-attempt failure goes to A.
+
+
+## A-authorized bounded entry recovery and one separate special attempt
+
+The preceding exhausted-attempt state remains historical. A subsequently authorized tasks 4.7/4.8: read-only bounded diagnosis of the actual pre-enqueue blocker, minimal necessary correction and isolated recovery/timeout evidence, followed conditionally by one separately counted special formal attempt. Original successors remain 2/2. Registry, service construction, PDF/layout and retries must remain inside the continuous 300-second formal measurement; shared tokens remain 50000. The same 307 positives, 44 negatives and four classification assertions, full-market denominator, official integrity checks and default identity remain unchanged. A finite review is still required before 5.1; no archive, expansion or next pair is authorized.

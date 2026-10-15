@@ -1,0 +1,57 @@
+{
+  "verified_at": "2026-10-15T02:26:57.056324+00:00",
+  "diagnosis": "v57-entry-diagnosis-receipt.json",
+  "synchronous_timeout_evidence": "v57-synchronous-block-proof-supervisor-receipt.json",
+  "local_full_owner": "v57-local-closure-receipt.json",
+  "review": {
+    "blocking_fixed": [
+      "Measured per-instrument asset repository connection overhead during full registry load",
+      "Pre-enqueue registry and service construction time omitted from internal elapsed budget"
+    ],
+    "checks": [
+      "Per-load read-only connection uses thread-local state; nested scope and exceptions close/reset; other threads and later writes remain independent",
+      "Registry fields/hash identical for all 5564 companies before/after",
+      "Official selection/integrity and source semantics unchanged; no row cache or index",
+      "v57 five cumulative switches, exact asset enqueue and runtime actor expansion; default unchanged",
+      "Outer isolated process deadline includes all synchronous entry/PDF/layout/retries; deliberate block killed with stack"
+    ],
+    "unrelated_baseline_failures": {
+      "current": "v57-entry-regressions.log: 21 passed, 5 failed",
+      "comparison": "v57-old-tests-baseline-comparison.log: same 5 failed with HEAD repository/registry/operations definitions; no repository source files swapped",
+      "classification": "C: pre-existing synthetic live/publication failures, deferred"
+    },
+    "nonblocking_expansion": "none undertaken",
+    "remaining_in_scope_blockers": 0
+  },
+  "validation": {
+    "first_combination": "36 passed, 1 failed (new synthetic registry fixture omitted as-of getter); fixture corrected, final entry 4 passed",
+    "current_business": "v57 complete official owner inputs 2 passed, 10 deselected; all 706 facts +6 bodies independently rescored local 712/712; 307 positives/44 negatives/4 assertions",
+    "candidate_tests": "all candidate registry cases passed in first 36-pass combination",
+    "static": "Ruff 7 Python files; format six whole files + registry changed range; diff check; four OpenSpec strict targets passed",
+    "old_semantics": "Full v56/v57 source input cases passed in first combination; v56 classifier and old v54/v53 semantic regression receipts retained, unchanged business implementation"
+  },
+  "protected_counts": {
+    "existing": 19,
+    "first": 18,
+    "first_review": 6,
+    "v55_first": 19,
+    "v55_review": 12,
+    "v56_partial_attempt": 4,
+    "v56_review": 20,
+    "first-executed-code-snapshot.json": 38,
+    "v55-executed-code-snapshot.json": 38,
+    "v56-executed-code-snapshot.json": 38
+  },
+  "history_receipt_reused": {
+    "file": "v56-source-freeze-receipt.json",
+    "count": 3519,
+    "same_immutable_snapshot": true,
+    "new_full_history_rehash": false
+  },
+  "original_successors_used": 2,
+  "special_attempt_used": 0,
+  "special_attempt_authorized": 1,
+  "conditions_for_special_attempt_met": true,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

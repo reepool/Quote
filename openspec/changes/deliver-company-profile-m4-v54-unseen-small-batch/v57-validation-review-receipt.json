@@ -1,0 +1,54 @@
+{
+  "verified_at": "2026-10-15T02:35:35.159362+00:00",
+  "preformal": "v57-entry-recovery-review-receipt.json",
+  "formal_readonly": "v57-readonly-verification-receipt.json",
+  "formal_gates": {
+    "all_contract": true,
+    "all_dynamic_unique": true,
+    "numeric_zero": true,
+    "all_negatives": true,
+    "supplemental_classification": true,
+    "whole_round": true,
+    "shared_tokens": true
+  },
+  "outer_supervisor": {
+    "started_at": "2026-10-15T02:27:23.577638+00:00",
+    "finished_at": "2026-10-15T02:30:48.807023+00:00",
+    "elapsed_seconds": 205.22935226932168,
+    "hard_limit_seconds": 300.0,
+    "timed_out": false,
+    "returncode": 0,
+    "formal_run_called": true,
+    "synchronous_block_proof": false,
+    "stack_dump_requested_on_deadline_approach": true
+  },
+  "old_successors_used": 2,
+  "special_attempt_used": 1,
+  "special_attempt_authorized": 1,
+  "a_finite_acceptance": "pending",
+  "remaining_in_scope_blockers_observed_by_b": 0,
+  "mechanical_script_correction": {
+    "original": "v57-readonly-verification-script.txt",
+    "first_readonly_guarded_probe": "v57-readonly-verification-corrected-script.txt",
+    "used": "v57-readonly-verification-final-script.txt",
+    "changes": [
+      "Historical v55 entry hash key read from original v56-workspace-baseline.json; original frozen script retained.",
+      "First read-only guarded source-owner replay refused its controlled read-lease write, returning None; this failure is retained in v57-readonly-verify.log. No formal run or score changed.",
+      "Final verification uses the existing CompanyProfileReadService and read-only SQLite; validates formal bound asset/report against official PDF hashes, independently rereads 73 source text pages/73 layouts, and reuses unchanged full-input owner-equivalence receipt from v55 instead of repeating a lease-writing asset access."
+    ]
+  },
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "supervisor_receipt_interpretation": {
+    "stack_dump_requested_on_deadline_approach": "Original receipt field is the enabled configuration, not an event count. Normal formal round returned before deadline branch; no stack signal sent. The isolated blocking proof did trigger the signal and kill."
+  },
+  "final_checks": {
+    "checked_at": "2026-10-15T02:37:02.601021+00:00",
+    "ruff": "7 files passed",
+    "format": "6 whole files + only modified candidate_registry range passed (old unrelated format retained)",
+    "openspec": "current change and 3 directly relevant main specifications strict passed",
+    "diff_check": "Code/spec/task scoped check passed. Full staged default check flags four native CSV CRLF line ends and one truncated diagnostic stack trailing space. Original artifacts preserved byte-for-byte; check with cr-at-eol and exclusion of that single immutable stack log passes.",
+    "source_and_historical_protection": "v57-final-protection-verification.json",
+    "review_classification": "A: entry connection overhead and preparation budget corrected; C: 5 identical HEAD failures deferred; no known remaining B-side scope blocker"
+  }
+}

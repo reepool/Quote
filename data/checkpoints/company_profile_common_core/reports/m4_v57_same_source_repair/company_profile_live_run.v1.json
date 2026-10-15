@@ -1,0 +1,177 @@
+{
+  "schema_version": "company_profile_live_run.v1",
+  "production_authorization": "not_authorized",
+  "knowledge_cutoff": "2026-09-17",
+  "plan": {
+    "schema_version": "company_profile_live_plan.v1",
+    "production_authorization": "not_authorized",
+    "plan_status": "recorded_before_live",
+    "live_task_started": false,
+    "budget": {
+      "max_companies_this_round": 2,
+      "min_companies_this_round": 0,
+      "token_budget": 50000,
+      "max_elapsed_seconds": 129.96646684408188,
+      "require_fifty_companies": false
+    },
+    "sampling": {
+      "method": "predeclared_stratified_sample",
+      "purpose": "independent_source_review",
+      "allocation": "priority_round_robin_then_instrument_id",
+      "selection_key": "instrument_id_ascending",
+      "missing_classification_stratum": "other",
+      "empty_stratum_policy": "keep_in_universe_skip_draw",
+      "exchange_strata": [
+        "SSE",
+        "SZSE",
+        "BSE"
+      ],
+      "disclosure_form_strata": [
+        "manufacturing",
+        "service",
+        "finance",
+        "other"
+      ],
+      "stratum_priority": [
+        [
+          "SSE",
+          "manufacturing"
+        ],
+        [
+          "SZSE",
+          "manufacturing"
+        ],
+        [
+          "BSE",
+          "manufacturing"
+        ],
+        [
+          "SSE",
+          "service"
+        ],
+        [
+          "SZSE",
+          "service"
+        ],
+        [
+          "BSE",
+          "service"
+        ],
+        [
+          "SSE",
+          "finance"
+        ],
+        [
+          "SZSE",
+          "finance"
+        ],
+        [
+          "BSE",
+          "finance"
+        ],
+        [
+          "SSE",
+          "other"
+        ],
+        [
+          "SZSE",
+          "other"
+        ],
+        [
+          "BSE",
+          "other"
+        ]
+      ],
+      "per_stratum_first_draw": 1,
+      "max_sample_size": 2,
+      "review_eligible_asset_status": "available",
+      "review_requires_latest_effective_annual_report": true,
+      "excludes_from_universe": false,
+      "used_to_fit_thresholds": false
+    },
+    "universe_denominator": {
+      "policy_version": "a_share_full_market.v1",
+      "exchanges": [
+        "SSE",
+        "SZSE",
+        "BSE"
+      ],
+      "as_of": "declared_at_run_from_knowledge_cutoff",
+      "includes_missing_assets": true,
+      "includes_missing_classification": true
+    },
+    "recall_denominator": {
+      "definition": "independently_read_important_disclosures_from_sampled_official_reports",
+      "forbidden_sources": [
+        "model_listed_fields",
+        "evidence_id_existence",
+        "gold24_equality"
+      ]
+    },
+    "expansion_thresholds": {
+      "numeric_thresholds_basis": "operator_cost_constraint",
+      "min_independently_reviewed_reports": 2,
+      "min_occupied_strata_reviewed": 2,
+      "min_source_recall_ratio": 1.0,
+      "min_source_accuracy_ratio": 1.0,
+      "max_critical_numeric_errors": 0,
+      "max_tokens": 50000,
+      "max_elapsed_seconds": 129.96646684408188,
+      "max_companies_this_expansion": 2,
+      "scale_quality_claim_allowed": false,
+      "fitted_from_observed_results": false,
+      "fixture_guards_are_not_live_quality": true,
+      "gold24_equality_is_not_a_threshold": true,
+      "untriggered_negatives_are_not_passes": true,
+      "expansion_requires_independent_source_review": true
+    }
+  },
+  "selected_instrument_ids": [
+    "600094.SH",
+    "600103.SH"
+  ],
+  "selected_strata": [
+    {
+      "instrument_id": "600094.SH",
+      "exchange": "SSE",
+      "disclosure_form": "service"
+    },
+    {
+      "instrument_id": "600103.SH",
+      "exchange": "SSE",
+      "disclosure_form": "manufacturing"
+    }
+  ],
+  "universe": {
+    "policy_version": "a_share_full_market.v1",
+    "as_of": "2026-09-17",
+    "total": 5564,
+    "eligible": 5564,
+    "missing_asset": 89,
+    "missing_classification": 0,
+    "selected_for_run": 2,
+    "completed": 2,
+    "failed": 0,
+    "includes_missing_assets": true
+  },
+  "company_outcomes": [
+    {
+      "instrument_id": "600094.SH",
+      "outcome": "completed",
+      "supplement_incomplete": false,
+      "delivered": true,
+      "batch_rerun_triggered": false
+    },
+    {
+      "instrument_id": "600103.SH",
+      "outcome": "completed",
+      "supplement_incomplete": false,
+      "delivered": true,
+      "batch_rerun_triggered": false
+    }
+  ],
+  "whole_batch_rerun": false,
+  "scale_quality_claim_allowed": false,
+  "first_expansion_plan_id": null,
+  "frozen_report_references": []
+}

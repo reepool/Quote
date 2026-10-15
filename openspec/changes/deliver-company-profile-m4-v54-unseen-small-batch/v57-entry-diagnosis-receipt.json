@@ -1,0 +1,55 @@
+{
+  "recorded_at": "2026-10-15T02:22:11.540664+00:00",
+  "diagnostic_formal_run_calls": 0,
+  "live_database_mode": "ro",
+  "before": {
+    "registry_seconds": 106.6790548497811,
+    "industry_seconds": 48.47401871904731,
+    "report_seconds": 54.35863541159779,
+    "event_offsets": {
+      "registry_start": 2.449959202669561,
+      "_storage_industry_lookup_start": 5.706386756151915,
+      "announcement_access_report_lookup_start": 54.18040547519922,
+      "build_a_share_candidate_registry_start": 108.53904088679701,
+      "registry_done": 109.12901405245066
+    }
+  },
+  "after": {
+    "registry_seconds": 52.15928263962269,
+    "industry_seconds": 44.50331177935004,
+    "report_seconds": 4.050627115182579,
+    "event_offsets": {
+      "registry_start": 2.1994911953806877,
+      "_storage_industry_lookup_start": 5.295432853512466,
+      "announcement_access_report_lookup_start": 49.79874463286251,
+      "build_a_share_candidate_registry_start": 53.84937174804509,
+      "registry_done": 54.358773835003376
+    }
+  },
+  "registry_before_sha256": "f56b6a467d117ab004d258a7b97f212da2e319f1e79c2e1ac2bd270616ddbf59",
+  "registry_after_sha256": "f56b6a467d117ab004d258a7b97f212da2e319f1e79c2e1ac2bd270616ddbf59",
+  "all_registry_fields_equal": true,
+  "registry_counts": {
+    "total": 5564,
+    "eligible": 5564,
+    "indeterminate": 0,
+    "classification_missing": 0,
+    "asset_available": 5475,
+    "asset_not_available": 89
+  },
+  "change": "one per-load asset repository read-only connection; existing per-instrument SQL and cutoff selection unchanged; no cache/index/schema change",
+  "v56_specific_blocking_call": "not retrospectively established; no v56 stack existed",
+  "current_evidenced_cost": "repeated synchronous asset repository connection setup across full-market registry; original measured report loop plus industry loop exhaust substantial entry time",
+  "service_construction": "isolated fresh storage, 4.466266563162208 seconds; no live-service initialization claimed",
+  "diagnostic_limitations": [
+    "Two probes with repeated asynchronous faulthandler dumps exited with signal 11; cause not established; they are not recovery evidence. Both corresponding no-watchdog registry probes completed normally.",
+    "An intended report probe accidentally repeated the original 35s read-only probe after python command was unavailable; retained separately.",
+    "Query plan showed industry history scan; no index or storage-manager change made because asset connection correction was sufficient for entry recovery."
+  ],
+  "attempts": {
+    "original_successors_used": 2,
+    "original_successors_authorized": 2,
+    "special_used": 0,
+    "special_authorized": 1
+  }
+}

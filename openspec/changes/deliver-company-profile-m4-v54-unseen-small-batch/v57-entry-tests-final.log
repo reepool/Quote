@@ -1,0 +1,7 @@
+[32m.[0m[32m.[0m[32m.[0m[32m.[0m[33m                                                                     [100%][0m
+============================= slowest 10 durations =============================
+0.04s call     tests/unit/test_research/test_company_profile_entry_recovery.py::test_asset_read_scope_reuses_connection_and_restores_after_exception
+0.02s call     tests/unit/test_research/test_company_profile_entry_recovery.py::test_registry_read_scope_preserves_full_denominator_and_every_lookup
+
+(8 durations < 0.005s hidden.  Use -vv to show these durations.)
+[33m[32m4 passed[0m, [33m[1m6 warnings[0m[33m in 0.93s[0m[0m

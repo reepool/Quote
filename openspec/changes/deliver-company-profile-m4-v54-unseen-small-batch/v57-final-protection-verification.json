@@ -1,0 +1,34 @@
+{
+  "verified_at": "2026-10-15T02:35:36.161045+00:00",
+  "newly_rehashed_counts": {
+    "original_first": 18,
+    "original_first_review": 6,
+    "v55_first": 19,
+    "v55_review": 12,
+    "v56_partial_attempt": 4,
+    "v56_review": 20,
+    "v57_first": 23,
+    "existing": 19,
+    "current_executed_code": 39,
+    "frozen_verification": 9,
+    "first-executed-code-snapshot.json": 38,
+    "v55-executed-code-snapshot.json": 38,
+    "v56-executed-code-snapshot.json": 38,
+    "v57-executed-code-snapshot.json": 39
+  },
+  "original_contract_unchanged": true,
+  "original_default_identity_unchanged": true,
+  "history_mechanical_receipt_reused": {
+    "file": "v56-source-freeze-receipt.json",
+    "count": 3519,
+    "same_immutable_snapshot": true,
+    "new_full_rehash": false
+  },
+  "historical_handoff_path_mapping": {
+    "review-submission.md (v56 manifest)": "v56-review-submission-original.md"
+  },
+  "old_successors_used": 2,
+  "special_attempt_used": 1,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

@@ -308,9 +308,10 @@ def negative_violations(n, rs, ds):
     return [r["record_id"] for r in bad]
 
 
+@pytest.mark.parametrize("repair_version", ["v56", "v57"])
 @pytest.mark.parametrize("instrument", ["600094.SH", "600103.SH"])
 def test_actual_official_input_delivers_frozen_income_actions_and_boundaries(
-    tmp_path, instrument
+    tmp_path, instrument, repair_version
 ):
     bundle = json.loads(FIXTURE.read_text())
     scope = bundle["contract"]
@@ -320,7 +321,7 @@ def test_actual_official_input_delivers_frozen_income_actions_and_boundaries(
         instrument=instrument,
         fixture=source["report"],
         pages=source["pages"],
-        repair_version="v56",
+        repair_version=repair_version,
     )
     assert queried == exported
     ck = json.loads(

@@ -1,0 +1,131 @@
+{"event": "imports_start", "elapsed": 6.13601878285408e-05}
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-15 10:17:32][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-15 10:17:32][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-15 10:17:32][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.00s
+[INFO][2026-10-15 10:17:33][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-15 10:17:34][tgbot.py:15] - [tgbot] Reading system configuration...
+{"event": "imports_done", "elapsed": 2.443515093997121}
+{"event": "dependencies_constructed", "elapsed": 2.4499052027240396, "database": "/home/python/Quote/data/research.db"}
+{"event": "registry_start", "elapsed": 2.449959202669561}
+{"event": "_resolve_universe_snapshot_start", "elapsed": 2.449999902397394}
+{"event": "_resolve_universe_snapshot_end", "elapsed": 5.155951057560742, "seconds": 2.705920472741127}
+{"event": "_storage_industry_lookup_start", "elapsed": 5.706386756151915}
+{"event": "_storage_industry_lookup_progress", "elapsed": 6.884283586405218, "count": 100, "seconds": 4.4342906614765525}
+{"event": "_storage_industry_lookup_progress", "elapsed": 7.9733292534947395, "count": 200, "seconds": 5.523338653147221}
+{"event": "_storage_industry_lookup_progress", "elapsed": 8.809189370833337, "count": 300, "seconds": 6.359199156984687}
+{"event": "_storage_industry_lookup_progress", "elapsed": 9.50916603114456, "count": 400, "seconds": 7.059175979346037}
+{"event": "_storage_industry_lookup_progress", "elapsed": 10.198904390446842, "count": 500, "seconds": 7.7489132937043905}
+{"event": "_storage_industry_lookup_progress", "elapsed": 10.894990183413029, "count": 600, "seconds": 8.445000091567636}
+{"event": "_storage_industry_lookup_progress", "elapsed": 11.582670858129859, "count": 700, "seconds": 9.13268116954714}
+{"event": "_storage_industry_lookup_progress", "elapsed": 12.293995077721775, "count": 800, "seconds": 9.844004923477769}
+{"event": "_storage_industry_lookup_progress", "elapsed": 14.885587732307613, "count": 900, "seconds": 12.435597388073802}
+{"event": "_storage_industry_lookup_progress", "elapsed": 15.687990750186145, "count": 1000, "seconds": 13.238000904209912}
+{"event": "_storage_industry_lookup_progress", "elapsed": 16.82618712168187, "count": 1100, "seconds": 14.376197228208184}
+{"event": "_storage_industry_lookup_progress", "elapsed": 17.571264521218836, "count": 1200, "seconds": 15.121274422854185}
+{"event": "_storage_industry_lookup_progress", "elapsed": 18.29068091418594, "count": 1300, "seconds": 15.840691031888127}
+{"event": "_storage_industry_lookup_progress", "elapsed": 19.014324333518744, "count": 1400, "seconds": 16.564334029331803}
+{"event": "_storage_industry_lookup_progress", "elapsed": 19.716855349950492, "count": 1500, "seconds": 17.266865412704647}
+{"event": "_storage_industry_lookup_progress", "elapsed": 20.411749433726072, "count": 1600, "seconds": 17.961759279482067}
+{"event": "_storage_industry_lookup_progress", "elapsed": 21.175283684395254, "count": 1700, "seconds": 18.725293688476086}
+{"event": "_storage_industry_lookup_progress", "elapsed": 22.05655768699944, "count": 1800, "seconds": 19.606567472219467}
+{"event": "_storage_industry_lookup_progress", "elapsed": 22.773343946784735, "count": 1900, "seconds": 20.323354185558856}
+{"event": "_storage_industry_lookup_progress", "elapsed": 23.46471606194973, "count": 2000, "seconds": 21.01472630444914}
+{"event": "_storage_industry_lookup_progress", "elapsed": 24.14422420784831, "count": 2100, "seconds": 21.6942341607064}
+{"event": "_storage_industry_lookup_progress", "elapsed": 24.82944610528648, "count": 2200, "seconds": 22.379456136375666}
+{"event": "_storage_industry_lookup_progress", "elapsed": 25.512847141362727, "count": 2300, "seconds": 23.0628569284454}
+{"event": "_storage_industry_lookup_progress", "elapsed": 26.20735047571361, "count": 2400, "seconds": 23.75736058410257}
+{"event": "_storage_industry_lookup_progress", "elapsed": 26.90232805069536, "count": 2500, "seconds": 24.45233844127506}
+{"event": "_storage_industry_lookup_progress", "elapsed": 29.088730381801724, "count": 2600, "seconds": 26.63874027132988}
+{"event": "_storage_industry_lookup_progress", "elapsed": 29.779164840467274, "count": 2700, "seconds": 27.329174348153174}
+{"event": "_storage_industry_lookup_progress", "elapsed": 30.46249250229448, "count": 2800, "seconds": 28.012502623721957}
+{"event": "_storage_industry_lookup_progress", "elapsed": 31.381375291384757, "count": 2900, "seconds": 28.931385215371847}
+{"event": "_storage_industry_lookup_progress", "elapsed": 32.38613382726908, "count": 3000, "seconds": 29.936143887229264}
+{"event": "_storage_industry_lookup_progress", "elapsed": 33.22962954547256, "count": 3100, "seconds": 30.7796395374462}
+{"event": "_storage_industry_lookup_progress", "elapsed": 34.148283522576094, "count": 3200, "seconds": 31.69829386100173}
+{"event": "_storage_industry_lookup_progress", "elapsed": 34.92091873753816, "count": 3300, "seconds": 32.4709289483726}
+{"event": "_storage_industry_lookup_progress", "elapsed": 35.71116972249001, "count": 3400, "seconds": 33.261179766617715}
+{"event": "_storage_industry_lookup_progress", "elapsed": 36.7120522018522, "count": 3500, "seconds": 34.262061041779816}
+{"event": "_storage_industry_lookup_progress", "elapsed": 37.682659642770886, "count": 3600, "seconds": 35.23266749456525}
+{"event": "_storage_industry_lookup_progress", "elapsed": 38.74305352382362, "count": 3700, "seconds": 36.29306352790445}
+{"event": "_storage_industry_lookup_progress", "elapsed": 39.761627410538495, "count": 3800, "seconds": 37.31163737177849}
+{"event": "_storage_industry_lookup_progress", "elapsed": 40.59003190882504, "count": 3900, "seconds": 38.14004194736481}
+{"event": "_storage_industry_lookup_progress", "elapsed": 41.3891121186316, "count": 4000, "seconds": 38.9391225297004}
+{"event": "_storage_industry_lookup_progress", "elapsed": 42.15587906725705, "count": 4100, "seconds": 39.705889178439975}
+{"event": "_storage_industry_lookup_progress", "elapsed": 42.9609399586916, "count": 4200, "seconds": 40.510950029827654}
+{"event": "_storage_industry_lookup_progress", "elapsed": 43.97051674313843, "count": 4300, "seconds": 41.52052665129304}
+{"event": "_storage_industry_lookup_progress", "elapsed": 44.77872895821929, "count": 4400, "seconds": 42.32873930968344}
+{"event": "_storage_industry_lookup_progress", "elapsed": 45.580028309486806, "count": 4500, "seconds": 43.13003839645535}
+{"event": "_storage_industry_lookup_progress", "elapsed": 46.388468141667545, "count": 4600, "seconds": 43.93847802747041}
+{"event": "_storage_industry_lookup_progress", "elapsed": 47.22205633018166, "count": 4700, "seconds": 44.77206561807543}
+{"event": "_storage_industry_lookup_progress", "elapsed": 48.03891267813742, "count": 4800, "seconds": 45.58892292715609}
+{"event": "_storage_industry_lookup_progress", "elapsed": 48.81032011657953, "count": 4900, "seconds": 46.36032994277775}
+{"event": "_storage_industry_lookup_progress", "elapsed": 49.57900372799486, "count": 5000, "seconds": 47.12901358585805}
+{"event": "_storage_industry_lookup_progress", "elapsed": 50.36627707257867, "count": 5100, "seconds": 47.91628718469292}
+{"event": "_storage_industry_lookup_progress", "elapsed": 51.144900494255126, "count": 5200, "seconds": 48.694899414666}
+{"event": "_storage_industry_lookup_progress", "elapsed": 51.99905878212303, "count": 5300, "seconds": 49.549068823456764}
+{"event": "_storage_industry_lookup_progress", "elapsed": 52.78815233055502, "count": 5400, "seconds": 50.33816227968782}
+{"event": "_storage_industry_lookup_progress", "elapsed": 53.72335138358176, "count": 5500, "seconds": 51.2733617015183}
+{"event": "announcement_access_report_lookup_start", "elapsed": 54.18040547519922}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 55.113361527211964, "count": 100, "seconds": 52.663370072841644}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 55.9935786658898, "count": 200, "seconds": 53.54358704946935}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 56.89488794468343, "count": 300, "seconds": 54.44489656481892}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 57.78487421479076, "count": 400, "seconds": 55.33488284237683}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 58.95463975146413, "count": 500, "seconds": 56.504646169021726}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 60.13886790443212, "count": 600, "seconds": 57.68887632898986}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 61.05634332168847, "count": 700, "seconds": 58.606352114118636}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 61.90844781789929, "count": 800, "seconds": 59.45845684502274}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 62.735024366527796, "count": 900, "seconds": 60.28503325674683}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 63.53884519729763, "count": 1000, "seconds": 61.08885389380157}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 64.56622382998466, "count": 1100, "seconds": 62.11623231135309}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 65.49460057076067, "count": 1200, "seconds": 63.04460845887661}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 66.38277888018638, "count": 1300, "seconds": 63.93278790730983}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 67.26734830252826, "count": 1400, "seconds": 64.81735709495842}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 68.15017583034933, "count": 1500, "seconds": 65.70018453802913}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 69.12609831895679, "count": 1600, "seconds": 66.67610699869692}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 70.04937743395567, "count": 1700, "seconds": 67.59938563406467}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 70.93395576067269, "count": 1800, "seconds": 68.48396454099566}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 71.89800164382905, "count": 1900, "seconds": 69.44799894094467}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 72.97777747083455, "count": 2000, "seconds": 70.5277612619102}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 73.91240813117474, "count": 2100, "seconds": 71.46241662744433}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 74.83413947559893, "count": 2200, "seconds": 72.38414723612368}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 75.81125378794968, "count": 2300, "seconds": 73.36126064881682}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 76.79132495075464, "count": 2400, "seconds": 74.34133326634765}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 77.63139808829874, "count": 2500, "seconds": 75.18140554241836}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 78.58026081696153, "count": 2600, "seconds": 76.13026884105057}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 79.45538912527263, "count": 2700, "seconds": 77.00539733562618}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 80.31223890930414, "count": 2800, "seconds": 77.86224743910134}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 81.37233149074018, "count": 2900, "seconds": 78.92233895231038}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 82.38986689038575, "count": 3000, "seconds": 79.93987480737269}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 83.23683634400368, "count": 3100, "seconds": 80.78684461303055}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 84.12558483984321, "count": 3200, "seconds": 81.67559309024364}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 85.04640846978873, "count": 3300, "seconds": 82.59641638118774}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 85.93566752132028, "count": 3400, "seconds": 83.48565401602536}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 86.8402060335502, "count": 3500, "seconds": 84.3902143817395}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 87.78225767426193, "count": 3600, "seconds": 85.33226526062936}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 88.71319359913468, "count": 3700, "seconds": 86.26320175919682}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 90.10274577699602, "count": 3800, "seconds": 87.65275390073657}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 91.15314276330173, "count": 3900, "seconds": 88.70315109658986}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 92.24193885736167, "count": 4000, "seconds": 89.79194696899503}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 93.35472721233964, "count": 4100, "seconds": 90.90473532769829}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 94.27006428968161, "count": 4200, "seconds": 91.82007241994143}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 95.54769800417125, "count": 4300, "seconds": 93.09770609997213}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 96.60347769409418, "count": 4400, "seconds": 94.15348590444773}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 97.94560700282454, "count": 4500, "seconds": 95.49561493843794}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 98.89661780185997, "count": 4600, "seconds": 96.4466261556372}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 99.84273455478251, "count": 4700, "seconds": 97.39274306409061}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 100.77032807283103, "count": 4800, "seconds": 98.32033642474562}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 101.69492141436785, "count": 4900, "seconds": 99.24493006337434}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 102.67061059270054, "count": 5000, "seconds": 100.2206189809367}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 104.46657423581928, "count": 5100, "seconds": 102.01658233162016}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 105.40720640309155, "count": 5200, "seconds": 102.95721433032304}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 106.2136785807088, "count": 5300, "seconds": 103.76368682738394}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 106.97542402148247, "count": 5400, "seconds": 104.52543232962489}
+{"event": "announcement_access_report_lookup_progress", "elapsed": 107.96161026321352, "count": 5500, "seconds": 105.51161887403578}
+{"event": "build_a_share_candidate_registry_start", "elapsed": 108.53904088679701}
+{"event": "build_a_share_candidate_registry_end", "elapsed": 109.07073945645243, "seconds": 0.5316275116056204}
+{"event": "registry_done", "elapsed": 109.12901405245066, "counts": {"total": 5564, "eligible": 5564, "indeterminate": 0, "classification_missing": 0, "asset_available": 5475, "asset_not_available": 89}, "candidates": 5564, "sql_count": 105226}

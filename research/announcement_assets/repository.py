@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
+import threading
 import uuid
 from collections.abc import Generator, Iterable, Mapping, Sequence
 from contextlib import contextmanager
@@ -226,6 +227,7 @@ class AnnouncementAssetRepository:
     def __init__(self, db_path: str | Path, *, timeout_seconds: float = 30.0) -> None:
         self.db_path = Path(db_path)
         self.timeout_seconds = max(1.0, float(timeout_seconds))
+        self._read_connection_state = threading.local()
 
     def initialize_schema(self) -> None:
         """Explicitly create or migrate only announcement-asset-owned tables."""
@@ -792,6 +794,10 @@ class AnnouncementAssetRepository:
 
     @contextmanager
     def connection(self) -> Generator[sqlite3.Connection, None, None]:
+        shared = getattr(self._read_connection_state, "connection", None)
+        if shared is not None:
+            yield shared
+            return
         conn = sqlite3.connect(self.db_path, timeout=self.timeout_seconds)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA foreign_keys = ON")
@@ -800,6 +806,24 @@ class AnnouncementAssetRepository:
             yield conn
         finally:
             conn.close()
+
+    @contextmanager
+    def read_connection_scope(self) -> Generator[None, None, None]:
+        """Reuse one read-only connection during a synchronous registry load.
+
+        This retains the existing per-instrument queries and cutoff selection;
+        no rows or results survive the scope and no transaction pins a snapshot.
+        """
+        if getattr(self._read_connection_state, "connection", None) is not None:
+            yield
+            return
+        with self.connection() as conn:
+            conn.execute("PRAGMA query_only = ON")
+            self._read_connection_state.connection = conn
+            try:
+                yield
+            finally:
+                del self._read_connection_state.connection
 
     @contextmanager
     def transaction(

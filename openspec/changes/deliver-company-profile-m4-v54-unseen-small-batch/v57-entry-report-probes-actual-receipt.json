@@ -1,0 +1,8 @@
+{
+  "elapsed_seconds": 5.135186520405114,
+  "hard_limit_seconds": 35,
+  "timed_out": false,
+  "returncode": 0,
+  "formal_run_called": false,
+  "live_sqlite_mode": "ro"
+}

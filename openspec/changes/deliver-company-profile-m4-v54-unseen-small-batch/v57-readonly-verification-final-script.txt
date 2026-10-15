@@ -1,0 +1,53 @@
+"""Verify delivery and protected artifacts without re-execution or rescoring."""
+import asyncio,json,hashlib,sqlite3,subprocess,re
+from pathlib import Path
+from datetime import datetime,timezone
+from utils import config_manager
+from research.storage import ResearchStorageManager
+from research.announcement_assets import AnnouncementAssetConfig,AnnouncementAssetRepository,AnnouncementAssetService
+from research.announcement_assets.access import AnnouncementAssetAccess
+from research.business_profile_async_production import BusinessProfileWorkRepository
+from research.company_profile.operations import OfficialAnnualReportPageSource
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.stage4_restricted_read import FROZEN_CHAPTERS,default_repo_root
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v57_same_source_repair';O=R/'data/research/company_profile_common_core/m4_v57_same_source_repair';load=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();co=lambda s:re.sub(r'\s+','',s)
+# Read-only verification uses the existing read owner, not service construction.
+_original_sqlite_connect=sqlite3.connect
+def _readonly_connect(database,*args,**kwargs):
+ text=str(database)
+ if text != ':memory:' and not text.startswith('file:'):
+  text=Path(text).resolve().as_uri()+'?mode=ro'
+ kwargs['uri']=True
+ return _original_sqlite_connect(text,*args,**kwargs)
+sqlite3.connect=_readonly_connect
+async def main():
+ formal=load(P/'formal_execution.json');scope=load(C/'source-scope.json');score=load(C/'v57-source-review-evidence.json');rc=config_manager.get_research_config();storage=ResearchStorageManager(rc);cfg=AnnouncementAssetConfig.from_research_config(rc,project_root=R);repo=AnnouncementAssetRepository(Path(str(rc.storage.db_path)).resolve());svc=AnnouncementAssetService(repository=repo,config=cfg,acquisition_service=None,attachment_retriever=None);access=AnnouncementAssetAccess(repository=repo,config=cfg,service=svc)
+ wr=BusinessProfileWorkRepository(storage,checkpoint_root=R/'data/checkpoints/company_profile_common_core',shared_asset_access=access);page_owner=OfficialAnnualReportPageSource(wr)
+ con=sqlite3.connect('file:data/research.db?mode=ro',uri=True);con.row_factory=sqlite3.Row;runtime=[];sources={};fresh={}
+ for ins,res in formal['results'].items():
+  q=res['query']['profiles'][0];again=CompanyProfileReadService(O,stage4_chapters=FROZEN_CHAPTERS,stage4_root=default_repo_root()).query((ins,),processing_identity=formal['processing_identity']);assert again['profiles']==res['query']['profiles'];assert q==res['export']['profiles'][0]==load(Path(res['export']['files'][0]));fresh[ins]=again
+  rt=load(O/'company_profile_common_core.v1'/(q['work_id']+'.json'));item=dict(con.execute('select * from business_profile_work_items where work_id=?',(q['work_id'],)).fetchone());assert item['status']=='completed';item['metadata']=json.loads(item['metadata_json']);st=item['metadata']['stage_results'];assert set(st)=={'acquire','parse','semantic','verify','publish'} and all(v['status']=='success' and not v['reused_scope_ids'] for v in st.values());assert not rt['execution']['predecessor_lineage']
+  runtime.append({'instrument_id':ins,'work_id':q['work_id'],'stage_results':st,'predecessor_lineage':[],'query_export_disk_equal':True,'token_budget':rt['execution']['token_budget']})
+  v=scope['versions'][ins];pdf=R/v['pdf'];assert sha(pdf)==v['sha256'];expected=next(r for r in scope['official_reports'] if r['instrument_id']==ins);binding=item['metadata']['bound_shared_asset'];assert binding['asset_id']==expected['asset_id'] and binding['content_hash']==v['sha256'];assert rt['report']['document_version']==v['sha256'] and rt['report']['report_id']==expected['asset_id'];pages=load(R/'tests/fixtures/company_profile_v55_property_paper_pages.json')['official_inputs'][ins]['pages']
+  # Independent native text/layout snapshot verified against the same PDF bytes.
+  import pypdfium2 as pdfium
+  from pypdf import PdfReader
+  doc=pdfium.PdfDocument(pdf);reader=PdfReader(pdf);texts=load(C/'independent-source-pages.json')[ins];layouts=load(C/'independent-source-layouts.json')[ins];fallback=[]
+  for p in texts:
+   same=co(doc[p['page']-1].get_textpage().get_text_range())==co(p['text'])
+   if not same:
+    assert co(reader.pages[p['page']-1].extract_text())==co(p['text']),(ins,p['page'],'independent text')
+    fallback.append(p['page'])
+  for page,text in layouts.items():assert co(reader.pages[int(page)-1].extract_text(extraction_mode='layout'))==co(text),(ins,page,'independent layout')
+  sources[ins]={'pdf_sha256':sha(pdf),'official_asset_id':expected['asset_id'],'official_pages':len(pages),'runtime_layout_pages':sum(bool(p.get('layout_text')) for p in pages),'independent_pdf_text_pages':len(texts),'pypdf_text_fallback_pages':fallback,'independent_layout_pages':len(layouts),'formal_bound_asset_and_report_match_frozen_source':True,'full_owner_input_equivalence_receipt_reused':'v55-readonly-verification-receipt.json; identical official bytes and page-source implementation','page_source_not_recalled_in_readonly_verification':True}
+ counts={}
+ for name,mapping in [('first',load(C/'first-formal-delivery-preservation-completion.json')['completed_sha256']),('first_review',load(C/'first-review-preservation.json')),('existing',load(C/'initial-workspace-baseline.json')['existing_modified_sha256']),('v57_first',load(C/'v57-formal-delivery-preservation-completion.json')['completed_sha256']),('v55_first',load(C/'v55-formal-delivery-preservation-completion.json')['completed_sha256']),('v55_review',load(C/'v55-review-preservation.json')),('v55_entry',{str((C/'v55-review-submission-original.md').relative_to(R)):load(C/'v56-workspace-baseline.json')['v55_entry_sha256']}),('current_code',formal['executed_code_sha256'])]:
+  assert all(sha(R/p)==h for p,h in mapping.items()),name;counts[name]=len(mapping)
+ for name in ['first-executed-code-snapshot.json','v55-executed-code-snapshot.json','v57-executed-code-snapshot.json']:
+  snap=load(C/name);assert all(hashlib.sha256(snap['files'][p].encode()).hexdigest()==h for p,h in snap['sha256'].items());counts[name]=len(snap['files'])
+ observation=load(P/'observation.json');gates={'all_contract':score['source_recall']=={'present':307,'total':307},'all_dynamic_unique':score['source_accuracy']['correct']==score['source_accuracy']['total'],'numeric_zero':score['critical_numeric_errors']==0,'all_negatives':score['negative_passed']==44,'supplemental_classification':score['supplemental_classification_passed']==4,'whole_round':formal['whole_round_seconds']<=300,'shared_tokens':observation['tokens_consumed']<=50000}
+ result={'verified_at':datetime.now(timezone.utc).isoformat(),'runtime':runtime,'sources':sources,'protected_counts':counts,'whole_round_seconds':formal['whole_round_seconds'],'tokens_consumed':observation['tokens_consumed'],'first_observation_used':1,'same_source_successors_used':2,'same_source_successors_authorized':2,'special_attempt_used':1,'special_attempt_authorized':1,'history_receipt_reused':'v56-source-freeze-receipt.json (3519 historical files; same immutable snapshot)','finite_gates':gates,'production_authorization':'not_authorized','scale_quality_claim_allowed':False,'elapsed_limitation':'已有PDF解析缓存；不是冷缓存上界','original_expansion_gates_met':load(C/'v57-source-review-owner-receipt.json')['source_review']['expansion_gates_met']}
+ for name,data in [('v57-requery-receipt.json',fresh),('v57-readonly-verification-receipt.json',result)]:
+  p=C/name;assert not p.exists();p.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+ print(result)
+if __name__=='__main__':asyncio.run(main())

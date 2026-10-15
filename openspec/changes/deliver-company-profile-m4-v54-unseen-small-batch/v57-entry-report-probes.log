@@ -1,0 +1,49 @@
+{"event": "imports_start", "elapsed": 0.00023759622126817703}
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-15 10:13:42][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-15 10:13:42][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-15 10:13:42][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.00s
+[INFO][2026-10-15 10:13:42][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-15 10:13:43][tgbot.py:15] - [tgbot] Reading system configuration...
+{"event": "imports_done", "elapsed": 2.0204774532467127}
+{"event": "dependencies_constructed", "elapsed": 2.0268756058067083, "database": "/home/python/Quote/data/research.db"}
+{"event": "registry_start", "elapsed": 2.0269292388111353}
+{"event": "_resolve_universe_snapshot_start", "elapsed": 2.0269803097471595}
+{"event": "_resolve_universe_snapshot_end", "elapsed": 4.762638475745916, "seconds": 2.7356302812695503}
+{"event": "_storage_industry_lookup_start", "elapsed": 5.368786144070327}
+{"event": "_storage_industry_lookup_progress", "elapsed": 6.303880266845226, "count": 100, "seconds": 4.276905989274383}
+{"event": "_storage_industry_lookup_progress", "elapsed": 7.123604900203645, "count": 200, "seconds": 5.096634809859097}
+{"event": "_storage_industry_lookup_progress", "elapsed": 7.925498988479376, "count": 300, "seconds": 5.898528498597443}
+{"event": "_storage_industry_lookup_progress", "elapsed": 8.656986837275326, "count": 400, "seconds": 6.630016324110329}
+{"event": "_storage_industry_lookup_progress", "elapsed": 9.42701381444931, "count": 500, "seconds": 7.400043247267604}
+{"event": "_storage_industry_lookup_progress", "elapsed": 10.150845607742667, "count": 600, "seconds": 8.123875230550766}
+{"event": "_storage_industry_lookup_progress", "elapsed": 10.915663935244083, "count": 700, "seconds": 8.888693625107408}
+{"event": "_storage_industry_lookup_progress", "elapsed": 11.828078550286591, "count": 800, "seconds": 9.801108002662659}
+{"event": "_storage_industry_lookup_progress", "elapsed": 12.736732011660933, "count": 900, "seconds": 10.709760958328843}
+{"event": "_storage_industry_lookup_progress", "elapsed": 13.672849033027887, "count": 1000, "seconds": 11.64587822649628}
+{"event": "_storage_industry_lookup_progress", "elapsed": 14.748647486791015, "count": 1100, "seconds": 12.721677128225565}
+{"event": "_storage_industry_lookup_progress", "elapsed": 15.554917832836509, "count": 1200, "seconds": 13.527947425842285}
+{"event": "_storage_industry_lookup_progress", "elapsed": 16.465936541557312, "count": 1300, "seconds": 14.438966249115765}
+{"event": "_storage_industry_lookup_progress", "elapsed": 17.189459429122508, "count": 1400, "seconds": 15.162489262409508}
+{"event": "_storage_industry_lookup_progress", "elapsed": 17.894669049419463, "count": 1500, "seconds": 15.867699461057782}
+{"event": "_storage_industry_lookup_progress", "elapsed": 18.705170653760433, "count": 1600, "seconds": 16.67819894850254}
+{"event": "_storage_industry_lookup_progress", "elapsed": 19.69266543816775, "count": 1700, "seconds": 17.66569329984486}
+{"event": "_storage_industry_lookup_progress", "elapsed": 20.604957716539502, "count": 1800, "seconds": 18.577987884171307}
+{"event": "_storage_industry_lookup_progress", "elapsed": 21.35589270014316, "count": 1900, "seconds": 19.32892282307148}
+{"event": "_storage_industry_lookup_progress", "elapsed": 22.54597056377679, "count": 2000, "seconds": 20.519000495783985}
+{"event": "_storage_industry_lookup_progress", "elapsed": 23.38791572023183, "count": 2100, "seconds": 21.36094576306641}
+{"event": "_storage_industry_lookup_progress", "elapsed": 24.357944772578776, "count": 2200, "seconds": 22.330972019582987}
+{"event": "_storage_industry_lookup_progress", "elapsed": 25.248960312455893, "count": 2300, "seconds": 23.221990371122956}
+{"event": "_storage_industry_lookup_progress", "elapsed": 26.06462798640132, "count": 2400, "seconds": 24.03765572141856}
+{"event": "_storage_industry_lookup_progress", "elapsed": 26.973862734623253, "count": 2500, "seconds": 24.946892520412803}
+{"event": "_storage_industry_lookup_progress", "elapsed": 28.14408796466887, "count": 2600, "seconds": 26.117115725763142}
+{"event": "_storage_industry_lookup_progress", "elapsed": 29.215349381789565, "count": 2700, "seconds": 27.188377286307514}
+{"event": "_storage_industry_lookup_progress", "elapsed": 30.242859380319715, "count": 2800, "seconds": 28.215888809412718}
+{"event": "_storage_industry_lookup_progress", "elapsed": 31.211805286817253, "count": 2900, "seconds": 29.184834644198418}
+{"event": "_storage_industry_lookup_progress", "elapsed": 32.25020140968263, "count": 3000, "seconds": 30.2232314562425}
+{"event": "_storage_industry_lookup_progress", "elapsed": 33.302644233219326, "count": 3100, "seconds": 31.275673743337393}
+{"event": "_storage_industry_lookup_progress", "elapsed": 34.142474291846156, "count": 3200, "seconds": 32.1155043579638}

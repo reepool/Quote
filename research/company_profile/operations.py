@@ -11,6 +11,7 @@ import json
 import logging
 import re
 import threading
+import time
 import uuid
 from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
@@ -1253,6 +1254,7 @@ class CompanyProfileTaskService:
                 "v54",
                 "v55",
                 "v56",
+                "v57",
             }:
                 from research.business_profile_production_operations import (
                     register_business_profile_shared_annual_report_asset,
@@ -1690,6 +1692,7 @@ async def execute_published_task(
 ) -> dict[str, Any]:
     """Unique owner entry for the published company-profile task operations."""
 
+    entry_started = time.monotonic()
     normalized = str(action or "").strip().lower()
     if normalized in {"run", "resume"}:
         publication = load_publication_control(checkpoint_root)
@@ -1701,11 +1704,14 @@ async def execute_published_task(
     access = shared_asset_access or _resolve_shared_asset_access(storage)
     registry = candidate_registry
     if str(action or "").strip().lower() == "run" and registry is None:
+        logger.info("Company-profile entry: loading full-market registry")
         registry = load_official_task_candidate_registry(
             as_of=_knowledge_cutoff(knowledge_cutoff),
             storage=storage,
             shared_asset_access=access,
         )
+        logger.info("Company-profile entry: registry loaded")
+    logger.info("Company-profile entry: constructing task service")
     service = CompanyProfileTaskService(
         storage=storage,
         output_root=output_root,
@@ -1719,6 +1725,11 @@ async def execute_published_task(
         processing_identity=processing_identity,
         plan_directory=plan_directory,
     )
+    logger.info("Company-profile entry: task service ready")
+    if normalized in {"run", "resume"}:
+        max_elapsed_seconds -= time.monotonic() - entry_started
+        if max_elapsed_seconds <= 0:
+            raise TimeoutError("company-profile entry budget exhausted before enqueue")
     return await service.execute(
         action,
         knowledge_cutoff=knowledge_cutoff,
