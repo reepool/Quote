@@ -1,0 +1,29 @@
+[31mF[0m[31mF[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[31m                                                   [100%][0m
+=================================== FAILURES ===================================
+[31m[1m_ test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600094.SH] _[0m
+[1m[31mtests/unit/test_research/test_company_profile_v55_property_paper.py[0m:340: in test_actual_official_input_delivers_frozen_income_actions_and_boundaries
+    [0m[94massert[39;49;00m [96many[39;49;00m(rolematch(r, condition) [94mfor[39;49;00m r [95min[39;49;00m rs), condition[90m[39;49;00m
+[1m[31mE   AssertionError: {'actor_aliases': ['北京佰才邦技术股份有限公司'], 'condition_id': '600094.SH-action-044', 'context_pages': [13, 26], 'instrument_id': '600094.SH', ...}[0m
+[1m[31mE   assert False[0m
+[1m[31mE    +  where False = any(<generator object test_actual_official_input_delivers_frozen_income_actions_and_boundaries.<locals>.<genexpr> at 0x7f4de61c85e0>)[0m
+[31m[1m_ test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600103.SH] _[0m
+[1m[31mtests/unit/test_research/test_company_profile_v55_property_paper.py[0m:340: in test_actual_official_input_delivers_frozen_income_actions_and_boundaries
+    [0m[94massert[39;49;00m [96many[39;49;00m(rolematch(r, condition) [94mfor[39;49;00m r [95min[39;49;00m rs), condition[90m[39;49;00m
+[1m[31mE   AssertionError: {'actor_aliases': ['深圳市恒宝通光电子股份有限公司'], 'condition_id': '600103.SH-action-078', 'context_pages': [188, 189], 'instrument_id': '600103.SH', ...}[0m
+[1m[31mE   assert False[0m
+[1m[31mE    +  where False = any(<generator object test_actual_official_input_delivers_frozen_income_actions_and_boundaries.<locals>.<genexpr> at 0x7f4de65e6890>)[0m
+============================= slowest 10 durations =============================
+21.47s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600103.SH]
+21.08s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600094.SH]
+18.82s call     tests/unit/test_research/test_company_profile_v54_media_machinery.py::test_complete_official_contract[600088.SH]
+16.37s call     tests/unit/test_research/test_company_profile_v53_source_conflict.py::test_v53_complete_official_owner_contract_and_source_conflict[600097.SH]
+11.66s call     tests/unit/test_research/test_company_profile_v54_media_machinery.py::test_complete_official_contract[600099.SH]
+6.15s call     tests/unit/test_research/test_company_profile_v53_source_conflict.py::test_v53_complete_official_owner_contract_and_source_conflict[600082.SH]
+1.52s setup    tests/unit/test_research/test_company_profile_v54_media_machinery.py::test_complete_official_contract[600088.SH]
+0.38s call     tests/unit/test_research/test_company_profile_v53_source_conflict.py::test_normal_technology_business_is_not_removed[\u5e94\u7528\u8f6f\u4ef6]
+0.25s setup    tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600094.SH]
+0.08s call     tests/unit/test_research/test_company_profile_v53_source_conflict.py::test_normal_technology_business_is_not_removed[\u96c6\u6210\u7535\u8def]
+[36m[1m=========================== short test summary info ============================[0m
+[31mFAILED[0m tests/unit/test_research/test_company_profile_v55_property_paper.py::[1mtest_actual_official_input_delivers_frozen_income_actions_and_boundaries[600094.SH][0m - AssertionError: {'actor_aliases': ['北京佰才邦技术股份有限公司'], 'conditio...
+[31mFAILED[0m tests/unit/test_research/test_company_profile_v55_property_paper.py::[1mtest_actual_official_input_delivers_frozen_income_actions_and_boundaries[600103.SH][0m - AssertionError: {'actor_aliases': ['深圳市恒宝通光电子股份有限公司'], 'cond...
+[31m[31m[1m2 failed[0m, [32m20 passed[0m, [33m7 warnings[0m[31m in 100.81s (0:01:40)[0m[0m

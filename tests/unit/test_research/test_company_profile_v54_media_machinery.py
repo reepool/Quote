@@ -326,7 +326,7 @@ def test_complete_official_contract(tmp_path, instrument):
         )
 
 
-@pytest.mark.parametrize("version", ["v54", "v55"])
+@pytest.mark.parametrize("version", ["v54", "v55", "v56"])
 def test_successor_retains_default_and_five_switches(version):
     default = default_processing_identity()
     successor = {**default, "revenue_sentence_repair": version}

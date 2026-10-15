@@ -1,0 +1,13 @@
+{
+  "completed_at": "2026-10-15T01:46:22.994085+00:00",
+  "completed_sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v56_same_source_repair/plan.json": "1877264918bb5b0143f2be21404b7c8ec2b4f8142ea39a1ee87fea88d9a6e29e",
+    "data/checkpoints/company_profile_common_core/reports/m4_v56_same_source_repair/formal_failure.json": "51fe7a1b2e368e21c36744be20ea7692afe5010cd2d7c77aaa66854f40b7812e",
+    "openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch/v56_formal_execute.log": "6f9035f40599bd844e6e488e8a7a2c30ccf4bed129d820e385b5fcbaa9bdf350",
+    "openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch/v56-formal-failure-receipt.json": "51fe7a1b2e368e21c36744be20ea7692afe5010cd2d7c77aaa66854f40b7812e"
+  },
+  "empty_file_count": 0,
+  "partial_attempt_not_full_delivery": true,
+  "protected_after_process_exit": true,
+  "formal_score_unavailable": true
+}

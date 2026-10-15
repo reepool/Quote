@@ -27,3 +27,10 @@ Under A/B workflow v1, B MUST proceed through scoped implementation, real-input 
 #### Scenario: Formal attempts are exhausted
 - **WHEN** both authorized successors fail after the retained first observation
 - **THEN** all results remain protected and B submits concrete remaining gaps to A without another attempt or archive
+
+### Requirement: Purchase category is part of source accuracy
+Current related-party purchases MUST preserve the disclosed content category along with complete name, supplier, current period, direction and Evidence. Consulting, recruitment testing and construction projects MUST NOT be asserted as goods. Whole-cell and split-object parsing MUST agree. Per-object scoring MUST check category before accepting an action match, including contract-external output. The four A-reviewed assertions MUST be evaluated separately without changing the frozen 307 positives or 44 negatives.
+
+#### Scenario: A current consulting purchase is present
+- **WHEN** the complete p199–200 purchase table discloses a current consulting, recruitment testing or construction purchase
+- **THEN** the accepted/query/export object retains the complete name and supplier as a service or construction purchase, while real goods and prior-only blanks preserve their original treatment

@@ -1,0 +1,102 @@
+import json,re,hashlib
+from pathlib import Path
+from tests.unit.test_research.test_company_profile_v55_property_paper import match,rolematch,pages,co,num,negative_violations,purchase_category_matches
+C=Path('openspec/changes/deliver-company-profile-m4-v54-unseen-small-batch')
+scope=json.loads((C/'source-scope.json').read_text())
+manual=json.loads((C/'v55-local-business-overview-semantic-audit.json').read_text())
+def semantic_key(r):return digest({k:r.get(k) for k in ['object_type','source_native','source_text','subject_scope','source_actor','action','relation_type','reported_period','uncertainty']})
+def digest(x):return hashlib.sha256(json.dumps(x,ensure_ascii=False,sort_keys=True).encode()).hexdigest()
+# These contract-external cells were separately read in the original tables;
+# classification heading totals are retained as headings, not new products.
+EXTRA_FIN={
+ ('consolidated_group','算力服务收入','15348294.98','合同收入/商品类型','原收入列：合计营业收入'),
+ ('consolidated_group','房地产销售收入','2042181135.99','合同收入/商品类型','原收入列：合计营业收入'),
+ ('consolidated_group','开发物业租赁及运营','189019138.54','合同收入/商品类型','原收入列：合计营业收入'),
+ ('consolidated_group','合计','2231200274.53','合同收入/合同分解合计','原收入列：房地产板块营业收入'),
+ ('consolidated_group','合计','15348294.98','合同收入/合同分解合计','原收入列：算力服务板块营业收入'),
+ ('consolidated_group','合计','2246548569.51','合同收入/合同分解合计','原收入列：合计营业收入'),
+ ('issuer','商品类型','21685129.13','合同收入/商品类型','原收入列：合计营业收入'),
+ ('issuer','房地产销售收入','4087732.00','合同收入/商品类型','原收入列：合计营业收入'),
+ ('issuer','开发物业租赁及运营','3761427.08','合同收入/商品类型','原收入列：合计营业收入'),
+ ('issuer','其他','13835970.05','合同收入/商品类型','原收入列：合计营业收入'),
+ ('issuer','按经营地区分类','21685129.13','合同收入/按经营地区分类','原收入列：合计营业收入'),
+ ('issuer','境内','21685129.13','合同收入/按经营地区分类','原收入列：合计营业收入'),
+ ('issuer','合计','21685129.13','合同收入/合同分解合计','原收入列：合计营业收入'),
+}
+def decision(ins,r,profile):
+ n=r['source_native'];k=r['object_type'];pg=pages(r);q=co(n.get('qualifier'));name=co(n['name']);actor=co(r.get('source_actor'));action=r.get('action');sc=r['subject_scope'];h=n.get('header') or ''
+ ev=co(''.join(e['anchor']['bounded_quote'] for e in r['evidence']))
+ base={'accurate':False,'critical_numeric_error':False,'reason':'需定向逐原文裁决','matched_income_conditions':[],'matched_role_conditions':[]}
+ if k in ['Segment','Measurement']:
+  hits=[v['condition_id'] for v in scope['source_rows'][ins] if match(r,v)]
+  if hits:return {**base,'accurate':True,'matched_income_conditions':hits,'reason':'独立原格：完整原行、原栏目、本期列、原主体、原交易方、期间、金额和单位匹配；配对计量同核'}
+  if h=='房地产出租/租金收入':
+   vs=[v for v in scope['source_uncertainty_conditions'] if ins==v['instrument_id'] and name==co(v['name']) and q==co('原地区：'+v['region']) and num(n['value'])==num(v['printed_value']) and n['unit']==v['printed_unit']]
+   ok=bool(vs) and any('official_income_unit_conflict:unclear' in u for u in r['uncertainty']) and all(r['record_id'] not in a['supporting_record_ids'] for a in profile['dimensions'])
+   return {**base,'accurate':ok,'matched_unclear_conditions':[v['condition_id'] for v in vs] if ok else [],'reason':'p23原字面与原万元表头保留；独立元值矛盾保持unclear，不确认万元或擅改元，不作为确定答案支持'}
+  key=(sc,name,str(num(n['value'])),h,q)
+  if ins=='600094.SH' and n['unit']=='元' and key in EXTRA_FIN and ({150,151,191,192}&pg):
+   return {**base,'accurate':True,'reason':'合同外独立原格：集团/母公司合同分类的合计收入列、分部合计或打印分类小计；原栏目及范围保留，与子行交叉不累计'}
+  if ins=='600103.SH' and name=='木竹片及木浆产品贸易业务' and num(n['value'])==num('60.15') and n['unit']=='万元' and 22 in pg and sc=='consolidated_group' and h=='本期营业收入':
+   return {**base,'accurate':True,'reason':'合同外p22打印贸易收入60.15万元；跨行原名木竹片及木浆产品贸易业务完整，非成本或费用'}
+ elif k in ['Activity','Relationship']:
+  if ins=='600103.SH' and not purchase_category_matches(r):
+   return {**base,'reason':'采购栏目不符原业务类别：服务/工程与商品须核对，不以动作命中代替分类'}
+  hits=[v['condition_id'] for v in scope['native_roles'] if ins==v['instrument_id'] and rolematch(r,v)]
+  if hits:return {**base,'accurate':True,'matched_role_conditions':hits,'reason':'独立原句/原表：具名对象、实际方向、原主体及限定匹配；采购不反推投入，参股及报告日不升格集团全年经营'}
+  if ins=='600094.SH':
+   if name=='其他' and h=='房地产出租/经营业态' and action=='provides_service' and sc=='consolidated_group' and q=='原地区：西北' and 23 in pg:
+    return {**base,'accurate':True,'reason':'合同外p23打印其他出租业态；活动方向只表示实际出租，不确认冲突单位'}
+   if name=='房地产开发' and action=='operates' and sc=='named_subsidiary' and actor in {'名城地产(兰州)有限公司','兰州新顺房地产开发有限公司','兰州悦华房地产开发有限公司','兰州江丰房地产开发有限公司','名城地产(福建)有限公司','东福名城(常州)置业发展有限公司','兰州顺泰房地产开发有限公司','南昌名城房地产开发有限公司','兰州恒尚房地产开发有限公司'} and q==co('原主体：'+r['source_actor']) and '房地产开发' in ev and 163 in pg:
+    return {**base,'accurate':True,'reason':'合同外p163存续具名子公司业务性质房地产开发；原主体核对，不替代项目销售'}
+   if name in ['接受劳务','采购商品','接受服务'] and action=='purchases' and sc=='consolidated_group' and q in ['交易对方：兰州英家皇道物业管理服务有限公司','交易对方：上海英家皇道物业管理服务有限公司','交易对方：福建大名城物业管理有限公司','交易对方：六妙白茶股份有限公司','交易对方：福建数产名商科技有限公司'] and {175,176}&pg:
+    return {**base,'accurate':True,'reason':'合同外p175/176正本期关联采购/劳务/服务原行，保留具名供应方；不指定未知商品或推投入'}
+   if name=='商务办公用房租赁' and action=='provides_service' and sc=='consolidated_group' and q in ['承租方：上海英家皇道物业管理服务有限公司','承租方：福州云璟商业管理有限公司','承租方：福建大名城物业管理有限公司','承租方：福州齐缘服务管理有限公司'] and {175,176}&pg:
+    return {**base,'accurate':True,'reason':'合同外p176四笔正本期商务办公用房出租；各原承租方分别核，不借承租费用'}
+   if name in ['股权投资','金融中介服务','创业投资','投资管理','投资咨询'] and actor=='深圳名城金控(集团)有限公司' and action=='provides_service' and sc=='named_subsidiary' and 193 in pg:
+    return {**base,'accurate':True,'reason':'合同外p193同p9正常经营性金融业务限定，原全资主体开展；不把股权处置损益确认为营业收入'}
+  else:
+   if sc=='unclear' and action=='operates' and 9 in pg and name in ['竹木浆','溶解浆','纸袋纸','纸制品','光电子产品','医药产品','林木产品','伸性纸袋纸','环保纸袋纸','精制牛皮纸','风油精','光器件','光模块']:
+    return {**base,'accurate':True,'reason':'p9原父类经营披露保留unclear主体；不计作确定的母公司或具名子公司产销条件'}
+   if sc=='consolidated_group' and 22 in pg and action=='sells' and name in ['木竹片','木浆产品']:
+    return {**base,'accurate':True,'reason':'合同外p22正本期木竹片及木浆产品贸易，保持原商品及销售，不生成名称含贸易业务的伪商品'}
+   if sc=='consolidated_group' and 31 in pg and action=='produces' and name in ['伸性纸袋纸','环保纸袋纸','精制牛皮纸','溶解浆','竹木浆','风油精','光器件','光模块']:
+    return {**base,'accurate':True,'reason':'合同外p31联同p9本期主要产品产销陈述；集团范围保留，不反推具名子公司'}
+   if actor=='福建省青山林业发展有限公司' and sc=='named_subsidiary' and 31 in pg and ((name=='森林培育' and action=='provides_service') or (name=='竹材' and action=='produces' and '原文采运，不反推本期销售' in q)):
+    return {**base,'accurate':True,'reason':'合同外p32具名子公司森林培育/竹材采运；原采运限定，不推本期销售'}
+   allowed={'ESG咨询服务等','维修','纸浆检测费','工程项目承包及其他咨询服务等','工程项目承包及其他咨询服务','风油香精','精油皂','手工皂、洗衣液','手工皂','洗衣液'}
+   if {199,200}&pg and sc=='consolidated_group' and action=='purchases' and name in allowed and (name,q) in {('ESG咨询服务等','交易对方：中碳(福建)生态科技有限公司'),('纸浆检测费','交易对方：福建省浆纸质量检验检测有限公司'),('工程项目承包及其他咨询服务等','交易对方：福建省建筑轻纺设计院有限公司'),('工程项目承包及其他咨询服务','交易对方：福建省建筑轻纺设计院有限公司'),('风油香精','交易对方：福建晶华生物科技有限公司'),('精油皂','交易对方：福建晶华生物科技有限公司'),('手工皂、洗衣液','交易对方：福建晶华生物科技有限公司'),('手工皂','交易对方：福建晶华生物科技有限公司'),('洗衣液','交易对方：福建晶华生物科技有限公司')}:
+    return {**base,'accurate':True,'reason':'合同外p199/200正本期原采购服务/商品原行及合法拆分，逐供应方核；不反推制造或投入'}
+ elif k=='BusinessOverview':
+  if semantic_key(r) in manual['reviewed_overviews'] and co(r['source_text']) in ev:
+   return {**base,'accurate':True,'reason':'逐条读原文语义及接受投影：原披露引文、原主体/母子/参股关系、原适用/不适用、注销/计划/筹备/注册和确认条件保留；该引文准确性与六正文完整性分开评估','source_text_sha256':digest(r['source_text'])}
+ return base
+
+def evaluate(ins,rs,profile):
+ rows=scope['source_rows'][ins];roles=[v for v in scope['native_roles'] if v['instrument_id']==ins];decisions={r['record_id']:decision(ins,r,profile) for r in rs}
+ answers={}
+ for a in profile['dimensions']:
+  rule=scope['answers'][ins][a['dimension_id']];txt=co(a['excerpt']);bad=[g for g in rule['required_groups'] if not any(co(t) in txt or t=='服务数量' and '服务提供数量' in txt for t in g)]
+  supports=[rid for rid in a['supporting_record_ids'] if rid not in decisions or not decisions[rid]['accurate']]
+  answers[a['dimension_id']]={'accurate':a['answered'] and bool(a['excerpt']) and not bad and not supports and digest(a['excerpt'])==manual['reviewed_answers'][ins+':'+a['dimension_id']]['excerpt_sha256'],'critical_numeric_error':False,'reason':'独立正文实质核：完整业务链、产品矩阵及收费/交付确认机制，与原母子/参股/报告日/筹备/研发和适用状态贯通；九项冲突单位不进入确定性答案','failed_substance_groups':bad,'inaccurate_supporting_ids':supports,'source_substance':rule['substance']}
+ negatives=[dict(**n,evaluated=True,passed=not(bad:=negative_violations(n,rs,profile['dimensions'])),violating_record_ids=bad) for n in scope['negative_conditions'] if ins==n['instrument_id']]
+ return {'facts':decisions,'answers':answers,'negatives':negatives}
+
+def supplemental_classifications(ins, rs):
+ assertions=json.loads((C/'v56-supplemental-classification-assertions.json').read_text())['assertions']
+ results=[]
+ for a in assertions:
+  if a['instrument_id']!=ins:continue
+  found=[r for r in rs if r['object_type']=='Activity' and co(r['source_native']['name'])==co(a['name'])]
+  passed=bool(found) and all(r.get('action')==a['action'] and r['reported_period']==a['reported_period'] and r['subject_scope']==a['subject_scope'] and r['source_native'].get('header')==a['expected_header'] and co(a['supplier']) in co(r['source_native'].get('qualifier')) and a['page'] in pages(r) and all(co(fragment) in co(''.join(e['anchor']['bounded_quote'] for e in r['evidence'])) for fragment in a['source_name_fragments']) for r in found)
+  results.append({**a,'evaluated':True,'passed':passed,'record_ids':[r['record_id'] for r in found]})
+ return results
+
+if __name__=='__main__':
+ import sys
+ prefix=sys.argv[1] if len(sys.argv)>1 else '/tmp/v56_audit_'
+ all_decisions={}
+ for ins in scope['versions']:
+  rs=json.loads(Path(prefix+'raw_'+ins+'.json').read_text());profile=json.loads(Path(prefix+'profile_'+ins+'.json').read_text());d=evaluate(ins,rs,profile);all_decisions[ins]=d
+  print(ins,len(rs),'wrong',[(r['object_type'],r['source_native'],pages(r)) for r in rs if not d['facts'][r['record_id']]['accurate']],'answers',d['answers'],'neg',sum(n['passed'] for n in d['negatives']))
+ Path('/tmp/v56_audit_decisions.json').write_text(json.dumps(all_decisions,ensure_ascii=False,indent=2)+'\n')

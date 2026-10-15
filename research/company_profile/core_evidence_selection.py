@@ -1418,6 +1418,7 @@ REVENUE_SENTENCE_REPAIR_V52 = "v52"
 REVENUE_SENTENCE_REPAIR_V53 = "v53"
 REVENUE_SENTENCE_REPAIR_V54 = "v54"
 REVENUE_SENTENCE_REPAIR_V55 = "v55"
+REVENUE_SENTENCE_REPAIR_V56 = "v56"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
@@ -1475,6 +1476,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
         REVENUE_SENTENCE_REPAIR_V53,
         REVENUE_SENTENCE_REPAIR_V54,
         REVENUE_SENTENCE_REPAIR_V55,
+        REVENUE_SENTENCE_REPAIR_V56,
     }
 )
 
@@ -1555,6 +1557,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V53,
         REVENUE_SENTENCE_REPAIR_V54,
         REVENUE_SENTENCE_REPAIR_V55,
+        REVENUE_SENTENCE_REPAIR_V56,
     }
 
 
@@ -1618,6 +1621,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
         REVENUE_SENTENCE_REPAIR_V53,
         REVENUE_SENTENCE_REPAIR_V54,
         REVENUE_SENTENCE_REPAIR_V55,
+        REVENUE_SENTENCE_REPAIR_V56,
     }
 
 
@@ -1681,6 +1685,7 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V53,
         REVENUE_SENTENCE_REPAIR_V54,
         REVENUE_SENTENCE_REPAIR_V55,
+        REVENUE_SENTENCE_REPAIR_V56,
     }
 
 
@@ -1745,6 +1750,7 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
         REVENUE_SENTENCE_REPAIR_V53,
         REVENUE_SENTENCE_REPAIR_V54,
         REVENUE_SENTENCE_REPAIR_V55,
+        REVENUE_SENTENCE_REPAIR_V56,
     }
 
 
@@ -12364,6 +12370,11 @@ def _related_current_goods_bindings(excerpt: str) -> list[dict[str, Any]]:
         r"采购商品/接受劳务情况表([\s\S]+?)(?=出售商品/提供劳务情况表|$)", excerpt
     )
     if purchase:
+        # Services and construction remain purchases, with their native category.
+        # Use the same content rule for whole cells and enumerated objects.
+        purchase_service = re.compile(
+            r"服务|劳务|工程|检测|维修|咨询|招聘测试|建设项目"
+        )
         native = _native_related_sales_columns(purchase[1])
         if native is not None:
             physical_tables = True
@@ -12387,7 +12398,7 @@ def _related_current_goods_bindings(excerpt: str) -> list[dict[str, Any]]:
                         ActivityAction.PURCHASES,
                         header=(
                             "本期采购服务"
-                            if re.search("服务|劳务|工程|检测|维修", row[1])
+                            if purchase_service.search(row[1])
                             else "本期采购商品"
                         ),
                         qualifier=row[5],
@@ -12415,7 +12426,7 @@ def _related_current_goods_bindings(excerpt: str) -> list[dict[str, Any]]:
                         ActivityAction.PURCHASES,
                         header=(
                             "本期采购服务"
-                            if re.search("服务|劳务|工程|检测|维修", row[1])
+                            if purchase_service.search(row[1])
                             else "本期采购原内容"
                         ),
                         qualifier=row[5],
@@ -12433,7 +12444,11 @@ def _related_current_goods_bindings(excerpt: str) -> list[dict[str, Any]]:
                         add(
                             name,
                             ActivityAction.PURCHASES,
-                            header="本期采购商品",
+                            header=(
+                                "本期采购服务"
+                                if purchase_service.search(name)
+                                else "本期采购商品"
+                            ),
                             qualifier=row[5],
                         )
     if "本公司作为出租方" in excerpt:

@@ -31,3 +31,13 @@ A已有限通过旧v54并授权本包；A/B流程v1允许卡内连续修复，�
 ## Current source treatment and successor delivery
 
 The preceding Open Questions text is the retained pre-execution state. User source judgment and frozen source-scope.json retain nine original p23 rental cells as unclear unit conclusions; p151 yuan income is independently supported. No official unit correction is asserted. Original 307 positives and 44 negatives remain immutable. v55 successor B self-review meets 307/307 and dynamic 712/712 with zero numeric errors, pending A finite review; no archive or expansion is authorized at this stage.
+
+## A v55 review and final authorized successor
+
+v55's preceding 712/712 is the retained B self-review, not finite acceptance. A identified four purchase-category errors; its correction is attached separately in v55-a-review-correction.json and the old handoff is retained byte-for-byte. No original contract or score is overwritten.
+
+Tasks 4.5/4.6 follow A/B workflow v1 continuously: current-owner purchase classification and per-object category checks, real full-source local accept/query/export, direct regressions and scoped Review, then the final authorized successor v56. The four supplemental category assertions are frozen separately; original 307 positive/44 negative conditions do not change. v56 must inherit five switches, exact asset enqueue and runtime actor expansion, with the default identity unchanged. Continuous first run to second export <=300 seconds and shared <=50000 tokens include all PDF/layout/retries. After this attempt successors are exhausted at 2/2; success or failure goes to A through the single review entry. No archive, expansion or next pair is authorized.
+
+## Final successor failed to complete within the authorized budget
+
+v56 was started once as successor 2/2. More than 300 seconds elapsed after the flushed start marker without a new identity work item or output; it was interrupted and all available attempt artifacts were protected. No formal scores, token total or completed first-run-to-second-export timing exist. Local 307/307 and 712/712 are not formal results. The blocking call was not stack-captured; the precise operational cause is unknown. No new performance/framework work or another execution is authorized. 4.6 and finite acceptance remain unmet, 5.1 remains conditional, and exhausted-attempt failure goes to A.

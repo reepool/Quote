@@ -1,0 +1,9 @@
+[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[33m                                                                    [100%][0m
+============================= slowest 10 durations =============================
+92.99s call     tests/unit/test_research/test_company_profile_v50_realestate_chemical.py::test_complete_official_contract[independent_pages-600096.SH]
+90.75s call     tests/unit/test_research/test_company_profile_v50_realestate_chemical.py::test_complete_official_contract[pages-600096.SH]
+30.66s call     tests/unit/test_research/test_company_profile_v50_realestate_chemical.py::test_complete_official_contract[independent_pages-600064.SH]
+22.63s call     tests/unit/test_research/test_company_profile_v50_realestate_chemical.py::test_complete_official_contract[pages-600064.SH]
+
+(6 durations < 0.005s hidden.  Use -vv to show these durations.)
+[33m[32m5 passed[0m, [33m[1m7 deselected[0m, [33m[1m7 warnings[0m[33m in 238.39s (0:03:58)[0m[0m

@@ -1,0 +1,23 @@
+{
+  "original_b_results_retained": true,
+  "original_b_accuracy": {
+    "correct": 712,
+    "total": 712
+  },
+  "a_finite_acceptance": "not_granted",
+  "a_accuracy_upper_bound": {
+    "correct": 708,
+    "total": 712
+  },
+  "root_cause": "本期采购商品与服务分类遗漏咨询、招聘测试及建设项目；动作匹配未核栏目",
+  "affected_names": [
+    "十五五生态环境保护规划咨询",
+    "清洁生产审核编制咨询",
+    "第三方招聘测试",
+    "堆场建设项目"
+  ],
+  "impact": "4条Activity；原报告、原计分和正式制品不覆盖",
+  "authorized_successor_remaining": 1,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

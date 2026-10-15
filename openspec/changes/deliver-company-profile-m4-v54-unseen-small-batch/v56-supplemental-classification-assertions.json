@@ -1,0 +1,70 @@
+{
+  "contract_unchanged": true,
+  "positive_count": 307,
+  "negative_count": 44,
+  "assertions": [
+    {
+      "name": "十五五生态环境保护规划咨询",
+      "supplier": "中碳（福建）生态科技有限公司",
+      "business_category": "咨询服务采购",
+      "expected_header": "本期采购服务",
+      "page": 199,
+      "instrument_id": "600103.SH",
+      "action": "purchases",
+      "reported_period": "2025-12-31",
+      "subject_scope": "consolidated_group",
+      "source_name_fragments": [
+        "十五五生态",
+        "环境保护规",
+        "划咨询"
+      ]
+    },
+    {
+      "name": "清洁生产审核编制咨询",
+      "supplier": "中碳（福建）生态科技有限公司",
+      "business_category": "咨询服务采购",
+      "expected_header": "本期采购服务",
+      "page": 199,
+      "instrument_id": "600103.SH",
+      "action": "purchases",
+      "reported_period": "2025-12-31",
+      "subject_scope": "consolidated_group",
+      "source_name_fragments": [
+        "清洁生产审",
+        "核编制咨询"
+      ]
+    },
+    {
+      "name": "第三方招聘测试",
+      "supplier": "福建省轻纺（控股）有限责任公司",
+      "business_category": "招聘测试服务采购",
+      "expected_header": "本期采购服务",
+      "page": 199,
+      "instrument_id": "600103.SH",
+      "action": "purchases",
+      "reported_period": "2025-12-31",
+      "subject_scope": "consolidated_group",
+      "source_name_fragments": [
+        "第三方招聘",
+        "测试"
+      ]
+    },
+    {
+      "name": "堆场建设项目",
+      "supplier": "福建省轻安工程建设有限公司",
+      "business_category": "建设工程采购",
+      "expected_header": "本期采购服务",
+      "page": 199,
+      "instrument_id": "600103.SH",
+      "action": "purchases",
+      "reported_period": "2025-12-31",
+      "subject_scope": "consolidated_group",
+      "source_name_fragments": [
+        "堆场建设项",
+        "目"
+      ]
+    }
+  ],
+  "source_scope_sha256": "52d2b6ad2904352959182c5392588b17e590528741b9483b0df061c056ab6c45",
+  "source_layout_sha256": "b39c898cbedd9fae5bb2257d1df2d5cfbfdeffb2f12c05d5d5caef4de8ef908f"
+}

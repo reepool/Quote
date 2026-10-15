@@ -1,0 +1,30 @@
+{
+  "verified_at": "2026-10-15T01:48:33.773395+00:00",
+  "newly_rehashed_counts": {
+    "original_first": 18,
+    "original_first_review": 6,
+    "v55_first": 19,
+    "v55_review": 12,
+    "existing": 19,
+    "current_executed_code": 38,
+    "frozen_verification": 7,
+    "v56_failed_attempt": 4,
+    "first-executed-code-snapshot.json": 38,
+    "v55-executed-code-snapshot.json": 38,
+    "v56-executed-code-snapshot.json": 38
+  },
+  "source_scope_unchanged": true,
+  "v55_original_entry_unchanged": true,
+  "history_mechanical_receipt_reused": {
+    "file": "v56-source-freeze-receipt.json",
+    "frozen_at": "2026-10-15T01:39:08.966359+00:00",
+    "count": 3519,
+    "new_full_history_rehash_after_abort": false,
+    "limitation": "3519历史集合的全量哈希在正式前通过；同快照回执复用。中止后仅重核上列关键原件、既有改动、执行代码和本次失败制品，不声称再次全量重哈希。"
+  },
+  "formal_failure": "v56-formal-failure-receipt.json",
+  "successors_used": 2,
+  "successors_authorized": 2,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

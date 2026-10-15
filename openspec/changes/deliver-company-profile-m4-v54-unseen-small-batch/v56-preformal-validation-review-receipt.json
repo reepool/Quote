@@ -1,0 +1,54 @@
+{
+  "scoped_review": {
+    "blocking_findings_fixed": [
+      "采购整行与拆分分支遗漏咨询/招聘测试/建设项目分类",
+      "评分命中动作后未核商品与服务栏目",
+      "局部测试发现v56主体释义展开名单遗漏，已接续runtime"
+    ],
+    "remaining_in_scope_blockers": 0,
+    "reviewed_paths": [
+      "research/company_profile/core_evidence_selection.py",
+      "research/company_profile/operations.py",
+      "research/company_profile/runtime.py",
+      "tests/unit/test_research/test_company_profile_v55_property_paper.py",
+      "tests/unit/test_research/test_company_profile_v54_media_machinery.py"
+    ],
+    "nonblocking_or_unrelated": "行业、性能、框架、正文精简及旧无关失败后置；无全套通过声明"
+  },
+  "tests": [
+    {
+      "command": "pytest -q tests/unit/test_research/test_company_profile_v55_property_paper.py tests/unit/test_research/test_company_profile_v54_media_machinery.py tests/unit/test_research/test_company_profile_v53_source_conflict.py",
+      "result": "20 passed, 2 failed initially; the 12 old-source cases passed, 2 new full-owner cases exposed missing v56 actor expansion; fixed before formal",
+      "log": "v56_package_tests.log"
+    },
+    {
+      "command": "pytest -q tests/unit/test_research/test_company_profile_v55_property_paper.py",
+      "result": "10 passed after actor expansion correction; includes both complete sources, four classifier mutations, service/goods and prior-only checks",
+      "log": "v56_new_final_tests.log"
+    },
+    {
+      "command": "pytest -q tests/unit/test_research/test_company_profile_v50_realestate_chemical.py -k \"complete_official or purchase\"",
+      "result": "5 passed, 7 deselected",
+      "log": "v56_old_v50_tests.log"
+    }
+  ],
+  "ruff_check": "passed on 5 changed Python files",
+  "ruff_format_check": "5 files formatted",
+  "scope_diff_check": "passed",
+  "strict_openspec": [
+    "deliver-company-profile-m4-v54-unseen-small-batch",
+    "company-profile-common-core-owned-page-facts",
+    "company-profile-common-core-company-total-and-income-mix",
+    "company-profile-m4-first-expansion"
+  ],
+  "local_closure_receipt": "v56-local-closure-receipt.json",
+  "old_v55_replay": "v56-checker-v55-replay-receipt.json",
+  "source_review": "official p199–200 PDF layout independently rebuilt and compared; four complete native names/suppliers/categories read directly; multiline cell fragments reflect PDF columns, not edited source names",
+  "formal_authority": {
+    "successors_used_before_this_round": 1,
+    "successors_authorized": 2,
+    "next_round_is_final": true
+  },
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

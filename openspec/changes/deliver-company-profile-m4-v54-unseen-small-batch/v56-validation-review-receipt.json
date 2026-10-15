@@ -1,0 +1,25 @@
+{
+  "preformal_receipt": "v56-preformal-validation-review-receipt.json",
+  "local_closure": "v56-local-closure-receipt.json",
+  "formal_failure": "v56-formal-failure-receipt.json",
+  "formal_attempts": {
+    "first_used": 1,
+    "successors_used": 2,
+    "successors_authorized": 2,
+    "another_round_started": false
+  },
+  "formal_gate_status": "failed_to_complete_within_300_seconds",
+  "formal_scores": null,
+  "formal_negatives_evaluated": false,
+  "formal_token_receipt_available": false,
+  "code_review": {
+    "classification_and_scoring_blockers_fixed": true,
+    "v56_runtime_actor_expansion_fixed_before_formal": true,
+    "remaining_known_code_blockers_in_4_5": 0,
+    "formal_4_6_requirement_unmet": true,
+    "stalled_call_root_cause_confirmed": false
+  },
+  "unrelated_work": "performance/framework/industry/old unrelated issues deferred",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

@@ -105,7 +105,55 @@ def match(r, v):
     return False
 
 
+# Independently read p199–200 categories; these expectations do not call the
+# extraction classifier. Native names and the frozen contract stay unchanged.
+PURCHASE_SERVICE_NAMES = {
+    "ESG咨询服务",
+    "ESG咨询服务等",
+    "十五五生态环境保护规划咨询",
+    "清洁生产审核编制咨询",
+    "信息化服务",
+    "第三方招聘测试",
+    "堆场建设项目",
+    "物业服务及维修",
+    "维修",
+    "大气污染治理资金申报服务",
+    "漂白和木片仓废气治理工程",
+    "纸浆检测",
+    "纸浆检测费",
+    "工程项目承包及其他咨询服务",
+    "工程项目承包及其他咨询服务等",
+}
+PURCHASE_GOODS_NAMES = {
+    "废纸袋",
+    "食用油",
+    "化学品原料",
+    "风油香精、精油皂等原料和商品",
+    "风油香精",
+    "精油皂",
+    "手工皂、洗衣液等",
+    "手工皂、洗衣液",
+    "手工皂",
+    "洗衣液",
+    "石灰粉原料",
+}
+
+
+def purchase_category_matches(r):
+    """Reject category errors even when the action and supplier match."""
+    if r.get("action") != "purchases" or not ({199, 200} & pages(r)):
+        return True
+    n = r["source_native"]
+    if n["name"] in PURCHASE_SERVICE_NAMES:
+        return n.get("header") == "本期采购服务"
+    if n["name"] in PURCHASE_GOODS_NAMES:
+        return n.get("header") in {"本期采购商品", "本期采购原内容"}
+    return False
+
+
 def rolematch(r, v):
+    if not purchase_category_matches(r):
+        return False
     if co(r["source_native"]["name"]) not in {co(a) for a in v["native_aliases"]}:
         return False
     expected = (
@@ -272,7 +320,7 @@ def test_actual_official_input_delivers_frozen_income_actions_and_boundaries(
         instrument=instrument,
         fixture=source["report"],
         pages=source["pages"],
-        repair_version="v55",
+        repair_version="v56",
     )
     assert queried == exported
     ck = json.loads(
@@ -347,6 +395,38 @@ def test_actual_official_input_delivers_frozen_income_actions_and_boundaries(
                 if f["record_id"] == record["record_id"]
             )
             assert published["uncertainty"] == record["uncertainty"]
+    if instrument == "600103.SH":
+        assertions = [
+            {
+                "name": name,
+                "supplier": supplier,
+                "expected_header": "本期采购服务",
+                "reported_period": "2025-12-31",
+                "subject_scope": "consolidated_group",
+                "page": 199,
+            }
+            for name, supplier in [
+                ("十五五生态环境保护规划咨询", "中碳（福建）生态科技有限公司"),
+                ("清洁生产审核编制咨询", "中碳（福建）生态科技有限公司"),
+                ("第三方招聘测试", "福建省轻纺（控股）有限责任公司"),
+                ("堆场建设项目", "福建省轻安工程建设有限公司"),
+            ]
+        ]
+        for a in assertions:
+            found = [
+                r
+                for r in rs
+                if r["source_native"]["name"] == a["name"]
+                and r.get("action") == "purchases"
+            ]
+            assert found
+            for r in found:
+                assert r["source_native"]["header"] == a["expected_header"]
+                assert co(a["supplier"]) in co(r["source_native"].get("qualifier"))
+                assert r["reported_period"] == a["reported_period"]
+                assert r["subject_scope"] == a["subject_scope"]
+                assert a["page"] in pages(r)
+                assert purchase_category_matches(r)
     if instrument == "600094.SH":
         assert not any(r["source_native"]["name"] == "映辰（毛家" for r in rs)
         notes = [
@@ -428,3 +508,59 @@ def test_wrapped_purchase_services_do_not_become_goods():
     assert service and all(b["header"] == "本期采购服务" for b in service)
     soaps = [b for b in bindings if b["name"] == "手工皂、洗衣液"]
     assert soaps and all(b["header"] == "本期采购原内容" for b in soaps)
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "十五五生态环境保护规划咨询",
+        "清洁生产审核编制咨询",
+        "第三方招聘测试",
+        "堆场建设项目",
+    ],
+)
+def test_purchase_match_rejects_goods_header_for_native_services(name):
+    bundle = json.loads(FIXTURE.read_text())
+    v = next(v for v in bundle["contract"]["native_roles"] if v["name"] == name)
+    supplier = v["qualifier"].split("供应方", 1)[1].split("；", 1)[0]
+    r = {
+        "object_type": "Activity",
+        "action": "purchases",
+        "subject_scope": "consolidated_group",
+        "reported_period": "2025-12-31",
+        "evidence": [{"page": 199}],
+        "source_native": {
+            "name": name,
+            "header": "本期采购服务",
+            "qualifier": "交易对方：" + supplier,
+        },
+    }
+    assert rolematch(r, v)
+    r["source_native"]["header"] = "本期采购商品"
+    assert not rolematch(r, v)
+
+
+def test_native_purchase_categories_keep_service_goods_and_prior_blanks():
+    from research.company_profile import core_evidence_selection as selection
+
+    ps = json.loads(FIXTURE.read_text())["official_inputs"]["600103.SH"]["pages"]
+    text = "\n".join(
+        p.get("layout_text") or p["text"] for p in ps if p["page"] in [199, 200]
+    )
+    bindings = selection._related_current_goods_bindings(text)
+    for name in [
+        "十五五生态环境保护规划咨询",
+        "清洁生产审核编制咨询",
+        "第三方招聘测试",
+        "堆场建设项目",
+    ]:
+        found = [b for b in bindings if b["name"] == name]
+        assert found and all(b["header"] == "本期采购服务" for b in found)
+    for name in ["手工皂", "洗衣液", "风油香精", "精油皂"]:
+        found = [b for b in bindings if b["name"] == name]
+        assert found and all(b["header"] == "本期采购商品" for b in found)
+    assert not any(
+        b["name"]
+        in {"煤炭原料", "木片原料", "咨询服务", "盐产品", "盐礼盒", "污水沉砂池设备"}
+        for b in bindings
+    )

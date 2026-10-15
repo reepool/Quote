@@ -1,0 +1,27 @@
+{
+  "readonly_old_formal_replay": true,
+  "wrong_facts": [
+    [
+      "600103.SH",
+      "owned:core-ev-393c389d988ebe88:commodity:8",
+      "采购栏目不符原业务类别：服务/工程与商品须核对，不以动作命中代替分类"
+    ],
+    [
+      "600103.SH",
+      "owned:core-ev-393c389d988ebe88:commodity:9",
+      "采购栏目不符原业务类别：服务/工程与商品须核对，不以动作命中代替分类"
+    ],
+    [
+      "600103.SH",
+      "owned:core-ev-393c389d988ebe88:commodity:13",
+      "采购栏目不符原业务类别：服务/工程与商品须核对，不以动作命中代替分类"
+    ],
+    [
+      "600103.SH",
+      "owned:core-ev-393c389d988ebe88:commodity:14",
+      "采购栏目不符原业务类别：服务/工程与商品须核对，不以动作命中代替分类"
+    ]
+  ],
+  "correct": 708,
+  "original_b_scores_unchanged": true
+}
