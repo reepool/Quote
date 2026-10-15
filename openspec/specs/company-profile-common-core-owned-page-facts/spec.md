@@ -368,3 +368,15 @@ A current affirmative manufacturing-and-sales declaration MAY bind the current n
 #### Scenario: Entrusted operations exclude management fees
 - **WHEN** the source states a named subsidiary operates entrusted resources without commission or management fees in 2023–2025
 - **THEN** substantive answers retain the original actor, period and fee exclusion rather than inventing a service-charge mechanism
+
+
+### Requirement: Procurement category and conflicting rental units remain source-grounded
+Current consulting, recruitment testing and construction purchases MUST retain service or construction meaning rather than goods. Whole-cell and split-object paths MUST agree while preserving original names, supplier, period, direction and Evidence. Accuracy review MUST validate category, including contract-external output. Genuine goods and prior-only blanks MUST retain their existing boundaries. Unexplained official rental-unit conflicts MUST preserve raw values and Evidence with unclear conclusions and MUST NOT support definite business answers; an independently supported financial-note amount MAY remain definite.
+
+#### Scenario: A purchase row is consulting rather than goods
+- **WHEN** a current related-party table discloses environmental planning consulting, audit consulting, recruitment testing or yard construction
+- **THEN** accepted facts, query and export preserve its full name and supplier as a service or construction purchase, and category-aware review rejects a goods assertion
+
+#### Scenario: Rental units conflict across official tables
+- **WHEN** an official rental table prints a unit inconsistent with an independently supported note and the conflict cannot be explained
+- **THEN** the original conflicting cells remain unclear and excluded from definite answer support without inventing corrected source text

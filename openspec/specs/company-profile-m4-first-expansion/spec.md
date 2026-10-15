@@ -136,3 +136,15 @@ The first M4 expansion MUST NOT implement a manufacturing/materials production e
 - **THEN** the finding is recorded as not delivered or inaccurate as the facts require
 - **AND** this change does not add a new extractor or a new published identity
 - **AND** a later change is required before any successor identity is published
+
+
+### Requirement: Complete v57 successors retain bounded entry semantics
+A reviewed successor identity MUST inherit the five cumulative repair switches, exact official-asset enqueue and source-grounded actor expansion while default identity remains unchanged. Registry loading and service construction MUST consume the same whole-round budget as PDF, layout, retries and two exports. External supervision MUST terminate synchronous blocking and preserve evidence. Registry connection reuse MUST preserve every full-market field and official validation without caching rows, changing the denominator or inferring a historical timeout root cause.
+
+#### Scenario: A bounded controlled pair starts
+- **WHEN** an authorized controlled two-report round starts its process
+- **THEN** continuous time includes registry and service preparation through the second export, and a synchronous block is bounded with diagnostic evidence
+
+#### Scenario: v57 receives finite approval
+- **WHEN** A accepts 307/307 and 712/712 for the frozen property and paper reports
+- **THEN** only that finite source scope may close, failed attempts and cache limitations remain, and production and scale authority stay unchanged
