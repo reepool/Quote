@@ -1,0 +1,68 @@
+{
+  "created_at": "2026-10-15T03:34:16.479491+00:00",
+  "selection": {
+    "plan_id": "3b9ffb5f97d78065acd11187b2003d8f99f5ea36ca8c3d2df44321317b8b75b1",
+    "knowledge_cutoff": "2026-09-17",
+    "max_companies_this_round": 2,
+    "token_budget": 50000,
+    "reports": [
+      {
+        "instrument_id": "600098.SH",
+        "asset_id": "asset_0d154e8e39d0be71567619c31f820c70",
+        "report_id": "1225103737",
+        "report_period": "2025-12-31",
+        "document_version": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+        "disclosure_form": "service"
+      },
+      {
+        "instrument_id": "600104.SH",
+        "asset_id": "asset_c32b6e7708c1cc8726dcfb5c41451400",
+        "report_id": "1225071780",
+        "report_period": "2025-12-31",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "disclosure_form": "manufacturing"
+      }
+    ]
+  },
+  "source_counts": {
+    "600098.SH": {
+      "official_pdf_pages": 259,
+      "source_contract_pages": 33,
+      "physical_layout_pages": 30
+    },
+    "600104.SH": {
+      "official_pdf_pages": 205,
+      "source_contract_pages": 29,
+      "physical_layout_pages": 31
+    }
+  },
+  "first_attempts_used": 0,
+  "successors_used": 0,
+  "business_execution_or_rehearsal": false,
+  "contract_frozen": false,
+  "source_conflict_pending": true,
+  "draft_counts": {
+    "bodies": 6,
+    "income": 239,
+    "actions": 210,
+    "positive_candidates": 455,
+    "negative_candidates": 41,
+    "pending_conflict_rows": 2
+  },
+  "existing_modified_files_verified": 19,
+  "previous_history_files_verified_at_freeze": 3750,
+  "same_source_v57_business_rerun": false,
+  "archive_preservation_verified": true,
+  "production": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "archive_originals_verified": 170,
+  "validation": {
+    "new_change_strict": "passed",
+    "all_main_specs_strict": "114 passed, 0 failed",
+    "archived_change_strict_after_move": "passed (temporary active-path mapping removed)",
+    "draft_amounts_present_on_original_page": "239/239; source transcription only, not business acceptance",
+    "review": "one original-source relation conflict requires A; no known archive/scope blocker",
+    "pytest": "not run; business code unchanged",
+    "git_diff_specs_check": "passed"
+  }
+}

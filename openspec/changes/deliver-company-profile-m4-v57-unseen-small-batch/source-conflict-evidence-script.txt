@@ -1,0 +1,9 @@
+import json,hashlib
+from pathlib import Path
+import pypdfium2 as pdfium
+C=Path('openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch');P=json.loads(Path('data/checkpoints/company_profile_common_core/reports/m4_v57_unseen_small_batch/plan.json').read_text());r=P['reports'][0];h=r['document_version'];f=Path(f'data/filings/announcements/blobs/{h[:2]}/{h}.pdf');d=pdfium.PdfDocument(str(f))
+texts=json.loads(Path('/tmp/v57new_source_600098.SH.json').read_text());lay=json.loads(Path('/tmp/v57new_layout_600098.SH.json').read_text())
+for n in [223,224,234]:d[n-1].render(scale=1.2).to_pil().save(C/f'independent-600098.SH-p{n}.png')
+e=dict(status='awaiting_A_source_conflict_ruling_before_formal',instrument_id='600098.SH',report=r,pdf_sha256=hashlib.sha256(f.read_bytes()).hexdigest(),pages={str(n):dict(text=texts[n-1]['text'],layout=lay[str(n)]) for n in [223,224,234]},conflict='p223 heading important joint ventures vs p224 associate-labelled rows and p234 explicit associate relationship',affected_rows=[dict(name='广东红海湾发电有限公司',value='4680929334.73',unit='元'),dict(name='广东珠海金湾液化天然气有限公司',value='889217225.49',unit='元')],proposed_treatment='retain raw Evidence, row identities/current yuan amounts and original conflicting heading; relationship conclusion unclear, do not assert joint-venture/associate classification or consolidated-group revenue until A ruling; independent current group income remains certain',formal_attempts_used=0,contract_not_frozen=True)
+(C/'source-relationship-conflict-evidence.json').write_text(json.dumps(e,ensure_ascii=False,indent=2)+'\n')
+print('SOURCE_CONFLICT_EVIDENCE_SAVED')

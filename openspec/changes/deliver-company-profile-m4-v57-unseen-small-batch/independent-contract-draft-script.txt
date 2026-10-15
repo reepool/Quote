@@ -1,0 +1,184 @@
+"""Source-only manual ledger, prior to any business output. Not a frozen contract."""
+import json,hashlib
+from pathlib import Path
+from datetime import datetime,timezone
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch';P=json.loads((R/'data/checkpoints/company_profile_common_core/reports/m4_v57_unseen_small_batch/plan.json').read_text());G='600098.SH';S='600104.SH';group='公司及合并子公司';rows={G:[],S:[]};roles=[];neg=[]
+def inc(i,p,n,v,h,d='business_type',u='元',a=group,s='consolidated_group',cp=None,seg=None,col='本期营业收入',q=None):
+ rows[i].append(dict(condition_id=f'{i}-income-{len(rows[i])+1:03}',instrument_id=i,page=p,name=n,native_aliases=[n],value=v.replace(',',''),unit=u,dimension=d,header=h,table_basis=h,source_column=col,source_actor=a,subject_scope=s,counterparty=cp,source_segment=seg,qualifier=q,reported_period='2025-12-31',period_state='current_printed'))
+def many(i,p,h,data,**kw):
+ for n,v in data:inc(i,p,n,v,h,**kw)
+def act(i,p,n,v,a=group,s='consolidated_group',q=None,cat=None,cp=None,context=None):
+ roles.append(dict(condition_id=f'{i}-action-{sum(x["instrument_id"]==i for x in roles)+1:03}',instrument_id=i,page=p,name=n,native_aliases=[n],source_actions=[v],source_actor=a,actor_aliases=[a],subject_scope=s,qualifier=q,category=cat,counterparty=cp,context_pages=context or [],state='current_affirmative',reported_period='2025-12-31'))
+def no(i,p,n,**kw):neg.append(dict(condition_id=f'{i}-negative-{sum(x["instrument_id"]==i for x in neg)+1:03}',instrument_id=i,page=p,name=n,**kw))
+# Guangzhou: each native basis/column is independent, not an arithmetic reconstruction.
+many(G,18,'主营业务分行业',[('燃煤发电及供热业务','4349947127.70'),('天然气发电及供热业务','3204831500.79'),('能源物流业务','29485020343.45')],d='industry')
+many(G,19,'主营业务分行业',[('天然气业务','10502056882.42'),('新能源及储能业务','3245504723.82'),('其他产业','95784921.17')],d='industry')
+many(G,19,'主营业务分产品',list(zip(['燃煤发电','天然气发电','煤电热力','气电热力','加气混凝土','煤炭','油品','危化品仓储','天然气','光伏发电','风力发电','充电桩','储能及综合能源','房产租赁','金融业务'],['3991623307.63','3009223900.18','318878412.48','195607600.61','39445407.59','23064543028.53','6395908933.37','24568381.55','10502056882.42','1020539666.84','2194507260.36','13668577.65','16789218.97','53158385.24','42626535.93'])),d='product')
+many(G,19,'主营业务分地区',[('华南地区','28489632478.05'),('其他地区','22393513021.30')],d='region')
+many(G,23,'贸易业务开展情况',[('煤炭','23064543028.53'),('油品','6395908933.37'),('天然气','3603362079.80')],d='product')
+many(G,26,'电力行业/电量收入及成本',[('火电','69.28'),('风电','21.92'),('光伏发电','10.20'),('合计','101.39')],u='亿元',d='product',col='本期收入')
+aliases={'东电公司':'广州东方电力有限公司','天然气发电公司':'广州珠江天然气发电有限公司','恒益热电公司':'佛山恒益热电有限公司','中电荔新公司':'广州中电荔新热电有限公司','南沙电力公司':'广州发展南沙电力有限公司','能源物流集团':'广州发展能源物流集团有限公司','燃气集团':'广州燃气集团有限公司','新能源集团':'广州发展新能源集团股份有限公司','储能集团':'广州储能集团有限公司','财务公司':'广州发展集团财务有限公司','珠海金湾公司':'广东珠海金湾液化天然气有限公司','红海湾发电公司':'广东红海湾发电有限公司'}
+for n,v in zip(aliases,['116507.87','109181.15','164126.43','141120.15','177189.12','3066856.13','722940.59','304897.84','1290.10','15779.80','88921.72','468092.93']):
+ inc(G,33,n,v,'主要控股参股公司分析',u='万元',a=aliases[n],s='group_associated_entity' if n in ['珠海金湾公司','红海湾发电公司'] else 'named_subsidiary',q='参股公司，不并表；合营/联营细分待裁决' if n in ['珠海金湾公司','红海湾发电公司'] else '原简称对应p5全名，不与合并收入累计')
+many(G,90,'合并利润表',[('营业总收入','50883145499.35'),('营业收入','50841626989.35'),('利息收入','41518510.00')],col='2025年度')
+many(G,193,'合并营业收入和营业成本',[('主营业务','50398202694.21'),('其他业务','443424295.14'),('合计','50841626989.35')])
+for block,data in [('电力业务',[('煤电','3918547846.77'),('煤电热力','318878412.48'),('气电','3008980877.93'),('气电热力','195607600.61'),('加气混凝土','37342353.94'),('小计','7479357091.73')]),('能源物流业务',[('煤炭','23062882143.43'),('油品','6394351769.68'),('危化品仓储','24568381.55'),('小计','29481802294.66')]),('燃气业务',[('天然气','10148088882.32'),('小计','10148088882.32')]),('新能源及储能业务',[('光伏发电','1019915934.22'),('风力发电','2191997937.18'),('储能及综合能源','13094423.29'),('充电桩','13668577.65'),('小计','3238676872.34')]),('其他产业',[('房产租赁','49169527.23'),('融资租赁','1108025.93'),('小计','50277553.16')])]:many(G,193,'合同收入分解/'+block,data,d='product',seg=block)
+inc(G,193,'合计','50398202694.21','合同收入分解/主营业务')
+many(G,194,'公司前五名客户的营业收入',list(zip(['中国南方电网及其子公司','中国石化销售股份有限公司及其附属企业','国家电网公司及子公司','内蒙古汇能集团通汇煤炭经营有限公司','广东省电力工业燃料有限公司','合计'],['7857315439.12','3711216946.79','2061017764.95','1383998380.16','1295822979.34','16309371510.36'])),d='customer',col='营业收入总额')
+many(G,194,'利息净收入/利息收入',[('利息收入','41518510.00'),('存放同业','36116706.49'),('存放中央银行','5401803.51')],col='本期金额',q='金融业务利息收入，不混入财务费用冲减项')
+many(G,207,'作为出租人的经营租赁',[('经营租赁收入','49169527.23'),('合计','49169527.23')],col='租赁收入')
+inc(G,207,'销售收入','1108025.93','作为出租人的融资租赁',col='销售损益',q='销售收入原行；成本与损益合计不当作收入')
+sub222=[('广州珠江天然气发电有限公司','1091811527.18'),('佛山恒益热电有限公司','1641264321.29'),('广州中电荔新热电有限公司','1411201488.74'),('广州发展南沙电力有限公司','1771891209.96'),('广州储能集团有限公司（合并）','12900967.32'),('美姑兴澜风电开发有限公司','136370815.24'),('临西县万辉新能源科技有限公司','140348140.29'),('广州发展碧辟油品有限公司','5809066500.42')]
+for n,v in sub222:inc(G,222,n,v,'重要非全资子公司的主要财务信息',a=n,s='named_subsidiary',col='本期发生额/营业收入')
+# Current related sales and prior-only cells transcribed from physical p236 columns.
+salesG=[('佛山市恒益环保建材有限公司','粉煤灰、蒸汽、石膏浆液、水、炉渣','5446452.83'),('佛山市恒益环保建材有限公司','外派人员劳务费','1895964.80'),('广东珠海金湾液化天然气有限公司','外派人员劳务费','615983.43'),('广州发展航运有限公司','回租业务收入','1057226.40'),('广州发展航运有限公司','外派人员劳务费','798425.96'),('广州港发石油化工码头有限公司','外派人员劳务费','840000.00'),('广州港发石油化工码头有限公司','油品仓储、水电费','60009.61'),('广州国有资产管理集团有限公司','销售天然气','23767.58'),('广州南沙珠江啤酒有限公司','电费、节能服务费','5033985.29'),('广州南沙珠江啤酒有限公司','销售天然气','137960.45'),('河北珠江啤酒有限公司','节能服务费','501574.17'),('湛江珠江啤酒有限公司','节能服务费','1307009.32'),('广州荣鑫容器有限公司','销售天然气','6421719.92'),('广州市超算分布式能源投资有限公司','销售天然气','25791821.82'),('广州珠江啤酒股份有限公司','销售天然气','30424.14'),('广州饮食服务企业集团有限公司','销售天然气','198229.23'),('广州环投增城环保能源有限公司','销售天然气','15830956.20'),('广州环投环境集团有限公司','销售天然气','15805.18'),('广州环投环境服务有限公司','电力交易代理','44338.94'),('广州恒运企业集团股份有限公司','煤炭销售','239134246.49'),('广州恒运企业集团股份有限公司','绿证销售','11645754.72'),('碧辟（中国）投资有限公司广州分公司','油品仓储','1604641.51'),('广州国际企业孵化器有限公司','电力交易代理','58972.57'),('梅州珠江啤酒有限公司','节能服务费','299629.82'),('广州从化珠江啤酒分装有限公司','节能服务费','4056594.50'),('东莞市珠江啤酒有限公司','节能服务费','2027023.75'),('广州恒运分布式能源发展有限公司','代输费','2613401.18'),('广州展能投资有限公司','外派人员劳务费','1320754.72')]
+for cp,n,v in salesG:inc(G,236,n,v,'关联交易/出售商品及提供劳务',cp=cp,col='本期发生额')
+for cp,n,v in [('广州产投私募基金管理有限公司','房屋建筑物','626091.48'),('广州市中小企业发展基金有限公司','房屋、车位租赁','834809.16'),('广州产业投资资本管理有限公司','房屋建筑物','2306525.76'),('广州产业投资控股集团有限公司','房屋、车位租赁','9728459.26'),('广州发展航运有限公司','房屋建筑物','1161553.19'),('广州绿色基础设施产业投资基金管理有限公司','房屋建筑物','417394.32')]:inc(G,237,n,v,'关联租赁/本公司作为出租方',cp=cp,col='本期确认的租赁收入')
+many(G,245,'分部信息/地区对外交易收入',[('中国华南地区','28489632478.05'),('其他地区','22393513021.30'),('合计','50883145499.35')],d='region')
+segments=['燃煤发电及供热分部','天然气发电及供热分部','新能源及储能分部','燃气分部','能源物流分部','其他']
+for col,values in [('对外交易收入',['4352327148.48','3195552231.87','3249555552.18','10506023612.35','29486238243.28','93448711.19']),('分部间交易收入',['171469370.59','7018222.47','4553737.62','1635395597.66','1900230913.95','246540080.02'])]:
+ for n,v in zip(segments,values):inc(G,246,n,v,'报告分部的财务信息',d='business_type',seg=n,col=col)
+inc(G,246,'合计','50883145499.35','报告分部的财务信息',col='对外交易收入')
+inc(G,246,'分部间抵销','3965207922.31','报告分部的财务信息',col='分部间交易收入',q='抵销原列打印正数；合计空，不借额')
+many(G,257,'母公司营业收入和营业成本',[('主营业务','48114415.90'),('其他业务','2959109.36'),('合计','51073525.26')],a='广州发展集团股份有限公司（母公司）',s='issuer')
+# SAIC: consolidated operating revenue excludes the separate financial gross components.
+many(S,11,'主营业务分行业',[('汽车制造业','646152101889.30'),('金融业','10091710191.88'),('合计','656243812081.18')],d='industry')
+many(S,11,'主营业务分产品',[('整车业务','410196473001.11'),('零部件业务','203019866775.26'),('劳务及其他','32935762112.94'),('金融业务','10091710191.88'),('合计','656243812081.18')],d='product')
+many(S,11,'主营业务分地区',[('中国','504138835950.64'),('其他','152104976130.54'),('合计','656243812081.18')],d='region',q='其他地区按本年纳入通用五菱出口的可比口径')
+many(S,18,'新能源汽车收入及补贴',[('乘用车','11921125'),('商用车','1431094')],d='product',u='万元',col='收入',q='不将打印零补贴当收入或零销售')
+for p,n,v in [(18,'上海汽车集团财务有限责任公司','60.76'),(19,'上汽通用汽车金融有限责任公司','30.70'),(19,'上海东正汽车金融股份有限公司','4.56')]:inc(S,p,n,v,'汽车金融业务/基本情况',u='亿元',a=n,s='named_subsidiary')
+subS=[('华域汽车','华域汽车系统股份有限公司','18399890.05'),('动力新科','上海新动力汽车科技股份有限公司','573954.10'),('智己汽车','智己汽车科技有限公司','1541140.76'),('上汽大通','上汽大通汽车有限公司','2533685.67'),('上汽财务公司','上海汽车集团财务有限责任公司','946887.95'),('中联汽车电子有限公司','中联汽车电子有限公司','2969.63'),('上海颀盟企业管理合伙企业（有限合伙）','上海颀盟企业管理合伙企业（有限合伙）','0.00')]
+for n,a,v in subS:inc(S,26,n,v,'主要控股参股公司分析',u='万元',a=a,s='named_subsidiary',col='营业总收入',q='原表公司层级口径，不与p18个别口径合并；打印零仍是收入披露但不反推动作')
+many(S,69,'合并利润表',[('营业总收入','656243812081.18'),('营业收入','646152101889.30'),('利息收入','9651526716.87'),('手续费及佣金收入','440183475.01')],col='2025年度')
+many(S,155,'合并营业收入和营业成本',[('主营业务','632007457472.74'),('其他业务','14144644416.56'),('合计','646152101889.30')])
+many(S,155,'主营业务收入明细',[('整车业务','410196473001.11'),('零部件业务','203019866775.26'),('劳务及其他','18791117696.37'),('合计','632007457472.74')],d='product')
+many(S,155,'其他业务收入明细',[('材料及废料销售','7098573219.12'),('劳务','4767911918.73'),('租赁','1094574636.74'),('其他','1183584641.97'),('合计','14144644416.56')],d='product')
+many(S,155,'集团前五名客户的营业收入',list(zip(['客户一','客户二','客户三','客户四','客户五','合计'],['33120406668.62','15730209886.40','9957610546.75','9523196371.07','7126788037.36','75458211510.20'])),d='customer')
+for name,v,seg,col in [('在某一时点确认','410196473001.11','整车业务','主营业务收入/在某一时点确认'),('在某一时点确认','203019866775.26','零部件业务','主营业务收入/在某一时点确认'),('在某一时点确认','6959111768.20','劳务及其他','主营业务收入/在某一时点确认'),('在某一时点确认','620175451544.57','合计','主营业务收入/在某一时点确认'),('在某一时段内确认','11832005928.17','劳务及其他','主营业务收入/在某一时段内确认'),('在某一时段内确认','11832005928.17','合计','主营业务收入/在某一时段内确认'),('其他业务收入','14144644416.56','其他','其他业务收入'),('其他业务收入','14144644416.56','合计','其他业务收入')]:inc(S,156,name,v,'2025年度收入确认时间分解',seg=seg,col=col,q='时间栏目不能标为产品或地区；保留原分部列及2025年度')
+for seg,v in [('整车业务','410196473001.11'),('零部件业务','203019866775.26'),('劳务及其他','18791117696.37'),('其他','14144644416.56'),('合计','646152101889.30')]:inc(S,156,'合计',v,'2025年度收入确认时间分解',seg=seg,col='合计营业收入/'+seg)
+many(S,165,'作为出租人的经营租赁',[('自有房屋及建筑物等','1094574636.74'),('合计','1094574636.74')],col='租赁收入')
+for n,a,v in [('华域汽车','华域汽车系统股份有限公司','183998900513.66'),('通用五菱','上汽通用五菱汽车股份有限公司','86149883158.29')]:inc(S,172,n,v,'重要非全资子公司的主要财务信息',a=a,s='named_subsidiary',col='本期发生额/营业收入')
+salesS=[(184,'合营企业','销售商品','52027039912.73'),(184,'联营企业','销售商品','4067284982.00'),(184,'上汽总公司之子公司','销售商品','1739149572.80'),(184,'合营企业','销售材料','618808267.44'),(184,'联营企业','销售材料','109412285.78'),(184,'合营企业','提供劳务','4884467932.01'),(184,'上汽总公司','提供劳务','710362377.72'),(184,'联营企业','提供劳务','542184502.36'),(184,'上汽总公司之子公司','提供劳务','107448784.49'),(184,'上汽总公司之联营企业','提供劳务','10752263.43'),(184,'合营企业','收取技术提成费及技术转让费','9111568.59'),(185,'合营企业','租赁收入','177345271.26'),(185,'联营企业','租赁收入','39643714.99'),(185,'上汽总公司之子公司','租赁收入','2940066.60')]
+for p,cp,n,v in salesS:inc(S,p,n,v,'关联交易/出售商品及提供劳务',cp=cp,col='本期发生额',q='原关系类为交易方分类，不是收入卖方')
+for n,v in [('合营企业','9034043.95'),('联营企业','2770513.59'),('合计','11804557.54')]:inc(S,186,'贷款利息收入',v,'其他关联交易/财务公司及上汽通用金融向关联方收取之贷款利息收入',cp=n,a='财务公司及上汽通用金融',s='named_subsidiary',col='2025年度')
+inc(S,187,'利息收入','34814440.63','其他关联交易/本集团向关联方收取之利息收入',cp='合营企业',col='2025年度',q='本集团除财务公司及上汽通用金融，不与贷款本金或费用混淆')
+for n,v in [('上汽总公司','208727.67'),('合营企业','8917.70'),('上汽总公司之子公司','6982.45'),('合计','224627.82')]:inc(S,187,'手续费收入',v,'其他关联交易/财务公司委托业务',cp=n,a='上海汽车集团财务有限责任公司',s='named_subsidiary',col='2025年度')
+for n,v in [('整车及零部件','644665370348.55'),('金融业','11578441732.63'),('合计','656243812081.18')]:inc(S,193,n,v,'报告分部的财务信息',seg=n,col='对外交易收入')
+for n,v in [('金融业','36066953.66'),('分部间抵销','-36066953.66')]:inc(S,193,n,v,'报告分部的财务信息',seg=n,col='分部间交易收入',q='原负抵销保留；整车及零部件和合计列为空')
+many(S,202,'母公司营业收入和营业成本',[('主营业务','59707338395.53'),('其他业务','9165375849.96'),('合计','68872714245.49')],a='上海汽车集团股份有限公司（母公司）',s='issuer')
+# Named current actions: use actual production/sale declarations, not future capacity or registry-only inference.
+for n in ['电力','蒸汽']:
+ for v in ['produces','sells']:act(G,9,n,v,context=[19])
+for n in ['天然气','煤炭','成品油']:
+ for v in ['procures','sells']:act(G,9,n,v)
+for n in ['能源管理服务','天然气装卸、运输和储存','煤炭装卸、运输和储存','油品装卸、运输和储存']:act(G,9,n,'provides_service')
+for n in ['源网荷储充一体化','能源托管','节能运维','碳资产管理']:act(G,10,n,'provides_service',context=[9])
+for n in ['燃煤发电','天然气发电','风力发电','光伏发电']:
+ for v in ['produces','sells']:act(G,245,n,v,context=[9,26])
+for n in ['储能业务','城市燃气管道建设','油罐及配套设施租赁']:act(G,245,n,'provides_service')
+for n in ['疆煤','焦煤']:act(G,12,n,'sells',context=[9])
+for n in ['煤炭供应链服务','危化品仓储']:act(G,12,n,'provides_service')
+act(G,13,'燃气具','sells',a='广州燃气集团有限公司',s='named_subsidiary',q='燃气保险/燃气具分别保留，不推保险商品生产')
+act(G,13,'燃气保险','provides_service',a='广州燃气集团有限公司',s='named_subsidiary')
+act(G,14,'国际航运','provides_service');act(G,14,'进口煤','sells',a='广州发展国际投资有限公司',s='named_subsidiary',context=[5])
+for short in ['东电公司','天然气发电公司','恒益热电公司','南沙电力公司']:
+ for v in ['produces','sells']:act(G,33,'电力',v,a=aliases[short],s='named_subsidiary',context=[5])
+for n in ['电力','热力']:
+ for v in ['produces','sells']:act(G,33,n,v,a=aliases['中电荔新公司'],s='named_subsidiary',context=[5])
+act(G,33,'燃料','sells',a=aliases['能源物流集团'],s='named_subsidiary',q='批发、零售原动作',context=[5])
+act(G,33,'燃气','sells',a=aliases['燃气集团'],s='named_subsidiary',context=[5]);act(G,33,'燃气管网建设','provides_service',a=aliases['燃气集团'],s='named_subsidiary',context=[5])
+for n in ['风力发电','光伏发电','充电桩']:act(G,33,n,'provides_service',a=aliases['新能源集团'],s='named_subsidiary',context=[5,9,13])
+act(G,33,'电力供应','provides_service',a=aliases['储能集团'],s='named_subsidiary',context=[5]);act(G,33,'液化天然气','processes',a=aliases['珠海金湾公司'],s='group_associated_entity',q='参股主体加工，不升格集团生产',context=[5])
+purchasesG=[('佛山市恒益环保建材有限公司','脱硫石灰石浆液、高精砌块等','goods'),('广州广府通信息科技有限公司','系统维护及开发','services'),('广州市国际工程咨询有限公司','咨询服务费','services'),('BP Singapore Pte. Limited','天然气','goods'),('广州发展航运有限公司','运输劳务','services'),('广州港发石油化工码头有限公司','装卸服务费、操作费、电费、包干费','mixed_goods_and_services'),('碧辟（中国）投资有限公司广州分公司','外派人员劳务费','services'),('广州产业投资控股集团有限公司','外派人员劳务费','services'),('广州发电厂有限公司','生产电费、物业管理费','mixed_goods_and_services'),('广州环投技术设备有限公司','检修费用','services'),('广州生产力促进中心有限公司','技术服务费','services')]
+for cp,n,cat in purchasesG:act(G,235,n,'procures',cp=cp,cat=cat,q='本期采购或接受劳务；收费名称保留原服务含义，不反推制造投入')
+# Distinct group sale/service actions from current related rows, with native counterparty.
+for cp,n,v in salesG:act(G,236,n,'sells' if n in ['销售天然气','煤炭销售','绿证销售','粉煤灰、蒸汽、石膏浆液、水、炉渣'] else 'provides_service',cp=cp,q='仅本期行；复合内容保留，不补造拆分金额')
+for n in ['基本乘用车','运动型多用途车（SUV）','多功能乘用车（MPV）','交叉型乘用车','客车','载货汽车']:
+ for v in ['produces','sells']:act(S,17,n,v)
+for n in ['新能源汽车乘用车','新能源汽车商用车']:
+ for v in ['produces','sells']:act(S,18,n,v)
+for n in ['整车','零部件']:
+ for v in ['produces','sells']:act(S,97,n,v,context=[192])
+act(S,8,'国际物流','provides_service',a='上汽安吉物流股份有限公司',s='named_subsidiary',context=[170]);act(S,9,'Robotaxi','provides_service',q='3.0已商业化运营，不是全部自动驾驶计划已完成')
+for n in ['上汽大众汽车有限公司','上汽通用汽车有限公司','上汽集团乘用车分公司','上汽通用五菱汽车股份有限公司','上汽大通汽车有限公司','智己汽车科技有限公司','上汽正大有限公司','上汽通用五菱印尼汽车有限公司','捷仕达名爵汽车印度有限公司']:
+ scope='group_associated_entity' if n in ['上汽大众汽车有限公司','上汽通用汽车有限公司'] else ('issuer' if '分公司' in n else 'named_subsidiary')
+ for v in ['produces','sells']:act(S,12,'汽车',v,a=n,s=scope,q='原具名企业产销，合营不升格集团并表',context=[127,170,171])
+for n,a in [('汽车零部件','华域汽车系统股份有限公司'),('柴油机及配件','上海新动力汽车科技股份有限公司'),('新能源汽车','智己汽车科技有限公司'),('汽车','上汽大通汽车有限公司')]:
+ for v in ['produces','sells']:act(S,26,n,v,a=a,s='named_subsidiary',context=[170,171])
+for n in ['汽车用电子产品']:act(S,26,n,'produces',a='中联汽车电子有限公司',s='named_subsidiary');act(S,26,n,'develops',a='中联汽车电子有限公司',s='named_subsidiary')
+for p,n in [(18,'上海汽车集团财务有限责任公司'),(19,'上汽通用汽车金融有限责任公司'),(19,'上海东正汽车金融股份有限公司')]:act(S,p,'汽车金融','provides_service',a=n,s='named_subsidiary')
+# Actual named subsidiary business nature, not issuer registered scope p81.
+for p,a,n,verbs in [(170,'上海汽车变速器有限公司','汽车变速器及零配件',['produces','sells']),(170,'上海彭浦机器厂有限公司','工程机械设备',['produces','sells']),(170,'上海汽车工业销售有限公司','汽车整车及零部件',['procures','sells']),(170,'中国汽车工业投资开发有限公司','汽车',['sells']),(170,'中国汽车工业投资开发有限公司','售后服务',['provides_service']),(170,'中联汽车电子有限公司','电控燃油喷射产品',['produces','sells']),(170,'上海汽车工业活动中心有限公司','客房、餐饮',['provides_service']),(170,'上海汽车报社有限公司','上海汽车报',['publishes']),(170,'联创汽车电子有限公司','汽车电子系统及其零部件',['develops','produces','sells']),(170,'南京汽车集团有限公司','汽车、发动机、汽车零部件',['develops','manufactures','sells']),(171,'上海申沃客车有限公司','客车及其零部件',['develops','manufactures','sells']),(171,'上汽时代动力电池系统有限公司','动力电池模块和系统',['develops','produces','sells']),(171,'南京依维柯汽车有限公司','商用车辆、乘用车辆、零部件',['develops','manufactures']),(171,'飞凡汽车科技有限公司','新能源汽车整车',['sells']),(171,'上海汽车集团保险有限公司','汽车保险及相关财产保险业务',['provides_service'])]:
+ for v in verbs:act(S,p,n,v,a=a,s='named_subsidiary',q='企业集团构成原业务性质，保留具名主体；不替换为母公司')
+for p,cp,n,v in salesS:act(S,p,n,'sells' if n.startswith('销售') else 'provides_service',cp=cp,q='原关系分类是交易方，不是集团主体')
+# Source negatives: real table blanks, categories, states and native scopes.
+priorG=[('BP Singapore Pte. Limited','油品仓储、油品销售','222690753.39'),('BP Singapore Pte. Limited','天然气采购取消补偿','187887487.14'),('广州发电厂有限公司','软件维护费分摊','23009.29'),('广州发展航运有限公司','加淡水服务等','26.32'),('广州发展航运有限公司','运费','29425.22'),('广州港发石油化工码头有限公司','餐厅服务费','10021.82'),('广州港发石油化工码头有限公司','其他劳务费','240094.34'),('广州国有资产管理集团有限公司','服务费','29733.94'),('广州珠江啤酒股份有限公司','代建燃气管道工程','675227.90'),('广州珠江啤酒股份有限公司','服务费','4.72')]
+for cp,n,v in priorG:no(G,236,'仅上期关联销售',content=n,counterparty=cp,prior_value=v,forbidden='本期空格不借上期，不造零或本期动作')
+for cp,n,v in [('广州南沙珠江啤酒有限公司','生产电费','24805.08'),('河北珠江啤酒有限公司','生产用水电费','3003.60')]:no(G,235,'仅上期采购',content=n,counterparty=cp,prior_value=v,forbidden='本期空格无本期采购，不以费用名反推实物生产')
+no(G,194,'买入返售金融资产本期利息空',prior_value='38730.93',forbidden='不得借上期')
+no(G,194,'手续费及佣金收入空',forbidden='支出及净负数不是手续费收入')
+no(G,246,'对外收入抵销空',forbidden='不把50883145499.35合计左移到空抵销')
+no(G,246,'内部交易合计空',forbidden='3965207922.31位于抵销列，不能移到合计或改符号')
+no(G,207,'未来租赁收款不是当期收入',forbidden='未折现收款92182690.31及各期非当前收入')
+no(G,207,'融资租赁成本及损益不是收入',forbidden='770121.24成本、337904.69损益不得当营业收入')
+no(G,238,'承租费用非出租收入',forbidden='7286278.58等承租费用不得收入化')
+no(G,237,'两笔受托收益本期空',forbidden='1.5%定价不是实际托管收入；委托方不当受托方')
+no(G,20,'新签LNG合同非本期已采购',content='摩科瑞/墨西哥太平洋',forbidden='摩科瑞2026年4月开始；墨西哥待FID，不按合同额推本期采购')
+no(G,19,'市场煤成品油天然气生产量空',forbidden='销售量/库存不能推本期生产；同页电力热力生产保留')
+no(G,29,'储能并网调试非全投产',content='河北邯郸大名独立储能',forbidden='处于调试阶段不升格已商业化运营')
+no(G,35,'2026经营计划非2025交付',forbidden='552.30亿元目标不是2025收入')
+no(G,224,'合营联营栏目冲突',forbidden='关系结论待A；不得把两家公司收入并入集团或无保留肯定冲突关系')
+no(G,257,'母公司合同分解不适用',forbidden='不复制集团行业产品收入到母公司')
+no(S,184,'仅上期关联销售商品',content='销售商品',counterparty='上汽总公司之联营企业',prior_value='250550820.65',forbidden='不借上期或造本期零')
+no(S,184,'横线本期销售材料',content='销售材料',counterparty='其他关联方',prior_value='28476.00',forbidden='横线不是打印零，不推本期动作')
+no(S,185,'仅上期关联租赁',counterparty='上汽总公司之联营企业',prior_value='1000000.00',forbidden='不借上期或造本期零')
+no(S,193,'对外交易抵销空',forbidden='656243812081.18合计不左移为空抵销')
+no(S,193,'内部交易空格及负抵销',forbidden='金融业36066953.66、抵销-36066953.66；整车及总计空，不造零')
+no(S,156,'2024年度收入不当2025',forbidden='保留2025时点/时段及原分部列，禁止前年串行')
+no(S,156,'时段整车零部件收入空',forbidden='11832005928.17仅劳务及其他与合计，不能借入整车/零部件')
+no(S,165,'可变租赁收入空',forbidden='1094574636.74为全额，不生成可变收入')
+no(S,165,'承租费用非收入',value='768363630.07',forbidden='不得作为租赁收入')
+no(S,173,'合营联营财务表不适用',forbidden='超额亏损或投资不当本期营业收入')
+no(S,187,'关联利息支出非收入',forbidden='444634300.47及各行支出不转收入')
+no(S,186,'贷款本金存款非收入',forbidden='贷款余额/本年发放/吸收存款不是收入')
+no(S,18,'新能源补贴零不推零销售',forbidden='补贴两行打印0，但产品收入产销非0')
+no(S,26,'颀盟打印零收入',forbidden='零收入不借509478.12利润，不以零收入推销售')
+no(S,26,'退出注销不升格期末子公司',forbidden='大众联合改装、回收服务中心、德实、深圳两注销及幸福坊清算保留退出状态')
+no(S,9,'固态电池中试及开发边界',forbidden='全固态中试不推量产销售；半固态MG4批量交付保留')
+no(S,81,'注册经营范围非实际销售',forbidden='摩托车、拖拉机及全部法定范围不可直接转本期动作')
+no(S,12,'合营企业产销不并表',forbidden='上汽大众、上汽通用原合营主体保留，汽车销量不替代收入')
+no(S,184,'研发费用非商品采购',forbidden='接受劳务-研发支出保留服务类型，不当已销售商品或原材料投入')
+# Final physical-column reread before freeze: single numbers can be current or prior.
+# These revisions only change an unfrozen source draft; no business attempt exists.
+prior_keys={('广州环投环境服务有限公司','电力交易代理'),('碧辟（中国）投资有限公司广州分公司','油品仓储'),('广州国际企业孵化器有限公司','电力交易代理')}
+rows[G]=[x for x in rows[G] if not(x['page']==236 and (x['counterparty'],x['name']) in prior_keys)]
+roles[:]=[x for x in roles if not(x['instrument_id']==G and ((x['page']==236 and (x['counterparty'],x['name']) in prior_keys) or (x['page']==235 and x['counterparty']=='广州产业投资控股集团有限公司')))]
+new_current=[('BP Singapore Pte. Limited','天然气采购取消补偿','187887487.14'),('广州发展航运有限公司','运费','29425.22'),('广州港发石油化工码头有限公司','其他劳务费','240094.34'),('广州国有资产管理集团有限公司','服务费','29733.94'),('广州珠江啤酒股份有限公司','代建燃气管道工程','675227.90'),('广州珠江啤酒股份有限公司','服务费','4.72')]
+new_keys={(cp,n) for cp,n,v in new_current}
+neg[:]=[x for x in neg if not(x['instrument_id']==G and ((x['page']==236 and (x.get('counterparty'),x.get('content')) in new_keys) or (x['page']==235 and x['name']=='仅上期采购'))) and not(x['instrument_id']==S and x['page']==185 and x['name']=='仅上期关联租赁')]
+for cp,n,v in new_current:
+ inc(G,236,n,v,'关联交易/出售商品及提供劳务',cp=cp,col='本期发生额',q='实际本期原交易行；补偿保留原类别，不改成商品销售')
+ if n!='天然气采购取消补偿':act(G,236,n,'provides_service',cp=cp)
+for cp,n,v in [('广州环投环境服务有限公司','电力交易代理','44338.94'),('碧辟（中国）投资有限公司广州分公司','油品仓储','1604641.51'),('广州国际企业孵化器有限公司','电力交易代理','58972.57')]:no(G,236,'仅上期关联销售',content=n,counterparty=cp,prior_value=v,forbidden='物理上期列，禁止借本期或生成当前动作')
+no(G,235,'仅上期采购',content='外派人员劳务费',counterparty='广州产业投资控股集团有限公司',prior_value='187456.28',forbidden='本期为空，不生成当前采购')
+for cp,n in [('广州南沙珠江啤酒有限公司','生产电费'),('河北珠江啤酒有限公司','生产用水电费')]:act(G,235,n,'procures',cp=cp,cat='utilities',q='物理本期电费/用水电费，不是本集团制造水电')
+inc(S,185,'租赁收入','1000000.00','关联交易/出售商品及提供劳务',cp='上汽总公司之联营企业',col='本期发生额')
+act(S,185,'租赁收入','provides_service',cp='上汽总公司之联营企业')
+for cp in ['合营企业','联营企业','其他关联方','上汽总公司之子公司','上汽总公司之联营企业','上汽总公司']:
+ act(S,184,'商品、材料及劳务','procures',cp=cp,cat='mixed_goods_and_services',q='原采购商品、材料及劳务复合内容，不改作全部商品或投入')
+for cp in ['合营企业','联营企业','上汽总公司之联营企业','上汽总公司之子公司']:act(S,184,'长期资产','procures',cp=cp,cat='assets',q='不改作销售商品或实际生产投入')
+for cp in ['其他关联方','联营企业','合营企业','上汽总公司之子公司','上汽总公司之联营企业']:act(S,184,'研发劳务','procures',cp=cp,cat='services',q='原接受劳务-研发支出，不升格研发成果量产销售')
+no(S,184,'仅上期使用权资产',counterparty='上汽总公司之子公司',prior_value='2313941.00',forbidden='本期为空；租赁资产不是采购商品金额')
+# Renumber only this source draft after physical-column review.
+for i,rr in rows.items():
+ for k,x in enumerate(rr):x['condition_id']=f'{i}-income-{k+1:03}'
+for items,kind in [(roles,'action'),(neg,'negative')]:
+ for i in [G,S]:
+  for k,x in enumerate([x for x in items if x['instrument_id']==i]):x['condition_id']=f'{i}-{kind}-{k+1:03}'
+answers={G:{'principal_business':dict(pages=[9,10,12,13,14,33,245],substance='综合智慧能源/节能环保能源金融，电力燃气能源物流新能源储能及金融的产购销储运用链条；电煤/气电风光自营发电、燃气集团管网和购销、物流集团煤油/仓储运输，储能并网调试及投产状态分开，具名子公司与参股不混；国网南网和自有管网/平台终端销售。'), 'products_services':dict(pages=[9,10,12,13,14,19,33,245],substance='电力蒸汽煤炭天然气成品油，加气混凝土、燃煤/天然气/风力/光伏发电，充电桩、储能和综合能源、危化品仓储，天然气/煤炭/油品装卸运输储存、源网荷储充、能源托管节能运维碳资产管理，燃气具保险及金融/租赁；原参股液化天然气加工与规划/研发不升格集团。'), 'revenue_model':dict(pages=[9,10,121,122,126,127,193,194,207,237,245,246,257],substance='电力按上网电量结算电价，燃气发出或耗用按收款/抄表日及批准价格，煤炭配送出库/签收控制权转移、数量合同单价及品质扣罚奖励；主责总额/代理佣金净额，利息时间实际利率，使用费约定收费、金融服务期间权责，租赁直线法和融资周期利率。集团/母公司主营其他/营业总收入利息/收入时间/分部对外内部及抵销分别保留，参股非集团，冲突栏目待裁决。')},S:{'principal_business':dict(pages=[8,9,12,17,26,97,170,171,192],substance='整车零部件主业、金融与移动出行服务协同，自主品牌及合营业务分别保留；设计研发生产营销、经销平台与4S/新营销/出口海外本地化生产，安吉国际物流和Robotaxi实际商业化；原具名主体及退出注销不升格，注册范围不替代当前业务。'), 'products_services':dict(pages=[8,9,17,18,26,170,171],substance='基本乘用/SUV/MPV/交叉型、客车载货/轻客皮卡及新能源乘用商用；MG4、荣威M7、尚界H5、智己LS6/LS9、五菱缤果S、大通大拿及合营AUDI E5/别克至境L7原推出限定；整车汽车零部件、柴油机/电控喷射/动力电池系统、金融物流出行保险服务；全固态中试不升级，半固态MG4批量交付属实。'), 'revenue_model':dict(pages=[97,98,99,101,155,156,165,186,187,192,193,202],substance='经销商电子交易平台移交整车权属并交易或约定交货地交接确认；售后代管按商业实质/识别/随时交付/不能自行使用判控制权，信用期无重大融资；销售数量折扣返利按期望/最可能估计净额，劳务成本比例投入法时段或控制权时点，不能测进度可补偿成本；主要责任总额/代理佣金净额，质量保证服务区别、退货，经营租赁直线法及可变租金实际发生。营业/营业总收入及金融利息佣金、原时点/时段和合并母公司/关联关系分别保留。')}}
+for i,a in answers.items():
+ for key,v in a.items():v['condition_id']=f'{i}-answer-{key}';v['substantive_review_required']=True
+pending=[dict(condition_id=f'{G}-relationship-conflict-{k+1}',instrument_id=G,page=224,context_pages=[223,234],name=n,value=v,unit='元',source_actor=n,subject_scope='group_associated_entity',original_heading='重要合营企业的主要财务信息',other_native_relation='联营企业',relationship_conclusion='awaiting_A',status='not_frozen') for k,(n,v) in enumerate([('广东红海湾发电有限公司','4680929334.73'),('广东珠海金湾液化天然气有限公司','889217225.49')])]
+out=dict(status='draft_awaiting_A_relationship_conflict_ruling',created_at=datetime.now(timezone.utc).isoformat(),fixed_before_formal_execution=False,formal_attempts_used=0,plan_id=P['plan_id'],knowledge_cutoff=P['knowledge_cutoff'],official_reports=P['reports'],processing_identity=json.loads((C/'freeze-receipt.json').read_text())['processing_identity'],answers=answers,source_rows=rows,native_roles=roles,negative_conditions=neg,pending_conflict_rows=pending,draft_positive_count=6+sum(map(len,rows.values()))+len(roles),draft_negative_count=len(neg),positive_count_not_final=True,source_conflict='source-relationship-conflict-evidence.json',denominator_method='Source-native current rows by original table/actor/column/unit; Measurement accuracy only; all actual output counts dynamically. Draft is not an executable frozen contract.',formal_authorization=dict(first=1,successors_max=2,first_used=0,successors_used=0,whole_round_seconds=300,shared_token_budget=50000,production='not_authorized',scale_quality_claim_allowed=False))
+(C/'source-scope-draft.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(dict(draft_income={i:len(r) for i,r in rows.items()},draft_actions={i:sum(a['instrument_id']==i for a in roles) for i in rows},bodies=6,pending_conflict_rows=2,draft_positives=out['draft_positive_count'],draft_negatives=len(neg)),ensure_ascii=False))

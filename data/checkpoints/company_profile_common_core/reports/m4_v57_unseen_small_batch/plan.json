@@ -1,0 +1,24 @@
+{
+  "plan_id": "3b9ffb5f97d78065acd11187b2003d8f99f5ea36ca8c3d2df44321317b8b75b1",
+  "knowledge_cutoff": "2026-09-17",
+  "max_companies_this_round": 2,
+  "token_budget": 50000,
+  "reports": [
+    {
+      "instrument_id": "600098.SH",
+      "asset_id": "asset_0d154e8e39d0be71567619c31f820c70",
+      "report_id": "1225103737",
+      "report_period": "2025-12-31",
+      "document_version": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+      "disclosure_form": "service"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "asset_id": "asset_c32b6e7708c1cc8726dcfb5c41451400",
+      "report_id": "1225071780",
+      "report_period": "2025-12-31",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "disclosure_form": "manufacturing"
+    }
+  ]
+}
