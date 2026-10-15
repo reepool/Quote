@@ -1,0 +1,12 @@
+import json
+from pathlib import Path
+from pypdf import PdfReader
+C=Path('openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch');plan=json.loads(Path('data/checkpoints/company_profile_common_core/reports/m4_v59_unseen_small_batch/plan.json').read_text())
+sets={'600101.SH':[7,9,17,18,19,23,24,36,37,38,88,91,200,201,214,215,218,219,220,229,230,231,232,233,234,240,254],'600108.SH':[5,10,11,13,17,52,54,103,104,113,114,116,117,118,119,120,121,122,123,126,132]}
+for r in plan['reports']:
+ i=r['instrument_id'];h=r['document_version'];reader=PdfReader(Path('data/filings/announcements/blobs')/h[:2]/(h+'.pdf'))
+ ls=[dict(page=n,text=reader.pages[n-1].extract_text(extraction_mode='layout') or '')for n in sets[i]]
+ (C/f'independent-source-layouts-{i}.json').write_text(json.dumps(ls,ensure_ascii=False,indent=2)+'\n')
+ ps=json.loads(Path('/tmp/v59new_source_'+i+'.json').read_text());(C/f'independent-source-pages-{i}.json').write_text(json.dumps(ps,ensure_ascii=False,indent=2)+'\n')
+ (C/f'independent-source-index-{i}.txt').write_bytes(Path('/tmp/v59new_index_'+i+'.txt').read_bytes())
+ print(i,'layout pages',len(ls),flush=True)

@@ -1,0 +1,34 @@
+{
+  "status": "proposed_pending_A_not_effective",
+  "original_contract_sha256": "4f396ffcb8560d57e433ec5c3fcfcfc8de18d49fae0c418b6bf564caa20a7ea7",
+  "original_condition": {
+    "condition_id": "600108.SH-action-014",
+    "instrument_id": "600108.SH",
+    "page": 9,
+    "name": "农业节水灌溉产品",
+    "native_aliases": [
+      "农业节水灌溉产品"
+    ],
+    "source_actions": [
+      "销售"
+    ],
+    "source_actor": "甘肃亚盛亚美特节水有限公司",
+    "actor_aliases": [
+      "甘肃亚盛亚美特节水有限公司"
+    ],
+    "subject_scope": "named_subsidiary",
+    "category": "goods",
+    "counterparty": null,
+    "qualifier": null,
+    "state": "current_affirmative",
+    "reported_period": "2025-12-31"
+  },
+  "proposed_source_actor": "亚美特公司",
+  "proposed_actor_aliases": [
+    "亚美特公司"
+  ],
+  "denominator_unchanged": 354,
+  "original_contract_and_first_artifacts_immutable": true,
+  "evidence": "source-actor-conflict-evidence.json",
+  "formal_successors_used": 0
+}

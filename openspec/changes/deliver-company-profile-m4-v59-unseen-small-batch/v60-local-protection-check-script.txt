@@ -1,0 +1,16 @@
+import json,hashlib
+from pathlib import Path
+from datetime import datetime,timezone
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();load=lambda p:json.loads(p.read_text());baseline=load(C/'initial-workspace-baseline.json');hist=load(C/'protection-baseline.json');first=load(C/'first-formal-delivery-preservation.json')['completed_sha256'];reviews=load(C/'first-review-preservation.json')['files_sha256'];checks={}
+for name,items in [('history',hist),('existing_worktree',baseline['existing_modified_sha256']),('first_formal_artifacts',first),('first_review_originals',reviews)]:
+ for p,h in items.items():assert sha(R/p)==h,(name,p)
+ checks[name]=len(items)
+old=load(R/baseline['predecessor_archive']/'v59-finite-archive-path-mapping.json') if (R/baseline['predecessor_archive']/'v59-finite-archive-path-mapping.json').exists()else None
+freeze=load(C/'first-source-freeze-receipt.json');assert sha(C/'source-scope.json')==freeze['source_scope_sha256'];snap=freeze['executed_code_sha256']
+for p,h in snap.items():assert sha(C/'first-executed-code-snapshot'/p)==h,p
+checks['first_execution_snapshot_modules']=len(snap)
+for r in load(C/'source-scope.json')['official_reports']:
+ h=r['document_version'];assert sha(R/'data/filings/announcements/blobs'/h[:2]/(h+'.pdf'))==h
+checks['official_pdf_versions']=2
+out=dict(completed_at=datetime.now(timezone.utc).isoformat(),success=True,checks=checks,original_contract_sha256=sha(C/'source-scope.json'),first_observation_used=1,successors_used=0,source_actor_adjudication_pending=True)
+(C/'v60-local-protection-verification.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print(out)

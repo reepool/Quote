@@ -1,0 +1,40 @@
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-15 21:22:57][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-15 21:22:57][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-15 21:22:57][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.00s
+[INFO][2026-10-15 21:22:58][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-15 21:22:58][tgbot.py:15] - [tgbot] Reading system configuration...
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+Timeout (0:00:20)!
+Thread 0x00007f3171ff8740 (most recent call first):
+  File "/home/python/Quote/research/storage.py", line 10705 in _apply_pragmas
+  File "/home/python/Quote/research/storage.py", line 8842 in resolve_industry_taxonomy_l1_name
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 650 in _with_taxonomy_l1_name
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 297 in lookup
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 232 in <dictcomp>
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 231 in load_a_share_candidate_registry
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 281 in load_official_task_candidate_registry
+  File "/home/python/Quote/research/company_profile/operations.py", line 972 in freeze_m4_next_batch_plan
+  File "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/selection-freeze-script.txt", line 48 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 98 in _run_module_code
+  File "<frozen runpy>", line 291 in run_path
+  File "<stdin>", line 3 in <module>
+Timeout (0:00:20)!
+Thread 0x00007f3171ff8740 (most recent call first):
+  File "/home/python/Quote/research/storage.py", line 8746 in get_industry_membership_as_of
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 295 in lookup
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 232 in <dictcomp>
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 231 in load_a_share_candidate_registry
+  File "/home/python/Quote/research/company_profile/candidate_registry.py", line 281 in load_official_task_candidate_registry
+  File "/home/python/Quote/research/company_profile/operations.py", line 972 in freeze_m4_next_batch_plan
+  File "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/selection-freeze-script.txt", line 48 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 98 in _run_module_code
+  File "<frozen runpy>", line 291 in run_path
+  File "<stdin>", line 3 in <module>

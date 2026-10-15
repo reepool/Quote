@@ -1,0 +1,58 @@
+import json,runpy,hashlib,re,collections
+from pathlib import Path
+C=Path('openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch');g=runpy.run_path(str(C/'business-match-script.txt'));s=g['scope'];co=g['co'];pages=g['pages'];orig=g['match'];role=g['rolematch']
+def fm(r,v):
+ if v['header']=='报告分部营业收入' and r.get('dimension',r.get('segment_dimension'))=='adjustment':
+  rr=dict(r);rr['dimension']=rr['segment_dimension']='business_segment';return orig(rr,v)
+ if v['header']=='贸易业务本期营业收入' and r['source_native'].get('header')=='本期营业收入':
+  rr=dict(r);rr['source_native']=dict(r['source_native'],header='贸易业务本期营业收入');return orig(rr,v)
+ return orig(r,v)
+def am(r,v):
+ rr=dict(r);n=dict(r['source_native']);rr['source_native']=n
+ if v['source_actions'][0]=='出租' and n['name']==v['name']+'租赁':n['name']=v['name']
+ return role(rr,v)
+allrecords=[];coverage=[];answers=[]
+for ins in s['answers']:
+ raw=json.loads((C/f'first-delivery-review-inputs/raw_{ins}.json').read_text());assert len({r['record_id']for r in raw})==len(raw)
+ decisions={}
+ for idx,r in enumerate(raw):
+  n=r['source_native'];typ=r['object_type'];p=pages(r);h=n.get('header')or'';bad=[];reason=''
+  if typ=='Activity':
+   if ins=='600101.SH' and 27<=idx<=124:bad.append('registered_permission_not_current_operation')
+   if r.get('source_verb')=='采购' and r['action']!='purchases':bad.append('source_verb_reverses_actual_sale_or_lease')
+   if ins=='600101.SH' and idx in [162,168,171]:bad.append('adjacent_party_and_content_concatenation')
+   if ins=='600101.SH' and idx==204:bad.append('total_is_not_named_sold_object')
+   if ins=='600108.SH' and idx in [48,55]:bad.append('unspecified_other_not_definite_goods')
+   if ins=='600108.SH' and idx==50:bad.append('engineering_material_is_goods_not_service')
+   reason='逐行核经营正文/产销量/当期关联采购销售出租；方向、原对象、供应方及服务商品栏目同时审查'
+  elif typ in ['Segment','Measurement']:
+   hits=[v['condition_id']for v in s['revenue_conditions'][ins]if fm(r,v)]
+   if hits:reason='独立冻结原行及本期金额、单位、栏目、主体、交易方匹配；配对对象分别核查'
+   else:
+    if h=='合并利润表/营业总收入':reason='合同外合法合并利润表营业总收入，与营业收入分别保留'
+    elif ins=='600101.SH' and 16 in p:reason='前页合法续表证据，p17同行业/产品/地区原格；两组合计保留'
+    elif ins=='600101.SH' and 36 in p and n['name']=='四川华润万通燃气股份有限公司':reason='p36原参股公司收入43699.57万元，business_segment不升为集团；不替代p219合营元表'
+    else:raise AssertionError((ins,idx,n,p))
+  elif typ=='BusinessOverview':reason='原文源段保留，非确定动作推断；混合主体源段unclear；完整性另按六正文实质核'
+  else:raise AssertionError(typ)
+  d=dict(instrument_id=ins,record_id=r['record_id'],object_type=typ,source_pages=sorted(p),source_native=n,source_actor=r.get('source_actor'),source_verb=r.get('source_verb'),action=r.get('action'),subject_scope=r['subject_scope'],accurate=not bad,numeric_error=False,errors=bad,reason=reason,evidence=r['evidence'])
+  decisions[r['record_id']]=d;allrecords.append(d)
+ for v in s['revenue_conditions'][ins]:
+  seg=[r for r in raw if r['object_type']=='Segment' and fm(r,v) and decisions[r['record_id']]['accurate']];mea=[r for r in raw if r['object_type']=='Measurement' and fm(r,v)and decisions[r['record_id']]['accurate']]
+  coverage.append(dict(condition_id=v['condition_id'],kind='income',satisfied=bool(seg and mea),record_ids=[r['record_id']for r in seg],paired_measurement_ids=[r['record_id']for r in mea]))
+ for v in s['action_conditions']:
+  if v['instrument_id']!=ins:continue
+  hit=[r for r in raw if am(r,v) and decisions[r['record_id']]['accurate']]
+  coverage.append(dict(condition_id=v['condition_id'],kind='action',satisfied=bool(hit),record_ids=[r['record_id']for r in hit]))
+ body_reasons={'600101.SH':{'principal_business':'缺p13已经投运项目及p219表决权合营范围；许可经营范围混入答案','products_services':'缺p13真实投运状态与具名服务；注册许可被肯定输出','revenue_model':'缺经营租赁完整直线法与合营边界，存在注册范围污染'},'600108.SH':{'principal_business':'缺p9实际加工与亚美特产品交付、建设状态；子公司表接入未来计划过界','products_services':'缺p9原加工产品及实际亚美特交付；原商品种植/加工方向不完整','revenue_model':'缺p74送货/自提、滴灌安装时段机制和p77一个种植周期租赁'}}
+ profile=json.loads((C/f'first-delivery-review-inputs/profile_{ins}.json').read_text())
+ for a in profile['dimensions']:
+  v=s['answers'][ins][a['dimension_id']];d=dict(condition_id=v['condition_id'],kind='answer',satisfied=False,instrument_id=ins,dimension_id=a['dimension_id'],accurate=False,numeric_error=False,reason=body_reasons[ins][a['dimension_id']],source_pages=v['pages'],actual_excerpt=a['excerpt']);coverage.append(d);answers.append(d)
+neg=[]
+for v in s['negative_conditions']:
+ ins=v['instrument_id'];k=int(v['condition_id'].split('-')[-1]);failed=ins=='600101.SH' and k in [2,9,13,15]
+ errors=[d['record_id']for d in allrecords if d['instrument_id']==ins and ((k==2 and '山东电力高等专科学校'in(d['source_native'].get('qualifier')or''))or(k==9 and '国网中兴'in(d['source_native'].get('qualifier')or''))or(k==13 and '四川巴中和兴'in(d['source_native'].get('qualifier')or''))or(k==15 and 'registered_permission_not_current_operation'in d['errors']))]if failed else []
+ neg.append(dict(**v,evaluated=True,passed=not failed,erroneous_record_ids=errors,reason='核全部正式对象与原页本期空位、状态、关系、栏目；不以遗漏输出代替正向交付'))
+summary=dict(recall_numerator=sum(x['satisfied']for x in coverage),recall_denominator=len(coverage),accuracy_numerator=sum(x['accurate']for x in allrecords)+sum(x['accurate']for x in answers),accuracy_denominator=len(allrecords)+len(answers),numeric_errors=0,negatives_passed=sum(x['passed']for x in neg),negative_total=len(neg),by_kind={k:dict(met=sum(x['satisfied']for x in coverage if x['kind']==k),total=sum(x['kind']==k for x in coverage))for k in ['answer','income','action']},error_types=dict(collections.Counter(z for x in allrecords for z in x['errors'])))
+result=dict(status='first_observation_business_failed',contract_sha256=hashlib.sha256((C/'source-scope.json').read_bytes()).hexdigest(),summary=summary,coverage=coverage,fact_review=allrecords,answer_review=answers,negative_review=neg,production_authorization='not_authorized',scale_quality_claim_allowed=False)
+(C/'first-source-review-evidence.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n');print(summary)

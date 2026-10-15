@@ -1,0 +1,23 @@
+{
+  "completed_at": "2026-10-15T13:41:51.958004+00:00",
+  "success": true,
+  "checks": {
+    "history": 4174,
+    "existing_worktree": 19,
+    "predecessor_archive": 189
+  },
+  "no_business_rehearsal": true,
+  "source_contract_frozen": true,
+  "all_prerequisite_processes_ended_successfully_and_inspected": true,
+  "source_conflicts_pending": 0,
+  "review": {
+    "blocking": 0,
+    "nonblocking_deferred": [
+      "性能",
+      "框架",
+      "行业增强"
+    ],
+    "unrelated_existing_items": 19
+  },
+  "new_sample_business_not_yet_validated": true
+}

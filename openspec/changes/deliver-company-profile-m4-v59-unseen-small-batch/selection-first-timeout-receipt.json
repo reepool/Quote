@@ -1,0 +1,8 @@
+{
+  "exit_code": 124,
+  "outer_timeout_seconds": 90,
+  "operation": "existing owner freeze only",
+  "formal_attempts_used": 0,
+  "plan_written": false,
+  "reason": "not yet localized; no attribution to registry"
+}

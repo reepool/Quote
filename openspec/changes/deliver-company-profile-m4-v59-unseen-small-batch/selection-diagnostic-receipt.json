@@ -1,0 +1,12 @@
+{
+  "exit_code": 124,
+  "outer_timeout_seconds": 60,
+  "formal_attempts_used": 0,
+  "stack_evidence": [
+    "candidate_registry.load_a_share_candidate_registry industry_lookup",
+    "ResearchStorageManager.get_industry_membership_as_of",
+    "ResearchStorageManager.resolve_industry_taxonomy_l1_name/_apply_pragmas"
+  ],
+  "interpretation": "full-market membership scan still progressing; no proof of deadlock or registry corruption",
+  "next_step": "complete existing owner selection with a longer bounded preparation window; no business execution or production-code change"
+}

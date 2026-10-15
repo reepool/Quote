@@ -1283,6 +1283,7 @@ class CompanyProfileTaskService:
                 "v57",
                 "v58",
                 "v59",
+                "v60",
             }:
                 from research.business_profile_production_operations import (
                     register_business_profile_shared_annual_report_asset,

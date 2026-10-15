@@ -1,0 +1,15 @@
+{
+  "files_sha256": {
+    "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/first-source-review-evidence.json": "dd8225a962a1f414e44704294fd19ab7842258e0648d51aedb0a10e53cc0bcea",
+    "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/first-business-audit-script.txt": "ffb478400691f03b74b934f762da00be4c2c04b07749e3ae9806ed3f520d64ae",
+    "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/first-readonly-verification-script.txt": "e5d042e8a6129e302978d141f0061cd2a35e6511c31ad9fcc561ba76f17cd7b4",
+    "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/first-readonly-verification-receipt.json": "e05bafe90dd34af87410dc5efd71a68b1857c347bfa5b57f9eeb7a878ed6a3cc",
+    "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/business-match-script.txt": "4bf7e70b401d43e96f98e9cb9f938f2be3ffae9d585452556de954fe7c532b91",
+    "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/source-scope.json": "4f396ffcb8560d57e433ec5c3fcfcfc8de18d49fae0c418b6bf564caa20a7ea7"
+  },
+  "original_formal_preservation": "first-formal-delivery-preservation.json",
+  "attempts": {
+    "first": "1/1",
+    "successors": "0/2"
+  }
+}

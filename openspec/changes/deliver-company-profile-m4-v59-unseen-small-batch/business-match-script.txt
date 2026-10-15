@@ -1,0 +1,46 @@
+"""Source contract matching: semantic table/column, actor, period, category and verb."""
+import json,re
+from decimal import Decimal
+from pathlib import Path
+C=Path('openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch');scope=json.loads((C/'source-scope.json').read_text())
+def co(s):return re.sub(r'\s+','',s or '').replace('（','(').replace('）',')')
+def num(v):return Decimal(str(v).replace(',','').strip())
+def pages(r):return {p for e in r.get('evidence',[]) for p in [e.get('page'),*e.get('continuation_pages',[]),*e.get('subject_evidence_pages',[])] if p is not None}
+def match(r,v):
+ if r['object_type'] not in ['Segment','Measurement']:return False
+ n=r['source_native'];h=n.get('header')or'';q=co(n.get('qualifier'));rh=v['header'];sc=r['subject_scope'];d=r.get('dimension',r.get('segment_dimension'))
+ if r.get('reported_period')!=v['reported_period'] or v['page'] not in pages(r) or n.get('value') is None or n.get('unit')!=v['unit']:return False
+ if num(n['value'])!=num(v['value']):return False
+ if co(n['name']) not in {co(x) for x in v['native_aliases']}:return False
+ if sc!=v['subject_scope']:return False
+ if v.get('counterparty') and co(v['counterparty']) not in q:return False
+ if rh.startswith('主营业务分'):return d==v['dimension'] and ('主营' in h or co(rh)in co(h))
+ if rh.startswith('主要控股'):return ('控股' in h or '子公司' in h) and ('营业收入'in h or '收入' in h) and co(v['source_actor']) in co(q+' '+n['name'])
+ if rh.startswith('前五名客户'):return '客户' in h and any(x in h for x in ['销售额','收入'])
+ if rh in ['合并营业收入和营业成本','母公司营业收入和营业成本']:return h in ['营业收入',rh,'营业收入和营业成本/收入']
+ if rh in ['合并利润表营业收入','母公司利润表营业收入']:return '营业收入' in h and ('利润表' in h or h=='营业收入')
+ if rh.startswith('营业收入分解/'):
+  if '成本'in h:return False
+  seg=co(v.get('source_segment'));timing='商品转让时间' in rh
+  return ('合同收入' in h or '收入分解' in h or '转让时间' in h) and (not seg or seg in co(q)) and (not timing or any(x in h+q for x in ['时点','时段','时间']))
+ if rh=='作为出租人的经营租赁':return '作为出租人' in h and '租赁收入' in h
+ if rh=='本公司作为出租方关联租赁':return '出租方' in h and '租赁收入' in h
+ if rh=='本期关联销售':return any(t in h for t in ['出售商品/提供劳务','关联销售','销售商品/提供劳务']) and any(t in h for t in ['本期','本年'])
+ if rh=='报告分部营业收入':return any(t in h for t in ['营业收入','分部收入']) and '成本' not in h and d=='business_segment'
+ if rh.startswith('重要合营'):return '合营' in h and '联营' not in h and '营业收入' in h and co(v['source_actor']) in co(n['name']+' '+q)
+ if rh=='贸易业务本期营业收入':return '贸易' in h and '收入' in h
+ return co(h)==co(rh)
+VERBS={'生产':'produces','种植':'produces','加工':'processes','销售':'sells','采购':'purchases','提供':'provides_service','安装':'provides_service','施工':'provides_service','出租':'provides_service','运营':'operates'}
+def rolematch(r,v):
+ if r['object_type']!='Activity':return False
+ n=r['source_native'];q=co(n.get('qualifier'));h=n.get('header')or'';expected=VERBS[v['source_actions'][0]]
+ if co(n['name']) not in {co(x) for x in v['native_aliases']} or r['subject_scope']!=v['subject_scope'] or r.get('reported_period')!=v['reported_period'] or v['page']not in pages(r) or r.get('action')!=expected:return False
+ if v['source_actor']!='公司及合并子公司' and co(r.get('source_actor'))not in {co(x) for x in v['actor_aliases']}:return False
+ if v.get('counterparty') and co(v['counterparty']) not in q:return False
+ if v['category']=='service' and expected=='purchases' and not any(t in h for t in ['服务','劳务','公用事业']):return False
+ if v['category']=='goods' and expected=='purchases' and not any(t in h for t in ['商品','原料','材料','电力']):return False
+ if v['category']=='mixed' and ('商品' in h and '原内容' not in h):return False
+ if v['source_actions'][0] in ['安装','施工','出租','种植']:
+  verb=r.get('source_verb')or''
+  if not any(t in verb for t in {'安装':['安装'],'施工':['施工','实施'],'出租':['出租','租赁'],'种植':['种植']}[v['source_actions'][0]]):return False
+ return True

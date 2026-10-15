@@ -1,0 +1,16 @@
+{
+  "completed_at": "2026-10-15T14:33:36.827096+00:00",
+  "success": true,
+  "checks": {
+    "history": 4174,
+    "existing_worktree": 19,
+    "first_formal_artifacts": 22,
+    "first_review_originals": 6,
+    "first_execution_snapshot_modules": 39,
+    "official_pdf_versions": 2
+  },
+  "original_contract_sha256": "4f396ffcb8560d57e433ec5c3fcfcfc8de18d49fae0c418b6bf564caa20a7ea7",
+  "first_observation_used": 1,
+  "successors_used": 0,
+  "source_actor_adjudication_pending": true
+}

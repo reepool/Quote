@@ -1,0 +1,11 @@
+import faulthandler
+faulthandler.dump_traceback_later(120, repeat=False)
+import json,tempfile
+from pathlib import Path
+from tests.unit.test_research.test_company_profile_v19_closure import _drive
+from research.company_profile.reads import _iter_accepted_raw
+C=Path('openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch');scope=json.loads((C/'source-scope.json').read_text());root=Path(tempfile.mkdtemp(prefix='quote_v60_local_'));print(root,flush=True)
+for rep in scope['official_reports']:
+ i=rep['instrument_id'];pages=json.loads(Path('/tmp/v60_real_pages_'+i+'.json').read_text());q,e=_drive(root/i,instrument=i,fixture=rep,pages=pages,repair_version='v60');assert q==e
+ rs=list(_iter_accepted_raw(json.loads(next((root/i/'company_profile_common_core.v1/checkpoints').glob('*.json')).read_text())))
+ Path('/tmp/v60_real_local_'+i+'.json').write_text(json.dumps(dict(profile=q,records=rs),ensure_ascii=False,indent=2));print(i,len(rs),flush=True)

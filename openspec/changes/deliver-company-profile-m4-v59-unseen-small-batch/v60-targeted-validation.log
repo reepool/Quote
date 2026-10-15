@@ -1,0 +1,13 @@
+[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[33m                                        [100%][0m
+============================= slowest 10 durations =============================
+48.47s call     tests/unit/test_research/test_company_profile_v59_technology_apparel.py::test_actual_complete_pages_accept_query_export[600100.SH]
+28.10s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600094.SH-v57]
+22.28s call     tests/unit/test_research/test_company_profile_v60_utility_agriculture.py::test_complete_official_accept_query_export[600101.SH]
+21.16s call     tests/unit/test_research/test_company_profile_v60_utility_agriculture.py::test_complete_official_accept_query_export[600108.SH]
+17.66s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600094.SH-v56]
+16.47s call     tests/unit/test_research/test_company_profile_v58_energy_automotive.py::test_official_complete_pages_accept_query_export[600104.SH]
+14.85s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600103.SH-v56]
+14.63s call     tests/unit/test_research/test_company_profile_v59_technology_apparel.py::test_actual_complete_pages_accept_query_export[600107.SH]
+13.11s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600103.SH-v57]
+12.49s call     tests/unit/test_research/test_company_profile_v58_energy_automotive.py::test_official_complete_pages_accept_query_export[600098.SH]
+[33m[32m33 passed[0m, [33m[1m7 warnings[0m[33m in 211.78s (0:03:31)[0m[0m

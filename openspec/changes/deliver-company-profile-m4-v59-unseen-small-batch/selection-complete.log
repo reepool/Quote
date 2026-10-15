@@ -1,0 +1,37 @@
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-15 21:25:53][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-15 21:25:53][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-15 21:25:53][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.00s
+[INFO][2026-10-15 21:25:54][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-15 21:25:54][tgbot.py:15] - [tgbot] Reading system configuration...
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+FROZEN {
+  "plan_id": "5fa606fd0e45f619b652d279b81f1c64ab79bba168b6dd536281384c0c187cd6",
+  "knowledge_cutoff": "2026-09-17",
+  "max_companies_this_round": 2,
+  "token_budget": 50000,
+  "reports": [
+    {
+      "instrument_id": "600101.SH",
+      "asset_id": "asset_212802979fd8ad51ac55c4bce755ebed",
+      "report_id": "1225038450",
+      "report_period": "2025-12-31",
+      "document_version": "3975566d6ed34cf7d3ac1bd8b7157c37e01fac1927fe8d0f99cc43acf1cb548f",
+      "disclosure_form": "service"
+    },
+    {
+      "instrument_id": "600108.SH",
+      "asset_id": "asset_d1174950c07550226d1e3cdb433dc6fb",
+      "report_id": "1225255137",
+      "report_period": "2025-12-31",
+      "document_version": "fb90a28a0a95404b3265e580daebbdfb980b75288859b7b68f8736cdd32820b9",
+      "disclosure_form": "manufacturing"
+    }
+  ]
+}
+HISTORY_UNCHANGED 4174 QUEUE_UNCHANGED 222

@@ -1,0 +1,143 @@
+import json,hashlib,re
+from datetime import datetime,timezone
+from pathlib import Path
+C=Path('openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch');P=Path('data/checkpoints/company_profile_common_core/reports/m4_v59_unseen_small_batch/plan.json');plan=json.loads(P.read_text());T='600101.SH';A='600108.SH'
+rev={T:[],A:[]};acts=[];negs=[]
+def income(i,p,name,value,header,dim='business_type',unit='元',actor='公司及合并子公司',scope='consolidated_group',party=None,segment=None,qualifier=None):
+ v=dict(condition_id=f'{i}-income-{len(rev[i])+1:03}',instrument_id=i,page=p,name=name,native_aliases=[name],value=value.replace(',',''),unit=unit,dimension=dim,header=header,table_basis=header,source_column='本期营业收入',source_actor=actor,subject_scope=scope,counterparty=party,source_segment=segment,qualifier=qualifier,reported_period='2025-12-31',period_state='current_printed');rev[i].append(v)
+def rows(i,p,header,items,**kw):
+ for name,val in items:income(i,p,name,val,header,**kw)
+def action(i,p,name,verb,actor='公司及合并子公司',scope='consolidated_group',category=None,party=None,qualifier=None):
+ acts.append(dict(condition_id=f'{i}-action-{sum(v["instrument_id"]==i for v in acts)+1:03}',instrument_id=i,page=p,name=name,native_aliases=[name],source_actions=[verb],source_actor=actor,actor_aliases=[actor],subject_scope=scope,category=category,counterparty=party,qualifier=qualifier,state='current_affirmative',reported_period='2025-12-31'))
+def negative(i,p,name,forbidden,**kw):negs.append(dict(condition_id=f'{i}-negative-{sum(v["instrument_id"]==i for v in negs)+1:03}',instrument_id=i,page=p,name=name,forbidden=forbidden,**kw))
+# Read directly from official annual main tables and each complete continuation.
+rows(T,17,'主营业务分行业',[('电力生产','184003404.83'),('电力供应','2572587584.40'),('减：电力生产与供应抵消数','184003404.83'),('电力生产和供应','2572587584.40'),('自来水生产、供应、安装','155776695.97'),('建筑施工','338066301.06'),('市场化售电服务','41062579.34'),('其他行业','63861434.46'),('合计','3171354595.23'),('减：公司内各分部抵消数','158533922.30'),('抵销后合计','3012820672.93')],dim='industry')
+rows(T,17,'主营业务分产品',[('电力','2572587584.40'),('自来水','155776695.97'),('施工劳务','338066301.06'),('市场化售电服务','41062579.34'),('其他','63861434.46')],dim='product')
+rows(T,18,'主营业务分产品',[('合计','3171354595.23'),('减：公司内各分部抵消数','158533922.30'),('抵销后合计','3012820672.93')],dim='product')
+rows(T,18,'主营业务分地区',[('遂宁','3012820672.93'),('合计','3012820672.93')],dim='region')
+for n,v in [('四川裕能新能源电池材料有限公司','24428.52'),('四川坤天新能源科技有限公司','17124.70'),('遂宁源晗能源技术有限公司','5701.05'),('中石油遂宁天然气净化有限公司','5597.08'),('蜂巢能源科技(遂宁)有限公司','5287.05')]:income(T,23,n,v,'前五名客户销售额',unit='万元',party=n)
+rows(T,200,'合并营业收入和营业成本',[('主营业务','3012820672.93'),('其他业务','8379460.38'),('合计','3021200133.31')])
+income(T,88,'营业收入','3021200133.31','合并利润表营业收入')
+income(T,91,'营业收入','2577591693.50','母公司利润表营业收入',actor='四川明星电力股份有限公司',scope='issuer')
+companies=[(36,'遂宁市明星自来水有限公司','16191.19'),(36,'遂宁市明星酒店有限公司','6185.84'),(36,'四川明星新能源科技有限公司','36213.83'),(37,'遂宁市明星电力工程设计有限公司','2459.30'),(37,'遂宁市明星水务设计有限公司','321.10'),(37,'陕西省金盾公路建设投资有限公司','91.99'),(37,'四川华润万通燃气股份有限公司','43699.57')]
+for p,n,v in companies:income(T,p,n,v,'主要控股参股公司营业收入',unit='万元',actor=n,scope='business_segment' if '华润' in n else 'named_subsidiary',qualifier='合营企业；权益法；50%表决权；不并表' if '华润' in n else '子公司')
+columns=['电力生产与供应','自来水生产、供应及安装','建筑施工','代理售电','其他行业','合计']
+matrix=[('商品销售',['257258.76','10546.98','67.91','4106.26',None,'271979.91']),('安装工程',[None,'4982.31','18792.92',None,None,'23775.23']),('提供服务',[None,None,'834.38',None,'4692.54','5526.92']),('其他',['111.53','71.95','457.64',None,'196.83','837.95']),('某一时点转让',['257370.29','10618.93','1359.93','4106.26','3246.16','276701.57']),('某一时段内转让',[None,'4982.31','18792.92',None,'1643.21','25418.44']),('合计',['257370.29','15601.24','20152.85','4106.26','4889.37','302120.01'])]
+for name,vs in matrix:
+ for seg,v in zip(columns,vs):
+  if v is not None:income(T,201,name,v,'营业收入分解/商品转让时间' if name.startswith('某一') else '营业收入分解/业务类型',unit='万元',segment=seg,qualifier='原分部营业收入列；与营业成本分别取列')
+rows(T,214,'作为出租人的经营租赁',[('投资性房地产','1921401.91'),('其他资产','80998.38')]);income(T,215,'合计','2002400.29','作为出租人的经营租赁',qualifier='承接p214租赁收入表')
+income(T,220,'四川华润万通燃气股份有限公司','436995747.00','重要合营企业主要财务信息/营业收入',actor='四川华润万通燃气股份有限公司',scope='business_segment',qualifier='合营企业；权益法；50%表决权；不并表')
+# Related sales names/values manually transcribed after physical current/prior check.
+salesT=[(232,'国网四川省电力公司','市场化售电','48282397.92'),(232,'国网四川省电力公司','销售电力产品','3109095.53'),(232,'国网四川省电力公司','提供劳务','5397038.94'),(232,'四川西星电力科技咨询有限公司','酒店服务','14235953.15'),(232,'国网四川省电力公司','销售产品','77995.78'),(232,'国网四川省电力公司','酒店服务','56341.49'),(232,'四川华润万通燃气股份有限公司','酒店服务','4754.71'),(232,'四川华润万通燃气股份有限公司','提供劳务','27223.85'),(232,'四川华润万通燃气股份有限公司','销售产品','9911.48'),(232,'四川东祥工程项目管理有限责任公司','酒店服务','4202.36'),(232,'遂宁兴业投资集团有限公司','提供劳务','134513.03'),(232,'国网四川电力送变电建设有限公司','酒店服务','70825.69'),(232,'国网四川招标有限公司','酒店服务','6127714.62'),(232,'英大泰和人寿保险股份有限公司','酒店服务','23245.28'),(232,'国网四川电力建设工程咨询有限公司','酒店服务','1024474.54'),(232,'英大长安保险经纪有限公司','酒店服务','2358.49'),(232,'宁夏天鹰电力物资有限公司','酒店服务','560070.76'),(232,'国网福建招标有限公司','酒店服务','545542.46'),(232,'河南电力物资有限公司','酒店服务','722976.42'),(232,'四川蜀能电力有限公司','酒店服务','96391.51'),(232,'国网黑龙江招标有限公司','酒店服务','598452.81'),(233,'国网重庆招标有限公司','酒店服务','1611058.53'),(233,'攀枝花网源电力有限公司','酒店服务','4528.30')]
+for p,party,n,v in salesT:income(T,p,n,v,'本期关联销售',party=party)
+income(T,233,'合计','82727067.65','本期关联销售')
+income(T,234,'房屋','151200.00','本公司作为出租方关联租赁',party='英大证券有限责任公司')
+rows(T,240,'报告分部营业收入',[('电力生产与供应','257743.12'),('自来水生产、供应及安装','16207.25'),('建筑施工','32107.58'),('代理售电','4106.26'),('其他行业','9058.23'),('分部间抵销','17102.43'),('合计','302120.01')],unit='万元',dim='business_segment')
+rows(T,254,'母公司营业收入和营业成本',[('主营业务','2572587584.40'),('其他业务','5004109.10'),('合计','2577591693.50')],actor='四川明星电力股份有限公司',scope='issuer')
+# Yasheng independent income tables: native headings retained even where pre-elimination sums differ.
+rows(A,10,'主营业务分行业',[('农业','3434567875.97'),('商贸','937369424.00'),('工业','303823274.70'),('其他','26267068.19')],dim='industry')
+income(A,10,'牧草','579407696.67','主营业务分产品',dim='product')
+rows(A,11,'主营业务分产品',[('辣椒产品','366554258.17'),('商品玉米','364789188.61'),('马铃薯','236644674.37'),('食葵','253544327.25'),('制种玉米','231925529.50'),('果品','160761209.21'),('啤酒花','84649682.65'),('农资与服务','398203275.18'),('节水滴灌材料及安装','304120285.08'),('家庭农场收入','536604671.70')],dim='product')
+income(A,11,'境内','4241548459.66','主营业务分地区',dim='region');income(A,11,'直销','4241548459.66','主营业务分销售模式',dim='sales_mode')
+rows(A,13,'贸易业务本期营业收入',[('肥料','142416925.90'),('农产品','129433953.60'),('其他产品','33860963.50')])
+subsA=[('甘肃亚盛田园牧歌草业集团有限责任公司','446048806.35'),('甘肃亚盛绿鑫啤酒原料集团有限责任公司','137191557.36'),('甘肃亚盛好食邦食品集团有限公司','358809562.07'),('甘肃亚盛薯业集团有限责任公司','145623927.64'),('甘肃亚盛亚美特节水有限公司','303823274.70'),('甘肃亚盛种业集团有限责任公司','323099190.62'),('甘肃泰达房屋经纪有限责任公司','9202846.42'),('甘肃亚盛农业研究院有限公司','3978920.06'),('甘肃亚盛本源生物科技有限公司','13085301.71'),('甘肃亚盛农业综合服务有限公司','398093183.44'),('甘肃兴农辣椒产业开发有限公司','180466678.49'),('甘肃亚盛本草源中药材有限公司','24337684.61')]
+for n,v in subsA:income(A,17,n,v,'主要控股子公司营业收入',actor=n,scope='named_subsidiary')
+income(A,52,'营业收入','4241548459.66','合并利润表营业收入');income(A,54,'营业收入','2358266709.39','母公司利润表营业收入',actor='甘肃亚盛实业（集团）股份有限公司',scope='issuer')
+rows(A,103,'合并营业收入和营业成本',[('主营业务','4152807884.42'),('其他业务','88740575.24'),('合计','4241548459.66')])
+colsA=['农业-分部','商贸-分部','工业-分部','其他-分部','合计']
+matA=[('主营业务-农产品销售收入',['2756029576.34','438089149.99',None,None,'3194118726.33']),('主营业务-其他',['385339498.59','360604795.76','204428109.03','8316754.71','958689158.09']),('其他业务',['81820495.00','2667608.99','3062707.01','1189764.24','88740575.24']),('合计',['3223189569.93','801361554.74','207490816.04','9506518.95','4241548459.66'])]
+for n,vs in matA:
+ for seg,v in zip(colsA,vs):
+  if v is not None:income(A,104,n,v,'营业收入分解/业务类型',segment=seg)
+rows(A,113,'作为出租人的经营租赁',[('土地租赁','150046750.81'),('机器设备租赁','94100.00'),('房屋建筑物租赁','14506220.04'),('合计','164647070.85')])
+salesA=[('甘肃黄羊河农工商（集团）有限责任公司','农产品','1740188.62'),('甘肃黄羊河农工商（集团）有限责任公司','其他','216096.00'),('甘肃省农垦建筑工程有限责任公司','工程施工/滴管材料','30213429.52'),('甘肃省农垦建筑工程有限责任公司','工程材料','4465306.75'),('甘肃省农垦建筑工程有限责任公司','生产资料','650104.00'),('农垦集团及其他所属公司','生产资料','42326994.38'),('农垦集团及其他所属公司','农产品','24831315.17'),('农垦集团及其他所属公司','工程施工/滴管材料','22649188.61'),('农垦集团及其他所属公司','水电费','85048.82'),('农垦集团及其他所属公司','其他','13904.59'),('农垦集团及其他所属公司','物业服务','11115.00'),('莫高股份及下属公司','生产资料','556655.60'),('庄园牧场及下属公司','农产品','3803579.98')]
+for party,n,v in salesA:income(A,120,n,v,'本期关联销售',party=party)
+for party,v in [('甘肃省农垦集团有限责任公司','2164800.00'),('甘肃省农牧投资发展有限公司','688628.57'),('甘肃亚盛盐化工业集团有限责任公司','210857.14'),('甘肃省农垦房地产综合开发有限公司','31360.00'),('甘肃农垦医药药材有限责任公司','23142.86')]:income(A,121,'房屋建筑物',v,'本公司作为出租方关联租赁',party=party)
+rows(A,126,'报告分部营业收入',[('农业','3434567875.97'),('商贸','937369424.00'),('工业','303823274.70'),('其他','26267068.19'),('分部间抵销','-460479183.20'),('合计','4241548459.66')],dim='business_segment')
+rows(A,132,'母公司营业收入和营业成本',[('主营业务','2313021267.02'),('其他业务','45245442.37'),('合计','2358266709.39')],actor='甘肃亚盛实业（集团）股份有限公司',scope='issuer')
+# Operating actions only: registration/license lists alone never establish actual activity.
+for n,v in [('电力','生产'),('电力','销售')]:action(T,11,n,v,category='goods')
+action(T,11,'电力','采购',category='goods',party='国网四川省电力公司')
+for n,v in [('自来水','采购'),('自来水','销售')]:action(T,11,n,v,actor='遂宁市明星自来水有限公司',scope='named_subsidiary',category='goods',qualifier='趸购销售为主；四座水厂停止常规生产')
+for n in ['电水设计安装','智能运维','市场化售电','电动汽车充电','能源托管']:action(T,11,n,'提供',category='service')
+for n in ['光储充享示范站','用户侧储能项目']:action(T,13,n,'运营',actor='四川明星新能源科技有限公司',scope='named_subsidiary',category='service',qualifier='建成投运')
+action(T,13,'绿色数智评标基地','运营',actor='遂宁市明星酒店有限公司',scope='named_subsidiary',category='service',qualifier='首座投运')
+for n in ['电力工程设计','水务工程设计','餐饮','住宿','会议','物业管理','带电作业','电气试验','智能维保','新能源服务']:action(T,129,n,'提供',category='service')
+for n in ['电力安装工程','自来水安装工程']:action(T,129,n,'安装',category='service')
+action(T,219,'燃气','销售',actor='四川华润万通燃气股份有限公司',scope='business_segment',category='goods',qualifier='合营企业；权益法；50%表决权；非集团收入')
+# Each current related procurement row has its own native supplier; generic original contents remain generic.
+textpages=json.loads((C/f'independent-source-pages-{T}.json').read_text());layout=json.loads((C/f'independent-source-layouts-{T}.json').read_text())
+for p in layout:
+ if p['page'] not in [229,230,231]:continue
+ for line in p['text'].splitlines():
+  m=re.match(r'^\s*(.+?)\s{2,}(购买电力产品|购买材料|购买商品|接受劳务)\s+(.*)$',line)
+  if not m:continue
+  name,content,tail=m.groups();amount=re.search(r'\d[\d,]*\.\d{2}',tail)
+  if not amount:continue
+  # Physical amount start, not count of printed annual cells.
+  pos=line.find(amount.group(),line.find(content)+len(content));current_start={229:57,230:56,231:49}[p['page']]
+  # Positions are actual visual text columns; current is the first amount before prior column.
+  if pos>{229:82,230:80,231:75}[p['page']]:
+   negative(T,p['page'],name.strip()+' '+content,'仅上期采购，不生成本期采购或投入',counterparty=name.strip(),content=content)
+   continue
+  n={'购买电力产品':'电力产品','购买材料':'材料','购买商品':'商品','接受劳务':'劳务'}[content]
+  action(T,p['page'],n,'采购',category='service' if content=='接受劳务' else 'goods',party=name.strip(),qualifier='原关联采购内容：'+content)
+# Current true sale/service actions must retain original party without invented specific products.
+for p,party,n,v in salesT:
+ if n=='酒店服务' or n=='提供劳务':action(T,p,n,'提供',category='service',party=party)
+ elif n in ['销售电力产品','销售产品']:action(T,p,n.removeprefix('销售'),'销售',category='goods',party=party)
+ else:action(T,p,n,'提供',category='service',party=party)
+action(T,234,'房屋','出租',category='service',party='英大证券有限责任公司')
+for n in ['牧草','马铃薯','制种玉米','啤酒花','中药材','果品','食葵','辣椒','香辛料']:action(A,8,n,'种植',category='goods')
+for n in ['马铃薯产品','辣椒产品','有机肥','农业节水灌溉产品']:action(A,9,n,'加工',category='goods')
+action(A,9,'农业节水灌溉产品','销售',actor='甘肃亚盛亚美特节水有限公司',scope='named_subsidiary',category='goods')
+for n in ['牧草','辣椒产品','商品玉米','马铃薯','食葵','制种玉米','果品','啤酒花']:
+ for verb in ['生产','销售']:action(A,11,n,verb,category='goods')
+for n in ['肥料','农产品','其他产品']:action(A,13,n,'销售',category='goods',qualifier='贸易业务')
+for n in ['农产品','滴灌材料']:action(A,104,n,'加工',category='goods')
+action(A,104,'农产品','销售',category='goods',qualifier='农产品贸易销售');action(A,104,'滴灌材料','销售',category='goods');action(A,104,'滴灌工程','施工',category='service')
+for party,n,v in salesA:
+ category='service' if n in ['物业服务','水电费'] else 'mixed' if n=='工程施工/滴管材料' else 'goods' if n in ['农产品','工程材料','生产资料'] else 'unspecified'
+ action(A,120,n,'提供' if category=='service' else '销售' if category=='goods' else '提供',category=category,party=party,qualifier='本期关联销售原内容；不拆混合工程施工/滴管材料')
+for party,n in [('甘肃黄羊河农工商（集团）有限责任公司','农产品'),('甘肃省农垦建筑工程有限责任公司','建筑工程'),('农垦集团及其他所属公司','建筑工程'),('农垦集团及其他所属公司','农产品'),('农垦集团及其他所属公司','生产资料'),('农垦集团及其他所属公司','水电费'),('农垦集团及其他所属公司','包装材料'),('莫高股份及下属公司','生产资料'),('莫高股份及下属公司','水电费'),('庄园牧场及下属公司','农产品'),('其他关联方','生产资料')]:action(A,120,n,'采购',category='service' if n in ['建筑工程','水电费'] else 'goods',party=party)
+for party,v in [('甘肃省农垦集团有限责任公司','2164800.00'),('甘肃省农牧投资发展有限公司','688628.57'),('甘肃亚盛盐化工业集团有限责任公司','210857.14'),('甘肃省农垦房地产综合开发有限公司','31360.00'),('甘肃农垦医药药材有限责任公司','23142.86')]:action(A,121,'房屋建筑物','出租',category='service',party=party)
+# Explicit financial and business false-positive boundaries, frozen independently of output.
+negative(T,37,'甘孜州奥深达润神矿业有限公司','营业收入空位，3.07及2.92为利润，不借入收入')
+negative(T,36,'经营范围许可与一般项目','仅许可和注册经营范围不得生成确定当前饮料、雪茄、电池等经营动作')
+negative(T,40,'二次供水、直饮水','探索发展不是已经开展的当前经营')
+negative(T,41,'虚拟电厂','调研探索及未来发展不推当前运营')
+negative(T,41,'2026经营计划','计划收入302800万元不作本期收入')
+negative(T,12,'唐家渡电站','非本公司所属，2026投产不推本公司本期发电')
+negative(T,201,'空位及营业成本','各分部原空位不借邻列收入或成本，不造零')
+negative(T,220,'重要联营企业','不适用，不能将前述合营收入复制为联营收入')
+negative(T,220,'四川华润万通燃气股份有限公司','合营企业不升格集团主体，49.43%持股与50%表决权分别保留')
+negative(T,232,'四笔仅上期酒店服务','绵阳东泓、四川科锐得实业、福建省电建咨询、国网射洪四行仅上期，不生成本期收入或服务')
+negative(T,234,'受托管理/承包','不适用，不造受托收入或动作')
+negative(T,214,'作为承租人','租赁费用、利息和现金流出不作收入')
+negative(T,215,'融资租赁','不适用，不造融资租赁收入')
+negative(T,254,'母公司营业收入分解','不适用，不复制合并分类为母公司收入')
+negative(A,17,'鱼儿红矿业与甜源农业','营业收入空位，不借负利润或造零')
+negative(A,9,'甜菜制糖','正在推进项目，不推本期制糖生产销售')
+negative(A,9,'微生物菌剂与马铃薯全粉','生产线项目推进，不推已经投产或销售')
+negative(A,19,'农机设备化肥农药风险','风险说明及未来措施不能反推本期具名投入或采购')
+negative(A,104,'空分部收入','农产品销售工业/其他分部空位不借成本或邻格，不造零')
+negative(A,120,'机耕费及其他仅上期采购','黄羊河机耕费887?原88,574.80、农垦机耕费537,655.24及其他关联方其他67,220.00仅上期不生成本期采购')
+negative(A,120,'农垦集团其他仅上期销售','其他231818.90仅上期，不生成本期收入或销售')
+negative(A,121,'甘肃农垦张掖农场有限责任公司','房屋建筑物25000仅上期，不能生成本期出租收入或动作')
+negative(A,122,'本公司作为承租方','所有租金费用、利息与使用权资产不作本期出租收入')
+negative(A,113,'融资租赁','不适用，不造融资租赁收入')
+negative(A,121,'受托管理/承包','不适用，不造受托收入或经营')
+negative(A,132,'母公司分解','不适用，不复制合并分部列为母公司分解')
+negative(A,118,'母公司同控关联方','关联方不是本集团子公司，不把交易对手业务提升为集团经营')
+answers={T:{'principal_business':dict(pages=[11,12,13,36,37,38,40,41,218,219,240],substance='电力生产与供应、自来水供应为核心，电水设计安装、智能运维、市场化售电、充电、托管；独立电网水网，自发电全上网缺口向国网购买销售；明星自来水四厂停常规生产、趸购销售为主、两厂加压一厂兼应急，不能删本期实际生产量；光储充享及用户侧储能建成投运、虚拟电厂仅调研；七子公司与华润万通权益法合营50%表决权分开。'), 'products_services':dict(pages=[11,13,19,128,129,218,219],substance='水电与自来水、供电售水、设计安装、智能运维、能源托管、充电、光储充享、储能；政府定价、直接市场化、零售代理三种电力业务；带电作业、电气试验、智能维保、新能源服务；电水工程设计、酒店餐饮住宿会议及物业管理，具名子公司与合营燃气独立。'), 'revenue_model':dict(pages=[11,128,129,132,133,200,201,214,215,219,220,232,233,234,240,254],substance='自发上网和购电售电、售水及综合能源收费；政府定价电每月共同电量与批准电价、直接交易三方合同约定、零售代理不控电能按批零价差与结算依据净额确认、售水共同售量政府水价；工程主要责任人总额、投入法时段履约、进度无法估量则可补偿成本；设计交图时点，酒店服务收款或权利，物业期间均摊，综合能源获认可时点；经营租赁直线法；各分部原列、母公司和合营收入不混。')},A:{'principal_business':dict(pages=[8,9,17,74,104,114],substance='农业为主，甘肃内蒙种植、加工、研发、农资服务及商贸流通一体，规模化土地整合订单农业产销衔接；九类作物矩阵及农产品加工；亚美特节水产品销售和工程服务，三家新设下属公司；甜菜一体化及两生产线仍在推进，研究/新品种登记不推销售。'), 'products_services':dict(pages=[8,9,11,13,17,74,104],substance='牧草马铃薯制种玉米啤酒花中药材果品食葵辣椒香辛料，商品玉米另有产销量；马铃薯/辣椒产品加工、有机肥、节水灌溉材料及安装；农资与服务、家庭农场土地租赁、肥料农产品其他产品贸易；原子公司农业/商贸/工业/研究/加工业务分别保留，未投产项目不肯定交付。'), 'revenue_model':dict(pages=[9,11,13,74,76,77,103,104,113,120,121,126,132],substance='直销和订单农业、农产品其他产品销售及滴灌安装、家庭农场与土地承包租赁、关联商品服务及出租；送货上门客户收货时点，自提开单且客户已提货时点；安装客户同步取得消耗、产出法或投入法时段进度；主要责任人与代理总净额分开；土地承包一个种植周期租期直线法，经营租赁及可变租金实际发生；合并/母公司、原分部抵销和本期空位分开。')}}
+for i,ds in answers.items():
+ for k,v in ds.items():v.update(condition_id=i+'-answer-'+k,substantive_review_required=True)
+# Retain original row names with disambiguating qualifiers rather than editing official words.
+for i in rev:
+ for v in rev[i]:
+  if v['name']=='抵销后合计':v['native_aliases'].append('合计');v['qualifier']='原表末行合计；扣除公司内分部抵消数后'
+negids=[v['condition_id'] for v in negs];assert len(negids)==len(set(negids))
+scope=dict(status='draft_independent_source_read_before_any_business_output',created_at=datetime.now(timezone.utc).isoformat(),formal_attempts_used=0,plan_id=plan['plan_id'],knowledge_cutoff='2026-09-17',official_reports=plan['reports'],processing_identity=json.loads((C/'freeze-receipt.json').read_text())['processing_identity'],answers=answers,revenue_conditions=rev,action_conditions=acts,negative_conditions=negs,positive_total=6+sum(map(len,rev.values()))+len(acts),counts={'bodies':6,'revenue':sum(map(len,rev.values())),'actions':len(acts),'negative':len(negs)},production_authorization='not_authorized',scale_quality_claim_allowed=False)
+(C/'source-scope-draft.json').write_text(json.dumps(scope,ensure_ascii=False,indent=2)+'\n')
+print(scope['counts'],'POSITIVE',scope['positive_total'],'per company income',{k:len(v) for k,v in rev.items()},'actions',dict(Counter(x['instrument_id'] for x in acts)) if False else '')

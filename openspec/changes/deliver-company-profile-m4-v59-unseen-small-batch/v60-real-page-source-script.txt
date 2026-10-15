@@ -1,0 +1,15 @@
+import json,sqlite3
+from pathlib import Path
+from utils import config_manager
+from research.storage import ResearchStorageManager
+from research.announcement_assets import AnnouncementAssetConfig, AnnouncementAssetRepository, AnnouncementAssetService
+from research.announcement_assets.access import AnnouncementAssetAccess
+from research.business_profile_async_production import BusinessProfileWorkRepository
+from research.company_profile.operations import OfficialAnnualReportPageSource
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch';rc=config_manager.get_research_config();storage=ResearchStorageManager(rc);cfg=AnnouncementAssetConfig.from_research_config(rc,project_root=R);ar=AnnouncementAssetRepository(Path(str(rc.storage.db_path)).resolve());access=AnnouncementAssetAccess(repository=ar,config=cfg,service=AnnouncementAssetService(repository=ar,config=cfg,acquisition_service=None,attachment_retriever=None));repo=BusinessProfileWorkRepository(storage=storage,shared_asset_access=access,checkpoint_root=R/'data/checkpoints/company_profile_common_core')
+db=sqlite3.connect('file:data/research.db?mode=ro',uri=True);db.row_factory=sqlite3.Row;f=json.loads((R/'data/checkpoints/company_profile_common_core/reports/m4_v59_unseen_small_batch/formal_execution.json').read_text());out=[]
+for i,res in f['results'].items():
+ work=res['query']['profiles'][0]['work_id'];item=dict(db.execute('select * from business_profile_work_items where work_id=?',(work,)).fetchone());item['metadata']=json.loads(item['metadata_json']);src=OfficialAnnualReportPageSource(repo)(item);assert src
+ ps=src['pages'];Path('/tmp/v60_real_pages_'+i+'.json').write_text(json.dumps(ps,ensure_ascii=False));print(i,len(ps),[p['page']for p in ps if p.get('layout_text')],flush=True)
+ out.append(dict(instrument_id=i,report=src['report'].model_dump(mode='json'),layout_pages=[p['page']for p in ps if p.get('layout_text')]))
+(C/'v60-real-page-source-receipt.json').write_text(json.dumps(out,ensure_ascii=False,indent=2))

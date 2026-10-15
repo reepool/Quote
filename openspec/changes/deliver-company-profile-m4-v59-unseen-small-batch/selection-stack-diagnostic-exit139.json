@@ -1,0 +1,6 @@
+{
+  "exit_code": 139,
+  "formal_attempts_used": 0,
+  "plan_written": false,
+  "description": "diagnostic process ended during timed stack dump; no supported attribution of root cause"
+}

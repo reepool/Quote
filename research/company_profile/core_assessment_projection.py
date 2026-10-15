@@ -37,7 +37,12 @@ BUSINESS_DESCRIPTION_CONFLICT = "official_business_description_conflict"
 def business_description_is_unclear(record: SemanticRecord) -> bool:
     """Return whether native business wording has an unresolved source conflict."""
     return any(
-        reason.startswith("official_income_unit_conflict:")
+        reason.startswith(
+            (
+                "official_income_unit_conflict:",
+                "registered_permission_not_current_operation:",
+            )
+        )
         or isinstance(record, BusinessOverview)
         and reason.startswith(BUSINESS_DESCRIPTION_CONFLICT + ":")
         for reason in record.uncertainty
@@ -350,6 +355,7 @@ def _assess_principal_business(
                 source_delivery_repair
                 and (
                     _NARRATIVE_BUSINESS.search(text)
+                    or "农业产业经营情况" in text
                     or re.search(
                         r"截至报告日，公司完成对|前期筹备阶段|公司控股子公司[^。]+采购先进计算技术服务|注\d+：[^。]+成立于\d{4}年|本公司具体的收入确认原则|本公司的营业收入主要包括|关联托管/承包情况说明|产销量情况说明|公司主要采用以销定产|受托方由|未确认收入及待履行合同|公司生产经营及工程项目建设所需|公司物流体系|新能源物流方面|公司着力构建中药全产业链|一是深化营销体系转型|上年计算机硬件业务出表|本年丧失子公司控制权|其他原因的合并范围变动|海外经营实体|传统药品注册许可证",
                         text,
