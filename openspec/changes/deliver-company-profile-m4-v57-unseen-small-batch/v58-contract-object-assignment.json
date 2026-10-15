@@ -1,0 +1,1830 @@
+{
+  "600098.SH-income-001": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:industry:(1)燃煤发电及供热业务:table:主营业务收入:row:15"
+  },
+  "600098.SH-income-002": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:industry:(2)天然气发电及供热业务:table:主营业务收入:row:16"
+  },
+  "600098.SH-income-003": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:industry:(3)能源物流业务:table:主营业务收入:row:17"
+  },
+  "600098.SH-income-004": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:industry:(4)天然气业务:table:主营业务收入:row:19"
+  },
+  "600098.SH-income-005": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:industry:(5)新能源及储能业务:table:主营业务收入:row:20"
+  },
+  "600098.SH-income-006": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:industry:(6)其他产业:table:主营业务收入:row:21"
+  },
+  "600098.SH-income-007": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:product:燃煤发电:table:主营业务收入:row:32"
+  },
+  "600098.SH-income-008": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:product:天然气发电:table:主营业务收入:row:33"
+  },
+  "600098.SH-income-009": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:product:煤电热力:table:主营业务收入:row:34"
+  },
+  "600098.SH-income-010": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:product:气电热力:table:主营业务收入:row:35"
+  },
+  "600098.SH-income-011": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:product:加气混凝土:table:主营业务收入:row:36"
+  },
+  "600098.SH-income-012": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:product:煤炭:table:主营业务收入:row:37"
+  },
+  "600098.SH-income-013": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:product:油品:table:主营业务收入:row:38"
+  },
+  "600098.SH-income-014": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:product:危化品仓储:table:主营业务收入:row:39"
+  },
+  "600098.SH-income-015": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:product:天然气:table:主营业务收入:row:40"
+  },
+  "600098.SH-income-016": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:product:光伏发电:table:主营业务收入:row:41"
+  },
+  "600098.SH-income-017": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:product:风力发电:table:主营业务收入:row:42"
+  },
+  "600098.SH-income-018": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:product:充电桩:table:主营业务收入:row:43"
+  },
+  "600098.SH-income-019": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:product:储能及综合能源:table:主营业务收入:row:44"
+  },
+  "600098.SH-income-020": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:product:房产租赁:table:主营业务收入:row:45"
+  },
+  "600098.SH-income-021": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:product:金融业务:table:主营业务收入:row:46"
+  },
+  "600098.SH-income-022": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:region:华南地区:table:主营业务收入:row:57"
+  },
+  "600098.SH-income-023": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-d7a34f8efb630313:segment:region:其他地区:table:主营业务收入:row:58"
+  },
+  "600098.SH-income-024": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-b158adc98738ace6:Segment:business_type:煤炭:本期营业收入:row:0"
+  },
+  "600098.SH-income-025": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-b158adc98738ace6:Segment:business_type:油品:本期营业收入:row:1"
+  },
+  "600098.SH-income-026": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-b158adc98738ace6:Segment:business_type:天然气:本期营业收入:row:2"
+  },
+  "600098.SH-income-027": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-83f8db60a238f65b:Segment:product:火电:电力行业电量、收入及成本/本期收入:row:0"
+  },
+  "600098.SH-income-028": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-83f8db60a238f65b:Segment:product:风电:电力行业电量、收入及成本/本期收入:row:1"
+  },
+  "600098.SH-income-029": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-83f8db60a238f65b:Segment:product:光伏发电:电力行业电量、收入及成本/本期收入:row:2"
+  },
+  "600098.SH-income-030": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-83f8db60a238f65b:Segment:product:合计:电力行业电量、收入及成本/本期收入:row:3"
+  },
+  "600098.SH-income-031": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-8de9a3c85cde35e9:Segment:business_segment:东电公司:控股参股公司/营业收入:row:0"
+  },
+  "600098.SH-income-032": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-8de9a3c85cde35e9:Segment:business_segment:天然气发电公司:控股参股公司/营业收入:row:1"
+  },
+  "600098.SH-income-033": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-8de9a3c85cde35e9:Segment:business_segment:恒益热电公司:控股参股公司/营业收入:row:2"
+  },
+  "600098.SH-income-034": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-8de9a3c85cde35e9:Segment:business_segment:中电荔新公司:控股参股公司/营业收入:row:3"
+  },
+  "600098.SH-income-035": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-8de9a3c85cde35e9:Segment:business_segment:南沙电力公司:控股参股公司/营业收入:row:4"
+  },
+  "600098.SH-income-036": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-8de9a3c85cde35e9:Segment:business_segment:能源物流集团:控股参股公司/营业收入:row:5"
+  },
+  "600098.SH-income-037": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-8de9a3c85cde35e9:Segment:business_segment:燃气集团:控股参股公司/营业收入:row:6"
+  },
+  "600098.SH-income-038": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-8de9a3c85cde35e9:Segment:business_segment:新能源集团:控股参股公司/营业收入:row:7"
+  },
+  "600098.SH-income-039": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-8de9a3c85cde35e9:Segment:business_segment:储能集团:控股参股公司/营业收入:row:8"
+  },
+  "600098.SH-income-040": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-8de9a3c85cde35e9:Segment:business_segment:财务公司:控股参股公司/营业收入:row:9"
+  },
+  "600098.SH-income-041": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-8de9a3c85cde35e9:Segment:business_segment:珠海金湾公司:控股参股公司/营业收入:row:10"
+  },
+  "600098.SH-income-042": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-8de9a3c85cde35e9:Segment:business_segment:红海湾发电公司:控股参股公司/营业收入:row:11"
+  },
+  "600098.SH-income-043": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-40ad0bcc73a1f30e:Segment:business_type:营业总收入:合并利润表/营业总收入:row:0"
+  },
+  "600098.SH-income-044": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-40ad0bcc73a1f30e:Segment:business_type:营业收入:合并利润表/营业收入:row:1"
+  },
+  "600098.SH-income-045": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-40ad0bcc73a1f30e:Segment:business_type:利息收入:合并利润表/利息收入:row:2"
+  },
+  "600098.SH-income-046": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-7991538e2c91a45c:Segment:business_type:主营业务:营业收入:row:0"
+  },
+  "600098.SH-income-047": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-7991538e2c91a45c:Segment:business_type:其他业务:营业收入:row:1"
+  },
+  "600098.SH-income-048": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-7991538e2c91a45c:Segment:business_type:合计:营业收入:row:2"
+  },
+  "600098.SH-income-049": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:煤电:合同收入/电力业务:row:3"
+  },
+  "600098.SH-income-050": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:煤电热力:合同收入/电力业务:row:4"
+  },
+  "600098.SH-income-051": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:气电:合同收入/电力业务:row:5"
+  },
+  "600098.SH-income-052": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:气电热力:合同收入/电力业务:row:6"
+  },
+  "600098.SH-income-053": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:加气混凝土:合同收入/电力业务:row:7"
+  },
+  "600098.SH-income-054": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:小计:合同收入/电力业务:row:8"
+  },
+  "600098.SH-income-055": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:煤炭:合同收入/能源物流业务:row:9"
+  },
+  "600098.SH-income-056": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:油品:合同收入/能源物流业务:row:10"
+  },
+  "600098.SH-income-057": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:危化品仓储:合同收入/能源物流业务:row:11"
+  },
+  "600098.SH-income-058": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:小计:合同收入/能源物流业务:row:12"
+  },
+  "600098.SH-income-059": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:天然气:合同收入/燃气业务:row:13"
+  },
+  "600098.SH-income-060": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:小计:合同收入/燃气业务:row:14"
+  },
+  "600098.SH-income-061": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:光伏发电:合同收入/新能源及储能业务:row:15"
+  },
+  "600098.SH-income-062": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:风力发电:合同收入/新能源及储能业务:row:16"
+  },
+  "600098.SH-income-063": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:储能及综合能源:合同收入/新能源及储能业务:row:17"
+  },
+  "600098.SH-income-064": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:充电桩:合同收入/新能源及储能业务:row:18"
+  },
+  "600098.SH-income-065": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:小计:合同收入/新能源及储能业务:row:19"
+  },
+  "600098.SH-income-066": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:房产租赁:合同收入/其他产业:row:20"
+  },
+  "600098.SH-income-067": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:融资租赁:合同收入/其他产业:row:21"
+  },
+  "600098.SH-income-068": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:小计:合同收入/其他产业:row:22"
+  },
+  "600098.SH-income-069": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-cc078aaae7b9eee6:Segment:product:合计:合同收入/主营业务:row:23"
+  },
+  "600098.SH-income-070": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-c93b9511fab9f23d:Segment:customer:中国南方电网及其子公司:前五名客户/营业收入:row:0"
+  },
+  "600098.SH-income-071": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-c93b9511fab9f23d:Segment:customer:中国石化销售股份有限公司及其附属企业:前五名客户/营业收入:row:1"
+  },
+  "600098.SH-income-072": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-c93b9511fab9f23d:Segment:customer:国家电网公司及子公司:前五名客户/营业收入:row:2"
+  },
+  "600098.SH-income-073": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-c93b9511fab9f23d:Segment:customer:内蒙古汇能集团通汇煤炭经营有限公司:前五名客户/营业收入:row:3"
+  },
+  "600098.SH-income-074": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-c93b9511fab9f23d:Segment:customer:广东省电力工业燃料有限公司:前五名客户/营业收入:row:4"
+  },
+  "600098.SH-income-075": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-c93b9511fab9f23d:Segment:customer:合计:前五名客户/营业收入:row:5"
+  },
+  "600098.SH-income-076": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-c93b9511fab9f23d:Segment:business_type:利息收入:利息净收入/利息收入:row:6"
+  },
+  "600098.SH-income-077": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-c93b9511fab9f23d:Segment:business_type:存放同业:利息净收入/利息收入:row:7"
+  },
+  "600098.SH-income-078": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-c93b9511fab9f23d:Segment:business_type:存放中央银行:利息净收入/利息收入:row:8"
+  },
+  "600098.SH-income-079": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-e0caa3fd2e4d586a:Segment:service:经营租赁收入:作为出租人的经营租赁/租赁收入:row:0"
+  },
+  "600098.SH-income-080": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-e0caa3fd2e4d586a:Segment:service:合计:作为出租人的经营租赁/租赁收入:row:1"
+  },
+  "600098.SH-income-081": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-0296d2a87a8c3a70:Segment:service:销售收入:作为出租人的融资租赁/销售收入:row:0"
+  },
+  "600098.SH-income-082": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-bd0428ac40dfe117:Segment:business_segment:广州珠江天然气发电有限公司:重要非全资子公司/本期营业收入:row:0"
+  },
+  "600098.SH-income-083": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-bd0428ac40dfe117:Segment:business_segment:佛山恒益热电有限公司:重要非全资子公司/本期营业收入:row:1"
+  },
+  "600098.SH-income-084": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-bd0428ac40dfe117:Segment:business_segment:广州中电荔新热电有限公司:重要非全资子公司/本期营业收入:row:2"
+  },
+  "600098.SH-income-085": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-bd0428ac40dfe117:Segment:business_segment:广州发展南沙电力有限公司:重要非全资子公司/本期营业收入:row:3"
+  },
+  "600098.SH-income-086": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-bd0428ac40dfe117:Segment:business_segment:广州储能集团有限公司（合并）:重要非全资子公司/本期营业收入:row:4"
+  },
+  "600098.SH-income-087": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-bd0428ac40dfe117:Segment:business_segment:美姑兴澜风电开发有限公司:重要非全资子公司/本期营业收入:row:5"
+  },
+  "600098.SH-income-088": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-bd0428ac40dfe117:Segment:business_segment:临西县万辉新能源科技有限公司:重要非全资子公司/本期营业收入:row:6"
+  },
+  "600098.SH-income-089": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-bd0428ac40dfe117:Segment:business_segment:广州发展碧辟油品有限公司:重要非全资子公司/本期营业收入:row:7"
+  },
+  "600098.SH-income-090": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:粉煤灰、蒸汽、石膏浆液、水、炉渣:出售商品/提供劳务/本期发生额:row:1"
+  },
+  "600098.SH-income-091": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:外派人员劳务费:出售商品/提供劳务/本期发生额:row:2"
+  },
+  "600098.SH-income-092": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:外派人员劳务费:出售商品/提供劳务/本期发生额:row:3"
+  },
+  "600098.SH-income-093": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:回租业务收入:出售商品/提供劳务/本期发生额:row:4"
+  },
+  "600098.SH-income-094": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:外派人员劳务费:出售商品/提供劳务/本期发生额:row:6"
+  },
+  "600098.SH-income-095": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:外派人员劳务费:出售商品/提供劳务/本期发生额:row:7"
+  },
+  "600098.SH-income-096": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:油品仓储、水电费:出售商品/提供劳务/本期发生额:row:9"
+  },
+  "600098.SH-income-097": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:销售天然气:出售商品/提供劳务/本期发生额:row:10"
+  },
+  "600098.SH-income-098": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:电费、节能服务费:出售商品/提供劳务/本期发生额:row:12"
+  },
+  "600098.SH-income-099": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:销售天然气:出售商品/提供劳务/本期发生额:row:13"
+  },
+  "600098.SH-income-100": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:节能服务费:出售商品/提供劳务/本期发生额:row:14"
+  },
+  "600098.SH-income-101": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:节能服务费:出售商品/提供劳务/本期发生额:row:15"
+  },
+  "600098.SH-income-102": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:销售天然气:出售商品/提供劳务/本期发生额:row:16"
+  },
+  "600098.SH-income-103": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:销售天然气:出售商品/提供劳务/本期发生额:row:17"
+  },
+  "600098.SH-income-104": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:销售天然气:出售商品/提供劳务/本期发生额:row:18"
+  },
+  "600098.SH-income-105": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:销售天然气:出售商品/提供劳务/本期发生额:row:21"
+  },
+  "600098.SH-income-106": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:销售天然气:出售商品/提供劳务/本期发生额:row:22"
+  },
+  "600098.SH-income-107": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:销售天然气:出售商品/提供劳务/本期发生额:row:23"
+  },
+  "600098.SH-income-108": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:煤炭销售:出售商品/提供劳务/本期发生额:row:24"
+  },
+  "600098.SH-income-109": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:绿证销售:出售商品/提供劳务/本期发生额:row:25"
+  },
+  "600098.SH-income-110": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:节能服务费:出售商品/提供劳务/本期发生额:row:26"
+  },
+  "600098.SH-income-111": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:节能服务费:出售商品/提供劳务/本期发生额:row:27"
+  },
+  "600098.SH-income-112": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:节能服务费:出售商品/提供劳务/本期发生额:row:28"
+  },
+  "600098.SH-income-113": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:代输费:出售商品/提供劳务/本期发生额:row:29"
+  },
+  "600098.SH-income-114": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:外派人员劳务费:出售商品/提供劳务/本期发生额:row:30"
+  },
+  "600098.SH-income-115": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-bd022a3b36e36187:Segment:lease:房屋建筑物:本公司作为出租方/本期确认的租赁收入:row:0"
+  },
+  "600098.SH-income-116": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-bd022a3b36e36187:Segment:lease:房屋、车位租赁:本公司作为出租方/本期确认的租赁收入:row:1"
+  },
+  "600098.SH-income-117": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-bd022a3b36e36187:Segment:lease:房屋建筑物:本公司作为出租方/本期确认的租赁收入:row:2"
+  },
+  "600098.SH-income-118": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-bd022a3b36e36187:Segment:lease:房屋、车位租赁:本公司作为出租方/本期确认的租赁收入:row:3"
+  },
+  "600098.SH-income-119": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-bd022a3b36e36187:Segment:lease:房屋建筑物:本公司作为出租方/本期确认的租赁收入:row:4"
+  },
+  "600098.SH-income-120": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-bd022a3b36e36187:Segment:lease:房屋建筑物:本公司作为出租方/本期确认的租赁收入:row:5"
+  },
+  "600098.SH-income-121": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-4d842ad311a231f1:Segment:region:中国华南地区:地区对外交易收入:row:0"
+  },
+  "600098.SH-income-122": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-4d842ad311a231f1:Segment:region:其他地区:地区对外交易收入:row:1"
+  },
+  "600098.SH-income-123": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-4d842ad311a231f1:Segment:region:合计:地区对外交易收入:row:2"
+  },
+  "600098.SH-income-124": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-850eb44bcab07ec0:Segment:business_segment:燃煤发电及供热分部:对外交易收入:row:0"
+  },
+  "600098.SH-income-125": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-850eb44bcab07ec0:Segment:business_segment:天然气发电及供热分部:对外交易收入:row:1"
+  },
+  "600098.SH-income-126": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-850eb44bcab07ec0:Segment:business_segment:新能源及储能分部:对外交易收入:row:2"
+  },
+  "600098.SH-income-127": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-850eb44bcab07ec0:Segment:business_segment:燃气分部:对外交易收入:row:3"
+  },
+  "600098.SH-income-128": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-850eb44bcab07ec0:Segment:business_segment:能源物流分部:对外交易收入:row:4"
+  },
+  "600098.SH-income-129": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-850eb44bcab07ec0:Segment:business_segment:其他:对外交易收入:row:5"
+  },
+  "600098.SH-income-130": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-850eb44bcab07ec0:Segment:business_segment:燃煤发电及供热分部:分部间交易收入:row:7"
+  },
+  "600098.SH-income-131": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-850eb44bcab07ec0:Segment:business_segment:天然气发电及供热分部:分部间交易收入:row:8"
+  },
+  "600098.SH-income-132": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-850eb44bcab07ec0:Segment:business_segment:新能源及储能分部:分部间交易收入:row:9"
+  },
+  "600098.SH-income-133": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-850eb44bcab07ec0:Segment:business_segment:燃气分部:分部间交易收入:row:10"
+  },
+  "600098.SH-income-134": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-850eb44bcab07ec0:Segment:business_segment:能源物流分部:分部间交易收入:row:11"
+  },
+  "600098.SH-income-135": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-850eb44bcab07ec0:Segment:business_segment:其他:分部间交易收入:row:12"
+  },
+  "600098.SH-income-136": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-850eb44bcab07ec0:Segment:business_segment:合计:对外交易收入:row:6"
+  },
+  "600098.SH-income-137": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-850eb44bcab07ec0:Segment:adjustment:分部间抵销:分部间交易收入:row:13"
+  },
+  "600098.SH-income-138": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-c36ecee186d825be:Segment:business_type:主营业务:营业收入:row:0"
+  },
+  "600098.SH-income-139": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-c36ecee186d825be:Segment:business_type:其他业务:营业收入:row:1"
+  },
+  "600098.SH-income-140": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-c36ecee186d825be:Segment:business_type:合计:营业收入:row:2"
+  },
+  "600098.SH-income-141": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:天然气采购取消补偿:出售商品/提供劳务/本期发生额:row:0"
+  },
+  "600098.SH-income-142": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:运费:出售商品/提供劳务/本期发生额:row:5"
+  },
+  "600098.SH-income-143": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:其他劳务费:出售商品/提供劳务/本期发生额:row:8"
+  },
+  "600098.SH-income-144": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:服务费:出售商品/提供劳务/本期发生额:row:11"
+  },
+  "600098.SH-income-145": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:代建燃气管道工程:出售商品/提供劳务/本期发生额:row:19"
+  },
+  "600098.SH-income-146": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-2c9a1e38fe263608:Segment:service:服务费:出售商品/提供劳务/本期发生额:row:20"
+  },
+  "600098.SH-relationship-conflict-1": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-c76c6d6d80935afa:Segment:business_segment:广东红海湾发电有限公司:重要合营企业/本期营业收入:row:0"
+  },
+  "600098.SH-relationship-conflict-2": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-c76c6d6d80935afa:Segment:business_segment:广东珠海金湾液化天然气有限公司:重要合营企业/本期营业收入:row:1"
+  },
+  "600104.SH-income-001": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-651428ccff25b03f:segment:industry:汽车制造业:table:主营业务收入:row:14"
+  },
+  "600104.SH-income-002": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-651428ccff25b03f:segment:industry:金融业:table:主营业务收入:row:15"
+  },
+  "600104.SH-income-003": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-651428ccff25b03f:segment:industry:合计:table:主营业务收入:row:16"
+  },
+  "600104.SH-income-004": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-651428ccff25b03f:segment:product:整车业务:table:主营业务收入:row:27"
+  },
+  "600104.SH-income-005": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-651428ccff25b03f:segment:product:零部件业务:table:主营业务收入:row:28"
+  },
+  "600104.SH-income-006": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-651428ccff25b03f:segment:product:劳务及其他:table:主营业务收入:row:29"
+  },
+  "600104.SH-income-007": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-651428ccff25b03f:segment:product:金融业务:table:主营业务收入:row:30"
+  },
+  "600104.SH-income-008": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-651428ccff25b03f:segment:product:合计:table:主营业务收入:row:31"
+  },
+  "600104.SH-income-009": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-651428ccff25b03f:segment:region:中国:table:主营业务收入:row:42"
+  },
+  "600104.SH-income-010": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-651428ccff25b03f:segment:region:其他（注）:table:主营业务收入:row:43"
+  },
+  "600104.SH-income-011": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-651428ccff25b03f:segment:region:合计:table:主营业务收入:row:44"
+  },
+  "600104.SH-income-012": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cc6f1196364d8a6a:Segment:product:乘用车:收入:row:0"
+  },
+  "600104.SH-income-013": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cc6f1196364d8a6a:Segment:product:商用车:收入:row:1"
+  },
+  "600104.SH-income-014": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-79bc089f5e28f50c:Segment:business_segment:上海汽车集团财务有限责任公司:汽车金融业务/基本情况/营业收入:row:0"
+  },
+  "600104.SH-income-015": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-ee9f70c16c17cb1a:Segment:business_segment:上汽通用汽车金融有限责任公司:汽车金融业务/基本情况/营业收入:row:0"
+  },
+  "600104.SH-income-016": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-ee9f70c16c17cb1a:Segment:business_segment:上海东正汽车金融股份有限公司:汽车金融业务/基本情况/营业收入:row:1"
+  },
+  "600104.SH-income-017": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-6bc023b753a8ba77:Segment:business_segment:华域汽车:控股参股公司/营业总收入:row:0"
+  },
+  "600104.SH-income-018": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-6bc023b753a8ba77:Segment:business_segment:动力新科:控股参股公司/营业总收入:row:1"
+  },
+  "600104.SH-income-019": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-6bc023b753a8ba77:Segment:business_segment:智己汽车:控股参股公司/营业总收入:row:2"
+  },
+  "600104.SH-income-020": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-6bc023b753a8ba77:Segment:business_segment:上汽大通:控股参股公司/营业总收入:row:3"
+  },
+  "600104.SH-income-021": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-6bc023b753a8ba77:Segment:business_segment:上汽财务公司:控股参股公司/营业总收入:row:4"
+  },
+  "600104.SH-income-022": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-6bc023b753a8ba77:Segment:business_segment:中联汽车电子有限公司:控股参股公司/营业总收入:row:5"
+  },
+  "600104.SH-income-023": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-6bc023b753a8ba77:Segment:business_segment:上海颀盟企业管理合伙企业（有限合伙）:控股参股公司/营业总收入:row:6"
+  },
+  "600104.SH-income-024": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf47e8ca480a145d:Segment:business_type:营业总收入:合并利润表/营业总收入:row:0"
+  },
+  "600104.SH-income-025": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf47e8ca480a145d:Segment:business_type:营业收入:合并利润表/营业收入:row:1"
+  },
+  "600104.SH-income-026": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf47e8ca480a145d:Segment:business_type:利息收入:合并利润表/利息收入:row:2"
+  },
+  "600104.SH-income-027": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf47e8ca480a145d:Segment:business_type:手续费及佣金收入:合并利润表/手续费及佣金收入:row:3"
+  },
+  "600104.SH-income-028": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-ebdbf34fc1677c54:Segment:business_type:主营业务:营业收入:row:0"
+  },
+  "600104.SH-income-029": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-ebdbf34fc1677c54:Segment:business_type:其他业务:营业收入:row:1"
+  },
+  "600104.SH-income-030": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-ebdbf34fc1677c54:Segment:business_type:合计:营业收入:row:2"
+  },
+  "600104.SH-income-031": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-9e61b0899128370e:Segment:product:整车业务:主营业务收入:row:3"
+  },
+  "600104.SH-income-032": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-9e61b0899128370e:Segment:product:零部件业务:主营业务收入:row:4"
+  },
+  "600104.SH-income-033": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-9e61b0899128370e:Segment:product:劳务及其他:主营业务收入:row:5"
+  },
+  "600104.SH-income-034": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-9e61b0899128370e:Segment:product:合计:主营业务收入:row:6"
+  },
+  "600104.SH-income-035": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-9e61b0899128370e:Segment:product:材料及废料销售:其他业务收入:row:7"
+  },
+  "600104.SH-income-036": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-9e61b0899128370e:Segment:product:劳务:其他业务收入:row:8"
+  },
+  "600104.SH-income-037": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-9e61b0899128370e:Segment:product:租赁:其他业务收入:row:9"
+  },
+  "600104.SH-income-038": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-9e61b0899128370e:Segment:product:其他:其他业务收入:row:10"
+  },
+  "600104.SH-income-039": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-9e61b0899128370e:Segment:product:合计:其他业务收入:row:11"
+  },
+  "600104.SH-income-040": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-e02fb702e0888c94:Segment:customer:客户一:前五名客户/营业收入:row:0"
+  },
+  "600104.SH-income-041": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-e02fb702e0888c94:Segment:customer:客户二:前五名客户/营业收入:row:1"
+  },
+  "600104.SH-income-042": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-e02fb702e0888c94:Segment:customer:客户三:前五名客户/营业收入:row:2"
+  },
+  "600104.SH-income-043": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-e02fb702e0888c94:Segment:customer:客户四:前五名客户/营业收入:row:3"
+  },
+  "600104.SH-income-044": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-e02fb702e0888c94:Segment:customer:客户五:前五名客户/营业收入:row:4"
+  },
+  "600104.SH-income-045": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-e02fb702e0888c94:Segment:customer:合计:前五名客户/营业收入:row:5"
+  },
+  "600104.SH-income-046": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-f261ce37801e77a0:Segment:revenue_timing:在某一时点确认:收入确认时间/主营业务收入/在某一时点确认:row:0"
+  },
+  "600104.SH-income-047": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-f261ce37801e77a0:Segment:revenue_timing:在某一时点确认:收入确认时间/主营业务收入/在某一时点确认:row:1"
+  },
+  "600104.SH-income-048": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-f261ce37801e77a0:Segment:revenue_timing:在某一时点确认:收入确认时间/主营业务收入/在某一时点确认:row:2"
+  },
+  "600104.SH-income-049": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-f261ce37801e77a0:Segment:revenue_timing:在某一时点确认:收入确认时间/主营业务收入/在某一时点确认:row:3"
+  },
+  "600104.SH-income-050": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-f261ce37801e77a0:Segment:revenue_timing:在某一时段内确认:收入确认时间/主营业务收入/在某一时段内确认:row:4"
+  },
+  "600104.SH-income-051": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-f261ce37801e77a0:Segment:revenue_timing:在某一时段内确认:收入确认时间/主营业务收入/在某一时段内确认:row:5"
+  },
+  "600104.SH-income-052": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-f261ce37801e77a0:Segment:revenue_timing:其他业务收入:收入确认时间/其他业务收入:row:6"
+  },
+  "600104.SH-income-053": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-f261ce37801e77a0:Segment:revenue_timing:其他业务收入:收入确认时间/其他业务收入:row:7"
+  },
+  "600104.SH-income-054": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-f261ce37801e77a0:Segment:revenue_timing:合计:收入确认时间/合计:row:8"
+  },
+  "600104.SH-income-055": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-f261ce37801e77a0:Segment:revenue_timing:合计:收入确认时间/合计:row:9"
+  },
+  "600104.SH-income-056": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-f261ce37801e77a0:Segment:revenue_timing:合计:收入确认时间/合计:row:10"
+  },
+  "600104.SH-income-057": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-f261ce37801e77a0:Segment:revenue_timing:合计:收入确认时间/合计:row:11"
+  },
+  "600104.SH-income-058": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-f261ce37801e77a0:Segment:revenue_timing:合计:收入确认时间/合计:row:12"
+  },
+  "600104.SH-income-059": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-8b43f68ddc7ea6ef:Segment:service:自有房屋及建筑物等:作为出租人的经营租赁/租赁收入:row:0"
+  },
+  "600104.SH-income-060": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-8b43f68ddc7ea6ef:Segment:service:合计:作为出租人的经营租赁/租赁收入:row:1"
+  },
+  "600104.SH-income-061": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-7dfd5f6d94fbbbc3:Segment:business_segment:华域汽车:重要非全资子公司/本期营业收入:row:0"
+  },
+  "600104.SH-income-062": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-7dfd5f6d94fbbbc3:Segment:business_segment:通用五菱:重要非全资子公司/本期营业收入:row:1"
+  },
+  "600104.SH-income-063": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-452a74db4c6d87e2:Segment:product:销售商品:出售商品/提供劳务/本期发生额:row:0"
+  },
+  "600104.SH-income-064": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-452a74db4c6d87e2:Segment:product:销售商品:出售商品/提供劳务/本期发生额:row:1"
+  },
+  "600104.SH-income-065": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-452a74db4c6d87e2:Segment:service:销售商品:出售商品/提供劳务/本期发生额:row:2"
+  },
+  "600104.SH-income-066": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-452a74db4c6d87e2:Segment:service:销售材料:出售商品/提供劳务/本期发生额:row:3"
+  },
+  "600104.SH-income-067": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-452a74db4c6d87e2:Segment:service:销售材料:出售商品/提供劳务/本期发生额:row:4"
+  },
+  "600104.SH-income-068": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-452a74db4c6d87e2:Segment:service:提供劳务:出售商品/提供劳务/本期发生额:row:5"
+  },
+  "600104.SH-income-069": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-452a74db4c6d87e2:Segment:service:提供劳务:出售商品/提供劳务/本期发生额:row:6"
+  },
+  "600104.SH-income-070": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-452a74db4c6d87e2:Segment:service:提供劳务:出售商品/提供劳务/本期发生额:row:7"
+  },
+  "600104.SH-income-071": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-452a74db4c6d87e2:Segment:service:提供劳务:出售商品/提供劳务/本期发生额:row:8"
+  },
+  "600104.SH-income-072": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-452a74db4c6d87e2:Segment:service:提供劳务:出售商品/提供劳务/本期发生额:row:9"
+  },
+  "600104.SH-income-073": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-452a74db4c6d87e2:Segment:service:收取技术提成费及技术转让费:出售商品/提供劳务/本期发生额:row:10"
+  },
+  "600104.SH-income-074": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-452a74db4c6d87e2:Segment:service:租赁收入:出售商品/提供劳务/本期发生额:row:11"
+  },
+  "600104.SH-income-075": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-452a74db4c6d87e2:Segment:service:租赁收入:出售商品/提供劳务/本期发生额:row:12"
+  },
+  "600104.SH-income-076": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-452a74db4c6d87e2:Segment:service:租赁收入:出售商品/提供劳务/本期发生额:row:13"
+  },
+  "600104.SH-income-077": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-1db668b5e63827ab:Segment:business_type:贷款利息收入:关联方贷款利息收入:row:0"
+  },
+  "600104.SH-income-078": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-1db668b5e63827ab:Segment:business_type:贷款利息收入:关联方贷款利息收入:row:1"
+  },
+  "600104.SH-income-079": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-1db668b5e63827ab:Segment:business_type:贷款利息收入:关联方贷款利息收入:row:2"
+  },
+  "600104.SH-income-080": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-e00c6ce682a1b7d1:Segment:business_type:利息收入:关联方委托贷款利息收入:row:0"
+  },
+  "600104.SH-income-081": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-e00c6ce682a1b7d1:Segment:business_type:手续费收入:关联方委托业务手续费收入:row:1"
+  },
+  "600104.SH-income-082": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-e00c6ce682a1b7d1:Segment:business_type:手续费收入:关联方委托业务手续费收入:row:2"
+  },
+  "600104.SH-income-083": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-e00c6ce682a1b7d1:Segment:business_type:手续费收入:关联方委托业务手续费收入:row:3"
+  },
+  "600104.SH-income-084": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-e00c6ce682a1b7d1:Segment:business_type:手续费收入:关联方委托业务手续费收入:row:4"
+  },
+  "600104.SH-income-085": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-3133be030ccff50b:Segment:business_segment:整车及零部件:对外交易收入:row:0"
+  },
+  "600104.SH-income-086": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-3133be030ccff50b:Segment:business_segment:金融业:对外交易收入:row:1"
+  },
+  "600104.SH-income-087": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-3133be030ccff50b:Segment:business_segment:合计:对外交易收入:row:2"
+  },
+  "600104.SH-income-088": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-3133be030ccff50b:Segment:business_segment:金融业:分部间交易收入:row:3"
+  },
+  "600104.SH-income-089": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-3133be030ccff50b:Segment:adjustment:分部间抵销:分部间交易收入:row:4"
+  },
+  "600104.SH-income-090": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-5d58cec95b606a26:Segment:business_type:主营业务:营业收入:row:0"
+  },
+  "600104.SH-income-091": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-5d58cec95b606a26:Segment:business_type:其他业务:营业收入:row:1"
+  },
+  "600104.SH-income-092": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-5d58cec95b606a26:Segment:business_type:合计:营业收入:row:2"
+  },
+  "600104.SH-income-093": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-452a74db4c6d87e2:Segment:service:租赁收入:出售商品/提供劳务/本期发生额:row:14"
+  },
+  "600098.SH-action-001": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-1dd066b416a01906:commodity:1"
+  },
+  "600098.SH-action-002": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-1dd066b416a01906:commodity:6"
+  },
+  "600098.SH-action-003": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-1dd066b416a01906:commodity:2"
+  },
+  "600098.SH-action-004": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-1dd066b416a01906:commodity:10"
+  },
+  "600098.SH-action-005": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-1dd066b416a01906:commodity:3"
+  },
+  "600098.SH-action-006": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-1dd066b416a01906:commodity:7"
+  },
+  "600098.SH-action-007": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-1dd066b416a01906:commodity:4"
+  },
+  "600098.SH-action-008": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-1dd066b416a01906:commodity:8"
+  },
+  "600098.SH-action-009": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-1dd066b416a01906:commodity:5"
+  },
+  "600098.SH-action-010": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-1dd066b416a01906:commodity:9"
+  },
+  "600098.SH-action-011": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-1dd066b416a01906:commodity:14"
+  },
+  "600098.SH-action-012": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-1dd066b416a01906:commodity:11"
+  },
+  "600098.SH-action-013": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-1dd066b416a01906:commodity:12"
+  },
+  "600098.SH-action-014": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-1dd066b416a01906:commodity:13"
+  },
+  "600098.SH-action-015": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-1dd066b416a01906:commodity:15"
+  },
+  "600098.SH-action-016": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-1dd066b416a01906:commodity:16"
+  },
+  "600098.SH-action-017": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-1dd066b416a01906:commodity:17"
+  },
+  "600098.SH-action-018": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-1dd066b416a01906:commodity:18"
+  },
+  "600098.SH-action-019": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-0f763e42c51ce1f7:commodity:1"
+  },
+  "600098.SH-action-020": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-0f763e42c51ce1f7:commodity:2"
+  },
+  "600098.SH-action-021": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-0f763e42c51ce1f7:commodity:3"
+  },
+  "600098.SH-action-022": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-0f763e42c51ce1f7:commodity:4"
+  },
+  "600098.SH-action-023": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-0f763e42c51ce1f7:commodity:5"
+  },
+  "600098.SH-action-024": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-0f763e42c51ce1f7:commodity:6"
+  },
+  "600098.SH-action-025": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-0f763e42c51ce1f7:commodity:7"
+  },
+  "600098.SH-action-026": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-0f763e42c51ce1f7:commodity:8"
+  },
+  "600098.SH-action-027": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-0f763e42c51ce1f7:commodity:9"
+  },
+  "600098.SH-action-028": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-0f763e42c51ce1f7:commodity:10"
+  },
+  "600098.SH-action-029": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-0f763e42c51ce1f7:commodity:11"
+  },
+  "600098.SH-action-030": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-ca597195fa2adc02:commodity:1"
+  },
+  "600098.SH-action-031": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-ca597195fa2adc02:commodity:2"
+  },
+  "600098.SH-action-032": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-ca597195fa2adc02:commodity:3"
+  },
+  "600098.SH-action-033": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-ca597195fa2adc02:commodity:4"
+  },
+  "600098.SH-action-034": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-7da081439bb3617d:commodity:1"
+  },
+  "600098.SH-action-035": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-7da081439bb3617d:commodity:2"
+  },
+  "600098.SH-action-036": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-fa1ed7d19326d29f:commodity:1"
+  },
+  "600098.SH-action-037": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-fa1ed7d19326d29f:commodity:2"
+  },
+  "600098.SH-action-038": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:1"
+  },
+  "600098.SH-action-039": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:2"
+  },
+  "600098.SH-action-040": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:3"
+  },
+  "600098.SH-action-041": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:4"
+  },
+  "600098.SH-action-042": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:5"
+  },
+  "600098.SH-action-043": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:6"
+  },
+  "600098.SH-action-044": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:13"
+  },
+  "600098.SH-action-045": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:14"
+  },
+  "600098.SH-action-046": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:9"
+  },
+  "600098.SH-action-047": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:10"
+  },
+  "600098.SH-action-048": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:11"
+  },
+  "600098.SH-action-049": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:12"
+  },
+  "600098.SH-action-050": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:15"
+  },
+  "600098.SH-action-051": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:17"
+  },
+  "600098.SH-action-052": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:16"
+  },
+  "600098.SH-action-053": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:18"
+  },
+  "600098.SH-action-054": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:19"
+  },
+  "600098.SH-action-055": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:20"
+  },
+  "600098.SH-action-056": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:21"
+  },
+  "600098.SH-action-057": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-027f57883242c163:commodity:22"
+  },
+  "600098.SH-action-058": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:44"
+  },
+  "600098.SH-action-059": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:48"
+  },
+  "600098.SH-action-060": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:49"
+  },
+  "600098.SH-action-061": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:50"
+  },
+  "600098.SH-action-062": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:51"
+  },
+  "600098.SH-action-063": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:52"
+  },
+  "600098.SH-action-064": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:53"
+  },
+  "600098.SH-action-065": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:55"
+  },
+  "600098.SH-action-066": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:56"
+  },
+  "600098.SH-action-067": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:57"
+  },
+  "600098.SH-action-068": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:1"
+  },
+  "600098.SH-action-069": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:7"
+  },
+  "600098.SH-action-070": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:8"
+  },
+  "600098.SH-action-071": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:9"
+  },
+  "600098.SH-action-072": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:11"
+  },
+  "600098.SH-action-073": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:12"
+  },
+  "600098.SH-action-074": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:14"
+  },
+  "600098.SH-action-075": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:15"
+  },
+  "600098.SH-action-076": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:18"
+  },
+  "600098.SH-action-077": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:19"
+  },
+  "600098.SH-action-078": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:21"
+  },
+  "600098.SH-action-079": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:22"
+  },
+  "600098.SH-action-080": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:23"
+  },
+  "600098.SH-action-081": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:25"
+  },
+  "600098.SH-action-082": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:27"
+  },
+  "600098.SH-action-083": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:31"
+  },
+  "600098.SH-action-084": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:33"
+  },
+  "600098.SH-action-085": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:35"
+  },
+  "600098.SH-action-086": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:37"
+  },
+  "600098.SH-action-087": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:38"
+  },
+  "600098.SH-action-088": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:39"
+  },
+  "600098.SH-action-089": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:40"
+  },
+  "600098.SH-action-090": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:41"
+  },
+  "600098.SH-action-091": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:42"
+  },
+  "600098.SH-action-092": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:43"
+  },
+  "600104.SH-action-001": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-d41aec5928f73bd0:commodity:2"
+  },
+  "600104.SH-action-002": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-d41aec5928f73bd0:commodity:1"
+  },
+  "600104.SH-action-003": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-d41aec5928f73bd0:commodity:4"
+  },
+  "600104.SH-action-004": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-d41aec5928f73bd0:commodity:3"
+  },
+  "600104.SH-action-005": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-d41aec5928f73bd0:commodity:6"
+  },
+  "600104.SH-action-006": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-d41aec5928f73bd0:commodity:5"
+  },
+  "600104.SH-action-007": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-d41aec5928f73bd0:commodity:8"
+  },
+  "600104.SH-action-008": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-d41aec5928f73bd0:commodity:7"
+  },
+  "600104.SH-action-009": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-d41aec5928f73bd0:commodity:10"
+  },
+  "600104.SH-action-010": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-d41aec5928f73bd0:commodity:9"
+  },
+  "600104.SH-action-011": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-d41aec5928f73bd0:commodity:12"
+  },
+  "600104.SH-action-012": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-d41aec5928f73bd0:commodity:11"
+  },
+  "600104.SH-action-013": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-a0a4da5d76e343a9:commodity:2"
+  },
+  "600104.SH-action-014": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-a0a4da5d76e343a9:commodity:1"
+  },
+  "600104.SH-action-015": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-a0a4da5d76e343a9:commodity:4"
+  },
+  "600104.SH-action-016": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-a0a4da5d76e343a9:commodity:3"
+  },
+  "600104.SH-action-017": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-78998545bdc0c27c:commodity:1"
+  },
+  "600104.SH-action-018": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-78998545bdc0c27c:commodity:2"
+  },
+  "600104.SH-action-019": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-78998545bdc0c27c:commodity:3"
+  },
+  "600104.SH-action-020": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-78998545bdc0c27c:commodity:4"
+  },
+  "600104.SH-action-021": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-9c72a1ecd91fb55c:commodity:2"
+  },
+  "600104.SH-action-022": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-9c72a1ecd91fb55c:commodity:1"
+  },
+  "600104.SH-action-023": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-2abcd184ef943f82:commodity:1"
+  },
+  "600104.SH-action-024": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-2abcd184ef943f82:commodity:2"
+  },
+  "600104.SH-action-025": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-2abcd184ef943f82:commodity:3"
+  },
+  "600104.SH-action-026": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-2abcd184ef943f82:commodity:4"
+  },
+  "600104.SH-action-027": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-2abcd184ef943f82:commodity:5"
+  },
+  "600104.SH-action-028": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-2abcd184ef943f82:commodity:6"
+  },
+  "600104.SH-action-029": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-2abcd184ef943f82:commodity:7"
+  },
+  "600104.SH-action-030": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-2abcd184ef943f82:commodity:8"
+  },
+  "600104.SH-action-031": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-2abcd184ef943f82:commodity:9"
+  },
+  "600104.SH-action-032": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-2abcd184ef943f82:commodity:10"
+  },
+  "600104.SH-action-033": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-2abcd184ef943f82:commodity:11"
+  },
+  "600104.SH-action-034": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-2abcd184ef943f82:commodity:12"
+  },
+  "600104.SH-action-035": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-2abcd184ef943f82:commodity:13"
+  },
+  "600104.SH-action-036": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-2abcd184ef943f82:commodity:14"
+  },
+  "600104.SH-action-037": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-2abcd184ef943f82:commodity:15"
+  },
+  "600104.SH-action-038": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-2abcd184ef943f82:commodity:16"
+  },
+  "600104.SH-action-039": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-2abcd184ef943f82:commodity:17"
+  },
+  "600104.SH-action-040": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-2abcd184ef943f82:commodity:18"
+  },
+  "600104.SH-action-041": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-fb421ab07cabfeec:commodity:7"
+  },
+  "600104.SH-action-042": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-fb421ab07cabfeec:commodity:8"
+  },
+  "600104.SH-action-043": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-fb421ab07cabfeec:commodity:9"
+  },
+  "600104.SH-action-044": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-fb421ab07cabfeec:commodity:10"
+  },
+  "600104.SH-action-045": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-fb421ab07cabfeec:commodity:11"
+  },
+  "600104.SH-action-046": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-fb421ab07cabfeec:commodity:12"
+  },
+  "600104.SH-action-047": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-fb421ab07cabfeec:commodity:13"
+  },
+  "600104.SH-action-048": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-fb421ab07cabfeec:commodity:14"
+  },
+  "600104.SH-action-049": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-fb421ab07cabfeec:commodity:16"
+  },
+  "600104.SH-action-050": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-fb421ab07cabfeec:commodity:18"
+  },
+  "600104.SH-action-051": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-a0a4da5d76e343a9:commodity:5"
+  },
+  "600104.SH-action-052": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-5b2e05fc880752ec:commodity:1"
+  },
+  "600104.SH-action-053": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-5b2e05fc880752ec:commodity:2"
+  },
+  "600104.SH-action-054": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:2"
+  },
+  "600104.SH-action-055": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:3"
+  },
+  "600104.SH-action-056": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:14"
+  },
+  "600104.SH-action-057": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:15"
+  },
+  "600104.SH-action-058": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:19"
+  },
+  "600104.SH-action-059": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:20"
+  },
+  "600104.SH-action-060": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:21"
+  },
+  "600104.SH-action-061": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:22"
+  },
+  "600104.SH-action-062": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:27"
+  },
+  "600104.SH-action-063": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:28"
+  },
+  "600104.SH-action-064": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:34"
+  },
+  "600104.SH-action-065": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:35"
+  },
+  "600104.SH-action-066": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:36"
+  },
+  "600104.SH-action-067": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:37"
+  },
+  "600104.SH-action-068": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:38"
+  },
+  "600104.SH-action-069": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:41"
+  },
+  "600104.SH-action-070": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:42"
+  },
+  "600104.SH-action-071": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:43"
+  },
+  "600104.SH-action-072": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:53"
+  },
+  "600104.SH-action-073": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:54"
+  },
+  "600104.SH-action-074": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:55"
+  },
+  "600104.SH-action-075": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:65"
+  },
+  "600104.SH-action-076": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:66"
+  },
+  "600104.SH-action-077": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:67"
+  },
+  "600104.SH-action-078": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:68"
+  },
+  "600104.SH-action-079": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:69"
+  },
+  "600104.SH-action-080": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:76"
+  },
+  "600104.SH-action-081": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-cf7d4a93a927011c:commodity:112"
+  },
+  "600104.SH-action-082": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:1"
+  },
+  "600104.SH-action-083": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:3"
+  },
+  "600104.SH-action-084": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:5"
+  },
+  "600104.SH-action-085": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:7"
+  },
+  "600104.SH-action-086": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:9"
+  },
+  "600104.SH-action-087": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:11"
+  },
+  "600104.SH-action-088": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:12"
+  },
+  "600104.SH-action-089": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:13"
+  },
+  "600104.SH-action-090": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:14"
+  },
+  "600104.SH-action-091": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:15"
+  },
+  "600104.SH-action-092": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:16"
+  },
+  "600104.SH-action-093": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:17"
+  },
+  "600104.SH-action-094": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:18"
+  },
+  "600104.SH-action-095": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:19"
+  },
+  "600098.SH-action-093": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:10"
+  },
+  "600098.SH-action-094": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:13"
+  },
+  "600098.SH-action-095": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:17"
+  },
+  "600098.SH-action-096": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:29"
+  },
+  "600098.SH-action-097": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:30"
+  },
+  "600098.SH-action-098": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:54"
+  },
+  "600098.SH-action-099": {
+    "instrument_id": "600098.SH",
+    "object_id": "owned:core-ev-f7e18ecac8f52106:commodity:58"
+  },
+  "600104.SH-action-096": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:20"
+  },
+  "600104.SH-action-097": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:21"
+  },
+  "600104.SH-action-098": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:24"
+  },
+  "600104.SH-action-099": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:27"
+  },
+  "600104.SH-action-100": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:30"
+  },
+  "600104.SH-action-101": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:33"
+  },
+  "600104.SH-action-102": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:36"
+  },
+  "600104.SH-action-103": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:39"
+  },
+  "600104.SH-action-104": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:40"
+  },
+  "600104.SH-action-105": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:41"
+  },
+  "600104.SH-action-106": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:42"
+  },
+  "600104.SH-action-107": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:43"
+  },
+  "600104.SH-action-108": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:44"
+  },
+  "600104.SH-action-109": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:45"
+  },
+  "600104.SH-action-110": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:46"
+  },
+  "600104.SH-action-111": {
+    "instrument_id": "600104.SH",
+    "object_id": "owned:core-ev-380f9c09549d15fb:commodity:47"
+  },
+  "600098.SH-answer-principal_business": {
+    "instrument_id": "600098.SH",
+    "object_id": "answer:principal_business"
+  },
+  "600098.SH-answer-products_services": {
+    "instrument_id": "600098.SH",
+    "object_id": "answer:products_services"
+  },
+  "600098.SH-answer-revenue_model": {
+    "instrument_id": "600098.SH",
+    "object_id": "answer:revenue_model"
+  },
+  "600104.SH-answer-principal_business": {
+    "instrument_id": "600104.SH",
+    "object_id": "answer:principal_business"
+  },
+  "600104.SH-answer-products_services": {
+    "instrument_id": "600104.SH",
+    "object_id": "answer:products_services"
+  },
+  "600104.SH-answer-revenue_model": {
+    "instrument_id": "600104.SH",
+    "object_id": "answer:revenue_model"
+  }
+}

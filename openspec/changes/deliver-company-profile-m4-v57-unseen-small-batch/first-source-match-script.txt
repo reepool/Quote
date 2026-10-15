@@ -1,0 +1,54 @@
+import json,re
+from decimal import Decimal
+from pathlib import Path
+C=Path('openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch')
+scope=json.loads((C/'source-scope.json').read_text())
+def co(s):return re.sub(r'\s+','',s or '').replace('（','(').replace('）',')')
+def num(s):return Decimal(co(s).replace(',',''))
+def pages(r):return {p for e in r['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[]),*e.get('subject_evidence_pages',[])] if p is not None}
+def match(r,v):
+ n=r['source_native'];h=n.get('header') or '';q=co(n.get('qualifier'));rh=v['header'];d=r.get('dimension',r.get('segment_dimension'))
+ if r.get('reported_period')!=v['reported_period'] or v['page'] not in pages(r) or n.get('unit')!=v['unit'] or n.get('value') is None or num(n['value'])!=num(v['value']):return False
+ if re.sub(r'^\(\d+\)','',co(n['name']).removeprefix('其中：')) not in {co(x) for x in v['native_aliases']}:return False
+ expected='business_segment' if v['subject_scope']=='group_associated_entity' else v['subject_scope']
+ if r['subject_scope']!=expected:return False
+ if v.get('counterparty') and co(v['counterparty']) not in q:return False
+ if rh.startswith('主营业务分'):return d==v['dimension'] and h=='主营业务收入'
+ if rh in ['合并营业收入和营业成本','母公司营业收入和营业成本']:return h=='营业收入' and d=='business_type'
+ if rh=='主要控股参股公司分析':return h=='控股参股公司/营业收入' and any(co(a) in q for a in [v['source_actor'],v['name']])
+ if rh=='重要非全资子公司的主要财务信息':return h=='重要非全资子公司/本期营业收入' and co(v['source_actor']) in q
+ if '原栏目冲突' in rh:return '联营企业/' in h and co(v['source_actor']) in q and any(w in q+''.join(r.get('uncertainty',[])) for w in ['栏目冲突','合营','p223'])
+ if rh=='关联交易/出售商品及提供劳务':return h=='出售商品/提供劳务/本期发生额' and q==co('交易对方：'+v['counterparty'])
+ if rh=='关联租赁/本公司作为出租方':return h=='本公司作为出租方/本期确认的租赁收入' and q==co('承租方：'+v['counterparty'])
+ if rh=='作为出租人的经营租赁':return h=='作为出租人的经营租赁/租赁收入'
+ if rh=='报告分部的财务信息':return co(v['source_column']) == co(h) and co(v.get('source_segment') or v['name']) == co(n['name'])
+ if rh.startswith('合同收入分解/'):
+  return h.startswith('合同收入/') and co(v['source_segment'] or '主营业务') in q
+ if rh=='2025年度收入确认时间分解':return h.startswith('合同收入/收入确认时间') and co(v['source_segment']) in q
+ if rh=='合并利润表':return h in ['营业总收入','合并利润表/营业收入','合并利润表/营业总收入','合并利润表/利息收入','合并利润表/手续费及佣金收入','合并利润表']
+ if rh=='电力行业/电量收入及成本':return h=='电力行业电量、收入及成本/本期收入'
+ if rh=='贸易业务开展情况':return h=='本期营业收入'
+ # Remaining headings are matched only after inspecting their actual native form.
+ return False
+
+def rolematch(r,v):
+ n=r['source_native'];q=co(n.get('qualifier'));expected='business_segment' if v['subject_scope']=='group_associated_entity' else v['subject_scope']
+ if co(n['name']) not in {co(x) for x in v['native_aliases']} or r['subject_scope']!=expected or r.get('reported_period')!=v['reported_period']:return False
+ if not ({v['page'],*v.get('context_pages',[])} & pages(r)):return False
+ if v['source_actor']!='公司及合并子公司' and co(r.get('source_actor')) not in {co(a) for a in v['actor_aliases']}:return False
+ actions=[{'procures':'purchases','manufactures':'produces'}.get(a,a) for a in v['source_actions']]
+ if not (r.get('relation_type')=='material_input' if actions==['uses_material'] else r.get('action') in actions):return False
+ if v.get('counterparty') and co(v['counterparty']) not in q:return False
+ if v.get('category')=='services' and n.get('header')!='本期采购服务':return False
+ if v.get('category')=='goods' and n.get('header') not in ['本期采购商品','本期采购原内容']:return False
+ if v.get('category')=='mixed_goods_and_services' and n.get('header')!='本期采购原内容':return False
+ return True
+if __name__=='__main__':
+ for ins in scope['source_rows']:
+  rs=json.loads(Path('/tmp/v57new_raw_'+ins+'.json').read_text())
+  fin=[r for r in rs if r['object_type']=='Segment'];acts=[r for r in rs if r['object_type'] in ['Activity','Relationship']]
+  missed=[v for v in scope['source_rows'][ins] if not any(match(r,v) for r in fin)]
+  missedroles=[v for v in scope['native_roles'] if v['instrument_id']==ins and not any(rolematch(r,v) for r in acts)]
+  print(ins,'income',len(scope['source_rows'][ins])-len(missed),'/',len(scope['source_rows'][ins]),'roles',len([v for v in scope['native_roles'] if v['instrument_id']==ins])-len(missedroles))
+  Path('/tmp/v57new_missed_'+ins+'.json').write_text(json.dumps(dict(income=missed,roles=missedroles),ensure_ascii=False,indent=2))
+  Path('/tmp/v57new_unmatched_'+ins+'.json').write_text(json.dumps([r for r in fin+acts if not any(match(r,v) for v in scope['source_rows'][ins]) and not any(rolematch(r,v) for v in scope['native_roles'] if v['instrument_id']==ins)],ensure_ascii=False,indent=2))

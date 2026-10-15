@@ -31,3 +31,11 @@ None before selection and independent source reading.
 ## Source relationship conflict before execution
 
 Guangzhou p223 important-joint-venture heading conflicts with p224 associate-labelled items and p234 explicit associate relations for the same two companies. Source Evidence, values and native headings are retained in source-relationship-conflict-evidence.json. Proposed unclear relationship treatment awaits A under workflow v1; the source contract is a draft and no formal execution has started. Independent statements and current/prior layout reading continue without resolving that conflict by assumption.
+
+## A relationship ruling
+
+A resolves the two entities as associates by p234 while retaining the p223–224 native heading conflict. Final source-scope.json freezes independent associate incomes with original evidence and no group attribution. The original draft and conflict request remain byte-preserved.
+
+## Same-source repair and actor ruling
+
+Repair native financial headings/physical columns/units, complete entity business cells and explicit noun/verb directions within existing owners. Full current narratives retain original states and actors. A resolves the unproven Hong Kong full-name alias by retaining 香港国际公司 in the successor, no denominator change. Original457 contract, first189/457 and495/612 remain immutable. v58 successor self-check reaches457/457 and997/997, pending A;5.1 remains conditional. No new framework, default identity or production change.

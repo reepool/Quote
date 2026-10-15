@@ -1,0 +1,207 @@
+{
+  "original_draft_sha256": "12086f047e5f9f506937d4693ebe90928ebd49c4e1c1cb2ff370dbf8816291a7",
+  "final_contract_sha256": "413100e3949bd0b90b102586f607dafbfab7e1c3c2f44759c59871f6cac03473",
+  "all_original_condition_ids_preserved": true,
+  "added_income_from_pending": [
+    {
+      "draft_condition_id": "600098.SH-relationship-conflict-1",
+      "final_condition_id": "600098.SH-relationship-conflict-1",
+      "change": "A明确联营并保留栏目冲突；冻结收入"
+    },
+    {
+      "draft_condition_id": "600098.SH-relationship-conflict-2",
+      "final_condition_id": "600098.SH-relationship-conflict-2",
+      "change": "A明确联营并保留栏目冲突；冻结收入"
+    }
+  ],
+  "source_only_semantic_clarifications_before_execution": [
+    {
+      "condition_id": "600098.SH-action-053",
+      "before": {
+        "condition_id": "600098.SH-action-053",
+        "instrument_id": "600098.SH",
+        "page": 33,
+        "name": "风力发电",
+        "native_aliases": [
+          "风力发电"
+        ],
+        "source_actions": [
+          "provides_service"
+        ],
+        "source_actor": "广州发展新能源集团股份有限公司",
+        "actor_aliases": [
+          "广州发展新能源集团股份有限公司"
+        ],
+        "subject_scope": "named_subsidiary",
+        "qualifier": null,
+        "category": null,
+        "counterparty": null,
+        "context_pages": [
+          5,
+          9,
+          13
+        ],
+        "state": "current_affirmative",
+        "reported_period": "2025-12-31"
+      },
+      "after": {
+        "condition_id": "600098.SH-action-053",
+        "instrument_id": "600098.SH",
+        "page": 33,
+        "name": "风力发电",
+        "native_aliases": [
+          "风力发电"
+        ],
+        "source_actions": [
+          "produces"
+        ],
+        "source_actor": "广州发展新能源集团股份有限公司",
+        "actor_aliases": [
+          "广州发展新能源集团股份有限公司"
+        ],
+        "subject_scope": "named_subsidiary",
+        "qualifier": "新能源集团风力/光伏发电，结合p13实际发电经营；不解释为生产风机或组件",
+        "category": null,
+        "counterparty": null,
+        "context_pages": [
+          5,
+          9,
+          13
+        ],
+        "state": "current_affirmative",
+        "reported_period": "2025-12-31"
+      }
+    },
+    {
+      "condition_id": "600098.SH-action-054",
+      "before": {
+        "condition_id": "600098.SH-action-054",
+        "instrument_id": "600098.SH",
+        "page": 33,
+        "name": "光伏发电",
+        "native_aliases": [
+          "光伏发电"
+        ],
+        "source_actions": [
+          "provides_service"
+        ],
+        "source_actor": "广州发展新能源集团股份有限公司",
+        "actor_aliases": [
+          "广州发展新能源集团股份有限公司"
+        ],
+        "subject_scope": "named_subsidiary",
+        "qualifier": null,
+        "category": null,
+        "counterparty": null,
+        "context_pages": [
+          5,
+          9,
+          13
+        ],
+        "state": "current_affirmative",
+        "reported_period": "2025-12-31"
+      },
+      "after": {
+        "condition_id": "600098.SH-action-054",
+        "instrument_id": "600098.SH",
+        "page": 33,
+        "name": "光伏发电",
+        "native_aliases": [
+          "光伏发电"
+        ],
+        "source_actions": [
+          "produces"
+        ],
+        "source_actor": "广州发展新能源集团股份有限公司",
+        "actor_aliases": [
+          "广州发展新能源集团股份有限公司"
+        ],
+        "subject_scope": "named_subsidiary",
+        "qualifier": "新能源集团风力/光伏发电，结合p13实际发电经营；不解释为生产风机或组件",
+        "category": null,
+        "counterparty": null,
+        "context_pages": [
+          5,
+          9,
+          13
+        ],
+        "state": "current_affirmative",
+        "reported_period": "2025-12-31"
+      }
+    },
+    {
+      "condition_id": "600104.SH-action-065",
+      "before": {
+        "condition_id": "600104.SH-action-065",
+        "instrument_id": "600104.SH",
+        "page": 170,
+        "name": "上海汽车报",
+        "native_aliases": [
+          "上海汽车报"
+        ],
+        "source_actions": [
+          "publishes"
+        ],
+        "source_actor": "上海汽车报社有限公司",
+        "actor_aliases": [
+          "上海汽车报社有限公司"
+        ],
+        "subject_scope": "named_subsidiary",
+        "qualifier": "企业集团构成原业务性质，保留具名主体；不替换为母公司",
+        "category": null,
+        "counterparty": null,
+        "context_pages": [],
+        "state": "current_affirmative",
+        "reported_period": "2025-12-31"
+      },
+      "after": {
+        "condition_id": "600104.SH-action-065",
+        "instrument_id": "600104.SH",
+        "page": 170,
+        "name": "上海汽车报",
+        "native_aliases": [
+          "上海汽车报"
+        ],
+        "source_actions": [
+          "provides_service"
+        ],
+        "source_actor": "上海汽车报社有限公司",
+        "actor_aliases": [
+          "上海汽车报社有限公司"
+        ],
+        "subject_scope": "named_subsidiary",
+        "qualifier": "《上海汽车报》出版发行服务，保留报社具名主体；不推印刷制造",
+        "category": null,
+        "counterparty": null,
+        "context_pages": [],
+        "state": "current_affirmative",
+        "reported_period": "2025-12-31"
+      }
+    },
+    {
+      "condition_id": "600098.SH-negative-017",
+      "before": {
+        "condition_id": "600098.SH-negative-017",
+        "instrument_id": "600098.SH",
+        "page": 224,
+        "name": "合营联营栏目冲突",
+        "forbidden": "关系结论待A；不得把两家公司收入并入集团或无保留肯定冲突关系"
+      },
+      "after": {
+        "condition_id": "600098.SH-negative-017",
+        "instrument_id": "600098.SH",
+        "page": 224,
+        "name": "合营联营栏目冲突",
+        "forbidden": "按A裁决p234为联营，保留p223–224栏目冲突，不无保留定为合营，不并入集团合并收入"
+      }
+    }
+  ],
+  "original_draft_preserved": true,
+  "counts": {
+    "bodies": 6,
+    "income": 241,
+    "actions": 210,
+    "negatives": 41,
+    "positives": 457
+  }
+}

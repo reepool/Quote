@@ -1,0 +1,30 @@
+{
+  "completed_at": "2026-10-15T06:22:27.593940+00:00",
+  "completed_sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v58_same_source_repair/company_profile_live_run.v1.json": "55172c1fbd37d3336ad5f50b361660384349335beac7277f40f830340ffc9176",
+    "data/checkpoints/company_profile_common_core/reports/m4_v58_same_source_repair/formal_execution.json": "bf071bb82029948ff18ae739616d6e92753ee776a077d5c7e284dcd45cc40f85",
+    "data/checkpoints/company_profile_common_core/reports/m4_v58_same_source_repair/observation.json": "3a9e8e635e03f20bfec4c0bec3f5663eceb91765f7098b64252573f64f9b8f82",
+    "data/checkpoints/company_profile_common_core/reports/m4_v58_same_source_repair/plan.json": "60bbf0c6beb68a9f0ef1313f3a90ad06b715a9327279825ad91a813a1fa6b512",
+    "data/exports/m4_v58_same_source_repair/600098.SH/600098.SH_2025-12-31.json": "367a0ebed99f1389b2b2c66b291c116cd17cac20e045d824717bf3a85067caae",
+    "data/exports/m4_v58_same_source_repair/600098.SH/export_manifest.json": "682859ab0f691352a97c699819915fec326f0d1b3e499d4f9ba94db2d4fa6d89",
+    "data/exports/m4_v58_same_source_repair/600098.SH/profiles.csv": "dc5ec35c5ab0f36132d3a2437de2e28d324c8413106d3bd0e43d202ce91bb775",
+    "data/exports/m4_v58_same_source_repair/600104.SH/600104.SH_2025-12-31.json": "7244c48885cc73272ebf8acabcd64d7c1765e05f935aba70ba71fa5c0cf7bd43",
+    "data/exports/m4_v58_same_source_repair/600104.SH/export_manifest.json": "6412c77a8524249b8e6d135d4f52847214f5da741519660b11ae3530601c3c3c",
+    "data/exports/m4_v58_same_source_repair/600104.SH/profiles.csv": "563cb6cf64df983cd1c7970c748cc2afc156f665ea27a6a5ef22afa496e68f52",
+    "data/research/company_profile_common_core/m4_v58_same_source_repair/company_profile_common_core.v1/bp-work-3a42e4681db7caaf245c9adc.json": "1e2fda4c9aacd864db3e5ce486912324f32a844c71b79ce0791a468a386b8609",
+    "data/research/company_profile_common_core/m4_v58_same_source_repair/company_profile_common_core.v1/bp-work-e7cf77cfc371de45880f57cf.json": "d1df64aa4bd97d49ffe51821959b7cc1956e5bcc737dbf5056b660540f235ce1",
+    "data/research/company_profile_common_core/m4_v58_same_source_repair/company_profile_common_core.v1/checkpoints/bp-work-3a42e4681db7caaf245c9adc.json": "bbf0721640b5f020df091a27d16712cfe2c11ad21ec4e95f4fdfdda1f33a8f8c",
+    "data/research/company_profile_common_core/m4_v58_same_source_repair/company_profile_common_core.v1/checkpoints/bp-work-e7cf77cfc371de45880f57cf.json": "2d0e61b83943124b120aca08146b0dad99bf0be6889268765d20409168a8bdea",
+    "data/research/company_profile_common_core/m4_v58_same_source_repair/company_profile_common_core.v1/scopes/600098.SH/2025-12-31/extract_business_overview.json": "7d1c0005e4ca2a0b2048d692bd23e52de617dfdd8f1b37f72958eef77737e90a",
+    "data/research/company_profile_common_core/m4_v58_same_source_repair/company_profile_common_core.v1/scopes/600098.SH/2025-12-31/extract_segment_financials.json": "fb0b1e077b3b7b91df3c64af7ed007c7f4289fe6e517cba3d6e59a848dea5ad4",
+    "data/research/company_profile_common_core/m4_v58_same_source_repair/company_profile_common_core.v1/scopes/600104.SH/2025-12-31/extract_business_overview.json": "5ee831cc88b82a48258a4153f4d9a9d36201acbffddfaf93df4f664294268ded",
+    "data/research/company_profile_common_core/m4_v58_same_source_repair/company_profile_common_core.v1/scopes/600104.SH/2025-12-31/extract_segment_financials.json": "a6414279684c6739cdb4d597e54542b7cabbe061318b6bbdf5a16f2f3bd73ae3",
+    "openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch/v58-attempt-start.json": "a422a938c00120fd0b82c98552957c434eedf31dda248494c0ff798691030998",
+    "openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch/v58-formal-stacks.log": "4eca268062c6d031070b8da0e666dbab8de089a0f4b972feb7cbc14ed5f02a93",
+    "openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch/v58-formal-supervisor-receipt.json": "16bee4c740a137b203101cba6cd51a74ab61b71ad68ab1007b032426e9296105",
+    "openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch/v58-formal.log": "ceaf1650258b69bb589855d27186564dfb451a7ea2d149aeac7217b0d2092748"
+  },
+  "protected_after_all_writers_ended": true,
+  "empty_paths": [],
+  "first_observation_used": 1
+}

@@ -1,0 +1,11 @@
+{
+  "started_at": "2026-10-15T06:17:46.702056+00:00",
+  "finished_at": "2026-10-15T06:22:27.386866+00:00",
+  "elapsed_seconds": 280.68479167856276,
+  "hard_limit_seconds": 300.0,
+  "timed_out": false,
+  "returncode": 0,
+  "formal_run_called": true,
+  "synchronous_block_proof": false,
+  "stack_dump_requested_on_deadline_approach": false
+}

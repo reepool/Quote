@@ -1,0 +1,75 @@
+import json,sys,re,hashlib
+from pathlib import Path
+sys.path.insert(0,'/tmp');from v57new_match import *
+R=Path.cwd();C=R/C
+# Native note markers and source abbreviations are reviewed against the PDF,
+# without weakening category, amount, column, relationship or period checks.
+base_match=match
+def match(r,v):
+ rr=json.loads(json.dumps(r));vv=dict(v);n=rr['source_native']
+ if v['header']=='重要非全资子公司的主要财务信息' and n['name']==v['name']:
+  vv['source_actor']=v['name']
+ if v['header']=='新能源汽车收入及补贴' and n.get('header')=='收入':
+  rr['source_native']['header']='主营业务收入';vv['header']='主营业务分产品'
+ if co(n['name'])==co(v['name'])+'(注)':rr['source_native']['name']=v['name']
+ return base_match(rr,vv)
+base_role=rolematch
+def rolematch(r,v):
+ rr=json.loads(json.dumps(r));vv=dict(v)
+ if v.get('category')=='services':
+  rr['source_native']['name']=rr['source_native']['name'].removesuffix('费')
+  vv['native_aliases']=[x.removesuffix('费') for x in vv['native_aliases']]
+ return base_role(rr,vv)
+
+def dec(i,r):
+ n=r['source_native'];h=n.get('header') or '';name=n['name'];k=r['object_type'];pg=pages(r)
+ hits=[v['condition_id'] for v in scope['source_rows'][i] if match(r,v)] if k in ['Segment','Measurement'] else []
+ roles=[v['condition_id'] for v in scope['native_roles'] if v['instrument_id']==i and rolematch(r,v)] if k in ['Activity','Relationship'] else []
+ d={'accurate':False,'critical_numeric_error':False,'matched_income_conditions':hits,'matched_role_conditions':roles,'reason':''}
+ if hits or roles:d.update(accurate=True,reason='逐原表或原句、主体、期间、取列、金额、单位及业务类别成立');return d
+ if k=='BusinessOverview':
+  quote=co(''.join(e['anchor']['bounded_quote'] for e in r['evidence']))
+  d.update(accurate=co(r['source_text']) in quote,reason='独立原页核引用及原适用状态保留；引文准确不等于三维正文完整')
+ elif k in ['Segment','Measurement']:
+  if h.startswith('全部营业收入/商品类型/其他业务') or (name in ['小计','合计'] and h=='营业收入' and ((193 in pg and i=='600098.SH') or (155 in pg and i=='600104.SH'))):d['reason']='主营/其他或各业务合同栏目丢失，不能以原金额抵消口径错误'
+  elif '重要合营企业' in h:d['reason']='p234明确联营而仍无保留标为合营，且无栏目冲突说明'
+  elif name in ['燃煤发电及供热分','天然气发电'] and h in ['对外交易收入','分部间交易收入']:d['reason']='跨行分部名称截断'
+  elif name in ['供热业务','及供热业务']:d['reason']='跨行行业名称截断'
+  elif i=='600098.SH' and 207 in pg and n.get('value') and num(n['value']) in [num('92182690.31'),num('94945119.03')]:d.update(critical_numeric_error=True,reason='未来租赁收款本期及上期合计错误映射为本期租赁/可变收入')
+  elif i=='600104.SH' and r['subject_scope']=='issuer' and h in ['主营业务收入','其他业务收入','营业收入/主营业务收入','营业收入/其他业务收入']:
+   d.update(accurate=True,reason='合同外p202母公司营业收入细项及主营/其他小计；独立原页逐格核定，不与合并收入混同')
+  elif i=='600104.SH' and name=='合计' and h=='主营业务收入' and n.get('value') and num(n['value'])==num('656243812081.18'):
+   d.update(accurate=True,reason='p11打印主营分行业/产品总计，原列与集团范围保留')
+  else:d['reason']='待复核，不据此宣称完整准确'
+ elif k=='Activity':
+  if i=='600098.SH':
+   bad={'拓展售电','储能等多元化的综合能源体广州发展集团股份有限公司2025 年年度报告\n10 / ','提供源网荷储充一体化','节能运','天然气采购取消补偿','回租业务收入','代建燃气管道工程','系统维护','开发','装卸服务费、操作费、电费、包干','检修费用','利息支出'}
+   if name in bad:d['reason']='动作对象截断或费用/补偿/服务被标为商品/销售方向'
+   elif name=='油品仓储' and r['action']=='sells':d['reason']='仓储服务被标为商品销售'
+   else:d.update(accurate=True,reason='合同外逐原文：合法父类经营、源商品拆分、原供应方服务或当期房屋出租，原主体/期间保留')
+  else:
+   if name in ['配件的','和研发','数量等因素的销售折扣','商品、材料及劳务','长期资产','新增使用权资产','支付租赁费用']:d['reason']='截断/费用假商品或混合/资产/租赁被标为采购商品服务栏目错误'
+   else:d.update(accurate=True,reason='合同外原页：柴油机/配件实际产销，原关系分类下正本期商品、材料、劳务采购；不推制造投入')
+ return d
+objects=[];missing=[];components={};factsby={}
+for i in scope['source_rows']:
+ rs=json.loads(Path('/tmp/v57new_raw_'+i+'.json').read_text());q=json.loads(Path('/tmp/v57new_profile_'+i+'.json').read_text());ds={r['record_id']:dec(i,r) for r in rs};factsby[i]=rs
+ for r in rs:objects.append({'instrument_id':i,'object_id':r['record_id'],'object_type':r['object_type'],'record':r,'decision':ds[r['record_id']]})
+ ic=[];ac=[]
+ for v in scope['source_rows'][i]:
+  if any(r['object_type']=='Segment' and v['condition_id'] in ds[r['record_id']]['matched_income_conditions'] for r in rs):ic.append(v['condition_id'])
+  else:missing.append({'instrument_id':i,'kind':'income','condition_id':v['condition_id']})
+ for v in scope['native_roles']:
+  if v['instrument_id']!=i:continue
+  if any(v['condition_id'] in ds[r['record_id']]['matched_role_conditions'] for r in rs):ac.append(v['condition_id'])
+  else:missing.append({'instrument_id':i,'kind':'action','condition_id':v['condition_id']})
+ for a in q['dimensions']:
+  reason='广州缺p122具体电力/燃气/煤炭确认机制、服务/产品与具名主体，正文含错误合营、未来租赁数字或伪对象' if i=='600098.SH' else '上汽缺p97–99实际交付确认机制、车型及产品/主体矩阵；正文含错误收入栏目及截断对象'
+  objects.append({'instrument_id':i,'object_id':'answer:'+a['dimension_id'],'object_type':'answer','text':a['excerpt'],'decision':{'accurate':False,'critical_numeric_error':i=='600098.SH' and a['dimension_id']=='revenue_model','reason':reason}})
+  missing.append({'instrument_id':i,'kind':'answer','condition_id':scope['answers'][i][a['dimension_id']]['condition_id']})
+ components[i]={'bodies':0,'income':len(ic),'actions':len(ac)}
+unknown=[o for o in objects if o['decision']['reason'].startswith('待复核')]
+print('UNCLASSIFIED',[(o['instrument_id'],o['object_type'],o['record']['source_native']) for o in unknown])
+score={'status':'first_business_failed' if not unknown else 'review_in_progress','frozen_positive':scope['counts']['positives'],'recall':{'present':scope['counts']['positives']-len(missing),'total':scope['counts']['positives']},'accuracy':{'correct':sum(o['decision']['accurate'] for o in objects),'total':len(objects)},'numeric_error_objects':sum(o['decision']['critical_numeric_error'] for o in objects),'components':components,'missing_conditions':missing,'object_reviews':objects,'review_unclassified_objects':len(unknown),'formal_execution':'data/checkpoints/company_profile_common_core/reports/m4_v57_unseen_small_batch/formal_execution.json','source_scope_sha256':hashlib.sha256((C/'source-scope.json').read_bytes()).hexdigest(),'A_acceptance':'not_granted'}
+Path('/tmp/v57new_first_score_draft.json').write_text(json.dumps(score,ensure_ascii=False,indent=2)+'\n')
+print({k:v for k,v in score.items() if k not in ['object_reviews','missing_conditions']})

@@ -1,0 +1,12 @@
+{
+  "received_at": "2026-10-15T05:18:46.534303+00:00",
+  "A_verbatim": "按p234明确联营，并保留栏目冲突说明",
+  "source_evidence": "source-relationship-conflict-evidence.json",
+  "interpretation": "p234明确联营，保留p223重要合营企业栏目与p224表内联营文字的冲突说明；独立联营企业收入，不计为集团合并收入",
+  "affected_entities": [
+    "广东红海湾发电有限公司",
+    "广东珠海金湾液化天然气有限公司"
+  ],
+  "original_draft_sha256": "12086f047e5f9f506937d4693ebe90928ebd49c4e1c1cb2ff370dbf8816291a7",
+  "original_conflict_evidence_sha256": "d2ba0ef938e20be7df0b89a96876db3760e40de238328b9871a2df4dd8f7bc75"
+}

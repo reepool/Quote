@@ -1,0 +1,60 @@
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-15 14:13:39][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-15 14:13:39][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-15 14:13:39][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.00s
+[INFO][2026-10-15 14:13:40][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-15 14:13:40][tgbot.py:15] - [tgbot] Reading system configuration...
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+[INFO][2026-10-15 14:13:42][proxy_patch_bootstrap.py:55] - restored unpatched curl_cffi.requests.Session for Chrome TLS clients
+[INFO][2026-10-15 14:13:42][proxy_patch_bootstrap.py:157] - akshare proxy patch installed early (token=202602***)
+600098.SH acquire 0.015070786699652672
+600098.SH parse 26.992761292494833
+Timeout (0:01:00)!
+Thread 0x00007f5f5242d740 (most recent call first):
+  File "/home/python/Quote/research/company_profile/core_evidence_selection.py", line 3679 in _native_actor_definitions
+  File "/home/python/Quote/research/company_profile/core_evidence_selection.py", line 3865 in add_activity
+  File "/home/python/Quote/research/company_profile/core_evidence_selection.py", line 4114 in _project_repair_commodity_span
+  File "/home/python/Quote/research/company_profile/core_evidence_selection.py", line 1869 in project_owned_page_facts
+  File "/home/python/Quote/research/company_profile/runtime.py", line 473 in _semantic
+  File "/home/python/Quote/research/company_profile/runtime.py", line 361 in run_stage
+  File "/home/python/Quote/research/company_profile/runtime.py", line 344 in __call__
+  File "/tmp/v58_local.py", line 27 in main
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/asyncio/events.py", line 84 in _run
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/asyncio/base_events.py", line 1936 in _run_once
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/asyncio/base_events.py", line 608 in run_forever
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/asyncio/base_events.py", line 641 in run_until_complete
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/asyncio/runners.py", line 118 in run
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/asyncio/runners.py", line 190 in run
+  File "/tmp/v58_local.py", line 32 in <module>
+600098.SH semantic 39.200356231071055
+600098.SH verify 0.3635573545470834
+600098.SH publish 0.003306071273982525
+600098.SH 519
+600104.SH acquire 0.10216707456856966
+600104.SH parse 27.06955606210977
+Timeout (0:01:00)!
+Thread 0x00007f5f5242d740 (most recent call first):
+  File "/home/python/Quote/research/company_profile/core_evidence_selection.py", line 3679 in _native_actor_definitions
+  File "/home/python/Quote/research/company_profile/core_evidence_selection.py", line 3865 in add_activity
+  File "/home/python/Quote/research/company_profile/core_evidence_selection.py", line 4114 in _project_repair_commodity_span
+  File "/home/python/Quote/research/company_profile/core_evidence_selection.py", line 1869 in project_owned_page_facts
+  File "/home/python/Quote/research/company_profile/runtime.py", line 473 in _semantic
+  File "/home/python/Quote/research/company_profile/runtime.py", line 361 in run_stage
+  File "/home/python/Quote/research/company_profile/runtime.py", line 344 in __call__
+  File "/tmp/v58_local.py", line 27 in main
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/asyncio/events.py", line 84 in _run
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/asyncio/base_events.py", line 1936 in _run_once
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/asyncio/base_events.py", line 608 in run_forever
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/asyncio/base_events.py", line 641 in run_until_complete
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/asyncio/runners.py", line 118 in run
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/asyncio/runners.py", line 190 in run
+  File "/tmp/v58_local.py", line 32 in <module>
+600104.SH semantic 62.28955911938101
+600104.SH verify 1.3729883944615722
+600104.SH publish 0.0037991106510162354
+600104.SH 472

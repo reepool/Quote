@@ -1,0 +1,68 @@
+{
+  "at": "2026-10-15T06:00:47.676685+00:00",
+  "A_ruling": "同意按香港国际公司保留原主体",
+  "source_scope_original_sha256": "413100e3949bd0b90b102586f607dafbfab7e1c3c2f44759c59871f6cac03473",
+  "counts_unchanged": {
+    "bodies": 6,
+    "income": 241,
+    "actions": 210,
+    "negatives": 41,
+    "positives": 457
+  },
+  "mapping": [
+    {
+      "condition_id": "600098.SH-action-037",
+      "original": {
+        "condition_id": "600098.SH-action-037",
+        "instrument_id": "600098.SH",
+        "page": 14,
+        "name": "进口煤",
+        "native_aliases": [
+          "进口煤"
+        ],
+        "source_actions": [
+          "sells"
+        ],
+        "source_actor": "广州发展国际投资有限公司",
+        "actor_aliases": [
+          "广州发展国际投资有限公司"
+        ],
+        "subject_scope": "named_subsidiary",
+        "qualifier": null,
+        "category": null,
+        "counterparty": null,
+        "context_pages": [
+          5
+        ],
+        "state": "current_affirmative",
+        "reported_period": "2025-12-31"
+      },
+      "successor": {
+        "condition_id": "600098.SH-action-037",
+        "instrument_id": "600098.SH",
+        "page": 14,
+        "name": "进口煤",
+        "native_aliases": [
+          "进口煤"
+        ],
+        "source_actions": [
+          "sells"
+        ],
+        "source_actor": "香港国际公司",
+        "actor_aliases": [
+          "香港国际公司"
+        ],
+        "subject_scope": "named_subsidiary",
+        "qualifier": "p14原具名境外平台；不推定法律全称；保留原主体",
+        "category": null,
+        "counterparty": null,
+        "context_pages": [
+          5
+        ],
+        "state": "current_affirmative",
+        "reported_period": "2025-12-31"
+      }
+    }
+  ],
+  "first_contract_and_score_unchanged": true
+}

@@ -1,0 +1,23 @@
+"""Read-only delivery, execution and immutable-file verification; no formal run."""
+import json,hashlib,sqlite3
+from pathlib import Path
+from datetime import datetime,timezone
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.stage4_restricted_read import FROZEN_CHAPTERS,default_repo_root
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v58_same_source_repair';O=R/'data/research/company_profile_common_core/m4_v58_same_source_repair';load=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+f=load(P/'formal_execution.json');s=load(C/'v58-source-scope.json');score=load(C/'v58-formal-source-review-evidence.json');db=sqlite3.connect('file:data/research.db?mode=ro',uri=True);db.row_factory=sqlite3.Row
+runtime=[];fresh={};sources=[]
+for ins,res in f['results'].items():
+ q=res['query']['profiles'][0];again=CompanyProfileReadService(O,stage4_chapters=FROZEN_CHAPTERS,stage4_root=default_repo_root()).query((ins,),processing_identity=f['processing_identity']);assert again['profiles']==res['query']['profiles'];assert q==res['export']['profiles'][0]==load(Path(res['export']['files'][0]));fresh[ins]=again
+ rt=load(O/'company_profile_common_core.v1'/(q['work_id']+'.json'));item=dict(db.execute('select * from business_profile_work_items where work_id=?',(q['work_id'],)).fetchone());assert item['status']=='completed';meta=json.loads(item['metadata_json']);st=meta['stage_results'];assert set(st)=={'acquire','parse','semantic','verify','publish'} and all(v['status']=='success' and not v['reused_scope_ids']for v in st.values());assert not rt['execution']['predecessor_lineage'];runtime.append(dict(instrument_id=ins,work_id=q['work_id'],stage_results=st,predecessor_lineage=[],query_export_disk_equal=True,token_budget=rt['execution']['token_budget']))
+ v=next(v for v in s['official_reports']if v['instrument_id']==ins);h=v['document_version'];pdf=R/'data/filings/announcements/blobs'/h[:2]/(h+'.pdf');assert sha(pdf)==h;binding=meta['bound_shared_asset'];assert binding['asset_id']==v['asset_id']and binding['content_hash']==h;assert rt['report']['document_version']==h and rt['report']['report_id']==v['asset_id'];sources.append(dict(instrument_id=ins,official_pdf_sha256=h,asset_id=v['asset_id'],formal_binding_matches=True))
+maps={'historical':load(C/'protection-baseline.json'),'existing19':load(C/'initial-workspace-baseline.json')['existing_modified_sha256'],'current_code':f['executed_code_sha256'],'first_code_snapshot':{str((C/'first-executed-code-snapshot'/p).relative_to(R)):h for p,h in load(C/'first-source-freeze-receipt.json')['executed_code_sha256'].items()},'v58_code_snapshot':{str((C/'v58-executed-code-snapshot'/p).relative_to(R)):h for p,h in f['executed_code_sha256'].items()}}
+for name,key in [('first-formal-delivery-preservation.json','completed_sha256'),('first-review-preservation.json','sha256'),('v58-formal-delivery-preservation.json','completed_sha256')]:maps[name]=load(C/name)[key]
+counts={}
+for name,m in maps.items():
+ bad=[p for p,h in m.items()if not (R/p).is_file()or sha(R/p)!=h];assert not bad,(name,bad[:5]);counts[name]=len(m)
+ob=load(P/'observation.json');gates=dict(recall=score['recall']=={'present':457,'total':457},accuracy=score['accuracy']['correct']==score['accuracy']['total'],numeric_zero=score['numeric_error_objects']==0,negatives=score['negative_passed']==score['negative_total']==41,whole_round=f['whole_round_seconds']<=300,shared_tokens=ob['tokens_consumed']<=50000)
+result=dict(verified_at=datetime.now(timezone.utc).isoformat(),runtime=runtime,sources=sources,protection_counts=counts,whole_round_seconds=f['whole_round_seconds'],tokens_consumed=ob['tokens_consumed'],first_observation_used=1,same_source_successors_used=1,same_source_successors_authorized=2,finite_gates=gates,production_authorization='not_authorized',scale_quality_claim_allowed=False,elapsed_limitation='已有PDF解析缓存，不是冷缓存上界',review_receipt_timing=dict(scope_review_completed=load(C/'v58-scope-review.json')['reviewed_at'],source_freeze_completed=load(C/'v58-source-freeze-receipt.json')['created_at'],attempt_started=load(C/'v58-attempt-start.json')['started_at'],limitation='代码和实质Review在前；3750项保护哈希回执异步完成晚于启动约3秒，原时间戳保留交A判断'))
+for n,j in [('v58-requery-receipt.json',fresh),('v58-readonly-verification-receipt.json',result)]:
+ with(C/n).open('x')as out:out.write(json.dumps(j,ensure_ascii=False,indent=2)+'\n')
+print({k:v for k,v in result.items()if k not in ['runtime','sources']})

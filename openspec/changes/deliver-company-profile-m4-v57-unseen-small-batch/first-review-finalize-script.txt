@@ -1,0 +1,23 @@
+import json,hashlib
+from pathlib import Path
+from datetime import datetime,timezone
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch';s=json.loads((C/'source-scope.json').read_text());d=json.loads(Path('/tmp/v57new_first_score_draft.json').read_text());rs={i:json.loads(Path('/tmp/v57new_raw_'+i+'.json').read_text()) for i in s['source_rows']}
+neg=[]
+for n in s['negative_conditions']:
+ bad=[]
+ for o in d['object_reviews']:
+  if o['instrument_id']!=n['instrument_id'] or o['object_type']=='answer':continue
+  r=o['record'];native=r['source_native'];q=native.get('qualifier') or '';h=native.get('header') or ''
+  if n['condition_id']=='600098.SH-negative-009' and '未来租赁' in o['decision']['reason']:bad.append(r['record_id'])
+  if n['condition_id']=='600098.SH-negative-017' and '重要合营企业' in h:bad.append(r['record_id'])
+  if n.get('prior_value') and native.get('value') and native['value'].replace(',','')==n['prior_value'] and n.get('counterparty','') in q:bad.append(r['record_id'])
+ neg.append({**n,'evaluated':True,'passed':not bad,'violating_record_ids':bad,'review_basis':'原PDF物理本期列/空格、实际全部事实和三维正文；状态原句保留不当作当前经营'})
+d['negatives']=neg;d['negative_passed']=sum(n['passed'] for n in neg);d['negative_total']=len(neg)
+for name,content in [('first-source-review-evidence.json',d),('first-negative-review-evidence.json',{'passed':d['negative_passed'],'total':len(neg),'conditions':neg})]:
+ with (C/name).open('x') as f:f.write(json.dumps(content,ensure_ascii=False,indent=2)+'\n')
+for src,name in [('/tmp/v57new_match.py','first-source-match-script.txt'),('/tmp/v57new_first_audit.py','first-source-audit-script.txt'),('/tmp/v57new_finish_first.py','first-review-finalize-script.txt')]:
+ (C/name).write_bytes(Path(src).read_bytes())
+p=C/'tasks.md';t=p.read_text().replace('- [ ] 2.1 P0:','- [x] 2.1 P0:').replace('- [ ] 2.2 P0:','- [x] 2.2 P0:');t+='\n## 首次结果（保留，非通过）\n\n首次189/457＝0正文＋143收入＋46动作；准确率495/612（606事实＋6正文），5个数字错误对象，39/41负例。两家公司五阶段完成，230.18秒，0 token；完整首次结果已在写入结束后保护。2.2勾选表示全量复核已完成，不表示业务通过。首次1/1、后继0/2，按A/B v1继续4.1/4.3/4.2；不得归档或扩大样本。\n';p.write_text(t)
+manifest={str(p.relative_to(R)):hashlib.sha256(p.read_bytes()).hexdigest() for p in C.iterdir() if p.is_file() and p.name.startswith('first-')}
+(C/'first-review-preservation.json').write_text(json.dumps({'completed_at':datetime.now(timezone.utc).isoformat(),'sha256':manifest},indent=2)+'\n')
+print(d['recall'],d['accuracy'],d['negative_passed'],d['negative_total'])

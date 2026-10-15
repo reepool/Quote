@@ -1,0 +1,16 @@
+import json,re,hashlib
+from pathlib import Path
+from pypdf import PdfReader
+import pypdfium2 as pdfium
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch';s=json.loads((C/'v58-source-scope.json').read_text());out=[];co=lambda t:re.sub(r'\s+','',t)
+for v in s['official_reports']:
+ ins=v['instrument_id'];h=v['document_version'];p=R/'data/filings/announcements/blobs'/h[:2]/(h+'.pdf');assert hashlib.sha256(p.read_bytes()).hexdigest()==h;doc=pdfium.PdfDocument(p);reader=PdfReader(p);text=json.loads((C/f'independent-source-pages-{ins}.json').read_text());layouts=json.loads((C/f'independent-source-layouts-{ins}.json').read_text());fallback=[]
+ for item in text:
+  page=item['page'];native=doc[page-1].get_textpage().get_text_range()
+  if co(native)!=co(item['text']):
+   assert co(reader.pages[page-1].extract_text())==co(item['text']),(ins,page,'text')
+   fallback.append(page)
+ for page,native in layouts.items():assert co(reader.pages[int(page)-1].extract_text(extraction_mode='layout'))==co(native),(ins,page,'layout')
+ out.append(dict(instrument_id=ins,official_pdf_sha256=h,independent_text_pages=len(text),independent_layout_pages=len(layouts),pypdf_fallback_pages=fallback,all_match=True))
+with(C/'v58-independent-pdf-verification.json').open('x')as f:f.write(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
+print(out)

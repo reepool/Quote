@@ -1,0 +1,1357 @@
+{
+  "basis": "独立检查原PDF业务性质及方向；以下合同外对象逐个核对，未匹配项不得默认准确。",
+  "objects": [
+    {
+      "instrument_id": "600098.SH",
+      "native_semantic_key": "{\"action\": \"produces\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"广州中电荔新热电有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"电力、热力\", \"qualifier\": \"原主体：广州中电荔新热电有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-027f57883242c163:commodity:7",
+      "pages": [
+        5,
+        32,
+        33
+      ],
+      "source_actor": "广州中电荔新热电有限公司",
+      "name": "电力、热力",
+      "action": "produces",
+      "source_review": "独立原表p32–33：中电荔新原业务为电力、热力生产和供应；合并名称保留同一原主体双方向"
+    },
+    {
+      "instrument_id": "600098.SH",
+      "native_semantic_key": "{\"action\": \"sells\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"广州中电荔新热电有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"电力、热力\", \"qualifier\": \"原主体：广州中电荔新热电有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-027f57883242c163:commodity:8",
+      "pages": [
+        5,
+        32,
+        33
+      ],
+      "source_actor": "广州中电荔新热电有限公司",
+      "name": "电力、热力",
+      "action": "sells",
+      "source_review": "独立原表p32–33：中电荔新原业务为电力、热力生产和供应；合并名称保留同一原主体双方向"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"公司及合并子公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原经营模式\", \"name\": \"Robotaxi\", \"qualifier\": null, \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"consolidated_group\"}",
+      "record_id": "owned:core-ev-9c72a1ecd91fb55c:commodity:1",
+      "pages": [
+        4,
+        8
+      ],
+      "source_actor": "公司及合并子公司",
+      "name": "Robotaxi",
+      "action": "provides_service",
+      "source_review": "p8实际商业化运营的Robotaxi服务，未将研发计划视为经营"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"produces\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海新动力汽车科技股份有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"控股参股公司原业务\", \"name\": \"配件\", \"qualifier\": \"原主体：上海新动力汽车科技股份有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-fb421ab07cabfeec:commodity:3",
+      "pages": [
+        4,
+        26
+      ],
+      "source_actor": "上海新动力汽车科技股份有限公司",
+      "name": "配件",
+      "action": "produces",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"sells\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海新动力汽车科技股份有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"控股参股公司原业务\", \"name\": \"配件\", \"qualifier\": \"原主体：上海新动力汽车科技股份有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-fb421ab07cabfeec:commodity:4",
+      "pages": [
+        4,
+        26
+      ],
+      "source_actor": "上海新动力汽车科技股份有限公司",
+      "name": "配件",
+      "action": "sells",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海汽车集团财务有限责任公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"金融服务\", \"qualifier\": \"原主体：上海汽车集团财务有限责任公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-fb421ab07cabfeec:commodity:15",
+      "pages": [
+        4,
+        26
+      ],
+      "source_actor": "上海汽车集团财务有限责任公司",
+      "name": "金融服务",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"operates\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"中联汽车电子有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车用电子产品\", \"qualifier\": \"原主体：中联汽车电子有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-fb421ab07cabfeec:commodity:17",
+      "pages": [
+        4,
+        26
+      ],
+      "source_actor": "中联汽车电子有限公司",
+      "name": "汽车用电子产品",
+      "action": "operates",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海颀盟企业管理合伙企业（有限合伙）\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"投资及咨询服务\", \"qualifier\": \"原主体：上海颀盟企业管理合伙企业（有限合伙）\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-fb421ab07cabfeec:commodity:19",
+      "pages": [
+        4,
+        26
+      ],
+      "source_actor": "上海颀盟企业管理合伙企业（有限合伙）",
+      "name": "投资及咨询服务",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"develops\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海汽车英国控股有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车技术\", \"qualifier\": \"原主体：上海汽车英国控股有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:1",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海汽车英国控股有限公司",
+      "name": "汽车技术",
+      "action": "develops",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"produces\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上汽大通汽车有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车及零配件\", \"qualifier\": \"原主体：上汽大通汽车有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:4",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上汽大通汽车有限公司",
+      "name": "汽车及零配件",
+      "action": "produces",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"sells\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上汽大通汽车有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车及零配件\", \"qualifier\": \"原主体：上汽大通汽车有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:5",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上汽大通汽车有限公司",
+      "name": "汽车及零配件",
+      "action": "sells",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"sells\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上汽通用汽车销售有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"整车\", \"qualifier\": \"原主体：上汽通用汽车销售有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:6",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上汽通用汽车销售有限公司",
+      "name": "整车",
+      "action": "sells",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"develops\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上汽正大有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车及汽车零部件\", \"qualifier\": \"原主体：上汽正大有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:7",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上汽正大有限公司",
+      "name": "汽车及汽车零部件",
+      "action": "develops",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"produces\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上汽正大有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车及汽车零部件\", \"qualifier\": \"原主体：上汽正大有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:8",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上汽正大有限公司",
+      "name": "汽车及汽车零部件",
+      "action": "produces",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"sells\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上汽正大有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车及汽车零部件\", \"qualifier\": \"原主体：上汽正大有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:9",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上汽正大有限公司",
+      "name": "汽车及汽车零部件",
+      "action": "sells",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"produces\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上汽正大有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"车辆配件及机械\", \"qualifier\": \"原主体：上汽正大有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:10",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上汽正大有限公司",
+      "name": "车辆配件及机械",
+      "action": "produces",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"processes\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上汽正大有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"车辆配件及机械\", \"qualifier\": \"原主体：上汽正大有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:11",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上汽正大有限公司",
+      "name": "车辆配件及机械",
+      "action": "processes",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"develops\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海尚鸿置业有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"房地产\", \"qualifier\": \"原主体：上海尚鸿置业有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:12",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海尚鸿置业有限公司",
+      "name": "房地产",
+      "action": "develops",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"operates\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海尚鸿置业有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"房地产\", \"qualifier\": \"原主体：上海尚鸿置业有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:13",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海尚鸿置业有限公司",
+      "name": "房地产",
+      "action": "operates",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"develops\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"华域汽车系统股份有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车零部件总成\", \"qualifier\": \"原主体：华域汽车系统股份有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:16",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "华域汽车系统股份有限公司",
+      "name": "汽车零部件总成",
+      "action": "develops",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"produces\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"华域汽车系统股份有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车零部件总成\", \"qualifier\": \"原主体：华域汽车系统股份有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:17",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "华域汽车系统股份有限公司",
+      "name": "汽车零部件总成",
+      "action": "produces",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"sells\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"华域汽车系统股份有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车零部件总成\", \"qualifier\": \"原主体：华域汽车系统股份有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:18",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "华域汽车系统股份有限公司",
+      "name": "汽车零部件总成",
+      "action": "sells",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海汽车集团保险销售有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"保险中介服务\", \"qualifier\": \"原主体：上海汽车集团保险销售有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:23",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海汽车集团保险销售有限公司",
+      "name": "保险中介服务",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"sells\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海上汽大众汽车销售有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车及零配件\", \"qualifier\": \"原主体：上海上汽大众汽车销售有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:24",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海上汽大众汽车销售有限公司",
+      "name": "汽车及零配件",
+      "action": "sells",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"produces\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上汽通用五菱汽车股份有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车及零部件\", \"qualifier\": \"原主体：上汽通用五菱汽车股份有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:25",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上汽通用五菱汽车股份有限公司",
+      "name": "汽车及零部件",
+      "action": "produces",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"sells\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上汽通用五菱汽车股份有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车及零部件\", \"qualifier\": \"原主体：上汽通用五菱汽车股份有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:26",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上汽通用五菱汽车股份有限公司",
+      "name": "汽车及零部件",
+      "action": "sells",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海汽车集团财务有限责任公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车金融\", \"qualifier\": \"原主体：上海汽车集团财务有限责任公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:29",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海汽车集团财务有限责任公司",
+      "name": "汽车金融",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上汽通用汽车金融有限责任公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车金融\", \"qualifier\": \"原主体：上汽通用汽车金融有限责任公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:30",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上汽通用汽车金融有限责任公司",
+      "name": "汽车金融",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海捷氢科技股份有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术服务\", \"qualifier\": \"原主体：上海捷氢科技股份有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:31",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海捷氢科技股份有限公司",
+      "name": "技术服务",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海捷氢科技股份有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术开发\", \"qualifier\": \"原主体：上海捷氢科技股份有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:32",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海捷氢科技股份有限公司",
+      "name": "技术开发",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海捷氢科技股份有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术咨询\", \"qualifier\": \"原主体：上海捷氢科技股份有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:33",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海捷氢科技股份有限公司",
+      "name": "技术咨询",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"develops\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"南京汽车集团有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车\", \"qualifier\": \"原主体：南京汽车集团有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:44",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "南京汽车集团有限公司",
+      "name": "汽车",
+      "action": "develops",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"produces\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"南京汽车集团有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车\", \"qualifier\": \"原主体：南京汽车集团有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:45",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "南京汽车集团有限公司",
+      "name": "汽车",
+      "action": "produces",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"sells\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"南京汽车集团有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车\", \"qualifier\": \"原主体：南京汽车集团有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:46",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "南京汽车集团有限公司",
+      "name": "汽车",
+      "action": "sells",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"develops\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"南京汽车集团有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"发动机\", \"qualifier\": \"原主体：南京汽车集团有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:47",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "南京汽车集团有限公司",
+      "name": "发动机",
+      "action": "develops",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"produces\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"南京汽车集团有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"发动机\", \"qualifier\": \"原主体：南京汽车集团有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:48",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "南京汽车集团有限公司",
+      "name": "发动机",
+      "action": "produces",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"sells\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"南京汽车集团有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"发动机\", \"qualifier\": \"原主体：南京汽车集团有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:49",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "南京汽车集团有限公司",
+      "name": "发动机",
+      "action": "sells",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"develops\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"南京汽车集团有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车零部件\", \"qualifier\": \"原主体：南京汽车集团有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:50",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "南京汽车集团有限公司",
+      "name": "汽车零部件",
+      "action": "develops",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"produces\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"南京汽车集团有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车零部件\", \"qualifier\": \"原主体：南京汽车集团有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:51",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "南京汽车集团有限公司",
+      "name": "汽车零部件",
+      "action": "produces",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"sells\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"南京汽车集团有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车零部件\", \"qualifier\": \"原主体：南京汽车集团有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:52",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "南京汽车集团有限公司",
+      "name": "汽车零部件",
+      "action": "sells",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"develops\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海捷能汽车技术有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车技术\", \"qualifier\": \"原主体：上海捷能汽车技术有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:56",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海捷能汽车技术有限公司",
+      "name": "汽车技术",
+      "action": "develops",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"宁波梅山保税港区捷创股权投资合伙企业(有限合伙)\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"股权投资及其相关咨询服务\", \"qualifier\": \"原主体：宁波梅山保税港区捷创股权投资合伙企业(有限合伙)\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:57",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "宁波梅山保税港区捷创股权投资合伙企业(有限合伙)",
+      "name": "股权投资及其相关咨询服务",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海帆一尚行科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术服务\", \"qualifier\": \"原主体：上海帆一尚行科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:58",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海帆一尚行科技有限公司",
+      "name": "技术服务",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海帆一尚行科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术开发\", \"qualifier\": \"原主体：上海帆一尚行科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:59",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海帆一尚行科技有限公司",
+      "name": "技术开发",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海帆一尚行科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术咨询\", \"qualifier\": \"原主体：上海帆一尚行科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:60",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海帆一尚行科技有限公司",
+      "name": "技术咨询",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海帆一尚行科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术交流\", \"qualifier\": \"原主体：上海帆一尚行科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:61",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海帆一尚行科技有限公司",
+      "name": "技术交流",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海帆一尚行科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术转让\", \"qualifier\": \"原主体：上海帆一尚行科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:62",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海帆一尚行科技有限公司",
+      "name": "技术转让",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"嘉兴颀骏一号股权投资合伙企业(有限合伙)\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"股权投资及相关咨询服务\", \"qualifier\": \"原主体：嘉兴颀骏一号股权投资合伙企业(有限合伙)\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:63",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "嘉兴颀骏一号股权投资合伙企业(有限合伙)",
+      "name": "股权投资及相关咨询服务",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上汽通用五菱多元金融印尼有限责任公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"多元金融服务\", \"qualifier\": \"原主体：上汽通用五菱多元金融印尼有限责任公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:64",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上汽通用五菱多元金融印尼有限责任公司",
+      "name": "多元金融服务",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"develops\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"南京依维柯汽车有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"商用车辆\", \"qualifier\": \"原主体：南京依维柯汽车有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:70",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "南京依维柯汽车有限公司",
+      "name": "商用车辆",
+      "action": "develops",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"produces\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"南京依维柯汽车有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"商用车辆\", \"qualifier\": \"原主体：南京依维柯汽车有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:71",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "南京依维柯汽车有限公司",
+      "name": "商用车辆",
+      "action": "produces",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"develops\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"南京依维柯汽车有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"乘用车辆\", \"qualifier\": \"原主体：南京依维柯汽车有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:72",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "南京依维柯汽车有限公司",
+      "name": "乘用车辆",
+      "action": "develops",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"produces\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"南京依维柯汽车有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"乘用车辆\", \"qualifier\": \"原主体：南京依维柯汽车有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:73",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "南京依维柯汽车有限公司",
+      "name": "乘用车辆",
+      "action": "produces",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"develops\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"南京依维柯汽车有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"零部件\", \"qualifier\": \"原主体：南京依维柯汽车有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:74",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "南京依维柯汽车有限公司",
+      "name": "零部件",
+      "action": "develops",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"produces\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"南京依维柯汽车有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"零部件\", \"qualifier\": \"原主体：南京依维柯汽车有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:75",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "南京依维柯汽车有限公司",
+      "name": "零部件",
+      "action": "produces",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"零束科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术服务\", \"qualifier\": \"原主体：零束科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:77",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "零束科技有限公司",
+      "name": "技术服务",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"零束科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术开发\", \"qualifier\": \"原主体：零束科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:78",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "零束科技有限公司",
+      "name": "技术开发",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"零束科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术咨询\", \"qualifier\": \"原主体：零束科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:79",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "零束科技有限公司",
+      "name": "技术咨询",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"零束科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术转让\", \"qualifier\": \"原主体：零束科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:80",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "零束科技有限公司",
+      "name": "技术转让",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"零束科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术推广\", \"qualifier\": \"原主体：零束科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:81",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "零束科技有限公司",
+      "name": "技术推广",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海友道智途科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术服务\", \"qualifier\": \"原主体：上海友道智途科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:82",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海友道智途科技有限公司",
+      "name": "技术服务",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海友道智途科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术开发\", \"qualifier\": \"原主体：上海友道智途科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:83",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海友道智途科技有限公司",
+      "name": "技术开发",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海友道智途科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术咨询\", \"qualifier\": \"原主体：上海友道智途科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:84",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海友道智途科技有限公司",
+      "name": "技术咨询",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海友道智途科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术交流\", \"qualifier\": \"原主体：上海友道智途科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:85",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海友道智途科技有限公司",
+      "name": "技术交流",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海友道智途科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术转让\", \"qualifier\": \"原主体：上海友道智途科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:86",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海友道智途科技有限公司",
+      "name": "技术转让",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海友道智途科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术推广\", \"qualifier\": \"原主体：上海友道智途科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:87",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海友道智途科技有限公司",
+      "name": "技术推广",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海安驾智行数字科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术服务\", \"qualifier\": \"原主体：上海安驾智行数字科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:88",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海安驾智行数字科技有限公司",
+      "name": "技术服务",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海安驾智行数字科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术开发\", \"qualifier\": \"原主体：上海安驾智行数字科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:89",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海安驾智行数字科技有限公司",
+      "name": "技术开发",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海安驾智行数字科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术咨询\", \"qualifier\": \"原主体：上海安驾智行数字科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:90",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海安驾智行数字科技有限公司",
+      "name": "技术咨询",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海安驾智行数字科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术交流\", \"qualifier\": \"原主体：上海安驾智行数字科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:91",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海安驾智行数字科技有限公司",
+      "name": "技术交流",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海安驾智行数字科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术转让\", \"qualifier\": \"原主体：上海安驾智行数字科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:92",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海安驾智行数字科技有限公司",
+      "name": "技术转让",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海安驾智行数字科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术推广\", \"qualifier\": \"原主体：上海安驾智行数字科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:93",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海安驾智行数字科技有限公司",
+      "name": "技术推广",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"嘉兴瑞佳股权投资合伙企业(有限合伙)\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"股权投资及相关咨询服务\", \"qualifier\": \"原主体：嘉兴瑞佳股权投资合伙企业(有限合伙)\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:94",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "嘉兴瑞佳股权投资合伙企业(有限合伙)",
+      "name": "股权投资及相关咨询服务",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"produces\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上汽动力科技(郑州)有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"汽车零部件及配件\", \"qualifier\": \"原主体：上汽动力科技(郑州)有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:95",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上汽动力科技(郑州)有限公司",
+      "name": "汽车零部件及配件",
+      "action": "produces",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海联径汽车科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术服务\", \"qualifier\": \"原主体：上海联径汽车科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:96",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海联径汽车科技有限公司",
+      "name": "技术服务",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海联径汽车科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术开发\", \"qualifier\": \"原主体：上海联径汽车科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:97",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海联径汽车科技有限公司",
+      "name": "技术开发",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海联径汽车科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术咨询\", \"qualifier\": \"原主体：上海联径汽车科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:98",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海联径汽车科技有限公司",
+      "name": "技术咨询",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上海联径汽车科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术转让\", \"qualifier\": \"原主体：上海联径汽车科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:99",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上海联径汽车科技有限公司",
+      "name": "技术转让",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"智己汽车科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术服务\", \"qualifier\": \"原主体：智己汽车科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:100",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "智己汽车科技有限公司",
+      "name": "技术服务",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"智己汽车科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术开发\", \"qualifier\": \"原主体：智己汽车科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:101",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "智己汽车科技有限公司",
+      "name": "技术开发",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"智己汽车科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术咨询\", \"qualifier\": \"原主体：智己汽车科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:102",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "智己汽车科技有限公司",
+      "name": "技术咨询",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"智己汽车科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术交流\", \"qualifier\": \"原主体：智己汽车科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:103",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "智己汽车科技有限公司",
+      "name": "技术交流",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"智己汽车科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术转让\", \"qualifier\": \"原主体：智己汽车科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:104",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "智己汽车科技有限公司",
+      "name": "技术转让",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"智己汽车科技有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术推广\", \"qualifier\": \"原主体：智己汽车科技有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:105",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "智己汽车科技有限公司",
+      "name": "技术推广",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上汽前行汽车科技（上海）有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术服务\", \"qualifier\": \"原主体：上汽前行汽车科技（上海）有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:106",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上汽前行汽车科技（上海）有限公司",
+      "name": "技术服务",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上汽前行汽车科技（上海）有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术开发\", \"qualifier\": \"原主体：上汽前行汽车科技（上海）有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:107",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上汽前行汽车科技（上海）有限公司",
+      "name": "技术开发",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上汽前行汽车科技（上海）有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术咨询\", \"qualifier\": \"原主体：上汽前行汽车科技（上海）有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:108",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上汽前行汽车科技（上海）有限公司",
+      "name": "技术咨询",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上汽前行汽车科技（上海）有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术交流\", \"qualifier\": \"原主体：上汽前行汽车科技（上海）有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:109",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上汽前行汽车科技（上海）有限公司",
+      "name": "技术交流",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上汽前行汽车科技（上海）有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术转让\", \"qualifier\": \"原主体：上汽前行汽车科技（上海）有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:110",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上汽前行汽车科技（上海）有限公司",
+      "name": "技术转让",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"provides_service\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"上汽前行汽车科技（上海）有限公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"原主体业务性质\", \"name\": \"技术推广\", \"qualifier\": \"原主体：上汽前行汽车科技（上海）有限公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"named_subsidiary\"}",
+      "record_id": "owned:core-ev-cf7d4a93a927011c:commodity:111",
+      "pages": [
+        4,
+        170,
+        171
+      ],
+      "source_actor": "上汽前行汽车科技（上海）有限公司",
+      "name": "技术推广",
+      "action": "provides_service",
+      "source_review": "独立原表p26/p170–171原具名子公司业务性质，按原共享动词或独立服务子句核名称、动作及并表关系；不是注册经营范围推测"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"purchases\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"公司及合并子公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"本期采购商品\", \"name\": \"商品\", \"qualifier\": \"交易对方：其他关联方\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"consolidated_group\"}",
+      "record_id": "owned:core-ev-380f9c09549d15fb:commodity:28",
+      "pages": [
+        4,
+        184,
+        185
+      ],
+      "source_actor": "公司及合并子公司",
+      "name": "商品",
+      "action": "purchases",
+      "source_review": "p184–185本期正数原采购内容：商品/材料或支付租赁费用，保留原交易方；租赁为服务非商品；不借上期使用权资产"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"purchases\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"公司及合并子公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"本期采购商品\", \"name\": \"材料\", \"qualifier\": \"交易对方：其他关联方\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"consolidated_group\"}",
+      "record_id": "owned:core-ev-380f9c09549d15fb:commodity:29",
+      "pages": [
+        4,
+        184,
+        185
+      ],
+      "source_actor": "公司及合并子公司",
+      "name": "材料",
+      "action": "purchases",
+      "source_review": "p184–185本期正数原采购内容：商品/材料或支付租赁费用，保留原交易方；租赁为服务非商品；不借上期使用权资产"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"purchases\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"公司及合并子公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"本期采购服务\", \"name\": \"支付租赁费用\", \"qualifier\": \"交易对方：上汽总公司之子公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"consolidated_group\"}",
+      "record_id": "owned:core-ev-380f9c09549d15fb:commodity:48",
+      "pages": [
+        4,
+        184,
+        185
+      ],
+      "source_actor": "公司及合并子公司",
+      "name": "支付租赁费用",
+      "action": "purchases",
+      "source_review": "p184–185本期正数原采购内容：商品/材料或支付租赁费用，保留原交易方；租赁为服务非商品；不借上期使用权资产"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"purchases\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"公司及合并子公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"本期采购服务\", \"name\": \"支付租赁费用\", \"qualifier\": \"交易对方：上汽总公司之联营企业\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"consolidated_group\"}",
+      "record_id": "owned:core-ev-380f9c09549d15fb:commodity:49",
+      "pages": [
+        4,
+        184,
+        185
+      ],
+      "source_actor": "公司及合并子公司",
+      "name": "支付租赁费用",
+      "action": "purchases",
+      "source_review": "p184–185本期正数原采购内容：商品/材料或支付租赁费用，保留原交易方；租赁为服务非商品；不借上期使用权资产"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"purchases\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"公司及合并子公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"本期采购服务\", \"name\": \"支付租赁费用\", \"qualifier\": \"交易对方：合营企业\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"consolidated_group\"}",
+      "record_id": "owned:core-ev-380f9c09549d15fb:commodity:50",
+      "pages": [
+        4,
+        184,
+        185
+      ],
+      "source_actor": "公司及合并子公司",
+      "name": "支付租赁费用",
+      "action": "purchases",
+      "source_review": "p184–185本期正数原采购内容：商品/材料或支付租赁费用，保留原交易方；租赁为服务非商品；不借上期使用权资产"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"purchases\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"公司及合并子公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"本期采购服务\", \"name\": \"支付租赁费用\", \"qualifier\": \"交易对方：上汽总公司\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"consolidated_group\"}",
+      "record_id": "owned:core-ev-380f9c09549d15fb:commodity:51",
+      "pages": [
+        4,
+        184,
+        185
+      ],
+      "source_actor": "公司及合并子公司",
+      "name": "支付租赁费用",
+      "action": "purchases",
+      "source_review": "p184–185本期正数原采购内容：商品/材料或支付租赁费用，保留原交易方；租赁为服务非商品；不借上期使用权资产"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "native_semantic_key": "{\"action\": \"purchases\", \"dimension\": null, \"object_type\": \"Activity\", \"relation_type\": null, \"segment_dimension\": null, \"source_actor\": \"公司及合并子公司\", \"source_native\": {\"footnote_refs\": [], \"header\": \"本期采购服务\", \"name\": \"支付租赁费用\", \"qualifier\": \"交易对方：联营企业\", \"source_aliases\": [], \"unit\": null, \"value\": null}, \"subject_scope\": \"consolidated_group\"}",
+      "record_id": "owned:core-ev-380f9c09549d15fb:commodity:52",
+      "pages": [
+        4,
+        184,
+        185
+      ],
+      "source_actor": "公司及合并子公司",
+      "name": "支付租赁费用",
+      "action": "purchases",
+      "source_review": "p184–185本期正数原采购内容：商品/材料或支付租赁费用，保留原交易方；租赁为服务非商品；不借上期使用权资产"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+"""Record actual unique reviewed objects through the existing source-review owner."""
+import json
+from pathlib import Path
+from research.company_profile.operations import record_published_source_review
+from research.company_profile.source_review import SemanticFinding
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v58_same_source_repair'
+a=json.loads((C/'v58-formal-source-review-evidence.json').read_text());s=json.loads((C/'v58-source-scope.json').read_text());f=json.loads((P/'formal_execution.json').read_text());obs=json.loads((P/'observation.json').read_text());objects=a['object_reviews'];choices={}
+for index,o in enumerate(objects):
+ d=o['decision'];ids=d.get('matched_income_conditions',[])if o['object_type']=='Segment'else d.get('matched_role_conditions',[])
+ if o['object_type']=='answer':ids=[s['answers'][o['instrument_id']][o['object_id'].split(':')[1]]['condition_id']]
+ for cid in ids:choices.setdefault(cid,[]).append(index)
+assigned={}
+def assign(cid,seen):
+ for idx in choices.get(cid,[]):
+  if idx in seen:continue
+  seen.add(idx)
+  if idx not in assigned or assign(assigned[idx],seen):assigned[idx]=cid;return True
+ return False
+all_ids=[v['condition_id']for rows in s['source_rows'].values()for v in rows]+[v['condition_id']for v in s['native_roles']]+[v['condition_id']for ans in s['answers'].values()for v in ans.values()]
+assert all(assign(cid,set())for cid in all_ids), 'contract-to-unique-object assignment incomplete'
+assert len(assigned)==457
+findings=[]
+for idx,o in enumerate(objects):
+ k=o['object_type'];findings.append(SemanticFinding(instrument_id=o['instrument_id'],aspect='core_skeleton'if k=='answer'else 'commodity_role'if k in ['Activity','Relationship']else 'important_disclosure',kind='semantic',source='independently_read_official_report',disclosure_id=o['object_id'],disclosed_in_source=idx in assigned,present_in_delivery=True,fact_accurate=o['decision']['accurate'],critical_numeric_error=o['decision']['critical_numeric_error']))
+result=record_published_source_review(checkpoint_root=R/'data/checkpoints/company_profile_common_core',plan_directory=P,semantic_findings=findings,tokens_used=obs['tokens_consumed'],elapsed_seconds=f['whole_round_seconds'])
+with(C/'v58-source-review-owner-receipt.json').open('x')as out:out.write(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+with(C/'v58-contract-object-assignment.json').open('x')as out:out.write(json.dumps({cid:{'instrument_id':objects[idx]['instrument_id'],'object_id':objects[idx]['object_id']}for idx,cid in assigned.items()},ensure_ascii=False,indent=2)+'\n')
+print({k:result['source_review'][k]for k in ['source_recall','source_accuracy','critical_numeric_errors','expansion_gates_met']})

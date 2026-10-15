@@ -297,6 +297,16 @@ class OfficialAnnualReportPageSource:
             or "业务性质" in p["text"]
             or "主要原材料的基本情况" in p["text"]
             or "已签订的重大采购合同截至本报告期的履行情况" in p["text"]
+            or "合并利润表" in p["text"]
+            or "前五名客户的营业收入" in p["text"]
+            or "利息净收入" in p["text"]
+            or "在某一时点确认" in p["text"]
+            or "对外交易收入总额" in p["text"]
+            or "向关联方收取之" in p["text"]
+            or "从关联方取得之手续费收入" in p["text"]
+            or "合营或联营企业名称" in p["text"]
+            or "基本情况" in p["text"]
+            and "营业收入" in p["text"]
         ]
         for page in list(project_pages):
             if (
@@ -1255,6 +1265,7 @@ class CompanyProfileTaskService:
                 "v55",
                 "v56",
                 "v57",
+                "v58",
             }:
                 from research.business_profile_production_operations import (
                     register_business_profile_shared_annual_report_asset,

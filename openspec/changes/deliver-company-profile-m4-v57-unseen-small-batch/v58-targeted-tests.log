@@ -1,0 +1,13 @@
+[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[33m                                                   [100%][0m
+============================= slowest 10 durations =============================
+65.40s call     tests/unit/test_research/test_company_profile_v58_energy_automotive.py::test_official_complete_pages_accept_query_export[600104.SH]
+33.95s call     tests/unit/test_research/test_company_profile_v58_energy_automotive.py::test_official_complete_pages_accept_query_export[600098.SH]
+31.56s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600103.SH-v57]
+25.34s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600094.SH-v57]
+13.85s call     tests/unit/test_research/test_company_profile_v53_source_conflict.py::test_v53_complete_official_owner_contract_and_source_conflict[600097.SH]
+6.28s call     tests/unit/test_research/test_company_profile_v53_source_conflict.py::test_v53_complete_official_owner_contract_and_source_conflict[600082.SH]
+0.18s call     tests/unit/test_research/test_company_profile_v53_source_conflict.py::test_normal_technology_business_is_not_removed[\u5e94\u7528\u8f6f\u4ef6]
+0.06s call     tests/unit/test_research/test_company_profile_v53_source_conflict.py::test_normal_technology_business_is_not_removed[\u96c6\u6210\u7535\u8def]
+0.02s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_wrapped_trade_row_keeps_original_identity
+0.02s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_wrapped_purchase_services_do_not_become_goods
+[33m[32m22 passed[0m, [33m[1m2 deselected[0m, [33m[1m7 warnings[0m[33m in 178.13s (0:02:58)[0m[0m

@@ -1,0 +1,52 @@
+{
+  "reviewed_at": "2026-10-15T06:17:49.531685+00:00",
+  "review_type": "B scoped implementation and source review, not A approval",
+  "blocking_findings_remaining": [],
+  "resolved_findings": [
+    "source relationship explicitly adjudicated by A p234 with native heading conflict kept",
+    "unproven Hong Kong legal actor alias corrected only in successor per A",
+    "empty revenue columns and future lease receipts excluded",
+    "service, goods, assets and utilities categories and directions verified",
+    "physical wrapped company/business rows and JV context boundaries verified",
+    "relation-only context spans no longer suppress valid old property goods entry",
+    "local missing state/product/dealer passages restored from original pages; no source rewriting",
+    "negative detector now distinguishes legitimate purchase from prior-only sale for same counterparty"
+  ],
+  "scope": "existing evidence selection, acceptance/projection, actual official page source and v58 inheritance; default identity unchanged",
+  "tests": {
+    "command": "PYTHONPATH=. python -m pytest -q test_company_profile_v58_energy_automotive.py test_company_profile_v55_property_paper.py test_company_profile_v53_source_conflict.py -k not_v56",
+    "passed": 22,
+    "deselected": 2,
+    "log": "v58-targeted-tests.log",
+    "all_suite_claim": false
+  },
+  "local": {
+    "recall": "457/457",
+    "accuracy": "997/997",
+    "negatives": "41/41",
+    "numeric_error_objects": 0,
+    "receipt": "v58-local-complete-source-review-evidence.json",
+    "actual_complete_owner_input": true,
+    "query_export_disk_equal": true
+  },
+  "checks": {
+    "ruff": true,
+    "format": true,
+    "diff": true,
+    "openspec_change_strict": true,
+    "specs_strict_passed": 114
+  },
+  "protection_verified": {
+    "historical": 3750,
+    "first-formal-delivery-preservation.json": 22,
+    "first-review-preservation.json": 13
+  },
+  "preexisting_changed": [],
+  "authorization": {
+    "first_used": 1,
+    "successors_used": 0,
+    "successors_authorized": 2
+  },
+  "production": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

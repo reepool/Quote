@@ -1,0 +1,18 @@
+{
+  "completed_at": "2026-10-15T05:25:47.982838+00:00",
+  "sha256": {
+    "openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch/first-formal-supervisor-receipt.json": "c108cc55755d7d424f660a0284b3a3443b663d935475d9a0ac7cdaf4ba693690",
+    "openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch/first-source-review-evidence.json": "56ca260890d11216348c81bf755009c5d08c1d21870522eb29f3ceeb726edc5d",
+    "openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch/first-attempt-start.json": "00a71fa85418086b502f4c676eee03d2cbe9a0bc1f791b94b11c8e0103bc9717",
+    "openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch/first-formal-execute-script.txt": "edfdf4453c582c9bae4d69d83ff6e50d8d32f2dd7244727c45f6db380ae439b7",
+    "openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch/first-negative-review-evidence.json": "13b6ac3e1c0bfe3baf334684da4f99f50f059a3687ac63a3af43ed177a403386",
+    "openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch/first-formal-delivery-preservation.json": "6bdde517bcbaff8047c78ba6902483dee5eac3b2b830c2ba49f31d6b09964b46",
+    "openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch/first-review-finalize-script.txt": "10ec60304fbd2ee38214ddc9346b4c8b2e3f8c3645cc98d774888470aa4d5cef",
+    "openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch/first-source-match-script.txt": "7c86d80c028779dd90682365317256f3b02e01db5d95bca988084b6cf68105cc",
+    "openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch/first-source-freeze-receipt.json": "5ffd1c5dea523f0eb9e5fbd4c5659111d1eb1d209e0f8327472f3864397ea6fa",
+    "openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch/first-formal-stacks.log": "26c3c26886b0f913ba1cffcfae2150aa85a4c5106be025fd223d71efd1d479d5",
+    "openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch/first-source-audit-script.txt": "734c940b187c211c40408cb837677cc18ddfda905d1bebf2073109a8c1abe7c5",
+    "openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch/first-formal.log": "559b277f9e69511c0f5d4b6990187580f689f835d5ddd377e28e17a262abd70c",
+    "openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch/first-bounded-supervisor-script.txt": "dad56694bdf66adb02090731654fda37cc42c403f44ddd2d961ab467e43eb79e"
+  }
+}

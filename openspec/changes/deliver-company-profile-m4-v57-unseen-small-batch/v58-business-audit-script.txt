@@ -1,0 +1,198 @@
+"""Read actual delivered objects and write a new scoped B audit. No business database writes."""
+import json,re
+from decimal import Decimal
+from pathlib import Path
+C=Path('openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch')
+scope=json.loads((C/'source-scope.json').read_text())
+def co(s):return re.sub(r'\s+','',s or '').replace('（','(').replace('）',')')
+def num(s):return Decimal(co(s).replace(',',''))
+def pages(r):return {p for e in r['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[]),*e.get('subject_evidence_pages',[])] if p is not None}
+def match(r,v):
+ n=r['source_native'];h=n.get('header') or '';q=co(n.get('qualifier'));rh=v['header'];d=r.get('dimension',r.get('segment_dimension'))
+ if r.get('reported_period')!=v['reported_period'] or v['page'] not in pages(r) or n.get('unit')!=v['unit'] or n.get('value') is None or num(n['value'])!=num(v['value']):return False
+ if re.sub(r'^\(\d+\)','',co(n['name']).removeprefix('其中：')) not in {co(x) for x in v['native_aliases']}:return False
+ expected='business_segment' if v['subject_scope']=='group_associated_entity' else v['subject_scope']
+ if r['subject_scope']!=expected:return False
+ if v.get('counterparty') and co(v['counterparty']) not in q:return False
+ if rh.startswith('主营业务分'):return d==v['dimension'] and h=='主营业务收入'
+ if rh in ['合并营业收入和营业成本','母公司营业收入和营业成本']:return h=='营业收入' and d=='business_type'
+ if rh=='主要控股参股公司分析':return h=='控股参股公司/营业收入' and any(co(a) in q for a in [v['source_actor'],v['name']])
+ if rh=='重要非全资子公司的主要财务信息':return h=='重要非全资子公司/本期营业收入' and co(v['source_actor']) in q
+ if '原栏目冲突' in rh:return '联营企业/' in h and co(v['source_actor']) in q and any(w in q+''.join(r.get('uncertainty',[])) for w in ['栏目冲突','合营','p223'])
+ if rh=='关联交易/出售商品及提供劳务':return h=='出售商品/提供劳务/本期发生额' and q==co('交易对方：'+v['counterparty'])
+ if rh=='关联租赁/本公司作为出租方':return h=='本公司作为出租方/本期确认的租赁收入' and q==co('承租方：'+v['counterparty'])
+ if rh=='作为出租人的经营租赁':return h=='作为出租人的经营租赁/租赁收入'
+ if rh=='报告分部的财务信息':return co(v['source_column']) == co(h) and co(v.get('source_segment') or v['name']) == co(n['name'])
+ if rh.startswith('合同收入分解/'):
+  return h.startswith('合同收入/') and co(v['source_segment'] or '主营业务') in q
+ if rh=='2025年度收入确认时间分解':return h.startswith('合同收入/收入确认时间') and co(v['source_segment']) in q
+ if rh=='合并利润表':return h in ['营业总收入','合并利润表/营业收入','合并利润表/营业总收入','合并利润表/利息收入','合并利润表/手续费及佣金收入','合并利润表']
+ if rh=='电力行业/电量收入及成本':return h=='电力行业电量、收入及成本/本期收入'
+ if rh=='贸易业务开展情况':return h=='本期营业收入'
+ # Remaining headings are matched only after inspecting their actual native form.
+ return False
+
+def rolematch(r,v):
+ n=r['source_native'];q=co(n.get('qualifier'));expected='business_segment' if v['subject_scope']=='group_associated_entity' else v['subject_scope']
+ if co(n['name']) not in {co(x) for x in v['native_aliases']} or r['subject_scope']!=expected or r.get('reported_period')!=v['reported_period']:return False
+ if not ({v['page'],*v.get('context_pages',[])} & pages(r)):return False
+ if v['source_actor']!='公司及合并子公司' and co(r.get('source_actor')) not in {co(a) for a in v['actor_aliases']}:return False
+ actions=[{'procures':'purchases','manufactures':'produces'}.get(a,a) for a in v['source_actions']]
+ if not (r.get('relation_type')=='material_input' if actions==['uses_material'] else r.get('action') in actions):return False
+ if v.get('counterparty') and co(v['counterparty']) not in q:return False
+ if v.get('category')=='services' and n.get('header')!='本期采购服务':return False
+ if v.get('category')=='goods' and n.get('header') not in ['本期采购商品','本期采购原内容']:return False
+ if v.get('category')=='mixed_goods_and_services' and n.get('header')!='本期采购原内容':return False
+ return True
+
+base_match=match;base_role=rolematch
+scope=json.loads((C/"v58-source-scope.json").read_text())
+
+def match(r,v):
+ if base_match(r,v):return True
+ if co(r['source_native']['name']).endswith('(注)'):
+  candidate={**r,'source_native':{**r['source_native'],'name':co(r['source_native']['name']).removesuffix('(注)')}}
+  if base_match(candidate,v):return True
+ n=r['source_native'];h=n.get('header') or '';q=co(n.get('qualifier'));rh=v['header'];d=r.get('dimension',r.get('segment_dimension'))
+ if r.get('reported_period')!=v['reported_period'] or v['page'] not in pages(r) or n.get('unit')!=v['unit'] or n.get('value') is None or num(n['value'])!=num(v['value']):return False
+ name=co(n['name']).removeprefix('其中：')
+ if name not in {co(x) for x in v['native_aliases']} and name.removesuffix('(注)') not in {co(x) for x in v['native_aliases']}:return False
+ expected='business_segment' if v['subject_scope']=='group_associated_entity' else v['subject_scope']
+ if r['subject_scope']!=expected:return False
+ if v.get('counterparty') and co(v['counterparty']) not in q:return False
+ if rh=='主要控股参股公司分析':return h=='控股参股公司/'+v['source_column'] and (co(v['source_actor']) in q or name in q)
+ if rh=='重要非全资子公司的主要财务信息':return h=='重要非全资子公司/本期营业收入' and any(co(a) in q for a in [v['source_actor'],v['name']])
+ if rh in ['公司前五名客户的营业收入','集团前五名客户的营业收入']:return h=='前五名客户/营业收入' and d=='customer'
+ if rh in ['利息净收入/利息收入','作为出租人的融资租赁']:return h=={'作为出租人的融资租赁':'作为出租人的融资租赁/销售收入'}.get(rh,rh)
+ if rh=='分部信息/地区对外交易收入':return h=='地区对外交易收入' and d=='region'
+ if rh=='合同收入分解/主营业务':return h=='合同收入/主营业务'
+ if rh in ['主营业务收入明细','其他业务收入明细']:return h==rh.removesuffix('明细')
+ if rh=='2025年度收入确认时间分解':
+  basis='合计' if v['name']=='合计' else v['source_column']
+  return h=='收入确认时间/'+basis and q==co('原收入列：'+v['source_segment']) and d=='revenue_timing'
+ if rh=='汽车金融业务/基本情况':return h=='汽车金融业务/基本情况/营业收入' and co(v['source_actor']) in q
+ if rh.startswith('其他关联交易/'):
+  expectedh={'其他关联交易/财务公司及上汽通用金融向关联方收取之贷款利息收入':'关联方贷款利息收入','其他关联交易/本集团向关联方收取之利息收入':'关联方委托贷款利息收入','其他关联交易/财务公司委托业务':'关联方委托业务手续费收入'}[rh]
+  if h!=expectedh:return False
+  return not v.get('counterparty') or co(v['counterparty']) in q
+ if rh=='新能源汽车收入及补贴':return h=='收入'
+ return False
+
+def rolematch(r,v):
+ if not base_role(r,v):return False
+ h=r['source_native'].get('header')
+ if v.get('category')=='assets':return h=='本期购置资产'
+ if v.get('category')=='utilities':return h=='本期采购公用事业'
+ return True
+
+"""Scoped source review. Reads only actual results; writes a new review receipt."""
+import json,sys,hashlib,re
+from pathlib import Path
+ROOT=Path(sys.argv[1]);PREFIX=sys.argv[2]
+def key(r):
+ return json.dumps({k:r.get(k) for k in ['object_type','subject_scope','source_actor','action','relation_type','dimension','segment_dimension','source_native']},sort_keys=True,ensure_ascii=False)
+first=json.loads((C/'first-source-review-evidence.json').read_text())
+known={key(o['record']):o['decision']['reason'] for o in first['object_reviews'] if o['object_type']!='answer' and o['decision']['accurate']}
+# Explicitly inspected contract-external actions: compare original actor/business
+# cells on p26/170–171, not just verbs or company-name words.
+extras=json.loads((C/'v58-contract-external-action-review.json').read_text())
+extra={r['native_semantic_key']:r for r in extras['objects']}
+body_rules={
+ '600098.SH':{
+ 'principal_business':['绿色低碳综合智慧能源','综合能源产业链','燃气集团','能源物流集团','调试','投产','国家电网','南方电网'],
+ 'products_services':['电力','蒸汽','煤炭','天然气','成品油','加气混凝土','光伏','源网荷储充','能源托管','节能运维','碳资产管理','危化品','充电桩'],
+ 'revenue_model':['上网电量','结算电价','抄表','扣罚','奖励','佣金','实际利率','直线法']},
+ '600104.SH':{
+ 'principal_business':['整车','零部件','金融','移动出行','经销','Robotaxi','国际物流','注销'],
+ 'products_services':['SUV','MPV','MG4','荣威M7','尚界H5','LS6','LS9','缤果S','大拿','E5','L7','中试','半固态'],
+ 'revenue_model':['电子交易平台','售后代管','随时交付','销售折扣','预计总成本','代理人','直线法']}}
+objects=[];facts={};profiles={};missing=[];components={}
+for ins in scope['source_rows']:
+ rs=json.loads((ROOT/('raw_'+ins+'.json')).read_text());facts[ins]=rs
+ profile=json.loads((ROOT/('profile_'+ins+'.json')).read_text());profiles[ins]=profile
+ for r in rs:
+  k=r['object_type'];n=r['source_native'];hit=[v['condition_id'] for v in scope['source_rows'][ins] if match(r,v)] if k in ['Segment','Measurement'] else []
+  roles=[v['condition_id'] for v in scope['native_roles'] if v['instrument_id']==ins and rolematch(r,v)] if k in ['Activity','Relationship'] else []
+  ok=False;reason='未复核对象，禁止默认通过'
+  if hit or roles:ok=True;reason='逐原格/原句匹配金额、单位、栏目、方向、主体、期间和关系；匹配器核全部必要约束'
+  elif k=='BusinessOverview':
+   source=co(r['source_text']);quote=co(''.join(e['anchor']['bounded_quote'] for e in r['evidence']));ok=source in quote
+   reason='保留完整来源段、原状态及限定；三维实质另核，非引文命中即答案成立'
+  elif key(r) in known:ok=True;reason='原首次已正确对象原生语义精确相同；'+known[key(r)]
+  elif key(r) in extra:ok=True;reason=extra[key(r)]['source_review']
+  objects.append(dict(instrument_id=ins,object_id=r['record_id'],object_type=k,record=r,decision=dict(accurate=ok,critical_numeric_error=False,matched_income_conditions=hit,matched_role_conditions=roles,reason=reason)))
+ local=[o for o in objects if o['instrument_id']==ins]
+ income=[v for v in scope['source_rows'][ins] if any(o['object_type']=='Segment' and v['condition_id'] in o['decision']['matched_income_conditions'] for o in local)]
+ actions=[v for v in scope['native_roles'] if v['instrument_id']==ins and any(v['condition_id'] in o['decision']['matched_role_conditions'] for o in local)]
+ for v in scope['source_rows'][ins]:
+  if v not in income:missing.append(v['condition_id'])
+ for v in scope['native_roles']:
+  if v['instrument_id']==ins and v not in actions:missing.append(v['condition_id'])
+ body_count=0
+ for a in profile['dimensions']:
+  d=a['dimension_id'];text=co(a['excerpt']);terms=body_rules[ins][d];absent=[w for w in terms if co(w) not in text]
+  support=set(a['supporting_record_ids']);bad=[o['object_id'] for o in local if o['object_id'] in support and not o['decision']['accurate']]
+  # Human source review confirms the listed concepts occur in their original
+  # paragraph with original actors/statuses; tokens below only detect regressions.
+  ok=not absent and not bad
+  body_count+=ok
+  if not ok:missing.append(scope['answers'][ins][d]['condition_id'])
+  objects.append(dict(instrument_id=ins,object_id='answer:'+d,object_type='answer',text=a['excerpt'],supporting_record_ids=a['supporting_record_ids'],decision=dict(accurate=ok,critical_numeric_error=False,reason='独立原页实质核对见v58-body-substance-review.json；校验原主体、状态、期间及支持对象',missing_substance=absent,inaccurate_support=bad)))
+ components[ins]=dict(bodies=body_count,income=len(income),actions=len(actions))
+
+def negative_bad(n):
+ ins=n['instrument_id'];idx=int(n['condition_id'].rsplit('-',1)[1]);rs=facts[ins];fin=[r for r in rs if r['object_type'] in ['Segment','Measurement']];acts=[r for r in rs if r['object_type']=='Activity'];b=[]
+ def add(seq,predicate):b.extend(r['record_id'] for r in seq if predicate(r))
+ def val(r):return num(r['source_native']['value']) if r['source_native'].get('value') is not None else None
+ def h(r):return r['source_native'].get('header') or ''
+ def q(r):return co(r['source_native'].get('qualifier'))
+ def name(r):return co(r['source_native']['name'])
+ page=n['page'];local=[r for r in fin if page in pages(r)]
+ if n.get('prior_value'):
+  add(local,lambda r:val(r)==num(n['prior_value']) and (not n.get('counterparty') or co(n['counterparty']) in q(r)))
+  if n.get('content'):
+   add(acts,lambda r:r['action']=='sells' and page in pages(r) and co(n.get('counterparty','')) in q(r) and name(r) in {co(n['content']),co(n['content']).removeprefix('销售')})
+ elif ins=='600098.SH':
+  if idx==6:add(local,lambda r:'手续费' in name(r)+h(r))
+  elif idx==7:add(local,lambda r:'对外' in h(r) and '抵销' in name(r))
+  elif idx==8:add(local,lambda r:'分部间' in h(r) and name(r)=='合计')
+  elif idx==9:add(local,lambda r:val(r) in {num(x) for x in ['92182690.31','94945119.03','46542665.43','30803151.80','8178533.08','4547520.25','2110819.75']})
+  elif idx==10:add(local,lambda r:val(r) in {num('770121.24'),num('337904.69')})
+  elif idx==11:add(local,lambda r:val(r)==num('7286278.58'))
+  elif idx==12:add(local,lambda r:'托管' in h(r) or val(r)==num('1.5'))
+  elif idx==13:add(acts,lambda r:r['action']=='purchases' and re.search('摩科瑞|墨西哥',q(r)+name(r)) is not None)
+  elif idx==14:add(acts,lambda r:r['action']=='produces' and name(r) in ['市场煤','成品油','天然气'])
+  elif idx==15:add(acts,lambda r:'河北邯郸大名' in name(r)+q(r) and r['action'] in ['operates','sells'])
+  elif idx==16:add(fin,lambda r:val(r)==num('552.30') and r['source_native'].get('unit')=='亿元')
+  elif idx==17:add(fin,lambda r:name(r) in ['广东红海湾发电有限公司','广东珠海金湾液化天然气有限公司'] and ('联营' not in h(r) or '栏目冲突' not in q(r) or r['subject_scope']!='business_segment'))
+  elif idx==18:add(local,lambda r:r['subject_scope']=='issuer' and '合同收入/' in h(r))
+  else:raise AssertionError(n)
+ else:
+  if idx==3:add(local,lambda r:'对外' in h(r) and '抵销' in name(r))
+  elif idx==4:add(local,lambda r:'分部间' in h(r) and name(r) in ['合计','整车及零部件','其他'])
+  elif idx==5:
+   prior={num('598531183108.65'),num('15542878709.48')};add(local,lambda r:val(r) in prior and '时间' in h(r))
+  elif idx==6:add(local,lambda r:'时段' in name(r) and any(t in q(r)for t in ['整车业务','零部件业务']))
+  elif idx==7:add(local,lambda r:'可变' in h(r)+name(r))
+  elif idx==8:add(local,lambda r:val(r)==num(n['value']))
+  elif idx==9:add(local,lambda r:'合营' in h(r)or'联营' in h(r))
+  elif idx==10:add(local,lambda r:val(r)==num('444634300.47')or'支出' in name(r)+h(r))
+  elif idx==11:add(local,lambda r:any(t in name(r)+h(r)for t in ['贷款余额','本年发放','吸收存款','存放金额']))
+  elif idx==12:add(acts,lambda r:name(r) in ['新能源汽车乘用车','新能源汽车商用车'] and r['source_native'].get('value') in ['0','0.00'])
+  elif idx==13:add(fin,lambda r:'颀盟' in name(r)+q(r) and val(r)==num('509478.12'))
+  elif idx==14:add(acts,lambda r:any(t in r.get('source_actor','')for t in ['大众联合改装','回收服务中心','德实','幸福坊'])and r.get('subject_scope')=='named_subsidiary')
+  elif idx==15:add(acts,lambda r:'全固态' in name(r)and r['action']in['produces','sells'])
+  elif idx==16:add(acts,lambda r:name(r)in['摩托车','拖拉机'])
+  elif idx==17:add(acts,lambda r:r.get('source_actor')in['上汽大众汽车有限公司','上汽通用汽车有限公司']and r['subject_scope']!='business_segment')
+  elif idx==18:add(acts,lambda r:name(r) in ['研发劳务','接受劳务-研发支出']and (r['action']!='purchases'or h(r)!='本期采购服务'))
+  else:raise AssertionError(n)
+ return sorted(set(b))
+neg=[]
+for n in scope['negative_conditions']:
+ bad=negative_bad(n);neg.append({**n,'evaluated':True,'passed':not bad,'violating_record_ids':bad,'review_basis':'独立原PDF页、物理空列/本期原行、实际所有事实和正文状态限定；逐项专门检查'})
+result=dict(status='local_review' if PREFIX.startswith('local') else 'formal_B_review',contract_counts=scope['counts'],recall={'present':457-len(missing),'total':457},accuracy={'correct':sum(o['decision']['accurate']for o in objects),'total':len(objects)},numeric_error_objects=sum(o['decision']['critical_numeric_error']for o in objects),components=components,missing_conditions=missing,negative_passed=sum(n['passed']for n in neg),negative_total=len(neg),negatives=neg,object_reviews=objects,A_acceptance='not_granted',source_scope_sha256=hashlib.sha256((C/'v58-source-scope.json').read_bytes()).hexdigest())
+path=C/('v58-'+PREFIX+'-source-review-evidence.json')
+with path.open('x')as f:f.write(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+print({k:v for k,v in result.items()if k not in ['object_reviews','negatives']})
+print('BAD',[(o['instrument_id'],o['object_id'],o['decision'])for o in objects if not o['decision']['accurate']])
+print('NEG BAD',[n['condition_id']for n in neg if not n['passed']])
