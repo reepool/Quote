@@ -380,3 +380,15 @@ Current consulting, recruitment testing and construction purchases MUST retain s
 #### Scenario: Rental units conflict across official tables
 - **WHEN** an official rental table prints a unit inconsistent with an independently supported note and the conflict cannot be explained
 - **THEN** the original conflicting cells remain unclear and excluded from definite answer support without inventing corrected source text
+
+
+### Requirement: Sparse income tables preserve native dimensions and continuation boundaries
+The owned-page owner MUST preserve full physical columns, current blanks, printed zeros, external versus internal income and negative eliminations. Numbered main/other-income subtables and legal continuation rows MUST stop at their native section boundaries. Finance income, customer, region, confirmation-time, related interest and fee, and finance-lease rows MUST retain their own actors, current columns and units. Future receipts, costs and profits MUST NOT become current revenue. Wrapped company and business cells MUST retain full names without importing an adjacent row.
+
+#### Scenario: A sparse external-income row has a blank elimination cell
+- **WHEN** physical layout leaves an elimination cell blank and separately prints external and internal amounts
+- **THEN** paired facts and the income answer retain the original column identities without shifting a neighboring amount into the blank
+
+#### Scenario: A numbered income subtable ends
+- **WHEN** the next main or other-income subtable begins after a native total
+- **THEN** the preceding context stops while legitimate totals and continuation rows remain eligible within their own table

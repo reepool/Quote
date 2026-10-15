@@ -148,3 +148,11 @@ A reviewed successor identity MUST inherit the five cumulative repair switches, 
 #### Scenario: v57 receives finite approval
 - **WHEN** A accepts 307/307 and 712/712 for the frozen property and paper reports
 - **THEN** only that finite source scope may close, failed attempts and cache limitations remain, and production and scale authority stay unchanged
+
+
+### Requirement: v58 finite closure retains failed observation and sequencing evidence
+A finite approval of the Guangzhou Development and SAIC frozen reports MUST remain limited to 457 positives and 41 negatives, 991 actual facts and six substantive answers. The original 189/457 recall and 495/612 accuracy, original contract, A actor correction, first artifacts and execution snapshots MUST remain immutable. Successor consumption MUST remain 1/2; unused authority MUST NOT transfer. The 279.95-second result MUST retain its existing-PDF-cache limitation and the original expansion_gates_met=false field with its timing explanation. Production MUST remain not_authorized and scale quality false. All prerequisite verification processes MUST finish successfully and their results MUST be checked before any subsequent code freeze and formal launch.
+
+#### Scenario: A accepts v58 despite the recorded receipt ordering deviation
+- **WHEN** A accepts 457/457 and 997/997 after unchanged original hashes are confirmed, while the protection receipt completed about three seconds after formal startup
+- **THEN** the finite change may archive without a same-source rerun, original timestamps and the deviation remain recorded, and future launches wait for successful prerequisite completion

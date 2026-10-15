@@ -1,0 +1,14 @@
+{
+  "success": true,
+  "verified": {
+    "protection-baseline.json": 3750,
+    "initial-workspace-baseline.json": 19,
+    "first-formal-delivery-preservation.json": 22,
+    "first-review-preservation.json": 13,
+    "v58-formal-delivery-preservation.json": 22,
+    "v58-review-preservation.json": 33,
+    "first-source-freeze-receipt.json": 39,
+    "v58-source-freeze-receipt.json": 39
+  },
+  "original_bytes_preserved_except_tasks": true
+}

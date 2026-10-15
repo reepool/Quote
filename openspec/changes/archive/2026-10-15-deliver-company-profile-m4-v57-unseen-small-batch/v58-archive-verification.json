@@ -1,0 +1,9 @@
+{
+  "success": true,
+  "path_mapping": {
+    "openspec/changes/deliver-company-profile-m4-v57-unseen-small-batch": "openspec/changes/archive/2026-10-15-deliver-company-profile-m4-v57-unseen-small-batch"
+  },
+  "immutable_files": 159,
+  "all_receipt_paths_resolved": true,
+  "checked_at": "2026-10-15T08:20:10.581954+00:00"
+}

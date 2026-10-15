@@ -231,3 +231,15 @@ An independently frozen contract MAY name associated entities as group_associate
 #### Scenario: A frozen actor label is corrected to match an associated company
 - **WHEN** the source identifies 江苏联海动力机械有限公司 and 福马新能（北京）科技有限公司 as associated and not consolidated, and A approves correcting the successor contract metadata
 - **THEN** their complete native actors and nonconsolidation qualifiers use business_segment scope without rewriting the retained original contract or inferring group operation
+
+
+### Requirement: Explicit relation adjudication and raw actors preserve native scope
+When official headings conflict with explicit same-report relationship disclosures, an A-adjudicated relationship MUST retain the original conflicting Evidence and column explanation. Independently disclosed associated-company income MUST NOT become consolidated group revenue. An informal original actor MUST NOT be replaced by an unproven legal-name alias. Substantive answers and named actions MUST preserve actual commissioning, trial, mass-delivery, disposal and control-period limitations, and distinguish procurement, production, sale and services in their original direction.
+
+#### Scenario: A heading conflicts with an explicit associate disclosure
+- **WHEN** Guangzhou Development p223–224 uses an important-joint-venture heading but p234 explicitly identifies the two investees as associates and A rules to follow p234
+- **THEN** the associate relationship and separate income survive with the original heading conflict retained and without promotion to consolidated group income
+
+#### Scenario: An overseas platform has only an original short name
+- **WHEN** a report attributes imported-coal sales to 香港国际公司 without proving equivalence to a legal full name
+- **THEN** the action retains that original actor rather than inventing an alias
