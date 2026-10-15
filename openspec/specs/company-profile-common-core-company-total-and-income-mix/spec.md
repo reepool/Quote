@@ -152,3 +152,10 @@ An audit discussion MUST NOT carry its relation-table parsing state across inter
 #### Scenario: A legitimate native related-income table continues across pages
 - **WHEN** the original section continues its current rows, wrapped counterparties or rental identities on the next physical page
 - **THEN** supported row continuations remain complete without inheriting an unrelated audit section, following-row identity or prior-only amount
+
+### Requirement: Native income categories and actor scope survive full delivery
+Current related sales, rentals, entrusted income, discontinued operations, noncontrolling subsidiaries and joint or associated entities MUST retain their original column, complete actor, current period, amount, unit and scope through acceptance, query and export. Equal amounts under different native headings MUST remain distinct without cross-basis aggregation. Associated or joint entity income MUST NOT become group income, and parent current blanks MUST NOT borrow consolidated or prior-year amounts.
+
+#### Scenario: Several native income rows share an amount
+- **WHEN** consolidated, parent or classified tables print equal amounts under independent source headings
+- **THEN** paired facts preserve each native heading and scope without collapsing rows or borrowing empty cells

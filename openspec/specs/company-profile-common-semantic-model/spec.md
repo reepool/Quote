@@ -243,3 +243,14 @@ When official headings conflict with explicit same-report relationship disclosur
 #### Scenario: An overseas platform has only an original short name
 - **WHEN** a report attributes imported-coal sales to 香港国际公司 without proving equivalence to a legal full name
 - **THEN** the action retains that original actor rather than inventing an alias
+
+### Requirement: Original service verbs and substantive mechanisms remain distinct
+Named actions MUST retain their original actor, direction and source verb. Installation, maintenance and technical support MAY share the existing service action enum but MUST remain independently identifiable; one service object MUST NOT satisfy multiple distinct named conditions solely through the shared enum. Substantive answers MUST preserve current delivery versus orders or development, complete product matrices, PPP and revenue-confirmation mechanisms, rental recognition, investee scope and control or disposal periods. Review MUST validate the original verb and category as well as numeric values.
+
+#### Scenario: Installation and maintenance are independently named
+- **WHEN** an official business row names installation, maintenance and technical support
+- **THEN** their source verbs and objects remain independently queryable and an installation-only object cannot satisfy the maintenance condition
+
+#### Scenario: Official company status changes during the year
+- **WHEN** the source distinguishes development, orders, commissioning and loss of control
+- **THEN** substantive answers preserve those states and periods without inferring completed delivery or full-year group operation

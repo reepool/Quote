@@ -1,0 +1,11 @@
+{
+  "strict_validation": {
+    "change:deliver-company-profile-m4-v58-unseen-small-batch": "Change 'deliver-company-profile-m4-v58-unseen-small-batch' is valid",
+    "spec:deliver-company-profile-m4-v58-unseen-small-batch": "Specification 'deliver-company-profile-m4-v58-unseen-small-batch' is valid",
+    "spec:company-profile-common-core-owned-page-facts": "Specification 'company-profile-common-core-owned-page-facts' is valid",
+    "spec:company-profile-common-core-company-total-and-income-mix": "Specification 'company-profile-common-core-company-total-and-income-mix' is valid",
+    "spec:company-profile-common-semantic-model": "Specification 'company-profile-common-semantic-model' is valid"
+  },
+  "scope_diff_check": true,
+  "business_rerun": false
+}

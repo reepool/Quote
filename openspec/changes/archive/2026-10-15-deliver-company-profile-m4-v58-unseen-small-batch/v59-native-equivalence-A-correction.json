@@ -1,0 +1,56 @@
+{
+  "completed_at": "2026-10-15T13:17:30.772446+00:00",
+  "original_receipt": "v59-formal-native-equivalence-receipt.json",
+  "original_sha256": "e887558865cbb921b6643d33f0c14d987af6763e7d2e565900b81fbbda3847ac",
+  "supersedes_only": "600107.SH additional_basis_difference and only_report_and_evidence_identity_differ explanation",
+  "correction": "局部与正式结果均同时存在两类subject_basis依据，包含subject_basis的非身份业务语义多重集一致。同名同额对象配对存在歧义，不能据此认定六个对象发生依据变化。保留原件及诊断，不改变正式结果或原分数。",
+  "comparison_fields": [
+    "object_type",
+    "subject_scope",
+    "subject_name",
+    "subject_basis",
+    "reported_period",
+    "period_type",
+    "knowledge_time",
+    "assertion_class",
+    "source_native",
+    "source_actor",
+    "action",
+    "source_verb",
+    "source_text",
+    "dimension",
+    "segment_dimension",
+    "uncertainty"
+  ],
+  "comparisons": {
+    "600100.SH": {
+      "count": 897,
+      "non_identity_semantic_multisets_equal_including_subject_basis": true,
+      "subject_basis_local": {
+        "report_default_group_scope": 467,
+        "null": 3,
+        "direct_source_wording": 427
+      },
+      "subject_basis_formal": {
+        "report_default_group_scope": 467,
+        "null": 3,
+        "direct_source_wording": 427
+      }
+    },
+    "600107.SH": {
+      "count": 285,
+      "non_identity_semantic_multisets_equal_including_subject_basis": true,
+      "subject_basis_local": {
+        "report_default_group_scope": 146,
+        "null": 1,
+        "direct_source_wording": 138
+      },
+      "subject_basis_formal": {
+        "report_default_group_scope": 146,
+        "null": 1,
+        "direct_source_wording": 138
+      }
+    }
+  },
+  "A_finite_acceptance": true
+}

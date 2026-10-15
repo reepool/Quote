@@ -392,3 +392,14 @@ The owned-page owner MUST preserve full physical columns, current blanks, printe
 #### Scenario: A numbered income subtable ends
 - **WHEN** the next main or other-income subtable begins after a native total
 - **THEN** the preceding context stops while legitimate totals and continuation rows remain eligible within their own table
+
+### Requirement: Complete native company and transaction rows preserve source semantics
+The existing owner MUST retain original physical income columns, full wrapped actors and counterparties, current blanks, printed zeros, original category, parent/consolidated scope and termination periods in paired facts and answers. Required continuation layouts MUST be read from the real official asset. A unit correction explicitly adjudicated for a frozen document version MUST preserve the printed conflicting header and explanation and MUST NOT apply automatically to another document version. Mixed procurement content MUST remain mixed rather than inventing goods, services or inputs.
+
+#### Scenario: A frozen apparel report has a unit adjudication
+- **WHEN** A rules that 美尔雅 p23–24 printed values use yuan despite the printed ten-thousand-yuan header
+- **THEN** accepted facts and answers use yuan only for that adjudicated document version and preserve the original header conflict
+
+#### Scenario: A current parent-company cell is blank
+- **WHEN** the parent table has a blank current cell and a printed prior-year amount
+- **THEN** no current income is created from that prior amount while genuine printed current zeros remain eligible
