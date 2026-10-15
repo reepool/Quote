@@ -1,0 +1,2079 @@
+{
+  "status": "source_only_draft_awaiting_A_unit_ruling",
+  "checked_at": "2026-10-15T08:42:18.935437+00:00",
+  "sources": {
+    "600100.SH": {
+      "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+      "official_page_count": 260,
+      "captured_relevant_text_pages": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        33,
+        34,
+        35,
+        36,
+        99,
+        100,
+        128,
+        129,
+        130,
+        132,
+        178,
+        190,
+        191,
+        192,
+        193,
+        194,
+        195,
+        196,
+        197,
+        198,
+        199,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        234,
+        247,
+        248,
+        259
+      ],
+      "captured_layout_pages": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        33,
+        34,
+        35,
+        36,
+        98,
+        99,
+        100,
+        128,
+        129,
+        130,
+        132,
+        178,
+        190,
+        191,
+        192,
+        193,
+        194,
+        195,
+        196,
+        197,
+        198,
+        199,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        234,
+        247,
+        248,
+        259
+      ],
+      "original_pdf_sha256_verified": true,
+      "business_output_read": false
+    },
+    "600107.SH": {
+      "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+      "official_page_count": 243,
+      "captured_relevant_text_pages": [
+        4,
+        10,
+        12,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        23,
+        24,
+        26,
+        78,
+        80,
+        122,
+        123,
+        182,
+        183,
+        199,
+        202,
+        203,
+        204,
+        205,
+        207,
+        213,
+        214,
+        215,
+        216,
+        227,
+        228,
+        229,
+        240
+      ],
+      "captured_layout_pages": [
+        4,
+        10,
+        12,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        23,
+        24,
+        26,
+        78,
+        80,
+        122,
+        123,
+        182,
+        183,
+        199,
+        202,
+        203,
+        204,
+        205,
+        207,
+        213,
+        214,
+        215,
+        216,
+        227,
+        228,
+        229,
+        240
+      ],
+      "original_pdf_sha256_verified": true,
+      "business_output_read": false
+    }
+  },
+  "counts": {
+    "answers": 6,
+    "revenue": 306,
+    "actions": 284,
+    "negative": 30,
+    "unit_conflict_candidates": 22
+  },
+  "source_value_checks": [
+    {
+      "condition_id": "600100.SH-income-001",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-002",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-003",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-004",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-005",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-006",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-007",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-008",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-009",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-010",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-011",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-012",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": [
+        34,
+        35
+      ]
+    },
+    {
+      "condition_id": "600100.SH-income-013",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": [
+        34,
+        35
+      ]
+    },
+    {
+      "condition_id": "600100.SH-income-014",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": [
+        34,
+        35
+      ]
+    },
+    {
+      "condition_id": "600100.SH-income-015",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": [
+        34,
+        35
+      ]
+    },
+    {
+      "condition_id": "600100.SH-income-016",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": [
+        34,
+        35
+      ]
+    },
+    {
+      "condition_id": "600100.SH-income-017",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": [
+        34,
+        35
+      ]
+    },
+    {
+      "condition_id": "600100.SH-income-018",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-019",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-020",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-021",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-022",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-023",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-024",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-025",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-026",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-027",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-028",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-029",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-030",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-031",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-032",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-033",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-034",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-035",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-036",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-037",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-038",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-039",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-040",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-041",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-042",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-043",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-044",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-045",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-046",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-047",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-048",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-049",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-050",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-051",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-052",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-053",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-054",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-055",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-056",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-057",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-058",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-059",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-060",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-061",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-062",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-063",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-064",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-065",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-066",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-067",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-068",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-069",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-070",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-071",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-072",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-073",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-074",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-075",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-076",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-077",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-078",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-079",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-080",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-081",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-082",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-083",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-084",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-085",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-086",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-087",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-088",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-089",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-090",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-091",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-092",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-093",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-094",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-095",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-096",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-097",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-098",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-099",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-100",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-101",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-102",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-103",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-104",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-105",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-106",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-107",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-108",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-109",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-110",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-111",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-112",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-113",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-114",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-115",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-116",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-117",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-118",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-119",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-120",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-121",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-122",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-123",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-124",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-125",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-126",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-127",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-128",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-129",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-130",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-131",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-132",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-133",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-134",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-135",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-136",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-137",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-138",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-139",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-140",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-141",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-142",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-143",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-144",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-145",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-146",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-147",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-148",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-149",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-150",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-151",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-152",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-153",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-154",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-155",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-156",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-157",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-158",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-159",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-160",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-161",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-162",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-163",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-164",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-165",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-166",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-167",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-168",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-169",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-170",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-171",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-172",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-173",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-174",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-175",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-176",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-177",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-178",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-179",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-180",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-181",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-182",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-183",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-184",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-185",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-186",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-187",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-188",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-189",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-190",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-191",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-192",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-193",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-194",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-195",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-196",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-197",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-198",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-199",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-200",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-201",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-202",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-203",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-204",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-205",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-206",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-207",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-208",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-209",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-210",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-211",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-212",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-213",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-214",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-215",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-216",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-217",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-218",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-219",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-220",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-221",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-222",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-223",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-224",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-225",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-226",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-227",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-228",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-229",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-230",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-231",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-232",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-233",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-234",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-235",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-236",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-237",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-238",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-239",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-240",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-241",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-242",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-243",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-244",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-245",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-246",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-247",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600100.SH-income-248",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-001",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-002",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-003",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-004",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-005",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-006",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-007",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-008",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-009",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-010",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-011",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-012",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-013",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-014",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-015",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-016",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-017",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-018",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-019",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-020",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-021",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-022",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-023",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-024",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-025",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-026",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-027",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-028",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-029",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-030",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-031",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-032",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-033",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-034",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-035",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-036",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-037",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-038",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-039",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-040",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-041",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-042",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-043",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-044",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-045",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-046",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-047",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-048",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-049",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-050",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-051",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-052",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-053",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-054",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-055",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-056",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-057",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    },
+    {
+      "condition_id": "600107.SH-income-058",
+      "printed_value_present": true,
+      "native_name_present": true,
+      "actor_context_pages": []
+    }
+  ],
+  "first_observation_used": 0,
+  "successors_used": 0,
+  "successors_authorized": 2,
+  "contract_frozen": false,
+  "no_business_rehearsal": true,
+  "existing_items_unchanged": 19,
+  "default_identity_unchanged": true,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

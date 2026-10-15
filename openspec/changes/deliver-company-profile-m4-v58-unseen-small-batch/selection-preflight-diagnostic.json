@@ -1,0 +1,12 @@
+{
+  "formal_attempts_used": 0,
+  "diagnostic_timeouts": [
+    90,
+    65
+  ],
+  "observed_stack": "load_a_share_candidate_registry -> industry_lookup -> get_industry_membership_as_of / _apply_pragmas",
+  "root_cause": "not established",
+  "business_code_modified": false,
+  "longer_freeze_bound_seconds": 240,
+  "contract_frozen": false
+}

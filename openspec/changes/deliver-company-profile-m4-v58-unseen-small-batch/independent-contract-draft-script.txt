@@ -1,0 +1,181 @@
+"""Independent official-source ledger; draft only, no business output or execution."""
+from pathlib import Path
+import json,re,hashlib
+from datetime import datetime,timezone
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v58-unseen-small-batch';P=json.loads((R/'data/checkpoints/company_profile_common_core/reports/m4_v58_unseen_small_batch/plan.json').read_text());T='600100.SH';M='600107.SH';group='公司及合并子公司';income={T:[],M:[]};actions=[];neg=[];conflicts=[]
+D={i:{x['page']:x['text'] for x in json.loads(Path('/tmp/v58new_source_'+i+'.json').read_text())} for i in [T,M]}
+def inc(i,p,n,v,h,d='business_type',u='元',a=group,s='consolidated_group',cp=None,col='本期收入',seg=None,q=None):
+ income[i].append(dict(condition_id=f'{i}-income-{len(income[i])+1:03}',instrument_id=i,page=p,name=n,native_aliases=[n],value=str(v).replace(',',''),unit=u,dimension=d,header=h,table_basis=h,source_column=col,source_actor=a,subject_scope=s,counterparty=cp,source_segment=seg,qualifier=q,reported_period='2025-12-31',period_state='current_printed'))
+def many(i,p,h,items,**kw):
+ for n,v in items:inc(i,p,n,v,h,**kw)
+def act(i,p,n,v,a=group,s='consolidated_group',q=None,cat=None,cp=None):
+ actions.append(dict(condition_id=f'{i}-action-{sum(x["instrument_id"]==i for x in actions)+1:03}',instrument_id=i,page=p,name=n,native_aliases=[n],source_actions=[v],source_actor=a,actor_aliases=[a],subject_scope=s,qualifier=q,category=cat,counterparty=cp,state='current_affirmative',reported_period='2025-12-31'))
+def no(i,p,n,**kw):neg.append(dict(condition_id=f'{i}-negative-{sum(x["instrument_id"]==i for x in neg)+1:03}',instrument_id=i,page=p,name=n,**kw))
+# Same native bases remain separate; no inferred arithmetic or missing-cell replacement.
+many(T,21,'产业板块主营业务收入',list(zip(['公共安全','数智产业','智慧能源','其他业务','总部投资及科技园','小计','减：业务板块间抵销','合计'],['698057.58','275072.20','450419.69','67758.61','33812.59','1525120.68','-28111.12','1497009.55'])),u='万元',d='industry',col='2025年1-12月主营业务收入')
+many(T,21,'主营业务分地区',[('国内市场','971560.22'),('国际市场','525449.33'),('合计','1497009.55')],u='万元',d='region',col='2025年主营业务收入')
+for p,n,v,a,s in [(35,'同方威视','698057.58','同方威视技术股份有限公司','named_subsidiary'),(35,'同方数科','275072.20','同方知网数字科技有限公司','named_subsidiary'),(35,'同方智慧能源','62687.94','同方智慧能源有限责任公司','named_subsidiary'),(36,'同方泰德','148139.78','同方泰德国际科技有限公司','named_subsidiary'),(36,'同方友友','75062.97','同方友友控股有限公司','named_subsidiary'),(36,'同方国信','62684.68','同方国信投资控股有限公司','group_associated_entity')]:inc(T,p,n,v,'主要控股参股公司财务情况',u='万元',a=a,s=s,col='主营业务收入',q='联营，不并表' if s=='group_associated_entity' else None)
+inc(T,99,'营业总收入','15064892096.09','合并利润表',col='2025年度')
+inc(T,100,'营业收入','2093450698.62','母公司利润表',a='同方股份有限公司',s='parent_company',col='2025年度')
+many(T,178,'合并营业收入和营业成本',[('主营业务','14970095547.03'),('其他业务','94796549.06'),('合计','15064892096.09')],col='本年发生额/收入')
+for a,v in [('同方泰德国际科技有限公司','1487560861.32'),('同方友友控股有限公司','766378780.71'),('同方威视技术股份有限公司','6992719435.23')]:inc(T,204,a,v,'重要非全资子公司主要财务信息',a=a,s='named_subsidiary',col='本年发生额/营业收入')
+for p,a,v,h in [(208,'同方全球人寿保险有限公司','4615608361.00','重要合营企业主要财务信息'),(208,'同方国信投资控股有限公司','1136653258.17','重要联营企业主要财务信息'),(208,'泰豪科技股份有限公司','4521381022.20','重要联营企业主要财务信息'),(209,'天诚国际投资有限公司','96207792.40','重要联营企业主要财务信息')]:inc(T,p,a,v,h,a=a,s='group_associated_entity',col='本年发生额/营业收入',q=('合营' if '合营' in h else '联营')+'，不并表')
+# Printed zero current sales are not prior-only blanks and do not prove a named action.
+pending='';started=False;relation='受中核集团控制的企业'
+for p in range(224,230):
+ text=D[T][p]
+ if p==224:text=text.split('2) 销售商品/提供劳务',1)[1];started=True
+ if p==229:text=text.split('(2) 关联受托管理',1)[0]
+ for line in text.splitlines():
+  l=line.strip()
+  if l in ['受中核集团控制的企业','联营企业','联营企业之控股子公司','原联营企业','最终控制人']:relation=l;continue
+  m=re.match(r'^(.*?)\s+(-?[\d,]+\.\d{2})\s+(-?[\d,]+\.\d{2})$',l)
+  if not m:
+   if l and l not in ['关联方 本年发生额 上年发生额'] and not l.isdigit() and not '年度报告' in l:pending=l
+   continue
+  cp=m[1].strip();cp=(pending+cp) if pending and ('有限公' in pending or pending.endswith('杂')) else cp;pending=''
+  if cp=='合计':inc(T,p,'合计',m[2],'关联交易/销售商品及提供劳务',col='本年发生额',q='原表交易合计')
+  else:inc(T,p,'销售商品/提供劳务',m[2],'关联交易/销售商品及提供劳务',cp=cp,col='本年发生额',q='交易方关系：'+relation+'；未披露具体商品，不拆出猜测对象')
+for cp,v in [('中核战略规划研究总院有限公司','366037.74'),('中国宝原投资有限公司','739182.40')]:inc(T,229,'资产托管',v,'关联受托管理',a='同方股份有限公司',s='parent_company',cp=cp,col='本年确认的托管收益',q='经营管理权委托；不推定受托资产并表')
+# Lessor section native column is named 出租方名称; preserve that caption with section context.
+for p in [229,230]:
+ t=D[T][p].split('1) 出租情况',1)[-1] if p==229 else D[T][p]
+ t=t.split('2) 承租情况',1)[0];pending=''
+ for l in t.splitlines():
+  m=re.match(r'^(.*?)\s+租赁办公区租金\s+([\d,]+\.\d{2})\s+([\d,]+\.\d{2})$',l.strip())
+  if m:
+   cp=(pending+m[1]).strip() if pending else m[1].strip();pending='';inc(T,p,'租赁办公区租金',m[2],'关联租赁/出租情况',cp=cp,col='本年发生额',q='原栏目出租方名称；按出租情况章节保留列名，不反转交易方向')
+  elif l.strip().startswith('合计'):
+   vals=re.findall(r'[\d,]+\.\d{2}',l)
+   if len(vals)==2:inc(T,p,'合计',vals[0],'关联租赁/出租情况',col='本年发生额')
+  elif l.strip().endswith('杂'):pending=l.strip()
+for p,n,a in [(247,'计算机板块业务','计算机板块业务'),(247,'同方健康科技（北京）股份有限公司','同方健康科技（北京）股份有限公司'),(248,'合计',group)]:inc(T,p,n,'0.00','终止经营营业收入',a=a,s='business_segment' if a!=group else 'consolidated_group',col='本年数/营业收入',q='终止经营打印零；不能反推当前经营动作')
+many(T,259,'母公司营业收入和营业成本',[('主营业务','2054842731.91'),('其他业务','38607966.71'),('合计','2093450698.62')],a='同方股份有限公司',s='parent_company',col='本年金额/收入')
+for x in income[T]:
+ if x['header']=='主要控股参股公司财务情况':x.update(native_aliases=[x['name'],x['source_actor']],actor_context_pages=[34,35])
+# Mailyard native revenue tables; p23–24 conflict is separately drafted, not silently fixed.
+many(M,15,'主营业务分行业',[('服装','229197408.86'),('其他业务','6997591.25'),('小计','236195000.11')],d='industry')
+many(M,15,'主营业务分产品',[('品牌男装','129735100.43')],d='product')
+many(M,16,'主营业务分产品',[('品牌女装','52701247.53'),('出口加工类','46761060.90'),('其他业务','6997591.25'),('小计','236195000.11')],d='product')
+many(M,16,'主营业务分地区',[('国内','189433939.21'),('国际','46761060.90')],d='region')
+many(M,16,'主营业务分销售模式',[('直营店','56431306.80'),('加盟联营店','75185231.39'),('出口加工','46761060.90'),('其他业务','57817401.02'),('小计','236195000.11')],d='sales_mode')
+many(M,19,'主要销售客户',list(zip(['客户1','客户2','客户3','客户4','客户5','合计'],['3730.25','625.51','537.80','353.81','326.76','5574.13'])),u='万元',d='customer',col='销售额')
+for p,h,data in [(23,'各品牌盈利',[('品牌','182436347.96'),('出口加工','46761060.90'),('合计','229197408.86')]),(23,'直营店和加盟店盈利',[('直营店','56431306.80'),('加盟店','75185231.39'),('出口加工','46761060.90'),('其他','50819809.77'),('合计','229197408.86')]),(24,'线上线下销售渠道盈利',[('线上销售','5580869.71'),('线下销售','223616539.15'),('合计','229197408.86')]),(24,'各地区盈利',list(zip(['东北地区','华北地区','华东地区','华南地区','华中地区','西北地区','西南地区','境内小计','国际地区','境外小计','合计'],['1421773.12','1044377.91','12532314.30','2664845.73','150610378.46','6405677.73','7756980.71','182436347.96','46761060.90','46761060.90','229197408.86'])))]:
+ for n,v in data:conflicts.append(dict(instrument_id=M,page=p,name=n,value=v,native_unit='万元',header=h,status='awaiting_A_ruling',proposed_uncertainty='unclear',p24_applicability='both boxes unchecked' if p==24 else 'applicable'))
+for p in [26,205]:
+ for a,v in [('湖北美尔雅服装集团有限公司','175793460.36'),('美尔雅服饰有限公司','41300845.88')]:inc(M,p,a,v,'主要控股参股公司分析' if p==26 else '重要非全资子公司主要财务信息',a=a,s='named_subsidiary',col='营业收入' if p==26 else '本期发生额/营业收入')
+inc(M,78,'营业收入','236195000.11','合并利润表',col='2025年度');inc(M,80,'营业收入','4386705.80','母公司利润表',a='湖北美尔雅股份有限公司',s='parent_company',col='2025年度')
+many(M,182,'合并营业收入和营业成本',[('主营业务','232806218.16'),('其他业务','3388781.95'),('合计','236195000.11')],col='本期发生额/收入')
+for seg in ['分部','合计']:
+ many(M,182,'合并收入分解/商品类型',[('服装及纺织','229197408.86'),('其他','6997591.25')],d='product',seg=seg,col=seg+'/营业收入')
+ many(M,182,'合并收入分解/经营地区',[('中国大陆地区','189433939.21'),('中国大陆地区以外的地区','46761060.90')],d='region',seg=seg,col=seg+'/营业收入')
+ inc(M,183,'合计','236195000.11','合并收入分解',seg=seg,col=seg+'/营业收入')
+many(M,199,'作为出租人的经营租赁',[('经营租赁收入','2520756.67'),('合计','2520756.67')],col='租赁收入')
+for cp,n,v in [('湖北美尔雅集团有限公司','销售水电汽、提供客运服务','464969.69'),('湖北美红服装有限公司','销售水电汽、提供客运服务','2172035.28'),('湖北闻世建筑工程有限公司','销售水电汽','31615.26')]:inc(M,215,n,v,'关联交易/出售商品及提供劳务',cp=cp,col='本期发生额')
+for n,v in [('房屋建筑物','541561.15'),('设备','120323.88')]:inc(M,215,n,v,'关联租赁/本公司作为出租方',cp='湖北美红服装有限公司',col='本期确认的租赁收入')
+for seg,v in [('服装及纺织品报告分部','236179399.28'),('其他报告分部','15600.83'),('合计','236195000.11')]:inc(M,227,'对外营业收入',v,'报告分部财务信息',seg=seg,col='对外营业收入/'+seg)
+many(M,240,'母公司营业收入和营业成本',[('其他业务','4386705.80'),('合计','4386705.80')],a='湖北美尔雅股份有限公司',s='parent_company',col='本期发生额/收入')
+for seg in ['分部','合计']:
+ for n,d in [('其他','product'),('中国大陆地区','region'),('合计','business_type')]:inc(M,240,n,'4386705.80','母公司收入分解',a='湖北美尔雅股份有限公司',s='parent_company',d=d,seg=seg,col=seg+'/营业收入')
+# Source-grounded group product/service matrix and named important actors.
+for n in ['智能检查系统','全生命周期运维服务','学术资源检索','知识管理','智能问答','CNKI系列数据库','CNKI AI工具','知网AI+图书平台','行业数智化解决方案','数字化转型方案与系统']:act(T,12,n,'提供',cat='service' if any(w in n for w in ['服务','检索','管理','问答','方案']) else None)
+for n in ['热泵装备','储冷系统','储热系统','储电系统','控制器产品','软件平台','能源系统算法']:act(T,13,n,'开发',q='原文开发，不反推已销售')
+for n in ['规划咨询','产品供应','工程建设','节能服务','运维托管','一体化解决方案与运维服务']:act(T,13,n,'提供',cat='service' if n!='产品供应' else None)
+for n in ['货物/车辆成像检查系统','放射性物质监测系统','行李及包裹成像检查系统','人体安全检查系统']:
+ for v in ['生产','销售']:act(T,34,n,v,a='同方威视技术股份有限公司',s='named_subsidiary',cat='goods')
+for n in ['楼宇自动化系统','能源管理系统','安控系统','消防系统产品']:
+ for v in ['制造','销售']:act(T,35,n,v,a='同方泰德国际科技有限公司',s='named_subsidiary',cat='goods')
+for n in ['装饰照明产品','一般照明灯具产品','白炽装饰灯具','舞台照明产品']:
+ for v in ['制造','分销']:act(T,35,n,v,a='同方友友控股有限公司',s='named_subsidiary',cat='goods')
+for n in ['基础设施投资','股权投资及经营']:act(T,35,n,'经营',a='同方国信投资控股有限公司',s='group_associated_entity',q='参股，不并表')
+for p,n,v,q in [(22,'行李查验','提供',None),(22,'CT查验设备','提供',None),(22,'智慧安检集成平台','提供',None),(22,'安检设备设施','升级',None),(23,'智能研学工具网络平台','服务',None),(23,'数据产品','挂牌',None),(24,'大温差机组','投运','石河子天河热电EMC项目54台全部投运'),(24,'大体量大温差机组','应用','威海热电等项目成功应用')]:act(T,p,n,v,q=q)
+# Whole current declarations bind named garment products; avoid prices/stock inference.
+for n in ['西服','衬衣','毛衫','T恤','大衣','休闲服','裤装','职业装','礼服','时装','休闲装']:
+ for v in ['生产','销售']:act(M,12,n,v,cat='goods',q='国内自主品牌男装女装的当前主营矩阵')
+for n in ['外贸来料加工','外贸进料加工','外贸一般贸易','团购定制']:act(M,12,n,'经营',cat='service' if n=='团购定制' else None)
+for n in ['美尔雅品牌男装','美尔雅品牌女装']:
+ for v in ['生产','销售']:act(M,16,n,v,cat='goods',q='产销量原列；件/套')
+for n in ['精毛纺织制品','服装','辅料']:
+ for v in ['制造','加工','销售']:act(M,26,n,v,a='湖北美尔雅服装集团有限公司',s='named_subsidiary',cat='goods')
+act(M,26,'中、高档西服','生产',a='美尔雅服饰有限公司',s='named_subsidiary',cat='goods')
+for cp in ['湖北美尔雅集团有限公司','湖北美红服装有限公司','湖北闻世建筑工程有限公司']:
+ for n in ['水','电','汽']:act(M,215,n,'销售',cat='goods',cp=cp)
+ if cp!='湖北闻世建筑工程有限公司':act(M,215,'客运服务','提供',cat='service',cp=cp)
+for n in ['服装','纺织品']:
+ for v in ['生产','销售']:act(M,227,n,v,a='服装及纺织品报告分部',s='business_segment',cat='goods')
+act(M,227,'蒸汽','生产',a='其他报告分部',s='business_segment',cat='goods');act(M,227,'蒸汽','销售',a='其他报告分部',s='business_segment',cat='goods')
+for n in ['水','电']:act(M,227,n,'转售',a='其他报告分部',s='business_segment',cat='goods')
+act(M,227,'运输服务','提供',a='其他报告分部',s='business_segment',cat='service')
+# Explicit named manufacturing / sale / installation rows from physical subsidiary and associate tables.
+for p,a,n,vs in [
+(193,'TongFang Global Limited','数字电视等消费电子产品',['经销']),
+(193,'Technovator International Limited','综合楼宇自动化与能源管理系统及安防与消防系统',['制造','销售']),
+(194,'贵州同方数字科技有限公司','计算机软硬件、配件、外围设备、电子产品',['销售']),
+(195,'北京华力兴科技发展有限责任公司','集装箱检查系统',['安装','技术支持']),
+(195,'同方威视科技（北京）有限公司','三类射线装置、民用核仪器仪表',['组装']),
+(195,'北京某工业公司','工业射线装置',['销售','安装']),
+(196,'华腾清创（北京）科技有限公司','电子产品、通讯设备、计算机、软件及辅助设备',['销售']),
+(196,'同方威视科技江苏有限公司','民用核仪器仪表',['生产','销售','安装']),
+(196,'NUCTECH HONG KONG COMPANY LIMITED','集装箱检查系统',['安装','技术支持']),
+(196,'THTF MACAO CO., LIMITED','信息电子产品及环境保护产品',['销售']),
+(197,'TONGFANG TECHNOVATOR (S.E.A) PTE. LTD.','综合楼宇自动化与能源管理系统及安防与消防系统',['制造','销售']),
+(197,'同方国际科技（深圳）有限公司','数字电视等消费电子产品',['经销']),
+(197,'同方泰德国际科技（北京）有限公司','楼宇自动化解决方案',['制造','销售']),
+(197,'重庆仙桃能源管理有限公司','空气净化设备、水处理设备、节能环保设备',['销售','安装']),
+(197,'同方泰德智能科技（上海）有限公司','楼宇自动化解决方案',['销售']),
+(198,'北京神目科技有限公司','社会公共安全设备及器材',['制造','销售','租赁']),
+(198,'北京神目科技有限公司','机械设备',['销售','租赁']),
+(198,'同方节能工程技术有限公司','城市热网节能方案',['制造','销售']),
+(198,'Nuctech Middle East FZCO','X射线检查设备',['安装','销售','维护']),
+(198,'NUCTECH SYDNEY PTY LTD','X射线检查设备',['维护']),
+(198,'NUCTECH BOLIVIA S.R.L.','X射线检查设备及软件系统',['安装','销售']),
+(198,'CRESCIENDO SPA','X射线检查设备',['安装','销售','维护']),
+(198,'InsTech Netherlands B.V.','安检设备',['销售']),
+(198,'NUCTECH LONDON COMPANY LIMITED','X射线检查设备',['安装','销售','维护']),
+(198,'Nuctech Operation Company Limited','X射线检查设备',['安装','分销','维护']),
+(198,'CONCORDIA TECHNOLOGY LTD','X射线检查设备',['安装','分销','维护']),
+(198,'NUCTECH KENYA COMPANY LIMITED','X射线检查设备',['安装','销售','维护']),
+(199,'NUCTECH MAROC SARL A.U','X射线检查设备及软件系统',['安装','销售']),
+(199,'NUCTECH TECHNOLOGY (MACAO) COMPANY LIMITED','X射线检查设备',['安装','销售','维护']),
+(199,'NUC&TECH MEXICO, SOCIEDAD ANONIMA DE CAPITAL VARIABLE','X射线检查设备',['安装','销售','维护']),
+(199,'NUCTECH TECHNOLOGY (MALAYSIA) SDN.BHD.','X射线检查设备',['安装','销售','维护']),
+(199,'NUCTECH PERU S.A.C.','X射线检查设备',['安装','销售','维护']),
+(199,'某公司','X射线检查设备',['生产','安装','销售','维护']),
+(199,'NUCTECH SINGAPORE PRIVATE LIMITED','X射线检查设备',['安装','销售','维护']),
+(199,'NUCTECH ANKARA GÜVENLIK SISTEMLERI SANAYI VE DIS TICARET LIMITED SIRKETI','X射线检查设备',['生产','销售','维护']),
+(199,'SECURE TECHNOLOGY VALUE SOLUTIONS INC.','X射线检查设备',['安装','分销','维护']),
+(199,'NUCTECH DO BRASIL LTDA','X射线检查设备',['安装','销售','维护','租赁']),
+(199,'同方知网（美国）技术有限公司','数字出版产品国际内容',['销售']),
+(199,'同方威视科技（天津）有限公司','X射线检查设备',['安装','分销','维护']),
+(199,'NUCTECH PANAMA, S.A.','X射线检查设备',['安装','销售','维护','租赁']),
+(199,'淮安空港同方水务有限公司','水务新产品',['生产','销售']),
+(200,'American Lighting, INC.','装饰灯产品',['销售']),
+(200,'NUCTECH SOUTH AFRICA (PTY) LTD','X射线检查设备',['安装','销售','维护']),
+(200,'Nuctech Regional Headquarters','X射线检查设备',['安装','销售','维护']),
+(200,'Nuctech Technology L.L.C.','X射线检查设备',['安装','销售','维护']),
+(200,'Neo-Neon Enterprises Limited','装饰灯产品',['销售']),
+(200,'HK Star Bright Lighting Limited','装饰灯产品',['销售']),
+(200,'Nuctech Lao Company Limited','X射线检查设备',['安装','销售','维护']),
+(201,'Tivoli,LLC','装饰灯产品',['销售']),
+(202,'Smart Scan Company','安检设备',['安装','维护']),
+(202,'Nuctech Georgia LLC','安检设备',['销售','安调','维护'])]:
+ for v in vs:act(T,p,n,v,a=a,s='named_subsidiary',q='原子公司业务性质；不从股比或研发推定额外动作',cat='service' if v in ['安装','维护','技术支持','安调'] else 'goods')
+for n in ['通讯设备','计算机及其外部设备','汽车倒车电脑系统','电子出版物','纸币清分机','点钞机']:
+ for v in ['生产','加工']:act(T,196,n,v,a='同方电子科技有限公司',s='named_subsidiary',cat='goods')
+for n in ['LED一般照明','发光二极管','LED芯片','LED外延片','LED封装']:
+ for v in ['生产','销售']:act(T,201,n,v,a='广东同方灯饰有限公司',s='named_subsidiary',cat='goods')
+for n in ['LED照明','装饰灯系列产品','米泡装饰灯','装饰灯配件','舞台灯系列产品']:
+ for v in ['生产','销售']:
+  if n=='米泡装饰灯' and v=='销售':continue
+  act(T,201,n,v,a='Neo-Neon (VietNam) Development Company Limited',s='named_subsidiary',cat='goods')
+for p,a,n,vs in [(205,'吉林同方科贸有限责任公司','计算机、软件及辅助设备',['零售']),(205,'泰豪科技股份有限公司','发电机及发电机组',['制造']),(205,'新鸿电子有限公司','纳米材料场致发射多点（包括单点）X射线光源产品及其零部件',['生产','销售']),(206,'北京朗视仪器股份有限公司','仪器仪表、医疗器械',['制造','修理']),(206,'津海威视技术（天津）有限公司','电子测量仪器',['制造']),(206,'津海威视技术（天津）有限公司','智能仪器仪表',['制造']),(206,'津海威视技术（天津）有限公司','试验分析仪器',['制造']),(206,'苏州微木智能系统有限公司','仪器仪表、电子设备',['生产','销售']),(206,'AA.NUCTECH CO.,LTD','X射线检查设备',['安装','销售','维护']),(206,'新疆芳香庄园酒业股份有限公司','葡萄',['种植','销售']),(206,'新疆芳香庄园酒业股份有限公司','农副产品',['加工','销售']),(206,'新疆芳香庄园酒业股份有限公司','皮棉',['销售']),(207,'和融浙联实业有限公司','电子产品、计算机、软件及辅助设备、机械设备',['销售']),(207,'广东同方瑞风节能科技股份有限公司','制冷、空调设备',['制造'])]:
+ for v in vs:act(T,p,n,v,a=a,s='group_associated_entity',q='参股权益法，不并表；原业务性质',cat='service' if v in ['修理','安装','维护'] else 'goods')
+
+# Real negative boundaries, independent of any future output.
+for p,n,reason in [(24,'产销量','不适用，不能编造具名生产销售量'),(21,'主营业务成本','不是收入'),(22,'蒙古国订单','订单不等于交付'),(22,'碳纳米管分布式光源安检CT系统','开发不推销售'),(22,'动力电池高清超快静态CT在线检测系统','研发及入选目录不推销售'),(190,'静态CT货物检查专项开发','预计2026年完成不推已交付'),(191,'移动式检查系统开发','预计2027年完成不推已销售'),(191,'北京同方以衡资产管理有限公司','2025-06-30丧失控制，不能全年并表'),(247,'计算机板块业务','终止经营打印零不推本期销售'),(247,'同方健康科技（北京）股份有限公司','终止经营打印零不推本期经营'),(208,'同方国信投资控股有限公司','联营收入不是集团收入'),(208,'同方全球人寿保险有限公司','合营不升格为合并子公司'),(222,'关联采购商品/接受劳务','无具体对象，不猜商品名或原料投入'),(230,'承租情况','租金支出不是集团租赁收入'),(234,'手续费支出','不是手续费收入')]:no(T,p,n,forbidden=reason)
+for p,n,reason in [(15,'医疗','本期收入空格不借上年金额，不造零'),(16,'医疗','本期产品收入空格，不从-100%反推零'),(17,'成本分析','医疗成本打印零不是医疗收入'),(23,'万元表头','争议单位不静默改写；待A裁决'),(24,'适用性复选框','均未勾选，不能宣称已勾不适用'),(199,'未来五年未折现租赁收款额','不能作为本期租赁收入'),(207,'重要合营联营财务信息','不适用，不从后续章节读入'),(215,'采购商品/接受劳务','混合项目不得猜测具体服装或建筑工程'),(216,'黄石众盛科技有限公司','公司为承租方，支出不能作收入'),(227,'分部间交易收入','全部横线，不借对外收入或造零'),(227,'分部间抵销','对外收入抵销格横线不借合计'),(240,'主营业务','本期空位不借上期58591137.65'),(240,'服装及纺织','母公司本期空位不借合并收入'),(228,'青海众友健康惠嘉医药连锁有限公司','2024年已转让51%，2025年完成全部过户；不作当前并表药品经营'),(203,'贵州美尔雅能源矿业有限公司','业务性质煤炭开采洗选不自动证明本期煤炭销售')]:no(M,p,n,forbidden=reason)
+answers={T:{'principal_business':dict(pages=[12,13,22,23,24,34,35,191,247],substance='公共安全、数智产业、智慧能源；安检核技术与数据人工智能双轮，知识服务订阅/按需、数智转型授权开发；综合能源规划装备工程节能运维；具名控股与联营分开，计算机硬件上年出表，当前开发/签约/投运区别。'),'products_services':dict(pages=[12,13,22,23,24,34,35],substance='智能安检系统及运维、货物车辆/放射物质/行李包裹/人体检查矩阵；CNKI数据库、AI工具、知网AI+图书、华知模型和方案；热泵储冷热电控制器平台算法；楼宇能源安控消防系统，装饰/一般/白炽/舞台照明；开发、挂牌、订单与实际应用分开。'),'revenue_model':dict(pages=[12,13,21,128,129,130,132,178,229,259],substance='机构订阅为主辅以个人按需；技术授权软件设计开发；规划咨询产品供应工程节能运维；商品交付接受和收款凭据时点，劳务/建造按产出/投入履约进度，PPP主要责任人/代理及运营收费权和维护管理费分开；租赁直线法与资产托管收益，主体及原表范围不混。')},M:{'principal_business':dict(pages=[12,14,15,26,203,227,228],substance='服装服饰研发设计生产销售，国外来料/进料加工与一般贸易、国内自主品牌全链条及零售团购网购；子公司精毛纺织服装辅料/西服，动力和运输服务；青海惠嘉2024年已转让51%，2025年全部过户，不能作为当前并表医药业务。'),'products_services':dict(pages=[12,16,26,203,215,227],substance='中高档商务政务男装西服衬衣毛衫T恤大衣休闲服裤装；女装职业礼服时装休闲；真实生产加工销售矩阵；团购定制服装与来料进料加工，销售水电汽及客运运输，子公司储能/健康咨询保持原经营范围，不能猜具体采购对象。'),'revenue_model':dict(pages=[12,123,183,199,215,240],substance='直营加盟联营商场/团购/京东天猫抖音销售及外贸加工；专卖交付控制并收款、商场交付后结算、电商确认收货收款；FOB装船报关，团购指定地点签收，预收赊销现销；服务投入法及不可确定进度可补偿成本，出租租赁收入与承租支出分开；p23–24万元原表冲突待A，不作确定收入结论。')}}
+for i,by in answers.items():
+ for k,v in by.items():v.update(condition_id=f'{i}-answer-{k}',substantive_review_required=True)
+ledger=dict(status='draft_not_frozen_pending_A_unit_ruling_and_final_source_review',created_at=datetime.now(timezone.utc).isoformat(),formal_attempts_used=0,plan_id=P['plan_id'],knowledge_cutoff=P['knowledge_cutoff'],official_reports=P['reports'],processing_identity=json.loads((C/'freeze-receipt.json').read_text())['processing_identity'],answers=answers,revenue_conditions=income,action_conditions=actions,negative_conditions=neg,unit_conflict_candidates=conflicts,counts=dict(answers=6,revenue=sum(map(len,income.values())),actions=len(actions),negative=len(neg),unit_conflict_candidates=len(conflicts)),production_authorization='not_authorized',scale_quality_claim_allowed=False)
+(C/'source-scope-draft.json').write_text(json.dumps(ledger,ensure_ascii=False,indent=2)+'\n');print(json.dumps(ledger['counts']))

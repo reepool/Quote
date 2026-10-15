@@ -1,0 +1,19 @@
+{
+  "success": true,
+  "historical_files": 3948,
+  "v58_archive_files": 159,
+  "no_formal_attempt": true,
+  "scope_review": {
+    "blocking_engineering_defects": 0,
+    "source_conflicts_awaiting_A": 1,
+    "unrelated_existing_items": 19
+  },
+  "checks": [
+    "all 306 source income values and row/actor names present with explicit alias context",
+    "source contract remains draft",
+    "no output/export/observation",
+    "66 exclusions and five repair flags",
+    "completed selection process returncode 0 inspected"
+  ],
+  "pytest": "not run: no business code changes"
+}
