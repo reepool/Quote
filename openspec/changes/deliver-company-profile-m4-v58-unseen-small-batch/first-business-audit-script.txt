@@ -1,0 +1,57 @@
+from pathlib import Path
+import runpy,json,re,hashlib,datetime,collections
+C=Path('openspec/changes/deliver-company-profile-m4-v58-unseen-small-batch');G=runpy.run_path(str(C/'business-match-script.txt'));globals().update({k:v for k,v in G.items()if not k.startswith('__')});D=C/'first-delivery-review-inputs'
+objects=[];missing=[];components={};unknown=[];facts={}
+for i in scope['revenue_conditions']:
+ rs=json.loads((D/f'raw_{i}.json').read_text());facts[i]=rs;profile=json.loads((D/f'profile_{i}.json').read_text())
+ for r in rs:
+  k=r['object_type'];n=r['source_native'];h=n.get('header') or '';name=n['name'];pg=pages(r);hit=[v['condition_id']for v in scope['revenue_conditions'][i] if match(r,v)]if k in ['Segment','Measurement']else[];roles=[v['condition_id']for v in scope['action_conditions']if v['instrument_id']==i and rolematch(r,v)]if k=='Activity'else[]
+  ok=bool(hit or roles);reason='原收入行、栏目、主体、单位、本期列及金额匹配' if hit else '原具名动作及分类匹配' if roles else '';numeric=False
+  if k=='BusinessOverview':ok=True;reason='独立PDF核原段及状态；准确引用不代表三维实质完整'
+  elif not ok and k in ['Segment','Measurement']:
+   if name=='医疗':reason='本期空格左移取-100.00百分比';numeric=True
+   elif i=='600107.SH' and 240 in pg and n.get('value') and num(n['value']) in [num('58591137.65'),num('63019092.53')]:reason='母公司本期空格借用上期金额';numeric=True
+   elif h=='对外营业收入' and name=='合计':reason='横线与正数拼接为负合计';numeric=True
+   elif name in ['外的地区','湖北美尔雅服装集团有限公司美尔','雅服饰有限公司']:reason='跨行地区或子公司名称截断/串行污染'
+   elif h=='本公司作为出租方/本期确认的租赁收入':reason='承租方串入上一行资产及金额'
+   elif n.get('unit') is None:reason='收入缺失原表单位，医疗另按数字错误计'
+   elif h=='其他业务收入扣除明细/本年度':ok=True;reason='合同外p10原表打印其他收入扣除项，万元及本年度保留'
+   elif name=='营业总收入' and i=='600107.SH':ok=True;reason='合同外p78合并利润表总收入原格'
+   elif h=='营业收入' and name=='合计' and 182 in pg and num(n['value'])==num('236195000.11'):ok=True;reason='原表合并营业收入合计原格'
+   elif h=='对外营业收入' and name in ['服装及纺织品报告分部','其他报告分部']:ok=True;reason='p227原表对外收入列与原分部准确'
+   else:unknown.append((i,k,n));reason='待独立原表复核，不默认准确'
+  elif not ok and k=='Activity':
+   if name in ['技术授权','服装服饰类产品','精毛纺织制品，服装及辅料','租赁','水电汽','销售水电汽']:ok=True;reason='合同外合法原父类经营或商品产销/出租服务；不替代具名条件'
+   elif name=='设备租赁':reason='租赁交易方串行污染'
+   elif name in ['接受劳务']:reason='混合采购原列未具名，不能改成确定服务采购'
+   else:reason='经营尾文/截断/混合服务商品或处置资产政策生成伪对象'
+  objects.append(dict(instrument_id=i,object_id=r['record_id'],object_type=k,record=r,decision=dict(accurate=ok,critical_numeric_error=numeric,matched_income_conditions=hit,matched_role_conditions=roles,reason=reason)))
+ local=[o for o in objects if o['instrument_id']==i];inc=[v['condition_id']for v in scope['revenue_conditions'][i]if any(o['object_type']=='Segment'and v['condition_id']in o['decision']['matched_income_conditions']for o in local)];acts=[v['condition_id']for v in scope['action_conditions']if v['instrument_id']==i and any(v['condition_id']in o['decision']['matched_role_conditions']for o in local)]
+ for v in scope['revenue_conditions'][i]:
+  if v['condition_id']not in inc:missing.append(dict(kind='income',condition=v))
+ for v in scope['action_conditions']:
+  if v['instrument_id']==i and v['condition_id']not in acts:missing.append(dict(kind='action',condition=v))
+ for a in profile['dimensions']:
+  d=a['dimension_id'];reason=('缺p22–24当前交付/订单/开发状态及p128–130确认机制、完整具名主体'if i=='600100.SH'else'缺青海惠嘉原退出期间、p123门店/商场/电商/FOB确认及完整其他分部；正文含错误收入/伪对象')
+  numeric=i=='600107.SH' and d=='revenue_model'
+  objects.append(dict(instrument_id=i,object_id='answer:'+d,object_type='answer',text=a['excerpt'],supporting_record_ids=a['supporting_record_ids'],decision=dict(accurate=False,critical_numeric_error=numeric,reason=reason)))
+  missing.append(dict(kind='answer',condition=scope['answers'][i][d]))
+ components[i]=dict(bodies=0,income=len(inc),actions=len(acts))
+score=dict(status='first_failed_review_in_progress'if unknown else'first_business_failed',counts=scope['counts'],recall=dict(present=618-len(missing),total=618),accuracy=dict(correct=sum(o['decision']['accurate']for o in objects),total=len(objects)),numeric_error_objects=sum(o['decision']['critical_numeric_error']for o in objects),components=components,missing_conditions=missing,object_reviews=objects,unclassified=unknown,production_authorization='not_authorized',scale_quality_claim_allowed=False)
+(C/'first-source-review-evidence-draft.json').write_text(json.dumps(score,ensure_ascii=False,indent=2)+'\n');print({k:v for k,v in score.items()if k not in ['missing_conditions','object_reviews']})
+neg=[]
+for v in scope['negative_conditions']:
+ i=v['instrument_id'];pg=v['page'];name=v['name'];rs=facts[i];bad=[]
+ for r in rs:
+  n=r['source_native'];h=n.get('header')or'';a=r.get('action');val=n.get('value');p=pages(r)
+  if i=='600107.SH' and name=='医疗' and r['object_type']in['Segment','Measurement']and n['name']=='医疗' and pg in p:bad.append(r['record_id'])
+  if i=='600107.SH'and pg==240 and r['object_type']in['Segment','Measurement']and pg in p:
+   if name=='主营业务' and val and num(val)==num('58591137.65'):bad.append(r['record_id'])
+   if name=='服装及纺织'and n['name']=='服装及纺织'and val:bad.append(r['record_id'])
+  if i=='600107.SH'and pg in [23,24] and pg in p and r['object_type']in ['Segment','Measurement'] and n.get('unit')=='万元':bad.append(r['record_id'])
+  if i=='600100.SH'and name in ['碳纳米管分布式光源安检CT系统','动力电池高清超快静态CT在线检测系统','静态CT货物检查专项开发','移动式检查系统开发','蒙古国订单'] and a=='sells'and name in n['name']:bad.append(r['record_id'])
+  if name=='采购商品/接受劳务'and a=='purchases'and pg in p and n['name'] not in ['采购商品/接受劳务','采购商品','接受劳务']:bad.append(r['record_id'])
+ neg.append(dict(condition=v,evaluated=True,passed=not bad,violating_object_ids=sorted(set(bad)),evaluation='实际两家发布事实及六正文逐对象核原文边界；不是未发布负例'))
+score.update(negative_results=neg,negative_passed=sum(x['passed']for x in neg),negative_total=len(neg),source_scope_sha256=hashlib.sha256((C/'source-scope.json').read_bytes()).hexdigest(),whole_round_seconds=json.loads(Path('data/checkpoints/company_profile_common_core/reports/m4_v58_unseen_small_batch/formal_execution.json').read_text())['whole_round_seconds'],A_acceptance='not_granted')
+(C/'first-source-review-evidence.json').write_text(json.dumps(score,ensure_ascii=False,indent=2)+'\n')
+print('NEGATIVES',score['negative_passed'],score['negative_total'])

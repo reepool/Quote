@@ -1,0 +1,16 @@
+{
+  "protected_at": "2026-10-15T09:06:39.114355+00:00",
+  "sha256": {
+    "openspec/changes/deliver-company-profile-m4-v58-unseen-small-batch/source-scope.json": "01932e6b5a2c2fc52e42ee929f75479aebb5420c96697eb97c4c4c079264182f",
+    "openspec/changes/deliver-company-profile-m4-v58-unseen-small-batch/source-unit-A-ruling.json": "cd6dbb57e00a0183e79a1156cc865bd1151d631f76e1d7cad581d1172d1e80d7",
+    "openspec/changes/deliver-company-profile-m4-v58-unseen-small-batch/business-match-script.txt": "c5e49bca0bf5ff585cfb4b9efc25d78c366da0f0bae47af8be38763e971f4e0c",
+    "openspec/changes/deliver-company-profile-m4-v58-unseen-small-batch/first-business-audit-script.txt": "11d55d4a5f31ec3060ddd815e9e6f884774a3f3ec8334f9f5f6783625cfc28f5",
+    "openspec/changes/deliver-company-profile-m4-v58-unseen-small-batch/first-source-review-evidence.json": "0fe9e026289ed1675aad3d39550edb4483e3103fe3da69c47aeee78811e1dd1e",
+    "openspec/changes/deliver-company-profile-m4-v58-unseen-small-batch/first-delivery-review-inputs/compact_600107.SH.json": "5d906c84f982b3127bc523c39d135bb947a62edd722d05ad4255a0853427884d",
+    "openspec/changes/deliver-company-profile-m4-v58-unseen-small-batch/first-delivery-review-inputs/raw_600107.SH.json": "a507e54548bf60f24ef27b08a28b610044f4358af633ac2213ac28789f740017",
+    "openspec/changes/deliver-company-profile-m4-v58-unseen-small-batch/first-delivery-review-inputs/profile_600107.SH.json": "4a4b940de4b103d8ea5b955f359305d5561a22522c23f25aa9d184cff420e29a",
+    "openspec/changes/deliver-company-profile-m4-v58-unseen-small-batch/first-delivery-review-inputs/compact_600100.SH.json": "2388be5322b920cca478108c812d7a875fd31da058f81f15b425e30947a86d4f",
+    "openspec/changes/deliver-company-profile-m4-v58-unseen-small-batch/first-delivery-review-inputs/raw_600100.SH.json": "99136998970ed86eff0be97acd052b4abdc11c56d1b03007ff749822e8f2ca88",
+    "openspec/changes/deliver-company-profile-m4-v58-unseen-small-batch/first-delivery-review-inputs/profile_600100.SH.json": "f5c5cd8b751b2159b95f3ea246f8f17ab6c4f2c9b7d23f552c50254ede270604"
+  }
+}

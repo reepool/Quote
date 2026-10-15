@@ -1,0 +1,40 @@
+{
+  "completed_at": "2026-10-15T12:15:47.456087+00:00",
+  "blocking_defects": 0,
+  "classification": {
+    "A_fixed": [
+      "原收入列/空位/跨行主体及单位",
+      "主体业务性质物理行绑定",
+      "订单/开发/投运状态和确认机制完整正文",
+      "服务动词去重过度及评分漏检",
+      "单位裁决限制本次官方版本"
+    ],
+    "B_deferred": [
+      "正文精简",
+      "通用性能或框架治理"
+    ],
+    "C_untouched": [
+      "19项既有改动",
+      "无关旧失败"
+    ]
+  },
+  "reviewed_files": [
+    "research/company_profile/core_evidence_selection.py",
+    "research/company_profile/core_assessment_projection.py",
+    "research/company_profile/operations.py",
+    "research/company_profile/runtime.py",
+    "tests/unit/test_research/test_company_profile_v59_technology_apparel.py"
+  ],
+  "local_counts": {
+    "600100.SH": {
+      "facts": 897,
+      "answers": 3
+    },
+    "600107.SH": {
+      "facts": 285,
+      "answers": 3
+    }
+  },
+  "test_result": "28 passed; no full-suite claim",
+  "all_prerequisite_processes_exited_successfully_and_results_inspected": true
+}

@@ -1,0 +1,2 @@
+{'recall': {'present': 618, 'total': 618}, 'accuracy': {'correct': 1188, 'total': 1188}, 'numeric_error_objects': 0, 'negative_passed': 30, 'negative_total': 30, 'inputs': {'600100.SH': {'facts': 897, 'answers': 3}, '600107.SH': {'facts': 285, 'answers': 3}}, 'missing_conditions': []}
+UNACCURATE []

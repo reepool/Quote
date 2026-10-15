@@ -1,0 +1,25 @@
+{
+  "checked_at": "2026-10-15T08:55:19.950691+00:00",
+  "success": true,
+  "historical_files": 3948,
+  "archive_files": 159,
+  "existing_items_unchanged": 19,
+  "source_income_values_verified": 328,
+  "source_contract_counts": {
+    "answers": 6,
+    "revenue": 328,
+    "actions": 284,
+    "negative": 30,
+    "positive": 618
+  },
+  "code_modules_verified": 39,
+  "no_business_rehearsal": true,
+  "scope_review": {
+    "blocking": 0,
+    "source_conflict": "A resolved: 元 with native万元 conflict retained",
+    "business_code_changes": 0
+  },
+  "strict_validation": "passed; process returned 0",
+  "diff_check": "passed; process returned 0",
+  "formal_attempts_used": 0
+}

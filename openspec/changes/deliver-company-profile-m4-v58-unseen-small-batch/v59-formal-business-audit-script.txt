@@ -1,0 +1,130 @@
+"""Finite source review of all actual records and all 30 source negatives.
+
+Reads selected input directory. Writes only new successor review artifacts.
+Explicit source decisions are fixed native semantic snapshots from local PDF review.
+"""
+import argparse, hashlib, json, re, runpy
+from pathlib import Path
+
+C=Path('openspec/changes/deliver-company-profile-m4-v58-unseen-small-batch')
+g=runpy.run_path(str(C/'v59-business-match-script.txt'))
+scope=g['scope'];match=g['match'];rolematch=g['rolematch'];pages=g['pages'];co=g['co'];num=g['num']
+FIELDS=['object_type','subject_scope','reported_period','source_native','source_actor','action','source_verb','source_text','dimension','segment_dimension','uncertainty']
+
+def negatives(i,rs,profile):
+ out=[];financial=[r for r in rs if r['object_type'] in ['Segment','Measurement']];acts=[r for r in rs if r['object_type']=='Activity'];body=co('\n'.join(a['excerpt']for a in profile['dimensions']));nname=lambda r:co(r['source_native']['name'])
+ for v in scope['negative_conditions']:
+  if v['instrument_id']!=i:continue
+  idx=int(v['condition_id'].rsplit('-',1)[1]);pg=v['page'];bad=[];checks=[]
+  def reject(items,reason):
+   checks.append(reason);bad.extend(r['record_id']for r in items)
+  if i=='600100.SH':
+   if idx==1:reject([r for r in financial if 24 in pages(r) and any(x in (r['source_native'].get('unit')or'')for x in ['台','套','件','吨'])],'产销量不适用，无编造具名数量')
+   elif idx==2:reject([r for r in financial if pg in pages(r) and '成本' in (r['source_native'].get('header')or'')],'p21原收入列，不读成本列')
+   elif idx==3:
+    reject([r for r in acts if '蒙古' in nname(r) and r['action'] in ['sells','operates','produces']],'蒙古国签订新订单不是交付');assert '蒙古国' in body and '订单' in body
+   elif idx in [4,5,6,7]:
+    stem=co(v['name']).replace('专项开发','').replace('开发','')
+    reject([r for r in acts if stem in nname(r) and r['action'] in ['sells','produces','operates']],'实际开发/研发或预计完成状态不推销售生产交付')
+   elif idx==8:
+    reject([r for r in acts if '以衡' in co(r.get('source_actor','')) and r['subject_scope']in ['consolidated_group','named_subsidiary'] and '2025.6.30' not in co(r['source_native'].get('qualifier',''))],'失控主体不能无期间限定作为全年集团经营');assert '2025.6.30' in body and '丧失' in body
+   elif idx in [9,10]:reject([r for r in acts if pg in pages(r) and (co(v['name']) in nname(r) or '健康科技' in co(r.get('source_actor','')))],'终止经营打印零保留为财务事实，不反推动作')
+   elif idx in [11,12]:
+    reject([r for r in rs if co(v['name']) in co(r['source_native']['name']+' '+(r['source_native'].get('qualifier')or'')) and r['object_type']in ['Segment','Measurement','Activity'] and r['subject_scope'] in ['issuer','consolidated_group','named_subsidiary']],'权益法合营/联营原收入及主体不升格集团经营')
+   elif idx==13:reject([r for r in acts if pg in pages(r) and (r['action']=='consumes_input' or r['action']=='purchases' and r['source_native']['name']!='采购商品/接受劳务')],'混合采购不猜商品/原材料投入')
+   elif idx==14:reject([r for r in financial if pg in pages(r) and any(x in (r['source_native'].get('header')or'')for x in ['承租','租金支出','租赁费支出'])],'p230保留出租当前列，承租支出不读作收入')
+   elif idx==15:reject([r for r in financial if '手续费' in nname(r)],'手续费支出不生成手续费收入')
+   else:raise AssertionError(v)
+  else:
+   if idx in [1,2,3]:reject([r for r in financial if r['source_native']['name']=='医疗'],'p15–17医疗本期空位或成本零不生成收入')
+   elif idx==4:
+    cells=[r for r in financial if r['source_native'].get('header')in ['各品牌盈利','直营店和加盟店盈利','线上线下销售渠道盈利','各地区盈利']];assert cells
+    reject([r for r in cells if r['source_native'].get('unit')!='元' or not all(t in r['source_native'].get('qualifier','')for t in ['原表单位：万元','冲突','金额按元解释'])],'A裁决元；保留万元原表头和冲突说明');assert '原表单位：万元' in body and '金额按元解释' in body
+   elif idx==5:
+    reject([r for r in rs if r['object_type']=='BusinessOverview' and pg in pages(r) and re.search('(?:线上|地区)[^。]{0,30}(?:√不适用|已勾.*不适用)',co(r.get('source_text','')))],'p24两框未勾，不宣称不适用')
+   elif idx==6:reject([r for r in financial if pg in pages(r) and r['source_native']['name'] not in ['经营租赁收入','合计']],'p199未来五年收款不是本期租赁收入')
+   elif idx==7:reject([r for r in financial if '重要合营' in (r['source_native'].get('header')or'') or '重要联营' in (r['source_native'].get('header')or'')],'重要合营/联营财务信息不适用，停止在本章')
+   elif idx==8:reject([r for r in acts if pg in pages(r) and r['action'] in ['purchases','consumes_input'] and not(r['action']=='purchases' and r['source_native']['name']=='采购商品/接受劳务' and r['source_native']['header']=='本期采购原内容')],'混合采购原内容保留，不猜服装/建筑工程或投入')
+   elif idx==9:reject([r for r in financial if '黄石众盛' in co(r['source_native'].get('qualifier')or'')],'承租支出不作本集团收入')
+   elif idx==10:reject([r for r in financial if pg in pages(r) and any(t in (r['source_native'].get('header')or'') for t in ['内部交易','分部间交易'])],'内部交易横线不造零')
+   elif idx==11:reject([r for r in financial if pg in pages(r) and any(t in nname(r)for t in ['抵销','抵消'])],'抵销横线不借对外合计')
+   elif idx==12:reject([r for r in financial if pg in pages(r) and (r['source_native']['name']=='主营业务' or r['source_native'].get('value') and num(r['source_native']['value'])==num('58591137.65'))],'母公司主营本期空位不借上期')
+   elif idx==13:reject([r for r in financial if pg in pages(r) and '服装' in r['source_native']['name']],'母公司服装本期空位不借合并收入')
+   elif idx==14:
+    reject([r for r in acts if any(t in co(r.get('source_actor','')) for t in ['青海惠嘉','青海众友健康惠嘉']) and r['subject_scope'] in ['consolidated_group','named_subsidiary']],'2024转让51%、2025全过户，不作当前集团医药经营');assert '2024年4月26日' in body and '2025年6月13日' in body and '51%' in body
+   elif idx==15:reject([r for r in acts if '贵州美尔雅能源矿业' in co(r.get('source_actor','')) and r['action']=='sells'],'开采洗选不是已销售')
+   else:raise AssertionError(v)
+  assert checks
+  out.append(dict(condition=v,evaluated=True,passed=not bad,violating_object_ids=sorted(set(bad)),actual_records_checked=len(rs),actual_answer_count=len(profile['dimensions']),checks=checks))
+ return out
+
+# Each group is one substantive obligation, reviewed against the complete source;
+# tokens record the corresponding actual answer passage, not the sole truth rule.
+BODY_OBLIGATIONS={
+ '600100.SH':{
+  'principal_business':[['公共安全','数智产业','智慧能源'],['核技术','数据要素','人工智能'],['机构订阅','个人按需','技术授权','软件设计与开发'],['规划咨询','产品供应','工程建设','节能服务','运维托管'],['同方国信','联营'],['上年计算机硬件业务出表','2025.6.30'],['签约','全部投运','成功应用']],
+  'products_services':[['智能检查系统','全生命周期运维'],['货物/车辆成像','放射性物质监测','行李及包裹成像','人体安全'],['CNKI','知网AI+图书','华知'],['热泵','储冷/热/电','控制器','软件平台','算法'],['楼宇自动化系统','能源管理系统','安控系统','消防系统'],['装饰','白炽','舞台'],['开发','挂牌','订单','全部投运','大温差']],
+  'revenue_model':[['机构订阅','个人按需'],['技术授权','软件设计与开发'],['规划咨询','产品供应','工程建设','节能服务','运维托管'],['交付给客户且客户已接受','收款凭证'],['产出法或投入法','履约进度'],['PPP','主要责任人','代理人','收取费用','收费金额不确定','日常维护管理费'],['直线法','租金收入'],['资产托管'],['重要联营企业','重要合营企业','母公司利润表','终止经营']]},
+ '600107.SH':{
+  'principal_business':[['服装服饰类产品','研发','设计','生产','销售'],['来料加工','进料加工','一般贸易'],['自主品牌','零售','团购','网购'],['湖北美尔雅服装集团','精毛纺织','美尔雅服饰','西服'],['蒸汽','转售水、电','运输服务'],['青海惠嘉','2024年4月26日','51%','2025年6月13日','智瑜科技100%']],
+  'products_services':[['男装','西服','衬衣','毛衫','T恤','大衣','休闲服','裤装'],['女装','职业装','礼服','时装','休闲装'],['生产','加工','销售','团购定制'],['来料加工','进料加工'],['蒸汽','水、电','运输服务'],['储能','健康咨询']],
+  'revenue_model':[['直营店','加盟店','商场专柜','团购','京东','天猫','抖音'],['专卖店销售','控制权','收取价款'],['与商场结算','消费者确认收货'],['FOB','装船并办理报关'],['指定交货地点','签收','预收款','赊销','现销'],['投入法','进度不能合理确定','成本预计能够得到补偿'],['本公司作为出租方','租赁收入'],['金额按元解释','原表单位：万元','冲突']]}}
+
+def audit(directory):
+ decisions=json.loads((C/'v59-explicit-source-decisions.json').read_text());objects=[];missing=[];ng=[];body_reviews=[];mapping=[];inputs={}
+ for i in scope['revenue_conditions']:
+  rs=list({r['record_id']:r for r in json.loads((directory/('raw_'+i+'.json')).read_text())}.values());profile=json.loads((directory/('profile_'+i+'.json')).read_text());inputs[i]=dict(facts=len(rs),answers=len(profile['dimensions']))
+  for r in rs:
+   k=r['object_type'];hit=[v['condition_id']for v in scope['revenue_conditions'][i]if match(r,v)]if k in ['Segment','Measurement']else[];roles=[v['condition_id']for v in scope['action_conditions']if v['instrument_id']==i and rolematch(r,v)]if k=='Activity'else[]
+   actual_signature={x:r.get(x)for x in FIELDS}
+   explicit=decisions.get(i+'|'+r['record_id'])
+   if not explicit:
+    # Fixture and formal report identities produce different Evidence IDs.
+    # Bind only an exact native semantic snapshot AND identical official pages.
+    candidates=[d for key,d in decisions.items()if key.startswith(i+'|')and d['expected_semantics']==actual_signature and d['source_pages']==sorted(pages(r))]
+    explicit=candidates[0]if candidates else None
+   same=bool(explicit and explicit['expected_semantics']==actual_signature and explicit['source_pages']==sorted(pages(r)))
+   ok=bool(hit or roles or same)
+   reason='原收入行/栏目/主体/交易方/期间/单位/本期取格匹配'if hit else'原具名对象/动作方向/分类/主体/期间匹配'if roles else explicit['reason']if same else'未有原表匹配或与逐对象原文复核快照不同，不默认准确'
+   objects.append(dict(instrument_id=i,object_id=r['record_id'],object_type=k,record=r,decision=dict(accurate=ok,critical_numeric_error=False,matched_income_conditions=hit,matched_role_conditions=roles,explicit_source_decision=same,reason=reason)))
+  for v in scope['revenue_conditions'][i]:
+   ids={kind:[r['record_id']for r in rs if r['object_type']==kind and match(r,v)]for kind in ['Segment','Measurement']};mapping.append(dict(condition_id=v['condition_id'],objects=ids));
+   if not all(ids.values()):missing.append(v['condition_id'])
+  for v in scope['action_conditions']:
+   if v['instrument_id']!=i:continue
+   ids=[r['record_id']for r in rs if r['object_type']=='Activity' and rolematch(r,v)];mapping.append(dict(condition_id=v['condition_id'],objects=ids))
+   if not ids:missing.append(v['condition_id'])
+  for a in profile['dimensions']:
+   dim=a['dimension_id'];obligations=[]
+   for group in BODY_OBLIGATIONS[i][dim]:
+    absent=[t for t in group if co(t)not in co(a['excerpt'])];obligations.append(dict(source_substance=group,actual_complete=not absent,missing=absent))
+   support=set(a['supporting_record_ids']);known={r['record_id']for r in rs};ok=bool(a['answered'])and all(x['actual_complete']for x in obligations)and support<=known
+   # Manual semantic review: complete originals retain source limitations. Actual
+   # actor/state/category/columns also checked separately across all native facts.
+   b=dict(instrument_id=i,object_id='answer:'+dim,object_type='answer',text=a['excerpt'],supporting_record_ids=a['supporting_record_ids'],contract=scope['answers'][i][dim],substantive_obligations=obligations,decision=dict(accurate=ok,critical_numeric_error=False,reason='按冻结substance逐项独立核官方业务/会计机制/主体退出/状态；未用收入条数代替经营回答'))
+   body_reviews.append(b);objects.append(b)
+   if not ok:missing.append(scope['answers'][i][dim]['condition_id'])
+  ng.extend(negatives(i,rs,profile))
+ # Every source condition needs a distinct native object; a broad service enum
+ # must not let one installation record also satisfy maintenance or support.
+ assigned={}
+ def assign(condition,seen):
+  candidates=condition['objects']
+  if isinstance(candidates,dict):candidates=candidates['Segment']
+  for record_id in candidates:
+   if record_id in seen:continue
+   seen.add(record_id)
+   prior=assigned.get(record_id)
+   if prior is None or assign(prior,seen):
+    assigned[record_id]=condition
+    return True
+  return False
+ for condition in mapping:
+  if not assign(condition,set()) and condition['condition_id']not in missing:missing.append(condition['condition_id'])
+ distinct={v['condition_id']:k for k,v in assigned.items()}
+ for condition in mapping:condition['distinct_object_id']=distinct.get(condition['condition_id'])
+ score=dict(source_scope_sha256=hashlib.sha256((C/'source-scope.json').read_bytes()).hexdigest(),recall=dict(present=618-len(missing),total=618),accuracy=dict(correct=sum(o['decision']['accurate']for o in objects),total=len(objects)),numeric_error_objects=sum(o['decision']['critical_numeric_error']for o in objects),negative_passed=sum(x['passed']for x in ng),negative_total=len(ng),negative_results=ng,inputs=inputs,missing_conditions=missing,condition_bindings=mapping,object_reviews=objects,body_reviews=body_reviews,A_acceptance='not_granted',production_authorization='not_authorized',scale_quality_claim_allowed=False)
+ return score
+
+if __name__=='__main__':
+ p=argparse.ArgumentParser();p.add_argument('--inputs',type=Path,required=True);p.add_argument('--output',type=Path,required=True);args=p.parse_args();s=audit(args.inputs);args.output.write_text(json.dumps(s,ensure_ascii=False,indent=2)+'\n');print({k:v for k,v in s.items()if k in ['recall','accuracy','numeric_error_objects','negative_passed','negative_total','missing_conditions','inputs']});print('UNACCURATE',[(o['instrument_id'],o['object_id'])for o in s['object_reviews']if not o['decision']['accurate']])

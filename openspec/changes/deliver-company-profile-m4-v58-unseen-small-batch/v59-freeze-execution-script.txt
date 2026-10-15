@@ -1,0 +1,31 @@
+"""Freeze only after successful, inspected local/regression/protection/Review results."""
+import hashlib,json,shutil
+from pathlib import Path
+from datetime import datetime,timezone
+from research.company_profile.execution import default_processing_identity
+from research.company_profile import core_evidence_selection as selection
+from research.company_profile.m4_next_batch import load_m4_next_batch_plan,save_m4_next_batch_plan
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v58-unseen-small-batch';cp=R/'data/checkpoints/company_profile_common_core';new=cp/'reports/m4_v59_same_source_repair';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();load=lambda p:json.loads(p.read_text())
+assert not (C/'v59-source-freeze-receipt.json').exists() and not (C/'v59-attempt-start.json').exists()
+local=load(C/'v59-local-source-review-evidence.json');assert local['recall']=={'present':618,'total':618}and local['accuracy']['correct']==local['accuracy']['total']and local['negative_passed']==local['negative_total']==30 and local['numeric_error_objects']==0
+assert load(C/'v59-protection-receipt.json')['success'] and load(C/'v59-audit-counterexample-receipt.json')['all_passed']
+assert '28 passed' in Path('/tmp/v59_final_tests3.log').read_text()
+logs=['v59_final_tests3','v59_ruff','v59_format','v59_scope_diff','v59_openspec_change','v59_openspec_owned','v59_openspec_income','v59_openspec_model']
+for name in logs:shutil.copyfile('/tmp/'+name+'.log',C/(name+'.log'))
+assert (C/'v59_ruff.log').read_text().strip()=='All checks passed!'
+assert '5 files already formatted' in (C/'v59_format.log').read_text()
+assert not (C/'v59_scope_diff.log').read_text()
+for name in ['v59_openspec_change','v59_openspec_owned','v59_openspec_income','v59_openspec_model']:assert 'is valid' in(C/(name+'.log')).read_text()
+review=dict(completed_at=datetime.now(timezone.utc).isoformat(),blocking_defects=0,classification={'A_fixed':['原收入列/空位/跨行主体及单位','主体业务性质物理行绑定','订单/开发/投运状态和确认机制完整正文','服务动词去重过度及评分漏检','单位裁决限制本次官方版本'],'B_deferred':['正文精简','通用性能或框架治理'],'C_untouched':['19项既有改动','无关旧失败']},reviewed_files=['research/company_profile/core_evidence_selection.py','research/company_profile/core_assessment_projection.py','research/company_profile/operations.py','research/company_profile/runtime.py','tests/unit/test_research/test_company_profile_v59_technology_apparel.py'],local_counts=local['inputs'],test_result='28 passed; no full-suite claim',all_prerequisite_processes_exited_successfully_and_results_inspected=True)
+(C/'v59-preformal-review-receipt.json').write_text(json.dumps(review,ensure_ascii=False,indent=2)+'\n')
+plan=load_m4_next_batch_plan(cp,plan_directory=cp/'reports/m4_v58_unseen_small_batch');assert plan is not None
+save_m4_next_batch_plan(cp,plan,plan_directory=new);assert plan==load_m4_next_batch_plan(cp,plan_directory=new)
+identity={**default_processing_identity(),'revenue_sentence_repair':'v59'};flags={n:getattr(selection,n)(identity)for n in ['revenue_sentence_repair_requested','named_role_repair_requested','service_operating_energy_requested','core_answer_repair_requested','source_delivery_repair_requested']};assert all(flags.values());assert default_processing_identity()==load(C/'freeze-receipt.json')['default_identity']
+code={p:sha(R/p)for p in load(C/'first-source-freeze-receipt.json')['executed_code_sha256']}
+snapshot=C/'v59-executed-code-snapshot';snapshot.mkdir(exist_ok=False)
+for p,h in code.items():
+ target=snapshot/p;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(R/p,target);assert sha(target)==h
+verification=[p for p in C.glob('v59*')if p.is_file()and p.name not in ['v59-source-freeze-receipt.json']]
+verification.extend([R/'tests/unit/test_research/test_company_profile_v59_technology_apparel.py',R/'tests/fixtures/company_profile_v59_technology_apparel_pages.json'])
+receipt=dict(frozen_at=datetime.now(timezone.utc).isoformat(),prerequisites_completed_and_inspected_before_freeze=True,executed_code_sha256=code,source_scope_sha256=sha(C/'source-scope.json'),processing_identity=identity,repair_flags=flags,default_identity=default_processing_identity(),default_identity_unchanged=True,exact_asset_enqueue_and_actor_expansion_inherited=True,verification_sha256={str(p.relative_to(R)):sha(p)for p in verification},first_observation_used=1,successors_used_before_start=0,successors_authorized=2,official_versions_unchanged=True,knowledge_cutoff=plan.knowledge_cutoff,plan_id=plan.plan_id)
+(C/'v59-source-freeze-receipt.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n');print('FROZEN_V59',len(code),receipt['frozen_at'])

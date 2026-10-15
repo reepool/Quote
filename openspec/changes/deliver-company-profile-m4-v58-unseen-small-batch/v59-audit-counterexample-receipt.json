@@ -1,0 +1,13 @@
+{
+  "all_passed": true,
+  "checks": [
+    "income rejects wrong header",
+    "income rejects wrong unit",
+    "income rejects wrong value",
+    "maintenance cannot be satisfied by installation sharing provides_service enum",
+    "income rejects wrong counterparty",
+    "negative rejects unit",
+    "negative rejects purchase",
+    "negative rejects parent_blank"
+  ]
+}

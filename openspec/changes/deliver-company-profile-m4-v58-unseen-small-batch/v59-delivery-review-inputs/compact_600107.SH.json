@@ -1,0 +1,7104 @@
+[
+  {
+    "record_id": "owned:core-ev-19e7969fcc3034d3:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "报告期内公司从事的业务情况",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ]
+    ],
+    "text": "报告期内公司从事的业务情况\n报告期内，公司的主营业务为服装服饰类产品的研发、设计、生产和销售，业务模式未发生\r\n重大变化。"
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:activity:1",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "服装服饰类产品",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-9c92a48fc4a55582:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          216
+        ]
+      ]
+    ],
+    "text": "本公司作为出租方：\n√适用  □不适用\n                                               单位：元   币种：人民币\n  承租方名称        租赁资产种类        本期确认的租赁收入          上期确认的租赁收入\n湖北美红服装有      房屋建筑物                   541,561.15         541,56115\n限公司\n湖北美红服装有      设备                      120,323.88          90,242.92\n限公司\n\n\n                             215/243\n                                   湖北美尔雅股份有限公司2025 年年度报告\n\n\n\n\n\n"
+  },
+  {
+    "record_id": "owned:core-ev-ac75f7d25192b34a:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        []
+      ]
+    ],
+    "text": "出售商品/提供劳务情况表\n√适用  □不适用\n                                               单位：元   币种：人民币\n      关联方           关联交易内容           本期发生额           上期发生额\n湖北美尔雅集团有限公        销售水电汽、提供客              464,969.69      374,187.37\n司                 运服务\n湖北美红服装有限公司        销售水电汽、提供客             2,172,035.28    2,386,506.24\n                  运服务\n湖北闻世建筑工程有限        销售水电汽                   31,615.26        7,795.73\n公司\n\n"
+  },
+  {
+    "record_id": "owned:core-ev-ad9e72c3a02dd480:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ]
+    ],
+    "text": "报告期内公司从事的业务情况报告期内，公司的主营业务为服装服饰类产品的研发、设计、生产和销售，业务模式未发生重大变化。按面向市场和经营模式的不同，公司经营模式可分为国外市场的外贸生产加工和国内市场品牌生产加工销售等。公司在国内开展服装全链条业务，涵盖生产加工与终端销售，主营自主品牌的男装、女装及各类配套服饰。其中美尔雅男装品类齐全，包含西服、衬衣、毛衫、T恤、大衣、休闲服及裤装等，定位中高档商务政务男装。“美尔雅”西服作为公司传统核心产品，不仅获评“中国驰名商标”，还荣获“中国服装年度大奖——品质大奖”，在内销业务中占据主导地位。美尔雅女装则分为职业装、礼服、时装、休闲装四大系列，主要面向职业女性，主打商务时尚风格。在国内市场，公司构建了零售、团购定制、线上网购相结合的多元化营销体系，通过整合数据、消费场景与各类资源，实现对不同消费场景和客户群体的全覆盖。零售以直营店、加盟店、商场专柜为主要形式，直面消费者，满足即时购买需求，同时也是品牌形象展示的重要平台；团购定制主要承接各类团体服装加工与定制业务，服务金融、电力、电信、政府机构、学校及各类企事业单位，业务表现易受宏观经济形势及客户经营状况影响；网购渠道依托京东、天猫、抖音等平台，销售与线下门店差异化的产品，有效补充和完善了线下营销网络。外贸加工业务主要采用来料加工、进料加工和一般贸易三种运营模式。公司凭借高效的生产组织能力与精细化现场管理，结合成熟的营销网络和订单资源，形成以来料加工、进料加工为主的外贸业务格局。在稳固日本、东南亚等传统加工贸易市场的同时，公司积极依托自身产能与外贸渠道拓展海外一般贸易业务，进一步优化产品结构与市场布局。公司持续研究电商新模式与新渠道，不断提升线上渠道覆盖范围与市场占有率；国内各业务板块以自身定位为基础、以客户需求为核心，拓展业务边界、优化产品结构，强化技术服务、方湖北美尔雅股份有限公司2025年年度报告13/243案营销与战略合作，实现大客户深度服务与长尾市场覆盖相互补充；国际市场则通过灵活布局供应链、精细化深耕区域市场，保障业务稳定发展。通过夯实组织运营、数据应用、供应链管理等核心能力，最终推动企业发展模式从规模扩张向高质量增长升级。"
+  },
+  {
+    "record_id": "owned:core-ev-744ef9dd90decbba:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        16,
+        []
+      ]
+    ],
+    "text": "产销量情况分析表√适用□不适用主要产品单位生产量销售量库存量生产量比上年增减（%）销售量比上年增减（%）库存量比上年增减（%）美尔雅品牌男装件/套659,689.00815,915.00701,810.00-21.27-12.86-18.21美尔雅品牌女件/套628,976.00669,828.00439,802.00-4.23-2.41-8.50"
+  },
+  {
+    "record_id": "owned:core-ev-f83dbb793f2a5f0b:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        16,
+        []
+      ]
+    ],
+    "text": "主营业务分行业、分产品、分地区、分销售模式情况的说明无"
+  },
+  {
+    "record_id": "owned:core-ev-3fedd03dcb13df98:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        17,
+        []
+      ]
+    ],
+    "text": "产销量情况分析表中，主要产品的生产量、销售量、库存量数据单位为件/套(3).重大采购合同、重大销售合同的履行情况□适用√不适用(4)."
+  },
+  {
+    "record_id": "owned:core-ev-b67941cf4a527305:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        17,
+        []
+      ]
+    ],
+    "text": "产销量情况说明上述产销量情况分析表中，主要产品的生产量、销售量、库存量数据单位为件/套"
+  },
+  {
+    "record_id": "owned:core-ev-90919c85cd79f0ea:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        25,
+        []
+      ]
+    ],
+    "text": "重大的股权投资□适用√不适用"
+  },
+  {
+    "record_id": "owned:core-ev-929d23acdcc4b207:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "unclear",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        [
+          27
+        ]
+      ]
+    ],
+    "text": "主要控股参股公司分析√适用□不适用主要子公司及对公司净利润影响达10%以上的参股公司情况√适用□不适用单位：元币种：人民币公司名称公司类型主要业务注册资本总资产净资产营业收入营业利润净利润湖北美尔雅服装集团有限公司子公司精毛纺织制品，服装及辅料制造、加工、销售36,302.23万元475,079,476.47312,112,949.33175,793,460.36-54,064,053.81-50,794,205.86美尔雅服饰有限公司子公司生产中、高档西服的中日合资企业1050万美元76,316,256.4656,882,243.3641,300,845.88-5,492,821.57-5,488,576.99"
+  },
+  {
+    "record_id": "owned:core-ev-8afad33e6b172127:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        [
+          27
+        ]
+      ]
+    ],
+    "text": "报告期内取得和处置子公司的情况□适用√不适用"
+  },
+  {
+    "record_id": "owned:core-ev-6753a708ed101456:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        122,
+        [
+          123
+        ]
+      ]
+    ],
+    "text": "本集团收入确认的具体方法如下：①服装销售收入的确认内销部分：专卖店销售于商品交付且控制权转移至消费者并收取价款时，确认销售收入；商场销售于商品交付且控制权转移至消费者后，与商场结算时，确认销售收入；网络电商销售于商品交付且控制权转移至消费者，消费者确认收货并收取价款时，确认销售收入。外销部分：根据合同约定的交货方式在履行完交货义务后确认收入。公司外销为FOB（船上交货）模式，在装船并办理报关手续时确认收入。②提供服务收入的确认公司履约的同时客户即取得并消耗履约所带来的经济利益时，公司将其作为在某一时段内履行的履约义务，按照履约进度确认收入，履约进度不能合理确定的除外。公司按照投入法确定提供服务的履约进度。对于履约进度不能合理确定时，已经发生的成本预计能够得到补偿的，按照已经发生的成本金额确认收入，直到履约进度能够合理确定为止。"
+  },
+  {
+    "record_id": "owned:core-ev-6bfd137812c38a6c:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        127,
+        []
+      ]
+    ],
+    "text": "作为出租方的租赁分类标准和会计处理方法√适用□不适用本集团在租赁开始日，基于交易的实质，将租赁分为融资租赁和经营租赁。融资租赁是指实质上转移了与租赁资产所有权有关的几乎全部风险和报酬的租赁。经营租赁是指除融资租赁以外的其他租赁。①经营租赁"
+  },
+  {
+    "record_id": "owned:core-ev-40931e0a2fae6bbc:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        183,
+        []
+      ]
+    ],
+    "text": "(3).履约义务的说明√适用□不适用单位：元币种：人民币项目履行履约义务的时间重要的支付条款公司承诺转让商品的性质是否为主要责任人公司承担的预期将退还给客户的款项公司提供的质量保证类型及相关义务门店销售商品交付至消费者并收取价款预收款、赊销、现销服装是不适用本集团提供符合既定标准的质量保证。所销售产品有质量缺陷时，客户有权退(换)货，但不构成单项履约义务。团购业务按照合同约定运至指定交货地点，经客户签收确认预收款、赊销服装是不适用出口业务按照合同约定的出口贸易条款，商品办理出口报关手续预收款、赊销服装是不适用"
+  },
+  {
+    "record_id": "owned:core-ev-debbf7d62982ff0c:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        199,
+        []
+      ]
+    ],
+    "text": "作为出租人的经营租赁√适用□不适用单位：元币种：人民币项目租赁收入其中:未计入租赁收款额的可变租赁付款额相关的收入经营租赁收入2,520,756.67合计2,520,756.67"
+  },
+  {
+    "record_id": "owned:core-ev-3adad757bf2094a6:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        202,
+        []
+      ]
+    ],
+    "text": "其他原因的合并范围变动说明其他原因导致的合并范围变动（如，新设子公司、清算子公司等）及其相关情况：□适用√不适用"
+  },
+  {
+    "record_id": "owned:core-ev-815684d079ed5458:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        202,
+        []
+      ]
+    ],
+    "text": "本期是否存在丧失子公司控制权的交易或事项□适用√不适用"
+  },
+  {
+    "record_id": "owned:core-ev-760be398b70214d5:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        203,
+        []
+      ]
+    ],
+    "text": "企业集团的构成√适用□不适用单位：元币种：人民币子公司名称主要经营地注册资本注册地业务性质持股比例(%)取得直接间接方式湖北美尔雅服装集团有限公司黄石36,302.23万元黄石批发和零售98.39设立美尔雅服饰有限公司黄石1,050万美元黄石制造业65.00设立黄石美羚洋服饰有限公司黄石300万元黄石制造业75.00设立黄石美羚洋服装科技有限公司黄石1000万黄石制造业75设立黄石美尔雅动力供应有限公司黄石100万元黄石动力供应61.50设立北京美恒雅商贸有限公司北京500万元北京批发100.00设立美尔雅健康科技集团（湖北）有限公司仙桃700万元仙桃健康咨询服务100.00设立北京美尔雅能源科技有限公司北京1,000万元北京技术服务、合同能源管理100.00设立石嘴山市格诺能源科技有限公司宁夏100万元宁夏储能技术服务51设立石嘴山市简沁能源科技有限公司宁夏100万元宁夏储能技术服务51设立石嘴山市尚源能源科技有限公司宁夏100万元宁夏储能技术服务51设立石嘴山市格得能源科技有限公司宁夏100万元宁夏储能技术服务51设立石嘴山市简森能源科技有限公司宁夏100万元宁夏储能技术服务51设立石嘴山市简泌能源科技有限公司宁夏100万元宁夏储能技术服务51设立贵州美尔雅能源矿业有限公司安顺5,000万元安顺煤炭开采洗选100.00设立在子公司的持股比例不同于表决权比例的说明：无持有半数或以下表决权但仍控制被投资单位、以及持有半数以上表决权但不控制被投资单位的依据：无"
+  },
+  {
+    "record_id": "owned:core-ev-b3669e9da67eea8e:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        []
+      ]
+    ],
+    "text": "关联托管/承包情况说明\r\n□适用 √不适用"
+  },
+  {
+    "record_id": "owned:core-ev-bd7483614b6746db:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        []
+      ]
+    ],
+    "text": "出售商品/提供劳务情况表√适用□不适用单位：元币种：人民币关联方关联交易内容本期发生额上期发生额湖北美尔雅集团有限公司销售水电汽、提供客运服务464,969.69374,187.37湖北美红服装有限公司销售水电汽、提供客运服务2,172,035.282,386,506.24湖北闻世建筑工程有限公司销售水电汽31,615.267,795.73"
+  },
+  {
+    "record_id": "owned:core-ev-5db0a1d7bdd9f92d:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        []
+      ]
+    ],
+    "text": "本公司作为出租方：√适用□不适用单位：元币种：人民币承租方名称租赁资产种类本期确认的租赁收入上期确认的租赁收入湖北美红服装有限公司房屋建筑物541,561.15541,56115湖北美红服装有限公司设备120,323.8890,242.92"
+  },
+  {
+    "record_id": "owned:core-ev-3336b4129c95937c:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        227,
+        [
+          228
+        ]
+      ]
+    ],
+    "text": "（1）2023年12月29日，本公司与吉林省智瑜科技有限公司（以下简称“智瑜科技”）签订《股权转让协议》，约定以10,000万元转让子公司青海众友健康惠嘉医药连锁有限公司（以下简称“青海惠嘉”）100%股权。本公司于2024年1月和4月分别收到智瑜科技支付的上述股权转让款3,000万元、4,000万元。本公司于2024年4月26日完成青海惠嘉51%股权过户至智瑜科技。根据《转让协议》约定，智瑜科技应在2024年3月31日前完成全部款项的支付。2024年9月，因智瑜科技未按约定完成剩余股权转让款的支付，本公司向黄石市下陆区人民法院提起诉讼，要求智瑜科技向本公司支付股权转让款3,000万元，并承担相应诉讼费用。同时，智瑜科技反诉本公司，请求法院解除其与本公司签署的《股权转让协议》，由本公司返还其已支付的7,000万元股权转让款及利息，并承担相应的诉讼费和保全费。2025年5月9日，本公司与智瑜科技签订《调解协议》并收到法院下发的《民事调解书》，主要内容如下：①湖北美尔雅股份有限公司与吉林省智瑜科技有限公司于2023年12月29日签订的《青海众友健康惠嘉医药连锁有限公司股权转让协议》继续履行。②吉林省智瑜科技有限公司于2025年6月10日前向湖北美尔雅股份有限公司支付股权转让款人民币2000万元。③吉林省智瑜科技有限公司按照本协议履行给付义务后，湖北美尔雅股份有限公司于15日内协助吉林省智瑜科技有限公司办理青海众友健康惠嘉医药连锁有限公司股权及工商登记变更手续，并办理交接手续。2025年6月19日和20日，公司收到上述股权转让款2000万元；2025年6月13日，青海惠嘉完成工商变更，成为智瑜科技100%控股的全资子公司。"
+  },
+  {
+    "record_id": "owned:core-ev-d6d7791c45ea551d:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        227,
+        [
+          228
+        ]
+      ]
+    ],
+    "text": "本公司各个报告分部提供的主要产品及劳务分别为：①服装及纺织品报告分部：组织生产销售服装及纺织品。②其他报告分部：组织生产销售蒸汽，转售水、电，提供运输服务。"
+  },
+  {
+    "record_id": "owned:core-ev-1bb4a16780aa50c5:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        227,
+        [
+          228
+        ]
+      ]
+    ],
+    "text": "本公司确定2个报告分部，分别为服装及纺织品报告分部、其他报告分部。"
+  },
+  {
+    "record_id": "owned:core-ev-6155e911f35c9385:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        227,
+        [
+          228
+        ]
+      ]
+    ],
+    "text": "本公司各个报告分部提供的主要产品及劳务分别为：①服装及纺织品报告分部：组织生产销售服装及纺织品。"
+  },
+  {
+    "record_id": "owned:core-ev-4fd5b61c6013cab3:overview",
+    "object_type": "BusinessOverview",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "当期产品及服务披露",
+      "value": null,
+      "unit": null,
+      "header": null,
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "uncertainty": [],
+    "pages": [
+      [
+        240,
+        []
+      ]
+    ],
+    "text": "(3).履约义务的说明□适用√不适用"
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:1",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "西服",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:2",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "西服",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ],
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:3",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "衬衣",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:4",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "衬衣",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ],
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:5",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "毛衫",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:6",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "毛衫",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ],
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:7",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "T恤",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:8",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "T恤",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ],
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:9",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "大衣",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:10",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "大衣",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ],
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:11",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "休闲服",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:12",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "休闲服",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ],
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:13",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "裤装",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:14",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "裤装",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ],
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:15",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "职业装",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:16",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "职业装",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ],
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:17",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "礼服",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:18",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "礼服",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ],
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:19",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "时装",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:20",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "时装",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ],
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:21",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "休闲装",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:22",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "休闲装",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ],
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:23",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "外贸来料加工",
+      "value": null,
+      "unit": null,
+      "header": "原外贸运营模式",
+      "qualifier": "原外贸运营模式",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "operates",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:24",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "外贸进料加工",
+      "value": null,
+      "unit": null,
+      "header": "原外贸运营模式",
+      "qualifier": "原外贸运营模式",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "operates",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:25",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "外贸一般贸易",
+      "value": null,
+      "unit": null,
+      "header": "原外贸运营模式",
+      "qualifier": "原外贸运营模式",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "operates",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b071153ea2c0f216:commodity:26",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "团购定制",
+      "value": null,
+      "unit": null,
+      "header": "原经营模式",
+      "qualifier": "原经营模式",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "operates",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-920e0cc222bfa8ac:commodity:1",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "西服",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-920e0cc222bfa8ac:commodity:3",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "衬衣",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-920e0cc222bfa8ac:commodity:5",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "毛衫",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-920e0cc222bfa8ac:commodity:7",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "T恤",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-920e0cc222bfa8ac:commodity:9",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "大衣",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-920e0cc222bfa8ac:commodity:11",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "休闲服",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-920e0cc222bfa8ac:commodity:13",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "裤装",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-920e0cc222bfa8ac:commodity:15",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "职业装",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-920e0cc222bfa8ac:commodity:17",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "礼服",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-920e0cc222bfa8ac:commodity:19",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "时装",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-920e0cc222bfa8ac:commodity:21",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "休闲装",
+      "value": null,
+      "unit": null,
+      "header": "原服装全链条产品矩阵",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-920e0cc222bfa8ac:commodity:23",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "外贸来料加工",
+      "value": null,
+      "unit": null,
+      "header": "原外贸运营模式",
+      "qualifier": "原外贸运营模式",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "operates",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-920e0cc222bfa8ac:commodity:24",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "外贸进料加工",
+      "value": null,
+      "unit": null,
+      "header": "原外贸运营模式",
+      "qualifier": "原外贸运营模式",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "operates",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-920e0cc222bfa8ac:commodity:25",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "外贸一般贸易",
+      "value": null,
+      "unit": null,
+      "header": "原外贸运营模式",
+      "qualifier": "原外贸运营模式",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "operates",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-920e0cc222bfa8ac:commodity:26",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "团购定制",
+      "value": null,
+      "unit": null,
+      "header": "原经营模式",
+      "qualifier": "原经营模式",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "operates",
+    "uncertainty": [],
+    "pages": [
+      [
+        12,
+        [
+          13,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-573f34f4d178c149:commodity:1",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "美尔雅品牌男装",
+      "value": null,
+      "unit": null,
+      "header": "原产销量正值/生产",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        16,
+        [
+          17,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-573f34f4d178c149:commodity:2",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "美尔雅品牌男装",
+      "value": null,
+      "unit": null,
+      "header": "原产销量正值/销售",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        16,
+        [
+          17,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-573f34f4d178c149:commodity:3",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "美尔雅品牌女装",
+      "value": null,
+      "unit": null,
+      "header": "原产销量正值/生产",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        16,
+        [
+          17,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-573f34f4d178c149:commodity:4",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "美尔雅品牌女装",
+      "value": null,
+      "unit": null,
+      "header": "原产销量正值/销售",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        16,
+        [
+          17,
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a984feb696ff8c99:commodity:1",
+    "object_type": "Activity",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "精毛纺织制品",
+      "value": null,
+      "unit": null,
+      "header": "控股参股公司原业务",
+      "qualifier": "原主体：湖北美尔雅服装集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "湖北美尔雅服装集团有限公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a984feb696ff8c99:commodity:2",
+    "object_type": "Activity",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "精毛纺织制品",
+      "value": null,
+      "unit": null,
+      "header": "控股参股公司原业务",
+      "qualifier": "原主体：湖北美尔雅服装集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "湖北美尔雅服装集团有限公司",
+    "action": "processes",
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a984feb696ff8c99:commodity:3",
+    "object_type": "Activity",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "精毛纺织制品",
+      "value": null,
+      "unit": null,
+      "header": "控股参股公司原业务",
+      "qualifier": "原主体：湖北美尔雅服装集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "湖北美尔雅服装集团有限公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a984feb696ff8c99:commodity:4",
+    "object_type": "Activity",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "服装",
+      "value": null,
+      "unit": null,
+      "header": "控股参股公司原业务",
+      "qualifier": "原主体：湖北美尔雅服装集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "湖北美尔雅服装集团有限公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a984feb696ff8c99:commodity:5",
+    "object_type": "Activity",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "服装",
+      "value": null,
+      "unit": null,
+      "header": "控股参股公司原业务",
+      "qualifier": "原主体：湖北美尔雅服装集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "湖北美尔雅服装集团有限公司",
+    "action": "processes",
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a984feb696ff8c99:commodity:6",
+    "object_type": "Activity",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "服装",
+      "value": null,
+      "unit": null,
+      "header": "控股参股公司原业务",
+      "qualifier": "原主体：湖北美尔雅服装集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "湖北美尔雅服装集团有限公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a984feb696ff8c99:commodity:7",
+    "object_type": "Activity",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "辅料",
+      "value": null,
+      "unit": null,
+      "header": "控股参股公司原业务",
+      "qualifier": "原主体：湖北美尔雅服装集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "湖北美尔雅服装集团有限公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a984feb696ff8c99:commodity:8",
+    "object_type": "Activity",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "辅料",
+      "value": null,
+      "unit": null,
+      "header": "控股参股公司原业务",
+      "qualifier": "原主体：湖北美尔雅服装集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "湖北美尔雅服装集团有限公司",
+    "action": "processes",
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a984feb696ff8c99:commodity:9",
+    "object_type": "Activity",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "辅料",
+      "value": null,
+      "unit": null,
+      "header": "控股参股公司原业务",
+      "qualifier": "原主体：湖北美尔雅服装集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "湖北美尔雅服装集团有限公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a984feb696ff8c99:commodity:10",
+    "object_type": "Activity",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "中、高档西服",
+      "value": null,
+      "unit": null,
+      "header": "控股参股公司原业务",
+      "qualifier": "原主体：美尔雅服饰有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "美尔雅服饰有限公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a984feb696ff8c99:commodity:11",
+    "object_type": "Activity",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "精毛纺织制品，服装及辅料",
+      "value": null,
+      "unit": null,
+      "header": "原主体业务性质",
+      "qualifier": "原主体：湖北美尔雅服装集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "湖北美尔雅服装集团有限公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a984feb696ff8c99:commodity:12",
+    "object_type": "Activity",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "精毛纺织制品，服装及辅料",
+      "value": null,
+      "unit": null,
+      "header": "原主体业务性质",
+      "qualifier": "原主体：湖北美尔雅服装集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "湖北美尔雅服装集团有限公司",
+    "action": "processes",
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a984feb696ff8c99:commodity:13",
+    "object_type": "Activity",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "精毛纺织制品，服装及辅料",
+      "value": null,
+      "unit": null,
+      "header": "原主体业务性质",
+      "qualifier": "原主体：湖北美尔雅服装集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "湖北美尔雅服装集团有限公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a984feb696ff8c99:commodity:14",
+    "object_type": "Activity",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "中、高档西服",
+      "value": null,
+      "unit": null,
+      "header": "原主体业务性质",
+      "qualifier": "原主体：美尔雅服饰有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "美尔雅服饰有限公司",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-92d6720784f45722:commodity:1",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "租赁",
+      "value": null,
+      "unit": null,
+      "header": "作为出租人的经营租赁",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "provides_service",
+    "uncertainty": [],
+    "pages": [
+      [
+        199,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-558f38a798173696:commodity:1",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "水",
+      "value": null,
+      "unit": null,
+      "header": "本期销售商品",
+      "qualifier": "交易对方：湖北美尔雅集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-558f38a798173696:commodity:2",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "电",
+      "value": null,
+      "unit": null,
+      "header": "本期销售商品",
+      "qualifier": "交易对方：湖北美尔雅集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-558f38a798173696:commodity:3",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "汽",
+      "value": null,
+      "unit": null,
+      "header": "本期销售商品",
+      "qualifier": "交易对方：湖北美尔雅集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-558f38a798173696:commodity:4",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "客运服务",
+      "value": null,
+      "unit": null,
+      "header": "本期提供服务",
+      "qualifier": "交易对方：湖北美尔雅集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "provides_service",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-558f38a798173696:commodity:5",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "水",
+      "value": null,
+      "unit": null,
+      "header": "本期销售商品",
+      "qualifier": "交易对方：湖北美红服装有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-558f38a798173696:commodity:6",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "电",
+      "value": null,
+      "unit": null,
+      "header": "本期销售商品",
+      "qualifier": "交易对方：湖北美红服装有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-558f38a798173696:commodity:7",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "汽",
+      "value": null,
+      "unit": null,
+      "header": "本期销售商品",
+      "qualifier": "交易对方：湖北美红服装有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-558f38a798173696:commodity:8",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "客运服务",
+      "value": null,
+      "unit": null,
+      "header": "本期提供服务",
+      "qualifier": "交易对方：湖北美红服装有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "provides_service",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-558f38a798173696:commodity:9",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "水",
+      "value": null,
+      "unit": null,
+      "header": "本期销售商品",
+      "qualifier": "交易对方：湖北闻世建筑工程有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-558f38a798173696:commodity:10",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "电",
+      "value": null,
+      "unit": null,
+      "header": "本期销售商品",
+      "qualifier": "交易对方：湖北闻世建筑工程有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-558f38a798173696:commodity:11",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "汽",
+      "value": null,
+      "unit": null,
+      "header": "本期销售商品",
+      "qualifier": "交易对方：湖北闻世建筑工程有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-558f38a798173696:commodity:12",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "采购商品/接受劳务",
+      "value": null,
+      "unit": null,
+      "header": "本期采购原内容",
+      "qualifier": "交易对方：湖北美红服装有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "purchases",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-558f38a798173696:commodity:13",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "采购商品/接受劳务",
+      "value": null,
+      "unit": null,
+      "header": "本期采购原内容",
+      "qualifier": "交易对方：湖北闻世建筑工程有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "purchases",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-558f38a798173696:commodity:14",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "房屋建筑物租赁",
+      "value": null,
+      "unit": null,
+      "header": "本期出租服务",
+      "qualifier": "承租方：湖北美红服装有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "provides_service",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-558f38a798173696:commodity:15",
+    "object_type": "Activity",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "设备租赁",
+      "value": null,
+      "unit": null,
+      "header": "本期出租服务",
+      "qualifier": "承租方：湖北美红服装有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "公司及合并子公司",
+    "action": "provides_service",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-79df664013631450:commodity:1",
+    "object_type": "Activity",
+    "subject_scope": "business_segment",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "服装",
+      "value": null,
+      "unit": null,
+      "header": "报告分部原经营",
+      "qualifier": "原主体：服装及纺织品报告分部",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "服装及纺织品报告分部",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        227,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-79df664013631450:commodity:2",
+    "object_type": "Activity",
+    "subject_scope": "business_segment",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "纺织品",
+      "value": null,
+      "unit": null,
+      "header": "报告分部原经营",
+      "qualifier": "原主体：服装及纺织品报告分部",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "服装及纺织品报告分部",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        227,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-79df664013631450:commodity:3",
+    "object_type": "Activity",
+    "subject_scope": "business_segment",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "服装",
+      "value": null,
+      "unit": null,
+      "header": "报告分部原经营",
+      "qualifier": "原主体：服装及纺织品报告分部",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "服装及纺织品报告分部",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        227,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-79df664013631450:commodity:4",
+    "object_type": "Activity",
+    "subject_scope": "business_segment",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "纺织品",
+      "value": null,
+      "unit": null,
+      "header": "报告分部原经营",
+      "qualifier": "原主体：服装及纺织品报告分部",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "服装及纺织品报告分部",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        227,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-79df664013631450:commodity:5",
+    "object_type": "Activity",
+    "subject_scope": "business_segment",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "蒸汽",
+      "value": null,
+      "unit": null,
+      "header": "报告分部原经营",
+      "qualifier": "原主体：其他报告分部",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "其他报告分部",
+    "action": "produces",
+    "uncertainty": [],
+    "pages": [
+      [
+        227,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-79df664013631450:commodity:6",
+    "object_type": "Activity",
+    "subject_scope": "business_segment",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "蒸汽",
+      "value": null,
+      "unit": null,
+      "header": "报告分部原经营",
+      "qualifier": "原主体：其他报告分部",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "其他报告分部",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        227,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-79df664013631450:commodity:7",
+    "object_type": "Activity",
+    "subject_scope": "business_segment",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "水",
+      "value": null,
+      "unit": null,
+      "header": "报告分部原经营",
+      "qualifier": "原主体：其他报告分部",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "其他报告分部",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        227,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-79df664013631450:commodity:8",
+    "object_type": "Activity",
+    "subject_scope": "business_segment",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "电",
+      "value": null,
+      "unit": null,
+      "header": "报告分部原经营",
+      "qualifier": "原主体：其他报告分部",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "其他报告分部",
+    "action": "sells",
+    "uncertainty": [],
+    "pages": [
+      [
+        227,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-79df664013631450:commodity:9",
+    "object_type": "Activity",
+    "subject_scope": "business_segment",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "运输服务",
+      "value": null,
+      "unit": null,
+      "header": "报告分部原经营",
+      "qualifier": "原主体：其他报告分部",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "source_actor": "其他报告分部",
+    "action": "provides_service",
+    "uncertainty": [],
+    "pages": [
+      [
+        227,
+        [
+          4
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-8f5fccbd49accb80:Segment:business_type:正常经营之外的其他业务收入:其他业务收入扣除明细/本年度:row:0",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "正常经营之外的其他业务收入",
+      "value": "338.88",
+      "unit": "万元",
+      "header": "其他业务收入扣除明细/本年度",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        10,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-fae3b0977585d6e1:Measurement:business_type:正常经营之外的其他业务收入:其他业务收入扣除明细/本年度:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "正常经营之外的其他业务收入",
+      "value": "338.88",
+      "unit": "万元",
+      "header": "其他业务收入扣除明细/本年度",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        10,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-8f5fccbd49accb80:Segment:business_type:未形成或难以形成稳定业务模式的业务所产生的收入:其他业务收入扣除明细/本年度:row:1",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "未形成或难以形成稳定业务模式的业务所产生的收入",
+      "value": "1.56",
+      "unit": "万元",
+      "header": "其他业务收入扣除明细/本年度",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        10,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-fae3b0977585d6e1:Measurement:business_type:未形成或难以形成稳定业务模式的业务所产生的收入:其他业务收入扣除明细/本年度:row:1",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "未形成或难以形成稳定业务模式的业务所产生的收入",
+      "value": "1.56",
+      "unit": "万元",
+      "header": "其他业务收入扣除明细/本年度",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        10,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-4f003e685268f9a7:Segment:business_segment:湖北美尔雅服装集团有限公司:控股参股公司/营业收入:row:0",
+    "object_type": "Segment",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "湖北美尔雅服装集团有限公司",
+      "value": "175,793,460.36",
+      "unit": "元",
+      "header": "控股参股公司/营业收入",
+      "qualifier": "子公司：湖北美尔雅服装集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-cec333b9d76bb6ae:Measurement:business_segment:湖北美尔雅服装集团有限公司:控股参股公司/营业收入:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "湖北美尔雅服装集团有限公司",
+      "value": "175,793,460.36",
+      "unit": "元",
+      "header": "控股参股公司/营业收入",
+      "qualifier": "子公司：湖北美尔雅服装集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-4f003e685268f9a7:Segment:business_segment:美尔雅服饰有限公司:控股参股公司/营业收入:row:1",
+    "object_type": "Segment",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "美尔雅服饰有限公司",
+      "value": "41,300,845.88",
+      "unit": "元",
+      "header": "控股参股公司/营业收入",
+      "qualifier": "子公司：美尔雅服饰有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-cec333b9d76bb6ae:Measurement:business_segment:美尔雅服饰有限公司:控股参股公司/营业收入:row:1",
+    "object_type": "Measurement",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "美尔雅服饰有限公司",
+      "value": "41,300,845.88",
+      "unit": "元",
+      "header": "控股参股公司/营业收入",
+      "qualifier": "子公司：美尔雅服饰有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        26,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-9299d61b2e7d3526:Segment:business_type:主营业务:营业收入:row:0",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "主营业务",
+      "value": "232,806,218.16",
+      "unit": "元",
+      "header": "营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-75770fb69361d6ba:Measurement:business_type:主营业务:营业收入:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "主营业务",
+      "value": "232,806,218.16",
+      "unit": "元",
+      "header": "营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-9299d61b2e7d3526:Segment:business_type:其他业务:营业收入:row:1",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他业务",
+      "value": "3,388,781.95",
+      "unit": "元",
+      "header": "营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-75770fb69361d6ba:Measurement:business_type:其他业务:营业收入:row:1",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他业务",
+      "value": "3,388,781.95",
+      "unit": "元",
+      "header": "营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-9299d61b2e7d3526:Segment:business_type:合计:营业收入:row:2",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-75770fb69361d6ba:Measurement:business_type:合计:营业收入:row:2",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-c191933163d5e1bc:Segment:business_type:主营业务:营业收入:row:0",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "主营业务",
+      "value": "232,806,218.16",
+      "unit": "元",
+      "header": "营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-eaba215658059228:Measurement:business_type:主营业务:营业收入:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "主营业务",
+      "value": "232,806,218.16",
+      "unit": "元",
+      "header": "营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-c191933163d5e1bc:Segment:business_type:其他业务:营业收入:row:1",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他业务",
+      "value": "3,388,781.95",
+      "unit": "元",
+      "header": "营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-eaba215658059228:Measurement:business_type:其他业务:营业收入:row:1",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他业务",
+      "value": "3,388,781.95",
+      "unit": "元",
+      "header": "营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-c191933163d5e1bc:Segment:business_type:合计:营业收入:row:2",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-eaba215658059228:Measurement:business_type:合计:营业收入:row:2",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-669373e7645a1bae:Segment:product:服装及纺织:合同收入/商品类型:row:0",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "服装及纺织",
+      "value": "229,197,408.86",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2b7d48cff08e2457:Measurement:product:服装及纺织:合同收入/商品类型:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "服装及纺织",
+      "value": "229,197,408.86",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-669373e7645a1bae:Segment:product:服装及纺织:合同收入/商品类型:row:1",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "服装及纺织",
+      "value": "229,197,408.86",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2b7d48cff08e2457:Measurement:product:服装及纺织:合同收入/商品类型:row:1",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "服装及纺织",
+      "value": "229,197,408.86",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-669373e7645a1bae:Segment:product:其他:合同收入/商品类型:row:2",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他",
+      "value": "6,997,591.25",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2b7d48cff08e2457:Measurement:product:其他:合同收入/商品类型:row:2",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他",
+      "value": "6,997,591.25",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-669373e7645a1bae:Segment:product:其他:合同收入/商品类型:row:3",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他",
+      "value": "6,997,591.25",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2b7d48cff08e2457:Measurement:product:其他:合同收入/商品类型:row:3",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他",
+      "value": "6,997,591.25",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-669373e7645a1bae:Segment:region:中国大陆地区:合同收入/按经营地区分类:row:4",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "中国大陆地区",
+      "value": "189,433,939.21",
+      "unit": "元",
+      "header": "合同收入/按经营地区分类",
+      "qualifier": "原收入列：分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2b7d48cff08e2457:Measurement:region:中国大陆地区:合同收入/按经营地区分类:row:4",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "中国大陆地区",
+      "value": "189,433,939.21",
+      "unit": "元",
+      "header": "合同收入/按经营地区分类",
+      "qualifier": "原收入列：分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-669373e7645a1bae:Segment:region:中国大陆地区:合同收入/按经营地区分类:row:5",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "中国大陆地区",
+      "value": "189,433,939.21",
+      "unit": "元",
+      "header": "合同收入/按经营地区分类",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2b7d48cff08e2457:Measurement:region:中国大陆地区:合同收入/按经营地区分类:row:5",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "中国大陆地区",
+      "value": "189,433,939.21",
+      "unit": "元",
+      "header": "合同收入/按经营地区分类",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-669373e7645a1bae:Segment:region:中国大陆地区以外的地区:合同收入/按经营地区分类:row:6",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "中国大陆地区以外的地区",
+      "value": "46,761,060.90",
+      "unit": "元",
+      "header": "合同收入/按经营地区分类",
+      "qualifier": "原收入列：分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2b7d48cff08e2457:Measurement:region:中国大陆地区以外的地区:合同收入/按经营地区分类:row:6",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "中国大陆地区以外的地区",
+      "value": "46,761,060.90",
+      "unit": "元",
+      "header": "合同收入/按经营地区分类",
+      "qualifier": "原收入列：分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-669373e7645a1bae:Segment:region:中国大陆地区以外的地区:合同收入/按经营地区分类:row:7",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "中国大陆地区以外的地区",
+      "value": "46,761,060.90",
+      "unit": "元",
+      "header": "合同收入/按经营地区分类",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2b7d48cff08e2457:Measurement:region:中国大陆地区以外的地区:合同收入/按经营地区分类:row:7",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "中国大陆地区以外的地区",
+      "value": "46,761,060.90",
+      "unit": "元",
+      "header": "合同收入/按经营地区分类",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-669373e7645a1bae:Segment:business_segment:合计:合同收入/合同分解合计:row:8",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "合同收入/合同分解合计",
+      "qualifier": "原收入列：分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2b7d48cff08e2457:Measurement:business_segment:合计:合同收入/合同分解合计:row:8",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "合同收入/合同分解合计",
+      "qualifier": "原收入列：分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-669373e7645a1bae:Segment:business_segment:合计:合同收入/合同分解合计:row:9",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "合同收入/合同分解合计",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2b7d48cff08e2457:Measurement:business_segment:合计:合同收入/合同分解合计:row:9",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "合同收入/合同分解合计",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        182,
+        [
+          183
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-4bcadcdf9440f1dc:Segment:business_segment:湖北美尔雅服装集团有限公司:重要非全资子公司/本期营业收入:row:0",
+    "object_type": "Segment",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "湖北美尔雅服装集团有限公司",
+      "value": "175,793,460.36",
+      "unit": "元",
+      "header": "重要非全资子公司/本期营业收入",
+      "qualifier": "原子公司：湖北美尔雅服装集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        204,
+        [
+          205
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-8b1f5245a02a7443:Measurement:business_segment:湖北美尔雅服装集团有限公司:重要非全资子公司/本期营业收入:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "湖北美尔雅服装集团有限公司",
+      "value": "175,793,460.36",
+      "unit": "元",
+      "header": "重要非全资子公司/本期营业收入",
+      "qualifier": "原子公司：湖北美尔雅服装集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        204,
+        [
+          205
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-4bcadcdf9440f1dc:Segment:business_segment:美尔雅服饰有限公司:重要非全资子公司/本期营业收入:row:1",
+    "object_type": "Segment",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "美尔雅服饰有限公司",
+      "value": "41,300,845.88",
+      "unit": "元",
+      "header": "重要非全资子公司/本期营业收入",
+      "qualifier": "原子公司：美尔雅服饰有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        204,
+        [
+          205
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-8b1f5245a02a7443:Measurement:business_segment:美尔雅服饰有限公司:重要非全资子公司/本期营业收入:row:1",
+    "object_type": "Measurement",
+    "subject_scope": "named_subsidiary",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "美尔雅服饰有限公司",
+      "value": "41,300,845.88",
+      "unit": "元",
+      "header": "重要非全资子公司/本期营业收入",
+      "qualifier": "原子公司：美尔雅服饰有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        204,
+        [
+          205
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-3c3a1e41ed141609:Segment:business_segment:服装及纺织品报告分部:对外营业收入:row:0",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "服装及纺织品报告分部",
+      "value": "236,179,399.28",
+      "unit": "元",
+      "header": "对外营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        227,
+        [
+          228
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-1ddfd38a4910cd21:Measurement:business_segment:服装及纺织品报告分部:对外营业收入:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "服装及纺织品报告分部",
+      "value": "236,179,399.28",
+      "unit": "元",
+      "header": "对外营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        227,
+        [
+          228
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-3c3a1e41ed141609:Segment:business_segment:其他报告分部:对外营业收入:row:1",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他报告分部",
+      "value": "15,600.83",
+      "unit": "元",
+      "header": "对外营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        227,
+        [
+          228
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-1ddfd38a4910cd21:Measurement:business_segment:其他报告分部:对外营业收入:row:1",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他报告分部",
+      "value": "15,600.83",
+      "unit": "元",
+      "header": "对外营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        227,
+        [
+          228
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-3c3a1e41ed141609:Segment:business_segment:合计:对外营业收入:row:2",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "对外营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        227,
+        [
+          228
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-1ddfd38a4910cd21:Measurement:business_segment:合计:对外营业收入:row:2",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "对外营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        227,
+        [
+          228
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-49d1b924c52b7612:Segment:business_type:其他业务:营业收入:row:0",
+    "object_type": "Segment",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他业务",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        240,
+        [
+          229
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-f1c28ef97982c488:Measurement:business_type:其他业务:营业收入:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他业务",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        240,
+        [
+          229
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-49d1b924c52b7612:Segment:business_type:合计:营业收入:row:1",
+    "object_type": "Segment",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        240,
+        [
+          229
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-f1c28ef97982c488:Measurement:business_type:合计:营业收入:row:1",
+    "object_type": "Measurement",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        240,
+        [
+          229
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-628c2307a78ba1f5:Segment:business_type:其他业务:营业收入:row:0",
+    "object_type": "Segment",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他业务",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        240,
+        [
+          229
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-628c2307a78ba1f5:Segment:business_type:合计:营业收入:row:1",
+    "object_type": "Segment",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        240,
+        [
+          229
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-67071a059eba7ed0:Segment:product:其他:合同收入/商品类型:row:0",
+    "object_type": "Segment",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        240,
+        [
+          229
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2e4273994460caf2:Measurement:product:其他:合同收入/商品类型:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        240,
+        [
+          229
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-67071a059eba7ed0:Segment:product:其他:合同收入/商品类型:row:1",
+    "object_type": "Segment",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        240,
+        [
+          229
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2e4273994460caf2:Measurement:product:其他:合同收入/商品类型:row:1",
+    "object_type": "Measurement",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "合同收入/商品类型",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        240,
+        [
+          229
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-67071a059eba7ed0:Segment:region:中国大陆地区:合同收入/按经营地区分类:row:2",
+    "object_type": "Segment",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "中国大陆地区",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "合同收入/按经营地区分类",
+      "qualifier": "原收入列：分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        240,
+        [
+          229
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2e4273994460caf2:Measurement:region:中国大陆地区:合同收入/按经营地区分类:row:2",
+    "object_type": "Measurement",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "中国大陆地区",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "合同收入/按经营地区分类",
+      "qualifier": "原收入列：分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        240,
+        [
+          229
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-67071a059eba7ed0:Segment:region:中国大陆地区:合同收入/按经营地区分类:row:3",
+    "object_type": "Segment",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "中国大陆地区",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "合同收入/按经营地区分类",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        240,
+        [
+          229
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2e4273994460caf2:Measurement:region:中国大陆地区:合同收入/按经营地区分类:row:3",
+    "object_type": "Measurement",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "中国大陆地区",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "合同收入/按经营地区分类",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        240,
+        [
+          229
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-67071a059eba7ed0:Segment:business_segment:合计:合同收入/合同分解合计:row:4",
+    "object_type": "Segment",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "合同收入/合同分解合计",
+      "qualifier": "原收入列：分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        240,
+        [
+          229
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2e4273994460caf2:Measurement:business_segment:合计:合同收入/合同分解合计:row:4",
+    "object_type": "Measurement",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "合同收入/合同分解合计",
+      "qualifier": "原收入列：分部营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        240,
+        [
+          229
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-67071a059eba7ed0:Segment:business_segment:合计:合同收入/合同分解合计:row:5",
+    "object_type": "Segment",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "合同收入/合同分解合计",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        240,
+        [
+          229
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2e4273994460caf2:Measurement:business_segment:合计:合同收入/合同分解合计:row:5",
+    "object_type": "Measurement",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "合同收入/合同分解合计",
+      "qualifier": "原收入列：合计营业收入",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_segment",
+    "uncertainty": [],
+    "pages": [
+      [
+        240,
+        [
+          229
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-ac64c44f405fd67c:Segment:customer:客户1:前五名客户/销售额:row:0",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "客户1",
+      "value": "3,730.25",
+      "unit": "万元",
+      "header": "前五名客户/销售额",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "customer",
+    "uncertainty": [],
+    "pages": [
+      [
+        19,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-02cdee492d3fc282:Measurement:customer:客户1:前五名客户/销售额:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "客户1",
+      "value": "3,730.25",
+      "unit": "万元",
+      "header": "前五名客户/销售额",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "customer",
+    "uncertainty": [],
+    "pages": [
+      [
+        19,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-ac64c44f405fd67c:Segment:customer:客户2:前五名客户/销售额:row:1",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "客户2",
+      "value": "625.51",
+      "unit": "万元",
+      "header": "前五名客户/销售额",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "customer",
+    "uncertainty": [],
+    "pages": [
+      [
+        19,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-02cdee492d3fc282:Measurement:customer:客户2:前五名客户/销售额:row:1",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "客户2",
+      "value": "625.51",
+      "unit": "万元",
+      "header": "前五名客户/销售额",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "customer",
+    "uncertainty": [],
+    "pages": [
+      [
+        19,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-ac64c44f405fd67c:Segment:customer:客户3:前五名客户/销售额:row:2",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "客户3",
+      "value": "537.80",
+      "unit": "万元",
+      "header": "前五名客户/销售额",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "customer",
+    "uncertainty": [],
+    "pages": [
+      [
+        19,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-02cdee492d3fc282:Measurement:customer:客户3:前五名客户/销售额:row:2",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "客户3",
+      "value": "537.80",
+      "unit": "万元",
+      "header": "前五名客户/销售额",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "customer",
+    "uncertainty": [],
+    "pages": [
+      [
+        19,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-ac64c44f405fd67c:Segment:customer:客户4:前五名客户/销售额:row:3",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "客户4",
+      "value": "353.81",
+      "unit": "万元",
+      "header": "前五名客户/销售额",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "customer",
+    "uncertainty": [],
+    "pages": [
+      [
+        19,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-02cdee492d3fc282:Measurement:customer:客户4:前五名客户/销售额:row:3",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "客户4",
+      "value": "353.81",
+      "unit": "万元",
+      "header": "前五名客户/销售额",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "customer",
+    "uncertainty": [],
+    "pages": [
+      [
+        19,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-ac64c44f405fd67c:Segment:customer:客户5:前五名客户/销售额:row:4",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "客户5",
+      "value": "326.76",
+      "unit": "万元",
+      "header": "前五名客户/销售额",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "customer",
+    "uncertainty": [],
+    "pages": [
+      [
+        19,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-02cdee492d3fc282:Measurement:customer:客户5:前五名客户/销售额:row:4",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "客户5",
+      "value": "326.76",
+      "unit": "万元",
+      "header": "前五名客户/销售额",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "customer",
+    "uncertainty": [],
+    "pages": [
+      [
+        19,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-ac64c44f405fd67c:Segment:customer:合计:前五名客户/销售额:row:5",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "5,574.13",
+      "unit": "万元",
+      "header": "前五名客户/销售额",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "customer",
+    "uncertainty": [],
+    "pages": [
+      [
+        19,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-02cdee492d3fc282:Measurement:customer:合计:前五名客户/销售额:row:5",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "5,574.13",
+      "unit": "万元",
+      "header": "前五名客户/销售额",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "customer",
+    "uncertainty": [],
+    "pages": [
+      [
+        19,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-c84a49a9a3649269:Segment:product:品牌:各品牌盈利:row:0",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "品牌",
+      "value": "182,436,347.96",
+      "unit": "元",
+      "header": "各品牌盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        23,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-469671a9a58e9cf6:Measurement:product:品牌:各品牌盈利:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "品牌",
+      "value": "182,436,347.96",
+      "unit": "元",
+      "header": "各品牌盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        23,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-c84a49a9a3649269:Segment:product:出口加工:各品牌盈利:row:1",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "出口加工",
+      "value": "46,761,060.90",
+      "unit": "元",
+      "header": "各品牌盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        23,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-469671a9a58e9cf6:Measurement:product:出口加工:各品牌盈利:row:1",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "出口加工",
+      "value": "46,761,060.90",
+      "unit": "元",
+      "header": "各品牌盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        23,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-c84a49a9a3649269:Segment:product:合计:各品牌盈利:row:2",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "229,197,408.86",
+      "unit": "元",
+      "header": "各品牌盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        23,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-469671a9a58e9cf6:Measurement:product:合计:各品牌盈利:row:2",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "229,197,408.86",
+      "unit": "元",
+      "header": "各品牌盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        23,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-5d8cc8a5b1258218:Segment:sales_mode:直营店:直营店和加盟店盈利:row:0",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "直营店",
+      "value": "56,431,306.80",
+      "unit": "元",
+      "header": "直营店和加盟店盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        23,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-8ad9458967e1fd0b:Measurement:sales_mode:直营店:直营店和加盟店盈利:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "直营店",
+      "value": "56,431,306.80",
+      "unit": "元",
+      "header": "直营店和加盟店盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        23,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-5d8cc8a5b1258218:Segment:sales_mode:加盟店:直营店和加盟店盈利:row:1",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "加盟店",
+      "value": "75,185,231.39",
+      "unit": "元",
+      "header": "直营店和加盟店盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        23,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-8ad9458967e1fd0b:Measurement:sales_mode:加盟店:直营店和加盟店盈利:row:1",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "加盟店",
+      "value": "75,185,231.39",
+      "unit": "元",
+      "header": "直营店和加盟店盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        23,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-5d8cc8a5b1258218:Segment:sales_mode:出口加工:直营店和加盟店盈利:row:2",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "出口加工",
+      "value": "46,761,060.90",
+      "unit": "元",
+      "header": "直营店和加盟店盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        23,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-8ad9458967e1fd0b:Measurement:sales_mode:出口加工:直营店和加盟店盈利:row:2",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "出口加工",
+      "value": "46,761,060.90",
+      "unit": "元",
+      "header": "直营店和加盟店盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        23,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-5d8cc8a5b1258218:Segment:sales_mode:其他:直营店和加盟店盈利:row:3",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他",
+      "value": "50,819,809.77",
+      "unit": "元",
+      "header": "直营店和加盟店盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        23,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-8ad9458967e1fd0b:Measurement:sales_mode:其他:直营店和加盟店盈利:row:3",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他",
+      "value": "50,819,809.77",
+      "unit": "元",
+      "header": "直营店和加盟店盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        23,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-5d8cc8a5b1258218:Segment:sales_mode:合计:直营店和加盟店盈利:row:4",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "229,197,408.86",
+      "unit": "元",
+      "header": "直营店和加盟店盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        23,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-8ad9458967e1fd0b:Measurement:sales_mode:合计:直营店和加盟店盈利:row:4",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "229,197,408.86",
+      "unit": "元",
+      "header": "直营店和加盟店盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        23,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-03af5f931a461804:Segment:sales_mode:线上销售:线上线下销售渠道盈利:row:0",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "线上销售",
+      "value": "5,580,869.71",
+      "unit": "元",
+      "header": "线上线下销售渠道盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-0b1d5901328e60ee:Measurement:sales_mode:线上销售:线上线下销售渠道盈利:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "线上销售",
+      "value": "5,580,869.71",
+      "unit": "元",
+      "header": "线上线下销售渠道盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-03af5f931a461804:Segment:sales_mode:线下销售:线上线下销售渠道盈利:row:1",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "线下销售",
+      "value": "223,616,539.15",
+      "unit": "元",
+      "header": "线上线下销售渠道盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-0b1d5901328e60ee:Measurement:sales_mode:线下销售:线上线下销售渠道盈利:row:1",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "线下销售",
+      "value": "223,616,539.15",
+      "unit": "元",
+      "header": "线上线下销售渠道盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-03af5f931a461804:Segment:sales_mode:合计:线上线下销售渠道盈利:row:2",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "229,197,408.86",
+      "unit": "元",
+      "header": "线上线下销售渠道盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-0b1d5901328e60ee:Measurement:sales_mode:合计:线上线下销售渠道盈利:row:2",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "229,197,408.86",
+      "unit": "元",
+      "header": "线上线下销售渠道盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a1600af41a14f633:Segment:region:东北地区:各地区盈利:row:0",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "东北地区",
+      "value": "1,421,773.12",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2d2c37be26d09603:Measurement:region:东北地区:各地区盈利:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "东北地区",
+      "value": "1,421,773.12",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a1600af41a14f633:Segment:region:华北地区:各地区盈利:row:1",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "华北地区",
+      "value": "1,044,377.91",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2d2c37be26d09603:Measurement:region:华北地区:各地区盈利:row:1",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "华北地区",
+      "value": "1,044,377.91",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a1600af41a14f633:Segment:region:华东地区:各地区盈利:row:2",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "华东地区",
+      "value": "12,532,314.30",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2d2c37be26d09603:Measurement:region:华东地区:各地区盈利:row:2",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "华东地区",
+      "value": "12,532,314.30",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a1600af41a14f633:Segment:region:华南地区:各地区盈利:row:3",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "华南地区",
+      "value": "2,664,845.73",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2d2c37be26d09603:Measurement:region:华南地区:各地区盈利:row:3",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "华南地区",
+      "value": "2,664,845.73",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a1600af41a14f633:Segment:region:华中地区:各地区盈利:row:4",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "华中地区",
+      "value": "150,610,378.46",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2d2c37be26d09603:Measurement:region:华中地区:各地区盈利:row:4",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "华中地区",
+      "value": "150,610,378.46",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a1600af41a14f633:Segment:region:西北地区:各地区盈利:row:5",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "西北地区",
+      "value": "6,405,677.73",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2d2c37be26d09603:Measurement:region:西北地区:各地区盈利:row:5",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "西北地区",
+      "value": "6,405,677.73",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a1600af41a14f633:Segment:region:西南地区:各地区盈利:row:6",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "西南地区",
+      "value": "7,756,980.71",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2d2c37be26d09603:Measurement:region:西南地区:各地区盈利:row:6",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "西南地区",
+      "value": "7,756,980.71",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a1600af41a14f633:Segment:region:境内小计:各地区盈利:row:7",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "境内小计",
+      "value": "182,436,347.96",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2d2c37be26d09603:Measurement:region:境内小计:各地区盈利:row:7",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "境内小计",
+      "value": "182,436,347.96",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a1600af41a14f633:Segment:region:国际地区:各地区盈利:row:8",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "国际地区",
+      "value": "46,761,060.90",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2d2c37be26d09603:Measurement:region:国际地区:各地区盈利:row:8",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "国际地区",
+      "value": "46,761,060.90",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a1600af41a14f633:Segment:region:境外小计:各地区盈利:row:9",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "境外小计",
+      "value": "46,761,060.90",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2d2c37be26d09603:Measurement:region:境外小计:各地区盈利:row:9",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "境外小计",
+      "value": "46,761,060.90",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a1600af41a14f633:Segment:region:合计:各地区盈利:row:10",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "229,197,408.86",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-2d2c37be26d09603:Measurement:region:合计:各地区盈利:row:10",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "229,197,408.86",
+      "unit": "元",
+      "header": "各地区盈利",
+      "qualifier": "金额按元解释；原表单位：万元，与同报告独立服装收入元表冲突；原打印表头保留",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        24,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-19af01877a369f62:Segment:business_type:营业总收入:合并利润表/营业总收入:row:0",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "营业总收入",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "合并利润表/营业总收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        78,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-1743166f6f234d0f:Measurement:business_type:营业总收入:合并利润表/营业总收入:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "营业总收入",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "合并利润表/营业总收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        78,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-19af01877a369f62:Segment:business_type:营业收入:合并利润表/营业收入:row:1",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "营业收入",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "合并利润表/营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        78,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-1743166f6f234d0f:Measurement:business_type:营业收入:合并利润表/营业收入:row:1",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "营业收入",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "合并利润表/营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        78,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-15aa60c9087628be:Segment:business_type:营业收入:母公司利润表/营业收入:row:0",
+    "object_type": "Segment",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "营业收入",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "母公司利润表/营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        80,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-89d502b4b4de2539:Measurement:business_type:营业收入:母公司利润表/营业收入:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "issuer",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "营业收入",
+      "value": "4,386,705.80",
+      "unit": "元",
+      "header": "母公司利润表/营业收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "business_type",
+    "uncertainty": [],
+    "pages": [
+      [
+        80,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b07a86783e03255f:Segment:industry:服装:主营业务收入:row:0",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "服装",
+      "value": "229,197,408.86",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "industry",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-fb0e8f07381b6049:Measurement:industry:服装:主营业务收入:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "服装",
+      "value": "229,197,408.86",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "industry",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b07a86783e03255f:Segment:industry:其他业务:主营业务收入:row:1",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他业务",
+      "value": "6,997,591.25",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "industry",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-fb0e8f07381b6049:Measurement:industry:其他业务:主营业务收入:row:1",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他业务",
+      "value": "6,997,591.25",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "industry",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b07a86783e03255f:Segment:industry:小计:主营业务收入:row:2",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "小计",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "industry",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-fb0e8f07381b6049:Measurement:industry:小计:主营业务收入:row:2",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "小计",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "industry",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b07a86783e03255f:Segment:product:品牌男装:主营业务收入:row:3",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "品牌男装",
+      "value": "129,735,100.43",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-fb0e8f07381b6049:Measurement:product:品牌男装:主营业务收入:row:3",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "品牌男装",
+      "value": "129,735,100.43",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b07a86783e03255f:Segment:product:品牌女装:主营业务收入:row:4",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "品牌女装",
+      "value": "52,701,247.53",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-fb0e8f07381b6049:Measurement:product:品牌女装:主营业务收入:row:4",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "品牌女装",
+      "value": "52,701,247.53",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b07a86783e03255f:Segment:product:出口加工类:主营业务收入:row:5",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "出口加工类",
+      "value": "46,761,060.90",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-fb0e8f07381b6049:Measurement:product:出口加工类:主营业务收入:row:5",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "出口加工类",
+      "value": "46,761,060.90",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b07a86783e03255f:Segment:product:其他业务:主营业务收入:row:6",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他业务",
+      "value": "6,997,591.25",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-fb0e8f07381b6049:Measurement:product:其他业务:主营业务收入:row:6",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他业务",
+      "value": "6,997,591.25",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b07a86783e03255f:Segment:product:小计:主营业务收入:row:7",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "小计",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-fb0e8f07381b6049:Measurement:product:小计:主营业务收入:row:7",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "小计",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "product",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b07a86783e03255f:Segment:region:国内:主营业务收入:row:8",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "国内",
+      "value": "189,433,939.21",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-fb0e8f07381b6049:Measurement:region:国内:主营业务收入:row:8",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "国内",
+      "value": "189,433,939.21",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b07a86783e03255f:Segment:region:国际:主营业务收入:row:9",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "国际",
+      "value": "46,761,060.90",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-fb0e8f07381b6049:Measurement:region:国际:主营业务收入:row:9",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "国际",
+      "value": "46,761,060.90",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "region",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b07a86783e03255f:Segment:sales_mode:直营店:主营业务收入:row:10",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "直营店",
+      "value": "56,431,306.80",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-fb0e8f07381b6049:Measurement:sales_mode:直营店:主营业务收入:row:10",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "直营店",
+      "value": "56,431,306.80",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b07a86783e03255f:Segment:sales_mode:加盟联营店:主营业务收入:row:11",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "加盟联营店",
+      "value": "75,185,231.39",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-fb0e8f07381b6049:Measurement:sales_mode:加盟联营店:主营业务收入:row:11",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "加盟联营店",
+      "value": "75,185,231.39",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b07a86783e03255f:Segment:sales_mode:出口加工:主营业务收入:row:12",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "出口加工",
+      "value": "46,761,060.90",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-fb0e8f07381b6049:Measurement:sales_mode:出口加工:主营业务收入:row:12",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "出口加工",
+      "value": "46,761,060.90",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b07a86783e03255f:Segment:sales_mode:其他业务:主营业务收入:row:13",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他业务",
+      "value": "57,817,401.02",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-fb0e8f07381b6049:Measurement:sales_mode:其他业务:主营业务收入:row:13",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "其他业务",
+      "value": "57,817,401.02",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-b07a86783e03255f:Segment:sales_mode:小计:主营业务收入:row:14",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "小计",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-fb0e8f07381b6049:Measurement:sales_mode:小计:主营业务收入:row:14",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "小计",
+      "value": "236,195,000.11",
+      "unit": "元",
+      "header": "主营业务收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "sales_mode",
+    "uncertainty": [],
+    "pages": [
+      [
+        15,
+        [
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-60cf3dd178718671:Segment:service:经营租赁收入:作为出租人的经营租赁/租赁收入:row:0",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "经营租赁收入",
+      "value": "2,520,756.67",
+      "unit": "元",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "service",
+    "uncertainty": [],
+    "pages": [
+      [
+        199,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-93f874cd87cf4b17:Measurement:service:经营租赁收入:作为出租人的经营租赁/租赁收入:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "经营租赁收入",
+      "value": "2,520,756.67",
+      "unit": "元",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "service",
+    "uncertainty": [],
+    "pages": [
+      [
+        199,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-60cf3dd178718671:Segment:service:合计:作为出租人的经营租赁/租赁收入:row:1",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "2,520,756.67",
+      "unit": "元",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "service",
+    "uncertainty": [],
+    "pages": [
+      [
+        199,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-93f874cd87cf4b17:Measurement:service:合计:作为出租人的经营租赁/租赁收入:row:1",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "合计",
+      "value": "2,520,756.67",
+      "unit": "元",
+      "header": "作为出租人的经营租赁/租赁收入",
+      "qualifier": null,
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "service",
+    "uncertainty": [],
+    "pages": [
+      [
+        199,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-c422640e39bbe79a:Segment:lease:房屋建筑物:本公司作为出租方/本期确认的租赁收入:row:0",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "房屋建筑物",
+      "value": "541,561.15",
+      "unit": "元",
+      "header": "本公司作为出租方/本期确认的租赁收入",
+      "qualifier": "承租方：湖北美红服装有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "lease",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          216
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a3780cb70f341a49:Measurement:lease:房屋建筑物:本公司作为出租方/本期确认的租赁收入:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "房屋建筑物",
+      "value": "541,561.15",
+      "unit": "元",
+      "header": "本公司作为出租方/本期确认的租赁收入",
+      "qualifier": "承租方：湖北美红服装有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "lease",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          216
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-c422640e39bbe79a:Segment:lease:设备:本公司作为出租方/本期确认的租赁收入:row:1",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "设备",
+      "value": "120,323.88",
+      "unit": "元",
+      "header": "本公司作为出租方/本期确认的租赁收入",
+      "qualifier": "承租方：湖北美红服装有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "lease",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          216
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-a3780cb70f341a49:Measurement:lease:设备:本公司作为出租方/本期确认的租赁收入:row:1",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "设备",
+      "value": "120,323.88",
+      "unit": "元",
+      "header": "本公司作为出租方/本期确认的租赁收入",
+      "qualifier": "承租方：湖北美红服装有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "lease",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        [
+          216
+        ]
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-bb27a4b726fa6385:Segment:service:销售水电汽、提供客运服务:出售商品/提供劳务/本期发生额:row:0",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "销售水电汽、提供客运服务",
+      "value": "464,969.69",
+      "unit": "元",
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": "交易对方：湖北美尔雅集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "service",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-26ac35f8f1a52ecf:Measurement:service:销售水电汽、提供客运服务:出售商品/提供劳务/本期发生额:row:0",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "销售水电汽、提供客运服务",
+      "value": "464,969.69",
+      "unit": "元",
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": "交易对方：湖北美尔雅集团有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "service",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-bb27a4b726fa6385:Segment:service:销售水电汽、提供客运服务:出售商品/提供劳务/本期发生额:row:1",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "销售水电汽、提供客运服务",
+      "value": "2,172,035.28",
+      "unit": "元",
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": "交易对方：湖北美红服装有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "service",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-26ac35f8f1a52ecf:Measurement:service:销售水电汽、提供客运服务:出售商品/提供劳务/本期发生额:row:1",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "销售水电汽、提供客运服务",
+      "value": "2,172,035.28",
+      "unit": "元",
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": "交易对方：湖北美红服装有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "service",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-bb27a4b726fa6385:Segment:service:销售水电汽:出售商品/提供劳务/本期发生额:row:2",
+    "object_type": "Segment",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "销售水电汽",
+      "value": "31,615.26",
+      "unit": "元",
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": "交易对方：湖北闻世建筑工程有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "dimension": "service",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        []
+      ]
+    ]
+  },
+  {
+    "record_id": "owned:core-ev-26ac35f8f1a52ecf:Measurement:service:销售水电汽:出售商品/提供劳务/本期发生额:row:2",
+    "object_type": "Measurement",
+    "subject_scope": "consolidated_group",
+    "reported_period": "2025-12-31",
+    "source_native": {
+      "name": "销售水电汽",
+      "value": "31,615.26",
+      "unit": "元",
+      "header": "出售商品/提供劳务/本期发生额",
+      "qualifier": "交易对方：湖北闻世建筑工程有限公司",
+      "footnote_refs": [],
+      "source_aliases": []
+    },
+    "segment_dimension": "service",
+    "uncertainty": [],
+    "pages": [
+      [
+        215,
+        []
+      ]
+    ]
+  }
+]

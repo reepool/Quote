@@ -283,6 +283,22 @@ class OfficialAnnualReportPageSource:
             for p in pages
             if "房地产销售收入分项列示如下" in p["text"]
             or "营业收入和营业成本情况" in p["text"]
+            or "营业收入和营业成本" in p["text"]
+            or "营业收入、营业成本" in p["text"]
+            or "出租方名称 租赁资产种类 本年发生额" in p["text"]
+            or "销售商品/提供劳务" in p["text"]
+            or "主要财务信息" in p["text"]
+            or "各品牌的盈利情况" in p["text"]
+            or "销售渠道的盈利情况" in p["text"]
+            or "各地区的盈利情况" in p["text"]
+            or "母公司利润表" in p["text"]
+            or "母 公 司 利 润 表" in p["text"]
+            or "终止经营净利润" in p["text"]
+            or "本年确认的租赁收入" in p["text"]
+            or "主营业务分行业、分产品、分地区、分销售模式情况" in p["text"]
+            or "前五名销售客户" in p["text"]
+            or "客户名称 销售额" in p["text"]
+            or "产销量情况分析表" in p["text"]
             or "收入确认时间" in p["text"]
             or "营业收入、营业成本的分解" in p["text"]
             or "主要控股参股公司分析" in p["text"]
@@ -352,7 +368,7 @@ class OfficialAnnualReportPageSource:
                     cursor += 1
             if "企业集团的构成" in page["text"]:
                 cursor = page["page"] + 1
-                while cursor <= page["page"] + 4:
+                while cursor <= page["page"] + 20:
                     following = next((p for p in pages if p["page"] == cursor), None)
                     if not following:
                         break
@@ -387,7 +403,7 @@ class OfficialAnnualReportPageSource:
         for page in pages:
             if "采购商品/接受劳务情况表" in page["text"]:
                 purchaser_active = True
-            if "出售商品/提供劳务情况表" in page["text"]:
+            if re.search(r"(?:出售|销售)商品/提供劳务", page["text"]):
                 seller_active = True
             if "本公司作为出租方" in page["text"]:
                 lease_active = True
@@ -1266,6 +1282,7 @@ class CompanyProfileTaskService:
                 "v56",
                 "v57",
                 "v58",
+                "v59",
             }:
                 from research.business_profile_production_operations import (
                     register_business_profile_shared_annual_report_asset,

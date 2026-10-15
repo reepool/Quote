@@ -1,0 +1,19 @@
+"""Read-only immutable/source/dirty verification, with a new receipt only."""
+import hashlib,json
+from datetime import datetime,timezone
+from pathlib import Path
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v58-unseen-small-batch';load=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+checks={}
+def verify(label,items):
+ bad=[p for p,h in items.items()if not (R/p).is_file() or sha(R/p)!=h];assert not bad,(label,bad);checks[label]=len(items)
+verify('historical_files',load(C/'protection-baseline.json'))
+verify('existing_worktree_items',load(C/'initial-workspace-baseline.json')['existing_modified_sha256'])
+verify('first_formal_delivery',load(C/'first-formal-delivery-preservation.json')['completed_sha256'])
+verify('first_review',load(C/'first-review-preservation.json')['sha256'])
+verify('first_execution_snapshot',{str((C/'first-executed-code-snapshot'/p).relative_to(R)):h for p,h in load(C/'first-source-freeze-receipt.json')['executed_code_sha256'].items()})
+verify('official_pdfs',{str(Path('data/filings/announcements/blobs')/r['document_version'][:2]/(r['document_version']+'.pdf')):r['document_version']for r in load(C/'source-scope.json')['official_reports']})
+old=load(C/'initial-workspace-baseline.json')['predecessor_archive'];print('ARCHIVE BASELINE',str(old)[:120])
+# The historical manifest contains the archived predecessor's immutable paths.
+checks['predecessor_archive_files']=sum('2026-10-15-deliver-company-profile-m4-v57-unseen-small-batch/'in p for p in load(C/'protection-baseline.json'))
+receipt=dict(completed_at=datetime.now(timezone.utc).isoformat(),success=True,checks=checks,source_scope_sha256=sha(C/'source-scope.json'),production_authorization='not_authorized',scale_quality_claim_allowed=False)
+(C/'v59-protection-receipt.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n');print(receipt)

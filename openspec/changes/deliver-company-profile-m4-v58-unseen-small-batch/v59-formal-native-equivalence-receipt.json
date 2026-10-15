@@ -1,0 +1,21 @@
+{
+  "600100.SH": {
+    "native_fact_count": 897,
+    "all_native_semantics_identical_to_reviewed_local": true,
+    "all_three_answer_bytes_identical": true,
+    "only_report_and_evidence_identity_differ": true
+  },
+  "600107.SH": {
+    "native_fact_count": 285,
+    "all_native_semantics_identical_to_reviewed_local": true,
+    "all_three_answer_bytes_identical": true,
+    "only_report_and_evidence_identity_differ": false,
+    "additional_basis_difference": {
+      "count": 6,
+      "fields": [
+        "subject_basis"
+      ],
+      "explanation": "p182合并表三个收入行的六个配对对象：正式subject_basis为report_default_group_scope，局部为direct_source_wording；原表合并范围支持正式依据，subject_scope均为consolidated_group，栏目、主体、金额与期间不变"
+    }
+  }
+}

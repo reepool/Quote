@@ -1,0 +1,46 @@
+"""Match source-frozen conditions, including native columns and action categories."""
+import json,re
+from decimal import Decimal
+from pathlib import Path
+C=Path('openspec/changes/deliver-company-profile-m4-v58-unseen-small-batch');scope=json.loads((C/'source-scope.json').read_text())
+def co(s):return re.sub(r'\s+','',s or '').replace('（','(').replace('）',')')
+def num(s):return Decimal(co(str(s)).replace(',',''))
+def pages(r):return {p for e in r['evidence'] for p in [e.get('page'),*e.get('continuation_pages',[]),*e.get('subject_evidence_pages',[])] if p is not None}
+def match(r,v):
+ n=r['source_native'];h=n.get('header') or '';q=co(n.get('qualifier'));rh=v['header'];d=r.get('dimension',r.get('segment_dimension'));sc=r['subject_scope'];expected={'parent_company':'issuer','group_associated_entity':'business_segment'}.get(v['subject_scope'],v['subject_scope'])
+ if r.get('reported_period')!=v['reported_period'] or v['page'] not in pages(r) or n.get('unit')!=v['unit'] or n.get('value') is None or num(n['value'])!=num(v['value']):return False
+ if co(n['name']) not in {co(x) for x in [*v['native_aliases'],*([v['source_segment']] if rh=='报告分部财务信息' else [])]}:return False
+ if sc!=expected and not (rh=='合并利润表' and sc=='unclear'):return False
+ if v.get('counterparty') and co(v['counterparty']) not in q:return False
+ if rh.startswith('主营业务分'):return d==v['dimension'] and h in ['主营业务收入',rh]
+ if rh in ['合并营业收入和营业成本','母公司营业收入和营业成本']:return h=='营业收入' and d=='business_type'
+ if rh in ['合并利润表','母公司利润表']:return h in [(rh+'/'+v['name']),v['name'],rh]
+ if rh in ['合并收入分解','母公司收入分解'] or '收入分解/' in rh:
+  target='合同收入/'+{'product':'商品类型','region':'按经营地区分类'}.get(v['dimension'],'合同分解合计');return h==target and q==co('原收入列：'+v['source_segment']+'营业收入')
+ if rh=='报告分部财务信息':return h=='对外营业收入' and co(v['source_segment'])==co(n['name'])
+ if rh=='作为出租人的经营租赁':return h=='作为出租人的经营租赁/租赁收入'
+ if rh=='关联交易/出售商品及提供劳务':return h=='出售商品/提供劳务/本期发生额' and q==co('交易对方：'+v['counterparty'])
+ if rh=='关联租赁/本公司作为出租方':return h=='本公司作为出租方/本期确认的租赁收入' and q==co('承租方：'+v['counterparty'])
+ if rh.startswith('重要') and rh.endswith('主要财务信息'):
+  relation='合营' if '合营' in rh else '联营' if '联营' in rh else '非全资子公司'
+  return h=='重要'+relation+'企业/本期营业收入' and co(v['source_actor']) in co(n['name']+' '+q) if relation in ['合营','联营'] else h=='重要非全资子公司/本期营业收入' and co(v['source_actor']) in co(n['name']+' '+q)
+ if rh=='重要非全资子公司主要财务信息':return h=='重要非全资子公司/本期营业收入' and co(v['source_actor']) in q
+ if rh in ['主要控股参股公司分析','主要控股参股公司财务情况']:return h=='控股参股公司/'+v['source_column'] and co(v['source_actor']) in q
+ if rh=='主要销售客户':return h in ['前五名客户/销售额','前五名客户/营业收入'] and d=='customer'
+ if rh=='关联受托管理':return h==rh and expected=='issuer'
+ if rh=='终止经营营业收入':return h==rh and d==v['dimension'] and sc==expected
+ # Any later recognized native table must retain its source heading / column.
+ return h==rh and (not v.get('source_segment') or co(v['source_segment']) in q) and (v['source_actor']=='公司及合并子公司' or co(v['source_actor']) in q) and (not v.get('native_unit') or '冲突' in q and '万元' in q and '元' in q)
+ACTION_MAP={'生产':'produces','制造':'produces','组装':'produces','加工':'processes','销售':'sells','零售':'sells','经销':'sells','分销':'sells','转售':'sells','开发':'develops','提供':'provides_service','服务':'provides_service','安装':'provides_service','维护':'provides_service','修理':'provides_service','技术支持':'provides_service','安调':'provides_service','升级':'provides_service','租赁':'provides_service','经营':'operates','投运':'operates','应用':'operates','挂牌':'operates','种植':'produces'}
+def rolematch(r,v):
+ n=r['source_native'];q=co(n.get('qualifier'));expected={'group_associated_entity':'business_segment','parent_company':'issuer'}.get(v['subject_scope'],v['subject_scope'])
+ if co(n['name']) not in {co(x) for x in v['native_aliases']} or r['subject_scope']!=expected or r.get('reported_period')!=v['reported_period'] or v['page'] not in pages(r):return False
+ if v['source_actor']!='公司及合并子公司' and co(r.get('source_actor')) not in {co(a) for a in v['actor_aliases']}:return False
+ if r.get('action') not in {ACTION_MAP[a]for a in v['source_actions']}:return False
+ required_services=set(v['source_actions']) & {'安装','维护','修理','租赁','技术支持','安调'}
+ if required_services and r.get('source_verb') not in required_services:return False
+ if v.get('counterparty') and co(v['counterparty']) not in q:return False
+ if v.get('category')=='service' and r['action'] not in ['provides_service','operates','develops']:return False
+ if v.get('category')=='goods' and r['action']=='provides_service' and not any(a in ['租赁']for a in v['source_actions']):return False
+ if v.get('qualifier') and any(t in v['qualifier'] for t in ['开发','投运','应用','参股']) and not n.get('qualifier'):return False
+ return True

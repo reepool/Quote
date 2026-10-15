@@ -1,0 +1,25 @@
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-15 20:21:34][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-15 20:21:35][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-15 20:21:35][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.00s
+[INFO][2026-10-15 20:21:35][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-15 20:21:36][tgbot.py:15] - [tgbot] Reading system configuration...
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+COMPANY 600100.SH completed
+COUNTS Counter({'Activity': 384, 'Segment': 249, 'Measurement': 248, 'BusinessOverview': 16})
+FIN_HEADERS Counter({'关联交易/销售商品及提供劳务': 186, '关联租赁/出租情况': 25, '产业板块主营业务收入': 8, '营业收入': 6, '控股参股公司/主营业务收入': 6, '终止经营营业收入': 4, '重要非全资子公司/本期营业收入': 3, '重要联营企业/本期营业收入': 3, '主营业务分地区': 3, '关联受托管理': 2, '重要合营企业/本期营业收入': 1, '合并利润表/营业总收入': 1, '母公司利润表/营业收入': 1})
+ANSWER principal_business True 15817
+ANSWER products_services True 14990
+ANSWER revenue_model True 14447
+COMPANY 600107.SH completed
+COUNTS Counter({'Segment': 88, 'Measurement': 86, 'Activity': 85, 'BusinessOverview': 26})
+FIN_HEADERS Counter({'主营业务收入': 15, '各地区盈利': 11, '营业收入': 10, '合同收入/商品类型': 6, '合同收入/按经营地区分类': 6, '前五名客户/销售额': 6, '直营店和加盟店盈利': 5, '合同收入/合同分解合计': 4, '对外营业收入': 3, '各品牌盈利': 3, '线上线下销售渠道盈利': 3, '出售商品/提供劳务/本期发生额': 3, '其他业务收入扣除明细/本年度': 2, '控股参股公司/营业收入': 2, '重要非全资子公司/本期营业收入': 2, '作为出租人的经营租赁/租赁收入': 2, '本公司作为出租方/本期确认的租赁收入': 2, '合并利润表/营业总收入': 1, '合并利润表/营业收入': 1, '母公司利润表/营业收入': 1})
+ANSWER principal_business True 4667
+ANSWER products_services True 4911
+ANSWER revenue_model True 4309
+ELAPSED 178.45299794804305

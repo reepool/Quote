@@ -1,0 +1,339 @@
+{
+  "answer": "按元解释，并保留原万元表头冲突说明",
+  "raw_conflict_sha256": "7763d9659ffd54c444d7cdbbf72b284b9e5840b611e9bbc8bb9c8d556cbcd347",
+  "original_draft_sha256": "2e3f33bf2ed3700f45d90ee8392564dda361bd87a4d4ac51310e3bfc7f90ff28",
+  "scope": "美尔雅p23–24四张原收入表；p24两框未勾选",
+  "mapping": [
+    {
+      "condition_id": "600107.SH-income-059",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 23,
+        "name": "品牌",
+        "value": "182436347.96",
+        "native_unit": "万元",
+        "header": "各品牌盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "applicable"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-060",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 23,
+        "name": "出口加工",
+        "value": "46761060.90",
+        "native_unit": "万元",
+        "header": "各品牌盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "applicable"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-061",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 23,
+        "name": "合计",
+        "value": "229197408.86",
+        "native_unit": "万元",
+        "header": "各品牌盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "applicable"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-062",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 23,
+        "name": "直营店",
+        "value": "56431306.80",
+        "native_unit": "万元",
+        "header": "直营店和加盟店盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "applicable"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-063",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 23,
+        "name": "加盟店",
+        "value": "75185231.39",
+        "native_unit": "万元",
+        "header": "直营店和加盟店盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "applicable"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-064",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 23,
+        "name": "出口加工",
+        "value": "46761060.90",
+        "native_unit": "万元",
+        "header": "直营店和加盟店盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "applicable"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-065",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 23,
+        "name": "其他",
+        "value": "50819809.77",
+        "native_unit": "万元",
+        "header": "直营店和加盟店盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "applicable"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-066",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 23,
+        "name": "合计",
+        "value": "229197408.86",
+        "native_unit": "万元",
+        "header": "直营店和加盟店盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "applicable"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-067",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 24,
+        "name": "线上销售",
+        "value": "5580869.71",
+        "native_unit": "万元",
+        "header": "线上线下销售渠道盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "both boxes unchecked"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-068",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 24,
+        "name": "线下销售",
+        "value": "223616539.15",
+        "native_unit": "万元",
+        "header": "线上线下销售渠道盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "both boxes unchecked"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-069",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 24,
+        "name": "合计",
+        "value": "229197408.86",
+        "native_unit": "万元",
+        "header": "线上线下销售渠道盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "both boxes unchecked"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-070",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 24,
+        "name": "东北地区",
+        "value": "1421773.12",
+        "native_unit": "万元",
+        "header": "各地区盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "both boxes unchecked"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-071",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 24,
+        "name": "华北地区",
+        "value": "1044377.91",
+        "native_unit": "万元",
+        "header": "各地区盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "both boxes unchecked"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-072",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 24,
+        "name": "华东地区",
+        "value": "12532314.30",
+        "native_unit": "万元",
+        "header": "各地区盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "both boxes unchecked"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-073",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 24,
+        "name": "华南地区",
+        "value": "2664845.73",
+        "native_unit": "万元",
+        "header": "各地区盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "both boxes unchecked"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-074",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 24,
+        "name": "华中地区",
+        "value": "150610378.46",
+        "native_unit": "万元",
+        "header": "各地区盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "both boxes unchecked"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-075",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 24,
+        "name": "西北地区",
+        "value": "6405677.73",
+        "native_unit": "万元",
+        "header": "各地区盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "both boxes unchecked"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-076",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 24,
+        "name": "西南地区",
+        "value": "7756980.71",
+        "native_unit": "万元",
+        "header": "各地区盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "both boxes unchecked"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-077",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 24,
+        "name": "境内小计",
+        "value": "182436347.96",
+        "native_unit": "万元",
+        "header": "各地区盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "both boxes unchecked"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-078",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 24,
+        "name": "国际地区",
+        "value": "46761060.90",
+        "native_unit": "万元",
+        "header": "各地区盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "both boxes unchecked"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-079",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 24,
+        "name": "境外小计",
+        "value": "46761060.90",
+        "native_unit": "万元",
+        "header": "各地区盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "both boxes unchecked"
+      },
+      "adjudicated_unit": "元"
+    },
+    {
+      "condition_id": "600107.SH-income-080",
+      "source_candidate": {
+        "instrument_id": "600107.SH",
+        "page": 24,
+        "name": "合计",
+        "value": "229197408.86",
+        "native_unit": "万元",
+        "header": "各地区盈利",
+        "status": "awaiting_A_ruling",
+        "proposed_uncertainty": "unclear",
+        "p24_applicability": "both boxes unchecked"
+      },
+      "adjudicated_unit": "元"
+    }
+  ],
+  "first_execution_not_started": true
+}

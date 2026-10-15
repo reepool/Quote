@@ -1,0 +1,13 @@
+[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[33m                                             [100%][0m
+============================= slowest 10 durations =============================
+59.16s call     tests/unit/test_research/test_company_profile_v59_technology_apparel.py::test_actual_complete_pages_accept_query_export[600100.SH]
+19.87s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600094.SH-v56]
+19.65s call     tests/unit/test_research/test_company_profile_v58_energy_automotive.py::test_official_complete_pages_accept_query_export[600104.SH]
+18.41s call     tests/unit/test_research/test_company_profile_v59_technology_apparel.py::test_actual_complete_pages_accept_query_export[600107.SH]
+17.27s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600094.SH-v57]
+15.76s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600103.SH-v56]
+15.00s call     tests/unit/test_research/test_company_profile_v55_property_paper.py::test_actual_official_input_delivers_frozen_income_actions_and_boundaries[600103.SH-v57]
+14.15s call     tests/unit/test_research/test_company_profile_v58_energy_automotive.py::test_official_complete_pages_accept_query_export[600098.SH]
+0.71s call     tests/unit/test_research/test_company_profile_v59_technology_apparel.py::test_unit_ruling_is_limited_to_approved_official_version[True]
+0.51s call     tests/unit/test_research/test_company_profile_v59_technology_apparel.py::test_unit_ruling_is_limited_to_approved_official_version[False]
+[33m[32m28 passed[0m, [33m[1m7 warnings[0m[33m in 182.28s (0:03:02)[0m[0m

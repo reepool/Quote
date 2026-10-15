@@ -1,0 +1,1083 @@
+"""Program-owned three-dimension core assessment.
+
+This projection evaluates accepted records only. It does not add ChapterTask
+values, request field IDs, or LLM payload fields.
+"""
+
+from __future__ import annotations
+
+import re
+from collections.abc import Sequence
+from typing import Any, Literal
+
+from pydantic import BaseModel, ConfigDict
+
+from .contracts import CompanyProfileTaskResult, DispositionStatus
+from .models import (
+    PRODUCTION_AUTHORIZATION,
+    Activity,
+    ActivityAction,
+    BusinessOverview,
+    CoverageResult,
+    Evidence,
+    Measurement,
+    MetricType,
+    ReportIdentity,
+    RowClass,
+    Segment,
+    SemanticRecord,
+    SubjectScope,
+    TableAnchor,
+    TextAnchor,
+)
+
+BUSINESS_DESCRIPTION_CONFLICT = "official_business_description_conflict"
+
+
+def business_description_is_unclear(record: SemanticRecord) -> bool:
+    """Return whether native business wording has an unresolved source conflict."""
+    return any(
+        reason.startswith("official_income_unit_conflict:")
+        or isinstance(record, BusinessOverview)
+        and reason.startswith(BUSINESS_DESCRIPTION_CONFLICT + ":")
+        for reason in record.uncertainty
+    )
+
+
+COMMON_CORE_MAPPING_VERSION = "company_profile_common_core_mapping.v1"
+CORE_DIMENSION_IDS = (
+    "principal_business",
+    "products_services",
+    "revenue_model",
+)
+_PRINCIPAL_PATTERN = re.compile(
+    r"(集[^。]{2,160}研发、制造与销售|主营|主业|业务分部|四大产业板块|主要从事|主要业务|主要经营|经营模式|经营范围|金融服务|核心提供商|报告分部|已投入运行|所属售电公司|车队管理服务)"
+)
+_COMPLETE_COMPANY_BUSINESS = re.compile(
+    r"(?<![\u4e00-\u9fff])(?:本公司|公司)(?:业务覆盖|专注于).{2,}"
+)
+_STEEL_BUSINESS = re.compile(r"公司是.{8,260}主要产品有.{2,80}")
+_NARRATIVE_BUSINESS = re.compile(
+    r"危化品仓储业务|整车产销量|独立储能项目|本集团生产整车及零部件|本公司及控股子公司向|本公司及控股子公司为|与海外经营实体签订商标及字号使用许可协议|一是同仁堂国药聚焦核心业务发展|同仁堂科技中药创新药|公司以服务收益和规模集拼收益为核心|截至报告日，公司完成对|前期筹备阶段|公司控股子公司[^。]+采购先进计算技术服务|注\d+：[^。]+成立于\d{4}年|本公司具体的收入确认原则|本公司的营业收入主要包括|关联托管/承包情况说明|产销量情况说明|公司主要采用以销定产|受托方由|未确认收入及待履行合同|公司生产经营及工程项目建设所需|公司物流体系|新能源物流方面|公司作为以传统中成药生产与销售为主|公司及下属子公司拥有多家药材种植基地|同仁堂商业下属零售药店|公司着力构建中药全产业链|一是深化营销体系转型|上年计算机硬件业务出表|本年丧失子公司控制权|其他原因的合并范围变动|本公司生产制造分部商品销售|项目支撑持续稳固|一体两翼持续推进|本公司收入主要来源于以下业务类型|对于本集团自第三方取得商品控制权后|报告分部|资源对接|用工保障|政策咨询服务|ALBO公司围绕品牌升级|母公司财务报表主要项目注释|本(?:公司|集团)收入确认的具体方法|本公司主要通过线下、线上|本公司没有重要的合营|代收代付事项处理|风景名胜资源有偿使用费|采购金额|公司作为国内领先的集|产品情况|公司沿用的采购模式|公司的销售系统及其下属子公司|公司与经销商每年|公司销售系统与经销商签订销售合同|业务包含|报告期内公司从事的业务情况|公司所从事的主要业务|不再纳入合并财务报表范围|报告期内，公司共实现营业收入|上年同期处置全资子公司|主要研发项目基本情况|公司核心产品|作为出租人的经营租赁|转租使用权资产取得的收入|增量配网售电企业|电力设施校验|联网通信发展稳健|公司已成长为|公司药[（(]产[)）]品销售情况|本集团的收入主要来自于|本集团对于提供的|本集团在履行了合同|综合服务包括|主营业务的其他收入系|公司深耕|不动产经营方面|公司立足|目前公司的|未实质控制|未将其纳入本期合并范围|公司的收入主要包括|公司营业收入主要包括|主要系公司战略调整|公司不再纳入公司财务报表合并范围|公司聚焦|公司聚力深耕市场|公司主要从事|公路投资运营方面|公司持续深化|成为[^。]+100%控股的全资子公司|本期是否存在丧失子公司控制权|天欣公司不再纳入|作为出租方的租赁分类|公司不同销售方式下收入|公司参股子公司|报告期内取得和处置子公司的情况|产能释放阶段|并网发电|吸收合并|一体化电视方案|全力办好|紧抓政企业务|主营业务分行业、分产品、分地区、分销售模式情况的说明|产销量情况说明|主要控股参股公司分析|企业集团的构成|公司主要负责|两大核心领域|循环经济产业链|公司已建成|公司开发了|公司生产的产品|公司全资子公司|具体收入确认方式|作为出租人|管道杆路租赁收入|紧抓政企业务|本次交易完成|公司饲料贸易业务板块|公司是[^。]+所属的专业从事[^。]+综合型能源企业|锂电池业务本期仅统计|公司丧失对[^。]+控制权|本公司受托管理/承包情况表|本公司作为出租方|出售商品/提供劳务|作为[^。]{2,80}(?:上市公司|工业企业)[^。]{2,}研发制造|公司坚持以[^。]{2,150}为核心[^。]*。公司持续深耕"
+)
+_SPEC_PRODUCT = re.compile(r"^(?:厚度|宽度|长度)")
+_PRODUCT_PATTERN = re.compile(
+    r"(主要产品|主要服务|业务线|产品包括|产品矩阵|服务包括|经营范围|主业|业务分部|服务产品|产品战略|推广.{0,40}服务|贸易业务收入|"
+    r"从事.{1,40}(?:的研发|的生产|的制造|的加工|的销售|服务))"
+)
+_STATEMENT_SPLIT = re.compile(r"[。；;，,\n]+")
+_REVENUE_INFLOW_PATTERN = re.compile(
+    r"(各业务类型收入确认和计量具体政策|本公司电力销售在|中长期、现货、绿电交易|本公司按照业务类型确定的收入确认具体原则|本公司作为出租方|出售商品/提供劳务|合同或订单|月结|本集团的营业收入主要包括|订单模式提供|海外市场采取直销|本公司所属售电公司|市场化交易|公司电力销售客户主要为|公司煤机全年市场化交易累计成交电量|收入来[源于自]|营业收入构成|主营业务收入|"
+    r"通过.{0,30}(?:销售|提供).{0,30}(?:取得|获得|收取)|"
+    r"取得货款|"
+    r"向客户(?:销售|提供).{0,24}(?:取得|获得|收取)|"
+    r"向客户收取|"
+    r"(?:公司|本公司)(?:收取|取得|获得).{0,16}(?:货款|价款|服务费|手续费|佣金|保费)|"
+    r"利息净收入|分成收入|经纪业务收入|保费收入|"
+    r"手续费及佣金(?:净)?收入|(?:服务费|手续费|佣金)收入|"
+    r"收取车辆通行费|通行费收入|"
+    r"为客户提供[^。；;，]{2,40}服务|收取[^。；;，]{2,30}费)"
+)
+_REVENUE_BLOCK_PATTERN = re.compile(
+    r"(免费|无偿|不收取|未收取|并不收取|无需(?:支付|收取)|向(?:公司|本公司)收取|"
+    r"第三方|代第三方|代收|(?<!向)客户[^。；;]{0,8}收取)"
+)
+_REVENUE_NEGATION_PREFIX = re.compile(r"(尚未|还未|仍未|并未|没有|未|不|拟|计划)$")
+_REPAIR_REVENUE_INFLOW_PATTERN = re.compile(
+    r"(本公司及控股子公司向|本公司及控股子公司为|与海外经营实体签订商标及字号使用许可协议|一是同仁堂国药聚焦核心业务发展|同仁堂科技中药创新药|公司以服务收益和规模集拼收益为核心|截至报告日，公司完成对|前期筹备阶段|公司控股子公司[^。]+采购先进计算技术服务|注\d+：[^。]+成立于\d{4}年|本公司具体的收入确认原则|本公司的营业收入主要包括|关联托管/承包情况说明|产销量情况说明|公司主要采用以销定产|受托方由|未确认收入及待履行合同|公司生产经营及工程项目建设所需|公司物流体系|新能源物流方面|公司作为以传统中成药生产与销售为主|公司及下属子公司拥有多家药材种植基地|同仁堂商业下属零售药店|公司着力构建中药全产业链|一是深化营销体系转型|上年计算机硬件业务出表|本年丧失子公司控制权|其他原因的合并范围变动|本公司生产制造分部商品销售|项目支撑持续稳固|一体两翼持续推进|本公司收入主要来源于以下业务类型|对于本集团自第三方取得商品控制权后|报告分部|资源对接|用工保障|政策咨询服务|ALBO公司围绕品牌升级|母公司财务报表主要项目注释|本(?:公司|集团)收入确认的具体方法|本公司主要通过线下、线上|本公司没有重要的合营|代收代付事项处理|风景名胜资源有偿使用费|采购金额|公司作为国内领先的集|产品情况|公司沿用的采购模式|公司的销售系统及其下属子公司|公司与经销商每年|公司销售系统与经销商签订销售合同|业务包含|报告期内公司从事的业务情况|公司所从事的主要业务|不再纳入合并财务报表范围|报告期内，公司共实现营业收入|上年同期处置全资子公司|主要研发项目基本情况|公司核心产品|作为出租人的经营租赁|转租使用权资产取得的收入|增量配网售电企业|电力设施校验|联网通信发展稳健|公司已成长为|公司药[（(]产[)）]品销售情况|本集团的收入主要来自于|本集团对于提供的|本集团在履行了合同|综合服务包括|主营业务的其他收入系|公司深耕|不动产经营方面|公司立足|目前公司的|未实质控制|未将其纳入本期合并范围|公司的收入主要包括|公司营业收入主要包括|主要系公司战略调整|公司不再纳入公司财务报表合并范围|公司主要从事|成为[^。]+100%控股的全资子公司|本期是否存在丧失子公司控制权|天欣公司不再纳入|公司不同销售方式下收入|作为出租方的租赁分类|全部营业收入|按销售渠道|直销|经销|公司以全资子公司|管道杆路租赁收入|租赁分类|(?:本)?公司作为出租人|具体收入确认方式|固定的周期性利率|信用等级|公司生产的产品|具体会计政策描述如下|公司定价和竞价|进行销售|主要责任人|重要的支付条款|款到发货|公司通过招投标|在某一时点确认收入|本公司受托管理/承包情况表|本公司电力销售在|中长期、现货、绿电交易|本公司按照业务类型确定的收入确认具体原则|本公司与[^。]+购销商品、提供服务的关联交易|本公司作为出租方|出售商品/提供劳务|对外交易收入|产品定价按照|年度供货框架协议|票款收入|运输服务交易价格|常旅客里程奖励计划|租金收入|清算补偿费收入|本集团利用自有及控制的船舶开展|公司盈利主要来自发电收入|营业收入主要来源于|"
+    + _REVENUE_INFLOW_PATTERN.pattern[1:]
+)
+_PRODUCT_ACTIONS = frozenset(
+    {
+        ActivityAction.DEVELOPS,
+        ActivityAction.PRODUCES,
+        ActivityAction.PROCESSES,
+        ActivityAction.SELLS,
+        ActivityAction.PROVIDES_SERVICE,
+        ActivityAction.OPERATES,
+    }
+)
+_REGION_DIMENSION = re.compile(
+    r"(分地区|地区|区域|地域|geographic|region)", re.IGNORECASE
+)
+_REGION_LABEL = re.compile(
+    r"^(?:境内|境外|国内|国外|中国境内|中国境外|"
+    r"华东|华北|华南|华中|东北|西北|西南|海外|"
+    r"国外地区|国内地区)(?:地区|区域)?$"
+)
+_TOTAL_LABEL = re.compile(
+    r"^(?:合计|总计|小计|汇总|总额|公司合计|total)$", re.IGNORECASE
+)
+_ELIMINATION_LABEL = re.compile(r"(抵销|抵消|elimination)", re.IGNORECASE)
+
+
+class _StrictModel(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
+
+
+class CoreDimensionAssessment(_StrictModel):
+    dimension_id: Literal["principal_business", "products_services", "revenue_model"]
+    answered: bool
+    supporting_record_ids: tuple[str, ...] = ()
+    evidence_ids: tuple[str, ...] = ()
+    excerpt: str | None = None
+    anchor: dict[str, Any] | None = None
+    missing_reason: (
+        Literal[
+            "no_accepted_evidence",
+            "overview_lacks_dimension",
+            "numeric_total_only",
+            "no_qualifying_source",
+        ]
+        | None
+    ) = None
+
+
+class CompanyProfileCoreAssessment(_StrictModel):
+    mapping_version: Literal["company_profile_common_core_mapping.v1"] = (
+        COMMON_CORE_MAPPING_VERSION
+    )
+    production_authorization: Literal["not_authorized"] = PRODUCTION_AUTHORIZATION
+    report: ReportIdentity
+    principal_business: CoreDimensionAssessment
+    products_services: CoreDimensionAssessment
+    revenue_model: CoreDimensionAssessment
+    core_complete: bool
+
+    @property
+    def dimensions(self) -> tuple[CoreDimensionAssessment, ...]:
+        return (
+            self.principal_business,
+            self.products_services,
+            self.revenue_model,
+        )
+
+
+def core_assessment_schema_manifest() -> dict[str, Any]:
+    schema = CompanyProfileCoreAssessment.model_json_schema()
+    return {
+        "mapping_version": COMMON_CORE_MAPPING_VERSION,
+        "dimension_ids": CORE_DIMENSION_IDS,
+        "chapter_tasks": (
+            "extract_business_overview",
+            "extract_segment_financials",
+        ),
+        "source_field_ids": (
+            "business_overview_source",
+            "explicit_activity",
+            "segment_dimension",
+            "operating_revenue",
+        ),
+        "title": schema.get("title", "CompanyProfileCoreAssessment"),
+        "schema": schema,
+    }
+
+
+def overview_dimension_hits(text: str) -> tuple[str, ...]:
+    """Return core dimensions supported by one overview narrative."""
+
+    hits: list[str] = []
+    if _PRINCIPAL_PATTERN.search(text):
+        hits.append("principal_business")
+    if _PRODUCT_PATTERN.search(text):
+        hits.append("products_services")
+    if _overview_states_revenue(text):
+        hits.append("revenue_model")
+    return tuple(hits)
+
+
+def core_record_is_reusable(record: SemanticRecord) -> bool:
+    """Return whether one accepted record can stand in for its own core field."""
+
+    if business_description_is_unclear(record):
+        return False
+    if (
+        isinstance(record, BusinessOverview)
+        and record.field_id == "business_overview_source"
+        and overview_dimension_hits(record.source_text)
+    ):
+        return True
+    if (
+        isinstance(record, Activity)
+        and record.field_id == "explicit_activity"
+        and record.action in _PRODUCT_ACTIONS
+        and record.object_name.strip()
+    ):
+        return True
+    if (
+        isinstance(record, Segment)
+        and record.field_id == "segment_dimension"
+        and not _is_skeleton_noise_segment(
+            dimension=record.dimension,
+            label=record.label,
+            row_class=record.row_class,
+        )
+    ):
+        return True
+    if not isinstance(record, Measurement) or record.field_id != "operating_revenue":
+        return False
+    if _is_income_mix_measurement(record):
+        return True
+    if _is_company_total_measurement(record):
+        return True
+    return (
+        record.metric_type == MetricType.OPERATING_REVENUE
+        and bool(record.segment_dimension)
+        and bool(record.segment_label)
+        and not _is_skeleton_noise_segment(
+            dimension=record.segment_dimension,
+            label=record.segment_label,
+            row_class=record.row_class,
+        )
+    )
+
+
+def resolved_core_field_ids(records: Sequence[SemanticRecord]) -> frozenset[str]:
+    """Return core field IDs that have at least one reusable accepted record."""
+
+    return frozenset(
+        record.field_id for record in records if core_record_is_reusable(record)
+    )
+
+
+_PERIOD_UNKNOWN = ""
+
+
+def coverage_reconciliation_identity(
+    coverage: CoverageResult,
+    *,
+    accepted_records: Sequence[SemanticRecord] = (),
+    report_period: str | None = None,
+) -> tuple[str, ...]:
+    """Return field/source identity for one coverage row.
+
+    Identity is this coverage's own physical source: field, column, object,
+    obligation, report version, page, and table. Accepted records and
+    ``report_period`` do not rewrite the key. Page and table are first-class
+    and do not come from ``cell_locator``.
+    """
+
+    del report_period, accepted_records
+    return (
+        coverage.field_id,
+        coverage.field_id,
+        _evidence_period_key(coverage.evidence),
+        _evidence_object_key(coverage.evidence),
+        coverage.requirement_level.value,
+        _evidence_report_key(coverage.evidence),
+        _evidence_page_key(coverage.evidence),
+        _evidence_table_key(coverage.evidence),
+    )
+
+
+def coverage_identity_can_close(identity: tuple[str, ...]) -> bool:
+    """Unknown page, table, column, or object must not close another scope."""
+
+    return all(identity[index] for index in (2, 3, 5, 6, 7))
+
+
+def project_core_assessment(
+    *,
+    report: ReportIdentity,
+    task_results: Sequence[CompanyProfileTaskResult],
+    repair_revenue_sentence: bool = False,
+    named_role_repair: bool = False,
+    core_answer_repair: bool = False,
+    source_delivery_repair: bool = False,
+) -> CompanyProfileCoreAssessment:
+    """Evaluate the common core from accepted same-report records."""
+
+    accepted: list[SemanticRecord] = []
+    for result in task_results:
+        statuses = {item.target_id: item.status for item in result.dispositions}
+        for record in result.records:
+            if record.report != report:
+                raise ValueError(
+                    "core assessment cannot mix records from another report"
+                )
+            if (
+                statuses.get(record.record_id) == DispositionStatus.ACCEPTED_FOR_REVIEW
+                and record.data_status == "research_fixture"
+                and not business_description_is_unclear(record)
+            ):
+                accepted.append(record)
+
+    principal = _assess_principal_business(
+        accepted,
+        named_role_repair=named_role_repair,
+        core_answer_repair=core_answer_repair,
+        source_delivery_repair=source_delivery_repair,
+    )
+    products = _assess_products_services(
+        accepted,
+        core_answer_repair=core_answer_repair,
+        source_delivery_repair=source_delivery_repair,
+    )
+    revenue = _assess_revenue_model(
+        accepted,
+        repair_revenue_sentence=repair_revenue_sentence,
+        core_answer_repair=core_answer_repair,
+        source_delivery_repair=source_delivery_repair,
+    )
+    return CompanyProfileCoreAssessment(
+        report=report,
+        principal_business=principal,
+        products_services=products,
+        revenue_model=revenue,
+        core_complete=principal.answered and products.answered and revenue.answered,
+    )
+
+
+def _assess_principal_business(
+    records: Sequence[SemanticRecord],
+    *,
+    named_role_repair: bool = False,
+    core_answer_repair: bool = False,
+    source_delivery_repair: bool = False,
+) -> CoreDimensionAssessment:
+    supports: list[SemanticRecord] = []
+    for record in records:
+        if not isinstance(record, BusinessOverview):
+            continue
+        if record.field_id != "business_overview_source":
+            continue
+        text = re.sub(r"\s+", "", record.source_text or "")
+        if (
+            _PRINCIPAL_PATTERN.search(text)
+            or (named_role_repair and _COMPLETE_COMPANY_BUSINESS.search(text))
+            or (core_answer_repair and _STEEL_BUSINESS.search(text))
+            or (
+                source_delivery_repair
+                and (
+                    _NARRATIVE_BUSINESS.search(text)
+                    or re.search(
+                        r"截至报告日，公司完成对|前期筹备阶段|公司控股子公司[^。]+采购先进计算技术服务|注\d+：[^。]+成立于\d{4}年|本公司具体的收入确认原则|本公司的营业收入主要包括|关联托管/承包情况说明|产销量情况说明|公司主要采用以销定产|受托方由|未确认收入及待履行合同|公司生产经营及工程项目建设所需|公司物流体系|新能源物流方面|公司着力构建中药全产业链|一是深化营销体系转型|上年计算机硬件业务出表|本年丧失子公司控制权|其他原因的合并范围变动|海外经营实体|传统药品注册许可证",
+                        text,
+                    )
+                    or "被投资公司名称" in text
+                    and "是否并表" in text
+                    or re.search(r"\d+[.．、][\u4e00-\u9fff]{2,12}业务", text)
+                )
+            )
+        ):
+            supports.append(record)
+    if supports:
+        answer = _answered("principal_business", supports)
+        if source_delivery_repair:
+            associated = [
+                r
+                for r in records
+                if isinstance(r, Segment)
+                and r.subject_scope == SubjectScope.BUSINESS_SEGMENT
+                and not r.uncertainty
+                and re.match(r"重要(?:合营|联营)企业/", r.source_native.header or "")
+            ]
+            relation_notes = list(
+                dict.fromkeys(
+                    (r.source_native.header or "").split("/", 1)[0]
+                    + "："
+                    + r.source_native.name
+                    for r in associated
+                )
+            )
+            answer = answer.model_copy(
+                update={
+                    "excerpt": "\n".join(
+                        [
+                            *dict.fromkeys(r.source_text.strip() for r in supports),
+                            *relation_notes,
+                        ]
+                    ),
+                    "supporting_record_ids": tuple(
+                        dict.fromkeys(
+                            (
+                                *answer.supporting_record_ids,
+                                *(r.record_id for r in associated),
+                            )
+                        )
+                    ),
+                }
+            )
+        return answer
+    if any(
+        isinstance(record, BusinessOverview)
+        and record.field_id == "business_overview_source"
+        for record in records
+    ):
+        return _unanswered("principal_business", "overview_lacks_dimension")
+    return _unanswered("principal_business", "no_accepted_evidence")
+
+
+def _assess_products_services(
+    records: Sequence[SemanticRecord],
+    *,
+    core_answer_repair: bool = False,
+    source_delivery_repair: bool = False,
+) -> CoreDimensionAssessment:
+    supports: list[SemanticRecord] = []
+    rejected = False
+    for record in records:
+        if isinstance(record, Activity) and record.field_id == "explicit_activity":
+            if core_answer_repair and _SPEC_PRODUCT.match(record.object_name.strip()):
+                continue
+            if record.action in _PRODUCT_ACTIONS and record.object_name.strip():
+                supports.append(record)
+            elif record.object_name.strip():
+                rejected = True
+            continue
+        if isinstance(record, Segment) and record.field_id == "segment_dimension":
+            if _is_skeleton_noise_segment(
+                dimension=record.dimension,
+                label=record.label,
+                row_class=record.row_class,
+            ):
+                rejected = True
+                continue
+            if record.dimension not in {"industry", "product"}:
+                continue
+            if record.label.strip():
+                supports.append(record)
+            continue
+        if (
+            isinstance(record, BusinessOverview)
+            and record.field_id == "business_overview_source"
+            and (
+                _PRODUCT_PATTERN.search(record.source_text)
+                or source_delivery_repair
+                and re.search(
+                    r"各业务类型收入确认和计量具体政策|零部件产销量",
+                    record.source_text,
+                )
+                or (
+                    source_delivery_repair
+                    and re.search(
+                        r"危化品仓储业务|整车产销量|独立储能项目|本集团生产整车及零部件|本公司及控股子公司向|本公司及控股子公司为|与海外经营实体签订商标及字号使用许可协议|一是同仁堂国药聚焦核心业务发展|同仁堂科技中药创新药|公司以服务收益和规模集拼收益为核心|截至报告日，公司完成对|前期筹备阶段|公司控股子公司[^。]+采购先进计算技术服务|注\d+：[^。]+成立于\d{4}年|本公司具体的收入确认原则|本公司的营业收入主要包括|关联托管/承包情况说明|产销量情况说明|公司主要采用以销定产|受托方由|未确认收入及待履行合同|公司生产经营及工程项目建设所需|公司物流体系|新能源物流方面|公司作为以传统中成药生产与销售为主|公司及下属子公司拥有多家药材种植基地|同仁堂商业下属零售药店|公司着力构建中药全产业链|一是深化营销体系转型|上年计算机硬件业务出表|本年丧失子公司控制权|其他原因的合并范围变动|本公司生产制造分部商品销售|项目支撑持续稳固|一体两翼持续推进|本公司收入主要来源于以下业务类型|对于本集团自第三方取得商品控制权后|报告分部|资源对接|用工保障|政策咨询服务|ALBO公司围绕品牌升级|母公司财务报表主要项目注释|本(?:公司|集团)收入确认的具体方法|本公司主要通过线下、线上|本公司没有重要的合营|代收代付事项处理|风景名胜资源有偿使用费|采购金额|公司作为国内领先的集|产品情况|公司沿用的采购模式|公司的销售系统及其下属子公司|公司与经销商每年|公司销售系统与经销商签订销售合同|业务包含|报告期内公司从事的业务情况|公司所从事的主要业务|不再纳入合并财务报表范围|报告期内，公司共实现营业收入|上年同期处置全资子公司|主要研发项目基本情况|公司核心产品|作为出租人的经营租赁|转租使用权资产取得的收入|增量配网售电企业|电力设施校验|联网通信发展稳健|公司已成长为|公司药[（(]产[)）]品销售情况|本集团的收入主要来自于|本集团对于提供的|本集团在履行了合同|综合服务包括|主营业务的其他收入系|公司深耕|不动产经营方面|公司立足|目前公司的|未实质控制|未将其纳入本期合并范围|公司的收入主要包括|公司营业收入主要包括|主要系公司战略调整|公司不再纳入公司财务报表合并范围|公司聚焦|公司聚力深耕市场|公司主要从事|公路投资运营方面|公司持续深化|成为[^。]+100%控股的全资子公司|本期是否存在丧失子公司控制权|天欣公司不再纳入|作为出租方的租赁分类|公司不同销售方式下收入|公司参股子公司|报告期内取得和处置子公司的情况|产能释放阶段|并网发电|吸收合并|一体化电视方案|全力办好|紧抓政企业务|主营业务分行业、分产品、分地区、分销售模式情况的说明|产销量情况说明|主要控股参股公司分析|企业集团的构成|公司主要负责|两大核心领域|循环经济产业链|公司已建成|公司开发了|公司生产的产品|公司全资子公司|具体收入确认方式|作为出租人|OEM&ODM|自发自用|本公司受托管理/承包情况表|本公司作为出租方|出售商品/提供劳务|锂电池业务本期仅统计|公司丧失对[^。]+控制权|绿证交易业务|核心主业|四大产业板块|主要产品包括|主要业务是|主要业务为|主要从事|主营业务为|主要经营|研发制造|核心提供商|公司持续深耕|产品畅销|已稳定量产|成功开拓|深化运营|自用光伏|综合能源|车队|KD|报告分部|客车产品研发|营业收入主要包括",
+                        record.source_text or "",
+                    )
+                )
+            )
+        ):
+            supports.append(record)
+    if core_answer_repair or source_delivery_repair:
+        series = [
+            record
+            for record in supports
+            if isinstance(record, BusinessOverview)
+            and re.search(
+                r"危化品仓储业务|整车产销量|独立储能项目|本集团生产整车及零部件|本公司及控股子公司向|本公司及控股子公司为|与海外经营实体签订商标及字号使用许可协议|一是同仁堂国药聚焦核心业务发展|同仁堂科技中药创新药|公司以服务收益和规模集拼收益为核心|截至报告日，公司完成对|前期筹备阶段|公司控股子公司[^。]+采购先进计算技术服务|注\d+：[^。]+成立于\d{4}年|本公司具体的收入确认原则|本公司的营业收入主要包括|关联托管/承包情况说明|产销量情况说明|公司主要采用以销定产|受托方由|未确认收入及待履行合同|公司生产经营及工程项目建设所需|公司物流体系|新能源物流方面|公司作为以传统中成药生产与销售为主|公司及下属子公司拥有多家药材种植基地|同仁堂商业下属零售药店|公司着力构建中药全产业链|一是深化营销体系转型|上年计算机硬件业务出表|本年丧失子公司控制权|其他原因的合并范围变动|本公司生产制造分部商品销售|项目支撑持续稳固|一体两翼持续推进|本公司收入主要来源于以下业务类型|对于本集团自第三方取得商品控制权后|报告分部|资源对接|用工保障|政策咨询服务|ALBO公司围绕品牌升级|母公司财务报表主要项目注释|本(?:公司|集团)收入确认的具体方法|本公司主要通过线下、线上|本公司没有重要的合营|代收代付事项处理|风景名胜资源有偿使用费|采购金额|公司作为国内领先的集|产品情况|公司沿用的采购模式|公司的销售系统及其下属子公司|公司与经销商每年|公司销售系统与经销商签订销售合同|业务包含|报告期内公司从事的业务情况|公司所从事的主要业务|不再纳入合并财务报表范围|报告期内，公司共实现营业收入|上年同期处置全资子公司|主要研发项目基本情况|公司核心产品|作为出租人的经营租赁|转租使用权资产取得的收入|增量配网售电企业|电力设施校验|联网通信发展稳健|公司已成长为|公司药[（(]产[)）]品销售情况|本集团的收入主要来自于|本集团对于提供的|本集团在履行了合同|综合服务包括|主营业务的其他收入系|公司深耕|不动产经营方面|公司立足|目前公司的|未实质控制|未将其纳入本期合并范围|公司的收入主要包括|公司营业收入主要包括|主要系公司战略调整|公司不再纳入公司财务报表合并范围|公司聚焦|公司聚力深耕市场|公司主要从事|公路投资运营方面|公司持续深化|成为[^。]+100%控股的全资子公司|本期是否存在丧失子公司控制权|天欣公司不再纳入|作为出租方的租赁分类|公司不同销售方式下收入|公司参股子公司|报告期内取得和处置子公司的情况|产能释放阶段|并网发电|吸收合并|一体化电视方案|全力办好|紧抓政企业务|主营业务分行业、分产品、分地区、分销售模式情况的说明|产销量情况说明|主要控股参股公司分析|企业集团的构成|公司主要负责|两大核心领域|循环经济产业链|公司已建成|公司开发了|公司生产的产品|公司全资子公司|具体收入确认方式|作为出租人|OEM&ODM|自发自用|本公司受托管理/承包情况表|本公司作为出租方|出售商品/提供劳务|锂电池业务本期仅统计|公司丧失对[^。]+控制权|绿证交易业务|核心主业|四大产业板块|主要产品包括|主要产品有|产品矩阵|主要业务是|主要业务为|主要从事|主营业务为|主要经营|研发制造|核心提供商|公司持续深耕|产品畅销|已稳定量产|成功开拓|深化运营|自用光伏|综合能源|车队|KD|报告分部|客车产品研发|营业收入主要包括",
+                record.source_text or "",
+            )
+        ]
+        if series:
+            supports = [
+                *series,
+                *[record for record in supports if record not in series],
+            ]
+    if supports:
+        answered = _answered("products_services", supports)
+        if source_delivery_repair:
+            narratives = list(
+                dict.fromkeys(
+                    r.source_text.strip()
+                    for r in supports
+                    if isinstance(r, BusinessOverview)
+                )
+            )
+            if narratives:
+                answered = answered.model_copy(
+                    update={"excerpt": "\n".join(narratives)}
+                )
+        if source_delivery_repair and any(
+            isinstance(record, BusinessOverview)
+            and "项目的开发、建设、运营与管理" in record.source_text
+            for record in supports
+        ):
+            product_labels = list(
+                dict.fromkeys(
+                    record.label
+                    for record in supports
+                    if isinstance(record, Segment) and record.dimension == "product"
+                )
+            )
+            if product_labels:
+                answered = answered.model_copy(
+                    update={
+                        "excerpt": (answered.excerpt or "")
+                        + "\n已披露产品："
+                        + "、".join(product_labels)
+                    }
+                )
+        return answered
+    if any(
+        isinstance(record, BusinessOverview)
+        and record.field_id == "business_overview_source"
+        for record in records
+    ):
+        return _unanswered("products_services", "overview_lacks_dimension")
+    if rejected:
+        return _unanswered("products_services", "no_qualifying_source")
+    return _unanswered("products_services", "no_accepted_evidence")
+
+
+def _assess_revenue_model(
+    records: Sequence[SemanticRecord],
+    *,
+    repair_revenue_sentence: bool = False,
+    core_answer_repair: bool = False,
+    source_delivery_repair: bool = False,
+) -> CoreDimensionAssessment:
+    supports: list[SemanticRecord] = []
+    totals: list[SemanticRecord] = []
+    rejected = False
+    for record in records:
+        if (
+            isinstance(record, BusinessOverview)
+            and record.field_id == "business_overview_source"
+            and (
+                _overview_states_revenue(
+                    record.source_text,
+                    repair_revenue_sentence=repair_revenue_sentence,
+                )
+                or source_delivery_repair
+                and re.search(
+                    r"本集团为代理人[\s\S]+?佣金或手续费[\s\S]+?确认收入|未合并抵消的口径|代收代付事项处理|风景名胜资源有偿使用费|本期采购发生额为[^。]+不再是公司信息披露口径的关联方",
+                    record.source_text,
+                )
+            )
+        ):
+            supports.append(record)
+            continue
+        if isinstance(record, Measurement) and record.field_id == "operating_revenue":
+            if _is_income_mix_measurement(record):
+                supports.append(record)
+                continue
+            if record.metric_type != MetricType.OPERATING_REVENUE:
+                continue
+            if _is_company_total_measurement(record) or not (
+                record.segment_dimension and record.segment_label
+            ):
+                totals.append(record)
+                continue
+            if _is_skeleton_noise_segment(
+                dimension=record.segment_dimension,
+                label=record.segment_label,
+                row_class=record.row_class,
+            ):
+                rejected = True
+                continue
+            supports.append(record)
+    if source_delivery_repair:
+        product_labels = {
+            r.segment_label
+            for r in supports
+            if isinstance(r, Measurement)
+            and r.segment_dimension == "product"
+            and r.segment_label
+        }
+        limited = [
+            r
+            for r in records
+            if isinstance(r, BusinessOverview)
+            and any(
+                re.search(
+                    rf"{re.escape(label)}业务本期仅统计",
+                    re.sub(r"\s+", "", r.source_text),
+                )
+                for label in product_labels
+            )
+        ]
+        if limited:
+            # Revenue labels must retain the accepted business's limited period
+            # and loss of control, just as the business/product answers do.
+            context = [
+                r
+                for r in records
+                if isinstance(r, BusinessOverview)
+                and (
+                    "公司丧失" in r.source_text
+                    and "合并范围" in r.source_text
+                    or "报告期内取得和处置子公司的情况" in r.source_text
+                    and re.search(r"仅对\d{4}年1[-—－]7月", r.source_text)
+                )
+            ]
+            supports.extend(r for r in [*limited, *context] if r not in supports)
+    if source_delivery_repair and any(
+        isinstance(r, BusinessOverview) and "支付渠道服务" in r.source_text
+        for r in supports
+    ):
+        supports.extend(
+            r
+            for r in records
+            if isinstance(r, BusinessOverview)
+            and "报告期内取得和处置子公司的情况" in r.source_text
+            and re.search(r"仅对\d{4}年1[-—－]7月", r.source_text)
+            and r not in supports
+        )
+    if supports:
+        answered = _answered("revenue_model", supports)
+        if repair_revenue_sentence:
+            pieces = [
+                record.source_text.strip()
+                for record in supports
+                if isinstance(record, BusinessOverview) and record.source_text.strip()
+            ]
+            if pieces:
+                answered = answered.model_copy(update={"excerpt": "\n".join(pieces)})
+        if core_answer_repair:
+            structure = _revenue_structure_excerpt(supports)
+            if structure:
+                answered = answered.model_copy(update={"excerpt": structure})
+        if source_delivery_repair:
+            industry = _industry_revenue_excerpt(supports)
+            if industry:
+                answered = answered.model_copy(update={"excerpt": industry})
+        if source_delivery_repair and any(
+            isinstance(r, Measurement) and r.segment_dimension == "business_segment"
+            for r in supports
+        ):
+            adjustments = [
+                r
+                for r in records
+                if isinstance(r, Measurement)
+                and r.row_class == RowClass.CONSOLIDATION_ADJUSTMENT
+            ]
+            if adjustments:
+                adjusted = _answered("revenue_model", [*supports, *adjustments])
+                answered = adjusted.model_copy(
+                    update={
+                        "excerpt": (answered.excerpt or "")
+                        + "\n分部间抵销（非同级业务，不累计）："
+                        + "；".join(
+                            f"{r.source_native.header} {r.source_native.value}{r.source_native.unit}"
+                            for r in adjustments
+                        )
+                    }
+                )
+        if source_delivery_repair:
+            unit_notes = list(
+                dict.fromkeys(
+                    r.source_native.qualifier
+                    for r in supports
+                    if isinstance(r, Measurement)
+                    and "原表单位" in (r.source_native.qualifier or "")
+                )
+            )
+            if unit_notes:
+                answered = answered.model_copy(
+                    update={
+                        "excerpt": (answered.excerpt or "")
+                        + "\n"
+                        + "；".join(unit_notes)
+                    }
+                )
+            for r in supports:
+                if not isinstance(r, BusinessOverview):
+                    continue
+                native = re.sub(r"\s+", "", r.source_text)
+                if (
+                    "履约义务的说明" in native
+                    and "款到发货" in native
+                    and re.search(r"验收合格后在信[^。]+用期内付款", native)
+                ):
+                    # Reconstruct the printed payment cell across a page break;
+                    # neighboring columns and page headers are not payment text.
+                    answered = answered.model_copy(
+                        update={
+                            "excerpt": (answered.excerpt or "")
+                            + "\n重要支付条款：款到发货；验收合格后在信用期内付款。"
+                        }
+                    )
+        return answered
+    if totals:
+        return _unanswered("revenue_model", "numeric_total_only")
+    if any(
+        isinstance(record, BusinessOverview)
+        and record.field_id == "business_overview_source"
+        for record in records
+    ):
+        return _unanswered("revenue_model", "overview_lacks_dimension")
+    if rejected:
+        return _unanswered("revenue_model", "no_qualifying_source")
+    return _unanswered("revenue_model", "no_accepted_evidence")
+
+
+def _industry_revenue_excerpt(records: Sequence[SemanticRecord]) -> str:
+    """The current-period industry lines, without eliminations or the total."""
+
+    # A genuine fee/collection narrative takes precedence over table labels.
+    narratives = [
+        record.source_text.strip()
+        for record in records
+        if isinstance(record, BusinessOverview)
+    ]
+    sales_mechanism = any(
+        "合同或订单" in text
+        or "本公司电力销售在" in text
+        or "核心主业" in text
+        or "电力销售客户主要为" in text
+        or "煤机全年市场化交易" in text
+        or "盈利主要来自发电收入" in re.sub(r"\s+", "", text)
+        for text in narratives
+    )
+    if (
+        narratives
+        and not sales_mechanism
+        and not any(
+            isinstance(r, Measurement) and r.segment_dimension == "business_segment"
+            for r in records
+        )
+    ):
+        return ""
+    products: list[str] = []
+    industries: list[str] = []
+    modes: list[str] = []
+    others: dict[str, list[str]] = {}
+    for record in records:
+        if not isinstance(record, Measurement):
+            continue
+        label = (record.segment_label or "").strip()
+        if not label or _is_skeleton_noise_segment(
+            dimension=record.segment_dimension, label=label, row_class=record.row_class
+        ):
+            continue
+        bucket = (
+            products
+            if record.segment_dimension == "product"
+            else industries
+            if record.segment_dimension == "industry"
+            else modes
+            if record.segment_dimension == "sales_mode"
+            else None
+        )
+        if bucket is not None and label not in bucket:
+            bucket.append(label)
+        if record.segment_dimension in {"business_type", "business_segment", "region"}:
+            basis = record.source_native.header or record.segment_dimension
+            qualifier = record.source_native.qualifier or ""
+            stated = (
+                label + "（" + qualifier + "）"
+                if qualifier.startswith("原收入列：")
+                else label
+            )
+            others.setdefault(basis, []).append(stated)
+    if products or industries:
+        text = "\n".join(
+            part
+            for part in (
+                "营业收入分行业：" + "、".join(industries) if industries else "",
+                "营业收入分产品：" + "、".join(products) if products else "",
+            )
+            if part
+        )
+        for basis, labels in others.items():
+            text += "\n" + basis + "：" + "、".join(dict.fromkeys(labels))
+        confirmations = [mode for mode in modes if "确认" in mode]
+        sales_modes = [mode for mode in modes if mode not in confirmations]
+        if sales_modes:
+            text += "\n销售模式：" + "、".join(sales_modes)
+        if confirmations:
+            text += "\n收入确认：" + "、".join(confirmations)
+        columns = list(
+            dict.fromkeys(
+                r.source_native.qualifier
+                for r in records
+                if isinstance(r, Measurement)
+                and (r.source_native.qualifier or "").startswith("原收入列：")
+            )
+        )
+        if columns:
+            text += "\n" + "；".join(columns)
+        if sales_mechanism or narratives:
+            text += "\n" + "\n".join(narratives)
+        return text
+    found: list[str] = []
+    for record in records:
+        if not isinstance(record, Measurement):
+            continue
+        if record.segment_dimension != "industry":
+            continue
+        label = (record.segment_label or "").strip()
+        if (
+            label
+            and not _is_skeleton_noise_segment(
+                dimension="industry", label=label, row_class=record.row_class
+            )
+            and label not in found
+        ):
+            found.append(label)
+    if len(found) < 2:
+        return ""
+    return "、".join(found)
+
+
+def _revenue_structure_excerpt(records: Sequence[SemanticRecord]) -> str:
+    """Parent revenue lines followed by the child lines recorded under them."""
+
+    parents: list[str] = []
+    children: dict[str, list[str]] = {}
+    for record in records:
+        if not isinstance(record, Measurement):
+            continue
+        if record.segment_dimension != "revenue_composition":
+            continue
+        label = (record.segment_label or "").strip()
+        if not label:
+            continue
+        header = (record.source_native.header or "").strip()
+        if header:
+            bucket = children.setdefault(header, [])
+            if label not in bucket:
+                bucket.append(label)
+        elif label not in parents:
+            parents.append(label)
+    lines: list[str] = []
+    for parent in parents:
+        names = children.get(parent) or []
+        lines.append(f"{parent}：" + "、".join(names) if names else parent)
+    return "\n".join(lines)
+
+
+def _overview_states_revenue(
+    text: str,
+    *,
+    repair_revenue_sentence: bool = False,
+) -> bool:
+    source = re.sub(r"[\r\n]+", "", text) if repair_revenue_sentence else text
+    compact = re.sub(r"\s+", "", source)
+    if (
+        repair_revenue_sentence
+        and re.match(r"本公司的主要营业收入系高速公路车辆通行费收入", compact)
+        and re.search(r"本公司及子公司[^。]+均按[^。]+确认通行费收入", compact)
+        and not re.search(r"(?:本公司|公司)(?:拟|计划|尚未|不从事)", compact)
+    ):
+        return True
+    pattern = (
+        _REPAIR_REVENUE_INFLOW_PATTERN
+        if repair_revenue_sentence
+        else _REVENUE_INFLOW_PATTERN
+    )
+    for sentence in re.split(r"[。；;\n]", source):
+        if not sentence.strip():
+            continue
+        # A collection-denial clause (不收取/未收取/无收费) denies the
+        # revenue for the whole sentence, collection by a third party is
+        # never company revenue, and a planned collection (尚未/拟/计划/
+        # 预期/将+收取/形成) anywhere in the sentence stops a service clause
+        # from borrowing it; free wording only constrains its own clause.
+        if re.search(r"(?:不收取|未收取|不再收取|无收费)", sentence):
+            continue
+        if re.search(r"第三方|代第三方|代收", sentence):
+            continue
+        if re.search(r"(?:尚未|拟|计划|预期|将)[^。；;]{0,12}(?:收取|形成)", sentence):
+            continue
+        # The subject may sit in an earlier clause of the same sentence
+        # ("公司……，按照收费标准收取车辆通行费"), so the company subject is
+        # judged at sentence level while the inflow keywords stay clause-level.
+        company_subject = re.search(r"本公司|本集团|公司", sentence) is not None
+        for statement in _STATEMENT_SPLIT.split(sentence):
+            statement = statement.strip()
+            if not statement:
+                continue
+            if _REVENUE_BLOCK_PATTERN.search(statement):
+                continue
+            match = pattern.search(statement)
+            if match is None:
+                continue
+            if _REVENUE_NEGATION_PREFIX.search(statement[: match.start()]):
+                continue
+            if re.search(
+                r"(?:尚未|拟|计划|预期|将)[^。；;]{0,12}(?:收取|形成)", statement
+            ):
+                continue
+            if "通行费" in statement and not _toll_statement_is_company_revenue(
+                sentence, company_subject
+            ):
+                continue
+            if "为客户提供" in statement and not re.search(
+                r"收取|实现|取得|获得", sentence
+            ):
+                continue
+            return True
+    return False
+
+
+def _toll_statement_is_company_revenue(sentence: str, company_subject: bool) -> bool:
+    """A toll statement counts only with the company subject (stated in the
+    sentence or carried over from its opening clause) and an actual,
+    affirmative collection action — planned, unformed, or third-party tolls
+    are not company revenue."""
+
+    if not company_subject:
+        return False
+    if re.search(r"客户|第三方|代收", sentence):
+        return False
+    if re.search(r"(?:尚未|拟|计划|预期|将)[^。；;]{0,12}(?:收取|形成)", sentence):
+        return False
+    return bool(re.search(r"收取|实现|取得|获得", sentence))
+
+
+def _is_company_total_measurement(record: SemanticRecord) -> bool:
+    return (
+        isinstance(record, Measurement)
+        and record.metric_type == MetricType.OPERATING_REVENUE
+        and record.measured_object in {"营业收入合计", "营业总收入", "营业收入"}
+        and not record.segment_dimension
+        and not record.segment_label
+    )
+
+
+def _is_income_mix_measurement(record: SemanticRecord) -> bool:
+    if not isinstance(record, Measurement):
+        return False
+    if (
+        record.metric_type == MetricType.DISCLOSED_SHARE
+        and record.measured_object == "利息净收入"
+        and record.relationship_context == "营业收入"
+    ):
+        return True
+    return (
+        record.metric_type == MetricType.OPERATING_REVENUE
+        and record.segment_dimension == "income_item"
+        and record.segment_label == "利息净收入"
+        and record.measured_object == "利息净收入"
+    )
+
+
+def _is_skeleton_noise_segment(
+    *,
+    dimension: str | None,
+    label: str | None,
+    row_class: RowClass | None,
+) -> bool:
+    if row_class == RowClass.CONSOLIDATION_ADJUSTMENT:
+        return True
+    dim = (dimension or "").strip()
+    lab = (label or "").strip()
+    if dim == "adjustment":
+        return True
+    if _REGION_DIMENSION.search(dim) or _REGION_LABEL.fullmatch(lab):
+        return True
+    if _TOTAL_LABEL.fullmatch(dim) or _TOTAL_LABEL.fullmatch(lab):
+        return True
+    return bool(_ELIMINATION_LABEL.search(dim) or _ELIMINATION_LABEL.search(lab))
+
+
+def _answered(
+    dimension_id: Literal["principal_business", "products_services", "revenue_model"],
+    records: Sequence[SemanticRecord],
+) -> CoreDimensionAssessment:
+    primary = records[0]
+    excerpt, anchor = _excerpt_and_anchor(primary)
+    evidence_ids = tuple(
+        dict.fromkeys(
+            evidence.evidence_id for record in records for evidence in record.evidence
+        )
+    )
+    return CoreDimensionAssessment(
+        dimension_id=dimension_id,
+        answered=True,
+        supporting_record_ids=tuple(record.record_id for record in records),
+        evidence_ids=evidence_ids,
+        excerpt=excerpt,
+        anchor=anchor,
+        missing_reason=None,
+    )
+
+
+def _unanswered(
+    dimension_id: Literal["principal_business", "products_services", "revenue_model"],
+    reason: Literal[
+        "no_accepted_evidence",
+        "overview_lacks_dimension",
+        "numeric_total_only",
+        "no_qualifying_source",
+    ],
+) -> CoreDimensionAssessment:
+    return CoreDimensionAssessment(
+        dimension_id=dimension_id,
+        answered=False,
+        missing_reason=reason,
+    )
+
+
+def _evidence_report_key(evidence: Sequence[Evidence]) -> str:
+    parts = [
+        f"{item.report.report_id}|{item.report.document_version}" for item in evidence
+    ]
+    return "|".join(parts) if parts else _PERIOD_UNKNOWN
+
+
+def _evidence_page_key(evidence: Sequence[Evidence]) -> str:
+    return "|".join(str(item.page) for item in evidence)
+
+
+def _evidence_table_key(evidence: Sequence[Evidence]) -> str:
+    parts: list[str] = []
+    for item in evidence:
+        label = getattr(item.anchor, "table_label", None)
+        if not label or not str(label).strip():
+            return _PERIOD_UNKNOWN
+        parts.append(str(label).strip())
+    return "|".join(parts) if parts else _PERIOD_UNKNOWN
+
+
+def _evidence_period_key(evidence: Sequence[Evidence]) -> str:
+    parts: list[str] = []
+    for item in evidence:
+        header = getattr(item.anchor, "column_header", None)
+        locator = getattr(item.anchor, "cell_locator", None)
+        if header and str(header).strip():
+            parts.append(str(header).strip())
+        if locator and str(locator).strip():
+            parts.append(str(locator).strip())
+    return "|".join(parts) if parts else _PERIOD_UNKNOWN
+
+
+def _evidence_object_key(evidence: Sequence[Evidence]) -> str:
+    parts: list[str] = []
+    for item in evidence:
+        row = getattr(item.anchor, "row_label", None)
+        if row:
+            parts.append(str(row).strip())
+            continue
+        quote = getattr(item.anchor, "bounded_quote", None)
+        if quote:
+            parts.append(re.sub(r"\s+", " ", str(quote).strip()))
+        else:
+            parts.append(f"page:{item.page}")
+    return "|".join(part for part in parts if part)
+
+
+def _excerpt_and_anchor(
+    record: SemanticRecord,
+) -> tuple[str | None, dict[str, Any] | None]:
+    if isinstance(record, BusinessOverview):
+        excerpt = record.source_text
+    elif isinstance(record, Activity):
+        excerpt = record.object_name
+    elif isinstance(record, Segment):
+        excerpt = record.label
+    elif isinstance(record, Measurement):
+        excerpt = record.segment_label or record.measured_object
+    else:
+        excerpt = None
+    evidence = record.evidence[0] if record.evidence else None
+    return excerpt, _anchor_payload(evidence)
+
+
+def _anchor_payload(evidence: Evidence | None) -> dict[str, Any] | None:
+    if evidence is None:
+        return None
+    payload: dict[str, Any] = {
+        "evidence_id": evidence.evidence_id,
+        "page": evidence.page,
+        "section_title": evidence.section_title,
+    }
+    if isinstance(evidence.anchor, TextAnchor):
+        payload["anchor_type"] = "text"
+        payload["bounded_quote"] = evidence.anchor.bounded_quote
+    elif isinstance(evidence.anchor, TableAnchor):
+        payload["anchor_type"] = "table"
+        payload["row_label"] = evidence.anchor.row_label
+        payload["cell_locator"] = evidence.anchor.cell_locator
+    return payload

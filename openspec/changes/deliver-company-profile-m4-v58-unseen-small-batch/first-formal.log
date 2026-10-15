@@ -1,0 +1,134 @@
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-15 16:55:39][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-15 16:55:39][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-15 16:55:39][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.00s
+[INFO][2026-10-15 16:55:39][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-15 16:55:40][tgbot.py:15] - [tgbot] Reading system configuration...
+V58_UNSEEN_FIRST_FORMAL_START
+[INFO][2026-10-15 16:55:41][operations.py:1718] - Company-profile entry: loading full-market registry
+[INFO][2026-10-15 16:56:26][operations.py:1724] - Company-profile entry: registry loaded
+[INFO][2026-10-15 16:56:26][operations.py:1725] - Company-profile entry: constructing task service
+[INFO][2026-10-15 16:56:26][operations.py:1739] - Company-profile entry: task service ready
+[INFO][2026-10-15 16:56:27][business_profile_async_production.py:3197] - business-profile stage start stage=acquire max_items=2 concurrency=1 max_elapsed_seconds=252.28543385583907 high_water_mark=1000
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-15 16:56:29][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-15 16:56:29][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-15 16:56:29][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.00s
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-15 16:56:29][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-15 16:56:29][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-15 16:56:29][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.00s
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-15 16:56:29][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-15 16:56:29][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-15 16:56:29][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.00s
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-15 16:56:29][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-15 16:56:29][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-15 16:56:29][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.00s
+[INFO][2026-10-15 16:56:29][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-15 16:56:29][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-15 16:56:29][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-15 16:56:30][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-15 16:56:30][tgbot.py:15] - [tgbot] Reading system configuration...
+[INFO][2026-10-15 16:56:30][tgbot.py:15] - [tgbot] Reading system configuration...
+[INFO][2026-10-15 16:56:30][tgbot.py:15] - [tgbot] Reading system configuration...
+[INFO][2026-10-15 16:56:30][tgbot.py:15] - [tgbot] Reading system configuration...
+[INFO][2026-10-15 16:56:35][business_profile_pdf_artifacts.py:1271] - business-profile pdf artifact extracted source_file_id=shared-asset:asset_5c5a35e4f97ec3c999cdd0a705e01b85 bytes=2011565 pages=260 status=parsed parser_warnings=0 timings={'hash_read_seconds': 0.001163, 'cache_read_seconds': 0.0, 'extract_seconds': 6.030424, 'write_seconds': 0.100587, 'total_seconds': 6.146059} path=/home/python/Quote/data/filings/announcements/blobs/7d/derived/business_profile_pdfium_recovery.v4/7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497_57e1dd4f16ef40ff.json.gz
+[INFO][2026-10-15 16:56:37][business_profile_async_production.py:3466] - business-profile stage item stage=acquire work_id=bp-work-f23d165c1ba90e0383e64578 instrument_id=600100.SH duration_seconds=9.683 claimed=1 completed=1 retried=0 terminal_failures=0
+[INFO][2026-10-15 16:56:37][business_profile_async_production.py:3576] - business-profile stage progress stage=acquire finished=1 in_flight=0 claimed=1 completed=1 retried=0 terminal_failures=0 effective_concurrency=1 elapsed_seconds=10.325 active_seconds=9.683
+[INFO][2026-10-15 16:56:37][business_profile_async_production.py:3671] - business-profile stage end stage=acquire status=success claimed=1 completed=1 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=1 elapsed_seconds=10.335 active_work_seconds=9.683 peak_in_flight=1 queue_underfilled_slots=1 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 2, 'wait_seconds': 3.2e-05, 'write_seconds': 0.493769, 'observation_seconds': 11.19664, 'transaction_p50_seconds': 0.246885, 'transaction_p95_seconds': 0.465481, 'transaction_max_seconds': 0.48977, 'writer_lock_duty': 0.0441, 'inter_write_idle_seconds': 9.797376, 'inter_write_seconds': 0.01}
+[INFO][2026-10-15 16:56:37][business_profile_async_production.py:3197] - business-profile stage start stage=parse max_items=2 concurrency=1 max_elapsed_seconds=252.28543385583907 high_water_mark=1000
+[INFO][2026-10-15 16:57:06][business_profile_async_production.py:3466] - business-profile stage item stage=parse work_id=bp-work-f23d165c1ba90e0383e64578 instrument_id=600100.SH duration_seconds=28.577 claimed=1 completed=1 retried=0 terminal_failures=0
+[INFO][2026-10-15 16:57:06][business_profile_async_production.py:3576] - business-profile stage progress stage=parse finished=1 in_flight=0 claimed=1 completed=1 retried=0 terminal_failures=0 effective_concurrency=1 elapsed_seconds=28.608 active_seconds=28.577
+[INFO][2026-10-15 16:57:06][business_profile_async_production.py:3671] - business-profile stage end stage=parse status=success claimed=1 completed=1 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=1 elapsed_seconds=28.619 active_work_seconds=28.577 peak_in_flight=1 queue_underfilled_slots=1 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 4, 'wait_seconds': 5.4e-05, 'write_seconds': 0.502269, 'observation_seconds': 39.816767, 'transaction_p50_seconds': 0.00425, 'transaction_p95_seconds': 0.416966, 'transaction_max_seconds': 0.48977, 'writer_lock_duty': 0.012615, 'inter_write_idle_seconds': 38.410157, 'inter_write_seconds': 0.01}
+[INFO][2026-10-15 16:57:06][business_profile_async_production.py:3197] - business-profile stage start stage=semantic max_items=2 concurrency=1 max_elapsed_seconds=252.28543385583907 high_water_mark=1000
+[INFO][2026-10-15 16:57:10][business_profile_async_production.py:3466] - business-profile stage item stage=semantic work_id=bp-work-f23d165c1ba90e0383e64578 instrument_id=600100.SH duration_seconds=4.268 claimed=1 completed=1 retried=0 terminal_failures=0
+[INFO][2026-10-15 16:57:10][business_profile_async_production.py:3576] - business-profile stage progress stage=semantic finished=1 in_flight=0 claimed=1 completed=1 retried=0 terminal_failures=0 effective_concurrency=1 elapsed_seconds=4.300 active_seconds=4.268
+[INFO][2026-10-15 16:57:10][business_profile_async_production.py:3671] - business-profile stage end stage=semantic status=success claimed=1 completed=1 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=1 elapsed_seconds=4.313 active_work_seconds=4.268 peak_in_flight=1 queue_underfilled_slots=1 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 6, 'wait_seconds': 7.4e-05, 'write_seconds': 0.511339, 'observation_seconds': 44.130748, 'transaction_p50_seconds': 0.00425, 'transaction_p95_seconds': 0.368578, 'transaction_max_seconds': 0.48977, 'writer_lock_duty': 0.011587, 'inter_write_idle_seconds': 42.71452, 'inter_write_seconds': 0.01}
+[INFO][2026-10-15 16:57:10][business_profile_async_production.py:3197] - business-profile stage start stage=verify max_items=2 concurrency=1 max_elapsed_seconds=252.28543385583907 high_water_mark=1000
+[INFO][2026-10-15 16:57:10][business_profile_async_production.py:3466] - business-profile stage item stage=verify work_id=bp-work-f23d165c1ba90e0383e64578 instrument_id=600100.SH duration_seconds=0.340 claimed=1 completed=1 retried=0 terminal_failures=0
+[INFO][2026-10-15 16:57:10][business_profile_async_production.py:3576] - business-profile stage progress stage=verify finished=1 in_flight=0 claimed=1 completed=1 retried=0 terminal_failures=0 effective_concurrency=1 elapsed_seconds=0.372 active_seconds=0.340
+[INFO][2026-10-15 16:57:10][business_profile_async_production.py:3671] - business-profile stage end stage=verify status=success claimed=1 completed=1 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=1 elapsed_seconds=0.383 active_work_seconds=0.34 peak_in_flight=1 queue_underfilled_slots=1 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 8, 'wait_seconds': 8.9e-05, 'write_seconds': 0.52143, 'observation_seconds': 44.515366, 'transaction_p50_seconds': 0.004504, 'transaction_p95_seconds': 0.320272, 'transaction_max_seconds': 0.48977, 'writer_lock_duty': 0.011713, 'inter_write_idle_seconds': 42.976897, 'inter_write_seconds': 0.01}
+[INFO][2026-10-15 16:57:10][business_profile_async_production.py:3197] - business-profile stage start stage=publish max_items=2 concurrency=1 max_elapsed_seconds=252.28543385583907 high_water_mark=1000
+[INFO][2026-10-15 16:57:11][business_profile_async_production.py:3466] - business-profile stage item stage=publish work_id=bp-work-f23d165c1ba90e0383e64578 instrument_id=600100.SH duration_seconds=0.045 claimed=1 completed=1 retried=0 terminal_failures=0
+[INFO][2026-10-15 16:57:11][business_profile_async_production.py:3576] - business-profile stage progress stage=publish finished=1 in_flight=0 claimed=1 completed=1 retried=0 terminal_failures=0 effective_concurrency=1 elapsed_seconds=0.087 active_seconds=0.045
+[INFO][2026-10-15 16:57:11][business_profile_async_production.py:3671] - business-profile stage end stage=publish status=success claimed=1 completed=1 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=1 elapsed_seconds=0.098 active_work_seconds=0.045 peak_in_flight=1 queue_underfilled_slots=1 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 10, 'wait_seconds': 0.000106, 'write_seconds': 0.539685, 'observation_seconds': 44.614717, 'transaction_p50_seconds': 0.004801, 'transaction_p95_seconds': 0.274371, 'transaction_max_seconds': 0.48977, 'writer_lock_duty': 0.012097, 'inter_write_idle_seconds': 43.163022, 'inter_write_seconds': 0.01}
+[INFO][2026-10-15 16:57:11][operations.py:1725] - Company-profile entry: constructing task service
+[INFO][2026-10-15 16:57:11][operations.py:1739] - Company-profile entry: task service ready
+[INFO][2026-10-15 16:57:11][operations.py:1725] - Company-profile entry: constructing task service
+[INFO][2026-10-15 16:57:11][operations.py:1739] - Company-profile entry: task service ready
+DELIVERED 600100.SH completed found completed 90.194
+[INFO][2026-10-15 16:57:11][operations.py:1718] - Company-profile entry: loading full-market registry
+[INFO][2026-10-15 16:57:58][operations.py:1724] - Company-profile entry: registry loaded
+[INFO][2026-10-15 16:57:58][operations.py:1725] - Company-profile entry: constructing task service
+[INFO][2026-10-15 16:57:58][operations.py:1739] - Company-profile entry: task service ready
+[INFO][2026-10-15 16:57:58][business_profile_async_production.py:3197] - business-profile stage start stage=acquire max_items=2 concurrency=1 max_elapsed_seconds=160.41099745314568 high_water_mark=1000
+[INFO][2026-10-15 16:58:02][business_profile_pdf_artifacts.py:1271] - business-profile pdf artifact extracted source_file_id=shared-asset:asset_99e0ff9e83b3dec83ee491a22ff95c31 bytes=1457656 pages=243 status=parsed parser_warnings=0 timings={'hash_read_seconds': 0.001008, 'cache_read_seconds': 0.0, 'extract_seconds': 3.36242, 'write_seconds': 0.094045, 'total_seconds': 3.468044} path=/home/python/Quote/data/filings/announcements/blobs/2d/derived/business_profile_pdfium_recovery.v4/2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8_57e1dd4f16ef40ff.json.gz
+[INFO][2026-10-15 16:58:03][business_profile_async_production.py:3466] - business-profile stage item stage=acquire work_id=bp-work-b5489bea7dc3d8f950ca9bf8 instrument_id=600107.SH duration_seconds=5.147 claimed=1 completed=1 retried=0 terminal_failures=0
+[INFO][2026-10-15 16:58:03][business_profile_async_production.py:3576] - business-profile stage progress stage=acquire finished=1 in_flight=0 claimed=1 completed=1 retried=0 terminal_failures=0 effective_concurrency=1 elapsed_seconds=5.180 active_seconds=5.148
+[INFO][2026-10-15 16:58:03][business_profile_async_production.py:3671] - business-profile stage end stage=acquire status=success claimed=1 completed=1 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=1 elapsed_seconds=5.191 active_work_seconds=5.148 peak_in_flight=1 queue_underfilled_slots=1 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 12, 'wait_seconds': 0.000123, 'write_seconds': 0.547433, 'observation_seconds': 97.501539, 'transaction_p50_seconds': 0.004504, 'transaction_p95_seconds': 0.226504, 'transaction_max_seconds': 0.48977, 'writer_lock_duty': 0.005615, 'inter_write_idle_seconds': 95.946233, 'inter_write_seconds': 0.01}
+[INFO][2026-10-15 16:58:03][business_profile_async_production.py:3197] - business-profile stage start stage=parse max_items=2 concurrency=1 max_elapsed_seconds=160.41099745314568 high_water_mark=1000
+[INFO][2026-10-15 16:58:15][business_profile_async_production.py:3466] - business-profile stage item stage=parse work_id=bp-work-b5489bea7dc3d8f950ca9bf8 instrument_id=600107.SH duration_seconds=11.035 claimed=1 completed=1 retried=0 terminal_failures=0
+[INFO][2026-10-15 16:58:15][business_profile_async_production.py:3576] - business-profile stage progress stage=parse finished=1 in_flight=0 claimed=1 completed=1 retried=0 terminal_failures=0 effective_concurrency=1 elapsed_seconds=11.067 active_seconds=11.036
+[INFO][2026-10-15 16:58:15][business_profile_async_production.py:3671] - business-profile stage end stage=parse status=success claimed=1 completed=1 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=1 elapsed_seconds=11.078 active_work_seconds=11.036 peak_in_flight=1 queue_underfilled_slots=1 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 14, 'wait_seconds': 0.000141, 'write_seconds': 0.555826, 'observation_seconds': 108.580659, 'transaction_p50_seconds': 0.004326, 'transaction_p95_seconds': 0.178637, 'transaction_max_seconds': 0.48977, 'writer_lock_duty': 0.005119, 'inter_write_idle_seconds': 107.119122, 'inter_write_seconds': 0.01}
+[INFO][2026-10-15 16:58:15][business_profile_async_production.py:3197] - business-profile stage start stage=semantic max_items=2 concurrency=1 max_elapsed_seconds=160.41099745314568 high_water_mark=1000
+[INFO][2026-10-15 16:58:18][business_profile_async_production.py:3466] - business-profile stage item stage=semantic work_id=bp-work-b5489bea7dc3d8f950ca9bf8 instrument_id=600107.SH duration_seconds=3.831 claimed=1 completed=1 retried=0 terminal_failures=0
+[INFO][2026-10-15 16:58:18][business_profile_async_production.py:3576] - business-profile stage progress stage=semantic finished=1 in_flight=0 claimed=1 completed=1 retried=0 terminal_failures=0 effective_concurrency=1 elapsed_seconds=3.864 active_seconds=3.832
+[INFO][2026-10-15 16:58:18][business_profile_async_production.py:3671] - business-profile stage end stage=semantic status=success claimed=1 completed=1 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=1 elapsed_seconds=3.875 active_work_seconds=3.832 peak_in_flight=1 queue_underfilled_slots=1 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 16, 'wait_seconds': 0.00016, 'write_seconds': 0.566883, 'observation_seconds': 112.457416, 'transaction_p50_seconds': 0.004504, 'transaction_p95_seconds': 0.130771, 'transaction_max_seconds': 0.48977, 'writer_lock_duty': 0.005041, 'inter_write_idle_seconds': 110.98637, 'inter_write_seconds': 0.01}
+[INFO][2026-10-15 16:58:18][business_profile_async_production.py:3197] - business-profile stage start stage=verify max_items=2 concurrency=1 max_elapsed_seconds=160.41099745314568 high_water_mark=1000
+[INFO][2026-10-15 16:58:19][business_profile_async_production.py:3466] - business-profile stage item stage=verify work_id=bp-work-b5489bea7dc3d8f950ca9bf8 instrument_id=600107.SH duration_seconds=0.198 claimed=1 completed=1 retried=0 terminal_failures=0
+[INFO][2026-10-15 16:58:19][business_profile_async_production.py:3576] - business-profile stage progress stage=verify finished=1 in_flight=0 claimed=1 completed=1 retried=0 terminal_failures=0 effective_concurrency=1 elapsed_seconds=0.230 active_seconds=0.198
+[INFO][2026-10-15 16:58:19][business_profile_async_production.py:3671] - business-profile stage end stage=verify status=success claimed=1 completed=1 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=1 elapsed_seconds=0.242 active_work_seconds=0.198 peak_in_flight=1 queue_underfilled_slots=1 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 18, 'wait_seconds': 0.000179, 'write_seconds': 0.576002, 'observation_seconds': 112.700432, 'transaction_p50_seconds': 0.004504, 'transaction_p95_seconds': 0.082904, 'transaction_max_seconds': 0.48977, 'writer_lock_duty': 0.005111, 'inter_write_idle_seconds': 111.220334, 'inter_write_seconds': 0.01}
+[INFO][2026-10-15 16:58:19][business_profile_async_production.py:3197] - business-profile stage start stage=publish max_items=2 concurrency=1 max_elapsed_seconds=160.41099745314568 high_water_mark=1000
+[INFO][2026-10-15 16:58:19][business_profile_async_production.py:3466] - business-profile stage item stage=publish work_id=bp-work-b5489bea7dc3d8f950ca9bf8 instrument_id=600107.SH duration_seconds=0.045 claimed=1 completed=1 retried=0 terminal_failures=0
+[INFO][2026-10-15 16:58:19][business_profile_async_production.py:3576] - business-profile stage progress stage=publish finished=1 in_flight=0 claimed=1 completed=1 retried=0 terminal_failures=0 effective_concurrency=1 elapsed_seconds=0.088 active_seconds=0.045
+[INFO][2026-10-15 16:58:19][business_profile_async_production.py:3671] - business-profile stage end stage=publish status=success claimed=1 completed=1 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=1 elapsed_seconds=0.099 active_work_seconds=0.045 peak_in_flight=1 queue_underfilled_slots=1 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 20, 'wait_seconds': 0.000197, 'write_seconds': 0.588427, 'observation_seconds': 112.800974, 'transaction_p50_seconds': 0.00476, 'transaction_p95_seconds': 0.035038, 'transaction_max_seconds': 0.48977, 'writer_lock_duty': 0.005217, 'inter_write_idle_seconds': 111.30156, 'inter_write_seconds': 0.01}
+[INFO][2026-10-15 16:58:19][operations.py:1725] - Company-profile entry: constructing task service
+[INFO][2026-10-15 16:58:19][operations.py:1739] - Company-profile entry: task service ready
+[INFO][2026-10-15 16:58:19][operations.py:1725] - Company-profile entry: constructing task service
+[INFO][2026-10-15 16:58:19][operations.py:1739] - Company-profile entry: task service ready
+DELIVERED 600107.SH completed found completed 68.499
+WHOLE_ROUND_SECONDS 161.01022325083613
+OBSERVATION {
+  "plan_id": "63858cbb408575fb36cb06d6124c80e3727410f2dcb15f372e0d5cd4ec0d5d27",
+  "knowledge_cutoff": "2026-09-17",
+  "token_budget": 50000,
+  "tokens_consumed": 0,
+  "outcomes": [
+    {
+      "instrument_id": "600100.SH",
+      "status": "completed",
+      "tokens_consumed": 0,
+      "reused_scope": false,
+      "reason": null
+    },
+    {
+      "instrument_id": "600107.SH",
+      "status": "completed",
+      "tokens_consumed": 0,
+      "reused_scope": false,
+      "reason": null
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "instrument_id": "600100.SH",
+    "independent_text_pages": 58,
+    "independent_layout_pages": 59,
+    "real_source_layout_pages": 47,
+    "layout_pages_comparable": 37,
+    "layout_pages_identical": 37,
+    "different_pages": []
+  },
+  {
+    "instrument_id": "600107.SH",
+    "independent_text_pages": 32,
+    "independent_layout_pages": 32,
+    "real_source_layout_pages": 42,
+    "layout_pages_comparable": 23,
+    "layout_pages_identical": 23,
+    "different_pages": []
+  }
+]
