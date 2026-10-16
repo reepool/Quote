@@ -19,6 +19,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
+from research.business_profile_async_production import _run_thread_call
+
 from .contracts import (
     ChecklistItem,
     CompanyProfileTaskResult,
@@ -69,11 +71,21 @@ from .models import (
     ActivityAction,
     ChapterTask,
     CoverageStatus,
+    Measurement,
     MetricType,
     ObjectType,
     ReportIdentity,
     RequirementLevel,
+    Segment,
     SemanticRecord,
+)
+from .report_interpretation import (
+    CompanyProfileCoreAssessmentV2,
+    ReportInterpretation,
+    llm_led,
+)
+from .report_interpretation import (
+    core_assessment as report_core_assessment,
 )
 from .workflow import CompanyProfileSemanticService
 
@@ -164,6 +176,14 @@ class CompanyProfileRuntimeRecord(_StrictModel):
     legacy_writers_invoked: tuple[str, ...] = ()
 
 
+class CompanyProfileRuntimeRecordV2(CompanyProfileRuntimeRecord):
+    schema_version: Literal["company_profile_common_core_runtime.v2"] = (
+        "company_profile_common_core_runtime.v2"
+    )
+    report_interpretation: ReportInterpretation
+    assessment: CompanyProfileCoreAssessmentV2
+
+
 @dataclass
 class _WorkState:
     work_id: str
@@ -177,6 +197,7 @@ class _WorkState:
     provider_calls: list[str] = field(default_factory=list)
     provider_blocked: bool = False
     published: CompanyProfileRuntimeRecord | None = None
+    report_interpretation: ReportInterpretation | None = None
     completed_scopes: dict[str, CompanyProfileTaskResult] = field(default_factory=dict)
     scope_digests: dict[str, str] = field(default_factory=dict)
     reused_scope_ids: list[str] = field(default_factory=list)
@@ -281,6 +302,7 @@ class CompanyProfileStageRuntime:
         transport_retries: int = TRANSPORT_RETRY_LIMIT,
     ) -> None:
         self.writer = writer
+        self._report_provider = provider
         self.page_source = page_source
         self.stop_after_chapter = stop_after_chapter
         self._total_token_budget = max(0, int(token_budget))
@@ -341,6 +363,10 @@ class CompanyProfileStageRuntime:
         stage: str,
         item: Mapping[str, Any],
     ) -> Mapping[str, Any]:
+        if llm_led(processing_identity_from_item(item)):
+            # The shared gateway's synchronous adapter owns its own async runner.
+            # Keep it outside the application's running event loop.
+            return await _run_thread_call(self.run_stage, stage, item)
         return self.run_stage(stage, item)
 
     def run_stage(
@@ -382,6 +408,12 @@ class CompanyProfileStageRuntime:
         if item.get("accepted_records"):
             state.accepted_records = tuple(item["accepted_records"])
         state.processing_identity = processing_identity_from_item(item)
+        if state.report_interpretation is not None and (
+            state.report_interpretation.report != state.report
+            or state.report_interpretation.processing_identity
+            != state.processing_identity
+        ):
+            state.report_interpretation = None
         return state
 
     def _acquire(
@@ -458,6 +490,43 @@ class CompanyProfileStageRuntime:
             self._parse(state)
         assert state.evidence is not None
         assert state.report is not None
+        if llm_led(state.processing_identity):
+            structured = tuple(
+                record
+                for chapter in COMMON_CORE_CHAPTERS
+                for record in project_owned_page_facts(state.evidence, chapter)
+                if isinstance(record, (Measurement, Segment))
+            )
+            state.report_interpretation = self._semantic_service.run_report(
+                report=state.report,
+                pages=state.pages,
+                processing_identity=state.processing_identity,
+                provider=self._report_provider,
+                work_id=state.work_id,
+                token_budget=self._total_token_budget,
+                structured_records=(
+                    *structured,
+                    *(
+                        item
+                        for item in state.accepted_records
+                        if isinstance(item, (Measurement, Segment))
+                    ),
+                ),
+                active_checklist=tuple(
+                    _checklist_item(field_id, chapter)
+                    for chapter, fields in _CORE_FIELDS.items()
+                    for field_id in fields
+                ),
+            )
+            state.provider_calls = [
+                item["purpose"] for item in state.report_interpretation.call_receipts
+            ]
+            state.provider_blocked = not state.report_interpretation.semantic_complete
+            state.tokens_used = (
+                state.tokens_restored + state.report_interpretation.tokens_charged
+            )
+            self._persist_work(state)
+            return self._result(state, status="success", stage="semantic")
         results: list[CompanyProfileTaskResult] = []
         state.provider_calls.clear()
         state.reused_scope_ids.clear()
@@ -632,6 +701,13 @@ class CompanyProfileStageRuntime:
     def _verify(self, state: _WorkState) -> dict[str, Any]:
         if state.report is None:
             raise ValueError("verify requires a bound report")
+        if llm_led(state.processing_identity):
+            if state.report_interpretation is None:
+                self._semantic(state)
+            assert state.report_interpretation is not None
+            state.assessment = report_core_assessment(state.report_interpretation)
+            self._persist_work(state)
+            return self._result(state, status="success", stage="verify")
         self._restore_task_results(state)
         if not state.task_results:
             self._semantic(state)
@@ -657,7 +733,12 @@ class CompanyProfileStageRuntime:
         assert state.report is not None
         assert state.assessment is not None
         assert state.evidence is not None
-        record = CompanyProfileRuntimeRecord(
+        record_type = (
+            CompanyProfileRuntimeRecordV2
+            if llm_led(state.processing_identity)
+            else CompanyProfileRuntimeRecord
+        )
+        record = record_type(
             work_id=state.work_id,
             report=state.report,
             assessment=state.assessment,
@@ -667,6 +748,11 @@ class CompanyProfileStageRuntime:
             provider_blocked=state.provider_blocked,
             execution=self._execution_for(state),
             legacy_writers_invoked=(),
+            **(
+                {"report_interpretation": state.report_interpretation}
+                if llm_led(state.processing_identity)
+                else {}
+            ),
         )
         try:
             self.writer.persist(record)
@@ -729,7 +815,7 @@ class CompanyProfileStageRuntime:
             ),
             default=self._verify_base_tokens,
         )
-        return build_execution_record(
+        record = build_execution_record(
             report=state.report,
             processing_identity=state.processing_identity,
             scope_digests=state.scope_digests,
@@ -746,6 +832,17 @@ class CompanyProfileStageRuntime:
             predecessor_lineage=state.predecessor_lineage,
             scope_token_allocations=state.scope_token_allocations,
         )
+        if llm_led(state.processing_identity) and record.input_identity is not None:
+            record = record.model_copy(
+                update={
+                    "input_identity": record.input_identity.model_copy(
+                        update={
+                            "policy_version": "company_profile_common_core_mapping.v2",
+                        }
+                    ),
+                }
+            )
+        return record
 
     def _work_checkpoint_path(self, work_id: str) -> Path:
         return self.writer.output_root / "checkpoints" / f"{work_id}.json"
@@ -771,8 +868,15 @@ class CompanyProfileStageRuntime:
             return
         if not isinstance(payload, Mapping):
             return
-        if payload.get("schema_version") != SCOPE_CHECKPOINT_SCHEMA:
+        if payload.get("schema_version") not in {
+            SCOPE_CHECKPOINT_SCHEMA,
+            "company_profile_scope_checkpoint.v2",
+        }:
             return
+        if payload.get("report_interpretation") is not None:
+            state.report_interpretation = ReportInterpretation.model_validate_json(
+                json.dumps(payload["report_interpretation"], ensure_ascii=False)
+            )
         if payload.get("report") is not None:
             state.report = ReportIdentity.model_validate(payload["report"])
         if payload.get("pages"):
@@ -928,7 +1032,22 @@ class CompanyProfileStageRuntime:
         _atomic_write_json(
             path,
             {
-                "schema_version": SCOPE_CHECKPOINT_SCHEMA,
+                "schema_version": (
+                    "company_profile_scope_checkpoint.v2"
+                    if llm_led(state.processing_identity)
+                    else SCOPE_CHECKPOINT_SCHEMA
+                ),
+                **(
+                    {
+                        "report_interpretation": (
+                            json_compatible(state.report_interpretation)
+                            if state.report_interpretation
+                            else None
+                        )
+                    }
+                    if llm_led(state.processing_identity)
+                    else {}
+                ),
                 "work_id": state.work_id,
                 "report": (
                     json_compatible(state.report) if state.report is not None else None

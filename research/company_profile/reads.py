@@ -36,6 +36,7 @@ from research.company_profile.runtime import (
     COMMON_CORE_STORAGE_NAMESPACE,
     COMMON_CORE_WRITER_NAME,
     CompanyProfileRuntimeRecord,
+    CompanyProfileRuntimeRecordV2,
     json_compatible,
 )
 from research.company_profile.stage4_restricted_read import (
@@ -51,6 +52,9 @@ COMMODITY_CONSUMER_AUTHORIZATION = {
     "price_sensitivity": False,
 }
 _RECORD_ADAPTER = TypeAdapter(SemanticRecord)
+_RUNTIME_ADAPTER = TypeAdapter(
+    CompanyProfileRuntimeRecordV2 | CompanyProfileRuntimeRecord
+)
 _SAFE_NAME = re.compile(r"[^A-Za-z0-9._-]+")
 
 
@@ -214,7 +218,7 @@ class CompanyProfileReadService:
             if not path.is_file():
                 continue
             try:
-                record = CompanyProfileRuntimeRecord.model_validate_json(
+                record = _RUNTIME_ADAPTER.validate_json(
                     path.read_text(encoding="utf-8")
                 )
             except (OSError, ValueError):
@@ -250,7 +254,7 @@ class CompanyProfileReadService:
             ),
             record.report.published_at,
         )
-        return {
+        profile = {
             "schema_version": PROFILE_SCHEMA_VERSION,
             "production_authorization": PRODUCTION_AUTHORIZATION,
             "storage_namespace": record.storage_namespace,
@@ -275,6 +279,12 @@ class CompanyProfileReadService:
                 knowledge_time=knowledge_time,
             ),
         }
+        if isinstance(record, CompanyProfileRuntimeRecordV2):
+            from .report_interpretation import research_views
+
+            profile["schema_version"] = "company_profile_common_core_profile.v2"
+            profile["three_views"] = research_views(record.report_interpretation)
+        return profile
 
     def _load_checkpoint(self, work_id: str) -> dict[str, Any]:
         path = self.namespace_root / "checkpoints" / f"{work_id}.json"
@@ -369,6 +379,11 @@ def _commodity_exposure_view(
 
 def _iter_accepted_raw(checkpoint: Mapping[str, Any]) -> list[Any]:
     items: list[Any] = list(checkpoint.get("accepted_records") or ())
+    semantics = checkpoint.get("report_interpretation")
+    if isinstance(semantics, Mapping):
+        # v2 includes only verified records in this projection. Legacy candidate
+        # scopes cannot leak into a new-policy reading.
+        return list(semantics.get("records") or ())
     for scope in checkpoint.get("completed_scopes") or ():
         if not isinstance(scope, Mapping):
             continue

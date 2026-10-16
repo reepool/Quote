@@ -1,0 +1,152 @@
+{
+  "schema_version": "company_profile_b1_offline_verification.v1",
+  "date": "2026-10-16",
+  "stage": "B1_offline_preparation_only",
+  "base_head": "96feb7188b6ebf9958b6acc38bb25b1f22ac4c00",
+  "real_llm_calls": 0,
+  "formal_first_attempts_used": 0,
+  "formal_successor_attempts_used": 0,
+  "blind_reports_used": 0,
+  "business_acceptance_passed": false,
+  "production_authorization": "not_authorized",
+  "checks": {
+    "final_pytest": {
+      "passed": 185,
+      "failed": 0,
+      "seconds": 128.55,
+      "files": [
+        "tests/unit/test_research/test_company_profile_llm_led.py",
+        "tests/unit/test_research/test_company_profile_stage5_provider.py"
+      ]
+    },
+    "ruff": "passed",
+    "git_diff_check": "passed",
+    "openspec_strict": "passed"
+  },
+  "source_sha256": {
+    "research/company_profile/contracts.py": "af251fbe13a42b87f813a1f1ffe885cb769581dc73b056363edfacb5935cd8d7",
+    "research/company_profile/report_interpretation.py": "45d943df841ff780574fb970c5ab8195d22fa5e0f0fa2765af22e33ed1cac2de",
+    "research/company_profile/runtime.py": "1c72c7c21431b1d95f1eec33c9ccda008faca266dc941300c5f89027c35492a3",
+    "research/company_profile/workflow.py": "ea0a0318d2affc207ff43d588d3ed1b03a422b9cfcac0017053499e10046678f",
+    "research/company_profile/reads.py": "ed09d58fa66952fa39f01f7b2166cb4c198241896661c55908725a6e53c1bf29",
+    "research/company_profile/stage5_provider.py": "b1ddf562490e270204bc391791d9ad0110aa1c1fbbf105622cb697db762b0ea0",
+    "tests/unit/test_research/test_company_profile_llm_led.py": "1fb848f5ac6022da3366bd96853d60314787cf7ce23966359466b7111b952156"
+  },
+  "pre_existing_modified_tracked_files_preserved": 11,
+  "review": {
+    "type": "B_self_review_not_A_independent_acceptance",
+    "fixed_blockers": [
+      "synchronous_gateway_inside_application_event_loop",
+      "fake_outputs_claiming_semantic_completion",
+      "mutated_numeric_record_and_dependent_answer",
+      "annual_year_vs_year_end_period_identity",
+      "cross_thread_completion_wait_reused_existing_queue_bridge"
+    ],
+    "unrelated_baseline_failures": {
+      "semantic_workflow": {
+        "passed": 36,
+        "failed": 5,
+        "same_failures_with_this_task_modules_excluded": true
+      },
+      "runtime_first_test": {
+        "failed": 1,
+        "reproduced_without_this_task_changes": true
+      }
+    }
+  },
+  "remaining_before_real_B1": [
+    "A0 frozen historical report/source contract/model/prices and paid budget authorization",
+    "physical-attempt and cost reservation across gateway internal retries/failovers",
+    "complete entry deadline binding",
+    "first real report interpretation/query/export and independent A1 source review"
+  ],
+  "offline_sample": {
+    "kind": "synthetic_offline_fixture_not_a_real_company_profile",
+    "draft_complete": true,
+    "semantic_complete": false,
+    "real_semantic_complete": false,
+    "core_complete": false,
+    "views": {
+      "company_profile": {
+        "assessment_status": "assessed",
+        "claims": [
+          {
+            "dimension": "principal_business",
+            "status": "observed",
+            "answer": "经营云运维与工业设计两条业务线。"
+          },
+          {
+            "dimension": "products_services",
+            "status": "observed",
+            "answer": "向企业提供云运维和工业设计服务。"
+          },
+          {
+            "dimension": "revenue_model",
+            "status": "observed",
+            "answer": "向企业收取订阅费和设计服务费。"
+          }
+        ]
+      },
+      "product_exposure": {
+        "assessment_status": "assessed",
+        "claims": [
+          {
+            "dimension": "output_exposure",
+            "status": "observed",
+            "answer": "收入端是云运维订阅服务和工业设计服务。"
+          },
+          {
+            "dimension": "input_exposure",
+            "status": "observed",
+            "answer": "明示投入包括服务器、电力和外部设计服务。"
+          }
+        ]
+      },
+      "supply_chain_position": {
+        "assessment_status": "assessed",
+        "claims": [
+          {
+            "dimension": "supply_chain_role",
+            "status": "observed",
+            "answer": "承担服务提供者角色；设备销售是下一年计划，本期未开展。"
+          },
+          {
+            "dimension": "upstream_downstream",
+            "status": "observed",
+            "answer": "明示下游是制造企业，未披露具名交易对手。"
+          }
+        ]
+      }
+    },
+    "gateway_calls": [
+      {
+        "purpose": "source_inventory",
+        "status": "success",
+        "usage": {
+          "total_tokens": 150
+        },
+        "gateway_request_id": "gateway-1",
+        "model": "fake-model"
+      },
+      {
+        "purpose": "synthesize_views",
+        "status": "success",
+        "usage": {
+          "total_tokens": 150
+        },
+        "gateway_request_id": "gateway-2",
+        "model": "fake-model"
+      },
+      {
+        "purpose": "verify_views",
+        "status": "success",
+        "usage": {
+          "total_tokens": 150
+        },
+        "gateway_request_id": "gateway-3",
+        "model": "fake-model"
+      }
+    ],
+    "usage_is_synthetic": true
+  }
+}

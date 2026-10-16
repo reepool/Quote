@@ -369,6 +369,129 @@ class SemanticProvider(Protocol):
     def verify(self, request: VerifyRequest) -> VerifyResponse | Mapping[str, Any]: ...
 
 
+# Registered report purposes extend extract/verify without changing v1 payloads
+# or adding ChapterTask values. These are evidence/reading projections, not facts.
+ReportPurpose = Literal["source_inventory", "synthesize_views", "verify_views"]
+ReportDimension = Literal[
+    "principal_business",
+    "products_services",
+    "revenue_model",
+    "output_exposure",
+    "input_exposure",
+    "supply_chain_role",
+    "upstream_downstream",
+]
+
+
+class ReportSourceCondition(_StrictModel):
+    condition_id: str = Field(min_length=1)
+    dimension: ReportDimension
+    description: str = Field(min_length=1)
+    evidence: tuple[Evidence, ...] = Field(min_length=1)
+    # Importance, actor, negation and time are semantic judgments, never regex hits.
+    major: bool
+    statement_status: Literal["current", "planned", "negated", "historical", "unclear"]
+
+
+class ReportViewClaim(_StrictModel):
+    claim_id: str = Field(min_length=1)
+    dimension: ReportDimension
+    status: Literal[
+        "observed", "not_disclosed", "not_applicable", "unclear", "extraction_failed"
+    ]
+    answer: str = Field(min_length=1)
+    condition_ids: tuple[str, ...] = ()
+    supporting_record_ids: tuple[str, ...] = ()
+    evidence: tuple[Evidence, ...] = ()
+    limitation: str | None = None
+    generation_method: Literal["evidence_supported_llm_summary"] = (
+        "evidence_supported_llm_summary"
+    )
+
+
+class ReportViewCheck(_StrictModel):
+    target_type: Literal["condition", "claim", "record"]
+    target_id: str = Field(min_length=1)
+    status: Literal["pass", "block", "unclear"]
+    explanation: str = Field(min_length=1)
+
+
+class ReportSemanticRequest(_StrictModel):
+    schema_version: Literal["company_profile_report_request.v2"] = (
+        "company_profile_report_request.v2"
+    )
+    request_id: str = Field(min_length=1)
+    purpose: ReportPurpose
+    report: ReportIdentity
+    processing_identity: dict[str, Any]
+    # Source-only inventory requests never receive candidate answers.
+    source_pages: tuple[dict[str, Any], ...] = Field(min_length=1)
+    source_conditions: tuple[ReportSourceCondition, ...] = ()
+    claims: tuple[ReportViewClaim, ...] = ()
+    records: tuple[SemanticRecord, ...] = ()
+    active_checklist: tuple[ChecklistItem, ...] = ()
+    max_output_tokens: int = Field(gt=0)
+    timeout_seconds: float = Field(gt=0)
+
+    @model_validator(mode="after")
+    def _purpose_scope(self) -> ReportSemanticRequest:
+        if self.purpose == "source_inventory" and (
+            self.source_conditions or self.claims or self.records
+        ):
+            raise ValueError("source-first inventory must not receive candidates")
+        if self.purpose == "synthesize_views" and self.claims:
+            raise ValueError("synthesis cannot receive prior answers")
+        return self
+
+
+class ReportSemanticResponse(_StrictModel):
+    schema_version: Literal["company_profile_report_response.v2"] = (
+        "company_profile_report_response.v2"
+    )
+    request_id: str = Field(min_length=1)
+    purpose: ReportPurpose
+    source_conditions: tuple[ReportSourceCondition, ...] = ()
+    claims: tuple[ReportViewClaim, ...] = ()
+    records: tuple[SemanticRecord, ...] = ()
+    checks: tuple[ReportViewCheck, ...] = ()
+
+    @model_validator(mode="after")
+    def _response_scope(self) -> ReportSemanticResponse:
+        if self.purpose == "source_inventory" and (
+            self.claims or self.records or self.checks
+        ):
+            raise ValueError("inventory returns source conditions only")
+        if self.purpose == "synthesize_views" and (
+            self.source_conditions or self.checks
+        ):
+            raise ValueError("synthesis returns claims and existing fact objects only")
+        if self.purpose == "verify_views" and (
+            self.source_conditions or self.claims or self.records
+        ):
+            raise ValueError("verification cannot mutate facts or summaries")
+        for items, key in (
+            (self.source_conditions, "condition_id"),
+            (self.claims, "claim_id"),
+            (self.records, "record_id"),
+        ):
+            ids = [getattr(item, key) for item in items]
+            if len(ids) != len(set(ids)):
+                raise ValueError("report response IDs must be unique")
+        targets = [(item.target_type, item.target_id) for item in self.checks]
+        if len(targets) != len(set(targets)):
+            raise ValueError("report verification targets must be unique")
+        return self
+
+
+def report_contract_schema_manifest() -> dict[str, Any]:
+    """Expose the registered v2 purposes without changing the frozen v1 manifest."""
+    return {
+        "schema_version": "company_profile_report_contract.v2",
+        "request": ReportSemanticRequest.model_json_schema(),
+        "response": ReportSemanticResponse.model_json_schema(),
+    }
+
+
 def contract_schema_manifest() -> dict[str, Any]:
     """Generate JSON Schema from the Pydantic runtime models."""
 

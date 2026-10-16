@@ -116,6 +116,12 @@ class CompanyProfileSemanticService:
     scheduler, or production writer dependency.
     """
 
+    def run_report(self, **kwargs):
+        """Run registered v2 source reading through this same semantic owner."""
+        from .report_interpretation import interpret_report
+
+        return interpret_report(**kwargs)
+
     def run_task(
         self,
         request: SemanticTaskRequest,
