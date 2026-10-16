@@ -14,7 +14,7 @@
 
 历史 requirements、调查和回执只能作为背景，不能覆盖当前目标合同和开发总纲；代码现状不能反过来改变业务目标。
 
-公司画像每次开发/审核额外按固定顺序读取：[产品总需求](company_profile_product_and_industry_semantic_requirements.md) → [验收计划v2及唯一进度](company_profile_acceptance_program.md) → [交付路径与任务卡](company_profile_delivery_plan.md) → [A/B流程v2](ab_role_development_workflow.md) → [当前change](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。旧M4轮次、closure和无LLM历史成绩不再是下一实施入口。当前先打通真实LLM三视图，再按固定样本验证和全市场分波，不逐公司枚举修补。
+公司画像每次开发/审核额外按固定顺序读取：[产品总需求](company_profile_product_and_industry_semantic_requirements.md) → [验收计划v2及唯一进度](company_profile_acceptance_program.md) → [交付路径与任务卡](company_profile_delivery_plan.md) → [A/B流程v3](ab_role_development_workflow.md) → [当前change](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。旧M4轮次、closure和无LLM历史成绩不再是下一实施入口。当前先打通真实LLM三视图，再按固定样本验证和全市场分波，不逐公司枚举修补。
 
 ## 2. 当前架构原则
 
@@ -126,7 +126,7 @@ OpenSpec CLI 位于：
 
 ### 5.3 A/B 分工
 
-采用 A 角审核、B 角开发时，以 `ab_role_development_workflow.md` 为唯一流程说明。A 下次审核推进时告知开发者，并在后续任务卡明确 B 的自主范围、运行约束和停止条件；B 可连续完成卡内修复及复验，A 保留独立业务验收。当前在途交付按原合同审核，不自动改变历史成绩或生产授权。
+采用 A 角审核、B 角开发时，以 `ab_role_development_workflow.md`（v3）为唯一流程说明。A0冻结目标、样本、合同、预算和停止条件；B在一个连续窗口内完成卡内实现、P0/P1修复、直接回归和正式复验；A在卡末独立审核。B不得自行扩批、改分母、改阈值或扩大模型权限。当前在途交付按原合同审核，不自动改变历史成绩或生产授权。
 
 ## 6. 测试与验证
 

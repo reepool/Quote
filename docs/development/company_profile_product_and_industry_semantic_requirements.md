@@ -7,7 +7,7 @@
 
 ## 0. 文档权威关系
 
-本文件确定“交付什么”；[验收计划v2](company_profile_acceptance_program.md)唯一确定数量、阈值、补救上限与实际进度；[交付路径与任务卡](company_profile_delivery_plan.md)确定先后顺序、owner及清理；[A/B流程v2](ab_role_development_workflow.md)确定职责和审核顺序。下一开发唯一change为 `restore-company-profile-llm-led-generalization`。
+本文件确定“交付什么”；[验收计划v2](company_profile_acceptance_program.md)唯一确定数量、阈值、补救上限与实际进度；[交付路径与任务卡v3](company_profile_delivery_plan.md)确定先后顺序、owner及清理；[A/B流程v3](ab_role_development_workflow.md)确定职责和审核顺序。下一开发唯一change为 `restore-company-profile-llm-led-generalization`。
 
 旧M4双公司轮次、closure v2、owned_page_facts版本、制造六章/固定Gold、仅缺字段才调用LLM等政策，只对其冻结历史身份有效，不能约束新政策或授权下一对样本。OpenSpec该change的delta描述目标行为；主spec中旧行为是迁移基线，适用说明明确区分，不表示新代码已实现。通用LLM/PDF/框架规范继续约束各自领域。
 
