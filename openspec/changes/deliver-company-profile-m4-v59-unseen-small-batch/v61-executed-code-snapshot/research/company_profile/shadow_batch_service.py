@@ -1,0 +1,1238 @@
+"""Report-local execution and immutable persistence for the shadow cohort."""
+
+from __future__ import annotations
+
+import csv
+import hashlib
+import json
+import os
+import re
+import uuid
+from collections.abc import Mapping
+from pathlib import Path
+from typing import Literal
+
+from pydantic import Field, model_validator
+
+from .models import PRODUCTION_AUTHORIZATION, ReportIdentity
+from .projection import CompanyProfileResearchView
+from .shadow_batch import (
+    SHADOW_REPORT_COUNT,
+    ShadowCohortReport,
+    ShadowSampleManifest,
+    _payload_hash,
+    _StrictModel,
+    _utc_now,
+)
+from .shadow_evidence import (
+    ShadowEvidencePlan,
+    ShadowEvidencePreparationAudit,
+    ShadowScopeRefinementAudit,
+)
+from .stage5 import (
+    STAGE5_EXPANDED_COHORT_MANIFEST_REVISION,
+    STAGE5_FRESH_COHORT_MANIFEST_REVISION,
+    PreparedRequestScope,
+    Stage5EvidencePlan,
+    Stage5ReportAsset,
+    Stage5SampleManifest,
+)
+from .stage5_bundle import (
+    Stage5BenchmarkResult,
+    Stage5FailureDiagnostic,
+    Stage5ReportStatus,
+    Stage5ScopeResult,
+)
+from .stage5_service import (
+    ManufacturingMaterialsProfileSliceService,
+    ProviderFactory,
+    SemanticInputFactory,
+    stage5_field_ids,
+)
+
+SHADOW_REPORT_RESULT_SCHEMA = "company_profile_shadow_report_result.v1"
+SHADOW_REPORT_FAILURE_SCHEMA = "company_profile_shadow_report_failure.v1"
+SHADOW_BATCH_RESULT_SCHEMA = "company_profile_shadow_batch_result.v1"
+_RUN_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+
+
+class FreshCohortAdmissionContract(_StrictModel):
+    """Immutable admission inputs for one frozen validation cohort."""
+
+    batch_id: str = Field(min_length=1)
+    sample_manifest_revision: str = Field(min_length=1)
+    sample_manifest_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evidence_plan_version: str = Field(min_length=1)
+    evidence_plan_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    preparation_audit_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    preparation_audit_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    sample_ids: tuple[str, ...] = Field(min_length=4, max_length=8)
+    primary_logical_profile: str = Field(min_length=1)
+    dynamic_output_tokens: Literal[True] = True
+    extract_base_tokens: int = Field(gt=0)
+    verify_base_tokens: int = Field(gt=0)
+    timeout_seconds: float = Field(gt=0)
+    max_provider_calls: int = Field(gt=0)
+    production_authorization: Literal["not_authorized"] = PRODUCTION_AUTHORIZATION
+
+    @model_validator(mode="after")
+    def _closed_sample_set(self) -> FreshCohortAdmissionContract:
+        if len(self.sample_ids) not in {4, 8} or len(set(self.sample_ids)) != len(
+            self.sample_ids
+        ):
+            raise ValueError("fresh cohort requires four or eight unique samples")
+        return self
+
+
+def validate_fresh_cohort_admission(
+    *,
+    contract: FreshCohortAdmissionContract,
+    batch_id: str,
+    primary_logical_profile: str,
+    dynamic_output_tokens: bool,
+    extract_base_tokens: int,
+    verify_base_tokens: int,
+    timeout_seconds: float,
+    max_provider_calls: int,
+    manifest: Stage5SampleManifest,
+    manifest_sha256: str,
+    evidence_plan: Stage5EvidencePlan,
+    evidence_plan_sha256: str,
+    preparation_audit: Mapping[str, object],
+    preparation_audit_sha256: str,
+    prepared: Mapping[str, tuple[PreparedRequestScope, ...]],
+    output_root: str | Path,
+) -> None:
+    """Reject any frozen-input or execution-policy drift before provider creation."""
+
+    actual = {
+        "batch_id": batch_id,
+        "sample_manifest_revision": manifest.manifest_revision,
+        "sample_manifest_sha256": manifest_sha256,
+        "evidence_plan_version": evidence_plan.plan_version,
+        "evidence_plan_sha256": evidence_plan_sha256,
+        "preparation_audit_sha256": preparation_audit_sha256,
+        "preparation_audit_hash": preparation_audit.get("audit_hash"),
+        "sample_ids": tuple(item.sample_id for item in manifest.reports),
+        "primary_logical_profile": primary_logical_profile,
+        "dynamic_output_tokens": dynamic_output_tokens,
+        "extract_base_tokens": extract_base_tokens,
+        "verify_base_tokens": verify_base_tokens,
+        "timeout_seconds": timeout_seconds,
+        "max_provider_calls": max_provider_calls,
+        "production_authorization": manifest.production_authorization,
+    }
+    expected = contract.model_dump(mode="python")
+    if actual != expected:
+        drift = sorted(key for key in expected if actual.get(key) != expected.get(key))
+        raise ValueError(f"fresh cohort contract mismatch: {drift}")
+
+    audit_payload = dict(preparation_audit)
+    audit_hash = audit_payload.pop("audit_hash", None)
+    if audit_hash != _payload_hash(audit_payload):
+        raise ValueError("fresh cohort preparation audit hash mismatch")
+    expected_ids = set(contract.sample_ids)
+    if (
+        preparation_audit.get("semantic_provider_calls") != 0
+        or preparation_audit.get("semantic_execution_started") is not False
+        or preparation_audit.get("report_count") != len(contract.sample_ids)
+        or preparation_audit.get("chapter_count_per_report") != 6
+        or preparation_audit.get("unsupported_field_ids") != []
+        or preparation_audit.get("expected_answers_embedded") is not False
+        or preparation_audit.get("sample_manifest_sha256") != manifest_sha256
+        or preparation_audit.get("evidence_plan_sha256") != evidence_plan_sha256
+        or preparation_audit.get("production_authorization") != PRODUCTION_AUTHORIZATION
+    ):
+        raise ValueError("fresh cohort preparation audit does not admit this batch")
+    if set(prepared) != expected_ids:
+        raise ValueError("fresh cohort prepared identities do not match the freeze")
+    if evidence_plan.sample_manifest_revision != manifest.manifest_revision:
+        raise ValueError("fresh cohort Evidence plan manifest mismatch")
+    for asset in manifest.reports:
+        report_plan = evidence_plan.report_by_id(asset.sample_id)
+        scopes = prepared[asset.sample_id]
+        expected_scopes = {
+            scope.scope_id
+            for task in report_plan.tasks
+            for scope in task.request_scopes
+        }
+        if report_plan.content_hash != asset.content_hash:
+            raise ValueError("fresh cohort PDF hash does not match the Evidence plan")
+        if {scope.scope_id for scope in scopes} != expected_scopes:
+            raise ValueError("fresh cohort prepared scopes do not match the plan")
+        if any(
+            scope.sample_id != asset.sample_id
+            or scope.report != asset.report
+            or scope.plan_version != evidence_plan.plan_version
+            or not set(scope.field_ids) <= stage5_field_ids()
+            for scope in scopes
+        ):
+            raise ValueError("fresh cohort prepared scope contract mismatch")
+    destination = Path(output_root).resolve() / f"batch-{batch_id}"
+    if destination.exists():
+        raise FileExistsError(f"shadow batch already exists: {batch_id}")
+
+
+class ShadowReplayContract(_StrictModel):
+    """Single-run admission contract for a controlled refined-plan replay."""
+
+    batch_id: str = Field(min_length=1)
+    sample_manifest_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evidence_plan_version: str = Field(min_length=1)
+    evidence_plan_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    preparation_audit_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    scope_refinement_audit_hash: str | None = Field(
+        default=None,
+        pattern=r"^[0-9a-f]{64}$",
+    )
+    correction_audit_hash: str | None = Field(
+        default=None,
+        pattern=r"^[0-9a-f]{64}$",
+    )
+    supporting_artifact_hashes: dict[str, str] = Field(default_factory=dict)
+    primary_logical_profile: str = Field(min_length=1)
+    extract_max_output_tokens: int = Field(gt=0)
+    verify_max_output_tokens: int = Field(gt=0)
+    timeout_seconds: float = Field(gt=0)
+    max_provider_calls: int = Field(gt=0)
+    production_authorization: Literal["not_authorized"] = PRODUCTION_AUTHORIZATION
+
+    @model_validator(mode="after")
+    def _audit_lineage_is_closed(self) -> ShadowReplayContract:
+        if (self.scope_refinement_audit_hash is None) == (
+            self.correction_audit_hash is None
+        ):
+            raise ValueError(
+                "shadow replay contract requires exactly one plan-lineage audit"
+            )
+        for name, value in self.supporting_artifact_hashes.items():
+            if not name or not re.fullmatch(r"[0-9a-f]{64}", value):
+                raise ValueError("shadow replay supporting artifact hashes are invalid")
+        return self
+
+
+def validate_shadow_replay_admission(
+    *,
+    contract: ShadowReplayContract,
+    batch_id: str,
+    primary_logical_profile: str,
+    extract_max_output_tokens: int,
+    verify_max_output_tokens: int,
+    timeout_seconds: float,
+    max_provider_calls: int,
+    manifest: ShadowSampleManifest,
+    evidence_plan: ShadowEvidencePlan,
+    preparation_audit: ShadowEvidencePreparationAudit,
+    scope_refinement_audit: ShadowScopeRefinementAudit | None = None,
+    correction_audit: Mapping[str, object] | None = None,
+    supporting_artifact_hashes: Mapping[str, str] | None = None,
+    prepared: Mapping[str, tuple[PreparedRequestScope, ...]],
+    output_root: str | Path,
+) -> None:
+    """Reject any replay drift before a provider client is created."""
+
+    actual = {
+        "batch_id": batch_id,
+        "sample_manifest_hash": manifest.manifest_hash,
+        "evidence_plan_version": evidence_plan.plan_version,
+        "evidence_plan_hash": evidence_plan.plan_hash,
+        "preparation_audit_hash": preparation_audit.audit_hash,
+        "scope_refinement_audit_hash": (
+            scope_refinement_audit.audit_hash if scope_refinement_audit else None
+        ),
+        "correction_audit_hash": (
+            str(correction_audit.get("audit_hash")) if correction_audit else None
+        ),
+        "supporting_artifact_hashes": dict(supporting_artifact_hashes or {}),
+        "primary_logical_profile": primary_logical_profile,
+        "extract_max_output_tokens": extract_max_output_tokens,
+        "verify_max_output_tokens": verify_max_output_tokens,
+        "timeout_seconds": timeout_seconds,
+        "max_provider_calls": max_provider_calls,
+        "production_authorization": PRODUCTION_AUTHORIZATION,
+    }
+    if actual != contract.model_dump(mode="python"):
+        drift = sorted(
+            key
+            for key, expected in contract.model_dump(mode="python").items()
+            if actual.get(key) != expected
+        )
+        raise ValueError(f"refined shadow replay contract mismatch: {drift}")
+    if (
+        preparation_audit.sample_manifest_hash != manifest.manifest_hash
+        or preparation_audit.evidence_plan_hash != evidence_plan.plan_hash
+        or preparation_audit.report_count != SHADOW_REPORT_COUNT
+        or preparation_audit.planned_report_count != SHADOW_REPORT_COUNT
+        or preparation_audit.evidence_traceability_rate != 1.0
+    ):
+        raise ValueError("refined shadow preparation audit does not admit this replay")
+    if scope_refinement_audit is not None:
+        if (
+            scope_refinement_audit.sample_manifest_hash != manifest.manifest_hash
+            or scope_refinement_audit.refined_plan_version != evidence_plan.plan_version
+            or scope_refinement_audit.refined_plan_hash != evidence_plan.plan_hash
+            or scope_refinement_audit.report_count != SHADOW_REPORT_COUNT
+            or scope_refinement_audit.unsupported_assignment_count != 0
+            or scope_refinement_audit.missing_required_owner_count != 0
+            or scope_refinement_audit.table_context_incomplete_count != 0
+            or scope_refinement_audit.evidence_traceability_rate != 1.0
+            or scope_refinement_audit.provider_calls != 0
+        ):
+            raise ValueError("scope refinement audit does not admit this replay")
+    elif correction_audit is not None:
+        _validate_shadow_correction_audit(
+            correction_audit,
+            manifest=manifest,
+            evidence_plan=evidence_plan,
+            preparation_audit=preparation_audit,
+        )
+    else:  # pragma: no cover - the contract validator makes this unreachable
+        raise ValueError("shadow replay plan-lineage audit is missing")
+    ManufacturingMaterialsShadowBatchService._validate_admission(
+        manifest,
+        evidence_plan,
+        prepared,
+    )
+    requested_root = Path(output_root)
+    if requested_root.exists() and requested_root.is_symlink():
+        raise ValueError("shadow output root cannot be a symlink")
+    if (requested_root.resolve() / f"batch-{batch_id}").exists():
+        raise FileExistsError(f"shadow batch already exists: {batch_id}")
+
+
+def _validate_shadow_correction_audit(
+    audit: Mapping[str, object],
+    *,
+    manifest: ShadowSampleManifest,
+    evidence_plan: ShadowEvidencePlan,
+    preparation_audit: ShadowEvidencePreparationAudit,
+) -> None:
+    payload = dict(audit)
+    audit_hash = payload.pop("audit_hash", None)
+    if audit_hash != _payload_hash(payload):
+        raise ValueError("shadow correction audit hash mismatch")
+    if (
+        audit.get("sample_manifest_hash") != manifest.manifest_hash
+        or audit.get("corrected_plan_hash") != evidence_plan.plan_hash
+        or audit.get("preparation_audit_hash") != preparation_audit.audit_hash
+        or audit.get("unresolved_finding_ids") != []
+        or audit.get("provider_calls") != 0
+        or audit.get("production_authorization") != PRODUCTION_AUTHORIZATION
+    ):
+        raise ValueError("shadow correction audit does not admit this replay")
+    schema_version = audit.get("schema_version")
+    if schema_version == "company_profile_shadow_evidence_correction_audit.v1":
+        return
+    if schema_version == "company_profile_shadow_routing_continuation_audit.v1":
+        results = audit.get("results")
+        if (
+            audit.get("report_count") != SHADOW_REPORT_COUNT
+            or audit.get("cohort_replay_performed") is not False
+            or audit.get("historical_artifacts_mutated") is not False
+            or audit.get("production_paths_opened") != []
+            or not isinstance(results, list)
+            or len(results) != 6
+        ):
+            raise ValueError("shadow correction audit does not admit this replay")
+        return
+    if schema_version in {
+        "company_profile_shadow_segment_heading_replay_proof.v1",
+        "company_profile_shadow_operating_ownership_replay_proof.v1",
+        "company_profile_shadow_external_operating_ownership_replay_proof.v1",
+    }:
+        if (
+            audit.get("report_count") != SHADOW_REPORT_COUNT
+            or audit.get("cohort_replay_performed") is not False
+            or audit.get("historical_artifacts_mutated") is not False
+            or audit.get("output_absent_before_provider") is not True
+            or audit.get("production_paths_opened") != []
+        ):
+            raise ValueError("shadow correction audit does not admit this replay")
+        return
+    raise ValueError("shadow correction audit schema is unsupported")
+
+
+def build_shadow_replay_admission_receipt(
+    *,
+    contract: ShadowReplayContract,
+    output_root: str | Path,
+    excluded_predecessor: Mapping[str, object] | None = None,
+    provider_route_contract: Mapping[str, object] | None = None,
+) -> dict[str, object]:
+    """Build a hash-bound receipt proving replay admission before provider creation."""
+
+    payload: dict[str, object] = {
+        "schema_version": "company_profile_shadow_replay_admission_receipt.v1",
+        "batch_id": contract.batch_id,
+        "contract": contract.model_dump(mode="json"),
+        "output_root": str(Path(output_root).resolve()),
+        "output_batch_path": str(
+            Path(output_root).resolve() / f"batch-{contract.batch_id}"
+        ),
+        "output_absent_before_provider": True,
+        "provider_calls": 0,
+        "cohort_replay_performed": False,
+        "production_authorization": PRODUCTION_AUTHORIZATION,
+    }
+    if excluded_predecessor is not None:
+        payload["excluded_predecessor"] = dict(excluded_predecessor)
+    if provider_route_contract is not None:
+        payload["provider_route_contract"] = dict(provider_route_contract)
+    return {**payload, "audit_hash": _payload_hash(payload)}
+
+
+def validate_segment_financial_closure_audit(
+    audit: Mapping[str, object],
+    *,
+    implementation_hashes: Mapping[str, str],
+) -> None:
+    """Validate the provider-free segment repair closure before replay admission."""
+
+    payload = dict(audit)
+    audit_hash = payload.pop("audit_hash", None)
+    if audit_hash != _payload_hash(payload):
+        raise ValueError("segment financial closure audit hash mismatch")
+    if (
+        audit.get("schema")
+        != "company_profile_segment_financial_provider_free_closure_audit.v1"
+        or audit.get("closure_status") != "passed"
+        or audit.get("provider_calls") != 0
+        or audit.get("cohort_replay_performed") is not False
+        or audit.get("external_replay_mutated") is not False
+        or audit.get("authoritative_replay_status") != "hold"
+        or audit.get("production_authorization") != PRODUCTION_AUTHORIZATION
+        or audit.get("production_paths_opened") != []
+    ):
+        raise ValueError("segment financial closure audit does not admit this replay")
+    fixture_results = audit.get("fixture_results")
+    if not isinstance(fixture_results, list) or not fixture_results:
+        raise ValueError("segment financial closure fixtures are incomplete")
+    if any(
+        not isinstance(item, Mapping) or item.get("status") != "passed"
+        for item in fixture_results
+    ):
+        raise ValueError("segment financial closure fixtures are incomplete")
+    expected_hashes = audit.get("implementation_hashes")
+    if not isinstance(expected_hashes, Mapping):
+        raise TypeError("segment financial closure implementation hashes are missing")
+    for relative_path, expected_hash in expected_hashes.items():
+        if implementation_hashes.get(str(relative_path)) != expected_hash:
+            raise ValueError(
+                "segment financial closure implementation hash mismatch: "
+                f"{relative_path}"
+            )
+
+
+def validate_segment_heading_replay_proof(
+    audit: Mapping[str, object],
+    *,
+    contract: ShadowReplayContract,
+    repository_root: str | Path,
+    output_root: str | Path,
+) -> dict[str, str]:
+    """Validate the current segment replay inputs without creating a provider."""
+
+    payload = dict(audit)
+    audit_hash = payload.pop("audit_hash", None)
+    if audit_hash != _payload_hash(payload):
+        raise ValueError("segment heading replay proof hash mismatch")
+    if (
+        audit.get("schema_version")
+        != "company_profile_shadow_segment_heading_replay_proof.v1"
+        or audit.get("report_count") != SHADOW_REPORT_COUNT
+        or audit.get("provider_calls") != 0
+        or audit.get("cohort_replay_performed") is not False
+        or audit.get("historical_artifacts_mutated") is not False
+        or audit.get("output_absent_before_provider") is not True
+        or audit.get("production_authorization") != PRODUCTION_AUTHORIZATION
+        or audit.get("production_paths_opened") != []
+        or audit.get("unresolved_finding_ids") != []
+        or audit.get("batch_id") != contract.batch_id
+        or audit.get("sample_manifest_hash") != contract.sample_manifest_hash
+        or audit.get("corrected_plan_hash") != contract.evidence_plan_hash
+        or audit.get("evidence_plan_version") != contract.evidence_plan_version
+        or audit.get("preparation_audit_hash") != contract.preparation_audit_hash
+        or audit_hash != contract.correction_audit_hash
+    ):
+        raise ValueError("segment heading replay proof does not admit this replay")
+
+    root = Path(repository_root).resolve()
+    artifact_hashes = audit.get("artifact_hashes")
+    implementation_hashes = audit.get("implementation_hashes")
+    supporting_hashes = audit.get("supporting_artifact_hashes")
+    if not isinstance(artifact_hashes, Mapping) or not artifact_hashes:
+        raise TypeError("segment heading replay artifact hashes are missing")
+    if not isinstance(implementation_hashes, Mapping) or not implementation_hashes:
+        raise TypeError("segment heading replay implementation hashes are missing")
+    if not isinstance(supporting_hashes, Mapping) or not supporting_hashes:
+        raise TypeError("segment heading replay supporting hashes are missing")
+
+    for relative_path, expected_hash in {
+        **artifact_hashes,
+        **implementation_hashes,
+    }.items():
+        path = (root / str(relative_path)).resolve()
+        if not path.is_relative_to(root) or not path.is_file():
+            raise ValueError(
+                f"segment heading replay proof path is invalid: {relative_path}"
+            )
+        actual_hash = hashlib.sha256(path.read_bytes()).hexdigest()
+        if actual_hash != expected_hash:
+            raise ValueError(
+                f"segment heading replay proof artifact hash mismatch: {relative_path}"
+            )
+    if any(
+        not isinstance(name, str)
+        or not name
+        or not isinstance(value, str)
+        or not re.fullmatch(r"[0-9a-f]{64}", value)
+        for name, value in supporting_hashes.items()
+    ):
+        raise ValueError("segment heading replay supporting hashes are invalid")
+    actual_supporting = {
+        str(name): str(value) for name, value in supporting_hashes.items()
+    }
+    if actual_supporting != contract.supporting_artifact_hashes:
+        raise ValueError("segment heading replay supporting hashes mismatch")
+    provider = audit.get("provider")
+    if not isinstance(provider, Mapping) or dict(provider) != {
+        "logical_profile": contract.primary_logical_profile,
+        "extract_max_output_tokens": contract.extract_max_output_tokens,
+        "verify_max_output_tokens": contract.verify_max_output_tokens,
+        "timeout_seconds": contract.timeout_seconds,
+        "max_provider_calls": contract.max_provider_calls,
+    }:
+        raise ValueError("segment heading replay provider contract mismatch")
+    if Path(str(audit.get("output_root"))).resolve() != Path(output_root).resolve():
+        raise ValueError("segment heading replay output root mismatch")
+    return actual_supporting
+
+
+def validate_operating_ownership_replay_proof(
+    audit: Mapping[str, object],
+    *,
+    contract: ShadowReplayContract,
+    repository_root: str | Path,
+    output_root: str | Path,
+) -> dict[str, str]:
+    """Validate the ownership-aware v6 replay before provider construction."""
+
+    payload = dict(audit)
+    audit_hash = payload.pop("audit_hash", None)
+    if audit_hash != _payload_hash(payload):
+        raise ValueError("operating ownership replay proof hash mismatch")
+    if (
+        audit.get("schema_version")
+        != "company_profile_shadow_operating_ownership_replay_proof.v1"
+        or audit.get("report_count") != SHADOW_REPORT_COUNT
+        or audit.get("affected_scope_count") != 17
+        or audit.get("semantic_rows_match_archived_audit") is not True
+        or audit.get("provider_calls") != 0
+        or audit.get("cohort_replay_performed") is not False
+        or audit.get("historical_artifacts_mutated") is not False
+        or audit.get("output_absent_before_provider") is not True
+        or audit.get("production_authorization") != PRODUCTION_AUTHORIZATION
+        or audit.get("production_paths_opened") != []
+        or audit.get("unresolved_finding_ids") != []
+        or audit.get("batch_id") != contract.batch_id
+        or audit.get("sample_manifest_hash") != contract.sample_manifest_hash
+        or audit.get("corrected_plan_hash") != contract.evidence_plan_hash
+        or audit.get("evidence_plan_version") != contract.evidence_plan_version
+        or audit.get("preparation_audit_hash") != contract.preparation_audit_hash
+        or audit_hash != contract.correction_audit_hash
+        or audit.get("source_review_rule")
+        != {
+            "include_all_dispositions": ["blocker", "caveat", "unresolved"],
+            "stable_sample_per_core_chapter": 1,
+            "stable_sample_kinds": ["accepted_for_review", "legal_empty"],
+            "core_chapter_count": 6,
+        }
+        or audit.get("readiness_gates")
+        != {
+            "execution_completion_min": 0.95,
+            "usable_report_rate_min": 0.9,
+            "evidence_traceability_min": 1.0,
+            "source_review_complete": True,
+            "sampled_precision_min": 0.99,
+            "critical_semantic_error_max": 0,
+            "unresolved_review_median_max": 2,
+            "unresolved_review_p90_max": 5,
+        }
+        or audit.get("authorized_transfer_hosts") != ["scorpio.reepool.com"]
+    ):
+        raise ValueError("operating ownership replay proof does not admit this replay")
+
+    root = Path(repository_root).resolve()
+    artifact_hashes = audit.get("artifact_hashes")
+    implementation_hashes = audit.get("implementation_hashes")
+    supporting_hashes = audit.get("supporting_artifact_hashes")
+    if not isinstance(artifact_hashes, Mapping) or not artifact_hashes:
+        raise TypeError("operating ownership replay artifact hashes are missing")
+    if not isinstance(implementation_hashes, Mapping) or not implementation_hashes:
+        raise TypeError("operating ownership implementation hashes are missing")
+    if not isinstance(supporting_hashes, Mapping) or not supporting_hashes:
+        raise TypeError("operating ownership supporting hashes are missing")
+
+    for relative_path, expected_hash in {
+        **artifact_hashes,
+        **implementation_hashes,
+    }.items():
+        path = (root / str(relative_path)).resolve()
+        if not path.is_relative_to(root) or not path.is_file():
+            raise ValueError(
+                f"operating ownership replay proof path is invalid: {relative_path}"
+            )
+        if hashlib.sha256(path.read_bytes()).hexdigest() != expected_hash:
+            raise ValueError(
+                "operating ownership replay proof artifact hash mismatch: "
+                f"{relative_path}"
+            )
+    if any(
+        not isinstance(name, str)
+        or not name
+        or not isinstance(value, str)
+        or not re.fullmatch(r"[0-9a-f]{64}", value)
+        for name, value in supporting_hashes.items()
+    ):
+        raise ValueError("operating ownership supporting hashes are invalid")
+    actual_supporting = {
+        str(name): str(value) for name, value in supporting_hashes.items()
+    }
+    if actual_supporting != contract.supporting_artifact_hashes:
+        raise ValueError("operating ownership supporting hashes mismatch")
+    provider = audit.get("provider")
+    if not isinstance(provider, Mapping) or dict(provider) != {
+        "logical_profile": contract.primary_logical_profile,
+        "extract_max_output_tokens": contract.extract_max_output_tokens,
+        "verify_max_output_tokens": contract.verify_max_output_tokens,
+        "timeout_seconds": contract.timeout_seconds,
+        "max_provider_calls": contract.max_provider_calls,
+        "outer_deadline_seconds": None,
+    }:
+        raise ValueError("operating ownership replay provider contract mismatch")
+    if Path(str(audit.get("output_root"))).resolve() != Path(output_root).resolve():
+        raise ValueError("operating ownership replay output root mismatch")
+    return actual_supporting
+
+
+def validate_external_operating_ownership_replay_proof(
+    audit: Mapping[str, object],
+    *,
+    contract: ShadowReplayContract,
+    repository_root: str | Path,
+    output_root: str | Path,
+) -> dict[str, str]:
+    """Validate the single external-path recovery of the v6 ownership replay."""
+
+    payload = dict(audit)
+    audit_hash = payload.pop("audit_hash", None)
+    if audit_hash != _payload_hash(payload):
+        raise ValueError("external ownership recovery proof hash mismatch")
+    if audit_hash != contract.correction_audit_hash:
+        raise ValueError("external ownership recovery proof contract hash mismatch")
+    recovery_artifact_hashes = audit.get("recovery_artifact_hashes")
+    if (
+        audit.get("schema_version")
+        != "company_profile_shadow_external_operating_ownership_replay_proof.v1"
+        or audit.get("recovery_from_batch_id")
+        != "manufacturing-materials-shadow-operating-ownership-gemini-20260911-a"
+        or audit.get("execution_path") != "external_authorized"
+        or audit.get("sandbox_fallback_allowed") is not False
+        or audit.get("changed_experimental_variables")
+        != ["batch_id", "execution_network_path", "output_root"]
+        or audit.get("failed_replay_reason_codes")
+        != [
+            "authoritative_batch_manifest_missing",
+            "cohort_execution_interrupted",
+            "sandbox_dns_failure",
+            "semantic_responses_zero",
+            "source_review_incomplete",
+        ]
+        or not isinstance(recovery_artifact_hashes, Mapping)
+        or set(recovery_artifact_hashes)
+        != {
+            "failed_readiness_audit",
+            "interrupted_attempt",
+            "failed_recurrence_audit",
+        }
+    ):
+        raise ValueError("external ownership recovery proof does not admit this replay")
+    supporting_hashes = audit.get("supporting_artifact_hashes")
+    if not isinstance(supporting_hashes, Mapping) or any(
+        supporting_hashes.get(name) != value
+        for name, value in recovery_artifact_hashes.items()
+    ):
+        raise ValueError("external ownership recovery artifact hashes mismatch")
+
+    base_audit = dict(audit)
+    base_audit["schema_version"] = (
+        "company_profile_shadow_operating_ownership_replay_proof.v1"
+    )
+    base_audit.pop("audit_hash", None)
+    base_audit["audit_hash"] = _payload_hash(base_audit)
+    base_contract = contract.model_copy(
+        update={"correction_audit_hash": base_audit["audit_hash"]}
+    )
+    return validate_operating_ownership_replay_proof(
+        base_audit,
+        contract=base_contract,
+        repository_root=repository_root,
+        output_root=output_root,
+    )
+
+
+class ShadowReportSuccess(_StrictModel):
+    schema_version: Literal["company_profile_shadow_report_result.v1"] = (
+        SHADOW_REPORT_RESULT_SCHEMA
+    )
+    batch_id: str = Field(min_length=1)
+    report_run_id: str = Field(min_length=1)
+    sample_id: str = Field(min_length=1)
+    company_name: str = Field(min_length=1)
+    report: ReportIdentity
+    sample_manifest_revision: str = Field(min_length=1)
+    sample_manifest_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evidence_plan_version: str = Field(min_length=1)
+    evidence_plan_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    scope_results: tuple[Stage5ScopeResult, ...] = Field(min_length=1)
+    research_view: CompanyProfileResearchView
+    report_status: Stage5ReportStatus
+    benchmark: Stage5BenchmarkResult
+    created_at: str = Field(min_length=1)
+    production_authorization: Literal["not_authorized"] = PRODUCTION_AUTHORIZATION
+
+    @model_validator(mode="after")
+    def _result_is_report_local(self) -> ShadowReportSuccess:
+        if any(
+            item.prepared_scope.sample_id != self.sample_id
+            or item.prepared_scope.report != self.report
+            for item in self.scope_results
+        ):
+            raise ValueError("shadow report result contains cross-report scopes")
+        if self.research_view.production_authorization != PRODUCTION_AUTHORIZATION:
+            raise ValueError("shadow research view cannot authorize production")
+        return self
+
+
+class ShadowReportFailure(_StrictModel):
+    schema_version: Literal["company_profile_shadow_report_failure.v1"] = (
+        SHADOW_REPORT_FAILURE_SCHEMA
+    )
+    batch_id: str = Field(min_length=1)
+    report_run_id: str = Field(min_length=1)
+    sample_id: str = Field(min_length=1)
+    company_name: str = Field(min_length=1)
+    report: ReportIdentity
+    sample_manifest_revision: str = Field(min_length=1)
+    sample_manifest_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evidence_plan_version: str = Field(min_length=1)
+    evidence_plan_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    status: Literal["failed"] = "failed"
+    diagnostics: tuple[Stage5FailureDiagnostic, ...] = Field(
+        min_length=1, max_length=20
+    )
+    created_at: str = Field(min_length=1)
+    production_authorization: Literal["not_authorized"] = PRODUCTION_AUTHORIZATION
+
+
+class ShadowReportReference(_StrictModel):
+    sample_id: str = Field(min_length=1)
+    report_run_id: str = Field(min_length=1)
+    status: Literal["success", "failed"]
+    relative_path: str = Field(min_length=1)
+    output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    report_status: Stage5ReportStatus | None = None
+
+    @model_validator(mode="after")
+    def _status_matches_payload(self) -> ShadowReportReference:
+        if (self.status == "success") != (self.report_status is not None):
+            raise ValueError("shadow report reference status is inconsistent")
+        return self
+
+
+class ShadowBatchResult(_StrictModel):
+    schema_version: Literal["company_profile_shadow_batch_result.v1"] = (
+        SHADOW_BATCH_RESULT_SCHEMA
+    )
+    batch_id: str = Field(min_length=1)
+    sample_manifest_revision: str = Field(min_length=1)
+    sample_manifest_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evidence_plan_version: str = Field(min_length=1)
+    evidence_plan_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    primary_logical_profile: str = Field(min_length=1)
+    reports: tuple[ShadowReportReference, ...] = Field(
+        min_length=1,
+        max_length=SHADOW_REPORT_COUNT,
+    )
+    completed_report_count: int = Field(ge=0, le=SHADOW_REPORT_COUNT)
+    failed_report_count: int = Field(ge=0, le=SHADOW_REPORT_COUNT)
+    created_at: str = Field(min_length=1)
+    result_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    production_authorization: Literal["not_authorized"] = PRODUCTION_AUTHORIZATION
+
+    @model_validator(mode="after")
+    def _batch_counts_are_consistent(self) -> ShadowBatchResult:
+        report_count = len(self.reports)
+        expected_counts = {
+            STAGE5_FRESH_COHORT_MANIFEST_REVISION: 4,
+            STAGE5_EXPANDED_COHORT_MANIFEST_REVISION: 8,
+        }
+        expected_count = expected_counts.get(
+            self.sample_manifest_revision, SHADOW_REPORT_COUNT
+        )
+        if report_count != expected_count:
+            raise ValueError("shadow batch result report count does not match its mode")
+        if len({item.sample_id for item in self.reports}) != report_count:
+            raise ValueError("shadow batch result requires unique reports")
+        completed = sum(item.status == "success" for item in self.reports)
+        if self.completed_report_count != completed:
+            raise ValueError("shadow batch completed count mismatch")
+        if self.failed_report_count != report_count - completed:
+            raise ValueError("shadow batch failed count mismatch")
+        if self.result_hash != _payload_hash(self, omit={"result_hash"}):
+            raise ValueError("shadow batch result hash mismatch")
+        return self
+
+
+class ShadowBatchStore:
+    """Persist one immutable result file per report and one batch manifest."""
+
+    def __init__(self, output_root: str | Path) -> None:
+        requested = Path(output_root)
+        if requested.exists() and requested.is_symlink():
+            raise ValueError("shadow output root cannot be a symlink")
+        self.output_root = requested.resolve()
+        self.output_root.mkdir(parents=True, exist_ok=True)
+
+    def start(self, batch_id: str) -> Path:
+        _validate_run_id(batch_id)
+        destination = self.output_root / f"batch-{batch_id}"
+        if destination.exists():
+            raise FileExistsError(f"shadow batch already exists: {batch_id}")
+        destination.mkdir(parents=False)
+        (destination / "reports").mkdir()
+        return destination
+
+    def commit_report(
+        self,
+        batch_directory: Path,
+        result: ShadowReportSuccess | ShadowReportFailure,
+    ) -> ShadowReportReference:
+        suffix = "json" if isinstance(result, ShadowReportSuccess) else "failed.json"
+        relative = Path("reports") / f"{result.sample_id}.{suffix}"
+        destination = batch_directory / relative
+        content = _json_bytes(result.model_dump(mode="json"))
+        _write_immutable(destination, content)
+        return ShadowReportReference(
+            sample_id=result.sample_id,
+            report_run_id=result.report_run_id,
+            status="success" if isinstance(result, ShadowReportSuccess) else "failed",
+            relative_path=relative.as_posix(),
+            output_sha256=hashlib.sha256(content).hexdigest(),
+            report_status=(
+                result.report_status
+                if isinstance(result, ShadowReportSuccess)
+                else None
+            ),
+        )
+
+    def commit_batch(self, batch_directory: Path, result: ShadowBatchResult) -> Path:
+        _write_immutable(
+            batch_directory / "manifest.json",
+            _json_bytes(result.model_dump(mode="json")),
+        )
+        return batch_directory
+
+
+class ManufacturingMaterialsShadowBatchService:
+    """Admit and execute the frozen cohort through the existing report owner."""
+
+    def __init__(
+        self,
+        *,
+        stage5_service: ManufacturingMaterialsProfileSliceService | None = None,
+    ) -> None:
+        self._stage5_service = (
+            stage5_service or ManufacturingMaterialsProfileSliceService()
+        )
+
+    def run(
+        self,
+        *,
+        batch_id: str,
+        primary_logical_profile: str,
+        manifest: ShadowSampleManifest,
+        evidence_plan: ShadowEvidencePlan,
+        prepared: Mapping[str, tuple[PreparedRequestScope, ...]],
+        store: ShadowBatchStore,
+        provider_factory: ProviderFactory,
+        semantic_input_factory: SemanticInputFactory | None = None,
+    ) -> tuple[ShadowBatchResult, Path]:
+        self._validate_admission(manifest, evidence_plan, prepared)
+        return self._run_reports(
+            batch_id=batch_id,
+            primary_logical_profile=primary_logical_profile,
+            reports=manifest.reports,
+            sample_manifest_revision=manifest.manifest_revision,
+            sample_manifest_hash=manifest.manifest_hash,
+            evidence_plan_version=evidence_plan.plan_version,
+            evidence_plan_hash=evidence_plan.plan_hash,
+            prepared=prepared,
+            store=store,
+            provider_factory=provider_factory,
+            semantic_input_factory=semantic_input_factory,
+        )
+
+    def run_fresh_cohort(
+        self,
+        *,
+        batch_id: str,
+        primary_logical_profile: str,
+        manifest: Stage5SampleManifest,
+        sample_manifest_hash: str,
+        evidence_plan: Stage5EvidencePlan,
+        evidence_plan_hash: str,
+        prepared: Mapping[str, tuple[PreparedRequestScope, ...]],
+        store: ShadowBatchStore,
+        provider_factory: ProviderFactory,
+        semantic_input_factory: SemanticInputFactory | None = None,
+    ) -> tuple[ShadowBatchResult, Path]:
+        """Execute an admitted fresh cohort through the same report-local loop."""
+
+        return self._run_reports(
+            batch_id=batch_id,
+            primary_logical_profile=primary_logical_profile,
+            reports=manifest.reports,
+            sample_manifest_revision=manifest.manifest_revision,
+            sample_manifest_hash=sample_manifest_hash,
+            evidence_plan_version=evidence_plan.plan_version,
+            evidence_plan_hash=evidence_plan_hash,
+            prepared=prepared,
+            store=store,
+            provider_factory=provider_factory,
+            semantic_input_factory=semantic_input_factory,
+        )
+
+    def export_accepted_research_data(
+        self, *, batch_directory: str | Path, output_directory: str | Path
+    ) -> dict[str, object]:
+        """Deliver accepted facts even when report completeness remains hold.
+
+        This is a read projection, not a new acceptance decision. Rejected and
+        unresolved candidates never enter facts. Missing fields stay missing.
+        """
+        from .acceptance_policy import usage_policy
+
+        source = Path(batch_directory).resolve()
+        destination = Path(output_directory).resolve()
+        if destination == source or source in destination.parents:
+            raise ValueError("research export must be outside the source batch")
+        if destination.exists():
+            raise FileExistsError("research export identity already exists")
+        batch = load_shadow_batch_result(source / "manifest.json")
+        facts: list[dict[str, object]] = []
+        gaps: list[dict[str, object]] = []
+        reports: list[dict[str, object]] = []
+        for reference in batch.reports:
+            path = (source / reference.relative_path).resolve()
+            if source not in path.parents:
+                raise ValueError("report path escapes its batch")
+            if hashlib.sha256(path.read_bytes()).hexdigest() != reference.output_sha256:
+                raise ValueError("source report hash mismatch")
+            report = load_shadow_report_result(path)
+            if (
+                report.batch_id != batch.batch_id
+                or report.sample_id != reference.sample_id
+                or report.report_run_id != reference.report_run_id
+                or report.sample_manifest_hash != batch.sample_manifest_hash
+                or report.evidence_plan_hash != batch.evidence_plan_hash
+            ):
+                raise ValueError("source report identity mismatch")
+            start = len(facts)
+            if isinstance(report, ShadowReportSuccess):
+                for scope in report.scope_results:
+                    for record in scope.task_result.accepted_records():
+                        facts.append(
+                            {
+                                "sample_id": report.sample_id,
+                                "scope_id": scope.scope_id,
+                                "source_report_status": report.report_status.value,
+                                "acceptance": "accepted_for_review",
+                                "usage": usage_policy(record),
+                                "record": record.model_dump(mode="json"),
+                            }
+                        )
+                    for coverage in scope.task_result.coverage:
+                        gaps.append(
+                            {
+                                "sample_id": report.sample_id,
+                                "scope_id": scope.scope_id,
+                                "coverage": coverage.model_dump(mode="json"),
+                            }
+                        )
+                    for item in scope.task_result.human_review_items:
+                        gaps.append(
+                            {
+                                "sample_id": report.sample_id,
+                                "scope_id": scope.scope_id,
+                                "review": item.model_dump(mode="json"),
+                            }
+                        )
+            else:
+                gaps.append(
+                    {
+                        "sample_id": report.sample_id,
+                        "failure": report.model_dump(mode="json"),
+                    }
+                )
+            count = len(facts) - start
+            reports.append(
+                {
+                    "sample_id": report.sample_id,
+                    "accepted_fact_count": count,
+                    "delivery_status": "available_partial"
+                    if count
+                    else "no_accepted_facts",
+                    "source_report_sha256": reference.output_sha256,
+                }
+            )
+        payload: dict[str, object] = {
+            "schema_version": "company_profile_accepted_research_export.v1",
+            "source_batch_id": batch.batch_id,
+            "source_batch_result_hash": batch.result_hash,
+            "source_manifest_sha256": hashlib.sha256(
+                (source / "manifest.json").read_bytes()
+            ).hexdigest(),
+            "production_authorization": PRODUCTION_AUTHORIZATION,
+            "provider_calls": 0,
+            "semantic_accuracy": "not_estimated_by_export",
+            "accepted_fact_count": len(facts),
+            "reports": reports,
+            "facts": facts,
+            "coverage_and_review": gaps,
+        }
+        # Validate all inputs before creating the new, exclusively owned output.
+        destination.mkdir(parents=True, exist_ok=False)
+        (destination / "accepted-research-data.json").write_bytes(_json_bytes(payload))
+        columns = (
+            "instrument_id",
+            "report_period",
+            "published_at",
+            "scope_id",
+            "record_id",
+            "field_id",
+            "object_type",
+            "reported_period",
+            "period_type",
+            "subject_scope",
+            "subject_basis",
+            "name",
+            "value",
+            "unit",
+            "header",
+            "qualifier",
+            "source_report_status",
+            "usage_json",
+            "evidence_json",
+        )
+        with (destination / "accepted-facts.csv").open(
+            "w", encoding="utf-8-sig", newline=""
+        ) as output:
+            writer = csv.DictWriter(output, fieldnames=columns)
+            writer.writeheader()
+            for fact in facts:
+                record = fact["record"]
+                native = record["source_native"]
+                row = {key: record.get(key) for key in columns}
+                row.update(
+                    {
+                        key: record["report"][key]
+                        for key in ("instrument_id", "report_period", "published_at")
+                    }
+                )
+                row.update(
+                    {
+                        key: native.get(key)
+                        for key in ("name", "value", "unit", "header", "qualifier")
+                    }
+                )
+                row.update(
+                    {
+                        "scope_id": fact["scope_id"],
+                        "source_report_status": fact["source_report_status"],
+                        "usage_json": json.dumps(fact["usage"], ensure_ascii=False),
+                        "evidence_json": json.dumps(
+                            record["evidence"], ensure_ascii=False
+                        ),
+                    }
+                )
+                writer.writerow(row)
+        return payload
+
+    def _run_reports(
+        self,
+        *,
+        batch_id: str,
+        primary_logical_profile: str,
+        reports: tuple[ShadowCohortReport | Stage5ReportAsset, ...],
+        sample_manifest_revision: str,
+        sample_manifest_hash: str,
+        evidence_plan_version: str,
+        evidence_plan_hash: str,
+        prepared: Mapping[str, tuple[PreparedRequestScope, ...]],
+        store: ShadowBatchStore,
+        provider_factory: ProviderFactory,
+        semantic_input_factory: SemanticInputFactory | None,
+    ) -> tuple[ShadowBatchResult, Path]:
+        batch_directory = store.start(batch_id)
+        references: list[ShadowReportReference] = []
+        for asset in reports:
+            report_run_id = _report_run_id(batch_id, asset)
+            try:
+                execution = self._stage5_service.execute_prepared_report(
+                    run_id=report_run_id,
+                    asset=asset,
+                    prepared_scopes=prepared[asset.sample_id],
+                    provider_factory=provider_factory,
+                    semantic_input_factory=semantic_input_factory,
+                )
+                report_result: ShadowReportSuccess | ShadowReportFailure = (
+                    ShadowReportSuccess(
+                        batch_id=batch_id,
+                        report_run_id=report_run_id,
+                        sample_id=asset.sample_id,
+                        company_name=asset.company_name,
+                        report=asset.report,
+                        sample_manifest_revision=sample_manifest_revision,
+                        sample_manifest_hash=sample_manifest_hash,
+                        evidence_plan_version=evidence_plan_version,
+                        evidence_plan_hash=evidence_plan_hash,
+                        scope_results=execution.scope_results,
+                        research_view=execution.research_view,
+                        report_status=execution.report_status,
+                        benchmark=execution.benchmark,
+                        created_at=execution.created_at,
+                    )
+                )
+            except Exception as exc:  # noqa: BLE001 - report isolation is contractual
+                report_result = ShadowReportFailure(
+                    batch_id=batch_id,
+                    report_run_id=report_run_id,
+                    sample_id=asset.sample_id,
+                    company_name=asset.company_name,
+                    report=asset.report,
+                    sample_manifest_revision=sample_manifest_revision,
+                    sample_manifest_hash=sample_manifest_hash,
+                    evidence_plan_version=evidence_plan_version,
+                    evidence_plan_hash=evidence_plan_hash,
+                    diagnostics=(
+                        Stage5FailureDiagnostic(
+                            code=type(exc).__name__,
+                            message=str(exc)[:2000] or "shadow report execution failed",
+                            sample_id=asset.sample_id,
+                        ),
+                    ),
+                    created_at=_utc_now(),
+                )
+            references.append(store.commit_report(batch_directory, report_result))
+        payload = {
+            "schema_version": SHADOW_BATCH_RESULT_SCHEMA,
+            "batch_id": batch_id,
+            "sample_manifest_revision": sample_manifest_revision,
+            "sample_manifest_hash": sample_manifest_hash,
+            "evidence_plan_version": evidence_plan_version,
+            "evidence_plan_hash": evidence_plan_hash,
+            "primary_logical_profile": primary_logical_profile,
+            "reports": tuple(references),
+            "completed_report_count": sum(
+                item.status == "success" for item in references
+            ),
+            "failed_report_count": sum(item.status == "failed" for item in references),
+            "created_at": _utc_now(),
+            "production_authorization": PRODUCTION_AUTHORIZATION,
+        }
+        result = ShadowBatchResult(**payload, result_hash=_payload_hash(payload))
+        return result, store.commit_batch(batch_directory, result)
+
+    @staticmethod
+    def _validate_admission(
+        manifest: ShadowSampleManifest,
+        plan: ShadowEvidencePlan,
+        prepared: Mapping[str, tuple[PreparedRequestScope, ...]],
+    ) -> None:
+        if (
+            plan.sample_manifest_revision != manifest.manifest_revision
+            or plan.sample_manifest_hash != manifest.manifest_hash
+        ):
+            raise ValueError("shadow Evidence plan does not match the active manifest")
+        expected_ids = {item.sample_id for item in manifest.reports}
+        if set(prepared) != expected_ids:
+            raise ValueError(
+                "shadow prepared report identities do not match the manifest"
+            )
+        for asset in manifest.reports:
+            report_plan = plan.report_by_id(asset.sample_id)
+            if report_plan.content_hash != asset.content_hash:
+                raise ValueError(
+                    "shadow report PDF hash does not match the active manifest"
+                )
+            scopes = prepared[asset.sample_id]
+            expected_scopes = {
+                scope.scope_id
+                for task in report_plan.tasks
+                for scope in task.request_scopes
+            }
+            if {scope.scope_id for scope in scopes} != expected_scopes:
+                raise ValueError("shadow prepared scopes do not match the frozen plan")
+            if any(
+                scope.sample_id != asset.sample_id
+                or scope.report != asset.report
+                or scope.plan_version != plan.plan_version
+                for scope in scopes
+            ):
+                raise ValueError("shadow prepared scope identity mismatch")
+
+
+def load_shadow_report_result(
+    path: str | Path,
+) -> ShadowReportSuccess | ShadowReportFailure:
+    source = Path(path).read_text(encoding="utf-8")
+    raw = json.loads(source)
+    if raw.get("schema_version") == SHADOW_REPORT_RESULT_SCHEMA:
+        return ShadowReportSuccess.model_validate_json(source)
+    if raw.get("schema_version") == SHADOW_REPORT_FAILURE_SCHEMA:
+        return ShadowReportFailure.model_validate_json(source)
+    raise ValueError("unknown shadow report result schema")
+
+
+def load_shadow_batch_result(path: str | Path) -> ShadowBatchResult:
+    return ShadowBatchResult.model_validate_json(Path(path).read_text(encoding="utf-8"))
+
+
+def _report_run_id(batch_id: str, asset: ShadowCohortReport) -> str:
+    instrument = asset.report.instrument_id.replace(".", "-")
+    value = f"{batch_id}-{instrument}"
+    _validate_run_id(value)
+    return value
+
+
+def _validate_run_id(value: str) -> None:
+    if not _RUN_ID_PATTERN.fullmatch(value):
+        raise ValueError(f"invalid shadow run identity: {value}")
+
+
+def _json_bytes(payload: dict[str, object]) -> bytes:
+    return (json.dumps(payload, ensure_ascii=False, indent=2) + "\n").encode()
+
+
+def _write_immutable(destination: Path, content: bytes) -> None:
+    if destination.exists():
+        if destination.read_bytes() != content:
+            raise RuntimeError(f"immutable shadow output mismatch: {destination}")
+        return
+    temporary = destination.with_name(f".{destination.name}.{uuid.uuid4().hex}.part")
+    temporary.write_bytes(content)
+    try:
+        os.replace(temporary, destination)
+    finally:
+        temporary.unlink(missing_ok=True)

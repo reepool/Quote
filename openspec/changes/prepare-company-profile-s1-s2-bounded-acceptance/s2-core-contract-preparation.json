@@ -1,0 +1,4533 @@
+{
+  "status": "source_grounded_preparation_contract_pending_S1_and_A_S0; not_execution_freeze",
+  "knowledge_cutoff": "2026-09-17",
+  "created_at": "2026-10-16T04:21:22.615806+00:00",
+  "independent_of_business_output": true,
+  "business_owner_invoked": false,
+  "positive_count": 211,
+  "negative_count": 45,
+  "reports": [
+    {
+      "instrument_id": "600110.SH",
+      "company_name": "诺德股份",
+      "layer": "manufacturing",
+      "exchange": "SSE",
+      "sw_l1": "电力设备",
+      "document_version": "08e177351e29f3cd8f8b3d6d356794249375dee292923c2fa5be75de5dd0abe4",
+      "asset": {
+        "asset_id": "asset_3a99709768cef11112e0cc74ef635761",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "08e177351e29f3cd8f8b3d6d356794249375dee292923c2fa5be75de5dd0abe4",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-04-22T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "600110.SH-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            14,
+            15,
+            16,
+            17,
+            36,
+            37
+          ],
+          "required_substance": "电解铜箔研发生产销售；光伏储能、电线电缆及附件、物资贸易；研发与实际量产状态分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            168
+          ],
+          "source_table_refs": [
+            36
+          ]
+        },
+        {
+          "condition_id": "600110.SH-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            14,
+            15,
+            16,
+            17,
+            36,
+            37
+          ],
+          "required_substance": "电解铜箔研发生产销售；光伏储能、电线电缆及附件、物资贸易；研发与实际量产状态分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            168
+          ],
+          "source_table_refs": [
+            36
+          ]
+        },
+        {
+          "condition_id": "600110.SH-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            14,
+            15,
+            16,
+            17,
+            36,
+            37
+          ],
+          "required_substance": "电解铜箔研发生产销售；光伏储能、电线电缆及附件、物资贸易；研发与实际量产状态分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            168
+          ],
+          "source_table_refs": [
+            36
+          ]
+        },
+        {
+          "condition_id": "600110.SH-income-01",
+          "kind": "current_primary_income",
+          "page": 36,
+          "name": "铜箔产品",
+          "value": "6745344486.37",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600110.SH-income-02",
+          "kind": "current_primary_income",
+          "page": 36,
+          "name": "电线电缆及附件",
+          "value": "315802261.25",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600110.SH-income-03",
+          "kind": "current_primary_income",
+          "page": 36,
+          "name": "贸易",
+          "value": "121119752.47",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600110.SH-income-04",
+          "kind": "current_primary_income",
+          "page": 36,
+          "name": "发电及储能",
+          "value": "59507780.23",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600110.SH-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            14,
+            15,
+            16,
+            17,
+            36,
+            37
+          ],
+          "required_substance": "生产铜箔",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "600110.SH-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            14,
+            15,
+            16,
+            17,
+            36,
+            37
+          ],
+          "required_substance": "销售铜箔",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "600110.SH-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            14,
+            15,
+            16,
+            17,
+            36,
+            37
+          ],
+          "required_substance": "电解铜箔研发生产销售；光伏储能、电线电缆及附件、物资贸易；研发与实际量产状态分开",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "600110.SH-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            14,
+            15,
+            16,
+            17,
+            36,
+            37,
+            168
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            14,
+            15,
+            16,
+            17,
+            36,
+            37,
+            168,
+            169
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "600110.SH-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            36
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "600110.SH-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            14,
+            15,
+            16,
+            17,
+            36,
+            37
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        }
+      ],
+      "source_pages": [
+        14,
+        15,
+        16,
+        17,
+        36,
+        37,
+        168,
+        169
+      ],
+      "all_source_pages_read": 323,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    },
+    {
+      "instrument_id": "600111.SH",
+      "company_name": "北方稀土",
+      "layer": "manufacturing",
+      "exchange": "SSE",
+      "sw_l1": "有色金属",
+      "document_version": "401eba062f09132ee6a1814dd57a1aff5aa52375f4bfde070d2034c2175b141c",
+      "asset": {
+        "asset_id": "asset_6b1434d990b3b25f8fd615c986cf4109",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "401eba062f09132ee6a1814dd57a1aff5aa52375f4bfde070d2034c2175b141c",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-04-17T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "600111.SH-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            12,
+            13,
+            14,
+            23,
+            24
+          ],
+          "required_substance": "稀土原料、新材料、终端应用；工业/商业/环保独立；稀土精矿采购履行与销售分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            143
+          ],
+          "source_table_refs": [
+            23
+          ]
+        },
+        {
+          "condition_id": "600111.SH-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            12,
+            13,
+            14,
+            23,
+            24
+          ],
+          "required_substance": "稀土原料、新材料、终端应用；工业/商业/环保独立；稀土精矿采购履行与销售分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            143
+          ],
+          "source_table_refs": [
+            23
+          ]
+        },
+        {
+          "condition_id": "600111.SH-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            12,
+            13,
+            14,
+            23,
+            24
+          ],
+          "required_substance": "稀土原料、新材料、终端应用；工业/商业/环保独立；稀土精矿采购履行与销售分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            143
+          ],
+          "source_table_refs": [
+            23
+          ]
+        },
+        {
+          "condition_id": "600111.SH-income-01",
+          "kind": "current_primary_income",
+          "page": 23,
+          "name": "工业",
+          "value": "33087212435.11",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600111.SH-income-02",
+          "kind": "current_primary_income",
+          "page": 23,
+          "name": "商业",
+          "value": "7794208427.98",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600111.SH-income-03",
+          "kind": "current_primary_income",
+          "page": 23,
+          "name": "环保板块",
+          "value": "1469594740.70",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600111.SH-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            12,
+            13,
+            14,
+            23,
+            24
+          ],
+          "required_substance": "生产稀土产品",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "600111.SH-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            12,
+            13,
+            14,
+            23,
+            24
+          ],
+          "required_substance": "销售稀土产品",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "600111.SH-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            12,
+            13,
+            14,
+            23,
+            24
+          ],
+          "required_substance": "稀土原料、新材料、终端应用；工业/商业/环保独立；稀土精矿采购履行与销售分开",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "600111.SH-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            12,
+            13,
+            14,
+            23,
+            24,
+            143
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            12,
+            13,
+            14,
+            23,
+            24,
+            143,
+            144
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "600111.SH-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            23
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "600111.SH-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            12,
+            13,
+            14,
+            23,
+            24
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        }
+      ],
+      "source_pages": [
+        12,
+        13,
+        14,
+        23,
+        24,
+        143,
+        144
+      ],
+      "all_source_pages_read": 263,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    },
+    {
+      "instrument_id": "000008.SZ",
+      "company_name": "神州高铁",
+      "layer": "manufacturing",
+      "exchange": "SZSE",
+      "sw_l1": "机械设备",
+      "document_version": "c0358b156cc0a4a1ed19b1ee423654ceec784b0058cc849e6bf773654af23220",
+      "asset": {
+        "asset_id": "asset_5ff9667daa549103a5a6a430f3371345",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "c0358b156cc0a4a1ed19b1ee423654ceec784b0058cc849e6bf773654af23220",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-04-17T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "000008.SZ-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            10,
+            11,
+            12,
+            18,
+            19
+          ],
+          "required_substance": "轨道交通运营检修装备与运营维保两主业；研发和已交付分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            105
+          ],
+          "source_table_refs": [
+            18
+          ]
+        },
+        {
+          "condition_id": "000008.SZ-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            10,
+            11,
+            12,
+            18,
+            19
+          ],
+          "required_substance": "轨道交通运营检修装备与运营维保两主业；研发和已交付分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            105
+          ],
+          "source_table_refs": [
+            18
+          ]
+        },
+        {
+          "condition_id": "000008.SZ-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            10,
+            11,
+            12,
+            18,
+            19
+          ],
+          "required_substance": "轨道交通运营检修装备与运营维保两主业；研发和已交付分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            105
+          ],
+          "source_table_refs": [
+            18
+          ]
+        },
+        {
+          "condition_id": "000008.SZ-income-01",
+          "kind": "current_primary_income",
+          "page": 18,
+          "name": "轨道交通运营检修装备",
+          "value": "1842343021.99",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000008.SZ-income-02",
+          "kind": "current_primary_income",
+          "page": 18,
+          "name": "轨道交通运营维保服务",
+          "value": "268907346.83",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000008.SZ-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            10,
+            11,
+            12,
+            18,
+            19
+          ],
+          "required_substance": "提供运营维保服务",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "000008.SZ-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            10,
+            11,
+            12,
+            18,
+            19
+          ],
+          "required_substance": "交付检修装备",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "000008.SZ-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            10,
+            11,
+            12,
+            18,
+            19
+          ],
+          "required_substance": "轨道交通运营检修装备与运营维保两主业；研发和已交付分开",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "000008.SZ-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            10,
+            11,
+            12,
+            18,
+            19,
+            105
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            10,
+            11,
+            12,
+            18,
+            19,
+            105,
+            106
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "000008.SZ-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            18
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "000008.SZ-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            10,
+            11,
+            12,
+            18,
+            19
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        }
+      ],
+      "source_pages": [
+        10,
+        11,
+        12,
+        18,
+        19,
+        105,
+        106
+      ],
+      "all_source_pages_read": 174,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    },
+    {
+      "instrument_id": "000009.SZ",
+      "company_name": "中国宝安",
+      "layer": "manufacturing",
+      "exchange": "SZSE",
+      "sw_l1": "电力设备",
+      "document_version": "a72585593e269cc1d4ea07f7fe4199e405ab2f6f64a470344fedfbd642b221d4",
+      "asset": {
+        "asset_id": "asset_c010824a728fe57f8b21ae380e3eb718",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "a72585593e269cc1d4ea07f7fe4199e405ab2f6f64a470344fedfbd642b221d4",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-04-24T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "000009.SZ-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            10,
+            11,
+            12,
+            13,
+            15,
+            16
+          ],
+          "required_substance": "高新技术、生物医药、房地产及其他；贝特瑞/国际精密/友诚/马应龙各原主体不混同",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            16
+          ]
+        },
+        {
+          "condition_id": "000009.SZ-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            10,
+            11,
+            12,
+            13,
+            15,
+            16
+          ],
+          "required_substance": "高新技术、生物医药、房地产及其他；贝特瑞/国际精密/友诚/马应龙各原主体不混同",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            16
+          ]
+        },
+        {
+          "condition_id": "000009.SZ-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            10,
+            11,
+            12,
+            13,
+            15,
+            16
+          ],
+          "required_substance": "高新技术、生物医药、房地产及其他；贝特瑞/国际精密/友诚/马应龙各原主体不混同",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            16
+          ]
+        },
+        {
+          "condition_id": "000009.SZ-income-01",
+          "kind": "current_primary_income",
+          "page": 16,
+          "name": "高新技术行业",
+          "value": "18698371280.77",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000009.SZ-income-02",
+          "kind": "current_primary_income",
+          "page": 16,
+          "name": "生物医药行业",
+          "value": "3940978301.06",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000009.SZ-income-03",
+          "kind": "current_primary_income",
+          "page": 16,
+          "name": "房地产行业",
+          "value": "135587369.27",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000009.SZ-income-04",
+          "kind": "current_primary_income",
+          "page": 16,
+          "name": "其他行业",
+          "value": "261338349.60",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000009.SZ-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            10,
+            11,
+            12,
+            13,
+            15,
+            16
+          ],
+          "required_substance": "贝特瑞生产销售锂电正负极材料",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "000009.SZ-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            10,
+            11,
+            12,
+            13,
+            15,
+            16
+          ],
+          "required_substance": "国际精密生产销售精密金属零部件",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "000009.SZ-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            10,
+            11,
+            12,
+            13,
+            15,
+            16
+          ],
+          "required_substance": "高新技术、生物医药、房地产及其他；贝特瑞/国际精密/友诚/马应龙各原主体不混同",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "000009.SZ-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            10,
+            11,
+            12,
+            13,
+            15,
+            16
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            10,
+            11,
+            12,
+            13,
+            15,
+            16
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "000009.SZ-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            16
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "000009.SZ-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            10,
+            11,
+            12,
+            13,
+            15,
+            16
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        }
+      ],
+      "source_pages": [
+        10,
+        11,
+        12,
+        13,
+        15,
+        16
+      ],
+      "all_source_pages_read": 218,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    },
+    {
+      "instrument_id": "920000.BJ",
+      "company_name": "安徽凤凰",
+      "layer": "manufacturing",
+      "exchange": "BSE",
+      "sw_l1": "汽车",
+      "document_version": "e5db3aef86c24bf4dac3f4370d4189a435ca5db907025c88419f26906d8cd3cc",
+      "asset": {
+        "asset_id": "asset_98efa973d51f2b78a2be200c119d6cc2",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "e5db3aef86c24bf4dac3f4370d4189a435ca5db907025c88419f26906d8cd3cc",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-04-20T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "920000.BJ-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            6,
+            12,
+            13,
+            16,
+            17
+          ],
+          "required_substance": "汽车滤清器及过滤材料研发生产销售；空调、空气、机油、燃油四滤清器分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            124
+          ],
+          "source_table_refs": [
+            16,
+            17
+          ]
+        },
+        {
+          "condition_id": "920000.BJ-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            6,
+            12,
+            13,
+            16,
+            17
+          ],
+          "required_substance": "汽车滤清器及过滤材料研发生产销售；空调、空气、机油、燃油四滤清器分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            124
+          ],
+          "source_table_refs": [
+            16,
+            17
+          ]
+        },
+        {
+          "condition_id": "920000.BJ-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            6,
+            12,
+            13,
+            16,
+            17
+          ],
+          "required_substance": "汽车滤清器及过滤材料研发生产销售；空调、空气、机油、燃油四滤清器分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            124
+          ],
+          "source_table_refs": [
+            16,
+            17
+          ]
+        },
+        {
+          "condition_id": "920000.BJ-income-01",
+          "kind": "current_primary_income",
+          "page": 16,
+          "name": "空调滤清器",
+          "value": "75974471.98",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "920000.BJ-income-02",
+          "kind": "current_primary_income",
+          "page": 16,
+          "name": "空气滤清器",
+          "value": "116077437.48",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "920000.BJ-income-03",
+          "kind": "current_primary_income",
+          "page": 16,
+          "name": "机油滤清器",
+          "value": "113008559.53",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "920000.BJ-income-04",
+          "kind": "current_primary_income",
+          "page": 16,
+          "name": "燃油滤清器",
+          "value": "80551563.03",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "920000.BJ-income-05",
+          "kind": "current_primary_income",
+          "page": 17,
+          "name": "其他业务",
+          "value": "41694784.17",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "920000.BJ-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            6,
+            12,
+            13,
+            16,
+            17
+          ],
+          "required_substance": "生产滤清器",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "920000.BJ-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            6,
+            12,
+            13,
+            16,
+            17
+          ],
+          "required_substance": "销售滤清器",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "920000.BJ-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            6,
+            12,
+            13,
+            16,
+            17
+          ],
+          "required_substance": "汽车滤清器及过滤材料研发生产销售；空调、空气、机油、燃油四滤清器分开",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "920000.BJ-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            6,
+            12,
+            13,
+            16,
+            17,
+            124
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            6,
+            12,
+            13,
+            16,
+            17,
+            124,
+            125
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "920000.BJ-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            16,
+            17
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "920000.BJ-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            6,
+            12,
+            13,
+            16,
+            17
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        }
+      ],
+      "source_pages": [
+        6,
+        12,
+        13,
+        16,
+        17,
+        124,
+        125
+      ],
+      "all_source_pages_read": 171,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    },
+    {
+      "instrument_id": "920001.BJ",
+      "company_name": "纬达光电",
+      "layer": "manufacturing",
+      "exchange": "BSE",
+      "sw_l1": "电子",
+      "document_version": "6aaa5d923e055572eb19a38a058a56f678b19ebb7bb6997d032b3f98e4def345",
+      "asset": {
+        "asset_id": "asset_6bac76802a591f352512630292eca0a8",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "6aaa5d923e055572eb19a38a058a56f678b19ebb7bb6997d032b3f98e4def345",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-03-26T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "920001.BJ-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            8,
+            13,
+            14,
+            18,
+            19
+          ],
+          "required_substance": "偏光片/防雾膜；三期爬坡不是充分释放产能；产品用途与自身生产产品分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            18
+          ]
+        },
+        {
+          "condition_id": "920001.BJ-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            8,
+            13,
+            14,
+            18,
+            19
+          ],
+          "required_substance": "偏光片/防雾膜；三期爬坡不是充分释放产能；产品用途与自身生产产品分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            18
+          ]
+        },
+        {
+          "condition_id": "920001.BJ-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            8,
+            13,
+            14,
+            18,
+            19
+          ],
+          "required_substance": "偏光片/防雾膜；三期爬坡不是充分释放产能；产品用途与自身生产产品分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            18
+          ]
+        },
+        {
+          "condition_id": "920001.BJ-income-01",
+          "kind": "current_primary_income",
+          "page": 18,
+          "name": "偏光片",
+          "value": "193902115.30",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "920001.BJ-income-02",
+          "kind": "current_primary_income",
+          "page": 18,
+          "name": "防雾膜",
+          "value": "17939018.45",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "920001.BJ-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            8,
+            13,
+            14,
+            18,
+            19
+          ],
+          "required_substance": "生产偏光片",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "920001.BJ-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            8,
+            13,
+            14,
+            18,
+            19
+          ],
+          "required_substance": "销售防雾膜",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "920001.BJ-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            8,
+            13,
+            14,
+            18,
+            19
+          ],
+          "required_substance": "偏光片/防雾膜；三期爬坡不是充分释放产能；产品用途与自身生产产品分开",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "920001.BJ-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            8,
+            13,
+            14,
+            18,
+            19
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            8,
+            13,
+            14,
+            18,
+            19
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "920001.BJ-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            18
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "920001.BJ-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            8,
+            13,
+            14,
+            18,
+            19
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        }
+      ],
+      "source_pages": [
+        8,
+        13,
+        14,
+        18,
+        19
+      ],
+      "all_source_pages_read": 139,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    },
+    {
+      "instrument_id": "600116.SH",
+      "company_name": "三峡水利",
+      "layer": "service",
+      "exchange": "SSE",
+      "sw_l1": "公用事业",
+      "document_version": "c2c7bfc3fdd348b9be15aeab6562b761c030d7db605c00f88a9c315854ee1486",
+      "asset": {
+        "asset_id": "asset_67d95778c1ca3b1e3613a4b978fe20ba",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "c2c7bfc3fdd348b9be15aeab6562b761c030d7db605c00f88a9c315854ee1486",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-04-22T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "600116.SH-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            12,
+            13,
+            20,
+            21
+          ],
+          "required_substance": "电力生产供应为核心；综合能源服务及其他主营业务，不省略电解锰等制造组成",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            143
+          ],
+          "source_table_refs": [
+            21
+          ]
+        },
+        {
+          "condition_id": "600116.SH-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            12,
+            13,
+            20,
+            21
+          ],
+          "required_substance": "电力生产供应为核心；综合能源服务及其他主营业务，不省略电解锰等制造组成",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            143
+          ],
+          "source_table_refs": [
+            21
+          ]
+        },
+        {
+          "condition_id": "600116.SH-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            12,
+            13,
+            20,
+            21
+          ],
+          "required_substance": "电力生产供应为核心；综合能源服务及其他主营业务，不省略电解锰等制造组成",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            143
+          ],
+          "source_table_refs": [
+            21
+          ]
+        },
+        {
+          "condition_id": "600116.SH-income-01",
+          "kind": "current_primary_income",
+          "page": 21,
+          "name": "电力销售",
+          "value": "6884147935.10",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600116.SH-income-02",
+          "kind": "current_primary_income",
+          "page": 21,
+          "name": "综合能源",
+          "value": "1540734152.07",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600116.SH-income-03",
+          "kind": "current_primary_income",
+          "page": 21,
+          "name": "其他主营业务",
+          "value": "1687186424.24",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600116.SH-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            12,
+            13,
+            20,
+            21
+          ],
+          "required_substance": "购进电力后售给终端用户",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "600116.SH-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            12,
+            13,
+            20,
+            21
+          ],
+          "required_substance": "提供综合能源服务",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "600116.SH-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            12,
+            13,
+            20,
+            21
+          ],
+          "required_substance": "电力生产供应为核心；综合能源服务及其他主营业务，不省略电解锰等制造组成",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "600116.SH-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            12,
+            13,
+            20,
+            21,
+            143
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            12,
+            13,
+            20,
+            21,
+            143,
+            144
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "600116.SH-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            21
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "600116.SH-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            12,
+            13,
+            20,
+            21
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        }
+      ],
+      "source_pages": [
+        12,
+        13,
+        20,
+        21,
+        143,
+        144
+      ],
+      "all_source_pages_read": 297,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    },
+    {
+      "instrument_id": "600106.SH",
+      "company_name": "重庆路桥",
+      "layer": "service",
+      "exchange": "SSE",
+      "sw_l1": "交通运输",
+      "document_version": "810897ccf0c758112af455abbd3ea9aac19cf468c39c90e019be726c42525411",
+      "asset": {
+        "asset_id": "asset_7a94df1fa7021cbacbda64872acce753",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "810897ccf0c758112af455abbd3ea9aac19cf468c39c90e019be726c42525411",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-04-22T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "600106.SH-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            10,
+            13,
+            14
+          ],
+          "required_substance": "嘉华大桥特许经营/路桥收费及股权投资；收费现金、BOT摊余成本经营收益与投资收益不同",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            67,
+            109
+          ],
+          "source_table_refs": [
+            13
+          ]
+        },
+        {
+          "condition_id": "600106.SH-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            10,
+            13,
+            14
+          ],
+          "required_substance": "嘉华大桥特许经营/路桥收费及股权投资；收费现金、BOT摊余成本经营收益与投资收益不同",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            67,
+            109
+          ],
+          "source_table_refs": [
+            13
+          ]
+        },
+        {
+          "condition_id": "600106.SH-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            10,
+            13,
+            14
+          ],
+          "required_substance": "嘉华大桥特许经营/路桥收费及股权投资；收费现金、BOT摊余成本经营收益与投资收益不同",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            67,
+            109
+          ],
+          "source_table_refs": [
+            13
+          ]
+        },
+        {
+          "condition_id": "600106.SH-income-01",
+          "kind": "current_primary_income",
+          "page": 13,
+          "name": "路桥行业",
+          "value": "111415201.20",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600106.SH-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            10,
+            13,
+            14
+          ],
+          "required_substance": "运营嘉华大桥",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "600106.SH-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            10,
+            13,
+            14
+          ],
+          "required_substance": "实施路桥隧维护维修",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "600106.SH-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            10,
+            13,
+            14
+          ],
+          "required_substance": "嘉华大桥特许经营/路桥收费及股权投资；收费现金、BOT摊余成本经营收益与投资收益不同",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "600106.SH-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            10,
+            13,
+            14,
+            67,
+            109
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            10,
+            13,
+            14,
+            67,
+            68,
+            109,
+            110
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "600106.SH-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            13
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "600106.SH-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            10,
+            13,
+            14
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        },
+        {
+          "condition_id": "600106.SH-negative-BOT",
+          "source_pages": [
+            10,
+            13
+          ],
+          "prohibited": "19480万元通行费现金或8602.53万元投资收益替代111415201.20元BOT收入"
+        }
+      ],
+      "source_pages": [
+        10,
+        13,
+        14,
+        67,
+        68,
+        109,
+        110
+      ],
+      "all_source_pages_read": 186,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    },
+    {
+      "instrument_id": "600113.SH",
+      "company_name": "XD浙江东",
+      "layer": "service",
+      "exchange": "SSE",
+      "sw_l1": "商贸零售",
+      "document_version": "15bd7ee6882a53b906bc8e1268ea7bdb396481f62ae1fadf47e16849c371de0c",
+      "asset": {
+        "asset_id": "asset_e17dd1025d7d60e81c8e4ff75de250cc",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "15bd7ee6882a53b906bc8e1268ea7bdb396481f62ae1fadf47e16849c371de0c",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-03-06T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "600113.SH-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            17,
+            20,
+            21
+          ],
+          "required_substance": "农批交易市场、生鲜配送、豆制品；市场租赁/管理费及成交额交易费、商品加成机制",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            77
+          ],
+          "source_table_refs": [
+            21
+          ]
+        },
+        {
+          "condition_id": "600113.SH-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            17,
+            20,
+            21
+          ],
+          "required_substance": "农批交易市场、生鲜配送、豆制品；市场租赁/管理费及成交额交易费、商品加成机制",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            77
+          ],
+          "source_table_refs": [
+            21
+          ]
+        },
+        {
+          "condition_id": "600113.SH-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            17,
+            20,
+            21
+          ],
+          "required_substance": "农批交易市场、生鲜配送、豆制品；市场租赁/管理费及成交额交易费、商品加成机制",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            77
+          ],
+          "source_table_refs": [
+            21
+          ]
+        },
+        {
+          "condition_id": "600113.SH-income-01",
+          "kind": "current_primary_income",
+          "page": 21,
+          "name": "商品销售",
+          "value": "343978655.01",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600113.SH-income-02",
+          "kind": "current_primary_income",
+          "page": 21,
+          "name": "批发交易市场收入",
+          "value": "156589414.82",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600113.SH-income-03",
+          "kind": "current_primary_income",
+          "page": 21,
+          "name": "租赁收入",
+          "value": "150777311.92",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600113.SH-income-04",
+          "kind": "current_primary_income",
+          "page": 21,
+          "name": "农批市场开发",
+          "value": "82245825.64",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600113.SH-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            17,
+            20,
+            21
+          ],
+          "required_substance": "雪顶豆制品生产销售",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "600113.SH-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            17,
+            20,
+            21
+          ],
+          "required_substance": "配送公司集采配送农副产品",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "600113.SH-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            17,
+            20,
+            21
+          ],
+          "required_substance": "农批交易市场、生鲜配送、豆制品；市场租赁/管理费及成交额交易费、商品加成机制",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "600113.SH-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            17,
+            20,
+            21,
+            77
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            17,
+            20,
+            21,
+            77,
+            78
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "600113.SH-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            21
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "600113.SH-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            17,
+            20,
+            21
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        },
+        {
+          "condition_id": "600113.SH-negative-lease",
+          "source_pages": [
+            17
+          ],
+          "prohibited": "仅出租的经营店面摊位推为销售"
+        }
+      ],
+      "source_pages": [
+        17,
+        20,
+        21,
+        77,
+        78
+      ],
+      "all_source_pages_read": 220,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    },
+    {
+      "instrument_id": "000002.SZ",
+      "company_name": "万  科Ａ",
+      "layer": "service",
+      "exchange": "SZSE",
+      "sw_l1": "房地产",
+      "document_version": "b2befc9da2a9e09c798702c351e6af65a4b148e32baa07737b941edc2caf1eba",
+      "asset": {
+        "asset_id": "asset_159777b54af8c5893cdceebc3f983cf7",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "b2befc9da2a9e09c798702c351e6af65a4b148e32baa07737b941edc2caf1eba",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-03-31T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "000002.SZ-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            16,
+            17,
+            18,
+            21,
+            22,
+            291,
+            292
+          ],
+          "required_substance": "开发及相关资产经营、物业服务；物流公寓商业办公保留；销售签约与竣工结算分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            16
+          ]
+        },
+        {
+          "condition_id": "000002.SZ-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            16,
+            17,
+            18,
+            21,
+            22,
+            291,
+            292
+          ],
+          "required_substance": "开发及相关资产经营、物业服务；物流公寓商业办公保留；销售签约与竣工结算分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            16
+          ]
+        },
+        {
+          "condition_id": "000002.SZ-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            16,
+            17,
+            18,
+            21,
+            22,
+            291,
+            292
+          ],
+          "required_substance": "开发及相关资产经营、物业服务；物流公寓商业办公保留；销售签约与竣工结算分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            16
+          ]
+        },
+        {
+          "condition_id": "000002.SZ-income-01",
+          "kind": "current_primary_income",
+          "page": 16,
+          "name": "房地产开发及相关资产经营业务",
+          "value": "19065115.35",
+          "unit": "万元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000002.SZ-income-02",
+          "kind": "current_primary_income",
+          "page": 16,
+          "name": "物业服务",
+          "value": "3552451.42",
+          "unit": "万元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000002.SZ-income-03",
+          "kind": "current_primary_income",
+          "page": 16,
+          "name": "其他业务",
+          "value": "725710.13",
+          "unit": "万元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000002.SZ-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            16,
+            17,
+            18,
+            21,
+            22,
+            291,
+            292
+          ],
+          "required_substance": "开发销售住宅",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "000002.SZ-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            16,
+            17,
+            18,
+            21,
+            22,
+            291,
+            292
+          ],
+          "required_substance": "提供物业服务",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "000002.SZ-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            16,
+            17,
+            18,
+            21,
+            22,
+            291,
+            292
+          ],
+          "required_substance": "开发及相关资产经营、物业服务；物流公寓商业办公保留；销售签约与竣工结算分开",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "000002.SZ-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            16,
+            17,
+            18,
+            21,
+            22,
+            291,
+            292
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            16,
+            17,
+            18,
+            21,
+            22,
+            291,
+            292
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "000002.SZ-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            16
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "000002.SZ-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            16,
+            17,
+            18,
+            21,
+            22,
+            291,
+            292
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        },
+        {
+          "condition_id": "000002.SZ-negative-contract",
+          "source_pages": [
+            17,
+            18,
+            292
+          ],
+          "prohibited": "签约销售额或待结算金额当已确认收入；抵销横线借额"
+        }
+      ],
+      "source_pages": [
+        16,
+        17,
+        18,
+        21,
+        22,
+        291,
+        292
+      ],
+      "all_source_pages_read": 298,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    },
+    {
+      "instrument_id": "000007.SZ",
+      "company_name": "全新好",
+      "layer": "service",
+      "exchange": "SZSE",
+      "sw_l1": "商贸零售",
+      "document_version": "73dd66bdf47eeaa56000b7b80da8f9c614d9b9e0c1ae77bff1e1c748b4f693a5",
+      "asset": {
+        "asset_id": "asset_4a66bef91f7462e05f29e645447ac34d",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "73dd66bdf47eeaa56000b7b80da8f9c614d9b9e0c1ae77bff1e1c748b4f693a5",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-04-28T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "000007.SZ-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            11,
+            12,
+            13,
+            14
+          ],
+          "required_substance": "物业租赁管理、汽车销售售后、杀菌卫生日用贸易、医药器械；2026年3月剥离不倒推2025全年停业",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            108,
+            109
+          ],
+          "source_table_refs": [
+            13
+          ]
+        },
+        {
+          "condition_id": "000007.SZ-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            11,
+            12,
+            13,
+            14
+          ],
+          "required_substance": "物业租赁管理、汽车销售售后、杀菌卫生日用贸易、医药器械；2026年3月剥离不倒推2025全年停业",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            108,
+            109
+          ],
+          "source_table_refs": [
+            13
+          ]
+        },
+        {
+          "condition_id": "000007.SZ-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            11,
+            12,
+            13,
+            14
+          ],
+          "required_substance": "物业租赁管理、汽车销售售后、杀菌卫生日用贸易、医药器械；2026年3月剥离不倒推2025全年停业",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            108,
+            109
+          ],
+          "source_table_refs": [
+            13
+          ]
+        },
+        {
+          "condition_id": "000007.SZ-income-01",
+          "kind": "current_primary_income",
+          "page": 13,
+          "name": "物业租赁及其他服务",
+          "value": "41563910.59",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000007.SZ-income-02",
+          "kind": "current_primary_income",
+          "page": 13,
+          "name": "医疗器械批发",
+          "value": "22659641.96",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000007.SZ-income-03",
+          "kind": "current_primary_income",
+          "page": 13,
+          "name": "汽车销售及相关服务",
+          "value": "299733572.35",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000007.SZ-income-04",
+          "kind": "current_primary_income",
+          "page": 13,
+          "name": "汽车售后服务",
+          "value": "29498481.11",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000007.SZ-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            11,
+            12,
+            13,
+            14
+          ],
+          "required_substance": "新城福德采购汽车零配件并销售",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "000007.SZ-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            11,
+            12,
+            13,
+            14
+          ],
+          "required_substance": "提供车辆售后维修保养",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "000007.SZ-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            11,
+            12,
+            13,
+            14
+          ],
+          "required_substance": "物业租赁管理、汽车销售售后、杀菌卫生日用贸易、医药器械；2026年3月剥离不倒推2025全年停业",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "000007.SZ-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            11,
+            12,
+            13,
+            14,
+            108,
+            109
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            11,
+            12,
+            13,
+            14,
+            108,
+            109,
+            110
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "000007.SZ-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            13
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "000007.SZ-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            11,
+            12,
+            13,
+            14
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        }
+      ],
+      "source_pages": [
+        11,
+        12,
+        13,
+        14,
+        108,
+        109,
+        110
+      ],
+      "all_source_pages_read": 163,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    },
+    {
+      "instrument_id": "000010.SZ",
+      "company_name": "*ST美丽",
+      "layer": "service",
+      "exchange": "SZSE",
+      "sw_l1": "建筑装饰",
+      "document_version": "7f01310fc02eeda772e7ee08b809bcd9296908b27f69dd84ba50acb63901d9f3",
+      "asset": {
+        "asset_id": "asset_74ceaf5dd95652a307c5aca27310531e",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "7f01310fc02eeda772e7ee08b809bcd9296908b27f69dd84ba50acb63901d9f3",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-04-28T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "000010.SZ-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            12,
+            13,
+            14,
+            15
+          ],
+          "required_substance": "市政基础设施施工核心，保留工程材料/苗木销售及算力等实际延伸；拓展规划不当已交付",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            15
+          ]
+        },
+        {
+          "condition_id": "000010.SZ-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            12,
+            13,
+            14,
+            15
+          ],
+          "required_substance": "市政基础设施施工核心，保留工程材料/苗木销售及算力等实际延伸；拓展规划不当已交付",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            15
+          ]
+        },
+        {
+          "condition_id": "000010.SZ-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            12,
+            13,
+            14,
+            15
+          ],
+          "required_substance": "市政基础设施施工核心，保留工程材料/苗木销售及算力等实际延伸；拓展规划不当已交付",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            15
+          ]
+        },
+        {
+          "condition_id": "000010.SZ-income-01",
+          "kind": "current_primary_income",
+          "page": 15,
+          "name": "工程项目",
+          "value": "563957935.12",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000010.SZ-income-02",
+          "kind": "current_primary_income",
+          "page": 15,
+          "name": "苗木销售",
+          "value": "38967251.38",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000010.SZ-income-03",
+          "kind": "current_primary_income",
+          "page": 15,
+          "name": "工程材料销售收入",
+          "value": "29920637.78",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000010.SZ-income-04",
+          "kind": "current_primary_income",
+          "page": 15,
+          "name": "算力业务",
+          "value": "1221071.95",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000010.SZ-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            12,
+            13,
+            14,
+            15
+          ],
+          "required_substance": "提供工程施工",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "000010.SZ-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            12,
+            13,
+            14,
+            15
+          ],
+          "required_substance": "销售苗木",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "000010.SZ-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            12,
+            13,
+            14,
+            15
+          ],
+          "required_substance": "市政基础设施施工核心，保留工程材料/苗木销售及算力等实际延伸；拓展规划不当已交付",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "000010.SZ-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            12,
+            13,
+            14,
+            15
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            12,
+            13,
+            14,
+            15
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "000010.SZ-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            15
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "000010.SZ-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            12,
+            13,
+            14,
+            15
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        }
+      ],
+      "source_pages": [
+        12,
+        13,
+        14,
+        15
+      ],
+      "all_source_pages_read": 164,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    },
+    {
+      "instrument_id": "600682.SH",
+      "company_name": "南京新百",
+      "layer": "other",
+      "exchange": "SSE",
+      "sw_l1": "综合",
+      "document_version": "d0216e94df98c69b58eeb2bd4268ec53f6a07c418bd08b8eb6f330569f895795",
+      "asset": {
+        "asset_id": "asset_13832a631b17a6a2f6986ecb6509266f",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "d0216e94df98c69b58eeb2bd4268ec53f6a07c418bd08b8eb6f330569f895795",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-04-29T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "600682.SH-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            12,
+            13,
+            14,
+            15,
+            38,
+            39
+          ],
+          "required_substance": "百货商业、境内外健康养老/护理、脐血存储技术服务、细胞免疫医药、医疗；零售联营/租赁与自营分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            183
+          ],
+          "source_table_refs": [
+            38
+          ]
+        },
+        {
+          "condition_id": "600682.SH-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            12,
+            13,
+            14,
+            15,
+            38,
+            39
+          ],
+          "required_substance": "百货商业、境内外健康养老/护理、脐血存储技术服务、细胞免疫医药、医疗；零售联营/租赁与自营分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            183
+          ],
+          "source_table_refs": [
+            38
+          ]
+        },
+        {
+          "condition_id": "600682.SH-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            12,
+            13,
+            14,
+            15,
+            38,
+            39
+          ],
+          "required_substance": "百货商业、境内外健康养老/护理、脐血存储技术服务、细胞免疫医药、医疗；零售联营/租赁与自营分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            183
+          ],
+          "source_table_refs": [
+            38
+          ]
+        },
+        {
+          "condition_id": "600682.SH-income-01",
+          "kind": "current_primary_income",
+          "page": 38,
+          "name": "商业",
+          "value": "331115950.07",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600682.SH-income-02",
+          "kind": "current_primary_income",
+          "page": 38,
+          "name": "健康养老、护理业",
+          "value": "2282630369.32",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600682.SH-income-03",
+          "kind": "current_primary_income",
+          "page": 38,
+          "name": "专业技术服务业",
+          "value": "947665502.18",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600682.SH-income-04",
+          "kind": "current_primary_income",
+          "page": 38,
+          "name": "医药制造业",
+          "value": "1374022087.99",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600682.SH-income-05",
+          "kind": "current_primary_income",
+          "page": 38,
+          "name": "医疗服务",
+          "value": "930500600.65",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600682.SH-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            12,
+            13,
+            14,
+            15,
+            38,
+            39
+          ],
+          "required_substance": "齐鲁干细胞提供脐血储存服务",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "600682.SH-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            12,
+            13,
+            14,
+            15,
+            38,
+            39
+          ],
+          "required_substance": "丹瑞美国生产销售PROVENGE",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "600682.SH-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            12,
+            13,
+            14,
+            15,
+            38,
+            39
+          ],
+          "required_substance": "百货商业、境内外健康养老/护理、脐血存储技术服务、细胞免疫医药、医疗；零售联营/租赁与自营分开",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "600682.SH-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            12,
+            13,
+            14,
+            15,
+            38,
+            39,
+            183
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            12,
+            13,
+            14,
+            15,
+            38,
+            39,
+            183,
+            184
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "600682.SH-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            38
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "600682.SH-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            12,
+            13,
+            14,
+            15,
+            38,
+            39
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        }
+      ],
+      "source_pages": [
+        12,
+        13,
+        14,
+        15,
+        38,
+        39,
+        183,
+        184
+      ],
+      "all_source_pages_read": 341,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    },
+    {
+      "instrument_id": "600620.SH",
+      "company_name": "天宸股份",
+      "layer": "other",
+      "exchange": "SSE",
+      "sw_l1": "综合",
+      "document_version": "327e365226b1402751a6f5cc1de7f6b8070dfec4410ba4e511901f460c835677",
+      "asset": {
+        "asset_id": "asset_45fd1f8efceda485a3e4c93e46c5a8e1",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "327e365226b1402751a6f5cc1de7f6b8070dfec4410ba4e511901f460c835677",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-04-29T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "600620.SH-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            9,
+            13,
+            14
+          ],
+          "required_substance": "健康城开发销售、物业租赁装修及储能；1B和日本储能项目建设中不能当已投产；无新增整体装饰工程",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            13
+          ]
+        },
+        {
+          "condition_id": "600620.SH-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            9,
+            13,
+            14
+          ],
+          "required_substance": "健康城开发销售、物业租赁装修及储能；1B和日本储能项目建设中不能当已投产；无新增整体装饰工程",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            13
+          ]
+        },
+        {
+          "condition_id": "600620.SH-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            9,
+            13,
+            14
+          ],
+          "required_substance": "健康城开发销售、物业租赁装修及储能；1B和日本储能项目建设中不能当已投产；无新增整体装饰工程",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            13
+          ]
+        },
+        {
+          "condition_id": "600620.SH-income-01",
+          "kind": "current_primary_income",
+          "page": 13,
+          "name": "房地产销售",
+          "value": "24804.04",
+          "unit": "万元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": "p13原文万元两位精度，不强求与另表元值字符串相同"
+        },
+        {
+          "condition_id": "600620.SH-income-02",
+          "kind": "current_primary_income",
+          "page": 13,
+          "name": "租赁业务收入",
+          "value": "4579.77",
+          "unit": "万元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": "p13原文万元两位精度，不强求与另表元值字符串相同"
+        },
+        {
+          "condition_id": "600620.SH-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            9,
+            13,
+            14
+          ],
+          "required_substance": "销售健康城1A房产",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "600620.SH-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            9,
+            13,
+            14
+          ],
+          "required_substance": "出租康复医院物业",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "600620.SH-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            9,
+            13,
+            14
+          ],
+          "required_substance": "健康城开发销售、物业租赁装修及储能；1B和日本储能项目建设中不能当已投产；无新增整体装饰工程",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "600620.SH-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            9,
+            13,
+            14
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            9,
+            13,
+            14
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "600620.SH-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            13
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "600620.SH-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            9,
+            13,
+            14
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        },
+        {
+          "condition_id": "600620.SH-negative-development",
+          "source_pages": [
+            9
+          ],
+          "prohibited": "1B或日本储能在建当已投产/交付"
+        }
+      ],
+      "source_pages": [
+        9,
+        13,
+        14
+      ],
+      "all_source_pages_read": 164,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    },
+    {
+      "instrument_id": "000025.SZ",
+      "company_name": "特  力Ａ",
+      "layer": "other",
+      "exchange": "SZSE",
+      "sw_l1": "综合",
+      "document_version": "e79b420e25c78565a42dcffa8a9617522c37160a0ceefc6e80ce11ac08f9fd12",
+      "asset": {
+        "asset_id": "asset_422ffcfdde7142bc3d0130ea078afa2b",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "e79b420e25c78565a42dcffa8a9617522c37160a0ceefc6e80ce11ac08f9fd12",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-04-21T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "000025.SZ-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            10,
+            11,
+            15,
+            16
+          ],
+          "required_substance": "珠宝服务/批发零售黄金珠宝与商业综合体运营物业租赁；黄金委托加工不混作自制",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            54,
+            98
+          ],
+          "source_table_refs": [
+            15
+          ]
+        },
+        {
+          "condition_id": "000025.SZ-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            10,
+            11,
+            15,
+            16
+          ],
+          "required_substance": "珠宝服务/批发零售黄金珠宝与商业综合体运营物业租赁；黄金委托加工不混作自制",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            54,
+            98
+          ],
+          "source_table_refs": [
+            15
+          ]
+        },
+        {
+          "condition_id": "000025.SZ-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            10,
+            11,
+            15,
+            16
+          ],
+          "required_substance": "珠宝服务/批发零售黄金珠宝与商业综合体运营物业租赁；黄金委托加工不混作自制",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            54,
+            98
+          ],
+          "source_table_refs": [
+            15
+          ]
+        },
+        {
+          "condition_id": "000025.SZ-income-01",
+          "kind": "current_primary_income",
+          "page": 15,
+          "name": "珠宝销售及服务",
+          "value": "1131888850.11",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000025.SZ-income-02",
+          "kind": "current_primary_income",
+          "page": 15,
+          "name": "租赁及服务",
+          "value": "329714550.42",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000025.SZ-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            10,
+            11,
+            15,
+            16
+          ],
+          "required_substance": "批发零售黄金珠宝",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "000025.SZ-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            10,
+            11,
+            15,
+            16
+          ],
+          "required_substance": "提供代理报关/黄金提纯兑换服务",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "000025.SZ-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            10,
+            11,
+            15,
+            16
+          ],
+          "required_substance": "珠宝服务/批发零售黄金珠宝与商业综合体运营物业租赁；黄金委托加工不混作自制",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "000025.SZ-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            10,
+            11,
+            15,
+            16,
+            54,
+            98
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            10,
+            11,
+            15,
+            16,
+            54,
+            55,
+            98,
+            99
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "000025.SZ-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            15
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "000025.SZ-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            10,
+            11,
+            15,
+            16
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        }
+      ],
+      "source_pages": [
+        10,
+        11,
+        15,
+        16,
+        54,
+        55,
+        98,
+        99
+      ],
+      "all_source_pages_read": 170,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    },
+    {
+      "instrument_id": "000421.SZ",
+      "company_name": "南京公用",
+      "layer": "other",
+      "exchange": "SZSE",
+      "sw_l1": "综合",
+      "document_version": "020bc6606fe2f27a760767b1c9409c45f4d3a0e1a76085a2b903eac3c6a2618e",
+      "asset": {
+        "asset_id": "asset_569fb7d028fd16f0f35c87ad32802223",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "020bc6606fe2f27a760767b1c9409c45f4d3a0e1a76085a2b903eac3c6a2618e",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-04-12T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "000421.SZ-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            11,
+            12,
+            13,
+            14,
+            21,
+            22
+          ],
+          "required_substance": "天然气及延伸工程、新能源、房地产、汽车营运、旅游等；原主体和建设/运营状态分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            21
+          ]
+        },
+        {
+          "condition_id": "000421.SZ-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            11,
+            12,
+            13,
+            14,
+            21,
+            22
+          ],
+          "required_substance": "天然气及延伸工程、新能源、房地产、汽车营运、旅游等；原主体和建设/运营状态分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            21
+          ]
+        },
+        {
+          "condition_id": "000421.SZ-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            11,
+            12,
+            13,
+            14,
+            21,
+            22
+          ],
+          "required_substance": "天然气及延伸工程、新能源、房地产、汽车营运、旅游等；原主体和建设/运营状态分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            21
+          ]
+        },
+        {
+          "condition_id": "000421.SZ-income-01",
+          "kind": "current_primary_income",
+          "page": 21,
+          "name": "房产开发",
+          "value": "3222362704.50",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000421.SZ-income-02",
+          "kind": "current_primary_income",
+          "page": 21,
+          "name": "燃气销售",
+          "value": "2703496719.18",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000421.SZ-income-03",
+          "kind": "current_primary_income",
+          "page": 21,
+          "name": "燃气工程",
+          "value": "362037372.38",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000421.SZ-income-04",
+          "kind": "current_primary_income",
+          "page": 21,
+          "name": "其他",
+          "value": "381339510.34",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000421.SZ-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            11,
+            12,
+            13,
+            14,
+            21,
+            22
+          ],
+          "required_substance": "南京港华销售管道天然气",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "000421.SZ-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            11,
+            12,
+            13,
+            14,
+            21,
+            22
+          ],
+          "required_substance": "提供燃气报警器安装服务",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "000421.SZ-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            11,
+            12,
+            13,
+            14,
+            21,
+            22
+          ],
+          "required_substance": "天然气及延伸工程、新能源、房地产、汽车营运、旅游等；原主体和建设/运营状态分开",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "000421.SZ-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            11,
+            12,
+            13,
+            14,
+            21,
+            22
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            11,
+            12,
+            13,
+            14,
+            21,
+            22
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "000421.SZ-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            21
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "000421.SZ-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            11,
+            12,
+            13,
+            14,
+            21,
+            22
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        }
+      ],
+      "source_pages": [
+        11,
+        12,
+        13,
+        14,
+        21,
+        22
+      ],
+      "all_source_pages_read": 225,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    },
+    {
+      "instrument_id": "000001.SZ",
+      "company_name": "平安银行",
+      "layer": "finance",
+      "exchange": "SZSE",
+      "sw_l1": "银行",
+      "document_version": "2273565ecbe1b32536631fd4a019a4f4a990f4c793cfd5b70eae90d44d3ff16c",
+      "asset": {
+        "asset_id": "asset_fe7eb14247dac32b1ac7f315f272597d",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "2273565ecbe1b32536631fd4a019a4f4a990f4c793cfd5b70eae90d44d3ff16c",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-03-20T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "000001.SZ-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            11,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "required_substance": "商业银行零售/对公/综合金融；实际经营与经营许可列表分开；净息差及手续费净额",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            26
+          ]
+        },
+        {
+          "condition_id": "000001.SZ-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            11,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "required_substance": "商业银行零售/对公/综合金融；实际经营与经营许可列表分开；净息差及手续费净额",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            26
+          ]
+        },
+        {
+          "condition_id": "000001.SZ-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            11,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "required_substance": "商业银行零售/对公/综合金融；实际经营与经营许可列表分开；净息差及手续费净额",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            26
+          ]
+        },
+        {
+          "condition_id": "000001.SZ-income-01",
+          "kind": "current_primary_income",
+          "page": 26,
+          "name": "利息净收入",
+          "value": "88021",
+          "unit": "百万元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "原金融收入净额/分部营业收入合计本期",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000001.SZ-income-02",
+          "kind": "current_primary_income",
+          "page": 26,
+          "name": "非利息净收入",
+          "value": "43421",
+          "unit": "百万元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "原金融收入净额/分部营业收入合计本期",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000001.SZ-income-03",
+          "kind": "current_primary_income",
+          "page": 26,
+          "name": "手续费及佣金净收入",
+          "value": "23894",
+          "unit": "百万元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "原金融收入净额/分部营业收入合计本期",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000001.SZ-income-04",
+          "kind": "current_primary_income",
+          "page": 26,
+          "name": "其他非利息净收入",
+          "value": "19527",
+          "unit": "百万元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "原金融收入净额/分部营业收入合计本期",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000001.SZ-income-05",
+          "kind": "current_primary_income",
+          "page": 26,
+          "name": "营业收入总额",
+          "value": "131442",
+          "unit": "百万元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "原金融收入净额/分部营业收入合计本期",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000001.SZ-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            11,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "required_substance": "提供贷款金融服务",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "000001.SZ-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            11,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "required_substance": "提供结算及手续费服务",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "000001.SZ-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            11,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "required_substance": "商业银行零售/对公/综合金融；实际经营与经营许可列表分开；净息差及手续费净额",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "000001.SZ-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            11,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            11,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "000001.SZ-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            26
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "000001.SZ-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            11,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        }
+      ],
+      "source_pages": [
+        11,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "all_source_pages_read": 288,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    },
+    {
+      "instrument_id": "600030.SH",
+      "company_name": "中信证券",
+      "layer": "finance",
+      "exchange": "SSE",
+      "sw_l1": "非银金融",
+      "document_version": "438f2a53dcf4bf0569b6783b51674aae25076d23d53198b08cf7b539e14003c2",
+      "asset": {
+        "asset_id": "asset_29e51c360929c6af3c291c389a21772d",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "438f2a53dcf4bf0569b6783b51674aae25076d23d53198b08cf7b539e14003c2",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-03-26T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "600030.SH-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            26,
+            36,
+            37,
+            38,
+            39
+          ],
+          "required_substance": "投行、财富管理、机构股票经纪、金融市场、资产管理、投资及托管研究；净收入/投资收益不按商品销售硬套",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            38
+          ]
+        },
+        {
+          "condition_id": "600030.SH-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            26,
+            36,
+            37,
+            38,
+            39
+          ],
+          "required_substance": "投行、财富管理、机构股票经纪、金融市场、资产管理、投资及托管研究；净收入/投资收益不按商品销售硬套",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            38
+          ]
+        },
+        {
+          "condition_id": "600030.SH-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            26,
+            36,
+            37,
+            38,
+            39
+          ],
+          "required_substance": "投行、财富管理、机构股票经纪、金融市场、资产管理、投资及托管研究；净收入/投资收益不按商品销售硬套",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            38
+          ]
+        },
+        {
+          "condition_id": "600030.SH-income-01",
+          "kind": "current_primary_income",
+          "page": 38,
+          "name": "经纪业务",
+          "value": "20787402940.51",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600030.SH-income-02",
+          "kind": "current_primary_income",
+          "page": 38,
+          "name": "资产管理业务",
+          "value": "14294329181.83",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600030.SH-income-03",
+          "kind": "current_primary_income",
+          "page": 38,
+          "name": "证券投资业务",
+          "value": "27605377070.99",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600030.SH-income-04",
+          "kind": "current_primary_income",
+          "page": 38,
+          "name": "证券承销业务",
+          "value": "6055217321.40",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600030.SH-income-05",
+          "kind": "current_primary_income",
+          "page": 38,
+          "name": "其他业务",
+          "value": "6112041838.12",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "营业收入/本期；行业或产品原栏目",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "600030.SH-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            26,
+            36,
+            37,
+            38,
+            39
+          ],
+          "required_substance": "提供证券承销财务顾问服务",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "600030.SH-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            26,
+            36,
+            37,
+            38,
+            39
+          ],
+          "required_substance": "提供证券经纪服务",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "600030.SH-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            26,
+            36,
+            37,
+            38,
+            39
+          ],
+          "required_substance": "投行、财富管理、机构股票经纪、金融市场、资产管理、投资及托管研究；净收入/投资收益不按商品销售硬套",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "600030.SH-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            26,
+            36,
+            37,
+            38,
+            39
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            26,
+            36,
+            37,
+            38,
+            39
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "600030.SH-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            38
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "600030.SH-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            26,
+            36,
+            37,
+            38,
+            39
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        }
+      ],
+      "source_pages": [
+        26,
+        36,
+        37,
+        38,
+        39
+      ],
+      "all_source_pages_read": 389,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    },
+    {
+      "instrument_id": "000166.SZ",
+      "company_name": "申万宏源",
+      "layer": "finance",
+      "exchange": "SZSE",
+      "sw_l1": "非银金融",
+      "document_version": "6af80f88d108b19ffaad9340395f3512e6a654a2272f04cfc0cdc694d2d82471",
+      "asset": {
+        "asset_id": "asset_eb5e6a9036a7592acc70eceec535d870",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "6af80f88d108b19ffaad9340395f3512e6a654a2272f04cfc0cdc694d2d82471",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-03-27T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "000166.SZ-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            28,
+            29,
+            64,
+            65,
+            401,
+            402,
+            403
+          ],
+          "required_substance": "投资控股集团+证券公司；企业金融、个人金融、机构服务及交易、投资管理四板块；佣金利息净额及投资收益分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            64
+          ]
+        },
+        {
+          "condition_id": "000166.SZ-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            28,
+            29,
+            64,
+            65,
+            401,
+            402,
+            403
+          ],
+          "required_substance": "投资控股集团+证券公司；企业金融、个人金融、机构服务及交易、投资管理四板块；佣金利息净额及投资收益分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            64
+          ]
+        },
+        {
+          "condition_id": "000166.SZ-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            28,
+            29,
+            64,
+            65,
+            401,
+            402,
+            403
+          ],
+          "required_substance": "投资控股集团+证券公司；企业金融、个人金融、机构服务及交易、投资管理四板块；佣金利息净额及投资收益分开",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [],
+          "source_table_refs": [
+            64
+          ]
+        },
+        {
+          "condition_id": "000166.SZ-income-01",
+          "kind": "current_primary_income",
+          "page": 64,
+          "name": "手续费及佣金净收入",
+          "value": "8477040197.43",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "原金融收入净额/分部营业收入合计本期",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000166.SZ-income-02",
+          "kind": "current_primary_income",
+          "page": 64,
+          "name": "投资收益",
+          "value": "14221768673.74",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "原金融收入净额/分部营业收入合计本期",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000166.SZ-income-03",
+          "kind": "current_primary_income",
+          "page": 64,
+          "name": "合计",
+          "value": "24256073184.06",
+          "unit": "元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "原金融收入净额/分部营业收入合计本期",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": null,
+          "rounding_note": null
+        },
+        {
+          "condition_id": "000166.SZ-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            28,
+            29,
+            64,
+            65,
+            401,
+            402,
+            403
+          ],
+          "required_substance": "提供证券保荐承销服务",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "000166.SZ-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            28,
+            29,
+            64,
+            65,
+            401,
+            402,
+            403
+          ],
+          "required_substance": "提供资产管理服务",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "000166.SZ-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            28,
+            29,
+            64,
+            65,
+            401,
+            402,
+            403
+          ],
+          "required_substance": "投资控股集团+证券公司；企业金融、个人金融、机构服务及交易、投资管理四板块；佣金利息净额及投资收益分开",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "000166.SZ-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            28,
+            29,
+            64,
+            65,
+            401,
+            402,
+            403
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            28,
+            29,
+            64,
+            65,
+            401,
+            402,
+            403
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "000166.SZ-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            64
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "000166.SZ-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            28,
+            29,
+            64,
+            65,
+            401,
+            402,
+            403
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        }
+      ],
+      "source_pages": [
+        28,
+        29,
+        64,
+        65,
+        401,
+        402,
+        403
+      ],
+      "all_source_pages_read": 458,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    },
+    {
+      "instrument_id": "601318.SH",
+      "company_name": "中国平安",
+      "layer": "finance",
+      "exchange": "SSE",
+      "sw_l1": "非银金融",
+      "document_version": "860c455bbad9be59d3d1bf64bf683733feb79157212532df44b91d49a0b03c2a",
+      "asset": {
+        "asset_id": "asset_502014c0f11bb2cf3e010db9ddc1eb6e",
+        "fiscal_year": 2025,
+        "report_period": "2025-12-31",
+        "content_hash": "860c455bbad9be59d3d1bf64bf683733feb79157212532df44b91d49a0b03c2a",
+        "availability": "local_valid",
+        "decision_state": "current",
+        "published_at": "2026-03-26T16:00:00+00:00"
+      },
+      "core_conditions": [
+        {
+          "condition_id": "601318.SH-principal_business",
+          "kind": "substantive_answer",
+          "dimension": "principal_business",
+          "source_pages": [
+            10,
+            51,
+            53,
+            55,
+            56,
+            249,
+            250
+          ],
+          "required_substance": "寿险健康险、财险、银行、资管、金融赋能及医养生态；原保费与保险服务收入分开、投资成分剔除",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            51
+          ],
+          "source_table_refs": [
+            249
+          ]
+        },
+        {
+          "condition_id": "601318.SH-products_services",
+          "kind": "substantive_answer",
+          "dimension": "products_services",
+          "source_pages": [
+            10,
+            51,
+            53,
+            55,
+            56,
+            249,
+            250
+          ],
+          "required_substance": "寿险健康险、财险、银行、资管、金融赋能及医养生态；原保费与保险服务收入分开、投资成分剔除",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            51
+          ],
+          "source_table_refs": [
+            249
+          ]
+        },
+        {
+          "condition_id": "601318.SH-revenue_model",
+          "kind": "substantive_answer",
+          "dimension": "revenue_model",
+          "source_pages": [
+            10,
+            51,
+            53,
+            55,
+            56,
+            249,
+            250
+          ],
+          "required_substance": "寿险健康险、财险、银行、资管、金融赋能及医养生态；原保费与保险服务收入分开、投资成分剔除",
+          "require_all_primary_businesses": true,
+          "require_native_actor_period_status": true,
+          "mechanism_source_pages": [
+            51
+          ],
+          "source_table_refs": [
+            249
+          ]
+        },
+        {
+          "condition_id": "601318.SH-income-01",
+          "kind": "current_primary_income",
+          "page": 249,
+          "name": "寿险及健康险/营业收入合计",
+          "value": "502171",
+          "unit": "百万元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "原金融收入净额/分部营业收入合计本期",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": "寿险及健康险/营业收入合计",
+          "rounding_note": null
+        },
+        {
+          "condition_id": "601318.SH-income-02",
+          "kind": "current_primary_income",
+          "page": 249,
+          "name": "财产保险/营业收入合计",
+          "value": "353272",
+          "unit": "百万元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "原金融收入净额/分部营业收入合计本期",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": "财产保险/营业收入合计",
+          "rounding_note": null
+        },
+        {
+          "condition_id": "601318.SH-income-03",
+          "kind": "current_primary_income",
+          "page": 249,
+          "name": "银行/营业收入合计",
+          "value": "131442",
+          "unit": "百万元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "原金融收入净额/分部营业收入合计本期",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": "银行/营业收入合计",
+          "rounding_note": null
+        },
+        {
+          "condition_id": "601318.SH-income-04",
+          "kind": "current_primary_income",
+          "page": 249,
+          "name": "资产管理/营业收入合计",
+          "value": "51346",
+          "unit": "百万元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "原金融收入净额/分部营业收入合计本期",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": "资产管理/营业收入合计",
+          "rounding_note": null
+        },
+        {
+          "condition_id": "601318.SH-income-05",
+          "kind": "current_primary_income",
+          "page": 249,
+          "name": "金融赋能/营业收入合计",
+          "value": "49358",
+          "unit": "百万元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "原金融收入净额/分部营业收入合计本期",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": "金融赋能/营业收入合计",
+          "rounding_note": null
+        },
+        {
+          "condition_id": "601318.SH-income-06",
+          "kind": "current_primary_income",
+          "page": 249,
+          "name": "合计/营业收入合计",
+          "value": "1050506",
+          "unit": "百万元",
+          "reported_period": "2025-12-31",
+          "subject": "company_and_consolidated_subsidiaries_unless_original_segment_column",
+          "header": "原金融收入净额/分部营业收入合计本期",
+          "column": "current_year_income_not_cost_previous_or_internal",
+          "source_actor_or_segment": "合计/营业收入合计",
+          "rounding_note": null
+        },
+        {
+          "condition_id": "601318.SH-action-01",
+          "kind": "source_business_direction",
+          "source_pages": [
+            10,
+            51,
+            53,
+            55,
+            56,
+            249,
+            250
+          ],
+          "required_substance": "提供寿险及健康险保险服务",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "601318.SH-action-02",
+          "kind": "source_business_direction",
+          "source_pages": [
+            10,
+            51,
+            53,
+            55,
+            56,
+            249,
+            250
+          ],
+          "required_substance": "提供财产保险服务",
+          "require_native_actor_and_actual_period": true
+        },
+        {
+          "condition_id": "601318.SH-matrix",
+          "kind": "all_primary_boards",
+          "source_pages": [
+            10,
+            51,
+            53,
+            55,
+            56,
+            249,
+            250
+          ],
+          "required_substance": "寿险健康险、财险、银行、资管、金融赋能及医养生态；原保费与保险服务收入分开、投资成分剔除",
+          "primary_threshold": "all >=5% revenue plus all explicitly primary; compatible breakdown >=90%; do not sum non-comparable subjects"
+        },
+        {
+          "condition_id": "601318.SH-mechanism",
+          "kind": "earning_and_recognition",
+          "source_pages": [
+            10,
+            51,
+            53,
+            55,
+            56,
+            249,
+            250
+          ],
+          "required_substance": "逐原文说明如何交易/收费及控制权或期间确认；不得仅列金额或通用模板",
+          "bound_source_excerpt_pages": [
+            10,
+            51,
+            52,
+            53,
+            55,
+            56,
+            249,
+            250
+          ]
+        }
+      ],
+      "negative_conditions": [
+        {
+          "condition_id": "601318.SH-negative-current",
+          "kind": "prior_period_and_cost_not_current_revenue",
+          "source_pages": [
+            249
+          ],
+          "prohibited": "上期、成本、支出及内部交易当本期对外营业收入"
+        },
+        {
+          "condition_id": "601318.SH-negative-status",
+          "kind": "source_status_and_actor",
+          "source_pages": [
+            10,
+            51,
+            53,
+            55,
+            56,
+            249,
+            250
+          ],
+          "prohibited": "行业背景、未来计划、经营许可或外部主体冒充本期确定集团经营"
+        },
+        {
+          "condition_id": "601318.SH-negative-premium",
+          "source_pages": [
+            51,
+            55,
+            249
+          ],
+          "prohibited": "原保险保费替代保险服务收入；投资成分计入服务收入；空横线借额"
+        }
+      ],
+      "source_pages": [
+        10,
+        51,
+        52,
+        53,
+        55,
+        56,
+        249,
+        250
+      ],
+      "all_source_pages_read": 370,
+      "readiness": "prepared_not_executed",
+      "requires_final_pre_execution_source_layout_review": true
+    }
+  ],
+  "unreviewed_output_accuracy": "not_applicable_no_output",
+  "S2_observed": 0,
+  "S3_observed": 0,
+  "source_reading_limit": "核心页及收入数字已读；首发前仍须完成必要布局/续页逐条件终核与执行代码冻结；S1尚10/12，不得启动S2"
+}

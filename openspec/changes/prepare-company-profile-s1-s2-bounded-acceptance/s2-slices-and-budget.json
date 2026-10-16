@@ -1,0 +1,130 @@
+{
+  "execution_authorized": false,
+  "first_slices": [
+    {
+      "slice_id": "S2-first-01",
+      "companies": [
+        "600110.SH",
+        "600111.SH"
+      ],
+      "seconds": 300,
+      "shared_token_budget": 50000
+    },
+    {
+      "slice_id": "S2-first-02",
+      "companies": [
+        "000008.SZ",
+        "000009.SZ"
+      ],
+      "seconds": 300,
+      "shared_token_budget": 50000
+    },
+    {
+      "slice_id": "S2-first-03",
+      "companies": [
+        "920000.BJ",
+        "920001.BJ"
+      ],
+      "seconds": 300,
+      "shared_token_budget": 50000
+    },
+    {
+      "slice_id": "S2-first-04",
+      "companies": [
+        "600116.SH",
+        "600106.SH"
+      ],
+      "seconds": 300,
+      "shared_token_budget": 50000
+    },
+    {
+      "slice_id": "S2-first-05",
+      "companies": [
+        "600113.SH",
+        "000002.SZ"
+      ],
+      "seconds": 300,
+      "shared_token_budget": 50000
+    },
+    {
+      "slice_id": "S2-first-06",
+      "companies": [
+        "000007.SZ",
+        "000010.SZ"
+      ],
+      "seconds": 300,
+      "shared_token_budget": 50000
+    },
+    {
+      "slice_id": "S2-first-07",
+      "companies": [
+        "600682.SH",
+        "600620.SH"
+      ],
+      "seconds": 300,
+      "shared_token_budget": 50000
+    },
+    {
+      "slice_id": "S2-first-08",
+      "companies": [
+        "000025.SZ",
+        "000421.SZ"
+      ],
+      "seconds": 300,
+      "shared_token_budget": 50000
+    },
+    {
+      "slice_id": "S2-first-09",
+      "companies": [
+        "000001.SZ",
+        "600030.SH"
+      ],
+      "seconds": 300,
+      "shared_token_budget": 50000
+    },
+    {
+      "slice_id": "S2-first-10",
+      "companies": [
+        "000166.SZ",
+        "601318.SH"
+      ],
+      "seconds": 300,
+      "shared_token_budget": 50000
+    }
+  ],
+  "first_budget": {
+    "seconds": 3000,
+    "tokens": 500000
+  },
+  "remedy_budget": {
+    "max_slices": 10,
+    "seconds": 3000,
+    "tokens": 500000,
+    "max_extra_runs_each_company": 1,
+    "max_common_iterations": 2,
+    "max_extra_active_minutes_each": 30,
+    "max_manually_remedied_companies": 2
+  },
+  "overall_upper_bound": {
+    "seconds": 6000,
+    "tokens": 1000000
+  },
+  "timing": "process start/registry/service/PDF/layout/retries through last export; outside synchronous limit",
+  "no_budget_transfer": true,
+  "checkpoints": [
+    5,
+    10,
+    15,
+    20
+  ],
+  "same_code_snapshot_first_group": true,
+  "audit": {
+    "all_core_answers_and_support": true,
+    "all_high_risk": true,
+    "supplemental_unique_objects_each": 20,
+    "seed": "S2-20260917-v1",
+    "label": "已审/抽样准确率",
+    "expand_same_kind_on_error": true
+  },
+  "cold_and_hot_cache_separately_recorded": true
+}

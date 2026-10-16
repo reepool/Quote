@@ -1,0 +1,37 @@
+{
+  "completed_at": "2026-10-16T04:18:03.279384+00:00",
+  "success": true,
+  "checks": {
+    "history": 4174,
+    "existing_worktree": 19,
+    "first": 22,
+    "first_review": 6,
+    "v60_delivery": 22,
+    "v60_review": 180,
+    "original_execution_snapshots": 78
+  },
+  "scope_review": {
+    "blocking_S0_defects": 0,
+    "removed_only_four_unsupported_activities": true,
+    "six_body_texts_unchanged": true,
+    "remaining_S1_defects": [
+      "600082.SH conflicting evidence metadata prevents query",
+      "600000.SH financial income missing at runtime"
+    ],
+    "S1_not_passed": true
+  },
+  "validation_sha256": {
+    "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/v61-validation-receipts/targeted-final.log": "4719f1df36559305c81280c447635a2c391e2bca6376435b09772b9e088db441",
+    "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/v61-validation-receipts/s1-tests.log": "54797d05da0e55f8a60dddeaf599e10f521613e7653b8045feab77215f0fecf1",
+    "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/v61-validation-receipts/s1-test-wiring-correction.log": "587deb04917010f1bd3d8a420b2032d8baad4bc66cc761f1c527020bf4c6fd5d",
+    "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/v61-validation-receipts/ruff-final.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/v61-validation-receipts/format-final.log": "ef7d13d02214e98ca902b05257cdbe6a8e84f3b4714508efdc19766460b54209",
+    "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/v61-validation-receipts/diff-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/v61-validation-receipts/openspec-s0.log": "6f46e59c9ff103ed09a02a4f7d6c86b8d82b4516bbed491e194118334621b5d6",
+    "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/v61-validation-receipts/openspec-bounded.log": "86cc1bda0ba9ed8ebe7f22b1fc1167873ffe545476a4c442723102105b1905d0"
+  },
+  "all_prerequisite_processes_completed_and_inspected": true,
+  "first_observation_used": 1,
+  "successors_used_before_launch": 1,
+  "successors_authorized": 2
+}

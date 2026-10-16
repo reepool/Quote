@@ -1,0 +1,70 @@
+[32m.[0m[32m.[0m[31mF[0m[31mF[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[31mF[0m[32m.[0m[32m.[0m[31mF[0m[31m                                                             [100%][0m
+=================================== FAILURES ===================================
+[31m[1m_____________ test_historical_core_accept_query_export[600100.SH] ______________[0m
+[1m[31mtests/unit/test_research/test_company_profile_s1_bounded_regression.py[0m:53: in test_historical_core_accept_query_export
+    [0m[94mfrom[39;49;00m[90m [39;49;00m[04m[96mtests[39;49;00m[04m[96m.[39;49;00m[04m[96munit[39;49;00m[04m[96m.[39;49;00m[04m[96mtest_research[39;49;00m[04m[96m.[39;49;00m[04m[96mtest_company_profile_v59_technology_apparel[39;49;00m[90m [39;49;00m[94mimport[39;49;00m match, rolematch, negative_check[90m[39;49;00m
+[1m[31mE   ImportError: cannot import name 'negative_check' from 'tests.unit.test_research.test_company_profile_v59_technology_apparel' (/home/python/Quote/tests/unit/test_research/test_company_profile_v59_technology_apparel.py)[0m
+[31m[1m_____________ test_historical_core_accept_query_export[600107.SH] ______________[0m
+[1m[31mtests/unit/test_research/test_company_profile_s1_bounded_regression.py[0m:53: in test_historical_core_accept_query_export
+    [0m[94mfrom[39;49;00m[90m [39;49;00m[04m[96mtests[39;49;00m[04m[96m.[39;49;00m[04m[96munit[39;49;00m[04m[96m.[39;49;00m[04m[96mtest_research[39;49;00m[04m[96m.[39;49;00m[04m[96mtest_company_profile_v59_technology_apparel[39;49;00m[90m [39;49;00m[94mimport[39;49;00m match, rolematch, negative_check[90m[39;49;00m
+[1m[31mE   ImportError: cannot import name 'negative_check' from 'tests.unit.test_research.test_company_profile_v59_technology_apparel' (/home/python/Quote/tests/unit/test_research/test_company_profile_v59_technology_apparel.py)[0m
+[31m[1m_____________ test_historical_core_accept_query_export[600082.SH] ______________[0m
+[1m[31mresearch/company_profile/reads.py[0m:350: in _commodity_exposure_view
+    [0massessment = assess_commodity_exposures([90m[39;49;00m
+[1m[31mresearch/company_profile/commodity_exposure.py[0m:717: in assess_commodity_exposures
+    [0m[94mreturn[39;49;00m bind_commodity_exposure_assessment([90m[39;49;00m
+[1m[31mresearch/company_profile/commodity_exposure.py[0m:330: in bind_commodity_exposure_assessment
+    [0m_validate_assessment_references(assessment, checked_evidence)[90m[39;49;00m
+[1m[31mresearch/company_profile/commodity_exposure.py[0m:192: in _validate_assessment_references
+    [0mby_id = _unique_evidence_index(checked_evidence, label=[33m"[39;49;00m[33mchecked_evidence_ids[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+[1m[31mresearch/company_profile/commodity_exposure.py[0m:146: in _unique_evidence_index
+    [0m[94mraise[39;49;00m [96mValueError[39;49;00m([33mf[39;49;00m[33m"[39;49;00m[33mconflicting evidence for [39;49;00m[33m{[39;49;00mkey[33m}[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+[1m[31mE   ValueError: conflicting evidence for core-ev-9ccb14b102b6a09d[0m
+
+[33mDuring handling of the above exception, another exception occurred:[0m
+[1m[31mtests/unit/test_research/test_company_profile_s1_bounded_regression.py[0m:36: in test_historical_core_accept_query_export
+    [0mq, e = _drive(tmp_path, instrument=instrument, fixture=source.get([33m'[39;49;00m[33mreport[39;49;00m[33m'[39;49;00m, source), pages=ps, repair_version=[33m'[39;49;00m[33mv61[39;49;00m[33m'[39;49;00m)[90m[39;49;00m
+[1m[31mtests/unit/test_research/test_company_profile_v19_closure.py[0m:46: in _drive
+    [0mquery = reads.query((instrument,), processing_identity=identity)[[33m"[39;49;00m[33mprofiles[39;49;00m[33m"[39;49;00m][[94m0[39;49;00m][90m[39;49;00m
+[1m[31mresearch/company_profile/reads.py[0m:88: in query
+    [0mprofiles, missing = [96mself[39;49;00m._select_profiles([90m[39;49;00m
+[1m[31mresearch/company_profile/reads.py[0m:199: in _select_profiles
+    [0m[94mreturn[39;49;00m [[96mself[39;49;00m.render_profile(item) [94mfor[39;49;00m item [95min[39;49;00m selected], missing[90m[39;49;00m
+[1m[31mresearch/company_profile/reads.py[0m:199: in <listcomp>
+    [0m[94mreturn[39;49;00m [[96mself[39;49;00m.render_profile(item) [94mfor[39;49;00m item [95min[39;49;00m selected], missing[90m[39;49;00m
+[1m[31mresearch/company_profile/reads.py[0m:272: in render_profile
+    [0m[33m"[39;49;00m[33mcommodity_exposure[39;49;00m[33m"[39;49;00m: _commodity_exposure_view([90m[39;49;00m
+[1m[31mresearch/company_profile/reads.py[0m:357: in _commodity_exposure_view
+    [0massessment = assess_commodity_exposures([90m[39;49;00m
+[1m[31mresearch/company_profile/commodity_exposure.py[0m:717: in assess_commodity_exposures
+    [0m[94mreturn[39;49;00m bind_commodity_exposure_assessment([90m[39;49;00m
+[1m[31mresearch/company_profile/commodity_exposure.py[0m:330: in bind_commodity_exposure_assessment
+    [0m_validate_assessment_references(assessment, checked_evidence)[90m[39;49;00m
+[1m[31mresearch/company_profile/commodity_exposure.py[0m:192: in _validate_assessment_references
+    [0mby_id = _unique_evidence_index(checked_evidence, label=[33m"[39;49;00m[33mchecked_evidence_ids[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+[1m[31mresearch/company_profile/commodity_exposure.py[0m:146: in _unique_evidence_index
+    [0m[94mraise[39;49;00m [96mValueError[39;49;00m([33mf[39;49;00m[33m"[39;49;00m[33mconflicting evidence for [39;49;00m[33m{[39;49;00mkey[33m}[39;49;00m[33m"[39;49;00m)[90m[39;49;00m
+[1m[31mE   ValueError: conflicting evidence for core-ev-9ccb14b102b6a09d[0m
+[31m[1m_____________ test_historical_core_accept_query_export[600000.SH] ______________[0m
+[1m[31mtests/unit/test_research/test_company_profile_s1_bounded_regression.py[0m:42: in test_historical_core_accept_query_export
+    [0m[94massert[39;49;00m [96many[39;49;00m(r[[33m'[39;49;00m[33msource_native[39;49;00m[33m'[39;49;00m][[33m'[39;49;00m[33mname[39;49;00m[33m'[39;49;00m]==name [95mand[39;49;00m r[[33m'[39;49;00m[33msource_native[39;49;00m[33m'[39;49;00m].get([33m'[39;49;00m[33mvalue[39;49;00m[33m'[39;49;00m)==value [95mand[39;49;00m r[[33m'[39;49;00m[33msource_native[39;49;00m[33m'[39;49;00m].get([33m'[39;49;00m[33munit[39;49;00m[33m'[39;49;00m)==[33m'[39;49;00m[33m百万元[39;49;00m[33m'[39;49;00m [94mfor[39;49;00m r [95min[39;49;00m raw)[90m[39;49;00m
+[1m[31mE   assert False[0m
+[1m[31mE    +  where False = any(<generator object test_historical_core_accept_query_export.<locals>.<genexpr> at 0x7fbd2d8e1030>)[0m
+-- generated xml file: /home/python/Quote/data/QuoteBak/v61_s0/s1-results.xml --
+============================= slowest 10 durations =============================
+54.42s call     tests/unit/test_research/test_company_profile_s1_bounded_regression.py::test_historical_core_accept_query_export[600100.SH]
+20.36s call     tests/unit/test_research/test_company_profile_s1_bounded_regression.py::test_historical_core_accept_query_export[600094.SH]
+19.39s call     tests/unit/test_research/test_company_profile_s1_bounded_regression.py::test_historical_core_accept_query_export[600054.SH]
+19.12s call     tests/unit/test_research/test_company_profile_s1_bounded_regression.py::test_historical_core_accept_query_export[600104.SH]
+18.86s call     tests/unit/test_research/test_company_profile_s1_bounded_regression.py::test_historical_core_accept_query_export[600103.SH]
+18.37s call     tests/unit/test_research/test_company_profile_s1_bounded_regression.py::test_historical_core_accept_query_export[600107.SH]
+14.79s call     tests/unit/test_research/test_company_profile_s1_bounded_regression.py::test_historical_core_accept_query_export[600098.SH]
+9.26s call     tests/unit/test_research/test_company_profile_s1_bounded_regression.py::test_historical_core_accept_query_export[600088.SH]
+7.70s call     tests/unit/test_research/test_company_profile_s1_bounded_regression.py::test_historical_core_accept_query_export[600097.SH]
+7.27s call     tests/unit/test_research/test_company_profile_s1_bounded_regression.py::test_historical_core_accept_query_export[600099.SH]
+[36m[1m=========================== short test summary info ============================[0m
+[31mFAILED[0m tests/unit/test_research/test_company_profile_s1_bounded_regression.py::[1mtest_historical_core_accept_query_export[600100.SH][0m - ImportError: cannot import name 'negative_check' from 'tests.unit.test_rese...
+[31mFAILED[0m tests/unit/test_research/test_company_profile_s1_bounded_regression.py::[1mtest_historical_core_accept_query_export[600107.SH][0m - ImportError: cannot import name 'negative_check' from 'tests.unit.test_rese...
+[31mFAILED[0m tests/unit/test_research/test_company_profile_s1_bounded_regression.py::[1mtest_historical_core_accept_query_export[600082.SH][0m - ValueError: conflicting evidence for core-ev-9ccb14b102b6a09d
+[31mFAILED[0m tests/unit/test_research/test_company_profile_s1_bounded_regression.py::[1mtest_historical_core_accept_query_export[600000.SH][0m - assert False
+[31m[31m[1m4 failed[0m, [32m8 passed[0m, [33m7 warnings[0m[31m in 201.76s (0:03:21)[0m[0m

@@ -1,0 +1,19 @@
+{
+  "formal_attempt": false,
+  "baseline": "v60 frozen selection and projection functions; unchanged remaining modules",
+  "results": [
+    {
+      "instrument_id": "600082.SH",
+      "old_frozen_selector_used": true,
+      "query_succeeded": false,
+      "error_type": "ValueError",
+      "error": "conflicting evidence for core-ev-9ccb14b102b6a09d"
+    },
+    {
+      "instrument_id": "600000.SH",
+      "old_frozen_selector_used": true,
+      "query_succeeded": true,
+      "financial_records": 0
+    }
+  ]
+}

@@ -1505,6 +1505,7 @@ REVENUE_SENTENCE_REPAIR_V57 = "v57"
 REVENUE_SENTENCE_REPAIR_V58 = "v58"
 REVENUE_SENTENCE_REPAIR_V59 = "v59"
 REVENUE_SENTENCE_REPAIR_V60 = "v60"
+REVENUE_SENTENCE_REPAIR_V61 = "v61"
 _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
     {
         REVENUE_SENTENCE_REPAIR_V1,
@@ -1567,6 +1568,7 @@ _REVENUE_SENTENCE_REPAIR_VERSIONS = frozenset(
         REVENUE_SENTENCE_REPAIR_V58,
         REVENUE_SENTENCE_REPAIR_V59,
         REVENUE_SENTENCE_REPAIR_V60,
+        REVENUE_SENTENCE_REPAIR_V61,
     }
 )
 
@@ -1652,6 +1654,7 @@ def named_role_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V58,
         REVENUE_SENTENCE_REPAIR_V59,
         REVENUE_SENTENCE_REPAIR_V60,
+        REVENUE_SENTENCE_REPAIR_V61,
     }
 
 
@@ -1720,6 +1723,7 @@ def service_operating_energy_requested(identity: Mapping[str, Any] | None) -> bo
         REVENUE_SENTENCE_REPAIR_V58,
         REVENUE_SENTENCE_REPAIR_V59,
         REVENUE_SENTENCE_REPAIR_V60,
+        REVENUE_SENTENCE_REPAIR_V61,
     }
 
 
@@ -1788,6 +1792,7 @@ def core_answer_repair_requested(identity: Mapping[str, Any] | None) -> bool:
         REVENUE_SENTENCE_REPAIR_V58,
         REVENUE_SENTENCE_REPAIR_V59,
         REVENUE_SENTENCE_REPAIR_V60,
+        REVENUE_SENTENCE_REPAIR_V61,
     }
 
 
@@ -1857,6 +1862,7 @@ def source_delivery_repair_requested(identity: Mapping[str, Any] | None) -> bool
         REVENUE_SENTENCE_REPAIR_V58,
         REVENUE_SENTENCE_REPAIR_V59,
         REVENUE_SENTENCE_REPAIR_V60,
+        REVENUE_SENTENCE_REPAIR_V61,
     }
 
 
@@ -14755,12 +14761,10 @@ def _related_current_goods_bindings(excerpt: str) -> list[dict[str, Any]]:
                 if goods in {"合计", "小计", "总计"}:
                     continue
                 if goods == "其他" or re.search(r"工程施工[/／].*材料", goods):
-                    add(
-                        goods,
-                        ActivityAction.PROVIDES_SERVICE,
-                        header="本期关联交易原内容",
-                        qualifier=row[5],
-                    )
+                    # The mixed table establishes income, not whether this
+                    # native row is a good, service, or a mixture. Retain its
+                    # financial records and original Evidence without adding
+                    # a definite Activity or an answer-supporting service.
                     continue
                 mixed = re.fullmatch(r"销售(水电汽)(?:、提供(客运服务))?", goods)
                 if mixed:

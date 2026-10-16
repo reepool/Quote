@@ -1,0 +1,160 @@
+{
+  "completed_at": "2026-10-16T04:18:39.486532+00:00",
+  "stage": "S1",
+  "observed_companies": 12,
+  "passed_companies": 10,
+  "total_companies": 12,
+  "stage_passed": false,
+  "core_only": true,
+  "formal_unseen_attempt": false,
+  "results": [
+    {
+      "instrument_id": "600094.SH",
+      "passed": true,
+      "duration_seconds": 20.616,
+      "failure": null,
+      "receipt": "s1-results.xml"
+    },
+    {
+      "instrument_id": "600103.SH",
+      "passed": true,
+      "duration_seconds": 19.018,
+      "failure": null,
+      "receipt": "s1-results.xml"
+    },
+    {
+      "instrument_id": "600100.SH",
+      "passed": true,
+      "duration_seconds": 53.26,
+      "failure": null,
+      "receipt": "s1-test-wiring-correction.xml"
+    },
+    {
+      "instrument_id": "600107.SH",
+      "passed": true,
+      "duration_seconds": 18.628,
+      "failure": null,
+      "receipt": "s1-test-wiring-correction.xml"
+    },
+    {
+      "instrument_id": "600098.SH",
+      "passed": true,
+      "duration_seconds": 14.935,
+      "failure": null,
+      "receipt": "s1-results.xml"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "passed": true,
+      "duration_seconds": 19.266,
+      "failure": null,
+      "receipt": "s1-results.xml"
+    },
+    {
+      "instrument_id": "600088.SH",
+      "passed": true,
+      "duration_seconds": 9.414,
+      "failure": null,
+      "receipt": "s1-results.xml"
+    },
+    {
+      "instrument_id": "600099.SH",
+      "passed": true,
+      "duration_seconds": 7.423,
+      "failure": null,
+      "receipt": "s1-results.xml"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "passed": false,
+      "duration_seconds": 6.245,
+      "failure": "ValueError: conflicting evidence for core-ev-9ccb14b102b6a09d",
+      "receipt": "s1-results.xml"
+    },
+    {
+      "instrument_id": "600097.SH",
+      "passed": true,
+      "duration_seconds": 7.851,
+      "failure": null,
+      "receipt": "s1-results.xml"
+    },
+    {
+      "instrument_id": "600054.SH",
+      "passed": true,
+      "duration_seconds": 19.548,
+      "failure": null,
+      "receipt": "s1-results.xml"
+    },
+    {
+      "instrument_id": "600000.SH",
+      "passed": false,
+      "duration_seconds": 1.512,
+      "failure": "assert False\n +  where False = any(<generator object test_historical_core_accept_query_export.<locals>.<genexpr> at 0x7fbd2d8e1030>)",
+      "receipt": "s1-results.xml"
+    }
+  ],
+  "risk_contract": "s1-core-regression-contract.json",
+  "executed_code_sha256": {
+    "research/company_profile/__init__.py": "41e5f0c5c3562e789053ce756fe342d1cb8b2c34f4049920eb246855bdbf1364",
+    "research/company_profile/acceptance_policy.py": "d7b96d51401b7c4baac7c56db36d99ae3e5ffb8742c6cac4edc07a7d99776d5c",
+    "research/company_profile/candidate_registry.py": "c782e7fb85379e07b464a1d90fdbf1b0ab527df287376a9091d2d7b00e0473c4",
+    "research/company_profile/commodity_exposure.py": "15d4cbf467013c23bb65db1fe0d8b9a69f68f323abefe2b0ccd1786c3652b063",
+    "research/company_profile/contracts.py": "3552379634e8ecd9514b97650ec32c224f48b590f17a56d2785a64f0e8c41527",
+    "research/company_profile/core_assessment_projection.py": "562a2c95c59b05aaa842d32b1eace6e39b89beaab2a2be00f73b2296eb008737",
+    "research/company_profile/core_evidence_selection.py": "efe51b41ff2b425e52c205cdccd129ec3a1dc92b54b3b9a074ac770728da7a86",
+    "research/company_profile/core_skeleton.py": "7361026c9436a72c7feaab4dc6445499c2b622ab6004b75d146588388d30cf6d",
+    "research/company_profile/counterparty_research.py": "83a3779d2e6c044acfe3f4e560b59b4a8d631bdcc03af8e8a4b686962b17fd83",
+    "research/company_profile/execution.py": "8649d1c31e081e168994a7fe433fa0b1d41616ea2039b78449b99e96065e2267",
+    "research/company_profile/first_expansion.py": "a37fef38017082f82e71036d470462f08a92ed05324a4685b21572fef91bf661",
+    "research/company_profile/legacy_retirement.py": "3e01e1a88369f866790e65a7c4b04a3e9e5e4480fc099eef55303a5e34386b0c",
+    "research/company_profile/live_plan.py": "12b442cd3334e65d4de050daa70043e02b2cb9271b0b90708be36fdd8e0dd856",
+    "research/company_profile/live_run.py": "ee7208f40879a12f2e87270743475a91aaf178a7bc2ec979cb36e059b4fb1933",
+    "research/company_profile/m4_next_batch.py": "a23249872610f38d1294a9945478cacf609455bfd453790044268c3bd9dc565a",
+    "research/company_profile/material_input_research.py": "1e903edfe38d1b0d569299436e59a150ca909570de5ac14c496630831d4d37ab",
+    "research/company_profile/models.py": "34be82906d9f8ec4d1f7a865ddaa5a5203da534d40c3573a6d85a2c9e08a4f03",
+    "research/company_profile/operating_quantity_research.py": "d2dfadb2a88a5c2267daea7fda53b2147c47af2c1fe43a8eaa96c147452a029d",
+    "research/company_profile/operations.py": "480ead73129c64b85345bcf2a4ef89ce30c1bd47ac80e8c7b2222613a4ad36d3",
+    "research/company_profile/operator_closure.py": "529dd42b014449c0ac20c0e5be3180c8c21b4f9df3cb509d5334fe65bb0232dd",
+    "research/company_profile/projection.py": "504f8446256d157219e1d21ce35474b323f3c625a799d5f0a22809d3e656536c",
+    "research/company_profile/publication.py": "d2c43d7a6199f0fbab64915beec8768a65c11df7d67d6615b25bff76300c6f36",
+    "research/company_profile/reads.py": "b8789b876349485a8b1a888a97b286f83c6a5618d559d7facbf2df3b1a9f91a5",
+    "research/company_profile/runtime.py": "3e44333bd1fc64067eb7ecf8907796039d76c050f0508189c1fba70f413f2d6d",
+    "research/company_profile/segment_financial_research.py": "1c0e27469a670e68fb289b4ad3dd86e643189c3874186f724c34f763e04a8d1f",
+    "research/company_profile/shadow_batch.py": "155e54e72c43a841683833e0ec46135ebde8e2572a195284b87b6a23340e4792",
+    "research/company_profile/shadow_batch_audit.py": "04f12d98d3819bfc02c683b3620e83c753be66c6377610ae8076c5153157a2ad",
+    "research/company_profile/shadow_batch_service.py": "bc3be4bd327b49f4abbec98d83cbbd6108993f9ac1253ecf2b42620c0a5dec74",
+    "research/company_profile/shadow_evidence.py": "dc580e45feb9eb55b63e0bea608fe63c4f50bef0e8553eb0ba879da88602970b",
+    "research/company_profile/source_review.py": "4da6bcb7b1aa1be459cb1b232df59a65acef535afc8b8593d8852f26ebe02bf9",
+    "research/company_profile/stage4_restricted_read.py": "f29e14ad0754dd42a0bd950171fb077ebaf7f7175aef12bd55771a82619ccbaf",
+    "research/company_profile/stage5.py": "47de653324c80e1eb1d615e179c2818eafdf568abd328698e92459122244da0c",
+    "research/company_profile/stage5_adjudication.py": "0897c27651a83f86da877d3940c7b21af5ddcc06e92b0ca32ffad94752037773",
+    "research/company_profile/stage5_benchmark.py": "c7cc313671af27e7c66687faf8ff8e774a993c47dd7fd97b2dbf83833d27290c",
+    "research/company_profile/stage5_bundle.py": "008b8c7d4de24ce03a75b95fbf97c47b24663d5950f53600761206e6397921c8",
+    "research/company_profile/stage5_provider.py": "279a6dcd3e623f2b83238662bb55b595a8837f84b6a11769601e3fb65fa1ba72",
+    "research/company_profile/stage5_service.py": "e53776bfe200ab3341f88d22207a41508020b6867ef03c3312ec9ec250957b11",
+    "research/company_profile/workflow.py": "96d45ea6990deb382e039783ea353354db84c92deb35063d355e15dc79e54470",
+    "research/announcement_assets/repository.py": "802c9fea7824e2fc7d391722d6ae97c7f9d4a276768a76368e6772a5fdbe6d32"
+  },
+  "baseline_diagnosis": {
+    "formal_attempt": false,
+    "baseline": "v60 frozen selection and projection functions; unchanged remaining modules",
+    "results": [
+      {
+        "instrument_id": "600082.SH",
+        "old_frozen_selector_used": true,
+        "query_succeeded": false,
+        "error_type": "ValueError",
+        "error": "conflicting evidence for core-ev-9ccb14b102b6a09d"
+      },
+      {
+        "instrument_id": "600000.SH",
+        "old_frozen_selector_used": true,
+        "query_succeeded": true,
+        "financial_records": 0
+      }
+    ]
+  },
+  "test_wiring_correction": "Initial two ImportErrors were test wiring and corrected independently; original 4-failure receipt retained. Actual 600082/600000 failures remain, not xfailed/skipped/replaced.",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false
+}

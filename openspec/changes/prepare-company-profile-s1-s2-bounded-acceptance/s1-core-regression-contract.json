@@ -1,0 +1,1319 @@
+{
+  "status": "core_regression_contract_frozen_before_execution",
+  "processing_identity": "v61",
+  "company_count": 12,
+  "risk_coverage": {
+    "associated_leasing": [
+      "600094.SH",
+      "600103.SH",
+      "600088.SH",
+      "600054.SH"
+    ],
+    "body": [
+      "600100.SH",
+      "600107.SH",
+      "600082.SH",
+      "600097.SH",
+      "600054.SH"
+    ],
+    "financial_disclosure": [
+      "600098.SH",
+      "600104.SH",
+      "600000.SH"
+    ],
+    "income_columns_units": [
+      "600094.SH",
+      "600107.SH",
+      "600082.SH",
+      "600000.SH"
+    ],
+    "purchase_sale_direction": [
+      "600103.SH",
+      "600104.SH",
+      "600099.SH",
+      "600097.SH"
+    ],
+    "subject_period": [
+      "600100.SH",
+      "600098.SH",
+      "600088.SH",
+      "600099.SH"
+    ]
+  },
+  "financial_scope_note": "浦发为银行；广州发展、上汽覆盖真实能源金融/汽车金融披露，不声称三家均为金融行业上市公司。",
+  "cases": [
+    {
+      "instrument_id": "600094.SH",
+      "fixture": "tests/fixtures/company_profile_v55_property_paper_pages.json",
+      "fixture_sha256": "74a4f8e4b65765ec805920061f6735ae7fdc14239aec63dcc305e1631e7f8860",
+      "revenue": [
+        {
+          "condition_id": "600094.SH-income-001",
+          "instrument_id": "600094.SH",
+          "page": 16,
+          "name": "房地产板块",
+          "native_aliases": [
+            "房地产板块"
+          ],
+          "value": "2231200274.53",
+          "unit": "元",
+          "dimension": "industry",
+          "header": "主营业务分行业",
+          "source_column": "本期营业收入",
+          "source_actor": "公司及合并子公司",
+          "subject_scope": "consolidated_group",
+          "counterparty": null,
+          "source_segment": null,
+          "reported_period": "2025-12-31",
+          "period_state": "current_printed",
+          "table_basis": "主营业务分行业",
+          "qualifier": null
+        },
+        {
+          "condition_id": "600094.SH-income-002",
+          "instrument_id": "600094.SH",
+          "page": 16,
+          "name": "算力服务板块",
+          "native_aliases": [
+            "算力服务板块"
+          ],
+          "value": "15348294.98",
+          "unit": "元",
+          "dimension": "industry",
+          "header": "主营业务分行业",
+          "source_column": "本期营业收入",
+          "source_actor": "公司及合并子公司",
+          "subject_scope": "consolidated_group",
+          "counterparty": null,
+          "source_segment": null,
+          "reported_period": "2025-12-31",
+          "period_state": "current_printed",
+          "table_basis": "主营业务分行业",
+          "qualifier": null
+        }
+      ],
+      "actions": [
+        {
+          "condition_id": "600094.SH-action-001",
+          "instrument_id": "600094.SH",
+          "page": 105,
+          "name": "房地产",
+          "native_aliases": [
+            "房地产"
+          ],
+          "source_actions": [
+            "sells"
+          ],
+          "source_actor": "公司及合并子公司",
+          "actor_aliases": [
+            "公司及合并子公司"
+          ],
+          "subject_scope": "consolidated_group",
+          "state": "current_affirmative",
+          "reported_period": "2025-12-31",
+          "qualifier": null,
+          "context_pages": [
+            104,
+            151
+          ]
+        },
+        {
+          "condition_id": "600094.SH-action-002",
+          "instrument_id": "600094.SH",
+          "page": 105,
+          "name": "物业服务",
+          "native_aliases": [
+            "物业服务"
+          ],
+          "source_actions": [
+            "provides_service"
+          ],
+          "source_actor": "公司及合并子公司",
+          "actor_aliases": [
+            "公司及合并子公司"
+          ],
+          "subject_scope": "consolidated_group",
+          "state": "current_affirmative",
+          "reported_period": "2025-12-31",
+          "qualifier": null,
+          "context_pages": [
+            104,
+            151
+          ]
+        }
+      ],
+      "negative": [
+        {
+          "condition_id": "600094.SH-negative-001",
+          "instrument_id": "600094.SH",
+          "page": 16,
+          "name": "本期收入空",
+          "content": "金控板块",
+          "forbidden": "不得造零、借利润或上期值"
+        },
+        {
+          "condition_id": "600094.SH-negative-002",
+          "instrument_id": "600094.SH",
+          "page": 16,
+          "name": "本期收入空",
+          "content": "金融投资",
+          "forbidden": "不得造零、借利润或上期值"
+        }
+      ],
+      "answer_rules": {
+        "principal_business": [
+          [
+            "房地产"
+          ]
+        ],
+        "products_services": [
+          [
+            "物业"
+          ]
+        ],
+        "revenue_model": [
+          [
+            "履约进度"
+          ]
+        ]
+      },
+      "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+      "risk_categories": [
+        "income_columns_units",
+        "associated_leasing"
+      ]
+    },
+    {
+      "instrument_id": "600103.SH",
+      "fixture": "tests/fixtures/company_profile_v55_property_paper_pages.json",
+      "fixture_sha256": "74a4f8e4b65765ec805920061f6735ae7fdc14239aec63dcc305e1631e7f8860",
+      "revenue": [
+        {
+          "condition_id": "600103.SH-income-001",
+          "instrument_id": "600103.SH",
+          "page": 16,
+          "name": "纸行业",
+          "native_aliases": [
+            "纸行业"
+          ],
+          "value": "1197089976.81",
+          "unit": "元",
+          "dimension": "industry",
+          "header": "主营业务分行业",
+          "source_column": "本期营业收入",
+          "source_actor": "公司及合并子公司",
+          "subject_scope": "consolidated_group",
+          "counterparty": null,
+          "source_segment": null,
+          "reported_period": "2025-12-31",
+          "period_state": "current_printed",
+          "table_basis": "主营业务分行业",
+          "qualifier": null
+        },
+        {
+          "condition_id": "600103.SH-income-002",
+          "instrument_id": "600103.SH",
+          "page": 16,
+          "name": "浆行业",
+          "native_aliases": [
+            "浆行业"
+          ],
+          "value": "358768319.71",
+          "unit": "元",
+          "dimension": "industry",
+          "header": "主营业务分行业",
+          "source_column": "本期营业收入",
+          "source_actor": "公司及合并子公司",
+          "subject_scope": "consolidated_group",
+          "counterparty": null,
+          "source_segment": null,
+          "reported_period": "2025-12-31",
+          "period_state": "current_printed",
+          "table_basis": "主营业务分行业",
+          "qualifier": null
+        }
+      ],
+      "actions": [
+        {
+          "condition_id": "600103.SH-action-001",
+          "instrument_id": "600103.SH",
+          "page": 10,
+          "name": "本色木浆",
+          "native_aliases": [
+            "本色木浆"
+          ],
+          "source_actions": [
+            "produces"
+          ],
+          "source_actor": "福建省青山纸业股份有限公司（母公司）",
+          "actor_aliases": [
+            "福建省青山纸业股份有限公司（母公司）"
+          ],
+          "subject_scope": "issuer",
+          "state": "current_affirmative",
+          "reported_period": "2025-12-31",
+          "qualifier": null,
+          "context_pages": [
+            9,
+            11
+          ]
+        },
+        {
+          "condition_id": "600103.SH-action-002",
+          "instrument_id": "600103.SH",
+          "page": 10,
+          "name": "本色木浆",
+          "native_aliases": [
+            "本色木浆"
+          ],
+          "source_actions": [
+            "sells"
+          ],
+          "source_actor": "福建省青山纸业股份有限公司（母公司）",
+          "actor_aliases": [
+            "福建省青山纸业股份有限公司（母公司）"
+          ],
+          "subject_scope": "issuer",
+          "state": "current_affirmative",
+          "reported_period": "2025-12-31",
+          "qualifier": null,
+          "context_pages": [
+            9,
+            11
+          ]
+        }
+      ],
+      "negative": [
+        {
+          "condition_id": "600103.SH-negative-001",
+          "instrument_id": "600103.SH",
+          "page": 201,
+          "name": "仅上期关联销售",
+          "counterparty": "福建海峡军民融合产业发展有限公司",
+          "content": "生活用纸",
+          "prior_value": "340.81",
+          "forbidden": "本期格空；不得借列造零或推本期销售"
+        },
+        {
+          "condition_id": "600103.SH-negative-002",
+          "instrument_id": "600103.SH",
+          "page": 201,
+          "name": "仅上期关联销售",
+          "counterparty": "福建海峡军民融合产业发展有限公司",
+          "content": "药品",
+          "prior_value": "2320.00",
+          "forbidden": "本期格空；不得借列造零或推本期销售"
+        }
+      ],
+      "answer_rules": {
+        "principal_business": [
+          [
+            "制浆"
+          ]
+        ],
+        "products_services": [
+          [
+            "本色木浆"
+          ]
+        ],
+        "revenue_model": [
+          [
+            "签收"
+          ]
+        ]
+      },
+      "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+      "risk_categories": [
+        "purchase_sale_direction",
+        "associated_leasing"
+      ]
+    },
+    {
+      "instrument_id": "600100.SH",
+      "fixture": "tests/fixtures/company_profile_v59_technology_apparel_pages.json",
+      "fixture_sha256": "5556e57e3f7165f94f20dfdc9b47087352d19adf9a2cd864648b8034b51dae06",
+      "revenue": [
+        {
+          "condition_id": "600100.SH-income-001",
+          "instrument_id": "600100.SH",
+          "page": 21,
+          "name": "公共安全",
+          "native_aliases": [
+            "公共安全"
+          ],
+          "value": "698057.58",
+          "unit": "万元",
+          "dimension": "industry",
+          "header": "产业板块主营业务收入",
+          "table_basis": "产业板块主营业务收入",
+          "source_column": "2025年1-12月主营业务收入",
+          "source_actor": "公司及合并子公司",
+          "subject_scope": "consolidated_group",
+          "counterparty": null,
+          "source_segment": null,
+          "qualifier": null,
+          "reported_period": "2025-12-31",
+          "period_state": "current_printed"
+        },
+        {
+          "condition_id": "600100.SH-income-002",
+          "instrument_id": "600100.SH",
+          "page": 21,
+          "name": "数智产业",
+          "native_aliases": [
+            "数智产业"
+          ],
+          "value": "275072.20",
+          "unit": "万元",
+          "dimension": "industry",
+          "header": "产业板块主营业务收入",
+          "table_basis": "产业板块主营业务收入",
+          "source_column": "2025年1-12月主营业务收入",
+          "source_actor": "公司及合并子公司",
+          "subject_scope": "consolidated_group",
+          "counterparty": null,
+          "source_segment": null,
+          "qualifier": null,
+          "reported_period": "2025-12-31",
+          "period_state": "current_printed"
+        }
+      ],
+      "actions": [
+        {
+          "condition_id": "600100.SH-action-001",
+          "instrument_id": "600100.SH",
+          "page": 12,
+          "name": "智能检查系统",
+          "native_aliases": [
+            "智能检查系统"
+          ],
+          "source_actions": [
+            "提供"
+          ],
+          "source_actor": "公司及合并子公司",
+          "actor_aliases": [
+            "公司及合并子公司"
+          ],
+          "subject_scope": "consolidated_group",
+          "qualifier": null,
+          "category": null,
+          "counterparty": null,
+          "state": "current_affirmative",
+          "reported_period": "2025-12-31"
+        },
+        {
+          "condition_id": "600100.SH-action-002",
+          "instrument_id": "600100.SH",
+          "page": 12,
+          "name": "全生命周期运维服务",
+          "native_aliases": [
+            "全生命周期运维服务"
+          ],
+          "source_actions": [
+            "提供"
+          ],
+          "source_actor": "公司及合并子公司",
+          "actor_aliases": [
+            "公司及合并子公司"
+          ],
+          "subject_scope": "consolidated_group",
+          "qualifier": null,
+          "category": "service",
+          "counterparty": null,
+          "state": "current_affirmative",
+          "reported_period": "2025-12-31"
+        }
+      ],
+      "negative": [
+        {
+          "condition_id": "600100.SH-negative-001",
+          "instrument_id": "600100.SH",
+          "page": 24,
+          "name": "产销量",
+          "forbidden": "不适用，不能编造具名生产销售量"
+        },
+        {
+          "condition_id": "600100.SH-negative-002",
+          "instrument_id": "600100.SH",
+          "page": 21,
+          "name": "主营业务成本",
+          "forbidden": "不是收入"
+        }
+      ],
+      "answer_rules": {
+        "principal_business": [],
+        "products_services": [],
+        "revenue_model": []
+      },
+      "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+      "risk_categories": [
+        "subject_period",
+        "body"
+      ]
+    },
+    {
+      "instrument_id": "600107.SH",
+      "fixture": "tests/fixtures/company_profile_v59_technology_apparel_pages.json",
+      "fixture_sha256": "5556e57e3f7165f94f20dfdc9b47087352d19adf9a2cd864648b8034b51dae06",
+      "revenue": [
+        {
+          "condition_id": "600107.SH-income-001",
+          "instrument_id": "600107.SH",
+          "page": 15,
+          "name": "服装",
+          "native_aliases": [
+            "服装"
+          ],
+          "value": "229197408.86",
+          "unit": "元",
+          "dimension": "industry",
+          "header": "主营业务分行业",
+          "table_basis": "主营业务分行业",
+          "source_column": "本期收入",
+          "source_actor": "公司及合并子公司",
+          "subject_scope": "consolidated_group",
+          "counterparty": null,
+          "source_segment": null,
+          "qualifier": null,
+          "reported_period": "2025-12-31",
+          "period_state": "current_printed"
+        },
+        {
+          "condition_id": "600107.SH-income-002",
+          "instrument_id": "600107.SH",
+          "page": 15,
+          "name": "其他业务",
+          "native_aliases": [
+            "其他业务"
+          ],
+          "value": "6997591.25",
+          "unit": "元",
+          "dimension": "industry",
+          "header": "主营业务分行业",
+          "table_basis": "主营业务分行业",
+          "source_column": "本期收入",
+          "source_actor": "公司及合并子公司",
+          "subject_scope": "consolidated_group",
+          "counterparty": null,
+          "source_segment": null,
+          "qualifier": null,
+          "reported_period": "2025-12-31",
+          "period_state": "current_printed"
+        }
+      ],
+      "actions": [
+        {
+          "condition_id": "600107.SH-action-001",
+          "instrument_id": "600107.SH",
+          "page": 12,
+          "name": "西服",
+          "native_aliases": [
+            "西服"
+          ],
+          "source_actions": [
+            "生产"
+          ],
+          "source_actor": "公司及合并子公司",
+          "actor_aliases": [
+            "公司及合并子公司"
+          ],
+          "subject_scope": "consolidated_group",
+          "qualifier": "国内自主品牌男装女装的当前主营矩阵",
+          "category": "goods",
+          "counterparty": null,
+          "state": "current_affirmative",
+          "reported_period": "2025-12-31"
+        },
+        {
+          "condition_id": "600107.SH-action-002",
+          "instrument_id": "600107.SH",
+          "page": 12,
+          "name": "西服",
+          "native_aliases": [
+            "西服"
+          ],
+          "source_actions": [
+            "销售"
+          ],
+          "source_actor": "公司及合并子公司",
+          "actor_aliases": [
+            "公司及合并子公司"
+          ],
+          "subject_scope": "consolidated_group",
+          "qualifier": "国内自主品牌男装女装的当前主营矩阵",
+          "category": "goods",
+          "counterparty": null,
+          "state": "current_affirmative",
+          "reported_period": "2025-12-31"
+        }
+      ],
+      "negative": [
+        {
+          "condition_id": "600107.SH-negative-001",
+          "instrument_id": "600107.SH",
+          "page": 15,
+          "name": "医疗",
+          "forbidden": "本期收入空格不借上年金额，不造零"
+        },
+        {
+          "condition_id": "600107.SH-negative-002",
+          "instrument_id": "600107.SH",
+          "page": 16,
+          "name": "医疗",
+          "forbidden": "本期产品收入空格，不从-100%反推零"
+        }
+      ],
+      "answer_rules": {
+        "principal_business": [],
+        "products_services": [],
+        "revenue_model": []
+      },
+      "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+      "risk_categories": [
+        "income_columns_units",
+        "body"
+      ]
+    },
+    {
+      "instrument_id": "600098.SH",
+      "fixture": "tests/fixtures/company_profile_v58_energy_automotive_pages.json",
+      "fixture_sha256": "a93a7bd617b5ced33b86d960c03b4820868241d46da9bff14f3615f9fc40eb40",
+      "revenue": [],
+      "actions": [],
+      "negative": [],
+      "answer_rules": {},
+      "document_version": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+      "risk_categories": [
+        "subject_period",
+        "financial_disclosure"
+      ]
+    },
+    {
+      "instrument_id": "600104.SH",
+      "fixture": "tests/fixtures/company_profile_v58_energy_automotive_pages.json",
+      "fixture_sha256": "a93a7bd617b5ced33b86d960c03b4820868241d46da9bff14f3615f9fc40eb40",
+      "revenue": [],
+      "actions": [],
+      "negative": [],
+      "answer_rules": {},
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "risk_categories": [
+        "financial_disclosure",
+        "purchase_sale_direction"
+      ]
+    },
+    {
+      "instrument_id": "600088.SH",
+      "fixture": "tests/fixtures/company_profile_v54_media_machinery_pages.json",
+      "fixture_sha256": "6fcb3719252ff585771936e4f7b171d2d6e32169c87533c662c6f9f687ff0557",
+      "revenue": [
+        {
+          "condition_id": "600088.SH-income-001",
+          "instrument_id": "600088.SH",
+          "page": 16,
+          "name": "影视业务",
+          "native_aliases": [
+            "影视业务"
+          ],
+          "value": "597,703,872.09",
+          "unit": "元",
+          "dimension": "industry",
+          "header": "主营业务分行业",
+          "source_column": "本期营业收入",
+          "source_actor": "公司及合并子公司",
+          "subject_scope": "consolidated_group",
+          "counterparty": null,
+          "source_segment": null,
+          "reported_period": "2025-12-31",
+          "period_state": "current_printed",
+          "table_basis": "主营业务分行业",
+          "qualifier": null
+        },
+        {
+          "condition_id": "600088.SH-income-002",
+          "instrument_id": "600088.SH",
+          "page": 16,
+          "name": "广告业务",
+          "native_aliases": [
+            "广告业务"
+          ],
+          "value": "289,904,563.86",
+          "unit": "元",
+          "dimension": "industry",
+          "header": "主营业务分行业",
+          "source_column": "本期营业收入",
+          "source_actor": "公司及合并子公司",
+          "subject_scope": "consolidated_group",
+          "counterparty": null,
+          "source_segment": null,
+          "reported_period": "2025-12-31",
+          "period_state": "current_printed",
+          "table_basis": "主营业务分行业",
+          "qualifier": null
+        }
+      ],
+      "actions": [
+        {
+          "condition_id": "600088.SH-action-001",
+          "instrument_id": "600088.SH",
+          "page": 11,
+          "name": "电视节目",
+          "native_aliases": [
+            "电视节目",
+            "电视节目制作"
+          ],
+          "source_actions": [
+            "produces"
+          ],
+          "source_actor": "公司及合并子公司",
+          "actor_aliases": [
+            "公司及合并子公司"
+          ],
+          "subject_scope": "consolidated_group",
+          "state": "current_affirmative",
+          "reported_period": "2025-12-31",
+          "qualifier": null,
+          "context_pages": []
+        },
+        {
+          "condition_id": "600088.SH-action-002",
+          "instrument_id": "600088.SH",
+          "page": 11,
+          "name": "电视节目",
+          "native_aliases": [
+            "电视节目",
+            "电视节目制作"
+          ],
+          "source_actions": [
+            "sells"
+          ],
+          "source_actor": "公司及合并子公司",
+          "actor_aliases": [
+            "公司及合并子公司"
+          ],
+          "subject_scope": "consolidated_group",
+          "state": "current_affirmative",
+          "reported_period": "2025-12-31",
+          "qualifier": null,
+          "context_pages": []
+        }
+      ],
+      "negative": [
+        {
+          "condition_id": "600088.SH-negative-1",
+          "instrument_id": "600088.SH",
+          "page": 154,
+          "name": "仅上期关联销售",
+          "counterparty": "环球国际视频通讯社有限公司",
+          "content": "影视业务",
+          "prior_value": "1,856,132.08",
+          "forbidden": "本期收入/肯定正文，不借列不造零"
+        },
+        {
+          "condition_id": "600088.SH-negative-2",
+          "instrument_id": "600088.SH",
+          "page": 154,
+          "name": "仅上期关联销售",
+          "counterparty": "央视国际网络有限公司",
+          "content": "影视业务",
+          "prior_value": "566,037.74",
+          "forbidden": "本期收入/肯定正文，不借列不造零"
+        }
+      ],
+      "answer_rules": {
+        "principal_business": [
+          [
+            "影视"
+          ]
+        ],
+        "products_services": [
+          [
+            "剪辑"
+          ]
+        ],
+        "revenue_model": [
+          [
+            "履约期间"
+          ]
+        ]
+      },
+      "document_version": "5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c",
+      "risk_categories": [
+        "associated_leasing",
+        "subject_period"
+      ]
+    },
+    {
+      "instrument_id": "600099.SH",
+      "fixture": "tests/fixtures/company_profile_v54_media_machinery_pages.json",
+      "fixture_sha256": "6fcb3719252ff585771936e4f7b171d2d6e32169c87533c662c6f9f687ff0557",
+      "revenue": [
+        {
+          "condition_id": "600099.SH-income-001",
+          "instrument_id": "600099.SH",
+          "page": 21,
+          "name": "特种车辆行业",
+          "native_aliases": [
+            "特种车辆行业"
+          ],
+          "value": "467,207,688.51",
+          "unit": "元",
+          "dimension": "industry",
+          "header": "主营业务分行业",
+          "source_column": "本期营业收入",
+          "source_actor": "公司及合并子公司",
+          "subject_scope": "consolidated_group",
+          "counterparty": null,
+          "source_segment": null,
+          "reported_period": "2025-12-31",
+          "period_state": "current_printed",
+          "table_basis": "主营业务分行业",
+          "qualifier": null
+        },
+        {
+          "condition_id": "600099.SH-income-002",
+          "instrument_id": "600099.SH",
+          "page": 21,
+          "name": "农业机械行业",
+          "native_aliases": [
+            "农业机械行业"
+          ],
+          "value": "283,722,402.61",
+          "unit": "元",
+          "dimension": "industry",
+          "header": "主营业务分行业",
+          "source_column": "本期营业收入",
+          "source_actor": "公司及合并子公司",
+          "subject_scope": "consolidated_group",
+          "counterparty": null,
+          "source_segment": null,
+          "reported_period": "2025-12-31",
+          "period_state": "current_printed",
+          "table_basis": "主营业务分行业",
+          "qualifier": null
+        }
+      ],
+      "actions": [
+        {
+          "condition_id": "600099.SH-action-001",
+          "instrument_id": "600099.SH",
+          "page": 8,
+          "name": "森林消防机械",
+          "native_aliases": [
+            "森林消防机械"
+          ],
+          "source_actions": [
+            "produces"
+          ],
+          "source_actor": "公司及合并子公司",
+          "actor_aliases": [
+            "公司及合并子公司"
+          ],
+          "subject_scope": "consolidated_group",
+          "state": "current_affirmative",
+          "reported_period": "2025-12-31",
+          "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+          "context_pages": [
+            8
+          ]
+        },
+        {
+          "condition_id": "600099.SH-action-002",
+          "instrument_id": "600099.SH",
+          "page": 8,
+          "name": "森林消防机械",
+          "native_aliases": [
+            "森林消防机械"
+          ],
+          "source_actions": [
+            "sells"
+          ],
+          "source_actor": "公司及合并子公司",
+          "actor_aliases": [
+            "公司及合并子公司"
+          ],
+          "subject_scope": "consolidated_group",
+          "state": "current_affirmative",
+          "reported_period": "2025-12-31",
+          "qualifier": "公司当前主要产品矩阵制造销售；油锯据p22实际产销量，不依据行业叙述或未来计划",
+          "context_pages": [
+            8
+          ]
+        }
+      ],
+      "negative": [
+        {
+          "condition_id": "600099.SH-negative-1",
+          "instrument_id": "600099.SH",
+          "page": 177,
+          "name": "零销售不推当前销售",
+          "counterparty": "天津工程机械研究院有限公司",
+          "current_value": "0.00"
+        },
+        {
+          "condition_id": "600099.SH-negative-2",
+          "instrument_id": "600099.SH",
+          "page": 176,
+          "name": "零采购不推动作",
+          "counterparties": [
+            "江苏林海智能装备有限公司",
+            "中国福马林业机械上海有限公司",
+            "江苏林海商贸有限公司"
+          ],
+          "current_value": "0.00"
+        }
+      ],
+      "answer_rules": {
+        "principal_business": [
+          [
+            "森林消防"
+          ]
+        ],
+        "products_services": [
+          [
+            "全地形消防车"
+          ]
+        ],
+        "revenue_model": [
+          [
+            "经销"
+          ]
+        ]
+      },
+      "document_version": "3dbe17e87d3b79bb5327d821786eb7a971ef367b24fd37ac3511da4a212cf07c",
+      "risk_categories": [
+        "subject_period",
+        "purchase_sale_direction"
+      ]
+    },
+    {
+      "instrument_id": "600082.SH",
+      "fixture": "tests/fixtures/company_profile_v51_park_fishery_frozen_pages.json",
+      "fixture_sha256": "25fa6954184c508040356791bb9f534d3635260166a8a818c8490c15f1fe1108",
+      "revenue": [
+        {
+          "condition_id": "600082.SH-income-001",
+          "instrument_id": "600082.SH",
+          "page": 15,
+          "name": "科技园区开发",
+          "native_aliases": [
+            "科技园区开发"
+          ],
+          "value": "418,710,800.51",
+          "unit": "元",
+          "dimension": "industry",
+          "header": "主营业务分行业",
+          "source_column": "本期营业收入",
+          "source_actor": "公司及合并子公司",
+          "subject_scope": "consolidated_group",
+          "counterparty": null,
+          "source_segment": null,
+          "reported_period": "2025-12-31",
+          "period_state": "current_printed",
+          "table_basis": "主营业务分行业"
+        },
+        {
+          "condition_id": "600082.SH-income-002",
+          "instrument_id": "600082.SH",
+          "page": 15,
+          "name": "科技园区运营",
+          "native_aliases": [
+            "科技园区运营"
+          ],
+          "value": "30,105,192.48",
+          "unit": "元",
+          "dimension": "industry",
+          "header": "主营业务分行业",
+          "source_column": "本期营业收入",
+          "source_actor": "公司及合并子公司",
+          "subject_scope": "consolidated_group",
+          "counterparty": null,
+          "source_segment": null,
+          "reported_period": "2025-12-31",
+          "period_state": "current_printed",
+          "table_basis": "主营业务分行业"
+        }
+      ],
+      "actions": [
+        {
+          "condition_id": "600082.SH-action-001",
+          "instrument_id": "600082.SH",
+          "page": 11,
+          "name": "工业园区",
+          "native_aliases": [
+            "工业园区",
+            "工业园区运营",
+            "园区运营"
+          ],
+          "source_actions": [
+            "operates"
+          ],
+          "source_actor": "公司及合并子公司",
+          "actor_aliases": [
+            "公司及合并子公司"
+          ],
+          "subject_scope": "consolidated_group",
+          "state": "current_affirmative",
+          "reported_period": "2025-12-31",
+          "qualifier": null
+        },
+        {
+          "condition_id": "600082.SH-action-002",
+          "instrument_id": "600082.SH",
+          "page": 11,
+          "name": "产业投资",
+          "native_aliases": [
+            "产业投资"
+          ],
+          "source_actions": [
+            "operates"
+          ],
+          "source_actor": "公司及合并子公司",
+          "actor_aliases": [
+            "公司及合并子公司"
+          ],
+          "subject_scope": "consolidated_group",
+          "state": "current_affirmative",
+          "reported_period": "2025-12-31",
+          "qualifier": null
+        }
+      ],
+      "negative": [
+        {
+          "condition_id": "600082.SH-negative-001",
+          "instrument_id": "600082.SH",
+          "page": 182,
+          "name": "仅上期关联销售",
+          "counterparty": "天津滨海高新区物业管理有限公司",
+          "content": "服务费",
+          "prior_value": "2,352,476.19",
+          "forbidden": "不得生成本期Segment/Measurement/肯定正文，不借列不造零"
+        },
+        {
+          "condition_id": "600082.SH-negative-002",
+          "instrument_id": "600082.SH",
+          "page": 182,
+          "name": "仅上期关联销售",
+          "counterparty": "天津滨海高新区企业创新服务有限公司",
+          "content": "销售房产",
+          "prior_value": "294,862,583.36",
+          "forbidden": "不得生成本期Segment/Measurement/肯定正文，不借列不造零"
+        }
+      ],
+      "answer_rules": {
+        "principal_business": [
+          [
+            "工业园区",
+            "园区运营"
+          ]
+        ],
+        "products_services": [
+          [
+            "园区"
+          ]
+        ],
+        "revenue_model": [
+          [
+            "竣工"
+          ]
+        ]
+      },
+      "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+      "risk_categories": [
+        "income_columns_units",
+        "body"
+      ]
+    },
+    {
+      "instrument_id": "600097.SH",
+      "fixture": "tests/fixtures/company_profile_v51_park_fishery_frozen_pages.json",
+      "fixture_sha256": "25fa6954184c508040356791bb9f534d3635260166a8a818c8490c15f1fe1108",
+      "revenue": [
+        {
+          "condition_id": "600097.SH-income-001",
+          "instrument_id": "600097.SH",
+          "page": 11,
+          "name": "海洋捕捞",
+          "native_aliases": [
+            "海洋捕捞"
+          ],
+          "value": "950,763,559.03",
+          "unit": "元",
+          "dimension": "industry",
+          "header": "主营业务分行业",
+          "source_column": "本期营业收入",
+          "source_actor": "公司及合并子公司",
+          "subject_scope": "consolidated_group",
+          "counterparty": null,
+          "source_segment": null,
+          "reported_period": "2025-12-31",
+          "period_state": "current_printed",
+          "table_basis": "主营业务分行业"
+        },
+        {
+          "condition_id": "600097.SH-income-002",
+          "instrument_id": "600097.SH",
+          "page": 11,
+          "name": "食品加工",
+          "native_aliases": [
+            "食品加工"
+          ],
+          "value": "1,054,611,208.73",
+          "unit": "元",
+          "dimension": "industry",
+          "header": "主营业务分行业",
+          "source_column": "本期营业收入",
+          "source_actor": "公司及合并子公司",
+          "subject_scope": "consolidated_group",
+          "counterparty": null,
+          "source_segment": null,
+          "reported_period": "2025-12-31",
+          "period_state": "current_printed",
+          "table_basis": "主营业务分行业"
+        }
+      ],
+      "actions": [
+        {
+          "condition_id": "600097.SH-action-001",
+          "instrument_id": "600097.SH",
+          "page": 8,
+          "name": "金枪鱼",
+          "native_aliases": [
+            "金枪鱼"
+          ],
+          "source_actions": [
+            "produces"
+          ],
+          "source_actor": "公司及合并子公司",
+          "actor_aliases": [
+            "公司及合并子公司"
+          ],
+          "subject_scope": "consolidated_group",
+          "state": "current_affirmative",
+          "reported_period": "2025-12-31",
+          "qualifier": "金枪鱼船队中西太平洋；磷虾为江苏深蓝合作南极项目"
+        },
+        {
+          "condition_id": "600097.SH-action-002",
+          "instrument_id": "600097.SH",
+          "page": 8,
+          "name": "鲣鱼",
+          "native_aliases": [
+            "鲣鱼"
+          ],
+          "source_actions": [
+            "produces"
+          ],
+          "source_actor": "公司及合并子公司",
+          "actor_aliases": [
+            "公司及合并子公司"
+          ],
+          "subject_scope": "consolidated_group",
+          "state": "current_affirmative",
+          "reported_period": "2025-12-31",
+          "qualifier": "金枪鱼船队中西太平洋；磷虾为江苏深蓝合作南极项目"
+        }
+      ],
+      "negative": [
+        {
+          "condition_id": "600097.SH-negative-001",
+          "instrument_id": "600097.SH",
+          "page": 144,
+          "name": "仅上期关联销售",
+          "counterparty": "上海菜管家电子商务有限公司",
+          "content": "出售商品",
+          "prior_value": "431,886.72",
+          "forbidden": "不得生成本期Segment/Measurement或肯定正文，不借列不造零"
+        },
+        {
+          "condition_id": "600097.SH-negative-002",
+          "instrument_id": "600097.SH",
+          "page": 122,
+          "name": "海上运输国内收入空",
+          "source_segment": "海上运输分部",
+          "names": [
+            "国内"
+          ],
+          "forbidden": "不得借国外6765806.04或造零本期收入"
+        }
+      ],
+      "answer_rules": {
+        "principal_business": [
+          [
+            "金枪鱼"
+          ]
+        ],
+        "products_services": [
+          [
+            "鲣鱼"
+          ]
+        ],
+        "revenue_model": [
+          [
+            "直销"
+          ]
+        ]
+      },
+      "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+      "risk_categories": [
+        "body",
+        "purchase_sale_direction"
+      ]
+    },
+    {
+      "instrument_id": "600054.SH",
+      "fixture": "tests/fixtures/company_profile_v46_tourism_wine_frozen_pages.json",
+      "fixture_sha256": "e5f2cc871f4ca4dde14d7836440ddab0b0ab2de16d264447b63431a6c05179a0",
+      "revenue": [
+        {
+          "condition_id": "600054.SH:income:001",
+          "page": 14,
+          "dimension": "industry",
+          "name": "酒店业务",
+          "native_aliases": [
+            "酒店业务"
+          ],
+          "value": "492,026,389.87",
+          "unit": "元",
+          "source_actor": "公司及合并子公司",
+          "counterparty": "",
+          "header": "主营业务分行业",
+          "column": "本期营业收入",
+          "source_quote": "黄山旅游发展股份有限公司2025 年年度报告\n14 / 185\n2、 收入和成本分析\n√适用 □不适用\n报告期内，公司实现营业收入 210,932.51 万元，同比增长 9.23%，主要系黄山景区接待进山\n游客增加及景区资源有偿使用费核算方法变化所致；营业成本 112,079.51 万元，同比增长 20.35%，\n主要系本期景区资源有偿使用费增加所致。\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本 毛利率\n（%）\n营业收\n入比上\n年增减\n（%）\n营业成\n本比上\n年增减\n（%）\n毛利率比上年\n增减（%）\n酒店业务 492,026,389.87 331,764,429.18 32.57 7.99 17.27 减少 5.34 个\n百分点\n索道及缆车业务 842,155,363.75 208,848,588.38 75.20 17.37 134.03 减少 12.36 个\n百分点\n景区业务 293,201,670.78 156,979,901.66 46.46 21.92 7.70 增加 7.06 个\n百分点\n旅游服务业务 532,255,057.39 489,760,970.14 7.98 12.13 13.61 减少 1.20 个\n百分点\n徽菜业务 245,296,390.79 244,568,871.09 0.30 1.09 10.30 减少 8.32 个\n百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n（1）主营业务分行业情况中各行业的收入按未合并抵消的口径列报，因此合计金额大于 2025\n年年度报告列报的营业收入（合并抵消后收入），两者的差额主要是各行业之间的内部交易抵消。\n（2）酒店业务营业成本增加主要系黄山风景名胜资源有偿使用费征收管理优化调整，对公司\n黄山风景区内山上酒店征收风景名胜资源有偿使用费所致（详见公司 2025-010 号公告）。\n（3）索道及缆车业务营业收入增加主要系本期黄山景区接待进山游客增加及景区资源有偿使\n用费核算方法变化所致；营业成本增加主要系黄山风景名胜资源有偿使用费征收管理优化调整，\n其征收模式发生改变且征收比例增长所致（详见公司 2025-010 号公告）。\n（4）景区业务营业收入增加主要系本期景区有效购票人数及平均客单价增加所致。\n(2). 产销量情况分析表\n□适用 √不适用\n(3). 重大采购合同、重大销售合同的履行情况\n□适用 √不适用\n(4). 成本分析表\n单位：元 币种：人民币\n分行业情况\n分行业 成本构成\n项目 本期金额\n本期\n占总\n成本\n比例\n(%)\n上年同期金额\n上年\n同期\n占总\n成本\n比例\n(%)\n本期金\n额较上\n年同期\n变动比\n例(%)\n情\n况\n说\n明",
+          "qualifier": "明确未合并抵消口径，与合并和分部表分开不累计",
+          "reported_period": "2025-12-31",
+          "continuation_pages": []
+        },
+        {
+          "condition_id": "600054.SH:income:002",
+          "page": 14,
+          "dimension": "industry",
+          "name": "索道及缆车业务",
+          "native_aliases": [
+            "索道及缆车业务"
+          ],
+          "value": "842,155,363.75",
+          "unit": "元",
+          "source_actor": "公司及合并子公司",
+          "counterparty": "",
+          "header": "主营业务分行业",
+          "column": "本期营业收入",
+          "source_quote": "黄山旅游发展股份有限公司2025 年年度报告\n14 / 185\n2、 收入和成本分析\n√适用 □不适用\n报告期内，公司实现营业收入 210,932.51 万元，同比增长 9.23%，主要系黄山景区接待进山\n游客增加及景区资源有偿使用费核算方法变化所致；营业成本 112,079.51 万元，同比增长 20.35%，\n主要系本期景区资源有偿使用费增加所致。\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本 毛利率\n（%）\n营业收\n入比上\n年增减\n（%）\n营业成\n本比上\n年增减\n（%）\n毛利率比上年\n增减（%）\n酒店业务 492,026,389.87 331,764,429.18 32.57 7.99 17.27 减少 5.34 个\n百分点\n索道及缆车业务 842,155,363.75 208,848,588.38 75.20 17.37 134.03 减少 12.36 个\n百分点\n景区业务 293,201,670.78 156,979,901.66 46.46 21.92 7.70 增加 7.06 个\n百分点\n旅游服务业务 532,255,057.39 489,760,970.14 7.98 12.13 13.61 减少 1.20 个\n百分点\n徽菜业务 245,296,390.79 244,568,871.09 0.30 1.09 10.30 减少 8.32 个\n百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n（1）主营业务分行业情况中各行业的收入按未合并抵消的口径列报，因此合计金额大于 2025\n年年度报告列报的营业收入（合并抵消后收入），两者的差额主要是各行业之间的内部交易抵消。\n（2）酒店业务营业成本增加主要系黄山风景名胜资源有偿使用费征收管理优化调整，对公司\n黄山风景区内山上酒店征收风景名胜资源有偿使用费所致（详见公司 2025-010 号公告）。\n（3）索道及缆车业务营业收入增加主要系本期黄山景区接待进山游客增加及景区资源有偿使\n用费核算方法变化所致；营业成本增加主要系黄山风景名胜资源有偿使用费征收管理优化调整，\n其征收模式发生改变且征收比例增长所致（详见公司 2025-010 号公告）。\n（4）景区业务营业收入增加主要系本期景区有效购票人数及平均客单价增加所致。\n(2). 产销量情况分析表\n□适用 √不适用\n(3). 重大采购合同、重大销售合同的履行情况\n□适用 √不适用\n(4). 成本分析表\n单位：元 币种：人民币\n分行业情况\n分行业 成本构成\n项目 本期金额\n本期\n占总\n成本\n比例\n(%)\n上年同期金额\n上年\n同期\n占总\n成本\n比例\n(%)\n本期金\n额较上\n年同期\n变动比\n例(%)\n情\n况\n说\n明",
+          "qualifier": "明确未合并抵消口径，与合并和分部表分开不累计",
+          "reported_period": "2025-12-31",
+          "continuation_pages": []
+        }
+      ],
+      "actions": [
+        {
+          "condition_id": "600054.SH:action:001",
+          "instrument_id": "600054.SH",
+          "name": "黄山景区",
+          "native_aliases": [
+            "黄山景区"
+          ],
+          "source_actions": [
+            "operates"
+          ],
+          "source_relation_types": [],
+          "role": "native_operating_action",
+          "page": 9,
+          "source_quote": "黄山旅游发展股份有限公司2025 年年度报告\n9 / 185\n与公司正常经营业务无关的或有事\n项产生的损益\n受托经营取得的托管费收入\n除上述各项之外的其他营业外收入\n和支出 116,341.47 -2,171,705.89 16,211.37\n其他符合非经常性损益定义的损益\n项目 700,000.00\n减：所得税影响额 9,288,023.38 -579,300.75 7,574,597.88\n少数股东权益影响额（税后） 836,408.87 159,074.98 392,164.66\n合计 30,646,295.20 -1,896,977.23 31,901,534.97\n对公司将《公开发行证券的公司信息披露解释性公告第 1 号——非经常性损益》未列举的项目认定\n为非经常性损益项目且金额重大的，以及将《公开发行证券的公司信息披露解释性公告第 1 号——\n非经常性损益》中列举的非经常性损益项目界定为经常性损益的项目，应说明原因。\n□适用 √不适用\n十一、 存在股权激励、员工持股计划的公司可选择披露扣除股份支付影响后的净利润\n□适用 √不适用\n十二、 采用公允价值计量的项目\n√适用 □不适用\n单位：元 币种：人民币\n项目名称 期初余额 期末余额 当期变动 对当期利润的影\n响金额\n其他权益工具投资 56,721,600.00 63,460,800.00 6,739,200.00\n其他非流动金融资产 454,642,336.70 476,657,869.83 22,015,533.13 22,475,933.05\n合计 511,363,936.70 540,118,669.83 28,754,733.13 22,475,933.05\n十三、 其他\n□适用 √不适用\n第三节 管理层讨论与分析\n一、报告期内公司从事的业务情况\n1、景区业务：公司经营黄山景区、花山谜窟景区及太平湖景区，主要提供旅游观光和休闲度\n假等服务。公司现为中国旅游景区协会副会长单位，多年来公司在景区业务上不断创新，积累了\n丰富的景区运营和管理经验，储备了一批专业性、技术性、实用性景区开发、建设、运营和管理\n人才，主编了国家标准《山岳型旅游景区清洁服务规范》，主编或参编了《风景名胜区游步道技\n术标准》、《景区玻璃栈道建设标准》、《景区垃圾分类设施设置标准》等团体标准。\n2、索道及缆车业务：公司拥有黄山云谷索道、玉屏索道、太平索道和西海观光缆车，主要提\n供客运观光服务。公司现为中国索道协会副理事长单位，国际索道协会会员单位，旗下索道均为\n5S 等级索道和安全生产标准化一级单位。一直以来，公司索道的安全管理、设备维护、服务质量\n均处于国内一流水平，先后参与了索道行业相关国家法规、标准及各类技术手册的编写和索道行\n业课题研究，成功对江西灵山索道、浙江龙游六春湖索道和北京冬奥会滑雪索道等实施了品牌、\n技术及管理输出。\n3、酒店业务：公司拥有各类酒店十余家，主要提供住宿餐饮等旅宿服务，黄山景区内主要分\n布雲麓北海宾馆、狮林大酒店、西海饭店、白云宾馆、玉屏楼宾馆、雲野@排云型旅酒店、雲亼·曙",
+          "source_actor": "公司及合并子公司",
+          "reported_period": "2025-12-31",
+          "qualifier": "原公司当前景区运营",
+          "continuation_pages": [],
+          "quantity_acceptance": "仅证明动作，不扩量价"
+        },
+        {
+          "condition_id": "600054.SH:action:002",
+          "instrument_id": "600054.SH",
+          "name": "花山谜窟景区",
+          "native_aliases": [
+            "花山谜窟景区"
+          ],
+          "source_actions": [
+            "operates"
+          ],
+          "source_relation_types": [],
+          "role": "native_operating_action",
+          "page": 9,
+          "source_quote": "黄山旅游发展股份有限公司2025 年年度报告\n9 / 185\n与公司正常经营业务无关的或有事\n项产生的损益\n受托经营取得的托管费收入\n除上述各项之外的其他营业外收入\n和支出 116,341.47 -2,171,705.89 16,211.37\n其他符合非经常性损益定义的损益\n项目 700,000.00\n减：所得税影响额 9,288,023.38 -579,300.75 7,574,597.88\n少数股东权益影响额（税后） 836,408.87 159,074.98 392,164.66\n合计 30,646,295.20 -1,896,977.23 31,901,534.97\n对公司将《公开发行证券的公司信息披露解释性公告第 1 号——非经常性损益》未列举的项目认定\n为非经常性损益项目且金额重大的，以及将《公开发行证券的公司信息披露解释性公告第 1 号——\n非经常性损益》中列举的非经常性损益项目界定为经常性损益的项目，应说明原因。\n□适用 √不适用\n十一、 存在股权激励、员工持股计划的公司可选择披露扣除股份支付影响后的净利润\n□适用 √不适用\n十二、 采用公允价值计量的项目\n√适用 □不适用\n单位：元 币种：人民币\n项目名称 期初余额 期末余额 当期变动 对当期利润的影\n响金额\n其他权益工具投资 56,721,600.00 63,460,800.00 6,739,200.00\n其他非流动金融资产 454,642,336.70 476,657,869.83 22,015,533.13 22,475,933.05\n合计 511,363,936.70 540,118,669.83 28,754,733.13 22,475,933.05\n十三、 其他\n□适用 √不适用\n第三节 管理层讨论与分析\n一、报告期内公司从事的业务情况\n1、景区业务：公司经营黄山景区、花山谜窟景区及太平湖景区，主要提供旅游观光和休闲度\n假等服务。公司现为中国旅游景区协会副会长单位，多年来公司在景区业务上不断创新，积累了\n丰富的景区运营和管理经验，储备了一批专业性、技术性、实用性景区开发、建设、运营和管理\n人才，主编了国家标准《山岳型旅游景区清洁服务规范》，主编或参编了《风景名胜区游步道技\n术标准》、《景区玻璃栈道建设标准》、《景区垃圾分类设施设置标准》等团体标准。\n2、索道及缆车业务：公司拥有黄山云谷索道、玉屏索道、太平索道和西海观光缆车，主要提\n供客运观光服务。公司现为中国索道协会副理事长单位，国际索道协会会员单位，旗下索道均为\n5S 等级索道和安全生产标准化一级单位。一直以来，公司索道的安全管理、设备维护、服务质量\n均处于国内一流水平，先后参与了索道行业相关国家法规、标准及各类技术手册的编写和索道行\n业课题研究，成功对江西灵山索道、浙江龙游六春湖索道和北京冬奥会滑雪索道等实施了品牌、\n技术及管理输出。\n3、酒店业务：公司拥有各类酒店十余家，主要提供住宿餐饮等旅宿服务，黄山景区内主要分\n布雲麓北海宾馆、狮林大酒店、西海饭店、白云宾馆、玉屏楼宾馆、雲野@排云型旅酒店、雲亼·曙",
+          "source_actor": "公司及合并子公司",
+          "reported_period": "2025-12-31",
+          "qualifier": "原公司当前景区运营",
+          "continuation_pages": [],
+          "quantity_acceptance": "仅证明动作，不扩量价"
+        }
+      ],
+      "negative": [
+        {
+          "condition_id": "600054.SH:negative:001",
+          "instrument_id": "600054.SH",
+          "page": 14,
+          "name": "抵销前行业不混合并",
+          "rule": "五行业收入明确未抵消，不与合并总额勾稽成伪合计",
+          "source_quote": "黄山旅游发展股份有限公司2025 年年度报告\n14 / 185\n2、 收入和成本分析\n√适用 □不适用\n报告期内，公司实现营业收入 210,932.51 万元，同比增长 9.23%，主要系黄山景区接待进山\n游客增加及景区资源有偿使用费核算方法变化所致；营业成本 112,079.51 万元，同比增长 20.35%，\n主要系本期景区资源有偿使用费增加所致。\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本 毛利率\n（%）\n营业收\n入比上\n年增减\n（%）\n营业成\n本比上\n年增减\n（%）\n毛利率比上年\n增减（%）\n酒店业务 492,026,389.87 331,764,429.18 32.57 7.99 17.27 减少 5.34 个\n百分点\n索道及缆车业务 842,155,363.75 208,848,588.38 75.20 17.37 134.03 减少 12.36 个\n百分点\n景区业务 293,201,670.78 156,979,901.66 46.46 21.92 7.70 增加 7.06 个\n百分点\n旅游服务业务 532,255,057.39 489,760,970.14 7.98 12.13 13.61 减少 1.20 个\n百分点\n徽菜业务 245,296,390.79 244,568,871.09 0.30 1.09 10.30 减少 8.32 个\n百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n（1）主营业务分行业情况中各行业的收入按未合并抵消的口径列报，因此合计金额大于 2025\n年年度报告列报的营业收入（合并抵消后收入），两者的差额主要是各行业之间的内部交易抵消。\n（2）酒店业务营业成本增加主要系黄山风景名胜资源有偿使用费征收管理优化调整，对公司\n黄山风景区内山上酒店征收风景名胜资源有偿使用费所致（详见公司 2025-010 号公告）。\n（3）索道及缆车业务营业收入增加主要系本期黄山景区接待进山游客增加及景区资源有偿使\n用费核算方法变化所致；营业成本增加主要系黄山风景名胜资源有偿使用费征收管理优化调整，\n其征收模式发生改变且征收比例增长所致（详见公司 2025-010 号公告）。\n（4）景区业务营业收入增加主要系本期景区有效购票人数及平均客单价增加所致。\n(2). 产销量情况分析表\n□适用 √不适用\n(3). 重大采购合同、重大销售合同的履行情况\n□适用 √不适用\n(4). 成本分析表\n单位：元 币种：人民币\n分行业情况\n分行业 成本构成\n项目 本期金额\n本期\n占总\n成本\n比例\n(%)\n上年同期金额\n上年\n同期\n占总\n成本\n比例\n(%)\n本期金\n额较上\n年同期\n变动比\n例(%)\n情\n况\n说\n明",
+          "continuation_pages": []
+        },
+        {
+          "condition_id": "600054.SH:negative:002",
+          "instrument_id": "600054.SH",
+          "page": 14,
+          "name": "成本表非收入",
+          "rule": "同行成本/毛利与下一成本表不可营业收入化",
+          "source_quote": "黄山旅游发展股份有限公司2025 年年度报告\n14 / 185\n2、 收入和成本分析\n√适用 □不适用\n报告期内，公司实现营业收入 210,932.51 万元，同比增长 9.23%，主要系黄山景区接待进山\n游客增加及景区资源有偿使用费核算方法变化所致；营业成本 112,079.51 万元，同比增长 20.35%，\n主要系本期景区资源有偿使用费增加所致。\n(1). 主营业务分行业、分产品、分地区、分销售模式情况\n单位：元 币种：人民币\n主营业务分行业情况\n分行业 营业收入 营业成本 毛利率\n（%）\n营业收\n入比上\n年增减\n（%）\n营业成\n本比上\n年增减\n（%）\n毛利率比上年\n增减（%）\n酒店业务 492,026,389.87 331,764,429.18 32.57 7.99 17.27 减少 5.34 个\n百分点\n索道及缆车业务 842,155,363.75 208,848,588.38 75.20 17.37 134.03 减少 12.36 个\n百分点\n景区业务 293,201,670.78 156,979,901.66 46.46 21.92 7.70 增加 7.06 个\n百分点\n旅游服务业务 532,255,057.39 489,760,970.14 7.98 12.13 13.61 减少 1.20 个\n百分点\n徽菜业务 245,296,390.79 244,568,871.09 0.30 1.09 10.30 减少 8.32 个\n百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n（1）主营业务分行业情况中各行业的收入按未合并抵消的口径列报，因此合计金额大于 2025\n年年度报告列报的营业收入（合并抵消后收入），两者的差额主要是各行业之间的内部交易抵消。\n（2）酒店业务营业成本增加主要系黄山风景名胜资源有偿使用费征收管理优化调整，对公司\n黄山风景区内山上酒店征收风景名胜资源有偿使用费所致（详见公司 2025-010 号公告）。\n（3）索道及缆车业务营业收入增加主要系本期黄山景区接待进山游客增加及景区资源有偿使\n用费核算方法变化所致；营业成本增加主要系黄山风景名胜资源有偿使用费征收管理优化调整，\n其征收模式发生改变且征收比例增长所致（详见公司 2025-010 号公告）。\n（4）景区业务营业收入增加主要系本期景区有效购票人数及平均客单价增加所致。\n(2). 产销量情况分析表\n□适用 √不适用\n(3). 重大采购合同、重大销售合同的履行情况\n□适用 √不适用\n(4). 成本分析表\n单位：元 币种：人民币\n分行业情况\n分行业 成本构成\n项目 本期金额\n本期\n占总\n成本\n比例\n(%)\n上年同期金额\n上年\n同期\n占总\n成本\n比例\n(%)\n本期金\n额较上\n年同期\n变动比\n例(%)\n情\n况\n说\n明\n黄山旅游发展股份有限公司2025 年年度报告\n15 / 185\n酒店业务 住宿、餐饮 331,764,429.18 23.17 282,898,884.06 24.16 17.27\n索道及缆车业务 索道、缆车\n运输等 208,848,588.38 14.59 89,240,001.67 7.62 134.03\n景区业务 景点开发、\n维护等 156,979,901.66 10.96 145,752,911.24 12.45 7.70\n旅游服务业务 人 员 、 场\n地、交通等 489,760,970.14 34.20 431,101,617.50 36.82 13.61\n徽菜业务 餐饮 244,568,871.09 17.08 221,736,704.48 18.94 10.30\n成本分析其他情况说明\n（1）酒店业务营业成本增加主要系黄山风景名胜资源有偿使用费征收管理优化调整，对公司\n黄山风景区内山上酒店征收风景名胜资源有偿使用费所致（详见公司 2025-010 号公告）。\n（2）索道及缆车业务营业成本增加主要系黄山风景名胜资源有偿使用费征收管理优化调整，\n其征收模式发生改变且征收比例增长所致（详见公司 2025-010 号公告）。\n(5). 报告期主要子公司股权变动导致合并范围变化\n□适用 √不适用\n(6). 公司报告期内业务、产品或服务发生重大变化或调整有关情况\n□适用 √不适用\n(7). 主要销售客户及主要供应商情况\n属于同一控制人控制的客户或供应商视为同一客户或供应商合并列示，受同一国有资产管理机构\n实际控制的除外。\n下列客户及供应商信息按照同一控制口径合并计算列示的情况说明\n无。\nA.公司主要销售客户及主要供应商情况\n√适用 □不适用\n前五名客户销售额18,250.88万元，占年度销售总额7.61%；其中前五名客户销售额中关联方销售\n额0万元，占年度销售总额0%。\n前五名供应商采购额13,750.74万元，占年度采购总额9.47%；其中前五名供应商采购额中关联方\n采购额0万元，占年度采购总额0%。\nB.报告期内向单个客户的销售比例超过总额的 50%、前 5 名客户中存在新增客户的或严重依赖于\n少数客户的情形\n□适用 √不适用\n报告期内向单个供应商的采购比例超过总额的 50%、前 5 名供应商中存在新增供应商的或严重依\n赖于少数供应商的情形\n□适用 √不适用\nC. 报告期内公司股票被实施退市风险警示或其他风险警示\n前五名销售客户\n□适用 √不适用\n前五名供应商\n□适用 √不适用",
+          "continuation_pages": [
+            15
+          ]
+        }
+      ],
+      "answer_rules": {
+        "principal_business": [
+          [
+            "景区"
+          ]
+        ],
+        "products_services": [
+          [
+            "黄山"
+          ]
+        ],
+        "revenue_model": [
+          [
+            "验证"
+          ]
+        ]
+      },
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "risk_categories": [
+        "body",
+        "associated_leasing"
+      ]
+    },
+    {
+      "instrument_id": "600000.SH",
+      "fixture": "tests/unit/test_research/test_company_profile_owned_page_facts.py",
+      "fixture_sha256": "2d7985b91e824f860ba3c22dd8b911c1235e620b4fc3691ad4cd1abfcc749ded",
+      "risk_categories": [
+        "financial_disclosure",
+        "income_columns_units"
+      ],
+      "source_pages": [
+        22,
+        62,
+        71
+      ],
+      "positive": [
+        "commercial credit business",
+        "173964百万元营业收入",
+        "120483百万元利息净收入",
+        "69.26%营业收入构成"
+      ],
+      "negative": [
+        "325269业务总收入不得作营业收入",
+        "186233贷款利息不得混入营业收入构成"
+      ]
+    }
+  ]
+}

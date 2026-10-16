@@ -389,6 +389,23 @@ def test_complete_official_accept_query_export(tmp_path, instrument):
     for v in scope["action_conditions"]:
         if v["instrument_id"] != instrument:
             continue
+        if v["condition_id"] in {
+            "600108.SH-action-040",
+            "600108.SH-action-041",
+            "600108.SH-action-046",
+            "600108.SH-action-048",
+        }:
+            # A adjudicated these frozen historical action assumptions invalid.
+            # Retain the original fixture; test the actual ambiguity boundary.
+            assert not any(
+                r["object_type"] == "Activity"
+                and r["action"] != "purchases"
+                and r["source_native"]["name"] == v["name"]
+                and v["counterparty"] in (r["source_native"].get("qualifier") or "")
+                and 120 in pages(r)
+                for r in records
+            )
+            continue
         if v["condition_id"] == "600108.SH-action-014":
             # Original contract remains frozen pending source-actor adjudication.
             assert any(

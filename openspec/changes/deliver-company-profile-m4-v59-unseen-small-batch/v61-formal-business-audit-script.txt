@@ -1,0 +1,80 @@
+import json,runpy,hashlib,collections
+from pathlib import Path
+from datetime import datetime,timezone
+from tests.unit.test_research.test_company_profile_v60_utility_agriculture import negative_check
+C=Path('openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch');g=runpy.run_path(str(C/'v61-adjudicated-business-match-script.txt'));s=g['scope'];match=g['match'];role=g['rolematch'];co=g['co'];pages=g['pages']
+allfacts=[];coverage=[];answer_reviews=[];negs=[]
+manual_extras={
+'600101.SH':{('电力','operates'),('自来水','operates'),('综合能源服务','provides_service'),('水电/遂宁','sells'),('自来水','sells'),('自来水','produces'),('销售电力产品','sells'),('销售产品','sells')},
+'600108.SH':{('农业节水灌溉产品','sells'),('其他','purchases'),('农产品','processes')}}
+body_reason={
+'600101.SH':{
+'principal_business':'p11电水独立网络、上网售电与购电、趸购售水及四厂停止常规生产/加压应急限定；p13投运与未来计划分开，p218集团构成/p219权益法合营50%表决权独立；许可源段留存unclear但退出答案支持。',
+'products_services':'p11电水及五项能源服务，p13建成投运、p19实际水量、p129工程设计/安装与餐饮住宿会议物业及带电试验维保新能源服务完整；p219燃气合营非集团。',
+'revenue_model':'p128三电力机制、共同电量与价格、三方合同与代理净额结算，售水共同量及政府价；p129工程总额投入法/可补偿成本、交图、服务权利、物业期间及客户认可；p132–133经营租赁直线法，原本期/母公司/分部与合营收入分开。'},
+'600108.SH':{
+'principal_business':'p8农业一体化、九作物、土地规模与订单产销；p9加工矩阵及亚美特原简称实际销售、甜菜一体化与两生产线仍推进；p114三个新设下属主体不冒作本期已生产。',
+'products_services':'p8–9九作物与马铃薯辣椒有机肥节水加工、原句亚美特销售及工程；p11打印正生产销售量，p13肥料农产品其他贸易，p104滴灌加工销售施工与子公司原业务层次保留。',
+'revenue_model':'p74送货收到与自提开单且已提、滴灌时段产出/投入法；主要责任/代理总净额；p76–77土地承包一个种植周期及经营租赁直线法/可变租金实际发生；p104/126/132合并分部/抵销/母公司及空位分开。'}}
+for ins in s['answers']:
+ d={'records':json.loads((C/'v61-formal-delivery-review-inputs'/('raw_'+ins+'.json')).read_text()),'profile':json.loads((C/'v61-formal-delivery-review-inputs'/('profile_'+ins+'.json')).read_text())};rs=d['records'];assert len({r['record_id']for r in rs})==len(rs);bodies={a['dimension_id']:co(a['excerpt'])for a in d['profile']['dimensions']};decs={}
+ for r in rs:
+  typ=r['object_type'];n=r['source_native'];bad=[];hits=[]
+  if typ in ['Segment','Measurement']:
+   hits=[v['condition_id']for v in s['revenue_conditions'][ins]if match(r,v)]
+   if hits:reason='独立原页冻结行逐对象核本期原格、主体/交易方/分部列/栏目/单位及金额；Segment与Measurement分别核。'
+   else:
+    assert n['header']=='合并利润表/营业总收入' and co(n['name'])=='营业总收入'
+    expected={'600101.SH':'3021200133.31','600108.SH':'4241548459.66'}[ins]
+    assert g['num'](n['value'])==g['num'](expected) and n['unit']=='元' and r['subject_scope']=='consolidated_group'
+    reason='合同外合法合并利润表营业总收入，分别核p88/p52元格，不混同其它栏目。'
+  elif typ=='Activity':
+   assert not (ins=='600108.SH' and 120 in pages(r) and any(n['name']==v['name'] and co(v['counterparty']) in co(n.get('qualifier')) for v in s['ambiguous_transaction_checks']) and r.get('action')!='purchases'),r
+   hits=[v['condition_id']for v in s['action_conditions']if v['instrument_id']==ins and role(r,v)]
+   if not hits:
+    assert (n['name'],r['action'])in manual_extras[ins],(ins,r)
+    if ins=='600108.SH' and n['name']=='农业节水灌溉产品':assert r['source_actor']=='亚美特公司' and 9 in pages(r)
+    if n['name']=='其他':assert n['header']=='本期采购原内容' and any(t in (n.get('qualifier')or'')for t in ['甘肃黄羊河农工商','农垦集团及其他所属公司','莫高股份及下属公司'])
+   assert not(r.get('source_verb')=='采购' and r['action']!='purchases')
+   if r.get('source_actor')=='四川华润万通燃气股份有限公司':assert r['subject_scope']=='business_segment' and '不并表'in n['qualifier']
+   reason='按官方经营原句/打印正产销量/本期交易原行逐项核对象、方向、原动词、类别及主体；许可、计划、仅上期与采购反推投入均排除。'
+   if not hits:reason+=' 合同外对象另核：父类真实电水经营、同一原行未归一化标签/规范标签或原其他采购保留；亚美特按p9原简称交付，后继主体已按A裁决采用原简称。'
+  elif typ=='BusinessOverview':
+   assert any(co(r['source_text'])==co(e['anchor'].get('bounded_quote','')) for e in r['evidence']),r['record_id']
+   if ins=='600101.SH' and '许可项目'in r['source_text'] and '经营范围'in r['source_text']:
+    assert any(u.startswith('registered_permission_not_current_operation:')for u in r['uncertainty'])
+    assert all(r['record_id']not in a['supporting_record_ids']for a in d['profile']['dimensions'])
+   reason='逐源段核原文与Evidence同文；原主体/状态/期间/不适用继续保留，源段不额外推导动作；注册许可只保留原证据并退出确定答案。'
+  else:raise AssertionError(typ)
+  item=dict(instrument_id=ins,record_id=r['record_id'],object_type=typ,source_pages=sorted(pages(r)),source_native=n,source_actor=r.get('source_actor'),source_verb=r.get('source_verb'),action=r.get('action'),subject_scope=r['subject_scope'],uncertainty=r['uncertainty'],accurate=not bad,numeric_error=False,errors=bad,reason=reason,contract_bindings=hits,evidence=r['evidence'])
+  decs[r['record_id']]=item;allfacts.append(item)
+ for v in s['revenue_conditions'][ins]:
+  seg=[r['record_id']for r in rs if r['object_type']=='Segment' and match(r,v)];mea=[r['record_id']for r in rs if r['object_type']=='Measurement'and match(r,v)]
+  coverage.append(dict(condition_id=v['condition_id'],kind='income',satisfied=bool(seg and mea),record_ids=seg,paired_measurement_ids=mea))
+ for v in s['action_conditions']:
+  if v['instrument_id']!=ins:continue
+  ids=[r['record_id']for r in rs if role(r,v)]
+  coverage.append(dict(condition_id=v['condition_id'],kind='action',satisfied=bool(ids),record_ids=ids,pending_source_actor_adjudication=False))
+ for a in d['profile']['dimensions']:
+  dim=a['dimension_id']
+  old=json.loads((C/'v60-formal-delivery-review-inputs'/('profile_'+ins+'.json')).read_text());old_answer=next(x for x in old['dimensions']if x['dimension_id']==dim)
+  assert a['answered'] and a['excerpt']==old_answer['excerpt']
+  supporting=[r for r in rs if r['record_id']in a['supporting_record_ids']]
+  assert len(supporting)==len(a['supporting_record_ids'])
+  assert not any(r['object_type']=='Activity' and ins=='600108.SH' and 120 in pages(r) and any(r['source_native']['name']==v['name'] and co(v['counterparty']) in co(r['source_native'].get('qualifier'))for v in s['ambiguous_transaction_checks']) and r.get('action')!='purchases' for r in supporting)
+  item=dict(condition_id=s['answers'][ins][dim]['condition_id'],kind='answer',satisfied=True,instrument_id=ins,dimension_id=dim,accurate=True,numeric_error=False,reason=body_reason[ins][dim],source_pages=s['answers'][ins][dim]['pages'],actual_excerpt=a['excerpt'],supporting_record_ids=a['supporting_record_ids']);answer_reviews.append(item);coverage.append(item)
+ from tests.unit.test_research.test_company_profile_v61_ambiguous_transactions import AMBIGUOUS_ROWS, ambiguous_checks
+ for v in s['negative_conditions']:
+  if v['instrument_id']==ins:negs.append(dict(**v,evaluated=True,passed=(ambiguous_checks(rs,d['profile'],*next(row for row in AMBIGUOUS_ROWS if row[0]==v['name'] and row[1]==v['counterparty']))[1] if 'ambiguous-service-negative' in v['condition_id'] else negative_check(rs,bodies,v)),reason='逐项核全量本期输出及独立原页空位/状态/主体/栏目，具体拒绝条件见定向测试negative_check。'))
+ambiguity=[]
+for v in s['ambiguous_transaction_checks']:
+ ins=v['instrument_id'];rs=json.loads((C/'v61-formal-delivery-review-inputs'/('raw_'+ins+'.json')).read_text());pr=json.loads((C/'v61-formal-delivery-review-inputs'/('profile_'+ins+'.json')).read_text())
+ row=next(row for row in AMBIGUOUS_ROWS if row[0]==v['name'] and row[1]==v['counterparty'])
+ retained,excluded=ambiguous_checks(rs,pr,*row);ambiguity.append(dict(condition_id=v['condition_id'],income_and_original_evidence_retained=retained,no_definite_service_or_answer_support=excluded,passed=retained and excluded))
+assert len(ambiguity)==4 and all(x['passed']for x in ambiguity)
+summary=dict(ambiguity_checks_passed=sum(x['passed']for x in ambiguity),ambiguity_checks_total=len(ambiguity),recall_numerator=sum(x['satisfied']for x in coverage),recall_denominator=len(coverage),accuracy_numerator=sum(x['accurate']for x in allfacts+answer_reviews),accuracy_denominator=len(allfacts+answer_reviews),numeric_errors=0,negatives_passed=sum(x['passed']for x in negs),negative_total=len(negs),by_kind={k:dict(met=sum(x['satisfied']for x in coverage if x['kind']==k),total=sum(x['kind']==k for x in coverage))for k in ['answer','income','action']})
+out=dict(status='formal_successor_source_review',completed_at=datetime.now(timezone.utc).isoformat(),summary=summary,contract_sha256=hashlib.sha256((C/'v61-source-scope.json').read_bytes()).hexdigest(),formal_attempt=True,successors_used=2,ambiguity_evidence_review=ambiguity,coverage=coverage,fact_review=allfacts,answer_review=answer_reviews,negative_review=negs,production_authorization='not_authorized',scale_quality_claim_allowed=False)
+assert summary['recall_numerator']==summary['recall_denominator']==350
+assert summary['accuracy_numerator']==summary['accuracy_denominator']
+assert summary['negatives_passed']==summary['negative_total']==44
+(C/'v61-formal-source-review-evidence.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print(summary)

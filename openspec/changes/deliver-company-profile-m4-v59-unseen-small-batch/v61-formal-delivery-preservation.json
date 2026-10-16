@@ -1,0 +1,32 @@
+{
+  "completed_at": "2026-10-16T04:20:41.283356+00:00",
+  "completed_sha256": {
+    "data/checkpoints/company_profile_common_core/reports/m4_v61_same_source_repair/company_profile_live_run.v1.json": "5049b30297d1fc6d7f0f71f17f200ab7ba390f0b6b86f9db4152d71af2869683",
+    "data/checkpoints/company_profile_common_core/reports/m4_v61_same_source_repair/formal_execution.json": "9e225c13b6c6fa5f90a0a727380a672cd60a3bcef5c6979cbc945c5ae5f4c0bc",
+    "data/checkpoints/company_profile_common_core/reports/m4_v61_same_source_repair/observation.json": "0e797d1256511587b0260dcc48a3551d8c400e64542c6b7b192219bf7d2b462a",
+    "data/checkpoints/company_profile_common_core/reports/m4_v61_same_source_repair/plan.json": "c322868030d2349bacc61f56248be18b2bec26c48dd805286a7c6869208c1982",
+    "data/exports/m4_v61_same_source_repair/600101.SH/600101.SH_2025-12-31.json": "dcdb4e87c04800adca50d4b36ca57d4d4e6937abda63747f7f27aa00d92d8216",
+    "data/exports/m4_v61_same_source_repair/600101.SH/export_manifest.json": "a9a9f0c558c50b0b0dcb546a97ed736425a5a5b2762736eb30a0606cda0e2265",
+    "data/exports/m4_v61_same_source_repair/600101.SH/profiles.csv": "912f457496c352838f1be91328d3718503dfc46abcdc2a46c83941706fab93df",
+    "data/exports/m4_v61_same_source_repair/600108.SH/600108.SH_2025-12-31.json": "b0309d61256fb7dba267f5eed8a0c701d2e73f2456ae5680204794a0e078bcc6",
+    "data/exports/m4_v61_same_source_repair/600108.SH/export_manifest.json": "1643eb48719445eccd36f20f42d91631877cb5a8b8184b17b58ef155b7c79afd",
+    "data/exports/m4_v61_same_source_repair/600108.SH/profiles.csv": "24c2bc0bcb1c31f40ee1d1ff558d7c060423b3d53893fb45da6428f93119b9f0",
+    "data/research/company_profile_common_core/m4_v61_same_source_repair/company_profile_common_core.v1/bp-work-68a8f7c40ffbd7a7decdb755.json": "3563b449726f3377732c8386acfd1d42e6145a37b6b9fdda92e17aa20c53c389",
+    "data/research/company_profile_common_core/m4_v61_same_source_repair/company_profile_common_core.v1/bp-work-ee5a0765784142e6e25db70e.json": "08364330b400789512b3d491fdbafbffad82f03a56c58cb5ca4ec9c3a3833f7b",
+    "data/research/company_profile_common_core/m4_v61_same_source_repair/company_profile_common_core.v1/checkpoints/bp-work-68a8f7c40ffbd7a7decdb755.json": "3aecc313b6319218d7667bbe97437d85a60316450f0e8a7007e57321047d5961",
+    "data/research/company_profile_common_core/m4_v61_same_source_repair/company_profile_common_core.v1/checkpoints/bp-work-ee5a0765784142e6e25db70e.json": "5ed0b359c447144b5240d481d9aadbcd331cac537da699c832106dbcb3980e7e",
+    "data/research/company_profile_common_core/m4_v61_same_source_repair/company_profile_common_core.v1/scopes/600101.SH/2025-12-31/extract_business_overview.json": "c1748d897f2dab3c0e33ec9ae99e8cd90baca1859c6115b2b637d2e4e54b78ee",
+    "data/research/company_profile_common_core/m4_v61_same_source_repair/company_profile_common_core.v1/scopes/600101.SH/2025-12-31/extract_segment_financials.json": "6a894cba078f6ff556a813472f66daf86345cdb773a9f9a0e9dbbc3140753afd",
+    "data/research/company_profile_common_core/m4_v61_same_source_repair/company_profile_common_core.v1/scopes/600108.SH/2025-12-31/extract_business_overview.json": "95c6f41b4d1068e55562c0d497cf9f0e0fedff64e719971701cc504b4c673a87",
+    "data/research/company_profile_common_core/m4_v61_same_source_repair/company_profile_common_core.v1/scopes/600108.SH/2025-12-31/extract_segment_financials.json": "86d49223133f43f90c00c54fc81133a963d693f0ea14823e576e90e03f5eab03",
+    "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/v61-attempt-start.json": "7f6ed376f303ae9f4d9f81bcbe83db02b549d7d8d4a6f30d77494a80bdc8a600",
+    "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/v61-formal-stacks.log": "4eca268062c6d031070b8da0e666dbab8de089a0f4b972feb7cbc14ed5f02a93",
+    "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/v61-formal-supervisor-receipt.json": "9ec508e191ee51d9aa3ad5805e5e60d7169e6439fa79d6fd4a22145c101afe98",
+    "openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch/v61-formal.log": "69fa3be42742404eb14c123699df0cb1f727ba2918c4e36dfce953f519e07deb"
+  },
+  "protected_after_all_writers_ended": true,
+  "empty_paths": [],
+  "first_observation_used": 1,
+  "successors_used": 2,
+  "successors_authorized": 2
+}

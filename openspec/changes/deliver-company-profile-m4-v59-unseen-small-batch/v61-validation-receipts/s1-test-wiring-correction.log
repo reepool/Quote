@@ -1,0 +1,10 @@
+[32m.[0m[32m.[0m[33m                                                                       [100%][0m
+- generated xml file: /home/python/Quote/data/QuoteBak/v61_s0/s1-test-wiring-correction.xml -
+============================= slowest 10 durations =============================
+52.99s call     tests/unit/test_research/test_company_profile_s1_bounded_regression.py::test_historical_core_accept_query_export[600100.SH]
+18.49s call     tests/unit/test_research/test_company_profile_s1_bounded_regression.py::test_historical_core_accept_query_export[600107.SH]
+0.20s setup    tests/unit/test_research/test_company_profile_s1_bounded_regression.py::test_historical_core_accept_query_export[600100.SH]
+0.08s setup    tests/unit/test_research/test_company_profile_s1_bounded_regression.py::test_historical_core_accept_query_export[600107.SH]
+0.07s teardown tests/unit/test_research/test_company_profile_s1_bounded_regression.py::test_historical_core_accept_query_export[600100.SH]
+0.06s teardown tests/unit/test_research/test_company_profile_s1_bounded_regression.py::test_historical_core_accept_query_export[600107.SH]
+[33m[32m2 passed[0m, [33m[1m10 deselected[0m, [33m[1m7 warnings[0m[33m in 74.30s (0:01:14)[0m[0m

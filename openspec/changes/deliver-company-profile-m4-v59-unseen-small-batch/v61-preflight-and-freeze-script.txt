@@ -1,0 +1,43 @@
+"""Freeze only after completed S0 checks; S1 failures are separately disclosed."""
+import json,hashlib,collections
+from pathlib import Path
+from datetime import datetime,timezone
+from research.company_profile.execution import default_processing_identity
+from research.company_profile.m4_next_batch import load_m4_next_batch_plan,save_m4_next_batch_plan
+from research.company_profile import core_evidence_selection as selection
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch';T=R/'data/QuoteBak/v61_s0';K=R/'data/checkpoints/company_profile_common_core';P=K/'reports/m4_v61_same_source_repair';load=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+assert not (C/'v61-source-freeze-receipt.json').exists()
+checks={}
+for name,items in [('history',load(C/'protection-baseline.json')),('existing_worktree',load(C/'initial-workspace-baseline.json')['existing_modified_sha256']),('first',load(C/'first-formal-delivery-preservation.json')['completed_sha256']),('first_review',load(C/'first-review-preservation.json')['files_sha256']),('v60_delivery',load(C/'v60-formal-delivery-preservation.json')['completed_sha256']),('v60_review',load(C/'v60-review-preservation.json')['files_sha256'])]:
+ for p,h in items.items():
+  if name=='v60_review' and p==str((C/'tasks.md').relative_to(R)):
+   import subprocess
+   original=subprocess.check_output(['git','show','HEAD:'+p]);assert hashlib.sha256(original).hexdigest()==h
+   assert (R/p).read_bytes().startswith(original)
+   dest=C/'v61-history-originals/tasks-v60-original.md';dest.parent.mkdir(exist_ok=True);dest.write_bytes(original);assert sha(dest)==h
+  else:assert sha(R/p)==h,(name,p)
+ checks[name]=len(items)
+for version in ['first','v60']:
+ freeze=load(C/(version+'-source-freeze-receipt.json'))
+ for p,h in freeze['executed_code_sha256'].items():assert sha(C/(version+'-executed-code-snapshot')/p)==h
+checks['original_execution_snapshots']=78
+for r in load(C/'source-scope.json')['official_reports']:
+ h=r['document_version'];assert sha(R/'data/filings/announcements/blobs'/h[:2]/(h+'.pdf'))==h
+for name,token in [('targeted-final.log','7 passed'),('s1-test-wiring-correction.log','2 passed'),('ruff-final.log','All checks passed'),('format-final.log','6 files already formatted'),('openspec-s0.log','is valid'),('openspec-bounded.log','is valid')]:
+ assert token in (T/name).read_text(),name
+assert not (T/'diff-check.log').read_text()
+local=load(C/'v61-local-source-review-evidence.json');sm=local['summary'];assert sm['recall_numerator']==sm['recall_denominator']==350 and sm['accuracy_numerator']==sm['accuracy_denominator'] and sm['negatives_passed']==44 and sm['ambiguity_checks_passed']==4 and sm['numeric_errors']==0
+identity={**default_processing_identity(),'revenue_sentence_repair':'v61'};flags={n:getattr(selection,n)(identity)for n in ['revenue_sentence_repair_requested','named_role_repair_requested','service_operating_energy_requested','core_answer_repair_requested','source_delivery_repair_requested']};assert all(flags.values());assert default_processing_identity()==load(C/'freeze-receipt.json')['default_identity']
+assert not P.exists() and not (R/'data/research/company_profile_common_core/m4_v61_same_source_repair').exists() and not (R/'data/exports/m4_v61_same_source_repair').exists()
+plan=load_m4_next_batch_plan(K,plan_directory=K/'reports/m4_v59_unseen_small_batch');path=save_m4_next_batch_plan(K,plan,plan_directory=P);assert path.read_bytes()==(K/'reports/m4_v59_unseen_small_batch/plan.json').read_bytes()
+files=sorted((R/'research/company_profile').glob('*.py'))+[R/'research/announcement_assets/repository.py'];code={str(p.relative_to(R)):sha(p)for p in files}
+for p,h in code.items():
+ dest=C/'v61-executed-code-snapshot'/p;dest.parent.mkdir(parents=True,exist_ok=True);dest.open('xb').write((R/p).read_bytes());assert sha(dest)==h
+validation=[T/n for n in ['targeted-final.log','s1-tests.log','s1-test-wiring-correction.log','ruff-final.log','format-final.log','diff-check.log','openspec-s0.log','openspec-bounded.log']]
+V=C/'v61-validation-receipts';V.mkdir(exist_ok=False)
+for p in validation:(V/p.name).write_bytes(p.read_bytes())
+pre=dict(completed_at=datetime.now(timezone.utc).isoformat(),success=True,checks=checks,scope_review=dict(blocking_S0_defects=0,removed_only_four_unsupported_activities=True,six_body_texts_unchanged=True,remaining_S1_defects=['600082.SH conflicting evidence metadata prevents query','600000.SH financial income missing at runtime'],S1_not_passed=True),validation_sha256={str((V/p.name).relative_to(R)):sha(V/p.name)for p in validation},all_prerequisite_processes_completed_and_inspected=True,first_observation_used=1,successors_used_before_launch=1,successors_authorized=2)
+(C/'v61-preflight-protection-verification.json').write_text(json.dumps(pre,ensure_ascii=False,indent=2)+'\n')
+verified=[C/n for n in ['v61-preflight-protection-verification.json','v61-local-source-review-evidence.json','v61-contract-correction.json','v61-source-scope.json','v61-formal-execute-script.txt','v61-bounded-supervisor-script.txt']]+[path]
+receipt=dict(frozen_at=datetime.now(timezone.utc).isoformat(),executed_code_sha256=code,verification_sha256={str(p.relative_to(R)):sha(p)for p in verified},processing_identity=identity,default_identity=default_processing_identity(),repair_flags=flags,source_scope_sha256=sha(C/'source-scope.json'),successor_scope_sha256=sha(C/'v61-source-scope.json'),same_source_plan_bytes=True,plan_id=plan.plan_id,plan_directory=str(P.relative_to(R)),formal_successors_used=1,authorized_successors=2,all_prerequisites_completed_and_inspected=True,preflight_success=True,production_authorization='not_authorized',scale_quality_claim_allowed=False)
+(C/'v61-source-freeze-receipt.json').open('x').write(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n');print('FROZEN',len(code),'modules',checks,flush=True)

@@ -1,0 +1,24 @@
+{
+  "head": "97cc9080a3365b035e4e51dbef83ee919ce226f1",
+  "existing_modified_sha256": {
+    "docs/development/common_llm_gateway_architecture.md": "7f2ad8851c0bc2e8953afc7f5451911ebedecd220f159d68263470ef468609de",
+    "docs/development/common_llm_gateway_usage.md": "e8a931f1c3a515d9e66769e955d980ae90031032b6c741a26bbe123e267c5cca",
+    "docs/development/pdf_engine_evaluation_local_corpus_20260825.json": "0ee90791f0e3eb1bca59e458a25ee19b7b4e05007127047ede21794f4aa6320e",
+    ".v2c/plugin_root": "b0fb5ebbbf078f39b21b4edec97916ef74241da0978bd565ab9b1084a503c75d",
+    ".video_agent/plugin_root": "58ef20f33be8ef566d9035925ecbc32c6d94577317ada218d6efc996e63afdea",
+    "<MagicMock name='data_manager.db_ops.db.db_path' id='139683238479184'>": "ea8b175649b32c4bbf0ad1fe7e5f6a70cf750dc15542b3793cd4f5048751dde1",
+    "<MagicMock name='data_manager.db_ops.db.db_path' id='139684137640144'>": "ea8b175649b32c4bbf0ad1fe7e5f6a70cf750dc15542b3793cd4f5048751dde1",
+    "<MagicMock name='data_manager.db_ops.db.db_path' id='139684138289808'>": "ea8b175649b32c4bbf0ad1fe7e5f6a70cf750dc15542b3793cd4f5048751dde1",
+    "<MagicMock name='data_manager.db_ops.db.db_path' id='139856830311696'>": "ea8b175649b32c4bbf0ad1fe7e5f6a70cf750dc15542b3793cd4f5048751dde1",
+    "<MagicMock name='data_manager.db_ops.db.db_path' id='139858376018960'>": "ea8b175649b32c4bbf0ad1fe7e5f6a70cf750dc15542b3793cd4f5048751dde1",
+    "<MagicMock name='data_manager.db_ops.db.db_path' id='139859056463056'>": "ea8b175649b32c4bbf0ad1fe7e5f6a70cf750dc15542b3793cd4f5048751dde1",
+    "docs/development/company_profile_manufacturing_materials_blind_review_submission.20260903.json": "0a26ad4f7d3d73aa08e7a80d6aa40bf7d2003683591715de5144c64fed812635",
+    "docs/development/framework_audit_and_improvement_plan.md": "932047c1947ed6412c20b8f403602b5cf4e82f1688064374ad2961e9ee501213",
+    "docs/development/pdf_parser_lab_handoff_600036_20260825.md": "b21973b9dbdfbf32927c5fd4b3d479f196c8242516a58755f86bf947bd0126b4",
+    "docs/development/shareholder_exposure_supply_chain_code_review_20260828.md": "ae90603f71bc00bd664db9840eac4eacd2460f2f787cc67485ea7f18c16e901e",
+    "docs/development/shareholder_exposure_supply_chain_code_review_20260828_recheck.md": "c8d03e494b14bd9876dab9df1a7b0960f015d2454f5e84878f59bf61ea825ebd",
+    "docs/development/shareholder_exposure_supply_chain_code_review_20260828_recheck2.md": "e718eb81e7bb72652174b7c3ee13fbc0465d6adaccce8c340cebfb39fd27d283",
+    "docs/development/shareholder_exposure_supply_chain_code_review_20260828_recheck3.md": "f8e708dd874e3ec6a56af815beb6ea2cd2ff9330d2cb3eab3a572402398e8f93",
+    "sqlite:/:memory:": "bd7002675d8db8049fd9ba09a5c31d7298ff337f30aef33460cd8056e68088b4"
+  }
+}

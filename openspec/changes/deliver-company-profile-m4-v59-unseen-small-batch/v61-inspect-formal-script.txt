@@ -1,0 +1,24 @@
+import json,collections
+from pathlib import Path
+from research.company_profile.reads import _iter_accepted_raw
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v61_same_source_repair';O=R/'data/research/company_profile_common_core/m4_v61_same_source_repair/company_profile_common_core.v1'
+D=C/'v61-formal-delivery-review-inputs';D.mkdir(exist_ok=False)
+f=json.loads((P/'formal_execution.json').read_text())
+for ins,x in f['results'].items():
+ print('COMPANY',ins,x['run']['state'])
+ if not x['query']['profiles']:print('NO PROFILE',x['run']);continue
+ q=x['query']['profiles'][0];assert q==x['export']['profiles'][0]==json.loads(Path(x['export']['files'][0]).read_text())
+ raw=list(_iter_accepted_raw(json.loads((O/'checkpoints'/(q['work_id']+'.json')).read_text())))
+ (D/('raw_'+ins+'.json')).write_text(json.dumps(raw,ensure_ascii=False,indent=2))
+ (D/('profile_'+ins+'.json')).write_text(json.dumps(q,ensure_ascii=False,indent=2))
+ print('COUNTS',collections.Counter(r['object_type'] for r in raw))
+ compact=[]
+ for r in raw:
+  v={k:r[k] for k in ['record_id','object_type','subject_scope','reported_period','source_native','source_actor','action','relation_type','dimension','segment_dimension','uncertainty'] if k in r}
+  v['pages']=[(e.get('page'),e.get('continuation_pages')) for e in r['evidence']]
+  if r['object_type']=='BusinessOverview':v['text']=r['source_text']
+  compact.append(v)
+ (D/('compact_'+ins+'.json')).write_text(json.dumps(compact,ensure_ascii=False,indent=2))
+ print('FIN_HEADERS',collections.Counter(r['source_native'].get('header') for r in raw if r['object_type']=='Segment'))
+ for a in q['dimensions']:print('ANSWER',a['dimension_id'],a['answered'],len(a['excerpt']))
+print('ELAPSED',f['whole_round_seconds'])

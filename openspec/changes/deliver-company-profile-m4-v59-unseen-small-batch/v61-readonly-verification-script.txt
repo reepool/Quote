@@ -1,0 +1,17 @@
+"""Read-only delivery, execution and immutable-file verification; no formal run."""
+import json,hashlib,sqlite3
+from pathlib import Path
+from datetime import datetime,timezone
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.stage4_restricted_read import FROZEN_CHAPTERS,default_repo_root
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch';P=R/'data/checkpoints/company_profile_common_core/reports/m4_v61_same_source_repair';O=R/'data/research/company_profile_common_core/m4_v61_same_source_repair';load=lambda p:json.loads(p.read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+f=load(P/'formal_execution.json');s=load(C/'source-scope.json');db=sqlite3.connect('file:data/research.db?mode=ro',uri=True);db.row_factory=sqlite3.Row
+runtime=[];fresh={};sources=[]
+for ins,res in f['results'].items():
+ q=res['query']['profiles'][0];again=CompanyProfileReadService(O,stage4_chapters=FROZEN_CHAPTERS,stage4_root=default_repo_root()).query((ins,),processing_identity=f['processing_identity']);assert again['profiles']==res['query']['profiles'];assert q==res['export']['profiles'][0]==load(Path(res['export']['files'][0]));fresh[ins]=again
+ rt=load(O/'company_profile_common_core.v1'/(q['work_id']+'.json'));item=dict(db.execute('select * from business_profile_work_items where work_id=?',(q['work_id'],)).fetchone());assert item['status']=='completed';meta=json.loads(item['metadata_json']);st=meta['stage_results'];assert set(st)=={'acquire','parse','semantic','verify','publish'} and all(v['status']=='success' and not v['reused_scope_ids']for v in st.values());assert not rt['execution']['predecessor_lineage'];runtime.append(dict(instrument_id=ins,work_id=q['work_id'],stage_results=st,predecessor_lineage=[],query_export_disk_equal=True,token_budget=rt['execution']['token_budget']))
+ v=next(v for v in s['official_reports']if v['instrument_id']==ins);h=v['document_version'];pdf=R/'data/filings/announcements/blobs'/h[:2]/(h+'.pdf');assert sha(pdf)==h;binding=meta['bound_shared_asset'];assert binding['asset_id']==v['asset_id']and binding['content_hash']==h;assert rt['report']['document_version']==h and rt['report']['report_id']==v['asset_id'];sources.append(dict(instrument_id=ins,official_pdf_sha256=h,asset_id=v['asset_id'],formal_binding_matches=True))
+
+result=dict(runtime=runtime,sources=sources,whole_round_seconds=f['whole_round_seconds'],tokens_consumed=load(P/'observation.json')['tokens_consumed'],query_export_disk_equal=True,five_stages_success_no_reuse_predecessor=True)
+(C/'v61-readonly-verification-receipt.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+print('V61_READONLY_VERIFIED',len(runtime),f['whole_round_seconds'])

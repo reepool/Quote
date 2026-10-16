@@ -1,0 +1,107 @@
+{
+  "authority": "A本轮裁决：v60不予有限通过；4项动作转歧义证据检查",
+  "original_contract_sha256": "4f396ffcb8560d57e433ec5c3fcfcfc8de18d49fae0c418b6bf564caa20a7ea7",
+  "v60_scope_sha256": "867a614d045650425e48b3d5384325331f94a0936710ea230288c80823d62733",
+  "successor_scope_sha256": "71e82b672c36f9aa45745f7200d33c88b9cb183d29296a9a69770ce7de2ab1b6",
+  "removed_affirmative_actions": [
+    {
+      "condition_id": "600108.SH-action-040",
+      "instrument_id": "600108.SH",
+      "page": 120,
+      "name": "其他",
+      "native_aliases": [
+        "其他"
+      ],
+      "source_actions": [
+        "提供"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "category": "unspecified",
+      "counterparty": "甘肃黄羊河农工商（集团）有限责任公司",
+      "qualifier": "本期关联销售原内容；不拆混合工程施工/滴管材料",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31"
+    },
+    {
+      "condition_id": "600108.SH-action-041",
+      "instrument_id": "600108.SH",
+      "page": 120,
+      "name": "工程施工/滴管材料",
+      "native_aliases": [
+        "工程施工/滴管材料"
+      ],
+      "source_actions": [
+        "提供"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "category": "mixed",
+      "counterparty": "甘肃省农垦建筑工程有限责任公司",
+      "qualifier": "本期关联销售原内容；不拆混合工程施工/滴管材料",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31"
+    },
+    {
+      "condition_id": "600108.SH-action-046",
+      "instrument_id": "600108.SH",
+      "page": 120,
+      "name": "工程施工/滴管材料",
+      "native_aliases": [
+        "工程施工/滴管材料"
+      ],
+      "source_actions": [
+        "提供"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "category": "mixed",
+      "counterparty": "农垦集团及其他所属公司",
+      "qualifier": "本期关联销售原内容；不拆混合工程施工/滴管材料",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31"
+    },
+    {
+      "condition_id": "600108.SH-action-048",
+      "instrument_id": "600108.SH",
+      "page": 120,
+      "name": "其他",
+      "native_aliases": [
+        "其他"
+      ],
+      "source_actions": [
+        "提供"
+      ],
+      "source_actor": "公司及合并子公司",
+      "actor_aliases": [
+        "公司及合并子公司"
+      ],
+      "subject_scope": "consolidated_group",
+      "category": "unspecified",
+      "counterparty": "农垦集团及其他所属公司",
+      "qualifier": "本期关联销售原内容；不拆混合工程施工/滴管材料",
+      "state": "current_affirmative",
+      "reported_period": "2025-12-31"
+    }
+  ],
+  "successor_positives": 350,
+  "ambiguity_checks": 4,
+  "negatives": 44,
+  "v60_original_B_self_check": {
+    "recall": "354/354",
+    "accuracy": "733/733"
+  },
+  "A_blocker": "four unjustified definite service activities and products_services supports",
+  "originals_preserved": true,
+  "successors_used_before": 1,
+  "authorized_successors": 2
+}

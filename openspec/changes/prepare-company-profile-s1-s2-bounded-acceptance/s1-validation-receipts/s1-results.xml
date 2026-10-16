@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="12" time="201.365" timestamp="2026-10-16T12:08:57.406836+08:00" hostname="ComputeR"><testcase classname="tests.unit.test_research.test_company_profile_s1_bounded_regression" name="test_historical_core_accept_query_export[600094.SH]" time="20.616" /><testcase classname="tests.unit.test_research.test_company_profile_s1_bounded_regression" name="test_historical_core_accept_query_export[600103.SH]" time="19.018" /><testcase classname="tests.unit.test_research.test_company_profile_s1_bounded_regression" name="test_historical_core_accept_query_export[600100.SH]" time="54.559"><failure message="ImportError: cannot import name 'negative_check' from 'tests.unit.test_research.test_company_profile_v59_technology_apparel' (/home/python/Quote/tests/unit/test_research/test_company_profile_v59_technology_apparel.py)">tests/unit/test_research/test_company_profile_s1_bounded_regression.py:53: in test_historical_core_accept_query_export
+    from tests.unit.test_research.test_company_profile_v59_technology_apparel import match, rolematch, negative_check
+E   ImportError: cannot import name 'negative_check' from 'tests.unit.test_research.test_company_profile_v59_technology_apparel' (/home/python/Quote/tests/unit/test_research/test_company_profile_v59_technology_apparel.py)</failure></testcase><testcase classname="tests.unit.test_research.test_company_profile_s1_bounded_regression" name="test_historical_core_accept_query_export[600107.SH]" time="18.518"><failure message="ImportError: cannot import name 'negative_check' from 'tests.unit.test_research.test_company_profile_v59_technology_apparel' (/home/python/Quote/tests/unit/test_research/test_company_profile_v59_technology_apparel.py)">tests/unit/test_research/test_company_profile_s1_bounded_regression.py:53: in test_historical_core_accept_query_export
+    from tests.unit.test_research.test_company_profile_v59_technology_apparel import match, rolematch, negative_check
+E   ImportError: cannot import name 'negative_check' from 'tests.unit.test_research.test_company_profile_v59_technology_apparel' (/home/python/Quote/tests/unit/test_research/test_company_profile_v59_technology_apparel.py)</failure></testcase><testcase classname="tests.unit.test_research.test_company_profile_s1_bounded_regression" name="test_historical_core_accept_query_export[600098.SH]" time="14.935" /><testcase classname="tests.unit.test_research.test_company_profile_s1_bounded_regression" name="test_historical_core_accept_query_export[600104.SH]" time="19.266" /><testcase classname="tests.unit.test_research.test_company_profile_s1_bounded_regression" name="test_historical_core_accept_query_export[600088.SH]" time="9.414" /><testcase classname="tests.unit.test_research.test_company_profile_s1_bounded_regression" name="test_historical_core_accept_query_export[600099.SH]" time="7.423" /><testcase classname="tests.unit.test_research.test_company_profile_s1_bounded_regression" name="test_historical_core_accept_query_export[600082.SH]" time="6.245"><failure message="ValueError: conflicting evidence for core-ev-9ccb14b102b6a09d">research/company_profile/reads.py:350: in _commodity_exposure_view
+    assessment = assess_commodity_exposures(
+research/company_profile/commodity_exposure.py:717: in assess_commodity_exposures
+    return bind_commodity_exposure_assessment(
+research/company_profile/commodity_exposure.py:330: in bind_commodity_exposure_assessment
+    _validate_assessment_references(assessment, checked_evidence)
+research/company_profile/commodity_exposure.py:192: in _validate_assessment_references
+    by_id = _unique_evidence_index(checked_evidence, label="checked_evidence_ids")
+research/company_profile/commodity_exposure.py:146: in _unique_evidence_index
+    raise ValueError(f"conflicting evidence for {key}")
+E   ValueError: conflicting evidence for core-ev-9ccb14b102b6a09d
+
+During handling of the above exception, another exception occurred:
+tests/unit/test_research/test_company_profile_s1_bounded_regression.py:36: in test_historical_core_accept_query_export
+    q, e = _drive(tmp_path, instrument=instrument, fixture=source.get('report', source), pages=ps, repair_version='v61')
+tests/unit/test_research/test_company_profile_v19_closure.py:46: in _drive
+    query = reads.query((instrument,), processing_identity=identity)["profiles"][0]
+research/company_profile/reads.py:88: in query
+    profiles, missing = self._select_profiles(
+research/company_profile/reads.py:199: in _select_profiles
+    return [self.render_profile(item) for item in selected], missing
+research/company_profile/reads.py:199: in &lt;listcomp&gt;
+    return [self.render_profile(item) for item in selected], missing
+research/company_profile/reads.py:272: in render_profile
+    "commodity_exposure": _commodity_exposure_view(
+research/company_profile/reads.py:357: in _commodity_exposure_view
+    assessment = assess_commodity_exposures(
+research/company_profile/commodity_exposure.py:717: in assess_commodity_exposures
+    return bind_commodity_exposure_assessment(
+research/company_profile/commodity_exposure.py:330: in bind_commodity_exposure_assessment
+    _validate_assessment_references(assessment, checked_evidence)
+research/company_profile/commodity_exposure.py:192: in _validate_assessment_references
+    by_id = _unique_evidence_index(checked_evidence, label="checked_evidence_ids")
+research/company_profile/commodity_exposure.py:146: in _unique_evidence_index
+    raise ValueError(f"conflicting evidence for {key}")
+E   ValueError: conflicting evidence for core-ev-9ccb14b102b6a09d</failure></testcase><testcase classname="tests.unit.test_research.test_company_profile_s1_bounded_regression" name="test_historical_core_accept_query_export[600097.SH]" time="7.851" /><testcase classname="tests.unit.test_research.test_company_profile_s1_bounded_regression" name="test_historical_core_accept_query_export[600054.SH]" time="19.548" /><testcase classname="tests.unit.test_research.test_company_profile_s1_bounded_regression" name="test_historical_core_accept_query_export[600000.SH]" time="1.512"><failure message="assert False&#10; +  where False = any(&lt;generator object test_historical_core_accept_query_export.&lt;locals&gt;.&lt;genexpr&gt; at 0x7fbd2d8e1030&gt;)">tests/unit/test_research/test_company_profile_s1_bounded_regression.py:42: in test_historical_core_accept_query_export
+    assert any(r['source_native']['name']==name and r['source_native'].get('value')==value and r['source_native'].get('unit')=='百万元' for r in raw)
+E   assert False
+E    +  where False = any(&lt;generator object test_historical_core_accept_query_export.&lt;locals&gt;.&lt;genexpr&gt; at 0x7fbd2d8e1030&gt;)</failure></testcase></testsuite></testsuites>

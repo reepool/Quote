@@ -1,0 +1,13 @@
+[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m.[0m[33m                                                                  [100%][0m
+============================= slowest 10 durations =============================
+25.70s call     tests/unit/test_research/test_company_profile_v61_ambiguous_transactions.py::test_complete_p120_preserves_income_without_inventing_service
+25.64s call     tests/unit/test_research/test_company_profile_v60_utility_agriculture.py::test_complete_official_accept_query_export[600108.SH]
+20.80s call     tests/unit/test_research/test_company_profile_v60_utility_agriculture.py::test_complete_official_accept_query_export[600101.SH]
+0.35s setup    tests/unit/test_research/test_company_profile_v61_ambiguous_transactions.py::test_complete_p120_preserves_income_without_inventing_service
+0.18s setup    tests/unit/test_research/test_company_profile_v60_utility_agriculture.py::test_complete_official_accept_query_export[600108.SH]
+0.17s teardown tests/unit/test_research/test_company_profile_v60_utility_agriculture.py::test_complete_official_accept_query_export[600101.SH]
+0.08s setup    tests/unit/test_research/test_company_profile_v60_utility_agriculture.py::test_complete_official_accept_query_export[600101.SH]
+0.07s call     tests/unit/test_research/test_company_profile_v60_utility_agriculture.py::test_equity_table_stops_before_voting_rights_explanation
+0.07s teardown tests/unit/test_research/test_company_profile_v60_utility_agriculture.py::test_supplier_rows_do_not_inherit_previous_only_party
+0.07s teardown tests/unit/test_research/test_company_profile_v60_utility_agriculture.py::test_match_rejects_service_category_and_reversed_verb
+[33m[32m7 passed[0m, [33m[1m7 warnings[0m[33m in 75.68s (0:01:15)[0m[0m
