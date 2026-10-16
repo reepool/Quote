@@ -67,6 +67,32 @@ CLI / API / Scheduler / Telegram / Operator Script
 
 运行命令时优先显式使用该解释器，不永久修改用户 shell 配置。
 
+### 统一开发临时目录
+
+整个项目统一使用 `/home/python/Quote/data/QuoteBak`，强制要求见 `AGENTS.md` §2.3。
+每个新开发终端执行：
+
+```bash
+source /home/python/Quote/scripts/quote_dev_env.sh
+```
+
+独立 Shell、AI 工具调用或自动化开发命令使用：
+
+```bash
+bash /home/python/Quote/scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest tests/unit/<test_file>.py
+```
+
+入口统一设置 `TMPDIR`、`TMP`、`TEMP`、`SQLITE_TMPDIR`，以及 pytest、pip、npm、Ruff、
+mypy、Matplotlib、Node 的临时／缓存位置；开发进程禁止生成 Python 字节码文件，
+Makefile 自动使用此入口。
+开发入口还通过 `QUOTE_DEV_LOG_DIR` 将应用开发日志放到 `QuoteBak/logs`；
+生产服务未设置该开发变量时，继续使用原日志配置。
+直接运行 pytest 时，测试配置也会将 `tempfile` 和测试缓存落到该目录。
+一次性脚本、备份和显式输出使用其下的任务子目录，不能再写死 `/tmp`。
+该目录当前是 NFS 挂载；启动时须确保挂载可写。环境变量由新启动进程继承，已运行进程
+需要在合适时机重新启动才会生效。系统和编辑器自身的临时文件由各自进程环境决定。
+正式来源、交付及必要审核证据继续保存在既定持久目录；临时产物不提交 Git。
+
 OpenSpec CLI 位于：
 
 ```bash

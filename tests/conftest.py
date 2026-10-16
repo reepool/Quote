@@ -16,6 +16,15 @@ import os
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+# Direct pytest invocations follow the same project-wide temporary directory.
+_PROJECT_TMP_DIR = Path("/home/python/Quote/data/QuoteBak")
+if not _PROJECT_TMP_DIR.is_mount():
+    raise RuntimeError(f"Project temporary directory is not mounted: {_PROJECT_TMP_DIR}")
+_PROJECT_TMP_DIR.mkdir(parents=True, exist_ok=True)
+for _temp_variable in ("TMPDIR", "TMP", "TEMP", "SQLITE_TMPDIR", "PYTEST_DEBUG_TEMPROOT"):
+    os.environ[_temp_variable] = str(_PROJECT_TMP_DIR)
+tempfile.tempdir = str(_PROJECT_TMP_DIR)
+
 from database.connection import DatabaseManager
 from database.models import Base
 from utils.config_manager import UnifiedConfigManager

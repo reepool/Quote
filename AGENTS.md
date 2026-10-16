@@ -92,6 +92,32 @@ export PATH="/home/python/.nvm/versions/node/v24.7.0/bin:$PATH"
 
 不要为此永久修改用户 shell 配置文件，除非任务明确要求。
 
+### 2.3 项目统一开发临时目录（强制）
+
+本项目的系统开发变量固定为：
+
+```bash
+TMPDIR=/home/python/Quote/data/QuoteBak
+TMP=/home/python/Quote/data/QuoteBak
+TEMP=/home/python/Quote/data/QuoteBak
+SQLITE_TMPDIR=/home/python/Quote/data/QuoteBak
+```
+
+此规则适用于整个 Quote 项目的所有开发者、AI 代理、A/B 角色、后续会话、测试、
+验证脚本和开发子进程，不依赖某个会话曾经执行过 `export`。
+
+- 每个开发终端先执行 `source /home/python/Quote/scripts/quote_dev_env.sh`；
+  独立命令使用 `bash /home/python/Quote/scripts/quote_dev_env.sh <命令> [参数...]`。
+  每次独立启动的命令也必须继承此环境；Makefile 已接入同一入口。
+- 开发临时脚本、日志、中间输出、测试数据库、数据库副本、备份、实验环境及工具缓存，
+  全部放在此目录下，按任务或用途使用子目录。禁止新增向 `/tmp`、`/var/tmp`
+  或仓库根目录写入这些开发产物的代码或命令。
+- Python 使用 `tempfile`，Shell 使用 `mktemp` 并继承上述环境；显式输出路径也必须
+  指向 `QuoteBak` 下。工具有独立缓存配置时，通过统一入口设置到 `QuoteBak/cache`。
+- 启动前确认目录已挂载且可写；不可写时明确失败并处理原因，不得静默回退到 `/tmp`。
+- `data/QuoteBak` 已被 Git 忽略。正式验收必须保留的来源、交付与审核证据，仍保存到
+  对应的持久业务／OpenSpec 目录；不得只留在可清理的临时目录。历史冻结材料不追溯改写。
+
 ---
 
 ## 3. 数据获取与接口

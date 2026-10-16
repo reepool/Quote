@@ -592,6 +592,7 @@ class Stage5RunBundleStore:
             relative is not None
             and relative.parts
             and relative.parts[0] in {"data", "config"}
+            and relative.parts[:2] != ("data", "QuoteBak")
         ):
             raise ValueError("stage-five output root cannot use production data/config")
         if "business_profile" in self.output_root.as_posix().lower():

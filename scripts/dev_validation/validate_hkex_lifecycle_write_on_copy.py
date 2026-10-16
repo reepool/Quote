@@ -15,6 +15,7 @@ import sqlite3
 import sys
 from datetime import datetime
 from pathlib import Path
+from tempfile import gettempdir
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 
@@ -307,7 +308,10 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--source-db", default="data/quotes.db")
     parser.add_argument(
         "--work-db",
-        default=f"/tmp/hkex_lifecycle_validation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db",
+        default=str(
+            Path(gettempdir())
+            / f"hkex_lifecycle_validation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
+        ),
     )
     parser.add_argument("--timeout-sec", type=int, default=120)
     parser.add_argument(

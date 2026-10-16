@@ -31,10 +31,11 @@ tests/
 │   └── test_api_integration.py
 ├── performance/               # 性能测试
 │   └── test_database_performance.py
-├── e2e/                      # 端到端测试
-│   └── test_full_workflow.py
-└── reports/                  # 测试报告目录
+└── e2e/                      # 端到端测试
+    └── test_full_workflow.py
 ```
+
+开发测试的报告、日志和覆盖率输出统一放在 `/home/python/Quote/data/QuoteBak/tests/`。
 
 ## 测试类型
 
@@ -70,6 +71,7 @@ tests/
 
 ```bash
 # 安装测试依赖
+source /home/python/Quote/scripts/quote_dev_env.sh
 python tests/run_tests.py install
 
 # 运行所有测试

@@ -10,6 +10,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from tempfile import gettempdir
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
@@ -33,7 +34,7 @@ def main() -> int:
     import yfinance as yf
 
     try:
-        yf.set_tz_cache_location("/tmp/py-yfinance")
+        yf.set_tz_cache_location(str(Path(gettempdir()) / "py-yfinance"))
     except Exception:
         pass
 

@@ -338,10 +338,10 @@ def test_complete_official_contract(tmp_path, instrument, input_kind):
         )
     )
     if input_kind == "pages":
-        Path("/tmp/v50raw_" + instrument + ".json").write_text(
+        (tmp_path / ("v50raw_" + instrument + ".json")).write_text(
             json.dumps(raw, ensure_ascii=False, indent=2)
         )
-        Path("/tmp/v50profile_" + instrument + ".json").write_text(
+        (tmp_path / ("v50profile_" + instrument + ".json")).write_text(
             json.dumps(q, ensure_ascii=False, indent=2)
         )
 

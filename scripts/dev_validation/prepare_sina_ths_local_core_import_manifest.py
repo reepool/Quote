@@ -10,6 +10,7 @@ import sys
 from collections import Counter
 from datetime import date, datetime
 from pathlib import Path
+from tempfile import gettempdir
 from typing import Any, Dict, List, Optional, Sequence
 
 
@@ -162,7 +163,7 @@ def build_local_core_import_manifest(
             "scripts/dev_validation/validate_sina_ths_local_core_dryrun.py "
             "--target-file <target-file> --report-periods "
             + ",".join(str(period) for period in report_periods)
-            + " --output-path /tmp/quote_l1_local_core_dryrun.json"
+            + f" --output-path {Path(gettempdir()) / 'quote_l1_local_core_dryrun.json'}"
         ),
     }
 

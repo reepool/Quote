@@ -1,6 +1,10 @@
 # Quote System Makefile
 # Provides convenient commands for development and testing
 
+# Every recipe and its children use the shared project development environment.
+SHELL := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))/scripts/quote_dev_env.sh
+.SHELLFLAGS := /bin/sh -c
+
 .PHONY: help install test test-unit test-integration test-performance test-e2e test-all test-quick
 .PHONY: lint format clean coverage docs setup dev
 
@@ -88,7 +92,7 @@ format:
 coverage:
 	@echo "Generating coverage report..."
 	python tests/run_tests.py unit --coverage
-	@echo "Coverage report available in htmlcov/"
+	@echo "Coverage report available in data/QuoteBak/tests/coverage/html/"
 
 # Documentation
 docs:
@@ -98,15 +102,15 @@ docs:
 # Maintenance
 clean:
 	@echo "Cleaning temporary files..."
-	find . -type f -name "*.pyc" -delete
-	find . -type d -name "__pycache__" -delete
-	find . -type d -name "*.egg-info" -exec rm -rf {} +
-	find . -type f -name ".coverage" -delete
-	find . -type d -name "htmlcov" -exec rm -rf {} +
-	find . -type d -name ".pytest_cache" -exec rm -rf {} +
-	find . -type d -name ".mypy_cache" -exec rm -rf {} +
-	rm -rf tests/reports/
-	rm -rf tests/coverage/
+	find . -path './data/QuoteBak' -prune -o -type f -name "*.pyc" -exec rm -- {} +
+	find . -path './data/QuoteBak' -prune -o -type d -name "__pycache__" -prune -exec rm -r -- {} +
+	find . -path './data/QuoteBak' -prune -o -type d -name "*.egg-info" -prune -exec rm -r -- {} +
+	find . -path './data/QuoteBak' -prune -o -type f -name ".coverage" -exec rm -- {} +
+	find . -path './data/QuoteBak' -prune -o -type d -name "htmlcov" -prune -exec rm -r -- {} +
+	find . -path './data/QuoteBak' -prune -o -type d -name ".pytest_cache" -prune -exec rm -r -- {} +
+	find . -path './data/QuoteBak' -prune -o -type d -name ".mypy_cache" -prune -exec rm -r -- {} +
+	rm -rf -- "$$TMPDIR/tests/reports"
+	rm -rf -- "$$TMPDIR/tests/coverage"
 	rm -rf .coverage coverage.xml
 	python tests/run_tests.py cleanup
 
@@ -242,7 +246,7 @@ install-dev:
 # Performance profiling
 profile:
 	@echo "Running with profiling..."
-	python -m cProfile -o profile.stats main.py api
+	python -m cProfile -o "$$TMPDIR/profile.stats" main.py api
 
 # Quick development cycle
 dev-test: format lint test-quick

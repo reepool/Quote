@@ -11,6 +11,10 @@ import subprocess
 import time
 from pathlib import Path
 
+TEST_OUTPUT_ROOT = Path("/home/python/Quote/data/QuoteBak/tests")
+TEST_REPORT_DIR = TEST_OUTPUT_ROOT / "reports"
+COVERAGE_DIR = TEST_OUTPUT_ROOT / "coverage"
+
 
 def run_command(cmd, cwd=None):
     """Run command and return result"""
@@ -50,10 +54,10 @@ def prepare_test_environment():
 
     # Create necessary directories
     dirs_to_create = [
-        "tests/reports",
-        "tests/logs",
-        "tests/coverage",
-        "htmlcov"
+        TEST_REPORT_DIR,
+        TEST_OUTPUT_ROOT / "logs",
+        COVERAGE_DIR,
+        COVERAGE_DIR / "html"
     ]
 
     for dir_name in dirs_to_create:
@@ -79,14 +83,14 @@ def run_unit_tests(coverage=True, verbose=False):
     if coverage:
         cmd.extend([
             "--cov=.",
-            "--cov-report=html:htmlcov",
-            "--cov-report=xml:coverage.xml",
+            f"--cov-report=html:{COVERAGE_DIR / 'html'}",
+            f"--cov-report=xml:{COVERAGE_DIR / 'coverage.xml'}",
             "--cov-report=term-missing",
             "--cov-fail-under=80"
         ])
 
     cmd.extend([
-        "--html=tests/reports/unit_test_report.html",
+        f"--html={TEST_REPORT_DIR / 'unit_test_report.html'}",
         "--self-contained-html",
         "-x"  # Stop on first failure
     ])
@@ -111,7 +115,7 @@ def run_integration_tests(verbose=False):
         cmd.append("-v")
 
     cmd.extend([
-        "--html=tests/reports/integration_test_report.html",
+        f"--html={TEST_REPORT_DIR / 'integration_test_report.html'}",
         "--self-contained-html",
         "-x"
     ])
@@ -137,8 +141,8 @@ def run_performance_tests(verbose=False):
 
     cmd.extend([
         "--benchmark-only",
-        "--benchmark-json=tests/reports/performance_benchmark.json",
-        "--html=tests/reports/performance_test_report.html",
+        f"--benchmark-json={TEST_REPORT_DIR / 'performance_benchmark.json'}",
+        f"--html={TEST_REPORT_DIR / 'performance_test_report.html'}",
         "--self-contained-html"
     ])
 
@@ -162,7 +166,7 @@ def run_e2e_tests(verbose=False):
         cmd.append("-v")
 
     cmd.extend([
-        "--html=tests/reports/e2e_test_report.html",
+        f"--html={TEST_REPORT_DIR / 'e2e_test_report.html'}",
         "--self-contained-html",
         "-x"
     ])
@@ -230,8 +234,9 @@ def generate_test_report():
     # This would aggregate all test reports into a single report
     # Implementation depends on specific reporting requirements
 
-    report_file = "tests/reports/combined_test_report.html"
-    Path(report_file).touch()  # Create placeholder
+    report_file = TEST_REPORT_DIR / "combined_test_report.html"
+    report_file.parent.mkdir(parents=True, exist_ok=True)
+    report_file.touch()  # Create placeholder
 
     print(f"✓ Test report generated: {report_file}")
     return True

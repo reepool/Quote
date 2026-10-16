@@ -10,6 +10,7 @@ import os
 import sys
 import traceback
 from pathlib import Path
+from tempfile import gettempdir
 from typing import Any, Dict, List, Optional, Sequence
 
 
@@ -65,8 +66,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--db-path",
-        default="/tmp/quote_futures_market_data_smoke.db",
-        help="Smoke database path. Defaults to /tmp to avoid writing production data.",
+        default=str(Path(gettempdir()) / "quote_futures_market_data_smoke.db"),
+        help="Smoke database path under the development TMPDIR.",
     )
     parser.add_argument(
         "--write-enabled",

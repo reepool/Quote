@@ -14,6 +14,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
+from tempfile import gettempdir
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
@@ -30,7 +31,7 @@ async def _run(args: argparse.Namespace) -> int:
     try:
         import yfinance as yf
 
-        yf.set_tz_cache_location("/tmp/py-yfinance")
+        yf.set_tz_cache_location(str(Path(gettempdir()) / "py-yfinance"))
     except Exception:
         pass
 

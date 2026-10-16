@@ -527,6 +527,29 @@ def test_stage5_bundle_store_rejects_production_data_root() -> None:
         )
 
 
+def test_stage5_bundle_store_accepts_project_temporary_root(tmp_path: Path) -> None:
+    store = Stage5RunBundleStore(tmp_path / "isolated", repository_root=REPOSITORY_ROOT)
+    assert store.output_root.is_relative_to(Path("/home/python/Quote/data/QuoteBak"))
+    assert store.output_root.is_dir()
+
+
+@pytest.mark.parametrize(
+    "relative_path", ["data", "data/quotes.db", "data/QuoteBak-other", "config"]
+)
+def test_stage5_bundle_store_keeps_other_production_paths_protected(
+    relative_path: str,
+) -> None:
+    with pytest.raises(ValueError, match="production data"):
+        Stage5RunBundleStore(REPOSITORY_ROOT / relative_path, repository_root=REPOSITORY_ROOT)
+
+
+def test_stage5_bundle_store_rejects_temporary_symlink_into_production(tmp_path: Path) -> None:
+    link = tmp_path / "production-link"
+    link.symlink_to(REPOSITORY_ROOT / "data", target_is_directory=True)
+    with pytest.raises(ValueError, match="production data"):
+        Stage5RunBundleStore(link / "stage5", repository_root=REPOSITORY_ROOT)
+
+
 def _minimal_run_bundle(run_id: str) -> Stage5RunBundle:
     report = ReportIdentity(
         instrument_id="300750.SZ",

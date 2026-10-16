@@ -123,7 +123,7 @@ class LoggingManager:
         if self._config.log_directory is None:
             # 使用默认路径：相对于项目根目录的 log 文件夹
             project_root = Path(__file__).resolve().parents[1]
-            self._config.log_directory = str(project_root / "log")
+            self._config.log_directory = os.environ.get("QUOTE_DEV_LOG_DIR") or str(project_root / "log")
 
         # 确保日志目录存在
         Path(self._config.log_directory).mkdir(parents=True, exist_ok=True)
@@ -154,7 +154,7 @@ class LoggingManager:
             logging_config = config_manager.get_logging_config()
 
             # 处理相对路径 - 转换为绝对路径
-            log_directory = logging_config.file_config.directory
+            log_directory = os.environ.get("QUOTE_DEV_LOG_DIR") or logging_config.file_config.directory
             if not os.path.isabs(log_directory):
                 # 如果是相对路径，相对于项目根目录
                 project_root = Path(__file__).resolve().parents[1]
