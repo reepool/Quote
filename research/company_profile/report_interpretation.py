@@ -13,6 +13,9 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from utils.llm.budget import LlmRunBudget
+from utils.llm.errors import LlmError
+
 from .contracts import (
     ChecklistItem,
     ReportSemanticRequest,
@@ -74,6 +77,7 @@ class ReportInterpretation(BaseModel):
     claims: tuple[ReportViewClaim, ...] = ()
     records: tuple[SemanticRecord, ...] = ()
     checks: tuple[ReportViewCheck, ...] = ()
+    record_dispositions: tuple[dict[str, Any], ...] = ()
     call_receipts: tuple[dict[str, Any], ...] = ()
     gaps: tuple[str, ...] = ()
     verified_dimensions: tuple[str, ...] = ()
@@ -82,6 +86,7 @@ class ReportInterpretation(BaseModel):
     real_semantic_complete: bool = False
     elapsed_seconds: float = Field(default=0, ge=0)
     tokens_charged: int = Field(default=0, ge=0)
+    budget_ledger: dict[str, Any] = Field(default_factory=dict)
     # Usage/cost absence is unknown, never zero measured expenditure.
     cost_status: Literal["unknown"] = "unknown"
 
@@ -149,6 +154,7 @@ def interpret_report(
     started_at: float | None = None,
     structured_records: Sequence[SemanticRecord] = (),
     active_checklist: Sequence[ChecklistItem] = (),
+    execution_budget: LlmRunBudget | None = None,
 ) -> ReportInterpretation:
     """Run source inventory → linked views → source-based verify within one report.
 
@@ -176,6 +182,8 @@ def interpret_report(
     claims: tuple[ReportViewClaim, ...] = ()
     records: tuple[SemanticRecord, ...] = ()
     checks: tuple[ReportViewCheck, ...] = ()
+    dispositions: list[dict[str, Any]] = []
+    quarantined: set[str] = set()
     receipts: list[dict[str, Any]] = []
     tokens = 0
     seen_condition_ids: set[str] = set()
@@ -199,7 +207,11 @@ def interpret_report(
 
     def invoke(purpose, source_pages, **payload):
         nonlocal tokens
-        remaining = 900 - (time.monotonic() - start)
+        remaining = (
+            execution_budget.remaining()
+            if execution_budget
+            else 900 - (time.monotonic() - start)
+        )
         if remaining <= 0 or len(receipts) >= 16:
             raise ValueError("report_deadline_or_request_budget_exhausted")
         request = ReportSemanticRequest(
@@ -216,9 +228,10 @@ def interpret_report(
         reserve = (
             len(request.model_dump_json().encode("utf-8")) + request.max_output_tokens
         )
-        if tokens + reserve > limit:
+        if execution_budget is None and tokens + reserve > limit:
             raise ValueError("report_token_budget_exhausted")
-        tokens += reserve
+        if execution_budget is None:
+            tokens += reserve
         before = len(getattr(provider, "traces", ()))
         receipt = {
             "request_id": request.request_id,
@@ -260,7 +273,10 @@ def interpret_report(
                 if all(value is not None for value in total):
                     actual = sum(total)
                     receipt["usage"] = {"total_tokens": actual}
-                    tokens += actual - reserve
+                    if execution_budget is None:
+                        tokens += actual - reserve
+            if execution_budget is not None:
+                tokens = execution_budget.snapshot()["charged_tokens"]
             if tokens > limit:
                 raise ValueError("report_token_budget_exceeded")
 
@@ -269,9 +285,14 @@ def interpret_report(
             raise ValueError("semantic_provider_unavailable")
         # A fake provider must identify itself; a real gateway cannot accidentally
         # be called under an offline test identity. Real admission is a later A0 binding.
-        if mode == "provider":
+        if mode == "provider" and (
+            execution_budget is None
+            or getattr(provider, "run_budget", None) is not execution_budget
+            or getattr(provider, "execution_authorization", {}).get("status")
+            != "authorized"
+        ):
             raise ValueError("a0_real_execution_binding_required")
-        if not getattr(provider, "offline_only", False):
+        if mode == "offline_fake" and not getattr(provider, "offline_only", False):
             raise ValueError("offline_identity_requires_fake_provider")
         if identity.get("prompt_version") != REPORT_PROMPT:
             raise ValueError("unregistered_report_prompt_version")
@@ -337,7 +358,15 @@ def interpret_report(
                     page_state["status"] = "read"
         # Synthesis receives full cited pages, including surrounding headers and
         # adjacent continuation pages. Discovery has already accounted for all pages.
-        cited = {e.page for c in conditions for e in c.evidence}
+        cited_evidence = (
+            *(e for c in conditions for e in c.evidence),
+            *structured_evidence.values(),
+        )
+        cited = {
+            page
+            for e in cited_evidence
+            for page in (e.page, *e.continuation_pages, *e.subject_evidence_pages)
+        }
         selected = tuple(
             p
             for p in sources
@@ -352,17 +381,22 @@ def interpret_report(
             records=tuple(structured.values()),
             active_checklist=tuple(active_checklist),
         )
-        claims, records = response.claims, response.records
+        claims, candidates = response.claims, response.records
+        # Reliable native facts are inputs to verification and delivery, not a
+        # model transcription obligation. Keep rejected variants separate below.
         condition_map = {item.condition_id: item for item in conditions}
-        record_map = {record.record_id: record for record in records}
         invalid_records = set()
-        for record in records:
+        merged = {}
+        for record in (*structured.values(), *candidates):
             scope_valid = record_scope_valid(record)
-            numeric_valid = True
-            if isinstance(record, Measurement):
-                # Reuse the existing structured parser's cell/value/unit binding.
-                # The model cannot alter values or transcribe a parallel table.
-                numeric_valid = structured.get(record.record_id) == record
+            original = structured.get(record.record_id)
+            numeric_valid = (
+                original == record
+                if original is not None
+                else not isinstance(record, Measurement)
+                and record.source_native.value is None
+                and record.source_native.unit is None
+            )
             period_valid = (
                 structured.get(record.record_id) == record
                 or record.reported_period == report.report_period
@@ -387,6 +421,21 @@ def interpret_report(
             ):
                 invalid_records.add(record.record_id)
                 gaps.append(f"invalid_record_identity_or_evidence:{record.record_id}")
+                dispositions.append(
+                    {
+                        "record_id": record.record_id,
+                        "status": "candidate_rejected",
+                        "reason": "native_identity_value_or_evidence_changed",
+                        "candidate": record.model_dump(mode="json"),
+                        "original_preserved": original is not None,
+                    }
+                )
+            else:
+                merged[record.record_id] = record
+        # Verify the preserved original too. A rejected variant must not mask a
+        # genuine source conflict in the reliable fact under the same record ID.
+        records = tuple(merged.values())
+        record_map = {record.record_id: record for record in records}
         invalid_claims = set()
         for claim in claims:
             if (
@@ -402,7 +451,7 @@ def interpret_report(
                 invalid_claims.add(claim.claim_id)
                 gaps.append(f"invalid_claim_reference:{claim.claim_id}")
         # Verify has original source plus source-first conditions and the complete
-        # draft, including invalid candidates; it may reject, never rewrite.
+        # draft. Rejected variants remain in dispositions, outside the fact set.
         response = invoke(
             "verify_views",
             selected,
@@ -412,6 +461,26 @@ def interpret_report(
             active_checklist=tuple(active_checklist),
         )
         checks = response.checks
+        # Retain explicit conflicts even if another verification target is missing.
+        # Pipeline failure may keep reliable independent facts, never these facts.
+        for check in checks:
+            if (
+                check.target_type == "record"
+                and check.status != "pass"
+                and check.target_id in record_map
+            ):
+                key = check.target_id
+                quarantined.add(key)
+                gaps.append(f"record_semantic_conflict:{key}")
+                dispositions.append(
+                    {
+                        "record_id": key,
+                        "status": "quarantined",
+                        "reason": check.explanation,
+                        "candidate": record_map[key].model_dump(mode="json"),
+                        "original_preserved": False,
+                    }
+                )
         targets = (
             {("condition", item.condition_id) for item in conditions}
             | {("claim", item.claim_id) for item in claims}
@@ -420,12 +489,13 @@ def interpret_report(
         if {(item.target_type, item.target_id) for item in checks} != targets:
             raise ValueError("semantic_verify_targets_missing_or_extra")
         verdicts = {(item.target_type, item.target_id): item.status for item in checks}
-        records = tuple(
-            record
-            for record in records
-            if record.record_id not in invalid_records
-            and verdicts[("record", record.record_id)] == "pass"
-        )
+        accepted = {}
+        for record in records:
+            key = record.record_id
+            if key in quarantined:
+                continue
+            accepted[key] = record
+        records = tuple(accepted.values())
         accepted_ids = {item.record_id for item in records}
         safe_claims = []
         for claim in claims:
@@ -458,10 +528,12 @@ def interpret_report(
                 and verdicts[("condition", condition.condition_id)] != "pass"
             ):
                 gaps.append(f"major_condition_not_delivered:{condition.condition_id}")
-    except (SemanticProviderError, ValueError, TypeError) as exc:
+    except (SemanticProviderError, LlmError, ValueError, TypeError) as exc:
         gaps.append(f"semantic_incomplete:{str(exc)[:240]}")
         records = tuple(
-            item for item in structured.values() if record_scope_valid(item)
+            item
+            for item in structured.values()
+            if record_scope_valid(item) and item.record_id not in quarantined
         )
         claims = tuple(
             claim.model_copy(
@@ -520,6 +592,7 @@ def interpret_report(
         claims=claims,
         records=records,
         checks=checks,
+        record_dispositions=tuple(dispositions),
         call_receipts=tuple(receipts),
         gaps=tuple(gaps),
         verified_dimensions=tuple(valid_dimensions),
@@ -527,6 +600,7 @@ def interpret_report(
         semantic_complete=complete and mode == "provider",
         real_semantic_complete=complete and mode == "provider",
         tokens_charged=max(0, tokens),
+        budget_ledger=execution_budget.snapshot() if execution_budget else {},
         elapsed_seconds=max(0.0, time.monotonic() - start),
     )
 
@@ -586,6 +660,8 @@ def research_views(result: ReportInterpretation) -> dict[str, Any]:
         "execution_mode": result.execution_mode,
         "gaps": list(result.gaps),
         "call_receipts": list(result.call_receipts),
+        "record_dispositions": list(result.record_dispositions),
+        "budget_ledger": result.budget_ledger,
         "classification": (
             "offline_fixture"
             if result.execution_mode == "offline_fake"

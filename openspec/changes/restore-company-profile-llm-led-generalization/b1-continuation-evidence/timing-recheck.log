@@ -1,0 +1,9 @@
+..                                                                       [100%]
+============================= slowest 10 durations =============================
+0.65s call     tests/unit/test_utils/test_llm_routed_client.py::test_streaming_idempotency_header_is_stable_across_failover
+0.18s call     tests/unit/test_utils/test_llm_gateway.py::test_client_execution_deadline_is_classified_separately
+0.07s teardown tests/unit/test_utils/test_llm_gateway.py::test_client_execution_deadline_is_classified_separately
+0.06s teardown tests/unit/test_utils/test_llm_routed_client.py::test_streaming_idempotency_header_is_stable_across_failover
+0.03s setup    tests/unit/test_utils/test_llm_gateway.py::test_client_execution_deadline_is_classified_separately
+0.03s setup    tests/unit/test_utils/test_llm_routed_client.py::test_streaming_idempotency_header_is_stable_across_failover
+2 passed, 6 warnings in 1.71s

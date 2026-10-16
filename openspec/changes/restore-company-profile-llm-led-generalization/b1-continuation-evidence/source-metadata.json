@@ -1,0 +1,37 @@
+{
+  "official_announcement": {
+    "source": "cninfo",
+    "source_announcement_id": "1225229913",
+    "title": "歌华有线2025年年度报告",
+    "instrument_id": "600037.SH",
+    "exchange": "SSE",
+    "published_at": "2026-04-28T16:00:00+00:00",
+    "published_at_precision": "instant",
+    "raw_payload_hash": "0345fb47a1c371280dc1b4f10ea33942298738923f11854622a7acf69c8c20d6"
+  },
+  "official_attachment_versions": [
+    {
+      "attachment_id": "att_3b2c9ec8dea524fb330e20a7dc140b65",
+      "schema_version": "official_announcement_attachment.v1",
+      "announcement_id": "ann_ae543786170a6fde81182bd8c79345eb",
+      "attachment_identity": "https://static.cninfo.com.cn/finalpage/2026-04-29/1225229913.PDF",
+      "source_attachment_id": null,
+      "source_url": "finalpage/2026-04-29/1225229913.PDF",
+      "normalized_source_url": "https://static.cninfo.com.cn/finalpage/2026-04-29/1225229913.PDF",
+      "name": null,
+      "media_type": "application/pdf",
+      "content_length_hint": null,
+      "first_observed_at": "2026-08-14T03:24:45.319908+00:00",
+      "last_observed_at": "2026-08-18T16:21:37.418747+00:00",
+      "metadata_json": "{\"adjunct_type\":\"PDF\",\"asset_classification\":{\"correction_evidence\":false,\"document_family\":\"annual_report\",\"fiscal_year\":2025,\"is_eligible\":true,\"is_full_report\":true,\"policy_version\":\"formal_annual_report.v1\",\"reasons\":[\"eligible_complete_original\"],\"report_period\":\"2025-12-31\",\"variant\":\"original\",\"vocabulary_version\":\"official_document_classification.v1\"}}",
+      "created_at": "2026-08-14T03:24:45.319908+00:00",
+      "updated_at": "2026-08-18T16:21:37.418747+00:00",
+      "version_id": "ver_23660af33d9962113d17e0ece2487194",
+      "observation_key": "obs_5b55a87522b330c36233e34f5315b1bb",
+      "version_available_at": "2026-08-14T19:46:59.688310+08:00",
+      "integrity_status": "valid",
+      "retrieval_status": "success",
+      "content_hash": "b5b6be18424b7c3d7d7988f755ff7083141831904d4347c07cba1da8452c8b76"
+    }
+  ]
+}

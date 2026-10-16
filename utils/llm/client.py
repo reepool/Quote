@@ -16,6 +16,7 @@ from dataclasses import asdict, dataclass, replace
 from typing import Any, Callable, Mapping, Optional, Protocol
 from urllib.parse import urlsplit, urlunsplit
 
+from .budget import LlmRunBudget
 from .errors import (
     LlmAuthenticationError,
     LlmCancelledError,
@@ -83,7 +84,9 @@ class LlmClient:
         pool_coordinator_registry: Optional[LlmPoolCoordinatorRegistry] = None,
         owns_transport: Optional[bool] = None,
         random_source: Callable[[], float] = random.random,
+        physical_budget: LlmRunBudget | None = None,
     ) -> None:
+        self.physical_budget = physical_budget
         self.config = config if isinstance(config, LlmConfig) else LlmConfig.from_mapping(config)
         if transport is None:
             max_connections = max(
@@ -120,6 +123,27 @@ class LlmClient:
 
     async def complete(self, request: LlmRequest) -> LlmResponse:
         """Execute a stable logical profile through a route or direct fallback."""
+        if self.physical_budget is None:
+            return await self._complete_with_route(request)
+        try:
+            async with asyncio.timeout(self.physical_budget.remaining()):
+                return await self._complete_with_route(request)
+        except TimeoutError as exc:
+            self.physical_budget.cancel("business_entry_deadline_exhausted")
+            raise LlmDeadlineExceededError("business entry deadline exhausted") from exc
+        except asyncio.CancelledError:
+            self.physical_budget.cancel()
+            raise
+        except LlmCancelledError as exc:
+            try:
+                self.physical_budget.remaining()
+            except LlmDeadlineExceededError:
+                self.physical_budget.cancel("business_entry_deadline_exhausted")
+                raise LlmDeadlineExceededError("business entry deadline exhausted") from exc
+            self.physical_budget.cancel()
+            raise
+
+    async def _complete_with_route(self, request: LlmRequest) -> LlmResponse:
         if self._closed:
             raise LlmConfigurationError("LLM client is closed")
         if not self.config.enabled:
@@ -1317,6 +1341,8 @@ class LlmClient:
         max_attempts: int,
     ) -> TransportResponse:
         remaining = deadline - time.monotonic()
+        if self.physical_budget is not None:
+            remaining = min(remaining, self.physical_budget.remaining())
         if remaining <= 0:
             raise LlmDeadlineExceededError()
         attempt_timeout = min(profile.attempt_timeout_seconds, remaining)
@@ -1331,19 +1357,31 @@ class LlmClient:
             attempt_timeout,
             remaining,
         )
-        return await asyncio.wait_for(
-            self.transport.send(
-                url,
-                self._attempt_headers(
-                    headers,
-                    profile=profile,
-                    idempotency_key=idempotency_key,
-                ),
-                payload,
-                attempt_timeout,
-            ),
-            timeout=attempt_timeout,
-        )
+        ticket = None
+        if self.physical_budget is not None:
+            ticket = self.physical_budget.reserve(
+                resource=self.config.resource_for_profile(profile).name,
+                model=str(payload["model"]), profile=profile.name, payload=payload,
+                request_id=request_id, attempt=attempt_count,
+            )
+        try:
+            response = await asyncio.wait_for(
+                self.transport.send(
+                    url,
+                    self._attempt_headers(headers, profile=profile, idempotency_key=idempotency_key),
+                    payload, attempt_timeout,
+                ), timeout=attempt_timeout,
+            )
+        except BaseException:
+            if ticket is not None:
+                self.physical_budget.settle(ticket, None, status="failed_or_cancelled")
+            raise
+        if ticket is not None:
+            self.physical_budget.settle(
+                ticket, LlmUsage.from_mapping((response.data or {}).get("usage")),
+                status="success" if 200 <= response.status_code < 300 else "http_failure",
+            )
+        return response
 
     def _resolve_profile(self, name: str) -> LlmProfile:
         profile_name = str(name or "").strip()

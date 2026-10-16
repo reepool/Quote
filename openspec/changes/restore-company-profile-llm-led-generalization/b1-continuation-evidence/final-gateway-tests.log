@@ -1,0 +1,131 @@
+.....FF...FFF....................................................F.....F [ 47%]
+FFF.F................................................................... [ 94%]
+.........                                                                [100%]
+=================================== FAILURES ===================================
+___________ test_client_execution_deadline_is_classified_separately ____________
+tests/unit/test_utils/test_llm_gateway.py:312: in test_client_execution_deadline_is_classified_separately
+    assert error.transport_error_type == "client_execution_deadline"
+E   AssertionError: assert None == 'client_execution_deadline'
+E    +  where None = LlmDeadlineExceededError(code='deadline_exceeded', message='LLM request deadline exceeded', retryable=False, status_co...ase=None, transport_exception_type=None, finish_reason=None, requested_output_tokens=None, observed_output_tokens=None).transport_error_type
+___________ test_initial_queue_wait_preserves_full_execution_budget ____________
+tests/unit/test_utils/test_llm_gateway.py:358: in test_initial_queue_wait_preserves_full_execution_budget
+    first_response, second_response = await asyncio.gather(first, second)
+utils/llm/client.py:127: in complete
+    return await self._complete_with_route(request)
+utils/llm/client.py:155: in _complete_with_route
+    response = await self._complete_concrete(request, budget=budget)
+utils/llm/client.py:1299: in _complete_concrete
+    raise contextual from exc
+utils/llm/client.py:1122: in _complete_concrete
+    raise last_error from exc
+E   utils.llm.errors.LlmDeadlineExceededError: LLM request deadline exceeded
+_____ test_response_parsing_cannot_return_success_after_execution_deadline _____
+tests/unit/test_utils/test_llm_gateway.py:490: in test_response_parsing_cannot_return_success_after_execution_deadline
+    assert len(transport.calls) == 1
+E   assert 0 == 1
+E    +  where 0 = len([])
+E    +    where [] = <utils.llm.testing.ScriptedTransport object at 0x7ffa48413bd0>.calls
+______ test_response_parsing_failure_prefers_execution_deadline[not-json] ______
+tests/unit/test_utils/test_llm_gateway.py:531: in test_response_parsing_failure_prefers_execution_deadline
+    assert len(transport.calls) == 1
+E   assert 0 == 1
+E    +  where 0 = len([])
+E    +    where [] = <utils.llm.testing.ScriptedTransport object at 0x7ffa484126d0>.calls
+_ test_response_parsing_failure_prefers_execution_deadline[{"label": "missing-score"}] _
+tests/unit/test_utils/test_llm_gateway.py:531: in test_response_parsing_failure_prefers_execution_deadline
+    assert len(transport.calls) == 1
+E   assert 0 == 1
+E    +  where 0 = len([])
+E    +    where [] = <utils.llm.testing.ScriptedTransport object at 0x7ffa48621cd0>.calls
+_________ test_multihop_failover_metrics_keep_initial_trigger_category _________
+tests/unit/test_utils/test_llm_routed_client.py:484: in test_multihop_failover_metrics_keep_initial_trigger_category
+    response = await client.complete(_request())
+utils/llm/client.py:127: in complete
+    return await self._complete_with_route(request)
+utils/llm/client.py:189: in _complete_with_route
+    return await self._complete_routed(
+utils/llm/client.py:513: in _complete_routed
+    raise last_error
+utils/llm/client.py:299: in _complete_routed
+    response = await self._complete_concrete(
+utils/llm/client.py:1299: in _complete_concrete
+    raise contextual from exc
+utils/llm/client.py:1216: in _complete_concrete
+    raise last_error
+utils/llm/client.py:974: in _complete_concrete
+    raise provider_error
+E   utils.llm.errors.LlmTransientTransportError: LLM provider returned a retryable response
+_____________ test_failover_reuses_one_absolute_execution_deadline _____________
+tests/unit/test_utils/test_llm_routed_client.py:599: in test_failover_reuses_one_absolute_execution_deadline
+    response = await _client(
+utils/llm/client.py:127: in complete
+    return await self._complete_with_route(request)
+utils/llm/client.py:189: in _complete_with_route
+    return await self._complete_routed(
+utils/llm/client.py:513: in _complete_routed
+    raise last_error
+utils/llm/client.py:261: in _complete_routed
+    raise LlmDeadlineExceededError()
+E   utils.llm.errors.LlmDeadlineExceededError: LLM request deadline exceeded
+__________ test_stalled_first_source_reserves_time_for_second_member ___________
+tests/unit/test_utils/test_llm_routed_client.py:627: in test_stalled_first_source_reserves_time_for_second_member
+    response = await _client(
+utils/llm/client.py:127: in complete
+    return await self._complete_with_route(request)
+utils/llm/client.py:189: in _complete_with_route
+    return await self._complete_routed(
+utils/llm/client.py:513: in _complete_routed
+    raise last_error
+utils/llm/client.py:299: in _complete_routed
+    response = await self._complete_concrete(
+utils/llm/client.py:1299: in _complete_concrete
+    raise contextual from exc
+utils/llm/client.py:1127: in _complete_concrete
+    raise last_error from exc
+E   utils.llm.errors.LlmTransientTransportError: LLM provider request timed out
+___________ test_routed_client_preserves_client_timeout_diagnostics ____________
+tests/unit/test_utils/test_llm_routed_client.py:670: in test_routed_client_preserves_client_timeout_diagnostics
+    assert len(attempts) == 2
+E   AssertionError: assert 1 == 2
+E    +  where 1 = len([{'attempt_count': 1, 'attempt_failures': [{'attempt_sequence': 1, 'error_code': 'transient_transport_error', 'status_...t_error_type': 'client_attempt_timeout', ...}], 'attempt_sequence': 1, 'error_code': 'transient_transport_error', ...}])
+__________ test_configuration_and_exhausted_deadline_do_not_fail_over __________
+tests/unit/test_utils/test_llm_routed_client.py:695: in test_configuration_and_exhausted_deadline_do_not_fail_over
+    assert error.transport_error_type == "client_execution_deadline"
+E   AssertionError: assert None == 'client_execution_deadline'
+E    +  where None = LlmDeadlineExceededError(code='deadline_exceeded', message='LLM request deadline exceeded', retryable=False, status_co...ase=None, transport_exception_type=None, finish_reason=None, requested_output_tokens=None, observed_output_tokens=None).transport_error_type
+____________ test_routing_logs_use_stable_levels_and_redact_content ____________
+tests/unit/test_utils/test_llm_routed_client.py:746: in test_routing_logs_use_stable_levels_and_redact_content
+    await _client(_config(), transport).complete(
+utils/llm/client.py:127: in complete
+    return await self._complete_with_route(request)
+utils/llm/client.py:189: in _complete_with_route
+    return await self._complete_routed(
+utils/llm/client.py:513: in _complete_routed
+    raise last_error
+utils/llm/client.py:261: in _complete_routed
+    raise LlmDeadlineExceededError()
+E   utils.llm.errors.LlmDeadlineExceededError: LLM request deadline exceeded
+============================= slowest 10 durations =============================
+3.64s call     tests/unit/test_utils/test_llm_pool_routing.py::test_deterministic_three_to_one_fairness_and_low_weight_non_starvation
+1.15s call     tests/unit/test_utils/test_llm_orchestration.py::test_two_clients_and_profiles_share_one_provider_ceiling
+1.13s call     tests/unit/test_utils/test_llm_routed_client.py::test_authentication_fails_closed_unless_explicitly_enabled
+0.96s call     tests/unit/test_utils/test_llm_routed_client.py::test_routing_logs_use_stable_levels_and_redact_content
+0.91s call     tests/unit/test_utils/test_llm_orchestration.py::test_orchestration_disable_keeps_profile_only_rollback_path
+0.79s call     tests/unit/test_utils/test_llm_routed_client.py::test_configuration_and_exhausted_deadline_do_not_fail_over
+0.75s call     tests/unit/test_utils/test_llm_routed_client.py::test_multihop_failover_metrics_keep_initial_trigger_category
+0.74s call     tests/unit/test_utils/test_llm_routed_client.py::test_all_sources_failure_is_classified_and_releases_pool_permit
+0.71s call     tests/unit/test_utils/test_llm_routed_client.py::test_streaming_idempotency_header_is_stable_across_failover
+0.70s call     tests/unit/test_utils/test_llm_pool_routing.py::test_registry_shares_pool_cap_across_clients_and_logical_profiles
+=========================== short test summary info ============================
+FAILED tests/unit/test_utils/test_llm_gateway.py::test_client_execution_deadline_is_classified_separately - AssertionError: assert None == 'client_execution_deadline'
+FAILED tests/unit/test_utils/test_llm_gateway.py::test_initial_queue_wait_preserves_full_execution_budget - utils.llm.errors.LlmDeadlineExceededError: LLM request deadline exceeded
+FAILED tests/unit/test_utils/test_llm_gateway.py::test_response_parsing_cannot_return_success_after_execution_deadline - assert 0 == 1
+FAILED tests/unit/test_utils/test_llm_gateway.py::test_response_parsing_failure_prefers_execution_deadline[not-json] - assert 0 == 1
+FAILED tests/unit/test_utils/test_llm_gateway.py::test_response_parsing_failure_prefers_execution_deadline[{"label": "missing-score"}] - assert 0 == 1
+FAILED tests/unit/test_utils/test_llm_routed_client.py::test_multihop_failover_metrics_keep_initial_trigger_category - utils.llm.errors.LlmTransientTransportError: LLM provider returned a retrya...
+FAILED tests/unit/test_utils/test_llm_routed_client.py::test_failover_reuses_one_absolute_execution_deadline - utils.llm.errors.LlmDeadlineExceededError: LLM request deadline exceeded
+FAILED tests/unit/test_utils/test_llm_routed_client.py::test_stalled_first_source_reserves_time_for_second_member - utils.llm.errors.LlmTransientTransportError: LLM provider request timed out
+FAILED tests/unit/test_utils/test_llm_routed_client.py::test_routed_client_preserves_client_timeout_diagnostics - AssertionError: assert 1 == 2
+FAILED tests/unit/test_utils/test_llm_routed_client.py::test_configuration_and_exhausted_deadline_do_not_fail_over - AssertionError: assert None == 'client_execution_deadline'
+FAILED tests/unit/test_utils/test_llm_routed_client.py::test_routing_logs_use_stable_levels_and_redact_content - utils.llm.errors.LlmDeadlineExceededError: LLM request deadline exceeded
+11 failed, 142 passed, 6 warnings in 57.38s

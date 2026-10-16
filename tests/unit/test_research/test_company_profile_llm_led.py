@@ -375,7 +375,11 @@ def test_reliable_numeric_records_reused_and_model_value_or_unit_mutation_isolat
         StructuredProvider(), report=numeric.report, structured_records=(numeric,)
     )
     if mutated_field:
-        assert numeric.record_id not in {record.record_id for record in result.records}
+        assert numeric in result.records  # reject the variant, preserve the native fact
+        assert all(
+            r == numeric for r in result.records if r.record_id == numeric.record_id
+        )
+        assert result.record_dispositions[0]["status"] == "candidate_rejected"
         assert not core_assessment(result).revenue_model.answered
     else:
         assert numeric in result.records
@@ -397,6 +401,164 @@ def test_real_execution_is_not_authorized_by_offline_development():
     assert not provider.requests
     assert not result.real_semantic_complete
     assert any("a0_real_execution_binding_required" in gap for gap in result.gaps)
+
+
+def test_native_numeric_fact_survives_model_omission_and_is_verified():
+    from pydantic import TypeAdapter
+
+    from research.company_profile.models import SemanticRecord
+    from tests.unit.test_research.test_company_profile_runtime import _reference_payload
+
+    numeric = next(
+        TypeAdapter(SemanticRecord).validate_json(json.dumps(raw))
+        for raw in _reference_payload()["records"]
+        if raw["object_type"] == "Measurement"
+    )
+    provider = FakeReportProvider()
+    result = _run(provider, report=numeric.report, structured_records=(numeric,))
+    assert numeric in result.records
+    assert numeric in provider.requests[-1].records
+    assert result.draft_complete
+
+
+def test_preserved_native_fact_keeps_its_source_page_in_verify_context():
+    from pydantic import TypeAdapter
+
+    from research.company_profile.models import SemanticRecord
+    from tests.unit.test_research.test_company_profile_runtime import _reference_payload
+
+    numeric = next(
+        TypeAdapter(SemanticRecord).validate_json(json.dumps(raw))
+        for raw in _reference_payload()["records"]
+        if raw["object_type"] == "Measurement"
+    )
+    native_text = f"{numeric.source_native.name} {numeric.source_native.value} {numeric.source_native.unit}"
+    numeric = numeric.model_copy(
+        update={
+            "evidence": tuple(
+                e.model_copy(
+                    update={"page": 3, "anchor": TextAnchor(bounded_quote=native_text)}
+                )
+                for e in numeric.evidence
+            )
+        }
+    )
+    provider = FakeReportProvider()
+    result = _run(
+        provider,
+        report=numeric.report,
+        structured_records=(numeric,),
+        pages=(
+            {"page": 1, "text": TEXT},
+            {"page": 2, "text": "中间页"},
+            {"page": 3, "text": native_text},
+        ),
+    )
+    assert numeric in result.records
+    assert 3 in {p["page"] for p in provider.requests[-1].source_pages}
+
+
+@pytest.mark.parametrize("new_id", [False, True])
+def test_segment_cannot_add_amount_even_with_a_new_candidate_id(new_id):
+    from pydantic import TypeAdapter
+
+    from research.company_profile.models import SemanticRecord
+    from tests.unit.test_research.test_company_profile_runtime import _reference_payload
+
+    original = next(
+        TypeAdapter(SemanticRecord).validate_json(json.dumps(raw))
+        for raw in _reference_payload()["records"]
+        if raw["object_type"] == "Segment"
+    )
+
+    class AddedAmount(FakeReportProvider):
+        def interpret(self, request):
+            response = super().interpret(request)
+            if request.purpose == "synthesize_views":
+                changed = original.model_copy(
+                    update={
+                        "record_id": "new-segment" if new_id else original.record_id,
+                        "source_native": original.source_native.model_copy(
+                            update={"value": "999999999", "unit": "元"}
+                        ),
+                    }
+                )
+                return response.model_copy(
+                    update={"records": (*response.records, changed)}
+                )
+            return response
+
+    result = _run(AddedAmount(), report=original.report, structured_records=(original,))
+    assert original in result.records
+    assert all(r.source_native.value != "999999999" for r in result.records)
+    assert result.record_dispositions[0]["status"] == "candidate_rejected"
+    assert any("invalid_record" in g for g in result.gaps)
+
+
+@pytest.mark.parametrize("incomplete_verify", [False, True])
+def test_native_fact_semantic_conflict_quarantines_fact_and_dependent_answer(
+    incomplete_verify,
+):
+    from pydantic import TypeAdapter
+
+    from research.company_profile.models import SemanticRecord
+    from tests.unit.test_research.test_company_profile_runtime import _reference_payload
+
+    numeric = next(
+        TypeAdapter(SemanticRecord).validate_json(json.dumps(raw))
+        for raw in _reference_payload()["records"]
+        if raw["object_type"] == "Measurement"
+    )
+
+    class ConflictingFact(FakeReportProvider):
+        def interpret(self, request):
+            response = super().interpret(request)
+            if request.purpose == "synthesize_views":
+                return response.model_copy(
+                    update={
+                        "claims": tuple(
+                            c.model_copy(
+                                update={"supporting_record_ids": (numeric.record_id,)}
+                            )
+                            if c.dimension == "revenue_model"
+                            else c
+                            for c in response.claims
+                        )
+                    }
+                )
+            if request.purpose == "verify_views":
+                return response.model_copy(
+                    update={
+                        "checks": tuple(
+                            c.model_copy(
+                                update={
+                                    "status": "unclear",
+                                    "explanation": "同口径来源冲突待核",
+                                }
+                            )
+                            if c.target_type == "record"
+                            and c.target_id == numeric.record_id
+                            else c
+                            for c in response.checks
+                            if not incomplete_verify
+                            or c.target_id != "upstream_downstream"
+                        )
+                    }
+                )
+            return response
+
+    result = _run(
+        ConflictingFact(), report=numeric.report, structured_records=(numeric,)
+    )
+    assert numeric not in result.records
+    if not incomplete_verify:
+        assert result.records  # unrelated, verified overview survives
+    assert not result.draft_complete
+    assert (
+        next(c for c in result.claims if c.dimension == "revenue_model").status
+        == "unclear"
+    )
+    assert result.record_dispositions[0]["reason"] == "同口径来源冲突待核"
 
 
 def test_unknown_purpose_and_source_first_answer_leak_rejected_before_provider():

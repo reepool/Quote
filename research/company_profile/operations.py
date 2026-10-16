@@ -114,6 +114,8 @@ from research.company_profile.stage4_restricted_read import (
     resolved_replay_dirs,
 )
 from utils.date_utils import get_shanghai_time
+from utils.llm.budget import LlmRunBudget
+from utils.llm.errors import LlmDeadlineExceededError
 
 logger = logging.getLogger(__name__)
 
@@ -228,8 +230,11 @@ def _knowledge_cutoff(value: str | None) -> str:
 class OfficialAnnualReportPageSource:
     """Load report identity and pages from the existing official annual-report store."""
 
-    def __init__(self, repository: BusinessProfileWorkRepository) -> None:
+    def __init__(
+        self, repository: BusinessProfileWorkRepository, *, artifact_store: Any = None
+    ) -> None:
         self.repository = repository
+        self.artifact_store = artifact_store
 
     def __call__(self, item: Mapping[str, Any]) -> dict[str, Any] | None:
         if self.repository.shared_asset_access is None:
@@ -252,6 +257,7 @@ class OfficialAnnualReportPageSource:
         try:
             extracted = ensure_archived_pdf_page_artifact(
                 asset,
+                store=self.artifact_store,
                 retry_failed_artifact=bool(
                     (item.get("metadata") or {}).get("pdf_parse_retry_authorized")
                 ),
@@ -590,8 +596,10 @@ class CompanyProfileTaskService:
         live_plan: CompanyProfileLivePlan | None = None,
         processing_identity: Mapping[str, Any] | None = None,
         plan_directory: str | Path | None = None,
+        execution_budget: LlmRunBudget | None = None,
     ) -> None:
         self.storage = storage
+        self.execution_budget = execution_budget
         self.output_root = Path(output_root)
         self.checkpoint_root = Path(checkpoint_root)
         self.provider = provider
@@ -636,6 +644,7 @@ class CompanyProfileTaskService:
             provider=provider,
             page_source=self.page_source,
             token_budget=self.token_budget,
+            execution_budget=execution_budget,
         )
         self.production = BusinessProfileAsyncProductionService(
             repository=self.repository,
@@ -671,6 +680,10 @@ class CompanyProfileTaskService:
         work_id: str | None = None,
         plan_directory: str | Path | None = None,
     ) -> dict[str, Any]:
+        if self.execution_budget is not None:
+            max_elapsed_seconds = min(
+                max_elapsed_seconds, self.execution_budget.remaining_time()
+            )
         if processing_identity:
             self.processing_identity = dict(processing_identity)
             self.processing_identity_hash = _stable_hash(self.processing_identity)
@@ -1652,6 +1665,11 @@ class CompanyProfileTaskService:
         )
 
     def _should_stop_run(self) -> bool:
+        if self.execution_budget is not None:
+            try:
+                self.execution_budget.remaining_time()
+            except LlmDeadlineExceededError:
+                return True
         return self.control.stop_requested() or not self._publication_allows_writes()
 
     def _ensure_publication_allows_writes(self) -> None:
@@ -1719,10 +1737,13 @@ async def execute_published_task(
     processing_identity: Mapping[str, Any] | None = None,
     work_id: str | None = None,
     plan_directory: str | Path | None = None,
+    execution_budget: LlmRunBudget | None = None,
 ) -> dict[str, Any]:
     """Unique owner entry for the published company-profile task operations."""
 
     entry_started = time.monotonic()
+    if execution_budget is not None:
+        execution_budget.remaining_time()
     normalized = str(action or "").strip().lower()
     if normalized in {"run", "resume"}:
         publication = load_publication_control(checkpoint_root)
@@ -1754,6 +1775,7 @@ async def execute_published_task(
         live_plan=live_plan,
         processing_identity=processing_identity,
         plan_directory=plan_directory,
+        execution_budget=execution_budget,
     )
     logger.info("Company-profile entry: task service ready")
     if normalized in {"run", "resume"}:

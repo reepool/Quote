@@ -20,6 +20,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
 from research.business_profile_async_production import _run_thread_call
+from utils.llm.budget import LlmRunBudget
 
 from .contracts import (
     ChecklistItem,
@@ -300,8 +301,10 @@ class CompanyProfileStageRuntime:
         extract_base_tokens: int = DEFAULT_EXTRACT_BASE_TOKENS,
         verify_base_tokens: int = DEFAULT_VERIFY_BASE_TOKENS,
         transport_retries: int = TRANSPORT_RETRY_LIMIT,
+        execution_budget: LlmRunBudget | None = None,
     ) -> None:
         self.writer = writer
+        self.execution_budget = execution_budget
         self._report_provider = provider
         self.page_source = page_source
         self.stop_after_chapter = stop_after_chapter
@@ -376,6 +379,11 @@ class CompanyProfileStageRuntime:
     ) -> dict[str, Any]:
         if stage not in QUEUE_STAGES:
             raise ValueError(f"unsupported company-profile runtime stage: {stage}")
+        if self.execution_budget is not None:
+            if stage in {"verify", "publish"}:
+                self.execution_budget.remaining_time()
+            else:
+                self.execution_budget.remaining()
         state = self._bind(item)
         self._active_state = state
         try:
@@ -517,6 +525,7 @@ class CompanyProfileStageRuntime:
                     for chapter, fields in _CORE_FIELDS.items()
                     for field_id in fields
                 ),
+                execution_budget=self.execution_budget,
             )
             state.provider_calls = [
                 item["purpose"] for item in state.report_interpretation.call_receipts

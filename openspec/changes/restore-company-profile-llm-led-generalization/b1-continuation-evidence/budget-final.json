@@ -1,0 +1,36 @@
+{
+  "physical_requests": 1,
+  "charged_tokens": 96134,
+  "charged_cost_cny": "0.100134",
+  "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+  "stopped_reason": "physical_request_token_context_or_cost_budget_exhausted",
+  "denied_request": {
+    "request_id": "2341be8900004f36bd32c421dabfef4c",
+    "reserved_input_tokens": 97310,
+    "reserved_output_tokens": 4000,
+    "required_tokens": 101310,
+    "remaining_tokens": 23866,
+    "required_cost_cny": "0.10531",
+    "remaining_cost_cny": "9.899866",
+    "context_tokens": 120000,
+    "remaining_requests": 15
+  },
+  "attempts": [
+    {
+      "sequence": 1,
+      "request_id": "f215c4bcd685425ea4864b3b282cc7db",
+      "attempt": 1,
+      "profile": "semantic_extraction__deepseek",
+      "provider_resource": "deepseek",
+      "model": "deepseek-flash",
+      "reserved_input_tokens": 92134,
+      "reserved_output_tokens": 4000,
+      "charged_tokens": 96134,
+      "charged_cost_cny": "0.100134",
+      "usage": null,
+      "status": "success",
+      "billing_basis": "OFFLINE SYNTHETIC PRICE; not evidence of actual billing",
+      "usage_status": "unknown_reserved"
+    }
+  ]
+}

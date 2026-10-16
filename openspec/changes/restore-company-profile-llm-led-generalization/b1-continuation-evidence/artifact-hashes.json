@@ -1,0 +1,17 @@
+{
+  "source-receipt.json": "f304554ec2ee85fd08071b1bb78427c1c854b588806c05efce7befc3ea912d30",
+  "offline-transport.json": "322fb4dc193d66c568e3dc66f9d3e415ffb9abacca9a659740f067b9bcd53926",
+  "source-metadata.json": "c58ba117114abfe14e028492e0f6509304e7fef508ac69b2ec1f43f81eda9bab",
+  "pypdf-source-check.json": "7f768acc82612124b01f63dca613dc9918043590b3e99f6f690446640678ac34",
+  "budget-final.json": "ec5710bff536d01649c6521bd4b0e22b7b4507c3b550ac11a0aa21b208745d9c",
+  "baseline_gateway_plugin.py": "c2ab5e6cfe680d6f0ac57b1b1e551412914ea7c0121165e3efb90cb9f31b3bd1",
+  "final-gateway-tests.log": "4c03925c17bcc7825d529893c059ca96fcd325571e2c120886f86b7548ac0b25",
+  "timing-recheck.log": "7a85d0facd49fdf51c4b442a060f519f662f91fde205973c24e80e84ca6376ea",
+  "supervisor.json": "22ec335029210747e1c26ceab2c2114aa9ce855f626a879f757e27d02428c1f1",
+  "entry.log": "e6d1bfaf1f69fcb09bce5aa28ced1efb28ec572add9b75c606ba3ee47e61f9c7",
+  "query.json.gz": "d4e53795ce95d48f2e40dda827c71347b94a9055559dfe46ae32ba1639b7afb0",
+  "entry-result.json": "6254cb8e33d1cc787c8924df852cb5861b5a63ef4c521407842e4bffae5c90ae",
+  "baseline-gateway-tests.log": "911d1d1d50d3f3b5c75e306adac6f8184bbb90f9900d42ead19d3f75e318eff3",
+  "final-direct-tests.log": "94bed9f0c4259e01704640b68c816f6b8c8b7693a334a1deb7da2e5bdef5b86a",
+  "export.json.gz": "be2f3b00cd28d8ac3936570f854cd921d3610315c8345f28bc89f14072c80884"
+}

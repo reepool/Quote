@@ -4075,6 +4075,7 @@ class CommonGatewaySemanticProvider:
         verify_max_output_tokens: int | None = None,
         runner: asyncio.Runner | None = None,
         physical_call_admission: Callable[[], None] | None = None,
+        execution_authorization: Mapping[str, Any] | None = None,
     ) -> None:
         if not profile.strip():
             raise ValueError("LLM profile is required")
@@ -4092,6 +4093,7 @@ class CommonGatewaySemanticProvider:
         self._timeout_seconds = timeout_seconds
         self._runner = runner
         self._physical_call_admission = physical_call_admission
+        self.execution_authorization = dict(execution_authorization or {})
         self._traces: list[Stage5ProviderCallTrace] = []
 
     def apply_output_token_budget(
@@ -4111,10 +4113,22 @@ class CommonGatewaySemanticProvider:
     def traces(self) -> tuple[Stage5ProviderCallTrace, ...]:
         return tuple(self._traces)
 
+    @property
+    def run_budget(self):
+        return getattr(self._client, "physical_budget", None)
+
     def interpret(self, request: ReportSemanticRequest) -> Mapping[str, Any]:
         """Use registered v2 reading purposes through the existing gateway."""
         if not isinstance(request, ReportSemanticRequest):
             raise TypeError("report reading requires the registered v2 request")
+        if request.processing_identity.get("execution_mode") == "provider" and (
+                self.execution_authorization.get("status") != "authorized"
+                or self.execution_authorization.get("document_version")
+                != request.report.document_version
+                or not self.execution_authorization.get("approval_reference")
+                or self.run_budget is None
+        ):
+            raise ValueError("a0_real_execution_binding_required")
         if (
             self._prepared_scope is not None
             and request.report != self._prepared_scope.report

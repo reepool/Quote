@@ -1,0 +1,268 @@
+{
+  "schema_version": "b1_continuation_offline_receipt.v1",
+  "date": "2026-10-16",
+  "baseline_commit": "b9e620da",
+  "classification": "offline_preparation_blocked_before_real_execution",
+  "binding_sha256": "33485ee4bfee5b65a3102c54e29bf2073a64dce2523ee08f6a269d8ca1d3e8f0",
+  "provider_model_proposed": {
+    "profile": "semantic_extraction__deepseek",
+    "provider_resource": "deepseek",
+    "model": "deepseek-flash",
+    "fallback": false,
+    "billing_basis": null,
+    "context_limit_verified": false,
+    "tokenizer_verified": false
+  },
+  "real_execution": {
+    "calls": 0,
+    "first_attempts": 0,
+    "successor_attempts": 0,
+    "paid_debug_calls": 0,
+    "authorization": "not_issued",
+    "real_usage": null,
+    "real_cost_cny": null,
+    "remaining_attempt_upper_bound": 2,
+    "remaining_card_token_upper_bound": 240000,
+    "remaining_card_physical_request_upper_bound": 32,
+    "remaining_card_cost_upper_bound_cny": "20",
+    "upper_bounds_are_not_spend_authorization": true
+  },
+  "review": {
+    "mode": "B self review; not A independent review",
+    "blocking_fixes": [
+      "native facts omitted by synthesis remain independent inputs to verify and delivery",
+      "reject added numeric values/units on Segment or a new ID; preserve original facts",
+      "explicit semantic conflicts quarantine records and dependencies, including incomplete verify",
+      "resource exhaustion forbids further physical sends while allowing local partial publish/query/export within wall deadline"
+    ],
+    "nonblocking": [],
+    "unrelated": {
+      "gateway_failures": [
+        "tests/unit/test_utils/test_llm_gateway.py::test_client_execution_deadline_is_classified_separately",
+        "tests/unit/test_utils/test_llm_gateway.py::test_initial_queue_wait_preserves_full_execution_budget",
+        "tests/unit/test_utils/test_llm_gateway.py::test_response_parsing_cannot_return_success_after_execution_deadline",
+        "tests/unit/test_utils/test_llm_gateway.py::test_response_parsing_failure_prefers_execution_deadline[not-json]",
+        "tests/unit/test_utils/test_llm_gateway.py::test_response_parsing_failure_prefers_execution_deadline[{\"label\":",
+        "tests/unit/test_utils/test_llm_routed_client.py::test_multihop_failover_metrics_keep_initial_trigger_category",
+        "tests/unit/test_utils/test_llm_routed_client.py::test_failover_reuses_one_absolute_execution_deadline",
+        "tests/unit/test_utils/test_llm_routed_client.py::test_stalled_first_source_reserves_time_for_second_member",
+        "tests/unit/test_utils/test_llm_routed_client.py::test_routed_client_preserves_client_timeout_diagnostics",
+        "tests/unit/test_utils/test_llm_routed_client.py::test_configuration_and_exhausted_deadline_do_not_fail_over",
+        "tests/unit/test_utils/test_llm_routed_client.py::test_routing_logs_use_stable_levels_and_redact_content"
+      ],
+      "gateway_baseline_same_failure_set": true
+    }
+  },
+  "offline_rehearsal": {
+    "source_parsed_pages": 208,
+    "source_readable_pages": 208,
+    "real_semantic_read_pages": 0,
+    "simulated_inventory_page_statuses": {
+      "read": 26,
+      "not_read": 182
+    },
+    "simulated_send_count": 1,
+    "simulated_token_reservation": 96134,
+    "simulated_price_basis": "SYNTHETIC; not actual billing evidence",
+    "simulated_usage": null,
+    "denied_next_request": {
+      "request_id": "2341be8900004f36bd32c421dabfef4c",
+      "reserved_input_tokens": 97310,
+      "reserved_output_tokens": 4000,
+      "required_tokens": 101310,
+      "remaining_tokens": 23866,
+      "required_cost_cny": "0.10531",
+      "remaining_cost_cny": "9.899866",
+      "context_tokens": 120000,
+      "remaining_requests": 15
+    },
+    "resource_feasibility_passed": false,
+    "query_export_profiles_equal": true,
+    "accepted_native_records": 6,
+    "native_objects": {
+      "Segment": 3,
+      "Measurement": 3
+    },
+    "three_view_statuses": {
+      "company_profile": "extraction_failed",
+      "product_exposure": "extraction_failed",
+      "supply_chain_position": "extraction_failed"
+    },
+    "core_complete": false,
+    "real_semantic_complete": false,
+    "gaps": [
+      "semantic_incomplete:physical_request_token_context_or_cost_budget_exhausted"
+    ],
+    "entry_elapsed_seconds": 59.467114130966365,
+    "pdf_bytes": 1263185,
+    "run_disk_bytes": 2476758,
+    "run_file_count": 18
+  },
+  "core_conditions": {
+    "C01": "not_assessed_without_real_three_views",
+    "C02": "not_assessed_without_real_three_views",
+    "C03": "not_assessed_without_real_three_views",
+    "C04": "not_assessed_without_real_three_views",
+    "C05": "not_assessed_without_real_three_views",
+    "C06": "not_assessed_without_real_three_views",
+    "C07": "not_assessed_without_real_three_views",
+    "C08": "not_assessed_without_real_three_views",
+    "C09": "not_assessed_without_real_three_views",
+    "C10": "not_assessed_without_real_three_views",
+    "C11": "not_assessed_without_real_three_views",
+    "C12": "not_assessed_without_real_three_views",
+    "E01": "not_assessed_without_real_three_views",
+    "E02": "not_assessed_without_real_three_views",
+    "E03": "not_assessed_without_real_three_views",
+    "S01": "not_assessed_without_real_three_views",
+    "S02": "not_assessed_without_real_three_views",
+    "S03": "not_assessed_without_real_three_views",
+    "S04": "not_assessed_without_real_three_views"
+  },
+  "negative_cases": {
+    "N01": "not_assessed_without_real_delivery",
+    "N02": "not_assessed_without_real_delivery",
+    "N03": "not_assessed_without_real_delivery",
+    "N04": "not_assessed_without_real_delivery",
+    "N05": "not_assessed_without_real_delivery",
+    "N06": "not_assessed_without_real_delivery"
+  },
+  "unique_object_accuracy": null,
+  "tests": {
+    "direct": {
+      "summary": "40 passed, 1 deselected, 7 warnings in 19.62s",
+      "failures": [],
+      "log_sha256": "e0e4908d5ac95c0485ef5601586b158653bf4cfc9b8e16b9e168fac00ada8709"
+    },
+    "existing_owner_fixture": "passed in initial combined run; source/report-specific final owner rehearsal also query/export equal",
+    "gateway_baseline": {
+      "summary": "11 failed, 142 passed, 6 warnings in 64.63s",
+      "failures": [
+        "tests/unit/test_utils/test_llm_gateway.py::test_client_execution_deadline_is_classified_separately",
+        "tests/unit/test_utils/test_llm_gateway.py::test_initial_queue_wait_preserves_full_execution_budget",
+        "tests/unit/test_utils/test_llm_gateway.py::test_response_parsing_cannot_return_success_after_execution_deadline",
+        "tests/unit/test_utils/test_llm_gateway.py::test_response_parsing_failure_prefers_execution_deadline[not-json]",
+        "tests/unit/test_utils/test_llm_gateway.py::test_response_parsing_failure_prefers_execution_deadline[{\"label\":",
+        "tests/unit/test_utils/test_llm_routed_client.py::test_multihop_failover_metrics_keep_initial_trigger_category",
+        "tests/unit/test_utils/test_llm_routed_client.py::test_failover_reuses_one_absolute_execution_deadline",
+        "tests/unit/test_utils/test_llm_routed_client.py::test_stalled_first_source_reserves_time_for_second_member",
+        "tests/unit/test_utils/test_llm_routed_client.py::test_routed_client_preserves_client_timeout_diagnostics",
+        "tests/unit/test_utils/test_llm_routed_client.py::test_configuration_and_exhausted_deadline_do_not_fail_over",
+        "tests/unit/test_utils/test_llm_routed_client.py::test_routing_logs_use_stable_levels_and_redact_content"
+      ],
+      "log_sha256": "a4573a86e55228dca228a1384681148422c5bc624b91ab1c8ba9f80460f3484c"
+    },
+    "gateway_current": {
+      "summary": "11 failed, 142 passed, 6 warnings in 57.38s",
+      "failures": [
+        "tests/unit/test_utils/test_llm_gateway.py::test_client_execution_deadline_is_classified_separately",
+        "tests/unit/test_utils/test_llm_gateway.py::test_initial_queue_wait_preserves_full_execution_budget",
+        "tests/unit/test_utils/test_llm_gateway.py::test_response_parsing_cannot_return_success_after_execution_deadline",
+        "tests/unit/test_utils/test_llm_gateway.py::test_response_parsing_failure_prefers_execution_deadline[not-json]",
+        "tests/unit/test_utils/test_llm_gateway.py::test_response_parsing_failure_prefers_execution_deadline[{\"label\":",
+        "tests/unit/test_utils/test_llm_routed_client.py::test_multihop_failover_metrics_keep_initial_trigger_category",
+        "tests/unit/test_utils/test_llm_routed_client.py::test_failover_reuses_one_absolute_execution_deadline",
+        "tests/unit/test_utils/test_llm_routed_client.py::test_stalled_first_source_reserves_time_for_second_member",
+        "tests/unit/test_utils/test_llm_routed_client.py::test_routed_client_preserves_client_timeout_diagnostics",
+        "tests/unit/test_utils/test_llm_routed_client.py::test_configuration_and_exhausted_deadline_do_not_fail_over",
+        "tests/unit/test_utils/test_llm_routed_client.py::test_routing_logs_use_stable_levels_and_redact_content"
+      ],
+      "log_sha256": "4164223ec4345f8af9bed049554b7d35a30923d99bd41c0c999809891f8db7ff"
+    },
+    "isolated_timing_recheck": {
+      "summary": "2 passed, 6 warnings in 1.71s",
+      "failures": [],
+      "log_sha256": "d60d951e857a2c0b595a486e7e6401d480dff7153d24a331e1e38612a47a3a93"
+    },
+    "client_lint": {
+      "baseline": 46,
+      "current": 46,
+      "new": []
+    }
+  },
+  "protected_baseline": {
+    "docs/development/common_llm_gateway_architecture.md": {
+      "baseline_sha256": "7f2ad8851c0bc2e8953afc7f5451911ebedecd220f159d68263470ef468609de",
+      "current_sha256": "7f2ad8851c0bc2e8953afc7f5451911ebedecd220f159d68263470ef468609de",
+      "unchanged": true
+    },
+    "docs/development/common_llm_gateway_usage.md": {
+      "baseline_sha256": "e8a931f1c3a515d9e66769e955d980ae90031032b6c741a26bbe123e267c5cca",
+      "current_sha256": "e8a931f1c3a515d9e66769e955d980ae90031032b6c741a26bbe123e267c5cca",
+      "unchanged": true
+    },
+    "docs/development/company_profile_acceptance_program.md": {
+      "baseline_sha256": "ea8af8deaa45083089851bd402754845075191110244a22b32dd2fa2f9dc006b",
+      "current_sha256": "ea8af8deaa45083089851bd402754845075191110244a22b32dd2fa2f9dc006b",
+      "unchanged": true
+    },
+    "docs/development/pdf_engine_evaluation_local_corpus_20260825.json": {
+      "baseline_sha256": "0ee90791f0e3eb1bca59e458a25ee19b7b4e05007127047ede21794f4aa6320e",
+      "current_sha256": "0ee90791f0e3eb1bca59e458a25ee19b7b4e05007127047ede21794f4aa6320e",
+      "unchanged": true
+    },
+    "openspec/changes/prepare-company-profile-s1-s2-bounded-acceptance/design.md": {
+      "baseline_sha256": "7f53cc968168b01a7b6b15e40b79700ee7daac6bb6152a55fe2d6b16c7ac8c59",
+      "current_sha256": "7f53cc968168b01a7b6b15e40b79700ee7daac6bb6152a55fe2d6b16c7ac8c59",
+      "unchanged": true
+    },
+    "openspec/changes/prepare-company-profile-s1-s2-bounded-acceptance/proposal.md": {
+      "baseline_sha256": "5f9799435b40d27c2c4f1a86cf350ba63c2924f0fd0dac7704989f677e5a37de",
+      "current_sha256": "5f9799435b40d27c2c4f1a86cf350ba63c2924f0fd0dac7704989f677e5a37de",
+      "unchanged": true
+    },
+    "openspec/changes/prepare-company-profile-s1-s2-bounded-acceptance/tasks.md": {
+      "baseline_sha256": "ba5c3fdd96c19f52e9ea838f16476a3991b6d5dd7b75718cd1029e3db0d1a766",
+      "current_sha256": "ba5c3fdd96c19f52e9ea838f16476a3991b6d5dd7b75718cd1029e3db0d1a766",
+      "unchanged": true
+    },
+    "research/company_profile/core_evidence_selection.py": {
+      "baseline_sha256": "ec85df0ec7f0c89e13f6dd1bbeecd4b4838f3af587819a8c4014c95fe60f5f1d",
+      "current_sha256": "ec85df0ec7f0c89e13f6dd1bbeecd4b4838f3af587819a8c4014c95fe60f5f1d",
+      "unchanged": true
+    },
+    "research/company_profile/core_skeleton.py": {
+      "baseline_sha256": "288c1e58ee1f4d94096a19bc5e27df516c49bc7a2caa6b3329414dd1756027bc",
+      "current_sha256": "288c1e58ee1f4d94096a19bc5e27df516c49bc7a2caa6b3329414dd1756027bc",
+      "unchanged": true
+    },
+    "tests/unit/test_research/test_company_profile_core_skeleton.py": {
+      "baseline_sha256": "f33f5c1b7a21f83e290198f91933afc23ea7bac3d995d81161405e7f58d80182",
+      "current_sha256": "f33f5c1b7a21f83e290198f91933afc23ea7bac3d995d81161405e7f58d80182",
+      "unchanged": true
+    },
+    "tests/unit/test_research/test_company_profile_owned_page_facts.py": {
+      "baseline_sha256": "835d3affe911ad88b52b623c1c1fde10c330941a8459765b3368a1631ada8f6a",
+      "current_sha256": "835d3affe911ad88b52b623c1c1fde10c330941a8459765b3368a1631ada8f6a",
+      "unchanged": true
+    }
+  },
+  "runtime": {
+    "python": "Python 3.11.15",
+    "packages": {
+      "pydantic": "2.11.0",
+      "pypdf": "6.12.2",
+      "pypdfium2": "5.13.0",
+      "httpx": "0.28.1",
+      "pytest": "8.3.4"
+    }
+  },
+  "progress": {
+    "development": "0/4",
+    "regression": "0/12",
+    "unseen": "0/20",
+    "pilot": "0/100",
+    "A1": "not_passed",
+    "production": "not_authorized",
+    "scale_claim": false
+  },
+  "blockers": [
+    "No verified price/context or tokenizer for the configured deepseek-flash alias; no real authorization",
+    "Conservative full-payload UTF8 reservation stops discovery before page 27; 182 pages remain unread in the offline protocol. Real model tokens/fees are unmeasured",
+    "No real synthesis/verification output or 19/6 business scores; all three views remain incomplete"
+  ],
+  "commands": {
+    "offline": "source /home/python/Quote/scripts/quote_dev_env.sh\ntimeout --signal=KILL 900s /home/python/miniconda3/envs/Quote/bin/python -m research.company_profile.bounded_entry --binding openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-binding.json --run-root data/QuoteBak/b1-continuation-20261016/full-report-final-v2",
+    "real_template_not_authorized": "source /home/python/Quote/scripts/quote_dev_env.sh\ntimeout --signal=KILL 900s /home/python/miniconda3/envs/Quote/bin/python -m research.company_profile.bounded_entry --binding openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-binding.json --run-root data/QuoteBak/b1-continuation-20261016/formal-first --real --authorization A_AUTHORIZATION_FILE"
+  }
+}

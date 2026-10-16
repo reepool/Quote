@@ -1,0 +1,13 @@
+........................................                                 [100%]
+============================= slowest 10 durations =============================
+1.21s call     tests/unit/test_research/test_company_profile_llm_led.py::test_offline_gateway_runs_through_runtime_and_records_three_call_receipts
+1.15s call     tests/unit/test_utils/test_llm_physical_budget.py::test_deadline_cancels_inflight_send_and_cannot_send_again
+0.81s call     tests/unit/test_utils/test_llm_physical_budget.py::test_routed_failover_uses_same_run_ledger_and_rejects_unpriced_source
+0.60s call     tests/unit/test_research/test_company_profile_bounded_entry.py::test_whole_entry_deadline_kills_blocking_worker_and_its_child
+0.47s call     tests/unit/test_utils/test_llm_physical_budget.py::test_unknown_usage_is_reserved_and_retries_cannot_reset_request_limit
+0.37s call     tests/unit/test_utils/test_llm_physical_budget.py::test_reservation_is_persisted_before_transport_send
+0.36s call     tests/unit/test_utils/test_llm_physical_budget.py::test_budget_rejects_before_any_physical_send[overrides2]
+0.29s call     tests/unit/test_utils/test_llm_physical_budget.py::test_budget_rejects_before_any_physical_send[overrides0]
+0.29s setup    tests/unit/test_research/test_company_profile_llm_led.py::test_offline_gateway_runs_through_runtime_and_records_three_call_receipts
+0.28s call     tests/unit/test_utils/test_llm_physical_budget.py::test_budget_rejects_before_any_physical_send[overrides1]
+40 passed, 1 deselected, 7 warnings in 19.62s
