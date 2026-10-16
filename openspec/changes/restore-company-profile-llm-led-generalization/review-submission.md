@@ -203,3 +203,36 @@ source /home/python/Quote/scripts/quote_dev_env.sh
 本轮其它改动文件Ruff通过；client的46条既有lint诊断与HEAD相同、无新增，未做全文件风格重构。`git diff --check`及当前change OpenSpec严格校验另作最终检查。本轮开始的11份tracked改动逐文件SHA-256保持一致，既有未跟踪内容未触碰；只提交本人可隔离改动，提交身份以本节所属Git提交为准。
 
 下一步由A核本次P1修复与具体阻塞，协调缺失的真实计费/模型资料及资源方案；B1保持未通过。开发0/4、回归0/12、未见0/20、试运行0/100，不启动B2，不将任何离线产物记为19/6或准确率达标。
+
+## 9. B角接续：复用现有负载均衡池（2026-10-17）
+
+用户补充“现有LLM有一个负载均衡池可供调用”。B已只读核实并将隔离入口接续到现有逻辑profile `semantic_extraction` → `shared_semantic`，保留公共网关的权重、借用和有界故障切换。该信息只确认可复用入口，未提供计费依据或新增真实调用授权。生产配置未修改。正式首次0、后继0、付费调试0；B1/A1仍未通过。
+
+新[池执行绑定草案](b1-pool-execution-binding.json)绑定路由fingerprint、完整配置及调用链文件hash、各实际profile/resource/model、原预算及命令。六个来源如下；source label仅作路由标签，实际模型以下表及物理账本为准，不能按标签推单价。
+
+| 实际profile后缀 | provider_resource | 实际配置model |
+| --- | --- | --- |
+| `__scorpio_gemini` | `scorpio:gemini` | `gemini-3.8-flash-high` |
+| `__zai` | `zai` | `glm-5.3-flash` |
+| `__scorpio_grok` | `scorpio:grok` | `grok-4.7` |
+| `__scorpio_luna` | `scorpio:luna` | `gpt-5.6-luna` |
+| `__scorpio_deepseek` | `scorpio:deepseek` | `DeepSeek-V4.1-Flash` |
+| `__deepseek` | `deepseek` | `deepseek-flash` |
+
+运行仍通过原`CommonGatewaySemanticProvider`和`LlmClient`。入口检查全部物理来源与绑定一致，任何成员缺计费/上下文依据均阻止真实准备；来源、模型、权重或切换策略改变须重冻。所有成员的重试/repair/切换共用一个物理预算。处理身份使用池名及路由hash标识路由版本，实际模型保存在每次gateway trace和物理账本中，不把池名当作实际执行模型。原直连模式继续可用；§8绑定与回执保留为`f90a9f64`历史快照，不将新代码hash写回旧绑定或套用旧成绩。
+
+本次[验证回执](b1-pool-verification.json)及[证据清单](b1-pool-evidence/artifact-hashes.json)记录了新的208页离线预演：入口48.329秒，query/export一致，原生6个可靠对象仍在。首个模拟请求由池选到`scorpio:gemini`，完整物理预留92142输入＋4000输出＝96142 token；usage unknown保留全额。第二次逻辑发现选到`zai`，需101309，余23858，在发送前拒绝。实际transport只有1次且为fake，真实请求0。模拟成功范围为1–26页，另182页未读；实际模型阅读0页。三视图均`extraction_failed`，各完整性标志false；19核心、6负例和已审准确率均未评估。账本0.100142元仍仅为合成测试价格运算，不是实际费用。
+
+直接验证命令如下，结果**21 passed、6 warnings**，覆盖监督入口、原直连兼容、路由/来源漂移拒绝、缺成员价格及模拟跨来源故障切换的共享账本；[测试日志](b1-pool-evidence/direct-tests.log)可复用。Ruff检查和格式检查通过。B人工Review本轮未提交差异，无新增A类阻塞；本次不修改公共网关或追修C类既有短时限测试。此前§8的P1回归仅按其原快照保留，不冒称本轮重新跑过全部测试。
+
+```bash
+source /home/python/Quote/scripts/quote_dev_env.sh
+/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_bounded_entry.py tests/unit/test_utils/test_llm_physical_budget.py
+timeout --signal=KILL 900s /home/python/miniconda3/envs/Quote/bin/python -m research.company_profile.bounded_entry --binding openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-execution-binding.json --run-root data/QuoteBak/b1-pool-binding-20261017/full-report-v1
+```
+
+该预演目录已存在，复验须换用新的QuoteBak目录。持久[查询](b1-pool-evidence/query.json.gz)、[导出](b1-pool-evidence/export.json.gz)、[源回执](b1-pool-evidence/source-receipt.json)、[预算](b1-pool-evidence/budget-final.json)、[模拟发送](b1-pool-evidence/offline-transport.json)和[入口耗时](b1-pool-evidence/supervisor.json)不依赖临时库存续。
+
+当前需补资料仍为六个来源的计费/订阅增量成本依据、币种换算及上下文/配额；仓库配置与所查网关文档未找到可核的价格/上下文表，未用真实请求试探。另需解决完整发现、合成及核验在120000 token内的有效计量/资源可行性，池可用并不扩大预算。已向用户询问池的计费与上下文资料维护位置，尚未据此取得真实权限。按[B1卡§5–6](b1-execution-card.md)停在实际运行前，待资料和可行性补齐后由A核定最终绑定与运行权限，不启动B2或扩批。
+
+本次基线`f90a9f64`，11份既有tracked文件hash均未变化，既有untracked内容未操作；仅提交本人入口、直接测试与本change新增材料。Git身份以本节所属提交为准。B活跃开发/等待时间未精确计量，本次正式复验0；新路线仍为开发0/4、回归0/12、未见0/20、试运行0/100，生产`not_authorized`、规模声明false。

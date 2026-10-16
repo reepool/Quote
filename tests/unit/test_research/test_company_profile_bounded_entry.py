@@ -6,7 +6,12 @@ import time
 
 import pytest
 
-from research.company_profile.bounded_entry import digest, supervise, validate_binding
+from research.company_profile.bounded_entry import (
+    digest,
+    prepare_gateway,
+    supervise,
+    validate_binding,
+)
 
 
 def test_whole_entry_deadline_kills_blocking_worker_and_its_child(tmp_path):
@@ -72,3 +77,101 @@ def test_changed_code_cannot_use_frozen_execution_binding(tmp_path):
     source.write_bytes(b"v2")
     with pytest.raises(ValueError, match="changed"):
         validate_binding(binding, real=False, authorization={}, binding_hash="test")
+
+
+@pytest.fixture
+def pool_binding():
+    from dataclasses import asdict
+
+    from tests.unit.test_utils.test_llm_routed_client import _config
+
+    config = _config(timeout_seconds=10, attempt_timeout_seconds=5)
+    binding = {
+        "profile": "semantic",
+        "pool": "semantic-pool",
+        "route_fingerprint": config.route_fingerprint("semantic"),
+        "fallback_allowed": True,
+        "sources": [
+            {
+                "profile": p.name,
+                "model": p.model,
+                "provider_resource": config.resource_for_profile(p).name,
+                "price": {
+                    "input_cny_per_million": "1",
+                    "output_cny_per_million": "2",
+                    "basis": "synthetic unit test only",
+                    "context_tokens": 120_000,
+                },
+            }
+            for p in config.concrete_profiles_for("semantic")
+        ],
+    }
+    return binding, asdict(config)
+
+
+def test_bounded_pool_keeps_failover_and_charges_both_physical_sources(pool_binding):
+    import asyncio
+
+    from tests.unit.test_utils.test_llm_physical_budget import _client
+    from tests.unit.test_utils.test_llm_routed_client import _request
+    from utils.llm import LlmTransientTransportError
+    from utils.llm.budget import LlmRunBudget
+    from utils.llm.testing import ScriptedTransport
+
+    binding, raw = pool_binding
+    config, prices = prepare_gateway(binding, raw, real=True)
+    assert config.route_fingerprint("semantic") == binding["route_fingerprint"]
+    budget = LlmRunBudget(deadline=time.monotonic() + 10, prices=prices)
+    transport = ScriptedTransport(
+        [
+            LlmTransientTransportError("offline failure"),
+            {"data": {"choices": [{"message": {"content": '{"label":"ok"}'}}]}},
+        ]
+    )
+    asyncio.run(
+        _client(transport, budget, config).complete(_request(max_output_tokens=100))
+    )
+    attempts = budget.snapshot()["attempts"]
+    assert len(transport.calls) == len(attempts) == 2
+    assert {a["provider_resource"] for a in attempts} == {
+        s["provider_resource"] for s in binding["sources"]
+    }
+    assert attempts[0]["usage_status"] == "unknown_reserved"
+
+
+@pytest.mark.parametrize(
+    "change", ["weight", "model", "resource", "missing_source", "fallback"]
+)
+def test_pool_binding_rejects_route_or_source_drift_before_client(pool_binding, change):
+    binding, raw = pool_binding
+    if change == "weight":
+        raw["pools"]["semantic-pool"]["members"][0]["weight"] += 1
+    elif change == "model":
+        raw["profiles"]["semantic__grok"]["model"] = "other-model"
+    elif change == "resource":
+        binding["sources"][0]["provider_resource"] = "other-resource"
+    elif change == "missing_source":
+        binding["sources"].pop()
+    else:
+        binding["fallback_allowed"] = False
+    with pytest.raises(ValueError, match="binding mismatch"):
+        prepare_gateway(binding, raw, real=False)
+
+
+def test_unpriced_pool_member_blocks_real_preparation_but_not_offline(pool_binding):
+    binding, raw = pool_binding
+    binding["sources"][1]["price"] = None
+    with pytest.raises(ValueError, match="every physical source"):
+        prepare_gateway(binding, raw, real=True)
+    _, prices = prepare_gateway(binding, raw, real=False)
+    assert len(prices) == 2
+    assert all("OFFLINE SYNTHETIC" in p.basis for p in prices.values())
+
+
+def test_existing_direct_binding_still_excludes_pool_routes(pool_binding):
+    binding, raw = pool_binding
+    direct = {**binding["sources"][0], "fallback_allowed": False}
+    config, prices = prepare_gateway(direct, raw, real=False)
+    assert not config.routes and not config.pools
+    assert list(config.profiles) == [direct["profile"]]
+    assert list(prices) == [(direct["provider_resource"], direct["model"])]

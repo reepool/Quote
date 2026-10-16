@@ -71,11 +71,81 @@ def validate_binding(
             raise ValueError(
                 "A real execution authorization for this binding is required"
             )
-        price = binding.get("price")
-        if not price or not binding.get("resource_feasibility_passed"):
+        prices = (
+            [source.get("price") for source in binding.get("sources", [])]
+            if binding.get("pool")
+            else [binding.get("price")]
+        )
+        if (
+            not prices
+            or not all(prices)
+            or not binding.get("resource_feasibility_passed")
+        ):
             raise ValueError(
                 "verified price/context and resource feasibility are required"
             )
+
+
+def prepare_gateway(binding: dict, raw_config: dict, *, real: bool):
+    """Bind the existing direct profile or pool without replacing gateway routing."""
+    from dataclasses import replace
+    from decimal import Decimal
+
+    from utils.llm import LlmConfig
+    from utils.llm.budget import LlmPrice
+
+    config = LlmConfig.from_mapping(raw_config)
+    name = binding["profile"]
+    profiles = config.concrete_profiles_for(name)
+    if binding.get("pool"):
+        route = config.route_for_profile(name)
+        pool = config.pool_for_profile(name)
+        if (
+            route is None
+            or route.pool != binding["pool"]
+            or config.route_fingerprint(name) != binding["route_fingerprint"]
+            or pool.failover.enabled != binding["fallback_allowed"]
+        ):
+            raise ValueError("pool route/failover binding mismatch")
+        sources = binding["sources"]
+    else:
+        if name not in config.profiles or binding["fallback_allowed"]:
+            raise ValueError(
+                "direct binding requires a concrete profile without fallback"
+            )
+        profiles = (config.profiles[name],)
+        config = replace(config, profiles={name: profiles[0]}, routes={}, pools={})
+        sources = [binding]
+
+    expected = [
+        (p.name, config.resource_for_profile(p).name, p.model) for p in profiles
+    ]
+    actual = [(s["profile"], s["provider_resource"], s["model"]) for s in sources]
+    if not expected or actual != expected:
+        raise ValueError("profile/model/resource binding mismatch")
+    prices = {}
+    for source in sources:
+        price = (
+            source.get("price")
+            if real
+            else {
+                "input_cny_per_million": "1",
+                "output_cny_per_million": "2",
+                "basis": "OFFLINE SYNTHETIC PRICE; not evidence of actual billing",
+                "context_tokens": 120_000,
+            }
+        )
+        if not price:
+            raise ValueError(
+                "verified price/context required for every physical source"
+            )
+        prices[(source["provider_resource"], source["model"])] = LlmPrice(
+            Decimal(price["input_cny_per_million"]),
+            Decimal(price["output_cny_per_million"]),
+            price["basis"],
+            price["context_tokens"],
+        )
+    return config, prices
 
 
 def _worker(
@@ -105,22 +175,12 @@ def _worker(
     from research.storage import ResearchStorageManager
     from utils.config_manager import ResearchConfig, ResearchStorageConfig
     from utils.llm import CallableTransport, LlmClient, load_project_environment
-    from utils.llm.budget import LlmPrice, LlmRunBudget
+    from utils.llm.budget import LlmRunBudget
 
     asset = binding["asset"]
     raw_config = json.loads(Path(binding["config_path"]).read_text())["llm"]
     profile_name = binding["profile"]
-    profile = raw_config["profiles"][profile_name]
-    if (
-        profile["model"] != binding["model"]
-        or profile.get("provider_resource") != binding["provider_resource"]
-    ):
-        raise ValueError("profile/model/resource binding mismatch")
-    # Concrete profile only. Remove logical routes and forbid implicit fallback.
-    raw_config["profiles"] = {profile_name: profile}
-    raw_config["routes"] = {}
-    raw_config["pools"] = {}
-    raw_config["failover"] = {"enabled": False}
+    gateway_config, prices = prepare_gateway(binding, raw_config, real=real)
     config = ResearchConfig(
         storage=ResearchStorageConfig(
             db_path=str(run_root / "research.db"),
@@ -131,26 +191,12 @@ def _worker(
             attach_quotes_db=False,
         )
     )
-    price = (
-        binding.get("price")
-        if real
-        else {
-            "input_cny_per_million": "1",
-            "output_cny_per_million": "2",
-            "basis": "OFFLINE SYNTHETIC PRICE; not evidence of actual billing",
-            "context_tokens": 120_000,
-        }
-    )
     budget = LlmRunBudget(
         deadline=deadline,
-        prices={
-            (binding["provider_resource"], binding["model"]): LlmPrice(
-                Decimal(price["input_cny_per_million"]),
-                Decimal(price["output_cny_per_million"]),
-                price["basis"],
-                price["context_tokens"],
-            )
-        },
+        prices=prices,
+        max_tokens=binding["max_tokens"],
+        max_requests=binding["max_physical_requests"],
+        max_cost_cny=Decimal(binding["max_cost_cny"]),
         ledger_path=run_root / "physical-budget.json",
     )
     transport_requests = []
@@ -179,22 +225,20 @@ def _worker(
     if real:
         load_project_environment()
     client = LlmClient(
-        raw_config,
+        gateway_config,
         physical_budget=budget,
         **(
             {}
             if real
             else {
                 "transport": CallableTransport(empty_inventory),
-                "environment": {profile["api_key_env"]: "offline-placeholder"},
+                "environment": {
+                    p.api_key_env: "offline-placeholder"
+                    for p in gateway_config.concrete_profiles_for(profile_name)
+                },
             }
         ),
     )
-    if (
-        client.config.resource_for_profile(client.config.profiles[profile_name]).name
-        != binding["provider_resource"]
-    ):
-        raise ValueError("resolved physical provider resource differs from binding")
 
     class ProbeProvider(CommonGatewaySemanticProvider):
         offline_only = True
@@ -261,7 +305,14 @@ def _worker(
     storage = ResearchStorageManager(config)
     identity = offline_processing_identity()
     if real:
-        identity.update(execution_mode="provider", model=binding["model"])
+        identity.update(
+            execution_mode="provider",
+            model=(
+                f"pool:{binding['pool']}:{binding['route_fingerprint']}"
+                if binding.get("pool")
+                else binding["model"]
+            ),
+        )
     service = CompanyProfileTaskService(
         storage=storage,
         output_root=run_root / "output",

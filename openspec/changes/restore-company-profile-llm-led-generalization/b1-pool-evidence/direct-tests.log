@@ -1,0 +1,13 @@
+.....................                                                    [100%]
+============================= slowest 10 durations =============================
+1.07s call     tests/unit/test_utils/test_llm_physical_budget.py::test_deadline_cancels_inflight_send_and_cannot_send_again
+0.57s call     tests/unit/test_research/test_company_profile_bounded_entry.py::test_bounded_pool_keeps_failover_and_charges_both_physical_sources
+0.54s call     tests/unit/test_research/test_company_profile_bounded_entry.py::test_whole_entry_deadline_kills_blocking_worker_and_its_child
+0.48s call     tests/unit/test_utils/test_llm_physical_budget.py::test_routed_failover_uses_same_run_ledger_and_rejects_unpriced_source
+0.38s call     tests/unit/test_utils/test_llm_physical_budget.py::test_reservation_is_persisted_before_transport_send
+0.29s call     tests/unit/test_utils/test_llm_physical_budget.py::test_budget_rejects_before_any_physical_send[overrides2]
+0.22s call     tests/unit/test_utils/test_llm_physical_budget.py::test_retry_retains_failed_reservation_and_charges_actual_second_usage
+0.19s setup    tests/unit/test_research/test_company_profile_bounded_entry.py::test_whole_entry_deadline_kills_blocking_worker_and_its_child
+0.18s call     tests/unit/test_utils/test_llm_physical_budget.py::test_schema_repair_reserves_the_expanded_physical_payload
+0.18s call     tests/unit/test_utils/test_llm_physical_budget.py::test_unknown_usage_is_reserved_and_retries_cannot_reset_request_limit
+21 passed, 6 warnings in 8.72s
