@@ -31,6 +31,8 @@
 
 - `docs/development/research_data_engine_execution.md`：研究数据引擎实施与现状
 - `docs/development/company_profile_product_and_industry_semantic_requirements.md`：全 A 股通用骨架、事实级交付、report_default_group_scope、基础商品暴露与 M1—M4 路线的唯一产品总需求
+- `docs/development/company_profile_acceptance_program.md`：requirements；后续12家回归、20家未见验证和100家受控研究试运行的固定数量、可用/限用/隔离、质量底线、有限补救及唯一验收进度表；不追溯变更在途合同或授权生产
+- `openspec/changes/define-company-profile-staged-acceptance/`：分阶段验收规范及后续执行任务卡；当前只制定计划，实际样本验证尚未启动
 - `openspec/changes/archive/2026-09-17-deliver-a-share-core-profiles-and-commodity-exposure/`：已归档的全 A 股通用骨架与基础商品暴露实施；入口为 `company_profile_common_core`，生产仍为 not_authorized；2026-09-17 首次观察未过 4.1 门槛
 - `openspec/changes/archive/2026-09-17-interpret-owned-page-company-total-and-bank-income-mix/`：已验收并归档的 `owned_page_facts=v4`；重新核原文后 recall 7/7、accuracy 7/7，4.1 数字门槛此次算过；独立 Review 已通过；不是生产授权
 - `openspec/specs/company-profile-common-core-company-total-and-income-mix/spec.md`：公司级营业收入总额与银行收入构成的当前合同
