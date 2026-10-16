@@ -1,8 +1,8 @@
 # 公司画像分行业研究方法
 
 > 文档类型 / artifact type：requirements / `company_profile_industry_research_method`
-> 状态 / review status：阶段 2 current / `approved`
-> 版本：`company_profile_industry_research_method.v1`
+> 状态 / review status：通用链之后的行业增强方法；历史阶段2研究成果保留，不再作为基础画像前置审批
+> 版本：`company_profile_industry_research_method.v2`（2026-10-16）
 > 行业边界：跨行业研究方法；不包含任何具体行业结论
 > owner：公司画像需求治理
 > reviewer：阶段 2 OpenSpec 合同审核
@@ -14,7 +14,7 @@
 
 本方法用于把多家公司、多种年报披露形态中的行业共性收敛为可审核的行业 requirements，明确研究哪些报告、阅读哪些章节、预先检查哪些字段、如何记录空值/失败，以及怎样证明行业合同不是由单家公司定义。
 
-阶段 2 只建立研究方法和模板，不研究具体行业字段，不编写生产 prompt、schema、selector、writer 或 resolver，不调用 LLM，不写数据库，不改变生产冻结状态。制造/材料真实年报研究必须在独立阶段 3 change `research-manufacturing-materials-profile-package` 中进行。
+通用S3通过后，按[交付路径卡6](company_profile_delivery_plan.md)选择一个有实际研究需要的行业家族、最多3个重要增量指标，沿原LLM/事实/读取owner实施。历史制造/材料研究可复用；不要求每个行业重走阶段2/3审批，也不要求每家公司人工Gold。真实调用和发布权限按该增强任务卡冻结，不因本文批准自动授予。
 
 ## 2. 角色与职责
 
@@ -30,7 +30,7 @@ research owner 与 independent reviewer 必须实名登记。未解决分歧保�
 
 ## 3. 强制研究产物
 
-每个行业研究必须版本化产出：本方法引用、行业 requirements、sample manifest、gold annotation manifest（含 review log）、benchmark acceptance report。每份产物声明 `artifact_type`、`schema_version`、`industry_package`、行业边界版本、owner、reviewer、review status 和上位总需求版本。JSON 模板必须带 `research_contract_only: true`；生产代码不得直接依赖研究模板字段。
+每个行业增强在一个change中集中记录：最多3项指标定义/适用条件、样本与源条件、正反例/分歧、验收结果和限制。可复用旧模板但不强制生成多份重复材料；生产代码不得依赖研究模板或Gold答案。新增对象/字段须版本化并明确消费者，不另建行业专用执行链。
 
 ## 4. 报告选择
 
@@ -40,8 +40,8 @@ research owner 与 independent reviewer 必须实名登记。未解决分歧保�
 
 ### 4.2 首轮样本下限
 
-- 至少 3 份正式年度报告、至少 2 家公司；
-- 可有 1 份 focus report，但另外至少 2 份必须在公司或年度上不同，并实际挑战 focus report；
+- 4家开发、另6家未见验证，按[验收计划§10](company_profile_acceptance_program.md)执行；
+- 可有1份重点报告，其他样本必须实际挑战其业务/披露形态；
 - 宁德时代或任何其他公司只能是样本之一；
 - 不用低相关公司凑交易所数量。
 
@@ -53,7 +53,7 @@ research owner 与 independent reviewer 必须实名登记。未解决分歧保�
 
 ## 5. Chapter family × section task
 
-行业研究以 chapter family 和 section task 为单位，不以单份报告编号为通用规则。每个任务记录标题别名、语义锚点、表格签名、所需上下文/表头/脚注、输入页范围、允许输出、确定性机会、LLM fallback 边界、禁止推断、续表规则、合法空值和失败策略。
+行业研究以业务问题、chapter family和section task为单位，不以公司/报告编号为生产规则。每个任务记录所需上下文/表头/脚注、允许输出、可靠结构化解析机会、LLM语义职责、禁止推断、续表和失败策略；标题别名只能辅助发现，不是模型可见性白名单。
 
 同一章节可承载多个任务，但必须分别声明 checklist 和输出边界；不得把整章交给无边界 prompt。编号或标题不同但语义相同的报告归入同一 chapter family，同时保留 observed alias。
 
@@ -75,7 +75,7 @@ review log 追加保留双方判断、证据、主题、最终 disposition 和�
 
 ## 8. Benchmark 验收
 
-行业 requirements 基于样本风险冻结字段级/章节级阈值；不设跨行业统一准确率。报告分别呈现 required coverage、source value/unit、subject/period、evidence anchoring、legal empty、failure honesty、prohibited inference 和 uncovered boundaries。
+行业增强统一底线按验收计划§10：增量已审准确率≥98%、核心增量宏召回≥90%、至少5/6可用、已知底线错误零外放；行业任务可预先声明更高要求，不在看过结果后降低。报告分列source value/unit、subject/period、证据、合法空值、失败和未覆盖边界。
 
 以下任一为 blocking failure：required 章节/表格静默遗漏、事实与推导混淆、清单外猜测、原始单位或主体被无证据覆盖、LLM/研究文字引入新事实、失败伪装为空成功。平均分不能抵消 blocker。结论只能 `pass` 或 `hold`；`pass` 不授权生产实现。
 
@@ -100,12 +100,12 @@ review log 追加保留双方判断、证据、主题、最终 disposition 和�
 
 ## 11. 行业增强研究进入条件
 
-- [ ] 本方法及 industry requirements、sample/gold manifest、acceptance report 模板已审核；
+- [ ] 通用S3已通过，该行业新增研究问题及最多3指标范围已明确；
 - [ ] 已提出真实报告 sample manifest，满足数量下限或诚实记录阻塞 gap；
 - [ ] 已命名 research owner、primary annotator、independent reviewer、acceptance reviewer；
 - [ ] 已声明行业边界、拟研究问题和不适用范围；
 - [ ] 按该增强包当前状态研究，不要求所有行业退回 not_researched；制造/材料已有基线可复用；
-- [ ] 已确认 production authorization 固定为 `not_authorized`，不授权生产代码、生产 prompt/schema、LLM 执行、数据库迁移或生产启用。
+- [ ] 已明确真实调用、预算和研究发布权限；当前仍`not_authorized`，本方法不自动启用生产。
 
 条件未满足时只暂停该增强的准入，不能阻塞全 A 股通用骨架。该清单用于行业研究，不要求每个生产公司再走一次人工选样/Gold 标注。主体执行总需求 §13 的 report_default_group_scope，历史 Gold 冲突单列。
 

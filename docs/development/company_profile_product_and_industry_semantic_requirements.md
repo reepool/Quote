@@ -1,29 +1,25 @@
 # 全 A 股业务画像与基础商品暴露总需求
 
 > 文档类型：requirements（唯一权威产品总需求）
-> 版本：`company_profile_product_contract.2026-09-14`
-> 实施状态：M1—M3 与 4.1—4.6 已接通并归档；权威入口为 `company_profile_common_core`；生产仍为 `not_authorized`；`scale_quality_claim_allowed=false`；`openspec/changes/archive/2026-09-17-interpret-owned-page-company-total-and-bank-income-mix/` 已验收并归档，`owned_page_facts=v4` successor 补公司级营业收入总额与银行 MD&A 收入构成；官方页重跑后核原文 source recall 7/7、accuracy 7/7、critical numeric 0，4.1 数字门槛此次算过；独立 Review 已通过；v1–v3 JSON 保留；`openspec/changes/archive/2026-09-24-read-as-of-shenwan-l1-for-profile-strata/` 已归档，as-of 一级名称沿同版本活动 taxonomy 父链解析；2026-09-17 `service_available_count=0` 只是该修复前的历史基线。固定样本已重新探查并执行：600004.SH / service、600006.SH / manufacturing。首次扩大 `openspec/changes/archive/2026-09-25-expand-company-profile-m4-first-expansion/` 已于 2026-09-25 执行、关闭并归档；原始观察 recall 0/9、accuracy unassessed、mode completed，closure v2 已写入。common-core repair `openspec/changes/archive/2026-09-26-repair-common-core-first-expansion-owned-page-gaps/` 已于 2026-09-26 归档；当前 identity 为 `owned_page_facts=v8`；v8 recall 8/9、accuracy 8/8、critical numeric errors 0、`expansion_gates_met=false`。两轮都未通过扩大门槛，不授权下一轮扩大、规模质量声明或生产
-> 状态：研究发布范围已切换，文档批准或已归档 change 不等于生产上线；DCF、交易和旧 writer 仍未授权
-> 已归档 change：`openspec/changes/archive/2026-09-17-deliver-a-share-core-profiles-and-commodity-exposure/`；`openspec/changes/archive/2026-09-17-repair-common-core-empty-delivery-on-owned-pages/`；`openspec/changes/archive/2026-09-17-interpret-owned-page-company-total-and-bank-income-mix/`；`openspec/changes/archive/2026-09-24-read-as-of-shenwan-l1-for-profile-strata/`；`openspec/changes/archive/2026-09-25-expand-company-profile-m4-first-expansion/`；`openspec/changes/archive/2026-09-26-repair-common-core-first-expansion-owned-page-gaps/`
-> 历史阶段 0—5 为研究/实现基线，历史合同与运行只用于回归和复核
+> 版本：`company_profile_product_contract.2026-10-16.llm-led.v2`
+> 状态：目标合同已修订，真实LLM通用链尚待实现与验收；不以本文批准宣称上线。
+> 生产仍为 `not_authorized`；`scale_quality_claim_allowed=false`。旧成绩、源合同与原制品不追溯修改。
 
 ## 0. 文档权威关系
 
-本文件统一全市场目标、核心信息、主体、验收、行业增强、商品暴露和迁移路线。OpenSpec 主规范描述目标合同，不保证功能已上线；剩余 M4 待办以正式 `company_profile_operator_closure.v2` 为准，不以未勾选 tasks 或旧入口为生产命令。v1 schema/catalog 仍兼容，但正式 checkpoint 没有 v1 快照，不得补造。closure v2 顶层 `executed` 由模型固定为 false；首次扩大已经执行由 backlog `first_expansion_executed_not_next_round` 和 completed mode 表达。行业文档只能细化增强字段，不得重新引入全市场整报否决或不同主体政策。
+本文件确定“交付什么”；[验收计划v2](company_profile_acceptance_program.md)唯一确定数量、阈值、补救上限与实际进度；[交付路径与任务卡](company_profile_delivery_plan.md)确定先后顺序、owner及清理；[A/B流程v2](ab_role_development_workflow.md)确定职责和审核顺序。下一开发唯一change为 `restore-company-profile-llm-led-generalization`。
 
-旧固定四/八/二十报告、全部六章完成、Gold 全通过、研究样本必须未见过、每家公司人工冻结 Evidence 等规则仅适用于对应已退役的历史试验。不能作为日常生产规则。历史 Gold/原始 bundle 不改写；旧标签冲突在新评测单列，不能用旧 Gold 否决现行主体政策。
+旧M4双公司轮次、closure v2、owned_page_facts版本、制造六章/固定Gold、仅缺字段才调用LLM等政策，只对其冻结历史身份有效，不能约束新政策或授权下一对样本。OpenSpec该change的delta描述目标行为；主spec中旧行为是迁移基线，适用说明明确区分，不表示新代码已实现。通用LLM/PDF/框架规范继续约束各自领域。
 
-旧 requirements/runbook、阶段汇总与裁决台账均为历史资料。当前产品目标只有本文件一个入口；已有 LLM/PDF/框架通用规范继续约束各自领域。结构关联检查不等于原文语义复核；被撤回的审计不能作为晋升依据。
+## 1. 当前状态与保留价值
 
-## 1. 当前状态与旧链边界
+旧v61为规则路径的有限验收；S1原10/12，局部修复后12/12核心回归通过，均不能证明完整画像或LLM阅读质量。S2已有20家来源准备，业务观察0/20；新路线必须重新绑定实现/模型/提示词和产品条件。唯一数值进度见验收计划，不在此复制轮次台账。
 
-当前已具备制造/材料 Stage 5 抽取、校验、隔离 bundle 和 accepted 事实导出。全 A 股通用任务、持续续跑、核心骨架评价、基础商品暴露和研究范围切换已由 `company_profile_common_core` 接通；生产仍为 `not_authorized`，`scale_quality_claim_allowed=false`。2026-09-17 对 302132.SZ / 600000.SH 的 v4 复核曾算出 recall 7/7、accuracy 7/7。as-of 申万一级名称读取已归档：正式历史行只有股票代码、行业代码、计入日期和更新时间；没有顶层 `sw_l1_name` 时沿同版本活动 taxonomy 父链解析；顶层名称优先；不读 `classification.levels.sw_l1.industry_name`；断链为 `other`；不回退 cutoff 后的当前 membership。2026-09-17 `service_available_count=0` 只是该修复前的历史基线。固定样本已重新探查并执行：600004.SH / service、600006.SH / manufacturing。首次扩大已于 2026-09-25 执行、关闭并归档；原始观察 recall 0/9、accuracy unassessed、mode completed，正式 closure v2 已写入。后续 common-core repair 已于 2026-09-26 归档，当前 identity 为 `owned_page_facts=v8`，v8 观察为 recall 8/9、accuracy 8/8、critical numeric errors 0、`expansion_gates_met=false`。两轮都未通过扩大门槛。生产仍为 `not_authorized`，`scale_quality_claim_allowed=false`，不授权下一轮扩大。不得把 v4、首次扩大或 v8 repair 当成生产授权。
-
-旧 `business_profile_llm_report.v2` / `business_profile_atomic_extraction.v6` writer 继续冻结。保留正式公告/PDF 获取、版本、原始证据、队列/租约/checkpoint、公共 LLM 池和只读/停止能力。本规划不执行数据 reset，不开启旧 backfill，不把研究 fixture 批量改成 approved。
+保留正式公告/PDF、解析布局与缓存、源版本、Evidence、事实模型、队列/租约/checkpoint、公共LLM网关、查询/导出及失败隔离。重做的是语义职责和泛化验收，不是推倒全部代码。旧 `business_profile_llm_report.v2` / `business_profile_atomic_extraction.v6` writer继续禁用；不执行数据reset。
 
 ## 2. 产品目标
 
-为 SSE、SZSE、BSE 的全部 A 股自动生成可持续更新、结构化、可核验的公司核心画像及基础商品暴露。全市场是证券池覆盖目标，不要求每家公司每个字段完整，也不允许用少量零散事实冒充骨架完整。
+为 SSE、SZSE、BSE 的全部 A 股自动生成可持续更新、结构化、可核验的公司画像、产品暴露和供应链定位。全市场是证券池覆盖目标，不要求每家公司每个字段完整，也不允许用少量零散事实冒充骨架完整。
 
 用户应能回答：公司做什么、主要产品/服务和板块、怎么赚钱、基本规模、明示投入和销售对象、商品关联及业务角色、近期重大变化。事实、程序推导、研究假设分开。生产审批只针对实际消费范围；研究数据库发布不自动授权 DCF 或交易。
 
@@ -45,11 +41,11 @@
 
 ### 3.3 边界
 
-第一版包含基础商品暴露（§20），不包括无依据的净利润敏感性、价格预测、传导率、完整供应链网络、DCF 自动参数或港股。行业增强未研究不阻塞通用三维画像。
+第一版包含产品/服务收入端、投入成本端暴露和有限供应链定位，以及基础商品关联（§20），不包括无依据的净利润敏感性、价格预测、传导率、完整供应链网络、DCF 自动参数或港股。行业增强未研究不阻塞通用三维画像。
 
 ## 4. 事实分层与自动接受
 
-复用 `reported_fact`、`deterministic_derivation`、`research_assumption`。证据和校验通过的事实可以由程序自动接受，无需逐条人工批准；LLM 本身不能写 approved。
+复用 `reported_fact`、`deterministic_derivation`、`research_assumption`。有原文支持的LLM摘要是披露事实的可读表达，另留摘要生成方式、模型/提示词版本与支持引用；模型归纳的角色或映射须标为解释/待核，不冒充程序确定性推导或直接披露。不新增一套平行事实对象；必要元数据通过版本化现有投影接续。证据和校验通过的事实可以由程序自动接受，无需逐条人工批准；LLM 本身不能写 approved。
 
 新生产 writer 接通前，数据仍为 `accepted_for_review` / `research_fixture`。生产切换后，由同一应用 owner 按明确版本的自动接受规则将合格事实写入新契约空间。机器判定、规则版本和依据可追溯；矛盾项隔离，不用平均分消除错误。
 
@@ -82,33 +78,39 @@ Activity 描述行动，Measurement 描述单一指标。Measurement 同时绑�
 
 更正仅在明确范围覆盖原稿；新公告按有效期与知识可得日形成后继，不重写历史。每条事实保留报告期、published_at、文档版本和有效/知识时间；同名不同对象、不同期间、不同来源锚点不静默合并。官方表格与叙述冲突先核对象、期间、口径和单位，无法解释保持 unclear。
 
-## 9. 年报章节家族
+## 9. 全文发现与必要上下文
 
-通用基础需要主营/产品服务/收入来源的语义片段；行业增强按触发条件增加分部、经营量、材料、对手和事件。复用现有章节任务和 selector，允许按需要局部扩展，不能把制造六章固定清单套给金融/TMT。
+每份新报告先建立全页结构和章节地图，区分正文、表格、附注、目录及不可读页面。LLM以有界分块阅读结构及内容，识别主要业务、产品/服务、变现机制、投入/渠道和关键变动；再读取相关完整段落、表头、单位、脚注及续页。不得仅用旧正则/固定章节白名单决定模型能看什么；未命中标题仍须有通用分块发现路径。预算不足不能假装读完。
 
-程序自动选取页段与续表并记录证据，不要求每家公司人工冻结选页。只将完整必要上下文传给相应任务；读不到的章节显式报缺，不以搜索词命中替代 owner 判定。
+不要求把整份PDF一次塞入prompt，也不要求逐附注行抽取；所有页面须在发现覆盖记录中有去向，重要业务证据必须进入正文读取与漏项检查。扫描/乱码页走现有定向OCR或布局解析，未恢复则标缺口。模型不得执行报告中嵌入的指令、工具请求或外部网址，报告内容仅作为待分析数据。
 
-### 9.1 三维到现有任务的唯一映射
+### 9.1 核心映射与摘要
 
-映射版本为 `company_profile_common_core_mapping.v1`。三个维度是程序评价/投影维度，**不是新增 ChapterTask、field_id 或第四种 LLM 请求**。六个现有 ChapterTask 值保留，未知任务继续在调用前拒绝。
+保留主营、产品服务、收入来源三维及现有ChapterTask/事实对象；以版本化请求/响应补充“全文证据地图、源先行核心条件、语义覆盖、证据摘要”，先更新schema和消费者再启用，不偷偷向v1返回未知字段。extract/repair/verify沿既有provider接续，不为三维重复调用三次，不新建多agent平台。
 
-| 维度 ID | 执行任务与既有来源字段 | 实质回答要求 |
-| --- | --- | --- |
-| `principal_business` | `extract_business_overview`：`business_overview_source` / BusinessOverview.source_text | 原文明确主营/经营模式 |
-| `products_services` | overview 的 `business_overview_source`、`explicit_activity`；如披露分部则用 `extract_segment_financials` 的 `segment_dimension` 补充 | 主要产品/服务/业务线在原文中可定位，Activity.object_name 或 Segment.label 可支持 |
-| `revenue_model` | overview 的主营/销售/服务收费等原文；如披露构成则用 segment 的 `operating_revenue` 和对应 Segment | 原文说明如何形成收入，或经营收入记录明确归属；不能用总收入数值或“公司制造X”自动补出变现方式 |
+每个维度记录支持对象/证据、实际回答、缺项/冲突及覆盖范围。语义是否实质回答、主体/计划/否定/期间、未披露与遗漏的区别，由完整上下文的语义阅读和复核判定。程序检查引用和状态依赖，不能凭字段存在、关键词命中或固定句式把维度标完整。允许证据内抽象和通俗归纳；原文原名原数值另存，不由摘要覆盖。
 
-有界 overview scope 可以一次抽取支持多个维度的原文，不为三维重复调用三次。每个维度分别保存 `answered`、`supporting_record_ids`、`evidence_ids`、原文摘录/表格锚点和 `missing_reason`。这些属于已接通的 `company_profile_common_core_mapping.v1` 版本化研究投影；不要求现有 LLM 响应偷偷增加字段。程序必须检验关联证据确实回答该维度，不能因一个 BusinessOverview 存在而自动把三维全标 answered。无标准 action 映射时，已接受的业务原文仍可支持产品/服务维度。
+## 10. LLM 与程序分工
 
-## 10. 确定性解析与 LLM 分工
+| 工作 | 权威职责 |
+| --- | --- |
+| 正式源/解析/布局/数字 | 程序获取和整理；可靠结构化表格及已有财务事实直接复用，保留物理锚点、单位、期间、主体 |
+| 开放语言解读 | LLM识别公司业务、主次板块、动作、否定/计划、关系和不确定性，生成证据支持的摘要 |
+| 完整性与语义复核 | 从源内容先建立主要业务清单，再与候选对照；不只检查候选，也找遗漏；A独立核原文 |
+| 硬约束 | 程序检验schema、精确身份/引用、原数值与换算、权限和预算；不把启发式正则当语义真值 |
+| 交付 | 原owner处理接受/限用/隔离、持久化、查询/导出；LLM不直接写approved或修改数据库 |
 
-优先复用已有合格事实和完整结构化表格；可靠数值无需重复让模型抄写。既有解析不能正确处理的上下文直接用有界 LLM，不为启用通用骨架先建设新解析平台。校验只能确认实际输入，不能用 Gold 补答案。
+每份新报告核心语义必须真实调用配置的LLM。已有同field记录不能短路阅读；无provider/超时/失败须明确缺语义，不能静默用规则输出冒充新路线成功。只有报告hash、输入范围、处理/模型/提示词版本一致且已有合格语义结果时可复用；复用轮可0调用，但须链接原真实调用与覆盖证明。新验收首发冻结禁止复用语义结果；PDF解析缓存可保留。
 
-## 11. LLM 合同与运行预算
+规则用于有把握的结构化内容、硬约束和风险提示，不新增公司名/证券代码/页码专属生产抽取分支。测试可以使用真实失败样本，修复必须解释其可跨公司的格式或业务原因。
 
-仅 extract、typed repair、独立 verify；程序生成复核包。请求携带身份、活跃字段、完整证据及允许语义，禁止外部公司知识补事实。source-native 不由模型换算；程序拥有 canonical 转换。
+## 11. 模型核验与运行预算
 
-沿用公共逻辑池、动态 scope token 预算和共享绝对 deadline。传输/协议失败允许有界模型切换，语义争议不能靠换模型投票强过。可恢复任务在总尝试/时间/调用预算内延期重试，达到上限交付缺项并继续其他公司。
+复用公共LLM池及extract/repair/verify能力。源先行漏项清单的请求不提供候选答案，之后才对照草稿；验证可以使用同一模型的独立上下文，但不得称为统计独立或真值保证。核心摘要和高风险数字/主体/时态全查，次要明细抽查，不重复让模型核全份大表。
+
+程序能拒绝无锚点/数值不一致等硬错误；语义冲突保留双方证据，定向补源/复读一次后仍不清楚则unclear。模型自报置信度和多模型多数票均不能自动批准。事实清晰但行业标准名不确定时保留原名，不能丢掉业务。
+
+复用现有日志记录report/run、阶段、provider/model、request/attempt、提示词版本、输入输出token、耗时/费用、成功/失败/缓存命中及关联证据范围，不记录密钥。供应商不返usage记unknown并计入保守预算，不记0。资源按验收计划§7冻结，累计包含传输重试、修复、验证、预处理和导出；超限转缺项/限用并继续其他公司。
 
 ## 12. 指标、动作和标准化
 
@@ -160,7 +162,7 @@ A 股通用基础包自动适用于全部行业。制造/材料、资源、能�
 
 独立行业文档定义指标、模板、触发、单位、正反例与小型验证；这是增强范围的验收，不是全行业基础采集前置审批。固定 Gold 只用于其版本回归；运行中发现新形态形成共性修复，不做无限公司专项补丁。
 
-当前：跨行业通用基础任务已接入；制造/材料研究基线已形成但未授权生产增强；其他行业增强属 M4。不能把文档登记或八报告 CSV 导出等同全市场生产上线。
+当前保留跨行业任务底座及制造/材料研究基线；真实LLM通用交付尚待新路线验收。行业增强按交付计划卡6后置，不再以旧M4轮次作为推进依据。文档登记或少数报告导出不等同全市场生产上线。
 
 ## 19. 单一执行链与任务
 
@@ -170,33 +172,23 @@ A 股通用基础包自动适用于全部行业。制造/材料、资源、能�
 
 已发布入口 `company_profile_common_core`（preview、run、status、pause、resume、query、export）；旧 backfill / daily incremental / semantic repair / shadow_sync 名称在 CLI 与 Telegram 执行解析层被拒绝，不能当作已接 Stage 5。按时间/调用预算工作，默认结果复用；不要求指定公司、不要求凑齐50家。完成 scope 即保存，失败续跑不重复已经完成的 scope。
 
-## 20. 基础商品暴露与有限价值链角色
+## 20. 产品暴露与有限供应链定位
 
-近期交付必须包含：公司/业务对象、商品标准标识或待映射原名、原文产品/投入名、产品销售/原料投入/能源消耗/套保等证据支持的角色、来源事实引用、期间/知识时间、可用性与不确定性。数量和强度披露则保留，未知留空。
+通用版每家公司交付下列三个相连的视图，不以行业增强或完整知识图谱为前提：
 
-角色与映射由程序按事实和版本规则产生，标记 deterministic_derivation，不伪装为原文。商品/产品映射一对多无法确定时显示待映射，不猜一个标的。一个商品可同时有收入端和成本端角色，不能无数量基础净额化。
+| 视图 | 必需回答 | 按披露补充 |
+| --- | --- | --- |
+| 公司画像 | 主营、主要板块/产品服务、如何赚钱；主体/报告期与证据 | 规模、业务变化、经营指标 |
+| 产品暴露 | 主要销售产品/服务及收入端关联、关键投入与成本端关联，区分自制/贸易/服务 | 金额、占比、采购依赖/集中度、商品映射 |
+| 供应链定位 | 生产/加工/贸易/运营/服务等角色；明示上游投入、下游用途/渠道/客户类型 | 具名对手和关系、分部角色、多环节经营 |
 
-商品存在但行情未绑定时仍交付关联；价格序列是独立市场数据域。投入成本端不等于净利润负相关，产品销售端不等于净利润正相关。净利润弹性、传导/滞后、套保有效性、价格预测独立研究，不阻塞基础商品关联。
+产品服务不限于大宗商品：银行信贷、旅游服务、软件等也属于收入端对象。报告支持的业务抽象可由LLM归纳并引用证据；标准行业/商品映射歧义保留原名和待映射，不能按常识补客户名称或主张已建立交易关系。产品、业务线、投入项复用Segment/Activity/Measurement，角色与关联复用ValueChainRole/CommodityExposure的现有职责及必要版本化读取投影，不为三视图造三套存储。
 
-不是所有公司都有重大商品暴露。完整检查后无证据则显示“未发现明示关联”；未检查或失败显示对应状态，二者都不能表示零暴露。有限价值链角色以实际输入/输出/服务证据为限，不承诺完整产业链。
+商品输出保留业务对象、原名、标准标识或pending/ambiguous、角色、源record/Evidence引用、期间/知识时间、可用性。数量/金额依赖原Measurement；无披露不估算。程序确定映射标deterministic_derivation，LLM解释标生成方式和支持证据，不伪装直接披露。
 
-### 20.1 M3 商品对象字段合同
+同一商品可以同时为收入端、原料、能源或套保对象，分别呈现，不无依据净额化；销售端不代表净利润正相关，投入端不代表净利润负相关。行情序列未绑定不阻断已成立关联。不承诺净利润弹性、价格预测、传导/滞后或完整产业链。
 
-目标投影版本为 `company_profile_commodity_exposure.v1`，归现有 CommodityExposure 职责；它是程序派生的读取/发布对象，不加入 Stage 5 抽取对象闭集。M3 的 3.1 须先完成模型、投影及读写 schema 注册，再接 writer；当前代码中的 ResearchBoundary 仍为占位，不代表以下字段已经存在。
-
-| 字段 | 合同 |
-| --- | --- |
-| `exposure_id`、`schema_version` | 程序生成，身份绑定来源记录、角色、商品/原名、期间及政策版本 |
-| `report`、`reported_period`、`period_type`、`knowledge_time` | 继承来源身份和时态，不推测缺失日期 |
-| `subject_scope`、`subject_basis`、`business_object` | 继承来源范围及业务对象，不合并不同分部/子公司 |
-| `source_record_ids`、`evidence_ids`、`measurement_record_ids` | 引用新模型已接受事实；数量/金额通过 Measurement 引用，后者可空 |
-| `source_native_name`、`commodity_id`、`mapping_status` | 原名必有；状态为 mapped/pending/ambiguous；仅 mapped 可有唯一 commodity_id |
-| `role` | product_sales/raw_material_input/energy_consumption/hedge_underlying/unknown；套保角色须有可表示且已接受的套保事实，否则留未知或待处理 |
-| `assertion_class`、`mapping_version`、`policy_version` | 程序映射为 deterministic_derivation，保留规则版本；不冒充直接披露 |
-| `market_series_id`、`market_link_status` | 可空；状态为 not_linked/linked/ambiguous；linked 必须有序列ID，未绑定不阻止商品关联 |
-| `uncertainty` | 复用明确不确定性，不引入 LLM 自报概率或新打分体系 |
-
-报告层另外保存 `assessment_status=not_assessed/assessed/extraction_failed`、`checked_evidence_ids` 和关联列表。assessed 且无关联必须有已检查来源范围；空列表不能单独证明零暴露。角色枚举只属于商品投影，尤其不得把 energy_consumption/hedge_underlying 当新增 Stage 5 field_id。数值源与 canonical 单位仍由原 Measurement 和程序转换控制；没有净利润方向、净敞口和弹性默认值。
+每个视图有assessed/not_assessed/extraction_failed及已检查证据范围。读完相关披露后确实未披露的补充项可标not_disclosed；不适用有证据说明。不确定/冲突必须显示具体字段、原因、影响及恢复条件；“未发现明示关联”不等于零暴露。关键产品或核心角色未读/冲突，不能把公司整体判为可用。
 
 ## 21. 使用与发布边界
 
@@ -216,7 +208,7 @@ DCF、交易、价格预测不在本 change 自动启用范围。not_authorized 
 
 ## 24. 迁移、清理与回滚
 
-新契约空间独立落地，复用 raw assets 和运行底座，不兼容错误旧语义。先提供新读取和 writer 的明确范围切换；再按确切旧语义清单清理。全量 reset 不阻塞新空间研究交付。
+沿已有新契约事实空间和唯一writer以版本化政策接续，复用raw assets和运行底座；不另建平行数据库或重复事实体系。先验证现有读取/发布的明确范围切换，再按确切替代清单清理错误旧语义。全量reset不是前置步骤。
 
 旧 writer 始终禁用；切换失败停止新写入并保留已保存正确记录，不能回滚为旧错误语义生产。删除清单必须说明对象/依赖/可恢复性，保留正式 PDF 和原始证据。本轮仅删除失效文档/派生审计，不执行数据库清理。
 
@@ -226,30 +218,23 @@ DCF、交易、价格预测不在本 change 自动启用范围。not_authorized 
 
 已撤回的 a3dc726 派生审计不能证明101条语义全对或五类缺陷零复发。原始运行结果和撤回说明保留；重复的当前状态汇总退出产品索引。新的语义审查纳入真实任务结果抽样，不再触发旧“再跑一次全套”待办。
 
-## 26. 新实施路线与依赖
+## 26. 当前开发路线
 
-| 里程碑 | 业务交付 | 依赖/完成证据 |
-| --- | --- | --- |
-| M1 全市场基础骨架 | 任意A股可进入基础任务，主营/产品服务/收入来源有实质回答和缺项 | 复用模型，跨制造/服务/金融等不同披露形态验证；不以全部行业增强为前置 |
-| M2 可持续任务与读取 | 自动选样、选证据、逐scope保存、续跑、查询/画像/导出 | M1；重复提交不重复调用，停止恢复能保留成果，单点失败不阻塞队列 |
-| M3 基础商品暴露和研究发布 | 商品与业务角色、期间和来源可查，未绑定行情仍可用 | M1事实＋M2持久化；明确映射/读取契约、范围切换，不等净利润模型 |
-| M4 行业深度与市场扩展 | 按真实缺口增强关键指标，扩大吞吐 | 基础任务持续交付；逐项验证增强，不要求全部公司齐全 |
+按[交付路径](company_profile_delivery_plan.md)顺序执行：L0一家公司真实LLM纵向闭环 → L1共4家已知跨行业报告 → S1原12家新版本回归 → S2固定20家盲测（失败最多再20家）→ S3另100家受控试运行 → S4分波全市场研究发布 → 行业增强。
 
-M1—M3 是近期同一产品闭环，已归档。M4 第一片已于 2026-09-25 执行、关闭并归档于 `openspec/changes/archive/2026-09-25-expand-company-profile-m4-first-expansion/`。固定样本为 600004.SH / service 与 600006.SH / manufacturing。原始观察 recall 0/9、accuracy unassessed、mode completed，正式 closure v2 已写入。后续 common-core repair 已于 2026-09-26 归档于 `openspec/changes/archive/2026-09-26-repair-common-core-first-expansion-owned-page-gaps/`，当前 identity 为 `owned_page_facts=v8`，观察为 recall 8/9、accuracy 8/8、critical numeric errors 0、`expansion_gates_met=false`。剩余 M4 待办以 closure v2 为准。不授权下一轮扩大、规模质量声明或生产。旧阶段6 reset 变为M2/M3切换后的清理工作，旧阶段7增强与基础生产解耦，旧阶段8生产不再排在所有增强之后。
+历史M1—M4归档只表示其冻结实现完成，不替代上述验收。L0/L1先交付三视图和真实模型调用，不先造平台、不接着增加双公司修补轮次。优先消除正文遗漏、主体/期间/方向错误和关键数字问题；次要附注全收集、微小别名、界面美化等后置。
 
 ## 27. 验收与扩大运行
 
-规划验收与运行验收分开。实施必须证明：全A股候选分母可解释；三维骨架可核验；事实错误隔离；保存/查询/续跑正确；商品关联可用；身份/时间/单位正确。
+数量、分层、首发/补救质量、成本、容错与退出仅以[验收计划v2](company_profile_acceptance_program.md)为准。每次审核按总需求 → 验收计划与进度 → 任务卡 → 原文/真实输出/调用记录顺序进行，不能以历史归档、测试数、哈希或开发者自评分代替业务判断。
 
-业务质量看三维骨架覆盖率、来源已披露的重要信息召回、来源抽样准确性、关键数值错误、时效、耗时/token和人工工作量。召回分母由独立阅读样本来源确定，不能用模型自己列出的字段充当全部已披露信息。按行业和披露形态分层报告，不能以大量细小表格记录掩盖主营缺失。
+三视图都进入冻结源条件；核心召回分母不能由模型自身输出决定。正式源核验在有限评测样本进行，日常全市场运行不要求逐家公司人工预冻或逐条审批。规模运行依靠自动不确定性/隔离、抽样和同类问题追查，不承诺零遗漏。
 
-不预设“50家全通过/Gold24全等/所有负例真实触发/人工项清零”。fixture守卫与真实样本结果分列，未触发不算通过。抽样规则和首次扩大运行的数值阈值须在观察结果前明确写入运行计划；阈值未确定或样本不足时不得声称规模质量达标。已接受事实的研究交付不依赖上述推广判定。
+## 28. 当前执行入口与权限
 
-2026-10-16起，后续验证采用`docs/development/company_profile_acceptance_program.md`（v1）的分阶段计划：12家历史回归、20家未见验证、100家受控研究试运行；20家失败仅有一次新的20家确认，上限到达仍失败则停止扩样并声明能力边界。计划规定首发质量、补救后可用率、有限缺项、错误隔离和进度检查点，不要求所有公司全部附注行100%交付。原冻结两家公司合同不追溯变更，具体样本与预算须由后续执行卡接续；本次只确定验收计划，不启动扩大、改变默认处理身份或授予生产/规模质量权限。
+新的唯一实施change为 `openspec/changes/restore-company-profile-llm-led-generalization/`。旧`define-company-profile-staged-acceptance`及`prepare-company-profile-s1-s2-bounded-acceptance`的未执行任务被接续，历史完成项/材料不改分。准备好的20家不能用旧v61规则直接启动，也不能用于L0/L1调试。
 
-## 28. 当前执行入口与完成说明
-
-`deliver-a-share-core-profiles-and-commodity-exposure` 已于 2026-09-17 归档，继续保持归档。`openspec/changes/archive/2026-09-17-repair-common-core-empty-delivery-on-owned-pages/` 的 v3 交付保留。`openspec/changes/archive/2026-09-17-interpret-owned-page-company-total-and-bank-income-mix/` 已验收并归档：对 302132.SZ / 600000.SH 发布 `owned_page_facts=v4` successor，不覆盖 v1–v3 completed work。2026-09-17 按官方页面重跑并核原文：中航 `营业收入合计 75,358,958,001.86` 为无分部维度 company-total，`直销` 仍为 `sales_mode`；浦发主证据为 p71 `利润表分析`，交付集团营业收入 `173,964` 百万元、利息净收入 `120,483` 百万元及其占营业收入 `69.26%`，未收业务总收入 `325,269`、净息差或成本收入比。source recall 7/7，accuracy 7/7，critical numeric errors 0，`expansion_gates_met=true`。独立 Review 已通过。本次归档不是生产授权；生产继续 `not_authorized`，`scale_quality_claim_allowed=false`。`openspec/changes/archive/2026-09-24-read-as-of-shenwan-l1-for-profile-strata/` 已归档：正式历史行只有股票代码、行业代码、计入日期和更新时间；一级名称通过同版本活动 taxonomy 父链解析；顶层 `sw_l1_name` 优先；不读取 `classification.levels.sw_l1.industry_name`；断链保持 `other`；不回退 cutoff 后的当前 membership。2026-09-17 `service_available_count=0` 只是该修复前的历史基线。固定样本已重新探查并执行：600004.SH / service、600006.SH / manufacturing。首次扩大 `openspec/changes/archive/2026-09-25-expand-company-profile-m4-first-expansion/` 已于 2026-09-25 执行、关闭并归档；原始观察 recall 0/9、accuracy unassessed、mode completed，正式 `company_profile_operator_closure.v2.json` 已写入，checkpoint 没有正式 v1 快照，不得补造。common-core repair `openspec/changes/archive/2026-09-26-repair-common-core-first-expansion-owned-page-gaps/` 已于 2026-09-26 归档；当前 identity 为 `owned_page_facts=v8`；v8 recall 8/9、accuracy 8/8、critical numeric errors 0、`expansion_gates_met=false`。v6、v7 的 8/8 快照保留，并已被后续 Review 否决。两轮都未通过扩大门槛。不建行业包，不授权下一轮扩大、规模质量声明或生产。主规范为 `openspec/specs/company-profile-m4-first-expansion/spec.md` 与 `openspec/specs/common-core-owned-page-gap-repair/spec.md`。
+以下是现有入口形状，**不是本次运行授权，也不证明默认路径已接真实LLM**。新政策应由同一入口显式选择并经卡片验收；正式运行按卡片有限预算，生产启用另作明确裁决。
 
 权威任务名：`company_profile_common_core`。Scheduler、CLI 和 Telegram 只转发到 `research.company_profile.operations`。已发布动作：preview、run、status、pause、resume、query、export。生产授权仍为 `not_authorized`。旧 `business_profile_*` 与 `company_profile_shadow_sync` 入口已断开，不得再作为执行命令。
 

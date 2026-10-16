@@ -1,5 +1,7 @@
 # 公司画像阶段 4 通用语义模型与内存工作流
 
+> 2026-10-16适用说明：本文件是历史模型实现参考。新真实LLM阅读、三视图及版本化投影按[产品总需求](company_profile_product_and_industry_semantic_requirements.md)和[交付路径](company_profile_delivery_plan.md)实施；旧固定任务/fake-provider/完整性限制不构成新路线禁止条款。现有对象和不冲突的字段语义继续复用。
+
 > 文档类型：implementation-reference（阶段 4 历史实现及模型参考，不是当前产品路线）
 > 版本：`company_profile_common_semantic_model.v1`
 > 日期：2026-09-03

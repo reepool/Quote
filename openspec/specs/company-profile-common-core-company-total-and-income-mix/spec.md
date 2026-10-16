@@ -1,5 +1,7 @@
 # company-profile-common-core-company-total-and-income-mix Specification
 
+> Scope notice (2026-10-16): This specification retains the archived implementation / frozen historical-policy baseline. For new company-profile work, read [current scope and precedence](../../README.md) and [LLM-led target change](../../changes/restore-company-profile-llm-led-generalization/proposal.md). Legacy no-provider completion, regex semantic completeness, fixed sample loops and old expansion instructions do not govern the new policy. Non-conflicting source, numeric, time and single-owner constraints remain valid. Target approval does not claim implementation or production activation.
+
 ## Purpose
 Common-core must project formal company-total operating revenue without a segment dimension, project bank MD&A income-mix amounts and bound shares from owned income-analysis excerpts, reject unbound share or non-group subjects at the acceptance boundary, and publish `owned_page_facts=v4` without overwriting v1–v3.
 

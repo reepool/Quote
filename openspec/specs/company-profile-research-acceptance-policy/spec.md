@@ -1,5 +1,7 @@
 # company-profile-research-acceptance-policy Specification
 
+> Scope notice (2026-10-16): This specification retains the archived implementation / frozen historical-policy baseline. For new company-profile work, read [current scope and precedence](../../README.md) and [LLM-led target change](../../changes/restore-company-profile-llm-led-generalization/proposal.md). Legacy no-provider completion, regex semantic completeness, fixed sample loops and old expansion instructions do not govern the new policy. Non-conflicting source, numeric, time and single-owner constraints remain valid. Target approval does not claim implementation or production activation.
+
 ## Purpose
 Current fact-level acceptance policy, revised 2026-09-13. Target policy is distinct from implementation readiness; remaining delivery work is tracked in deliver-a-share-core-profiles-and-commodity-exposure.
 ## Requirements

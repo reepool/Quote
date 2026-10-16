@@ -1,5 +1,7 @@
 # company-profile-a-share-delivery Specification
 
+> Scope notice (2026-10-16): This specification retains the archived implementation / frozen historical-policy baseline. For new company-profile work, read [current scope and precedence](../../README.md) and [LLM-led target change](../../changes/restore-company-profile-llm-led-generalization/proposal.md). Legacy no-provider completion, regex semantic completeness, fixed sample loops and old expansion instructions do not govern the new policy. Non-conflicting source, numeric, time and single-owner constraints remain valid. Target approval does not claim implementation or production activation.
+
 ## Purpose
 Target all-A-share core profile, commodity association and task delivery contract. Approved planning revision 2026-09-13; implementation remains tracked in the corresponding change.
 

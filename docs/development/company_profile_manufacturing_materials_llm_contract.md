@@ -2,7 +2,8 @@
 
 > 文档类型：industry LLM contract
 > schema/version：`company_profile_manufacturing_materials_llm_contract.v1`
-> 状态：`approved_research_contract`
+> 状态：`historical_research_contract`；只约束原冻结制造/材料身份与回归，不再是全A股新语义政策。
+> 新开发以[产品总需求](company_profile_product_and_industry_semantic_requirements.md)及[交付路径](company_profile_delivery_plan.md)为准；下文“不是画像作者”“仅三类固定请求”等旧限制不禁止新版本的证据内摘要、源先行发现和语义覆盖。原source-native数字与主体保护继续有效，生产仍未授权。
 > 日期：2026-09-03
 > production authorization：`not_authorized`
 > 行业需求：`company_profile_manufacturing_materials_requirements.md`

@@ -1,3 +1,5 @@
+> 2026-10-16接续说明：已完成的来源准备与规则回归及原结果保留，不追改成绩或勾选。后续执行以[新change](../restore-company-profile-llm-led-generalization/proposal.md)和[验收计划v2](../../../docs/development/company_profile_acceptance_program.md)为准；旧规则身份/预算不授权新LLM或S2运行，未执行任务由新卡承接，不按已完成归档。
+
 ## 1. Historical regression
 
 - [x] 1.1 Freeze twelve distinct historical companies and core source assertions with six risks each covering at least two companies.

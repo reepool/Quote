@@ -1,3 +1,5 @@
+> 2026-10-16接续说明：旧数量/分级规划及原结果保留，不追改成绩或勾选。后续执行以[新change](../restore-company-profile-llm-led-generalization/proposal.md)和[验收计划v2](../../../docs/development/company_profile_acceptance_program.md)为准；旧规则身份/预算不授权新LLM或S2运行，未执行任务由新卡承接，不按已完成归档。
+
 ## Why
 
 历版累计分析约70家公司，修复后的有限通过仍不能证明新公司首次交付稳定；现有两家公司任务没有累计验收的退出条件。需要固定验证数量、可容忍缺项、错误隔离及补救上限，让通用画像进入可控研究使用，而非无限追加修补样本。

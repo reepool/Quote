@@ -1,3 +1,5 @@
+> 2026-10-16接续说明：旧v61执行设计及原结果保留，不追改成绩或勾选。后续执行以[新change](../restore-company-profile-llm-led-generalization/proposal.md)和[验收计划v2](../../../docs/development/company_profile_acceptance_program.md)为准；旧规则身份/预算不授权新LLM或S2运行，未执行任务由新卡承接，不按已完成归档。
+
 ## Context
 
 当前S0的v60仍有四项确定服务P1。后继仅剩一次正式授权；S1可以回归，S2仅准备，业务运行须S0获A有限通过及后续执行卡生效。

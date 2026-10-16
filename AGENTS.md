@@ -428,6 +428,19 @@ A 下次审核开发交付并推进时，须在同一回复中告知开发者，
 
 ---
 
+### 10.4 公司画像开发与审核的固定顺序
+
+涉及年报解读、公司画像、产品暴露、供应链定位时，每次开发和审核必须依次读取：
+
+1. `docs/development/company_profile_product_and_industry_semantic_requirements.md`：唯一产品目标；
+2. `docs/development/company_profile_acceptance_program.md`（v2）：唯一数量、门槛、补救与进度；
+3. `docs/development/company_profile_delivery_plan.md`：当前顺序任务卡及清理条件；
+4. `docs/development/ab_role_development_workflow.md`（v2）及当前实施change。
+
+当前新路线唯一实施change为`restore-company-profile-llm-led-generalization`。历史逐公司规则轮次、无LLM成绩、旧closure或测试数量不能替代新路线业务验收，不能据此再派“下一对修到100%”。开放语言由真实LLM阅读、归纳和源先行漏项核验；程序负责可靠结构化内容及硬约束，禁止同field存在或正则命中冒充完整语义。旧合同/首次成绩不追改。
+
+审核先核三类产品及真实执行路径，再核原文质量、资源和必要工程验证；报告当前阶段、实际/剩余数量、首次/补救结果、限制和下一张卡。数千家公司自动处理是终点，行业增强后置。新运行须具备任务卡的冻结版本与预算授权，文档批准不等于付费调用或生产启用。所有临时开发制品继续遵守§2.3的`TMPDIR=/home/python/Quote/data/QuoteBak`。
+
 ## 11. 本仓库 Git 闭环授权
 
 本节仅适用于 Quote 仓库。

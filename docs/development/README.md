@@ -12,7 +12,9 @@
 4. 当前域的 current 文档或 runbook；
 5. 涉及框架改造时读取 `docs/development/framework_refactoring_program.md`。
 
-历史 requirements、调查和回执只能作为背景，不能覆盖当前代码、OpenSpec spec 和开发总纲。
+历史 requirements、调查和回执只能作为背景，不能覆盖当前目标合同和开发总纲；代码现状不能反过来改变业务目标。
+
+公司画像每次开发/审核额外按固定顺序读取：[产品总需求](company_profile_product_and_industry_semantic_requirements.md) → [验收计划v2及唯一进度](company_profile_acceptance_program.md) → [交付路径与任务卡](company_profile_delivery_plan.md) → [A/B流程v2](ab_role_development_workflow.md) → [当前change](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。旧M4轮次、closure和无LLM历史成绩不再是下一实施入口。当前先打通真实LLM三视图，再按固定样本验证和全市场分波，不逐公司枚举修补。
 
 ## 2. 当前架构原则
 

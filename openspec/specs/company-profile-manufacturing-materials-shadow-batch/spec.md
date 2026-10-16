@@ -1,5 +1,7 @@
 # company-profile-manufacturing-materials-shadow-batch Specification
 
+> Scope notice (2026-10-16): This specification retains the archived implementation / frozen historical-policy baseline. For new company-profile work, read [current scope and precedence](../../README.md) and [LLM-led target change](../../changes/restore-company-profile-llm-led-generalization/proposal.md). Legacy no-provider completion, regex semantic completeness, fixed sample loops and old expansion instructions do not govern the new policy. Non-conflicting source, numeric, time and single-owner constraints remain valid. Target approval does not claim implementation or production activation.
+
 ## Purpose
 TBD - created by archiving change validate-manufacturing-materials-company-profile-shadow-batch. Update Purpose after archive.
 ## Contract scope

@@ -1,3 +1,5 @@
+> 2026-10-16接续说明：旧实施待办及原结果保留，不追改成绩或勾选。后续执行以[新change](../restore-company-profile-llm-led-generalization/proposal.md)和[验收计划v2](../../../docs/development/company_profile_acceptance_program.md)为准；旧规则身份/预算不授权新LLM或S2运行，未执行任务由新卡承接，不按已完成归档。
+
 ## 1. 固定验收规划（本次交付）
 
 - [x] 1.1 制定12家已知回归、20家未见验证、100家受控试运行及S2最多一次新20家确认的数量上限；保持在途v60合同不变。
