@@ -1,0 +1,24 @@
+import json,hashlib,runpy
+from pathlib import Path
+from datetime import datetime,timezone
+from research.company_profile.execution import default_processing_identity
+from research.company_profile.m4_next_batch import load_m4_next_batch_plan,save_m4_next_batch_plan
+from research.company_profile import core_evidence_selection as selection
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch';K=R/'data/checkpoints/company_profile_common_core';P=K/'reports/m4_v60_same_source_repair';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();load=lambda p:json.loads(p.read_text())
+pre=load(C/'v60-preflight-protection-verification.json');assert pre['success'] and pre['scope_review']['blocking_code_defects']==0
+for p,h in pre['preserved_change_originals_sha256'].items():assert sha(R/p)==h,p
+validation=load(C/'v60-local-validation-receipt.json')
+for p,h in validation['code_and_fixture_sha256'].items():assert sha(R/p)==h,p
+identity={**default_processing_identity(),'revenue_sentence_repair':'v60'}
+flags={n:getattr(selection,n)(identity)for n in ['revenue_sentence_repair_requested','named_role_repair_requested','service_operating_energy_requested','core_answer_repair_requested','source_delivery_repair_requested']};assert all(flags.values())
+assert default_processing_identity()==load(C/'freeze-receipt.json')['default_identity']
+plan=load_m4_next_batch_plan(K,plan_directory=K/'reports/m4_v59_unseen_small_batch');assert plan
+assert not P.exists();assert not (R/'data/research/company_profile_common_core/m4_v60_same_source_repair').exists();assert not (R/'data/exports/m4_v60_same_source_repair').exists()
+path=save_m4_next_batch_plan(K,plan,plan_directory=P)
+assert path.read_bytes()==(K/'reports/m4_v59_unseen_small_batch/plan.json').read_bytes()
+files=list(sorted((R/'research/company_profile').glob('*.py')))+[R/'research/announcement_assets/repository.py'];code={str(p.relative_to(R)):sha(p)for p in files}
+for p,h in code.items():
+ dest=C/'v60-executed-code-snapshot'/p;dest.parent.mkdir(parents=True,exist_ok=True);dest.open('xb').write((R/p).read_bytes());assert sha(dest)==h
+verified=[C/n for n in ['v60-preflight-protection-verification.json','v60-local-validation-receipt.json','v60-local-adjudicated-source-review-evidence.json','v60-actor-adjudication-mapping.json','v60-source-scope.json','v60-formal-execute-script.txt','v60-bounded-supervisor-script.txt']]+[path]
+receipt=dict(frozen_at=datetime.now(timezone.utc).isoformat(),executed_code_sha256=code,verification_sha256={str(p.relative_to(R)):sha(p)for p in verified},processing_identity=identity,default_identity=default_processing_identity(),repair_flags=flags,source_scope_sha256=sha(C/'source-scope.json'),successor_scope_sha256=sha(C/'v60-source-scope.json'),same_source_plan_bytes=True,plan_id=plan.plan_id,plan_directory=str(P.relative_to(R)),formal_successors_used=0,authorized_successors=2,all_prerequisites_completed_and_inspected=True,preflight_success=True,production_authorization='not_authorized',scale_quality_claim_allowed=False)
+(C/'v60-source-freeze-receipt.json').open('x').write(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n');print('FROZEN',len(code),'modules',flags,flush=True)

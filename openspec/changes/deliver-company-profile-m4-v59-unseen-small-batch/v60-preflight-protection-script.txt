@@ -1,0 +1,30 @@
+import json,hashlib
+from pathlib import Path
+from datetime import datetime,timezone
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();load=lambda p:json.loads(p.read_text());baseline=load(C/'initial-workspace-baseline.json');hist=load(C/'protection-baseline.json');first=load(C/'first-formal-delivery-preservation.json')['completed_sha256'];reviews=load(C/'first-review-preservation.json')['files_sha256'];checks={}
+for name,items in [('history',hist),('existing_worktree',baseline['existing_modified_sha256']),('first_formal_artifacts',first),('first_review_originals',reviews)]:
+ for p,h in items.items():assert sha(R/p)==h,(name,p)
+ checks[name]=len(items)
+old=load(R/baseline['predecessor_archive']/'v59-finite-archive-path-mapping.json') if (R/baseline['predecessor_archive']/'v59-finite-archive-path-mapping.json').exists()else None
+freeze=load(C/'first-source-freeze-receipt.json');assert sha(C/'source-scope.json')==freeze['source_scope_sha256'];snap=freeze['executed_code_sha256']
+for p,h in snap.items():assert sha(C/'first-executed-code-snapshot'/p)==h,p
+checks['first_execution_snapshot_modules']=len(snap)
+for r in load(C/'source-scope.json')['official_reports']:
+ h=r['document_version'];assert sha(R/'data/filings/announcements/blobs'/h[:2]/(h+'.pdf'))==h
+checks['official_pdf_versions']=2
+out=dict(completed_at=datetime.now(timezone.utc).isoformat(),success=True,checks=checks,original_contract_sha256=sha(C/'source-scope.json'),first_observation_used=1,successors_used=0,source_actor_adjudication_pending=False)
+validation=load(C/'v60-local-validation-receipt.json')
+for p,h in validation['code_and_fixture_sha256'].items():assert sha(R/p)==h,p
+assert validation['targeted_pytest']['passed']==33 and validation['targeted_pytest']['exit_code']==0
+assert all(x['exit_code']==0 for x in validation['checks'])
+checks['reused_code_and_fixture_hashes']=len(validation['code_and_fixture_sha256'])
+local=load(C/'v60-local-adjudicated-source-review-evidence.json');assert local['summary']['recall_numerator']==354 and local['summary']['accuracy_numerator']==733 and local['summary']['negatives_passed']==40
+import runpy,copy
+g=runpy.run_path(str(C/'v60-adjudicated-business-match-script.txt'));v=next(v for v in g['scope']['action_conditions']if v['condition_id']=='600108.SH-action-014');rs=load(C/'v60-local-delivery-review-inputs/raw_600108.SH.json');matches=[r for r in rs if g['rolematch'](r,v)];assert matches
+for actor in ['甘肃亚盛亚美特节水有限公司','未知主体']:
+ bad=copy.deepcopy(matches[0]);bad['source_actor']=actor;assert not g['rolematch'](bad,v)
+checks['actor_adjudication_positive_and_two_negative_assertions']=3
+protected=[p for p in C.rglob('*')if p.is_file() and p.name not in ['review-submission.md','tasks.md'] and not p.name.startswith('v60-formal') and not p.name.startswith('v60-source-freeze') and not p.name.startswith('v60-attempt') and p.name!='v60-preflight-protection-verification.json']
+out['preserved_change_originals_sha256']={str(p.relative_to(R)):sha(p)for p in protected}
+out['scope_review']={'blocking_code_defects':0,'pending_contract_adjudications':0,'business_code_changes_this_turn':False,'actor_mapping_only':True,'global_alias_or_financial_merge':False}
+(C/'v60-preflight-protection-verification.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print(out)

@@ -1,0 +1,39 @@
+"""Read-only protection checks, current-snapshot strict validation, and this handoff's preservation."""
+import json,hashlib,subprocess,os
+from pathlib import Path
+from datetime import datetime,timezone
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();load=lambda p:json.loads(p.read_text());checks={}
+pre=load(C/'v60-preflight-protection-verification.json');assert pre['success']
+groups=[('history',load(C/'protection-baseline.json')),('existing_worktree',load(C/'initial-workspace-baseline.json')['existing_modified_sha256']),('first_formal',load(C/'first-formal-delivery-preservation.json')['completed_sha256']),('first_review',load(C/'first-review-preservation.json')['files_sha256']),('preflight_originals',pre['preserved_change_originals_sha256']),('formal_written_artifacts',load(C/'v60-formal-delivery-preservation.json')['completed_sha256'])]
+for name,items in groups:
+ for p,h in items.items():assert sha(R/p)==h,(name,p)
+ checks[name]=len(items)
+freeze=load(C/'v60-source-freeze-receipt.json')
+for p,h in freeze['executed_code_sha256'].items():assert sha(R/p)==sha(C/'v60-executed-code-snapshot'/p)==h,p
+for p,h in freeze['verification_sha256'].items():assert sha(R/p)==h,p
+checks['frozen_current_modules']=len(freeze['executed_code_sha256'])
+for p,h in load(C/'first-source-freeze-receipt.json')['executed_code_sha256'].items():assert sha(C/'first-executed-code-snapshot'/p)==h,p
+checks['first_code_snapshot']=39
+for p,h in load(C/'v60-local-validation-receipt.json')['code_and_fixture_sha256'].items():assert sha(R/p)==h,p
+checks['reused_test_code_fixture_hashes']=41
+assert sha(C/'source-scope.json')==freeze['source_scope_sha256']
+scope=load(C/'source-scope.json')
+for r in scope['official_reports']:
+ h=r['document_version'];assert sha(R/'data/filings/announcements/blobs'/h[:2]/(h+'.pdf'))==h
+checks['official_pdf_versions']=2
+score=load(C/'v60-formal-source-review-evidence.json');summ=score['summary'];assert summ['recall_numerator']==summ['recall_denominator']==354 and summ['accuracy_numerator']==summ['accuracy_denominator'] and summ['numeric_errors']==0 and summ['negatives_passed']==summ['negative_total']==40
+assert len({(r['instrument_id'],r['record_id'])for r in score['fact_review']})==len(score['fact_review'])==727
+assert len(score['answer_review'])==6
+native=load(C/'v60-formal-native-equivalence-receipt.json');assert all(x['complete_native_semantics_multiset_equal'] and all(d['excerpt_equal']and d['support_native_multiset_equal']for d in x['dimensions'])for x in native['companies'])
+ro=load(C/'v60-readonly-verification-receipt.json');assert ro['query_export_disk_equal'] and ro['five_stages_success_no_reuse_predecessor']
+P=R/'data/checkpoints/company_profile_common_core/reports/m4_v60_same_source_repair';f=load(P/'formal_execution.json');supervisor=load(C/'v60-formal-supervisor-receipt.json');obs=load(P/'observation.json')
+assert f['whole_round_seconds']<=300 and obs['tokens_consumed']<=50000 and supervisor['returncode']==0 and not supervisor['timed_out']
+commands=[['openspec','validate','deliver-company-profile-m4-v59-unseen-small-batch','--strict']]+[['openspec','validate',s,'--strict','--type','spec']for s in ['company-profile-common-core-owned-page-facts','company-profile-common-core-company-total-and-income-mix','company-profile-common-semantic-model']]+[['git','diff','--check']]
+env={**os.environ,'PATH':'/home/python/.nvm/versions/node/v24.7.0/bin:'+os.environ['PATH'],'OPENSPEC_TELEMETRY':'0'};validation=[]
+for cmd in commands:
+ r=subprocess.run(cmd,env=env,capture_output=True,text=True,timeout=30);validation.append(dict(command=cmd,exit_code=r.returncode,output=r.stdout+r.stderr));assert r.returncode==0,validation[-1]
+out=dict(completed_at=datetime.now(timezone.utc).isoformat(),success=True,checks=checks,summary=summ,whole_round_seconds=f['whole_round_seconds'],outer_process_seconds=supervisor['elapsed_seconds'],tokens_consumed=obs['tokens_consumed'],validation=validation,scope_review=dict(blocking_P0_P1_remaining=0,source_contract_conflicts_remaining=0,business_code_changes_this_turn=False,actor_mapping_only=True,no_global_alias_or_financial_merge=True),first_observation_used=1,successors_used=1,successors_authorized=2,production_authorization='not_authorized',scale_quality_claim_allowed=False,awaiting_A_finite_review=True)
+(C/'v60-final-verification-receipt.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
+paths=[p for p in C.rglob('*')if p.is_file()and not p.name.endswith('.pyc')and p.name!='v60-review-preservation.json']
+(C/'v60-review-preservation.json').write_text(json.dumps(dict(completed_at=datetime.now(timezone.utc).isoformat(),files_sha256={str(p.relative_to(R)):sha(p)for p in sorted(paths)},all_review_writers_ended=True,formal_artifacts_separately_protected=True),ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(out,ensure_ascii=False))

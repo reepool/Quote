@@ -1,0 +1,40 @@
+"""Bound this authorized operator invocation, including synchronous entry calls."""
+import argparse,hashlib,json,os,signal,subprocess,time
+from datetime import datetime,timezone
+from pathlib import Path
+parser=argparse.ArgumentParser();parser.add_argument('--block-proof',action='store_true');args=parser.parse_args()
+R=Path.cwd();C=R/'openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch'
+proof=args.block_proof;prefix='v60-synchronous-block-proof' if proof else 'v60-formal'
+limit=1.5 if proof else 300.0
+if proof:
+ command=['/home/python/miniconda3/envs/Quote/bin/python','-u','-c',"import faulthandler,signal,time;faulthandler.register(signal.SIGUSR1,all_threads=True);print('ISOLATED_SYNCHRONOUS_BLOCK',flush=True);time.sleep(60)"]
+else:
+ assert (C/'v60-source-freeze-receipt.json').exists()
+ assert not (C/'v60-attempt-start.json').exists()
+ command=['/home/python/miniconda3/envs/Quote/bin/python','-u',str(C/'v60-formal-execute-script.txt')]
+start=time.monotonic();utc=datetime.now(timezone.utc).isoformat()
+if not proof:(C/'v60-attempt-start.json').open('x').write(json.dumps(dict(started_at=utc,first_observation_used=1,successors_used=1,successors_authorized=2),indent=2)+'\n')
+env={**os.environ,'PYTHONPATH':'.','V60_ROUND_STARTED_MONOTONIC':str(start),'V60_ROUND_STARTED_UTC':utc}
+with (C/(prefix+'.log')).open('x') as out,(C/(prefix+'-stacks.log')).open('x') as err:
+ p=subprocess.Popen(command,stdout=out,stderr=err,env=env,start_new_session=True)
+ deadline=start+limit
+ stack_requested=False
+ try:
+  rc=p.wait(timeout=max(0.01,deadline-time.monotonic()-0.2));timed_out=False
+ except subprocess.TimeoutExpired:
+  stack_requested=True
+  try:os.kill(p.pid,signal.SIGUSR1)
+  except ProcessLookupError:pass
+  try:rc=p.wait(timeout=max(0.001,deadline-time.monotonic()));timed_out=False
+  except subprocess.TimeoutExpired:
+   timed_out=True;os.killpg(p.pid,signal.SIGKILL);rc=p.wait(timeout=5)
+elapsed=time.monotonic()-start
+receipt=dict(started_at=utc,finished_at=datetime.now(timezone.utc).isoformat(),elapsed_seconds=elapsed,hard_limit_seconds=limit,timed_out=timed_out,returncode=rc,formal_run_called=not proof,synchronous_block_proof=proof,stack_dump_requested_on_deadline_approach=stack_requested)
+(C/(prefix+'-supervisor-receipt.json')).write_text(json.dumps(receipt,indent=2)+'\n')
+if not proof:
+ parents=[R/'data/checkpoints/company_profile_common_core/reports/m4_v60_same_source_repair',R/'data/research/company_profile_common_core/m4_v60_same_source_repair',R/'data/exports/m4_v60_same_source_repair']
+ paths={p for parent in parents for p in parent.rglob('*') if p.is_file()}
+ paths.update(C/n for n in [prefix+'.log',prefix+'-stacks.log',prefix+'-supervisor-receipt.json','v60-attempt-start.json'])
+ manifest={str(p.relative_to(R)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(paths)}
+ (C/'v60-formal-delivery-preservation.json').write_text(json.dumps(dict(completed_at=datetime.now(timezone.utc).isoformat(),completed_sha256=manifest,protected_after_all_writers_ended=True,empty_paths=[str(p.relative_to(R)) for p in paths if p.stat().st_size==0],first_observation_used=1,successors_used=1,successors_authorized=2),ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(receipt),flush=True)

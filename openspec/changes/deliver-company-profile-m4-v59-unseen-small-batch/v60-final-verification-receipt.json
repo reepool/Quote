@@ -1,0 +1,112 @@
+{
+  "completed_at": "2026-10-16T02:19:14.398318+00:00",
+  "success": true,
+  "checks": {
+    "history": 4174,
+    "existing_worktree": 19,
+    "first_formal": 22,
+    "first_review": 6,
+    "preflight_originals": 116,
+    "formal_written_artifacts": 22,
+    "frozen_current_modules": 39,
+    "first_code_snapshot": 39,
+    "reused_test_code_fixture_hashes": 41,
+    "official_pdf_versions": 2
+  },
+  "summary": {
+    "recall_numerator": 354,
+    "recall_denominator": 354,
+    "accuracy_numerator": 733,
+    "accuracy_denominator": 733,
+    "numeric_errors": 0,
+    "negatives_passed": 40,
+    "negative_total": 40,
+    "by_kind": {
+      "answer": {
+        "met": 6,
+        "total": 6
+      },
+      "income": {
+        "met": 195,
+        "total": 195
+      },
+      "action": {
+        "met": 153,
+        "total": 153
+      }
+    }
+  },
+  "whole_round_seconds": 166.07823828421533,
+  "outer_process_seconds": 166.74466506019235,
+  "tokens_consumed": 0,
+  "validation": [
+    {
+      "command": [
+        "openspec",
+        "validate",
+        "deliver-company-profile-m4-v59-unseen-small-batch",
+        "--strict"
+      ],
+      "exit_code": 0,
+      "output": "Change 'deliver-company-profile-m4-v59-unseen-small-batch' is valid\n"
+    },
+    {
+      "command": [
+        "openspec",
+        "validate",
+        "company-profile-common-core-owned-page-facts",
+        "--strict",
+        "--type",
+        "spec"
+      ],
+      "exit_code": 0,
+      "output": "Specification 'company-profile-common-core-owned-page-facts' is valid\n"
+    },
+    {
+      "command": [
+        "openspec",
+        "validate",
+        "company-profile-common-core-company-total-and-income-mix",
+        "--strict",
+        "--type",
+        "spec"
+      ],
+      "exit_code": 0,
+      "output": "Specification 'company-profile-common-core-company-total-and-income-mix' is valid\n"
+    },
+    {
+      "command": [
+        "openspec",
+        "validate",
+        "company-profile-common-semantic-model",
+        "--strict",
+        "--type",
+        "spec"
+      ],
+      "exit_code": 0,
+      "output": "Specification 'company-profile-common-semantic-model' is valid\n"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "output": ""
+    }
+  ],
+  "scope_review": {
+    "blocking_P0_P1_remaining": 0,
+    "source_contract_conflicts_remaining": 0,
+    "business_code_changes_this_turn": false,
+    "actor_mapping_only": true,
+    "no_global_alias_or_financial_merge": true
+  },
+  "first_observation_used": 1,
+  "successors_used": 1,
+  "successors_authorized": 2,
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "awaiting_A_finite_review": true
+}

@@ -1,0 +1,27 @@
+"""Compare all formal native semantics with reviewed local outputs; never pair duplicate keys arbitrarily."""
+import json,hashlib,collections
+from pathlib import Path
+from datetime import datetime,timezone
+C=Path('openspec/changes/deliver-company-profile-m4-v59-unseen-small-batch');load=lambda p:json.loads(p.read_text());dump=lambda x:json.dumps(x,ensure_ascii=False,sort_keys=True)
+# Only envelope identities vary between isolated fixture delivery and official owner delivery.
+# Report-envelope differences are reported explicitly and official bindings checked separately.
+def native(r):
+ if isinstance(r,list):return [native(v)for v in r]
+ if isinstance(r,dict):return {k:native(v)for k,v in r.items()if k not in ['record_id','evidence_id','report']}
+ return r
+results=[]
+for ins in ['600101.SH','600108.SH']:
+ local=load(C/'v60-local-delivery-review-inputs'/('raw_'+ins+'.json'));formal=load(C/'v60-formal-delivery-review-inputs'/('raw_'+ins+'.json'))
+ left=collections.Counter(dump(native(r))for r in local);right=collections.Counter(dump(native(r))for r in formal)
+ missing=list((left-right).elements());added=list((right-left).elements())
+ result=dict(instrument_id=ins,local_count=len(local),formal_count=len(formal),complete_native_semantics_multiset_equal=left==right,missing_count=len(missing),added_count=len(added),missing_semantics=[json.loads(v)for v in missing],added_semantics=[json.loads(v)for v in added],local_reports=list({dump(r['report'])for r in local}),formal_reports=list({dump(r['report'])for r in formal}),dimensions=[])
+ lmap={r['record_id']:dump(native(r))for r in local};fmap={r['record_id']:dump(native(r))for r in formal}
+ lp=load(C/'v60-local-delivery-review-inputs'/('profile_'+ins+'.json'));fp=load(C/'v60-formal-delivery-review-inputs'/('profile_'+ins+'.json'))
+ for la,fa in zip(lp['dimensions'],fp['dimensions'],strict=True):
+  assert la['dimension_id']==fa['dimension_id'];ls=collections.Counter(lmap[x]for x in la['supporting_record_ids']);fs=collections.Counter(fmap[x]for x in fa['supporting_record_ids'])
+  result['dimensions'].append(dict(dimension_id=la['dimension_id'],answered_equal=la['answered']==fa['answered'],excerpt_equal=la['excerpt']==fa['excerpt'],support_native_multiset_equal=ls==fs,formal_excerpt=fa['excerpt']))
+ results.append(result)
+out=dict(completed_at=datetime.now(timezone.utc).isoformat(),normalization_excluded=['record_id','evidence_id','report envelope (differences explicitly retained)'],all_other_native_fields_preserved=True,comparison='complete native semantic multisets, including subject_basis; no arbitrary per-record duplicate pairing',companies=results)
+(C/'v60-formal-native-equivalence-receipt.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
+for r in results:print(r['instrument_id'],r['local_count'],r['formal_count'],r['complete_native_semantics_multiset_equal'],[(v['dimension_id'],v['excerpt_equal'],v['support_native_multiset_equal'])for v in r['dimensions']])
+assert all(r['complete_native_semantics_multiset_equal'] and all(d['answered_equal']and d['excerpt_equal']and d['support_native_multiset_equal']for d in r['dimensions'])for r in results)

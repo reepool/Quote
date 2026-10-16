@@ -13,9 +13,9 @@
 A/B workflowv1: docs/development/ab_role_development_workflow.md. A authorizes first1 plus necessary successors at most2, per-round budgets do not transfer. First failure pauses subsequent samples, not authorized same-source repairs. B may continuously implement→real-input local closure→P0/P1 repairs→direct old regression→Review→freeze→formal successor; repeated roots require stronger local proof. Contract/source conflicts, scope/permissions changes, exhausted attempts or inability to isolate existing changes go to A. One review-submission.md handoff. Productionnot_authorized/scalefalse.
 
 - [x] 4.1 ConditionalP0: Repair only actual substantive six-body gaps with original actors, periods and statuses.
-- [ ] 4.3 ConditionalP0/P1: Correct actual false actions then restore named actions in their source direction/category.
+- [x] 4.3 ConditionalP0/P1: Correct actual false actions then restore named actions in their source direction/category.
 - [x] 4.2 ConditionalP0/P1: Correct native income row/column/actor/amount/unit/blank before restoring omitted income, paired measurements and bodies together.
-- [ ] 4.4 ConditionalP0: After all local/direct regression, protection and Review processes successfully finish and their results are checked, at most2 full successor formal attempts, complete identity/new directory, same frozen source/cutoff/contract, independent300seconds/50000tokens; protect every result, submit A on success or exhaustion.
+- [x] 4.4 ConditionalP0: After all local/direct regression, protection and Review processes successfully finish and their results are checked, at most2 full successor formal attempts, complete identity/new directory, same frozen source/cutoff/contract, independent300seconds/50000tokens; protect every result, submit A on success or exhaustion.
 
 ## 5. Conditional finite closure
 
@@ -42,3 +42,11 @@ A/B workflowv1: docs/development/ab_role_development_workflow.md. A authorizes f
 六正文与195/195收入通过完整390页真实输入局部闭环。全部实际727事实＋6正文逐对象自检733/733、数字0、40/40负例；原合同353/354＝6正文＋195收入＋152动作。仅600108.SH-action-014的原法律主体与p9简称未有明确同一依据，已保存证据、提请A裁决并提供独立建议映射；不自行改别名、原合同或首次成绩。4.3该条件仍待裁决，4.4正式后继0/2不启动。
 
 当前代码33项新旧定向测试通过，Ruff/格式/diff及四份OpenSpec严格校验通过；直接回归中暴露的供应方多行、空动作名、常规空收入行与续表合计处理均已修复。范围Review剩余代码P0/P1为0，合同裁决1项；实际正式验收尚未完成。19既有改动、4174历史、首次制品/复核和39模块首次快照保护成功。单一交接入口review-submission.md。
+
+## A主体裁决生效及后继前置
+
+A已批准600108.SH-action-014后继仅用亚美特公司及原称别名，原页9/产品/销售/named_subsidiary/本期不变。不建立全局别名，不合并财务主体。原354合同、首次及353/354局部回执保留；v60-actor-adjudication-mapping.json和v60-source-scope.json单列生效。保存实际输出经新口径核验354/354、733/733、数字0、40/40，4.3完成。33测试同快照回执复用，全部前置保护结束并检查成功后才能冻结/执行4.4；正式后继尚0/2，5.1待A正式有限通过。
+
+## v60首次后继正式结果（待A有限审核）
+
+全部前置核验成功结束并检查后冻结39模块，完整v60身份新目录正式1/2。354/354＝6正文＋195收入＋153动作；实际727事实＋6正文动态唯一733/733，数字0，40/40负例。进程启动至第二次导出166.078238秒，外层退出166.744665秒，0/50000token；五阶段成功无复用/前驱，重新查询/导出/磁盘一致。正式业务语义多重集、六正文及支持依据与A已审核局部输出一致（仅隔离交付/正式交付身份与报告包络单列，不进行歧义配对）。两PDF解析缓存命中，耗时仅限该条件。写入完成立即保护；待A有限审核，不消耗剩余1次，5.1仍未授权、不归档、不扩批。首次174.71秒及原169/354、旁挂190/354、441/597失败均保留。

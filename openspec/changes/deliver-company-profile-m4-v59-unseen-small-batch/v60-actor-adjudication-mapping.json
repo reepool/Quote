@@ -1,0 +1,62 @@
+{
+  "status": "A_adjudicated_effective_for_successor_only",
+  "recorded_at": "2026-10-16T02:11:31.428416+00:00",
+  "condition_id": "600108.SH-action-014",
+  "original_condition": {
+    "condition_id": "600108.SH-action-014",
+    "instrument_id": "600108.SH",
+    "page": 9,
+    "name": "农业节水灌溉产品",
+    "native_aliases": [
+      "农业节水灌溉产品"
+    ],
+    "source_actions": [
+      "销售"
+    ],
+    "source_actor": "甘肃亚盛亚美特节水有限公司",
+    "actor_aliases": [
+      "甘肃亚盛亚美特节水有限公司"
+    ],
+    "subject_scope": "named_subsidiary",
+    "category": "goods",
+    "counterparty": null,
+    "qualifier": null,
+    "state": "current_affirmative",
+    "reported_period": "2025-12-31"
+  },
+  "successor_condition": {
+    "condition_id": "600108.SH-action-014",
+    "instrument_id": "600108.SH",
+    "page": 9,
+    "name": "农业节水灌溉产品",
+    "native_aliases": [
+      "农业节水灌溉产品"
+    ],
+    "source_actions": [
+      "销售"
+    ],
+    "source_actor": "亚美特公司",
+    "actor_aliases": [
+      "亚美特公司"
+    ],
+    "subject_scope": "named_subsidiary",
+    "category": "goods",
+    "counterparty": null,
+    "qualifier": null,
+    "state": "current_affirmative",
+    "reported_period": "2025-12-31"
+  },
+  "original_contract_sha256": "4f396ffcb8560d57e433ec5c3fcfcfc8de18d49fae0c418b6bf564caa20a7ea7",
+  "successor_contract_sha256": "867a614d045650425e48b3d5384325331f94a0936710ea230288c80823d62733",
+  "changed_fields": [
+    "source_actor",
+    "actor_aliases"
+  ],
+  "denominator_unchanged": 354,
+  "negative_count_unchanged": 40,
+  "source": "official annual report p9; source-actor-conflict-evidence.json",
+  "authority": "A本次裁决：按原文亚美特公司，别名仅原称；允许继续正式复验，不作有限通过。",
+  "global_alias_created": false,
+  "financial_subject_merge": false,
+  "original_contract_and_results_immutable": true
+}
