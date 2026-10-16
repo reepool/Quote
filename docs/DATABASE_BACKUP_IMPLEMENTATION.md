@@ -38,8 +38,8 @@
       "chunk_sleep_seconds": 0.05,
       "busy_timeout_seconds": 30,
       "min_free_space_multiplier": 1.5,
-      "max_database_seconds": 7200,
-      "max_total_seconds": 21600,
+      "max_database_seconds": 25200,
+      "max_total_seconds": 36000,
       "progress_stall_seconds": 900,
       "progress_log_interval_seconds": 30,
       "validation_mode": "quick_check_small_open_large",
@@ -110,6 +110,6 @@
 - `validation_mode=quick_check_small_open_large`：小库执行完整 `quick_check`，大库只做 SQLite open-only 校验。
 - `quick_check_max_bytes=5368709120`：超过 5GB 的备份文件不在周任务里做 NAS 全量扫描。
 - `validation_timeout_seconds=900`：需要执行 quick_check 时最多等待 15 分钟，超时后该库失败并按 `continue_on_database_failure` 继续后续库。
-- `max_database_seconds=7200`、`progress_stall_seconds=900`：备份复制阶段如果单库耗时过长或进度长期不变，将主动失败，不再无限等待。
+- `max_database_seconds=25200`、`progress_stall_seconds=900`：备份复制阶段如果单库耗时过长或进度长期不变，将主动失败，不再无限等待。`financials.db` 约 67GB，备份目标为 NFS 挂载，实测整库拷贝吞吐在 2.7–7.4 MB/s 波动（2026-07-04 无上限时实跑 5.2 小时），单库上限按慢速日预留 7 小时；整轮预算 `max_total_seconds=36000`（10 小时）覆盖 financials 拉长后的最坏情况。
 
 如果需要对某个大库做完整一致性巡检，应在非周备份窗口单独执行校验任务，避免与生产调度和 Telegram 管理进程竞争资源。

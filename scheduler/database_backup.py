@@ -532,8 +532,6 @@ class DatabaseBackupService:
                             ratio * 100,
                         )
                         progress_state["last_log"] = now
-                    if self.config.performance.chunk_sleep_seconds > 0:
-                        time.sleep(self.config.performance.chunk_sleep_seconds)
 
                 src.backup(
                     dst,
