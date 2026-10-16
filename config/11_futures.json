@@ -1179,6 +1179,11 @@
               "observation_date": "2026-02-20",
               "reason": "spring_festival_release_cancelled",
               "evidence_url": "https://www.stats.gov.cn/xw/tjxw/tzgg/202512/t20251224_1962137.html"
+            },
+            {
+              "observation_date": "2026-10-10",
+              "reason": "national_day_release_cancelled",
+              "evidence_url": "https://www.stats.gov.cn/xw/tjxw/tzgg/202512/t20251224_1962137.html"
             }
           ],
           "timeout_seconds": 30,
