@@ -30,7 +30,7 @@
     "database_backup_config": {
         "enabled": true,
         "backup_directory": "data/PVE-Bak/QuoteBak",
-        "default_max_backup_files": 3,
+        "default_max_backup_files": 2,
         "default_filename_pattern": "{stem}_backup_{timestamp}.db",
         "timestamp_format": "%Y%m%d_%H%M%S",
         "include_globs": [
@@ -67,42 +67,42 @@
                 "path": "data/quotes.db",
                 "enabled": true,
                 "filename_pattern": "quotes_backup_{timestamp}.db",
-                "max_backup_files": 3
+                "max_backup_files": 2
             },
             {
                 "name": "research",
                 "path": "data/research.db",
                 "enabled": true,
                 "filename_pattern": "research_backup_{timestamp}.db",
-                "max_backup_files": 3
+                "max_backup_files": 2
             },
             {
                 "name": "financials",
                 "path": "data/financials.db",
                 "enabled": true,
                 "filename_pattern": "financials_backup_{timestamp}.db",
-                "max_backup_files": 3
+                "max_backup_files": 2
             },
             {
                 "name": "valuation",
                 "path": "data/valuation.db",
                 "enabled": true,
                 "filename_pattern": "valuation_backup_{timestamp}.db",
-                "max_backup_files": 3
+                "max_backup_files": 2
             },
             {
                 "name": "futures",
                 "path": "data/futures.db",
                 "enabled": true,
                 "filename_pattern": "futures_backup_{timestamp}.db",
-                "max_backup_files": 3
+                "max_backup_files": 2
             },
             {
                 "name": "fx",
                 "path": "data/fx.db",
                 "enabled": true,
                 "filename_pattern": "fx_backup_{timestamp}.db",
-                "max_backup_files": 3
+                "max_backup_files": 2
             }
         ]
     }

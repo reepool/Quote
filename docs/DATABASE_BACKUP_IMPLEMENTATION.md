@@ -9,7 +9,7 @@
 - 统一备份入口，避免独立任务和周维护任务各自执行不同备份逻辑。
 - 通过配置声明需要备份的数据库、目标目录、命名规则和保留数量。
 - 默认覆盖当前 `data/*.db` 中的生产 SQLite 数据库：`quotes / research / financials / valuation / futures / fx`。
-- 每个数据库默认最多保留 3 个备份文件。
+- 每个数据库默认最多保留 2 个备份文件。
 - 使用 SQLite online backup，降低直接复制活跃 SQLite 文件导致不一致备份的风险。
 - 每个数据库完成后发送 Telegram 通知，整轮结束后发送汇总报告。
 
@@ -22,7 +22,7 @@
   "database_backup_config": {
     "enabled": true,
     "backup_directory": "data/PVE-Bak/QuoteBak",
-    "default_max_backup_files": 3,
+    "default_max_backup_files": 2,
     "default_filename_pattern": "{stem}_backup_{timestamp}.db",
     "timestamp_format": "%Y%m%d_%H%M%S",
     "include_globs": ["data/*.db"],
@@ -47,12 +47,12 @@
       "validation_timeout_seconds": 900
     },
     "databases": [
-      {"name": "quotes", "path": "data/quotes.db", "filename_pattern": "quotes_backup_{timestamp}.db", "max_backup_files": 3},
-      {"name": "research", "path": "data/research.db", "filename_pattern": "research_backup_{timestamp}.db", "max_backup_files": 3},
-      {"name": "financials", "path": "data/financials.db", "filename_pattern": "financials_backup_{timestamp}.db", "max_backup_files": 3},
-      {"name": "valuation", "path": "data/valuation.db", "filename_pattern": "valuation_backup_{timestamp}.db", "max_backup_files": 3},
-      {"name": "futures", "path": "data/futures.db", "filename_pattern": "futures_backup_{timestamp}.db", "max_backup_files": 3},
-      {"name": "fx", "path": "data/fx.db", "filename_pattern": "fx_backup_{timestamp}.db", "max_backup_files": 3}
+      {"name": "quotes", "path": "data/quotes.db", "filename_pattern": "quotes_backup_{timestamp}.db", "max_backup_files": 2},
+      {"name": "research", "path": "data/research.db", "filename_pattern": "research_backup_{timestamp}.db", "max_backup_files": 2},
+      {"name": "financials", "path": "data/financials.db", "filename_pattern": "financials_backup_{timestamp}.db", "max_backup_files": 2},
+      {"name": "valuation", "path": "data/valuation.db", "filename_pattern": "valuation_backup_{timestamp}.db", "max_backup_files": 2},
+      {"name": "futures", "path": "data/futures.db", "filename_pattern": "futures_backup_{timestamp}.db", "max_backup_files": 2},
+      {"name": "fx", "path": "data/fx.db", "filename_pattern": "fx_backup_{timestamp}.db", "max_backup_files": 2}
     ]
   }
 }
