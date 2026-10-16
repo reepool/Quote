@@ -1,0 +1,87 @@
+{
+  "schema_version": "company_profile_a_offline_review.v1",
+  "date": "2026-10-16",
+  "reviewed_commit": "4ade7a18c52d8d81672315d07e084e836d635da2",
+  "scope": "B1 offline preparation; not real LLM business acceptance",
+  "decision": "offline path verified; two P1 issues remain; B1 and A1 incomplete",
+  "real_llm_calls_during_review": 0,
+  "formal_first_attempts_used": 0,
+  "formal_successor_attempts_used": 0,
+  "independent_validation": {
+    "pytest": {
+      "command": "source scripts/quote_dev_env.sh; /home/python/miniconda3/envs/Quote/bin/python -m pytest tests/unit/test_research/test_company_profile_llm_led.py -q",
+      "passed": 22,
+      "warnings": 7,
+      "elapsed_seconds": 105.43
+    },
+    "b_source_hashes_checked": 7,
+    "b_source_hashes_match": true,
+    "same_snapshot_gateway_receipt_reused": {
+      "passed": 163,
+      "rerun_by_A": false,
+      "receipt": "offline-verification.json"
+    },
+    "full_suite_pass_claimed": false,
+    "openspec_strict_passed": true,
+    "documentation_local_links_passed": true,
+    "json_receipt_parsed": true,
+    "diff_check_passed": true
+  },
+  "findings": [
+    {
+      "id": "A-P1-01",
+      "priority": "P1",
+      "path": "research/company_profile/report_interpretation.py",
+      "line": 355,
+      "trigger": "Synthesis returns its overview and claims but omits a supplied reliable structured Measurement.",
+      "input_record_id": "cp-300750-revenue",
+      "observed_output_record_ids": ["overview"],
+      "draft_complete": true,
+      "gaps": [],
+      "impact": "Independent numeric facts silently disappear; reads._iter_accepted_raw uses only report_interpretation.records for v2.",
+      "required_behavior": "Retain reliable native records independently of model retransmission. Explicit source or validation conflicts isolate the affected record and dependent claims with a reason."
+    },
+    {
+      "id": "A-P1-02",
+      "priority": "P1",
+      "path": "research/company_profile/report_interpretation.py",
+      "line": 362,
+      "trigger": "Synthesis returns a supplied structured Segment with source_native.value changed from null to 999999999 and unit from null to 元; verifier says pass.",
+      "input_record_id": "cp-300750-segment",
+      "observed_accepted_value": "999999999",
+      "observed_accepted_unit": "元",
+      "draft_complete": true,
+      "gaps": [],
+      "impact": "The hard numeric equality guard only covers Measurement, permitting an unsupported amount on an existing Segment.",
+      "required_behavior": "Preserve native numeric values and identity for every reused structured record type; reject unsupported amounts and suppress dependent claims even if semantic verification says pass."
+    }
+  ],
+  "A0_source_freeze": {
+    "instrument_id": "600037.SH",
+    "name": "歌华有线",
+    "report_period": "2025-12-31",
+    "knowledge_cutoff": "2026-09-17",
+    "document_sha256": "b5b6be18424b7c3d7d7988f755ff7083141831904d4347c07cba1da8452c8b76",
+    "physical_pages": 208,
+    "pypdf_text_characters": 176124,
+    "pypdf_text_utf8_bytes": 395738,
+    "reviewed_pdf_pages": [1, 12, 14, 15, 16, 17, 18, 19, 53, 116, 165, 166],
+    "core_conditions": 19,
+    "negative_conditions": 6,
+    "present_in_S2_reports": false,
+    "present_in_historical_exclusions": true,
+    "card": "b1-execution-card.md",
+    "source_only_freeze_complete": true,
+    "model_prices_execution_and_authorization_complete": false,
+    "paid_calls_authorized": false
+  },
+  "progress": {
+    "real_llm_development_observed": "0/4",
+    "real_llm_regression_observed": "0/12",
+    "S2_observed": "0/20",
+    "S3_observed": "0/100"
+  },
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "A_active_review_time": "unknown; not measured separately from tool execution and document preparation"
+}

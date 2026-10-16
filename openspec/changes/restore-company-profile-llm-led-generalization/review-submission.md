@@ -82,3 +82,61 @@ B做了本次差异自检，不冒称A独立业务审核。范围内阻塞已修
 - 执行流程继续引用`ab_role_development_workflow.md` v3；B在卡内连续修复P0/P1与必要P2/P3，不越样本/预算/次数。合同冲突、授权变化或既有改动不可隔离时保留原结果交A。
 
 Git基线为master，开始时已有11份tracked修改及若干untracked内容。本轮只提交可隔离的本人改动，既有内容保持原样。提交身份由本节所属Git提交确定；不将旧改动纳入提交。B活跃开发与交接等待时间未精确计时，记unknown；fake token不代表开发/审核成本。
+
+## 7. A角离线审核与接续卡（2026-10-16）
+
+结论：已独立确认离线主链及fake不冒充真实完成，但发现两项范围内P1，须在B1内修复。**不判B1/A1通过，不归档、不扩批。** 本次是工程准备审核，真实LLM开发仍0/4、S1新链0/12、S2观察0/20、S3观察0/100。原B交接及回执原样保留，本节是后继审核结论。
+
+[A核验回执](a-offline-review.json)记录已复现结果；[B1接续执行卡](b1-execution-card.md)是当前唯一开发卡。A已从正式PDF核源，冻结歌华有线600037.SH、19项核心/6负例、来源hash/知识时点及资源边界；不在S2留出20家中。A0的实际模型/价格/代码及执行授权仍待补齐，不能用文件中预算上限当作付费授权。
+
+### 7.1 阻塞发现
+
+| ID | 证据与实际行为 | 必须修复的结果 |
+| --- | --- | --- |
+| A-P1-01 | `report_interpretation.py:355`用模型返回records替换全部交付，425处仅过滤这些返回项；向现有FakeReportProvider传入可靠Measurement `cp-300750-revenue`，模型未回传该项，输出只余overview，仍`draft_complete=true`且gaps空。`reads.py:_iter_accepted_raw`在v2仅读此集合 | 原生可靠事实不能依赖模型照抄回传才能保留；原值独立交付。若存在实际冲突，须有对象隔离原因及依赖摘要处理，不能静默漏掉 |
+| A-P1-02 | `report_interpretation.py:362–365`仅对Measurement核原值。将已有Segment `cp-300750-segment`的source_native.value从null改为999999999、unit改为元，同一fake verify全pass时被接受，草稿仍完整且无gaps | 所有复用结构化对象的原生数字/单位及身份都要保护，Segment也不能新增无来源金额；硬错误不得由模型pass覆盖 |
+
+这两项是程序硬约束/原始事实保留问题，不授权增加语言正则、逐公司规则或新验证框架。原semantic_workflow的五项旧失败没有新证据表明本轮引入，按C类后置；不宣称完整套件通过。
+
+### 7.2 验证及限制
+
+- A独立执行新政策离线套件：22 passed、7 warnings、105.43秒，含原owner持久化→查询→导出；命令为§6.2第一条去掉旧网关测试文件。B回执中7个代码/测试hash与当前文件逐个一致，同快照163项网关回执复用，不将其称为A重跑185项。
+- A直接读正式PDF核来源hash、封面及关键正文、原收入列/续页和投入方向；208页及176124字符是输入规模，不是完整业务观察或全页质量成绩。未调用真实LLM、未运行新业务批次、未写生产数据。
+- 当前change的OpenSpec严格校验、本轮文档本地链接与JSON回执检查、`git diff --check`通过；这些工程检查不替代真实LLM业务验收。
+- 两项独立挑战使用现有离线fixture，复现命令如下；输出是缺陷证据，不能算业务通过。A活跃审核时间未单独准确计量，记unknown。
+
+```bash
+source /home/python/Quote/scripts/quote_dev_env.sh
+/home/python/miniconda3/envs/Quote/bin/python - <<'PY'
+import json
+from pydantic import TypeAdapter
+from research.company_profile.models import SemanticRecord
+from tests.unit.test_research.test_company_profile_runtime import _reference_payload
+from tests.unit.test_research.test_company_profile_llm_led import _run, FakeReportProvider
+records = [TypeAdapter(SemanticRecord).validate_json(json.dumps(x))
+           for x in _reference_payload()['records']]
+numeric = next(x for x in records if x.object_type == 'Measurement')
+result = _run(FakeReportProvider(), report=numeric.report, structured_records=(numeric,))
+print('A-P1-01', numeric.record_id, [x.record_id for x in result.records],
+      result.draft_complete, result.gaps)
+segment = next(x for x in records if x.object_type == 'Segment')
+class ChangedSegment(FakeReportProvider):
+    def interpret(self, request):
+        response = super().interpret(request)
+        if request.purpose == 'synthesize_views':
+            original = request.records[0]
+            changed = original.model_copy(update={'source_native':
+                original.source_native.model_copy(update={'value': '999999999', 'unit': '元'})})
+            return response.model_copy(update={'records': (*response.records, changed)})
+        return response
+result = _run(ChangedSegment(), report=segment.report, structured_records=(segment,))
+print('A-P1-02', [(x.record_id, x.source_native.value, x.source_native.unit)
+                  for x in result.records], result.draft_complete, result.gaps)
+PY
+```
+
+### 7.3 告知开发者
+
+继续执行A/B流程v3和[B1接续卡](b1-execution-card.md)。B在卡内连续修复上述两项P1，完成真实provider、物理预算/费用预留、完整入口deadline与208页离线预演；无需逐函数/逐测试等待A。补齐实际模型/计费/最终快照后在本入口申请一次真实运行放行；未获授权不试探真实模型。首次及后继各最多一次，同源问题在额度内自主修复，卡外扩批暂停。A1在完整交接后独立审核真实三产品和原文，不再派下一对规则补丁。
+
+容错沿验收计划：主要业务/关键数字/主体错误不能确定性外放，次要遗漏和有据unclear可限用；无法补救写清来源、原因、影响与恢复条件。B1只要求一家可用，后续仍依次4家开发→12家新链→20家盲测（最多另20家确认）→100家试运行→全市场分波；数量到限而未过即出失败/收窄裁决。生产`not_authorized`、规模声明false不变。所有临时制品留项目TMPDIR。
