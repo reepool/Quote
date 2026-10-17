@@ -10,8 +10,11 @@ from research.company_profile.contracts import (
     ReportSemanticResponseV3,
 )
 from research.company_profile.report_interpretation import (
+    DEVELOPMENT_WIRE_MARGIN,
     DIMENSIONS,
     compact_processing_identity,
+    compact_wire_bytes,
+    pack_fitting_batches,
     page_map,
     unsampled_ranges,
 )
@@ -28,6 +31,7 @@ from tests.unit.test_research.test_company_profile_llm_led import (
     _run,
 )
 from tests.unit.test_research.test_company_profile_runtime import _report
+from utils.llm.budget import DEVELOPMENT_PAYLOAD_BYTE_LIMIT
 
 
 def request(purpose="source_inventory", **kwargs):
@@ -143,6 +147,45 @@ def test_compact_plan_preserves_source_first_omission_checks_and_partial_coverag
         assert not p.requests[0].records and not p.requests[0].source_conditions
         assert result.page_coverage[2]["status"] == "partially_checked"
         assert result.page_coverage[2]["map_checked"]
+
+
+def test_payload_batches_keep_every_page_inside_the_development_byte_cap():
+    pages = tuple(
+        {
+            "page": page,
+            "text": "年报正文" * 4000,
+            "readable": True,
+            "offset": 0,
+            "body_scope": "full_page",
+        }
+        for page in range(1, 5)
+    )
+    identity = compact_processing_identity(discovery_scope="page_map")
+    report = _report()
+
+    def fits(batch):
+        return (
+            compact_wire_bytes(
+                batch,
+                purpose="source_inventory",
+                source_scope="full_context",
+                report=report,
+                identity=identity,
+                max_output_tokens=2500,
+            )
+            + DEVELOPMENT_WIRE_MARGIN
+            <= DEVELOPMENT_PAYLOAD_BYTE_LIMIT
+        )
+
+    batches = pack_fitting_batches(pages, fits)
+    assert len(batches) > 1
+    assert "".join(page["text"] for batch in batches for page in batch) == "".join(
+        page["text"] for page in pages
+    )
+    assert [page["page"] for batch in batches for page in batch] == [
+        page["page"] for page in pages
+    ]
+    assert all(fits(batch) for batch in batches)
 
 
 def test_map_indexes_arbitrary_pages_without_claiming_unsampled_body_read():

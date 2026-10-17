@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-17，[§17](#17-a接续用户裁决复用现有池撤销资料齐备才能试跑的门槛)）：用户重申本地池选路/换源，A撤销§16等待渠道资料的暂停卡。正文发现P1及清理保持接受，B1/A1未通过；真实调用仍0。按执行卡§11授权B连续完成局部接续、最终快照冻结和首家公司一次真实开发观察，费用未知例外按验收§7.1披露。后继/扩批/生产未授权。以下历史交接和首次结果保留，不代表最新授权。
+当前状态（2026-10-17，[§18](#18-b角现有池首次真实观察2026-10-17)）：正文发现修复保持接受。首家真实观察已启动并占用首次1次；发出1次物理请求后传输失败，usage未知，费用unknown，三视图未形成。B1/A1未通过。后继未授权。A的放行说明见[§17](#17-a接续用户裁决复用现有池撤销资料齐备才能试跑的门槛)。以下历史交接和首次结果保留。
 
 ## 1. 唯一实施指引
 
@@ -545,3 +545,30 @@ A此前将精算所需资料全设成首家开发观察前置，阻止取得真�
 B完成局部修改、直接回归和快照冻结后连续执行，不再等维护资料或额外格式审核；失败结果保留，后继和其余公司仍待A据实测裁决。原离线2/2、专项0/1保留，不新增fake轮次。当前真实调用0，开发0/4、S1 0/12、S2 0/20、S3 0/100；不归档、不扩批，生产not_authorized、规模声明false。
 
 本轮A只修正文档与目标delta，不改业务代码/生产配置或旧冻结绑定，不运行模型、不重跑pytest。当前change的OpenSpec严格校验、81个本地文件链接及git diff --check通过；11份既有修改完整保留，66份未改目标的冻结文件及§1—16审核正文hash不变。Review确认本次明确改变的是首家开发观察的资源前置和费用例外，业务门槛未放宽；不以文档变更宣称B代码已经可运行。A活跃时间未精确计量，记unknown。
+
+## 18. B角：现有池首次真实观察（2026-10-17）
+
+结果：B1卡§11的首次开发观察已经执行，占用首次1次。结果是传输失败后的资源停止，不是业务通过。待A判断失败分类、是否授权后继，以及这一次预留是否应按传输失败保留。
+
+业务：歌华有线三视图状态都是`extraction_failed`，claims为0。`draft_complete=false`，`real_semantic_complete=false`。19项核心、6项负例和已审准确率未评估。208页都记为`unsampled_body_not_discovered`。query与export的profiles一致，`delivered=1`只表示限用记录已保存，不是可用画像。
+
+差异：基线`accdd03e`。严格计费模式仍拒绝没有价格的来源。`development_unpriced`只用于这次绑定：没有价格仍可发送，费用保持unknown，不造`LlmPrice`或context。每个请求仍按完整payload字节加256再加最大输出预留；有效usage才把token账结算下来。开发观察另限制payload≤65536字节、最大输出≤4000。发现分块把每页正文都保留在某个请求里，不按公司或页码挑选。旧绑定文件没有改。
+
+验证：`pytest -q tests/unit/test_utils/test_llm_physical_budget.py tests/unit/test_research/test_company_profile_bounded_entry.py tests/unit/test_research/test_company_profile_report_wire.py tests/unit/test_research/test_company_profile_llm_led.py -k 'not existing_owner'` 为64 passed、1 deselected、7 warnings。`ruff check`覆盖本次改动文件，通过。没有重跑无关旧套件。
+
+资源：入口墙钟56.5秒，未到900秒。物理请求1/16。预留60963，账上限120000。费用unknown，10元和80元都未评估，不能宣称货币上限内完成。
+
+| 项 | 实际 |
+| --- | --- |
+| 来源 | `scorpio:gemini` / 配置模型`gemini-3.8-flash-high` |
+| 响应模型 | 未返回 |
+| payload | 59707 UTF-8字节，最大输出1000 |
+| 结果 | `ProxyError`，host=`scorpio.reepool.com`，约958毫秒 |
+| usage | 无，预留60963不释放 |
+| 重试/换源 | 第2次尝试在发送前被同一总账拒绝（剩余59037，下一次需要60963）。`failover_count=0`，没有第二个来源的物理发送 |
+
+证据：[绑定](b1-pool-observation-binding.json)、[按卡授权，不是代码已审](b1-pool-observation-authorization.json)、[账本](b1-pool-observation-evidence/budget-final.json)、[摘要](b1-pool-observation-evidence/summary.json)。运行目录`data/QuoteBak/b1-pool-observation-20261017/first`保留query/export/日志。正式PDF和旧checkpoint未改。
+
+闭环与清理：本窗口测试新产生的2个pytest日志目录已删，约8KB。观察目录保留到A审核。11份既有修改和原未跟踪文件未动。首次已用，后继0/1未授权。开发0/4、S1 0/12、S2 0/20、S3 0/100。生产`not_authorized`，规模声明false。
+
+效率：B活跃时间未精确计量，记unknown。正式复验1次，没有重复根因重跑。

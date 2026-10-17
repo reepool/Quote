@@ -1,0 +1,36 @@
+{
+  "classification": "real_first_observation_failed_before_body_reading",
+  "instrument_id": "600037.SH",
+  "attempt": "first",
+  "elapsed_seconds": 56.536,
+  "exit_code": 0,
+  "physical_requests": 1,
+  "charged_tokens_reserved": 60963,
+  "cost_status": "unknown",
+  "cost_limit_evaluated": false,
+  "stopped_reason": "physical_request_token_context_or_cost_budget_exhausted",
+  "first_request": {
+    "provider_resource": "scorpio:gemini",
+    "configured_model": "gemini-3.8-flash-high",
+    "response_model": null,
+    "payload_utf8_bytes": 59707,
+    "max_output_tokens": 1000,
+    "status": "failed_or_cancelled",
+    "usage": null,
+    "transport": "ProxyError host=scorpio.reepool.com"
+  },
+  "failover_physical_sends": 0,
+  "retry_denied_before_send": true,
+  "remaining_tokens_after_failure": 59037,
+  "three_views": {
+    "company_profile": "extraction_failed",
+    "product_exposure": "extraction_failed",
+    "supply_chain_position": "extraction_failed",
+    "claims": 0,
+    "draft_complete": false,
+    "real_semantic_complete": false
+  },
+  "unread_pages": 208,
+  "query_export_equal": true,
+  "run_root": "data/QuoteBak/b1-pool-observation-20261017/first"
+}

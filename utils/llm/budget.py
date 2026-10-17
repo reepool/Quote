@@ -38,12 +38,22 @@ class LlmPrice:
         ) / 1_000_000
 
 
+STRICT_BILLING = "strict"
+DEVELOPMENT_UNPRICED_BILLING = "development_unpriced"
+DEVELOPMENT_PAYLOAD_BYTE_LIMIT = 65_536
+DEVELOPMENT_MAX_OUTPUT_TOKENS = 4_000
+
+
 class LlmRunBudget:
     """One deadline and ledger shared by every retry, repair and routed source.
 
     Unknown usage retains its complete reservation. UTF-8 payload bytes plus
     framing are a deliberately conservative token bound; this is not a model
     tokenizer or a performance estimate. No pricing or route is guessed.
+
+    ``development_unpriced`` is the single B1 first-observation exception: a
+    source without a frozen price can still be sent. Its fee stays unknown and
+    is not treated as zero. Strict mode still refuses an unpriced source.
     """
 
     def __init__(
@@ -55,6 +65,7 @@ class LlmRunBudget:
         max_requests: int = 16,
         max_cost_cny: Decimal = Decimal(10),
         ledger_path: Path | None = None,
+        billing_mode: str = STRICT_BILLING,
     ):
         if (
             not math.isfinite(deadline)
@@ -64,12 +75,15 @@ class LlmRunBudget:
             raise ValueError("invalid bounded run limits")
         if not max_cost_cny.is_finite() or not 0 < max_cost_cny <= 10:
             raise ValueError("invalid run cost limit")
+        if billing_mode not in {STRICT_BILLING, DEVELOPMENT_UNPRICED_BILLING}:
+            raise ValueError("unknown billing mode")
         self.deadline = deadline
         self.prices = dict(prices)
         self.max_tokens = max_tokens
         self.max_requests = max_requests
         self.max_cost_cny = max_cost_cny
         self.ledger_path = ledger_path
+        self.billing_mode = billing_mode
         self.attempts: list[dict[str, Any]] = []
         self._lock = threading.RLock()
         self._stopped: str | None = None
@@ -115,7 +129,7 @@ class LlmRunBudget:
         with self._lock:
             self.remaining()
             price = self.prices.get((resource, model))
-            if price is None:
+            if price is None and self.billing_mode != DEVELOPMENT_UNPRICED_BILLING:
                 raise LlmConfigurationError(
                     "physical source/model has no frozen billing basis"
                 )
@@ -124,38 +138,59 @@ class LlmRunBudget:
                 raise LlmConfigurationError(
                     "physical budget requires a bounded maximum output"
                 )
-            inputs = (
-                len(
-                    json.dumps(
-                        payload, ensure_ascii=False, separators=(",", ":")
-                    ).encode("utf-8")
+            payload_bytes = len(
+                json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode(
+                    "utf-8"
                 )
-                + 256
             )
+            inputs = payload_bytes + 256
             tokens = inputs + output
-            cost = price.cost(inputs, output)
+            priced = price is not None
+            cost = price.cost(inputs, output) if priced else None
             used_tokens = sum(x["charged_tokens"] for x in self.attempts)
-            used_cost = sum(
-                (Decimal(x["charged_cost_cny"]) for x in self.attempts), Decimal(0)
+            known_costs = [
+                Decimal(x["charged_cost_cny"])
+                for x in self.attempts
+                if x["charged_cost_cny"] != "unknown"
+            ]
+            cost_known = priced and len(known_costs) == len(self.attempts)
+            used_cost = sum(known_costs, Decimal(0)) if cost_known else None
+            context_exceeded = priced and tokens > price.context_tokens
+            payload_exceeded = self.billing_mode == DEVELOPMENT_UNPRICED_BILLING and (
+                payload_bytes > DEVELOPMENT_PAYLOAD_BYTE_LIMIT
+                or output > DEVELOPMENT_MAX_OUTPUT_TOKENS
             )
             if (
-                tokens > price.context_tokens
+                context_exceeded
+                or payload_exceeded
                 or len(self.attempts) >= self.max_requests
                 or used_tokens + tokens > self.max_tokens
-                or used_cost + cost > self.max_cost_cny
+                or (
+                    cost_known
+                    and used_cost is not None
+                    and cost is not None
+                    and used_cost + cost > self.max_cost_cny
+                )
             ):
                 self._stopped = (
-                    "physical_request_token_context_or_cost_budget_exhausted"
+                    "physical_payload_or_output_limit"
+                    if payload_exceeded
+                    else "physical_request_token_context_or_cost_budget_exhausted"
                 )
                 self._denied_request = {
                     "request_id": request_id,
+                    "payload_utf8_bytes": payload_bytes,
                     "reserved_input_tokens": inputs,
                     "reserved_output_tokens": output,
                     "required_tokens": tokens,
                     "remaining_tokens": self.max_tokens - used_tokens,
-                    "required_cost_cny": str(cost),
-                    "remaining_cost_cny": str(self.max_cost_cny - used_cost),
-                    "context_tokens": price.context_tokens,
+                    "required_cost_cny": str(cost) if cost is not None else "unknown",
+                    "remaining_cost_cny": (
+                        str(self.max_cost_cny - used_cost)
+                        if used_cost is not None
+                        else "unknown"
+                    ),
+                    "context_tokens": price.context_tokens if priced else None,
                     "remaining_requests": self.max_requests - len(self.attempts),
                 }
                 self._persist()
@@ -172,10 +207,13 @@ class LlmRunBudget:
                     "reserved_input_tokens": inputs,
                     "reserved_output_tokens": output,
                     "charged_tokens": tokens,
-                    "charged_cost_cny": str(cost),
+                    "charged_cost_cny": str(cost) if cost is not None else "unknown",
                     "usage": None,
                     "status": "reserved",
-                    "billing_basis": price.basis,
+                    "billing_basis": (
+                        price.basis if priced else "unpriced_development_observation"
+                    ),
+                    "cost_status": "priced" if priced else "unknown",
                 }
             )
             self._persist()
@@ -196,15 +234,16 @@ class LlmRunBudget:
                 if usage
                 else ()
             )
+            price = self.prices.get((item["provider_resource"], item["model"]))
             if (
-                len(values) == 3
+                price is not None
+                and len(values) == 3
                 and all(
                     isinstance(x, int) and not isinstance(x, bool) and x >= 0
                     for x in values
                 )
                 and usage.total_tokens >= usage.input_tokens + usage.output_tokens
             ):
-                price = self.prices[(item["provider_resource"], item["model"])]
                 # Any extra reported tokens are conservatively priced at the higher rate.
                 extra = usage.total_tokens - usage.input_tokens - usage.output_tokens
                 cost = (
@@ -215,14 +254,33 @@ class LlmRunBudget:
                 )
                 item["charged_tokens"] = usage.total_tokens
                 item["charged_cost_cny"] = str(cost)
+                item["cost_status"] = "priced"
+            elif (
+                len(values) == 3
+                and all(
+                    isinstance(x, int) and not isinstance(x, bool) and x >= 0
+                    for x in values
+                )
+                and usage is not None
+                and usage.total_tokens >= usage.input_tokens + usage.output_tokens
+            ):
+                item["charged_tokens"] = usage.total_tokens
+                item["charged_cost_cny"] = "unknown"
+                item["cost_status"] = "unknown"
             else:
                 item["usage_status"] = "unknown_reserved"
+            known_costs = [
+                Decimal(x["charged_cost_cny"])
+                for x in self.attempts
+                if x["charged_cost_cny"] != "unknown"
+            ]
+            cost_exceeded = (
+                len(known_costs) == len(self.attempts)
+                and sum(known_costs, Decimal(0)) > self.max_cost_cny
+            )
             if (
                 sum(x["charged_tokens"] for x in self.attempts) > self.max_tokens
-                or sum(
-                    (Decimal(x["charged_cost_cny"]) for x in self.attempts), Decimal(0)
-                )
-                > self.max_cost_cny
+                or cost_exceeded
             ):
                 self._stopped = "provider_usage_exceeded_reserved_run_budget"
                 self._persist()
@@ -231,15 +289,20 @@ class LlmRunBudget:
 
     def snapshot(self) -> dict[str, Any]:
         with self._lock:
+            known_costs = [
+                Decimal(x["charged_cost_cny"])
+                for x in self.attempts
+                if x["charged_cost_cny"] != "unknown"
+            ]
+            cost_known = len(known_costs) == len(self.attempts)
             return {
                 "physical_requests": len(self.attempts),
                 "charged_tokens": sum(x["charged_tokens"] for x in self.attempts),
-                "charged_cost_cny": str(
-                    sum(
-                        (Decimal(x["charged_cost_cny"]) for x in self.attempts),
-                        Decimal(0),
-                    )
+                "charged_cost_cny": (
+                    str(sum(known_costs, Decimal(0))) if cost_known else "unknown"
                 ),
+                "cost_status": "priced" if cost_known else "unknown",
+                "billing_mode": self.billing_mode,
                 "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
                 "stopped_reason": self._stopped,
                 "denied_request": self._denied_request,

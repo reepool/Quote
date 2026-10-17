@@ -13,7 +13,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from utils.llm.budget import LlmRunBudget
+from utils.llm.budget import DEVELOPMENT_PAYLOAD_BYTE_LIMIT, LlmRunBudget
 from utils.llm.errors import LlmError
 
 from .contracts import (
@@ -42,6 +42,9 @@ from .models import (
 
 DISCOVERY_CHUNK_CHARS = 24_000
 DISCOVERY_CHUNK_OVERLAP = 1_000
+# Gateway framing, schema and the longest configured model name sit outside the
+# compact user JSON. 12 KiB keeps a packed request inside the 65536-byte cap.
+DEVELOPMENT_WIRE_MARGIN = 12_000
 REPORT_POLICY = "company_profile_llm_led.v2"
 REPORT_PROMPT = "company_profile_report_reading.2026-10-16.v1"
 COMPACT_REPORT_PROMPT = "company_profile_report_reading.2026-10-17.v2"
@@ -183,9 +186,91 @@ def page_map(sources: Sequence[Mapping[str, Any]]) -> tuple[dict[str, Any], ...]
     return tuple(result)
 
 
+def compact_wire_bytes(
+    source_pages: Sequence[Mapping[str, Any]],
+    *,
+    purpose: str,
+    source_scope: str,
+    report: ReportIdentity,
+    identity: Mapping[str, Any],
+    max_output_tokens: int,
+) -> int:
+    """UTF-8 size of the compact user payload, excluding gateway framing."""
+    from .report_wire import compact_request
+
+    request = ReportSemanticRequestV3(
+        request_id="size-check",
+        purpose=purpose,
+        report=report,
+        processing_identity=dict(identity),
+        source_pages=tuple(source_pages),
+        source_scope=source_scope,
+        max_output_tokens=max_output_tokens,
+        timeout_seconds=30,
+    )
+    return len(
+        json.dumps(
+            compact_request(request), ensure_ascii=False, separators=(",", ":")
+        ).encode()
+    )
+
+
+def fits_development_payload(
+    source_pages: Sequence[Mapping[str, Any]], **kwargs
+) -> bool:
+    return (
+        compact_wire_bytes(source_pages, **kwargs) + DEVELOPMENT_WIRE_MARGIN
+        <= DEVELOPMENT_PAYLOAD_BYTE_LIMIT
+    )
+
+
+def pack_fitting_batches(
+    items: Sequence[Mapping[str, Any]],
+    fits,
+    *,
+    scope_break: bool = False,
+) -> list[list[dict[str, Any]]]:
+    """Greedy batches that preserve every character and every page."""
+
+    def pieces_of(item: Mapping[str, Any]) -> list[dict[str, Any]]:
+        fragment = dict(item)
+        if fits([fragment]):
+            return [fragment]
+        text = str(fragment["text"])
+        if len(text) <= 1:
+            raise ValueError("single_source_fragment_exceeds_payload_limit")
+        midpoint = len(text) // 2
+        left = {**fragment, "text": text[:midpoint]}
+        right = {
+            **fragment,
+            "text": text[midpoint:],
+            "offset": int(fragment.get("offset") or 0) + midpoint,
+        }
+        return pieces_of(left) + pieces_of(right)
+
+    batches: list[list[dict[str, Any]]] = []
+    current: list[dict[str, Any]] = []
+    for item in items:
+        for piece in pieces_of(item):
+            scope_changed = (
+                scope_break
+                and current
+                and current[-1].get("body_scope") != piece.get("body_scope")
+            )
+            if current and (scope_changed or not fits([*current, piece])):
+                batches.append(current)
+                current = []
+            current.append(piece)
+    if current:
+        batches.append(current)
+    return batches
+
+
 def structural_discovery_chunks(
     sources: Sequence[Mapping[str, Any]],
     full_page_ids: set[int],
+    *,
+    payload_fits=None,
 ) -> list[list[dict[str, Any]]]:
     """Pack full selected pages and the unsampled body of every other page.
 
@@ -218,22 +303,13 @@ def structural_discovery_chunks(
         else:
             for span_start, span_end in unsampled_ranges(str(page["text"])):
                 enqueue(page, span_start, span_end, "unsampled_span")
-    chunks: list[list[dict[str, Any]]] = []
-    current: list[dict[str, Any]] = []
-    current_size = 0
-    for fragment in queued:
-        scope_changed = current and current[-1]["body_scope"] != fragment["body_scope"]
-        if current and (
-            scope_changed
-            or current_size + len(fragment["text"]) > DISCOVERY_CHUNK_CHARS
-        ):
-            chunks.append(current)
-            current, current_size = [], 0
-        current.append(fragment)
-        current_size += len(fragment["text"])
-    if current:
-        chunks.append(current)
-    return chunks
+
+    def fits(batch: Sequence[Mapping[str, Any]]) -> bool:
+        if sum(len(str(item["text"])) for item in batch) > DISCOVERY_CHUNK_CHARS:
+            return False
+        return True if payload_fits is None else payload_fits(batch)
+
+    return pack_fitting_batches(queued, fits, scope_break=True)
 
 
 def _pages(pages: Sequence[Mapping[str, Any]]) -> tuple[dict[str, Any], ...]:
@@ -368,7 +444,9 @@ def interpret_report(
                 (
                     1000
                     if source_scope == "page_map"
-                    else 2500 if purpose != "verify_views" else 2000
+                    else 2500
+                    if purpose != "verify_views"
+                    else 2000
                 )
                 if compact
                 else 4000
@@ -459,13 +537,26 @@ def interpret_report(
             gaps.append("physical_pages_missing")
         discovery_sources = sources
         if structural:
-            response = invoke(
-                "source_inventory", page_map(sources), source_scope="page_map"
-            )
-            if response.source_conditions:
-                raise ValueError("page_map_cannot_establish_source_conditions")
-            requested = set(response.requested_pages)
+            requested: set[int] = set()
             available = {p["page"] for p in sources if p["readable"]}
+            map_batches = pack_fitting_batches(
+                page_map(sources),
+                lambda batch: fits_development_payload(
+                    batch,
+                    purpose="source_inventory",
+                    source_scope="page_map",
+                    report=report,
+                    identity=identity,
+                    max_output_tokens=1000,
+                ),
+            )
+            for batch in map_batches:
+                response = invoke(
+                    "source_inventory", tuple(batch), source_scope="page_map"
+                )
+                if response.source_conditions:
+                    raise ValueError("page_map_cannot_establish_source_conditions")
+                requested.update(response.requested_pages)
             if not requested or not requested <= available:
                 raise ValueError("page_map_requires_valid_full_context_selection")
             map_checked = True
@@ -496,7 +587,24 @@ def interpret_report(
             # sends the body the preview did not sample, so a major business
             # outside those windows can enter the source-first list.
             full_ids = {page["page"] for page in discovery_sources}
-        chunks = structural_discovery_chunks(sources, full_ids)
+        chunks = structural_discovery_chunks(
+            sources,
+            full_ids,
+            payload_fits=(
+                (
+                    lambda batch: fits_development_payload(
+                        batch,
+                        purpose="source_inventory",
+                        source_scope="full_context",
+                        report=report,
+                        identity=identity,
+                        max_output_tokens=2500,
+                    )
+                )
+                if compact
+                else None
+            ),
+        )
         full_expected = {page["page"]: 0 for page in sources}
         for chunk in chunks:
             for fragment in chunk:

@@ -191,3 +191,76 @@ def test_routed_failover_uses_same_run_ledger_and_rejects_unpriced_source():
     )
     assert len(transport.calls) == budget.snapshot()["physical_requests"] == 2
     assert len({a["provider_resource"] for a in budget.snapshot()["attempts"]}) == 2
+
+
+def test_development_mode_sends_without_price_and_does_not_invent_cost():
+    response = _response({"label": "ok", "score": 1})
+    response["usage"] = {
+        "prompt_tokens": 100,
+        "completion_tokens": 10,
+        "total_tokens": 110,
+    }
+    budget = _budget(prices={}, billing_mode="development_unpriced")
+    transport = ScriptedTransport([response, response])
+    asyncio.run(_client(transport, budget).complete(_request(max_output_tokens=100)))
+    ledger = budget.snapshot()
+    assert ledger["physical_requests"] == 1
+    assert ledger["attempts"][0]["charged_tokens"] == 110
+    assert ledger["charged_cost_cny"] == "unknown"
+    assert ledger["cost_status"] == "unknown"
+    # Settled usage is far below the reservation, so another request still fits.
+    asyncio.run(_client(transport, budget).complete(_request(max_output_tokens=100)))
+    assert budget.snapshot()["physical_requests"] == 2
+
+
+def test_development_unknown_usage_keeps_reservation_shared_by_failover():
+    from tests.unit.test_utils.test_llm_routed_client import _config as routed_config
+    from tests.unit.test_utils.test_llm_routed_client import _request as routed_request
+
+    config = routed_config(timeout_seconds=10, attempt_timeout_seconds=5)
+    budget = _budget(prices={}, billing_mode="development_unpriced", max_tokens=20_000)
+    transport = ScriptedTransport(
+        [
+            LlmTransientTransportError("offline"),
+            {"data": {"choices": [{"message": {"content": '{"label":"ok"}'}}]}},
+        ]
+    )
+    asyncio.run(
+        _client(transport, budget, config).complete(
+            routed_request(max_output_tokens=100)
+        )
+    )
+    ledger = budget.snapshot()
+    assert ledger["physical_requests"] == 2
+    assert len({item["provider_resource"] for item in ledger["attempts"]}) == 2
+    assert ledger["charged_cost_cny"] == "unknown"
+    assert all(
+        item["usage_status"] == "unknown_reserved" for item in ledger["attempts"]
+    )
+    budget.max_tokens = ledger["charged_tokens"]
+    with pytest.raises(LlmDeadlineExceededError):
+        asyncio.run(
+            _client(transport, budget, config).complete(
+                routed_request(max_output_tokens=100)
+            )
+        )
+    assert budget.snapshot()["physical_requests"] == 2
+
+
+def test_development_mode_rejects_oversized_payload_before_send():
+    budget = _budget(prices={}, billing_mode="development_unpriced")
+    with pytest.raises(LlmDeadlineExceededError, match="payload"):
+        budget.reserve(
+            resource="unpriced",
+            model="alias",
+            profile="semantic",
+            payload={
+                "model": "alias",
+                "max_tokens": 100,
+                "messages": [{"role": "user", "content": "文" * 40_000}],
+            },
+            request_id="oversize",
+            attempt=1,
+        )
+    assert budget.snapshot()["physical_requests"] == 0
+    assert budget.snapshot()["denied_request"]["payload_utf8_bytes"] > 65_536

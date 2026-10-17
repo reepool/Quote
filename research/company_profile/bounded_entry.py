@@ -71,19 +71,29 @@ def validate_binding(
             raise ValueError(
                 "A real execution authorization for this binding is required"
             )
-        prices = (
-            [source.get("price") for source in binding.get("sources", [])]
-            if binding.get("pool")
-            else [binding.get("price")]
-        )
-        if (
-            not prices
-            or not all(prices)
-            or not binding.get("resource_feasibility_passed")
-        ):
-            raise ValueError(
-                "verified price/context and resource feasibility are required"
+        development = binding.get("billing_mode") == "development_unpriced"
+        if development:
+            if (
+                authorization.get("billing_mode") != "development_unpriced"
+                or authorization.get("cost_limit_evaluated") is not False
+            ):
+                raise ValueError(
+                    "development observation must record unknown cost explicitly"
+                )
+        else:
+            prices = (
+                [source.get("price") for source in binding.get("sources", [])]
+                if binding.get("pool")
+                else [binding.get("price")]
             )
+            if (
+                not prices
+                or not all(prices)
+                or not binding.get("resource_feasibility_passed")
+            ):
+                raise ValueError(
+                    "verified price/context and resource feasibility are required"
+                )
 
 
 def prepare_gateway(binding: dict, raw_config: dict, *, real: bool):
@@ -124,21 +134,24 @@ def prepare_gateway(binding: dict, raw_config: dict, *, real: bool):
     if not expected or actual != expected:
         raise ValueError("profile/model/resource binding mismatch")
     prices = {}
+    development = binding.get("billing_mode") == "development_unpriced"
+    synthetic = {
+        "input_cny_per_million": "1",
+        "output_cny_per_million": "2",
+        "basis": "OFFLINE SYNTHETIC PRICE; not evidence of actual billing",
+        "context_tokens": 120_000,
+    }
     for source in sources:
-        price = (
-            source.get("price")
-            if real
-            else {
-                "input_cny_per_million": "1",
-                "output_cny_per_million": "2",
-                "basis": "OFFLINE SYNTHETIC PRICE; not evidence of actual billing",
-                "context_tokens": 120_000,
-            }
-        )
+        if not real:
+            price = synthetic
+        else:
+            price = source.get("price")
+            if not price and not development:
+                raise ValueError(
+                    "verified price/context required for every physical source"
+                )
         if not price:
-            raise ValueError(
-                "verified price/context required for every physical source"
-            )
+            continue
         prices[(source["provider_resource"], source["model"])] = LlmPrice(
             Decimal(price["input_cny_per_million"]),
             Decimal(price["output_cny_per_million"]),
@@ -199,6 +212,7 @@ def _worker(
         max_requests=binding["max_physical_requests"],
         max_cost_cny=Decimal(binding["max_cost_cny"]),
         ledger_path=run_root / "physical-budget.json",
+        billing_mode=binding.get("billing_mode", "strict"),
     )
     transport_requests = []
 
