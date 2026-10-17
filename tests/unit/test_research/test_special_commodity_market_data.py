@@ -679,6 +679,119 @@ def test_configured_source_chain_prefers_primary_and_fills_missing_dates(monkeyp
     assert diagnostics["max_absolute_difference"] == 0.5
 
 
+def test_configured_source_chain_downgrades_covered_primary_failure_to_note(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item = CommodityUniverseSelector(cfg).resolve(
+        series_ids=["CMD.OIL.WTI.SPOT.EIA.DAILY"]
+    )[0]
+    provider = ConfiguredSourceChainProvider(
+        item.source_profile,
+        cfg["source_profiles"][item.source_profile],
+        cfg,
+    )
+
+    def observation(series: CommoditySeries, observed_date: str, value: float):
+        return CommodityObservation(
+            series_id=series.series_id,
+            observation_date=observed_date,
+            value=value,
+            currency="USD",
+            unit="USD/barrel",
+            raw_value=value,
+            raw_currency="USD",
+            raw_unit="USD/barrel",
+            source_profile=series.source_profile,
+            source_url=f"https://example.test/{series.source_profile}",
+            quality_flag="official_public_api",
+            source_symbol=series.source_symbol,
+            parser_version="unit-test",
+            raw_payload_hash=f"{series.source_profile}-{observed_date}-{value}",
+        )
+
+    from research.special_commodity_market_data import CommodityProviderResult
+
+    class FailingPrimaryProvider:
+        def fetch(self, series, *, start_date, end_date):
+            return CommodityProviderResult(
+                warnings=[
+                    {
+                        "reason": "provider_request_failed",
+                        "series_id": series[0].series_id,
+                        "offset": 0,
+                        "error": "Read timed out. (read timeout=30.0)",
+                    }
+                ]
+            )
+
+    class FallbackCoveringProvider:
+        def fetch(self, series, *, start_date, end_date):
+            return CommodityProviderResult(
+                observations=[observation(series[0], "2026-01-02", 70.0)]
+            )
+
+    monkeypatch.setattr(
+        provider,
+        "_resolve_provider",
+        lambda profile: (
+            FailingPrimaryProvider()
+            if profile == "eia_official_api"
+            else FallbackCoveringProvider()
+        ),
+    )
+    result = provider.fetch([item], start_date="2026-01-01", end_date="2026-01-02")
+
+    assert result.warnings == []
+    assert result.observations[0].metadata["source_role"] == "fallback"
+    note = next(
+        entry
+        for entry in result.notes
+        if entry["reason"] == "provider_request_failed_fallback_covered"
+    )
+    assert note["series_id"] == item.series_id
+    assert note["fallback_filled_dates"] == 1
+    assert note["chain_source_profile"] == "eia_official_api"
+
+
+def test_configured_source_chain_keeps_warning_when_no_source_covered(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item = CommodityUniverseSelector(cfg).resolve(
+        series_ids=["CMD.OIL.WTI.SPOT.EIA.DAILY"]
+    )[0]
+    provider = ConfiguredSourceChainProvider(
+        item.source_profile,
+        cfg["source_profiles"][item.source_profile],
+        cfg,
+    )
+
+    from research.special_commodity_market_data import CommodityProviderResult
+
+    class FailingProvider:
+        def fetch(self, series, *, start_date, end_date):
+            return CommodityProviderResult(
+                warnings=[
+                    {
+                        "reason": "provider_request_failed",
+                        "series_id": series[0].series_id,
+                        "offset": 0,
+                        "error": "Read timed out. (read timeout=30.0)",
+                    }
+                ]
+            )
+
+    monkeypatch.setattr(provider, "_resolve_provider", lambda profile: FailingProvider())
+    result = provider.fetch([item], start_date="2026-01-01", end_date="2026-01-02")
+
+    assert result.observations == []
+    assert result.notes == []
+    assert [
+        entry for entry in result.warnings if entry["reason"] == "provider_request_failed"
+    ]
+
+
 def test_source_unit_governance_normalizes_equivalent_official_labels():
     assert _source_unit_matches("USD/barrel", "Dollars per Barrel")
     assert _source_unit_matches("USD/barrel", "$/BBL")
@@ -3843,6 +3956,7 @@ def test_lme_akshare_provider_falls_back_to_eastmoney(monkeypatch):
     ).fetch(series, start_date="2026-01-02", end_date="2026-01-02")
 
     assert result.blockers == []
+    assert result.warnings == []
     assert len(result.observations) == 1
     assert result.observations[0].value == 2630
     assert result.observations[0].source_symbol == "LALT"
@@ -3850,7 +3964,7 @@ def test_lme_akshare_provider_falls_back_to_eastmoney(monkeypatch):
     assert result.metadata["series_metadata"][series[0].series_id]["lifecycle_start"] == "2013-06-21"
     assert any(
         item["reason"] == "primary_provider_failed_fallback_used"
-        for item in result.warnings
+        for item in result.notes
     )
 
 
@@ -3969,7 +4083,7 @@ def test_lme_provider_excludes_governed_nickel_suspension_from_gap_fill(monkeypa
     assert diagnostics["unresolved_dates"] == 0
 
 
-def test_lme_provider_reports_close_outside_intraday_range_without_rewrite(monkeypatch):
+def test_lme_provider_substitutes_inconsistent_ohlc_from_fallback(monkeypatch):
     cfg = config_manager.get_research_config().modules["commodity_market_data"][
         "special_commodity_market_data"
     ]
@@ -3977,15 +4091,84 @@ def test_lme_provider_reports_close_outside_intraday_range_without_rewrite(monke
     series = CommodityUniverseSelector(cfg).resolve(
         series_ids=["CMD.METAL.COPPER.LME3M.DAILY"]
     )
-    fake_akshare = SimpleNamespace(
-        futures_foreign_hist=lambda symbol: pd.DataFrame(
+    fallback_calls = []
+
+    def _sina(symbol):
+        return pd.DataFrame(
             [
                 {"date": "2021-03-23", "open": 9134, "high": 9145, "low": 8871, "close": 8870},
             ]
-        ),
-        futures_global_hist_em=lambda symbol: (_ for _ in ()).throw(
-            AssertionError("single covered date must not request fallback")
-        ),
+        )
+
+    def _eastmoney(symbol):
+        fallback_calls.append(symbol)
+        assert symbol == "LCPT"
+        return pd.DataFrame(
+            [
+                {"日期": "2021-03-23", "名称": "综合铜03", "开盘": 9134, "最高": 9145, "最低": 8871, "最新价": 8890, "总量": 0, "持仓": 0},
+            ]
+        )
+
+    fake_akshare = SimpleNamespace(
+        futures_foreign_hist=_sina,
+        futures_global_hist_em=_eastmoney,
+        futures_hq_subscribe_exchange_symbol=lambda: pd.DataFrame(),
+    )
+    monkeypatch.setattr(
+        AkshareForeignFuturesProvider,
+        "_load_akshare",
+        staticmethod(lambda mode: fake_akshare),
+    )
+
+    result = AkshareForeignFuturesProvider(
+        "lme_akshare_foreign_futures", source_cfg
+    ).fetch(series, start_date="2021-03-23", end_date="2021-03-23")
+
+    assert fallback_calls == ["LCPT"]
+    assert result.warnings == []
+    assert result.observations[0].value == 8890
+    assert result.observations[0].metadata["low"] == 8871
+    assert result.observations[0].metadata["ohlc_consistency"] == (
+        "primary_inconsistent_fallback_substituted"
+    )
+    assert result.observations[0].metadata["ohlc_inconsistent_primary"]["value"] == 8870
+    assert result.observations[0].metadata["selected_provider"] == "eastmoney"
+    diagnostics = result.metadata["quality_diagnostics"]["ohlc"]
+    assert diagnostics["close_outside_range"] == 0
+    assert diagnostics["fallback_substituted"] == 1
+    assert diagnostics["fallback_substituted_by_series"][series[0].series_id] == 1
+    assert any(
+        item["reason"] == "ohlc_inconsistent_fallback_substituted"
+        for item in result.notes
+    )
+
+
+def test_lme_provider_warns_when_all_sources_ohlc_inconsistent(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = cfg["source_profiles"]["lme_akshare_foreign_futures"]
+    series = CommodityUniverseSelector(cfg).resolve(
+        series_ids=["CMD.METAL.COPPER.LME3M.DAILY"]
+    )
+
+    def _sina(symbol):
+        return pd.DataFrame(
+            [
+                {"date": "2021-03-23", "open": 9134, "high": 9145, "low": 8871, "close": 8870},
+            ]
+        )
+
+    def _eastmoney(symbol):
+        return pd.DataFrame(
+            [
+                {"日期": "2021-03-23", "名称": "综合铜03", "开盘": 9134, "最高": 9145, "最低": 8871, "最新价": 8860},
+            ]
+        )
+
+    fake_akshare = SimpleNamespace(
+        futures_foreign_hist=_sina,
+        futures_global_hist_em=_eastmoney,
         futures_hq_subscribe_exchange_symbol=lambda: pd.DataFrame(),
     )
     monkeypatch.setattr(
@@ -3999,9 +4182,69 @@ def test_lme_provider_reports_close_outside_intraday_range_without_rewrite(monke
     ).fetch(series, start_date="2021-03-23", end_date="2021-03-23")
 
     assert result.observations[0].value == 8870
-    assert result.observations[0].metadata["low"] == 8871
-    assert result.observations[0].metadata["ohlc_consistency"] == "close_outside_intraday_range"
-    assert result.metadata["quality_diagnostics"]["ohlc"]["close_outside_range"] == 1
+    assert result.observations[0].metadata["ohlc_consistency"] == (
+        "close_outside_intraday_range"
+    )
+    diagnostics = result.metadata["quality_diagnostics"]["ohlc"]
+    assert diagnostics["close_outside_range"] == 1
+    assert diagnostics["fallback_substituted"] == 0
+    warning = next(
+        item for item in result.warnings
+        if item["reason"] == "ohlc_inconsistent_all_sources"
+    )
+    assert warning["series_id"] == series[0].series_id
+    assert warning["dates"] == ["2021-03-23"]
+    assert warning["inconsistencies"][0]["value"] == 8870
+
+
+def test_lme_provider_substitutes_open_outside_intraday_range(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = cfg["source_profiles"]["lme_akshare_foreign_futures"]
+    series = CommodityUniverseSelector(cfg).resolve(
+        series_ids=["CMD.METAL.COPPER.LME3M.DAILY"]
+    )
+
+    def _sina(symbol):
+        return pd.DataFrame(
+            [
+                {"date": "2021-03-23", "open": 9134, "high": 9100, "low": 8871, "close": 9050},
+            ]
+        )
+
+    def _eastmoney(symbol):
+        return pd.DataFrame(
+            [
+                {"日期": "2021-03-23", "名称": "综合铜03", "开盘": 9050, "最高": 9100, "最低": 8871, "最新价": 9050, "总量": 0, "持仓": 0},
+            ]
+        )
+
+    fake_akshare = SimpleNamespace(
+        futures_foreign_hist=_sina,
+        futures_global_hist_em=_eastmoney,
+        futures_hq_subscribe_exchange_symbol=lambda: pd.DataFrame(),
+    )
+    monkeypatch.setattr(
+        AkshareForeignFuturesProvider,
+        "_load_akshare",
+        staticmethod(lambda mode: fake_akshare),
+    )
+
+    result = AkshareForeignFuturesProvider(
+        "lme_akshare_foreign_futures", source_cfg
+    ).fetch(series, start_date="2021-03-23", end_date="2021-03-23")
+
+    assert result.warnings == []
+    assert result.observations[0].value == 9050
+    assert result.observations[0].metadata["open"] == 9050
+    assert result.observations[0].metadata["ohlc_consistency"] == (
+        "primary_inconsistent_fallback_substituted"
+    )
+    assert result.observations[0].metadata["ohlc_inconsistent_primary"]["reason"] == (
+        "open_outside_intraday_range"
+    )
+    assert result.metadata["quality_diagnostics"]["ohlc"]["fallback_substituted"] == 1
 
 
 def test_lme_governance_precedes_write_and_uses_only_observed_dates(monkeypatch, tmp_path):
@@ -4430,6 +4673,50 @@ def test_special_commodity_scheduler_report_compacts_normal_success():
     assert "metric_absent=12" in report
     assert "parse_failed=1" in report
     assert "field_reconciled=2" in report
+
+
+def test_special_commodity_report_renders_notes_on_success():
+    from scheduler.tasks import _format_special_commodity_scheduler_report
+
+    report = _format_special_commodity_scheduler_report(
+        {
+            "status": "success",
+            "run_id": 583,
+            "dry_run": False,
+            "target_series": 8,
+            "venues": ["EIA", "LME"],
+            "fetched_rows": 52,
+            "inserted": 6,
+            "changed": 5,
+            "unchanged": 41,
+            "per_source": {
+                "eia_fred_oil_chain": {
+                    "status": "success",
+                    "series": 2,
+                    "fetched": 10,
+                    "warnings": 0,
+                    "notes": 1,
+                    "blockers": 0,
+                }
+            },
+            "warnings": [],
+            "blockers": [],
+            "notes": [
+                {
+                    "reason": "provider_request_failed_fallback_covered",
+                    "series_id": "CMD.OIL.BRENT.SPOT.EIA.DAILY",
+                    "fallback_filled_dates": 5,
+                }
+            ],
+        }
+    )
+
+    assert "状态: `success`" in report
+    assert "告警:" not in report
+    assert "说明:" in report
+    assert "provider_request_failed_fallback_covered" in report
+    assert "fallback_filled_dates" in report
+    assert "notes=1" in report
 
 
 def test_special_commodity_report_supports_article_source_coverage():

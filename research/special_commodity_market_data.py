@@ -568,6 +568,7 @@ class CommodityProviderResult:
     observations: List[CommodityObservation] = field(default_factory=list)
     warnings: List[Dict[str, Any]] = field(default_factory=list)
     blockers: List[Dict[str, Any]] = field(default_factory=list)
+    notes: List[Dict[str, Any]] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -2837,10 +2838,42 @@ class ConfiguredSourceChainProvider:
                 default=0.0,
             ),
         }
+        # A failed primary request is a resolved outcome when the chain still
+        # covered that series from fallback profiles without value conflicts;
+        # it only stays a warning when the series ended up without data.
+        notes: List[Dict[str, Any]] = []
+        unresolved_warnings: List[Dict[str, Any]] = []
+        conflict_series = {str(item.get("series_id")) for item in conflicts}
+        selected_series_ids = {row.series_id for row in selected}
+        fallback_dates_by_series: Dict[str, int] = {}
+        for row in selected:
+            if row.metadata.get("source_role") == "fallback":
+                fallback_dates_by_series[row.series_id] = (
+                    fallback_dates_by_series.get(row.series_id, 0) + 1
+                )
+        for item in warnings:
+            if (
+                str(item.get("reason") or "") == "provider_request_failed"
+                and item.get("series_id") in selected_series_ids
+                and str(item.get("series_id")) not in conflict_series
+            ):
+                notes.append(
+                    {
+                        **item,
+                        "reason": "provider_request_failed_fallback_covered",
+                        "fallback_filled_dates": fallback_dates_by_series.get(
+                            str(item.get("series_id")), 0
+                        ),
+                    }
+                )
+            else:
+                unresolved_warnings.append(item)
+        warnings = unresolved_warnings
         return CommodityProviderResult(
             observations=selected,
             warnings=warnings,
             blockers=blockers,
+            notes=notes,
             metadata={
                 "provider": "CONFIGURED_SOURCE_CHAIN",
                 "series_requested": len(series),
@@ -6507,6 +6540,83 @@ class AkshareForeignFuturesProvider:
         return load_akshare(mode)
 
     @staticmethod
+    def _ohlc_inconsistency_reason(
+        value: float, metadata: Mapping[str, Any]
+    ) -> Optional[str]:
+        """Return why close/open cannot coexist with the stored intraday range."""
+        low = metadata.get("low")
+        high = metadata.get("high")
+        if low is None or high is None:
+            return None
+        low = float(low)
+        high = float(high)
+        if low > high:
+            return "low_exceeds_high"
+        if value < low or value > high:
+            return "close_outside_intraday_range"
+        open_price = metadata.get("open")
+        if open_price is not None and not low <= float(open_price) <= high:
+            return "open_outside_intraday_range"
+        return None
+
+    def _ohlc_rescue_rows(
+        self,
+        akshare: Any,
+        candidate: Mapping[str, Any],
+        item: "CommoditySeries",
+        target_dates: set,
+    ) -> tuple[Dict[str, tuple[float, Dict[str, Any], Dict[str, Any]]], Dict[str, Any]]:
+        """Fetch one fallback candidate and keep self-consistent OHLC rows only."""
+        provider_id = str(candidate.get("provider_id") or "").strip()
+        source_symbol = str(
+            (item.metadata.get("provider_symbols") or {}).get(provider_id) or ""
+        ).strip()
+        function_name = str(candidate.get("akshare_function") or "").strip()
+        date_column = str(candidate.get("date_column") or "").strip()
+        value_column = str(candidate.get("value_column") or "").strip()
+        func = getattr(akshare, function_name, None)
+        if not provider_id or not source_symbol or func is None:
+            return {}, {"provider_id": provider_id, "status": "invalid_mapping"}
+        try:
+            payload_rows = self._payload_records(func(symbol=source_symbol))
+        except Exception as exc:
+            return {}, {
+                "provider_id": provider_id,
+                "source_symbol": source_symbol,
+                "status": "request_failed",
+                "error": str(exc),
+            }
+        rescued: Dict[str, tuple[float, Dict[str, Any], Dict[str, Any]]] = {}
+        for row in payload_rows:
+            observed = _parse_date(str(row.get(date_column) or "")[:10])
+            if observed is None or observed.isoformat() not in target_dates:
+                continue
+            value = self._numeric(row, value_column)
+            if value is None:
+                continue
+            ohlc_meta: Dict[str, Any] = {}
+            for target, config_key in (
+                ("open", "open_column"),
+                ("high", "high_column"),
+                ("low", "low_column"),
+                ("volume", "volume_column"),
+                ("position", "position_column"),
+            ):
+                numeric = self._numeric(row, str(candidate.get(config_key) or ""))
+                if numeric is not None:
+                    ohlc_meta[target] = numeric
+            if self._ohlc_inconsistency_reason(value, ohlc_meta) is not None:
+                continue
+            rescued[observed.isoformat()] = (value, ohlc_meta, row)
+        return rescued, {
+            "provider_id": provider_id,
+            "source_symbol": source_symbol,
+            "status": "success",
+            "rows": len(payload_rows),
+            "rescued_dates": len(rescued),
+        }
+
+    @staticmethod
     def _payload_records(payload: Any) -> List[Dict[str, Any]]:
         if hasattr(payload, "to_dict"):
             return [dict(row) for row in payload.to_dict("records")]
@@ -6633,6 +6743,7 @@ class AkshareForeignFuturesProvider:
         observations: List[CommodityObservation] = []
         warnings: List[Dict[str, Any]] = []
         blockers: List[Dict[str, Any]] = []
+        notes: List[Dict[str, Any]] = []
         series_metadata: Dict[str, Dict[str, Any]] = {}
         attempts_by_series: Dict[str, List[Dict[str, Any]]] = {}
         available_lme_products = self._discover_lme_products(akshare)
@@ -6808,7 +6919,10 @@ class AkshareForeignFuturesProvider:
                 "contract_detail_error": contract_detail_error,
             }
             if int(selected.get("candidate_index") or 0) > 0:
-                warnings.append(
+                # The fallback provider returned the full series window, so this is a
+                # resolved outcome, not an alert: unresolved gaps emit their own
+                # `foreign_futures_date_gaps_unresolved` warning below.
+                notes.append(
                     {
                         "reason": "primary_provider_failed_fallback_used",
                         "series_id": item.series_id,
@@ -7076,19 +7190,150 @@ class AkshareForeignFuturesProvider:
                     len(unresolved_dates),
                 )
 
-        ohlc_diagnostics: Dict[str, Any] = {"close_outside_range": 0, "by_series": {}}
-        for observation in observations:
-            low = observation.metadata.get("low")
-            high = observation.metadata.get("high")
-            if low is None or high is None:
+        ohlc_diagnostics: Dict[str, Any] = {
+            "close_outside_range": 0,
+            "by_series": {},
+            "fallback_substituted": 0,
+            "fallback_substituted_by_series": {},
+        }
+        inconsistent_indexes_by_series: Dict[str, List[int]] = {}
+        for index, observation in enumerate(observations):
+            reason = self._ohlc_inconsistency_reason(
+                observation.value, observation.metadata
+            )
+            if reason is None:
                 continue
-            outside = float(low) > float(high) or observation.value < float(low) or observation.value > float(high)
-            if not outside:
-                continue
-            observation.metadata["ohlc_consistency"] = "close_outside_intraday_range"
-            ohlc_diagnostics["close_outside_range"] += 1
-            by_series = ohlc_diagnostics["by_series"]
-            by_series[observation.series_id] = by_series.get(observation.series_id, 0) + 1
+            observation.metadata["ohlc_consistency"] = reason
+            inconsistent_indexes_by_series.setdefault(observation.series_id, []).append(
+                index
+            )
+        if inconsistent_indexes_by_series:
+            item_by_series = {item.series_id: item for item in series}
+            for series_id, indexes in inconsistent_indexes_by_series.items():
+                item = item_by_series.get(series_id)
+                if item is None:
+                    continue
+                source_meta = series_metadata.get(series_id) or {}
+                selected_provider = str(source_meta.get("selected_provider") or "")
+                contract_detail = dict(source_meta.get("contract_detail") or {})
+                remaining = list(indexes)
+                rescue_attempts: List[Dict[str, Any]] = []
+                substituted: List[Dict[str, Any]] = []
+                for candidate in chain:
+                    if not remaining:
+                        break
+                    candidate_provider = str(candidate.get("provider_id") or "").strip()
+                    if not candidate_provider or candidate_provider == selected_provider:
+                        continue
+                    target_dates = {observations[i].observation_date for i in remaining}
+                    rescued, attempt = self._ohlc_rescue_rows(
+                        akshare, candidate, item, target_dates
+                    )
+                    rescue_attempts.append(attempt)
+                    if not rescued:
+                        continue
+                    still_remaining: List[int] = []
+                    for i in remaining:
+                        observation = observations[i]
+                        rescue_row = rescued.get(observation.observation_date)
+                        if rescue_row is None:
+                            still_remaining.append(i)
+                            continue
+                        value, ohlc_meta, row = rescue_row
+                        metadata = {
+                            "actual_source_profile": str(
+                                candidate.get("actual_source_profile")
+                                or candidate_provider
+                            ),
+                            "selected_provider": candidate_provider,
+                            "ohlc_consistency": "primary_inconsistent_fallback_substituted",
+                            "ohlc_inconsistent_primary": {
+                                "selected_provider": observation.metadata.get(
+                                    "selected_provider"
+                                ),
+                                "reason": observation.metadata.get("ohlc_consistency"),
+                                "value": observation.value,
+                                "open": observation.metadata.get("open"),
+                                "high": observation.metadata.get("high"),
+                                "low": observation.metadata.get("low"),
+                            },
+                            "provider_attempts": rescue_attempts,
+                            "underlying_exchange": item.metadata.get("underlying_exchange"),
+                            "prompt_tenor": item.metadata.get("prompt_tenor"),
+                            "market_data_type": contract_detail.get("market_data_type"),
+                            "contract_multiplier": contract_detail.get("contract_multiplier"),
+                            "tick_size": contract_detail.get("tick_size"),
+                            **ohlc_meta,
+                        }
+                        observations[i] = _build_observation(
+                            item=item,
+                            source_profile=self.source_profile,
+                            source_cfg=self.source_cfg,
+                            observation_date=observation.observation_date,
+                            value=value,
+                            source_url=str(
+                                candidate.get("source_url")
+                                or f"akshare://{candidate.get('akshare_function')}"
+                            ),
+                            source_symbol=str(
+                                (item.metadata.get("provider_symbols") or {})
+                                .get(candidate_provider)
+                                or candidate_provider
+                            ),
+                            raw_payload=row,
+                            metadata=metadata,
+                        )
+                        substituted.append(
+                            {
+                                "observation_date": observation.observation_date,
+                                "provider_id": candidate_provider,
+                                "value": value,
+                            }
+                        )
+                    remaining = still_remaining
+                if substituted:
+                    ohlc_diagnostics["fallback_substituted"] += len(substituted)
+                    by_series = ohlc_diagnostics["fallback_substituted_by_series"]
+                    by_series[series_id] = by_series.get(series_id, 0) + len(substituted)
+                    notes.append(
+                        {
+                            "reason": "ohlc_inconsistent_fallback_substituted",
+                            "series_id": series_id,
+                            "primary_provider": selected_provider,
+                            "selected_provider": substituted[0]["provider_id"],
+                            "dates": sorted(
+                                {entry["observation_date"] for entry in substituted}
+                            )[:20],
+                            "substituted": len(substituted),
+                        }
+                    )
+                if remaining:
+                    ohlc_diagnostics["close_outside_range"] += len(remaining)
+                    by_series = ohlc_diagnostics["by_series"]
+                    by_series[series_id] = by_series.get(series_id, 0) + len(remaining)
+                    warnings.append(
+                        {
+                            "reason": "ohlc_inconsistent_all_sources",
+                            "series_id": series_id,
+                            "dates": sorted(
+                                {observations[i].observation_date for i in remaining}
+                            )[:20],
+                            "inconsistencies": [
+                                {
+                                    "observation_date": observations[i].observation_date,
+                                    "reason": observations[i].metadata.get(
+                                        "ohlc_consistency"
+                                    ),
+                                    "value": observations[i].value,
+                                    "open": observations[i].metadata.get("open"),
+                                    "high": observations[i].metadata.get("high"),
+                                    "low": observations[i].metadata.get("low"),
+                                }
+                                for i in remaining[:20]
+                            ],
+                            "fallback_attempts": rescue_attempts,
+                        }
+                    )
 
         configured_primary_codes = set(
             _normalize_list(self.source_cfg.get("known_primary_symbols"), upper=True)
@@ -7107,6 +7352,7 @@ class AkshareForeignFuturesProvider:
             observations=observations,
             warnings=warnings,
             blockers=blockers,
+            notes=notes,
             metadata={
                 "provider": "AKSHARE_FOREIGN_FUTURES",
                 "series_requested": len(series),
@@ -8892,6 +9138,7 @@ class SpecialCommodityGovernancePipeline:
         calendar_rows: List[Dict[str, Any]] = []
         warnings: List[Dict[str, Any]] = []
         blockers: List[Dict[str, Any]] = []
+        notes: List[Dict[str, Any]] = []
         per_source: Dict[str, Dict[str, Any]] = {}
         latest_stored = {
             str(row["series_id"]): str(row["observation_date"])
@@ -9005,6 +9252,13 @@ class SpecialCommodityGovernancePipeline:
             warnings.extend(
                 _annotate_source_diagnostics(
                     [{**item, "governance_stage": "provider"} for item in provider_result.warnings],
+                    source_profile=source_profile,
+                    research_role=research_role,
+                )
+            )
+            notes.extend(
+                _annotate_source_diagnostics(
+                    [{**item, "governance_stage": "provider"} for item in provider_result.notes],
                     source_profile=source_profile,
                     research_role=research_role,
                 )
@@ -9184,6 +9438,7 @@ class SpecialCommodityGovernancePipeline:
                 "calendar_rows": len(date_result.calendar_rows),
                 "fetched": len(governed_observations),
                 "warnings": source_warnings,
+                "notes": len(provider_result.notes),
                 "blockers": source_blockers,
                 "calendar_type": date_result.metadata.get("calendar_type"),
                 "weekday_inference_used": False,
@@ -9258,6 +9513,7 @@ class SpecialCommodityGovernancePipeline:
             "per_source": per_source,
             "warnings": warnings,
             "blockers": blockers,
+            "notes": notes,
         }
 
 
@@ -10045,6 +10301,7 @@ class SpecialCommodityPriceSyncService:
         total_observations = list(governance.get("observations") or [])
         warnings = list(governance.get("warnings") or [])
         blockers = list(governance.get("blockers") or [])
+        notes = list(governance.get("notes") or [])
         write_counts = self.storage.upsert_observations(
             total_observations,
             ingestion_run_id=run_id,
@@ -10072,6 +10329,7 @@ class SpecialCommodityPriceSyncService:
             "per_source": governance.get("per_source", {}),
             "warnings": warnings[:20],
             "blockers": blockers[:20],
+            "notes": notes[:20],
             **write_counts,
         }
         self.storage.finish_ingestion_run(run_id, status=status, metadata=summary)

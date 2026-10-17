@@ -4398,6 +4398,7 @@ def _format_special_commodity_scheduler_report(
                     f"first={min(first_dates) if first_dates else 'N/A'}, "
                     f"latest={max(latest_dates) if latest_dates else 'N/A'}, "
                     f"calendar_missing={missing_dates}, "
+                    f"notes={item.get('notes', 0)}, "
                     f"warnings={item.get('warnings', 0)}, "
                     f"blockers={item.get('blockers', 0)}"
                     f"{coverage_suffix}"
@@ -4410,6 +4411,9 @@ def _format_special_commodity_scheduler_report(
         lines.extend(["", "阻断:", "```text", "\n".join(str(item) for item in blockers[:12]), "```"])
     if detailed and warnings:
         lines.extend(["", "告警:", "```text", "\n".join(str(item) for item in warnings[:12]), "```"])
+    notes = result.get("notes") or []
+    if notes:
+        lines.extend(["", "说明:", "```text", "\n".join(str(item) for item in notes[:12]), "```"])
     return "\n".join(lines)
 
 
