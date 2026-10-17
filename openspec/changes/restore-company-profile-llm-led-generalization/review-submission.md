@@ -236,3 +236,48 @@ timeout --signal=KILL 900s /home/python/miniconda3/envs/Quote/bin/python -m rese
 当前需补资料仍为六个来源的计费/订阅增量成本依据、币种换算及上下文/配额；仓库配置与所查网关文档未找到可核的价格/上下文表，未用真实请求试探。另需解决完整发现、合成及核验在120000 token内的有效计量/资源可行性，池可用并不扩大预算。已向用户询问池的计费与上下文资料维护位置，尚未据此取得真实权限。按[B1卡§5–6](b1-execution-card.md)停在实际运行前，待资料和可行性补齐后由A核定最终绑定与运行权限，不启动B2或扩批。
 
 本次基线`f90a9f64`，11份既有tracked文件hash均未变化，既有untracked内容未操作；仅提交本人入口、直接测试与本change新增材料。Git身份以本节所属提交为准。B活跃开发/等待时间未精确计量，本次正式复验0；新路线仍为开发0/4、回归0/12、未见0/20、试运行0/100，生产`not_authorized`、规模声明false。
+
+## 10. A角接续审核与资源裁决（2026-10-17）
+
+审核提交：`f90a9f64`、`d320ed1dd289c03b3112b496b3617509b8307d64`。结论：**原两项P1修复在直接核验范围内成立，池/物理预算及部分交付链可接续；B1/A1仍未通过。** 本轮未发现新的业务P0/P1，当前阻塞为完整请求计划的资源可行性，以及实际计费/上下文资料和真实授权。下一步按[B1卡§7](b1-execution-card.md#7-当前接续先让完整请求计划可运行a于2026-10-17裁决)实施，不继续增加池功能或以fake数量代替业务。
+
+### 10.1 A实际核验与完成边界
+
+- 官方PDF hash与冻结版本一致；池绑定54份执行文件hash全部匹配当前内容，包含既有脏的抽取依赖。8份持久制品hash通过；本轮只读复核query/export的profiles相等，解析缓存208页逐页文本hash与持久source receipt一致。缓存只用于诊断与重建本轮请求计划，不作真实语义成绩。
+- 原A-P1-01和A-P1-02关闭：A独立执行6项直接用例，覆盖模型漏回传原数值、原事实上下文保留、Segment原ID/新ID新增金额拒绝、完整/不完整verify中的真实冲突及依赖隔离。原生事实可以独立保留，未经支持的金额变体不能由verify pass放行；未据此宣称所有未测边界成立。
+- A审阅了现有池接续、物理发送前预留、失败/切换不重置、unknown usage、入口监督和原owner读回。针对性组合首次为**26 passed、1 failed、7 warnings、16.30秒**，失败为`test_routed_failover_uses_same_run_ledger_and_rejects_unpriced_source`的请求deadline；其路由fixture配置0.5秒时限。单独复验为**1 passed、6 warnings、1.84秒**。两次结果并列，不能称A一次27/27或全套通过；这项短时限波动未显示新业务P1，不追修整个旧网关套件。B的21 passed回执仍保留，不用A后继改写。
+- B此前网关142 passed/11 failed及原client同环境对照保持历史；本次未重跑那组。A没有修改业务代码，没有重跑208页入口，没有发真实请求或写生产库。A活跃审核时间未单独计量，记unknown。
+
+A组合复验命令（必须继承项目TMPDIR）：
+
+```bash
+source /home/python/Quote/scripts/quote_dev_env.sh
+/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_bounded_entry.py tests/unit/test_utils/test_llm_physical_budget.py tests/unit/test_research/test_company_profile_llm_led.py::test_native_numeric_fact_survives_model_omission_and_is_verified tests/unit/test_research/test_company_profile_llm_led.py::test_preserved_native_fact_keeps_its_source_page_in_verify_context tests/unit/test_research/test_company_profile_llm_led.py::test_segment_cannot_add_amount_even_with_a_new_candidate_id tests/unit/test_research/test_company_profile_llm_led.py::test_native_fact_semantic_conflict_quarantines_fact_and_dependent_answer
+/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_utils/test_llm_physical_budget.py::test_routed_failover_uses_same_run_ledger_and_rejects_unpriced_source
+```
+
+### 10.2 当前主要矛盾及资源诊断
+
+| 核验项 | 实际结果与裁决 |
+| --- | --- |
+| 208页离线预演 | 是完整入口的一次预算停止观察；只模拟发送第一批1–26页，另182页未读。真实模型阅读0页，三视图均为`extraction_failed`，19核心/6负例未评估 |
+| 首次物理预留 | 96,142＝92,142输入上界＋4,000最大输出；第二批需要101,309、只余23,858，在发送前拒绝。预算硬停成立，完整资源可行性未成立 |
+| 发现请求形态 | `report_interpretation.py`按24,000字符/1,000重叠形成8批；`stage5_provider.py:interpret`每批发送完整`ReportSemanticResponse`schema，30个defs、紧凑JSON为25,833字节，包括该purpose不能返回的records/claims/checks |
+| 当前计量法的下界 | 208页正文404,158字节＋8份schema206,664字节＋8份最大输出32,000＝**642,822个当前预留单位**；还未计system、封装、元数据/转义/256 framing、合成/核验及重试。120000下无法跑通，单靠更小分批仍会重复schema |
+| 最小purpose诊断 | 只在内存保留inventory允许字段及可达defs，测得4,121字节/5 defs。A未实现或批准以该投影绕过完整本地校验；单独缩schema也不证明全程可行 |
+| token与费用含义 | 上述是UTF-8保守计量及请求结构证据，**不是真实token超额/模型费用实测**。账本0.100142元为合成价格结果，实际费用仍未评估；不能凭该数校准真实成本 |
+| 资源资料 | 全池六来源price均null，没有可核上下文资料；不以型号别名推价格。全池若继续使用，须核全部可达成员；首家也可沿现有已核concrete profile关闭回退准备隔离绑定，生产池不变 |
+
+A未放宽900秒/120000 token/16物理请求/10元及整卡上限，也没有据当前过度保守计量要求直接加预算。B先去除purpose无关schema/事实重复，形成全程请求计划及有依据的计量/上下文方案；必要时采用通用有界发现和核心正文阅读，但不能裁掉主要业务、把结构索引冒充正文已读或改用固定关键页白名单。只有这一步可行后，真实首发才有检验业务质量的价值。
+
+### 10.3 下一卡、流程与进度
+
+执行[B1当前接续卡§7](b1-execution-card.md#7-当前接续先让完整请求计划可运行a于2026-10-17裁决)：在同一B窗口完成完整请求/预算计划、非空的208页离线协议闭环及最小可用来源资料。A负责核最终实际来源、路由/版本与资源权限；没有真实授权前不试探模型。若只有一个来源资料齐全，不为凑六份阻塞首家准备；其余未定价来源不得切换进入真实执行。
+
+按A/B流程v3，B自主处理卡内P0/P1和必要P2/P3，最多两次离线资源方案迭代；超限或确实需要资源/合同/权限裁决时交A，不无限堆fake轮次。真实首次/后继仍0/0，允许上限仍首次1＋后继最多1，旧离线停止观察不占正式次数、不增加费用授权。下一次交接须说明完整方案可否运行及具体差额，不能只交新的网关测试数。
+
+唯一验收进度表已更新：来源合同1/4、实际执行冻结0/4；开发0/4、S1新链0/12、S2首组0/20（失败最多另20）、S3试运行0/100。后续按4→12→20→100顺序推进，到数量上限即结论，不追加样本稀释失败。本卡19核心/6负例及可用门槛不变；允许次要遗漏和有据unclear，已知错误/依赖答案退出确定结论，无法补救须写原因、影响和恢复条件，核心不成立不算可用。生产`not_authorized`、规模声明false，不归档、不扩批。
+
+本次只新增审核/任务文档指引，不改旧§6–9、绑定、成绩或制品。任务开始时实际有14份tracked既有修改（B起始11份之外另有3份并行修改）及原untracked；均须保持，验收计划只隔离本轮活动进度行。临时制品继续使用项目TMPDIR，原正式来源/持久证据不清理。
+
+本轮文档通过`openspec validate restore-company-profile-llm-led-generalization --strict --no-interactive`和`git diff --check`；5份本人文档58个本地链接及19项核心条件检查通过。14份既有文件在扣除本人进度行后内容hash不变。审核期间另有并行提交`9841642a`及无关文档修改，A未操作这些内容，仅隔离提交本轮5份文档。

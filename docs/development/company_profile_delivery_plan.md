@@ -56,7 +56,7 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 ### B1：一家公司真实解读闭环（B连续实施，当前首要任务）
 
 - 目标：从已有历史报告选1家同时含主营描述、收入表及投入/角色的公司，真实LLM生成三视图，并从query/export读回；选择不得触碰S2留出20家。
-- 当前执行以[B1接续卡](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md)为准：同一窗口修两项A复现P1、接续真实网关/总预算/入口deadline和完整报告验证，再在资源绑定及授权齐备后正式运行；不是另开一轮fake平台建设。
+- 当前执行以[B1接续卡§7](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md)为准：2026-10-17 A已关闭原两项P1，确认现有池共用物理预算；下一窗口集中完成完整发现/合成/核验的有界请求计划和最小可用来源绑定，资源及权限齐备后才真实运行。不能继续以增加fake测试或池功能代替首份三产品交付；不要求先凑齐全部六来源资料。
 - 入口/owner：`company_profile_common_core` → `research/company_profile/operations.py` → runtime/workflow及`CommonGatewaySemanticProvider` → 原repository/read service；统一走`utils/llm`公共网关。
 - 实现：先绑定provider与可核日志，再接全文发现、源先行核心清单、证据摘要；将同field短路限定为可靠结构化事实复用；拆开硬校验与语义判断，正则只作定位提示/风险提示。必要请求/读取元数据版本化，不向旧schema偷偷塞字段。
 - 输出：三视图、原文引用、缺项/冲突说明、真实模型/请求/usage、页覆盖、query/export一致；provider未配置或不可用明确失败/限用。
