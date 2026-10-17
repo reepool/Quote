@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前审核状态（2026-10-17）：A对71735099的结论及下一卡见[§14](#14-a审核71735099正文发现修复接受资源阻塞未解除)。正文发现P1关闭；B1/A1未通过，真实调用0；下一步按[B1卡§9](b1-execution-card.md#9-a对71735099的裁决与下一卡解资源阻塞后完成b1)先清理并补交接，再解实际部署/计费/上下文/计量阻塞。以下历史交接和首次结果保留，不代表最新授权。
+当前状态（2026-10-17，[§15](#15-b角清理与资源缺项停止2026-10-17)）：正文发现修复已被接受；本窗口完成临时产物清理，六个现有来源仍缺部署映射、计费、上下文和可信计量，资料不足故停止。B1/A1未通过。真实调用0，208页专项0/1未启动，三视图和19项核心未评估。A对71735099的结论仍见[§14](#14-a审核71735099正文发现修复接受资源阻塞未解除)。以下历史交接和首次结果保留，不代表最新授权。
 
 ## 1. 唯一实施指引
 
@@ -468,3 +468,46 @@ source /home/python/Quote/scripts/quote_dev_env.sh
 A本轮只更新流程、活动进度、任务卡/待办和本审核入口；提交身份以本节所属Git提交为准。开始时11份tracked既有改动及原untracked继续保护；验收计划仅隔离本人活动进度一行，其他既有字节不纳入提交。
 
 本轮文档通过当前change的OpenSpec严格校验、76个本地文件链接核查及`git diff --check`；11份既有文件扣除本人活动进度行后hash不变，静态计划/资源回执及此前审核正文保护通过。未新增过程脚本、测试数据或备份，pytest临时日志按既有session收尾清除；历史待清候选留B按下卡核依赖处理。
+
+## 15. B角：清理与资源缺项停止（2026-10-17）
+
+结果：当前是B1卡§9。本次是清理和资源核对，不是正式首发或后继。正文发现局部修复此前已被接受；本窗口资源受阻并停止。待A判断的是：由维护方提供至少一个现有来源的部署映射、计费、上下文和可信计量后，再重估完整计划。
+
+业务：歌华有线三视图没有新的交付。19项核心、6项负例、已审准确率均未评估。允许的次要遗漏和有据歧义本窗口没有新的业务样本可记。
+
+差异：基线`672449ad`。本窗口没有改业务规则或阅读代码。A-P1-MAP-01保持关闭。R4仍未完成。
+
+验证：没有新的业务测试。上一轮60 passed是§13的离线回执，本窗口未重跑。§14的两项非阻塞提示（`protocol_reply`未使用导入，以及`report_interpretation.py`一处格式）本窗口没有改那些文件，仍然未处理，不能称为全部静态检查通过。清理不依赖测试通过。
+
+资源：真实调用0，usage和费用未评估。静态预留仍是§13的字节保守单位575995，不是token，也不能据此判断120000 token不足。原离线方案2/2已用。208页专项0/1，本窗口未启动。真实首次0/1、后继0/1，授权未签发。
+
+证据：正式PDF、OpenSpec中的iteration2 checkpoint、`static-plan.json`和S1持久回执都未删除。`a-s1-review-W6qOUq/results.xml`仍在，SHA-256与持久副本`s1-validation-receipts/s1-repaired-independent-results.xml`相同：`cdc2ef3293dd5461f8a76486ef6f806510baad9ecb9ac191e904ae7b504cc914`。资源文件删除前，iteration1/2的budget、source-receipt、entry-result、offline-transport以及query/export与`b1-resource-evidence`逐一相同；`scorpio-model-plaza.json`也相同。`full-report-final-v2/export.json`与`b1-continuation-evidence/export.json.gz`解开后相同。
+
+闭环与清理：清理时点2026-10-17。清理前`du`约275M，文件字节279,853,560；清理后`du` 67M，文件字节67,561,851；释放212,291,709字节。`lsof`未看到占用这些目录的进程。已删除：
+
+| 路径 | 文件字节 | 删除依据 |
+| --- | --- | --- |
+| `a-s1-review-W6qOUq/work` | 115,241,777 | 隔离测试库；成绩已在持久XML，hash一致 |
+| `pytest-of-python` | 54,024,082 | 已结束的pytest数据目录，可重建 |
+| `cache/pycache`与`cache/pytest` | 32,173,931 | 工具缓存，可重建 |
+| `b1-resource-20261017` | 5,796,264 | 与持久iteration证据hash一致的重复运行副本 |
+| `debug-s1-600082`、`debug-s1-600000` | 2,506,379 | 无引用的调试输出 |
+| `b1-continuation-20261016/full-report-final-v2` | 2,476,758 | export与持久gzip一致 |
+| 75个`quote_pytest_logs_*` | 72,518 | 已结束的pytest日志目录 |
+
+保留及原因：`v61_s0`仍被v61预检脚本使用；`s1-s2-freeze-20261016`仍被S2冻结核验脚本读取；`s1-v60-baseline-gmcgf7oq`和`profile-plan-ctuAoKJK`没有引用，但内容是导出或文档草稿，归属未证实，不按目录名删除；`b1-continuation-20261016`其余探针的export与持久副本不一致，连同baseline diff和日志保留；`b1-pool-binding-20261017`和`b1-llm-led-offline-20261016`未证明是已持久化副本；`logs/`是当前开发日志目录；`cache`下的ruff、black、node-compile缓存仍可复用。正式PDF、OpenSpec checkpoint和11份既有工作区改动未动。
+
+资源缺项（2026-10-17只重读本地`config/13_llm.json`，没有新的网络查询，也没有推理探路）。六个`semantic_extraction`具体profile都没有价格、上下文、分词或配额字段。配置里的超时和每分钟请求数不是供应商配额。公开模型广场404是既有回执，本窗口没有重查。
+
+| profile | resource / model | 部署映射 | 计费、币种、日期 | 上下文 / 最大输出 | 可信计量 | 配额 | 回退 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `semantic_extraction__scorpio_gemini` | `scorpio:gemini` / `gemini-3.8-flash-high` | 缺渠道到部署型号的依据 | 缺 | 缺 | 缺 | 缺 | 未核，不能参与切换 |
+| `semantic_extraction__zai` | `zai` / `glm-5.3-flash` | 缺 | 缺 | 缺 | 缺 | 缺 | 同上 |
+| `semantic_extraction__scorpio_grok` | `scorpio:grok` / `grok-4.7` | 缺 | 缺 | 缺 | 缺 | 缺 | 同上 |
+| `semantic_extraction__scorpio_luna` | `scorpio:luna` / `gpt-5.6-luna` | 缺 | 缺 | 缺 | 缺 | 缺 | 同上 |
+| `semantic_extraction__scorpio_deepseek` | `scorpio:deepseek` / `DeepSeek-V4.1-Flash` | 缺 | 缺 | 缺 | 缺 | 缺 | 同上 |
+| `semantic_extraction__deepseek` | `deepseek` / `deepseek-flash` | 缺 | 缺 | 缺 | 缺 | 缺 | 同上 |
+
+没有一个来源资料齐备，因此没有隔离绑定，没有重算发现/合成/核验计划，也没有启动208页专项。生产池未改。需要维护方提供上表中的缺项；本窗口停止，不再迭代fake或压缩方案。
+
+效率：B活跃时间未精确计量，记unknown。本窗口正式复验0次。既有11份tracked修改和原未跟踪文件未操作。开发0/4，S1 0/12，S2 0/20，S3 0/100。生产`not_authorized`，规模声明false。
