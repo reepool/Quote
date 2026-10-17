@@ -1,0 +1,52 @@
+{
+  "physical_requests": 2,
+  "charged_tokens": 112562,
+  "charged_cost_cny": "0.116062",
+  "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+  "stopped_reason": "physical_request_token_context_or_cost_budget_exhausted",
+  "denied_request": {
+    "request_id": "96afc483bb084e8caa83aa4c25c1db22",
+    "reserved_input_tokens": 62838,
+    "reserved_output_tokens": 2500,
+    "required_tokens": 65338,
+    "remaining_tokens": 7438,
+    "required_cost_cny": "0.067838",
+    "remaining_cost_cny": "9.883938",
+    "context_tokens": 120000,
+    "remaining_requests": 14
+  },
+  "attempts": [
+    {
+      "sequence": 1,
+      "request_id": "af8b17593c774f8494c92b7632c40725",
+      "attempt": 1,
+      "profile": "semantic_extraction__scorpio_gemini",
+      "provider_resource": "scorpio:gemini",
+      "model": "gemini-3.8-flash-high",
+      "reserved_input_tokens": 75509,
+      "reserved_output_tokens": 1000,
+      "charged_tokens": 76509,
+      "charged_cost_cny": "0.077509",
+      "usage": null,
+      "status": "success",
+      "billing_basis": "OFFLINE SYNTHETIC PRICE; not evidence of actual billing",
+      "usage_status": "unknown_reserved"
+    },
+    {
+      "sequence": 2,
+      "request_id": "56152eda4ee64d889b323c2107228217",
+      "attempt": 1,
+      "profile": "semantic_extraction__zai",
+      "provider_resource": "zai",
+      "model": "glm-5.3-flash",
+      "reserved_input_tokens": 33553,
+      "reserved_output_tokens": 2500,
+      "charged_tokens": 36053,
+      "charged_cost_cny": "0.038553",
+      "usage": null,
+      "status": "success",
+      "billing_basis": "OFFLINE SYNTHETIC PRICE; not evidence of actual billing",
+      "usage_status": "unknown_reserved"
+    }
+  ]
+}

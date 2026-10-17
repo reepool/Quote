@@ -1,0 +1,174 @@
+{
+  "schema_version": "b1_resource_projection.v1",
+  "classification": "unsent_plan_not_complete_rehearsal",
+  "real_calls": 0,
+  "simulated_additional_sends": 0,
+  "scheme": "iteration2_unchanged",
+  "actual_charged_units": 112562,
+  "unsent_requests": [
+    {
+      "classification": "UNSENT_projection_same_iteration2_no_admission_or_transport",
+      "purpose": "synthesize_views",
+      "full_context_pages": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        103,
+        104,
+        105,
+        106,
+        107
+      ],
+      "context_text_utf8_bytes": 37887,
+      "wire_schema_utf8_bytes": 2123,
+      "synthetic_response_utf8_bytes": 6673,
+      "max_output_tokens": 2500,
+      "physical_source_bounds": [
+        {
+          "profile": "semantic_extraction__scorpio_gemini",
+          "provider_resource": "scorpio:gemini",
+          "model": "gemini-3.8-flash-high",
+          "reserved_input_units": 62851,
+          "max_output_tokens": 2500,
+          "total_reserved_units": 65351
+        },
+        {
+          "profile": "semantic_extraction__zai",
+          "provider_resource": "zai",
+          "model": "glm-5.3-flash",
+          "reserved_input_units": 62843,
+          "max_output_tokens": 2500,
+          "total_reserved_units": 65343
+        },
+        {
+          "profile": "semantic_extraction__scorpio_grok",
+          "provider_resource": "scorpio:grok",
+          "model": "grok-4.7",
+          "reserved_input_units": 62838,
+          "max_output_tokens": 2500,
+          "total_reserved_units": 65338
+        },
+        {
+          "profile": "semantic_extraction__scorpio_luna",
+          "provider_resource": "scorpio:luna",
+          "model": "gpt-5.6-luna",
+          "reserved_input_units": 62842,
+          "max_output_tokens": 2500,
+          "total_reserved_units": 65342
+        },
+        {
+          "profile": "semantic_extraction__scorpio_deepseek",
+          "provider_resource": "scorpio:deepseek",
+          "model": "DeepSeek-V4.1-Flash",
+          "reserved_input_units": 62849,
+          "max_output_tokens": 2500,
+          "total_reserved_units": 65349
+        },
+        {
+          "profile": "semantic_extraction__deepseek",
+          "provider_resource": "deepseek",
+          "model": "deepseek-flash",
+          "reserved_input_units": 62844,
+          "max_output_tokens": 2500,
+          "total_reserved_units": 65344
+        }
+      ]
+    },
+    {
+      "classification": "UNSENT_projection_same_iteration2_no_admission_or_transport",
+      "purpose": "verify_views",
+      "full_context_pages": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        103,
+        104,
+        105,
+        106,
+        107
+      ],
+      "context_text_utf8_bytes": 37887,
+      "wire_schema_utf8_bytes": 1063,
+      "synthetic_response_utf8_bytes": 6647,
+      "max_output_tokens": 2000,
+      "physical_source_bounds": [
+        {
+          "profile": "semantic_extraction__scorpio_gemini",
+          "provider_resource": "scorpio:gemini",
+          "model": "gemini-3.8-flash-high",
+          "reserved_input_units": 68279,
+          "max_output_tokens": 2000,
+          "total_reserved_units": 70279
+        },
+        {
+          "profile": "semantic_extraction__zai",
+          "provider_resource": "zai",
+          "model": "glm-5.3-flash",
+          "reserved_input_units": 68271,
+          "max_output_tokens": 2000,
+          "total_reserved_units": 70271
+        },
+        {
+          "profile": "semantic_extraction__scorpio_grok",
+          "provider_resource": "scorpio:grok",
+          "model": "grok-4.7",
+          "reserved_input_units": 68266,
+          "max_output_tokens": 2000,
+          "total_reserved_units": 70266
+        },
+        {
+          "profile": "semantic_extraction__scorpio_luna",
+          "provider_resource": "scorpio:luna",
+          "model": "gpt-5.6-luna",
+          "reserved_input_units": 68270,
+          "max_output_tokens": 2000,
+          "total_reserved_units": 70270
+        },
+        {
+          "profile": "semantic_extraction__scorpio_deepseek",
+          "provider_resource": "scorpio:deepseek",
+          "model": "DeepSeek-V4.1-Flash",
+          "reserved_input_units": 68277,
+          "max_output_tokens": 2000,
+          "total_reserved_units": 70277
+        },
+        {
+          "profile": "semantic_extraction__deepseek",
+          "provider_resource": "deepseek",
+          "model": "deepseek-flash",
+          "reserved_input_units": 68272,
+          "max_output_tokens": 2000,
+          "total_reserved_units": 70272
+        }
+      ]
+    }
+  ],
+  "normal_four_request_upper_units": 248192,
+  "normal_gap_units": 128192,
+  "one_retry_additional_upper_units": 76509,
+  "normal_plus_one_retry_upper_units": 324701,
+  "normal_requests": 4,
+  "with_one_retry_requests": 5,
+  "wall_deadline_seconds": 900,
+  "context_and_currency_cost": "unknown_until_verified_source资料",
+  "supplement": "At most one additional source discovery round, bounded by remaining shared ledger; no capacity is proved for it",
+  "semantics": "All 14 conditions and 7 claims are synthetic unclear; 27 checks are protocol shapes, not business judgments"
+}

@@ -19,7 +19,9 @@ from utils.llm.errors import LlmError
 from .contracts import (
     ChecklistItem,
     ReportSemanticRequest,
+    ReportSemanticRequestV3,
     ReportSemanticResponse,
+    ReportSemanticResponseV3,
     ReportSourceCondition,
     ReportViewCheck,
     ReportViewClaim,
@@ -40,6 +42,7 @@ from .models import (
 
 REPORT_POLICY = "company_profile_llm_led.v2"
 REPORT_PROMPT = "company_profile_report_reading.2026-10-16.v1"
+COMPACT_REPORT_PROMPT = "company_profile_report_reading.2026-10-17.v2"
 DIMENSIONS = (
     "principal_business",
     "products_services",
@@ -106,6 +109,49 @@ def offline_processing_identity() -> dict[str, Any]:
     }
 
 
+def compact_processing_identity(*, discovery_scope: str) -> dict[str, Any]:
+    if discovery_scope not in {"full_text", "page_map"}:
+        raise ValueError("unknown compact discovery scope")
+    return {
+        **offline_processing_identity(),
+        "prompt_version": COMPACT_REPORT_PROMPT,
+        "preprocessing_version": "uniform_page_map.v1"
+        if discovery_scope == "page_map"
+        else "full_page_chunks.v1",
+        "wire_protocol": "company_profile_report_request.v3",
+        "discovery_scope": discovery_scope,
+    }
+
+
+def page_map(sources: Sequence[Mapping[str, Any]]) -> tuple[dict[str, Any], ...]:
+    """Index every page uniformly; samples are explicitly partial, never evidence.
+
+    No company, chapter name, keyword or frozen acceptance answer affects which
+    page is visible. Original offsets and text lengths expose what was omitted.
+    """
+    result = []
+    for source in sources:
+        text = source["text"]
+        offsets = tuple(
+            dict.fromkeys((0, max(0, len(text) // 2 - 8), max(0, len(text) - 16)))
+        )
+        spans = [
+            (offset, text[offset : offset + (48 if offset == 0 else 16)])
+            for offset in offsets
+        ]
+        result.append(
+            {
+                "page": source["page"],
+                "readable": source["readable"],
+                "source_characters": len(text),
+                "scope": "structure_preview_only",
+                "sample_offsets": [offset for offset, _ in spans],
+                "text": "\n…\n".join(value for _, value in spans),
+            }
+        )
+    return tuple(result)
+
+
 def _pages(pages: Sequence[Mapping[str, Any]]) -> tuple[dict[str, Any], ...]:
     result = []
     seen = set()
@@ -164,12 +210,21 @@ def interpret_report(
     """
     start = time.monotonic() if started_at is None else started_at
     identity = dict(processing_identity)
+    compact = identity.get("wire_protocol") == "company_profile_report_request.v3"
+    structural = compact and identity.get("discovery_scope") == "page_map"
+    map_checked = False
     mode = identity.get("execution_mode", "offline_fake")
     if mode not in {"offline_fake", "provider"}:
         raise ValueError("unknown report execution mode")
     sources = _pages(pages)
     coverage = [
-        {"page": page["page"], "status": "not_read", "chunks": []} for page in sources
+        {
+            "page": page["page"],
+            "status": "not_read",
+            "chunks": [],
+            **({"structure_indexed": True, "map_checked": False} if structural else {}),
+        }
+        for page in sources
     ]
     gaps: list[str] = []
     conditions: list[ReportSourceCondition] = []
@@ -205,7 +260,7 @@ def interpret_report(
             return record.action in scope.allowed_actions
         return True
 
-    def invoke(purpose, source_pages, **payload):
+    def invoke(purpose, source_pages, *, source_scope="full_context", **payload):
         nonlocal tokens
         remaining = (
             execution_budget.remaining()
@@ -214,14 +269,26 @@ def interpret_report(
         )
         if remaining <= 0 or len(receipts) >= 16:
             raise ValueError("report_deadline_or_request_budget_exhausted")
-        request = ReportSemanticRequest(
+        request_type = ReportSemanticRequestV3 if compact else ReportSemanticRequest
+        request = request_type(
             request_id=f"{work_id}:report:{len(receipts) + 1}",
             purpose=purpose,
             report=report,
             processing_identity=identity,
             source_pages=tuple(source_pages),
-            max_output_tokens=4000,
+            max_output_tokens=(
+                (
+                    1000
+                    if source_scope == "page_map"
+                    else 2500
+                    if purpose != "verify_views"
+                    else 2000
+                )
+                if compact
+                else 4000
+            ),
             timeout_seconds=float(remaining),
+            **({"source_scope": source_scope} if compact else {}),
             **payload,
         )
         # UTF-8 bytes are a conservative preflight allowance for unknown usage.
@@ -242,6 +309,7 @@ def interpret_report(
             "prompt_version": identity.get("prompt_version"),
             "execution_mode": mode,
             "source_pages": [page["page"] for page in source_pages],
+            "source_scope": source_scope,
         }
         receipts.append(receipt)
         try:
@@ -249,9 +317,9 @@ def interpret_report(
             response = (
                 response
                 if isinstance(response, ReportSemanticResponse)
-                else ReportSemanticResponse.model_validate_json(
-                    json.dumps(response, ensure_ascii=False)
-                )
+                else (
+                    ReportSemanticResponseV3 if compact else ReportSemanticResponse
+                ).model_validate_json(json.dumps(response, ensure_ascii=False))
             )
             if response.request_id != request.request_id or response.purpose != purpose:
                 raise ValueError("report_response_identity_mismatch")
@@ -294,18 +362,48 @@ def interpret_report(
             raise ValueError("a0_real_execution_binding_required")
         if mode == "offline_fake" and not getattr(provider, "offline_only", False):
             raise ValueError("offline_identity_requires_fake_provider")
-        if identity.get("prompt_version") != REPORT_PROMPT:
+        if identity.get("prompt_version") != (
+            COMPACT_REPORT_PROMPT if compact else REPORT_PROMPT
+        ):
             raise ValueError("unregistered_report_prompt_version")
         by_page = {item["page"]: item for item in coverage}
         if {p["page"] for p in sources} != set(
             range(1, max((p["page"] for p in sources), default=0) + 1)
         ):
             gaps.append("physical_pages_missing")
+        discovery_sources = sources
+        if structural:
+            response = invoke(
+                "source_inventory", page_map(sources), source_scope="page_map"
+            )
+            if response.source_conditions:
+                raise ValueError("page_map_cannot_establish_source_conditions")
+            requested = set(response.requested_pages)
+            available = {p["page"] for p in sources if p["readable"]}
+            if not requested or not requested <= available:
+                raise ValueError("page_map_requires_valid_full_context_selection")
+            map_checked = True
+            for page_state in coverage:
+                page_state.update(
+                    structure_indexed=True, map_checked=True, status="partially_checked"
+                )
+            # Reliable facts need their real context even if the model doesn't
+            # request the page. This does not inject candidate answers into map.
+            requested |= {
+                page
+                for e in structured_evidence.values()
+                for page in (e.page, *e.continuation_pages, *e.subject_evidence_pages)
+            }
+            discovery_sources = tuple(
+                p
+                for p in sources
+                if p["readable"] and any(abs(p["page"] - n) <= 1 for n in requested)
+            )
         chunks: list[list[dict[str, Any]]] = []
         current: list[dict[str, Any]] = []
         current_size = 0
         chunk_size, overlap = 24_000, 1_000
-        for page in sources:
+        for page in discovery_sources:
             if not page["readable"]:
                 by_page[page["page"]]["status"] = "extraction_failed"
                 gaps.append(f"page_unreadable:{page['page']}")
@@ -331,8 +429,11 @@ def interpret_report(
             )
             for page in sources
         }
+        supplements = 0
+        read_pages = set()
         for chunk in chunks:
             response = invoke("source_inventory", tuple(chunk))
+            read_pages.update(p["page"] for p in chunk)
             for condition in response.source_conditions:
                 if not all(
                     _evidence_valid(e, report, chunk) for e in condition.evidence
@@ -356,6 +457,22 @@ def interpret_report(
                 )
                 if len(page_state["chunks"]) == expected_chunks[fragment["page"]]:
                     page_state["status"] = "read"
+            if compact and response.requested_pages:
+                pending = (
+                    set(response.requested_pages)
+                    - read_pages
+                    - {p["page"] for later in chunks for p in later}
+                )
+                if not pending <= {p["page"] for p in sources if p["readable"]}:
+                    raise ValueError("requested_source_page_unavailable")
+                if pending:
+                    if supplements >= 1:
+                        raise ValueError("source_supplement_limit_reached")
+                    supplements += 1
+                    extra = [p for p in sources if p["page"] in pending]
+                    chunks.append([{**p, "offset": 0} for p in extra])
+                    for p in extra:
+                        expected_chunks[p["page"]] += 1
         # Synthesis receives full cited pages, including surrounding headers and
         # adjacent continuation pages. Discovery has already accounted for all pages.
         cited_evidence = (
@@ -550,7 +667,14 @@ def interpret_report(
     all_pages_read = (
         bool(coverage)
         and "physical_pages_missing" not in gaps
-        and all(page["status"] == "read" for page in coverage)
+        and (
+            all(page["status"] == "read" for page in coverage)
+            if not structural
+            else map_checked
+            and bool(conditions)
+            and not any("semantic_incomplete:" in gap for gap in gaps)
+            and all(p["readable"] for p in sources)
+        )
     )
     verdicts = {(item.target_type, item.target_id): item.status for item in checks}
     for dimension in DIMENSIONS:

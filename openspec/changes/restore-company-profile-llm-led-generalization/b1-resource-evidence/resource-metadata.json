@@ -1,0 +1,41 @@
+{
+  "schema_version": "b1_resource_metadata.v1",
+  "real_calls": 0,
+  "pool_preference": "Existing semantic_extraction -> shared_semantic routing and configured failover; not permanently pinned to scorpio-deepseek",
+  "public_read_only_lookup": {
+    "url": "https://scorpio.reepool.com/api/v1/model-plaza",
+    "date": "2026-10-17",
+    "http_status": 404,
+    "result": {
+      "code": 404,
+      "message": "Model plaza is not enabled"
+    },
+    "credentials_sent": false,
+    "inference_calls": 0
+  },
+  "verified_source_prices": false,
+  "missing_for_each_reachable_source": [
+    "channel input/output price or subscription marginal cost and billing source/date",
+    "currency/exchange basis",
+    "actual deployed context and output limits",
+    "matching tokenizer or documented usage/metering basis",
+    "actual quota"
+  ],
+  "configured_rate_limits_are_not_provider_quotas": true,
+  "real_authorization": null,
+  "production_authorization": "not_authorized",
+  "scale_claim": false,
+  "baseline_protected_sha256": {
+    "docs/development/common_llm_gateway_architecture.md": "7f2ad8851c0bc2e8953afc7f5451911ebedecd220f159d68263470ef468609de",
+    "docs/development/common_llm_gateway_usage.md": "e8a931f1c3a515d9e66769e955d980ae90031032b6c741a26bbe123e267c5cca",
+    "docs/development/company_profile_acceptance_program.md": "6a62a97f575d2f9442e44950912874dc837c533ff4835cb1688bfe6e45dd5e7b",
+    "docs/development/pdf_engine_evaluation_local_corpus_20260825.json": "0ee90791f0e3eb1bca59e458a25ee19b7b4e05007127047ede21794f4aa6320e",
+    "openspec/changes/prepare-company-profile-s1-s2-bounded-acceptance/design.md": "7f53cc968168b01a7b6b15e40b79700ee7daac6bb6152a55fe2d6b16c7ac8c59",
+    "openspec/changes/prepare-company-profile-s1-s2-bounded-acceptance/proposal.md": "5f9799435b40d27c2c4f1a86cf350ba63c2924f0fd0dac7704989f677e5a37de",
+    "openspec/changes/prepare-company-profile-s1-s2-bounded-acceptance/tasks.md": "ba5c3fdd96c19f52e9ea838f16476a3991b6d5dd7b75718cd1029e3db0d1a766",
+    "research/company_profile/core_evidence_selection.py": "ec85df0ec7f0c89e13f6dd1bbeecd4b4838f3af587819a8c4014c95fe60f5f1d",
+    "research/company_profile/core_skeleton.py": "288c1e58ee1f4d94096a19bc5e27df516c49bc7a2caa6b3329414dd1756027bc",
+    "tests/unit/test_research/test_company_profile_core_skeleton.py": "f33f5c1b7a21f83e290198f91933afc23ea7bac3d995d81161405e7f58d80182",
+    "tests/unit/test_research/test_company_profile_owned_page_facts.py": "835d3affe911ad88b52b623c1c1fde10c330941a8459765b3368a1631ada8f6a"
+  }
+}

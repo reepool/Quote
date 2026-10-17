@@ -483,12 +483,49 @@ class ReportSemanticResponse(_StrictModel):
         return self
 
 
+class ReportSemanticRequestV3(ReportSemanticRequest):
+    """Explicit opt-in for compact wire references and structural discovery."""
+
+    schema_version: Literal["company_profile_report_request.v3"] = (
+        "company_profile_report_request.v3"
+    )
+    source_scope: Literal["page_map", "full_context"] = "full_context"
+
+
+class ReportSemanticResponseV3(ReportSemanticResponse):
+    schema_version: Literal["company_profile_report_response.v3"] = (
+        "company_profile_report_response.v3"
+    )
+    # Only source discovery may request additional physical pages. A page-map
+    # response is a reading plan, never a source-backed condition or answer.
+    requested_pages: tuple[int, ...] = ()
+
+    @model_validator(mode="after")
+    def _reading_scope(self) -> ReportSemanticResponseV3:
+        if self.requested_pages and self.purpose != "source_inventory":
+            raise ValueError("only discovery may request pages")
+        if any(page < 1 for page in self.requested_pages):
+            raise ValueError("requested physical pages must be positive")
+        if len(set(self.requested_pages)) != len(self.requested_pages):
+            raise ValueError("requested pages must be unique")
+        return self
+
+
 def report_contract_schema_manifest() -> dict[str, Any]:
     """Expose the registered v2 purposes without changing the frozen v1 manifest."""
     return {
         "schema_version": "company_profile_report_contract.v2",
         "request": ReportSemanticRequest.model_json_schema(),
         "response": ReportSemanticResponse.model_json_schema(),
+    }
+
+
+def compact_report_contract_schema_manifest() -> dict[str, Any]:
+    return {
+        "schema_version": "company_profile_report_contract.v3",
+        "request": ReportSemanticRequestV3.model_json_schema(),
+        "response": ReportSemanticResponseV3.model_json_schema(),
+        "wire": "report_wire.response_schema:purpose-specific compact Evidence references",
     }
 
 

@@ -1,0 +1,36 @@
+{
+  "physical_requests": 1,
+  "charged_tokens": 65557,
+  "charged_cost_cny": "0.068057",
+  "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+  "stopped_reason": "physical_request_token_context_or_cost_budget_exhausted",
+  "denied_request": {
+    "request_id": "64314a5a09bd455f9a23f3d33fc0d7a3",
+    "reserved_input_tokens": 68224,
+    "reserved_output_tokens": 2500,
+    "required_tokens": 70724,
+    "remaining_tokens": 54443,
+    "required_cost_cny": "0.073224",
+    "remaining_cost_cny": "9.931943",
+    "context_tokens": 120000,
+    "remaining_requests": 15
+  },
+  "attempts": [
+    {
+      "sequence": 1,
+      "request_id": "87a3a6007d4c4885bd45d65e7f782b5f",
+      "attempt": 1,
+      "profile": "semantic_extraction__scorpio_gemini",
+      "provider_resource": "scorpio:gemini",
+      "model": "gemini-3.8-flash-high",
+      "reserved_input_tokens": 63057,
+      "reserved_output_tokens": 2500,
+      "charged_tokens": 65557,
+      "charged_cost_cny": "0.068057",
+      "usage": null,
+      "status": "success",
+      "billing_basis": "OFFLINE SYNTHETIC PRICE; not evidence of actual billing",
+      "usage_status": "unknown_reserved"
+    }
+  ]
+}

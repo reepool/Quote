@@ -162,7 +162,9 @@ def test_routed_failover_uses_same_run_ledger_and_rejects_unpriced_source():
     from tests.unit.test_utils.test_llm_routed_client import _config as routed_config
     from tests.unit.test_utils.test_llm_routed_client import _request as routed_request
 
-    config = routed_config()
+    # This verifies shared charging across sources, not a 0.5s timeout. Keep
+    # positive-path fixture scheduling independent of gateway deadline tests.
+    config = routed_config(timeout_seconds=10, attempt_timeout_seconds=5)
     price = LlmPrice(Decimal(1), Decimal(2), "synthetic", 120_000)
     budget = _budget(
         prices={(p.provider_resource, p.model): price for p in config.profiles.values()}

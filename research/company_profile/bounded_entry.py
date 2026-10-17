@@ -169,6 +169,7 @@ def _worker(
         OfficialAnnualReportPageSource,
     )
     from research.company_profile.report_interpretation import (
+        compact_processing_identity,
         offline_processing_identity,
     )
     from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
@@ -208,18 +209,28 @@ def _worker(
         transport_requests.append(
             {
                 "purpose": request["purpose"],
+                "source_scope": request.get("source_scope", "full_context"),
                 "pages": [p["page"] for p in request["source_pages"]],
                 "payload_utf8_bytes": len(
                     json.dumps(
                         payload, ensure_ascii=False, separators=(",", ":")
                     ).encode()
                 ),
+                "max_output_tokens": payload.get(
+                    "max_tokens", payload.get("max_completion_tokens")
+                ),
             }
         )
         result = {"request_id": request["request_id"], "purpose": request["purpose"]}
+        if binding.get("offline_protocol") == "nonempty_v3":
+            from .resource_probe import protocol_reply
+
+            result = protocol_reply(request)
+        encoded = json.dumps(result, ensure_ascii=False)
+        transport_requests[-1]["response_utf8_bytes"] = len(encoded.encode())
         return {
             "status_code": 200,
-            "data": {"choices": [{"message": {"content": json.dumps(result)}}]},
+            "data": {"choices": [{"message": {"content": encoded}}]},
         }
 
     if real:
@@ -304,6 +315,10 @@ def _worker(
 
     storage = ResearchStorageManager(config)
     identity = offline_processing_identity()
+    if binding.get("discovery_scope"):
+        identity = compact_processing_identity(
+            discovery_scope=binding["discovery_scope"]
+        )
     if real:
         identity.update(
             execution_mode="provider",
