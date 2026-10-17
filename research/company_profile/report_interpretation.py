@@ -15,7 +15,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from utils.llm.budget import (
     DEVELOPMENT_PAYLOAD_BYTE_LIMIT,
-    RECOVERY_ATTEMPT_RESERVE,
+    DEVELOPMENT_RECOVERY_RESERVATION,
     LlmRunBudget,
 )
 from utils.llm.errors import LlmError
@@ -222,13 +222,36 @@ def compact_wire_bytes(
 def fits_development_payload(
     source_pages: Sequence[Mapping[str, Any]], **kwargs
 ) -> bool:
-    max_output_tokens = int(kwargs["max_output_tokens"])
+    """Keep one gateway payload inside the byte cap and one recovery resend.
+
+    The earlier 30000 slot split this report past the 16-request ledger. The
+    recovery ceiling is half of the 120000 ledger, so one unknown failure can
+    be sent again. Callers still record every page and offset.
+    """
     estimated_payload = (
         compact_wire_bytes(source_pages, **kwargs) + DEVELOPMENT_WIRE_MARGIN
     )
+    output = int(kwargs.get("max_output_tokens") or 0)
     return (
         estimated_payload <= DEVELOPMENT_PAYLOAD_BYTE_LIMIT
-        and estimated_payload + 256 + max_output_tokens <= RECOVERY_ATTEMPT_RESERVE
+        and estimated_payload + 256 + output <= DEVELOPMENT_RECOVERY_RESERVATION
+    )
+
+
+def cited_quote_pages(evidence: Sequence[Evidence]) -> tuple[dict[str, Any], ...]:
+    """Pages made only of quotes already read, so synthesis does not resend bodies."""
+    grouped: dict[int, list[str]] = {}
+    for item in evidence:
+        if not isinstance(item.anchor, TextAnchor) or not item.anchor.bounded_quote:
+            continue
+        quote = item.anchor.bounded_quote
+        for page in (item.page, *item.continuation_pages, *item.subject_evidence_pages):
+            bucket = grouped.setdefault(int(page), [])
+            if quote not in bucket:
+                bucket.append(quote)
+    return tuple(
+        {"page": page, "text": "\n".join(quotes), "readable": True}
+        for page, quotes in sorted(grouped.items())
     )
 
 
@@ -317,7 +340,7 @@ def structural_discovery_chunks(
             return False
         return True if payload_fits is None else payload_fits(batch)
 
-    return pack_fitting_batches(queued, fits, scope_break=True)
+    return pack_fitting_batches(queued, fits, scope_break=False)
 
 
 def _pages(pages: Sequence[Mapping[str, Any]]) -> tuple[dict[str, Any], ...]:
@@ -440,7 +463,6 @@ def interpret_report(
         )
         if remaining <= 0 or len(receipts) >= 16:
             raise ValueError("report_deadline_or_request_budget_exhausted")
-            raise ValueError("report_deadline_or_request_budget_exhausted")
         request_type = ReportSemanticRequestV3 if compact else ReportSemanticRequest
         request = request_type(
             request_id=f"{work_id}:report:{len(receipts) + 1}",
@@ -463,6 +485,23 @@ def interpret_report(
             **({"source_scope": source_scope} if compact else {}),
             **payload,
         )
+        if compact and purpose != "source_inventory":
+            from .report_wire import compact_request
+
+            followup_wire = len(
+                json.dumps(
+                    compact_request(request),
+                    ensure_ascii=False,
+                    separators=(",", ":"),
+                ).encode()
+            )
+            estimated_followup = followup_wire + DEVELOPMENT_WIRE_MARGIN
+            if (
+                estimated_followup > DEVELOPMENT_PAYLOAD_BYTE_LIMIT
+                or estimated_followup + 256 + request.max_output_tokens
+                > DEVELOPMENT_RECOVERY_RESERVATION
+            ):
+                raise ValueError("followup_payload_exceeds_recovery_room")
         # UTF-8 bytes are a conservative preflight allowance for unknown usage.
         reserve = (
             len(request.model_dump_json().encode("utf-8")) + request.max_output_tokens
@@ -565,13 +604,20 @@ def interpret_report(
                 if response.source_conditions:
                     raise ValueError("page_map_cannot_establish_source_conditions")
                 requested.update(response.requested_pages)
+                # A later batch can fail. Keep this batch's preview and selection
+                # without treating the sample as a full-text read.
+                for page in batch:
+                    by_page[page["page"]].update(
+                        structure_indexed=True,
+                        map_checked=True,
+                        map_selected=page["page"] in response.requested_pages,
+                        status="partially_checked",
+                    )
+            map_checked = all(
+                by_page[page["page"]].get("map_checked") for page in sources
+            )
             if not requested or not requested <= available:
                 raise ValueError("page_map_requires_valid_full_context_selection")
-            map_checked = True
-            for page_state in coverage:
-                page_state.update(
-                    structure_indexed=True, map_checked=True, status="partially_checked"
-                )
             # Reliable facts need their real context even if the model doesn't
             # request the page. This does not inject candidate answers into map.
             requested |= {
@@ -719,9 +765,14 @@ def interpret_report(
         )
         if not selected:
             raise ValueError("no_substantive_source_conditions")
+        quote_pages = cited_quote_pages(cited_evidence)
+        if not quote_pages:
+            raise ValueError("no_substantive_source_conditions")
+        # Discovery already sent every body span. Follow-up requests carry the
+        # quotes and conditions, not the same pages again.
         response = invoke(
             "synthesize_views",
-            selected,
+            quote_pages,
             source_conditions=tuple(conditions),
             records=tuple(structured.values()),
             active_checklist=tuple(active_checklist),
@@ -799,7 +850,7 @@ def interpret_report(
         # draft. Rejected variants remain in dispositions, outside the fact set.
         response = invoke(
             "verify_views",
-            selected,
+            quote_pages,
             source_conditions=tuple(conditions),
             claims=claims,
             records=records,

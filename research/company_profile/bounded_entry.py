@@ -27,6 +27,24 @@ def write_json(path: Path, value: Any) -> None:
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def finish_worker(run_root: Path, worker) -> dict:
+    """Persist the entry receipt even when the worker raises, then re-raise."""
+    try:
+        result = worker()
+    except Exception as exc:
+        write_json(
+            run_root / "entry-result.json",
+            {
+                "status": "failed",
+                "error_type": type(exc).__name__,
+                "error": str(exc)[:500],
+            },
+        )
+        raise
+    write_json(run_root / "entry-result.json", result)
+    return result
+
+
 def supervise(command: list[str], *, deadline: float, log_path: Path) -> int:
     """Bound synchronous parsing/DB work and kill owned workers on entry timeout."""
     remaining = deadline - time.monotonic()
@@ -65,7 +83,7 @@ def validate_binding(
             authorization.get("status") != "authorized"
             or authorization.get("binding_sha256") != binding_hash
             or authorization.get("document_version") != asset["content_hash"]
-            or authorization.get("attempt") not in {"first", "successor"}
+            or authorization.get("attempt") not in {"first", "successor", "special"}
             or not authorization.get("approval_reference")
         ):
             raise ValueError(
@@ -453,9 +471,9 @@ def main() -> int:
         binding_hash=digest(args.binding),
     )
     if args.worker_deadline is not None:
-        write_json(
-            run_root / "entry-result.json",
-            _worker(
+        finish_worker(
+            run_root,
+            lambda: _worker(
                 binding,
                 run_root=run_root,
                 deadline=args.worker_deadline,
@@ -476,6 +494,13 @@ def main() -> int:
             and not (attempts / "first.json").is_file()
         ):
             raise ValueError("successor requires the protected first attempt")
+        if authorization["attempt"] == "special" and not (
+            (attempts / "first.json").is_file()
+            and (attempts / "successor.json").is_file()
+        ):
+            raise ValueError(
+                "special attempt requires the protected first and successor markers"
+            )
         with (attempts / f"{authorization['attempt']}.json").open("x") as marker:
             json.dump(
                 {

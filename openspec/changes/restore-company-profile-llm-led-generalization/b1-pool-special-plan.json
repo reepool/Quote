@@ -1,0 +1,23 @@
+{
+  "method": "208-page checkpoint pages packed by fits_development_payload; synthesis and verification send cited quotes rather than full page bodies",
+  "payload_byte_limit": 65536,
+  "recovery_reservation": 60000,
+  "main_path_request_limit": 15,
+  "physical_request_limit": 16,
+  "map_batches": 2,
+  "body_discovery": {
+    "unsampled_only": 10,
+    "successor_requested_pages_and_neighbors": 10,
+    "all_pages_selected": 10
+  },
+  "synthesis_and_verify": 2,
+  "totals_without_recovery": {
+    "unsampled_only": 14,
+    "successor_requested_pages_and_neighbors": 14,
+    "all_pages_selected": 14
+  },
+  "recovery_slot_remaining": 1,
+  "config_sha256": "270f9a3b06555dc1802a3f13a6c5372274bb0abd00e0345f983df8c38cf3c9ae",
+  "route_fingerprint": "fb5b895c00cdbdd7c158d35d3707988d5813d62f7d5df7319112151afb1e9141",
+  "config_note": "Current config/13_llm.json hash and route fingerprint match the successor freeze. No model probe was sent."
+}

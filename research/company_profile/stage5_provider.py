@@ -4872,12 +4872,22 @@ def _run_complete(
     request: LlmRequest,
     runner: asyncio.Runner | None,
 ) -> LlmResponse:
+    async def call_and_release() -> LlmResponse:
+        try:
+            return await client.complete(request)
+        finally:
+            release = getattr(
+                getattr(client, "transport", None), "release_client", None
+            )
+            if release is not None:
+                await release()
+
     try:
         asyncio.get_running_loop()
     except RuntimeError:
         if runner is not None:
             return runner.run(client.complete(request))
-        return asyncio.run(client.complete(request))
+        return asyncio.run(call_and_release())
     raise SemanticProviderError(
         ContractErrorCode.PROVIDER_UNAVAILABLE,
         "synchronous stage-five provider cannot run inside an active event loop",

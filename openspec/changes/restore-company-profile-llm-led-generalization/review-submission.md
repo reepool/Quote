@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-17，[§21](#21-a审核唯一后继失败与专项闭环裁决2026-10-17)）：A接受原后继真实失败记录，首次1/1及原后继1/1均用尽，B1/A1未通过。两次地图有效响应不能代替三视图。用户确认404配置已修正；A另发现全链37/46请求超过16及生命周期/部分覆盖缺口。按执行卡§13先修复并验证，条件授权一次第三次完整专项0/1、仅取原累计余量；尚未启动，无自动第四次、不扩批或生产。§1—20正文及原成绩保留。
+当前状态（2026-10-17，[§22](#22-b1-c专项受阻交接2026-10-17)）：B1-C请求计划静态核验为14次并留1次恢复，生命周期和部分地图覆盖已修；专项1/1已执行，363.3秒、3次物理请求、账本81584、费用unknown，三视图仍为extraction_failed。B1/A1未通过。首次、原后继和专项均已用尽，无自动第四次。观察1/4、可用0/4，S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产未授权。§1—21正文不改写。
 
 ## 1. 唯一实施指引
 
@@ -675,3 +675,68 @@ A签发[B1-C执行卡§13](b1-execution-card.md#13-b1-c修正全链请求计划�
 A独立命令（先source scripts/quote_dev_env.sh）：`/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_report_wire.py -k 'gehu_batches_keep_failover_synthesis_and_verify_after_one_unknown_failure or compact_plan_preserves_source_first_omission_checks_and_partial_coverage'`，**3 passed、11 deselected、7 warnings**。复用B同快照68 passed/1 deselected的其余直接回执，不声明全套测试通过；测试通过的范围限制如上。A仅做只读源/回执/代码核验和静态计数，没有真实模型调用或第三次入口。
 
 本轮只更新本卡、待办、交付路径、验收活动台账、design当前指引及本审核节。当前change的OpenSpec严格校验、98个本地文件链接及git diff --check通过；Review未发现本轮文档新增阻塞，真实业务缺口仍留B实施。原§1—20正文及88份未修改的change文件hash不变，config未改；11份既有修改和原未跟踪内容保留，验收计划历史区块hash不变，提交只隔离本人活动差异。必要证据不再复制，临时产物统一QuoteBak；本次测试日志由fixture清理，残留的本人空日志目录核无文件后rmdir删除约4KB，可重建，可复用缓存保留。首次/后继清理核现存状态和持久hash，删除前逐副本比对属B记录。当前QuoteBak约68M，不因目录大小盲删。A活跃审核时间未精确计量，记unknown。
+
+## 22. B1-C专项受阻交接（2026-10-17）
+
+### 22.1 结果
+
+局部修复完成，专项正式闭环已执行并受阻。B1/A1业务未通过。三视图均为`extraction_failed`，`draft_complete`、`semantic_complete`、`real_semantic_complete`均为false。19项核心和6项负例没有可审交付，记未评估，不用零输出记零错误或负例通过。观察仍1/4，可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产`not_authorized`，规模声明false。
+
+首次1/1、原后继1/1、专项1/1均已用尽。专项失败后按卡停止，没有第四次入口。待A重新裁决路线和资源。
+
+### 22.2 业务与覆盖
+
+同一家600037.SH、同一208页源，PDF SHA-256 `b5b6be18424b7c3d7d7988f755ff7083141831904d4347c07cba1da8452c8b76`。专项`source-receipt.json`与首次回执同为`f304554e`、17175字节。
+
+查询与导出profiles一致。`delivered=1`只表示写库，不是可用三视图。条件、主张和记录均为0。缺口209条：1条`semantic_incomplete:physical_request_token_context_or_cost_budget_exhausted`，以及208条`unsampled_body_not_discovered`。正文发现没有完成。
+
+三个视图的`checked_pages`各208页：全部`partially_checked`且`map_checked`，`map_selected` 53页，没有一页`read`。两批地图成功后的预览和选页留在覆盖里；失败的正文请求没有把预览升为已读。
+
+### 22.3 差异
+
+基线`9865f79c`。请求计划不再使用30000四槽预留切批。单次载荷仍≤65536字节；另要求一次预留不超过120000账本的一半（60000），以便一次未知失败还能重发同等载荷。地图与正文发现可以放在各自保留scope的同一请求里。合成和核验只带已经读过的引用摘录和条件，不把同一正文再发一遍。
+
+HTTP客户端在创建它的事件循环里释放，入口`close`不再触发`Event loop is closed`。失败也会写入`entry-result.json`后再抛出。地图按成功批次写入`map_checked`/`map_selected`，不等全部批次结束。
+
+当前`config/13_llm.json` SHA-256仍是`270f9a3b06555dc1802a3f13a6c5372274bb0abd00e0345f983df8c38cf3c9ae`，路由指纹仍是`fb5b895c00cdbdd7c158d35d3707988d5813d62f7d5df7319112151afb1e9141`，与后继冻结相同。本次没有探测模型，也没有改生产池或`max_retries`。专项绑定只在内存里把同源重试设为0。旧首次/后继绑定和attempt标记未改。
+
+### 22.4 静态计划与直接验证
+
+208页checkpoint上，现打包为2次地图＋10次正文发现＋2次合成/核验＝14，三种选页都一样：未选页仍发现预览外正文、后继前两次35个选页及相邻页、全部页面选中。余1次恢复。直接测试断言每种合计≤15，且每个发现片段覆盖对应正文偏移。
+
+命令（先`source scripts/quote_dev_env.sh`）：
+
+`/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_report_wire.py tests/unit/test_research/test_company_profile_llm_led.py tests/unit/test_research/test_company_profile_bounded_entry.py tests/unit/test_utils/test_llm_physical_budget.py tests/unit/test_utils/test_llm_gateway.py::test_owned_http_client_is_closed_on_the_loop_that_created_it`
+
+结果：**70 passed、7 warnings**。没有跑全库。最大真实正文载荷经`LlmClient`和`ScriptedTransport`：第一次可重试失败，第二次另一`provider_resource`物理发送同一载荷，共享开发预算，两次usage均unknown并保留预留，费用unknown。这是模拟传输，不是专项里的真实换源成功。
+
+### 22.5 专项资源
+
+入口在无沙箱进程启动。当时`http_proxy`/`https_proxy`均为空，没有改全局代理或TLS。监督退出码0，耗时363.318675秒。`entry-result.json`已写，日志没有`Event loop is closed`。
+
+| 次序 | 来源 | 结果 | 账本 |
+| --- | --- | --- | --- |
+| 1 | scorpio:gemini `gemini-3.8-flash-high` | HTTP 200，地图142页 | 有效usage 17240＋725＝17965 |
+| 2 | zai `glm-5.3-flash` | HTTP 200，地图66页；请求输出1000，供应商输出5062，日志`output_budget_exceeded` | 有效usage 6489＋5062＝11551，不把5062改成1000 |
+| 3 | scorpio:grok `grok-4.7` | 流已打开且HTTP 200，随后客户端尝试超时182712毫秒，无usage | 未知预留52068保留 |
+| 未发送 | scorpio:luna | 路由选了换源，预留52072超过剩余38416，发送前拒绝 | 不计入物理请求 |
+
+物理请求3次，不是4次。换源被选中但没有第二次物理发送。总账81584＝29516有效usage＋52068未知预留。费用`unknown`，不能声称≤10元或阶段≤80元。停止原因是token总账，不是16次请求用尽；被拒时还剩13次请求名额。
+
+| 尝试 | 秒 | 物理请求 | 有效usage | 未知预留 | 账本占用 |
+| --- | --- | --- | --- | --- | --- |
+| 首次 | 56.535554 | 1 | 0 | 60963 | 60963 |
+| 原后继 | 100.132023 | 3 | 14050 | 21183 | 35233 |
+| 专项 | 363.318675 | 3 | 29516 | 52068 | 81584 |
+| 累计 | 519.986252 | 7 | 43566 | 134214 | 177780 |
+
+原B1累计上限1800秒、240000 token、32请求。剩余约1280.014秒、25次请求、62220 token账本。专项没有用满120000；未知预留使下一次同等正文载荷放不进剩余账本。这不是模型token不足的证明，也不是费用为0。
+
+### 22.6 证据、清理与下一步
+
+专项证据在[b1-pool-observation-evidence/special](b1-pool-observation-evidence/special/manifest.json)。`entry.log` `3423109c` 31351字节；`query.json` `122f8a38` 220044字节；`export.json` `c38083a8` 220488字节；`budget-final.json` `518e4dde` 2501字节；`supervisor.json` `95ef320a` 60字节；`entry-result.json` `1ed86ef7` 50032字节。日志无`sk-`、`Bearer`或`api_key`。绑定[b1-pool-special-binding.json](b1-pool-special-binding.json) SHA-256 `45ee4272b62d3184c19faf2d2cd0d3363a8c29a661ad096990c45a3e2290d89f`。计划见[b1-pool-special-plan.json](b1-pool-special-plan.json)。
+
+哈希一致后删除专项运行目录里的`research.db`、`pdf-cache`、`output`、`checkpoints`和`export`目录，约2.1MB，可从同一PDF和已保存查询重建。本窗口`pytest-of-python/pytest-4`约4.9MB已删。19:10的`pytest-2`/`pytest-3`、观察证据、attempt标记和其余QuoteBak目录保留。清理后QuoteBak约69M。11份既有修改和未跟踪内容未改。
+
+B活跃开发时间未单独计量，记unknown；上面363秒是专项进程时间，不是开发时间。重复根因：未知usage占满预留后，剩余账本装不下下一次正文载荷。恢复条件是A重新给出可容纳已结算地图用量加一次失败预留再加剩余正文的账本或请求策略。本次不自动重跑。
+

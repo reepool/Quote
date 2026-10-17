@@ -105,6 +105,46 @@ def _response(data, **kwargs):
     return value
 
 
+def test_owned_http_client_is_closed_on_the_loop_that_created_it(monkeypatch):
+    """Repeated asyncio.run calls must not close httpx on a dead loop."""
+    import asyncio
+
+    calls = []
+
+    def handler(request):
+        calls.append(1)
+        if len(calls) == 2:
+            raise httpx.ConnectError("down")
+        return httpx.Response(200, json={"ok": True})
+
+    real_client = httpx.AsyncClient
+
+    def factory(*args, **kwargs):
+        kwargs["transport"] = httpx.MockTransport(handler)
+        return real_client(*args, **kwargs)
+
+    monkeypatch.setattr(httpx, "AsyncClient", factory)
+    transport = HttpxOpenAICompatibleTransport()
+
+    async def once():
+        try:
+            return await transport.send(
+                "https://provider.example/v1/chat/completions",
+                {},
+                {"model": "x"},
+                5,
+            )
+        finally:
+            await transport.release_client()
+
+    asyncio.run(once())
+    with pytest.raises(LlmTransientTransportError):
+        asyncio.run(once())
+    asyncio.run(transport.close())
+    assert len(calls) == 2
+    assert transport._client is None
+
+
 def test_project_dotenv_loader_is_explicit_and_does_not_override_environment(tmp_path, monkeypatch):
     dotenv = tmp_path / ".env"
     dotenv.write_text("TEST_LLM_KEY=from-file\n", encoding="utf-8")

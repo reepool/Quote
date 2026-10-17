@@ -1,0 +1,80 @@
+{
+  "physical_requests": 3,
+  "charged_tokens": 81584,
+  "charged_cost_cny": "unknown",
+  "cost_status": "unknown",
+  "billing_mode": "development_unpriced",
+  "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+  "stopped_reason": "physical_request_token_context_or_cost_budget_exhausted",
+  "denied_request": {
+    "request_id": "1172ed7ff8964669bd57cea4b2322574",
+    "payload_utf8_bytes": 49316,
+    "reserved_input_tokens": 49572,
+    "reserved_output_tokens": 2500,
+    "required_tokens": 52072,
+    "remaining_tokens": 38416,
+    "required_cost_cny": "unknown",
+    "remaining_cost_cny": "unknown",
+    "context_tokens": null,
+    "remaining_requests": 13
+  },
+  "attempts": [
+    {
+      "sequence": 1,
+      "request_id": "99345feebd0a4abaa700d6396b15c44e",
+      "attempt": 1,
+      "profile": "semantic_extraction__scorpio_gemini",
+      "provider_resource": "scorpio:gemini",
+      "model": "gemini-3.8-flash-high",
+      "reserved_input_tokens": 52740,
+      "reserved_output_tokens": 1000,
+      "charged_tokens": 17965,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 17240,
+        "output_tokens": 725,
+        "total_tokens": 17965
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown"
+    },
+    {
+      "sequence": 2,
+      "request_id": "26a85a3e84ec428e9908498e5cf578fb",
+      "attempt": 1,
+      "profile": "semantic_extraction__zai",
+      "provider_resource": "zai",
+      "model": "glm-5.3-flash",
+      "reserved_input_tokens": 25383,
+      "reserved_output_tokens": 1000,
+      "charged_tokens": 11551,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 6489,
+        "output_tokens": 5062,
+        "total_tokens": 11551
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown"
+    },
+    {
+      "sequence": 3,
+      "request_id": "28d83738028c4920bbe6ba356aab307b",
+      "attempt": 1,
+      "profile": "semantic_extraction__scorpio_grok",
+      "provider_resource": "scorpio:grok",
+      "model": "grok-4.7",
+      "reserved_input_tokens": 49568,
+      "reserved_output_tokens": 2500,
+      "charged_tokens": 52068,
+      "charged_cost_cny": "unknown",
+      "usage": null,
+      "status": "failed_or_cancelled",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown",
+      "usage_status": "unknown_reserved"
+    }
+  ]
+}

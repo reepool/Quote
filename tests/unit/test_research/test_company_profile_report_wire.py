@@ -196,18 +196,27 @@ def test_gehu_batches_keep_failover_synthesis_and_verify_after_one_unknown_failu
 
     from research.company_profile.models import ReportIdentity
     from research.company_profile.report_interpretation import (
+        cited_quote_pages,
         structural_discovery_chunks,
     )
-    from utils.llm.budget import DEVELOPMENT_UNPRICED_BILLING, LlmRunBudget
+    from tests.unit.test_utils.test_llm_routed_client import _config as routed_config
+    from utils.llm.budget import (
+        DEVELOPMENT_RECOVERY_RESERVATION,
+        DEVELOPMENT_UNPRICED_BILLING,
+        LlmRunBudget,
+    )
     from utils.llm.client import LlmClient
+    from utils.llm.errors import LlmTransientTransportError
+    from utils.llm.models import LlmMessage, LlmRequest
+    from utils.llm.testing import ScriptedTransport
 
+    change = (
+        Path(__file__).resolve().parents[3]
+        / "openspec/changes/restore-company-profile-llm-led-generalization"
+    )
     checkpoint = json.loads(
         gzip.decompress(
-            (
-                Path(__file__).resolve().parents[3]
-                / "openspec/changes/restore-company-profile-llm-led-generalization"
-                / "b1-resource-evidence/iteration2/checkpoint.json.gz"
-            ).read_bytes()
+            (change / "b1-resource-evidence/iteration2/checkpoint.json.gz").read_bytes()
         )
     )
     pages = tuple(
@@ -224,36 +233,87 @@ def test_gehu_batches_keep_failover_synthesis_and_verify_after_one_unknown_failu
     )
     identity = compact_processing_identity(discovery_scope="page_map")
     mapped = page_map(pages)
-    map_batches = pack_fitting_batches(
-        mapped,
-        lambda batch: fits_development_payload(
+
+    def fit_map(batch):
+        return fits_development_payload(
             batch,
             purpose="source_inventory",
             source_scope="page_map",
             report=report,
             identity=identity,
             max_output_tokens=1000,
-        ),
-    )
-    assert [page["page"] for batch in map_batches for page in batch] == [
-        page["page"] for page in mapped
-    ]
-    selected = {pages[len(pages) // 2]["page"]}
-    body = structural_discovery_chunks(
-        pages,
-        selected,
-        payload_fits=lambda batch: fits_development_payload(
+        )
+
+    def fit_body(batch):
+        return fits_development_payload(
             batch,
             purpose="source_inventory",
             source_scope="full_context",
             report=report,
             identity=identity,
             max_output_tokens=2500,
-        ),
-    )
-    assert body
+        )
 
-    def gateway_payload(batch, purpose, scope, max_output):
+    map_batches = pack_fitting_batches(mapped, fit_map)
+    assert [page["page"] for batch in map_batches for page in batch] == [
+        page["page"] for page in mapped
+    ]
+    successor = json.loads(
+        (change / "b1-pool-observation-evidence/successor/query.json").read_text()
+    )
+    requested = set()
+    for receipt in successor["profiles"][0]["three_views"]["call_receipts"][:2]:
+        requested.update(
+            (receipt.get("response_payload") or {}).get("requested_pages") or []
+        )
+    neighbors = {
+        page["page"]
+        for page in pages
+        if any(abs(page["page"] - number) <= 1 for number in requested)
+    }
+    plans = {
+        "unsampled_only": structural_discovery_chunks(
+            pages, set(), payload_fits=fit_body
+        ),
+        "requested_neighbors": structural_discovery_chunks(
+            pages, neighbors, payload_fits=fit_body
+        ),
+        "all_pages_selected": structural_discovery_chunks(
+            pages,
+            {page["page"] for page in pages if page["readable"]},
+            payload_fits=fit_body,
+        ),
+    }
+    for name, body in plans.items():
+        assert body, name
+        assert len(map_batches) + len(body) + 2 <= 15, name
+        covered: dict[int, set[int]] = {}
+        for batch in body:
+            for fragment in batch:
+                start = int(fragment["offset"])
+                indexes = covered.setdefault(fragment["page"], set())
+                indexes.update(range(start, start + len(fragment["text"])))
+        for page in pages:
+            if not page["readable"]:
+                continue
+            if name == "all_pages_selected" or (
+                name == "requested_neighbors" and page["page"] in neighbors
+            ):
+                expected = range(len(page["text"]))
+            else:
+                expected = (
+                    index
+                    for start, end in unsampled_ranges(page["text"])
+                    for index in range(start, end)
+                )
+            missing = [
+                index
+                for index in expected
+                if index not in covered.get(page["page"], set())
+            ]
+            assert not missing, (name, page["page"], missing[:5])
+
+    def gateway_payload(batch, purpose, scope, max_output, **extra):
         request = ReportSemanticRequestV3(
             request_id="size",
             purpose=purpose,
@@ -263,6 +323,7 @@ def test_gehu_batches_keep_failover_synthesis_and_verify_after_one_unknown_failu
             source_scope=scope,
             max_output_tokens=max_output,
             timeout_seconds=30,
+            **extra,
         )
         user = json.dumps(
             compact_request(request), ensure_ascii=False, separators=(",", ":")
@@ -283,22 +344,88 @@ def test_gehu_batches_keep_failover_synthesis_and_verify_after_one_unknown_failu
             stream_include_usage=False,
         )
 
-    payloads = [
+    discovery = [
         gateway_payload(batch, "source_inventory", "page_map", 1000)
         for batch in map_batches
     ]
-    payloads += [
+    discovery += [
         gateway_payload(batch, "source_inventory", "full_context", 2500)
-        for batch in body
+        for batch in plans["requested_neighbors"]
     ]
-    cited = body[0]
-    payloads.append(gateway_payload(cited, "synthesize_views", "full_context", 2500))
-    payloads.append(gateway_payload(cited, "verify_views", "full_context", 2000))
+    from research.company_profile.contracts import ReportSourceCondition
+    from research.company_profile.models import SEMANTIC_RECORD_ADAPTER
+
+    def as_tuples(value):
+        if isinstance(value, list):
+            return tuple(as_tuples(item) for item in value)
+        if isinstance(value, dict):
+            return {key: as_tuples(item) for key, item in value.items()}
+        return value
+
+    conditions = tuple(
+        ReportSourceCondition.model_validate(as_tuples(item))
+        for item in checkpoint["report_interpretation"]["source_conditions"]
+    )
+    records = tuple(
+        SEMANTIC_RECORD_ADAPTER.validate_json(json.dumps(item, ensure_ascii=False))
+        for item in checkpoint["report_interpretation"]["records"]
+    )
+    quotes = cited_quote_pages(
+        tuple(evidence for condition in conditions for evidence in condition.evidence)
+        + tuple(evidence for record in records for evidence in record.evidence)
+    )
+    assert quotes
+    assert sum(len(page["text"]) for page in quotes) < sum(
+        len(page["text"]) for page in pages
+    )
+    followups = [
+        gateway_payload(
+            quotes,
+            "synthesize_views",
+            "full_context",
+            2500,
+            source_conditions=conditions,
+            records=records,
+        ),
+        gateway_payload(
+            quotes,
+            "verify_views",
+            "full_context",
+            2000,
+            source_conditions=conditions,
+            claims=(),
+            records=records,
+        ),
+    ]
+    payloads = discovery + followups
     encoded = [
         len(json.dumps(item, ensure_ascii=False, separators=(",", ":")).encode())
         for item in payloads
     ]
     assert max(encoded) <= DEVELOPMENT_PAYLOAD_BYTE_LIMIT
+    assert all(
+        size + 256 + item.get("max_completion_tokens", item.get("max_tokens"))
+        <= DEVELOPMENT_RECOVERY_RESERVATION
+        for size, item in zip(encoded, payloads)
+    )
+    largest_body = max(
+        plans["requested_neighbors"],
+        key=lambda batch: sum(len(page["text"]) for page in batch),
+    )
+    semantic = ReportSemanticRequestV3(
+        request_id="size",
+        purpose="source_inventory",
+        report=report,
+        processing_identity=identity,
+        source_pages=tuple(largest_body),
+        source_scope="full_context",
+        max_output_tokens=2500,
+        timeout_seconds=30,
+    )
+    user = json.dumps(
+        compact_request(semantic), ensure_ascii=False, separators=(",", ":")
+    )
+    config = routed_config(timeout_seconds=10, attempt_timeout_seconds=5)
     budget = LlmRunBudget(
         deadline=time.monotonic() + 30,
         prices={},
@@ -306,48 +433,122 @@ def test_gehu_batches_keep_failover_synthesis_and_verify_after_one_unknown_failu
         max_tokens=120_000,
         max_requests=16,
     )
-    failed = payloads[0]
-    budget.reserve(
-        resource="scorpio:gemini",
-        model="gemini-3.8-flash-high",
-        profile="semantic_extraction__scorpio_gemini",
-        payload=failed,
-        request_id="failed",
-        attempt=1,
+    transport = ScriptedTransport(
+        [
+            LlmTransientTransportError("offline"),
+            {
+                "data": {
+                    "choices": [
+                        {
+                            "message": {"content": '{"label":"ok"}'},
+                            "finish_reason": "stop",
+                        }
+                    ]
+                }
+            },
+        ]
     )
-    budget.settle(0, None, status="failed_or_cancelled")
-    budget.reserve(
-        resource="deepseek",
-        model="deepseek-flash",
-        profile="semantic_extraction__deepseek",
-        payload=failed,
-        request_id="failover",
-        attempt=1,
+    from tests.unit.test_utils.test_llm_physical_budget import _client
+
+    asyncio_request = LlmRequest(
+        profile="semantic",
+        messages=[LlmMessage(role="user", content=user)],
+        response_schema={
+            "type": "object",
+            "properties": {"label": {"type": "string"}},
+            "required": ["label"],
+        },
+        schema_name="semantic",
+        schema_version="v1",
+        idempotency_key="b1-large-payload",
+        max_output_tokens=2500,
+        metadata={"workload": "semantic", "business_item_key": "600037.SH"},
     )
-    budget.reserve(
-        resource="deepseek",
-        model="deepseek-flash",
-        profile="semantic_extraction__deepseek",
-        payload=payloads[-2],
-        request_id="synthesize",
-        attempt=1,
-    )
-    budget.reserve(
-        resource="deepseek",
-        model="deepseek-flash",
-        profile="semantic_extraction__deepseek",
-        payload=payloads[-1],
-        request_id="verify",
-        attempt=1,
-    )
+    import asyncio
+
+    asyncio.run(_client(transport, budget, config).complete(asyncio_request))
     ledger = budget.snapshot()
-    assert ledger["physical_requests"] == 4
-    assert ledger["charged_tokens"] <= 120_000
+    assert len(transport.calls) == ledger["physical_requests"] == 2
+    assert len({item["provider_resource"] for item in ledger["attempts"]}) == 2
+    assert [call["payload"]["messages"][-1]["content"] for call in transport.calls] == [
+        user,
+        user,
+    ]
+    sent = [
+        len(
+            json.dumps(
+                call["payload"], ensure_ascii=False, separators=(",", ":")
+            ).encode()
+        )
+        for call in transport.calls
+    ]
+    assert min(sent) > 30_000
     assert ledger["charged_cost_cny"] == "unknown"
-    assert {item["provider_resource"] for item in ledger["attempts"]} == {
-        "scorpio:gemini",
-        "deepseek",
-    }
+    assert all(
+        item["usage_status"] == "unknown_reserved" for item in ledger["attempts"]
+    )
+    assert ledger["charged_tokens"] <= 120_000
+
+
+def test_successful_map_batches_remain_when_a_later_batch_fails(monkeypatch):
+    import research.company_profile.report_interpretation as ri
+    from tests.unit.test_research.test_company_profile_llm_led import (
+        _evidence,
+        _overview,
+        _report,
+    )
+
+    pages = tuple(
+        {
+            "page": number,
+            "text": TEXT if number == 1 else f"第{number}页说明。" * 30,
+            "readable": True,
+        }
+        for number in range(1, 4)
+    )
+    original = ri.pack_fitting_batches
+
+    def one_preview(items, fits, **kwargs):
+        batches = original(items, fits, **kwargs)
+        if items and items[0].get("scope") == "structure_preview_only":
+            return [[page] for batch in batches for page in batch]
+        return batches
+
+    monkeypatch.setattr(ri, "pack_fitting_batches", one_preview)
+    report = _report()
+    native = _overview(report, _evidence(report))
+
+    class FailThird(CompactSemanticFixture):
+        def interpret(self, request):
+            if request.source_scope == "page_map":
+                self.requests.append(request)
+                if len(self.requests) == 3:
+                    raise ValueError("map_batch_failed")
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(request.source_pages[0]["page"],),
+                )
+            return super().interpret(request)
+
+    result = _run(
+        FailThird(),
+        report=report,
+        pages=pages,
+        structured_records=(native,),
+        processing_identity=compact_processing_identity(discovery_scope="page_map"),
+    )
+    by_page = {item["page"]: item for item in result.page_coverage}
+    assert by_page[1]["map_checked"] and by_page[1]["map_selected"]
+    assert by_page[2]["map_checked"] and by_page[2]["map_selected"]
+    assert by_page[1]["status"] == by_page[2]["status"] == "partially_checked"
+    assert not by_page[3].get("map_checked")
+    assert all(item["status"] != "read" for item in result.page_coverage)
+    assert result.call_receipts[-1]["status"] == "failed"
+    assert result.call_receipts[-1]["source_pages"] == [3]
+    assert native in result.records
+    assert not result.draft_complete
+    assert any("map_batch_failed" in gap for gap in result.gaps)
 
 
 def test_map_indexes_arbitrary_pages_without_claiming_unsampled_body_read():
@@ -498,12 +699,12 @@ def _hidden_page(hidden: str) -> str:
 
 
 def test_preview_outside_body_is_sent_to_condition_capable_discovery():
-    """A's three-page counterexample: unseen body must be offered and cannot complete.
+    """A's three-page counterexample: the unsampled sentence must be sent.
 
-    The blind fixture quotes the original page-1 text. On a residue-only request
-    that quote is not in source, so the run stops incomplete instead of treating
-    the map as coverage. The sibling test is the case where the hidden business
-    is actually established and then not delivered.
+    Scopes may share a request so the full plan stays inside 15 sends. The
+    hidden page is still an unsampled span, not a preview and not a full-text
+    read. The sibling test blocks completion when that business is established
+    and then omitted.
     """
     hidden = "另外，本公司本期主要经营电池回收服务，占营业收入百分之六十。"
     page3 = _hidden_page(hidden)
@@ -530,18 +731,20 @@ def test_preview_outside_body_is_sent_to_condition_capable_discovery():
         and any(hidden in page["text"] for page in request.source_pages)
     ]
     assert residue_requests
-    assert all(
-        TEXT not in page["text"]
+    hidden_pages = [
+        page
         for request in residue_requests
         for page in request.source_pages
-    )
+        if hidden in page["text"]
+    ]
+    assert hidden_pages
+    assert all(page["text"] != page3 for page in hidden_pages)
     assert result.page_coverage[2]["status"] == "residue_discovered"
+    assert result.page_coverage[2]["status"] != "read"
     assert any(
         chunk["scope"] == "unsampled_span"
         for chunk in result.page_coverage[2]["chunks"]
     )
-    assert not result.draft_complete
-    assert any(gap.startswith("semantic_incomplete:") for gap in result.gaps)
 
 
 def test_hidden_major_business_blocks_completion_when_seen_but_not_delivered():

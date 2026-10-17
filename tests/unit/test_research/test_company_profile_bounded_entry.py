@@ -1,5 +1,6 @@
 """Entry scope includes blocking source work; authorization precedes real calls."""
 
+import json
 import subprocess
 import sys
 import time
@@ -12,6 +13,20 @@ from research.company_profile.bounded_entry import (
     supervise,
     validate_binding,
 )
+
+
+def test_worker_failure_keeps_the_entry_receipt(tmp_path):
+    from research.company_profile.bounded_entry import finish_worker
+
+    def fail():
+        raise RuntimeError("Event loop is closed")
+
+    with pytest.raises(RuntimeError, match="Event loop is closed"):
+        finish_worker(tmp_path, fail)
+    receipt = json.loads((tmp_path / "entry-result.json").read_text())
+    assert receipt["status"] == "failed"
+    assert receipt["error_type"] == "RuntimeError"
+    assert "Event loop is closed" in receipt["error"]
 
 
 def test_whole_entry_deadline_kills_blocking_worker_and_its_child(tmp_path):

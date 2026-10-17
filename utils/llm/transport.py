@@ -298,18 +298,26 @@ class HttpxOpenAICompatibleTransport:
                 exc, url=url, started=started, stream=True
             ) from exc
 
+    async def release_client(self) -> None:
+        """Close the live HTTP client on the loop that owns it.
+
+        The next send creates a new client. This keeps one client from being
+        closed on a different event loop after ``asyncio.run`` returns.
+        """
+        if self._client is None or not self._owns_client:
+            return
+        client = self._client
+        self._client = None
+        try:
+            await asyncio.wait_for(client.aclose(), timeout=5.0)
+        except asyncio.TimeoutError:
+            return
+
     async def close(self) -> None:
         if self._closed:
             return
         self._closed = True
-        if self._client is not None and self._owns_client:
-            client = self._client
-            self._client = None
-            try:
-                await asyncio.wait_for(client.aclose(), timeout=5.0)
-            except asyncio.TimeoutError:
-                # Closing must not outlive the business deadline indefinitely.
-                return
+        await self.release_client()
 
 
 async def _collect_openai_stream(

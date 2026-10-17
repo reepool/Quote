@@ -42,8 +42,10 @@ STRICT_BILLING = "strict"
 DEVELOPMENT_UNPRICED_BILLING = "development_unpriced"
 DEVELOPMENT_PAYLOAD_BYTE_LIMIT = 65_536
 DEVELOPMENT_MAX_OUTPUT_TOKENS = 4_000
-# Four reservations of this size fit in the 120000 ledger: a failed send, the
-# next source, one synthesis and one verification.
+# Half of the 120000 development ledger. One unknown failure can be resent once.
+# This is not a payload cap; DEVELOPMENT_PAYLOAD_BYTE_LIMIT remains the hard cap.
+DEVELOPMENT_RECOVERY_RESERVATION = 60_000
+# Earlier four-slot tactic. New reading plans use DEVELOPMENT_RECOVERY_RESERVATION.
 RECOVERY_ATTEMPT_RESERVE = 30_000
 
 
