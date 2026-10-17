@@ -13,7 +13,11 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from utils.llm.budget import DEVELOPMENT_PAYLOAD_BYTE_LIMIT, LlmRunBudget
+from utils.llm.budget import (
+    DEVELOPMENT_PAYLOAD_BYTE_LIMIT,
+    RECOVERY_ATTEMPT_RESERVE,
+    LlmRunBudget,
+)
 from utils.llm.errors import LlmError
 
 from .contracts import (
@@ -218,9 +222,13 @@ def compact_wire_bytes(
 def fits_development_payload(
     source_pages: Sequence[Mapping[str, Any]], **kwargs
 ) -> bool:
-    return (
+    max_output_tokens = int(kwargs["max_output_tokens"])
+    estimated_payload = (
         compact_wire_bytes(source_pages, **kwargs) + DEVELOPMENT_WIRE_MARGIN
-        <= DEVELOPMENT_PAYLOAD_BYTE_LIMIT
+    )
+    return (
+        estimated_payload <= DEVELOPMENT_PAYLOAD_BYTE_LIMIT
+        and estimated_payload + 256 + max_output_tokens <= RECOVERY_ATTEMPT_RESERVE
     )
 
 

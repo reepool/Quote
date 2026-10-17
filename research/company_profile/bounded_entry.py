@@ -106,6 +106,18 @@ def prepare_gateway(binding: dict, raw_config: dict, *, real: bool):
 
     config = LlmConfig.from_mapping(raw_config)
     name = binding["profile"]
+    retry_override = binding.get("same_source_max_retries")
+    if retry_override is not None:
+        limit = int(retry_override)
+        if limit < 0:
+            raise ValueError("same-source retry override cannot be negative")
+        config = replace(
+            config,
+            profiles={
+                profile_name: replace(profile, max_retries=limit)
+                for profile_name, profile in config.profiles.items()
+            },
+        )
     profiles = config.concrete_profiles_for(name)
     if binding.get("pool"):
         route = config.route_for_profile(name)

@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-17，[§19](#19-a审核首次真实失败与唯一后继授权2026-10-17)）：A接受b1c57236首次真实失败留存及开发模式接续；B1/A1未通过。首次1/1已用、仅1物理请求，ProxyError后60963unknown预留保留，未真正换源、三视图未形成。按执行卡§12条件授权原有唯一后继0/1；先恢复实际进程出口、验证实际载荷换源余量并冻结新快照，费用unknown例外仅延续本家。历史正文/成绩不改，不归档、不扩批或生产。
+当前状态（2026-10-17，[§20](#20-b角出口排查与唯一后继2026-10-17)）：首次失败保持留存。后继1次已用。沙箱本地代理造成ProxyError；无沙箱时主机可连通。后继有两次带usage的地图请求，第三次来源404后阅读停止，三视图未形成。B1/A1未通过，没有第三次。A的授权见[§19](#19-a审核首次真实失败与唯一后继授权2026-10-17)。历史正文不改。
 
 ## 1. 唯一实施指引
 
@@ -601,3 +601,31 @@ A签发[B1-R执行卡§12](b1-execution-card.md#12-b1-r恢复真实出口与换�
 A独立运行：`source scripts/quote_dev_env.sh`后，`/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_utils/test_llm_physical_budget.py`，**13 passed、6 warnings**；验证严格/开发模式、有效usage/unknown及共享账本等直接行为。首次曾加`-p no:cacheprovider`，与项目cache_dir配置冲突、未收集测试，改回上述标准命令后通过。未把这一命令错误计为业务失败，也未声明该小载荷测试证明本次大载荷恢复路径。
 
 本轮A只修改任务卡、待办、交付路径、验收活动进度及本节，不修改业务代码/生产配置、不启动后继或任何真实LLM。当前change的OpenSpec严格校验、90个本地文件链接及git diff --check通过。§1—18正文及73份未修改的change文件hash不变；11份既有修改（验收计划仅隔离本人新增活动内容，原历史区块hash不变）及所有原未跟踪内容不触碰。Review未发现本轮文档新增阻塞，真实出口和大载荷恢复仍为B下一卡待办，不据发卡宣称已修。测试日志按现有fixture自动清理，本次独立测试的QuoteBak/pytest-of-python/pytest-2及其current链接已核归属后删除，约9KB，可由测试重建；可复用工具缓存保留。首次观察目录约束为必要证据持久化后再清，不因本次失败整目录删除。A活跃审核时间未精确计量，记unknown。
+
+## 20. B角：出口排查与唯一后继（2026-10-17）
+
+结果：B1-R已执行。出口障碍来自沙箱注入的本地代理，无沙箱进程可以连到配置主机。唯一后继已启动并占用1次。三视图仍未交付，待A裁决，不再发起第三次。
+
+业务：后继三视图均为`extraction_failed`，claims为0，`draft_complete=false`。19项核心、6项负例和已审准确率未评估，不能把空输出记成负例通过。阶段召回仍按首次审核的0/19理解；后继没有新的可用公司。
+
+差异：基线`6b46e5d3`。请求打包把单次保守预留压到30000以内，使一次unknown失败后仍能再发一源、合成和核验。隔离绑定把同源`max_retries`设为0，生产`config/13_llm.json`未改，路由指纹仍是`fb5b895c00cdbdd7c158d35d3707988d5813d62f7d5df7319112151afb1e9141`。旧首次绑定和授权原文件未改。
+
+验证：`pytest -q tests/unit/test_research/test_company_profile_report_wire.py tests/unit/test_utils/test_llm_physical_budget.py tests/unit/test_research/test_company_profile_bounded_entry.py tests/unit/test_research/test_company_profile_llm_led.py -k 'not existing_owner'` 为68 passed、1 deselected、7 warnings。其中歌华208页真实载荷测试确认：一次失败预留后，另一`provider_resource`、合成和核验四个准入都在120000内，费用保持unknown。`ruff check`覆盖本次改动文件，通过。没有重跑无关旧套件。
+
+资源：出口检查3次，均无鉴权、无模型调用、超时5秒。沙箱进程代理为`http://127.0.0.1`本地端口，访问`scorpio.reepool.com`得到`ProxyError`。去掉沙箱后代理为空，`https://scorpio.reepool.com/`返回200，`https://api.deepseek.com/`返回401。后继因此在无沙箱进程中运行。
+
+后继入口100.1秒，物理请求3/16，token账35233，费用unknown。10元和80元仍未验收。首次60963 unknown预留留在首次账，没有并进后继账，也没有记成0。
+
+| 序 | 来源 | 配置模型 | 结果 | usage | 结算token |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `scorpio:gemini` | `gemini-3.8-flash-high` | HTTP 200 | 6356+659 | 7015 |
+| 2 | `zai` | `glm-5.3-flash` | HTTP 200；请求最大输出1000，供应商返回2020 | 5015+2020 | 7035 |
+| 3 | `scorpio:grok` | `grok-4.7` | HTTP 404，`provider_error` | 无 | 预留21183 |
+
+三次都是独立的地图请求，`failover_count=0`。404按现有池策略不换源。前两次选出的页码没有在第三次失败前写入覆盖结果，所以208页仍显示未采样。进程在写出query/export之后关闭HTTP客户端时出现`Event loop is closed`，入口退出码1。响应模型除日志中的provider request id外，账本没有单独的响应model字段。
+
+证据：首次持久副本及hash在[first/manifest.json](b1-pool-observation-evidence/first/manifest.json)。后继账本、query/export和日志在`b1-pool-observation-evidence/successor/`，与清理前运行副本hash一致。绑定[b1-pool-successor-binding.json](b1-pool-successor-binding.json)，授权写明按卡执行、不是代码已审。
+
+闭环与清理：首次运行目录的重复库和导出已在hash核对后删除，`attempts/first.json`保留。后继的`research.db`、pdf缓存和output副本已删，query/export/日志的持久副本保留，`attempts/successor.json`保留。本窗口pytest日志目录已删。11份既有修改未动。QuoteBak当前约68M。没有第三次运行。开发观察1家已跑首次和后继，可用0家；S1 0/12、S2 0/20、S3 0/100。生产`not_authorized`，规模声明false。
+
+效率：B活跃时间未精确计量，记unknown。后继1次，没有在失败后再跑。

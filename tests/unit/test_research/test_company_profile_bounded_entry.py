@@ -158,6 +158,15 @@ def test_pool_binding_rejects_route_or_source_drift_before_client(pool_binding, 
         prepare_gateway(binding, raw, real=False)
 
 
+def test_same_source_retry_override_does_not_change_route_fingerprint(pool_binding):
+    binding, raw = pool_binding
+    fingerprint = binding["route_fingerprint"]
+    binding["same_source_max_retries"] = 0
+    config, _prices = prepare_gateway(binding, raw, real=False)
+    assert config.route_fingerprint("semantic") == fingerprint
+    assert {profile.max_retries for profile in config.profiles.values()} == {0}
+
+
 def test_unpriced_pool_member_blocks_real_preparation_but_not_offline(pool_binding):
     binding, raw = pool_binding
     binding["sources"][1]["price"] = None

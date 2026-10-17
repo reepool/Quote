@@ -14,6 +14,7 @@ from research.company_profile.report_interpretation import (
     DIMENSIONS,
     compact_processing_identity,
     compact_wire_bytes,
+    fits_development_payload,
     pack_fitting_batches,
     page_map,
     unsampled_ranges,
@@ -186,6 +187,167 @@ def test_payload_batches_keep_every_page_inside_the_development_byte_cap():
         page["page"] for page in pages
     ]
     assert all(fits(batch) for batch in batches)
+
+
+def test_gehu_batches_keep_failover_synthesis_and_verify_after_one_unknown_failure():
+    import gzip
+    import time
+    from pathlib import Path
+
+    from research.company_profile.models import ReportIdentity
+    from research.company_profile.report_interpretation import (
+        structural_discovery_chunks,
+    )
+    from utils.llm.budget import DEVELOPMENT_UNPRICED_BILLING, LlmRunBudget
+    from utils.llm.client import LlmClient
+
+    checkpoint = json.loads(
+        gzip.decompress(
+            (
+                Path(__file__).resolve().parents[3]
+                / "openspec/changes/restore-company-profile-llm-led-generalization"
+                / "b1-resource-evidence/iteration2/checkpoint.json.gz"
+            ).read_bytes()
+        )
+    )
+    pages = tuple(
+        {
+            "page": int(page["page"]),
+            "text": str(page.get("text") or ""),
+            "readable": bool(page.get("readable", True))
+            and bool(str(page.get("text") or "").strip()),
+        }
+        for page in checkpoint["pages"]
+    )
+    report = ReportIdentity.model_validate(
+        checkpoint["report_interpretation"]["report"]
+    )
+    identity = compact_processing_identity(discovery_scope="page_map")
+    mapped = page_map(pages)
+    map_batches = pack_fitting_batches(
+        mapped,
+        lambda batch: fits_development_payload(
+            batch,
+            purpose="source_inventory",
+            source_scope="page_map",
+            report=report,
+            identity=identity,
+            max_output_tokens=1000,
+        ),
+    )
+    assert [page["page"] for batch in map_batches for page in batch] == [
+        page["page"] for page in mapped
+    ]
+    selected = {pages[len(pages) // 2]["page"]}
+    body = structural_discovery_chunks(
+        pages,
+        selected,
+        payload_fits=lambda batch: fits_development_payload(
+            batch,
+            purpose="source_inventory",
+            source_scope="full_context",
+            report=report,
+            identity=identity,
+            max_output_tokens=2500,
+        ),
+    )
+    assert body
+
+    def gateway_payload(batch, purpose, scope, max_output):
+        request = ReportSemanticRequestV3(
+            request_id="size",
+            purpose=purpose,
+            report=report,
+            processing_identity=identity,
+            source_pages=tuple(batch),
+            source_scope=scope,
+            max_output_tokens=max_output,
+            timeout_seconds=30,
+        )
+        user = json.dumps(
+            compact_request(request), ensure_ascii=False, separators=(",", ":")
+        )
+        return LlmClient._build_payload(
+            model="gemini-3.8-flash-high",
+            messages=[
+                {"role": "system", "content": "size"},
+                {"role": "user", "content": user},
+            ],
+            schema=response_schema(request),
+            schema_name="company_profile_report_response",
+            mode="json_object",
+            temperature=0,
+            max_output_tokens=max_output,
+            max_output_tokens_field="max_completion_tokens",
+            stream=False,
+            stream_include_usage=False,
+        )
+
+    payloads = [
+        gateway_payload(batch, "source_inventory", "page_map", 1000)
+        for batch in map_batches
+    ]
+    payloads += [
+        gateway_payload(batch, "source_inventory", "full_context", 2500)
+        for batch in body
+    ]
+    cited = body[0]
+    payloads.append(gateway_payload(cited, "synthesize_views", "full_context", 2500))
+    payloads.append(gateway_payload(cited, "verify_views", "full_context", 2000))
+    encoded = [
+        len(json.dumps(item, ensure_ascii=False, separators=(",", ":")).encode())
+        for item in payloads
+    ]
+    assert max(encoded) <= DEVELOPMENT_PAYLOAD_BYTE_LIMIT
+    budget = LlmRunBudget(
+        deadline=time.monotonic() + 30,
+        prices={},
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        max_tokens=120_000,
+        max_requests=16,
+    )
+    failed = payloads[0]
+    budget.reserve(
+        resource="scorpio:gemini",
+        model="gemini-3.8-flash-high",
+        profile="semantic_extraction__scorpio_gemini",
+        payload=failed,
+        request_id="failed",
+        attempt=1,
+    )
+    budget.settle(0, None, status="failed_or_cancelled")
+    budget.reserve(
+        resource="deepseek",
+        model="deepseek-flash",
+        profile="semantic_extraction__deepseek",
+        payload=failed,
+        request_id="failover",
+        attempt=1,
+    )
+    budget.reserve(
+        resource="deepseek",
+        model="deepseek-flash",
+        profile="semantic_extraction__deepseek",
+        payload=payloads[-2],
+        request_id="synthesize",
+        attempt=1,
+    )
+    budget.reserve(
+        resource="deepseek",
+        model="deepseek-flash",
+        profile="semantic_extraction__deepseek",
+        payload=payloads[-1],
+        request_id="verify",
+        attempt=1,
+    )
+    ledger = budget.snapshot()
+    assert ledger["physical_requests"] == 4
+    assert ledger["charged_tokens"] <= 120_000
+    assert ledger["charged_cost_cny"] == "unknown"
+    assert {item["provider_resource"] for item in ledger["attempts"]} == {
+        "scorpio:gemini",
+        "deepseek",
+    }
 
 
 def test_map_indexes_arbitrary_pages_without_claiming_unsampled_body_read():

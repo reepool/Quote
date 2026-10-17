@@ -1,0 +1,40 @@
+{
+  "physical_requests": 1,
+  "charged_tokens": 60963,
+  "charged_cost_cny": "unknown",
+  "cost_status": "unknown",
+  "billing_mode": "development_unpriced",
+  "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+  "stopped_reason": "physical_request_token_context_or_cost_budget_exhausted",
+  "denied_request": {
+    "request_id": "56489df0448f45b3bf3022c824eda6fd",
+    "payload_utf8_bytes": 59707,
+    "reserved_input_tokens": 59963,
+    "reserved_output_tokens": 1000,
+    "required_tokens": 60963,
+    "remaining_tokens": 59037,
+    "required_cost_cny": "unknown",
+    "remaining_cost_cny": "unknown",
+    "context_tokens": null,
+    "remaining_requests": 15
+  },
+  "attempts": [
+    {
+      "sequence": 1,
+      "request_id": "56489df0448f45b3bf3022c824eda6fd",
+      "attempt": 1,
+      "profile": "semantic_extraction__scorpio_gemini",
+      "provider_resource": "scorpio:gemini",
+      "model": "gemini-3.8-flash-high",
+      "reserved_input_tokens": 59963,
+      "reserved_output_tokens": 1000,
+      "charged_tokens": 60963,
+      "charged_cost_cny": "unknown",
+      "usage": null,
+      "status": "failed_or_cancelled",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown",
+      "usage_status": "unknown_reserved"
+    }
+  ]
+}

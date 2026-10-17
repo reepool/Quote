@@ -42,6 +42,9 @@ STRICT_BILLING = "strict"
 DEVELOPMENT_UNPRICED_BILLING = "development_unpriced"
 DEVELOPMENT_PAYLOAD_BYTE_LIMIT = 65_536
 DEVELOPMENT_MAX_OUTPUT_TOKENS = 4_000
+# Four reservations of this size fit in the 120000 ledger: a failed send, the
+# next source, one synthesis and one verification.
+RECOVERY_ATTEMPT_RESERVE = 30_000
 
 
 class LlmRunBudget:
