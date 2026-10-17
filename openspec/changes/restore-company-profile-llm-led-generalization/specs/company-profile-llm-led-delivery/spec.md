@@ -11,6 +11,11 @@ The new processing policy MUST route every new report's open-language interpreta
 - **WHEN** no real provider is configured or calls exhaust their budget
 - **THEN** reliable independent numeric facts remain available but missing semantics are explicit and the company cannot be declared semantically complete
 
+#### Scenario: The first development report uses the existing configured pool
+- **WHEN** the B1 card authorizes one bounded real development observation through the existing semantic pool and exact channel billing or tokenizer metadata is unavailable
+- **THEN** the implementation retains configured load distribution and failover, freezes the pool policy and execution identity, reserves each physical request conservatively within the token/request/deadline ledger, settles only valid returned usage, and records unknown cost without inventing a price or claiming cost acceptance
+- **AND** missing commercial metadata or an overlarge static byte projection alone does not prohibit that authorized observation; business quality remains source-audited and neither further reports nor production are authorized automatically
+
 ### Requirement: Discovery and omission checking are source-led
 The system MUST account for every page in bounded document discovery and inspect substantive business, product, income, input and role contexts with necessary headers and continuations. Regex-only page whitelists MUST NOT determine all model visibility. A source-first inventory built without candidate answers MUST be compared with delivered claims to detect missing major businesses. Unsupported or unread sources MUST remain missing or unclear rather than not_disclosed.
 

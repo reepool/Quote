@@ -2,7 +2,7 @@
 
 > 类型：requirements / execution plan；版本：3；2026-10-16。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。本次批准A/B分工与任务顺序，不运行付费调用、盲测或生产。B可开始B1实现及离线验证；真实运行须具备A0冻结的模型/价格/预算绑定和执行授权，不能用旧双公司余量。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。按B1执行卡§11，仅放行首家公司沿现有池的有界真实开发观察，费用未知例外见验收§7.1；未开放盲测、扩批或生产。B先冻结实际执行快照，不能用旧双公司余量。
 
 ## 1. 开发者必须先理解的纠偏
 
@@ -50,13 +50,13 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 
 - 目标：选定1家历史报告作为B1输入，确认其具备主营、收入表、投入/角色披露；核对不在S2留出20家内，冻结来源hash、知识截止日、合同、模型/提示词/预处理版本、费用和调用预算。
 - A交付：一张可执行的B1卡，写明唯一owner、允许修改目录、输入输出、验证命令、一个证据入口和停止条件。A不要求B按指定函数实现。
-- 当前接续：[B1执行卡](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md)已冻结歌华有线600037.SH的19核心/6负例、源hash和知识时点；真实模型/计费与执行授权仍待绑定，A0未全部完成。B提交4ade7a18的离线准备不折算真实LLM数量。
-- B开始条件：A0材料齐全后开始；没有真实provider、价格/费用依据或预算授权时只能离线实现和fake测试，不得付费运行。
+- 当前接续：[B1执行卡§11](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md)保留歌华有线600037.SH的19核心/6负例、源hash和知识时点；A已按用户现有池选路/换源要求放行一次首家真实开发观察。B仍须冻结最终代码/config/prompt及输入输出身份；费用未知按验收§7.1明示，不等待补齐六来源资料。旧离线准备不折算真实LLM数量。
+- B开始条件：现有provider及池配置可加载、必要环境凭据可用，完成本卡直接回归及最终快照冻结后，在单次授权内执行；不能新增账号/充值或绕过公共网关。
 
 ### B1：一家公司真实解读闭环（B连续实施，当前首要任务）
 
 - 目标：从已有历史报告选1家同时含主营描述、收入表及投入/角色的公司，真实LLM生成三视图，并从query/export读回；选择不得触碰S2留出20家。
-- 当前执行以[B1接续卡§10](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md)为准：A审核8e30ebff接受清理与资源缺项交接，正文发现P1保持关闭，真实三视图仍无交付。下一卡A0-R由A协调资源维护方提供至少一个现有来源的部署/计费/上下文/可信计量依据；B等待依赖，不再重复查配置、清理或追加fake方案。资料齐备后B按条件卡B1-R连续完成原§9的最窄绑定、完整计划、原专项0/1及一次交接；真实首发仍待A0授权。原资源上限不变；沿现有池，全部实际可达成员须有资料，资料不足的部分限制为不可达，不永久锁单一模型、不改生产池或新增平台。
+- 当前执行以[B1接续卡§11](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md)为准：撤销§10等待渠道资料的暂停卡，B沿现有semantic_extraction → shared_semantic池连续修正精确计费/容量元数据缺失即禁止发送的局部阻塞，保留逐物理请求预留和总账，完成直接回归、冻结最终快照并执行一次真实首发。价格未知只影响成本验收；本次例外及风险按验收§7.1明示。现有weighted_fair和故障切换直接复用，不新建随机路由、不改生产池，也不把静态字节全计划当实际token。原离线专项可保留不用，不再作为真实首发的强制前置。
 - 入口/owner：`company_profile_common_core` → `research/company_profile/operations.py` → runtime/workflow及`CommonGatewaySemanticProvider` → 原repository/read service；统一走`utils/llm`公共网关。
 - 实现：先绑定provider与可核日志，再接全文发现、源先行核心清单、证据摘要；将同field短路限定为可靠结构化事实复用；拆开硬校验与语义判断，正则只作定位提示/风险提示。必要请求/读取元数据版本化，不向旧schema偷偷塞字段。
 - 输出：三视图、原文引用、缺项/冲突说明、真实模型/请求/usage、页覆盖、query/export一致；provider未配置或不可用明确失败/限用。
