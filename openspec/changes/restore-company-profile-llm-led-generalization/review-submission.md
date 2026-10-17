@@ -328,3 +328,60 @@ source /home/python/Quote/scripts/quote_dev_env.sh
 正向路由fixture由0.5秒改为整体10秒/单次5秒，专门超时/取消断言未放宽。Review只核本轮阻塞性错误：修正新测试把逻辑profile误写成未配置profile的问题；精简路径保留完整本地与硬约束，未发现其他需阻塞的代码错误。公共provider/contracts的既有格式问题与无关旧套件问题不扩修。所有执行文件hash和源PDF hash与两次绑定匹配；11份既有tracked文件hash与本轮基线相等，原untracked未操作。完整重建仍依赖绑定列出的既有脏依赖，不能声称单独checkout本次提交即可复原运行环境。
 
 本轮按A/B v3自主完成可独立推进的实现/回归/证据工作。触发停止来自[B1卡§7](b1-execution-card.md#7-当前接续先让完整请求计划可运行a于2026-10-17裁决)明确的“最多两次离线资源方案迭代；若仍不可行交A”合同，不是增加逐项审批。下一步由A核定计量/资源取舍及后续卡，资料和完整资源可行性成立后再核真实权限。本次正式调用0、实际费用unknown、B活跃时间未精确计量；开发0/4、回归0/12、未见0/20、试运行0/100不变，生产`not_authorized`、规模声明false。提交身份以本节所属Git提交为准。
+
+## 12. A审核df946753：资源裁决及正文发现P1（2026-10-17）
+
+结论：**三阶段精简及两次停止记录成立；B1/A1未通过，新增1项范围内P1。** A不批准直接提高预算或盲开第三压缩方案；下一步按[B1卡§8](b1-execution-card.md)修正文发现和完整性，再以可信计量核完整计划与实际资源。原两项数值P1保持关闭，§11及26份原证据不改。
+
+### 12.1 独立核验与资源裁决
+
+- A复验B的相同定向组合：**57 passed、1 deselected、7 warnings，15.09秒**；命令见§11.3。未选中的原owner重型用例本次未运行，不声明全套测试通过。
+- 26份证据hash、56份绑定执行文件hash及正式PDF hash通过；两次query/export profiles一致。绑定包含既有脏依赖，仍不能声称仅checkout提交就能重建。A未重跑208页入口、未调用真实模型、未写生产数据。
+- A执行既有只读`project_remaining.py`重建：正常四请求248192、差128192；另加一次最大请求重试76509，合计324701。均为UTF-8保守计量单位下的既定合成形态，**不是实际token、费用或动态增长上界**，也不是完成闭环。
+- 方案2仅模拟完整阅读13页，195页仅片段检查；片段地图不能证明主业召回。三视图、19核心/6负例及真实质量/费用仍未评估，正式首次/后继0/0。
+- 资源裁决：采用有依据、与实际部署型号及消息/schema封装相匹配的计量可替代字节上界，未知usage继续保留预留；不按经验比例折算。原120000token/900秒/16物理请求/10元及累计上限不变。若计量仍超限，再交量化资源裁决，不能先裁掉主业或直接放大额度。
+- 六来源可核计费/上下文/计量资料仍缺。继续现有池/故障切换，实际可达成员须全有资料；可提交已核成员隔离范围交A，未核成员在选路前不可达，不永久锁单一模型、不新建池。没有可核来源时，资源绑定与真实权限保持未完成；公开模型广场404不是模型不可用或价格为零的证据。
+
+### 12.2 A-P1-MAP-01：预览外主业未读仍判完整
+
+位置：`report_interpretation.py:page_map`每页仅取48/16/16字符，结构模式只对模型所选页及原生事实相邻页做正文发现；末尾`all_pages_read`在该模式以`map_checked`及已生成条件代替内容发现充分性，再据这些条件判七维完整。
+
+A使用现有`CompactSemanticFixture`构造3页离线反例：第1页为原七维支持原文，第2页为相邻普通说明，第3页在三个采样点之外新增“本期主要经营电池回收服务，占营业收入百分之六十”。不传任何该业务候选或答案。实际模型可见完整页只有1、2，第3页标`partially_checked`且chunks为空；该主业既不在预览也不在后继全文请求，结果仍`draft_complete=true`、七维全部verified、gaps为空。此处无真实调用，**不是歌华有线实际漏项成绩**；它证明存在当前代码决定的语义盲区及完整性误判，同一判定用于provider模式的真实完整性。
+
+可复现命令（只读来源/代码，零网络推理）：
+
+```bash
+source /home/python/Quote/scripts/quote_dev_env.sh
+/home/python/miniconda3/envs/Quote/bin/python - <<'PY'
+import json
+from tests.unit.test_research.test_company_profile_llm_led import TEXT, _run
+from tests.unit.test_research.test_company_profile_report_wire import CompactSemanticFixture
+from research.company_profile.report_interpretation import compact_processing_identity, page_map
+hidden = '另外，本公司本期主要经营电池回收服务，占营业收入百分之六十。'
+pages = (
+    {'page': 1, 'text': TEXT, 'readable': True},
+    {'page': 2, 'text': '与第一页配套的普通说明。', 'readable': True},
+    {'page': 3, 'text': '附加说明。' * 50 + hidden + '附加说明。' * 400, 'readable': True},
+)
+provider = CompactSemanticFixture()
+result = _run(provider, processing_identity=compact_processing_identity(discovery_scope='page_map'), pages=pages)
+print(json.dumps({
+    'hidden_in_map': hidden in page_map(pages)[2]['text'],
+    'full_context_pages': sorted({p['page'] for r in provider.requests if r.source_scope == 'full_context' for p in r.source_pages}),
+    'page3': result.page_coverage[2], 'draft_complete': result.draft_complete,
+    'verified_dimensions': result.verified_dimensions, 'gaps': result.gaps,
+}, ensure_ascii=False))
+PY
+```
+
+修复条件：对非采样/陌生位置且无结构化事实的正文提供通用语义发现/补源路径；未取得核心覆盖依据时不能单凭地图和已知条件宣称完整。不能只加“电池回收”等关键词，也不能把所有存在未读次要附注的报告一律永久判失败。不要求逐行抽取全部附注，不承诺绝对零遗漏；主要业务必须有进入语义发现的机会，已确认漏项须阻塞可用结论。B补隐藏主业反例及无关长附注正例，A复核该P1和直接回归。
+
+### 12.3 下一卡、授权及进度
+
+按[B1卡§8](b1-execution-card.md)，B在同一窗口先修P1及直接验证，并行核实部署匹配计量和资源。第7节2/2离线方案已用尽；A仅明确追加**1次最终修复快照的专项离线整体验证**，必须先有可信计量及全流程可行计划；否则不启动。此次追加单列，不重置旧2次、不增加正式/付费次数；失败即交具体结论，不再派生无限方案。来源资料不可得时先交可独立完成的P1修复及缺项，不增加fake测试或池功能替代真实业务。
+
+本卡19核心至少18项、已审准确率≥98%、全部主要业务/关键数字/三视图及6负例要求不变；次要遗漏及有据unclear允许限用，错误和依赖结论退出确定输出，无法补救须说明原因/影响/恢复条件。真实首次/后继仍0/0，真实授权未签发；开发0/4（尚差4）、S1新链0/12、S2首组0/20、S3试运行0/100不变。按4→12→20→100推进，S2至多另20确认，到上限失败须结论；不归档、不扩批，生产`not_authorized`、规模声明false。
+
+A本轮只审核及更新任务文档，不替B修业务代码；活跃审核时间未精确计量记unknown。开始时11份tracked既有修改及原untracked继续保护，验收计划仅隔离本人计量澄清及活动进度行；原合同、原§11和首次制品不变。
+
+本轮5份文档通过OpenSpec本change严格校验、`git diff --check`及69个本地链接检查；19项源条件保留，11份既有文件扣除本人两处文档变更后hash相等。审核旧记录保持原字节前缀；本人提交仅含上述5份审核/任务文档。
