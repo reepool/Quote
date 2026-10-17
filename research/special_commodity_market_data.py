@@ -2838,9 +2838,10 @@ class ConfiguredSourceChainProvider:
                 default=0.0,
             ),
         }
-        # A failed primary request is a resolved outcome when the chain still
-        # covered that series from fallback profiles without value conflicts;
-        # it only stays a warning when the series ended up without data.
+        # A failed request is a resolved outcome only when the chain primary
+        # failed for that series and fallback profiles actually filled dates
+        # without value conflicts; fallback-profile failures and series without
+        # any fallback coverage stay warnings.
         notes: List[Dict[str, Any]] = []
         unresolved_warnings: List[Dict[str, Any]] = []
         conflict_series = {str(item.get("series_id")) for item in conflicts}
@@ -2851,10 +2852,13 @@ class ConfiguredSourceChainProvider:
                 fallback_dates_by_series[row.series_id] = (
                     fallback_dates_by_series.get(row.series_id, 0) + 1
                 )
+        primary_profile = profiles[0] if profiles else ""
         for item in warnings:
             if (
                 str(item.get("reason") or "") == "provider_request_failed"
+                and str(item.get("chain_source_profile") or "") == primary_profile
                 and item.get("series_id") in selected_series_ids
+                and fallback_dates_by_series.get(str(item.get("series_id")), 0) > 0
                 and str(item.get("series_id")) not in conflict_series
             ):
                 notes.append(
@@ -6607,6 +6611,8 @@ class AkshareForeignFuturesProvider:
                     ohlc_meta[target] = numeric
             if self._ohlc_inconsistency_reason(value, ohlc_meta) is not None:
                 continue
+            if ohlc_meta.get("low") is None or ohlc_meta.get("high") is None:
+                continue
             rescued[observed.isoformat()] = (value, ohlc_meta, row)
         return rescued, {
             "provider_id": provider_id,
@@ -7301,6 +7307,9 @@ class AkshareForeignFuturesProvider:
                             "series_id": series_id,
                             "primary_provider": selected_provider,
                             "selected_provider": substituted[0]["provider_id"],
+                            "selected_providers": sorted(
+                                {entry["provider_id"] for entry in substituted}
+                            ),
                             "dates": sorted(
                                 {entry["observation_date"] for entry in substituted}
                             )[:20],

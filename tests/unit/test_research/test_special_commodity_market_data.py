@@ -792,6 +792,75 @@ def test_configured_source_chain_keeps_warning_when_no_source_covered(monkeypatc
     ]
 
 
+def test_configured_source_chain_keeps_warning_when_only_fallback_failed(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item = CommodityUniverseSelector(cfg).resolve(
+        series_ids=["CMD.OIL.WTI.SPOT.EIA.DAILY"]
+    )[0]
+    provider = ConfiguredSourceChainProvider(
+        item.source_profile,
+        cfg["source_profiles"][item.source_profile],
+        cfg,
+    )
+
+    def observation(series: CommoditySeries, observed_date: str, value: float):
+        return CommodityObservation(
+            series_id=series.series_id,
+            observation_date=observed_date,
+            value=value,
+            currency="USD",
+            unit="USD/barrel",
+            raw_value=value,
+            raw_currency="USD",
+            raw_unit="USD/barrel",
+            source_profile=series.source_profile,
+            source_url=f"https://example.test/{series.source_profile}",
+            quality_flag="official_public_api",
+            source_symbol=series.source_symbol,
+            parser_version="unit-test",
+            raw_payload_hash=f"{series.source_profile}-{observed_date}-{value}",
+        )
+
+    from research.special_commodity_market_data import CommodityProviderResult
+
+    class HealthyPrimaryProvider:
+        def fetch(self, series, *, start_date, end_date):
+            return CommodityProviderResult(
+                observations=[observation(series[0], "2026-01-02", 70.0)]
+            )
+
+    class FailingFallbackProvider:
+        def fetch(self, series, *, start_date, end_date):
+            return CommodityProviderResult(
+                warnings=[
+                    {
+                        "reason": "provider_request_failed",
+                        "series_id": series[0].series_id,
+                        "error": "Read timed out. (read timeout=30.0)",
+                    }
+                ]
+            )
+
+    monkeypatch.setattr(
+        provider,
+        "_resolve_provider",
+        lambda profile: (
+            HealthyPrimaryProvider()
+            if profile == "eia_official_api"
+            else FailingFallbackProvider()
+        ),
+    )
+    result = provider.fetch([item], start_date="2026-01-01", end_date="2026-01-02")
+
+    assert result.observations[0].metadata["source_role"] == "primary"
+    assert result.notes == []
+    assert [
+        entry for entry in result.warnings if entry["reason"] == "provider_request_failed"
+    ]
+
+
 def test_source_unit_governance_normalizes_equivalent_official_labels():
     assert _source_unit_matches("USD/barrel", "Dollars per Barrel")
     assert _source_unit_matches("USD/barrel", "$/BBL")
@@ -4195,6 +4264,56 @@ def test_lme_provider_warns_when_all_sources_ohlc_inconsistent(monkeypatch):
     assert warning["series_id"] == series[0].series_id
     assert warning["dates"] == ["2021-03-23"]
     assert warning["inconsistencies"][0]["value"] == 8870
+
+
+def test_lme_provider_skips_fallback_rows_without_intraday_range(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = deepcopy(cfg["source_profiles"]["lme_akshare_foreign_futures"])
+    for candidate in source_cfg["provider_chain"]:
+        if candidate.get("provider_id") == "eastmoney":
+            candidate.pop("high_column", None)
+            candidate.pop("low_column", None)
+    series = CommodityUniverseSelector(cfg).resolve(
+        series_ids=["CMD.METAL.COPPER.LME3M.DAILY"]
+    )
+
+    def _sina(symbol):
+        return pd.DataFrame(
+            [
+                {"date": "2021-03-23", "open": 9134, "high": 9145, "low": 8871, "close": 8870},
+            ]
+        )
+
+    def _eastmoney(symbol):
+        return pd.DataFrame(
+            [
+                {"日期": "2021-03-23", "名称": "综合铜03", "开盘": 9134, "最新价": 8890},
+            ]
+        )
+
+    fake_akshare = SimpleNamespace(
+        futures_foreign_hist=_sina,
+        futures_global_hist_em=_eastmoney,
+        futures_hq_subscribe_exchange_symbol=lambda: pd.DataFrame(),
+    )
+    monkeypatch.setattr(
+        AkshareForeignFuturesProvider,
+        "_load_akshare",
+        staticmethod(lambda mode: fake_akshare),
+    )
+
+    result = AkshareForeignFuturesProvider(
+        "lme_akshare_foreign_futures", source_cfg
+    ).fetch(series, start_date="2021-03-23", end_date="2021-03-23")
+
+    assert result.observations[0].value == 8870
+    assert result.metadata["quality_diagnostics"]["ohlc"]["fallback_substituted"] == 0
+    assert any(
+        item["reason"] == "ohlc_inconsistent_all_sources"
+        for item in result.warnings
+    )
 
 
 def test_lme_provider_substitutes_open_outside_intraday_range(monkeypatch):
