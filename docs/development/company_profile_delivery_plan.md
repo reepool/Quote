@@ -56,7 +56,7 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 ### B1：一家公司真实解读闭环（B连续实施，当前首要任务）
 
 - 目标：从已有历史报告选1家同时含主营描述、收入表及投入/角色的公司，真实LLM生成三视图，并从query/export读回；选择不得触碰S2留出20家。
-- 当前执行以[B1接续卡§9](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md)为准：A审核71735099后关闭预览外正文发现P1，仅接受离线修复；真实三视图仍无交付。先核依赖并清理无用历史开发产物、补当前交接，再取得至少一个现有可达来源的部署/计费/上下文/计量依据；资料不到位就明确外部阻塞并停止，不继续fake或压缩方案。资料齐备后才在同一物理预算接点绑定可信计量、核全流程计划，并条件接续原有一次专项离线验证；真实首发仍待A0授权。原资源上限不变；沿现有池，全部实际可达成员须有资料，资料不足的部分限制为不可达，不永久锁单一模型、不改生产池或新增平台。
+- 当前执行以[B1接续卡§10](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md)为准：A审核8e30ebff接受清理与资源缺项交接，正文发现P1保持关闭，真实三视图仍无交付。下一卡A0-R由A协调资源维护方提供至少一个现有来源的部署/计费/上下文/可信计量依据；B等待依赖，不再重复查配置、清理或追加fake方案。资料齐备后B按条件卡B1-R连续完成原§9的最窄绑定、完整计划、原专项0/1及一次交接；真实首发仍待A0授权。原资源上限不变；沿现有池，全部实际可达成员须有资料，资料不足的部分限制为不可达，不永久锁单一模型、不改生产池或新增平台。
 - 入口/owner：`company_profile_common_core` → `research/company_profile/operations.py` → runtime/workflow及`CommonGatewaySemanticProvider` → 原repository/read service；统一走`utils/llm`公共网关。
 - 实现：先绑定provider与可核日志，再接全文发现、源先行核心清单、证据摘要；将同field短路限定为可靠结构化事实复用；拆开硬校验与语义判断，正则只作定位提示/风险提示。必要请求/读取元数据版本化，不向旧schema偷偷塞字段。
 - 输出：三视图、原文引用、缺项/冲突说明、真实模型/请求/usage、页覆盖、query/export一致；provider未配置或不可用明确失败/限用。
