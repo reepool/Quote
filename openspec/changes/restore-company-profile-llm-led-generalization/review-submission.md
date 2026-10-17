@@ -2,6 +2,8 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
+当前审核状态（2026-10-17）：A对71735099的结论及下一卡见[§14](#14-a审核71735099正文发现修复接受资源阻塞未解除)。正文发现P1关闭；B1/A1未通过，真实调用0；下一步按[B1卡§9](b1-execution-card.md#9-a对71735099的裁决与下一卡解资源阻塞后完成b1)先清理并补交接，再解实际部署/计费/上下文/计量阻塞。以下历史交接和首次结果保留，不代表最新授权。
+
 ## 1. 唯一实施指引
 
 - [产品总需求](../../../docs/development/company_profile_product_and_industry_semantic_requirements.md)：公司画像、产品暴露、供应链定位；LLM语义/程序硬约束分工。
@@ -427,3 +429,42 @@ source /home/python/Quote/scripts/quote_dev_env.sh
 开始时HEAD为`1a9de515`。11份既有tracked修改和原未跟踪文件未操作。真实调用0，正式首次0/1、后继0/1，真实授权仍未签发。B活跃时间未精确计量，记unknown。开发0/4、S1新链0/12、S2首组0/20、S3 0/100不变。生产`not_authorized`，规模声明false。
 
 下一步需要A裁决：在有部署匹配的分词与计费依据后重估这版发现计划，或明确阅读范围/预算取舍。本窗口不再开第三种压缩方案，也不把575995换算成token。
+
+## 14. A审核71735099：正文发现修复接受，资源阻塞未解除
+
+结论：**关闭A-P1-MAP-01，仅接受离线代码修复；B1/A1仍不通过。** R3可保留完成，R1/R2/R4及正式业务项不勾完成。下一卡为[B1卡§9](b1-execution-card.md#9-a对71735099的裁决与下一卡解资源阻塞后完成b1)：先清理无用历史开发产物并补交接，再解资源资料阻塞；无新资料不再做fake/压缩方案，不批准直接加预算或削掉主要业务。
+
+### 14.1 独立核验与边界
+
+- A按产品总需求→验收计划→交付路径→A/B流程/当前change顺序审核。实际仍无真实三视图或调用/usage证据，19核心/6负例及业务准确率均未评估，不以测试数或静态计划计开发公司数。
+- 独立执行报告协议直接套件：**12 passed、7 warnings，4.84秒**，覆盖预览外正文、隐藏主业未交付、无关长附注、源先行漏检、数值/冲突保护及unknown usage物理预算。B的60 passed/1 deselected是其交接回执，本次A不冒称重跑全部60项；没有重跑无关旧套件。
+- A额外检查0、1、47、48、49、80、81、999、24001、50001字符的页面：预览与正文发现区间合计无字符空洞，每块≤24000字符。这只是结构覆盖核查，不证明真实模型已读懂各句或业务召回达标。代码没有新公司/证券代码/固定页码选择分支。
+- A读取现有208页checkpoint，只序列化重建静态计划，并拦截`Path.write_text`防止覆盖冻结JSON；重建对象与提交的static-plan.json完全相等：发现10请求575995，差455995，加一次最大重试652471，全部未采样页补全文的示例449032。这些都是当前字节保守预留，不是实际token、费用或完整可行计划；合成/verify/动态增长仍未计齐。原重建脚本会写回static-plan.json，不能直接当只读核验命令运行。
+- 未发真实请求、未运行208页专项、未改业务代码/生产配置、未删除历史数据；源与§13原记录保留。本轮未发现新增业务P0/P1；当前外部资源阻塞仍是实际部署映射、计费/币种、上下文/输出、可信计量和可达范围/配额资料，配置中没有字段不等于服务不可用或免费。
+
+实际直接验证命令：
+
+```bash
+source /home/python/Quote/scripts/quote_dev_env.sh
+/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_report_wire.py
+/home/python/miniconda3/envs/Quote/bin/python -m ruff check research/company_profile/report_interpretation.py research/company_profile/report_wire.py tests/unit/test_research/test_company_profile_report_wire.py openspec/changes/restore-company-profile-llm-led-generalization/b1-coverage-evidence/project_static_plan.py
+/home/python/miniconda3/envs/Quote/bin/python -m ruff format --check research/company_profile/report_interpretation.py research/company_profile/report_wire.py tests/unit/test_research/test_company_profile_report_wire.py openspec/changes/restore-company-profile-llm-led-generalization/b1-coverage-evidence/project_static_plan.py
+```
+
+静态核查有两项**非阻塞**：辅助脚本未使用导入`protocol_reply`（F401），report_interpretation.py一处条件表达式格式提示。留B下次触及相关文件时处理，不据此重开P1、扩大重构或消耗正式尝试；本轮不能称所有lint/格式检查通过。
+
+### 14.2 新开发者报告方式与清理前置
+
+§13如实区分了离线、静态预留、真实调用和业务进度，报告内容基本合格；“第8节已执行完”则不准确，R4/资源前置尚未完成，应报“正文发现局部修复完成、资源受阻”。以后按[A/B流程§8](../../../docs/development/ab_role_development_workflow.md#8-一个固定交接入口)统一必要字段，聊天不强制相同文风；顶部给最新状态和本次链接，详细证据仍用原入口，不重写§13或旧首次结果。
+
+本次交接未报告清理范围/释放空间或保留理由，清理执行**未证实**。A仍见QuoteBak约275MB，111MB旧隔离输出、54MB pytest数据及若干旧B1临时目录仍在；目录存在不能直接证明可删。下卡由B先核引用/活跃占用/证据持久化再清无依赖产物，持久checkpoint、正式来源、首次失败、必要证据及既有/并行改动保留。A本次只提出清理前置，没有宣称已释放空间，也不建立新清理台账。
+
+### 14.3 资源裁决、权限与进度
+
+优先取得至少一个现有来源与实际部署匹配的计量/计费/上下文资料，再核真实token需求；当前字节投影不能据以判断120000实际token必然不足。允许同网关隔离已核可达成员，未核来源不参与实际切换，不改生产池、不要求先凑齐六份，也不冒称单来源已证明故障切换。资料确实不可得时，B交一个确切缺项简表即停止，由A集中协调资源，不继续派纯fake任务；只有可信计量仍不可行，才需要有数据支撑的范围/预算裁决。
+
+旧离线2/2用尽；原专项0/1未启动；真实首次0/1、后继0/1且**未获授权**。预算、19核心/6负例及容错政策不变。开发0/4（剩4）、S1新链0/12（剩12）、S2首组0/20（剩20）、S3 0/100（剩100）；不归档、不扩批，生产not_authorized、规模声明false。A活跃审核时间未精确计量，记unknown；本轮新增业务P0/P1为0，报告/清理缺项需补，非阻塞静态提示两项不扩大范围。
+
+A本轮只更新流程、活动进度、任务卡/待办和本审核入口；提交身份以本节所属Git提交为准。开始时11份tracked既有改动及原untracked继续保护；验收计划仅隔离本人活动进度一行，其他既有字节不纳入提交。
+
+本轮文档通过当前change的OpenSpec严格校验、76个本地文件链接核查及`git diff --check`；11份既有文件扣除本人活动进度行后hash不变，静态计划/资源回执及此前审核正文保护通过。未新增过程脚本、测试数据或备份，pytest临时日志按既有session收尾清除；历史待清候选留B按下卡核依赖处理。
