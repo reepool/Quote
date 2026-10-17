@@ -10,8 +10,10 @@ from research.company_profile.contracts import (
     ReportSemanticResponseV3,
 )
 from research.company_profile.report_interpretation import (
+    DIMENSIONS,
     compact_processing_identity,
     page_map,
+    unsampled_ranges,
 )
 from research.company_profile.report_wire import (
     compact_request,
@@ -22,6 +24,7 @@ from research.company_profile.resource_probe import protocol_reply
 from tests.unit.test_research.test_company_profile_llm_led import (
     TEXT,
     FakeReportProvider,
+    _evidence,
     _run,
 )
 from tests.unit.test_research.test_company_profile_runtime import _report
@@ -257,14 +260,16 @@ def test_compact_reading_keeps_native_fact_or_quarantines_conflict_and_dependenc
                 return result.model_copy(
                     update={
                         "checks": tuple(
-                            c.model_copy(
-                                update={
-                                    "status": "block",
-                                    "explanation": "source conflict",
-                                }
+                            (
+                                c.model_copy(
+                                    update={
+                                        "status": "block",
+                                        "explanation": "source conflict",
+                                    }
+                                )
+                                if c.target_type == "record"
+                                else c
                             )
-                            if c.target_type == "record"
-                            else c
                             for c in result.checks
                         )
                     }
@@ -281,3 +286,194 @@ def test_compact_reading_keeps_native_fact_or_quarantines_conflict_and_dependenc
     if conflict:
         assert all(c.status == "unclear" for c in result.claims)
         assert result.record_dispositions[0]["status"] == "quarantined"
+
+
+def _hidden_page(hidden: str) -> str:
+    return "附加说明。" * 50 + hidden + "附加说明。" * 400
+
+
+def test_preview_outside_body_is_sent_to_condition_capable_discovery():
+    """A's three-page counterexample: unseen body must be offered and cannot complete.
+
+    The blind fixture quotes the original page-1 text. On a residue-only request
+    that quote is not in source, so the run stops incomplete instead of treating
+    the map as coverage. The sibling test is the case where the hidden business
+    is actually established and then not delivered.
+    """
+    hidden = "另外，本公司本期主要经营电池回收服务，占营业收入百分之六十。"
+    page3 = _hidden_page(hidden)
+    pages = (
+        {"page": 1, "text": TEXT, "readable": True},
+        {"page": 2, "text": "与第一页配套的普通说明。", "readable": True},
+        {"page": 3, "text": page3, "readable": True},
+    )
+    mapped = page_map(pages)
+    assert hidden not in mapped[2]["text"]
+    assert any(
+        start <= page3.index(hidden) < end for start, end in unsampled_ranges(page3)
+    )
+    provider = CompactSemanticFixture()
+    result = _run(
+        provider,
+        processing_identity=compact_processing_identity(discovery_scope="page_map"),
+        pages=pages,
+    )
+    residue_requests = [
+        request
+        for request in provider.requests
+        if request.source_scope == "full_context"
+        and any(hidden in page["text"] for page in request.source_pages)
+    ]
+    assert residue_requests
+    assert all(
+        TEXT not in page["text"]
+        for request in residue_requests
+        for page in request.source_pages
+    )
+    assert result.page_coverage[2]["status"] == "residue_discovered"
+    assert any(
+        chunk["scope"] == "unsampled_span"
+        for chunk in result.page_coverage[2]["chunks"]
+    )
+    assert not result.draft_complete
+    assert any(gap.startswith("semantic_incomplete:") for gap in result.gaps)
+
+
+def test_hidden_major_business_blocks_completion_when_seen_but_not_delivered():
+    hidden = "另外，本公司本期主要经营电池回收服务，占营业收入百分之六十。"
+    pages = (
+        {"page": 1, "text": TEXT, "readable": True},
+        {"page": 2, "text": "与第一页配套的普通说明。", "readable": True},
+        {"page": 3, "text": _hidden_page(hidden), "readable": True},
+    )
+
+    class HiddenMajor(CompactSemanticFixture):
+        def interpret(self, r):
+            if r.source_scope == "page_map":
+                return super().interpret(r)
+            if r.purpose == "source_inventory" and any(
+                hidden in page["text"] for page in r.source_pages
+            ):
+                self.requests.append(r)
+                return ReportSemanticResponseV3.model_validate(
+                    {
+                        "request_id": r.request_id,
+                        "purpose": r.purpose,
+                        "source_conditions": (
+                            {
+                                "condition_id": "hidden_major",
+                                "dimension": "principal_business",
+                                "description": "预览采样点之外的另一主要经营",
+                                "evidence": (_evidence(r.report, text=hidden, page=3),),
+                                "major": True,
+                                "statement_status": "current",
+                            },
+                        ),
+                    }
+                )
+            result = super().interpret(r)
+            if r.purpose == "synthesize_views":
+                return result.model_copy(
+                    update={
+                        "claims": tuple(
+                            claim.model_copy(
+                                update={
+                                    "condition_ids": tuple(
+                                        item
+                                        for item in claim.condition_ids
+                                        if "hidden_major" not in item
+                                    )
+                                }
+                            )
+                            for claim in result.claims
+                        )
+                    }
+                )
+            if r.purpose == "verify_views":
+                return result.model_copy(
+                    update={
+                        "checks": tuple(
+                            (
+                                check.model_copy(
+                                    update={
+                                        "status": "block",
+                                        "explanation": "预览外主要业务未进入交付。",
+                                    }
+                                )
+                                if "hidden_major" in check.target_id
+                                else check
+                            )
+                            for check in result.checks
+                        )
+                    }
+                )
+            return result
+
+    provider = HiddenMajor()
+    result = _run(
+        provider,
+        processing_identity=compact_processing_identity(discovery_scope="page_map"),
+        pages=pages,
+    )
+    assert any(
+        request.source_scope == "full_context"
+        and any(hidden in page["text"] for page in request.source_pages)
+        for request in provider.requests
+    )
+    assert result.page_coverage[2]["status"] == "residue_discovered"
+    assert result.page_coverage[2]["status"] != "read"
+    assert not result.draft_complete
+    assert any("hidden_major" in gap for gap in result.gaps)
+    assert not any(
+        "hidden_major" in item
+        for claim in result.claims
+        if claim.status == "observed"
+        for item in claim.condition_ids
+    )
+
+
+def test_long_unrelated_note_need_not_be_extracted_line_by_line():
+    line = "附注明细行，与主营无关。"
+    footnote = line * 80
+    pages = (
+        {"page": 1, "text": TEXT, "readable": True},
+        {"page": 2, "text": "承接说明。", "readable": True},
+        *({"page": page, "text": "短附注。", "readable": True} for page in range(3, 8)),
+        {"page": 8, "text": footnote, "readable": True},
+    )
+
+    class IgnoresFootnoteLines(CompactSemanticFixture):
+        def interpret(self, r):
+            if r.source_scope == "page_map":
+                return super().interpret(r)
+            if r.purpose == "source_inventory" and all(
+                TEXT not in page["text"] for page in r.source_pages
+            ):
+                self.requests.append(r)
+                return ReportSemanticResponseV3(
+                    request_id=r.request_id, purpose=r.purpose
+                )
+            return super().interpret(r)
+
+    provider = IgnoresFootnoteLines()
+    result = _run(
+        provider,
+        processing_identity=compact_processing_identity(discovery_scope="page_map"),
+        pages=pages,
+    )
+    assert any(
+        request.source_scope == "full_context"
+        and any(line in page["text"] for page in request.source_pages)
+        for request in provider.requests
+    )
+    assert result.page_coverage[7]["status"] == "residue_discovered"
+    assert all(
+        item["status"] == "partially_checked" for item in result.page_coverage[2:7]
+    )
+    assert result.draft_complete
+    assert len(result.records) == 1
+    assert all(
+        line not in (getattr(record, "source_text", "") or "")
+        for record in result.records
+    )
+    assert len(result.source_conditions) == len(DIMENSIONS)

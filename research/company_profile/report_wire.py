@@ -186,11 +186,15 @@ def instructions(request: ReportSemanticRequestV3) -> str:
         )
     if request.purpose == "source_inventory":
         return common + (
-            "Read supplied FULL contexts, establish source-first conditions across seven "
-            "dimensions, main business lines and revenue mechanisms. Distinguish current, "
+            "Read supplied FULL contexts, including contiguous spans the structure preview "
+            "did not sample. Establish source-first conditions across seven dimensions, main "
+            "business lines and revenue mechanisms. A span outside the preview can contain a "
+            "major business even with no heading and no structured fact. Distinguish current, "
             "planned, negated, historical and third-party actors. Request additional physical "
             "pages if context or continuation is insufficient; otherwise requested_pages=[]. "
-            "No candidate answers are supplied. Preserve uncertainty, original names and units."
+            "No candidate answers are supplied. Preserve uncertainty, original names and units. "
+            "A secondary footnote line need not each become a condition, but do not omit a "
+            "major business, product, earning mechanism, input or role the supplied text supports."
         )
     if request.purpose == "synthesize_views":
         return common + (

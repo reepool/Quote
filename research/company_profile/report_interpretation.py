@@ -40,6 +40,8 @@ from .models import (
     TextAnchor,
 )
 
+DISCOVERY_CHUNK_CHARS = 24_000
+DISCOVERY_CHUNK_OVERLAP = 1_000
 REPORT_POLICY = "company_profile_llm_led.v2"
 REPORT_PROMPT = "company_profile_report_reading.2026-10-16.v1"
 COMPACT_REPORT_PROMPT = "company_profile_report_reading.2026-10-17.v2"
@@ -115,12 +117,46 @@ def compact_processing_identity(*, discovery_scope: str) -> dict[str, Any]:
     return {
         **offline_processing_identity(),
         "prompt_version": COMPACT_REPORT_PROMPT,
-        "preprocessing_version": "uniform_page_map.v1"
-        if discovery_scope == "page_map"
-        else "full_page_chunks.v1",
+        "preprocessing_version": (
+            "uniform_page_map.v1"
+            if discovery_scope == "page_map"
+            else "full_page_chunks.v1"
+        ),
         "wire_protocol": "company_profile_report_request.v3",
         "discovery_scope": discovery_scope,
     }
+
+
+def preview_spans(text: str) -> tuple[tuple[int, int], ...]:
+    """Uniform head/middle/end samples. Offsets do not depend on wording."""
+    offsets = tuple(
+        dict.fromkeys((0, max(0, len(text) // 2 - 8), max(0, len(text) - 16)))
+    )
+    return tuple(
+        (offset, min(len(text), offset + (48 if offset == 0 else 16)))
+        for offset in offsets
+    )
+
+
+def unsampled_ranges(text: str) -> tuple[tuple[int, int], ...]:
+    """Contiguous body outside the structure preview. Empty when the page is fully sampled."""
+    merged: list[list[int]] = []
+    for start, end in preview_spans(text):
+        if start >= end:
+            continue
+        if merged and start <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], end)
+        else:
+            merged.append([start, end])
+    ranges: list[tuple[int, int]] = []
+    cursor = 0
+    for start, end in merged:
+        if cursor < start:
+            ranges.append((cursor, start))
+        cursor = end
+    if cursor < len(text):
+        ranges.append((cursor, len(text)))
+    return tuple(ranges)
 
 
 def page_map(sources: Sequence[Mapping[str, Any]]) -> tuple[dict[str, Any], ...]:
@@ -128,28 +164,76 @@ def page_map(sources: Sequence[Mapping[str, Any]]) -> tuple[dict[str, Any], ...]
 
     No company, chapter name, keyword or frozen acceptance answer affects which
     page is visible. Original offsets and text lengths expose what was omitted.
+    Omitted spans stay eligible for a later condition-capable discovery request.
     """
     result = []
     for source in sources:
         text = source["text"]
-        offsets = tuple(
-            dict.fromkeys((0, max(0, len(text) // 2 - 8), max(0, len(text) - 16)))
-        )
-        spans = [
-            (offset, text[offset : offset + (48 if offset == 0 else 16)])
-            for offset in offsets
-        ]
+        spans = preview_spans(text)
         result.append(
             {
                 "page": source["page"],
                 "readable": source["readable"],
                 "source_characters": len(text),
                 "scope": "structure_preview_only",
-                "sample_offsets": [offset for offset, _ in spans],
-                "text": "\n…\n".join(value for _, value in spans),
+                "sample_offsets": [start for start, _ in spans],
+                "text": "\n…\n".join(text[start:end] for start, end in spans),
             }
         )
     return tuple(result)
+
+
+def structural_discovery_chunks(
+    sources: Sequence[Mapping[str, Any]],
+    full_page_ids: set[int],
+) -> list[list[dict[str, Any]]]:
+    """Pack full selected pages and the unsampled body of every other page.
+
+    Page-map samples are not repeated here. No title, keyword or company identity
+    chooses a span.
+    """
+    queued: list[dict[str, Any]] = []
+    step = DISCOVERY_CHUNK_CHARS - DISCOVERY_CHUNK_OVERLAP
+
+    def enqueue(page: Mapping[str, Any], start: int, end: int, body_scope: str) -> None:
+        span = str(page["text"])[start:end]
+        for local in range(0, len(span), step):
+            queued.append(
+                {
+                    "page": page["page"],
+                    "readable": True,
+                    "text": span[local : local + DISCOVERY_CHUNK_CHARS],
+                    "offset": start + local,
+                    "body_scope": body_scope,
+                }
+            )
+            if local + DISCOVERY_CHUNK_CHARS >= len(span):
+                break
+
+    for page in sources:
+        if not page["readable"]:
+            continue
+        if page["page"] in full_page_ids:
+            enqueue(page, 0, len(page["text"]), "full_page")
+        else:
+            for span_start, span_end in unsampled_ranges(str(page["text"])):
+                enqueue(page, span_start, span_end, "unsampled_span")
+    chunks: list[list[dict[str, Any]]] = []
+    current: list[dict[str, Any]] = []
+    current_size = 0
+    for fragment in queued:
+        scope_changed = current and current[-1]["body_scope"] != fragment["body_scope"]
+        if current and (
+            scope_changed
+            or current_size + len(fragment["text"]) > DISCOVERY_CHUNK_CHARS
+        ):
+            chunks.append(current)
+            current, current_size = [], 0
+        current.append(fragment)
+        current_size += len(fragment["text"])
+    if current:
+        chunks.append(current)
+    return chunks
 
 
 def _pages(pages: Sequence[Mapping[str, Any]]) -> tuple[dict[str, Any], ...]:
@@ -177,13 +261,16 @@ def _evidence_valid(
     # Exact quotes and physical references are hard constraints. Meaning is verified separately.
     if evidence.report != report or not isinstance(evidence.anchor, TextAnchor):
         return False
-    texts = {int(page["page"]): str(page["text"]) for page in pages if page["readable"]}
+    grouped: dict[int, list[str]] = {}
+    for page in pages:
+        if page["readable"]:
+            grouped.setdefault(int(page["page"]), []).append(str(page["text"]))
     quote = evidence.anchor.bounded_quote
     return (
         bool(quote.strip())
-        and quote in texts.get(evidence.page, "")
+        and any(quote in text for text in grouped.get(evidence.page, ()))
         and all(
-            page in texts
+            page in grouped
             for page in (*evidence.continuation_pages, *evidence.subject_evidence_pages)
         )
     )
@@ -269,6 +356,7 @@ def interpret_report(
         )
         if remaining <= 0 or len(receipts) >= 16:
             raise ValueError("report_deadline_or_request_budget_exhausted")
+            raise ValueError("report_deadline_or_request_budget_exhausted")
         request_type = ReportSemanticRequestV3 if compact else ReportSemanticRequest
         request = request_type(
             request_id=f"{work_id}:report:{len(receipts) + 1}",
@@ -280,9 +368,7 @@ def interpret_report(
                 (
                     1000
                     if source_scope == "page_map"
-                    else 2500
-                    if purpose != "verify_views"
-                    else 2000
+                    else 2500 if purpose != "verify_views" else 2000
                 )
                 if compact
                 else 4000
@@ -399,41 +485,62 @@ def interpret_report(
                 for p in sources
                 if p["readable"] and any(abs(p["page"] - n) <= 1 for n in requested)
             )
-        chunks: list[list[dict[str, Any]]] = []
-        current: list[dict[str, Any]] = []
-        current_size = 0
-        chunk_size, overlap = 24_000, 1_000
-        for page in discovery_sources:
-            if not page["readable"]:
-                by_page[page["page"]]["status"] = "extraction_failed"
-                gaps.append(f"page_unreadable:{page['page']}")
-                continue
-            for offset in range(0, len(page["text"]), chunk_size - overlap):
-                fragment = {
-                    **page,
-                    "text": page["text"][offset : offset + chunk_size],
-                    "offset": offset,
-                }
-                if current and current_size + len(fragment["text"]) > chunk_size:
-                    chunks.append(current)
-                    current, current_size = [], 0
-                current.append(fragment)
-                current_size += len(fragment["text"])
-                if offset + chunk_size >= len(page["text"]):
-                    break
-        if current:
-            chunks.append(current)
-        expected_chunks = {
-            page["page"]: sum(
-                any(p["page"] == page["page"] for p in chunk) for chunk in chunks
-            )
-            for page in sources
-        }
+        if not structural:
+            for page in discovery_sources:
+                if not page["readable"]:
+                    by_page[page["page"]]["status"] = "extraction_failed"
+                    gaps.append(f"page_unreadable:{page['page']}")
+            full_ids = {page["page"] for page in discovery_sources if page["readable"]}
+        else:
+            # Selected pages are read in full. Every other readable page still
+            # sends the body the preview did not sample, so a major business
+            # outside those windows can enter the source-first list.
+            full_ids = {page["page"] for page in discovery_sources}
+        chunks = structural_discovery_chunks(sources, full_ids)
+        full_expected = {page["page"]: 0 for page in sources}
+        for chunk in chunks:
+            for fragment in chunk:
+                if fragment["body_scope"] == "full_page":
+                    full_expected[fragment["page"]] += 1
         supplements = 0
         read_pages = set()
         for chunk in chunks:
-            response = invoke("source_inventory", tuple(chunk))
-            read_pages.update(p["page"] for p in chunk)
+            response = invoke(
+                "source_inventory",
+                tuple(
+                    {
+                        "page": fragment["page"],
+                        "text": fragment["text"],
+                        "readable": True,
+                        "offset": fragment["offset"],
+                        "scope": fragment["body_scope"],
+                    }
+                    for fragment in chunk
+                ),
+            )
+            read_pages.update(
+                fragment["page"]
+                for fragment in chunk
+                if fragment["body_scope"] == "full_page"
+            )
+            for fragment in chunk:
+                page_state = by_page[fragment["page"]]
+                page_state["chunks"].append(
+                    {
+                        "offset": fragment["offset"],
+                        "length": len(fragment["text"]),
+                        "scope": fragment["body_scope"],
+                        "request_id": receipts[-1]["request_id"],
+                    }
+                )
+                if fragment["body_scope"] == "unsampled_span":
+                    page_state["residue_discovered"] = True
+                    if page_state["status"] != "read":
+                        page_state["status"] = "residue_discovered"
+                else:
+                    page_state["full_chunks"] = page_state.get("full_chunks", 0) + 1
+                    if page_state["full_chunks"] == full_expected[fragment["page"]]:
+                        page_state["status"] = "read"
             for condition in response.source_conditions:
                 if not all(
                     _evidence_valid(e, report, chunk) for e in condition.evidence
@@ -446,22 +553,16 @@ def interpret_report(
                 conditions.append(
                     condition.model_copy(update={"condition_id": scoped_id})
                 )
-            for fragment in chunk:
-                page_state = by_page[fragment["page"]]
-                page_state["chunks"].append(
-                    {
-                        "offset": fragment["offset"],
-                        "length": len(fragment["text"]),
-                        "request_id": receipts[-1]["request_id"],
-                    }
-                )
-                if len(page_state["chunks"]) == expected_chunks[fragment["page"]]:
-                    page_state["status"] = "read"
             if compact and response.requested_pages:
                 pending = (
                     set(response.requested_pages)
                     - read_pages
-                    - {p["page"] for later in chunks for p in later}
+                    - {
+                        fragment["page"]
+                        for later in chunks
+                        for fragment in later
+                        if fragment["body_scope"] == "full_page"
+                    }
                 )
                 if not pending <= {p["page"] for p in sources if p["readable"]}:
                     raise ValueError("requested_source_page_unavailable")
@@ -470,9 +571,20 @@ def interpret_report(
                         raise ValueError("source_supplement_limit_reached")
                     supplements += 1
                     extra = [p for p in sources if p["page"] in pending]
-                    chunks.append([{**p, "offset": 0} for p in extra])
+                    chunks.append(
+                        [
+                            {
+                                "page": p["page"],
+                                "readable": True,
+                                "text": p["text"],
+                                "offset": 0,
+                                "body_scope": "full_page",
+                            }
+                            for p in extra
+                        ]
+                    )
                     for p in extra:
-                        expected_chunks[p["page"]] += 1
+                        full_expected[p["page"]] += 1
         # Synthesis receives full cited pages, including surrounding headers and
         # adjacent continuation pages. Discovery has already accounted for all pages.
         cited_evidence = (
@@ -663,6 +775,26 @@ def interpret_report(
             for claim in claims
         )
 
+    states = {item["page"]: item for item in coverage}
+    if structural:
+        for source in sources:
+            state = states[source["page"]]
+            if (
+                source["readable"]
+                and unsampled_ranges(source["text"])
+                and state["status"] != "read"
+                and not state.get("residue_discovered")
+            ):
+                gaps.append(f"unsampled_body_not_discovered:{source['page']}")
+
+    def structurally_covered(source: Mapping[str, Any]) -> bool:
+        state = states[source["page"]]
+        if state["status"] == "read":
+            return True
+        if unsampled_ranges(source["text"]):
+            return bool(state.get("residue_discovered"))
+        return bool(state.get("map_checked"))
+
     valid_dimensions = []
     all_pages_read = (
         bool(coverage)
@@ -672,8 +804,12 @@ def interpret_report(
             if not structural
             else map_checked
             and bool(conditions)
-            and not any("semantic_incomplete:" in gap for gap in gaps)
+            and not any(gap.startswith("semantic_incomplete:") for gap in gaps)
+            and not any(
+                gap.startswith("unsampled_body_not_discovered:") for gap in gaps
+            )
             and all(p["readable"] for p in sources)
+            and all(structurally_covered(source) for source in sources)
         )
     )
     verdicts = {(item.target_type, item.target_id): item.status for item in checks}

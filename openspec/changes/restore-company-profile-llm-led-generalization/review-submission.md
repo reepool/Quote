@@ -385,3 +385,45 @@ PY
 A本轮只审核及更新任务文档，不替B修业务代码；活跃审核时间未精确计量记unknown。开始时11份tracked既有修改及原untracked继续保护，验收计划仅隔离本人计量澄清及活动进度行；原合同、原§11和首次制品不变。
 
 本轮5份文档通过OpenSpec本change严格校验、`git diff --check`及69个本地链接检查；19项源条件保留，11份既有文件扣除本人两处文档变更后hash相等。审核旧记录保持原字节前缀；本人提交仅含上述5份审核/任务文档。
+
+## 13. B角接续：未采样正文发现与计量阻塞（2026-10-17）
+
+结论：**A-P1-MAP-01的发现通路和完整性误判已按卡修入同一owner；可信token计量资料仍缺，最终计划的字节上界仍超过120000，故§8允许的那一次208页离线整体验证没有启动。** B1/A1仍未通过。正式首次/后继0/0，真实模型调用0，实际费用未评估。19项核心、6项负例和已审准确率未评估。不进入B2，不归档，不扩批，不改生产池，不加预算。
+
+### 13.1 正文发现与完整性
+
+地图仍只做均匀采样导航，不建立源条件，也不使用公司、证券代码、固定页码或标题白名单。模型选中的页及其相邻页继续读全文。其余可读页把预览没有覆盖的连续区间单独打包，送入`full_context`的源先行发现；这些区间不并进全文块，避免被已选正文淹没。程序不判断句子是否无关。已确认的主要条件若未进入交付，或引用不能落在本次正文上，就不能把七维标成完整。未采样正文没有进入发现请求时记`unsampled_body_not_discovered`，不能靠`map_checked`当成已读或未披露。
+
+| 回归 | 实际结果 |
+| --- | --- |
+| A的三页反例，盲fixture | “占营业收入百分之六十”的句子不在48/16/16预览内，进入独立全文发现请求。该fixture仍引用第一页原文，引用不在未采样区间内，流程记`semantic_incomplete`，`draft_complete=false`。页状态为`residue_discovered`，不是`read` |
+| 同一隐藏主业被模型立成主要条件但回答未交付 | 条件进入源先行清单，核验为block，观察回答不包含该条件，`draft_complete=false` |
+| 无关长附注 | 第8页长附注进入未采样发现；fixture不逐行生成条件。短页仍只是`partially_checked`。七维可`draft_complete=true`，记录仍为1条，不是每行一条 |
+
+没有把“电池回收”或收入比例写成生产规则。长报告不会因为存在未逐行抽取的附注而永久判失败。
+
+### 13.2 计量、资源与静态计划
+
+`semantic_extraction`的六个具体profile仍只有路由、超时和并发字段，没有价格、上下文字数或分词器字段。模型名为`gemini-3.8-flash-high`、`glm-5.3-flash`、`grok-4.7`、`gpt-5.6-luna`、`DeepSeek-V4.1-Flash`、`deepseek-flash`。没有可绑定到这些渠道型号的计费依据或分词器，因此物理预算接点继续使用UTF-8 payload字节＋256 framing＋最大输出。这不是token，也不是费用。未改`LlmRunBudget`的算法，未用经验除数、正文除法或fake usage冲减。未发送推理请求，也未重查模型广场。生产池和故障切换保持原配置；六个成员都没有资料，所以没有一个可单独放行的隔离绑定。
+
+静态计划只序列化、不发送，正文来自第二次方案已保存的208页checkpoint（184544字 / UTF-8 404158字节），不是新的入口运行。非空协议的中页选择为第105页，全文为其相邻的104–106页，其余页发送未采样区间。发现阶段10个物理请求，按六成员较大预留合计**575995**，比120000多**455995**。再保留一次最大请求重试则为**652471**。若模型把全部未采样页一次补成全文，这一次补源单独为**449032**。合成、核验和Evidence增长尚未计入，因为发现阶段已经超过上限。请求数10小于16，先阻塞的是预留单位。动态内容若大于该计划，现有发送前拒绝仍然生效。因此§8的208页专项验证**未启动**，旧两次失败记录不重置。
+
+证据：[静态计划](b1-coverage-evidence/static-plan.json)、[重建脚本](b1-coverage-evidence/project_static_plan.py)。
+
+```bash
+source /home/python/Quote/scripts/quote_dev_env.sh
+PYTHONPATH=/home/python/Quote /home/python/miniconda3/envs/Quote/bin/python openspec/changes/restore-company-profile-llm-led-generalization/b1-coverage-evidence/project_static_plan.py
+```
+
+### 13.3 验证、保护与停止
+
+直接回归：**60 passed、1 deselected、7 warnings**。命令与§11.3相同，多出的3个通过项是本节两个正反例所在文件中的新用例；未选中的原owner重型用例仍未重跑。
+
+```bash
+source /home/python/Quote/scripts/quote_dev_env.sh
+/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_report_wire.py tests/unit/test_research/test_company_profile_llm_led.py tests/unit/test_research/test_company_profile_bounded_entry.py tests/unit/test_utils/test_llm_physical_budget.py -k 'not existing_owner'
+```
+
+开始时HEAD为`1a9de515`。11份既有tracked修改和原未跟踪文件未操作。真实调用0，正式首次0/1、后继0/1，真实授权仍未签发。B活跃时间未精确计量，记unknown。开发0/4、S1新链0/12、S2首组0/20、S3 0/100不变。生产`not_authorized`，规模声明false。
+
+下一步需要A裁决：在有部署匹配的分词与计费依据后重估这版发现计划，或明确阅读范围/预算取舍。本窗口不再开第三种压缩方案，也不把575995换算成token。
