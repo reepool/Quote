@@ -46,6 +46,7 @@ from .models import (
 )
 from .reading_budget import (
     partial_slice_plan,
+    records_for_fragments,
     remaining_tail_units,
     request_reservation,
     reused_map_receipts,
@@ -499,6 +500,25 @@ def interpret_report(
             **({"source_scope": source_scope} if compact else {}),
             **payload,
         )
+        if partial and partial_plan is not None and execution_budget is not None:
+            units = request_reservation(request)
+            ceiling = partial_plan["ceilings"].get(purpose)
+            if (
+                purpose != "source_inventory"
+                and ceiling is not None
+                and units > ceiling
+            ):
+                raise ValueError("followup_growth_exceeds_frozen_ceiling")
+            charged = execution_budget.snapshot()["charged_tokens"]
+            later = remaining_tail_units(
+                partial_plan,
+                execution_budget.snapshot()["attempts"],
+                purpose,
+            )
+            if charged + units + later > int(
+                identity.get("ledger_tokens") or execution_budget.max_tokens
+            ):
+                raise ValueError("partial_tail_hold_would_be_exhausted")
         if compact and purpose != "source_inventory":
             from .report_wire import compact_request
 
@@ -516,25 +536,6 @@ def interpret_report(
                 > DEVELOPMENT_RECOVERY_RESERVATION
             ):
                 raise ValueError("followup_payload_exceeds_recovery_room")
-        if partial and partial_plan is not None and execution_budget is not None:
-            units = request_reservation(request)
-            charged = execution_budget.snapshot()["charged_tokens"]
-            later = remaining_tail_units(
-                partial_plan,
-                execution_budget.snapshot()["attempts"],
-                purpose,
-            )
-            if charged + units + later > int(
-                identity.get("ledger_tokens") or execution_budget.max_tokens
-            ):
-                raise ValueError("partial_tail_hold_would_be_exhausted")
-            ceiling = partial_plan["ceilings"].get(purpose)
-            if (
-                purpose != "source_inventory"
-                and ceiling is not None
-                and units > ceiling
-            ):
-                raise ValueError("followup_growth_exceeds_frozen_ceiling")
         # UTF-8 bytes are a conservative preflight allowance for unknown usage.
         reserve = (
             len(request.model_dump_json().encode("utf-8")) + request.max_output_tokens
@@ -654,16 +655,23 @@ def interpret_report(
                 identity=identity,
                 ledger_units=int(identity.get("ledger_tokens") or 62_220),
                 records=tuple(structured.values()),
+                explicit_span=identity.get("diagnostic_span"),
             )
+            spare = max(0, int(plan["ledger_units"]) - int(plan["total_units"]))
             partial_plan = {
                 **plan,
                 "ceilings": {
                     "source_inventory": plan["body_units"],
-                    "synthesize_views": plan["synthesis_units"],
-                    "verify_views": plan["verification_units"],
+                    "synthesize_views": plan["synthesis_units"] + spare,
+                    "verify_views": plan["verification_units"] + spare,
                 },
             }
             partial_fragments = [plan["fragments"]]
+            if plan.get("span_start") is not None:
+                gaps.append(
+                    "diagnostic_span:"
+                    f"{plan['pages'][-1]}:{plan['span_start']}:{plan['tail_offset']}"
+                )
             if plan["tail_offset"] is not None:
                 gaps.append(
                     f"slice_tail_unread:{plan['pages'][-1]}:{plan['tail_offset']}"
@@ -835,6 +843,18 @@ def interpret_report(
                     )
                     for p in extra:
                         full_expected[p["page"]] += 1
+        related_records = tuple(structured.values())
+        if partial and partial_fragments is not None:
+            sent_fragments = [
+                fragment for chunk in partial_fragments for fragment in chunk
+            ]
+            related_records = records_for_fragments(
+                structured.values(), sent_fragments
+            )
+            related_ids = {item.record_id for item in related_records}
+            for record in structured.values():
+                if record.record_id not in related_ids:
+                    gaps.append(f"native_fact_outside_read_span:{record.record_id}")
         # Synthesis receives full cited pages, including surrounding headers and
         # adjacent continuation pages. Discovery has already accounted for all pages.
         cited_evidence = (
@@ -862,7 +882,7 @@ def interpret_report(
             "synthesize_views",
             quote_pages,
             source_conditions=tuple(conditions),
-            records=tuple(structured.values()),
+            records=related_records,
             active_checklist=tuple(active_checklist),
         )
         claims, candidates = response.claims, response.records
@@ -871,7 +891,7 @@ def interpret_report(
         condition_map = {item.condition_id: item for item in conditions}
         invalid_records = set()
         merged = {}
-        for record in (*structured.values(), *candidates):
+        for record in (*related_records, *candidates):
             scope_valid = record_scope_valid(record)
             original = structured.get(record.record_id)
             numeric_valid = (
@@ -921,7 +941,11 @@ def interpret_report(
         records = tuple(merged.values())
         record_map = {record.record_id: record for record in records}
         invalid_claims = set()
+        outside_ids = set(structured) - {item.record_id for item in related_records}
         for claim in claims:
+            if any(key in outside_ids for key in claim.supporting_record_ids):
+                invalid_claims.add(claim.claim_id)
+                gaps.append(f"claim_dependency_outside_read_span:{claim.claim_id}")
             if (
                 not all(key in condition_map for key in claim.condition_ids)
                 or not all(
@@ -1023,7 +1047,7 @@ def interpret_report(
                         report=report,
                         identity=identity,
                         ledger_units=int(identity.get("ledger_tokens") or 62_220),
-                        records=tuple(structured.values()),
+                        records=related_records,
                     )
                     charged_now = (
                         execution_budget.snapshot()["charged_tokens"]
@@ -1048,11 +1072,14 @@ def interpret_report(
                     gaps.append(f"semantic_incomplete:{str(exc)[:240]}")
     except (SemanticProviderError, LlmError, ValueError, TypeError) as exc:
         gaps.append(f"semantic_incomplete:{str(exc)[:240]}")
-        records = tuple(
-            item
-            for item in structured.values()
-            if record_scope_valid(item) and item.record_id not in quarantined
-        )
+        if not partial:
+            records = tuple(
+                item
+                for item in structured.values()
+                if record_scope_valid(item) and item.record_id not in quarantined
+            )
+        elif not checks:
+            records = ()
         claims = tuple(
             claim.model_copy(
                 update={

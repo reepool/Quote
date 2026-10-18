@@ -1101,3 +1101,116 @@ def test_shrunk_slice_body_tail_and_recovery_share_one_ledger():
         )
         > 1000
     )
+
+
+def test_explicit_span_ceiling_uses_citation_volume_not_protocol_reply(monkeypatch):
+    """The frozen page-12 span is admitted by its own text, not a 14/7 fixture."""
+    import gzip
+    import hashlib
+    from pathlib import Path
+
+    from research.company_profile.core_evidence_selection import (
+        project_owned_page_facts,
+        select_core_evidence,
+    )
+    from research.company_profile.models import Measurement, ReportIdentity, Segment
+    from research.company_profile.reading_budget import (
+        executable_reservations,
+        partial_slice_plan,
+        reused_map_receipts,
+    )
+    from research.company_profile.report_interpretation import COMPACT_REPORT_PROMPT
+    from research.company_profile.runtime import COMMON_CORE_CHAPTERS
+
+    def fail(*_args, **_kwargs):
+        raise AssertionError("protocol_reply entered admission")
+
+    monkeypatch.setattr(
+        "research.company_profile.resource_probe.protocol_reply", fail
+    )
+    change = (
+        Path(__file__).resolve().parents[3]
+        / "openspec/changes/restore-company-profile-llm-led-generalization"
+    )
+    checkpoint = json.loads(
+        gzip.decompress(
+            (change / "b1-resource-evidence/iteration2/checkpoint.json.gz").read_bytes()
+        )
+    )
+    pages = tuple(
+        {
+            "page": int(page["page"]),
+            "text": str(page.get("text") or ""),
+            "readable": bool(str(page.get("text") or "").strip()),
+        }
+        for page in checkpoint["pages"]
+    )
+    span = next(page["text"] for page in pages if page["page"] == 12)[415:822]
+    assert len(span) == 407
+    assert len(span.encode()) == 1169
+    assert (
+        hashlib.sha256(span.encode()).hexdigest()
+        == "930fd035efb3384f73fab6be3eba5c169939bb70f40fa588a938aa97c96b256b"
+    )
+    report = ReportIdentity.model_validate(
+        checkpoint["report_interpretation"]["report"]
+    )
+    identity = compact_processing_identity(discovery_scope="page_map")
+    explicit = {
+        "page": 12,
+        "start": 415,
+        "end": 822,
+        "sha256": "930fd035efb3384f73fab6be3eba5c169939bb70f40fa588a938aa97c96b256b",
+    }
+    fragment = {
+        "page": 12,
+        "text": span,
+        "readable": True,
+        "offset": 415,
+        "body_scope": "bounded_span",
+    }
+    measured = executable_reservations(
+        [fragment], report=report, identity=identity
+    )
+    assert measured["citation_bytes"] == 1169
+    assert measured["record_count"] == 0
+    assert (
+        measured["synthesis_units"]
+        == measured["synthesis_shell_units"] + measured["citation_bytes"]
+    )
+    assert (
+        measured["verification_units"]
+        == measured["verification_shell_units"] + measured["citation_bytes"]
+    )
+    assert measured["total_units"] > 33_998
+    selection = select_core_evidence(report=report, pages=pages)
+    unrelated = tuple(
+        record
+        for chapter in COMMON_CORE_CHAPTERS
+        for record in project_owned_page_facts(selection, chapter)
+        if isinstance(record, (Measurement, Segment))
+    )
+    assert len(unrelated) == 6
+    with_unrelated = executable_reservations(
+        [fragment], report=report, identity=identity, records=unrelated
+    )
+    assert with_unrelated["record_count"] == 0
+    assert with_unrelated["total_units"] == measured["total_units"]
+    query = json.loads(
+        (change / "b1-pool-observation-evidence/special/query.json").read_text()
+    )
+    _, selected = reused_map_receipts(
+        query["profiles"][0]["three_views"]["call_receipts"],
+        prompt_version=COMPACT_REPORT_PROMPT,
+        page_count=len(pages),
+    )
+    with pytest.raises(ValueError, match="partial_slice_does_not_fit_remaining_ledger"):
+        partial_slice_plan(
+            pages,
+            sorted(selected),
+            report=report,
+            identity=identity,
+            ledger_units=33_998,
+            records=unrelated,
+            explicit_span=explicit,
+        )

@@ -74,6 +74,7 @@ def preflight_partial(binding: dict) -> dict:
         report=report,
         identity=compact_processing_identity(discovery_scope="page_map"),
         ledger_units=int(binding["max_tokens"]),
+        explicit_span=binding.get("diagnostic_span"),
     )
     if plan["total_units"] > int(binding["max_tokens"]):
         raise ValueError("partial_plan_exceeds_ledger")
@@ -442,6 +443,8 @@ def _worker(
             navigation_query=binding["navigation_query"],
             parent_attempt=binding.get("parent_attempt", "special"),
         )
+        if binding.get("diagnostic_span"):
+            identity["diagnostic_span"] = binding["diagnostic_span"]
     service = CompanyProfileTaskService(
         storage=storage,
         output_root=run_root / "output",

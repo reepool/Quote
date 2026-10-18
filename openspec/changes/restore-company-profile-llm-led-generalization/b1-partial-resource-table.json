@@ -184,9 +184,33 @@
     },
     "planner": "partial_slice_plan with these six records raises partial_slice_does_not_fit_remaining_ledger against 62220. No selected page is admitted."
   },
-  "preferred_decision": {
+  "b1e_decision_retained": {
     "choice": "do_not_authorize_a_fifth_live_entry",
     "reason": "The smallest nonempty slice that also carries the six projected native facts is page 12 at 79811 reservation units. That is 17591 above the old slice ledger 62220 and 45813 above the remaining 33998. Pages 12-13 with the same facts are 97408. The earlier 56131 page-12 figure omitted those facts and is not the payload the owner sends. Full-report discovery remains the prior 588281-607021 before a nonempty tail.",
     "not_requested": "Do not raise the ledger to 79811, 97408, or the old 749989-766497 figure. None of those is a measured token count or a fee."
+  },
+  "b1f_span_executable_bound": {
+    "source": "iteration2 checkpoint page 12 characters [415, 822), CRLF preserved",
+    "chars": 407,
+    "citation_bytes": 1169,
+    "sha256": "930fd035efb3384f73fab6be3eba5c169939bb70f40fa588a938aa97c96b256b",
+    "basis": "Measured gateway reservation of this span plus one extra UTF-8 copy of the read text. The six page-18 records are outside the span and do not change the total. Not a 14/7 protocol reply, not an empty follow-up, not measured tokens or CNY.",
+    "body_units": 8264,
+    "synthesis_shell_units": 8213,
+    "verification_shell_units": 6424,
+    "synthesis_units": 9382,
+    "verification_units": 7593,
+    "recovery_units": 9382,
+    "total_units": 34621,
+    "record_count": 0,
+    "gap_versus_33998": 623,
+    "empty_condition_shell_not_the_ceiling": 31165,
+    "request_plan_if_admitted": "3 content sends plus 1 shared recovery = 4, within 6. Not started.",
+    "output_overshoot": "Requested caps 2500 and 2000 are inside the shell. Historical returns of 12327 and 5062 are not a token ratio and are not added to 34621. A real send that settled above its reservation would stop the next send."
+  },
+  "preferred_decision": {
+    "choice": "do_not_start_the_authorized_short_segment",
+    "reason": "The frozen span's executable plan is 34621 reservation units, 623 above the remaining 33998. The conditional real entry was not started and its attempt marker was not written.",
+    "not_requested": "Do not raise 33998 by 623, and do not admit the span by dropping the citation copy back to the 31165 empty-condition shell."
   }
 }

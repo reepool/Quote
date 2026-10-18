@@ -6,6 +6,7 @@ requested output cap. They are not a tokenizer reading and not a fee.
 
 from __future__ import annotations
 
+import hashlib
 import json
 from collections.abc import Mapping, Sequence
 from pathlib import Path
@@ -146,6 +147,100 @@ def remaining_tail_units(
     return 0
 
 
+def _evidence_in_fragments(evidence: Any, fragments: Sequence[Mapping[str, Any]]) -> bool:
+    """A fact is in this read when its quote sits inside a fragment actually sent."""
+    page = getattr(evidence, "page", None)
+    anchor = getattr(evidence, "anchor", None)
+    quote = getattr(anchor, "bounded_quote", None) if anchor is not None else None
+    if page is None or not quote:
+        return False
+    return any(
+        int(fragment["page"]) == int(page) and str(quote) in str(fragment["text"])
+        for fragment in fragments
+    )
+
+
+def records_for_fragments(
+    records: Sequence[Any], fragments: Sequence[Mapping[str, Any]]
+) -> tuple[Any, ...]:
+    """Native facts whose evidence is inside the read span.
+
+    Facts cited only on other pages stay out of this slice. Callers keep the
+    original records in storage and do not mark them verified.
+    """
+    return tuple(
+        record
+        for record in records
+        if any(
+            _evidence_in_fragments(item, fragments)
+            for item in (getattr(record, "evidence", ()) or ())
+        )
+    )
+
+
+def executable_reservations(
+    fragments: Sequence[Mapping[str, Any]],
+    *,
+    report: Any,
+    identity: Mapping[str, Any],
+    records: Sequence[Any] = (),
+) -> dict[str, int]:
+    """Send limit for one span: measured payload plus one copy of the read text.
+
+    The shell is the request that will actually be built for this span, including
+    its schema, instructions and output cap. The extra citation bytes are the
+    UTF-8 size of the text just read, which is the most quote text a later
+    request can add after duplicate quotes collapse. This is not a simulated
+    condition count and not an empty follow-up. A later real response that
+    exceeds the ceiling is kept and not forwarded.
+    """
+    citation = sum(len(str(item.get("text") or "").encode()) for item in fragments)
+    related = records_for_fragments(records, fragments)
+    body = request_reservation(
+        _request(
+            fragments,
+            purpose="source_inventory",
+            report=report,
+            identity=identity,
+            max_output=2500,
+        )
+    )
+    synthesis_shell = request_reservation(
+        _request(
+            fragments,
+            purpose="synthesize_views",
+            report=report,
+            identity=identity,
+            max_output=2500,
+            records=related,
+        )
+    )
+    verification_shell = request_reservation(
+        _request(
+            fragments,
+            purpose="verify_views",
+            report=report,
+            identity=identity,
+            max_output=2000,
+            records=related,
+        )
+    )
+    synthesis = synthesis_shell + citation
+    verification = verification_shell + citation
+    recovery = max(body, synthesis, verification)
+    return {
+        "body_units": body,
+        "synthesis_shell_units": synthesis_shell,
+        "verification_shell_units": verification_shell,
+        "citation_bytes": citation,
+        "synthesis_units": synthesis,
+        "verification_units": verification,
+        "recovery_units": recovery,
+        "total_units": body + synthesis + verification + recovery,
+        "record_count": len(related),
+    }
+
+
 def stage_reservations(
     pages: Sequence[Mapping[str, Any]],
     *,
@@ -155,11 +250,7 @@ def stage_reservations(
     claims: Sequence[Any] = (),
     records: Sequence[Any] = (),
 ) -> dict[str, int]:
-    """Body plus follow-ups that carry the supplied conditions, claims and facts.
-
-    Empty follow-ups are not an upper bound. Callers that have not yet read the
-    body pass protocol-shaped objects from ``protocol_followup``.
-    """
+    """Measure one concrete request. Callers pass the objects they will send."""
     body = request_reservation(
         _request(
             pages,
@@ -203,47 +294,6 @@ def stage_reservations(
         "claim_count": len(tuple(claims)),
         "record_count": len(tuple(records)),
     }
-
-
-def protocol_followup(
-    pages: Sequence[Mapping[str, Any]],
-    *,
-    report: Any,
-    identity: Mapping[str, Any],
-    records: Sequence[Any] = (),
-):
-    """Protocol-shaped conditions and claims for sizing, not a business reading."""
-    from .contracts import ReportSemanticResponseV3
-    from .report_wire import compact_request, expand_response
-    from .resource_probe import protocol_reply
-
-    inventory = _request(
-        pages,
-        purpose="source_inventory",
-        report=report,
-        identity=identity,
-        max_output=2500,
-    )
-    conditions = ReportSemanticResponseV3.model_validate_json(
-        json.dumps(
-            expand_response(protocol_reply(compact_request(inventory)), inventory)
-        )
-    ).source_conditions
-    synthesis = _request(
-        pages,
-        purpose="synthesize_views",
-        report=report,
-        identity=identity,
-        max_output=2500,
-        source_conditions=conditions,
-        records=tuple(records),
-    )
-    claims = ReportSemanticResponseV3.model_validate_json(
-        json.dumps(
-            expand_response(protocol_reply(compact_request(synthesis)), synthesis)
-        )
-    ).claims
-    return conditions, claims
 
 
 def reused_map_receipts(
@@ -295,31 +345,67 @@ def partial_slice_plan(
     identity: Mapping[str, Any],
     ledger_units: int = PARTIAL_LEDGER_UNITS,
     records: Sequence[Any] = (),
+    explicit_span: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Longest whole-page prefix of the first selected run that leaves a tail.
+    """Fit a read span inside the ledger using the executable citation ceiling.
 
-    The tail is nonempty synthesis and verification plus one recovery. Empty
-    follow-up requests are not the ceiling. Unread pages stay outside the slice.
+    An explicit span is the caller's bounded text, not a production page picker.
+    Without one, the longest whole-page prefix of the first selected run is used.
+    Unrelated native facts are not part of the ceiling. Unread pages stay outside.
     """
     by_page = {int(page["page"]): page for page in pages}
     runs = contiguous_runs(selected_ids)
-    if not runs:
+    if not runs and explicit_span is None:
         raise ValueError("partial_slice_requires_a_selected_run")
     chosen: list[int] = []
     plan: dict[str, int] | None = None
 
     def sized(candidate: Sequence[Mapping[str, Any]]) -> dict[str, int]:
-        conditions, claims = protocol_followup(
+        return executable_reservations(
             candidate, report=report, identity=identity, records=records
         )
-        return stage_reservations(
-            candidate,
-            report=report,
-            identity=identity,
-            conditions=conditions,
-            claims=claims,
-            records=records,
-        )
+
+    if explicit_span is not None:
+        page_no = int(explicit_span["page"])
+        source = by_page[page_no]
+        text = str(source["text"])
+        start = int(explicit_span["start"])
+        end = int(explicit_span["end"])
+        if not 0 <= start < end <= len(text):
+            raise ValueError("diagnostic_span_outside_page")
+        fragment_text = text[start:end]
+        expected = explicit_span.get("sha256")
+        if (
+            expected
+            and hashlib.sha256(fragment_text.encode()).hexdigest() != expected
+        ):
+            raise ValueError("diagnostic_span_hash_mismatch")
+        if not fragment_text.strip():
+            raise ValueError("partial_slice_has_no_complete_sentence")
+        fragments = [
+            {
+                "page": page_no,
+                "text": fragment_text,
+                "readable": True,
+                "offset": start,
+                "body_scope": "bounded_span",
+            }
+        ]
+        plan = sized(fragments)
+        if plan["total_units"] > ledger_units:
+            raise ValueError("partial_slice_does_not_fit_remaining_ledger")
+        sent = {page_no}
+        return {
+            "pages": [page_no],
+            "fragments": fragments,
+            "unread_selected_pages": [
+                page for page in sorted(set(selected_ids)) if page not in sent
+            ],
+            "tail_offset": end,
+            "span_start": start,
+            "ledger_units": ledger_units,
+            **plan,
+        }
 
     for count in range(1, len(runs[0]) + 1):
         candidate = [by_page[page] for page in runs[0][:count]]

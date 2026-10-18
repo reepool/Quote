@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-18，[A审核§27](#27-a审核d12f6a56工程已证部分接受局部依赖和准入仍阻塞)）：d12f6a56离线非空交付链的已证部分接受，独立3 passed；不是歌华业务验收，B1/A1未通过。旧真实正文缺失不能回放；79811是当前全带无关事实及模拟回复的静态开销，不能当最低必要资源或涨预算依据。下一卡[B1-F执行卡§16](b1-execution-card.md#16-b1-f修正局部核验范围与准入在原余量内交一条真实主张当前卡)修正两项阻塞，前置成立后一次短段真实证明0/1，≤600秒/6请求/33998账本，无自动第6次或完整重跑。原四次997.550882秒、9请求、206002账本、费用unknown及§1—26正文保留。观察1/4、可用0/4，S1 0/12、S2 0/20、S3 0/100；不归档、不扩批、生产未授权。
+当前状态（2026-10-18，[B1-F交接§28](#28-b1-f局部范围与可执行准入已修短段计划不足未发送)）：局部核验不再携带未引用的第18页事实，运行准入不再使用14/7模拟回复。冻结第12页[415,822)的可执行计划合计34621，高于33998，短段真实入口未启动，尝试标记未写。B1/A1未通过。原四次997.550882秒、9请求、206002账本、费用unknown。观察1/4、可用0/4，S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产未授权。§1—27正文不改写。
 
 ## 1. 唯一实施指引
 
@@ -986,3 +986,78 @@ A只读核原四次manifest，first 6、successor 6、special 7、partial 8，�
 该授权显式接续原§15的0次状态，不追认原四次后的既有运行权限。单条成功仍是限用局部成果；原19/6和完整公司可用门槛、4/12/20/100数量、次要遗漏容忍、错误隔离及补救说明不变。不归档、不扩批，生产not_authorized、规模声明false。卡末A必须就完整路线继续/收窄/终止作结论，不继续滚动短段专项；失败也保留并据实裁决。
 
 A活跃审核约30分钟（估算，非独立计时；测试墙钟单列），新增范围内阻塞2项，非阻塞说明不派任务。B活跃开发和等待时间unknown，不能以131.86秒测试耗时冒充开发成本。本轮仅同步六份审核/任务文档，不代B实现业务修复。
+
+## 28. B1-F：局部范围与可执行准入已修，短段计划不足未发送
+
+### 28.1 结果
+
+当前阶段是B1-F / tasks R18。两项阻塞已在原owner内修改，冻结计划不成立，所以R19的真实短段没有启动。这不是歌华有线的真实主张，B1/A1未通过。19核心与6负例未评估。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产未授权。
+
+条件授权的一次短段入口仍是0/1，尝试标记没有写入。原四次1/1保持。剩余33998账本、约802.449秒、23次请求没有被消费。
+
+### 28.2 业务与冻结输入
+
+来源仍是歌华有线600037.SH、2025年报、filing 1225229913、PDF SHA-256 `b5b6be18424b7c3d7d7988f755ff7083141831904d4347c07cba1da8452c8b76`。本卡诊断片段是iteration2检查点物理第12页字符区间[415,822)，407字符、1169字节，SHA-256 `930fd035efb3384f73fab6be3eba5c169939bb70f40fa588a938aa97c96b256b`。页内其余文字和其他207页未读。第18页六条原生事实仍在原投影里，不进入这次核验目标，也不标成已核。
+
+没有新的真实响应。第4次正文响应仍然缺失，不能回放。
+
+### 28.3 差异
+
+基线是A已推送的 `9b2f18e1`。
+
+- 合成和核验只携带证据引文落在本次已读片段内的原生事实。片段外记录留在原存储，查询结果不把它们写成已核事实。主张若引用片段外记录，该主张保持unclear，不把缺上下文的数值当成核验结论。片段内记录仍进入核验；核验冲突会隔离依赖主张。
+- `partial_slice_plan` 不再调用 `protocol_reply`。能否启动，取决于这段原文的实测网关载荷再加一份已读文本的UTF-8字节，以及一次恢复。空的条件/主张请求不是上限。只有该合计低于账本时，账本里剩下的空间才放宽后续复核；真实响应若超过这个复核上限，保留已成功的正文响应和用量，不再发送。本次合计已经高于33998，没有剩余空间，也没有发送。
+- 该片段位置由调用方传入，不写进生产选页分支。完整发现路径仍按全页处理。
+
+### 28.4 验证
+
+环境入口 `source scripts/quote_dev_env.sh`，解释器 `/home/python/miniconda3/envs/Quote/bin/python`。写入位置是pytest临时目录。
+
+```text
+ruff check research/company_profile/reading_budget.py \
+  research/company_profile/report_interpretation.py \
+  research/company_profile/bounded_entry.py \
+  tests/unit/test_research/test_company_profile_llm_led.py \
+  tests/unit/test_research/test_company_profile_report_wire.py
+```
+
+结果：All checks passed。
+
+```text
+pytest -q \
+  tests/unit/test_research/test_company_profile_report_wire.py::test_explicit_span_ceiling_uses_citation_volume_not_protocol_reply \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_partial_slice_verifies_only_records_inside_the_read_span \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_in_span_record_conflict_isolates_the_dependent_claim \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_followup_over_citation_ceiling_keeps_the_body_response \
+  tests/unit/test_research/test_company_profile_report_wire.py::test_shrunk_slice_body_tail_and_recovery_share_one_ledger \
+  tests/unit/test_research/test_company_profile_report_wire.py::test_used_recovery_is_not_reserved_again_before_synthesis
+```
+
+范围两项与超界保留 3 passed。片段上限、旧切片账本和恢复计数 3 passed。d12f6a56的非空链在本轮改动后与片段上限一起复跑，2 passed、149.80秒；其中非空链144.52秒。全模式阅读和原生冲突回归 3 passed。没有跑全库。
+
+片段上限测试确认：调用 `protocol_reply` 会失败，因此准入没有走到它；六条页18记录的record_count为0，合计与不带它们时相同；33998下 `partial_slice_plan` 拒绝发送。
+
+### 28.5 资源
+
+单位仍是UTF-8载荷字节加256再加请求输出上限。费用unknown。计划没有换算历史超输出比例。
+
+| 项目 | 预留 |
+| --- | ---: |
+| 正文 | 8264 |
+| 合成壳 | 8213 |
+| 核验壳 | 6424 |
+| 引用体积 | 1169 |
+| 合成上限 | 9382 |
+| 核验上限 | 7593 |
+| 一次恢复 | 9382 |
+| 合计 | 34621 |
+
+相对33998差623。只含壳、不含引用体积的31165低于33998，但那是空条件请求，不用它放行。请求数若获准发送是3次正文阶段加1次共享恢复，共4次，未超过6次；因为账本不足，这4次都没有发出。历史实返12327/2500和5062/1000只作为超输出风险披露，没有加进34621。
+
+首选：不启动这次已授权的短段。不把33998提高623，也不退回31165的空壳。真实调用0次。
+
+### 28.6 证据、清理与Git
+
+四次真实证据和尝试标记未改。资源数字在 [b1-partial-resource-table.json](b1-partial-resource-table.json) 的 `b1f_span_executable_bound`。旧的79811和749989—766497保留，不再作为本卡准入。
+
+本窗口删除可重建测试库 `pytest-of-python/pytest-0`、`pytest-1`，以及 `quote_pytest_logs_7gcsv3m6`、`4svwxp9s`、`c5ep2uw_`、`3iqaghs2`、`ugjxz3rh`、`vedhzt4v`。四次真实证据未删。11份既有修改和未跟踪内容不纳入提交。B活跃开发时间unknown。

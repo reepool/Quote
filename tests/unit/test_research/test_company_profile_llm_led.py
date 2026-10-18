@@ -12,6 +12,7 @@ from pydantic import ValidationError
 from research.company_profile.contracts import (
     ReportSemanticRequest,
     ReportSemanticResponse,
+    ReportSemanticResponseV3,
 )
 from research.company_profile.models import (
     AssertionClass,
@@ -29,6 +30,7 @@ from research.company_profile.models import (
 )
 from research.company_profile.report_interpretation import (
     DIMENSIONS,
+    compact_processing_identity,
     core_assessment,
     interpret_report,
     offline_processing_identity,
@@ -993,4 +995,206 @@ def test_nonempty_chain_survives_failover_publish_and_a_later_failure(tmp_path):
     assert followups
     assert all(
         "rev-cloud" in json.dumps(item, ensure_ascii=False) for item in followups
+    )
+
+
+def _span_measurement(report, record_id, quote, page):
+    return Measurement(
+        record_id=record_id,
+        field_id="operating_revenue",
+        chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+        report=report,
+        subject_scope=SubjectScope.ISSUER,
+        reported_period=report.report_period,
+        period_type=PeriodType.DURATION,
+        knowledge_time=report.published_at,
+        assertion_class=AssertionClass.REPORTED_FACT,
+        evidence=(_evidence(report, text=quote, page=page),),
+        source_native=SourceNativeValue(name=quote, value="10", unit="万元"),
+        metric_type=MetricType.OPERATING_REVENUE,
+        logical_slot=LogicalSlot.REVENUE,
+        measured_object="有线电视网络",
+    )
+
+
+def _partial_identity(*, ledger_tokens=120_000):
+    identity = compact_processing_identity(discovery_scope="page_map")
+    identity.update(
+        partial_slice=True,
+        ledger_tokens=ledger_tokens,
+        max_physical_requests=8,
+        navigation_receipts=(
+            {
+                "status": "success",
+                "source_scope": "page_map",
+                "purpose": "source_inventory",
+                "prompt_version": identity["prompt_version"],
+                "source_pages": [1, 2],
+                "response_payload": {
+                    "purpose": "source_inventory",
+                    "requested_pages": [1],
+                    "source_conditions": [],
+                },
+            },
+        ),
+    )
+    return identity
+
+
+class _SliceProvider(FakeReportProvider):
+    def __init__(self, *, conflict=False, huge=False):
+        super().__init__()
+        self.conflict = conflict
+        self.huge = huge
+
+    def interpret(self, request):
+        self.requests.append(request)
+        evidence = _evidence(request.report, text="公司经营有线电视网络传输", page=1)
+        if request.purpose == "source_inventory":
+            return ReportSemanticResponseV3.model_validate(
+                {
+                    "request_id": request.request_id,
+                    "purpose": request.purpose,
+                    "requested_pages": (),
+                    "source_conditions": (
+                        {
+                            "condition_id": "biz",
+                            "dimension": "principal_business",
+                            "description": (
+                                "超界" * 5000 if self.huge else "来源写明网络传输"
+                            ),
+                            "evidence": (evidence,),
+                            "major": True,
+                            "statement_status": "current",
+                        },
+                    ),
+                }
+            )
+        if request.purpose == "synthesize_views":
+            condition_id = request.source_conditions[0].condition_id
+            return ReportSemanticResponseV3.model_validate(
+                {
+                    "request_id": request.request_id,
+                    "purpose": request.purpose,
+                    "claims": (
+                        {
+                            "claim_id": "claim-biz",
+                            "dimension": "principal_business",
+                            "status": "observed",
+                            "answer": "公司经营有线电视网络传输并提供信息服务。",
+                            "condition_ids": (condition_id,),
+                            "supporting_record_ids": ("rev-in",),
+                            "evidence": (evidence,),
+                        },
+                    ),
+                }
+            )
+        return ReportSemanticResponseV3.model_validate(
+            {
+                "request_id": request.request_id,
+                "purpose": request.purpose,
+                "checks": tuple(
+                    {
+                        "target_type": kind,
+                        "target_id": item,
+                        "status": (
+                            "unclear"
+                            if self.conflict and kind == "record" and item == "rev-in"
+                            else "pass"
+                        ),
+                        "explanation": "离线核验",
+                    }
+                    for kind, values in (
+                        (
+                            "condition",
+                            [c.condition_id for c in request.source_conditions],
+                        ),
+                        ("claim", [c.claim_id for c in request.claims]),
+                        ("record", [c.record_id for c in request.records]),
+                    )
+                    for item in values
+                ),
+            }
+        )
+
+
+def _slice_pages():
+    return (
+        {"page": 1, "text": "公司经营有线电视网络传输，并向用户提供信息服务。", "readable": True},
+        {"page": 2, "text": "第18页收入表不在本次阅读范围。", "readable": True},
+    )
+
+
+def test_partial_slice_verifies_only_records_inside_the_read_span():
+    report = _report()
+    inside = _span_measurement(report, "rev-in", "公司经营有线电视网络传输", 1)
+    outside = _span_measurement(report, "rev-out", "第18页收入表不在本次阅读范围。", 2)
+    provider = _SliceProvider()
+    result = _run(
+        provider,
+        report=report,
+        pages=_slice_pages(),
+        processing_identity=_partial_identity(),
+        structured_records=(inside, outside),
+    )
+    verify = next(item for item in provider.requests if item.purpose == "verify_views")
+    assert [item.record_id for item in verify.records] == ["rev-in"]
+    assert any(item.record_id == "rev-in" for item in result.records)
+    assert all(item.record_id != "rev-out" for item in result.records)
+    assert "native_fact_outside_read_span:rev-out" in result.gaps
+    assert result.real_semantic_complete is False
+
+
+def test_in_span_record_conflict_isolates_the_dependent_claim():
+    report = _report()
+    inside = _span_measurement(report, "rev-in", "公司经营有线电视网络传输", 1)
+    provider = _SliceProvider(conflict=True)
+    result = _run(
+        provider,
+        report=report,
+        pages=_slice_pages(),
+        processing_identity=_partial_identity(),
+        structured_records=(inside,),
+    )
+    assert all(item.record_id != "rev-in" for item in result.records)
+    claim = next(item for item in result.claims if item.claim_id == "claim-biz")
+    assert claim.status == "unclear"
+    assert any("record_semantic_conflict:rev-in" in gap for gap in result.gaps)
+
+
+def test_followup_over_citation_ceiling_keeps_the_body_response():
+    import time
+
+    from utils.llm.budget import DEVELOPMENT_UNPRICED_BILLING, LlmRunBudget
+
+    report = _report()
+    inside = _span_measurement(report, "rev-in", "公司经营有线电视网络传输", 1)
+    provider = _SliceProvider(huge=True)
+    budget = LlmRunBudget(
+        deadline=time.monotonic() + 30,
+        prices={},
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        max_tokens=40_000,
+        max_requests=8,
+    )
+    result = _run(
+        provider,
+        report=report,
+        pages=_slice_pages(),
+        processing_identity=_partial_identity(ledger_tokens=40_000),
+        structured_records=(inside,),
+        execution_budget=budget,
+    )
+    assert [item.purpose for item in provider.requests] == ["source_inventory"]
+    body = next(
+        item
+        for item in result.call_receipts
+        if item.get("purpose") == "source_inventory"
+        and item.get("source_scope") != "page_map"
+    )
+    assert body["status"] == "success"
+    assert body["response_payload"]["source_conditions"]
+    assert all(item.status != "observed" for item in result.claims)
+    assert any(
+        "followup_growth_exceeds_frozen_ceiling" in gap for gap in result.gaps
     )
