@@ -185,6 +185,23 @@ class CompanyProfileRuntimeRecordV2(CompanyProfileRuntimeRecord):
     assessment: CompanyProfileCoreAssessmentV2
 
 
+def _reading_policy(identity: Mapping[str, Any] | None) -> tuple:
+    """Prompt and report policy. Budget plans and receipt blobs are not policy."""
+    if not isinstance(identity, Mapping):
+        return ()
+    return tuple(
+        identity.get(key)
+        for key in (
+            "semantic_policy",
+            "prompt_version",
+            "preprocessing_version",
+            "discovery_scope",
+            "wire_protocol",
+            "execution_mode",
+        )
+    )
+
+
 @dataclass
 class _WorkState:
     work_id: str
@@ -418,8 +435,8 @@ class CompanyProfileStageRuntime:
         state.processing_identity = processing_identity_from_item(item)
         if state.report_interpretation is not None and (
             state.report_interpretation.report != state.report
-            or state.report_interpretation.processing_identity
-            != state.processing_identity
+            or _reading_policy(state.report_interpretation.processing_identity)
+            != _reading_policy(state.processing_identity)
         ):
             state.report_interpretation = None
         return state

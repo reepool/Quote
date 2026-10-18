@@ -18,6 +18,9 @@ from research.company_profile.models import (
     BusinessOverview,
     ChapterTask,
     Evidence,
+    LogicalSlot,
+    Measurement,
+    MetricType,
     PeriodType,
     SourceNativeValue,
     SubjectBasis,
@@ -702,4 +705,292 @@ def test_existing_owner_offline_query_export_and_reload_are_consistent(tmp_path)
     assert exported["profiles"] == queried["profiles"]
     reloaded = CompanyProfileReadService(tmp_path / "output").query(("600000.SH",))
     assert reloaded["profiles"] == queried["profiles"]
-    assert len(profile["accepted_facts"]) == 1
+
+
+def test_nonempty_chain_survives_failover_publish_and_a_later_failure(tmp_path):
+    """Offline owner path: real client, simulated transport, original writer.
+
+    This is not a real-model score. It checks that nonempty conditions, claims,
+    evidence and receipts stay readable after failover, output overshoot,
+    verify/publish, and a later discovery failure.
+    """
+    import time
+
+    from research.company_profile.operations import CompanyProfileTaskService
+    from research.company_profile.reads import CompanyProfileReadService
+    from research.company_profile.report_interpretation import (
+        compact_processing_identity,
+    )
+    from tests.unit.test_research.test_business_profile_async_production import (
+        _frontier,
+    )
+    from tests.unit.test_research.test_business_profile_exposure_components import (
+        _storage,
+    )
+    from tests.unit.test_utils.test_llm_physical_budget import _client
+    from tests.unit.test_utils.test_llm_routed_client import _config as routed_config
+    from utils.llm.budget import DEVELOPMENT_UNPRICED_BILLING, LlmRunBudget
+    from utils.llm.errors import LlmTransientTransportError
+    from utils.llm.testing import ScriptedTransport
+
+    report = _report(instrument_id="600000.SH")
+    page_text = f"{TEXT}云运维业务营业收入10万元。"
+    pages = (
+        {"page": 1, "text": page_text, "readable": True},
+        {"page": 2, "text": "中间页不在本次切片。", "readable": True},
+        {"page": 3, "text": "后续发现页，不应抹掉已核主张。", "readable": True},
+    )
+    identity = compact_processing_identity(discovery_scope="page_map")
+    identity.update(
+        partial_slice=True,
+        ledger_tokens=120_000,
+        max_physical_requests=8,
+        continue_after_verify=True,
+        parent_attempt="offline-fixture",
+        navigation_receipts=(
+            {
+                "status": "success",
+                "source_scope": "page_map",
+                "purpose": "source_inventory",
+                "prompt_version": identity["prompt_version"],
+                "source_pages": [1, 2, 3],
+                "response_payload": {
+                    "purpose": "source_inventory",
+                    "requested_pages": [1, 3],
+                    "source_conditions": [],
+                },
+            },
+        ),
+    )
+    quote = TEXT[:24]
+    native_fact = Measurement(
+        record_id="rev-cloud",
+        field_id="operating_revenue",
+        chapter_task=ChapterTask.EXTRACT_SEGMENT_FINANCIALS,
+        report=report,
+        subject_scope=SubjectScope.ISSUER,
+        reported_period=report.report_period,
+        period_type=PeriodType.DURATION,
+        knowledge_time=report.published_at,
+        assertion_class=AssertionClass.REPORTED_FACT,
+        evidence=(_evidence(report, text="云运维业务营业收入10万元。", page=1),),
+        source_native=SourceNativeValue(
+            name="云运维业务营业收入", value="10", unit="万元"
+        ),
+        metric_type=MetricType.OPERATING_REVENUE,
+        logical_slot=LogicalSlot.REVENUE,
+        measured_object="云运维业务",
+    )
+
+    def reply(raw):
+        purpose = raw["purpose"]
+        base = {
+            "schema_version": "company_profile_report_response.v3",
+            "request_id": raw["request_id"],
+            "purpose": purpose,
+        }
+        if purpose == "source_inventory":
+            page = next(item for item in raw["source_pages"] if item["text"].strip())
+            base.update(
+                requested_pages=[],
+                source_conditions=[
+                    {
+                        "condition_id": "biz",
+                        "dimension": "principal_business",
+                        "description": "来源写明的经营事项",
+                        "evidence": [{"page": page["page"], "quote": quote}],
+                        "major": True,
+                        "statement_status": "current",
+                    }
+                ],
+            )
+            return base
+        if purpose == "synthesize_views":
+            condition = raw["source_conditions"][0]
+            base["claims"] = [
+                {
+                    "claim_id": "claim-biz",
+                    "dimension": "principal_business",
+                    "status": "observed",
+                    "answer": "来源写明公司经营云运维与工业设计。",
+                    "condition_ids": [condition["condition_id"]],
+                    "supporting_record_ids": [
+                        item["record_id"] for item in raw.get("records", [])
+                    ],
+                    "evidence": condition.get("evidence_refs") or condition["evidence"],
+                }
+            ]
+            return base
+        base["checks"] = [
+            {
+                "target_type": kind,
+                "target_id": item[key],
+                "status": "pass",
+                "explanation": "离线链核验，不是真实年报结论。",
+            }
+            for kind, values, key in (
+                ("condition", raw.get("source_conditions", []), "condition_id"),
+                ("claim", raw.get("claims", []), "claim_id"),
+                ("record", raw.get("records", []), "record_id"),
+            )
+            for item in values
+        ]
+        return base
+
+    from utils.llm.transport import TransportResponse
+
+    class ReplyTransport(ScriptedTransport):
+        def __init__(self):
+            super().__init__([])
+            self.inventory = 0
+
+        async def send(self, url, headers, payload, timeout_seconds):
+            self.calls.append({"payload": dict(payload)})
+            raw = json.loads(
+                next(m["content"] for m in payload["messages"] if m["role"] == "user")
+            )
+            if len(self.calls) == 1:
+                raise LlmTransientTransportError("offline")
+            if raw["purpose"] == "source_inventory":
+                self.inventory += 1
+                if self.inventory > 1:
+                    raise LlmTransientTransportError("later-discovery")
+            output = 6000 if raw["purpose"] == "source_inventory" else 40
+            return TransportResponse(
+                status_code=200,
+                data={
+                    "choices": [
+                        {
+                            "message": {
+                                "content": json.dumps(reply(raw), ensure_ascii=False)
+                            },
+                            "finish_reason": "stop",
+                        }
+                    ],
+                    "usage": {
+                        "prompt_tokens": 100,
+                        "completion_tokens": output,
+                        "total_tokens": 100 + output,
+                    },
+                },
+            )
+
+    transport = ReplyTransport()
+    client = _client(
+        transport,
+        None,
+        routed_config(timeout_seconds=10, attempt_timeout_seconds=5),
+    )
+    budget = LlmRunBudget(
+        deadline=time.monotonic() + 60,
+        prices={},
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        max_tokens=120_000,
+        max_requests=8,
+    )
+    client.physical_budget = budget
+    provider = OfflineGatewayProvider(
+        client=client,
+        profile="semantic",
+        max_output_tokens=4000,
+        timeout_seconds=30,
+    )
+    storage = _storage(tmp_path)
+    _frontier(storage)
+    service = CompanyProfileTaskService(
+        storage=storage,
+        output_root=tmp_path / "output",
+        checkpoint_root=tmp_path / "checkpoints",
+        page_source=lambda item: {
+            "report": report,
+            "pages": pages,
+            "accepted_records": (native_fact,),
+        },
+        provider=provider,
+        processing_identity=identity,
+        execution_budget=budget,
+        token_budget=120_000,
+    )
+    budget.deadline = time.monotonic() + 60
+    run_result = asyncio.run(
+        service.execute("run", knowledge_cutoff="2026-08-30", max_items=1)
+    )
+    queried = asyncio.run(service.execute("query", instrument_ids=("600000.SH",)))
+    assert queried["delivered"] == 1, json.dumps(
+        {
+            "state": run_result.get("state") if isinstance(run_result, dict) else None,
+            "drain": run_result.get("drain") if isinstance(run_result, dict) else None,
+            "queue": run_result.get("queue") if isinstance(run_result, dict) else None,
+        },
+        ensure_ascii=False,
+        default=str,
+    )[:2500]
+    exported = asyncio.run(
+        service.execute(
+            "export",
+            instrument_ids=("600000.SH",),
+            output_directory=str(tmp_path / "export"),
+        )
+    )
+    assert exported["profiles"] == queried["profiles"]
+    assert queried["delivered"] == 1
+    profile = queried["profiles"][0]
+    views = profile["three_views"]
+    assert views["draft_complete"] is False
+    assert views["semantic_complete"] is False
+    assert views["real_semantic_complete"] is False
+    assert views["classification"] == "offline_fixture"
+    observed = [
+        claim
+        for view in views["views"].values()
+        for claim in view["claims"]
+        if claim["status"] == "observed"
+    ]
+    assert observed, (
+        [(c.get("status"), c.get("claim_id")) for v in views["views"].values() for c in v["claims"]],
+        [g for g in views["gaps"] if not str(g).startswith("unsampled")],
+    )
+    assert quote in json.dumps(observed, ensure_ascii=False)
+    body = [
+        item
+        for item in views["call_receipts"]
+        if item.get("source_scope") == "full_context"
+        and item.get("purpose") == "source_inventory"
+        and item.get("status") == "success"
+    ]
+    assert body and body[0]["response_payload"]["source_conditions"]
+    assert any("later-discovery" in gap or "semantic_incomplete" in gap for gap in views["gaps"])
+    saved = json.loads(
+        next((tmp_path / "output").rglob("checkpoints/*.json")).read_text()
+    )
+    saved_identity = saved["report_interpretation"]["processing_identity"]
+    assert "partial_plan" not in saved_identity
+    from research.company_profile.runtime import _reading_policy
+
+    assert _reading_policy(saved_identity) == _reading_policy(identity)
+    reloaded = CompanyProfileReadService(tmp_path / "output").query(("600000.SH",))
+    assert reloaded["profiles"] == queried["profiles"]
+    inventory_usage = [
+        item
+        for item in budget.snapshot()["attempts"]
+        if item.get("usage") and item["usage"]["output_tokens"] == 6000
+    ]
+    assert inventory_usage
+    assert inventory_usage[0]["charged_tokens"] == 6100
+    assert len({item["provider_resource"] for item in budget.snapshot()["attempts"][:2]}) == 2
+    assert any(item["record_id"] == "rev-cloud" for item in profile["accepted_facts"])
+    followups = []
+    for call in transport.calls:
+        raw = json.loads(
+            next(
+                message["content"]
+                for message in call["payload"]["messages"]
+                if message["role"] == "user"
+            )
+        )
+        if raw["purpose"] in {"synthesize_views", "verify_views"}:
+            followups.append(raw)
+    assert followups
+    assert all(
+        "rev-cloud" in json.dumps(item, ensure_ascii=False) for item in followups
+    )

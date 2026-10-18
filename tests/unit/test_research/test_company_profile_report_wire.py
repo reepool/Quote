@@ -901,6 +901,20 @@ def test_used_recovery_is_not_reserved_again_before_synthesis():
     )
     assert remaining_tail_units(plan, (), "synthesize_views") == 11_774 + 13_614
     assert remaining_tail_units(plan, attempts, "synthesize_views") == 11_774
+    assert (
+        remaining_tail_units(
+            plan, ({"status": "http_failure", "usage": None},), "synthesize_views"
+        )
+        == 11_774
+    )
+    assert (
+        remaining_tail_units(
+            plan,
+            ({"status": "failed_or_cancelled", "usage": {"total_tokens": 10}},),
+            "synthesize_views",
+        )
+        == 11_774
+    )
     charged = 13_633 + 14_589
     assert charged + plan["synthesis_units"] + remaining_tail_units(
         plan, attempts, "synthesize_views"

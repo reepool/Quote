@@ -117,5 +117,76 @@
     }
   },
   "cumulative_remaining_units": 62220,
-  "minimum_full_report_shortfall_units": 687769
+  "minimum_full_report_shortfall_units": 687769,
+  "nonempty_protocol_growth": {
+    "basis": "protocol_reply on the trimmed slice: 14 conditions and 7 claims, no native record cited this slice. Not a business reading, not measured tokens or CNY.",
+    "pages_12_13": {
+      "body_units": 13527,
+      "synthesis_units": 18971,
+      "verification_units": 20525,
+      "recovery_units": 20525,
+      "total_units": 73548,
+      "condition_count": 14,
+      "claim_count": 7,
+      "record_count": 0,
+      "gap_versus_62220": 11328,
+      "gap_versus_remaining_33998": 39550
+    },
+    "page_12_only_fits_62220": {
+      "pages": [
+        12
+      ],
+      "total_units": 56131,
+      "condition_count": 14,
+      "claim_count": 7,
+      "gap_versus_remaining_33998": 22133
+    },
+    "empty_followup_pages_12_13_not_a_ceiling": {
+      "body_units": 13527,
+      "synthesis_units": 13476,
+      "verification_units": 11687,
+      "total_units": 52217
+    },
+    "observed_output_overshoot": {
+      "map_request_output": 1000,
+      "map_observed_output": 5062,
+      "body_request_output": 2500,
+      "body_observed_output": 12327,
+      "note": "Settled usage uses the provider total. The request cap does not limit the charge."
+    }
+  },
+  "native_facts_on_followups": {
+    "basis": "select_core_evidence plus project_owned_page_facts on the iteration2 checkpoint. Six Measurement/Segment records, all evidenced on page 18 section 收入和成本分析. Pages 12-13 cite none of them. The owner still sends every structured record on synthesis and verification, so a plan that omits them is not the payload.",
+    "record_count": 6,
+    "page_12": {
+      "body_units": 9475,
+      "synthesis_units": 20552,
+      "verification_units": 24892,
+      "recovery_units": 24892,
+      "total_units": 79811,
+      "condition_count": 14,
+      "claim_count": 7,
+      "record_count": 6,
+      "gap_versus_62220": 17591,
+      "gap_versus_remaining_33998": 45813
+    },
+    "pages_12_13": {
+      "body_units": 13527,
+      "synthesis_units": 25067,
+      "verification_units": 29407,
+      "recovery_units": 29407,
+      "total_units": 97408,
+      "condition_count": 14,
+      "claim_count": 7,
+      "record_count": 6,
+      "gap_versus_62220": 35188,
+      "gap_versus_remaining_33998": 63410
+    },
+    "planner": "partial_slice_plan with these six records raises partial_slice_does_not_fit_remaining_ledger against 62220. No selected page is admitted."
+  },
+  "preferred_decision": {
+    "choice": "do_not_authorize_a_fifth_live_entry",
+    "reason": "The smallest nonempty slice that also carries the six projected native facts is page 12 at 79811 reservation units. That is 17591 above the old slice ledger 62220 and 45813 above the remaining 33998. Pages 12-13 with the same facts are 97408. The earlier 56131 page-12 figure omitted those facts and is not the payload the owner sends. Full-report discovery remains the prior 588281-607021 before a nonempty tail.",
+    "not_requested": "Do not raise the ledger to 79811, 97408, or the old 749989-766497 figure. None of those is a measured token count or a fee."
+  }
 }

@@ -653,6 +653,7 @@ def interpret_report(
                 report=report,
                 identity=identity,
                 ledger_units=int(identity.get("ledger_tokens") or 62_220),
+                records=tuple(structured.values()),
             )
             partial_plan = {
                 **plan,
@@ -1022,6 +1023,7 @@ def interpret_report(
                         report=report,
                         identity=identity,
                         ledger_units=int(identity.get("ledger_tokens") or 62_220),
+                        records=tuple(structured.values()),
                     )
                     charged_now = (
                         execution_budget.snapshot()["charged_tokens"]

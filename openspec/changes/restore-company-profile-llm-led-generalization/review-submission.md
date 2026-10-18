@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-18，[A审核§25](#25-a审核920aea41真实正文留存和非空末端计划仍阻塞)）：接受局部真实换源与失败留存，B1/A1未通过；真实正文响应未留在提交检查点，非空末端计划不成立，事后补丁不算真实复验。四次累计997.550882秒、9物理请求、206002账本，费用unknown，四个入口各1/1耗尽。当前按B1-E卡§15仅修复非空调用链及资源定稿，真实授权0次。观察1/4、可用0/4，S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产未授权。§1—24正文不改写。
+当前状态（2026-10-18，[B1-E交接§26](#26-b1-e离线非空调用链与资源定稿真实授权仍为0)）：离线工程修复已交接，不是真实业务成绩，B1/A1未通过。旧真实正文响应缺失、不能回放。带6条原生事实后，最小非空切片预留79811，高于62220和剩余33998；本卡不申请第5次真实运行。四次累计997.550882秒、9物理请求、206002账本，费用unknown。观察1/4、可用0/4，S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产未授权。§1—25正文不改写。
 
 ## 1. 唯一实施指引
 
@@ -869,3 +869,77 @@ remaining_tail_units的事后补丁能识别failed_or_cancelled且无usage的恢
 - A独立只读核manifest/累计账、检查点及日志；上述非空载荷反例只序列化、未联网/未发模型，输出为14条件/7主张及三个实际预留值，未生成新的正文副本或业务数据库。http_failure反例只执行只读抽取函数。
 - 本轮仅更新六份规划/审核文档；源资产、四次原制品、§1—24正文、配置、11份既有修改和16项未跟踪内容均按开始基线保护，验收计划的既有历史块不纳入本次提交。本人已结束的pytest-0测试库及中断日志已清，约6.8MB，均可重建；前序未知归属对象不删。OpenSpec严格校验及diff检查通过；最终隔离提交和保护结果见本次提交回复。
 - A活跃审核约20分钟（估算，未独立计时）；新增阻塞为上述两类，未扩大产品范围。B活跃开发/等待时间仍unknown；477秒仅本次真实进程运行时间，不能混作人工成本。
+
+## 26. B1-E：离线非空调用链与资源定稿，真实授权仍为0
+
+### 26.1 结果
+
+当前阶段是B1-E / tasks R16–R17，离线工程修复，不是正式首发、后继或局部真实验证。工程闭环已交，待A审核。B1/A1未通过。19核心与6负例未评估。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产未授权。
+
+待A判断的只有下一份真实合同：本卡不申请、也不构成第5次入口。四次历史入口保持各1/1。剩余33998账本、约802.449秒、23次请求不是新的授权。
+
+### 26.2 业务与旧响应
+
+歌华有线600037.SH、2025年报、filing 1225229913、PDF SHA-256 `b5b6be18424b7c3d7d7988f755ff7083141831904d4347c07cba1da8452c8b76` 的真实正文没有可回放响应。第4次zai请求 `cab6f133f04a4a9cbbeae7a08c68d020`、request_hash `b984750527ddf076eacee131a3dacdf49208ba47b9d19658ccd301005f334691` 的usage仍是输入2262、输出12327、合计14589。entry.log只有这组usage和请求标识；work-checkpoint、query、export、entry-result、budget-final都没有该次response_payload。结论是响应缺失，不能回放。没有用日志、夹具或手写答案补造这次正文。
+
+离线证明使用600000.SH夹具页，分类 `offline_fixture`。它证明同一业务入口能留下非空条件和已核主张，不能当作歌华有线的阅读成绩。draft/semantic/real 三个完整标志均为false。
+
+### 26.3 差异
+
+基线是A已推送的 `6d53e19a`。本轮只改结果留存、恢复计数和末端预留：
+
+- `runtime._bind` 只在报告或阅读策略变化时清空解释结果。策略键是 semantic_policy、prompt_version、preprocessing_version、discovery_scope、wire_protocol、execution_mode。预算、计划和导航回执的JSON往返不再清掉已保存的解释。真实prompt或策略变化仍会使旧结果失效。
+- `remaining_tail_units` 把一次窗口里的一次恢复交给任何非空、非reserved、非success的尝试。`http_failure`、无usage的失败、以及带usage的失败都消耗这唯一一次，不按阶段重置。
+- `stage_reservations` 和 `partial_slice_plan` 把条件、主张和已有结构化记录放进合成与核验。空的后续请求不再当作上限。
+
+未改生产池、价格、上下文、尝试标记和四次真实证据。
+
+### 26.4 验证
+
+环境入口 `source scripts/quote_dev_env.sh`，解释器 `/home/python/miniconda3/envs/Quote/bin/python`。写入位置是pytest临时目录，不覆盖冻结证据。
+
+```text
+ruff check research/company_profile/reading_budget.py \
+  research/company_profile/runtime.py \
+  research/company_profile/report_interpretation.py \
+  tests/unit/test_research/test_company_profile_llm_led.py \
+  tests/unit/test_research/test_company_profile_report_wire.py
+```
+
+结果：All checks passed。
+
+```text
+pytest -q \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_nonempty_chain_survives_failover_publish_and_a_later_failure \
+  tests/unit/test_research/test_company_profile_report_wire.py::test_used_recovery_is_not_reserved_again_before_synthesis \
+  tests/unit/test_research/test_company_profile_report_wire.py::test_shrunk_slice_body_tail_and_recovery_share_one_ledger
+```
+
+结果：3 passed，131.86秒。没有跑全库，不把这3个测试当成72 passed或公司数。
+
+这条离线链的实际路径是 `CompanyProfileTaskService` → runtime → `OfflineGatewayProvider` / 真实 `LlmClient` → `ReplyTransport`。第一次发送抛传输错误并换到第二个来源；正文返回请求输出之上的6000 completion，账本按total 6100结算；合成和核验请求都带 `rev-cloud`；query与export的profiles相同，delivered为1；可读主张包含页内原句；成功正文回执带非空 `source_conditions`；随后发现失败写入 `later-discovery` 缺口，已核主张和正文回执仍在。重新读出的profiles与query相同。保存身份没有 `partial_plan`，阅读策略与入口一致。`accepted_facts` 含 `rev-cloud`。未核部分留在缺口，不写成确定事实。
+
+### 26.5 资源
+
+单位仍是UTF-8载荷字节加256再加请求输出上限，不是token，也不是人民币。费用unknown。实返超输出保持：地图请求1000、实返5062；正文请求2500、实返12327。
+
+同一裁剪后的第12–13页，`protocol_reply` 给出14个条件、7条主张。不带原生记录时合计73548（正文13527、合成18971、核验20525、恢复20525）。这组数字说明空后续请求不是上限，也不是将要发送的载荷。
+
+同一检查点上 `select_core_evidence` 与 `project_owned_page_facts` 得到6条Measurement/Segment，证据都在第18页“收入和成本分析”。第12–13页不引用它们，但合成和核验仍会带上全部结构化记录。带上这6条后：
+
+| 范围 | 正文 | 合成 | 核验 | 一次恢复 | 合计 | 相对62220 | 相对剩余33998 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 仅第12页 | 9475 | 20552 | 24892 | 24892 | 79811 | 差17591 | 差45813 |
+| 第12–13页 | 13527 | 25067 | 29407 | 29407 | 97408 | 差35188 | 差63410 |
+
+`partial_slice_plan` 在62220下带这6条记录会拒绝，没有任何选中页获准发送。旧的整报告一次故障表749989–766497仍不是严格上界，也不作为加预算依据。全文发现阶段原先的588281–607021还没有加上非空末端。
+
+首选：不启动第5次真实运行。不把账本改成79811、97408或约75万。若A以后要真实阅读，需要单独裁决账本和未读范围；本卡不预签。
+
+### 26.6 证据、清理与Git
+
+四次真实证据目录、尝试标记和源回执未改。第4次证据仍是 [partial/manifest.json](b1-pool-observation-evidence/partial/manifest.json)。资源数字写在 [b1-partial-resource-table.json](b1-partial-resource-table.json) 的 `native_facts_on_followups`，旧空表数字保留。
+
+本窗口删除的是可重建测试库 `pytest-of-python/pytest-0`、`pytest-1`、`pytest-11`、`pytest-14`、`pytest-15`、`pytest-16`，以及空的 `quote_pytest_logs_*` 和只含本次测试日志的 `quote_pytest_logs_tr2i82k5`、`quote_pytest_logs_21afd5kg`、`quote_pytest_logs_ch87sd7r`。QuoteBak回到约69M。首次结果、局部证据和未知归属对象未删。
+
+11份既有修改和未跟踪内容不纳入本次提交。B活跃开发时间unknown；本轮没有模型调用，正式复验次数仍是已耗尽的4次。

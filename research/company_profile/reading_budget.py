@@ -22,11 +22,17 @@ from utils.llm import LlmClient, LlmConfig
 PARTIAL_LEDGER_UNITS = 62_220
 
 
+_PROFILE_CACHE = None
+
+
 def _profiles():
-    config = LlmConfig.from_mapping(
-        json.loads(Path("config/13_llm.json").read_text())["llm"]
-    )
-    return tuple(config.concrete_profiles_for("semantic_extraction"))
+    global _PROFILE_CACHE
+    if _PROFILE_CACHE is None:
+        config = LlmConfig.from_mapping(
+            json.loads(Path("config/13_llm.json").read_text())["llm"]
+        )
+        _PROFILE_CACHE = tuple(config.concrete_profiles_for("semantic_extraction"))
+    return _PROFILE_CACHE
 
 
 def reservation_units(payload: Mapping[str, Any], max_output: int) -> int:
@@ -98,6 +104,7 @@ def _request(
     report: Any,
     identity: Mapping[str, Any],
     max_output: int,
+    **extra: Any,
 ) -> ReportSemanticRequestV3:
     return ReportSemanticRequestV3(
         request_id="partial-size",
@@ -108,20 +115,30 @@ def _request(
         source_scope="full_context",
         max_output_tokens=max_output,
         timeout_seconds=30,
+        **extra,
     )
 
 
-def remaining_tail_units(plan: Mapping[str, int], attempts: Sequence[Mapping[str, Any]], purpose: str) -> int:
-    """Hold synthesis, verification and one recovery until that recovery is used.
+def _recovery_consumed(item: Mapping[str, Any]) -> bool:
+    """One window shares one recovery. Any settled failure consumes it.
 
-    A failed attempt with no usage has already consumed the shared recovery.
-    Later stages must not reserve a second one.
+    ``failed_or_cancelled`` covers timeouts. ``http_failure`` is what the live
+    client records for a non-2xx response. A failure that happens to include
+    usage, or a later parse/repair send, does not restore a fresh recovery.
     """
-    recovery_used = any(
-        item.get("status") == "failed_or_cancelled" and not item.get("usage")
-        for item in attempts
+    status = str(item.get("status") or "")
+    return status not in {"", "reserved", "success"}
+
+
+def remaining_tail_units(
+    plan: Mapping[str, int], attempts: Sequence[Mapping[str, Any]], purpose: str
+) -> int:
+    """Hold synthesis, verification and one recovery until that recovery is used."""
+    recovery = (
+        0
+        if any(_recovery_consumed(item) for item in attempts)
+        else int(plan["recovery_units"])
     )
-    recovery = 0 if recovery_used else int(plan["recovery_units"])
     if purpose == "source_inventory":
         return int(plan["synthesis_units"]) + int(plan["verification_units"]) + recovery
     if purpose == "synthesize_views":
@@ -134,8 +151,15 @@ def stage_reservations(
     *,
     report: Any,
     identity: Mapping[str, Any],
+    conditions: Sequence[Any] = (),
+    claims: Sequence[Any] = (),
+    records: Sequence[Any] = (),
 ) -> dict[str, int]:
-    """Body, synthesis and verification if follow-up quotes the whole slice."""
+    """Body plus follow-ups that carry the supplied conditions, claims and facts.
+
+    Empty follow-ups are not an upper bound. Callers that have not yet read the
+    body pass protocol-shaped objects from ``protocol_followup``.
+    """
     body = request_reservation(
         _request(
             pages,
@@ -152,6 +176,8 @@ def stage_reservations(
             report=report,
             identity=identity,
             max_output=2500,
+            source_conditions=tuple(conditions),
+            records=tuple(records),
         )
     )
     verification = request_reservation(
@@ -161,6 +187,9 @@ def stage_reservations(
             report=report,
             identity=identity,
             max_output=2000,
+            source_conditions=tuple(conditions),
+            claims=tuple(claims),
+            records=tuple(records),
         )
     )
     recovery = max(body, synthesis, verification)
@@ -170,7 +199,51 @@ def stage_reservations(
         "verification_units": verification,
         "recovery_units": recovery,
         "total_units": body + synthesis + verification + recovery,
+        "condition_count": len(tuple(conditions)),
+        "claim_count": len(tuple(claims)),
+        "record_count": len(tuple(records)),
     }
+
+
+def protocol_followup(
+    pages: Sequence[Mapping[str, Any]],
+    *,
+    report: Any,
+    identity: Mapping[str, Any],
+    records: Sequence[Any] = (),
+):
+    """Protocol-shaped conditions and claims for sizing, not a business reading."""
+    from .contracts import ReportSemanticResponseV3
+    from .report_wire import compact_request, expand_response
+    from .resource_probe import protocol_reply
+
+    inventory = _request(
+        pages,
+        purpose="source_inventory",
+        report=report,
+        identity=identity,
+        max_output=2500,
+    )
+    conditions = ReportSemanticResponseV3.model_validate_json(
+        json.dumps(
+            expand_response(protocol_reply(compact_request(inventory)), inventory)
+        )
+    ).source_conditions
+    synthesis = _request(
+        pages,
+        purpose="synthesize_views",
+        report=report,
+        identity=identity,
+        max_output=2500,
+        source_conditions=conditions,
+        records=tuple(records),
+    )
+    claims = ReportSemanticResponseV3.model_validate_json(
+        json.dumps(
+            expand_response(protocol_reply(compact_request(synthesis)), synthesis)
+        )
+    ).claims
+    return conditions, claims
 
 
 def reused_map_receipts(
@@ -221,12 +294,12 @@ def partial_slice_plan(
     report: Any,
     identity: Mapping[str, Any],
     ledger_units: int = PARTIAL_LEDGER_UNITS,
+    records: Sequence[Any] = (),
 ) -> dict[str, Any]:
     """Longest whole-page prefix of the first selected run that leaves a tail.
 
-    The tail is synthesis, verification and one unknown resend, measured as if
-    those follow-ups still carried the slice text. Callers do not drop unread
-    pages; they stay outside ``pages``.
+    The tail is nonempty synthesis and verification plus one recovery. Empty
+    follow-up requests are not the ceiling. Unread pages stay outside the slice.
     """
     by_page = {int(page["page"]): page for page in pages}
     runs = contiguous_runs(selected_ids)
@@ -234,12 +307,26 @@ def partial_slice_plan(
         raise ValueError("partial_slice_requires_a_selected_run")
     chosen: list[int] = []
     plan: dict[str, int] | None = None
+
+    def sized(candidate: Sequence[Mapping[str, Any]]) -> dict[str, int]:
+        conditions, claims = protocol_followup(
+            candidate, report=report, identity=identity, records=records
+        )
+        return stage_reservations(
+            candidate,
+            report=report,
+            identity=identity,
+            conditions=conditions,
+            claims=claims,
+            records=records,
+        )
+
     for count in range(1, len(runs[0]) + 1):
         candidate = [by_page[page] for page in runs[0][:count]]
-        sized = stage_reservations(candidate, report=report, identity=identity)
-        if sized["total_units"] <= ledger_units:
+        measured = sized(candidate)
+        if measured["total_units"] <= ledger_units:
             chosen = runs[0][:count]
-            plan = sized
+            plan = measured
         else:
             break
     if not chosen or plan is None:
@@ -268,7 +355,7 @@ def partial_slice_plan(
             }
         )
     if any(item["body_scope"] == "bounded_span" for item in fragments):
-        plan = stage_reservations(fragments, report=report, identity=identity)
+        plan = sized(fragments)
         if plan["total_units"] > ledger_units:
             raise ValueError("partial_slice_does_not_fit_remaining_ledger")
     sent = set(chosen)
