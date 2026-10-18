@@ -134,7 +134,11 @@ def _recovery_consumed(item: Mapping[str, Any]) -> bool:
 def remaining_tail_units(
     plan: Mapping[str, int], attempts: Sequence[Mapping[str, Any]], purpose: str
 ) -> int:
-    """Hold synthesis, verification and one recovery until that recovery is used."""
+    """Planning hold: later stage estimates plus the planned recovery figure.
+
+    This is a forecast. It is not the send decision for a request whose actual
+    payload is already known.
+    """
     recovery = (
         0
         if any(_recovery_consumed(item) for item in attempts)
@@ -145,6 +149,26 @@ def remaining_tail_units(
     if purpose == "synthesize_views":
         return int(plan["verification_units"]) + recovery
     return 0
+
+
+def send_admission_hold(
+    plan: Mapping[str, int],
+    attempts: Sequence[Mapping[str, Any]],
+    purpose: str,
+    current_units: int,
+) -> int:
+    """Future stage estimates plus one recovery of the request about to be sent.
+
+    Recovery follows the actual payload. A stale plan figure is not added on
+    top, and a failure that already consumed the shared recovery does not
+    reserve a second one. The earlier stage estimate is not part of this hold.
+    """
+    recovery = 0 if any(_recovery_consumed(item) for item in attempts) else int(current_units)
+    if purpose == "source_inventory":
+        return int(plan["synthesis_units"]) + int(plan["verification_units"]) + recovery
+    if purpose == "synthesize_views":
+        return int(plan["verification_units"]) + recovery
+    return recovery
 
 
 def _evidence_in_fragments(evidence: Any, fragments: Sequence[Mapping[str, Any]]) -> bool:

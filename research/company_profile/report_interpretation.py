@@ -48,9 +48,9 @@ from .reading_budget import (
     _evidence_in_fragments,
     partial_slice_plan,
     records_for_fragments,
-    remaining_tail_units,
     request_reservation,
     reused_map_receipts,
+    send_admission_hold,
 )
 
 DISCOVERY_CHUNK_CHARS = 24_000
@@ -503,23 +503,22 @@ def interpret_report(
         )
         if partial and partial_plan is not None and execution_budget is not None:
             units = request_reservation(request)
+            snapshot = execution_budget.snapshot()
+            charged = int(snapshot["charged_tokens"])
+            hold = send_admission_hold(
+                partial_plan, snapshot["attempts"], purpose, units
+            )
+            if charged + units + hold > int(
+                identity.get("ledger_tokens") or execution_budget.max_tokens
+            ):
+                raise ValueError("partial_tail_hold_would_be_exhausted")
             ceiling = partial_plan["ceilings"].get(purpose)
             if (
                 purpose != "source_inventory"
                 and ceiling is not None
                 and units > ceiling
             ):
-                raise ValueError("followup_growth_exceeds_frozen_ceiling")
-            charged = execution_budget.snapshot()["charged_tokens"]
-            later = remaining_tail_units(
-                partial_plan,
-                execution_budget.snapshot()["attempts"],
-                purpose,
-            )
-            if charged + units + later > int(
-                identity.get("ledger_tokens") or execution_budget.max_tokens
-            ):
-                raise ValueError("partial_tail_hold_would_be_exhausted")
+                gaps.append(f"stage_estimate_exceeded:{purpose}:{units}>{ceiling}")
         if compact and purpose != "source_inventory":
             from .report_wire import compact_request
 

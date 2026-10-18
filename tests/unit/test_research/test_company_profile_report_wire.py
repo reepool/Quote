@@ -887,6 +887,33 @@ def test_long_unrelated_note_need_not_be_extracted_line_by_line():
     assert len(result.source_conditions) == len(DIMENSIONS)
 
 
+def test_actual_verification_is_not_refused_by_the_old_stage_cap():
+    """14262 fits 40000 with the spent 9029 and one actual recovery; 12972 must not block."""
+    from research.company_profile.reading_budget import send_admission_hold
+
+    plan = {
+        "synthesis_units": 9_382,
+        "verification_units": 7_593,
+        "recovery_units": 9_382,
+        "ceilings": {"verify_views": 12_972},
+    }
+    verify_units = 14_262
+    charged = 9_029
+    hold = send_admission_hold(plan, (), "verify_views", verify_units)
+    assert hold == verify_units
+    old_plan_total = charged + verify_units + 9_382
+    actual_total = charged + verify_units + hold
+    assert old_plan_total == 32_673
+    assert old_plan_total <= 40_000
+    assert actual_total == 37_553
+    assert actual_total <= 40_000
+    assert verify_units > plan["ceilings"]["verify_views"]
+    used = ({"status": "http_failure", "usage": None},)
+    assert send_admission_hold(plan, used, "verify_views", verify_units) == 0
+    too_large = 20_000
+    assert charged + too_large + too_large > 40_000
+
+
 def test_used_recovery_is_not_reserved_again_before_synthesis():
     from research.company_profile.reading_budget import remaining_tail_units
 

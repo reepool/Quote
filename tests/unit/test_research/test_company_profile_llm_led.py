@@ -1196,5 +1196,360 @@ def test_followup_over_citation_ceiling_keeps_the_body_response():
     assert body["response_payload"]["source_conditions"]
     assert all(item.status != "observed" for item in result.claims)
     assert any(
-        "followup_growth_exceeds_frozen_ceiling" in gap for gap in result.gaps
+        "partial_tail_hold_would_be_exhausted" in gap for gap in result.gaps
     )
+
+
+def test_text_claim_with_empty_record_ids_verifies_and_asset_id_stays_unclear():
+    report = _report()
+    pages = _slice_pages()
+    identity = _partial_identity()
+
+    class _Claims(FakeReportProvider):
+        def __init__(self, record_ids):
+            super().__init__()
+            self.record_ids = record_ids
+
+        def interpret(self, request):
+            self.requests.append(request)
+            evidence = _evidence(request.report, text="公司经营有线电视网络传输", page=1)
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3.model_validate(
+                    {
+                        "request_id": request.request_id,
+                        "purpose": request.purpose,
+                        "requested_pages": (),
+                        "source_conditions": (
+                            {
+                                "condition_id": "biz",
+                                "dimension": "principal_business",
+                                "description": "来源写明网络传输",
+                                "evidence": (evidence,),
+                                "major": True,
+                                "statement_status": "current",
+                            },
+                        ),
+                    }
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3.model_validate(
+                    {
+                        "request_id": request.request_id,
+                        "purpose": request.purpose,
+                        "claims": (
+                            {
+                                "claim_id": "claim-biz",
+                                "dimension": "principal_business",
+                                "status": "observed",
+                                "answer": "公司经营有线电视网络传输。",
+                                "condition_ids": (
+                                    request.source_conditions[0].condition_id,
+                                ),
+                                "supporting_record_ids": self.record_ids,
+                                "evidence": (evidence,),
+                            },
+                        ),
+                    }
+                )
+            return ReportSemanticResponseV3.model_validate(
+                {
+                    "request_id": request.request_id,
+                    "purpose": request.purpose,
+                    "checks": tuple(
+                        {
+                            "target_type": kind,
+                            "target_id": item,
+                            "status": "pass",
+                            "explanation": "离线核验",
+                        }
+                        for kind, values in (
+                            (
+                                "condition",
+                                [c.condition_id for c in request.source_conditions],
+                            ),
+                            ("claim", [c.claim_id for c in request.claims]),
+                            ("record", [c.record_id for c in request.records]),
+                        )
+                        for item in values
+                    ),
+                }
+            )
+
+    legal = _run(
+        _Claims(()),
+        report=report,
+        pages=pages,
+        processing_identity=identity,
+    )
+    assert any(claim.status == "observed" for claim in legal.claims)
+    blocked = _run(
+        _Claims((report.report_id,)),
+        report=report,
+        pages=pages,
+        processing_identity=identity,
+    )
+    assert all(claim.status == "unclear" for claim in blocked.claims)
+    assert any("invalid_claim_reference" in gap for gap in blocked.gaps)
+
+
+def test_saved_segment_responses_reach_verification_and_keep_bad_record_ids_unclear(
+    tmp_path,
+):
+    """Offline replay of the saved segment responses. Not a real verification score."""
+    import time
+    from pathlib import Path
+
+    from research.company_profile.models import ReportIdentity
+    from research.company_profile.operations import CompanyProfileTaskService
+    from research.company_profile.reads import CompanyProfileReadService
+    from tests.unit.test_research.test_business_profile_async_production import (
+        _announcement,
+        _frontier,
+    )
+    from tests.unit.test_research.test_business_profile_exposure_components import (
+        _storage,
+    )
+    from tests.unit.test_utils.test_llm_physical_budget import _client
+    from tests.unit.test_utils.test_llm_routed_client import _config as routed_config
+    from utils.llm.budget import DEVELOPMENT_UNPRICED_BILLING, LlmRunBudget
+    from utils.llm.testing import ScriptedTransport
+    from utils.llm.transport import TransportResponse
+
+    change = (
+        Path(__file__).resolve().parents[3]
+        / "openspec/changes/restore-company-profile-llm-led-generalization"
+    )
+    saved = json.loads(
+        (change / "b1-pool-observation-evidence/segment/work-checkpoint.json").read_text()
+    )
+    payloads = {
+        item["purpose"]: item["response_payload"]
+        for item in saved["report_interpretation"]["call_receipts"]
+        if item.get("source_scope") == "full_context"
+    }
+    report = ReportIdentity.model_validate(saved["report"])
+    pages = tuple(
+        {
+            "page": int(page["page"]),
+            "text": str(page.get("text") or ""),
+            "readable": bool(str(page.get("text") or "").strip()),
+        }
+        for page in saved["pages"]
+    )
+    identity = dict(saved["report_interpretation"]["processing_identity"])
+    identity.update(execution_mode="offline_fake", model="offline_replay")
+
+    def compact_evidence(item):
+        anchor = item.get("anchor") or {}
+        return {"page": item["page"], "quote": anchor["bounded_quote"]}
+
+    def compact_response(raw, request_id):
+        purpose = raw["purpose"]
+        body = {
+            "schema_version": "company_profile_report_response.v3",
+            "request_id": request_id,
+            "purpose": purpose,
+        }
+        if purpose == "source_inventory":
+            body["requested_pages"] = []
+            body["source_conditions"] = [
+                {
+                    "condition_id": item["condition_id"],
+                    "dimension": item["dimension"],
+                    "description": item["description"],
+                    "major": item["major"],
+                    "statement_status": item["statement_status"],
+                    "evidence": [compact_evidence(evidence) for evidence in item["evidence"]],
+                }
+                for item in raw["source_conditions"]
+            ]
+        elif purpose == "synthesize_views":
+            body["claims"] = []
+            for item in raw["claims"]:
+                evidence = [
+                    compact_evidence(evidence)
+                    for evidence in item.get("evidence") or []
+                    if isinstance(evidence, dict) and evidence.get("anchor")
+                ]
+                body["claims"].append(
+                    {
+                        "claim_id": item["claim_id"],
+                        "dimension": item["dimension"],
+                        "status": item["status"],
+                        "answer": item["answer"],
+                        "condition_ids": list(item.get("condition_ids") or []),
+                        "supporting_record_ids": list(item.get("supporting_record_ids") or []),
+                        "evidence": evidence,
+                    }
+                )
+        return body
+
+    class ReplayTransport(ScriptedTransport):
+        def __init__(self):
+            super().__init__([])
+
+        async def send(self, url, headers, payload, timeout_seconds):
+            self.calls.append({"payload": dict(payload)})
+            raw = json.loads(
+                next(message["content"] for message in payload["messages"] if message["role"] == "user")
+            )
+            saved_payload = payloads.get(raw["purpose"])
+            if saved_payload is None:
+                checks = [
+                    {
+                        "target_type": kind,
+                        "target_id": item["condition_id" if kind == "condition" else "claim_id" if kind == "claim" else "record_id"],
+                        "status": "pass",
+                        "explanation": "离线回放核验，不是真实年报结论。",
+                    }
+                    for kind, key in (
+                        ("condition", "source_conditions"),
+                        ("claim", "claims"),
+                        ("record", "records"),
+                    )
+                    for item in raw.get(key) or []
+                ]
+                content = {
+                    "schema_version": "company_profile_report_response.v3",
+                    "request_id": raw["request_id"],
+                    "purpose": raw["purpose"],
+                    "checks": checks,
+                }
+                usage = {"prompt_tokens": 10, "completion_tokens": 10, "total_tokens": 20}
+            else:
+                content = compact_response(saved_payload, raw["request_id"])
+                if raw["purpose"] == "synthesize_views":
+                    by_suffix = {
+                        item["condition_id"].split(":")[-1]: item["condition_id"]
+                        for item in raw.get("source_conditions") or []
+                    }
+                    for claim in content["claims"]:
+                        claim["condition_ids"] = [
+                            by_suffix.get(item.split(":")[-1], item)
+                            for item in claim["condition_ids"]
+                        ]
+                    usage = {
+                        "prompt_tokens": 1936,
+                        "completion_tokens": 4781,
+                        "total_tokens": 6717,
+                    }
+                else:
+                    usage = {
+                        "prompt_tokens": 1239,
+                        "completion_tokens": 1073,
+                        "total_tokens": 2312,
+                    }
+            return TransportResponse(
+                status_code=200,
+                data={
+                    "choices": [
+                        {
+                            "message": {
+                                "content": json.dumps(content, ensure_ascii=False)
+                            },
+                            "finish_reason": "stop",
+                        }
+                    ],
+                    "usage": usage,
+                },
+            )
+
+    transport = ReplayTransport()
+    client = _client(
+        transport,
+        None,
+        routed_config(timeout_seconds=10, attempt_timeout_seconds=5),
+    )
+    budget = LlmRunBudget(
+        deadline=time.monotonic() + 180,
+        prices={},
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        max_tokens=40_000,
+        max_requests=6,
+    )
+    client.physical_budget = budget
+    provider = OfflineGatewayProvider(
+        client=client,
+        profile="semantic",
+        max_output_tokens=4000,
+        timeout_seconds=30,
+    )
+    storage = _storage(tmp_path)
+    repository, _ignored = _frontier(storage)
+    repository.upsert_record(
+        instrument={
+            "instrument_id": report.instrument_id,
+            "symbol": report.instrument_id.split(".")[0],
+            "exchange": "SSE",
+        },
+        record=_announcement(
+            "annual-2025-gehua",
+            "歌华有线2025年年度报告",
+            published_at="2026-04-28T16:00:00+00:00",
+        ),
+    )
+    service = CompanyProfileTaskService(
+        storage=storage,
+        output_root=tmp_path / "output",
+        checkpoint_root=tmp_path / "checkpoints",
+        page_source=lambda item: {"report": report, "pages": pages},
+        provider=provider,
+        processing_identity=identity,
+        execution_budget=budget,
+        token_budget=40_000,
+    )
+    budget.deadline = time.monotonic() + 180
+    run_result = asyncio.run(
+        service.execute(
+            "run",
+            knowledge_cutoff="2026-09-17",
+            instrument_ids=(report.instrument_id,),
+            max_items=1,
+        )
+    )
+    queried = asyncio.run(service.execute("query", instrument_ids=(report.instrument_id,)))
+    drain = run_result.get("drain") if isinstance(run_result, dict) else {}
+    stage_errors = {
+        name: {
+            "status": stage.get("status"),
+            "errors": stage.get("errors"),
+            "completed": stage.get("completed"),
+            "terminal_failures": stage.get("terminal_failures"),
+        }
+        for name, stage in (drain or {}).items()
+        if isinstance(stage, dict)
+    }
+    assert queried["delivered"] == 1, json.dumps(
+        {"state": run_result.get("state"), "stages": stage_errors},
+        ensure_ascii=False,
+        default=str,
+    )[:4000]
+    exported = asyncio.run(
+        service.execute(
+            "export",
+            instrument_ids=(report.instrument_id,),
+            output_directory=str(tmp_path / "export"),
+        )
+    )
+    assert exported["profiles"] == queried["profiles"]
+    assert queried["delivered"] == 1
+    profile = queried["profiles"][0]
+    views = profile["three_views"]
+    assert views["draft_complete"] is False
+    assert views["semantic_complete"] is False
+    assert views["real_semantic_complete"] is False
+    claims = [claim for view in views["views"].values() for claim in view["claims"]]
+    assert len(claims) == 7
+    assert all(claim["status"] == "unclear" for claim in claims)
+    assert any("invalid_claim_reference" in gap for gap in views["gaps"])
+    purposes = [item.get("purpose") for item in views["call_receipts"] if item.get("source_scope") == "full_context"]
+    assert purposes == ["source_inventory", "synthesize_views", "verify_views"]
+    verify = next(item for item in transport.calls if json.loads(next(m["content"] for m in item["payload"]["messages"] if m["role"] == "user"))["purpose"] == "verify_views")
+    verify_raw = json.loads(next(m["content"] for m in verify["payload"]["messages"] if m["role"] == "user"))
+    assert {page["page"] for page in verify_raw["source_pages"]} == {12}
+    assert any(
+        report.report_id in claim.get("supporting_record_ids", [])
+        for claim in verify_raw["claims"]
+    )
+    reloaded = CompanyProfileReadService(tmp_path / "output").query((report.instrument_id,))
+    assert reloaded["profiles"] == queried["profiles"]

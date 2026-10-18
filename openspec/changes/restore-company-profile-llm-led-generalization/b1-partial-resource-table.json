@@ -228,9 +228,27 @@
     "reason": "The frozen span's executable plan is 34621 reservation units, 623 above the remaining 33998. The conditional real entry was not started and its attempt marker was not written.",
     "not_requested": "Do not raise 33998 by 623, and do not admit the span by dropping the citation copy back to the 31165 empty-condition shell."
   },
+  "b1r_full_report_plan": {
+    "basis": "Current packer on the iteration2 208-page checkpoint. Units are UTF-8 payload bytes plus 256 plus the requested output cap, not tokens or CNY. Synthesis and verification are not simulated.",
+    "readable_pages": 208,
+    "map_requests": 2,
+    "map_units": 80365,
+    "max_map_units": 53857,
+    "body_requests": 10,
+    "body_units": 528454,
+    "max_body_units": 53939,
+    "discovery_units": 608819,
+    "discovery_requests": 12,
+    "one_recovery_units": 53939,
+    "discovery_plus_one_recovery": 662758,
+    "gap_versus_remaining_30971": 577848,
+    "gap_versus_120000": 488819,
+    "followup_policy": "Remeasure the actual condition and claim payload before synthesis and verification. One recovery equals that actual request and is not reserved twice. The segment verify payload was 14262 against an earlier 7593 estimate; synthesis output was 4781 against a 2500 request. Those are not added into the discovery sum.",
+    "not_the_request": "890954 would repeat the largest body chunk as citation text. The old 749989-766497 table is not a token budget. Neither number is the preferred authorization."
+  },
   "preferred_decision": {
-    "choice": "segment_sent_once_verification_not_sent",
-    "reason": "After the unread quotes were removed, the same 34621 plan fit the revised 40000 window. The one authorized entry ran. Inventory and synthesis succeeded on page 12 only. Verification was not sent because the follow-up exceeded the frozen ceiling. No verified claim was saved. Do not start another entry.",
-    "not_requested": "Do not treat the 30971 remainder under 246002 as a sixth authorization, and do not rerun this span."
+    "choice": "do_not_start_a_sixth_run_on_the_remainder",
+    "reason": "Full-report discovery of 208 readable pages measures 608819 reservation units across 12 requests. One recovery of the largest discovery request adds 53939, totaling 662758. That is 577848 above the remaining 30971. Synthesis and verification are sized from the actual payload at send time, not from this discovery sum.",
+    "not_requested": "Do not authorize 890954 or the old 749989-766497 figure as tokens or a fee. Do not start a sixth entry on the 30971 remainder."
   }
 }

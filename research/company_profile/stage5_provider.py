@@ -4146,6 +4146,9 @@ class CommonGatewaySemanticProvider:
                     **compact_request(request),
                     "max_output_tokens": request.max_output_tokens,
                     "timeout_seconds": request.timeout_seconds,
+                    "partial_slice": bool(
+                        request.processing_identity.get("partial_slice")
+                    ),
                 },
                 response_model=ReportSemanticResponseV3,
                 schema_name="company_profile_report_response",
@@ -4343,13 +4346,15 @@ class CommonGatewaySemanticProvider:
             )
             if compact_reading:
                 from types import SimpleNamespace
+
                 from .report_wire import instructions
 
                 system_instruction = instructions(SimpleNamespace(**runtime_payload))
             user_content = json.dumps(
                 {
                     k: v for k, v in runtime_payload.items()
-                    if not compact_reading or k not in {"max_output_tokens", "timeout_seconds"}
+                    if not compact_reading
+                    or k not in {"max_output_tokens", "timeout_seconds", "partial_slice"}
                 }, ensure_ascii=False, separators=(",", ":")
             )
         elif flat_extract:
