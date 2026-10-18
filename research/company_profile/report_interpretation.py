@@ -433,25 +433,175 @@ def _pages(pages: Sequence[Mapping[str, Any]]) -> tuple[dict[str, Any], ...]:
     return tuple(sorted(result, key=lambda item: item["page"]))
 
 
+def _nonspace_index(text: str) -> tuple[str, list[int]]:
+    chars: list[str] = []
+    indexes: list[int] = []
+    for index, char in enumerate(text):
+        if char.isspace():
+            continue
+        chars.append(char)
+        indexes.append(index)
+    return "".join(chars), indexes
+
+
+def _spans_in_text(quote: str, text: str) -> list[tuple[int, int]] | None:
+    """Unique or ambiguous spans. None means the characters do not match.
+
+    Exact source matches win. Otherwise only whitespace may differ. A different
+    digit, punctuation mark or word is not a location.
+    """
+    if not quote.strip():
+        return []
+    exact: list[tuple[int, int]] = []
+    start = 0
+    while True:
+        found = text.find(quote, start)
+        if found < 0:
+            break
+        exact.append((found, found + len(quote)))
+        start = found + 1
+    if exact:
+        return exact
+    wanted, _ignored = _nonspace_index(quote)
+    if not wanted:
+        return []
+    folded, indexes = _nonspace_index(text)
+    spans: list[tuple[int, int]] = []
+    start = 0
+    while True:
+        found = folded.find(wanted, start)
+        if found < 0:
+            break
+        spans.append((indexes[found], indexes[found + len(wanted) - 1] + 1))
+        start = found + 1
+    return spans
+
+
+def _heading_and_paragraph(text: str, start: int, end: int) -> tuple[str, str]:
+    paragraph_start = text.rfind("\n", 0, start)
+    paragraph_start = 0 if paragraph_start < 0 else paragraph_start + 1
+    paragraph_end = text.find("\n", end)
+    paragraph_end = len(text) if paragraph_end < 0 else paragraph_end
+    # A PDF page can be one long line. Keep the surrounding words, not the page.
+    if paragraph_end - paragraph_start > 800:
+        paragraph_start = max(paragraph_start, start - 240)
+        paragraph_end = min(paragraph_end, end + 240)
+    paragraph = text[paragraph_start:paragraph_end].strip()
+    heading = ""
+    for line in reversed(text[:paragraph_start].splitlines()):
+        stripped = line.strip()
+        if not stripped:
+            if heading:
+                break
+            continue
+        if 1 < len(stripped) <= 40 and not stripped.endswith(("。", "；", "！", "？")):
+            heading = stripped
+        break
+    return heading, paragraph
+
+
+def locate_source_quote(
+    quote: str, pages: Sequence[Mapping[str, Any]], *, page_number: int
+) -> tuple[str, int, str, str] | None:
+    """Locate one quote inside the text that was actually sent.
+
+    Returns the continuous source text, its page offset, a nearby heading and
+    the containing paragraph. Multiple matches stay unlocated.
+    """
+    hits: list[tuple[str, int, str, str]] = []
+    for fragment in pages:
+        if int(fragment["page"]) != int(page_number):
+            continue
+        if fragment.get("readable", True) is False:
+            continue
+        text = str(fragment.get("text") or "")
+        spans = _spans_in_text(quote, text)
+        if not spans:
+            continue
+        base = int(fragment.get("offset") or 0)
+        for start, end in spans:
+            heading, paragraph = _heading_and_paragraph(text, start, end)
+            hits.append((text[start:end], base + start, heading, paragraph))
+    if len(hits) != 1:
+        return None
+    return hits[0]
+
+
+def _bind_source_evidence(
+    evidence: Evidence, report: ReportIdentity, pages: Sequence[Mapping[str, Any]]
+) -> Evidence | None:
+    """Backfill one sent-page location. Meaning is not decided here."""
+    if evidence.report != report or not isinstance(evidence.anchor, TextAnchor):
+        return None
+    sent_pages = {int(page["page"]) for page in pages if page.get("readable", True)}
+    if any(
+        page not in sent_pages
+        for page in (*evidence.continuation_pages, *evidence.subject_evidence_pages)
+    ):
+        return None
+    model_quote = evidence.anchor.model_quote or evidence.anchor.bounded_quote
+    located = locate_source_quote(model_quote, pages, page_number=evidence.page)
+    if located is None:
+        return None
+    source, offset, heading, paragraph = located
+    anchor = evidence.anchor.model_copy(
+        update={
+            "bounded_quote": source,
+            "model_quote": None if model_quote == source else model_quote,
+            "source_offset": offset,
+            "context_before": paragraph or evidence.anchor.context_before,
+        }
+    )
+    return evidence.model_copy(
+        update={
+            "anchor": anchor,
+            "section_title": heading or evidence.section_title,
+        }
+    )
+
+
+def _located_conditions(
+    response_conditions: Sequence[ReportSourceCondition],
+    report: ReportIdentity,
+    pages: Sequence[Mapping[str, Any]],
+    *,
+    request_id: str,
+    seen: set[str],
+) -> tuple[list[ReportSourceCondition], list[str]]:
+    """Keep conditions whose quotes locate. One bad quote does not drop the rest."""
+    accepted: list[ReportSourceCondition] = []
+    gaps: list[str] = []
+    for condition in response_conditions:
+        bound: list[Evidence] = []
+        failed = False
+        for evidence in condition.evidence:
+            located = _bind_source_evidence(evidence, report, pages)
+            if located is None:
+                failed = True
+                break
+            bound.append(located)
+        scoped_id = f"{request_id}:{condition.condition_id}"
+        if failed:
+            gaps.append(f"evidence_not_located:{scoped_id}")
+            if condition.major:
+                gaps.append(f"major_evidence_not_located:{scoped_id}")
+            continue
+        if scoped_id in seen:
+            raise ValueError("duplicate_source_condition")
+        seen.add(scoped_id)
+        accepted.append(
+            condition.model_copy(
+                update={"condition_id": scoped_id, "evidence": tuple(bound)}
+            )
+        )
+    return accepted, gaps
+
+
 def _evidence_valid(
     evidence: Evidence, report: ReportIdentity, pages: Sequence[Mapping[str, Any]]
 ) -> bool:
-    # Exact quotes and physical references are hard constraints. Meaning is verified separately.
-    if evidence.report != report or not isinstance(evidence.anchor, TextAnchor):
-        return False
-    grouped: dict[int, list[str]] = {}
-    for page in pages:
-        if page["readable"]:
-            grouped.setdefault(int(page["page"]), []).append(str(page["text"]))
-    quote = evidence.anchor.bounded_quote
-    return (
-        bool(quote.strip())
-        and any(quote in text for text in grouped.get(evidence.page, ()))
-        and all(
-            page in grouped
-            for page in (*evidence.continuation_pages, *evidence.subject_evidence_pages)
-        )
-    )
+    # Location is a hard constraint. Semantic support is a later verification.
+    return _bind_source_evidence(evidence, report, pages) is not None
 
 
 def interpret_report(
@@ -1123,18 +1273,15 @@ def interpret_report(
                     if page_state["full_chunks"] == full_expected[fragment["page"]]:
                         page_state["status"] = "read"
                         read_pages.add(int(fragment["page"]))
-            for condition in response.source_conditions:
-                if not all(
-                    _evidence_valid(e, report, chunk) for e in condition.evidence
-                ):
-                    raise ValueError("inventory_evidence_outside_source")
-                scoped_id = f"{receipts[-1]['request_id']}:{condition.condition_id}"
-                if scoped_id in seen_condition_ids:
-                    raise ValueError("duplicate_source_condition")
-                seen_condition_ids.add(scoped_id)
-                conditions.append(
-                    condition.model_copy(update={"condition_id": scoped_id})
-                )
+            accepted, location_gaps = _located_conditions(
+                response.source_conditions,
+                report,
+                chunk,
+                request_id=receipts[-1]["request_id"],
+                seen=seen_condition_ids,
+            )
+            gaps.extend(location_gaps)
+            conditions.extend(accepted)
             if compact and not layered and response.requested_pages:
                 pending = (
                     set(response.requested_pages)
@@ -1297,21 +1444,15 @@ def interpret_report(
                     if sent_extra[page_no] == planned_extra[page_no]:
                         read_pages.add(page_no)
                         by_page[page_no]["status"] = "read"
-                for condition in response.source_conditions:
-                    if not all(
-                        _evidence_valid(evidence, report, chunk)
-                        for evidence in condition.evidence
-                    ):
-                        raise ValueError("inventory_evidence_outside_source")
-                    scoped_id = (
-                        f"{receipts[-1]['request_id']}:{condition.condition_id}"
-                    )
-                    if scoped_id in seen_condition_ids:
-                        raise ValueError("duplicate_source_condition")
-                    seen_condition_ids.add(scoped_id)
-                    conditions.append(
-                        condition.model_copy(update={"condition_id": scoped_id})
-                    )
+                accepted, location_gaps = _located_conditions(
+                    response.source_conditions,
+                    report,
+                    chunk,
+                    request_id=receipts[-1]["request_id"],
+                    seen=seen_condition_ids,
+                )
+                gaps.extend(location_gaps)
+                conditions.extend(accepted)
             for page_no in requested_extra:
                 if page_no not in read_pages:
                     necessary_pages.add(page_no)
@@ -1416,15 +1557,82 @@ def interpret_report(
         if not quote_pages:
             raise ValueError("no_substantive_source_conditions")
         # Discovery already sent every body span. Follow-up requests carry the
-        # quotes and conditions, not the same pages again.
-        response = invoke(
-            "synthesize_views",
-            quote_pages,
-            source_conditions=tuple(conditions),
-            records=related_records,
-            active_checklist=tuple(active_checklist),
-        )
-        claims, candidates = response.claims, response.records
+        # quotes and conditions, not the same pages again. A layered card
+        # request stays within 24000 by grouping independent conditions.
+        card_limit = reservation_limit or (24_000 if layered else 0)
+
+        def followup_units(purpose: str, group, pages, claims_group=()) -> int:
+            return request_reservation(
+                ReportSemanticRequestV3(
+                    request_id="followup-fit",
+                    purpose=purpose,
+                    report=report,
+                    processing_identity=identity,
+                    source_pages=tuple(pages),
+                    source_scope="full_context",
+                    source_conditions=tuple(group),
+                    claims=tuple(claims_group),
+                    records=related_records,
+                    max_output_tokens=2500 if purpose != "verify_views" else 2000,
+                    timeout_seconds=30,
+                )
+            )
+
+        def groups_under_limit(items, purpose: str, claims_for=None):
+            groups: list[list] = []
+            current: list = []
+            for item in items:
+                trial = [*current, item]
+                pages = cited_quote_pages(
+                    tuple(evidence for condition in trial for evidence in condition.evidence)
+                ) or quote_pages[:1]
+                claims_group = claims_for(trial) if claims_for else ()
+                if (
+                    card_limit
+                    and current
+                    and followup_units(purpose, trial, pages, claims_group) > card_limit
+                ):
+                    groups.append(current)
+                    current = [item]
+                else:
+                    current = trial
+            if current:
+                groups.append(current)
+            return groups
+
+        if layered and card_limit:
+            claim_rows = []
+            for group in groups_under_limit(conditions, "synthesize_views"):
+                pages = cited_quote_pages(
+                    tuple(evidence for condition in group for evidence in condition.evidence)
+                ) or quote_pages[:1]
+                if followup_units("synthesize_views", group, pages) > card_limit:
+                    gaps.append(
+                        f"followup_exceeds_card_reservation:{group[0].condition_id}"
+                    )
+                    if group[0].major:
+                        gaps.append(
+                            f"major_evidence_not_located:{group[0].condition_id}"
+                        )
+                    continue
+                response = invoke(
+                    "synthesize_views",
+                    pages,
+                    source_conditions=tuple(group),
+                    records=related_records,
+                    active_checklist=tuple(active_checklist),
+                )
+                claim_rows.extend(response.claims)
+            claims, candidates = tuple(claim_rows), ()
+        else:
+            response = invoke(
+                "synthesize_views",
+                quote_pages,
+                source_conditions=tuple(conditions),
+                records=related_records,
+                active_checklist=tuple(active_checklist),
+            )
+            claims, candidates = response.claims, response.records
         # Reliable native facts are inputs to verification and delivery, not a
         # model transcription obligation. Keep rejected variants separate below.
         condition_map = {item.condition_id: item for item in conditions}
@@ -1523,15 +1731,119 @@ def interpret_report(
             request_claims = tuple(limited_claims)
         # Verify has original source plus source-first conditions and the complete
         # draft. Rejected variants remain in dispositions, outside the fact set.
-        response = invoke(
-            "verify_views",
-            quote_pages,
-            source_conditions=tuple(conditions),
-            claims=request_claims,
-            records=records,
-            active_checklist=tuple(active_checklist),
-        )
-        checks = response.checks
+        def verify_units(group_claims, group_conditions, group_records) -> int:
+            pages = cited_quote_pages(
+                tuple(
+                    evidence
+                    for item in (*group_conditions, *group_claims)
+                    for evidence in item.evidence
+                )
+            ) or quote_pages[:1]
+            return request_reservation(
+                ReportSemanticRequestV3(
+                    request_id="verify-fit",
+                    purpose="verify_views",
+                    report=report,
+                    processing_identity=identity,
+                    source_pages=tuple(pages),
+                    source_scope="full_context",
+                    source_conditions=tuple(group_conditions),
+                    claims=tuple(group_claims),
+                    records=tuple(group_records),
+                    max_output_tokens=2000,
+                    timeout_seconds=30,
+                )
+            )
+
+        def pack_objects(items, with_records=()):
+            groups: list[list] = []
+            current: list = []
+            for item in items:
+                trial = [*current, item]
+                conds = [
+                    condition
+                    for condition in conditions
+                    if condition.condition_id
+                    in {key for claim in trial for key in claim.condition_ids}
+                ] or list(conditions[:1] if not trial else [])
+                if (
+                    card_limit
+                    and current
+                    and verify_units(trial, conds, with_records) > card_limit
+                ):
+                    groups.append(current)
+                    current = [item]
+                else:
+                    current = trial
+            if current:
+                groups.append(current)
+            return groups
+
+        if layered and card_limit and (
+            verify_units(request_claims, conditions, records) > card_limit
+        ):
+            check_rows = []
+            for group in pack_objects(request_claims):
+                conds = tuple(
+                    condition
+                    for condition in conditions
+                    if condition.condition_id
+                    in {key for claim in group for key in claim.condition_ids}
+                )
+                pages = cited_quote_pages(
+                    tuple(
+                        evidence
+                        for item in (*conds, *group)
+                        for evidence in item.evidence
+                    )
+                ) or quote_pages[:1]
+                response = invoke(
+                    "verify_views",
+                    pages,
+                    source_conditions=conds,
+                    claims=tuple(group),
+                    records=(),
+                    active_checklist=tuple(active_checklist),
+                )
+                check_rows.extend(response.checks)
+            record_groups: list[list] = []
+            current_records: list = []
+            for record in records:
+                trial = [*current_records, record]
+                if (
+                    card_limit
+                    and current_records
+                    and verify_units((), (), trial) > card_limit
+                ):
+                    record_groups.append(current_records)
+                    current_records = [record]
+                else:
+                    current_records = trial
+            if current_records:
+                record_groups.append(current_records)
+            for group in record_groups:
+                if not group:
+                    continue
+                response = invoke(
+                    "verify_views",
+                    quote_pages[:1],
+                    source_conditions=(),
+                    claims=(),
+                    records=tuple(group),
+                    active_checklist=tuple(active_checklist),
+                )
+                check_rows.extend(response.checks)
+            checks = tuple(check_rows)
+        else:
+            response = invoke(
+                "verify_views",
+                quote_pages,
+                source_conditions=tuple(conditions),
+                claims=request_claims,
+                records=records,
+                active_checklist=tuple(active_checklist),
+            )
+            checks = response.checks
         # Retain explicit conflicts even if another verification target is missing.
         # Pipeline failure may keep reliable independent facts, never these facts.
         for check in checks:
@@ -1728,6 +2040,7 @@ def interpret_report(
                         "necessary_unread:",
                         "necessary_fragment_unread:",
                         "gap_check_incomplete:",
+                        "major_evidence_not_located:",
                     )
                 )
                 for gap in gaps

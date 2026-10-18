@@ -222,6 +222,10 @@ class TextAnchor(_StrictModel):
     context_before: str | None = None
     context_after: str | None = None
     match_index: int = Field(default=0, ge=0)
+    # Original model string when PDF whitespace differed. The bounded quote is
+    # the continuous source text. source_offset is the start on that sent page.
+    model_quote: str | None = None
+    source_offset: int | None = None
 
 
 PhysicalAnchor: TypeAlias = Annotated[

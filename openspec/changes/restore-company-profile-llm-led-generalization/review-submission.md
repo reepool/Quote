@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-18，[A审核§37](#37-a审核475b728f纠正引文归因并改绑未用入口)）：接受第7次失败留存，B1/A1未通过。A核13处引文：3处原本精确，其余10处仅差排版空白且可唯一定位；仍有行业/公司及转型/当前语义风险，不能判条件通过。按执行卡§20修证据到完整三视图，原未用第8次改绑新冻结快照，不增次数或单窗额度。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产未授权。原§1—36正文不改写。
+当前状态（2026-10-18，[B1-H交接§38](#38-b1-h第8次重放已存正文时响应校验失败)）：引文定位和原入口离线回放已交。第8次入口已启动，但重放第7次正文响应时严格校验拒绝了列表形态的条件，没有新的物理请求，也没有已核主张。B1/A1仍未通过，19项核心和6项负例不可评估。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。无第9次、不归档、不扩批，生产未授权。原§1—37正文不改写。
 
 ## 1. 唯一实施指引
 
@@ -1521,3 +1521,47 @@ source scripts/quote_dev_env.sh
 结果**4 passed/8.11秒、7 warnings**，未跑全库。另独立执行上述13引文字符/位置对比，并用pypdf重读官方PDF的p12—15：PDF SHA-256与合同一致，13/13引文非空白字符均能在对应官方原页匹配；7次manifest共51份文件hash全部成立。旧静态检查只复用对应快照回执，不补称本轮全库通过。B的§36结构可沿用，但验证段缺精确命令/数量，归因过度概括；下次同一入口补齐并分开HTTP成功、领域接受和已核交付，不为报告格式另开开发窗口。A活跃审核时间unknown，独立新增范围内阻塞2项（定位/中断、待核语义），不把审核消耗记为业务模型usage。
 
 本轮OpenSpec严格校验、diff及10份修改文档的本地文件链接检查通过；未留下测试库，已清本轮空pytest日志目录（数据文件释放0字节），未删除业务/验收资料。未新增证据平台或重复报告目录。既有11份修改/16项未跟踪按开始时hash核保护；验收文档已有历史块保留且不纳提交。Git结果见本次最终回复。
+
+## 38. B1-H第8次：重放已存正文时响应校验失败
+
+### 38.1 结论
+
+**B1/A1未通过。** R26把排版空白定位、单条坏证据隔离，以及第7次正文到合成/核验/query/export的离线回放做进了这次冻结代码。R27把原未用第8次改绑到该快照并已启动。启动后只复用了第6次两批导航，重放第7次正文响应时`ReportSemanticResponseV3`的严格校验拒绝了`source_conditions`的列表形态，流程停在`semantic_incomplete`。没有新的物理请求，没有已核主张。19项核心、6项负例和已审准确率不可评估。
+
+第8次已经记为用过。同一实现方案不再自动第9次。定位成功仍然不是语义通过；这次真实入口还没有走到上下文核验。
+
+观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批。生产仍`not_authorized`。
+
+### 38.2 离线修复
+
+优先精确匹配。只有空白不同时，在本次发送的页面里找唯一连续原文，回填原文、页内偏移和模型原句。数字、标点或其他非空白变化，以及多处匹配，保持未定位。一条坏证据只隔离自己的条件；主要条件未定位仍阻止完整。核验请求带上标题和所在段落，并要求把行业环境与公司行动、战略目标与当前身份分开。合成或核验超过24000时按独立条件分批，不截断JSON。
+
+第7次保存的13处引文，在已发送的第12–15页上13/13能唯一定位，其中3处原本就是精确子串。这只证明位置，不证明语义。离线原入口回放走到了query/export，模拟核验把主张留在unclear，`real_semantic_complete`为false，不计19/6。
+
+### 38.3 第8次运行
+
+冻结绑定SHA-256 `9da7e3172992ef98b7a07a932c7da3ecfae052e2f942fd4bce19aa56c16597ef`。预检仍是29页、5批正文，预留21942、23481、23289、23838、19760。这一窗没有推迟合成和核验。
+
+监督耗时104.525174秒。物理请求0，入账0，没有usage。查询与导出一致，主张0条，三个完整标志false，分类limited。缺口是响应校验：`source_conditions`输入为list，严格模型要求tuple。旧响应文件没有改。
+
+七次累计仍是336482账本、1423.570950秒、16次请求。本窗没有新增账本或请求，但入口次数已经用完。旧余额不转入。费用没有新的模型调用，不据此声称成本达标。
+
+### 38.4 验证与证据
+
+```text
+pytest -q \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_whitespace_quote_locates_on_the_sent_page_and_a_bad_quote_stays_isolated \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_seventh_run_quotes_relocate_on_the_sent_pages_without_a_model_call \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_layered_reading_supplements_a_hidden_business_and_labels_unread_notes
+```
+
+3 passed / 7.74秒。
+
+```text
+pytest -q \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_saved_seventh_body_reaches_query_export_without_counting_as_a_real_score
+```
+
+1 passed / 145.74秒。Ruff检查本次修改文件通过。没有跑全库。
+
+持久证据在[resume2](b1-pool-observation-evidence/resume2/manifest.json)。来源回执仍是`f304554e`。研究库和PDF缓存未放入OpenSpec。运行目录约2.8MB已删。9个空测试日志目录已删。`resume2.json`尝试标记保留。11份既有修改和16项未跟踪内容不纳入提交。B活跃开发时间unknown。

@@ -1783,3 +1783,390 @@ def test_layered_gap_check_reads_every_requested_batch_and_blocks_when_one_is_mi
     missed_result = _run(missed, pages=pages, processing_identity=identity)
     assert any(gap == "necessary_unread:3" for gap in missed_result.gaps)
     assert missed_result.draft_complete is False
+
+
+def test_whitespace_quote_locates_on_the_sent_page_and_a_bad_quote_stays_isolated():
+    from research.company_profile.report_interpretation import locate_source_quote
+
+    text = "公司经营有线电视网络。\n从技术环境来看，行业在推进700MHz。"
+    pages = ({"page": 13, "text": text, "readable": True, "offset": 0},)
+    exact = locate_source_quote("从技术环境来看", pages, page_number=13)
+    assert exact is not None and exact[0] == "从技术环境来看"
+    spaced = locate_source_quote("推进 700 MHz", pages, page_number=13)
+    assert spaced is not None
+    assert spaced[0] == "推进700MHz"
+    assert spaced[1] == text.index("推进700MHz")
+    assert locate_source_quote("推进700MHz网络", pages, page_number=13) is None
+    assert locate_source_quote("。", pages, page_number=13) is None
+
+    class _Mixed(FakeReportProvider):
+        def interpret(self, request):
+            self.requests.append(request)
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(1,),
+                )
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=(
+                        {
+                            "condition_id": "kept",
+                            "dimension": "principal_business",
+                            "description": "来源写明网络传输",
+                            "evidence": (
+                                _evidence(
+                                    request.report,
+                                    text="公司经营 有线电视 网络",
+                                    page=1,
+                                ),
+                            ),
+                            "major": True,
+                            "statement_status": "current",
+                        },
+                        {
+                            "condition_id": "dropped",
+                            "dimension": "products_services",
+                            "description": "数字被改写",
+                            "evidence": (
+                                Evidence(
+                                    evidence_id="source-dropped",
+                                    report=request.report,
+                                    page=1,
+                                    section_title="新形态业务叙述",
+                                    anchor=TextAnchor(bounded_quote="推广9台"),
+                                ),
+                            ),
+                            "major": False,
+                            "statement_status": "current",
+                        },
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=(),
+            )
+
+    identity = layered_processing_identity()
+    result = _run(
+        _Mixed(),
+        pages=(
+            {"page": 1, "text": "公司经营有线电视网络。推广3台。", "readable": True},
+            {"page": 2, "text": "附注：会计政策。", "readable": True},
+        ),
+        processing_identity=identity,
+    )
+    kept = [item for item in result.source_conditions if item.condition_id.endswith("kept")]
+    assert len(kept) == 1
+    assert kept[0].evidence[0].anchor.bounded_quote == "公司经营有线电视网络"
+    assert kept[0].evidence[0].anchor.model_quote == "公司经营 有线电视 网络"
+    assert any("evidence_not_located" in gap and gap.endswith("dropped") for gap in result.gaps)
+    assert result.draft_complete is False
+
+
+def test_seventh_run_quotes_relocate_on_the_sent_pages_without_a_model_call():
+    """The saved body response is not a verification score. Location is not meaning."""
+    import gzip
+    from pathlib import Path
+
+    from research.company_profile.report_interpretation import locate_source_quote
+
+    change = (
+        Path(__file__).resolve().parents[3]
+        / "openspec/changes/restore-company-profile-llm-led-generalization"
+    )
+    saved = json.loads(
+        (
+            change / "b1-pool-observation-evidence/resume1/work-checkpoint.json"
+        ).read_text()
+    )
+    pages = {
+        int(page["page"]): str(page.get("text") or "")
+        for page in saved.get("pages") or []
+    }
+    if not pages:
+        raw = gzip.decompress(
+            (change / "b1-resource-evidence/iteration2/checkpoint.json.gz").read_bytes()
+        )
+        pages = {
+            int(page["page"]): str(page.get("text") or "")
+            for page in json.loads(raw)["pages"]
+        }
+    body = next(
+        item
+        for item in saved["report_interpretation"]["call_receipts"]
+        if item.get("source_scope") == "full_context"
+    )
+    sent = [
+        {"page": page, "text": pages[int(page)], "readable": True, "offset": 0}
+        for page in body["source_pages"]
+    ]
+    located = 0
+    exact = 0
+    for condition in body["response_payload"]["source_conditions"]:
+        for evidence in condition["evidence"]:
+            quote = evidence["anchor"]["bounded_quote"]
+            hit = locate_source_quote(quote, sent, page_number=int(evidence["page"]))
+            assert hit is not None, condition["condition_id"]
+            located += 1
+            if hit[0] == quote:
+                exact += 1
+            assert "".join(hit[0].split()) == "".join(quote.split())
+    assert located == 13
+    assert exact == 3
+
+
+def test_saved_seventh_body_reaches_query_export_without_counting_as_a_real_score(
+    tmp_path,
+):
+    """Offline owner replay. Located quotes are not verified business claims."""
+    import time
+    from pathlib import Path
+
+    from research.company_profile.models import ReportIdentity
+    from research.company_profile.operations import CompanyProfileTaskService
+    from research.company_profile.reads import CompanyProfileReadService
+    from research.company_profile.report_interpretation import (
+        layered_processing_identity,
+    )
+    from tests.unit.test_research.test_business_profile_async_production import (
+        _announcement,
+        _frontier,
+    )
+    from tests.unit.test_research.test_business_profile_exposure_components import (
+        _storage,
+    )
+    from tests.unit.test_utils.test_llm_physical_budget import _client
+    from tests.unit.test_utils.test_llm_routed_client import _config as routed_config
+    from utils.llm.budget import DEVELOPMENT_UNPRICED_BILLING, LlmRunBudget
+    from utils.llm.testing import ScriptedTransport
+    from utils.llm.transport import TransportResponse
+
+    change = (
+        Path(__file__).resolve().parents[3]
+        / "openspec/changes/restore-company-profile-llm-led-generalization"
+    )
+    saved = json.loads(
+        (change / "b1-pool-observation-evidence/resume1/work-checkpoint.json").read_text()
+    )
+    report = ReportIdentity.model_validate(saved["report"])
+    pages = tuple(
+        {
+            "page": int(page["page"]),
+            "text": (
+                str(page.get("text") or "")
+                if int(page["page"]) >= 12
+                else "页面前文占位。本公司另有正文。"
+            ),
+            "readable": True,
+        }
+        for page in saved["pages"]
+        if int(page["page"]) <= 15
+    )
+    body = next(
+        item
+        for item in saved["report_interpretation"]["call_receipts"]
+        if item.get("source_scope") == "full_context"
+    )
+    identity = layered_processing_identity()
+    identity.update(
+        execution_mode="offline_fake",
+        model="offline_replay",
+        ledger_tokens=120_000,
+        max_physical_requests=8,
+    )
+
+    class ReplayTransport(ScriptedTransport):
+        def __init__(self):
+            super().__init__([])
+
+        async def send(self, url, headers, payload, timeout_seconds):
+            self.calls.append({"payload": dict(payload)})
+            raw = json.loads(
+                next(
+                    message["content"]
+                    for message in payload["messages"]
+                    if message["role"] == "user"
+                )
+            )
+            content = {
+                "schema_version": "company_profile_report_response.v3",
+                "request_id": raw["request_id"],
+                "purpose": raw["purpose"],
+            }
+            if raw.get("source_scope") == "page_map":
+                content["requested_pages"] = [12, 13, 14, 15]
+            elif raw["purpose"] == "source_inventory":
+                content["requested_pages"] = []
+                content["source_conditions"] = [
+                    {
+                        "condition_id": item["condition_id"],
+                        "dimension": item["dimension"],
+                        "description": item["description"],
+                        "major": item["major"],
+                        "statement_status": item["statement_status"],
+                        "evidence": [
+                            {
+                                "page": evidence["page"],
+                                "quote": evidence["anchor"]["bounded_quote"],
+                            }
+                            for evidence in item["evidence"]
+                        ],
+                    }
+                    for item in body["response_payload"]["source_conditions"]
+                ]
+            elif raw["purpose"] == "synthesize_views":
+                content["claims"] = [
+                    {
+                        "claim_id": f"claim-{item['condition_id']}",
+                        "dimension": item["dimension"],
+                        "status": "observed",
+                        "answer": item["description"],
+                        "condition_ids": [item["condition_id"]],
+                        "supporting_record_ids": [],
+                        "evidence": list(item.get("evidence_refs") or []),
+                    }
+                    for item in raw.get("source_conditions") or []
+                ]
+            else:
+                content["checks"] = [
+                    {
+                        "target_type": kind,
+                        "target_id": item[
+                            "condition_id"
+                            if kind == "condition"
+                            else "claim_id"
+                            if kind == "claim"
+                            else "record_id"
+                        ],
+                        "status": "unclear",
+                        "explanation": "离线回放，定位成功不是语义通过。",
+                    }
+                    for kind, key in (
+                        ("condition", "source_conditions"),
+                        ("claim", "claims"),
+                        ("record", "records"),
+                    )
+                    for item in raw.get(key) or []
+                ]
+            return TransportResponse(
+                status_code=200,
+                data={
+                    "choices": [
+                        {
+                            "message": {
+                                "content": json.dumps(content, ensure_ascii=False)
+                            },
+                            "finish_reason": "stop",
+                        }
+                    ],
+                    "usage": {
+                        "prompt_tokens": 100,
+                        "completion_tokens": 20,
+                        "total_tokens": 120,
+                    },
+                },
+            )
+
+    transport = ReplayTransport()
+    budget = LlmRunBudget(
+        deadline=time.monotonic() + 180,
+        prices={},
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        max_tokens=120_000,
+        max_requests=8,
+    )
+    client = _client(
+        transport,
+        budget,
+        routed_config(timeout_seconds=30, attempt_timeout_seconds=10),
+    )
+    provider = OfflineGatewayProvider(
+        client=client,
+        profile="semantic",
+        max_output_tokens=2500,
+        timeout_seconds=30,
+    )
+    storage = _storage(tmp_path)
+    repository, _ignored = _frontier(storage)
+    repository.upsert_record(
+        instrument={
+            "instrument_id": report.instrument_id,
+            "symbol": report.instrument_id.split(".")[0],
+            "exchange": "SSE",
+        },
+        record=_announcement(
+            "annual-2025-gehua",
+            "歌华有线2025年年度报告",
+            published_at="2026-04-28T16:00:00+00:00",
+        ),
+    )
+    service = CompanyProfileTaskService(
+        storage=storage,
+        output_root=tmp_path / "output",
+        checkpoint_root=tmp_path / "checkpoints",
+        page_source=lambda item: {"report": report, "pages": pages},
+        provider=provider,
+        processing_identity=identity,
+        execution_budget=budget,
+        token_budget=120_000,
+    )
+    asyncio.run(
+        service.execute(
+            "run",
+            knowledge_cutoff="2026-09-17",
+            instrument_ids=(report.instrument_id,),
+            max_items=1,
+        )
+    )
+    queried = asyncio.run(
+        service.execute("query", instrument_ids=(report.instrument_id,))
+    )
+    exported = CompanyProfileReadService(tmp_path / "output").export(
+        (report.instrument_id,), tmp_path / "export"
+    )
+    assert queried["delivered"] == 1
+    assert exported["delivered"] == 1
+    assert queried["profiles"] == CompanyProfileReadService(tmp_path / "output").query(
+        (report.instrument_id,)
+    )["profiles"]
+    views = queried["profiles"][0]["three_views"]
+    purposes = [
+        json.loads(
+            next(
+                message["content"]
+                for message in call["payload"]["messages"]
+                if message["role"] == "user"
+            )
+        )["purpose"]
+        for call in transport.calls
+    ]
+    assert "verify_views" in purposes, (purposes, views["gaps"][:6])
+    verify = next(
+        call
+        for call, purpose in zip(transport.calls, purposes)
+        if purpose == "verify_views"
+    )
+    raw_verify = json.loads(
+        next(
+            message["content"]
+            for message in verify["payload"]["messages"]
+            if message["role"] == "user"
+        )
+    )
+    catalog = raw_verify["evidence_catalog"]
+    anchors = [item.get("anchor") or {} for item in catalog.values()]
+    assert any(anchor.get("model_quote") for anchor in anchors)
+    assert any(anchor.get("context_before") for anchor in anchors)
+    views = queried["profiles"][0]["three_views"]
+    assert views["real_semantic_complete"] is False
