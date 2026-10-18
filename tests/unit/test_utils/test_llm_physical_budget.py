@@ -264,3 +264,68 @@ def test_development_mode_rejects_oversized_payload_before_send():
         )
     assert budget.snapshot()["physical_requests"] == 0
     assert budget.snapshot()["denied_request"]["payload_utf8_bytes"] > 65_536
+
+
+def test_spent_map_and_unknown_body_reject_the_next_source_before_send():
+    """29516 settled plus 52068 unknown leaves 38416, so 52072 cannot be sent."""
+    from utils.llm.models import LlmMessage, LlmUsage
+
+    budget = _budget(
+        prices={},
+        billing_mode="development_unpriced",
+        max_tokens=120_000,
+        max_requests=16,
+    )
+
+    def settle_usage(total, request_id):
+        ticket = budget.reserve(
+            resource="scorpio:gemini",
+            model="gemini-3.8-flash-high",
+            profile="semantic",
+            payload={"max_tokens": 100, "messages": [{"role": "user", "content": "x"}]},
+            request_id=request_id,
+            attempt=1,
+        )
+        budget.settle(
+            ticket,
+            LlmUsage(input_tokens=total, output_tokens=0, total_tokens=total),
+            status="success",
+        )
+
+    settle_usage(17_965, "map-1")
+    settle_usage(11_551, "map-2")
+    failed = budget.reserve(
+        resource="scorpio:grok",
+        model="grok-4.7",
+        profile="semantic",
+        payload={"max_tokens": 100, "messages": [{"role": "user", "content": "x"}]},
+        request_id="body-timeout",
+        attempt=1,
+    )
+    budget.settle(failed, None, status="failed_or_cancelled")
+    budget.attempts[failed]["charged_tokens"] = 52_068
+    assert budget.snapshot()["charged_tokens"] == 29_516 + 52_068
+
+    payload = {
+        "max_completion_tokens": 2500,
+        "messages": [{"role": "user", "content": "文" * 12_000}],
+    }
+    transport = ScriptedTransport([_response({"label": "ok", "score": 1})])
+    client = _client(transport, budget)
+    with pytest.raises(LlmDeadlineExceededError):
+        asyncio.run(
+            client.complete(
+                _request(
+                    messages=[
+                        LlmMessage(
+                            role="user", content=payload["messages"][0]["content"]
+                        )
+                    ],
+                    max_output_tokens=2500,
+                )
+            )
+        )
+    assert transport.calls == []
+    denied = budget.snapshot()["denied_request"]
+    assert denied["required_tokens"] > 38_416
+    assert denied["remaining_tokens"] == 120_000 - (29_516 + 52_068)

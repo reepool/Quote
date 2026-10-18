@@ -885,3 +885,205 @@ def test_long_unrelated_note_need_not_be_extracted_line_by_line():
         for record in result.records
     )
     assert len(result.source_conditions) == len(DIMENSIONS)
+
+
+def test_used_recovery_is_not_reserved_again_before_synthesis():
+    from research.company_profile.reading_budget import remaining_tail_units
+
+    plan = {
+        "synthesis_units": 13_563,
+        "verification_units": 11_774,
+        "recovery_units": 13_614,
+    }
+    attempts = (
+        {"status": "failed_or_cancelled", "usage": None},
+        {"status": "success", "usage": {"total_tokens": 14_589}},
+    )
+    assert remaining_tail_units(plan, (), "synthesize_views") == 11_774 + 13_614
+    assert remaining_tail_units(plan, attempts, "synthesize_views") == 11_774
+    charged = 13_633 + 14_589
+    assert charged + plan["synthesis_units"] + remaining_tail_units(
+        plan, attempts, "synthesize_views"
+    ) <= 62_220
+
+
+def test_verified_slice_survives_a_later_discovery_failure_and_stays_incomplete():
+    hidden = "另外，本公司本期主要经营电池回收服务，占营业收入百分之六十。"
+    pages = (
+        {"page": 1, "text": TEXT, "readable": True},
+        {"page": 2, "text": "承接上页的普通说明。", "readable": True},
+        {"page": 3, "text": hidden, "readable": True},
+    )
+    identity = compact_processing_identity(discovery_scope="page_map")
+    identity.update(
+        partial_slice=True,
+        ledger_tokens=120_000,
+        max_physical_requests=8,
+        continue_after_verify=True,
+        parent_attempt="special",
+        navigation_receipts=(
+            {
+                "status": "success",
+                "source_scope": "page_map",
+                "purpose": "source_inventory",
+                "prompt_version": identity["prompt_version"],
+                "source_pages": [1, 2, 3],
+                "response_payload": {
+                    "purpose": "source_inventory",
+                    "requested_pages": [1, 3],
+                    "source_conditions": [],
+                },
+                "usage": {"total_tokens": 10},
+                "model": "parent-model",
+            },
+        ),
+    )
+
+    class LaterFailure(CompactSemanticFixture):
+        def interpret(self, request):
+            if request.source_scope == "full_context" and request.purpose == "source_inventory" and any(
+                hidden in page["text"] for page in request.source_pages
+            ):
+                raise ValueError("later_discovery_failed")
+            return super().interpret(request)
+
+    result = _run(LaterFailure(), processing_identity=identity, pages=pages)
+    assert any(claim.status == "observed" for claim in result.claims)
+    assert result.draft_complete is False
+    assert result.semantic_complete is False
+    assert result.real_semantic_complete is False
+    assert result.page_coverage[2]["status"] != "read"
+    assert any("later_discovery_failed" in gap for gap in result.gaps)
+    views = __import__(
+        "research.company_profile.report_interpretation", fromlist=["research_views"]
+    ).research_views(result)
+    assert views["views"]["company_profile"]["claims"]
+    assert views["draft_complete"] is False
+    assert all(
+        item.get("physical_request") is False
+        for item in result.call_receipts
+        if item.get("reused_navigation")
+    )
+
+
+def test_shrunk_slice_body_tail_and_recovery_share_one_ledger():
+    import asyncio
+    import gzip
+    import time
+    from pathlib import Path
+
+    from research.company_profile.models import ReportIdentity
+    from research.company_profile.reading_budget import (
+        partial_slice_plan,
+        reused_map_receipts,
+    )
+    from research.company_profile.report_interpretation import COMPACT_REPORT_PROMPT
+    from tests.unit.test_utils.test_llm_physical_budget import _client
+    from tests.unit.test_utils.test_llm_routed_client import _config as routed_config
+    from utils.llm.budget import DEVELOPMENT_UNPRICED_BILLING, LlmRunBudget
+    from utils.llm.errors import LlmTransientTransportError
+    from utils.llm.models import LlmMessage, LlmRequest
+    from utils.llm.testing import ScriptedTransport
+
+    change = (
+        Path(__file__).resolve().parents[3]
+        / "openspec/changes/restore-company-profile-llm-led-generalization"
+    )
+    checkpoint = json.loads(
+        gzip.decompress(
+            (change / "b1-resource-evidence/iteration2/checkpoint.json.gz").read_bytes()
+        )
+    )
+    query = json.loads(
+        (change / "b1-pool-observation-evidence/special/query.json").read_text()
+    )
+    pages = tuple(
+        {
+            "page": int(page["page"]),
+            "text": str(page.get("text") or ""),
+            "readable": bool(str(page.get("text") or "").strip()),
+        }
+        for page in checkpoint["pages"]
+    )
+    _, selected = reused_map_receipts(
+        query["profiles"][0]["three_views"]["call_receipts"],
+        prompt_version=COMPACT_REPORT_PROMPT,
+        page_count=len(pages),
+    )
+    report = ReportIdentity.model_validate(
+        checkpoint["report_interpretation"]["report"]
+    )
+    identity = compact_processing_identity(discovery_scope="page_map")
+    plan = partial_slice_plan(
+        pages,
+        sorted(selected),
+        report=report,
+        identity=identity,
+        ledger_units=62_220,
+    )
+    assert plan["total_units"] <= 62_220
+    assert plan["pages"]
+    assert plan["fragments"][-1]["text"].rstrip()[-1] in "。！？"
+
+    def request_for(purpose, max_output):
+        semantic = ReportSemanticRequestV3(
+            request_id="slice",
+            purpose=purpose,
+            report=report,
+            processing_identity=identity,
+            source_pages=tuple(plan["fragments"]),
+            source_scope="full_context",
+            max_output_tokens=max_output,
+            timeout_seconds=30,
+        )
+        user = json.dumps(
+            compact_request(semantic), ensure_ascii=False, separators=(",", ":")
+        )
+        return LlmRequest(
+            profile="semantic",
+            messages=[LlmMessage(role="user", content=user)],
+            response_schema={
+                "type": "object",
+                "properties": {"label": {"type": "string"}},
+                "required": ["label"],
+            },
+            schema_name="semantic",
+            schema_version="v1",
+            idempotency_key=purpose,
+            max_output_tokens=max_output,
+            metadata={"workload": "semantic", "business_item_key": "600037.SH"},
+        )
+
+    budget = LlmRunBudget(
+        deadline=time.monotonic() + 30,
+        prices={},
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        max_tokens=62_220,
+        max_requests=8,
+    )
+    transport = ScriptedTransport(
+        [
+            LlmTransientTransportError("offline"),
+            {"data": {"choices": [{"message": {"content": '{"label":"body"}'}}]}},
+            {"data": {"choices": [{"message": {"content": '{"label":"synth"}'}}]}},
+            {"data": {"choices": [{"message": {"content": '{"label":"verify"}'}}]}},
+        ]
+    )
+    client = _client(
+        transport, budget, routed_config(timeout_seconds=10, attempt_timeout_seconds=5)
+    )
+    asyncio.run(client.complete(request_for("source_inventory", 2500)))
+    asyncio.run(client.complete(request_for("synthesize_views", 2500)))
+    asyncio.run(client.complete(request_for("verify_views", 2000)))
+    ledger = budget.snapshot()
+    assert ledger["physical_requests"] == 4
+    assert len({item["provider_resource"] for item in ledger["attempts"][:2]}) == 2
+    assert ledger["charged_tokens"] <= 62_220
+    assert ledger["charged_cost_cny"] == "unknown"
+    assert (
+        min(
+            len(call["payload"]["messages"][-1]["content"].encode())
+            for call in transport.calls
+        )
+        > 1000
+    )

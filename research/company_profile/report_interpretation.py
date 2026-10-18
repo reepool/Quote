@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import time
 from collections.abc import Mapping, Sequence
+from pathlib import Path
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -42,6 +43,12 @@ from .models import (
     ReportIdentity,
     SemanticRecord,
     TextAnchor,
+)
+from .reading_budget import (
+    partial_slice_plan,
+    remaining_tail_units,
+    request_reservation,
+    reused_map_receipts,
 )
 
 DISCOVERY_CHUNK_CHARS = 24_000
@@ -437,6 +444,9 @@ def interpret_report(
     tokens = 0
     seen_condition_ids: set[str] = set()
     limit = min(max(0, token_budget), 120_000)
+    partial = bool(identity.get("partial_slice"))
+    partial_plan: dict[str, Any] | None = None
+    request_cap = int(identity.get("max_physical_requests") or (8 if partial else 16))
 
     allowed = {
         (item.chapter_task, item.field_id): item
@@ -461,7 +471,11 @@ def interpret_report(
             if execution_budget
             else 900 - (time.monotonic() - start)
         )
-        if remaining <= 0 or len(receipts) >= 16:
+        if (
+            remaining <= 0
+            or sum(1 for item in receipts if item.get("physical_request", True))
+            >= request_cap
+        ):
             raise ValueError("report_deadline_or_request_budget_exhausted")
         request_type = ReportSemanticRequestV3 if compact else ReportSemanticRequest
         request = request_type(
@@ -502,6 +516,25 @@ def interpret_report(
                 > DEVELOPMENT_RECOVERY_RESERVATION
             ):
                 raise ValueError("followup_payload_exceeds_recovery_room")
+        if partial and partial_plan is not None and execution_budget is not None:
+            units = request_reservation(request)
+            charged = execution_budget.snapshot()["charged_tokens"]
+            later = remaining_tail_units(
+                partial_plan,
+                execution_budget.snapshot()["attempts"],
+                purpose,
+            )
+            if charged + units + later > int(
+                identity.get("ledger_tokens") or execution_budget.max_tokens
+            ):
+                raise ValueError("partial_tail_hold_would_be_exhausted")
+            ceiling = partial_plan["ceilings"].get(purpose)
+            if (
+                purpose != "source_inventory"
+                and ceiling is not None
+                and units > ceiling
+            ):
+                raise ValueError("followup_growth_exceeds_frozen_ceiling")
         # UTF-8 bytes are a conservative preflight allowance for unknown usage.
         reserve = (
             len(request.model_dump_json().encode("utf-8")) + request.max_output_tokens
@@ -583,7 +616,58 @@ def interpret_report(
         ):
             gaps.append("physical_pages_missing")
         discovery_sources = sources
-        if structural:
+        partial_fragments = None
+        if structural and partial:
+            raw_navigation = identity.get("navigation_receipts")
+            if raw_navigation is None and identity.get("navigation_query"):
+                raw_navigation = json.loads(
+                    Path(identity["navigation_query"]).read_text()
+                )["profiles"][0]["three_views"]["call_receipts"]
+            accepted, requested = reused_map_receipts(
+                raw_navigation or (),
+                prompt_version=COMPACT_REPORT_PROMPT,
+                page_count=len(sources),
+            )
+            for item in accepted:
+                payload = item.get("response_payload") or {}
+                chosen = set(payload.get("requested_pages") or [])
+                for page in item.get("source_pages") or []:
+                    by_page[int(page)].update(
+                        structure_indexed=True,
+                        map_checked=True,
+                        map_selected=int(page) in chosen,
+                        status="partially_checked",
+                    )
+                receipts.append(
+                    {
+                        **item,
+                        "physical_request": False,
+                        "reused_navigation": True,
+                        "parent_attempt": identity.get("parent_attempt"),
+                    }
+                )
+            map_checked = True
+            plan = partial_slice_plan(
+                sources,
+                sorted(requested),
+                report=report,
+                identity=identity,
+                ledger_units=int(identity.get("ledger_tokens") or 62_220),
+            )
+            partial_plan = {
+                **plan,
+                "ceilings": {
+                    "source_inventory": plan["body_units"],
+                    "synthesize_views": plan["synthesis_units"],
+                    "verify_views": plan["verification_units"],
+                },
+            }
+            partial_fragments = [plan["fragments"]]
+            if plan["tail_offset"] is not None:
+                gaps.append(
+                    f"slice_tail_unread:{plan['pages'][-1]}:{plan['tail_offset']}"
+                )
+        elif structural:
             requested: set[int] = set()
             available = {p["page"] for p in sources if p["readable"]}
             map_batches = pack_fitting_batches(
@@ -641,24 +725,27 @@ def interpret_report(
             # sends the body the preview did not sample, so a major business
             # outside those windows can enter the source-first list.
             full_ids = {page["page"] for page in discovery_sources}
-        chunks = structural_discovery_chunks(
-            sources,
-            full_ids,
-            payload_fits=(
-                (
-                    lambda batch: fits_development_payload(
-                        batch,
-                        purpose="source_inventory",
-                        source_scope="full_context",
-                        report=report,
-                        identity=identity,
-                        max_output_tokens=2500,
+        if partial_fragments is not None:
+            chunks = partial_fragments
+        else:
+            chunks = structural_discovery_chunks(
+                sources,
+                full_ids,
+                payload_fits=(
+                    (
+                        lambda batch: fits_development_payload(
+                            batch,
+                            purpose="source_inventory",
+                            source_scope="full_context",
+                            report=report,
+                            identity=identity,
+                            max_output_tokens=2500,
+                        )
                     )
-                )
-                if compact
-                else None
-            ),
-        )
+                    if compact
+                    else None
+                ),
+            )
         full_expected = {page["page"]: 0 for page in sources}
         for chunk in chunks:
             for fragment in chunk:
@@ -728,7 +815,7 @@ def interpret_report(
                 )
                 if not pending <= {p["page"] for p in sources if p["readable"]}:
                     raise ValueError("requested_source_page_unavailable")
-                if pending:
+                if pending and not partial:
                     if supplements >= 1:
                         raise ValueError("source_supplement_limit_reached")
                     supplements += 1
@@ -924,6 +1011,39 @@ def interpret_report(
                 and verdicts[("condition", condition.condition_id)] != "pass"
             ):
                 gaps.append(f"major_condition_not_delivered:{condition.condition_id}")
+        if partial and partial_plan is not None:
+            committed = (conditions, claims, records, checks)
+            remaining_ids = partial_plan.get("unread_selected_pages") or []
+            if remaining_ids and identity.get("continue_after_verify"):
+                try:
+                    continuation = partial_slice_plan(
+                        sources,
+                        remaining_ids,
+                        report=report,
+                        identity=identity,
+                        ledger_units=int(identity.get("ledger_tokens") or 62_220),
+                    )
+                    charged_now = (
+                        execution_budget.snapshot()["charged_tokens"]
+                        if execution_budget is not None
+                        else tokens
+                    )
+                    if (
+                        charged_now + continuation["total_units"]
+                        <= int(identity.get("ledger_tokens") or limit)
+                        and sum(
+                            1 for item in receipts if item.get("physical_request", True)
+                        )
+                        + 3
+                        <= request_cap
+                    ):
+                        invoke(
+                            "source_inventory",
+                            tuple(continuation["fragments"]),
+                        )
+                except (SemanticProviderError, LlmError, ValueError, TypeError) as exc:
+                    conditions, claims, records, checks = committed
+                    gaps.append(f"semantic_incomplete:{str(exc)[:240]}")
     except (SemanticProviderError, LlmError, ValueError, TypeError) as exc:
         gaps.append(f"semantic_incomplete:{str(exc)[:240]}")
         records = tuple(

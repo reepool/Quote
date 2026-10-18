@@ -27,6 +27,61 @@ def write_json(path: Path, value: Any) -> None:
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def preflight_partial(binding: dict) -> dict:
+    """Refuse a partial entry before it consumes an attempt marker."""
+    import gzip
+
+    from research.company_profile.models import ReportIdentity
+    from research.company_profile.reading_budget import (
+        partial_slice_plan,
+        reused_map_receipts,
+    )
+    from research.company_profile.report_interpretation import (
+        COMPACT_REPORT_PROMPT,
+        compact_processing_identity,
+    )
+
+    source = json.loads(Path(binding["navigation_source_receipt"]).read_text())
+    query = json.loads(Path(binding["navigation_query"]).read_text())
+    checkpoint = json.loads(
+        gzip.decompress(Path(binding["navigation_checkpoint"]).read_bytes())
+    )
+    pages = tuple(
+        {
+            "page": int(page["page"]),
+            "text": str(page.get("text") or ""),
+            "readable": bool(str(page.get("text") or "").strip()),
+        }
+        for page in checkpoint["pages"]
+    )
+    hashes = {
+        str(page["page"]): hashlib.sha256(page["text"].encode()).hexdigest()
+        for page in pages
+    }
+    if hashes != source["page_text_sha256"]:
+        raise ValueError("navigation_checkpoint_does_not_match_source_receipt")
+    _, selected = reused_map_receipts(
+        query["profiles"][0]["three_views"]["call_receipts"],
+        prompt_version=COMPACT_REPORT_PROMPT,
+        page_count=len(pages),
+    )
+    report = ReportIdentity.model_validate(
+        checkpoint["report_interpretation"]["report"]
+    )
+    plan = partial_slice_plan(
+        pages,
+        sorted(selected),
+        report=report,
+        identity=compact_processing_identity(discovery_scope="page_map"),
+        ledger_units=int(binding["max_tokens"]),
+    )
+    if plan["total_units"] > int(binding["max_tokens"]):
+        raise ValueError("partial_plan_exceeds_ledger")
+    if 4 > int(binding["max_physical_requests"]):
+        raise ValueError("partial_plan_exceeds_request_cap")
+    return plan
+
+
 def finish_worker(run_root: Path, worker) -> dict:
     """Persist the entry receipt even when the worker raises, then re-raise."""
     try:
@@ -83,7 +138,8 @@ def validate_binding(
             authorization.get("status") != "authorized"
             or authorization.get("binding_sha256") != binding_hash
             or authorization.get("document_version") != asset["content_hash"]
-            or authorization.get("attempt") not in {"first", "successor", "special"}
+            or authorization.get("attempt")
+            not in {"first", "successor", "special", "partial"}
             or not authorization.get("approval_reference")
         ):
             raise ValueError(
@@ -353,6 +409,12 @@ def _worker(
                 "layout_pages": [p["page"] for p in pages if p.get("layout_text")],
             }
         )
+        if binding.get("partial_slice"):
+            expected = json.loads(
+                Path(binding["navigation_source_receipt"]).read_text()
+            )["page_text_sha256"]
+            if expected != source_receipt["page_text_sha256"]:
+                raise ValueError("navigation_page_hash_mismatch")
         write_json(run_root / "source-receipt.json", source_receipt)
         budget.remaining()
         return source
@@ -371,6 +433,14 @@ def _worker(
                 if binding.get("pool")
                 else binding["model"]
             ),
+        )
+    if binding.get("partial_slice"):
+        identity.update(
+            partial_slice=True,
+            ledger_tokens=binding["max_tokens"],
+            max_physical_requests=binding["max_physical_requests"],
+            navigation_query=binding["navigation_query"],
+            parent_attempt=binding.get("parent_attempt", "special"),
         )
     service = CompanyProfileTaskService(
         storage=storage,
@@ -470,6 +540,8 @@ def main() -> int:
         authorization=authorization,
         binding_hash=digest(args.binding),
     )
+    if binding.get("partial_slice"):
+        preflight_partial(binding)
     if args.worker_deadline is not None:
         finish_worker(
             run_root,
@@ -494,12 +566,13 @@ def main() -> int:
             and not (attempts / "first.json").is_file()
         ):
             raise ValueError("successor requires the protected first attempt")
-        if authorization["attempt"] == "special" and not (
+        if authorization["attempt"] == "partial" and not (
             (attempts / "first.json").is_file()
             and (attempts / "successor.json").is_file()
+            and (attempts / "special.json").is_file()
         ):
             raise ValueError(
-                "special attempt requires the protected first and successor markers"
+                "partial attempt requires the protected first, successor and special markers"
             )
         with (attempts / f"{authorization['attempt']}.json").open("x") as marker:
             json.dump(

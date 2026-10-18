@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-18，[A审核§23](#23-a审核专项失败与局部业务闭环裁决2026-10-18)）：接受B1-C请求数收敛、收尾和部分地图覆盖，专项1/1失败，B1/A1未通过。三次累计7请求、519.986252秒、177780账本、费用unknown；完整次数均耗尽，不批准第四次完整重跑。按B1-D卡§14先做局部正文到交付及整报告资源表，条件授权原62220余量内局部真实验证0/1；不算完整验收或新首发。观察1/4、可用0/4，S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产未授权。§1—22正文不改写。
+当前状态（2026-10-18，[§24](#24-b1-d局部验证未形成主张2026-10-18)）：局部验证1/1已执行，477.6秒、2次物理请求、账本28222、费用unknown。正文换源后合成被尾部预留拦住，没有可核验主张，查询交付0。B1/A1仍未通过。第4个真实入口已用尽，不自动第5次。观察1/4、可用0/4，S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产未授权。§1—23正文不改写。
 
 ## 1. 唯一实施指引
 
@@ -788,3 +788,51 @@ B的§22已按A/B流程§8区分真实/模拟、静态/usage、次数与成本�
 A独立命令（先source scripts/quote_dev_env.sh）：`/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_report_wire.py::test_gehu_batches_keep_failover_synthesis_and_verify_after_one_unknown_failure tests/unit/test_research/test_company_profile_report_wire.py::test_successful_map_batches_remain_when_a_later_batch_fails tests/unit/test_research/test_company_profile_bounded_entry.py::test_worker_failure_keeps_the_entry_receipt tests/unit/test_utils/test_llm_gateway.py::test_owned_http_client_is_closed_on_the_loop_that_created_it`，**4 passed、7 warnings**；复用B同快照70项组合回执，与A的4项有重叠，不相加、不声明全套通过。A无真实LLM调用，无完整或局部业务重跑，仅只读核源/制品/代码和静态请求序列化。
 
 本轮仅更新执行卡、tasks、design当前指引、交付路径、验收活动表和本节，原§1—22正文保护。OpenSpec严格校验、本人改动diff及107个本地文件链接检查通过；CLI遥测联网提示不影响严格校验结果。既有验收历史区块及11份脏文件的他人改动不纳入提交，原首次/后继/专项和配置保持。临时产物沿QuoteBak，测试日志由fixture清理；B所述删除前副本比对归B回执，A核现存持久hash及约69M状态，不盲删仍有用途/归属不明的目录。A活跃审核时间未单独计量，记unknown；本次新发现/量化的阻塞为2项预算可执行性P2，业务未交付P0持续，不将静态核算或单测计数充当业务进度。
+
+## 24. B1-D局部验证未形成主张（2026-10-18）
+
+### 24.1 结果
+
+局部计划成立并已启动第4个真实入口，局部验证1/1用尽。没有一条经过真实核验的主张，查询`delivered=0`。B1/A1不通过。19项核心和6项负例仍未评估。观察1/4、可用0/4。不自动第5次，也不把这次拼进完整成绩。
+
+### 24.2 业务切片
+
+专项两批地图回执与当前208页正文哈希一致，只作导航，不计入本次物理请求。模型选中页的第一段连续页里，能同时放下正文、合成、核验和一次未知重发的是第12–13页。第13页末尾未完句被裁到最后一个句号，偏移1281之后未发送，记`slice_tail_unread:13:1281`。其余选中页和未选页仍是未读缺口。`draft_complete`、`semantic_complete`、`real_semantic_complete`均为false。
+
+静态预留：正文13614、合成13563、核验11774、恢复13614，合计52565，低于62220，余9655。这是保守预留单位，不是token或费用。
+
+### 24.3 真实调用
+
+无沙箱，代理环境变量为空。监督退出码0，477.564630秒。
+
+| 次序 | 来源 | 结果 | 账本 |
+| --- | --- | --- | --- |
+| 1 | scorpio:gemini | 客户端尝试超时211868毫秒，无usage | 未知预留13633 |
+| 2 | zai | HTTP成功并换源完成；请求输出2500，实际输出12327，日志`output_budget_exceeded` | 有效usage 2262＋12327＝14589 |
+
+物理请求2次。总账28222＝13633未知预留＋14589有效usage。费用unknown。换源已经用掉那一次恢复。随后合成被`partial_tail_hold_would_be_exhausted`拦住：代码仍按“再留一次完整恢复”计算，28222＋合成＋核验＋第二次恢复超过62220。工作检查点里的解释结果因此没有条件和主张。发布阶段又因`processing_identity`被写入`partial_plan`后与原身份不一致，把解释结果清成空，查询和导出profiles均为空，但两者一致。
+
+这次入口已经计1/1，不能再用剩余额度重跑。运行之后补了两处代码：恢复用过就不再预留第二次；不再把计划写进会参与身份比较的`processing_identity`。该补丁没有新的真实调用。
+
+### 24.4 整报告资源差额
+
+表在[b1-partial-resource-table.json](b1-partial-resource-table.json)。单位是完整payload字节＋256＋请求输出上限，取池内最大预留，不是实测token或人民币。
+
+| 情形 | 发现预留 | 无故障再加合成/核验 | 一次未知失败 |
+| --- | --- | --- | --- |
+| 只发现预览外正文 | 588281 | 695456 | 749989 |
+| 选页及相邻页 | 595369 | 702220 | 756591 |
+| 全页选中 | 607021 | 712708 | 766497 |
+
+相对当前累计余量62220，一次未知失败路径至少还差687769。相对原120000单次上限，至少还差629989。不能把地图usage比例换成全文token，也不能据此直接把预算改成60万。
+
+### 24.5 验证、证据与清理
+
+直接回归：`test_company_profile_report_wire.py`、`test_company_profile_llm_led.py`、`test_company_profile_bounded_entry.py`、`test_llm_physical_budget.py`，**72 passed**。另有尾部预留单测2 passed。没有跑全库。29516＋52068之后，下一次超过剩余38416的发送在进入传输前被拒绝。缩块正文经`LlmClient`模拟传输，失败后另一来源再发，合成和核验共用62220账本。
+
+证据目录[partial](b1-pool-observation-evidence/partial/manifest.json)。`entry.log` `bd692340` 30803字节；`budget-final.json` `4c067f20` 1486字节；`work-checkpoint.json` `2ebae960` 661155字节；`source-receipt.json`仍是`f304554e`。绑定[b1-pool-partial-binding.json](b1-pool-partial-binding.json) SHA-256 `c63b9ae418713f83ff6ab97f63254f4d0238167782591bf30770aa07a685521e`。
+
+清理：pytest-2/pytest-3是2026-10-17 19:10的测试临时目录，无清单引用；本窗口pytest-0/pytest-4同样只是可重建日志，已删。专项和局部的库与PDF缓存在哈希核对后删除。QuoteBak现约69M。11份既有修改未动。
+
+三次加本次累计997.550882秒、9次物理请求、账本206002。原上限内约剩802.449秒、23次请求、33998账本单位。这些余额没有第5次入口授权。B开发时间未单独计量，记unknown；477秒是本次进程时间。
+
