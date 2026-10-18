@@ -198,6 +198,7 @@ def _reading_policy(identity: Mapping[str, Any] | None) -> tuple:
             "discovery_scope",
             "wire_protocol",
             "execution_mode",
+            "reading_strategy",
         )
     )
 

@@ -121,14 +121,21 @@ def _request(
 
 
 def _recovery_consumed(item: Mapping[str, Any]) -> bool:
-    """One window shares one recovery. Any settled failure consumes it.
+    """One window shares one recovery.
 
-    ``failed_or_cancelled`` covers timeouts. ``http_failure`` is what the live
-    client records for a non-2xx response. A failure that happens to include
-    usage, or a later parse/repair send, does not restore a fresh recovery.
+    A non-success status consumes it. So does a later physical send of the
+    same request: HTTP 200 followed by schema repair is recorded as another
+    success with ``attempt`` greater than 1, and that second send is the
+    recovery. It is not restored just because both rows say success.
     """
     status = str(item.get("status") or "")
-    return status not in {"", "reserved", "success"}
+    if status not in {"", "reserved", "success"}:
+        return True
+    try:
+        attempt = int(item.get("attempt") or 1)
+    except (TypeError, ValueError):
+        attempt = 1
+    return attempt > 1
 
 
 def remaining_tail_units(

@@ -127,6 +127,16 @@ def offline_processing_identity() -> dict[str, Any]:
     }
 
 
+def layered_processing_identity() -> dict[str, Any]:
+    """Full-report navigation, then core context, not every unread footnote."""
+    identity = compact_processing_identity(discovery_scope="page_map")
+    identity["reading_strategy"] = "layered_v3"
+    identity["product_contract"] = (
+        "company_profile_product_contract.2026-10-18.llm-led.v3"
+    )
+    return identity
+
+
 def compact_processing_identity(*, discovery_scope: str) -> dict[str, Any]:
     if discovery_scope not in {"full_text", "page_map"}:
         raise ValueError("unknown compact discovery scope")
@@ -443,12 +453,16 @@ def interpret_report(
     dispositions: list[dict[str, Any]] = []
     quarantined: set[str] = set()
     receipts: list[dict[str, Any]] = []
+    read_pages: set[int] = set()
     tokens = 0
     seen_condition_ids: set[str] = set()
     limit = min(max(0, token_budget), 120_000)
     partial = bool(identity.get("partial_slice"))
+    layered = identity.get("reading_strategy") == "layered_v3"
     partial_plan: dict[str, Any] | None = None
     request_cap = int(identity.get("max_physical_requests") or (8 if partial else 16))
+    if layered:
+        request_cap = min(request_cap, 15)
 
     allowed = {
         (item.chapter_task, item.field_id): item
@@ -718,11 +732,18 @@ def interpret_report(
                 for e in structured_evidence.values()
                 for page in (e.page, *e.continuation_pages, *e.subject_evidence_pages)
             }
-            discovery_sources = tuple(
-                p
-                for p in sources
-                if p["readable"] and any(abs(p["page"] - n) <= 1 for n in requested)
-            )
+            if layered:
+                discovery_sources = tuple(
+                    p
+                    for p in sources
+                    if p["readable"] and int(p["page"]) in requested
+                )
+            else:
+                discovery_sources = tuple(
+                    p
+                    for p in sources
+                    if p["readable"] and any(abs(p["page"] - n) <= 1 for n in requested)
+                )
         if not structural:
             for page in discovery_sources:
                 if not page["readable"]:
@@ -730,12 +751,26 @@ def interpret_report(
                     gaps.append(f"page_unreadable:{page['page']}")
             full_ids = {page["page"] for page in discovery_sources if page["readable"]}
         else:
-            # Selected pages are read in full. Every other readable page still
-            # sends the body the preview did not sample, so a major business
-            # outside those windows can enter the source-first list.
+            # Historical page-map reading still samples every other page. The
+            # layered contract reads the pages the navigation actually selected.
             full_ids = {page["page"] for page in discovery_sources}
         if partial_fragments is not None:
             chunks = partial_fragments
+        elif layered:
+            chunks = structural_discovery_chunks(
+                discovery_sources,
+                full_ids,
+                payload_fits=(
+                    lambda batch: fits_development_payload(
+                        batch,
+                        purpose="source_inventory",
+                        source_scope="full_context",
+                        report=report,
+                        identity=identity,
+                        max_output_tokens=2500,
+                    )
+                ),
+            )
         else:
             chunks = structural_discovery_chunks(
                 sources,
@@ -761,7 +796,7 @@ def interpret_report(
                 if fragment["body_scope"] == "full_page":
                     full_expected[fragment["page"]] += 1
         supplements = 0
-        read_pages = set()
+        read_pages.clear()
         for chunk in chunks:
             response = invoke(
                 "source_inventory",
@@ -843,6 +878,95 @@ def interpret_report(
                     )
                     for p in extra:
                         full_expected[p["page"]] += 1
+        if layered:
+            unread_previews = [
+                fragment
+                for fragment in page_map(sources)
+                if int(fragment["page"]) not in read_pages
+            ]
+            if unread_previews:
+                preview_batches = pack_fitting_batches(
+                    unread_previews,
+                    lambda batch: fits_development_payload(
+                        batch,
+                        purpose="source_inventory",
+                        source_scope="page_map",
+                        report=report,
+                        identity=identity,
+                        max_output_tokens=1000,
+                    ),
+                )
+                if preview_batches:
+                    gap_response = invoke(
+                        "source_inventory",
+                        tuple(preview_batches[0]),
+                        source_scope="page_map",
+                    )
+                    if gap_response.source_conditions:
+                        raise ValueError("page_map_cannot_establish_source_conditions")
+                    extra_ids = [
+                        page
+                        for page in gap_response.requested_pages
+                        if page not in read_pages
+                    ]
+                    extra_pages = [
+                        page
+                        for page in sources
+                        if page["readable"] and int(page["page"]) in set(extra_ids)
+                    ]
+                    if extra_pages:
+                        supplement_chunks = structural_discovery_chunks(
+                            extra_pages,
+                            {int(page["page"]) for page in extra_pages},
+                            payload_fits=lambda batch: fits_development_payload(
+                                batch,
+                                purpose="source_inventory",
+                                source_scope="full_context",
+                                report=report,
+                                identity=identity,
+                                max_output_tokens=2500,
+                            ),
+                        )
+                        if supplement_chunks:
+                            response = invoke(
+                                "source_inventory",
+                                tuple(
+                                    {
+                                        "page": fragment["page"],
+                                        "text": fragment["text"],
+                                        "readable": True,
+                                        "offset": fragment["offset"],
+                                        "scope": fragment["body_scope"],
+                                    }
+                                    for fragment in supplement_chunks[0]
+                                ),
+                            )
+                            read_pages.update(
+                                int(fragment["page"])
+                                for fragment in supplement_chunks[0]
+                            )
+                            for condition in response.source_conditions:
+                                if not all(
+                                    _evidence_valid(
+                                        evidence, report, supplement_chunks[0]
+                                    )
+                                    for evidence in condition.evidence
+                                ):
+                                    raise ValueError("inventory_evidence_outside_source")
+                                scoped_id = (
+                                    f"{receipts[-1]['request_id']}:{condition.condition_id}"
+                                )
+                                if scoped_id in seen_condition_ids:
+                                    raise ValueError("duplicate_source_condition")
+                                seen_condition_ids.add(scoped_id)
+                                conditions.append(
+                                    condition.model_copy(
+                                        update={"condition_id": scoped_id}
+                                    )
+                                )
+            for source in sources:
+                if source["readable"] and int(source["page"]) not in read_pages:
+                    gaps.append(f"supplement_unread:{int(source['page'])}")
         related_records = tuple(structured.values())
         if partial and partial_fragments is not None:
             sent_fragments = [
@@ -1156,7 +1280,7 @@ def interpret_report(
         )
 
     states = {item["page"]: item for item in coverage}
-    if structural:
+    if structural and not layered:
         for source in sources:
             state = states[source["page"]]
             if (
@@ -1171,6 +1295,8 @@ def interpret_report(
         state = states[source["page"]]
         if state["status"] == "read":
             return True
+        if layered and int(source["page"]) not in read_pages:
+            return bool(state.get("map_checked"))
         if unsampled_ranges(source["text"]):
             return bool(state.get("residue_discovered"))
         return bool(state.get("map_checked"))

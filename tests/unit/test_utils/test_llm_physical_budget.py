@@ -101,6 +101,37 @@ def test_schema_repair_reserves_the_expanded_physical_payload():
     attempts = budget.snapshot()["attempts"]
     assert len(transport.calls) == len(attempts) == 2
     assert attempts[1]["reserved_input_tokens"] > attempts[0]["reserved_input_tokens"]
+    assert [item["attempt"] for item in attempts] == [1, 2]
+    assert all(item["status"] == "success" for item in attempts)
+    from research.company_profile.reading_budget import send_admission_hold
+
+    assert (
+        send_admission_hold(
+            {"synthesis_units": 1, "verification_units": 1, "recovery_units": 9},
+            attempts,
+            "verify_views",
+            14_262,
+        )
+        == 0
+    )
+
+
+def test_second_schema_repair_does_not_get_another_recovery():
+    budget = _budget(max_requests=4, max_tokens=120_000)
+    transport = ScriptedTransport(
+        [
+            _response({"label": "missing-score"}),
+            _response({"label": "still-missing"}),
+            _response({"label": "ok", "score": 1}),
+        ]
+    )
+    client = _client(
+        transport, budget, _config(max_retries=2, max_schema_repair_attempts=2)
+    )
+    with pytest.raises(LlmDeadlineExceededError, match="shared_recovery_already_used"):
+        asyncio.run(client.complete(_request(max_output_tokens=100)))
+    assert len(transport.calls) == 2
+    assert [item["attempt"] for item in budget.snapshot()["attempts"]] == [1, 2]
 
 
 @pytest.mark.parametrize(

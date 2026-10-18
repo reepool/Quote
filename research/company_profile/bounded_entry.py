@@ -83,6 +83,80 @@ def preflight_partial(binding: dict) -> dict:
     return plan
 
 
+def preflight_layered(binding: dict) -> dict:
+    """Admit a layered run without summing every unread footnote."""
+    import gzip
+
+    from research.company_profile.contracts import ReportSemanticRequestV3
+    from research.company_profile.models import ReportIdentity
+    from research.company_profile.reading_budget import request_reservation
+    from research.company_profile.report_interpretation import (
+        fits_development_payload,
+        layered_processing_identity,
+        pack_fitting_batches,
+        page_map,
+    )
+
+    checkpoint = json.loads(
+        gzip.decompress(Path(binding["navigation_checkpoint"]).read_bytes())
+    )
+    source = json.loads(Path(binding["navigation_source_receipt"]).read_text())
+    pages = tuple(
+        {
+            "page": int(page["page"]),
+            "text": str(page.get("text") or ""),
+            "readable": bool(str(page.get("text") or "").strip()),
+        }
+        for page in checkpoint["pages"]
+    )
+    hashes = {
+        str(page["page"]): hashlib.sha256(page["text"].encode()).hexdigest()
+        for page in pages
+    }
+    if hashes != source["page_text_sha256"]:
+        raise ValueError("navigation_checkpoint_does_not_match_source_receipt")
+    raw_report = checkpoint.get("report") or checkpoint["report_interpretation"]["report"]
+    report = ReportIdentity.model_validate(raw_report)
+    identity = layered_processing_identity()
+    batches = pack_fitting_batches(
+        page_map(pages),
+        lambda batch: fits_development_payload(
+            batch,
+            purpose="source_inventory",
+            source_scope="page_map",
+            report=report,
+            identity=identity,
+            max_output_tokens=1000,
+        ),
+    )
+    if not batches or len(batches) > 12:
+        raise ValueError("layered_navigation_does_not_fit_request_cap")
+    reservations = []
+    for batch in batches:
+        reservations.append(
+            request_reservation(
+                ReportSemanticRequestV3(
+                    request_id="layered-preflight",
+                    purpose="source_inventory",
+                    report=report,
+                    processing_identity=identity,
+                    source_pages=tuple(batch),
+                    source_scope="page_map",
+                    max_output_tokens=1000,
+                    timeout_seconds=30,
+                )
+            )
+        )
+    if max(reservations) > int(binding["max_tokens"]):
+        raise ValueError("layered_navigation_request_exceeds_ledger")
+    return {
+        "navigation_batches": len(batches),
+        "navigation_units": reservations,
+        "content_request_cap": 15,
+        "recovery_requests": 1,
+    }
+
+
 def finish_worker(run_root: Path, worker) -> dict:
     """Persist the entry receipt even when the worker raises, then re-raise."""
     try:
@@ -140,7 +214,7 @@ def validate_binding(
             or authorization.get("binding_sha256") != binding_hash
             or authorization.get("document_version") != asset["content_hash"]
             or authorization.get("attempt")
-            not in {"first", "successor", "special", "partial", "segment"}
+            not in {"first", "successor", "special", "partial", "segment", "layered"}
             or not authorization.get("approval_reference")
         ):
             raise ValueError(
@@ -435,6 +509,23 @@ def _worker(
                 else binding["model"]
             ),
         )
+    if binding.get("reading_strategy") == "layered_v3":
+        from research.company_profile.report_interpretation import (
+            layered_processing_identity,
+        )
+
+        identity = layered_processing_identity()
+        if real:
+            identity.update(
+                execution_mode="provider",
+                model=(
+                    f"pool:{binding['pool']}:{binding['route_fingerprint']}"
+                    if binding.get("pool")
+                    else binding["model"]
+                ),
+            )
+        identity["max_physical_requests"] = binding["max_physical_requests"]
+        identity["ledger_tokens"] = binding["max_tokens"]
     if binding.get("partial_slice"):
         identity.update(
             partial_slice=True,
@@ -545,6 +636,8 @@ def main() -> int:
     )
     if binding.get("partial_slice"):
         preflight_partial(binding)
+    if binding.get("reading_strategy") == "layered_v3":
+        preflight_layered(binding)
     if args.worker_deadline is not None:
         finish_worker(
             run_root,
@@ -576,6 +669,16 @@ def main() -> int:
         ):
             raise ValueError(
                 "partial attempt requires the protected first, successor and special markers"
+            )
+        if authorization["attempt"] == "layered" and not (
+            (attempts / "first.json").is_file()
+            and (attempts / "successor.json").is_file()
+            and (attempts / "special.json").is_file()
+            and (attempts / "partial.json").is_file()
+            and (attempts / "segment.json").is_file()
+        ):
+            raise ValueError(
+                "layered attempt requires the five protected earlier markers"
             )
         if authorization["attempt"] == "segment" and not (
             (attempts / "first.json").is_file()

@@ -250,5 +250,15 @@
     "choice": "do_not_start_a_sixth_run_on_the_remainder",
     "reason": "Full-report discovery of 208 readable pages measures 608819 reservation units across 12 requests. One recovery of the largest discovery request adds 53939, totaling 662758. That is 577848 above the remaining 30971. Synthesis and verification are sized from the actual payload at send time, not from this discovery sum.",
     "not_requested": "Do not authorize 890954 or the old 749989-766497 figure as tokens or a fee. Do not start a sixth entry on the 30971 remainder."
+  },
+  "arithmetic_correction": {
+    "recorded": "2026-10-18",
+    "leaves_original_fields_unchanged": true,
+    "discovery_only_gap_versus_30971": 577848,
+    "discovery_only_basis": "608819 - 30971",
+    "discovery_plus_recovery_gap_versus_30971": 631787,
+    "discovery_plus_recovery_basis": "662758 - 30971",
+    "preferred_decision_reason_uses": 577848,
+    "correction": "577848 remains the discovery-only gap. The original reason applied that figure to discovery plus one recovery; that gap is 631787. Neither figure is tokens or CNY."
   }
 }

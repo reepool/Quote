@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-18，[A审核77c76156，§33](#33-a审核77c76156离线部分接受改为完整报告分层阅读交付)）：离线契约修复部分接受，HTTP 200后schema repair的恢复计数仍阻塞，B1/A1未通过。按新产品契约v3及[B1-G卡§18](b1-execution-card.md#18-b1-g分层阅读完成一家真实三视图当前卡)，连续完成全报告分层阅读、直接验证、冻结及一次有条件完整真实运行0/1（900秒/120000账本/16请求），不再试短段、不按全附注字节估算大幅扩额。本轮审核及B本次交付真实调用均0。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产未授权；原§1—32正文及五次失败不改写。
+当前状态（2026-10-18，[B1-G交接§34](#34-b1-g分层阅读第6次真实运行账本耗尽没有可审三视图)）：分层阅读和共享恢复的离线修复已交，第6次真实入口已用。歌华208页导航选出页面后，正文第一批失败，下一次发送因账本不足未发出；没有条件、主张或已核三视图。B1/A1仍未通过，19项核心和6项负例不可评估。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。无第7次、不归档、不扩批，生产未授权。原§1—33正文不改写。
 
 ## 1. 唯一实施指引
 
@@ -1337,3 +1337,70 @@ python -m pytest -q \
 结果3 passed/4.28秒（7 warnings）；共享schema repair反例另行独立复现，不冒称已修。已读原响应owner回放的实现/断言并复用其1 passed/126.98秒回执，不重复生成测试库。`openspec validate restore-company-profile-llm-led-generalization --strict`及`git diff --check`通过（OpenSpec遥测联网失败不影响校验退出0）；这是文档审核，不声明全套pytest或R22实现通过。
 
 原§1—32正文、五次制品、资源JSON/旧绑定及本地配置保护；独立hash核验119份未改change文件及配置一致。旧绑定代表历史代码，不能要求改动后的当前代码匹配旧执行hash。11份既有修改和16项未跟踪保护，验收计划既有历史块与本次活动区改动隔离；146个文档相对链接/锚点和新预算算术检查通过。QuoteBak约71M，本轮未复制正文/整库；已清本人空测试日志目录`quote_pytest_logs_g529m4df`，释放数据量0，不删除前序未知归属目录。开发者后续继续先清无依赖垃圾再开发，结束清本人产物，必要证据一套。A活跃审核成本未独立计时，记unknown，不以测试运行时长冒充人工成本。
+
+## 34. B1-G分层阅读：第6次真实运行账本耗尽，没有可审三视图
+
+### 34.1 结论
+
+**B1/A1未通过。** R22的分层阅读和共享恢复修复已进入这次冻结运行；R23入口已启动并记为累计第6次、本窗1/1。歌华有线600037.SH、2025年报、208页可读，导航两批都返回了选页，正文第一批没有读成，独立查漏、补读、合成和核验都没有发出。查询与导出所存的是同一份空视图：主张0条，三个完整标志均为false，分类limited。没有可交给A打分的三视图。19项核心、6项负例、数字错误和已审准确率保持不可评估，不能按空输出计通过。
+
+观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批。生产仍`not_authorized`，规模声明false。没有第7次入口、其他公司或额外探针。本次失败后没有改代码再跑。
+
+### 34.2 这次运行
+
+冻结绑定SHA-256 `3ffd90d04befc6a04826ec82c71d7805e54aca34468acd18181addfb9ac8c9ae`。阅读策略`layered_v3`，产品契约`company_profile_product_contract.2026-10-18.llm-led.v3`，`partial_slice=false`。来源回执与前几次相同，SHA-256 `f304554ec2ee85fd08071b1bb78427c1c854b588806c05efce7befc3ea912d30`。知识截止2026-09-17。工作号`bp-work-d69a142ba195cb8c7362bc54`。入口退出码0，监督耗时141.034100秒。费用unknown，不宣称不超过10元或阶段不超过80元。
+
+| 序 | 来源 | 模型 | 请求 | 结果 | 入账 |
+| --- | --- | --- | --- | --- | ---: |
+| 1 | scorpio:gemini | gemini-3.8-flash-high | `506775a90db4493698bb2a1df2fd27e1` | HTTP 200，地图第1—142页，选出12、13、14、15、16、17、18、19、20、93、115、116 | 18674（输入17269，输出1405；请求输出1000） |
+| 2 | zai | glm-5.3-flash | `28a3835547fd4bce8bddb832e5243f05` | HTTP 500，地图第143—208页，usage unknown | 26483预留 |
+| 3 | scorpio:grok | grok-4.7 | `f106565638e9405b987a931e099c6e0f` | HTTP 200，同一地图换源，选出152、156、161、162、165、166、177、187、188、189、190、191、192、193、195、196、197 | 16301（输入11137，输出5164；请求输出1000） |
+| 4 | scorpio:luna | gpt-5.6-luna | `500c6ebcb06c453f888f7ff49b365ed0` | HTTP 503，正文第12—25、93、115页，usage unknown | 51599预留 |
+
+四次都是`attempt=1`。有效usage 34975，未知预留78082，合计入账113057 / 120000。请求哈希依次为`14bd95e3ace359793686f8d6b5910f6b9f2a01997f38d555819530f8ecd2b3fd`、`ec85c8eba8de452d7a4895a9e5fd0e64c2a8b2251607cbd140a7e0cf88e9db01`、`5f58271af4c33992c01c9d5de34b67baca49908f4d3b5c3310f6611e91246687`、`aa73c4b65937592b45274a9eec5155de42de5557f460865421f8af717d99524b`。
+
+下一次要发的是正文换源，请求`d019128e96b146e2b4223ce9658bb97f`，准备走scorpio:deepseek / DeepSeek-V4.1-Flash。载荷48850字节，需要51606，剩余6943，剩余请求12，发送前停止，原因`physical_request_token_context_or_cost_budget_exhausted`。它没有成为第5次物理请求。
+
+208页都进入了地图。正文一页都没有读完。模型选出的页再加上程序并入的原生事实所在页，第一批正文才包含第21—25页；第116页和后段选出的页还没排到发送。独立源先行查漏没有执行。停在正文循环内，所以保存的缺口只有`semantic_incomplete:physical_request_token_context_or_cost_budget_exhausted`，没有写成`supplement_unread`。这些页是未读，不是未披露，也不是已经覆盖。导航覆盖、正文已读和核心可用三者分开：地图已查，正文未读，核心不可用。
+
+查询交付1份，与导出及重读一致。三视图没有主张。`draft_complete`、`semantic_complete`、`real_semantic_complete`均为false。
+
+旧五次215031账本、1149.333103秒、11次请求保持不动，30971没有并入本窗。本窗用掉113057 / 141.034100秒 / 4次请求。六次累计328088账本、1290.367203秒、15次请求。公司累计上限335031 / 2049.333103秒 / 最多27次且不超过32次。窗口里还剩6943账本、约758.966秒和12次请求额度，这不是第7次授权。
+
+### 34.3 共享恢复与资源差额
+
+这次真实路径没有出现HTTP 200之后的schema repair。两次成功都是`attempt=1`。第2次地图的HTTP 500之后，第3次是该地图的一次换源，占用本窗那一次共享恢复。正文HTTP 503后的再换源没有发出，拦住它的是总账，不是`shared_recovery_already_used`。后者只拒绝已经有过`attempt>1`之后的又一次修复发送；本窗没有走到那条路径。离线测试覆盖了A的两笔success反例：第二次修复可以发送，第三次修复在预留时拒绝，且已用恢复不再重复预留。
+
+原表和§32不改。发现差额577848（608819−30971）仍然只代表发现阶段。发现加一次最大发现恢复的差额是631787（662758−30971）。`b1-partial-resource-table.json`新增`arithmetic_correction`旁挂这一点，原来的`preferred_decision.reason`仍写着577848。两个数都是载荷预留单位，不是token，也不是人民币。
+
+### 34.4 证据与验证
+
+持久证据在[layered](b1-pool-observation-evidence/layered/manifest.json)。来源回执与历史`f304554e`一致。研究库和PDF缓存没有放进OpenSpec。绑定与授权是`b1-pool-layered-binding.json`、`b1-pool-layered-authorization.json`。
+
+直接回归：
+
+```text
+ruff check research/company_profile/bounded_entry.py \
+  research/company_profile/reading_budget.py \
+  research/company_profile/report_interpretation.py \
+  research/company_profile/report_wire.py \
+  research/company_profile/runtime.py \
+  research/company_profile/stage5_provider.py \
+  tests/unit/test_research/test_company_profile_llm_led.py \
+  tests/unit/test_utils/test_llm_physical_budget.py \
+  utils/llm/budget.py
+pytest -q \
+  tests/unit/test_utils/test_llm_physical_budget.py::test_schema_repair_reserves_the_expanded_physical_payload \
+  tests/unit/test_utils/test_llm_physical_budget.py::test_second_schema_repair_does_not_get_another_recovery \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_layered_reading_supplements_a_hidden_business_and_labels_unread_notes \
+  tests/unit/test_research/test_company_profile_report_wire.py::test_actual_verification_is_not_refused_by_the_old_stage_cap \
+  tests/unit/test_research/test_company_profile_report_wire.py::test_used_recovery_is_not_reserved_again_before_synthesis
+openspec validate restore-company-profile-llm-led-generalization --strict
+git diff --check
+```
+
+Ruff通过。上述5项3.35秒通过。OpenSpec严格校验通过；校验后的遥测联网失败不影响退出码。`git diff --check`通过。没有跑全库。隐藏主业的离线用例能补读并标出未读附注；本次真实运行停在补读之前，不能用那条用例代替歌华成绩。
+
+### 34.5 清理与保护
+
+证据核完哈希后，删除本窗运行目录`data/QuoteBak/b1-pool-layered-20261018`（含`research.db`和PDF缓存，约2.6MB）、空测试日志`quote_pytest_logs_v0vs6pfr`与`quote_pytest_logs_t45rvtta`，以及只剩断链的`pytest-of-python`。五次历史证据和`layered.json`尝试标记保留。11份既有修改和16项未跟踪内容未纳入提交。B活跃开发时间unknown。

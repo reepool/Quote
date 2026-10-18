@@ -33,6 +33,7 @@ from research.company_profile.report_interpretation import (
     compact_processing_identity,
     core_assessment,
     interpret_report,
+    layered_processing_identity,
     offline_processing_identity,
 )
 from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
@@ -1553,3 +1554,120 @@ def test_saved_segment_responses_reach_verification_and_keep_bad_record_ids_uncl
     )
     reloaded = CompanyProfileReadService(tmp_path / "output").query((report.instrument_id,))
     assert reloaded["profiles"] == queried["profiles"]
+
+
+def test_layered_reading_supplements_a_hidden_business_and_labels_unread_notes():
+    pages = (
+        {"page": 1, "text": "公司经营有线电视网络传输，并向用户提供信息服务。", "readable": True},
+        {"page": 2, "text": "附注：会计政策说明，不是本期主要经营业务。", "readable": True},
+        {
+            "page": 3,
+            "text": "本公司本期主要经营电池回收服务，占营业收入百分之六十。",
+            "readable": True,
+        },
+    )
+    identity = layered_processing_identity()
+    identity["max_physical_requests"] = 16
+
+    class _Layered(FakeReportProvider):
+        def __init__(self, *, find_hidden: bool):
+            super().__init__()
+            self.find_hidden = find_hidden
+            self.maps = 0
+
+        def interpret(self, request):
+            self.requests.append(request)
+            if request.source_scope == "page_map":
+                self.maps += 1
+                chosen = [3] if self.find_hidden and self.maps > 1 else [1]
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=tuple(chosen),
+                )
+            evidence_text = request.source_pages[0]["text"]
+            hidden = "电池回收" in evidence_text
+            evidence = _evidence(
+                request.report,
+                text=(
+                    "本公司本期主要经营电池回收服务"
+                    if hidden
+                    else "公司经营有线电视网络传输"
+                ),
+                page=int(request.source_pages[0]["page"]),
+            )
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(),
+                    source_conditions=(
+                        {
+                            "condition_id": "hidden" if hidden else "network",
+                            "dimension": "principal_business",
+                            "description": (
+                                "来源写明电池回收是本期主要经营"
+                                if hidden
+                                else "来源写明网络传输"
+                            ),
+                            "evidence": (evidence,),
+                            "major": True,
+                            "statement_status": "current",
+                        },
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=tuple(
+                        {
+                            "claim_id": f"claim-{condition.condition_id}",
+                            "dimension": "principal_business",
+                            "status": "observed",
+                            "answer": condition.description,
+                            "condition_ids": (condition.condition_id,),
+                            "supporting_record_ids": (),
+                            "evidence": condition.evidence,
+                        }
+                        for condition in request.source_conditions
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": kind,
+                        "target_id": item,
+                        "status": "pass",
+                        "explanation": "离线核验",
+                    }
+                    for kind, values in (
+                        (
+                            "condition",
+                            [item.condition_id for item in request.source_conditions],
+                        ),
+                        ("claim", [item.claim_id for item in request.claims]),
+                        ("record", [item.record_id for item in request.records]),
+                    )
+                    for item in values
+                ),
+            )
+
+    found = _run(
+        _Layered(find_hidden=True),
+        pages=pages,
+        processing_identity=identity,
+    )
+    assert any("电池回收" in condition.description for condition in found.source_conditions)
+    assert any("supplement_unread:2" == gap for gap in found.gaps)
+    assert not any(gap.startswith("unsampled_body_not_discovered:") for gap in found.gaps)
+    missed = _run(
+        _Layered(find_hidden=False),
+        pages=pages,
+        processing_identity=identity,
+    )
+    assert not any("电池回收" in condition.description for condition in missed.source_conditions)
+    assert any(gap == "supplement_unread:3" for gap in missed.gaps)
+    assert missed.draft_complete is False

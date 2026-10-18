@@ -4149,6 +4149,9 @@ class CommonGatewaySemanticProvider:
                     "partial_slice": bool(
                         request.processing_identity.get("partial_slice")
                     ),
+                    "reading_strategy": request.processing_identity.get(
+                        "reading_strategy"
+                    ),
                 },
                 response_model=ReportSemanticResponseV3,
                 schema_name="company_profile_report_response",
@@ -4354,7 +4357,13 @@ class CommonGatewaySemanticProvider:
                 {
                     k: v for k, v in runtime_payload.items()
                     if not compact_reading
-                    or k not in {"max_output_tokens", "timeout_seconds", "partial_slice"}
+                    or k
+                    not in {
+                        "max_output_tokens",
+                        "timeout_seconds",
+                        "partial_slice",
+                        "reading_strategy",
+                    }
                 }, ensure_ascii=False, separators=(",", ":")
             )
         elif flat_extract:

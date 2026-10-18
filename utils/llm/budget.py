@@ -165,6 +165,18 @@ class LlmRunBudget:
                 payload_bytes > DEVELOPMENT_PAYLOAD_BYTE_LIMIT
                 or output > DEVELOPMENT_MAX_OUTPUT_TOKENS
             )
+            recovery_already_sent = any(
+                int(item.get("attempt") or 1) > 1 for item in self.attempts
+            )
+            if int(attempt) > 1 and recovery_already_sent:
+                self._stopped = "shared_recovery_already_used"
+                self._denied_request = {
+                    "request_id": request_id,
+                    "attempt": attempt,
+                    "payload_utf8_bytes": payload_bytes,
+                }
+                self._persist()
+                raise LlmDeadlineExceededError(self._stopped)
             if (
                 context_exceeded
                 or payload_exceeded
