@@ -117,6 +117,32 @@ def test_schema_repair_reserves_the_expanded_physical_payload():
 
 
 def test_second_schema_repair_does_not_get_another_recovery():
+    from utils.llm.budget import LogicalRecoveryPolicy
+
+    budget = _budget(
+        max_requests=4,
+        max_tokens=120_000,
+        recovery_policy=LogicalRecoveryPolicy(
+            max_recoveries=4, max_per_logical_request=1
+        ),
+    )
+    transport = ScriptedTransport(
+        [
+            _response({"label": "missing-score"}),
+            _response({"label": "still-missing"}),
+            _response({"label": "ok", "score": 1}),
+        ]
+    )
+    client = _client(
+        transport, budget, _config(max_retries=2, max_schema_repair_attempts=2)
+    )
+    with pytest.raises(LlmDeadlineExceededError, match="logical_recovery_already_used"):
+        asyncio.run(client.complete(_request(max_output_tokens=100)))
+    assert len(transport.calls) == 2
+    assert [item["attempt"] for item in budget.snapshot()["attempts"]] == [1, 2]
+
+
+def test_public_budget_does_not_hardcode_the_card_recovery_cap():
     budget = _budget(max_requests=4, max_tokens=120_000)
     transport = ScriptedTransport(
         [
@@ -128,10 +154,66 @@ def test_second_schema_repair_does_not_get_another_recovery():
     client = _client(
         transport, budget, _config(max_retries=2, max_schema_repair_attempts=2)
     )
-    with pytest.raises(LlmDeadlineExceededError, match="shared_recovery_already_used"):
-        asyncio.run(client.complete(_request(max_output_tokens=100)))
-    assert len(transport.calls) == 2
-    assert [item["attempt"] for item in budget.snapshot()["attempts"]] == [1, 2]
+    asyncio.run(client.complete(_request(max_output_tokens=100)))
+    assert len(transport.calls) == 3
+
+
+def test_cross_source_reset_still_consumes_the_logical_recovery():
+    from utils.llm.budget import LogicalRecoveryPolicy
+
+    budget = _budget(
+        max_requests=8,
+        prices={},
+        billing_mode="development_unpriced",
+        recovery_policy=LogicalRecoveryPolicy(max_recoveries=4),
+    )
+    payload = {"max_tokens": 10, "messages": []}
+
+    def send(request_id: str, logical_id: str) -> int:
+        return budget.reserve(
+            resource="resource",
+            model="model",
+            profile="profile",
+            payload=payload,
+            request_id=request_id,
+            attempt=1,
+            logical_request_id=logical_id,
+            source_label=request_id,
+        )
+
+    first = send("a1", "logic-a")
+    budget.settle(first, None, status="http_failure")
+    second = send("a2", "logic-a")
+    budget.settle(second, None, status="success")
+    with pytest.raises(LlmDeadlineExceededError, match="logical_recovery_already_used"):
+        send("a3", "logic-a")
+    send("b1", "logic-b")
+    capped = _budget(
+        max_requests=8,
+        prices={},
+        billing_mode="development_unpriced",
+        recovery_policy=LogicalRecoveryPolicy(max_recoveries=1),
+        prior_logical_attempts=budget.snapshot()["attempts"][:2],
+    )
+    capped.reserve(
+        resource="resource",
+        model="model",
+        profile="profile",
+        payload=payload,
+        request_id="c1",
+        attempt=1,
+        logical_request_id="logic-c",
+    )
+    with pytest.raises(LlmDeadlineExceededError, match="card_recovery_exhausted"):
+        capped.reserve(
+            resource="resource",
+            model="model",
+            profile="profile",
+            payload=payload,
+            request_id="c2",
+            attempt=1,
+            logical_request_id="logic-c",
+        )
 
 
 @pytest.mark.parametrize(

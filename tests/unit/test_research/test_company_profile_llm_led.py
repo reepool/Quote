@@ -1671,3 +1671,115 @@ def test_layered_reading_supplements_a_hidden_business_and_labels_unread_notes()
     assert not any("电池回收" in condition.description for condition in missed.source_conditions)
     assert any(gap == "supplement_unread:3" for gap in missed.gaps)
     assert missed.draft_complete is False
+
+
+def test_layered_gap_check_reads_every_requested_batch_and_blocks_when_one_is_missed():
+    from research.company_profile.contracts import ReportSemanticRequestV3
+    from research.company_profile.reading_budget import request_reservation
+    from utils.llm.errors import LlmTransientTransportError
+
+    filler = "经营说明。" * 800
+    pages = (
+        {
+            "page": 1,
+            "text": "公司经营有线电视网络传输，并向用户提供信息服务。" + filler,
+            "readable": True,
+        },
+        {
+            "page": 2,
+            "text": "附注：会计政策说明，不是本期主要经营业务。" + filler,
+            "readable": True,
+        },
+        {
+            "page": 3,
+            "text": "本公司本期主要经营电池回收服务，占营业收入百分之六十。" + filler,
+            "readable": True,
+        },
+    )
+    identity = layered_processing_identity()
+    report = _report()
+
+    def reservation(items: list[dict]) -> int:
+        return request_reservation(
+            ReportSemanticRequestV3(
+                request_id="fit",
+                purpose="source_inventory",
+                report=report,
+                processing_identity=identity,
+                source_pages=tuple(items),
+                source_scope="full_context",
+                max_output_tokens=2500,
+                timeout_seconds=30,
+            )
+        )
+
+    packed = [
+        {**page, "offset": 0, "body_scope": "full_page"} for page in pages
+    ]
+    identity["request_reservation_limit"] = max(
+        reservation([item]) for item in packed
+    ) + 800
+    assert reservation(packed[1:]) > identity["request_reservation_limit"]
+
+    class _Both(FakeReportProvider):
+        def interpret(self, request):
+            self.requests.append(request)
+            if request.source_scope == "page_map":
+                chosen = [1] if len(self.requests) == 1 else [2, 3]
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=tuple(chosen),
+                )
+            if any(int(page["page"]) == 3 for page in request.source_pages) and getattr(
+                self, "drop_page_three", False
+            ):
+                raise LlmTransientTransportError("offline")
+            evidence = _evidence(
+                request.report,
+                text=request.source_pages[0]["text"][:12],
+                page=int(request.source_pages[0]["page"]),
+            )
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=(
+                        {
+                            "condition_id": f"p{request.source_pages[0]['page']}",
+                            "dimension": "principal_business",
+                            "description": request.source_pages[0]["text"][:40],
+                            "evidence": (evidence,),
+                            "major": int(request.source_pages[0]["page"]) == 3,
+                            "statement_status": "current",
+                        },
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=(),
+            )
+
+    found = _Both()
+    result = _run(found, pages=pages, processing_identity=identity)
+    bodies = [
+        {int(page["page"]) for page in request.source_pages}
+        for request in found.requests
+        if request.source_scope == "full_context"
+        and request.purpose == "source_inventory"
+    ]
+    assert {2} in bodies and {3} in bodies
+    assert not any(gap.startswith("necessary_unread:") for gap in result.gaps)
+
+    missed = _Both()
+    missed.drop_page_three = True
+    missed_result = _run(missed, pages=pages, processing_identity=identity)
+    assert any(gap == "necessary_unread:3" for gap in missed_result.gaps)
+    assert missed_result.draft_complete is False

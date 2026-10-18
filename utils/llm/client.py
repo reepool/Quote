@@ -240,6 +240,12 @@ class LlmClient:
         )
         attempts: list[dict[str, Any]] = []
         excluded_sources: set[str] = set()
+        if self.physical_budget is not None:
+            excluded_sources.update(self.physical_budget.failed_source_labels())
+        metadata_logical = request.metadata.get("logical_request_id")
+        logical_request_id = (
+            str(metadata_logical) if metadata_logical else route_request_id
+        )
         failover_count = 0
         pending_failover_error: Optional[str] = None
         failover_started_at: Optional[float] = None
@@ -302,6 +308,8 @@ class LlmClient:
                         budget=budget,
                         attempt_failures=source_attempt_failures,
                         routed_attempt_timeout_seconds=routed_attempt_timeout,
+                        logical_request_id=logical_request_id,
+                        source_label=selected_source,
                     )
                 except LlmError as exc:
                     last_error = exc
@@ -600,10 +608,16 @@ class LlmClient:
         budget: Optional[_ExecutionBudget] = None,
         attempt_failures: Optional[list[dict[str, Any]]] = None,
         routed_attempt_timeout_seconds: Optional[float] = None,
+        logical_request_id: Optional[str] = None,
+        source_label: Optional[str] = None,
     ) -> LlmResponse:
         if self._closed:
             raise LlmConfigurationError("LLM client is closed")
         request_id = uuid.uuid4().hex
+        metadata_logical = request.metadata.get("logical_request_id")
+        logical_id = logical_request_id or (
+            str(metadata_logical) if metadata_logical else request_id
+        )
         started = time.monotonic()
         attempt_count = 0
         request_hash: Optional[str] = None
@@ -888,6 +902,8 @@ class LlmClient:
                                 request_id=request_id,
                                 attempt_count=attempt_count,
                                 max_attempts=max_attempts,
+                                logical_request_id=logical_id,
+                                source_label=source_label or profile.source_label,
                             )
                             if provider_coordinator is not None:
                                 if (
@@ -1339,6 +1355,8 @@ class LlmClient:
         request_id: str,
         attempt_count: int,
         max_attempts: int,
+        logical_request_id: str | None = None,
+        source_label: str | None = None,
     ) -> TransportResponse:
         remaining = deadline - time.monotonic()
         if self.physical_budget is not None:
@@ -1362,7 +1380,10 @@ class LlmClient:
             ticket = self.physical_budget.reserve(
                 resource=self.config.resource_for_profile(profile).name,
                 model=str(payload["model"]), profile=profile.name, payload=payload,
-                request_id=request_id, attempt=attempt_count,
+                request_id=request_id,
+                attempt=attempt_count,
+                logical_request_id=logical_request_id,
+                source_label=source_label,
             )
         try:
             response = await asyncio.wait_for(

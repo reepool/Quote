@@ -91,6 +91,7 @@ def preflight_layered(binding: dict) -> dict:
     from research.company_profile.models import ReportIdentity
     from research.company_profile.reading_budget import request_reservation
     from research.company_profile.report_interpretation import (
+        fits_card_reservation,
         fits_development_payload,
         layered_processing_identity,
         pack_fitting_batches,
@@ -147,13 +148,73 @@ def preflight_layered(binding: dict) -> dict:
                 )
             )
         )
+    if binding.get("navigation_query"):
+        from research.company_profile.reading_budget import reused_map_receipts
+        from research.company_profile.report_interpretation import COMPACT_REPORT_PROMPT
+
+        query = json.loads(Path(binding["navigation_query"]).read_text())
+        _accepted, selected = reused_map_receipts(
+            query["profiles"][0]["three_views"]["call_receipts"],
+            prompt_version=COMPACT_REPORT_PROMPT,
+            page_count=len(pages),
+        )
+        limit = int(binding.get("request_reservation_limit", 24_000))
+        selected_pages = [
+            {
+                "page": page["page"],
+                "readable": True,
+                "text": page["text"],
+                "offset": 0,
+                "body_scope": "full_page",
+            }
+            for page in pages
+            if int(page["page"]) in selected
+        ]
+        body_batches = pack_fitting_batches(
+            selected_pages,
+            lambda batch: fits_card_reservation(
+                batch,
+                reservation_limit=limit,
+                purpose="source_inventory",
+                source_scope="full_context",
+                report=report,
+                identity=identity,
+                max_output_tokens=2500,
+            ),
+            split_mode="boundary",
+        )
+        body_units = [
+            request_reservation(
+                ReportSemanticRequestV3(
+                    request_id="layered-body-preflight",
+                    purpose="source_inventory",
+                    report=report,
+                    processing_identity=identity,
+                    source_pages=tuple(batch),
+                    source_scope="full_context",
+                    max_output_tokens=2500,
+                    timeout_seconds=30,
+                )
+            )
+            for batch in body_batches
+        ]
+        if any(units > limit for units in body_units):
+            raise ValueError("layered_body_request_exceeds_card_reservation")
+        return {
+            "navigation_reused": True,
+            "selected_pages": len(selected_pages),
+            "body_batches": len(body_batches),
+            "body_units": body_units,
+            "content_request_cap": int(binding["max_physical_requests"]),
+            "recovery_requests": int(binding.get("max_recoveries", 4)),
+        }
     if max(reservations) > int(binding["max_tokens"]):
         raise ValueError("layered_navigation_request_exceeds_ledger")
     return {
         "navigation_batches": len(batches),
         "navigation_units": reservations,
-        "content_request_cap": 15,
-        "recovery_requests": 1,
+        "content_request_cap": int(binding.get("max_physical_requests", 16)),
+        "recovery_requests": int(binding.get("max_recoveries", 4)),
     }
 
 
@@ -214,7 +275,16 @@ def validate_binding(
             or authorization.get("binding_sha256") != binding_hash
             or authorization.get("document_version") != asset["content_hash"]
             or authorization.get("attempt")
-            not in {"first", "successor", "special", "partial", "segment", "layered"}
+            not in {
+                "first",
+                "successor",
+                "special",
+                "partial",
+                "segment",
+                "layered",
+                "resume1",
+                "resume2",
+            }
             or not authorization.get("approval_reference")
         ):
             raise ValueError(
@@ -350,7 +420,7 @@ def _worker(
     from research.storage import ResearchStorageManager
     from utils.config_manager import ResearchConfig, ResearchStorageConfig
     from utils.llm import CallableTransport, LlmClient, load_project_environment
-    from utils.llm.budget import LlmRunBudget
+    from utils.llm.budget import LlmRunBudget, LogicalRecoveryPolicy
 
     asset = binding["asset"]
     raw_config = json.loads(Path(binding["config_path"]).read_text())["llm"]
@@ -366,6 +436,11 @@ def _worker(
             attach_quotes_db=False,
         )
     )
+    prior_attempts = ()
+    continuation_budget = binding.get("continuation_budget")
+    if continuation_budget:
+        prior_payload = json.loads(Path(continuation_budget).read_text())
+        prior_attempts = tuple(prior_payload.get("attempts") or ())
     budget = LlmRunBudget(
         deadline=deadline,
         prices=prices,
@@ -374,6 +449,15 @@ def _worker(
         max_cost_cny=Decimal(binding["max_cost_cny"]),
         ledger_path=run_root / "physical-budget.json",
         billing_mode=binding.get("billing_mode", "strict"),
+        recovery_policy=(
+            LogicalRecoveryPolicy(
+                max_recoveries=int(binding.get("max_recoveries", 4)),
+                max_per_logical_request=1,
+            )
+            if binding.get("reading_strategy") == "layered_v3"
+            else None
+        ),
+        prior_logical_attempts=prior_attempts,
     )
     transport_requests = []
 
@@ -526,6 +610,36 @@ def _worker(
             )
         identity["max_physical_requests"] = binding["max_physical_requests"]
         identity["ledger_tokens"] = binding["max_tokens"]
+        identity["request_reservation_limit"] = int(
+            binding.get("request_reservation_limit", 24_000)
+        )
+        identity["protect_tail"] = not bool(
+            binding.get("defer_tail_to_next_window")
+        )
+        if binding.get("navigation_query"):
+            identity["navigation_query"] = binding["navigation_query"]
+            identity["parent_attempt"] = binding.get("parent_attempt")
+            identity["development_continuation"] = True
+        if binding.get("continuation_checkpoint"):
+            saved = json.loads(Path(binding["continuation_checkpoint"]).read_text())
+            saved_identity = (
+                (saved.get("report_interpretation") or {}).get("processing_identity")
+                or {}
+            )
+            if saved_identity and saved_identity.get("prompt_version") != identity.get(
+                "prompt_version"
+            ):
+                raise ValueError("continuation_prompt_mismatch")
+            if saved_identity.get("reading_strategy") not in {None, "layered_v3"}:
+                raise ValueError("continuation_strategy_mismatch")
+            identity["resumed_receipts"] = [
+                item
+                for item in (saved.get("report_interpretation") or {}).get(
+                    "call_receipts"
+                )
+                or ()
+                if item.get("status") == "success" and not item.get("reused_navigation")
+            ]
     if binding.get("partial_slice"):
         identity.update(
             partial_slice=True,
@@ -670,6 +784,13 @@ def main() -> int:
             raise ValueError(
                 "partial attempt requires the protected first, successor and special markers"
             )
+        if authorization["attempt"] == "resume1" and not (attempts / "layered.json").is_file():
+            raise ValueError("resume1 requires the protected layered attempt")
+        if authorization["attempt"] == "resume2" and not (
+            (attempts / "layered.json").is_file()
+            and (attempts / "resume1.json").is_file()
+        ):
+            raise ValueError("resume2 requires the protected layered and resume1 markers")
         if authorization["attempt"] == "layered" and not (
             (attempts / "first.json").is_file()
             and (attempts / "successor.json").is_file()

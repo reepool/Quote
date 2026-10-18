@@ -158,11 +158,37 @@ def remaining_tail_units(
     return 0
 
 
+def _card_recovery_room(
+    attempts: Sequence[Mapping[str, Any]],
+    policy: Any,
+    logical_request_id: str | None,
+) -> bool:
+    """Whether one more recovery of this request can still be reserved."""
+    counts: dict[str, int] = {}
+    recoveries = 0
+    for item in attempts:
+        key = str(item.get("logical_request_id") or item.get("request_id") or "")
+        if not key:
+            continue
+        counts[key] = counts.get(key, 0) + 1
+        if counts[key] > 1:
+            recoveries += 1
+    if recoveries >= int(policy.max_recoveries):
+        return False
+    if logical_request_id is None:
+        return True
+    used = counts.get(str(logical_request_id), 0)
+    return used < 1 + int(policy.max_per_logical_request)
+
+
 def send_admission_hold(
     plan: Mapping[str, int],
     attempts: Sequence[Mapping[str, Any]],
     purpose: str,
     current_units: int,
+    *,
+    recovery_policy: Any = None,
+    logical_request_id: str | None = None,
 ) -> int:
     """Future stage estimates plus one recovery of the request about to be sent.
 
@@ -170,7 +196,16 @@ def send_admission_hold(
     top, and a failure that already consumed the shared recovery does not
     reserve a second one. The earlier stage estimate is not part of this hold.
     """
-    recovery = 0 if any(_recovery_consumed(item) for item in attempts) else int(current_units)
+    if recovery_policy is None:
+        recovery = (
+            0 if any(_recovery_consumed(item) for item in attempts) else int(current_units)
+        )
+    else:
+        recovery = (
+            int(current_units)
+            if _card_recovery_room(attempts, recovery_policy, logical_request_id)
+            else 0
+        )
     if purpose == "source_inventory":
         return int(plan["synthesis_units"]) + int(plan["verification_units"]) + recovery
     if purpose == "synthesize_views":

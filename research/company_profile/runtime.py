@@ -523,6 +523,10 @@ class CompanyProfileStageRuntime:
                 for record in project_owned_page_facts(state.evidence, chapter)
                 if isinstance(record, (Measurement, Segment))
             )
+            def save_progress(partial) -> None:
+                state.report_interpretation = partial
+                self._persist_work(state)
+
             state.report_interpretation = self._semantic_service.run_report(
                 report=state.report,
                 pages=state.pages,
@@ -530,6 +534,7 @@ class CompanyProfileStageRuntime:
                 provider=self._report_provider,
                 work_id=state.work_id,
                 token_budget=self._total_token_budget,
+                on_progress=save_progress,
                 structured_records=(
                     *structured,
                     *(

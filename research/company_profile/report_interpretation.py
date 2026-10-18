@@ -51,6 +51,7 @@ from .reading_budget import (
     request_reservation,
     reused_map_receipts,
     send_admission_hold,
+    stage_reservations,
 )
 
 DISCOVERY_CHUNK_CHARS = 24_000
@@ -238,22 +239,51 @@ def compact_wire_bytes(
     )
 
 
+def fits_card_reservation(
+    source_pages: Sequence[Mapping[str, Any]],
+    *,
+    reservation_limit: int,
+    purpose: str,
+    source_scope: str,
+    report: ReportIdentity,
+    identity: Mapping[str, Any],
+    max_output_tokens: int,
+) -> bool:
+    """True when this exact request's payload, framing and output cap fit the card."""
+    if not source_pages:
+        return False
+    request = ReportSemanticRequestV3(
+        request_id="card-fit",
+        purpose=purpose,
+        report=report,
+        processing_identity=dict(identity),
+        source_pages=tuple(source_pages),
+        source_scope=source_scope,
+        max_output_tokens=max_output_tokens,
+        timeout_seconds=30,
+    )
+    return request_reservation(request) <= int(reservation_limit)
+
+
 def fits_development_payload(
     source_pages: Sequence[Mapping[str, Any]], **kwargs
 ) -> bool:
-    """Keep one gateway payload inside the byte cap and one recovery resend.
+    """Keep one gateway payload inside the byte cap and the caller's reservation.
 
-    The earlier 30000 slot split this report past the 16-request ledger. The
-    recovery ceiling is half of the 120000 ledger, so one unknown failure can
-    be sent again. Callers still record every page and offset.
+    The public default remains one resend inside half of the 120000 ledger.
+    A card can pass ``reservation_limit`` without changing that public cap.
+    Callers still record every page and offset.
     """
+    reservation_limit = int(
+        kwargs.pop("reservation_limit", None) or DEVELOPMENT_RECOVERY_RESERVATION
+    )
     estimated_payload = (
         compact_wire_bytes(source_pages, **kwargs) + DEVELOPMENT_WIRE_MARGIN
     )
     output = int(kwargs.get("max_output_tokens") or 0)
     return (
         estimated_payload <= DEVELOPMENT_PAYLOAD_BYTE_LIMIT
-        and estimated_payload + 256 + output <= DEVELOPMENT_RECOVERY_RESERVATION
+        and estimated_payload + 256 + output <= reservation_limit
     )
 
 
@@ -279,6 +309,7 @@ def pack_fitting_batches(
     fits,
     *,
     scope_break: bool = False,
+    split_mode: str = "midpoint",
 ) -> list[list[dict[str, Any]]]:
     """Greedy batches that preserve every character and every page."""
 
@@ -287,6 +318,27 @@ def pack_fitting_batches(
         if fits([fragment]):
             return [fragment]
         text = str(fragment["text"])
+        if split_mode == "boundary":
+            best = 0
+            for index, char in enumerate(text):
+                if char not in "\n。！？；":
+                    continue
+                end = index + 1
+                if end >= len(text):
+                    continue
+                if fits([{**fragment, "text": text[:end]}]):
+                    best = end
+            if best <= 0:
+                raise ValueError(
+                    f"fragment_has_no_safe_boundary:{fragment.get('page')}"
+                )
+            left = {**fragment, "text": text[:best]}
+            right = {
+                **fragment,
+                "text": text[best:],
+                "offset": int(fragment.get("offset") or 0) + best,
+            }
+            return [left, *pieces_of(right)]
         if len(text) <= 1:
             raise ValueError("single_source_fragment_exceeds_payload_limit")
         midpoint = len(text) // 2
@@ -414,6 +466,7 @@ def interpret_report(
     structured_records: Sequence[SemanticRecord] = (),
     active_checklist: Sequence[ChecklistItem] = (),
     execution_budget: LlmRunBudget | None = None,
+    on_progress: Any = None,
 ) -> ReportInterpretation:
     """Run source inventory → linked views → source-based verify within one report.
 
@@ -454,6 +507,8 @@ def interpret_report(
     quarantined: set[str] = set()
     receipts: list[dict[str, Any]] = []
     read_pages: set[int] = set()
+    read_fragments: list[dict[str, Any]] = []
+    necessary_pages: set[int] = set()
     tokens = 0
     seen_condition_ids: set[str] = set()
     limit = min(max(0, token_budget), 120_000)
@@ -461,8 +516,7 @@ def interpret_report(
     layered = identity.get("reading_strategy") == "layered_v3"
     partial_plan: dict[str, Any] | None = None
     request_cap = int(identity.get("max_physical_requests") or (8 if partial else 16))
-    if layered:
-        request_cap = min(request_cap, 15)
+    reservation_limit = int(identity.get("request_reservation_limit") or (24_000 if layered else 0))
 
     allowed = {
         (item.chapter_task, item.field_id): item
@@ -480,8 +534,87 @@ def interpret_report(
             return record.action in scope.allowed_actions
         return True
 
+    def fragment_identity(pages: Sequence[Mapping[str, Any]]) -> tuple:
+        return tuple(
+            (
+                int(page["page"]),
+                int(page.get("offset") or 0),
+                str(page.get("scope") or page.get("body_scope") or ""),
+                len(str(page.get("text") or "")) or int(page.get("length") or 0),
+            )
+            for page in pages
+        )
+
+    def reused_stage(purpose: str, source_pages, source_scope: str):
+        wanted = fragment_identity(source_pages)
+        for item in identity.get("resumed_receipts") or ():
+            if item.get("status") != "success" or item.get("purpose") != purpose:
+                continue
+            if str(item.get("source_scope") or "full_context") != source_scope:
+                continue
+            saved_pages = item.get("source_fragments") or [
+                {"page": page, "text": ""} for page in item.get("source_pages") or []
+            ]
+            saved_identity = fragment_identity(saved_pages)
+            same_pages = [int(page) for page in item.get("source_pages") or []] == [
+                int(page["page"]) for page in source_pages
+            ]
+            if saved_identity != wanted and not same_pages:
+                continue
+            return item
+        return None
+
+    def publish_progress() -> None:
+        if on_progress is None:
+            return
+        on_progress(
+            ReportInterpretation(
+                report=report,
+                processing_identity=identity,
+                execution_mode=mode if mode in {"offline_fake", "provider"} else "offline_fake",
+                page_coverage=tuple(coverage),
+                source_conditions=tuple(conditions),
+                claims=claims,
+                records=records,
+                checks=checks,
+                record_dispositions=tuple(dispositions),
+                call_receipts=tuple(receipts),
+                gaps=tuple(gaps),
+                tokens_charged=max(0, tokens),
+                budget_ledger=(
+                    execution_budget.snapshot() if execution_budget is not None else {}
+                ),
+                elapsed_seconds=max(0.0, time.monotonic() - start),
+            )
+        )
+
+    def remember_read(purpose: str, source_scope: str, source_pages) -> None:
+        if purpose == "source_inventory" and source_scope == "full_context":
+            read_fragments.extend(dict(page) for page in source_pages)
+
     def invoke(purpose, source_pages, *, source_scope="full_context", **payload):
         nonlocal tokens
+        saved = reused_stage(purpose, source_pages, source_scope)
+        if saved is not None:
+            payload_json = dict(saved.get("response_payload") or {})
+            payload_json["request_id"] = f"{work_id}:report:{len(receipts) + 1}"
+            payload_json["purpose"] = purpose
+            response_type = (
+                ReportSemanticResponseV3 if compact else ReportSemanticResponse
+            )
+            response = response_type.model_validate(payload_json)
+            receipts.append(
+                {
+                    **saved,
+                    "request_id": response.request_id,
+                    "physical_request": False,
+                    "reused_stage": True,
+                    "status": "success",
+                }
+            )
+            remember_read(purpose, source_scope, source_pages)
+            publish_progress()
+            return response
         remaining = (
             execution_budget.remaining()
             if execution_budget
@@ -533,6 +666,53 @@ def interpret_report(
                 and units > ceiling
             ):
                 gaps.append(f"stage_estimate_exceeded:{purpose}:{units}>{ceiling}")
+        if layered and execution_budget is not None:
+            units = request_reservation(request)
+            if reservation_limit and units > reservation_limit:
+                raise ValueError("card_request_reservation_exceeded")
+            snapshot = execution_budget.snapshot()
+            charged = int(snapshot["charged_tokens"])
+            ledger = int(identity.get("ledger_tokens") or execution_budget.max_tokens)
+            if charged + units > ledger:
+                raise ValueError("partial_tail_hold_would_be_exhausted")
+            # The first window can fill with body reads when a later window is
+            # reserved for the tail. A tail window keeps one measured synthesis,
+            # verification and recovery before sending more discovery.
+            if identity.get("protect_tail", True) and purpose == "source_inventory":
+                quote_pages = (
+                    cited_quote_pages(
+                        tuple(
+                            evidence
+                            for condition in conditions
+                            for evidence in condition.evidence
+                        )
+                    )
+                    if conditions
+                    else tuple(source_pages)
+                )
+                related = records_for_fragments(
+                    tuple(structured.values()), quote_pages or tuple(source_pages)
+                )
+                measured = stage_reservations(
+                    quote_pages or tuple(source_pages),
+                    report=report,
+                    identity=identity,
+                    conditions=tuple(conditions),
+                    claims=tuple(claims),
+                    records=related,
+                )
+                hold = send_admission_hold(
+                    measured,
+                    [
+                        *getattr(execution_budget, "prior_logical_attempts", ()),
+                        *snapshot["attempts"],
+                    ],
+                    purpose,
+                    units,
+                    recovery_policy=getattr(execution_budget, "recovery_policy", None),
+                )
+                if charged + units + hold > ledger:
+                    raise ValueError("partial_tail_hold_would_be_exhausted")
         if compact and purpose != "source_inventory":
             from .report_wire import compact_request
 
@@ -568,6 +748,15 @@ def interpret_report(
             "prompt_version": identity.get("prompt_version"),
             "execution_mode": mode,
             "source_pages": [page["page"] for page in source_pages],
+            "source_fragments": [
+                {
+                    "page": page["page"],
+                    "offset": int(page.get("offset") or 0),
+                    "scope": page.get("scope") or page.get("body_scope") or "",
+                    "length": len(str(page.get("text") or "")),
+                }
+                for page in source_pages
+            ],
             "source_scope": source_scope,
         }
         receipts.append(receipt)
@@ -584,6 +773,8 @@ def interpret_report(
                 raise ValueError("report_response_identity_mismatch")
             receipt["response_payload"] = response.model_dump(mode="json")
             receipt["status"] = "success"
+            remember_read(purpose, source_scope, source_pages)
+            publish_progress()
             return response
         finally:
             traces = tuple(getattr(provider, "traces", ()))[before:]
@@ -690,19 +881,60 @@ def interpret_report(
                 gaps.append(
                     f"slice_tail_unread:{plan['pages'][-1]}:{plan['tail_offset']}"
                 )
+        elif structural and layered and (
+            identity.get("navigation_receipts") or identity.get("navigation_query")
+        ):
+            raw_navigation = identity.get("navigation_receipts")
+            if raw_navigation is None:
+                raw_navigation = json.loads(
+                    Path(identity["navigation_query"]).read_text()
+                )["profiles"][0]["three_views"]["call_receipts"]
+            accepted, requested = reused_map_receipts(
+                raw_navigation or (),
+                prompt_version=COMPACT_REPORT_PROMPT,
+                page_count=len(sources),
+            )
+            for item in accepted:
+                payload = item.get("response_payload") or {}
+                chosen = set(payload.get("requested_pages") or [])
+                for page in item.get("source_pages") or []:
+                    by_page[int(page)].update(
+                        structure_indexed=True,
+                        map_checked=True,
+                        map_selected=int(page) in chosen,
+                        status="partially_checked",
+                    )
+                receipts.append(
+                    {
+                        **item,
+                        "physical_request": False,
+                        "reused_navigation": True,
+                        "development_continuation": True,
+                        "parent_attempt": identity.get("parent_attempt"),
+                    }
+                )
+            map_checked = True
+            discovery_sources = tuple(
+                page
+                for page in sources
+                if page["readable"] and int(page["page"]) in requested
+            )
         elif structural:
             requested: set[int] = set()
             available = {p["page"] for p in sources if p["readable"]}
+            map_options = {
+                "purpose": "source_inventory",
+                "source_scope": "page_map",
+                "report": report,
+                "identity": identity,
+                "max_output_tokens": 1000,
+            }
+            if layered and reservation_limit:
+                map_options["reservation_limit"] = reservation_limit
             map_batches = pack_fitting_batches(
                 page_map(sources),
-                lambda batch: fits_development_payload(
-                    batch,
-                    purpose="source_inventory",
-                    source_scope="page_map",
-                    report=report,
-                    identity=identity,
-                    max_output_tokens=1000,
-                ),
+                lambda batch: fits_development_payload(batch, **map_options),
+                split_mode="boundary" if layered else "midpoint",
             )
             for batch in map_batches:
                 response = invoke(
@@ -725,13 +957,19 @@ def interpret_report(
             )
             if not requested or not requested <= available:
                 raise ValueError("page_map_requires_valid_full_context_selection")
-            # Reliable facts need their real context even if the model doesn't
-            # request the page. This does not inject candidate answers into map.
-            requested |= {
-                page
-                for e in structured_evidence.values()
-                for page in (e.page, *e.continuation_pages, *e.subject_evidence_pages)
-            }
+            # Historical reading pulls native-fact pages into the body. Layered
+            # reading keeps those facts in storage and does not mark them read
+            # just because they exist.
+            if not layered:
+                requested |= {
+                    page
+                    for e in structured_evidence.values()
+                    for page in (
+                        e.page,
+                        *e.continuation_pages,
+                        *e.subject_evidence_pages,
+                    )
+                }
             if layered:
                 discovery_sources = tuple(
                     p
@@ -757,19 +995,48 @@ def interpret_report(
         if partial_fragments is not None:
             chunks = partial_fragments
         elif layered:
-            chunks = structural_discovery_chunks(
-                discovery_sources,
-                full_ids,
-                payload_fits=(
-                    lambda batch: fits_development_payload(
-                        batch,
-                        purpose="source_inventory",
-                        source_scope="full_context",
-                        report=report,
-                        identity=identity,
-                        max_output_tokens=2500,
+            def layered_fit(batch, *, source_scope: str, max_output: int) -> bool:
+                return fits_card_reservation(
+                    batch,
+                    reservation_limit=reservation_limit or 24_000,
+                    purpose="source_inventory",
+                    source_scope=source_scope,
+                    report=report,
+                    identity=identity,
+                    max_output_tokens=max_output,
+                )
+
+            pieces: list[dict[str, Any]] = []
+            for page in discovery_sources:
+                whole = {
+                    "page": page["page"],
+                    "readable": True,
+                    "text": page["text"],
+                    "offset": 0,
+                    "body_scope": "full_page",
+                }
+                try:
+                    page_batches = pack_fitting_batches(
+                        [whole],
+                        lambda batch: layered_fit(
+                            batch, source_scope="full_context", max_output=2500
+                        ),
+                        split_mode="boundary",
                     )
+                except ValueError as exc:
+                    if not str(exc).startswith("fragment_has_no_safe_boundary"):
+                        raise
+                    necessary_pages.add(int(page["page"]))
+                    gaps.append(f"necessary_fragment_unread:{int(page['page'])}")
+                    continue
+                for batch in page_batches:
+                    pieces.extend(batch)
+            chunks = pack_fitting_batches(
+                pieces,
+                lambda batch: layered_fit(
+                    batch, source_scope="full_context", max_output=2500
                 ),
+                split_mode="boundary",
             )
         else:
             chunks = structural_discovery_chunks(
@@ -797,25 +1064,46 @@ def interpret_report(
                     full_expected[fragment["page"]] += 1
         supplements = 0
         read_pages.clear()
+        continuable = {
+            "partial_tail_hold_would_be_exhausted",
+            "card_request_reservation_exceeded",
+            "logical_recovery_already_used",
+            "card_recovery_exhausted",
+        }
+
+        def mark_necessary(chunk_fragments) -> None:
+            for fragment in chunk_fragments:
+                page_no = int(fragment["page"])
+                necessary_pages.add(page_no)
+                gap = f"necessary_unread:{page_no}"
+                if gap not in gaps:
+                    gaps.append(gap)
+
         for chunk in chunks:
-            response = invoke(
-                "source_inventory",
-                tuple(
-                    {
-                        "page": fragment["page"],
-                        "text": fragment["text"],
-                        "readable": True,
-                        "offset": fragment["offset"],
-                        "scope": fragment["body_scope"],
-                    }
-                    for fragment in chunk
-                ),
-            )
-            read_pages.update(
-                fragment["page"]
-                for fragment in chunk
-                if fragment["body_scope"] == "full_page"
-            )
+            try:
+                response = invoke(
+                    "source_inventory",
+                    tuple(
+                        {
+                            "page": fragment["page"],
+                            "text": fragment["text"],
+                            "readable": True,
+                            "offset": fragment["offset"],
+                            "scope": fragment["body_scope"],
+                        }
+                        for fragment in chunk
+                    ),
+                )
+            except (ValueError, LlmError) as exc:
+                message = str(exc)
+                if message not in continuable and not (
+                    isinstance(exc, LlmError)
+                    and exc.code
+                    not in {"deadline_exceeded", "cancelled", "configuration_error"}
+                ):
+                    raise
+                mark_necessary(chunk)
+                continue
             for fragment in chunk:
                 page_state = by_page[fragment["page"]]
                 page_state["chunks"].append(
@@ -834,6 +1122,7 @@ def interpret_report(
                     page_state["full_chunks"] = page_state.get("full_chunks", 0) + 1
                     if page_state["full_chunks"] == full_expected[fragment["page"]]:
                         page_state["status"] = "read"
+                        read_pages.add(int(fragment["page"]))
             for condition in response.source_conditions:
                 if not all(
                     _evidence_valid(e, report, chunk) for e in condition.evidence
@@ -846,7 +1135,7 @@ def interpret_report(
                 conditions.append(
                     condition.model_copy(update={"condition_id": scoped_id})
                 )
-            if compact and response.requested_pages:
+            if compact and not layered and response.requested_pages:
                 pending = (
                     set(response.requested_pages)
                     - read_pages
@@ -884,90 +1173,176 @@ def interpret_report(
                 for fragment in page_map(sources)
                 if int(fragment["page"]) not in read_pages
             ]
+            requested_extra: set[int] = set()
             if unread_previews:
                 preview_batches = pack_fitting_batches(
                     unread_previews,
-                    lambda batch: fits_development_payload(
-                        batch,
-                        purpose="source_inventory",
-                        source_scope="page_map",
-                        report=report,
-                        identity=identity,
-                        max_output_tokens=1000,
+                    lambda batch: layered_fit(
+                        batch, source_scope="page_map", max_output=1000
                     ),
+                    split_mode="boundary",
                 )
-                if preview_batches:
-                    gap_response = invoke(
-                        "source_inventory",
-                        tuple(preview_batches[0]),
-                        source_scope="page_map",
-                    )
+                for batch in preview_batches:
+                    try:
+                        gap_response = invoke(
+                            "source_inventory",
+                            tuple(batch),
+                            source_scope="page_map",
+                        )
+                    except (ValueError, LlmError) as exc:
+                        message = str(exc)
+                        if message not in continuable and not (
+                            isinstance(exc, LlmError)
+                            and exc.code
+                            not in {
+                                "deadline_exceeded",
+                                "cancelled",
+                                "configuration_error",
+                            }
+                        ):
+                            raise
+                        for fragment in batch:
+                            gaps.append(
+                                f"gap_check_incomplete:{int(fragment['page'])}"
+                            )
+                        break
                     if gap_response.source_conditions:
                         raise ValueError("page_map_cannot_establish_source_conditions")
-                    extra_ids = [
-                        page
+                    requested_extra.update(
+                        int(page)
                         for page in gap_response.requested_pages
-                        if page not in read_pages
-                    ]
-                    extra_pages = [
-                        page
-                        for page in sources
-                        if page["readable"] and int(page["page"]) in set(extra_ids)
-                    ]
-                    if extra_pages:
-                        supplement_chunks = structural_discovery_chunks(
-                            extra_pages,
-                            {int(page["page"]) for page in extra_pages},
-                            payload_fits=lambda batch: fits_development_payload(
-                                batch,
-                                purpose="source_inventory",
-                                source_scope="full_context",
-                                report=report,
-                                identity=identity,
-                                max_output_tokens=2500,
+                        if int(page) not in read_pages
+                    )
+            extra_pages = [
+                page
+                for page in sources
+                if page["readable"] and int(page["page"]) in requested_extra
+            ]
+            supplement_chunks: list[list[dict[str, Any]]] = []
+            if extra_pages:
+                supplement_pieces: list[dict[str, Any]] = []
+                for page in extra_pages:
+                    whole = {
+                        "page": page["page"],
+                        "readable": True,
+                        "text": page["text"],
+                        "offset": 0,
+                        "body_scope": "full_page",
+                    }
+                    try:
+                        page_batches = pack_fitting_batches(
+                            [whole],
+                            lambda batch: layered_fit(
+                                batch, source_scope="full_context", max_output=2500
                             ),
+                            split_mode="boundary",
                         )
-                        if supplement_chunks:
-                            response = invoke(
-                                "source_inventory",
-                                tuple(
-                                    {
-                                        "page": fragment["page"],
-                                        "text": fragment["text"],
-                                        "readable": True,
-                                        "offset": fragment["offset"],
-                                        "scope": fragment["body_scope"],
-                                    }
-                                    for fragment in supplement_chunks[0]
-                                ),
-                            )
-                            read_pages.update(
-                                int(fragment["page"])
-                                for fragment in supplement_chunks[0]
-                            )
-                            for condition in response.source_conditions:
-                                if not all(
-                                    _evidence_valid(
-                                        evidence, report, supplement_chunks[0]
-                                    )
-                                    for evidence in condition.evidence
-                                ):
-                                    raise ValueError("inventory_evidence_outside_source")
-                                scoped_id = (
-                                    f"{receipts[-1]['request_id']}:{condition.condition_id}"
-                                )
-                                if scoped_id in seen_condition_ids:
-                                    raise ValueError("duplicate_source_condition")
-                                seen_condition_ids.add(scoped_id)
-                                conditions.append(
-                                    condition.model_copy(
-                                        update={"condition_id": scoped_id}
-                                    )
-                                )
+                    except ValueError as exc:
+                        if not str(exc).startswith("fragment_has_no_safe_boundary"):
+                            raise
+                        necessary_pages.add(int(page["page"]))
+                        gaps.append(
+                            f"necessary_fragment_unread:{int(page['page'])}"
+                        )
+                        continue
+                    for batch in page_batches:
+                        supplement_pieces.extend(batch)
+                if supplement_pieces:
+                    supplement_chunks = pack_fitting_batches(
+                        supplement_pieces,
+                        lambda batch: layered_fit(
+                            batch, source_scope="full_context", max_output=2500
+                        ),
+                        split_mode="boundary",
+                    )
+            planned_extra: dict[int, int] = {}
+            for chunk in supplement_chunks:
+                for fragment in chunk:
+                    page_no = int(fragment["page"])
+                    planned_extra[page_no] = planned_extra.get(page_no, 0) + 1
+            sent_extra: dict[int, int] = {}
+            for index, chunk in enumerate(supplement_chunks):
+                try:
+                    response = invoke(
+                        "source_inventory",
+                        tuple(
+                            {
+                                "page": fragment["page"],
+                                "text": fragment["text"],
+                                "readable": True,
+                                "offset": fragment["offset"],
+                                "scope": fragment["body_scope"],
+                            }
+                            for fragment in chunk
+                        ),
+                    )
+                except (ValueError, LlmError) as exc:
+                    message = str(exc)
+                    if message not in continuable and not (
+                        isinstance(exc, LlmError)
+                        and exc.code
+                        not in {
+                            "deadline_exceeded",
+                            "cancelled",
+                            "configuration_error",
+                        }
+                    ):
+                        raise
+                    for later in supplement_chunks[index:]:
+                        mark_necessary(later)
+                    break
+                for fragment in chunk:
+                    page_no = int(fragment["page"])
+                    sent_extra[page_no] = sent_extra.get(page_no, 0) + 1
+                    if sent_extra[page_no] == planned_extra[page_no]:
+                        read_pages.add(page_no)
+                        by_page[page_no]["status"] = "read"
+                for condition in response.source_conditions:
+                    if not all(
+                        _evidence_valid(evidence, report, chunk)
+                        for evidence in condition.evidence
+                    ):
+                        raise ValueError("inventory_evidence_outside_source")
+                    scoped_id = (
+                        f"{receipts[-1]['request_id']}:{condition.condition_id}"
+                    )
+                    if scoped_id in seen_condition_ids:
+                        raise ValueError("duplicate_source_condition")
+                    seen_condition_ids.add(scoped_id)
+                    conditions.append(
+                        condition.model_copy(update={"condition_id": scoped_id})
+                    )
+            for page_no in requested_extra:
+                if page_no not in read_pages:
+                    necessary_pages.add(page_no)
+                    gap = (
+                        f"necessary_fragment_unread:{page_no}"
+                        if any(
+                            int(fragment["page"]) == page_no
+                            for fragment in read_fragments
+                        )
+                        else f"necessary_unread:{page_no}"
+                    )
+                    if gap not in gaps:
+                        gaps.append(gap)
             for source in sources:
-                if source["readable"] and int(source["page"]) not in read_pages:
-                    gaps.append(f"supplement_unread:{int(source['page'])}")
+                page_no = int(source["page"])
+                if not source["readable"] or page_no in read_pages:
+                    continue
+                if page_no in necessary_pages or any(
+                    gap == f"gap_check_incomplete:{page_no}" for gap in gaps
+                ):
+                    continue
+                gaps.append(f"supplement_unread:{page_no}")
         related_records = tuple(structured.values())
+        if layered:
+            related_records = records_for_fragments(
+                structured.values(), read_fragments
+            )
+            related_ids = {item.record_id for item in related_records}
+            for record in structured.values():
+                if record.record_id not in related_ids:
+                    gaps.append(f"native_fact_outside_read_span:{record.record_id}")
         if partial and partial_fragments is not None:
             sent_fragments = [
                 fragment for chunk in partial_fragments for fragment in chunk
@@ -1260,24 +1635,55 @@ def interpret_report(
                     gaps.append(f"semantic_incomplete:{str(exc)[:240]}")
     except (SemanticProviderError, LlmError, ValueError, TypeError) as exc:
         gaps.append(f"semantic_incomplete:{str(exc)[:240]}")
-        if not partial:
+        if layered:
+            verified = {
+                item.target_id
+                for item in checks
+                if item.target_type == "claim" and item.status == "pass"
+            }
+            if not checks:
+                records = ()
+            claims = tuple(
+                claim
+                if claim.claim_id in verified
+                else claim.model_copy(
+                    update={
+                        "status": "unclear",
+                        "answer": "语义流程未完成。",
+                        "limitation": "semantic_pipeline_incomplete",
+                    }
+                )
+                for claim in claims
+            )
+        elif not partial:
             records = tuple(
                 item
                 for item in structured.values()
                 if record_scope_valid(item) and item.record_id not in quarantined
             )
-        elif not checks:
-            records = ()
-        claims = tuple(
-            claim.model_copy(
-                update={
-                    "status": "unclear",
-                    "answer": "语义流程未完成。",
-                    "limitation": "semantic_pipeline_incomplete",
-                }
+            claims = tuple(
+                claim.model_copy(
+                    update={
+                        "status": "unclear",
+                        "answer": "语义流程未完成。",
+                        "limitation": "semantic_pipeline_incomplete",
+                    }
+                )
+                for claim in claims
             )
-            for claim in claims
-        )
+        else:
+            if not checks:
+                records = ()
+            claims = tuple(
+                claim.model_copy(
+                    update={
+                        "status": "unclear",
+                        "answer": "语义流程未完成。",
+                        "limitation": "semantic_pipeline_incomplete",
+                    }
+                )
+                for claim in claims
+            )
 
     states = {item["page"]: item for item in coverage}
     if structural and not layered:
@@ -1295,6 +1701,8 @@ def interpret_report(
         state = states[source["page"]]
         if state["status"] == "read":
             return True
+        if layered and int(source["page"]) in necessary_pages:
+            return False
         if layered and int(source["page"]) not in read_pages:
             return bool(state.get("map_checked"))
         if unsampled_ranges(source["text"]):
@@ -1313,6 +1721,16 @@ def interpret_report(
             and not any(gap.startswith("semantic_incomplete:") for gap in gaps)
             and not any(
                 gap.startswith("unsampled_body_not_discovered:") for gap in gaps
+            )
+            and not any(
+                gap.startswith(
+                    (
+                        "necessary_unread:",
+                        "necessary_fragment_unread:",
+                        "gap_check_incomplete:",
+                    )
+                )
+                for gap in gaps
             )
             and all(p["readable"] for p in sources)
             and all(structurally_covered(source) for source in sources)

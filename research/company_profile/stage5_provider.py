@@ -51,6 +51,35 @@ from .models import (
 from .stage5 import PreparedRequestScope
 from .stage5_bundle import Stage5ProviderCallTrace, Stage5RejectedExtractItem
 
+
+def _logical_report_request_id(payload: Mapping[str, Any]) -> str:
+    """Stable id for one report read, shared by repair and failover."""
+    pages = []
+    for page in payload.get("source_pages") or []:
+        text = str(page.get("text") or "")
+        pages.append(
+            {
+                "page": page.get("page"),
+                "offset": page.get("offset") or 0,
+                "scope": page.get("scope") or "",
+                "length": len(text),
+                "sha256": hashlib.sha256(text.encode()).hexdigest(),
+            }
+        )
+    encoded = json.dumps(
+        {
+            "purpose": payload.get("purpose"),
+            "source_scope": payload.get("source_scope"),
+            "reading_strategy": payload.get("reading_strategy"),
+            "pages": pages,
+        },
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return hashlib.sha256(encoded.encode()).hexdigest()
+
+
 _ResponseT = TypeVar("_ResponseT", bound=BaseModel)
 
 
@@ -4602,6 +4631,11 @@ class CommonGatewaySemanticProvider:
                 "workload": "company_profile_stage5",
                 "run_id": semantic_request_id.split(":", 1)[0],
                 "stage": call_type,
+                "logical_request_id": (
+                    _logical_report_request_id(runtime_payload)
+                    if report_reading
+                    else semantic_request_id
+                ),
                 "business_item_key": (
                     f"{runtime_payload['report']['instrument_id']}:{runtime_payload['purpose']}"
                     if report_reading

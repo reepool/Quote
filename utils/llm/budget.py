@@ -17,6 +17,23 @@ from .models import LlmUsage
 
 
 @dataclass(frozen=True)
+class LogicalRecoveryPolicy:
+    """Card-scoped recovery limit. Absent on the public budget.
+
+    A recovery is any physical send after the first send of the same logical
+    request: same-source retry, schema repair, or a failover that minted a new
+    request id. The public client does not assume a card's numeric cap.
+    """
+
+    max_recoveries: int
+    max_per_logical_request: int = 1
+
+    def __post_init__(self) -> None:
+        if self.max_recoveries < 1 or self.max_per_logical_request < 1:
+            raise ValueError("recovery policy requires positive limits")
+
+
+@dataclass(frozen=True)
 class LlmPrice:
     """Frozen CNY prices per million tokens, with the original billing basis."""
 
@@ -49,6 +66,36 @@ DEVELOPMENT_RECOVERY_RESERVATION = 60_000
 RECOVERY_ATTEMPT_RESERVE = 30_000
 
 
+def _recovery_block(
+    history: list[Mapping[str, Any]],
+    logical_id: str,
+    policy: LogicalRecoveryPolicy | None,
+) -> str | None:
+    """Return a refusal reason when this send would exceed the card policy.
+
+    The first send of a logical request is the primary request. Every later
+    physical send of that same id is one recovery, including a failover whose
+    attempt number was reset to 1.
+    """
+    if policy is None:
+        return None
+    counts: dict[str, int] = {}
+    recoveries = 0
+    for item in history:
+        key = str(item.get("logical_request_id") or item.get("request_id") or "")
+        if not key:
+            continue
+        counts[key] = counts.get(key, 0) + 1
+        if counts[key] > 1:
+            recoveries += 1
+    used = counts.get(logical_id, 0)
+    if used >= 1 + policy.max_per_logical_request:
+        return "logical_recovery_already_used"
+    if used >= 1 and recoveries >= policy.max_recoveries:
+        return "card_recovery_exhausted"
+    return None
+
+
 class LlmRunBudget:
     """One deadline and ledger shared by every retry, repair and routed source.
 
@@ -71,6 +118,8 @@ class LlmRunBudget:
         max_cost_cny: Decimal = Decimal(10),
         ledger_path: Path | None = None,
         billing_mode: str = STRICT_BILLING,
+        recovery_policy: LogicalRecoveryPolicy | None = None,
+        prior_logical_attempts: tuple[Mapping[str, Any], ...] | list[Mapping[str, Any]] = (),
     ):
         if (
             not math.isfinite(deadline)
@@ -89,6 +138,8 @@ class LlmRunBudget:
         self.max_cost_cny = max_cost_cny
         self.ledger_path = ledger_path
         self.billing_mode = billing_mode
+        self.recovery_policy = recovery_policy
+        self.prior_logical_attempts = [dict(item) for item in prior_logical_attempts]
         self.attempts: list[dict[str, Any]] = []
         self._lock = threading.RLock()
         self._stopped: str | None = None
@@ -130,6 +181,8 @@ class LlmRunBudget:
         payload: Mapping[str, Any],
         request_id: str,
         attempt: int,
+        logical_request_id: str | None = None,
+        source_label: str | None = None,
     ) -> int:
         with self._lock:
             self.remaining()
@@ -165,18 +218,23 @@ class LlmRunBudget:
                 payload_bytes > DEVELOPMENT_PAYLOAD_BYTE_LIMIT
                 or output > DEVELOPMENT_MAX_OUTPUT_TOKENS
             )
-            recovery_already_sent = any(
-                int(item.get("attempt") or 1) > 1 for item in self.attempts
+            logical_id = str(logical_request_id or request_id)
+            blocked = _recovery_block(
+                [*self.prior_logical_attempts, *self.attempts],
+                logical_id,
+                self.recovery_policy,
             )
-            if int(attempt) > 1 and recovery_already_sent:
-                self._stopped = "shared_recovery_already_used"
+            if blocked is not None:
+                # Refuse only this send. Other logical requests can still run.
                 self._denied_request = {
                     "request_id": request_id,
+                    "logical_request_id": logical_id,
                     "attempt": attempt,
                     "payload_utf8_bytes": payload_bytes,
+                    "reason": blocked,
                 }
                 self._persist()
-                raise LlmDeadlineExceededError(self._stopped)
+                raise LlmDeadlineExceededError(blocked)
             if (
                 context_exceeded
                 or payload_exceeded
@@ -217,6 +275,8 @@ class LlmRunBudget:
                 {
                     "sequence": ticket + 1,
                     "request_id": request_id,
+                    "logical_request_id": logical_id,
+                    "source_label": source_label,
                     "attempt": attempt,
                     "profile": profile,
                     "provider_resource": resource,
@@ -303,6 +363,21 @@ class LlmRunBudget:
                 self._persist()
                 raise LlmDeadlineExceededError(self._stopped)
             self._persist()
+
+    def failed_source_labels(self) -> set[str]:
+        """Sources that already failed in this card. Successes stay eligible."""
+        labels = set()
+        for item in [*self.prior_logical_attempts, *self.attempts]:
+            if item.get("status") not in {
+                "http_failure",
+                "failed",
+                "failed_or_cancelled",
+            }:
+                continue
+            label = item.get("source_label")
+            if label:
+                labels.add(str(label))
+        return labels
 
     def snapshot(self) -> dict[str, Any]:
         with self._lock:
