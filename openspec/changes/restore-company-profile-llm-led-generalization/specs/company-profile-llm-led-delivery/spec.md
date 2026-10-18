@@ -17,7 +17,16 @@ The new processing policy MUST route every new report's open-language interpreta
 - **AND** missing commercial metadata or an overlarge static byte projection alone does not prohibit that authorized observation; business quality remains source-audited and neither further reports nor production are authorized automatically
 
 ### Requirement: Discovery and omission checking are source-led
-The system MUST account for every page in bounded document discovery and inspect substantive business, product, income, input and role contexts with necessary headers and continuations. Regex-only page whitelists MUST NOT determine all model visibility. A source-first inventory built without candidate answers MUST be compared with delivered claims to detect missing major businesses. Unsupported or unread sources MUST remain missing or unclear rather than not_disclosed.
+The system MUST account for every physical page through full-report navigation and bounded discovery. The real LLM MUST select substantive business, product, income, input and role contexts and read their necessary paragraphs, headers and continuations. Navigation-only coverage, full-text reading coverage and verified core usability MUST be recorded separately. Sending every readable supplementary note verbatim MUST NOT be a prerequisite for core delivery. Regex-only page whitelists MUST NOT determine all model visibility; unfamiliar locations and unsampled text MUST remain reachable through bounded model-led context recovery. A source-first omission review in a separate context without candidate answers or evaluation Gold MUST be compared with delivered claims and reliable major revenue composition. Unresolved major-business or necessary-context gaps MUST prevent core completeness. Unsupported or unread sources MUST remain missing or unclear rather than not_disclosed. Historical full-text contracts and scores MUST NOT be reevaluated under this policy.
+
+#### Scenario: Supplementary notes remain unread after the core is verified
+- **WHEN** real reading and source-first omission checks support all substantive core views and no known major-business gap remains, while supplementary notes have not been read in full
+- **THEN** core usability may be evaluated under the unchanged acceptance thresholds and the unread notes remain explicit
+- **AND** neither the navigation map nor the core result is reported as a full-text reading guarantee
+
+#### Scenario: Navigation misses a potentially major business
+- **WHEN** independent source review, revenue composition or omission checking identifies an uncovered major disclosure
+- **THEN** bounded model-led recovery reads the necessary context or leaves the affected core limited, and first-run evaluation retains the omission rather than changing the sample contract
 
 #### Scenario: A major business uses an unfamiliar heading
 - **WHEN** no historical heading regex matches a disclosed business

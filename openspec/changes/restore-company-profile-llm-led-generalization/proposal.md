@@ -7,6 +7,7 @@ v61及S1证明了部分历史样本的规则抽取，却没有证明真实LLM阅
 - **BREAKING（新处理政策，不追溯旧结果）**：新报告开放语义必须经过真实LLM阅读和源先行漏项检查；禁止因已存在同名字段跳过语义，禁止规则/假provider成功冒充LLM交付。
 - 程序负责可靠结构化数值、身份/单位/来源硬约束、持久化和资源限制；语义判断交给有证据的模型阅读及独立源审查，保留不确定项，不新增通用框架。
 - 交付通用画像、产品/服务收入与投入暴露、有限供应链角色；复用现有对象、PDF、gateway和唯一owner。
+- 2026-10-18显式接续产品契约v3：全报告导航、LLM选择核心完整上下文、独立源先行查漏及有界补读；导航覆盖、全文阅读范围、核心可用分开。未读补充附注不要求逐字发送后才交核心，但已知主要业务缺口仍阻止完整；旧合同与失败不重判。
 - 将开发收敛为4家已知报告的纵向切片、12家回归、20家盲测、100家试运行，再按预算分波覆盖全A股；量化质量、成本、补救和停止条件。
 - 清除当前索引中的旧轮次执行指令；旧合同/成绩作为历史保留，旧规则路径在新链验收后按调用依赖删除，不删除正式源资产。
 
@@ -23,4 +24,4 @@ v61及S1证明了部分历史样本的规则抽取，却没有证明真实LLM阅
 
 ## Impact
 
-需求、验收、A/B流程、任务卡及导航本轮更新；业务实现待下列tasks。涉及`operations.py`、`runtime.py`、`workflow.py`、`stage5_provider.py`、`core_evidence_selection.py`、`core_assessment_projection.py`及现有读取投影，沿`company_profile_common_core`单一owner。FR-05/FR-14/FR-15文档治理适用，不启动全仓框架改造。生产仍`not_authorized`、规模声明false，当前不发起付费调用、不运行S2、不改写历史或已有代码改动。
+需求、验收、A/B流程、任务卡及导航按显式版本接续；业务实现待下列tasks。涉及`operations.py`、`runtime.py`、`workflow.py`、`stage5_provider.py`、`core_evidence_selection.py`、`core_assessment_projection.py`及现有读取投影，沿`company_profile_common_core`单一owner。FR-05/FR-14/FR-15文档治理适用，不启动全仓框架改造。当前真实运行仅限验收§7.9/执行卡§18的有条件一次完整报告开发窗口，费用unknown例外不等于成本达标或购买授权。生产仍`not_authorized`、规模声明false，不运行S2、不改写历史或已有代码改动。
