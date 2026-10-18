@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-18，[B1-F短段§30](#30-b1-f引文范围已收紧短段已发送核验未完成)）：页外引文已退出合成/核验载荷。原未用短段已启动并完成一次，151.782221秒、2次物理请求、账本9029、费用unknown；发现和合成成功且只读第12页片段，核验因后续载荷超过冻结上限未发送。查询结果没有已核主营主张。B1/A1未通过。累计1149.333103秒、11请求、215031账本。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产未授权。§1—29正文不改写。
+当前状态（2026-10-18，[A审核§31](#31-a审核21df1ce0接受范围修复与失败留存结束短段试跑)）：接受引文范围修复和第5次失败留存，B1/A1未通过。核验被阶段cap误挡；七条候选全部引用错误record ID，仍无已核主营主张。累计1149.333103秒、11请求、215031账本、费用unknown。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。当前只执行B1-R卡§17的离线契约修复、真实响应回放和完整208页执行准备，新增真实调用0次，结束短段试跑。无第6次授权，不归档、不扩批，生产未授权、规模声明false。原§1—30正文不改写。
 
 ## 1. 唯一实施指引
 
@@ -1190,3 +1190,50 @@ python -m research.company_profile.bounded_entry \
 证据目录[segment/manifest.json](b1-pool-observation-evidence/segment/manifest.json)。`entry.log` `30b5a7c7` 20194字节；`query.json` `d3a94d00` 244709字节；`export.json` `8ddc58da` 245154字节；`budget-final.json` `4d66b216` 1520字节；`entry-result.json` `64ae03f8` 50022字节；`work-checkpoint.json` `e4b8f7aa` 681298字节；`supervisor.json` `4fbe7619` 61字节。`source-receipt.json`仍是`f304554e`，17175字节。
 
 尝试标记`segment.json`已写入，不覆盖前四个标记。本窗口删除了可重建的`quote_pytest_logs_7xd652zt`、`huinazvc`，以及运行目录里的research.db和pdf-cache。QuoteBak约71M。11份既有修改和未跟踪内容不纳入提交。B活跃开发时间unknown；151.782221秒是本次进程时间。
+
+## 31. A审核21df1ce0：接受范围修复与失败留存，结束短段试跑
+
+### 31.1 结论与独立业务核对
+
+**B1/A1仍未通过。** 接受已证的引文限域、原生事实保留、逐阶段真实响应留存及按冻结边界停止；第5次入口1/1已用，无已核主营主张，不追认19核心/6负例、数字错误或准确率通过。原范围P1关闭，当前两项主要阻塞为阶段预算与引用契约，不以更多短段调用试错。
+
+A核对segment检查点、调用回执、query/export、账本及冻结代码：五条发现条件的引文均在p12字符[415,822)，发现/合成source_pages仅p12。p18六条原生事实在原存储及未读缺口中，未进入本次targets、未标已核。核验checks为0、verified_dimensions为空，七条保存候选均unclear、draft/semantic/real完整标志false；query/export的profiles一致。delivered=1仅表示限用记录已保存，不表示主营结论已核。合成回执有主营叙述，查询的“语义流程未完成。”符合未核状态。
+
+第5次151.782221秒、2物理请求，发现2312有效usage、合成6717有效usage，合计9029，无新增unknown token预留，费用unknown。原五次累计1149.333103秒、11请求，67184有效usage＋147847未知预留＝215031账本；本家累计上限246002/1800秒/32请求，余30971/650.666897秒/21请求不是第6次授权。不宣称费用≤10元或阶段≤80元。
+
+### 31.2 两项阻塞及A对契约的修正
+
+**P1：阶段cap低估实际核验输入，冻结卡需要修正。** 用原processing_identity、五条源条件、七条原合成候选、records空集及完整引文，沿原request_reservation全池序列化重建：核验compact_request为9114字节，保守预留14262。旧核验7593＋未分配5379＝12972的阶段cap触发`followup_growth_exceeds_frozen_ceiling`；实际已用9029＋核验14262＋原共享恢复9382＝32673≤40000。因此直接阻塞是阶段cap，不是总账耗尽。合成实际输出4781超过请求2500是事实，但输出token与后续payload字节不同，不混称。B按冻结卡停止是正确执行；A上一卡用一份正文体积约束后继，低估了条件/主张增长，本轮修订后续契约，不追溯改写失败。
+
+后续按完整实际payload、实际已用及unknown、剩余必要阶段和一次共享恢复进行发送准入；阶段估计用于规划/预警，不能单独拒绝满足已冻全部硬约束的必要核验。真正总账/payload/输出/请求/deadline超限仍停，unknown不释放，恢复已用不再预留第二次；恢复留额按实际待恢复请求重算，原9382不充当增长后的充分上界。32673是本次实际输入配原恢复计划的离线比较，不是若发送就必成功的结论，也不是任何新运行授权。
+
+**P1：真实模型的引用ID契约不成立。** 七条原合成候选的supporting_record_ids全部为报告资产ID`asset_84332159e02a19189c1f61fef85cbf02`；本次records为空，因此全部invalid_claim_reference。当前硬校验隔离正确，放宽资源不能解决它。下一卡须让prompt/schema只暴露实际可引用ID，资产与record含义明确；没有原生record的文本主张可以源条件/证据支持且record引用为空。未知ID仍隔离，不猜映射、不静默删除依赖、不手改原响应洗白。局部阅读不强迫模型填七维占位，整报告七维/三视图不减。cond-3的5G探索及战略转型等仍需结合原文区分计划与当前经营，不新增逐公司规则替代语义核验。
+
+### 31.3 后续唯一任务与停止条件
+
+按[验收§7.8](../../../docs/development/company_profile_acceptance_program.md#78-第5次失败后的完整路线裁决2026-10-18)发[B1-R卡§17](b1-execution-card.md#17-b1-r完整报告路线的契约修复与真实响应回放当前卡)：继续LLM主导的完整报告路线，结束短段试跑。本卡新增真实调用、真实探针及付费调试0次，不增加预算、不延续新费用unknown例外。B依流程v3在一个窗口内连续完成R20/R21，最多两次共性局部修复，不逐模块等A。
+
+回放直接使用已保存的真实发现/合成response_payload，保留5条件7候选及原错误引用，捕获核验完整请求。可用明确mock/offline传输验证同owner后续持久化，但七条错误依赖仍unclear；合法引用/冲突用最小通用正反例证明，不把模拟核验算歌华真实成绩。不复制全报告/整库、不重开208页fake专项、不新建平台。
+
+同卡必须交完整208页的一个首选执行方案，含全文发现覆盖、必要上下文/可靠数值、源先行漏项、三视图及核验，列无故障/一次unknown恢复/响应增长的完整payload、请求、保守字节预留、实测usage及最小差额。不能只交407字符或53个导航页，也不能拿旧749989—766497估计直接申请数十万token；不把所有静态字节合计≤120000当一切真实观察的前提。下次A直接裁决完整报告范围/预算/次数或终止当前实现方案，不再滚动派短段试跑卡。当前没有第6次、其他公司、购买/充值或生产授权。
+
+观察1/4、可用0/4，余3家未观察；S1 0/12、S2 0/20、S3 0/100。验收仍是4→12→20（失败最多另20）→100；S2首发18/20补救19/20、S3首发90/100补救95/100，宏召回≥95%及已审准确≥99%与分层/底线并行。非主要遗漏可限用、有据歧义可unclear，已知关键错误/依赖必须修正或隔离，无法补救要说明原因、范围、影响、恢复条件。当前不归档、不扩批，生产not_authorized、规模声明false。
+
+### 31.4 验证、保护与清理
+
+A使用统一QuoteBak环境独立执行：
+
+```text
+source scripts/quote_dev_env.sh
+timeout --signal=TERM --kill-after=10s 90s \
+  /home/python/miniconda3/envs/Quote/bin/python -m pytest -q \
+  tests/unit/test_research/test_company_profile_report_wire.py::test_frozen_span_followup_payload_excludes_unread_record_quotes \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_source_first_reading_three_views_without_heading_regex \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_partial_slice_verifies_only_records_inside_the_read_span
+```
+
+结果3 passed、7 warnings、4.64秒；复用B本快照另外4项直接回执，不声明全套通过。A本轮只改审核/任务文档，不改应用代码，不代B调用真实模型。OpenSpec严格校验、文档diff与锚点检查结果见本次最终交接。
+
+绑定的60份执行文件hash匹配；first 6、successor 6、special 7、partial 8、segment 8共35份manifest文件的hash/字节数一致。原§1—30正文、源资产、五次制品、配置、11份既有修改及16项未跟踪内容保护；验收文档既有历史块不纳入本次提交。QuoteBak约71M，本轮不复制正文或数据库，本人空测试日志目录收尾清理；下卡继续要求先清无依赖历史产物，必要证据仅一套。
+
+A本轮活跃审核约45分钟（估算，测试墙钟另列），旧P1关闭1项、主要阻塞2项；B活跃开发及等待成本unknown。提交、普通推送及最终保护检查见本次回复。
