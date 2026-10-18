@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-18，[B1-F交接§28](#28-b1-f局部范围与可执行准入已修短段计划不足未发送)）：局部核验不再携带未引用的第18页事实，运行准入不再使用14/7模拟回复。冻结第12页[415,822)的可执行计划合计34621，高于33998，短段真实入口未启动，尝试标记未写。B1/A1未通过。原四次997.550882秒、9请求、206002账本、费用unknown。观察1/4、可用0/4，S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产未授权。§1—27正文不改写。
+当前状态（2026-10-18，[A审核§29](#29-a审核3bc3024f工程部分接受引文范围仍阻塞接续原未用授权)）：3bc3024f的已证工程部分接受，34621>33998未发送符合原卡；合成source_pages仍混入18—25页引文，一个范围内P1待修。当前执行[B1-F卡§16.4](b1-execution-card.md#164-审核3bc3024f后的同卡接续当前执行条款)，修复/回归/冻结后自主执行原未用短段0/1，窗口账本调整为40000、本家累计上限246002，不新增尝试。B1/A1未通过。原四次997.550882秒、9请求、206002账本和费用unknown不改。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产未授权。§1—28正文不改写。
 
 ## 1. 唯一实施指引
 
@@ -1061,3 +1061,54 @@ pytest -q \
 四次真实证据和尝试标记未改。资源数字在 [b1-partial-resource-table.json](b1-partial-resource-table.json) 的 `b1f_span_executable_bound`。旧的79811和749989—766497保留，不再作为本卡准入。
 
 本窗口删除可重建测试库 `pytest-of-python/pytest-0`、`pytest-1`，以及 `quote_pytest_logs_7gcsv3m6`、`4svwxp9s`、`c5ep2uw_`、`3iqaghs2`、`ugjxz3rh`、`vedhzt4v`。四次真实证据未删。11份既有修改和未跟踪内容不纳入提交。B活跃开发时间unknown。
+
+## 29. A审核3bc3024f：工程部分接受，引文范围仍阻塞，接续原未用授权
+
+### 29.1 结论及真实业务进度
+
+**B1/A1未通过；接受已证工程部分和预算不足未发送的说明。** 准入已不调用固定14条件/7主张模拟回复，片段外六条记录退出records/核验targets、片段内冲突隔离及超界保存响应的直接测试成立。冻结计划34621较原33998多623时停下符合原授权，短段仍0/1，没有第5次真实入口。本轮A真实调用0次，不把测试或静态计划计为语义成果。
+
+仍有一个原范围内P1：原生记录被筛掉后，其Evidence仍从全量structured_evidence进入合成/核验source_pages。只验证record_count=0不能证明完整请求已限域。因此R18只在已证范围接受，不能宣称两项前置全部完成；不重开已证的非空持久化链或共享恢复问题。
+
+观察仍1/4、公司可用0/4，余3家未观察；S1 0/12、S2 0/20、S3 0/100。原19核心无可审交付、6负例未评估；三视图未成立，数字错误和准确率仍不可评估。不归档、不扩批，生产not_authorized、规模声明false。
+
+### 29.2 可定位阻塞与独立验证
+
+`research/company_profile/report_interpretation.py`的related_records已经按sent_fragments筛选，但cited_evidence仍展开`structured_evidence.values()`（3bc3024f第862行），随后cited_quote_pages将页外Evidence及continuation/subject页变成source_pages。A沿同一interpret_report，用真实iteration2检查点的208页及六条原生记录、原special地图回执、冻结p12[415,822)和40000静态身份捕获请求；离线provider显式offline_only，不联网，只对发现返回一条源内条件“有线网络经营”，引文为冻结段起句，在合成前捕获并终止。结果：
+
+| 阶段 | records数 | source_pages | 最大池物理预留 |
+| --- | ---: | --- | ---: |
+| source_inventory | 0 | 12 | 8270 |
+| synthesize_views | 0 | 12、18、19、20、21、22、23、24、25 | 17493 |
+
+该身份下预留与B原计划身份不同，不混为实耗；表明运行会携带计划未计入的页外引文，可能在正文成功后才被末端cap挡住，也违反冻结片段范围。修复必须覆盖最终payload及引用有效性，页外原件保留；片段内依赖不能漏传，缺上下文的候选保持unclear。此处是明确原合同缺口，不是新增语义完备平台。
+
+A独立直接回归命令（统一环境入口，所有临时输出在QuoteBak）：
+
+```bash
+source scripts/quote_dev_env.sh
+timeout --signal=TERM --kill-after=10s 90s \
+  /home/python/miniconda3/envs/Quote/bin/python -m pytest -q \
+  tests/unit/test_research/test_company_profile_report_wire.py::test_explicit_span_ceiling_uses_citation_volume_not_protocol_reply \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_partial_slice_verifies_only_records_inside_the_read_span \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_in_span_record_conflict_isolates_the_dependent_claim \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_followup_over_citation_ceiling_keeps_the_body_response
+```
+
+结果4 passed、7 warnings、7.87秒；警告不计业务通过。复用B本快照§28.4的非空链2 passed/149.80秒回执，不重复144秒旧链或全套测试。只读重建原计划8264＋9382＋7593＋9382＝34621；这只是完整请求壳与一份已读文本的可执行cap，不证明实际条件/主张/引用一定落在其中，必须在每次发送前核实际payload并在增长超界时保留停止。未发现需另派任务的风格问题。
+
+### 29.3 A资源裁决和下一张接续卡
+
+按[验收§7.7](../../../docs/development/company_profile_acceptance_program.md#77-b1-f未发送后的接续裁决2026-10-18)、[执行卡§16.4](b1-execution-card.md#164-审核3bc3024f后的同卡接续当前执行条款)继续原B1-F/R18–R19。B采用A/B流程v3，在一个窗口内先清无依赖开发垃圾，修上述残留P1，补最终网关载荷正反回归，冻结新快照及完整非空计划后自主执行原短段0/1；不逐模块等A，不新开fake专项或一轮623差额压缩。
+
+A显式将本窗口账本由33998改为40000，留出当前静态计划之上5379执行余量；原206002不改，本家累计上限改为246002，较原240000增加6002约2.5%。L0/L1合并966002，其余3家各240000不变；窗口600秒/6物理请求、本家1800秒/32请求及每请求65536字节/请求输出4000不变。修复后按真实执行身份重冻；全计划及共享一次恢复不成立即不发送，不缩源凑数、不借其他公司或重复使用余量。该调整是保守账本授权，不是实测token/费用，也不采用旧整报告估计加额。
+
+次数仍为原未用0/1，启动才记本次1/1及累计第5入口，不新开专项或自动第6次。逐物理预留、有效usage结算、unknown保留和实返超输出后停后续不变；不能保证供应商单次超输出绝不越过预算。费用unknown例外仅延续这次原未用窗口，有价仍核原费用上限，不声称成本达标，无充值/购买/新账号或生产授权。首次及四次失败、原19/6不改。
+
+至少一条来自冻结片段的实质主营主张需经过真实发现/合成/核验，在原writer及query/export/重读一致，响应及原文引用可追溯；计划/探索5G不能当已运营事实。所有完整标志false，其余未读/未核明示。次要遗漏可限用、有据歧义可unclear；底线错误及依赖须修正/隔离，无法补救须说明原因/范围/影响/恢复条件。单条成功不增加可用公司数、不放行B2。卡末A据真实结果决定完整路线继续/收窄/终止，不再滚动派短段专项。
+
+### 29.4 保护、清理及审核成本
+
+A只读核原四次manifest：first 6、successor 6、special 7、partial 8，共27份文件的SHA-256及字节数全部一致。QuoteBak约69M，本轮无新整库备份或正文副本；测试仅用统一临时目录，本人无用临时产物收尾清理。必要证据仅记本入口，原§1—28正文、配置、四次制品、11份既有修改和16项未跟踪内容保护；验收文档既有历史块不纳入本次提交。
+
+A活跃审核约35分钟（估算，测试墙钟另列），新增/残留范围内阻塞1项；B活跃开发及等待时间unknown，不用测试耗时冒充开发工时。本轮A只改六份审核/任务文档，不改业务代码、不代B真实运行。提交、推送及最终保护核验见本次回复。
