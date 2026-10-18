@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-18，[A审核§29](#29-a审核3bc3024f工程部分接受引文范围仍阻塞接续原未用授权)）：3bc3024f的已证工程部分接受，34621>33998未发送符合原卡；合成source_pages仍混入18—25页引文，一个范围内P1待修。当前执行[B1-F卡§16.4](b1-execution-card.md#164-审核3bc3024f后的同卡接续当前执行条款)，修复/回归/冻结后自主执行原未用短段0/1，窗口账本调整为40000、本家累计上限246002，不新增尝试。B1/A1未通过。原四次997.550882秒、9请求、206002账本和费用unknown不改。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产未授权。§1—28正文不改写。
+当前状态（2026-10-18，[B1-F短段§30](#30-b1-f引文范围已收紧短段已发送核验未完成)）：页外引文已退出合成/核验载荷。原未用短段已启动并完成一次，151.782221秒、2次物理请求、账本9029、费用unknown；发现和合成成功且只读第12页片段，核验因后续载荷超过冻结上限未发送。查询结果没有已核主营主张。B1/A1未通过。累计1149.333103秒、11请求、215031账本。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产未授权。§1—29正文不改写。
 
 ## 1. 唯一实施指引
 
@@ -1112,3 +1112,81 @@ A显式将本窗口账本由33998改为40000，留出当前静态计划之上537
 A只读核原四次manifest：first 6、successor 6、special 7、partial 8，共27份文件的SHA-256及字节数全部一致。QuoteBak约69M，本轮无新整库备份或正文副本；测试仅用统一临时目录，本人无用临时产物收尾清理。必要证据仅记本入口，原§1—28正文、配置、四次制品、11份既有修改和16项未跟踪内容保护；验收文档既有历史块不纳入本次提交。
 
 A活跃审核约35分钟（估算，测试墙钟另列），新增/残留范围内阻塞1项；B活跃开发及等待时间unknown，不用测试耗时冒充开发工时。本轮A只改六份审核/任务文档，不改业务代码、不代B真实运行。提交、推送及最终保护核验见本次回复。
+
+## 30. B1-F：引文范围已收紧，短段已发送，核验未完成
+
+### 30.1 结果
+
+当前阶段是B1-F / R19，一次真实短段，不是离线成绩。入口已用：本次1/1，累计第5次。发现和合成已返回，核验请求没有发出。查询、导出和重读一致，但保存的主张都是unclear，答案为“语义流程未完成。”没有已核主营主张。B1/A1未通过。19核心与6负例未评估。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产未授权。
+
+没有第6次。246002累计上限内的剩余30971账本、约650.667秒和21次请求不是新的授权。
+
+### 30.2 业务
+
+来源仍是歌华有线600037.SH、2025年报、filing 1225229913。阅读范围是第12页字符[415,822)，407字符、1169字节，SHA-256 `930fd035efb3384f73fab6be3eba5c169939bb70f40fa588a938aa97c96b256b`。五条发现条件的引文都在这段原文内。其中“加快部署5G网络并探索应用”是片段里的探索表述，没有被核验，也不当作已独立运营的全链。
+
+合成回执里有一条未核的主营叙述：公司主要负责北京市广播电视网络的开发、经营管理和维护。它引用条件cond-1。该主张同时把报告编号写成supporting_record_ids，引用检查未通过。核验停止后，查询层不再把这条叙述当作已核结论。
+
+第18页六条原生事实仍在缺口`native_fact_outside_read_span`中，不是本次核验对象，也没有标成已核。合成和发现的正文回执source_pages都是第12页。完整标志draft/semantic/real均为false，分类limited。
+
+### 30.3 差异
+
+基线是A已推送的`c3fb88b9`。有界片段的后续请求不再把全量structured_evidence收进source_pages。引文必须落在已读片段内；片段外的延续页不进入这次载荷。原记录和Evidence对象没有删除。完整发现路径仍按相邻页引用，不受这段诊断限域影响。
+
+### 30.4 验证
+
+环境入口`source scripts/quote_dev_env.sh`，解释器`/home/python/miniconda3/envs/Quote/bin/python`。
+
+```text
+ruff check research/company_profile/report_interpretation.py \
+  research/company_profile/bounded_entry.py \
+  tests/unit/test_research/test_company_profile_report_wire.py
+```
+
+结果：All checks passed。
+
+```text
+pytest -q \
+  tests/unit/test_research/test_company_profile_report_wire.py::test_frozen_span_followup_payload_excludes_unread_record_quotes \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_source_first_reading_three_views_without_heading_regex \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_partial_slice_verifies_only_records_inside_the_read_span \
+  tests/unit/test_research/test_company_profile_report_wire.py::test_explicit_span_ceiling_uses_citation_volume_not_protocol_reply \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_in_span_record_conflict_isolates_the_dependent_claim \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_followup_over_citation_ceiling_keeps_the_body_response \
+  tests/unit/test_research/test_company_profile_report_wire.py::test_used_recovery_is_not_reserved_again_before_synthesis
+```
+
+新载荷测试与两项相邻回归3 passed、4.37秒。其后四项4 passed。没有跑全库。真实检查点上的六条页外引文不出现在合成/核验序列化载荷中，source_pages只有第12页，原记录内容不变。
+
+真实命令：
+
+```text
+python -m research.company_profile.bounded_entry \
+  --binding openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-segment-binding.json \
+  --authorization openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-segment-authorization.json \
+  --run-root data/QuoteBak/b1-pool-segment-20261018 \
+  --real
+```
+
+退出码0。监督记录151.782221秒。绑定SHA-256 `da2c893ea316b436a73f2eec48ad56e7eef87afd68a433d2db87178dd2a54b3a`。
+
+### 30.5 资源
+
+预发送计划仍是正文8264、合成9382、核验7593、一次恢复9382，合计34621，低于本窗口40000，余量5379。这是载荷预留，不是token或人民币。
+
+实际两次请求都有usage，没有unknown预留：
+
+| 顺序 | 来源 | 输入 | 输出 | 合计 | 请求输出 |
+| --- | --- | ---: | ---: | ---: | ---: |
+| 发现 | scorpio:gemini | 1239 | 1073 | 2312 | 2500 |
+| 合成 | zai | 1936 | 4781 | 6717 | 2500 |
+
+账本9029，费用unknown。合成输出4781超过请求2500，随后核验预留超过冻结上限，核验没有发送。查询与导出profiles一致，delivered为1。
+
+原四次加本次：1149.333103秒、11次物理请求、215031账本。本家累计上限246002。费用仍不能声称达到10元或80元。
+
+### 30.6 证据、清理与Git
+
+证据目录[segment/manifest.json](b1-pool-observation-evidence/segment/manifest.json)。`entry.log` `30b5a7c7` 20194字节；`query.json` `d3a94d00` 244709字节；`export.json` `8ddc58da` 245154字节；`budget-final.json` `4d66b216` 1520字节；`entry-result.json` `64ae03f8` 50022字节；`work-checkpoint.json` `e4b8f7aa` 681298字节；`supervisor.json` `4fbe7619` 61字节。`source-receipt.json`仍是`f304554e`，17175字节。
+
+尝试标记`segment.json`已写入，不覆盖前四个标记。本窗口删除了可重建的`quote_pytest_logs_7xd652zt`、`huinazvc`，以及运行目录里的research.db和pdf-cache。QuoteBak约71M。11份既有修改和未跟踪内容不纳入提交。B活跃开发时间unknown；151.782221秒是本次进程时间。

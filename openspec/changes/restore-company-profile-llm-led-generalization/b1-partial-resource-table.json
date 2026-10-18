@@ -208,9 +208,29 @@
     "request_plan_if_admitted": "3 content sends plus 1 shared recovery = 4, within 6. Not started.",
     "output_overshoot": "Requested caps 2500 and 2000 are inside the shell. Historical returns of 12327 and 5062 are not a token ratio and are not added to 34621. A real send that settled above its reservation would stop the next send."
   },
-  "preferred_decision": {
+  "segment_real_entry": {
+    "attempt": "segment",
+    "elapsed_seconds": 151.782221,
+    "physical_requests": 2,
+    "charged_units": 9029,
+    "unknown_reserved_units": 0,
+    "cost": "unknown",
+    "window_ledger": 40000,
+    "pre_send_plan_units": 34621,
+    "inventory_usage": {"provider_resource": "scorpio:gemini", "input_tokens": 1239, "output_tokens": 1073, "total_tokens": 2312},
+    "synthesis_usage": {"provider_resource": "zai", "input_tokens": 1936, "output_tokens": 4781, "total_tokens": 6717, "requested_output": 2500},
+    "verification": "not_sent",
+    "stop": "followup_growth_exceeds_frozen_ceiling",
+    "verified_claim": false
+  },
+  "preferred_decision_before_segment": {
     "choice": "do_not_start_the_authorized_short_segment",
     "reason": "The frozen span's executable plan is 34621 reservation units, 623 above the remaining 33998. The conditional real entry was not started and its attempt marker was not written.",
     "not_requested": "Do not raise 33998 by 623, and do not admit the span by dropping the citation copy back to the 31165 empty-condition shell."
+  },
+  "preferred_decision": {
+    "choice": "segment_sent_once_verification_not_sent",
+    "reason": "After the unread quotes were removed, the same 34621 plan fit the revised 40000 window. The one authorized entry ran. Inventory and synthesis succeeded on page 12 only. Verification was not sent because the follow-up exceeded the frozen ceiling. No verified claim was saved. Do not start another entry.",
+    "not_requested": "Do not treat the 30971 remainder under 246002 as a sixth authorization, and do not rerun this span."
   }
 }

@@ -1,0 +1,34 @@
+{
+  "entry.log": {
+    "sha256": "30b5a7c7822d8ca50f3a5958f20e6a66369e98a26ef784ab74ab1e5c6475c56e",
+    "bytes": 20194
+  },
+  "source-receipt.json": {
+    "sha256": "f304554ec2ee85fd08071b1bb78427c1c854b588806c05efce7befc3ea912d30",
+    "bytes": 17175
+  },
+  "query.json": {
+    "sha256": "d3a94d00dc10d325cdf18353001f7494c02686e95a58cadeef7ded8a57db949d",
+    "bytes": 244709
+  },
+  "export.json": {
+    "sha256": "8ddc58daa40f990275d292453636dd540319ce00d48908f31f12fda7b6142c5c",
+    "bytes": 245154
+  },
+  "supervisor.json": {
+    "sha256": "4fbe7619c8e7c1f58327cfca2b5891a5ba5b7245d864bc68a6c43e26560222d8",
+    "bytes": 61
+  },
+  "budget-final.json": {
+    "sha256": "4d66b216dda07a815a4e87f3248a7e4eabf518cd51519328dc8438115b0eb7f9",
+    "bytes": 1520
+  },
+  "entry-result.json": {
+    "sha256": "64ae03f8c138567a7cfa0f6c207b2561445980cb95e0fc6dcf107d9e61b3d452",
+    "bytes": 50022
+  },
+  "work-checkpoint.json": {
+    "sha256": "e4b8f7aa6283e1868cd781a4d313d067afa9fe8d5ad18f702bc4330a0c4070e8",
+    "bytes": 681298
+  }
+}

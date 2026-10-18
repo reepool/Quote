@@ -140,7 +140,7 @@ def validate_binding(
             or authorization.get("binding_sha256") != binding_hash
             or authorization.get("document_version") != asset["content_hash"]
             or authorization.get("attempt")
-            not in {"first", "successor", "special", "partial"}
+            not in {"first", "successor", "special", "partial", "segment"}
             or not authorization.get("approval_reference")
         ):
             raise ValueError(
@@ -576,6 +576,15 @@ def main() -> int:
         ):
             raise ValueError(
                 "partial attempt requires the protected first, successor and special markers"
+            )
+        if authorization["attempt"] == "segment" and not (
+            (attempts / "first.json").is_file()
+            and (attempts / "successor.json").is_file()
+            and (attempts / "special.json").is_file()
+            and (attempts / "partial.json").is_file()
+        ):
+            raise ValueError(
+                "segment attempt requires the protected first, successor, special and partial markers"
             )
         with (attempts / f"{authorization['attempt']}.json").open("x") as marker:
             json.dump(

@@ -1214,3 +1214,177 @@ def test_explicit_span_ceiling_uses_citation_volume_not_protocol_reply(monkeypat
             records=unrelated,
             explicit_span=explicit,
         )
+
+
+def test_frozen_span_followup_payload_excludes_unread_record_quotes():
+    """Page-18 evidence stays stored and out of the serialized follow-up."""
+    import gzip
+    from pathlib import Path
+
+    from research.company_profile.core_evidence_selection import (
+        project_owned_page_facts,
+        select_core_evidence,
+    )
+    from research.company_profile.models import Measurement, ReportIdentity, Segment
+    from research.company_profile.reading_budget import reused_map_receipts
+    from research.company_profile.report_interpretation import COMPACT_REPORT_PROMPT
+    from research.company_profile.runtime import COMMON_CORE_CHAPTERS
+
+    change = (
+        Path(__file__).resolve().parents[3]
+        / "openspec/changes/restore-company-profile-llm-led-generalization"
+    )
+    checkpoint = json.loads(
+        gzip.decompress(
+            (change / "b1-resource-evidence/iteration2/checkpoint.json.gz").read_bytes()
+        )
+    )
+    pages = tuple(
+        {
+            "page": int(page["page"]),
+            "text": str(page.get("text") or ""),
+            "readable": bool(str(page.get("text") or "").strip()),
+        }
+        for page in checkpoint["pages"]
+    )
+    page_text = next(page["text"] for page in pages if page["page"] == 12)
+    span = page_text[415:822]
+    report = ReportIdentity.model_validate(
+        checkpoint["report_interpretation"]["report"]
+    )
+    selection = select_core_evidence(report=report, pages=pages)
+    unrelated = tuple(
+        record
+        for chapter in COMMON_CORE_CHAPTERS
+        for record in project_owned_page_facts(selection, chapter)
+        if isinstance(record, (Measurement, Segment))
+    )
+    assert len(unrelated) == 6
+    preserved = [record.model_dump(mode="json") for record in unrelated]
+    outside_quotes = [
+        record.evidence[0].anchor.bounded_quote[:40]
+        for record in unrelated
+        if record.evidence and getattr(record.evidence[0].anchor, "bounded_quote", "")
+    ]
+    assert outside_quotes
+    query = json.loads(
+        (change / "b1-pool-observation-evidence/special/query.json").read_text()
+    )
+    receipts, _selected = reused_map_receipts(
+        query["profiles"][0]["three_views"]["call_receipts"],
+        prompt_version=COMPACT_REPORT_PROMPT,
+        page_count=len(pages),
+    )
+    identity = compact_processing_identity(discovery_scope="page_map")
+    identity.update(
+        partial_slice=True,
+        ledger_tokens=40_000,
+        max_physical_requests=6,
+        diagnostic_span={
+            "page": 12,
+            "start": 415,
+            "end": 822,
+            "sha256": "930fd035efb3384f73fab6be3eba5c169939bb70f40fa588a938aa97c96b256b",
+        },
+        navigation_receipts=tuple(receipts),
+    )
+    quote = "公司主要负责北京市广播电视网络的开发、经营管理和维护"
+    assert quote in span
+
+    class _SpanProvider(FakeReportProvider):
+        def interpret(self, request):
+            self.requests.append(request)
+            evidence = _evidence(request.report, text=quote, page=12)
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3.model_validate(
+                    {
+                        "request_id": request.request_id,
+                        "purpose": request.purpose,
+                        "requested_pages": (),
+                        "source_conditions": (
+                            {
+                                "condition_id": "network",
+                                "dimension": "principal_business",
+                                "description": "来源写明有线网络经营",
+                                "evidence": (evidence,),
+                                "major": True,
+                                "statement_status": "current",
+                            },
+                        ),
+                    }
+                )
+            if request.purpose == "synthesize_views":
+                condition_id = request.source_conditions[0].condition_id
+                return ReportSemanticResponseV3.model_validate(
+                    {
+                        "request_id": request.request_id,
+                        "purpose": request.purpose,
+                        "claims": (
+                            {
+                                "claim_id": "claim-network",
+                                "dimension": "principal_business",
+                                "status": "observed",
+                                "answer": "公司负责北京市广播电视网络的开发、经营管理和维护。",
+                                "condition_ids": (condition_id,),
+                                "supporting_record_ids": (),
+                                "evidence": (evidence,),
+                            },
+                        ),
+                    }
+                )
+            return ReportSemanticResponseV3.model_validate(
+                {
+                    "request_id": request.request_id,
+                    "purpose": request.purpose,
+                    "checks": tuple(
+                        {
+                            "target_type": kind,
+                            "target_id": item,
+                            "status": "pass",
+                            "explanation": "离线核验，不是年报结论。",
+                        }
+                        for kind, values in (
+                            (
+                                "condition",
+                                [item.condition_id for item in request.source_conditions],
+                            ),
+                            ("claim", [item.claim_id for item in request.claims]),
+                            ("record", [item.record_id for item in request.records]),
+                        )
+                        for item in values
+                    ),
+                }
+            )
+
+    provider = _SpanProvider()
+    result = _run(
+        provider,
+        report=report,
+        pages=pages,
+        processing_identity=identity,
+        structured_records=unrelated,
+    )
+    followups = [
+        item
+        for item in provider.requests
+        if item.purpose in {"synthesize_views", "verify_views"}
+    ]
+    assert [item.purpose for item in followups] == ["synthesize_views", "verify_views"]
+    unread = page_text[822:862]
+    for request in followups:
+        assert {int(page["page"]) for page in request.source_pages} == {12}
+        assert all(page["text"] in span for page in request.source_pages)
+        assert {item.record_id for item in request.records}.isdisjoint(
+            {item.record_id for item in unrelated}
+        )
+        payload = json.dumps(compact_request(request), ensure_ascii=False)
+        assert quote in payload
+        assert unread not in payload
+        for outside in outside_quotes:
+            assert outside not in payload
+    assert [item.model_dump(mode="json") for item in unrelated] == preserved
+    assert all(
+        f"native_fact_outside_read_span:{item.record_id}" in result.gaps
+        for item in unrelated
+    )
+    assert result.real_semantic_complete is False

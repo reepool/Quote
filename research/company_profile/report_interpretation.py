@@ -45,6 +45,7 @@ from .models import (
     TextAnchor,
 )
 from .reading_budget import (
+    _evidence_in_fragments,
     partial_slice_plan,
     records_for_fragments,
     remaining_tail_units,
@@ -855,22 +856,62 @@ def interpret_report(
             for record in structured.values():
                 if record.record_id not in related_ids:
                     gaps.append(f"native_fact_outside_read_span:{record.record_id}")
-        # Synthesis receives full cited pages, including surrounding headers and
-        # adjacent continuation pages. Discovery has already accounted for all pages.
-        cited_evidence = (
-            *(e for c in conditions for e in c.evidence),
-            *structured_evidence.values(),
-        )
-        cited = {
-            page
-            for e in cited_evidence
-            for page in (e.page, *e.continuation_pages, *e.subject_evidence_pages)
-        }
-        selected = tuple(
-            p
-            for p in sources
-            if p["readable"] and any(abs(p["page"] - page) <= 1 for page in cited)
-        )
+        # Full reading may follow citations onto adjacent pages. A bounded span
+        # sends only quotes that sit inside the text already read.
+        if partial and partial_fragments is not None:
+            read_pages = {int(fragment["page"]) for fragment in sent_fragments}
+            cited_evidence = []
+            for item in (
+                *(e for condition in conditions for e in condition.evidence),
+                *(e for record in related_records for e in record.evidence),
+            ):
+                if not _evidence_in_fragments(item, sent_fragments):
+                    continue
+                cited_evidence.append(
+                    item.model_copy(
+                        update={
+                            "continuation_pages": tuple(
+                                page
+                                for page in item.continuation_pages
+                                if int(page) in read_pages
+                            ),
+                            "subject_evidence_pages": tuple(
+                                page
+                                for page in item.subject_evidence_pages
+                                if int(page) in read_pages
+                            ),
+                        }
+                    )
+                )
+            cited_evidence = tuple(cited_evidence)
+            selected = tuple(
+                {
+                    "page": int(fragment["page"]),
+                    "text": str(fragment["text"]),
+                    "readable": True,
+                }
+                for fragment in sent_fragments
+            )
+        else:
+            cited_evidence = (
+                *(e for c in conditions for e in c.evidence),
+                *structured_evidence.values(),
+            )
+            cited = {
+                page
+                for e in cited_evidence
+                for page in (
+                    e.page,
+                    *e.continuation_pages,
+                    *e.subject_evidence_pages,
+                )
+            }
+            selected = tuple(
+                p
+                for p in sources
+                if p["readable"]
+                and any(abs(p["page"] - page) <= 1 for page in cited)
+            )
         if not selected:
             raise ValueError("no_substantive_source_conditions")
         quote_pages = cited_quote_pages(cited_evidence)
@@ -958,13 +999,37 @@ def interpret_report(
             ):
                 invalid_claims.add(claim.claim_id)
                 gaps.append(f"invalid_claim_reference:{claim.claim_id}")
+        request_claims = claims
+        if partial and partial_fragments is not None:
+            limited_claims = []
+            for claim in claims:
+                kept = tuple(
+                    item
+                    for item in claim.evidence
+                    if _evidence_in_fragments(item, sent_fragments)
+                )
+                if len(kept) != len(claim.evidence):
+                    invalid_claims.add(claim.claim_id)
+                    gaps.append(f"claim_evidence_outside_read_span:{claim.claim_id}")
+                    limited_claims.append(
+                        claim.model_copy(
+                            update={
+                                "evidence": kept,
+                                "status": "unclear",
+                                "limitation": "evidence_outside_read_span",
+                            }
+                        )
+                    )
+                else:
+                    limited_claims.append(claim)
+            request_claims = tuple(limited_claims)
         # Verify has original source plus source-first conditions and the complete
         # draft. Rejected variants remain in dispositions, outside the fact set.
         response = invoke(
             "verify_views",
             quote_pages,
             source_conditions=tuple(conditions),
-            claims=claims,
+            claims=request_claims,
             records=records,
             active_checklist=tuple(active_checklist),
         )
