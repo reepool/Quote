@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: New-report interpretation has a real semantic execution path
-The new processing policy MUST route every new report's open-language interpretation through the existing real LLM gateway and company-profile owner. Existing field IDs, deterministic candidates, fake providers and missing providers MUST NOT satisfy semantic completion. Reuse MUST bind a prior successful semantic result to identical report hash, input coverage, processing code/policy, model and prompt versions. First-run evaluation MUST prohibit semantic-result reuse while declaring PDF-cache conditions.
+The new processing policy MUST route every new report's open-language interpretation through the existing real LLM gateway and company-profile owner. Existing field IDs, deterministic candidates, fake providers and missing providers MUST NOT satisfy semantic completion. Reuse MUST bind a prior successful semantic result to identical report hash, input coverage, processing code/policy, model and prompt versions. An explicitly authorized development continuation MAY revalidate compatible raw receipts under a repaired snapshot with retained version lineage; it MUST NOT present this as unchanged-result reuse or a first-run evaluation. First-run evaluation MUST prohibit semantic-result reuse while declaring PDF-cache conditions.
 
 #### Scenario: Existing overview does not bypass the model
 - **WHEN** a new report already has a deterministic BusinessOverview record
@@ -25,6 +25,11 @@ The new processing policy MUST route every new report's open-language interpreta
 - **WHEN** later reading or provider failure interrupts the same frozen development task
 - **THEN** existing checkpoints retain successful receipts, exact read ranges and independent verified claims for query/export, while unfinished claims remain unverified and the authorized continuation processes only valid unfinished work
 - **AND** window and task charges, unknown reservations and logical-request recovery counts remain cumulative under the current card, without changing the default public gateway policy
+
+#### Scenario: A explicitly rebinds an unused development continuation
+- **WHEN** the current A card authorizes a repaired snapshot to use an already allocated but unused development entrance
+- **THEN** old raw receipts may be revalidated with explicit source ranges, old and new identities and derived-result lineage, without changing prior failures or reporting a same-version first-run score
+- **AND** the new entrance freezes before sending, retains cumulative unknown charges and recovery counts, and does not gain extra entrances or resource limits
 
 ### Requirement: Discovery and omission checking are source-led
 The system MUST account for every physical page through full-report navigation and bounded discovery. The real LLM MUST select substantive business, product, income, input and role contexts and read their necessary paragraphs, headers and continuations. Navigation-only coverage, full-text reading coverage and verified core usability MUST be recorded separately. Sending every readable supplementary note verbatim MUST NOT be a prerequisite for core delivery. Regex-only page whitelists MUST NOT determine all model visibility; unfamiliar locations and unsampled text MUST remain reachable through bounded model-led context recovery. A source-first omission review in a separate context without candidate answers or evaluation Gold MUST be compared with delivered claims and reliable major revenue composition. Unresolved major-business or necessary-context gaps MUST prevent core completeness. Unsupported or unread sources MUST remain missing or unclear rather than not_disclosed. Historical full-text contracts and scores MUST NOT be reevaluated under this policy.
@@ -60,6 +65,12 @@ The system MUST deliver company profile, product/service output and input exposu
 #### Scenario: Important sources conflict
 - **WHEN** two relevant passages disagree and a bounded reread does not resolve them
 - **THEN** both remain traceable, affected claims are unclear or isolated, and unrelated reliable facts remain readable
+
+#### Scenario: PDF layout whitespace differs from a returned quotation
+- **WHEN** non-whitespace characters match a unique span within the exact source page and fragment supplied to the model
+- **THEN** a character-position mapping may recover the contiguous original source quotation and offsets, retaining the model quotation and raw response unchanged
+- **AND** altered non-whitespace characters, out-of-scope references and unresolved multiple matches remain ungrounded; quotation location alone does not establish semantic support
+- **AND** contextual verification retains the relevant paragraph and heading to distinguish industry statements, company actions and plans; invalid objects and their dependencies are isolated without clearing independent valid results
 
 ### Requirement: Finite evaluation governs expansion and remediation
 Implementation and review MUST follow the product requirements, acceptance program v2 and delivery plan in that order. Four historical development reports, twelve new-policy regressions, twenty unseen reports and another hundred controlled reports MUST remain distinct. S2 MUST stop at twenty or one authorized replacement confirmation group of twenty; S3 MUST stop at one hundred. Initial and remedied scores MUST remain immutable and separate. All three views, source-derived core conditions, bounded supplementary audits, resource limits and remediation costs MUST be evaluated under the acceptance program; uncertainty MUST NOT disguise unprocessed core information.
