@@ -2,7 +2,7 @@
 
 > 类型：requirements / execution plan；版本：3；2026-10-16。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。按B1执行卡§13，原首次/后继均失败且次数耗尽；先修全链请求计划、生命周期和部分覆盖，再条件执行第三次完整专项一次。费用例外及累计余量见验收§7.3；未开放其他公司、盲测、扩批或生产，不能用旧双公司余量。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。2026-10-18按B1执行卡§14，原首次/后继/完整专项均失败且次数耗尽；不批准第四次完整重跑。先做局部正文到交付及整报告资源重规划，再条件执行原62220剩余账本内的一次局部真实验证；费用例外见验收§7.4。未开放其他公司、盲测、扩批或生产，不能用旧双公司余量。
 
 ## 1. 开发者必须先理解的纠偏
 
@@ -50,18 +50,18 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 
 - 目标：选定1家历史报告作为B1输入，确认其具备主营、收入表、投入/角色披露；核对不在S2留出20家内，冻结来源hash、知识截止日、合同、模型/提示词/预处理版本、费用和调用预算。
 - A交付：一张可执行的B1卡，写明唯一owner、允许修改目录、输入输出、验证命令、一个证据入口和停止条件。A不要求B按指定函数实现。
-- 当前接续：[B1执行卡§13](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md)保留歌华19核心/6负例、源hash和知识时点。原两次均耗尽；A单列一次第三次完整专项，仅取已有累计余量。前置为全链主路径≤15请求并留1次恢复、真实大载荷经LlmClient跨源验证、部分地图覆盖和HTTP客户端生命周期修复及新快照冻结。费用未知按验收§7.3明示，不等待六来源资料；原失败不改。
+- 当前接续：[B1-D执行卡§14](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md)保留歌华19核心/6负例、源hash和知识时点。三次均已耗尽，A不再授权同样完整重跑。当前仅条件授权一次局部真实闭环验证，最多900秒/8请求/62220账本；完整payload、末端、增长与一次unknown恢复须整体准入，新快照冻结后B自主执行。费用未知按验收§7.4明示，不等待六来源资料；原三次失败不改。
 - B开始条件：现有provider及池配置可加载、必要环境凭据可用，完成本卡直接回归及最终快照冻结后，在单次授权内执行；不能新增账号/充值或绕过公共网关。
 
 ### B1：一家公司真实解读闭环（B连续实施，当前首要任务）
 
 - 目标：从已有历史报告选1家同时含主营描述、收入表及投入/角色的公司，真实LLM生成三视图，并从query/export读回；选择不得触碰S2留出20家。
-- 当前执行以[B1接续卡§13](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md)为准：出口已由B排查，404配置由用户确认修正；原两次失败保留。A实源静态测算发现现版全链37/46请求超过16，不能只修404重跑。B连续先清无用临时产物，修正通用打包/重复上下文、部分地图覆盖及客户端事件循环生命周期，补实际载荷跨源直接验证并重冻配置。完整主路径≤15且留1次恢复后自主执行专项0/1，不额外真实探针、不新建平台或开启新的fake业务方案；计划不成立或专项失败即停，不自动第四次或开放其余3家。
+- 当前执行以[B1-D卡§14](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md)为准：14次静态计划、生命周期和部分地图覆盖已改善，但专项在正文首请求超时后因换源预留不足停止。B连续先清无用临时产物，利用已核地图仅作内部导航，完成真实正文→源先行条件→有据主张→局部核验→原owner保存/查询/导出；保留末端预算和逐块结果，不把局部已读升级完整。前置通过后只可执行一次原余量内局部验证，累计为第4个真实入口，不能冒称正式整报告验收或自行第5次。同步交完整报告资源表，A据业务和资源实证统一裁决完整路线，不再只以请求数或新fake测试通过放行。
 - 入口/owner：`company_profile_common_core` → `research/company_profile/operations.py` → runtime/workflow及`CommonGatewaySemanticProvider` → 原repository/read service；统一走`utils/llm`公共网关。
 - 实现：先绑定provider与可核日志，再接全文发现、源先行核心清单、证据摘要；将同field短路限定为可靠结构化事实复用；拆开硬校验与语义判断，正则只作定位提示/风险提示。必要请求/读取元数据版本化，不向旧schema偷偷塞字段。
 - 输出：三视图、原文引用、缺项/冲突说明、真实模型/请求/usage、页覆盖、query/export一致；provider未配置或不可用明确失败/限用。
 - 验证：同一报告完整端到端；增加缺provider、已存在overview仍需语义阅读、否定/计划/第三方及真实冲突的直接测试；源先行检查要能找出故意移除的主要板块。模型调用量不作为质量替代。
-- B自主范围：上述调用链的最小充分修改、直接旧回归、至多两次共性局部迭代及每家公司至多一次正式后继；B可连续完成局部闭环和P0/P1修复，不等待A逐项确认。运行按验收§7的L0/L1累计上限，模型配置、费用及权限冻结后执行，不接下一对规则轮次。
+- B自主范围：上述调用链的最小充分修改、直接旧回归、至多两次共性局部迭代及卡内明确次数；B可连续完成局部闭环和P0/P1修复，不等待A逐项确认。当前完整三次均用尽，仅验收§7.4一次局部窗口有条件授权，不再新增完整后继。运行按本家及L0/L1累计上限，模型配置、费用及权限冻结后执行，不接下一对规则轮次。
 - B交接条件：提交一个`review-submission.md`，同时给出首次/后继、三视图逐项证据、真实provider/model/request/usage、query/export、测试和未解决项；代码、提示词、输入和制品版本可重建。
 - 停止：无真实调用、核心语义被规则误判、底线错误无法隔离、预算耗尽、合同冲突或既有改动不可安全隔离时，B保护结果并交A。B1通过后由A1审核，不自动进入B2。
 
