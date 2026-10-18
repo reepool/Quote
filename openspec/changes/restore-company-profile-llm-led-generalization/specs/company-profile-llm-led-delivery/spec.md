@@ -16,6 +16,16 @@ The new processing policy MUST route every new report's open-language interpreta
 - **THEN** the implementation retains configured load distribution and failover, freezes the pool policy and execution identity, reserves each physical request conservatively within the token/request/deadline ledger, settles only valid returned usage, and records unknown cost without inventing a price or claiming cost acceptance
 - **AND** missing commercial metadata or an overlarge static byte projection alone does not prohibit that authorized observation; business quality remains source-audited and neither further reports nor production are authorized automatically
 
+#### Scenario: Explicit development continuation reuses navigation only
+- **WHEN** the current A card explicitly authorizes continuation with prior real navigation whose report, source coverage, model, prompt and navigation semantics are validated as compatible
+- **THEN** those receipts may identify pending reading scopes, with original attempts and charges preserved, but cannot establish verified claims or be reported as a fresh first-run evaluation
+- **AND** substantive reading, source-first omission checking, synthesis and verification still execute through the authoritative owner
+
+#### Scenario: A later stage fails after a verified claim was saved
+- **WHEN** later reading or provider failure interrupts the same frozen development task
+- **THEN** existing checkpoints retain successful receipts, exact read ranges and independent verified claims for query/export, while unfinished claims remain unverified and the authorized continuation processes only valid unfinished work
+- **AND** window and task charges, unknown reservations and logical-request recovery counts remain cumulative under the current card, without changing the default public gateway policy
+
 ### Requirement: Discovery and omission checking are source-led
 The system MUST account for every physical page through full-report navigation and bounded discovery. The real LLM MUST select substantive business, product, income, input and role contexts and read their necessary paragraphs, headers and continuations. Navigation-only coverage, full-text reading coverage and verified core usability MUST be recorded separately. Sending every readable supplementary note verbatim MUST NOT be a prerequisite for core delivery. Regex-only page whitelists MUST NOT determine all model visibility; unfamiliar locations and unsampled text MUST remain reachable through bounded model-led context recovery. A source-first omission review in a separate context without candidate answers or evaluation Gold MUST be compared with delivered claims and reliable major revenue composition. Unresolved major-business or necessary-context gaps MUST prevent core completeness. Unsupported or unread sources MUST remain missing or unclear rather than not_disclosed. Historical full-text contracts and scores MUST NOT be reevaluated under this policy.
 
@@ -27,6 +37,10 @@ The system MUST account for every physical page through full-report navigation a
 #### Scenario: Navigation misses a potentially major business
 - **WHEN** independent source review, revenue composition or omission checking identifies an uncovered major disclosure
 - **THEN** bounded model-led recovery reads the necessary context or leaves the affected core limited, and first-run evaluation retains the omission rather than changing the sample contract
+
+#### Scenario: Requested necessary reading crosses a batch boundary
+- **WHEN** a model requests necessary context in more than one batch and only the first batch or a fragment has been read
+- **THEN** every outstanding necessary scope remains explicit and blocks affected core completeness; it cannot be relabeled as an ordinary unread supplementary note, nor may a fragment imply the entire page was read
 
 #### Scenario: A major business uses an unfamiliar heading
 - **WHEN** no historical heading regex matches a disclosed business

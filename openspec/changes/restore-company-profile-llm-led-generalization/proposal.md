@@ -24,4 +24,4 @@ v61及S1证明了部分历史样本的规则抽取，却没有证明真实LLM阅
 
 ## Impact
 
-需求、验收、A/B流程、任务卡及导航按显式版本接续；业务实现待下列tasks。涉及`operations.py`、`runtime.py`、`workflow.py`、`stage5_provider.py`、`core_evidence_selection.py`、`core_assessment_projection.py`及现有读取投影，沿`company_profile_common_core`单一owner。FR-05/FR-14/FR-15文档治理适用，不启动全仓框架改造。当前真实运行仅限验收§7.9/执行卡§18的有条件一次完整报告开发窗口，费用unknown例外不等于成本达标或购买授权。生产仍`not_authorized`、规模声明false，不运行S2、不改写历史或已有代码改动。
+需求、验收、A/B流程、任务卡及导航按显式版本接续；业务实现待下列tasks。涉及`operations.py`、`runtime.py`、`workflow.py`、`stage5_provider.py`、`core_evidence_selection.py`、`core_assessment_projection.py`及现有读取投影，沿`company_profile_common_core`单一owner。FR-05/FR-14/FR-15文档治理适用，不启动全仓框架改造。当前真实运行仅限验收§7.10/执行卡§19的可恢复开发任务、最多两个入口窗口；第6次失败保留，费用unknown例外不等于成本达标或购买授权。生产仍`not_authorized`、规模声明false，不运行S2、不改写历史或已有代码改动。
