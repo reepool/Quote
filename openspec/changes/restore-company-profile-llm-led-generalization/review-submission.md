@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-19，[B1-K交接§44](#44-b1-k按批核验与持久交付)）：B1/A1未通过。分层阅读改为每批合成后先标待核、再核验、再经原writer发布，然后才发下一批。后批失败不再拿掉已核主张；未核草稿保持待核。新增真实调用0，不批准第10次。九入口累计仍为2110.163851秒、21次请求、账本439992，费用unknown。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产not_authorized、规模声明false。原§1—43正文不改写。
+当前状态（2026-10-19，[A审核§45](#45-a审核7faec71b分批方向接受原卡退回收尾)）：B1/A1未通过，7faec71b仅部分接受。分批顺序/局部提示词方向已改，但非法依赖仍可verified、核验失败KeyError、实际query/磁盘恢复未证，R32/R33撤销完成勾选。按[执行卡§23.1](b1-execution-card.md#231-a审核7faec71b后退回一次交齐原卡业务提交边界)退回原B1-K集中收尾，不新增准备卡或重置原迭代。新增真实调用0，无第10次；九入口2110.163851秒/21请求/439992账本及费用unknown不改。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产not_authorized、规模声明false。原§1—44正文保留。
 
 ## 1. 唯一实施指引
 
@@ -1852,3 +1852,55 @@ A已清本轮审核产生且无占用的空pytest日志目录，没有删除业�
 第9次正文和第一批合成草稿仍未经过真实核验。下一次若要授权，最短顺序是：复用第9次已成功的正文和第一批合成回执，先核验并发布这一批，再决定是否读其余必要页。当前没有第10次授权。
 
 九入口累计不变：2110.163851秒、21次请求、账本439992，费用unknown。观察1/4、可用0/4。既有修改和未跟踪文件不纳入本次提交。
+
+## 45. A审核7faec71b：分批方向接受，原卡退回收尾
+
+### 45.1 结论与整体走向
+
+**B1/A1未通过，B1-K仅部分接受；R32/R33未完成，无第10次。** 新代码确实把合成改为批内待核→核验→发布后再下批，局部提示词也已去掉全七维占位并允许有据定性归纳；这部分不重做。但没有新增真实已核主张或可用三视图，工程交付证据也没有达到原卡要求。主要矛盾仍是能否让已有真实阅读成果通过硬约束和核验，沿原owner可靠交付，而非继续导航、加预算或打磨报告。
+
+A不能仅因代码出现`publish_progress`及测试名就放行，必须核其实际命中路径。此次不新开B1-L/R34或按三个缺陷拆卡；按原卡§23.1在剩余迭代内一次完成必要修复和实际交付验证。原最多两次共性迭代不重置，B须如实补已用次数，已耗尽就交能力边界结束；不以“再准备一次”延长重整。工程就绪后再整体裁决新方案真实业务验证，当前不授权真实调用，不代B修业务代码。
+
+### 45.2 独立发现与处理条件
+
+| 分类 | 具体证据及实际影响 | 原卡完成条件 |
+| --- | --- | --- |
+| 接受：分批顺序/局部提示词 | report_interpretation的本批循环依次构建待核claims、核验、发布；report_wire只请求本批源条件，允许产品/客户类型/运营角色的有据定性归纳。runtime增加原`_publish`调用 | 保留正确方向，不再要求每批七维，不因无集中度/金额丢已有定性信息 |
+| P1：分批晋升绕过原硬约束 | layered分支先设claims为空，约1772行原`invalid_claims`循环未检查后续新claim；约1942行晋升只核模型pass、非空引文及condition，约2082行又跳过原accepted-record依赖检查。A在提交者原用例中仅加入`supporting_record_ids=("missing-native-record",)`，仍得到observed、`review_state=verified`。本批核验一律`records=()`也未传实际原生依赖 | 原文定位/已读范围、condition及record完整性在晋升/可靠writer之前有效；引用真实且可用，必要原生事实参与核验，冲突隔离到依赖。不能让模型pass覆盖硬错误 |
+| P1：核验失败不能安全结束 | A注入verify_views抛ValueError，分批循环break后约2111行仍以`verdicts[("condition", id)]`取缺失结果，未捕获KeyError。坏引文反例也走到该KeyError。此前可靠结果可能已有发布，但入口不能按约定返回缺口/限用结果 | 失败/预算拒绝/缺目标/未处理主要条件安全记缺口，草稿待核、前批可靠结果保留，正常返回及磁盘可读；缺结果绝不能默认通过 |
+| P1：所报路径验证未成立 | 原新增测试独立复跑1 passed，但A跟踪cond-b合成发送次数为0：其长description触发`followup_exceeds_card_reservation`，第二批被continue跳过。测试只调用`interpret_report`及内存on_progress，未调用实际runtime/writer/query/export；恢复是手工把成功回执放入resumed_receipts，非磁盘operator重启，也未用第9次正文/10草稿 | 原R33一次交齐：可发送第二批实际进入受控失败；此前原query/export/新实例已可见；从磁盘JSON新建服务恢复，不重发已完成批次/不重复写；核验拒绝、冲突和未完成目标正确处置。同页不同批须按实际条件/主张区分，不错复用 |
+| C：两项原有失败 | 文本空record合法主张用例和片段内record冲突用例在本HEAD均失败；把三个受改模块在内存加载为86eec5a8版本后，同一两项在相同断言失败 | 如实列旧失败，不声明全套通过，不顺手修旧partial路线；新layered实际依赖边界仍是当前P1，须有直接证明 |
+
+上述模拟只检程序行为，不能证明模型能正确核行业/公司或计划/当前，也不把缺引文/依赖通过当真正业务错误外放成绩。第9次原10条草稿仍未真实核验，19核心/6负例、准确率、数字错误均未评估。
+
+### 45.3 实际验证与可复现证据
+
+A定向诊断结果 **4 failed、1 passed / 13.13秒、12 warnings**：原新增测试通过；缺record反例被错误标verified，坏引文/核验异常两反例触发KeyError，第二批路径断言因实际0发送失败。最小诊断保留于[batch-review-audit.py](b1-pool-decision-evidence/batch-review-audit.py)，SHA-256为`e10a85e8a5d03a7af1108e6251df76ad6d9835dc4b2a12ab136101ee2596fc7c`，与实际执行的QuoteBak副本逐字节一致。它是针对7faec71b的审核证据，不另建产品测试平台；B吸收必要反例到直接回归后删除一次性脚本。
+
+```bash
+source scripts/quote_dev_env.sh
+/home/python/miniconda3/envs/Quote/bin/python -m pytest -q \
+  openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-decision-evidence/batch-review-audit.py \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_a_verified_batch_remains_when_the_next_synthesis_fails \
+  --basetemp=/home/python/Quote/data/QuoteBak/a-review-7faec71b/reproduce
+```
+
+实际运行使用同hash的`data/QuoteBak/a-review-7faec71b/test_batch_audit.py`，basetemp为同目录`pytest-audit`；上方持久路径命令用于复现相同诊断，不写原证据。此前两版临时诊断迭代仅用于收敛反例，不另算业务尝试。原有两测试实际命令如下，HEAD **2 failed / 3.97秒**；父版本以`git show 86eec5a8:<模块>`在隔离Python进程内加载report_wire/report_interpretation/runtime后运行同一组合，**2 failed / 3.13秒**，工作文件未替换：
+
+```bash
+source scripts/quote_dev_env.sh
+/home/python/miniconda3/envs/Quote/bin/python -m pytest -q \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_text_claim_with_empty_record_ids_verifies_and_asset_id_stays_unclear \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_in_span_record_conflict_isolates_the_dependent_claim \
+  --basetemp=/home/python/Quote/data/QuoteBak/a-review-7faec71b/pytest-prior-guards
+```
+
+四个受改Python文件及最小诊断定向Ruff通过；OpenSpec严格校验、175处本地链接/锚点及diff检查通过。没有全库pytest、真实调用、模型可用性探针或业务重跑；原源和第9次真实语义内容沿上轮已核证据复用，不重复全量检查。
+
+### 45.4 下一步、进度与清理
+
+唯一执行指引为[原B1-K §23.1](b1-execution-card.md#231-a审核7faec71b后退回一次交齐原卡业务提交边界)，资源及唯一进度见[验收§7.15/§8](../../../docs/development/company_profile_acceptance_program.md#715-b1-k部分接受退回原卡完成可靠交付边界2026-10-19)。B按A/B流程v3自主修直接阻塞、完成原owner实际交付证据和直接回归，不逐函数等待A，不拓展平台/公司规则/完整208页fake。原迭代有余量才继续，已耗尽或集中收尾仍失败就结束重整交具体能力边界；当前无真实/付费/探针授权，旧余额和修池不是第10次授权。
+
+九入口累计2110.163851秒/21请求/439992账本＝142602有效usage＋297390unknown、费用unknown不改。观察1/4、剩3家未观察、可用0/4；S1 0/12、S2 0/20、S3 0/100。固定4→12→20（失败最多另20）→100和歌华19核心至少18/6负例实际全查/七维三视图/已审准确率≥98%不变；可容忍次要遗漏及有据歧义，但已知底线错误/无效引用不得确定外放，不能补救给具体限制和恢复条件。不归档、不扩批，生产not_authorized、规模声明false。
+
+盘点QuoteBak约82MB，未见本轮整库复制膨胀，但B§44没有清理量/保留时点或实际迭代计数，不能认定原清理/交接全部完成；要求在原卡收尾简记，不新增台账。A只保留一份2940字节必要诊断源，已清约7KB本人临时目录（含同hash诊断副本）及5个已结束空日志目录；均为可重建产物，既有未知归属目录不删，正式证据/九入口不动。原13份tracked修改/16项未跟踪保护，验收历史块隔离提交；原§1—44正文hash一致。A本轮只改审核/规划和诊断证据，无业务实现、真实调用或生产操作；新发现阻塞3类，活跃审核时间未单独计量，记unknown。Git结果见本轮最终交接。

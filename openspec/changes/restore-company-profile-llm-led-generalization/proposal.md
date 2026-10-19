@@ -24,4 +24,4 @@ v61及S1证明了部分历史样本的规则抽取，却没有证明真实LLM阅
 
 ## Impact
 
-需求、验收、A/B流程、任务卡及导航按显式版本接续；业务实现待下列tasks。涉及`operations.py`、`runtime.py`、`workflow.py`、`stage5_provider.py`、`core_evidence_selection.py`、`core_assessment_projection.py`及现有读取投影，沿`company_profile_common_core`单一owner。FR-05/FR-14/FR-15文档治理适用，不启动全仓框架改造。2026-10-19 A审核1bcfd517：上下文/查漏标记修复接受，B1/A1未过；第9次失败、B1-J结束，不批准第10次。当前验收§7.14/执行卡§23只做B1-K按批合成/核验/原owner持久交付及恢复的重整，局部批次不强求全七维占位，以第9次真实回执证明业务提交边界，只模拟缺失传输、禁止外网。最多两次共性迭代，真实入口/请求/付费新增0；保留LLM方向及九入口失败/账本，未完成则交能力边界、不自动续卡。生产仍`not_authorized`、规模声明false，不扩批或改写历史/既有改动。
+需求、验收、A/B流程、任务卡及导航按显式版本接续；业务实现待下列tasks。涉及`operations.py`、`runtime.py`、`workflow.py`、`stage5_provider.py`、`core_evidence_selection.py`、`core_assessment_projection.py`及现有读取投影，沿`company_profile_common_core`单一owner。FR-05/FR-14/FR-15文档治理适用，不启动全仓框架改造。2026-10-19 A审核7faec71b：分批顺序/提示词部分接受，硬约束、核验失败收尾及实际query/磁盘恢复仍阻塞，R32/R33未完成，B1/A1未过。当前验收§7.15/执行卡§23.1退回原B1-K集中收尾，原最多两次共性迭代不重置，已耗尽即交能力边界结束，不派新准备卡。以第9次真实回执及实际operator/原owner证明可靠交付，只模拟缺失核验/故障、禁止外网，不重跑完整208页fake、不建平台。真实入口/请求/付费新增0，不批准第10次；保留LLM方向及九入口失败/账本，工程就绪后A整体裁决新方案真实验证。生产仍`not_authorized`、规模声明false，不归档/扩批，不改历史或既有工作区内容。
