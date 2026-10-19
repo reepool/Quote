@@ -2459,7 +2459,7 @@ def test_a_verified_batch_remains_when_the_next_synthesis_fails():
     assert "customer type" in prompt
 
     one = request_reservation(preview)
-    long_gap = "补充说明。" * 2500
+    long_gap = "补充说明。" * 365
     two = request_reservation(
         preview.model_copy(
             update={
@@ -2485,8 +2485,54 @@ def test_a_verified_batch_remains_when_the_next_synthesis_fails():
             }
         )
     )
-    assert two > 20_000 >= one
-    identity["request_reservation_limit"] = 20_000
+    from research.company_profile.report_interpretation import (
+        DEVELOPMENT_WIRE_MARGIN,
+        compact_wire_bytes,
+        page_map,
+    )
+
+    map_need = (
+        compact_wire_bytes(
+            page_map(pages),
+            purpose="source_inventory",
+            source_scope="page_map",
+            report=report,
+            identity=identity,
+            max_output_tokens=1000,
+        )
+        + DEVELOPMENT_WIRE_MARGIN
+        + 256
+        + 1000
+    )
+    second_only = request_reservation(
+        preview.model_copy(
+            update={
+                "source_conditions": (
+                    {
+                        "condition_id": "cond-b",
+                        "dimension": "products_services",
+                        "description": "另有产品说明" + long_gap,
+                        "evidence": (
+                            Evidence(
+                                evidence_id="source-b",
+                                report=report,
+                                page=1,
+                                section_title="业务",
+                                anchor=TextAnchor(
+                                    bounded_quote="并向家庭用户提供收视服务"
+                                ),
+                            ),
+                        ),
+                        "major": False,
+                        "statement_status": "current",
+                    },
+                )
+            }
+        )
+    )
+    assert one <= map_need and second_only <= map_need < two
+    identity["request_reservation_limit"] = map_need
+    second_synthesis = {"calls": 0}
     seen = {"verified_before_second_synthesis": False}
 
     class _Batches(FakeReportProvider):
@@ -2540,8 +2586,9 @@ def test_a_verified_batch_remains_when_the_next_synthesis_fails():
             if request.purpose == "synthesize_views":
                 ids = [item.condition_id for item in request.source_conditions]
                 if any(item.endswith("cond-b") for item in ids):
+                    second_synthesis["calls"] += 1
                     assert seen["verified_before_second_synthesis"]
-                    raise ValueError("partial_tail_hold_would_be_exhausted")
+                    raise ValueError("controlled_second_batch_failure")
                 condition = request.source_conditions[0]
                 return ReportSemanticResponseV3(
                     request_id=request.request_id,
@@ -2595,9 +2642,9 @@ def test_a_verified_batch_remains_when_the_next_synthesis_fails():
         on_progress=progress,
     )
     kept = [item for item in result.claims if item.status == "observed"]
-    print("ALL", [(c.claim_id, c.status, c.limitation) for c in result.claims], result.gaps[:8])
     assert kept and kept[0].claim_id == "claim-a"
     assert seen["verified_before_second_synthesis"]
+    assert second_synthesis["calls"] == 1
     assert any(gap.startswith("condition_not_synthesized:") for gap in result.gaps)
     assert result.real_semantic_complete is False
     views = research_views(result)
@@ -2626,3 +2673,124 @@ def test_a_verified_batch_remains_when_the_next_synthesis_fails():
         report=report,
     )
     assert any(item.status == "observed" for item in again.claims)
+
+
+def _one_batch_provider(report, *, claim_update=None, verify_error=None):
+    class _Provider(FakeReportProvider):
+        def interpret(self, request):
+            self.requests.append(request)
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(1,),
+                )
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=(
+                        {
+                            "condition_id": "cond-a",
+                            "dimension": "principal_business",
+                            "description": "来源写明网络传输",
+                            "evidence": (
+                                Evidence(
+                                    evidence_id="source-a",
+                                    report=request.report,
+                                    page=1,
+                                    section_title="业务",
+                                    anchor=TextAnchor(bounded_quote="公司经营有线电视网络传输"),
+                                ),
+                            ),
+                            "major": True,
+                            "statement_status": "current",
+                        },
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                condition = request.source_conditions[0]
+                claim = {
+                    "claim_id": "claim-a",
+                    "dimension": condition.dimension,
+                    "status": "observed",
+                    "answer": condition.description,
+                    "condition_ids": (condition.condition_id,),
+                    "evidence": condition.evidence,
+                }
+                if claim_update:
+                    claim.update(claim_update)
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(claim,),
+                )
+            if verify_error:
+                raise ValueError(verify_error)
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "condition",
+                        "target_id": item.condition_id,
+                        "status": "pass",
+                        "explanation": "离线核验",
+                    }
+                    for item in request.source_conditions
+                )
+                + tuple(
+                    {
+                        "target_type": "claim",
+                        "target_id": item.claim_id,
+                        "status": "pass",
+                        "explanation": "离线核验",
+                    }
+                    for item in request.claims
+                ),
+            )
+
+    return _Provider()
+
+
+def test_missing_native_record_is_not_promoted():
+    from research.company_profile.report_interpretation import (
+        layered_processing_identity,
+        research_views,
+    )
+
+    report = _report()
+    result = _run(
+        _one_batch_provider(
+            report, claim_update={"supporting_record_ids": ("missing-native-record",)}
+        ),
+        pages=({"page": 1, "text": "公司经营有线电视网络传输。", "readable": True},),
+        processing_identity=layered_processing_identity(),
+        report=report,
+    )
+    assert all(item.status != "observed" for item in result.claims)
+    rendered = research_views(result)["views"]["company_profile"]["claims"]
+    assert all(item["review_state"] != "verified" for item in rendered)
+    assert result.real_semantic_complete is False
+
+
+def test_verification_failure_returns_a_pending_gap_without_raising():
+    from research.company_profile.report_interpretation import (
+        layered_processing_identity,
+    )
+
+    report = _report()
+    result = _run(
+        _one_batch_provider(report, verify_error="review_injected_verification_failure"),
+        pages=({"page": 1, "text": "公司经营有线电视网络传输。", "readable": True},),
+        processing_identity=layered_processing_identity(),
+        report=report,
+    )
+    assert any(
+        "review_injected_verification_failure" in gap for gap in result.gaps
+    )
+    assert all(item.status != "observed" for item in result.claims)
+    assert any(
+        item.limitation == "pending_verification" for item in result.claims
+    )
+    assert result.real_semantic_complete is False

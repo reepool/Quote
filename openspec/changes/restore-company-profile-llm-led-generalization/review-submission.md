@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-19，[A审核§45](#45-a审核7faec71b分批方向接受原卡退回收尾)）：B1/A1未通过，7faec71b仅部分接受。分批顺序/局部提示词方向已改，但非法依赖仍可verified、核验失败KeyError、实际query/磁盘恢复未证，R32/R33撤销完成勾选。按[执行卡§23.1](b1-execution-card.md#231-a审核7faec71b后退回一次交齐原卡业务提交边界)退回原B1-K集中收尾，不新增准备卡或重置原迭代。新增真实调用0，无第10次；九入口2110.163851秒/21请求/439992账本及费用unknown不改。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产not_authorized、规模声明false。原§1—44正文保留。
+当前状态（2026-10-19，[B1-K收尾§46](#46-b1-k收尾硬约束与实际入口)）：B1/A1未通过。分批晋升已接回原记录/引文硬约束；缺核验结果不再抛KeyError。实际operator上，第一批已核主张在第二批真实发送失败前就可查询，磁盘重启不重发已完成核验。新增真实调用0，不批准第10次。本卡两次共性迭代已用完。九入口累计仍为2110.163851秒、21次请求、账本439992，费用unknown。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产not_authorized、规模声明false。原§1—45正文不改写。
 
 ## 1. 唯一实施指引
 
@@ -1853,6 +1853,41 @@ A已清本轮审核产生且无占用的空pytest日志目录，没有删除业�
 
 九入口累计不变：2110.163851秒、21次请求、账本439992，费用unknown。观察1/4、可用0/4。既有修改和未跟踪文件不纳入本次提交。
 
+## 46. B1-K收尾：硬约束与实际入口
+
+### 46.1 结论
+
+这是B1-K的第二次、也是原卡允许的最后一次共性修复。三个退回点都有直接结果：非法record引用不能再标成verified；核验异常会留下待核主张和缺口，不再抛KeyError；第二批合成确实发出并失败，第一批已核主张在此之前已进入原query。磁盘上的checkpoint重新启动后，已完成的合成和核验没有再次发送，已核主张仍在。新增真实调用0。这仍不是B1/A1通过。
+
+### 46.2 三处修复
+
+晋升前检查：condition属于本批、引文能在已发送页定位、`supporting_record_ids`要么为空、要么每条都在已接受的原生记录里。模型核验pass不能盖过缺失记录。本批核验会带上这些真实记录，不再对所有批一律传空records。
+
+缺核验结果时，主要条件用`verdicts.get`记`major_condition_not_delivered`，不按缺失键抛错。核验函数抛出的错误记入`semantic_incomplete`，该批主张保持`pending_verification`。
+
+一次性诊断`batch-review-audit.py`已删除。对应反例在`test_missing_native_record_is_not_promoted`、`test_verification_failure_returns_a_pending_gap_without_raising`，以及改过的第二批发送测试。直接回归3项通过。
+
+### 46.3 实际入口顺序
+
+命令使用现有`python -m research.company_profile.bounded_entry`，没有`--real`。绑定只在QuoteBak，读取了本地池指纹以便通过加载校验，不提交用户的池配置。
+
+第一次运行`data/QuoteBak/b1-k-batch-commit/first`，传输顺序是：
+
+1. 正文页12–15
+2. 正文页16–20、93
+3. 合成页12
+4. 核验页12
+5. 合成页16，此时原query里已经有`principal_business`的verified/observed主张，传输随即按受控失败返回
+6. 同一逻辑请求的另一次合成页16被恢复上限拒绝
+
+`query=export`。`real_semantic_complete=false`。`real_calls=0`。
+
+第二次运行`data/QuoteBak/b1-k-batch-commit/resume`，`continuation_checkpoint`指向第一次写下的工作checkpoint，不是手工填进测试身份的回执。实时传输只有失败批次的合成页16，没有核验、也没有已完成的页12合成。查询里仍是那条verified主张，`query=export`。
+
+### 46.4 清理与边界
+
+研究库和PDF缓存已从这两次运行目录删除，QuoteBak该目录约3.9MB，保留query/传输记录到本次交接之后。没有把用户池配置或整库纳入提交。九入口账本439992、2110.163851秒、21次请求不变。第9次草稿仍未经真实核验。原两次迭代已用完，不再自动派生准备卡或第10次。观察1/4、可用0/4。
+
 ## 45. A审核7faec71b：分批方向接受，原卡退回收尾
 
 ### 45.1 结论与整体走向
@@ -1904,3 +1939,29 @@ source scripts/quote_dev_env.sh
 九入口累计2110.163851秒/21请求/439992账本＝142602有效usage＋297390unknown、费用unknown不改。观察1/4、剩3家未观察、可用0/4；S1 0/12、S2 0/20、S3 0/100。固定4→12→20（失败最多另20）→100和歌华19核心至少18/6负例实际全查/七维三视图/已审准确率≥98%不变；可容忍次要遗漏及有据歧义，但已知底线错误/无效引用不得确定外放，不能补救给具体限制和恢复条件。不归档、不扩批，生产not_authorized、规模声明false。
 
 盘点QuoteBak约82MB，未见本轮整库复制膨胀，但B§44没有清理量/保留时点或实际迭代计数，不能认定原清理/交接全部完成；要求在原卡收尾简记，不新增台账。A只保留一份2940字节必要诊断源，已清约7KB本人临时目录（含同hash诊断副本）及5个已结束空日志目录；均为可重建产物，既有未知归属目录不删，正式证据/九入口不动。原13份tracked修改/16项未跟踪保护，验收历史块隔离提交；原§1—44正文hash一致。A本轮只改审核/规划和诊断证据，无业务实现、真实调用或生产操作；新发现阻塞3类，活跃审核时间未单独计量，记unknown。Git结果见本轮最终交接。
+
+## 46. B1-K收尾：硬约束与实际入口
+
+### 46.1 结论
+
+这是B1-K的第二次、也是原卡允许的最后一次共性修复。三个退回点都有直接结果：非法record引用不能再标成verified；核验异常会留下待核主张和缺口，不再抛KeyError；第二批合成确实发出并失败，第一批已核主张在此之前已进入原query。磁盘上的checkpoint重新启动后，已完成的合成和核验没有再次发送，已核主张仍在。新增真实调用0。这仍不是B1/A1通过。
+
+### 46.2 三处修复
+
+晋升前检查：condition属于本批、引文能在已发送页定位、`supporting_record_ids`要么为空、要么每条都在已接受的原生记录里。模型核验pass不能盖过缺失记录。本批核验会带上这些真实记录，不再对所有批一律传空records。
+
+缺核验结果时，主要条件用`verdicts.get`记`major_condition_not_delivered`，不按缺失键抛错。核验函数抛出的错误记入`semantic_incomplete`，该批主张保持`pending_verification`。
+
+一次性诊断`batch-review-audit.py`已删除。对应反例在`test_missing_native_record_is_not_promoted`、`test_verification_failure_returns_a_pending_gap_without_raising`，以及改过的第二批发送测试。直接回归3项通过。
+
+### 46.3 实际入口顺序
+
+命令使用现有`python -m research.company_profile.bounded_entry`，没有`--real`。绑定只在QuoteBak，读取了本地池指纹以便通过加载校验，不提交用户的池配置。
+
+第一次运行`data/QuoteBak/b1-k-batch-commit/first`。传输顺序：正文页12–15，正文页16–20及93，合成页12，核验页12，然后合成页16。发出页16时，原query里已经有`principal_business`的verified/observed主张，传输按受控失败返回；同一次逻辑请求的另一次发送被恢复上限拒绝。`query=export`。`real_semantic_complete=false`。`real_calls=0`。
+
+第二次运行`data/QuoteBak/b1-k-batch-commit/resume`。`continuation_checkpoint`指向第一次写下的工作checkpoint。实时传输只有失败批次的合成页16，没有核验，也没有已完成的页12合成。查询里仍是那条verified主张，`query=export`。
+
+### 46.4 清理与边界
+
+研究库和PDF缓存已从这两次运行目录删除。QuoteBak该目录约3.9MB，保留query和传输记录供核对，不放入提交。没有把用户池配置或整库纳入提交。九入口账本439992、2110.163851秒、21次请求不变。第9次草稿仍未经真实核验。原两次迭代已用完，不再自动派生准备卡或第10次。观察1/4、可用0/4。

@@ -499,6 +499,31 @@ def _worker(
                 # synthesis.
                 if map_replies["count"] > 1:
                     result["requested_pages"] = []
+        elif protocol == "batch_commit_v3":
+            from .resource_probe import batch_commit_reply
+
+            result = batch_commit_reply(request)
+            if request.get("source_scope") == "page_map":
+                map_replies["count"] += 1
+                if map_replies["count"] > 1:
+                    result["requested_pages"] = []
+            result.pop("_fail_second_batch", None)
+            if request["purpose"] == "synthesize_views":
+                from research.company_profile.reads import CompanyProfileReadService
+
+                queried = CompanyProfileReadService(run_root / "output").query(
+                    (binding["asset"]["instrument_id"],)
+                )
+                claims = [
+                    claim
+                    for profile in queried.get("profiles") or []
+                    for view in (profile.get("three_views") or {})
+                    .get("views", {})
+                    .values()
+                    for claim in view.get("claims") or []
+                ]
+                if any(claim.get("review_state") == "verified" for claim in claims):
+                    raise ValueError("controlled_second_batch_failure")
         encoded = json.dumps(result, ensure_ascii=False)
         transport_requests[-1]["response_utf8_bytes"] = len(encoded.encode())
         usage = (

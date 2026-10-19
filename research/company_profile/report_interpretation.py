@@ -1914,12 +1914,18 @@ def interpret_report(
                 )
                 publish_progress()
                 try:
+                    referenced_records = tuple(
+                        record_map[key]
+                        for claim in response.claims
+                        for key in claim.supporting_record_ids
+                        if key in record_map and key not in invalid_records
+                    )
                     verified = invoke(
                         "verify_views",
                         pages,
                         source_conditions=tuple(group),
                         claims=tuple(response.claims),
-                        records=(),
+                        records=referenced_records,
                         active_checklist=tuple(active_checklist),
                     )
                 except (SemanticProviderError, LlmError, ValueError, TypeError) as exc:
@@ -1929,14 +1935,25 @@ def interpret_report(
                     (item.target_type, item.target_id): item.status
                     for item in verified.checks
                 }
-                targets = {
-                    ("condition", item.condition_id) for item in group
-                } | {("claim", item.claim_id) for item in response.claims}
+                reused_verify = bool(receipts[-1].get("reused_stage"))
+                cited_conditions = {
+                    key for claim in response.claims for key in claim.condition_ids
+                }
+                targets = (
+                    (
+                        {("condition", key) for key in cited_conditions}
+                        if reused_verify
+                        else {("condition", item.condition_id) for item in group}
+                    )
+                    | {("claim", item.claim_id) for item in response.claims}
+                    | {("record", item.record_id) for item in referenced_records}
+                )
                 if {
                     (item.target_type, item.target_id) for item in verified.checks
                 } != targets:
                     gaps.append("semantic_verify_targets_missing_or_extra")
                     break
+                group_ids = {item.condition_id for item in group}
                 promoted: list[ReportViewClaim] = []
                 for claim in response.claims:
                     blocked = (
@@ -1947,6 +1964,19 @@ def interpret_report(
                         )
                         or not claim.evidence
                         or not claim.condition_ids
+                        or (
+                            not reused_verify
+                            and not set(claim.condition_ids) <= group_ids
+                        )
+                        or not all(
+                            key in record_map and key not in invalid_records
+                            for key in claim.supporting_record_ids
+                        )
+                        or any(key in outside_ids for key in claim.supporting_record_ids)
+                        or not all(
+                            _evidence_valid(evidence, report, pages)
+                            for evidence in claim.evidence
+                        )
                     )
                     if blocked:
                         promoted.append(
@@ -1965,7 +1995,11 @@ def interpret_report(
                 settled_checks.extend(verified.checks)
                 claims = tuple(settled)
                 checks = tuple(settled_checks)
-                publish_progress()
+                try:
+                    publish_progress()
+                except (OSError, ValueError) as exc:
+                    gaps.append(f"publication_not_saved:{type(exc).__name__}")
+                    break
             batch_settled = True
         if not batch_settled and layered and card_limit and (
             verify_units(request_claims, conditions, records) > card_limit
@@ -2106,10 +2140,7 @@ def interpret_report(
                 safe_claims.append(claim)
         claims = tuple(safe_claims)
         for condition in conditions:
-            if (
-                condition.major
-                and verdicts[("condition", condition.condition_id)] != "pass"
-            ):
+            if condition.major and verdicts.get(("condition", condition.condition_id)) != "pass":
                 gaps.append(f"major_condition_not_delivered:{condition.condition_id}")
         claimed_ids = {key for claim in claims for key in claim.condition_ids}
         for condition in conditions:

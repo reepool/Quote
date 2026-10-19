@@ -164,6 +164,108 @@ def entry_proof_reply(request: dict) -> dict:
     return result
 
 
+def batch_commit_reply(request: dict) -> dict:
+    """Offline stand-in for one batch-commit proof. Not a business reading."""
+    result = {
+        "schema_version": "company_profile_report_response.v3",
+        "request_id": request["request_id"],
+        "purpose": request["purpose"],
+    }
+    if request.get("source_scope") == "page_map":
+        readable = [
+            page
+            for page in request["source_pages"]
+            if page.get("readable", True) and str(page.get("text") or "").strip()
+        ]
+        result["requested_pages"] = (
+            [readable[len(readable) // 2]["page"]] if readable else []
+        )
+        return result
+    if request["purpose"] == "source_inventory":
+        pages = [
+            page
+            for page in request["source_pages"]
+            if str(page.get("text") or "").strip()
+        ]
+        result["requested_pages"] = []
+        result["source_conditions"] = []
+        if not pages:
+            return result
+        compact = "".join(str(pages[0]["text"]).split())
+
+        def take(start: int) -> str:
+            if len(compact) <= 40:
+                return compact
+            start = min(start, len(compact) - 40)
+            return compact[start : start + 40]
+
+        result["source_conditions"] = [
+            {
+                "condition_id": "batch-a",
+                "dimension": "principal_business",
+                "description": "OFFLINE current disclosure in the supplied page.",
+                "evidence": [{"page": pages[0]["page"], "quote": take(0)}],
+                "major": True,
+                "statement_status": "current",
+            },
+            {
+                "condition_id": "batch-b",
+                "dimension": "products_services",
+                "description": "OFFLINE second batch. " + ("补充说明。" * 1040),
+                "evidence": [{"page": pages[0]["page"], "quote": take(40)}],
+                "major": False,
+                "statement_status": "current",
+            },
+        ]
+        return result
+    if request["purpose"] == "synthesize_views":
+        result["claims"] = [
+            {
+                "claim_id": f"batch-claim-{item['condition_id']}",
+                "dimension": item["dimension"],
+                "status": "observed",
+                "answer": item["description"][:80],
+                "condition_ids": [item["condition_id"]],
+                "supporting_record_ids": [],
+                "evidence": list(item.get("evidence_refs") or []),
+            }
+            for item in request.get("source_conditions") or []
+        ]
+        result["_fail_second_batch"] = any(
+            "补充说明" in str(item.get("description") or "")
+            for item in request.get("source_conditions") or []
+        )
+        return result
+    result["checks"] = [
+        {
+            "target_type": "condition",
+            "target_id": item["condition_id"],
+            "status": "pass",
+            "explanation": "OFFLINE verifier. Not a business score.",
+        }
+        for item in request.get("source_conditions") or []
+    ]
+    result["checks"].extend(
+        {
+            "target_type": "claim",
+            "target_id": item["claim_id"],
+            "status": "pass",
+            "explanation": "OFFLINE verifier. Not a business score.",
+        }
+        for item in request.get("claims") or []
+    )
+    result["checks"].extend(
+        {
+            "target_type": "record",
+            "target_id": item["record_id"],
+            "status": "pass",
+            "explanation": "OFFLINE verifier. Not a business score.",
+        }
+        for item in request.get("records") or []
+    )
+    return result
+
+
 def protocol_reply(request: dict) -> dict:
     result = {
         "schema_version": "company_profile_report_response.v3",
