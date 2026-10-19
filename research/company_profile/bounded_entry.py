@@ -27,6 +27,14 @@ def write_json(path: Path, value: Any) -> None:
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def refuse_layered_semantic_continuation(binding: dict) -> None:
+    """Layered reading starts from the report. Old semantic receipts are not inputs."""
+    if binding.get("reading_strategy") == "layered_v3" and (
+        binding.get("navigation_query") or binding.get("continuation_checkpoint")
+    ):
+        raise ValueError("layered_v3_refuses_semantic_continuation")
+
+
 def preflight_partial(binding: dict) -> dict:
     """Refuse a partial entry before it consumes an attempt marker."""
     import gzip
@@ -285,6 +293,7 @@ def validate_binding(
                 "resume1",
                 "resume2",
                 "decision",
+                "window10",
             }
             or not authorization.get("approval_reference")
         ):
@@ -660,30 +669,7 @@ def _worker(
         identity["protect_tail"] = not bool(
             binding.get("defer_tail_to_next_window")
         )
-        if binding.get("navigation_query"):
-            identity["navigation_query"] = binding["navigation_query"]
-            identity["parent_attempt"] = binding.get("parent_attempt")
-            identity["development_continuation"] = True
-        if binding.get("continuation_checkpoint"):
-            saved = json.loads(Path(binding["continuation_checkpoint"]).read_text())
-            saved_identity = (
-                (saved.get("report_interpretation") or {}).get("processing_identity")
-                or {}
-            )
-            if saved_identity and saved_identity.get("prompt_version") != identity.get(
-                "prompt_version"
-            ):
-                raise ValueError("continuation_prompt_mismatch")
-            if saved_identity.get("reading_strategy") not in {None, "layered_v3"}:
-                raise ValueError("continuation_strategy_mismatch")
-            identity["resumed_receipts"] = [
-                item
-                for item in (saved.get("report_interpretation") or {}).get(
-                    "call_receipts"
-                )
-                or ()
-                if item.get("status") == "success" and not item.get("reused_navigation")
-            ]
+        refuse_layered_semantic_continuation(binding)
     if binding.get("partial_slice"):
         identity.update(
             partial_slice=True,
@@ -792,6 +778,7 @@ def main() -> int:
         authorization=authorization,
         binding_hash=digest(args.binding),
     )
+    refuse_layered_semantic_continuation(binding)
     if binding.get("partial_slice"):
         preflight_partial(binding)
     if binding.get("reading_strategy") == "layered_v3":
@@ -843,6 +830,10 @@ def main() -> int:
             raise ValueError(
                 "decision requires the protected layered, resume1 and resume2 markers"
             )
+        if authorization["attempt"] == "window10" and not (
+            (attempts / "decision.json").is_file()
+        ):
+            raise ValueError("window10 requires the protected decision marker")
         if authorization["attempt"] == "layered" and not (
             (attempts / "first.json").is_file()
             and (attempts / "successor.json").is_file()

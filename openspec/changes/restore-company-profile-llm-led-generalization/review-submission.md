@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-19，[A审核§47](#47-a审核176e10d0结束b1-k收窄能力交真实产品)）：B1/A1未通过；B1-K按2/2结束，部分工程接受，但冲突依赖仍verified、同页条件错复用及原真实回执欠交使R32/R33未完成。唯一当前[执行卡§24](b1-execution-card.md#24-重新规划停用语义续跑单窗核心交付当前卡)/T1显式停用语义续跑、单窗交真实三视图；前置成立自主执行一次新条件窗口（累计第10次），未启动0/1，无第11次。九入口2110.163851秒/21请求/439992账本及费用unknown不改。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产not_authorized、规模声明false。原§1—46正文保留。
+当前状态（2026-10-19，[B交接§48](#48-b交接停用语义续跑后第10次真实窗口未交出三视图)）：B1/A1未通过。§24/T1已执行：分层入口拒绝旧语义续跑；原生记录核验未通过时依赖主张不再标成已核；同页不同条件会重新合成。第9次保存正文与10条草稿只用于离线直接验证，不是成绩。累计第10次真实窗口已用1/1，进程退出码0，但发布查询的三视图主张为0，`real_semantic_complete=false`。无第11次、不换公司、不另开短段。九入口原账2110.163851秒/21请求/439992不改；本窗另计墙钟444.516秒、8次物理请求、账本49071、费用unknown。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产not_authorized、规模声明false。原§1—47正文保留。
 
 ## 1. 唯一实施指引
 
@@ -2011,3 +2011,46 @@ B临时证据只读核对：`data/QuoteBak/b1-k-batch-commit/first`和`resume`�
 ### 47.4 清理、保护与交接
 
 B已清两次模拟研究库/PDF副本，约3.9MB剩余query/transport待审；本轮未见大量新增开发库，但它们只在临时区，不是永久证据。必要审核摘要/hash已见本节，下一卡先核依赖/占用后清其无用副本，不删历史真实响应或在途他人文件。A本轮仅留上述一份必要持久诊断源；核无活跃pytest/operator后删除本人`data/QuoteBak/a-review-176e10d0`（7,552字节，诊断副本及目录；均可重建），没有删除业务或B原证据。无新增清理台账/平台。定向Ruff及诊断格式、OpenSpec严格校验、15处本轮新增链接/锚点、预算算术及diff检查通过；OpenSpec校验后遥测DNS失败不影响有效结论，未借此启模型。原13份tracked修改及16项未跟踪内容保护；验收文档用户历史块与本人活动规划变更隔离提交，原§1—46正文hash核对保留（包括B重复§46）。A只改审核/任务/需求配套文档和最小诊断证据，不代B改业务代码。新发现阻塞2个代码问题及1项原卡证据欠交，活跃审核时间未单独计量，记unknown。Git结果见本轮最终交接。
+
+## 48. B交接：停用语义续跑后，第10次真实窗口未交出三视图
+
+本节不改§1—47。模拟验证不是19项/6项负例成绩，也不代替A的原文审核。B不自评准确率。
+
+### 48.1 本卡改了什么
+
+分层阅读不再把另一次运行的地图、正文条件、合成、核验或已核主张当作输入。`bounded_entry`在校验绑定后调用`refuse_layered_semantic_continuation`：绑定里只要有`navigation_query`或`continuation_checkpoint`就拒绝，不进入预检，也不写attempt。页码相同也不复用旧回执；`reused_verify`放宽条件范围的分支已删除。PDF解析缓存仍由既有`navigation_checkpoint`参与预检，九个历史attempt和证据原件未删。
+
+一批主张在写入前增加原生记录核验：被引用记录的核验不是pass时，该主张保持unclear，不标observed/verified。记录随后被隔离时，已经进入本批的依赖主张也会撤回。没有记录编号、证据仍有效的文本主张不受这条限制。
+
+直接验证用的是第9次查询里保存的10条正文条件和10条草稿，以及resume1里对应页的原文。`从技术环境来看`仍能定位到700MHz那段引文的段落里。核验传输是离线替换，只证明这批对象能走过分批提交和`research_views`，不是业务通过。A留下的两条边界诊断现在通过：记录核验unclear时依赖主张不是verified；同页改成`different-condition`后会重新调用合成，不交旧主张。
+
+### 48.2 第10次真实窗口
+
+冻结绑定`b1-pool-window10-binding.json`，SHA-256 `74d5eb4ffd83474fa9fa3d190a45fb58f5a9b82f549849a637e5c5de1c63fd0d`。授权attempt为`window10`，要求已有`decision.json`，不覆盖它。池指纹`193be2135e4a93eab9f476676f68b374dd9316ee37f9236fe7780dae97128311`，来自当时工作区的池配置；该配置文件未提交。绑定不含`navigation_query`和`continuation_checkpoint`。预检本地通过：导航2批，未发送模型。
+
+命令：
+
+```bash
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m research.company_profile.bounded_entry \
+  --binding openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-window10-binding.json \
+  --authorization openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-window10-authorization.json \
+  --run-root data/QuoteBak/b1-window10-20261019 \
+  --real
+```
+
+进程退出码0，墙钟444.516秒。语义阶段记录elapsed 388.016秒。账本8次物理请求、49071单位，8次都有usage，费用unknown，恢复0次，未触顶900秒/120000/16。工作`bp-work-89cbe6c1eb6817fc39cd6d40`。查询、导出一致，新读实例能读到这份发布结果。
+
+发布的三视图是空的。`draft_complete`、`semantic_complete`、`real_semantic_complete`都是false。主张0条。7张成功回执全是`source_inventory` / `page_map`，覆盖208页的地图分批。地图请求了46个正文页，这46页都标成`necessary_unread`。另有208条`gap_check_incomplete`和6条`native_fact_outside_read_span`。账本第8次成功请求（zai，输入2254、输出2211、合计4465）没有对应的已保存语义回执。没有正文条件、合成或核验被发布。
+
+这不是可用的公司画像。导航把整份年报走完之后，这一窗没有留下可核的正文批次。按卡停止：不改冻结代码再跑，无第11次，不换公司，不开短段。歌华这条实现到此结束，交给A判断能力边界。跨运行语义恢复仍然未通过，S3前需要另验。
+
+持久证据在[b1-pool-window10-evidence](b1-pool-window10-evidence/)：`query.json` SHA-256 `221aea6d3da223fd637d161488e92d4983fc04054aa2f1bc933b6e08362c8c30`，`budget-final.json` `c0cadceb497a12832814bc1bdc731b88caaffcaab6b4f0910ed1be192f0431cf`，`entry-result.json` `b03de00c1fc0fc49efeca101edf1e697a345f642b45bca0764a0c4110d70830a`，`supervisor.json` `07b8cbf3c08386d8eb071b08c226394a6f7a2bdf7dc811ca3f14769e9c5691c1`。运行目录`data/QuoteBak/b1-window10-20261019`另有研究库和PDF缓存，不作为第二份永久正文。attempt标记`data/QuoteBak/b1-pool-observation-20261017/attempts/window10.json`保留。
+
+### 48.3 验证、清理与进度
+
+直接测试：边界诊断2 passed；第9次正文提交1 passed；入口拒绝续跑1 passed；原三项回归及两条既有分层测试共7 passed。Ruff检查改动文件通过。这些测试不构成19/6验收。
+
+已删除`data/QuoteBak/b1-k-batch-commit`（约3.9MB，可重建的模拟运行）。九入口证据、`decision.json`和他人工作区文件未动。
+
+进度不变：观察1/4，可用0/4；S1 0/12，S2 0/20，S3 0/100。九入口原账不改。本窗另计后的合计是2554.679851秒、29请求、账本489063（其中有效usage 191673，unknown仍为297390），费用unknown。生产not_authorized，规模声明false。不归档，不扩批。
+

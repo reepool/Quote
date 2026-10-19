@@ -199,3 +199,18 @@ def test_existing_direct_binding_still_excludes_pool_routes(pool_binding):
     assert not config.routes and not config.pools
     assert list(config.profiles) == [direct["profile"]]
     assert list(prices) == [(direct["provider_resource"], direct["model"])]
+
+
+def test_layered_entry_refuses_old_semantic_receipts():
+    from research.company_profile.bounded_entry import (
+        refuse_layered_semantic_continuation,
+    )
+
+    binding = {"reading_strategy": "layered_v3", "continuation_checkpoint": "old.json"}
+    try:
+        refuse_layered_semantic_continuation(binding)
+    except ValueError as exc:
+        assert str(exc) == "layered_v3_refuses_semantic_continuation"
+    else:
+        raise AssertionError("old semantic continuation was admitted")
+    refuse_layered_semantic_continuation({"reading_strategy": "layered_v3"})

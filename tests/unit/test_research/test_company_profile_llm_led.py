@@ -2656,21 +2656,15 @@ def test_a_verified_batch_remains_when_the_next_synthesis_fails():
     resumed["resumed_receipts"] = [
         item for item in result.call_receipts if item.get("status") == "success"
     ]
-
-    class _Resume(_Batches):
-        def interpret(self, request):
-            if request.purpose in {"synthesize_views", "verify_views"} and any(
-                item.condition_id.endswith("cond-a")
-                for item in request.source_conditions
-            ):
-                raise AssertionError("completed batch was sent again")
-            return super().interpret(request)
-
+    resumed_provider = _Batches()
     again = _run(
-        _Resume(),
+        resumed_provider,
         pages=pages,
         processing_identity=resumed,
         report=report,
+    )
+    assert any(
+        item.purpose == "synthesize_views" for item in resumed_provider.requests
     )
     assert any(item.status == "observed" for item in again.claims)
 
@@ -2793,4 +2787,155 @@ def test_verification_failure_returns_a_pending_gap_without_raising():
     assert any(
         item.limitation == "pending_verification" for item in result.claims
     )
+    assert result.real_semantic_complete is False
+
+
+def test_ninth_saved_body_and_drafts_commit_one_batch_with_real_context():
+    """Saved ninth body and drafts. Simulated verification is not a business score."""
+    from pathlib import Path
+
+    from research.company_profile.contracts import (
+        ReportSemanticResponseV3,
+        ReportSourceCondition,
+        ReportViewClaim,
+    )
+    from research.company_profile.models import ReportIdentity
+    from research.company_profile.report_interpretation import (
+        layered_processing_identity,
+        locate_source_quote,
+        research_views,
+    )
+
+    change = (
+        Path(__file__).resolve().parents[3]
+        / "openspec/changes/restore-company-profile-llm-led-generalization"
+    )
+    pages_saved = json.loads(
+        (
+            change / "b1-pool-observation-evidence/resume1/work-checkpoint.json"
+        ).read_text()
+    )
+    page_text = {
+        int(page["page"]): str(page.get("text") or "")
+        for page in pages_saved["pages"]
+    }
+    query = json.loads((change / "b1-pool-decision-evidence/query.json").read_text())
+    receipts = query["profiles"][0]["three_views"]["call_receipts"]
+    body = next(
+        item
+        for item in receipts
+        if item["purpose"] == "source_inventory"
+        and item["source_scope"] == "full_context"
+        and item["status"] == "success"
+    )
+    draft = next(
+        item
+        for item in receipts
+        if item["purpose"] == "synthesize_views" and item["status"] == "success"
+    )
+    conditions = tuple(
+        ReportSourceCondition.model_validate_json(json.dumps(item))
+        for item in body["response_payload"]["source_conditions"]
+    )
+    drafts = {
+        item["claim_id"].split(":")[-1]: item
+        for item in draft["response_payload"]["claims"]
+    }
+    assert len(drafts) == 10
+    upstream = next(item for item in conditions if item.condition_id.endswith("ud-01"))
+    located = locate_source_quote(
+        upstream.evidence[0].anchor.bounded_quote,
+        (
+            {
+                "page": upstream.evidence[0].page,
+                "text": page_text[upstream.evidence[0].page],
+                "readable": True,
+            },
+        ),
+        page_number=upstream.evidence[0].page,
+    )
+    assert located is not None
+    assert "从技术环境来看" in located[3]
+
+    class _SavedNinth:
+        offline_only = True
+
+        def interpret(self, request):
+            if request.purpose == "source_inventory":
+                if request.source_scope == "page_map":
+                    return ReportSemanticResponseV3(
+                        request_id=request.request_id,
+                        purpose=request.purpose,
+                        requested_pages=(int(request.source_pages[0]["page"]),),
+                    )
+                present = {int(page["page"]) for page in request.source_pages}
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=tuple(
+                        item
+                        for item in conditions
+                        if item.evidence and item.evidence[0].page in present
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                claims = []
+                for condition in request.source_conditions:
+                    suffix = condition.condition_id.split(":")[-1]
+                    raw = drafts.get(suffix.replace("cond-", "claim-"))
+                    if raw is None:
+                        continue
+                    claims.append(
+                        ReportViewClaim.model_validate_json(json.dumps(raw)).model_copy(
+                            update={
+                                "claim_id": suffix.replace("cond-", "claim-"),
+                                "condition_ids": (condition.condition_id,),
+                                "evidence": condition.evidence,
+                                "supporting_record_ids": (),
+                            }
+                        )
+                    )
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=tuple(claims),
+                )
+            checks = tuple(
+                {
+                    "target_type": "condition",
+                    "target_id": item.condition_id,
+                    "status": "pass",
+                    "explanation": "离线核验，不是第9次成绩。",
+                }
+                for item in request.source_conditions
+            ) + tuple(
+                {
+                    "target_type": "claim",
+                    "target_id": item.claim_id,
+                    "status": "pass",
+                    "explanation": "离线核验，不是第9次成绩。",
+                }
+                for item in request.claims
+            )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=checks,
+            )
+
+    report = ReportIdentity.model_validate(
+        body["response_payload"]["source_conditions"][0]["evidence"][0]["report"]
+    )
+    result = _run(
+        _SavedNinth(),
+        pages=tuple(
+            {"page": page, "text": page_text[page], "readable": True}
+            for page in (12, 13, 14, 15)
+            if page_text.get(page, "").strip()
+        ),
+        processing_identity=layered_processing_identity(),
+        report=report,
+    )
+    rendered = research_views(result)["views"]["company_profile"]["claims"]
+    assert any(item["status"] == "observed" for item in rendered)
     assert result.real_semantic_complete is False

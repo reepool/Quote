@@ -770,6 +770,10 @@ def interpret_report(
         )
 
     def reused_stage(purpose: str, source_pages, source_scope: str):
+        # Layered reading does not reuse maps, conditions, synthesis or
+        # verification from another run. Page identity is not semantic identity.
+        if layered:
+            return None
         wanted = fragment_identity(source_pages)
         for item in identity.get("resumed_receipts") or ():
             if item.get("status") != "success" or item.get("purpose") != purpose:
@@ -1935,16 +1939,8 @@ def interpret_report(
                     (item.target_type, item.target_id): item.status
                     for item in verified.checks
                 }
-                reused_verify = bool(receipts[-1].get("reused_stage"))
-                cited_conditions = {
-                    key for claim in response.claims for key in claim.condition_ids
-                }
                 targets = (
-                    (
-                        {("condition", key) for key in cited_conditions}
-                        if reused_verify
-                        else {("condition", item.condition_id) for item in group}
-                    )
+                    {("condition", item.condition_id) for item in group}
                     | {("claim", item.claim_id) for item in response.claims}
                     | {("record", item.record_id) for item in referenced_records}
                 )
@@ -1964,9 +1960,10 @@ def interpret_report(
                         )
                         or not claim.evidence
                         or not claim.condition_ids
-                        or (
-                            not reused_verify
-                            and not set(claim.condition_ids) <= group_ids
+                        or not set(claim.condition_ids) <= group_ids
+                        or any(
+                            verdicts.get(("record", key)) != "pass"
+                            for key in claim.supporting_record_ids
                         )
                         or not all(
                             key in record_map and key not in invalid_records
@@ -2113,9 +2110,25 @@ def interpret_report(
         records = tuple(accepted.values())
         accepted_ids = {item.record_id for item in records}
         safe_claims = []
-        if batch_settled:
-            safe_claims = list(claims)
-        for claim in ([] if batch_settled else claims):
+        for claim in claims:
+            dependency_blocked = bool(claim.supporting_record_ids) and not set(
+                claim.supporting_record_ids
+            ) <= accepted_ids
+            if batch_settled and not dependency_blocked:
+                safe_claims.append(claim)
+                continue
+            if batch_settled and dependency_blocked:
+                safe_claims.append(
+                    claim.model_copy(
+                        update={
+                            "status": "unclear",
+                            "answer": "结论未通过证据或语义核验。",
+                            "limitation": "claim_or_dependency_not_verified",
+                        }
+                    )
+                )
+                gaps.append(f"claim_not_verified:{claim.claim_id}")
+                continue
             blocked = (
                 claim.claim_id in invalid_claims
                 or verdicts[("claim", claim.claim_id)] != "pass"
