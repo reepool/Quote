@@ -2170,3 +2170,38 @@ def test_saved_seventh_body_reaches_query_export_without_counting_as_a_real_scor
     assert any(anchor.get("context_before") for anchor in anchors)
     views = queried["profiles"][0]["three_views"]
     assert views["real_semantic_complete"] is False
+
+
+def test_saved_body_json_reloads_through_the_resume_decoder():
+    """Disk JSON uses the same decoder as a live response. Not a business score."""
+    from pathlib import Path
+
+    from pydantic import ValidationError
+
+    from research.company_profile.contracts import ReportSemanticResponseV3
+
+    change = (
+        Path(__file__).resolve().parents[3]
+        / "openspec/changes/restore-company-profile-llm-led-generalization"
+    )
+    saved = json.loads(
+        (change / "b1-pool-observation-evidence/resume1/work-checkpoint.json").read_text()
+    )
+    body = next(
+        item
+        for item in saved["report_interpretation"]["call_receipts"]
+        if item.get("source_scope") == "full_context"
+    )
+    payload = dict(body["response_payload"])
+    with pytest.raises(ValidationError):
+        ReportSemanticResponseV3.model_validate(payload)
+    loaded = ReportSemanticResponseV3.model_validate_json(
+        json.dumps(payload, ensure_ascii=False)
+    )
+    assert len(loaded.source_conditions) == 10
+    rejected = dict(payload)
+    rejected["unknown_field"] = True
+    with pytest.raises(ValidationError):
+        ReportSemanticResponseV3.model_validate_json(
+            json.dumps(rejected, ensure_ascii=False)
+        )

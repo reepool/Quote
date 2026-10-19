@@ -1,0 +1,64 @@
+{
+  "files": [
+    {
+      "path": "b1-i-offline-evidence/fresh/query.json",
+      "bytes": 355884,
+      "sha256": "da9707fe00967900170c1bf4ec11db5c0efebc48632eb0a0b74e6d2876be80ed"
+    },
+    {
+      "path": "b1-i-offline-evidence/fresh/export.json",
+      "bytes": 356341,
+      "sha256": "4ffe023cac0c0dbb199c8c5b157c65a809c03755e31894afd0ad3a54934134ec"
+    },
+    {
+      "path": "b1-i-offline-evidence/fresh/physical-budget.json",
+      "bytes": 11127,
+      "sha256": "cf6e47cf1c102d57cc9c38a81d24b94985cb6348c8b2195daf0707f2d4fcada8"
+    },
+    {
+      "path": "b1-i-offline-evidence/fresh/supervisor.json",
+      "bytes": 60,
+      "sha256": "b76abb54697adf0bc8d9cf3a3385c711e55d9e27a37df96709b29026562f7bc2"
+    },
+    {
+      "path": "b1-i-offline-evidence/fresh/entry-result.json",
+      "bytes": 50039,
+      "sha256": "7408e44fdcff9219fb6d1469d16096d1e64c9b7089669ca3e43e375a204a6639"
+    },
+    {
+      "path": "b1-i-offline-evidence/resume/query.json",
+      "bytes": 451009,
+      "sha256": "06fb9141d93ddf6ff17d2fc9217a1ed86f377cdfde0b17bd71a45c9f65b269f5"
+    },
+    {
+      "path": "b1-i-offline-evidence/resume/export.json",
+      "bytes": 451470,
+      "sha256": "20b418cd09cc9b8fdfe0cdd36527ee2bec2df49af20b2329837f947d0586eae2"
+    },
+    {
+      "path": "b1-i-offline-evidence/resume/physical-budget.json",
+      "bytes": 7247,
+      "sha256": "2475b574c0aced8917d8152c96e444f227ab170d39233e0930f2f88a9797aec4"
+    },
+    {
+      "path": "b1-i-offline-evidence/resume/supervisor.json",
+      "bytes": 61,
+      "sha256": "09e082335308b23567ad2a3f1c33c4b126f08f064d25979576cd27e62dcf3b9d"
+    },
+    {
+      "path": "b1-i-offline-evidence/resume/entry-result.json",
+      "bytes": 50037,
+      "sha256": "7f86f87e5592f45a00c196105b44cc30b20fa2e6fc729125cdd40cfa71221ea7"
+    }
+  ],
+  "bindings": {
+    "b1-i-fresh-binding.json": {
+      "bytes": 12552,
+      "sha256": "d4812975aafd4afa27ee97dbe1238e10de07f42427af0fa02da9ca50064e2adf"
+    },
+    "b1-i-resume-binding.json": {
+      "bytes": 13092,
+      "sha256": "218613e33a7e87b07474a92154094c3e8f623023e549319d472f0e95c000c28a"
+    }
+  }
+}

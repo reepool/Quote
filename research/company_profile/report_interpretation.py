@@ -752,7 +752,12 @@ def interpret_report(
             response_type = (
                 ReportSemanticResponseV3 if compact else ReportSemanticResponse
             )
-            response = response_type.model_validate(payload_json)
+            # Same JSON decoder as a live response. Strict mode still rejects
+            # unknown fields and wrong JSON types; it does accept JSON arrays
+            # as tuples. model_validate on the already-parsed dict does not.
+            response = response_type.model_validate_json(
+                json.dumps(payload_json, ensure_ascii=False)
+            )
             receipts.append(
                 {
                     **saved,

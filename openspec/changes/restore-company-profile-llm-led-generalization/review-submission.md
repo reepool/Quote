@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-19，[A审核§39](#39-a审核24e8cd2f结束b1-h试跑先核完整实际入口)）：接受24e8cd2f失败留存和引文定位修复，B1/A1未通过。B1-H的2/2已耗尽并结束；第8次因本地磁盘JSON校验错误停止，0外呼/0新增账本/无已核主张。八入口累计1528.096124秒、16请求、336482账本。当前只执行[卡§21](b1-execution-card.md#21-b1-i完整实际入口验证与实施取舍当前卡)的B1-I完整实际入口离线验证与实施取舍，新增真实入口/模型请求均0，无第9次。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100，19核心/6负例不可评估。不归档、不扩批，生产not_authorized、规模声明false。原§1—38正文不改写。
+当前状态（2026-10-19，[B1-I交接§40](#40-b1-i完整实际入口离线验证与实施取舍)）：B1/A1仍未通过。R28/R29已交一次零外呼的208页实际入口验证，不是业务验收。磁盘续跑已用与实时路径相同的JSON解码读入第7次10条件/13引文，且该正文回执`reused_stage=true`、未重发。新建与续跑均到原owner的查询/导出/新实例重读，三视图非空，`real_semantic_complete=false`。模拟核验不是真实语义：第7次行业环境句和战略转型句仍被标成observed，不能计19/6。八入口累计仍为1528.096124秒、16请求、336482账本，无第9次。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产not_authorized、规模声明false。原§1—39正文不改写。
 
 ## 1. 唯一实施指引
 
@@ -1608,3 +1608,76 @@ source scripts/quote_dev_env.sh
 流程已同步验收、交付计划、任务卡、tasks、设计及delta；开发者按A/B流程v3连续执行R28/R29，不逐项等A。先清已结束无依赖垃圾，临时产物统一QuoteBak，交接只留一套必要证据并清本人产物；历史/正式源及既有11修改/16未跟踪保护。A本轮不代B修改应用代码，未增加模型请求；人工审核成本未单独计量，记unknown。
 
 本次文档交付验证：`openspec validate restore-company-profile-llm-led-generalization --strict`通过，9份修改文档的158个本地链接/锚点无失效，`git diff --check`通过。A测试basetemp已自动清理，核空目录及无进程占用后删除1个已结束空测试日志目录，文件内容释放0字节；其余QuoteBak内容未因本轮审核批量删除，正式证据不动。
+
+## 40. B1-I：完整实际入口离线验证与实施取舍
+
+### 40.1 结论
+
+协议路径已经用实际 operator、208页源和原读写 owner 走通新建与磁盘续跑。这不是 B1/A1 通过，不计观察/可用公司，不计19核心/6负例。新增真实入口0、模型请求0、付费0。八入口时钟1528.096124秒和账本336482不变。
+
+一次共性修正：结构预览短于200字时，模拟选页返回空，第一轮新建停在`page_map_requires_valid_full_context_selection`。改为选择预览里任一非空页后，两条入口都完成。没有用第二次迭代。
+
+### 40.2 实际命令、身份与版本
+
+两条都没有`--real`，传输是进程内 `CallableTransport`，`offline-transport.json` 的 `real_calls` 均为0。沙箱未开外网权限。没有写入 `attempts/` 下的真实尝试标记；`resume2.json` 仍是第8次失败标记。
+
+```text
+source scripts/quote_dev_env.sh
+python -m research.company_profile.bounded_entry \
+  --binding openspec/changes/restore-company-profile-llm-led-generalization/b1-i-fresh-binding.json \
+  --run-root data/QuoteBak/b1-i-offline-20261019/fresh
+python -m research.company_profile.bounded_entry \
+  --binding openspec/changes/restore-company-profile-llm-led-generalization/b1-i-resume-binding.json \
+  --run-root data/QuoteBak/b1-i-offline-20261019/resume
+```
+
+派生绑定只改离线协议和续跑指针，文件哈希按当时代码重算。fresh SHA-256 `d4812975aafd4afa27ee97dbe1238e10de07f42427af0fa02da9ca50064e2adf`。resume SHA-256 `218613e33a7e87b07474a92154094c3e8f623023e549319d472f0e95c000c28a`。策略 `company_profile_llm_led.v2`，提示词 `company_profile_report_reading.2026-10-17.v2`，阅读 `layered_v3`，产品合同 `company_profile_product_contract.2026-10-18.llm-led.v3`。池指纹仍是 `fb5b895c00cdbdd7c158d35d3707988d5813d62f7d5df7319112151afb1e9141`。来源仍是歌华有线2025年报，PDF `b5b6be18424b7c3d7d7988f755ff7083141831904d4347c07cba1da8452c8b76`，208页均可读。预算类上限仍是900秒/120000/16；本窗没有放宽 `LlmRunBudget`。
+
+### 40.3 两条入口的实际分支
+
+| 入口 | 实际分支 | 断点 | 结果 |
+| --- | --- | --- | --- |
+| 新建 | 无 navigation_query、无 continuation。7次页面地图、1次正文、4次未读预览、1次合成、1次核验，共14次物理请求 | 预览只选中1页；其余页是 `supplement_unread`，不单独挡完整。缺 products_services / input_exposure / supply_chain_role | 219.363484秒。query=export，新 `CompanyProfileReadService` 重读与二者一致。draft_complete=false，real_semantic_complete=false |
+| 磁盘续跑 | navigation_query 复用第6次地图；continuation_checkpoint 是第7次 work-checkpoint。正文回执 `reused_stage=true`，页12–15，10条件/13引文，没有重发该请求 | 后续查漏有一批被拒绝后循环停止：`gap_check_incomplete` 57页，`necessary_unread` 7页。这挡住完整 | 256.271317秒。9次物理请求。query=export，新实例重读一致。draft_complete=false，real_semantic_complete=false |
+
+续跑回执里的第7次引文已经按空白映射回到发送页。例：`cond-pb-01` 的 bounded_quote 保留换行，model_quote 是模型原句。位置仍不等于语义支持。
+
+### 40.4 保留对象与隔离对象
+
+模拟核验只看三件事：引文能否定位、`statement_status=planned`、描述或已附上下文里有没有“计划/技术环境”。它不是业务阅读器。
+
+新建保留：`proof-current`，principal_business，observed，引文来自选中页的非空白切片。产品视图有 `proof-output`，供应链视图有 `proof-upstream`，三视图都有实质主张。隔离：`proof-bad-quote` 为 `evidence_not_located`，不丢同批其他条件；`proof-planned` 为 unclear。
+
+续跑保留的协议对象：第7次 `cond-pb-01` 等进入 observed，证据已定位。这只证明磁盘 JSON 能进入原投影，不证明这些句子的公司事实。模拟核验把 `cond-ud-01`（700MHz/中国移动，来源是技术环境而非公司已建成）和 `cond-scr-01`（战略转型，不是当前身份）也标成 observed，因为已附段落里没有“技术环境”三字，fixture 也没有公司专用规则。这两条不得计为已核业务主张。续跑同时隔离了三次 `proof-bad-quote` 和计划句 `proof-planned`（unclear / `claim_not_verified`）。
+
+分批：新建核验1批，续跑合成3批、核验3批。两批都没有 `semantic_verify_targets_missing_or_extra`，所以每个条件/主张/记录目标都有处置。单批与分批的最终投影都经过同一个 query/export。
+
+### 40.5 预算与未知用量
+
+模拟传输对 `entry_proof_v3` 返回 prompt 80 / completion 40。新建14次预留合计235316、最大23837，结算1680。续跑9次预留合计190008、最大23470，结算1080。账本因此能走完。若这14次预留在未知用量下整笔保留，235316已经超过120000，同一窗口进不了合成。未知用量保留规则没有改。配置价目对模拟 usage 算出了金额；那不是真实费用，本窗付费为0，历史费用仍 unknown。八入口账本336482不增加。
+
+### 40.6 实施取舍
+
+当前实现能承载的部分：全报告解析、分层选页、24000分批、磁盘 JSON 续跑、空白引文定位、单条件隔离、合成/核验分批、原 writer、查询/导出/新实例重读。
+
+当前实现不能承载的部分：
+
+- 一次120000/16窗口，在用量未知时，装不下208页地图、未读预览、正文和末端。新建这条链的预留和已经说明了边界。
+- 程序不会把行业技术环境判成“不是公司已建成”，也不会把战略转型判成“不是当前身份”。这仍要真实核验模型。第7次其余正文批、独立查漏走完、真实合成和真实核验都还没有外呼证据。
+
+最短可行路径只有一条，而且现在没有授权：一次真实窗口，复用第6次地图和第7次正文，提供方必须回传 usage，并由真实核验处理行业/公司与计划/当前。不要再发一张只补 JSON 或只加 fixture 的卡。若用量仍未知，就得把未读查漏拆出这16次请求，那要改账本上限；现有 `LlmRunBudget` 拒绝超过16次或120000。A若不授权这次真实窗口，本实现方案停在这条离线边界，不自动第9次。
+
+### 40.7 验证、清理与保护
+
+直接回归3 passed / 3.82秒：
+
+```text
+pytest -q \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_saved_body_json_reloads_through_the_resume_decoder \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_whitespace_quote_locates_on_the_sent_page_and_a_bad_quote_stays_isolated \
+  tests/unit/test_research/test_company_profile_llm_led.py::test_seventh_run_quotes_relocate_on_the_sent_pages_without_a_model_call
+```
+
+`test_saved_body_json_reloads_through_the_resume_decoder` 用第7次原始文件证明 `model_validate` 失败、`model_validate_json` 读入10条件，未知字段仍拒绝。没有改那份原始 checkpoint。
+
+持久证据在 [b1-i-offline-evidence](b1-i-offline-evidence/manifest.json)。研究库、PDF缓存、页缓存和 output 未放入 OpenSpec。QuoteBak 运行目录在哈希核对后删除。八入口 attempt 标记未改。既有11份修改和16项未跟踪文件不纳入提交。

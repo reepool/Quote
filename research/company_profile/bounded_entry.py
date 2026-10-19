@@ -460,6 +460,7 @@ def _worker(
         prior_logical_attempts=prior_attempts,
     )
     transport_requests = []
+    map_replies = {"count": 0}
 
     async def empty_inventory(_url, _headers, payload, _timeout):
         request = json.loads(
@@ -481,16 +482,33 @@ def _worker(
             }
         )
         result = {"request_id": request["request_id"], "purpose": request["purpose"]}
-        if binding.get("offline_protocol") == "nonempty_v3":
+        protocol = binding.get("offline_protocol")
+        if protocol == "nonempty_v3":
             from .resource_probe import protocol_reply
 
             result = protocol_reply(request)
+        elif protocol == "entry_proof_v3":
+            from .resource_probe import entry_proof_reply
+
+            result = entry_proof_reply(request)
+            if request.get("source_scope") == "page_map":
+                map_replies["count"] += 1
+                # The first preview may select one page. Later previews do not
+                # keep requesting new body pages, or the proof never reaches
+                # synthesis.
+                if map_replies["count"] > 1:
+                    result["requested_pages"] = []
         encoded = json.dumps(result, ensure_ascii=False)
         transport_requests[-1]["response_utf8_bytes"] = len(encoded.encode())
-        return {
-            "status_code": 200,
-            "data": {"choices": [{"message": {"content": encoded}}]},
-        }
+        usage = (
+            {"prompt_tokens": 80, "completion_tokens": 40, "total_tokens": 120}
+            if protocol == "entry_proof_v3"
+            else None
+        )
+        data = {"choices": [{"message": {"content": encoded}}]}
+        if usage is not None:
+            data["usage"] = usage
+        return {"status_code": 200, "data": data}
 
     if real:
         load_project_environment()
