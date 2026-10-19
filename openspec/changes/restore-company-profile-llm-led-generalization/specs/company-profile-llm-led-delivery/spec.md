@@ -75,6 +75,13 @@ The system MUST account for every physical page through full-report navigation a
 - **WHEN** independent source review, revenue composition or omission checking identifies an uncovered major disclosure
 - **THEN** bounded model-led recovery reads the necessary context or leaves the affected core limited, and first-run evaluation retains the omission rather than changing the sample contract
 
+#### Scenario: An explicit replacement policy reads core sections directly
+- **WHEN** A authorizes the D1 replacement within the same company-profile owner
+- **THEN** a selected complete source context may directly yield evidence-linked candidates for the three views without a mandatory inventory-to-separate-synthesis stage
+- **AND** source-led omission review still uses a separate request without candidate answers or Gold, followed by comparison and verification of the candidates and their actual native dependencies; one source-review receipt may serve only the source scopes it actually covers
+- **AND** the first verified business package becomes durably queryable before later packages, while report-level usability still requires all necessary core reading, omission checks and the unchanged acceptance thresholds
+- **AND** this replaces the superseded orchestration rather than adding a parallel writer or inferring real-call permission from old budget balances
+
 #### Scenario: Requested necessary reading crosses a batch boundary
 - **WHEN** a model requests necessary context in more than one batch and only the first batch or a fragment has been read
 - **THEN** every outstanding necessary scope remains explicit and blocks affected core completeness; it cannot be relabeled as an ordinary unread supplementary note, nor may a fragment imply the entire page was read
