@@ -26,6 +26,17 @@ The new processing policy MUST route every new report's open-language interpreta
 - **THEN** existing checkpoints retain successful receipts, exact read ranges and independent verified claims for query/export, while unfinished claims remain unverified and the authorized continuation processes only valid unfinished work
 - **AND** window and task charges, unknown reservations and logical-request recovery counts remain cumulative under the current card, without changing the default public gateway policy
 
+#### Scenario: The second synthesis batch fails
+- **WHEN** the first source-supported batch has yielded candidate claims and another batch is waiting
+- **THEN** the first candidates are durably retained as unverified, their batch is verified and its independent supported results are committed through the existing writer and query/export before the next synthesis batch is sent
+- **AND** a later failure or process restart preserves those verified results and explicit unresolved gaps; a draft's model-reported observed status does not make it a verified result
+- **AND** later source conflicts invalidate affected claims and dependencies without clearing unrelated supported results
+
+#### Scenario: A local batch does not cover all report dimensions
+- **WHEN** synthesis receives only a subset of the report's source conditions
+- **THEN** it returns claims only for supported dimensions of that batch, without inserting global missing-dimension placeholders; completeness is evaluated after aggregation and source-first omission checks
+- **AND** supported qualitative products, customer types and operating roles do not require concentration figures, transaction names or literal industry-role labels, while unsupported numbers and relationships remain unasserted
+
 #### Scenario: A explicitly rebinds an unused development continuation
 - **WHEN** the current A card authorizes a repaired snapshot to use an already allocated but unused development entrance
 - **THEN** old raw receipts may be revalidated with explicit source ranges, old and new identities and derived-result lineage, without changing prior failures or reporting a same-version first-run score
