@@ -24,4 +24,4 @@ v61及S1证明了部分历史样本的规则抽取，却没有证明真实LLM阅
 
 ## Impact
 
-需求、验收、A/B流程、任务卡及导航按显式版本接续；业务实现待tasks。涉及`operations.py`、`runtime.py`、`workflow.py`、`stage5_provider.py`、`core_evidence_selection.py`、`core_assessment_projection.py`及现有读取投影，沿`company_profile_common_core`单一owner。FR-05/FR-14/FR-15文档治理适用，不启动全仓框架改造。第10次失败结束旧T1，十入口失败及19核心/6负例保留，B1/A1未过。用户委托A选路线后，A按验收§7.18/执行卡§25启用D1：核心全文直接产有据三视图候选，独立源审与核验、首包及时可查，删除被替代强制中间层。连续实施、直接验证、冻结及一次条件真实窗口合卡，在原累计资源上限内显式分配，不恢复旧链；若启动计累计第11次，无第12次/换公司/短段。语义恢复仍未通过、S3前另验；生产not_authorized、规模声明false，不归档/扩批，不动既有改动。
+需求、验收、A/B流程、任务卡及导航按显式版本接续；业务实现待tasks。涉及现有operations/runtime/workflow/provider、内部阅读编排及读取投影，沿`company_profile_common_core`单一owner；FR-05/FR-14/FR-15治理适用，不启动全仓改造。A审核`f6d2db2c`后结束D1第11次真实窗口，原十一失败及19核心/6负例保留，B1/A1未过。保留核心直读＋可靠数值＋独立查漏核验方向，当前按验收§7.19/执行卡§26/D2一次补齐整条核心产品链、执行时限及非空实际入口验证，新增真实入口/调用0，无第12次/换公司/短段。模拟只证明工程，旧余额不构成授权。语义恢复仍未通过、S3前另验；生产not_authorized、规模声明false，不归档/扩批，不动既有改动。

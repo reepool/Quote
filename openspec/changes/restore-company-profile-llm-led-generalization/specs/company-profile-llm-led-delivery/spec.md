@@ -63,6 +63,16 @@ The new processing policy MUST route every new report's open-language interpreta
 - **THEN** fresh and disk-resumed execution use the authoritative owner and persistence/read path, retain nonempty linked views and independent valid verified-state claims under explicitly simulated verification, and isolate invalid objects and dependencies
 - **AND** batched verification accounts for every required target and unresolved major omission, real semantic completion remains false, and mock results neither advance business acceptance nor authorize another real entrance
 
+#### Scenario: The direct-reading path finishes its necessary core scopes
+- **WHEN** navigation, requested necessary reading, source-led review and verification succeed for all major core conditions through the actual entry and owner
+- **THEN** report-level completeness is derived from that evidence and the remaining necessary gaps, rather than a constant false value or the existence of one claim per dimension
+- **AND** a second major business in the same dimension remains a separate omission target, ordinary unread supplementary notes remain explicit, and simulated transport never establishes real semantic completion
+
+#### Scenario: The pool distributes a logical request across sources
+- **WHEN** a bounded task permits an initial physical attempt and a limited recovery within its entry deadline
+- **THEN** logical and physical attempt timeouts are consistent with that task's recovery policy and remaining entry time, without treating a routing log's logical remaining time as the entry's remaining time
+- **AND** readiness uses actual nonempty verification payloads and avoids repeating expensive identical preparation in parent, worker and business paths
+
 ### Requirement: Discovery and omission checking are source-led
 The system MUST account for every physical page through full-report navigation and bounded discovery. The real LLM MUST select substantive business, product, income, input and role contexts and read their necessary paragraphs, headers and continuations. Navigation-only coverage, full-text reading coverage and verified core usability MUST be recorded separately. Sending every readable supplementary note verbatim MUST NOT be a prerequisite for core delivery. Regex-only page whitelists MUST NOT determine all model visibility; unfamiliar locations and unsampled text MUST remain reachable through bounded model-led context recovery. A source-first omission review in a separate context without candidate answers or evaluation Gold MUST be compared with delivered claims and reliable major revenue composition. Unresolved major-business or necessary-context gaps MUST prevent core completeness. Unsupported or unread sources MUST remain missing or unclear rather than not_disclosed. Historical full-text contracts and scores MUST NOT be reevaluated under this policy.
 
