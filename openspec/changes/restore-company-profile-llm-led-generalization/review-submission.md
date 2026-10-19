@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-19，[B1-K收尾§46](#46-b1-k收尾硬约束与实际入口)）：B1/A1未通过。分批晋升已接回原记录/引文硬约束；缺核验结果不再抛KeyError。实际operator上，第一批已核主张在第二批真实发送失败前就可查询，磁盘重启不重发已完成核验。新增真实调用0，不批准第10次。本卡两次共性迭代已用完。九入口累计仍为2110.163851秒、21次请求、账本439992，费用unknown。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产not_authorized、规模声明false。原§1—45正文不改写。
+当前状态（2026-10-19，[A审核§47](#47-a审核176e10d0结束b1-k收窄能力交真实产品)）：B1/A1未通过；B1-K按2/2结束，部分工程接受，但冲突依赖仍verified、同页条件错复用及原真实回执欠交使R32/R33未完成。唯一当前[执行卡§24](b1-execution-card.md#24-重新规划停用语义续跑单窗核心交付当前卡)/T1显式停用语义续跑、单窗交真实三视图；前置成立自主执行一次新条件窗口（累计第10次），未启动0/1，无第11次。九入口2110.163851秒/21请求/439992账本及费用unknown不改。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产not_authorized、规模声明false。原§1—46正文保留。
 
 ## 1. 唯一实施指引
 
@@ -1965,3 +1965,49 @@ source scripts/quote_dev_env.sh
 ### 46.4 清理与边界
 
 研究库和PDF缓存已从这两次运行目录删除。QuoteBak该目录约3.9MB，保留query和传输记录供核对，不放入提交。没有把用户池配置或整库纳入提交。九入口账本439992、2110.163851秒、21次请求不变。第9次草稿仍未经真实核验。原两次迭代已用完，不再自动派生准备卡或第10次。观察1/4、可用0/4。
+
+## 47. A审核176e10d0：结束B1-K，收窄能力交真实产品
+
+### 47.1 结论与主线自省
+
+**B1/A1未通过，B1-K按2/2结束；R32/R33撤勾，不派第三轮原卡返修。** 原三项直接回归独立3 passed：不存在record不能晋升、核验异常安全留下待核，以及可发送的第二批实际进入受控失败，以上在已证范围接受；实际operator及磁盘JSON重启也有模拟主张持久可查证据。不将这些有效成果推倒重做，但也不能当真实业务通过。A新增两个源挑战均失败，阻塞可靠交付，见下表。
+
+**整体判断：** 主要矛盾已经不是再做更复杂的恢复演练，而是让同一报告真实LLM生成有据、可用三视图。A此前将续跑实现和证明反复置于核心交付之前，造成工程小循环；本次明确取舍：保留LLM主导、唯一owner、批内核验及硬约束，暂舍跨运行语义复用，只用PDF缓存。B1-K不再续命；下一卡是有真实业务终点和一窗条件授权的能力收窄，不是重置两次迭代的新准备卡。语义恢复仍是未完成能力，须S3前另验，不能声称数千家自动化已经成立。
+
+### 47.2 独立挑战及证据边界
+
+| 分类 | 当前输入/实际结果 | 裁决 |
+| --- | --- | --- |
+| A/P1：冲突依赖仍确定外放 | 一页真实结构的小fixture，原生`rev-in`实际进入verify；verify对record返回unclear、claim/condition返回pass。最终record已移出accepted并有`record_semantic_conflict:rev-in`，依赖claim仍`observed`，投影`review_state=verified`。晋升只查record存在/初始有效，未查本批record verdict；最终batch_settled又跳过依赖accepted_ids筛选，见report_interpretation.py:1958及2116 | 不能容忍为次要遗漏；冲突record及全部依赖必须隔离，独立可靠主张保留。不让LLM自报pass盖过依赖失败 |
+| A/P1：同页不同条件错用旧回执 | 同一源页，新发现condition后缀为`different-condition`，仅传旧成功合成/核验回执。provider实际只收到地图及正文，未重新合成；最终claim仍引用旧`cond-a`且observed。reused_stage仅按purpose/scope/页片段匹配，未绑定实际条件/主张；新增reused_verify又豁免本批condition范围，见report_interpretation.py:772及1938 | 本卡不继续扩恢复算法，下一模式在真实入口及持久绑定拒绝旧语义输入；旧能力不算通过，后续S3前另验 |
+| A/P1：原R33真实回执驱动验证欠交 | resource_probe.batch_commit_reply重新造`batch-a/b`、40字符片段及长补充说明，合成`OFFLINE current disclosure...`。first/resume工作checkpoint确有一条模拟observed、第一批合成/核验重启复用；但不是原指定第9次真实正文/10草稿。不能凭“真实资产PDF＋实际operator”声称真实回执验证完成 | R33未完成，原卡结束不再补交；下一业务卡前置仅对实际回执做必要直接验证，不再重跑完整208页fake或建新测试协议 |
+| B：交接编排 | 本提交在§45前后插入了两份§46，且没有完整可复现命令/持久必要证据链接 | 不作为业务阻塞，不追改历史正文；本§47为唯一新审核锚点。下一交接沿A/B v3§8补精确命令和证据，勿再堆重复段落 |
+
+持久最小反例：[delivery-boundary-audit.py](b1-pool-decision-evidence/delivery-boundary-audit.py)，只调用当前公开测试fixture及实际interpret_report/research_views，不联网、不改业务输出。两个测试均为期望安全行为的失败反例，非已实现能力。旧两个partial测试的父版本同失败结论沿审核§45复用，不再扩大跑旧套件或改C类问题。
+
+B临时证据只读核对：`data/QuoteBak/b1-k-batch-commit/first`和`resume`，合计3,912,286字节。两边`query.profiles`与export画像及导出单画像文件一致（action等操作包装不要求字节相等）；工作checkpoint的模拟主张/核验ID可追。first checkpoint SHA-256 `7526be8df2484b52a1cf2e850b542e0e9af144ba39913e1d8c1cbd9ef802628c`，resume `975ca1ccb1e96a876820946684adff942cb4cdddd936c6119a10d6cccfbe480f`。transport只提供请求元数据，没有在第二批发送时的query快照；结合bounded_entry中的实际读取/受控抛错实现及checkpoint，可接受该模拟顺序，不扩称任意故障或真实主张核验。
+
+### 47.3 验证与下一业务卡
+
+本轮独立命令均先`source scripts/quote_dev_env.sh`，Quote环境Python；首次裸`pytest`未在PATH找到，未产生测试结果，改用环境绝对路径：
+
+```bash
+/home/python/miniconda3/envs/Quote/bin/python -m pytest -q \
+  tests/unit/test_research/test_company_profile_llm_led.py \
+  -k 'a_verified_batch_remains or missing_native_record_is_not_promoted or verification_failure_returns_a_pending_gap' \
+  --basetemp=data/QuoteBak/a-review-176e10d0/pytest
+# 3 passed、42 deselected / 6.80秒
+/home/python/miniconda3/envs/Quote/bin/python -m pytest -q \
+  openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-decision-evidence/delivery-boundary-audit.py \
+  --basetemp=data/QuoteBak/a-review-176e10d0/final-audit
+```
+
+最终独立诊断**2 failed / 6.82秒**，详细错误为冲突依赖`('observed','verified')`以及同页改条件后无新合成、仍交旧cond-a。初版诊断的condition ID断言先因运行时合法加前缀失败，改为校验后缀后才得到上述实际错复用证据；这不是第三个业务缺陷。无真实模型调用、池探针或新业务运行。
+
+下一卡唯一为[执行卡§24/T1](b1-execution-card.md#24-重新规划停用语义续跑单窗核心交付当前卡)，A/B流程v3及产品→验收→交付→change固定顺序继续执行。B在一个连续窗口内先清垃圾、缩减恢复能力、处理冲突依赖、直接验证及冻结，前置成立后自主执行**新条件真实窗口0/1（累计第10次）**。额度、费用unknown例外、恢复计数和不提高原累计上限的算术唯一见验收§7.16；不是旧余额或原B1-K迭代续额。前置不成不发送并结束，启动即1/1，失败无第11次/换公司/短段或同类准备卡。A下一次先核真实三视图与源质量，再看工程细节；还失败就结束此歌华实现并向用户明确能力/资源限制及替代路线。
+
+原19核心≥18、六负例实际全查、七维/三视图、已审准确≥98%及源审抽样不变。容忍次要遗漏/有据unclear，不容忍已知主体/期间/数字/方向/计划或冲突依赖错误确定外放；未读/未核不是未披露。无法补救写来源、影响、处理与恢复条件，不伪造零错误。九入口2110.163851秒/21请求/439992账本＝142602有效usage＋297390unknown、费用unknown不改；观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100，不归档/扩批，生产not_authorized、规模声明false。4→12→20（失败最多另20）→100数量及阶段门槛不减。
+
+### 47.4 清理、保护与交接
+
+B已清两次模拟研究库/PDF副本，约3.9MB剩余query/transport待审；本轮未见大量新增开发库，但它们只在临时区，不是永久证据。必要审核摘要/hash已见本节，下一卡先核依赖/占用后清其无用副本，不删历史真实响应或在途他人文件。A本轮仅留上述一份必要持久诊断源；核无活跃pytest/operator后删除本人`data/QuoteBak/a-review-176e10d0`（7,552字节，诊断副本及目录；均可重建），没有删除业务或B原证据。无新增清理台账/平台。定向Ruff及诊断格式、OpenSpec严格校验、15处本轮新增链接/锚点、预算算术及diff检查通过；OpenSpec校验后遥测DNS失败不影响有效结论，未借此启模型。原13份tracked修改及16项未跟踪内容保护；验收文档用户历史块与本人活动规划变更隔离提交，原§1—46正文hash核对保留（包括B重复§46）。A只改审核/任务/需求配套文档和最小诊断证据，不代B改业务代码。新发现阻塞2个代码问题及1项原卡证据欠交，活跃审核时间未单独计量，记unknown。Git结果见本轮最终交接。

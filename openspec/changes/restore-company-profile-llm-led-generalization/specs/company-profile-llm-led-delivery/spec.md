@@ -32,6 +32,17 @@ The new processing policy MUST route every new report's open-language interpreta
 - **AND** a later failure or process restart preserves those verified results and explicit unresolved gaps; a draft's model-reported observed status does not make it a verified result
 - **AND** later source conflicts invalidate affected claims and dependencies without clearing unrelated supported results
 
+#### Scenario: A narrows a development slice to fresh semantic execution
+- **WHEN** an explicit A card ends an unsuccessful semantic-resume implementation and authorizes a bounded fresh-generation business slice
+- **THEN** the actual operator and persisted-binding boundary reject prior navigation, discovery, synthesis, verification and verified-claim inputs for that slice, while PDF parsing caches may remain reusable
+- **AND** real reading, independent source-led omission checking, batch verification and existing-owner publication still satisfy unchanged business criteria; reliable partial query results remain available after failure without authorizing another entrance
+- **AND** semantic continuation remains unaccepted capability work to verify before S3 rather than an implied success, and new execution uses only the card's explicit resource authorization without changing historical attempts or charges
+
+#### Scenario: A batch's native dependency fails verification
+- **WHEN** verification marks a referenced native record block or unclear while marking the dependent claim pass
+- **THEN** the record is quarantined and every dependent claim remains unverified or is withdrawn from verified query/export results before another batch proceeds
+- **AND** the same dependency rule applies at final publication and to later-discovered conflicts, without removing independent supported claims
+
 #### Scenario: A local batch does not cover all report dimensions
 - **WHEN** synthesis receives only a subset of the report's source conditions
 - **THEN** it returns claims only for supported dimensions of that batch, without inserting global missing-dimension placeholders; completeness is evaluated after aggregation and source-first omission checks
