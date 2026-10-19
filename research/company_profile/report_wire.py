@@ -227,15 +227,17 @@ def instructions(request: ReportSemanticRequestV3) -> str:
             "major business, product, earning mechanism, input or role the supplied text supports."
         )
     if request.purpose == "synthesize_views":
-        coverage = (
-            "Return a claim only for a supplied source condition the text supports. "
-            "Do not fill unread dimensions with placeholder claims. "
-            if partial
-            else "Return claims for all seven dimensions. "
-        )
         return common + (
-            coverage
-            + "Link source condition IDs and exact Evidence. "
+            "Return a claim only for a supplied source condition. "
+            "Do not add a claim for a dimension with no supplied condition, and do not "
+            "fill unread dimensions with placeholder claims. "
+            "Where the supplied text states a product, service, customer type or "
+            "operating role, write that qualitative claim with its citation. "
+            "Missing concentration, amount or a fixed role label is a supplementary "
+            "gap, not a reason to drop the supported claim. "
+            "A strategic goal is not current identity. An industry or technical "
+            "environment is not a completed company action. "
+            "Link source condition IDs and exact Evidence. "
             "supporting_record_ids may list only IDs present in the supplied records. "
             "If no record is supplied, leave supporting_record_ids empty; do not copy "
             "the report_id or asset id into that field. Original typed facts are read-only "

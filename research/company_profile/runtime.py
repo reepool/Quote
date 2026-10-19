@@ -525,7 +525,18 @@ class CompanyProfileStageRuntime:
             )
             def save_progress(partial) -> None:
                 state.report_interpretation = partial
+                state.assessment = report_core_assessment(partial)
+                state.provider_calls = [
+                    item["purpose"] for item in partial.call_receipts
+                ]
+                state.tokens_used = (
+                    state.tokens_restored + partial.tokens_charged
+                )
                 self._persist_work(state)
+                try:
+                    self._publish(state)
+                except PublicationWritesStopped:
+                    return
 
             state.report_interpretation = self._semantic_service.run_report(
                 report=state.report,

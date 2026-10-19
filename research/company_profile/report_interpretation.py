@@ -726,6 +726,7 @@ def interpret_report(
     claims: tuple[ReportViewClaim, ...] = ()
     records: tuple[SemanticRecord, ...] = ()
     checks: tuple[ReportViewCheck, ...] = ()
+    batch_settled = False
     dispositions: list[dict[str, Any]] = []
     quarantined: set[str] = set()
     receipts: list[dict[str, Any]] = []
@@ -1699,30 +1700,11 @@ def interpret_report(
             return groups
 
         if layered and card_limit:
-            claim_rows = []
-            for group in groups_under_limit(conditions, "synthesize_views"):
-                pages = cited_quote_pages(
-                    tuple(evidence for condition in group for evidence in condition.evidence)
-                ) or quote_pages[:1]
-                if followup_units("synthesize_views", group, pages) > card_limit:
-                    gaps.append(
-                        f"followup_exceeds_card_reservation:{group[0].condition_id}"
-                    )
-                    if group[0].major:
-                        gaps.append(
-                            f"major_evidence_not_located:{group[0].condition_id}"
-                        )
-                    continue
-                response = invoke(
-                    "synthesize_views",
-                    pages,
-                    source_conditions=tuple(group),
-                    records=related_records,
-                    active_checklist=tuple(active_checklist),
-                )
-                claim_rows.extend(response.claims)
-            claims, candidates = tuple(claim_rows), ()
+            batch_groups = groups_under_limit(conditions, "synthesize_views")
+            claims, candidates = (), ()
         else:
+            batch_groups = None
+        if batch_groups is None:
             response = invoke(
                 "synthesize_views",
                 quote_pages,
@@ -1877,7 +1859,115 @@ def interpret_report(
                 groups.append(current)
             return groups
 
-        if layered and card_limit and (
+        if batch_groups is not None:
+            settled: list[ReportViewClaim] = []
+            settled_checks: list[ReportViewCheck] = []
+            for group in batch_groups:
+                pages = cited_quote_pages(
+                    tuple(
+                        evidence
+                        for condition in group
+                        for evidence in condition.evidence
+                    )
+                ) or quote_pages[:1]
+                if followup_units("synthesize_views", group, pages) > card_limit:
+                    gaps.append(
+                        f"followup_exceeds_card_reservation:{group[0].condition_id}"
+                    )
+                    if group[0].major:
+                        gaps.append(
+                            f"major_evidence_not_located:{group[0].condition_id}"
+                        )
+                    continue
+                if execution_budget is not None and settled:
+                    charged = int(execution_budget.snapshot()["charged_tokens"])
+                    ledger = int(
+                        identity.get("ledger_tokens") or execution_budget.max_tokens
+                    )
+                    synth_units = followup_units("synthesize_views", group, pages)
+                    verify_estimate = verify_units((), group, ())
+                    if charged + synth_units + verify_estimate + synth_units > ledger:
+                        gaps.append("batch_verification_hold")
+                        break
+                try:
+                    response = invoke(
+                        "synthesize_views",
+                        pages,
+                        source_conditions=tuple(group),
+                        records=related_records,
+                        active_checklist=tuple(active_checklist),
+                    )
+                except (SemanticProviderError, LlmError, ValueError, TypeError) as exc:
+                    gaps.append(f"semantic_incomplete:{str(exc)[:240]}")
+                    break
+                claims = (
+                    *settled,
+                    *(
+                        claim.model_copy(
+                            update={
+                                "status": "unclear",
+                                "limitation": "pending_verification",
+                            }
+                        )
+                        for claim in response.claims
+                    ),
+                )
+                publish_progress()
+                try:
+                    verified = invoke(
+                        "verify_views",
+                        pages,
+                        source_conditions=tuple(group),
+                        claims=tuple(response.claims),
+                        records=(),
+                        active_checklist=tuple(active_checklist),
+                    )
+                except (SemanticProviderError, LlmError, ValueError, TypeError) as exc:
+                    gaps.append(f"semantic_incomplete:{str(exc)[:240]}")
+                    break
+                verdicts = {
+                    (item.target_type, item.target_id): item.status
+                    for item in verified.checks
+                }
+                targets = {
+                    ("condition", item.condition_id) for item in group
+                } | {("claim", item.claim_id) for item in response.claims}
+                if {
+                    (item.target_type, item.target_id) for item in verified.checks
+                } != targets:
+                    gaps.append("semantic_verify_targets_missing_or_extra")
+                    break
+                promoted: list[ReportViewClaim] = []
+                for claim in response.claims:
+                    blocked = (
+                        verdicts.get(("claim", claim.claim_id)) != "pass"
+                        or any(
+                            verdicts.get(("condition", key)) != "pass"
+                            for key in claim.condition_ids
+                        )
+                        or not claim.evidence
+                        or not claim.condition_ids
+                    )
+                    if blocked:
+                        promoted.append(
+                            claim.model_copy(
+                                update={
+                                    "status": "unclear",
+                                    "answer": "结论未通过证据或语义核验。",
+                                    "limitation": "claim_or_dependency_not_verified",
+                                }
+                            )
+                        )
+                        gaps.append(f"claim_not_verified:{claim.claim_id}")
+                    else:
+                        promoted.append(claim)
+                settled.extend(promoted)
+                settled_checks.extend(verified.checks)
+                claims = tuple(settled)
+                checks = tuple(settled_checks)
+                publish_progress()
+            batch_settled = True
+        if not batch_settled and layered and card_limit and (
             verify_units(request_claims, conditions, records) > card_limit
         ):
             check_rows = []
@@ -1932,7 +2022,7 @@ def interpret_report(
                 )
                 check_rows.extend(response.checks)
             checks = tuple(check_rows)
-        else:
+        elif not batch_settled:
             response = invoke(
                 "verify_views",
                 quote_pages,
@@ -1967,9 +2057,19 @@ def interpret_report(
             | {("claim", item.claim_id) for item in claims}
             | {("record", item.record_id) for item in records}
         )
-        if {(item.target_type, item.target_id) for item in checks} != targets:
+        if (
+            not batch_settled
+            and {(item.target_type, item.target_id) for item in checks} != targets
+        ):
             raise ValueError("semantic_verify_targets_missing_or_extra")
-        verdicts = {(item.target_type, item.target_id): item.status for item in checks}
+        if batch_settled:
+            verdicts = {
+                (item.target_type, item.target_id): item.status for item in checks
+            }
+        else:
+            verdicts = {
+                (item.target_type, item.target_id): item.status for item in checks
+            }
         accepted = {}
         for record in records:
             key = record.record_id
@@ -1979,7 +2079,9 @@ def interpret_report(
         records = tuple(accepted.values())
         accepted_ids = {item.record_id for item in records}
         safe_claims = []
-        for claim in claims:
+        if batch_settled:
+            safe_claims = list(claims)
+        for claim in ([] if batch_settled else claims):
             blocked = (
                 claim.claim_id in invalid_claims
                 or verdicts[("claim", claim.claim_id)] != "pass"
@@ -2055,11 +2157,16 @@ def interpret_report(
                 for item in checks
                 if item.target_type == "claim" and item.status == "pass"
             }
-            if not checks:
-                records = ()
+            checked = {
+                item.target_id
+                for item in checks
+                if item.target_type == "claim"
+            }
             claims = tuple(
                 claim
-                if claim.claim_id in verified
+                if claim.claim_id in checked
+                or claim.claim_id in verified
+                or claim.limitation == "pending_verification"
                 else claim.model_copy(
                     update={
                         "status": "unclear",
@@ -2247,7 +2354,19 @@ def research_views(result: ReportInterpretation) -> dict[str, Any]:
                 if all(d in result.verified_dimensions for d in dimensions)
                 else "extraction_failed"
             ),
-            "claims": [item.model_dump(mode="json") for item in claims],
+            "claims": [
+                {
+                    **item.model_dump(mode="json"),
+                    "review_state": (
+                        "pending_verification"
+                        if item.limitation == "pending_verification"
+                        else "verified"
+                        if item.status == "observed"
+                        else "not_reliable"
+                    ),
+                }
+                for item in claims
+            ],
             "checked_pages": [item for item in result.page_coverage],
         }
     return {

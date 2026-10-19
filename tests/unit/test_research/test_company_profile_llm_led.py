@@ -2404,3 +2404,225 @@ def test_seventh_body_pages_reserve_at_the_send_point():
             request_id="unknown-2",
             attempt=1,
         )
+
+
+def test_a_verified_batch_remains_when_the_next_synthesis_fails():
+    """Later synthesis failure must not drop a batch already verified and published."""
+    from research.company_profile.contracts import ReportSemanticRequestV3
+    from research.company_profile.reading_budget import request_reservation
+    from research.company_profile.report_interpretation import (
+        layered_processing_identity,
+        research_views,
+    )
+    from research.company_profile.report_wire import instructions
+
+    identity = layered_processing_identity()
+    report = _report()
+    pages = (
+        {
+            "page": 1,
+            "text": "公司经营有线电视网络传输，并向家庭用户提供收视服务。",
+            "readable": True,
+        },
+        {"page": 2, "text": "附注：会计政策说明。", "readable": True},
+    )
+    preview = ReportSemanticRequestV3(
+        request_id="prompt",
+        purpose="synthesize_views",
+        report=report,
+        processing_identity=identity,
+        source_pages=({"page": 1, "text": pages[0]["text"], "readable": True},),
+        source_scope="full_context",
+        source_conditions=(
+            {
+                "condition_id": "cond-a",
+                "dimension": "principal_business",
+                "description": "来源写明网络传输",
+                "evidence": (
+                    Evidence(
+                        evidence_id="source-a",
+                        report=report,
+                        page=1,
+                        section_title="业务",
+                        anchor=TextAnchor(bounded_quote="公司经营有线电视网络传输"),
+                    ),
+                ),
+                "major": True,
+                "statement_status": "current",
+            },
+        ),
+        max_output_tokens=2500,
+        timeout_seconds=30,
+    )
+    prompt = instructions(preview)
+    assert "all seven dimensions" not in prompt
+    assert "customer type" in prompt
+
+    one = request_reservation(preview)
+    long_gap = "补充说明。" * 2500
+    two = request_reservation(
+        preview.model_copy(
+            update={
+                "source_conditions": (
+                    *preview.source_conditions,
+                    {
+                        "condition_id": "cond-b",
+                        "dimension": "products_services",
+                        "description": "另有产品说明" + long_gap,
+                        "evidence": (
+                            Evidence(
+                                evidence_id="source-b",
+                                report=report,
+                                page=1,
+                                section_title="业务",
+                                anchor=TextAnchor(bounded_quote="并向家庭用户提供收视服务"),
+                            ),
+                        ),
+                        "major": False,
+                        "statement_status": "current",
+                    },
+                )
+            }
+        )
+    )
+    assert two > 20_000 >= one
+    identity["request_reservation_limit"] = 20_000
+    seen = {"verified_before_second_synthesis": False}
+
+    class _Batches(FakeReportProvider):
+        def interpret(self, request):
+            self.requests.append(request)
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(1,),
+                )
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=(
+                        {
+                            "condition_id": "cond-a",
+                            "dimension": "principal_business",
+                            "description": "来源写明网络传输",
+                            "evidence": (
+                                Evidence(
+                                    evidence_id="source-a",
+                                    report=request.report,
+                                    page=1,
+                                    section_title="业务",
+                                    anchor=TextAnchor(bounded_quote="公司经营有线电视网络传输"),
+                                ),
+                            ),
+                            "major": True,
+                            "statement_status": "current",
+                        },
+                        {
+                            "condition_id": "cond-b",
+                            "dimension": "products_services",
+                            "description": "另有产品说明" + long_gap,
+                            "evidence": (
+                                Evidence(
+                                    evidence_id="source-b",
+                                    report=request.report,
+                                    page=1,
+                                    section_title="业务",
+                                    anchor=TextAnchor(bounded_quote="并向家庭用户提供收视服务"),
+                                ),
+                            ),
+                            "major": False,
+                            "statement_status": "current",
+                        },
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                ids = [item.condition_id for item in request.source_conditions]
+                if any(item.endswith("cond-b") for item in ids):
+                    assert seen["verified_before_second_synthesis"]
+                    raise ValueError("partial_tail_hold_would_be_exhausted")
+                condition = request.source_conditions[0]
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        {
+                            "claim_id": "claim-a",
+                            "dimension": condition.dimension,
+                            "status": "observed",
+                            "answer": condition.description,
+                            "condition_ids": (condition.condition_id,),
+                            "evidence": condition.evidence,
+                        },
+                    ),
+                )
+            checks = [
+                {
+                    "target_type": "condition",
+                    "target_id": item.condition_id,
+                    "status": "pass",
+                    "explanation": "离线核验",
+                }
+                for item in request.source_conditions
+            ]
+            checks.extend(
+                {
+                    "target_type": "claim",
+                    "target_id": item.claim_id,
+                    "status": "unclear"
+                    if "技术环境" in item.answer
+                    else "pass",
+                    "explanation": "离线核验",
+                }
+                for item in request.claims
+            )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(checks),
+            )
+
+    def progress(partial) -> None:
+        if any(item.status == "observed" for item in partial.claims):
+            seen["verified_before_second_synthesis"] = True
+
+    result = _run(
+        _Batches(),
+        pages=pages,
+        processing_identity=identity,
+        report=report,
+        on_progress=progress,
+    )
+    kept = [item for item in result.claims if item.status == "observed"]
+    print("ALL", [(c.claim_id, c.status, c.limitation) for c in result.claims], result.gaps[:8])
+    assert kept and kept[0].claim_id == "claim-a"
+    assert seen["verified_before_second_synthesis"]
+    assert any(gap.startswith("condition_not_synthesized:") for gap in result.gaps)
+    assert result.real_semantic_complete is False
+    views = research_views(result)
+    rendered = views["views"]["company_profile"]["claims"]
+    assert rendered[0]["review_state"] == "verified"
+    assert "products_services" not in {item["dimension"] for item in rendered}
+
+    resumed = dict(identity)
+    resumed["resumed_receipts"] = [
+        item for item in result.call_receipts if item.get("status") == "success"
+    ]
+
+    class _Resume(_Batches):
+        def interpret(self, request):
+            if request.purpose in {"synthesize_views", "verify_views"} and any(
+                item.condition_id.endswith("cond-a")
+                for item in request.source_conditions
+            ):
+                raise AssertionError("completed batch was sent again")
+            return super().interpret(request)
+
+    again = _run(
+        _Resume(),
+        pages=pages,
+        processing_identity=resumed,
+        report=report,
+    )
+    assert any(item.status == "observed" for item in again.claims)
