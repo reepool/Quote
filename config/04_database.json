@@ -58,7 +58,7 @@
             "progress_stall_seconds": 900,
             "progress_log_interval_seconds": 30,
             "validation_mode": "quick_check_small_open_large",
-            "quick_check_max_bytes": 5368709120,
+            "quick_check_max_bytes": 2147483648,
             "validation_timeout_seconds": 900
         },
         "databases": [

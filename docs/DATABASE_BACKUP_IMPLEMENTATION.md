@@ -43,7 +43,7 @@
       "progress_stall_seconds": 900,
       "progress_log_interval_seconds": 30,
       "validation_mode": "quick_check_small_open_large",
-      "quick_check_max_bytes": 5368709120,
+      "quick_check_max_bytes": 2147483648,
       "validation_timeout_seconds": 900
     },
     "databases": [
@@ -108,7 +108,7 @@
 为避免同类问题，默认策略为：
 
 - `validation_mode=quick_check_small_open_large`：小库执行完整 `quick_check`，大库只做 SQLite open-only 校验。
-- `quick_check_max_bytes=5368709120`：超过 5GB 的备份文件不在周任务里做 NAS 全量扫描。
+- `quick_check_max_bytes=2147483648`：超过 2GB 的备份文件不在周任务里做 NAS 全量扫描。2026-10-19 周备份中 research（4.8GB）的 quick_check 因 NAS 冷缓存随机读仅约 3MB/s，900 秒内无法完成而超时失败；按该校验预算 2GB 是安全上界，research/valuation/quotes/financials 均走 open-only，完整一致性巡检移出备份窗口单独执行。
 - `validation_timeout_seconds=900`：需要执行 quick_check 时最多等待 15 分钟，超时后该库失败并按 `continue_on_database_failure` 继续后续库。
 - `max_database_seconds=25200`、`progress_stall_seconds=900`：备份复制阶段如果单库耗时过长或进度长期不变，将主动失败，不再无限等待。`financials.db` 约 67GB，备份目标为 NFS 挂载，实测整库拷贝吞吐在 2.7–7.4 MB/s 波动（2026-07-04 无上限时实跑 5.2 小时），单库上限按慢速日预留 7 小时；整轮预算 `max_total_seconds=36000`（10 小时）覆盖 financials 拉长后的最坏情况。
 
