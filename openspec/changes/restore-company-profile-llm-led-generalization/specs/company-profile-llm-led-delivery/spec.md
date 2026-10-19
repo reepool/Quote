@@ -82,6 +82,11 @@ The system MUST deliver company profile, product/service output and input exposu
 - **AND** altered non-whitespace characters, out-of-scope references and unresolved multiple matches remain ungrounded; quotation location alone does not establish semantic support
 - **AND** contextual verification retains the relevant paragraph and heading to distinguish industry statements, company actions and plans; invalid objects and their dependencies are isolated without clearing independent valid results
 
+#### Scenario: A PDF line break separates a quotation from its governing context
+- **WHEN** an exact quotation belongs to an industry discussion, strategic target, different actor or negated statement whose governing source context crosses a layout line break
+- **THEN** synthesis and verification receive that necessary source context together with the exact quotation, rather than only the quotation's PDF line
+- **AND** insufficient context leaves the claim unverified or triggers an authorized bounded reread; keywords, company names, page numbers or quotation location do not replace semantic verification
+
 ### Requirement: Finite evaluation governs expansion and remediation
 Implementation and review MUST follow the product requirements, acceptance program v2 and delivery plan in that order. Four historical development reports, twelve new-policy regressions, twenty unseen reports and another hundred controlled reports MUST remain distinct. S2 MUST stop at twenty or one authorized replacement confirmation group of twenty; S3 MUST stop at one hundred. Initial and remedied scores MUST remain immutable and separate. All three views, source-derived core conditions, bounded supplementary audits, resource limits and remediation costs MUST be evaluated under the acceptance program; uncertainty MUST NOT disguise unprocessed core information.
 

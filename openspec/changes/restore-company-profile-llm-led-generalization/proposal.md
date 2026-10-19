@@ -24,4 +24,4 @@ v61及S1证明了部分历史样本的规则抽取，却没有证明真实LLM阅
 
 ## Impact
 
-需求、验收、A/B流程、任务卡及导航按显式版本接续；业务实现待下列tasks。涉及`operations.py`、`runtime.py`、`workflow.py`、`stage5_provider.py`、`core_evidence_selection.py`、`core_assessment_projection.py`及现有读取投影，沿`company_profile_common_core`单一owner。FR-05/FR-14/FR-15文档治理适用，不启动全仓框架改造。2026-10-19 A审核24e8cd2f，B1-H的2/2入口耗尽并结束，B1/A1未过；当前只按验收§7.12/执行卡§21完成B1-I零外呼完整实际入口验证与实施取舍，新增真实入口/模型调用/付费均0，无第9次。保留分层LLM方向，八入口失败/账本及派生链保留，模拟不计真实成绩；后续须A整体裁决。生产仍`not_authorized`、规模声明false，不扩批或改写历史/既有改动。
+需求、验收、A/B流程、任务卡及导航按显式版本接续；业务实现待下列tasks。涉及`operations.py`、`runtime.py`、`workflow.py`、`stage5_provider.py`、`core_evidence_selection.py`、`core_assessment_projection.py`及现有读取投影，沿`company_profile_common_core`单一owner。FR-05/FR-14/FR-15文档治理适用，不启动全仓框架改造。2026-10-19 A审核97fb94a4：B1-I协议闭环局部接受，B1/A1未过；当前按验收§7.13/执行卡§22连续修上下文/直接阻塞并冻结，自主执行一次真实业务裁决窗0/1（累计第9入口），900秒/120000账本/16物理请求。不是恢复B1-H或转借旧余额；前置/真实窗失败交可靠部分及能力结论，结束本执行方案，无第10次。保留分层LLM方向和原owner，不扩大公共硬限；八入口失败/账本及派生链不改，模拟不计真实成绩。生产仍`not_authorized`、规模声明false，不扩批或改写历史/既有改动。

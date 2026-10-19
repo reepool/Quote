@@ -2,7 +2,7 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-10-19。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。2026-10-19 A审核24e8cd2f，B1/A1未通过；B1-H的2/2入口耗尽并结束。当前[执行卡§21](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md#21-b1-i完整实际入口验证与实施取舍当前卡)只做B1-I完整实际入口离线验证与实施取舍，新增真实入口/模型调用授权均为0。资源/唯一进度见验收§7.12/§8，八入口失败及19核心/6负例不改。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。2026-10-19 A审核97fb94a4，B1-I磁盘JSON/实际owner协议闭环接受、核验就绪部分接受，B1/A1未通过。当前[执行卡§22](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md#22-b1-j真实三视图交付与能力裁决当前卡)为B1-J：修必要上下文及直接阻塞后，显式授权一次真实业务裁决窗0/1（累计第9入口），不是恢复B1-H或借旧余额；失败结束本执行方案，无第10次。资源/唯一进度见验收§7.13/§8，八入口失败及19核心/6负例不改。
 
 ## 1. 开发者必须先理解的纠偏
 
@@ -46,24 +46,24 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 
 ## 4. 顺序开发任务卡
 
-### A0：冻结B1执行合同（A负责，当前仅离线卡获授权）
+### A0：冻结B1执行合同（A负责，当前仅B1-J一个真实裁决窗）
 
 - 目标：选定1家历史报告作为B1输入，确认其具备主营、收入表、投入/角色披露；核对不在S2留出20家内，冻结来源hash、知识截止日、合同、模型/提示词/预处理版本、费用和调用预算。
 - A交付：一张可执行的B1卡，写明唯一owner、允许修改目录、输入输出、验证命令、一个证据入口和停止条件。A不要求B按指定函数实现。
-- 当前接续：[执行卡§21](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md#21-b1-i完整实际入口验证与实施取舍当前卡)保留歌华19核心/6负例、源hash、知识时点及产品契约v3，结束B1-H试跑授权。真实执行身份/旧响应不改，离线派生身份明确标模拟、保版本链，不称新首发或重判八入口失败。
-- B开始条件：先清无依赖历史垃圾并保护唯一证据/既有改动；同窗解决实际入口及磁盘续跑、非空原owner闭环，提交完整验证及实施取舍。当前真实入口0、模型调用0、付费0，无第9次；A下次整体裁决而非自动续额。
+- 当前接续：[执行卡§22](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md#22-b1-j真实三视图交付与能力裁决当前卡)保留歌华19核心/6负例、源hash、知识时点及产品契约v3。允许第6次真实导航/第7次真实正文在新冻结身份重验并保派生链；原始响应/执行身份/账本不动，不加载B1-I模拟条件、主张或usage作为真实结果，不称新首发或重判八入口失败。
+- B开始条件：先清无依赖历史垃圾并保护唯一证据/既有改动；同窗修上下文输入和直接阻塞、做必要验证并冻结，再自主执行唯一真实窗900秒/120000账本/16物理请求。前置或真实窗失败交可靠部分及明确能力结论，结束本执行方案，不再只申请另一准备卡。
 
 ### B1：一家公司真实解读闭环（B连续实施，当前首要任务）
 
 - 目标：从已有历史报告选1家同时含主营描述、收入表及投入/角色的公司，真实LLM生成三视图，并从query/export读回；选择不得触碰S2留出20家。
-- 当前只执行[卡§21](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md#21-b1-i完整实际入口验证与实施取舍当前卡)/R28—R29：一个有退出条件的零外呼窗口，用完整208页及实际操作入口证明新建/磁盘续跑、非空三视图、合法结果保留与局部错误隔离，再交实施取舍；不再用真实入口定位本地可发现的错误。模拟只计工程证据，原八入口失败及19/6不改。
+- 当前只执行[卡§22](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md#22-b1-j真实三视图交付与能力裁决当前卡)/R30—R31：一个连续窗口交真实LLM核验的三视图，不能达标则交可靠部分和能力失败结论。先保存最早可独立成立的已核结果，再补齐主要业务、关键机制和源先行查漏；次要附注后置，已知核心缺口挡完整。模拟只计工程证据，原八入口失败及19/6不改。
 - 入口/owner：`company_profile_common_core` → `research/company_profile/operations.py` → runtime/workflow及`CommonGatewaySemanticProvider` → 原repository/read service；统一走`utils/llm`公共网关。
 - 实现：真实provider/日志→全报告导航与LLM核心上下文→独立源先行查漏/有界补读→证据摘要与核验；可靠结构化事实复用不短路开放语义。正则只作定位/硬约束，A核心答案不输入选页器；必要请求/读取元数据版本化。
 - 输出：三视图、原文引用、缺项/冲突说明、真实模型/请求/usage、页覆盖、query/export一致；provider未配置或不可用明确失败/限用。
 - 验证：同一报告完整端到端；增加缺provider、已存在overview仍需语义阅读、否定/计划/第三方及真实冲突的直接测试；源先行检查要能找出故意移除的主要板块。模型调用量不作为质量替代。
-- B自主范围：上述调用链最小充分修改及直接回归，按卡§21连续完成R28/R29，目标一个工作日、最多两次共性局部迭代，不逐函数等A。复用已有模拟传输及operator入口，不另建框架；保留严格硬约束，不全局关闭strict或用空结果通关。新建和磁盘接续均只在隔离离线身份下执行，不改真实attempt标记，不发模型请求或探针。
+- B自主范围：上述调用链最小充分修改及直接回归，按卡§22连续完成R30/R31，最多两次共性局部迭代，不逐函数等A。修PDF软换行截断统领上下文、必要分批处置及可靠结果保留，复用实际operator/owner；不另建框架、不全局关闭strict、不改公共预算硬限。验证实载正常、一次unknown及输出增长后的末端；不以固定模拟usage证明资源可行，也不新增全部未来最大预留相加的启动门槛。冻结后唯一真实窗自主执行，无额外探针。
 - B交接条件：提交一个`review-submission.md`，同时给出首次/后继、三视图逐项证据、真实provider/model/request/usage、query/export、测试和未解决项；代码、提示词、输入和制品版本可重建。
-- 停止：合同冲突、既有改动不可安全隔离或两次迭代仍不能完整验证时，保护结果并交具体不可实施边界和最短替代方案，停止该实现方案，不再只交另一轮准备申请。离线通过也须A作整体可执行性/能力与资源取舍，不自动真实运行；只有真实B1经A1独立通过才进入B2，局部/模拟成绩和旧余额均不放行。
+- 停止：合同冲突、既有改动不可安全隔离、两次迭代仍不能形成可执行路径，或唯一真实窗失败/硬限到达，保护结果并交可靠部分、具体不可实施边界和最短替代方案，停止本执行方案。无第10次、短段探针、换公司或额外预算；只有真实B1经A1独立通过才进入B2，局部/模拟成绩和旧余额均不放行。
 
 ### A1：B1独立审核与放行（A负责）
 
