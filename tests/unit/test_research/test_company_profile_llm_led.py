@@ -1922,6 +1922,12 @@ def test_seventh_run_quotes_relocate_on_the_sent_pages_without_a_model_call():
             if hit[0] == quote:
                 exact += 1
             assert "".join(hit[0].split()) == "".join(quote.split())
+            paragraph = hit[3]
+            if condition["condition_id"] == "cond-ud-01" and "700" in quote:
+                assert "从技术环境来看" in paragraph
+            if condition["condition_id"] == "cond-scr-01" and "战略转型" in quote:
+                assert "近年来" in paragraph
+                assert "公司" in paragraph
     assert located == 13
     assert exact == 3
 
@@ -2204,4 +2210,197 @@ def test_saved_body_json_reloads_through_the_resume_decoder():
     with pytest.raises(ValidationError):
         ReportSemanticResponseV3.model_validate_json(
             json.dumps(rejected, ensure_ascii=False)
+        )
+
+
+def test_unsent_gap_pages_stay_incomplete_and_one_claim_is_kept():
+    """A stopped gap check must not relabel the pages it never sent as ordinary notes."""
+    from research.company_profile.report_interpretation import (
+        layered_processing_identity,
+    )
+
+    identity = layered_processing_identity()
+    report = _report()
+    pages = tuple(
+        {
+            "page": number,
+            "text": f"第{number}页公司经营有线电视网络传输。",
+            "readable": True,
+        }
+        for number in range(1, 5)
+    )
+
+    class _StopGap(FakeReportProvider):
+        def interpret(self, request):
+            self.requests.append(request)
+            if request.source_scope == "page_map":
+                if any(
+                    earlier.purpose == "source_inventory"
+                    and earlier.source_scope == "full_context"
+                    for earlier in self.requests[:-1]
+                ):
+                    raise ValueError("partial_tail_hold_would_be_exhausted")
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(1,),
+                )
+            if request.purpose == "source_inventory":
+                evidence = _evidence(
+                    request.report,
+                    text="公司经营有线电视网络传输",
+                    page=1,
+                )
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=(
+                        {
+                            "condition_id": "kept",
+                            "dimension": "principal_business",
+                            "description": "来源写明网络传输",
+                            "evidence": (evidence,),
+                            "major": True,
+                            "statement_status": "current",
+                        },
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                condition = request.source_conditions[0]
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        {
+                            "claim_id": "claim-kept",
+                            "dimension": condition.dimension,
+                            "status": "observed",
+                            "answer": condition.description,
+                            "condition_ids": (condition.condition_id,),
+                            "evidence": condition.evidence,
+                        },
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "condition",
+                        "target_id": item.condition_id,
+                        "status": "pass",
+                        "explanation": "离线核验",
+                    }
+                    for item in request.source_conditions
+                )
+                + tuple(
+                    {
+                        "target_type": "claim",
+                        "target_id": item.claim_id,
+                        "status": "pass",
+                        "explanation": "离线核验",
+                    }
+                    for item in request.claims
+                ),
+            )
+
+    result = _run(_StopGap(), pages=pages, processing_identity=identity, report=report)
+    assert any(claim.status == "observed" for claim in result.claims)
+    for page in (2, 3, 4):
+        assert f"gap_check_incomplete:{page}" in result.gaps
+        assert f"supplement_unread:{page}" not in result.gaps
+    assert result.draft_complete is False
+    assert result.real_semantic_complete is False
+
+
+def test_seventh_body_pages_reserve_at_the_send_point():
+    """The card limit is the real payload reservation, not a flat simulated usage."""
+    import time
+    from pathlib import Path
+
+    from research.company_profile.contracts import ReportSemanticRequestV3
+    from research.company_profile.reading_budget import request_reservation
+    from research.company_profile.report_interpretation import (
+        layered_processing_identity,
+    )
+    from utils.llm.budget import DEVELOPMENT_UNPRICED_BILLING, LlmRunBudget
+    from utils.llm.errors import LlmDeadlineExceededError
+
+    change = (
+        Path(__file__).resolve().parents[3]
+        / "openspec/changes/restore-company-profile-llm-led-generalization"
+    )
+    saved = json.loads(
+        (
+            change / "b1-pool-observation-evidence/resume1/work-checkpoint.json"
+        ).read_text()
+    )
+    pages = {int(page["page"]): page["text"] for page in saved["pages"]}
+    body = next(
+        item
+        for item in saved["report_interpretation"]["call_receipts"]
+        if item.get("source_scope") == "full_context"
+    )
+    source_pages = tuple(
+        {
+            "page": int(page),
+            "text": pages[int(page)],
+            "readable": True,
+            "offset": 0,
+            "body_scope": "full_page",
+        }
+        for page in body["source_pages"]
+    )
+    units = request_reservation(
+        ReportSemanticRequestV3(
+            request_id="send-point",
+            purpose="source_inventory",
+            report=_report(),
+            processing_identity=layered_processing_identity(),
+            source_pages=source_pages,
+            source_scope="full_context",
+            max_output_tokens=2500,
+            timeout_seconds=30,
+        )
+    )
+    assert 8_000 < units <= 24_000
+    budget = LlmRunBudget(
+        deadline=time.monotonic() + 30,
+        prices={},
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        max_tokens=units,
+        max_requests=2,
+    )
+    output = 2500
+    empty = json.dumps(
+        {
+            "max_completion_tokens": output,
+            "messages": [{"role": "user", "content": ""}],
+        },
+        ensure_ascii=False,
+        separators=(",", ":"),
+    ).encode()
+    payload = {
+        "max_completion_tokens": output,
+        "messages": [{"role": "user", "content": "x" * (units - 256 - output - len(empty))}],
+    }
+    ticket = budget.reserve(
+        resource="scorpio:gemini",
+        model="gemini-3.8-flash-high",
+        profile="semantic_extraction__scorpio_gemini",
+        payload=payload,
+        request_id="unknown-1",
+        attempt=1,
+    )
+    budget.settle(ticket, None, status="success")
+    assert budget.snapshot()["charged_tokens"] == units
+    assert budget.snapshot()["cost_status"] == "unknown"
+    with pytest.raises(LlmDeadlineExceededError):
+        budget.reserve(
+            resource="scorpio:gemini",
+            model="gemini-3.8-flash-high",
+            profile="semantic_extraction__scorpio_gemini",
+            payload=payload,
+            request_id="unknown-2",
+            attempt=1,
         )

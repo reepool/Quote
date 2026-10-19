@@ -477,24 +477,97 @@ def _spans_in_text(quote: str, text: str) -> list[tuple[int, int]] | None:
     return spans
 
 
+def _line_spans(text: str) -> list[tuple[int, int]]:
+    spans: list[tuple[int, int]] = []
+    start = 0
+    for index, char in enumerate(text):
+        if char == "\n":
+            spans.append((start, index))
+            start = index + 1
+    spans.append((start, len(text)))
+    return spans
+
+
+def _line_text(text: str, span: tuple[int, int]) -> str:
+    return text[span[0] : span[1]].replace("\r", "").strip()
+
+
+def _ends_sentence(line: str) -> bool:
+    return bool(line) and line.endswith(("。", "！", "？"))
+
+
+def _is_heading_line(line: str) -> bool:
+    # A full PDF wrap is about forty characters and must stay inside the paragraph.
+    return 1 < len(line) <= 20 and not line.endswith(("。", "；", "！", "？"))
+
+
+def _bounded_governing_context(
+    text: str, paragraph_start: int, paragraph_end: int, start: int, end: int
+) -> str:
+    """Keep the opening sentence and the quote's sentence inside a long paragraph."""
+    body = text[paragraph_start:paragraph_end]
+    opening_end = len(body)
+    for mark in ("。", "！", "？"):
+        found = body.find(mark)
+        if 0 <= found < opening_end:
+            opening_end = found + 1
+    local_start = max(0, start - paragraph_start)
+    local_end = max(local_start, end - paragraph_start)
+    sentence_start = 0
+    for mark in ("。", "！", "？"):
+        found = body.rfind(mark, 0, local_start)
+        if found >= sentence_start:
+            sentence_start = found + 1
+    sentence_end = len(body)
+    for mark in ("。", "！", "？"):
+        found = body.find(mark, local_end)
+        if 0 <= found < sentence_end:
+            sentence_end = found + 1
+    if sentence_start <= opening_end:
+        return body[:sentence_end].strip("\r\n ")
+    return (body[:opening_end] + body[sentence_start:sentence_end]).strip("\r\n ")
+
+
 def _heading_and_paragraph(text: str, start: int, end: int) -> tuple[str, str]:
-    paragraph_start = text.rfind("\n", 0, start)
-    paragraph_start = 0 if paragraph_start < 0 else paragraph_start + 1
-    paragraph_end = text.find("\n", end)
-    paragraph_end = len(text) if paragraph_end < 0 else paragraph_end
-    # A PDF page can be one long line. Keep the surrounding words, not the page.
-    if paragraph_end - paragraph_start > 800:
-        paragraph_start = max(paragraph_start, start - 240)
-        paragraph_end = min(paragraph_end, end + 240)
-    paragraph = text[paragraph_start:paragraph_end].strip()
+    """Restore the paragraph that governs a quote.
+
+    A single PDF newline is a wrap, not a paragraph boundary. Boundaries are a
+    blank line, a short heading, or a line that already ended a sentence.
+    """
+    lines = _line_spans(text)
+    index = 0
+    for position, span in enumerate(lines):
+        if span[0] <= start <= span[1]:
+            index = position
+            break
+    para_start = index
+    while para_start > 0:
+        previous = _line_text(text, lines[para_start - 1])
+        if not previous or _ends_sentence(previous) or _is_heading_line(previous):
+            break
+        para_start -= 1
+    para_end = index
+    while para_end + 1 < len(lines):
+        current = _line_text(text, lines[para_end])
+        following = _line_text(text, lines[para_end + 1])
+        if not following or _ends_sentence(current) or _is_heading_line(following):
+            break
+        para_end += 1
+    paragraph_start = lines[para_start][0]
+    paragraph_end = lines[para_end][1]
+    paragraph = text[paragraph_start:paragraph_end].strip("\r\n ")
+    if len(paragraph) > 800:
+        paragraph = _bounded_governing_context(
+            text, paragraph_start, paragraph_end, start, end
+        )
     heading = ""
-    for line in reversed(text[:paragraph_start].splitlines()):
-        stripped = line.strip()
+    for span in reversed(lines[:para_start]):
+        stripped = _line_text(text, span)
         if not stripped:
             if heading:
                 break
             continue
-        if 1 < len(stripped) <= 40 and not stripped.endswith(("。", "；", "！", "？")):
+        if _is_heading_line(stripped):
             heading = stripped
         break
     return heading, paragraph
@@ -1234,7 +1307,7 @@ def interpret_report(
                 if gap not in gaps:
                     gaps.append(gap)
 
-        for chunk in chunks:
+        for index, chunk in enumerate(chunks):
             try:
                 response = invoke(
                     "source_inventory",
@@ -1251,6 +1324,16 @@ def interpret_report(
                 )
             except (ValueError, LlmError) as exc:
                 message = str(exc)
+                # A hard stop keeps the pages already read and does not send the
+                # rest. Their absence stays a necessary gap, then synthesis of
+                # what was read can still be saved.
+                if isinstance(exc, LlmError) and exc.code in {
+                    "deadline_exceeded",
+                    "cancelled",
+                }:
+                    for later in chunks[index:]:
+                        mark_necessary(later)
+                    break
                 if message not in continuable and not (
                     isinstance(exc, LlmError)
                     and exc.code
@@ -1334,7 +1417,7 @@ def interpret_report(
                     ),
                     split_mode="boundary",
                 )
-                for batch in preview_batches:
+                for batch_index, batch in enumerate(preview_batches):
                     try:
                         gap_response = invoke(
                             "source_inventory",
@@ -1343,20 +1426,30 @@ def interpret_report(
                         )
                     except (ValueError, LlmError) as exc:
                         message = str(exc)
-                        if message not in continuable and not (
-                            isinstance(exc, LlmError)
-                            and exc.code
-                            not in {
-                                "deadline_exceeded",
-                                "cancelled",
-                                "configuration_error",
-                            }
+                        if (
+                            not (
+                                isinstance(exc, LlmError)
+                                and exc.code in {"deadline_exceeded", "cancelled"}
+                            )
+                            and message not in continuable
+                            and not (
+                                isinstance(exc, LlmError)
+                                and exc.code
+                                not in {
+                                    "deadline_exceeded",
+                                    "cancelled",
+                                    "configuration_error",
+                                }
+                            )
                         ):
                             raise
-                        for fragment in batch:
-                            gaps.append(
-                                f"gap_check_incomplete:{int(fragment['page'])}"
-                            )
+                        # Batches not sent are unfinished gap checks. They are
+                        # not ordinary unread notes and cannot be skipped.
+                        for later in preview_batches[batch_index:]:
+                            for fragment in later:
+                                gap = f"gap_check_incomplete:{int(fragment['page'])}"
+                                if gap not in gaps:
+                                    gaps.append(gap)
                         break
                     if gap_response.source_conditions:
                         raise ValueError("page_map_cannot_establish_source_conditions")
@@ -1916,6 +2009,10 @@ def interpret_report(
                 and verdicts[("condition", condition.condition_id)] != "pass"
             ):
                 gaps.append(f"major_condition_not_delivered:{condition.condition_id}")
+        claimed_ids = {key for claim in claims for key in claim.condition_ids}
+        for condition in conditions:
+            if condition.condition_id not in claimed_ids:
+                gaps.append(f"condition_not_synthesized:{condition.condition_id}")
         if partial and partial_plan is not None:
             committed = (conditions, claims, records, checks)
             remaining_ids = partial_plan.get("unread_selected_pages") or []

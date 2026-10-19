@@ -284,6 +284,7 @@ def validate_binding(
                 "layered",
                 "resume1",
                 "resume2",
+                "decision",
             }
             or not authorization.get("approval_reference")
         ):
@@ -809,6 +810,14 @@ def main() -> int:
             and (attempts / "resume1.json").is_file()
         ):
             raise ValueError("resume2 requires the protected layered and resume1 markers")
+        if authorization["attempt"] == "decision" and not (
+            (attempts / "layered.json").is_file()
+            and (attempts / "resume1.json").is_file()
+            and (attempts / "resume2.json").is_file()
+        ):
+            raise ValueError(
+                "decision requires the protected layered, resume1 and resume2 markers"
+            )
         if authorization["attempt"] == "layered" and not (
             (attempts / "first.json").is_file()
             and (attempts / "successor.json").is_file()
