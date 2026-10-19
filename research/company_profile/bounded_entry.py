@@ -28,8 +28,8 @@ def write_json(path: Path, value: Any) -> None:
 
 
 def refuse_layered_semantic_continuation(binding: dict) -> None:
-    """Layered reading starts from the report. Old semantic receipts are not inputs."""
-    if binding.get("reading_strategy") == "layered_v3" and (
+    """A new reading starts from the report. Old semantic receipts are not inputs."""
+    if binding.get("reading_strategy") in {"layered_v3", "direct_core_v1"} and (
         binding.get("navigation_query") or binding.get("continuation_checkpoint")
     ):
         raise ValueError("layered_v3_refuses_semantic_continuation")
@@ -89,6 +89,47 @@ def preflight_partial(binding: dict) -> dict:
     if 4 > int(binding["max_physical_requests"]):
         raise ValueError("partial_plan_exceeds_request_cap")
     return plan
+
+
+def preflight_direct_core(binding: dict) -> dict:
+    """Admit the first chapter package with the same reservation the send uses."""
+    import gzip
+
+    from research.company_profile.direct_reading import first_package_plan
+    from research.company_profile.models import ReportIdentity
+    from research.company_profile.report_interpretation import (
+        direct_core_processing_identity,
+    )
+
+    checkpoint = json.loads(
+        gzip.decompress(Path(binding["navigation_checkpoint"]).read_bytes())
+    )
+    source = json.loads(Path(binding["navigation_source_receipt"]).read_text())
+    pages = tuple(
+        {
+            "page": int(page["page"]),
+            "text": str(page.get("text") or ""),
+            "readable": bool(str(page.get("text") or "").strip()),
+        }
+        for page in checkpoint["pages"]
+    )
+    hashes = {
+        str(page["page"]): hashlib.sha256(page["text"].encode()).hexdigest()
+        for page in pages
+    }
+    if hashes != source["page_text_sha256"]:
+        raise ValueError("navigation_checkpoint_does_not_match_source_receipt")
+    report = ReportIdentity.model_validate(
+        checkpoint.get("report") or checkpoint["report_interpretation"]["report"]
+    )
+    identity = direct_core_processing_identity()
+    return first_package_plan(
+        pages,
+        report,
+        identity,
+        ledger=int(binding["max_tokens"]),
+        reservation_limit=int(binding.get("request_reservation_limit", 24_000)),
+    )
 
 
 def preflight_layered(binding: dict) -> dict:
@@ -294,6 +335,7 @@ def validate_binding(
                 "resume2",
                 "decision",
                 "window10",
+                "direct1",
             }
             or not authorization.get("approval_reference")
         ):
@@ -461,10 +503,14 @@ def _worker(
         billing_mode=binding.get("billing_mode", "strict"),
         recovery_policy=(
             LogicalRecoveryPolicy(
-                max_recoveries=int(binding.get("max_recoveries", 4)),
+                max_recoveries=(
+                    1
+                    if binding.get("reading_strategy") == "direct_core_v1"
+                    else int(binding.get("max_recoveries", 4))
+                ),
                 max_per_logical_request=1,
             )
-            if binding.get("reading_strategy") == "layered_v3"
+            if binding.get("reading_strategy") in {"layered_v3", "direct_core_v1"}
             else None
         ),
         prior_logical_attempts=prior_attempts,
@@ -646,12 +692,17 @@ def _worker(
                 else binding["model"]
             ),
         )
-    if binding.get("reading_strategy") == "layered_v3":
+    if binding.get("reading_strategy") in {"layered_v3", "direct_core_v1"}:
         from research.company_profile.report_interpretation import (
+            direct_core_processing_identity,
             layered_processing_identity,
         )
 
-        identity = layered_processing_identity()
+        identity = (
+            direct_core_processing_identity()
+            if binding.get("reading_strategy") == "direct_core_v1"
+            else layered_processing_identity()
+        )
         if real:
             identity.update(
                 execution_mode="provider",
@@ -783,6 +834,8 @@ def main() -> int:
         preflight_partial(binding)
     if binding.get("reading_strategy") == "layered_v3":
         preflight_layered(binding)
+    if binding.get("reading_strategy") == "direct_core_v1":
+        preflight_direct_core(binding)
     if args.worker_deadline is not None:
         finish_worker(
             run_root,
@@ -834,6 +887,10 @@ def main() -> int:
             (attempts / "decision.json").is_file()
         ):
             raise ValueError("window10 requires the protected decision marker")
+        if authorization["attempt"] == "direct1" and not (
+            (attempts / "window10.json").is_file()
+        ):
+            raise ValueError("direct1 requires the protected window10 marker")
         if authorization["attempt"] == "layered" and not (
             (attempts / "first.json").is_file()
             and (attempts / "successor.json").is_file()

@@ -2939,3 +2939,191 @@ def test_ninth_saved_body_and_drafts_commit_one_batch_with_real_context():
     rendered = research_views(result)["views"]["company_profile"]["claims"]
     assert any(item["status"] == "observed" for item in rendered)
     assert result.real_semantic_complete is False
+
+
+def test_direct_core_publishes_one_verified_package_and_keeps_it_when_the_next_stops():
+    """Chapter text becomes a claim before the next package. Not a business score."""
+    from research.company_profile.contracts import (
+        ReportSemanticResponseV3,
+        ReportViewClaim,
+    )
+    from research.company_profile.report_interpretation import (
+        direct_core_processing_identity,
+    )
+    from research.company_profile.report_wire import compact_request
+
+    report = _report()
+    sentence = "公司经营有线电视网络传输。"
+    filler = "甲" * 1800
+    pages = (
+        {"page": 1, "text": sentence + filler + "。", "readable": True},
+        {"page": 2, "text": sentence + ("乙" * 1800) + "。", "readable": True},
+    )
+    identity = direct_core_processing_identity()
+    identity["request_reservation_limit"] = 15_000
+    seen = {"published": False}
+
+    class _Provider:
+        offline_only = True
+
+        def __init__(self):
+            self.requests = []
+            self.syntheses = 0
+
+        def interpret(self, request):
+            self.requests.append(request)
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=tuple(page["page"] for page in request.source_pages),
+                )
+            if request.purpose == "synthesize_views":
+                self.syntheses += 1
+                if self.syntheses > 1:
+                    raise ValueError("controlled_second_package")
+                quote = request.source_pages[0]["text"][:12]
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="claim-current",
+                            dimension="principal_business",
+                            status="observed",
+                            answer="公司经营有线电视网络传输。",
+                            evidence=(
+                                _evidence(report, text=quote, page=1).model_copy(
+                                    update={"evidence_id": "e-current"}
+                                ),
+                            ),
+                        ),
+                        ReportViewClaim(
+                            claim_id="claim-missing-quote",
+                            dimension="products_services",
+                            status="observed",
+                            answer="不存在的产品。",
+                            evidence=(
+                                _evidence(report, text="不存在的原文", page=1).model_copy(
+                                    update={"evidence_id": "e-missing"}
+                                ),
+                            ),
+                        ),
+                        ReportViewClaim(
+                            claim_id="claim-dependent",
+                            dimension="output_exposure",
+                            status="observed",
+                            answer="依赖原生记录的收入。",
+                            supporting_record_ids=("rev-in",),
+                            evidence=(
+                                _evidence(report, text=quote, page=1).model_copy(
+                                    update={"evidence_id": "e-dependent"}
+                                ),
+                            ),
+                        ),
+                        ReportViewClaim(
+                            claim_id="claim-planned",
+                            dimension="revenue_model",
+                            status="unclear",
+                            answer="计划开展的业务。",
+                            limitation="planned_not_current",
+                            evidence=(
+                                _evidence(report, text=quote, page=1).model_copy(
+                                    update={"evidence_id": "e-planned"}
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+            if request.purpose == "source_inventory":
+                assert request.claims == ()
+                assert "claims" not in compact_request(request)
+                quote = request.source_pages[0]["text"][:12]
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=(
+                        {
+                            "condition_id": "cond-current",
+                            "dimension": "principal_business",
+                            "description": "正文支持的主营。",
+                            "evidence": (
+                                _evidence(report, text=quote, page=1).model_copy(
+                                    update={"evidence_id": "e-condition"}
+                                ),
+                            ),
+                            "major": True,
+                            "statement_status": "current",
+                        },
+                    ),
+                )
+            checks = tuple(
+                {
+                    "target_type": "claim",
+                    "target_id": item.claim_id,
+                    "status": "pass",
+                    "explanation": "离线核验",
+                }
+                for item in request.claims
+            ) + tuple(
+                {
+                    "target_type": "condition",
+                    "target_id": item.condition_id,
+                    "status": "pass",
+                    "explanation": "离线核验",
+                }
+                for item in request.source_conditions
+            ) + tuple(
+                {
+                    "target_type": "record",
+                    "target_id": item.record_id,
+                    "status": "unclear",
+                    "explanation": "冲突",
+                }
+                for item in request.records
+            )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=checks,
+            )
+
+    def progress(partial) -> None:
+        if any(item.status == "observed" for item in partial.claims):
+            seen["published"] = True
+
+    provider = _Provider()
+    result = _run(
+        provider,
+        pages=pages,
+        processing_identity=identity,
+        report=report,
+        on_progress=progress,
+        structured_records=(_span_measurement(report, "rev-in", sentence[:12], 1),),
+    )
+    assert seen["published"]
+    assert any(item.status == "observed" for item in result.claims)
+    assert all(
+        item.status != "observed"
+        for item in result.claims
+        if item.claim_id == "claim-missing-quote"
+    )
+    assert all(
+        item.status != "observed"
+        for item in result.claims
+        if item.claim_id == "claim-dependent"
+    )
+    assert all(
+        item.status != "observed"
+        for item in result.claims
+        if item.claim_id == "claim-planned"
+    )
+    assert any(gap.startswith("record_semantic_conflict:rev-in") for gap in result.gaps)
+    assert any(gap.startswith("direct_core_package_stopped:") for gap in result.gaps)
+    assert result.real_semantic_complete is False
+    assert [item.purpose for item in provider.requests][:4] == [
+        "source_inventory",
+        "synthesize_views",
+        "source_inventory",
+        "verify_views",
+    ]

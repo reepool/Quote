@@ -128,6 +128,17 @@ def offline_processing_identity() -> dict[str, Any]:
     }
 
 
+def direct_core_processing_identity() -> dict[str, Any]:
+    """Core-chapter reading: navigate, then write claims from the chapter text."""
+    identity = compact_processing_identity(discovery_scope="page_map")
+    identity["reading_strategy"] = "direct_core_v1"
+    identity["prompt_version"] = "company_profile_report_reading.2026-10-19.direct-core.v1"
+    identity["product_contract"] = (
+        "company_profile_product_contract.2026-10-18.llm-led.v3"
+    )
+    return identity
+
+
 def layered_processing_identity() -> dict[str, Any]:
     """Full-report navigation, then core context, not every unread footnote."""
     identity = compact_processing_identity(discovery_scope="page_map")
@@ -698,6 +709,21 @@ def interpret_report(
     executable now and cannot claim real semantic completion.
     """
     start = time.monotonic() if started_at is None else started_at
+    if processing_identity.get("reading_strategy") == "direct_core_v1":
+        from research.company_profile.direct_reading import interpret_direct_core
+
+        return interpret_direct_core(
+            report=report,
+            pages=pages,
+            processing_identity=processing_identity,
+            provider=provider,
+            work_id=work_id,
+            token_budget=token_budget,
+            started_at=start,
+            structured_records=structured_records,
+            execution_budget=execution_budget,
+            on_progress=on_progress,
+        )
     identity = dict(processing_identity)
     compact = identity.get("wire_protocol") == "company_profile_report_request.v3"
     structural = compact and identity.get("discovery_scope") == "page_map"
