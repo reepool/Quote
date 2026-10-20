@@ -332,3 +332,89 @@ def protocol_reply(request: dict) -> dict:
             for item in values
         ]
     return result
+
+
+def _source_sentences(request: dict) -> list[tuple[int, str]]:
+    found: list[tuple[int, str]] = []
+    for page in request.get("source_pages") or []:
+        text = str(page.get("text") or "")
+        for piece in text.split("。"):
+            quote = piece.strip()
+            if len(quote) < 8 or quote not in text:
+                continue
+            found.append((int(page["page"]), quote[:40]))
+            if len(found) == 2:
+                return found
+    return found
+
+
+def direct_chain_reply(request: dict) -> dict:
+    """Offline stand-in for the direct chapter chain. Not a reading of the company."""
+    result = {
+        "schema_version": "company_profile_report_response.v3",
+        "request_id": request["request_id"],
+        "purpose": request["purpose"],
+    }
+    if request.get("source_scope") == "page_map":
+        chosen = [
+            int(page["page"])
+            for page in request.get("source_pages") or []
+            if any(
+                mark in str(page.get("text") or "")
+                for mark in ("业务", "收入", "产品", "管理")
+            )
+        ]
+        if not chosen:
+            chosen = [
+                int(page["page"])
+                for page in request.get("source_pages") or []
+                if str(page.get("text") or "").strip()
+            ][:1]
+        result["requested_pages"] = chosen[:2]
+        return result
+    sentences = _source_sentences(request)
+    if request["purpose"] == "source_inventory":
+        if request.get("claims"):
+            raise ValueError("gap_request_contains_candidates")
+        result["requested_pages"] = []
+        result["source_conditions"] = [
+            {
+                "condition_id": f"chain-{index}",
+                "dimension": "principal_business",
+                "description": "模拟正文条件，不是年报结论。",
+                "evidence": [{"page": page, "quote": quote}],
+                "major": True,
+                "statement_status": "current",
+            }
+            for index, (page, quote) in enumerate(sentences)
+        ]
+        return result
+    if request["purpose"] == "synthesize_views":
+        result["claims"] = [
+            {
+                "claim_id": f"chain-claim-{index}",
+                "dimension": "principal_business",
+                "status": "observed",
+                "answer": "模拟主张，不是年报结论。",
+                "condition_ids": [],
+                "supporting_record_ids": [],
+                "evidence": [{"page": page, "quote": quote}],
+            }
+            for index, (page, quote) in enumerate(sentences)
+        ]
+        return result
+    result["checks"] = [
+        {
+            "target_type": kind,
+            "target_id": item[key],
+            "status": "pass",
+            "explanation": "离线链路核验，不是年报结论。",
+        }
+        for kind, values, key in (
+            ("condition", request.get("source_conditions") or [], "condition_id"),
+            ("claim", request.get("claims") or [], "claim_id"),
+            ("record", request.get("records") or [], "record_id"),
+        )
+        for item in values
+    ]
+    return result

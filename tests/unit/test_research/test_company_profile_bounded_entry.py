@@ -214,3 +214,91 @@ def test_layered_entry_refuses_old_semantic_receipts():
     else:
         raise AssertionError("old semantic continuation was admitted")
     refuse_layered_semantic_continuation({"reading_strategy": "layered_v3"})
+
+
+def test_direct_chain_entry_completes_and_keeps_a_verified_package():
+    """The real entry, with the network replaced. Not a business score."""
+    import hashlib
+    import json
+    import shutil
+    from pathlib import Path
+
+    from research.company_profile.bounded_entry import main
+    from research.company_profile.reads import CompanyProfileReadService
+
+    root = Path("/home/python/Quote")
+    change = root / "openspec/changes/restore-company-profile-llm-led-generalization"
+    source = json.loads((change / "b1-pool-direct1-binding.json").read_text())
+    source["file_hashes"]["research/company_profile/direct_reading.py"] = ""
+    source["file_hashes"] = {
+        name: hashlib.sha256((root / name).read_bytes()).hexdigest()
+        for name in source["file_hashes"]
+    }
+
+    def run(protocol: str, folder: str) -> dict:
+        run_root = root / "data/QuoteBak" / folder
+        if run_root.exists():
+            shutil.rmtree(run_root)
+        binding = dict(source)
+        binding["offline_protocol"] = protocol
+        binding["max_elapsed_seconds"] = 400
+        binding["max_tokens"] = 120_000
+        path = root / "data/QuoteBak" / f"{folder}-binding.json"
+        path.write_text(json.dumps(binding, ensure_ascii=False))
+        import sys
+
+        argv = sys.argv
+        sys.argv = [
+            "bounded_entry",
+            "--binding",
+            str(path),
+            "--run-root",
+            str(run_root),
+        ]
+        try:
+            assert main() == 0
+        finally:
+            sys.argv = argv
+        query = json.loads((run_root / "query.json").read_text())
+        exported = json.loads((run_root / "export.json").read_text())
+        reloaded = CompanyProfileReadService(run_root / "output").query(
+            (binding["asset"]["instrument_id"],)
+        )
+        assert query["profiles"] == exported["profiles"] == reloaded["profiles"]
+        return query
+
+    success = run("direct_chain_v1", "d2-chain-success")
+    profile = success["profiles"][0]["three_views"]
+    claims = [
+        claim
+        for view in profile["views"].values()
+        for claim in view["claims"]
+        if claim["status"] == "observed"
+    ]
+    assert success["delivered"] == 1
+    assert len(claims) >= 2
+    assert len({claim["answer"] for claim in claims}) >= 1
+    assert sum(claim["dimension"] == "principal_business" for claim in claims) >= 2
+    assert profile["draft_complete"] is True
+    assert profile["real_semantic_complete"] is False
+    assert not any(gap.startswith("necessary_unread:") for gap in profile["gaps"])
+
+    failed = run("direct_chain_fail_v1", "d2-chain-fail")
+    failed_profile = failed["profiles"][0]["three_views"]
+    kept = [
+        claim
+        for view in failed_profile["views"].values()
+        for claim in view["claims"]
+        if claim["status"] == "observed"
+    ]
+    assert failed["delivered"] == 1
+    assert kept
+    assert failed_profile["draft_complete"] is False
+    assert any(
+        gap.startswith("direct_core_package_stopped:") or gap.startswith("necessary_unread:")
+        for gap in failed_profile["gaps"]
+    )
+    plan = json.loads(
+        (root / "data/QuoteBak/d2-chain-success/direct-plan.json").read_text()
+    )
+    assert plan["nonempty_verify_units"] > plan["empty_verify_units"]

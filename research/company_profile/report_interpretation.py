@@ -136,6 +136,9 @@ def direct_core_processing_identity() -> dict[str, Any]:
     identity["product_contract"] = (
         "company_profile_product_contract.2026-10-18.llm-led.v3"
     )
+    identity["logical_request_timeout_seconds"] = 120
+    identity["max_route_attempts"] = 2
+    identity["max_recoveries"] = 1
     return identity
 
 
@@ -331,14 +334,20 @@ def pack_fitting_batches(
         text = str(fragment["text"])
         if split_mode == "boundary":
             best = 0
-            for index, char in enumerate(text):
-                if char not in "\n。！？；":
+            low = 1
+            high = len(text) - 1
+            while low <= high:
+                mid = (low + high) // 2
+                cut = max(text.rfind(mark, 0, mid + 1) for mark in "\n。！？；")
+                if cut <= 0:
+                    low = mid + 1
                     continue
-                end = index + 1
-                if end >= len(text):
-                    continue
+                end = cut + 1
                 if fits([{**fragment, "text": text[:end]}]):
                     best = end
+                    low = mid + 1
+                else:
+                    high = cut - 1
             if best <= 0:
                 raise ValueError(
                     f"fragment_has_no_safe_boundary:{fragment.get('page')}"

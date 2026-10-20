@@ -447,6 +447,11 @@ def prepare_gateway(binding: dict, raw_config: dict, *, real: bool):
 def _worker(
     binding: dict, *, run_root: Path, deadline: float, real: bool, authorization: dict
 ) -> dict:
+    nav_groups = run_root / "direct-nav-groups.json"
+    if nav_groups.is_file():
+        from research.company_profile import direct_reading
+
+        direct_reading.PREPARED_NAV = json.loads(nav_groups.read_text())
     # Heavy imports and initialization run inside the parent's original deadline.
     import asyncio
     from decimal import Decimal
@@ -517,6 +522,7 @@ def _worker(
     )
     transport_requests = []
     map_replies = {"count": 0}
+    chain_state = {"syntheses": 0, "gaps": 0, "delayed": False}
 
     async def empty_inventory(_url, _headers, payload, _timeout):
         request = json.loads(
@@ -579,11 +585,35 @@ def _worker(
                 ]
                 if any(claim.get("review_state") == "verified" for claim in claims):
                     raise ValueError("controlled_second_batch_failure")
+        elif protocol in {"direct_chain_v1", "direct_chain_fail_v1"}:
+            from .resource_probe import direct_chain_reply
+
+            if (
+                protocol == "direct_chain_fail_v1"
+                and request["purpose"] == "synthesize_views"
+                and chain_state["syntheses"] >= 1
+            ):
+                raise ValueError("controlled_later_package")
+            if request["purpose"] == "synthesize_views":
+                chain_state["syntheses"] += 1
+            result = direct_chain_reply(request)
+            if (
+                request["purpose"] == "source_inventory"
+                and request.get("source_scope") != "page_map"
+                and chain_state["gaps"] == 0
+            ):
+                page = int(request["source_pages"][0]["page"])
+                result["requested_pages"] = [page + 1]
+                chain_state["gaps"] += 1
+            if request["purpose"] == "verify_views" and not chain_state["delayed"]:
+                await asyncio.sleep(8)
+                chain_state["delayed"] = True
         encoded = json.dumps(result, ensure_ascii=False)
         transport_requests[-1]["response_utf8_bytes"] = len(encoded.encode())
         usage = (
             {"prompt_tokens": 80, "completion_tokens": 40, "total_tokens": 120}
-            if protocol == "entry_proof_v3"
+            if protocol
+            in {"entry_proof_v3", "direct_chain_v1", "direct_chain_fail_v1"}
             else None
         )
         data = {"choices": [{"message": {"content": encoded}}]}
@@ -834,8 +864,10 @@ def main() -> int:
         preflight_partial(binding)
     if binding.get("reading_strategy") == "layered_v3":
         preflight_layered(binding)
-    if binding.get("reading_strategy") == "direct_core_v1":
-        preflight_direct_core(binding)
+    if binding.get("reading_strategy") == "direct_core_v1" and args.worker_deadline is None:
+        direct_plan = preflight_direct_core(binding)
+    else:
+        direct_plan = None
     if args.worker_deadline is not None:
         finish_worker(
             run_root,
@@ -850,6 +882,9 @@ def main() -> int:
         return 0
     deadline = started + binding["max_elapsed_seconds"]
     run_root.mkdir(parents=True, exist_ok=False)
+    if direct_plan is not None:
+        write_json(run_root / "direct-plan.json", direct_plan)
+        write_json(run_root / "direct-nav-groups.json", direct_plan["navigation_pages"])
     if args.real:
         # A freezes one shared attempt directory for first + successor. Never resume
         # or overwrite an attempted identity, including a crash or a timeout.

@@ -4181,6 +4181,9 @@ class CommonGatewaySemanticProvider:
                     "reading_strategy": request.processing_identity.get(
                         "reading_strategy"
                     ),
+                    "max_route_attempts": request.processing_identity.get(
+                        "max_route_attempts"
+                    ),
                 },
                 response_model=ReportSemanticResponseV3,
                 schema_name="company_profile_report_response",
@@ -4640,6 +4643,11 @@ class CommonGatewaySemanticProvider:
                     f"{runtime_payload['report']['instrument_id']}:{runtime_payload['purpose']}"
                     if report_reading
                     else f"{self._prepared_scope.sample_id}:{self._prepared_scope.scope_id}"
+                ),
+                **(
+                    {"max_route_attempts": int(runtime_payload["max_route_attempts"])}
+                    if report_reading and runtime_payload.get("max_route_attempts")
+                    else {}
                 ),
             },
             content_is_untrusted=True,

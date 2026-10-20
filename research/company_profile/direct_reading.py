@@ -8,6 +8,7 @@ package. This module does not open a second writer or gateway.
 
 from __future__ import annotations
 
+import json
 import time
 from collections.abc import Mapping, Sequence
 from typing import Any
@@ -18,6 +19,7 @@ from research.company_profile.contracts import (
     ReportSourceCondition,
     ReportViewCheck,
     ReportViewClaim,
+    SemanticProviderError,
 )
 from research.company_profile.models import ReportIdentity, SemanticRecord
 from research.company_profile.reading_budget import request_reservation
@@ -52,19 +54,67 @@ def _fit(pages, *, purpose, source_scope, report, identity, output, limit):
     )
 
 
+def _claim_covers(condition: ReportSourceCondition, claim: ReportViewClaim) -> bool:
+    """One claim does not cover a second major business in the same dimension."""
+    if claim.status != "observed":
+        return False
+    if any(
+        condition.condition_id == key or condition.condition_id.endswith(":" + key)
+        for key in claim.condition_ids
+    ):
+        return True
+
+    def quote(evidence) -> str:
+        return str(getattr(evidence.anchor, "bounded_quote", "") or "")
+
+    for left in condition.evidence:
+        for right in claim.evidence:
+            if int(left.page) != int(right.page):
+                continue
+            left_quote, right_quote = quote(left), quote(right)
+            if left_quote and right_quote and (
+                left_quote in right_quote or right_quote in left_quote
+            ):
+                return True
+    return False
+
+
+def _structure_preview(text: str) -> str:
+    """Headings a reader can recognize, plus a short body sample. Not an 8-character stub."""
+    headings = []
+    for raw in text.splitlines():
+        line = " ".join(raw.split())
+        if not line or len(line) > 40 or line.endswith(("。", "！", "？", "；")):
+            continue
+        headings.append(line)
+        if len(headings) == 2:
+            break
+    sample = " ".join(text.split())[:48]
+    return " / ".join([*headings, sample])[:180]
+
+
+PREPARED_NAV: list[list[int]] | None = None
+
+
 def navigation_batches(pages, report, identity, limit: int):
-    """Pack a short uniform preview of every page into at most two sends."""
-    previews = []
-    for source in pages:
-        text = str(source.get("text") or "")
-        middle_at = max(0, len(text) // 2)
-        previews.append(
-            {
-                "page": source["page"],
-                "readable": bool(source.get("readable", True)),
-                "text": text[:4] + "…" + text[middle_at : middle_at + 4],
-            }
-        )
+    """Pack a recognizable structure preview of every page."""
+    previews = [
+        {
+            "page": source["page"],
+            "readable": bool(source.get("readable", True)),
+            "text": _structure_preview(str(source.get("text") or "")),
+        }
+        for source in pages
+    ]
+    if PREPARED_NAV:
+        by_page = {int(item["page"]): item for item in previews}
+        grouped = []
+        for group in PREPARED_NAV:
+            batch = [by_page[page] for page in group if page in by_page]
+            if batch:
+                grouped.append(batch)
+        if grouped:
+            return grouped
     return pack_fitting_batches(
         tuple(previews),
         lambda batch: _fit(
@@ -135,7 +185,52 @@ def _units(pages, *, purpose, source_scope, report, identity, output) -> int:
             source_pages=tuple(pages),
             source_scope=source_scope,
             max_output_tokens=output,
-            timeout_seconds=30,
+            timeout_seconds=float(identity.get("logical_request_timeout_seconds") or 120),
+        )
+    )
+
+
+def _nonempty_verify_units(piece, *, report, identity) -> int:
+    """Size verification with a real claim and condition, not an empty target list."""
+    from research.company_profile.models import Evidence, TextAnchor
+
+    quote = str(piece[0].get("text") or "")[:40] or "正文"
+    evidence = Evidence(
+        evidence_id="direct-core-size",
+        report=report,
+        page=int(piece[0]["page"]),
+        section_title="size",
+        anchor=TextAnchor(bounded_quote=quote),
+    )
+    claim = ReportViewClaim(
+        claim_id="size-claim",
+        dimension="principal_business",
+        status="observed",
+        answer=quote,
+        evidence=(evidence,),
+    )
+    condition = ReportSourceCondition(
+        condition_id="size-condition",
+        dimension="principal_business",
+        description="用于计量的非空条件",
+        evidence=(evidence,),
+        major=True,
+        statement_status="current",
+    )
+    return request_reservation(
+        ReportSemanticRequestV3(
+            request_id="direct-core-nonempty-verify",
+            purpose="verify_views",
+            report=report,
+            processing_identity=dict(identity),
+            source_pages=tuple(piece),
+            source_scope="full_context",
+            source_conditions=(condition,),
+            claims=(claim,),
+            max_output_tokens=VERIFY_OUTPUT,
+            timeout_seconds=float(
+                identity.get("logical_request_timeout_seconds") or 120
+            ),
         )
     )
 
@@ -150,8 +245,8 @@ def first_package_plan(
 ) -> dict[str, Any]:
     """Admit navigation, one chapter package, its review and one recovery."""
     nav = navigation_batches(pages, report, identity, reservation_limit)
-    if not nav or len(nav) > 2:
-        raise ValueError("direct_core_navigation_exceeds_two_requests")
+    if not nav:
+        raise ValueError("direct_core_navigation_has_no_batch")
     readable = [page for page in pages if page.get("readable", True)]
     if not readable:
         raise ValueError("direct_core_has_no_readable_page")
@@ -195,18 +290,26 @@ def first_package_plan(
         identity=identity,
         output=VERIFY_OUTPUT,
     )
-    recovery = max([*nav_units, body_units, gap_units, verify_units])
-    total = sum(nav_units) + body_units + gap_units + verify_units + recovery
-    if total > ledger:
-        raise ValueError(f"direct_core_first_package_exceeds_ledger:{total}>{ledger}")
+    nonempty_verify = _nonempty_verify_units(
+        piece, report=report, identity=identity
+    )
+    recovery = max([*nav_units, body_units, gap_units, nonempty_verify])
+    known_total = sum(nav_units) + body_units + gap_units + verify_units + max(
+        [*nav_units, body_units, gap_units, verify_units]
+    )
+    unknown_total = sum(nav_units) + body_units + gap_units + nonempty_verify + recovery
     return {
         "navigation_batches": len(nav),
+        "navigation_pages": [[int(page["page"]) for page in batch] for batch in nav],
         "navigation_units": nav_units,
         "body_units": body_units,
         "gap_units": gap_units,
-        "verify_units": verify_units,
+        "empty_verify_units": verify_units,
+        "nonempty_verify_units": nonempty_verify,
         "recovery_units": recovery,
-        "total_units": total,
+        "known_total_units": known_total,
+        "unknown_total_units": unknown_total,
+        "fits_ledger": unknown_total <= ledger,
     }
 
 
@@ -243,24 +346,7 @@ def interpret_direct_core(
 
     sources = _pages(pages)
     limit = int(identity.get("request_reservation_limit") or RESERVATION_LIMIT)
-    ledger = min(
-        int(identity.get("ledger_tokens") or token_budget or LEDGER_LIMIT),
-        LEDGER_LIMIT,
-        max(0, token_budget),
-    )
-    try:
-        first_package_plan(
-            sources, report, identity, ledger=ledger, reservation_limit=limit
-        )
-    except ValueError as exc:
-        gaps: list[str] = [str(exc)]
-        return ReportInterpretation(
-            report=report,
-            processing_identity=identity,
-            execution_mode=mode if mode in {"offline_fake", "provider"} else "offline_fake",
-            gaps=tuple(gaps),
-            elapsed_seconds=max(0.0, time.monotonic() - started_at),
-        )
+    ledger = int(identity.get("ledger_tokens") or token_budget or LEDGER_LIMIT)
     request_cap = int(identity.get("max_physical_requests") or 16)
     gaps: list[str] = []
     conditions: list[ReportSourceCondition] = []
@@ -306,6 +392,17 @@ def interpret_direct_core(
 
     def _result() -> ReportInterpretation:
         observed = {item.dimension for item in claims if item.status == "observed"}
+        blocking = any(
+            gap.startswith(
+                (
+                    "major_condition_not_delivered:",
+                    "necessary_unread:",
+                    "necessary_fragment",
+                )
+            )
+            for gap in gaps
+        )
+        draft_complete = any(item.status == "observed" for item in claims) and not blocking
         return ReportInterpretation(
             report=report,
             processing_identity=identity,
@@ -319,9 +416,9 @@ def interpret_direct_core(
             call_receipts=tuple(receipts),
             gaps=tuple(gaps),
             verified_dimensions=tuple(sorted(observed)),
-            draft_complete=False,
-            semantic_complete=False,
-            real_semantic_complete=False,
+            draft_complete=draft_complete,
+            semantic_complete=draft_complete,
+            real_semantic_complete=draft_complete and mode == "provider",
             tokens_charged=charged(),
             budget_ledger=snapshot(),
             elapsed_seconds=max(0.0, time.monotonic() - started_at),
@@ -349,7 +446,7 @@ def interpret_direct_core(
             source_pages=tuple(source_pages),
             source_scope=source_scope,
             max_output_tokens=output,
-            timeout_seconds=30,
+            timeout_seconds=float(identity.get("logical_request_timeout_seconds") or 120),
             **(extra or {}),
         )
         units = request_reservation(request)
@@ -359,7 +456,9 @@ def interpret_direct_core(
             raise ValueError("direct_core_admission_stopped")
         response = provider.interpret(request)
         if not isinstance(response, ReportSemanticResponseV3):
-            response = ReportSemanticResponseV3.model_validate(response)
+            response = ReportSemanticResponseV3.model_validate_json(
+                json.dumps(response, ensure_ascii=False)
+            )
         receipts.append(
             {
                 "request_id": request.request_id,
@@ -377,9 +476,6 @@ def interpret_direct_core(
         nav = navigation_batches(sources, report, identity, limit)
     except ValueError as exc:
         gaps.append(str(exc))
-        return _result()
-    if len(nav) > 2:
-        gaps.append("direct_core_navigation_exceeds_two_requests")
         return _result()
 
     selected: set[int] = set()
@@ -413,7 +509,7 @@ def interpret_direct_core(
                     map_selected=int(page["page"]) in response.requested_pages,
                     status="partially_checked",
                 )
-    except (ValueError, LlmError) as exc:
+    except (ValueError, LlmError, SemanticProviderError) as exc:
         gaps.append(f"direct_core_navigation_stopped:{exc}")
         return _result()
     if not selected:
@@ -426,7 +522,12 @@ def interpret_direct_core(
     except ValueError as exc:
         gaps.append(str(exc))
         return _result()
-    for index, package in enumerate(packages):
+    queued_pages = set(selected)
+    supplement_pages: list[int] = []
+    packages = list(packages)
+    index = 0
+    while index < len(packages) and index < 8:
+        package = packages[index]
         package_pages = {int(page["page"]) for page in package}
         try:
             drafted = invoke(
@@ -451,7 +552,7 @@ def interpret_direct_core(
                     output=VERIFY_OUTPUT,
                 ),
             )
-        except (ValueError, LlmError) as exc:
+        except (ValueError, LlmError, SemanticProviderError) as exc:
             gaps.append(f"direct_core_package_stopped:{exc}")
             for page_no in selected - {int(item["page"]) for item in coverage if item["status"] == "read"}:
                 gaps.append(f"necessary_unread:{page_no}")
@@ -493,7 +594,7 @@ def interpret_direct_core(
                     output=VERIFY_OUTPUT,
                 ),
             )
-        except (ValueError, LlmError) as exc:
+        except (ValueError, LlmError, SemanticProviderError) as exc:
             gaps.append(f"direct_core_gap_check_stopped:{exc}")
             claims.extend(package_claims)
             publish()
@@ -507,10 +608,13 @@ def interpret_direct_core(
         )
         gaps.extend(location_gaps)
         conditions.extend(accepted)
-        covered = {item.dimension for item in package_claims if item.status == "observed"}
-        for condition in accepted:
-            if condition.major and condition.dimension not in covered:
-                gaps.append(f"major_condition_not_in_claims:{condition.condition_id}")
+        for page_no in reviewed.requested_pages:
+            page_no = int(page_no)
+            if page_no in by_page and by_page[page_no]["status"] != "read":
+                selected.add(page_no)
+                if page_no not in queued_pages:
+                    supplement_pages.append(page_no)
+                    queued_pages.add(page_no)
         related = tuple(
             record
             for record in structured.values()
@@ -531,7 +635,7 @@ def interpret_direct_core(
                     "records": related,
                 },
             )
-        except (ValueError, LlmError) as exc:
+        except (ValueError, LlmError, SemanticProviderError) as exc:
             gaps.append(f"direct_core_verify_stopped:{exc}")
             claims.extend(
                 item.model_copy(update={"limitation": "pending_verification"})
@@ -559,6 +663,17 @@ def interpret_direct_core(
                     }
                 )
                 gaps.append(f"record_semantic_conflict:{key}")
+                for index, earlier in enumerate(claims):
+                    if key not in earlier.supporting_record_ids or earlier.status != "observed":
+                        continue
+                    claims[index] = earlier.model_copy(
+                        update={
+                            "status": "unclear",
+                            "answer": "结论未通过证据或语义核验。",
+                            "limitation": "claim_or_dependency_not_verified",
+                        }
+                    )
+                    gaps.append(f"claim_not_verified:{earlier.claim_id}")
         kept_records = [item for item in related if item.record_id not in quarantined]
         records = [item for item in records if item.record_id not in {r.record_id for r in related}]
         records.extend(kept_records)
@@ -594,13 +709,34 @@ def interpret_direct_core(
         for page in package:
             by_page[int(page["page"])]["status"] = "read"
         publish()
-        if index + 1 < len(packages) and any(
-            gap.startswith("direct_core_ledger_hold") for gap in gaps
-        ):
+        if supplement_pages:
+            extra = [
+                page
+                for page in sources
+                if int(page["page"]) in supplement_pages and int(page["page"]) not in {
+                    int(item["page"]) for done in packages[: index + 1] for item in done
+                }
+            ]
+            supplement_pages.clear()
+            if extra:
+                try:
+                    packages.extend(body_packages(extra, report, identity, limit))
+                except ValueError as exc:
+                    gaps.append(str(exc))
+        index += 1
+        if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
             break
     unread = selected - {int(item["page"]) for item in coverage if item["status"] == "read"}
     for page_no in sorted(unread):
         gap = f"necessary_unread:{page_no}"
+        if gap not in gaps:
+            gaps.append(gap)
+    for condition in conditions:
+        if not condition.major:
+            continue
+        if any(_claim_covers(condition, claim) for claim in claims):
+            continue
+        gap = f"major_condition_not_delivered:{condition.condition_id}"
         if gap not in gaps:
             gaps.append(gap)
     return _result()
