@@ -411,18 +411,30 @@ def direct_chain_reply(request: dict) -> dict:
             for index, (dimension, (page, quote)) in enumerate(paired)
         ]
         return result
-    result["checks"] = [
-        {
-            "target_type": kind,
-            "target_id": item[key],
-            "status": "pass",
-            "explanation": "离线链路核验，不是年报结论。",
-        }
-        for kind, values, key in (
-            ("condition", request.get("source_conditions") or [], "condition_id"),
-            ("claim", request.get("claims") or [], "claim_id"),
-            ("record", request.get("records") or [], "record_id"),
-        )
-        for item in values
-    ]
+    result["checks"] = []
+    for kind, values, key in (
+        ("condition", request.get("source_conditions") or [], "condition_id"),
+        ("claim", request.get("claims") or [], "claim_id"),
+        ("record", request.get("records") or [], "record_id"),
+    ):
+        for item in values:
+            check = {
+                "target_type": kind,
+                "target_id": item[key],
+                "status": "pass",
+                "explanation": "离线链路核验，不是年报结论。",
+            }
+            if kind == "condition":
+                match = next(
+                    (
+                        claim["claim_id"]
+                        for claim in request.get("claims") or []
+                        if claim.get("dimension") == item.get("dimension")
+                    ),
+                    None,
+                )
+                if match:
+                    check["covers_target_type"] = "claim"
+                    check["covers_target_id"] = match
+            result["checks"].append(check)
     return result

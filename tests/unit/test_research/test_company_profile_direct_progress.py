@@ -315,3 +315,162 @@ def test_a_later_verify_unit_failure_keeps_the_earlier_unit():
     )
     assert any(item.claim_id == "first" and item.status == "observed" for item in result.claims)
     assert any(item.claim_id == "second" and item.limitation == "pending_verification" for item in result.claims)
+
+
+def test_a_condition_pass_without_a_delivered_object_is_not_coverage():
+    from research.company_profile.contracts import (
+        ReportSourceCondition,
+        ReportViewCheck,
+    )
+    from research.company_profile.direct_reading import _completeness_gaps
+
+    report = _report()
+    text = "公司提供云计算服务。"
+    quote = text[:8]
+    claims = []
+    for claim_id, dimension in (
+        ("cloud-business", "principal_business"),
+        ("cloud-product", "products_services"),
+        ("cloud-revenue", "revenue_model"),
+        ("cloud-output", "output_exposure"),
+        ("cloud-role", "supply_chain_role"),
+    ):
+        claims.append(
+            ReportViewClaim(
+                claim_id=claim_id,
+                dimension=dimension,
+                status="observed",
+                answer="只交付了云计算服务。",
+                evidence=(_evidence(report, text=quote, page=1),),
+            )
+        )
+    condition = ReportSourceCondition(
+        condition_id="design-business",
+        dimension="principal_business",
+        description="另一主要业务是工业设计。",
+        evidence=(_evidence(report, text=quote, page=1),),
+        major=True,
+        statement_status="current",
+    )
+    bare = ReportViewCheck(
+        target_type="condition",
+        target_id="design-business",
+        status="pass",
+        explanation="只看到了源条件。",
+    )
+    gaps = _completeness_gaps(claims, [condition], [bare])
+    assert any(gap == "major_condition_not_verified:design-business" for gap in gaps)
+    unrelated = bare.model_copy(
+        update={"covers_target_type": "claim", "covers_target_id": "missing-claim"}
+    )
+    gaps = _completeness_gaps(claims, [condition], [unrelated])
+    assert any(gap == "major_condition_not_verified:design-business" for gap in gaps)
+    covered = bare.model_copy(
+        update={"covers_target_type": "claim", "covers_target_id": "cloud-business"}
+    )
+    gaps = _completeness_gaps(
+        [
+            claims[0].model_copy(update={"answer": "公司从事工业设计。"}),
+            *claims[1:],
+        ],
+        [condition],
+        [covered],
+    )
+    assert not any(gap.startswith("major_condition_not_verified:") for gap in gaps)
+
+
+def test_coverage_verification_includes_the_verified_claim():
+    report = _report()
+    text = "公司提供云计算服务，不包含其他主业。"
+    quote = text[:8]
+
+    class _Provider:
+        offline_only = True
+        coverage_claims: tuple = ()
+
+        def interpret(self, request):
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(1,),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="cloud-only",
+                            dimension="principal_business",
+                            status="observed",
+                            answer="只交付了云计算服务。",
+                            evidence=(
+                                _evidence(report, text=quote, page=1).model_copy(
+                                    update={"evidence_id": "cloud-evidence"}
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=(
+                        {
+                            "condition_id": "design-business",
+                            "dimension": "principal_business",
+                            "description": "另一主要业务是工业设计。",
+                            "evidence": (
+                                _evidence(report, text=quote, page=1).model_copy(
+                                    update={"evidence_id": "design-evidence"}
+                                ),
+                            ),
+                            "major": True,
+                            "statement_status": "current",
+                        },
+                    ),
+                )
+            if request.source_conditions:
+                self.coverage_claims = request.claims
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    checks=(
+                        {
+                            "target_type": "condition",
+                            "target_id": "design-business",
+                            "status": "pass",
+                            "explanation": "没有指出覆盖对象。",
+                        },
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=(
+                    {
+                        "target_type": "claim",
+                        "target_id": "cloud-only",
+                        "status": "pass",
+                        "explanation": "离线",
+                    },
+                ),
+            )
+
+    provider = _Provider()
+    result = _run(
+        provider,
+        pages=({"page": 1, "text": text, "readable": True},),
+        processing_identity=direct_core_processing_identity(),
+        report=report,
+    )
+    assert provider.coverage_claims
+    assert provider.coverage_claims[0].claim_id == "cloud-only"
+    assert any(
+        gap.startswith("major_condition_not_verified:") and gap.endswith("design-business")
+        for gap in result.gaps
+    )
+    assert result.draft_complete is False
+    assert any(item.claim_id == "cloud-only" and item.status == "observed" for item in result.claims)

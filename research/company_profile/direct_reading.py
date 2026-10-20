@@ -54,8 +54,8 @@ def _fit(pages, *, purpose, source_scope, report, identity, output, limit):
     )
 
 
-def _completeness_gaps(claims, conditions, checks) -> list[str]:
-    """Three views and every major condition's verification decide completeness."""
+def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
+    """Three views and covered major conditions decide completeness."""
     observed = {item.dimension for item in claims if item.status == "observed"}
     found = []
     for view, dimensions in VIEWS.items():
@@ -66,11 +66,38 @@ def _completeness_gaps(claims, conditions, checks) -> list[str]:
             found.append(f"core_dimension_missing:{dimension}")
     if not observed & {"supply_chain_role", "upstream_downstream"}:
         found.append("core_dimension_missing:operating_role")
-    verdicts = {(item.target_type, item.target_id): item.status for item in checks}
+    verified_claims = {
+        item.claim_id
+        for item in claims
+        if item.status == "observed"
+        and item.limitation
+        not in {
+            "pending_verification",
+            "claim_or_dependency_not_verified",
+            "evidence_not_located",
+        }
+    }
+    accepted_records = {item.record_id for item in records}
     for condition in conditions:
         if not condition.major:
             continue
-        if verdicts.get(("condition", condition.condition_id)) != "pass":
+        covered = False
+        for check in checks:
+            if (
+                check.target_type != "condition"
+                or check.target_id != condition.condition_id
+                or check.status != "pass"
+            ):
+                continue
+            if (
+                check.covers_target_type == "claim"
+                and check.covers_target_id in verified_claims
+            ) or (
+                check.covers_target_type == "record"
+                and check.covers_target_id in accepted_records
+            ):
+                covered = True
+        if not covered:
             found.append(f"major_condition_not_verified:{condition.condition_id}")
     return found
 
@@ -388,7 +415,7 @@ def interpret_direct_core(
 
     def _result() -> ReportInterpretation:
         observed = {item.dimension for item in claims if item.status == "observed"}
-        dynamic = _completeness_gaps(claims, conditions, checks)
+        dynamic = _completeness_gaps(claims, conditions, checks, records)
         blocking = bool(dynamic) or any(
             gap.startswith(
                 (
@@ -767,51 +794,89 @@ def interpret_direct_core(
             read_selected(extra)
 
     def settle_conditions(found) -> None:
-        current = []
-        groups = []
-        def sized(group) -> int:
+        def verified_claims():
+            return [
+                item
+                for item in claims
+                if item.status == "observed"
+                and item.limitation
+                not in {
+                    "pending_verification",
+                    "claim_or_dependency_not_verified",
+                    "evidence_not_located",
+                }
+            ]
+
+        def relevant(condition):
+            pages = {int(evidence.page) for evidence in condition.evidence}
+            picked = []
+            for claim in verified_claims():
+                claim_pages = {int(evidence.page) for evidence in claim.evidence}
+                if claim.dimension == condition.dimension or claim_pages & pages:
+                    picked.append(claim)
+            return picked
+
+        def sized(group, delivered):
             pages = []
             seen_pages = set()
-            for condition in group:
-                for evidence in condition.evidence:
+            for item in (*group, *delivered):
+                for evidence in item.evidence:
                     page_no = int(evidence.page)
                     if page_no in seen_pages:
                         continue
-                    page = next((item for item in sources if int(item["page"]) == page_no), None)
+                    page = next((row for row in sources if int(row["page"]) == page_no), None)
                     if page is not None:
                         pages.append(page)
                         seen_pages.add(page_no)
-            return request_reservation(
+            units = request_reservation(
                 ReportSemanticRequestV3(
                     request_id=f"{work_id}:condition-size",
                     purpose="verify_views",
                     report=report,
                     processing_identity=identity,
-                    source_pages=tuple(pages),
+                    source_pages=tuple(pages) or tuple(sources[:1]),
                     source_scope="full_context",
                     source_conditions=tuple(group),
+                    claims=tuple(delivered),
                     max_output_tokens=VERIFY_OUTPUT,
                     timeout_seconds=float(identity.get("logical_request_timeout_seconds") or 120),
                 )
-            ), pages
+            )
+            return units, pages
+
+        current = []
+        current_claims = []
+        groups = []
         for condition in found:
-            units, _pages = sized([condition])
+            delivered = relevant(condition)
+            if not delivered:
+                gaps.append(f"major_condition_not_verified:{condition.condition_id}")
+                continue
+            units, _pages = sized([condition], delivered)
             if units > limit:
                 gaps.append(f"major_condition_not_verified:{condition.condition_id}")
                 continue
             if current:
-                units, _pages = sized(current + [condition])
+                merged_claims = list({item.claim_id: item for item in current_claims + delivered}.values())
+                units, _pages = sized(current + [condition], merged_claims)
                 if units > limit:
-                    groups.append(current)
+                    groups.append((current, current_claims))
                     current = [condition]
+                    current_claims = delivered
                 else:
                     current.append(condition)
+                    current_claims = merged_claims
             else:
                 current = [condition]
+                current_claims = delivered
         if current:
-            groups.append(current)
-        for group in groups:
-            _units_now, pages = sized(group)
+            groups.append((current, current_claims))
+        for group, delivered in groups:
+            _units_now, pages = sized(group, delivered)
+            if not pages:
+                for condition in group:
+                    gaps.append(f"major_condition_not_verified:{condition.condition_id}")
+                continue
             try:
                 verified = invoke(
                     "verify_views",
@@ -819,7 +884,10 @@ def interpret_direct_core(
                     source_scope="full_context",
                     output=VERIFY_OUTPUT,
                     later=0,
-                    extra={"source_conditions": tuple(group)},
+                    extra={
+                        "source_conditions": tuple(group),
+                        "claims": tuple(delivered),
+                    },
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
                 gaps.append(f"direct_core_verify_stopped:{exc}")
@@ -936,6 +1004,10 @@ def interpret_direct_core(
                     continue
                 bound_claims.append(claim.model_copy(update={"evidence": tuple(located)}))
             receipts.append({**item, "physical_request": False, "reused_candidate": True})
+            for page_no in page_ids:
+                if page_no in by_page:
+                    by_page[page_no]["status"] = "read"
+                    by_page[page_no]["full_text_sent"] = True
         return bound_claims
 
     for item in identity.get("accepted_page_map_receipts") or ():
@@ -947,13 +1019,13 @@ def interpret_direct_core(
     reused = bind_reused_candidates()
     if reused:
         settle_claims(reused)
-        report_gap(
-            [
-                int(page["page"])
-                for page in coverage
-                if page["status"] == "read"
-            ]
-        )
+        remaining = [
+            page_no
+            for page_no in selected_order
+            if by_page.get(page_no, {}).get("status") != "read"
+        ]
+        if remaining:
+            read_selected(remaining)
     elif selected_order:
         read_selected(selected_order)
 
@@ -998,7 +1070,7 @@ def interpret_direct_core(
         gap = f"necessary_unread:{page_no}"
         if gap not in gaps:
             gaps.append(gap)
-    for gap in _completeness_gaps(claims, conditions, checks):
+    for gap in _completeness_gaps(claims, conditions, checks, records):
         if gap not in gaps:
             gaps.append(gap)
     return _result()

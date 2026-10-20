@@ -414,6 +414,8 @@ class ReportViewCheck(_StrictModel):
     target_id: str = Field(min_length=1)
     status: Literal["pass", "block", "unclear"]
     explanation: str = Field(min_length=1)
+    covers_target_type: Literal["claim", "record"] | None = None
+    covers_target_id: str | None = None
 
 
 class ReportSemanticRequest(_StrictModel):
