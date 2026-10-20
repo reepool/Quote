@@ -2,7 +2,7 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-10-20。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。A审核`764abcfc`：部分接受G2首轮工程，1/2已用；当前[§32.5/G2同卡接续](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md#325-a审核接续同卡剩余一次合并完成)合并完成实际联合打包和公司接续入口。新增真实额度待用户确认，确认前无第15次。B1/A1未过，进度/资源唯一见验收§7.25—7.26/§8，旧结果不改。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。A审核`764abcfc`：部分接受G2首轮工程，1/2已用；用户已确认§7.25额度，当前[§32.5/G2同卡接续](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md#325-a审核接续同卡剩余一次合并完成)须先完成实际联合打包和公司接续入口，冻结后同卡执行。B1/A1未过，进度/资源唯一见验收§7.25—7.27/§8，旧结果不改。
 
 ## 1. 开发者必须先理解的纠偏
 
@@ -51,7 +51,7 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 - 目标：选定1家历史报告作为B1输入，确认其具备主营、收入表、投入/角色披露；核对不在S2留出20家内，冻结来源hash、知识截止日、合同、模型/提示词/预处理版本、费用和调用预算。
 - A交付：一张可执行的B1卡，写明唯一owner、允许修改目录、输入输出、验证命令、一个证据入口和停止条件。A不要求B按指定函数实现。
 - 当前：[执行卡§32.5/G2](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md#325-a审核接续同卡剩余一次合并完成)合并完成同卡剩余主链；G2首轮1/2，G1不再返修。原19/6及旧成绩保持。
-- B开始条件：先清历史无用临时产物并护基线；工程实施可开始，新增真实额度及unknown例外待用户确认，确认前不创建真实attempt。确认后按整卡冻结条件连续执行，不再逐窗交准备卡。
+- B开始条件：先清历史无用临时产物并护基线；G2额度及unknown例外已确认，但必须先完成§32.5工程冻结，冻结前不创建真实attempt。冻结后按整卡连续执行，不再逐窗交准备卡。
 
 ### B1：一家公司真实解读闭环（未通过；当前G2公司任务）
 
@@ -61,9 +61,9 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 - 本卡实现：同页不同段丢失已关闭；按§32.5把实际条件/主张/原生依赖和上下文一并打包计量并按真实目标拆包，沿原入口/checkpoint实现G2公司累计及同版跨窗，成功即持久，unknown/恢复不清零。LLM选择必要核心与补读，主体/数字/时态/来源底线不降，A Gold只在隔离评分侧。
 - 输出：三视图、原文引用、缺项/冲突说明、真实模型/请求/usage、页覆盖、query/export一致；provider未配置或不可用明确失败/限用。
 - 验证：同一报告完整端到端；增加缺provider、已存在overview仍需语义阅读、否定/计划/第三方及真实冲突的直接测试；源先行检查要能找出故意移除的主要板块。模型调用量不作为质量替代。
-- B自主范围：按§32/§32.5在一个连续窗口处理剩余实现、范围内P0—P3、直接验证/Review/冻结及获准后的真实公司任务；G2已用1/2，仅剩一次合并工程迭代，不新增G3/准备卡或重置次数。不逐函数等A、不跑全208页fake、不建平台或改用户池/公共预算。
+- B自主范围：按§32/§32.5在一个连续窗口处理剩余实现、范围内P0—P3、直接验证/Review/冻结及已获准的真实公司任务；G2已用1/2，仅剩一次合并工程迭代，不新增G3/准备卡或重置次数。不逐函数等A、不跑全208页fake、不建平台或改用户池/公共预算。
 - B交接条件：提交一个`review-submission.md`，同时给出首次/后继、三视图逐项证据、真实provider/model/request/usage、query/export、测试和未解决项；代码、提示词、输入和制品版本可重建。
-- 停止：真实额度确认前无第15次；工程两次仍失败则不外呼，交明确失败。若获准，一个新公司任务最多两个同版工作窗，到限结束，不自动第17次、第三窗或换公司。用了第二窗才能完整须另报常规资源未过，A1未过不进B2。
+- 停止：工程冻结前无第15次；工程两次仍失败则不外呼，交明确失败。冻结后，一个新公司任务最多两个同版工作窗，到限结束，不自动第17次、第三窗或换公司。用了第二窗才能完整须另报常规资源未过，A1未过不进B2。
 
 ### A1：B1独立审核与放行（A负责）
 
