@@ -195,3 +195,20 @@ Under an explicitly enabled v5 policy, the authoritative owner MUST verify actua
 - **WHEN** the card explicitly permits compatible real receipts with source, model, prompt, request and version lineage
 - **THEN** old candidates remain unverified until new genuine verification succeeds, original failures and charges remain unchanged, and the result is reported as development continuation rather than a fresh first-run score
 - **AND** this exception does not authorize other receipts, another entrance, production or a general semantic-resume acceptance claim
+
+### Requirement: Omission coverage is checked against delivered business content
+After candidate-free source discovery, the owner MUST compare major conditions with actual verified claims and relevant native facts. A condition pass MUST bind the delivered objects that semantically cover it, and valid object identities, states and dependencies MUST be enforced. Source presence alone, another claim in the same dimension, or a check with no delivered comparison MUST NOT establish coverage or completeness.
+
+#### Scenario: A second major business is missing while the source condition is correct
+- **WHEN** verified claims describe one business and a source-led condition identifies another major business that is absent from those claims
+- **THEN** validating the condition's source wording cannot mark that omission covered, and the company remains limited pending substantive recovery
+- **AND** the comparison receives the relevant actual delivered claims or facts, rather than only conditions and source text
+
+#### Scenario: A coverage response cites an unrelated or unverified answer
+- **WHEN** a condition pass has no coverage object, cites an unknown or unverified object, or cites a different business merely sharing the same dimension
+- **THEN** it cannot clear the major gap; reference checks enforce identity and state, and semantic comparison determines substantive coverage
+
+#### Scenario: The first-company experiment has ended
+- **WHEN** the current card permits only offline correction and closeout of saved real receipts
+- **THEN** the existing entry may prove engineering corrections in isolated storage, but the original real results and charges remain unchanged
+- **AND** offline success does not create newly verified business content, authorize another real entrance or move to another company
