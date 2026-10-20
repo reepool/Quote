@@ -503,6 +503,7 @@ def interpret_direct_core(
 
     selected: set[int] = set()
     selected_order: list[int] = []
+    supplementary: set[int] = set()
     covered_nav: set[int] = set()
     queued_pages: set[int] = set()
     supplement_pages: list[int] = []
@@ -529,15 +530,47 @@ def interpret_direct_core(
                 status="partially_checked",
             )
 
+    def context_page(evidence) -> dict | None:
+        page_no = int(evidence.page)
+        source = next((item for item in sources if int(item["page"]) == page_no), None)
+        if source is None or not source.get("readable", True):
+            return None
+        paragraph = str(getattr(evidence.anchor, "context_before", "") or "").strip()
+        quote = str(getattr(evidence.anchor, "bounded_quote", "") or "").strip()
+        heading = str(getattr(evidence, "section_title", "") or "").strip()
+        if not paragraph or (quote and quote not in paragraph):
+            return source
+        parts = [heading] if heading and heading not in paragraph else []
+        parts.append(paragraph)
+        return {"page": page_no, "text": "\n".join(parts), "readable": True}
+
+    def pages_for(items) -> list[dict]:
+        pages = []
+        seen = set()
+        for item in items:
+            for evidence in getattr(item, "evidence", ()):
+                fragment = context_page(evidence)
+                if fragment is None:
+                    continue
+                key = (int(fragment["page"]), fragment["text"])
+                if key not in seen:
+                    seen.add(key)
+                    pages.append(fragment)
+                for page_no in getattr(evidence, "continuation_pages", ()):
+                    source = next(
+                        (row for row in sources if int(row["page"]) == int(page_no)),
+                        None,
+                    )
+                    if source is None:
+                        continue
+                    key = (int(source["page"]), source["text"])
+                    if key not in seen:
+                        seen.add(key)
+                        pages.append(source)
+        return pages
+
     def claim_pages(claim) -> list[dict]:
-        needed: list[int] = []
-        for evidence in claim.evidence:
-            for page_no in (evidence.page, *getattr(evidence, "continuation_pages", ())):
-                page_no = int(page_no)
-                if page_no not in needed:
-                    needed.append(page_no)
-        by_id = {int(page["page"]): page for page in sources}
-        return [by_id[page_no] for page_no in needed if page_no in by_id and by_id[page_no]["readable"]]
+        return pages_for([claim])
 
     def group_pages(group, related) -> list[dict]:
         pages: list[dict] = []
@@ -653,6 +686,50 @@ def interpret_direct_core(
             claims.append(claim)
         checks.extend(verified.checks)
 
+    def retract_rejected(sent_claims, verified) -> None:
+        """A block or a missing check retracts only the objects in this request."""
+        verdicts = {
+            (item.target_type, item.target_id): item.status for item in verified.checks
+        }
+        for claim in sent_claims:
+            verdict = verdicts.get(("claim", claim.claim_id))
+            if verdict == "pass":
+                continue
+            for index, earlier in enumerate(claims):
+                if earlier.claim_id != claim.claim_id or earlier.status != "observed":
+                    continue
+                claims[index] = earlier.model_copy(
+                    update={
+                        "status": "unclear",
+                        "answer": "结论未通过证据或语义核验。",
+                        "limitation": "claim_or_dependency_not_verified",
+                    }
+                )
+                gaps.append(f"claim_not_verified:{claim.claim_id}")
+        for record in records:
+            verdict = verdicts.get(("record", record.record_id))
+            if verdict in (None, "pass"):
+                continue
+            dispositions.append(
+                {
+                    "record_id": record.record_id,
+                    "status": "quarantined",
+                    "reason": "record_semantic_conflict",
+                }
+            )
+            gaps.append(f"record_semantic_conflict:{record.record_id}")
+            for index, earlier in enumerate(claims):
+                if record.record_id not in earlier.supporting_record_ids or earlier.status != "observed":
+                    continue
+                claims[index] = earlier.model_copy(
+                    update={
+                        "status": "unclear",
+                        "answer": "结论未通过证据或语义核验。",
+                        "limitation": "claim_or_dependency_not_verified",
+                    }
+                )
+                gaps.append(f"claim_not_verified:{earlier.claim_id}")
+
     def settle_claims(package_claims) -> None:
         observable = []
         for claim in package_claims:
@@ -767,7 +844,7 @@ def interpret_direct_core(
                     piece,
                     source_scope="full_context",
                     output=BODY_OUTPUT,
-                    later=0,
+                    later=_nonempty_verify_units(piece, report=report, identity=identity),
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
                 gaps.append(f"direct_core_gap_check_stopped:{exc}")
@@ -817,31 +894,21 @@ def interpret_direct_core(
             return picked
 
         def sized(group, delivered):
-            pages = []
-            seen_pages = set()
-            for item in (*group, *delivered):
-                for evidence in item.evidence:
-                    page_no = int(evidence.page)
-                    if page_no in seen_pages:
-                        continue
-                    page = next((row for row in sources if int(row["page"]) == page_no), None)
-                    if page is not None:
-                        pages.append(page)
-                        seen_pages.add(page_no)
+            pages = pages_for([*group, *delivered])
             units = request_reservation(
                 ReportSemanticRequestV3(
                     request_id=f"{work_id}:condition-size",
                     purpose="verify_views",
                     report=report,
                     processing_identity=identity,
-                    source_pages=tuple(pages) or tuple(sources[:1]),
+                    source_pages=tuple(pages),
                     source_scope="full_context",
                     source_conditions=tuple(group),
                     claims=tuple(delivered),
                     max_output_tokens=VERIFY_OUTPUT,
                     timeout_seconds=float(identity.get("logical_request_timeout_seconds") or 120),
                 )
-            )
+            ) if pages else limit + 1
             return units, pages
 
         current = []
@@ -892,7 +959,19 @@ def interpret_direct_core(
             except (ValueError, LlmError, SemanticProviderError) as exc:
                 gaps.append(f"direct_core_verify_stopped:{exc}")
                 continue
-            checks.extend(verified.checks)
+            retract_rejected(delivered, verified)
+            checks.extend(
+                check
+                for check in verified.checks
+                if not (
+                    check.target_type == "condition"
+                    and check.covers_target_type == "claim"
+                    and any(
+                        item.claim_id == check.covers_target_id and item.status != "observed"
+                        for item in claims
+                    )
+                )
+            )
 
     def read_selected(page_ids) -> None:
         ordered = []
@@ -925,7 +1004,7 @@ def interpret_direct_core(
                     package,
                     source_scope="full_context",
                     output=BODY_OUTPUT,
-                    later=0,
+                    later=_nonempty_verify_units(package, report=report, identity=identity),
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
                 gaps.append(f"direct_core_package_stopped:{exc}")
@@ -970,6 +1049,58 @@ def interpret_direct_core(
                 if by_page[int(page["page"])]["status"] == "read"
             ]
         )
+
+    def priority_order(page_ids):
+        """Ask which already selected pages are the core reading order."""
+        previews = []
+        for page_no in page_ids:
+            source = next((item for item in sources if int(item["page"]) == int(page_no)), None)
+            if source is None:
+                continue
+            previews.append(
+                {
+                    "page": int(page_no),
+                    "text": _structure_preview(str(source.get("text") or "")),
+                    "readable": True,
+                }
+            )
+        if not previews:
+            return [], list(page_ids)
+        try:
+            batches = navigation_batches(previews, report, identity, limit)
+        except ValueError as exc:
+            gaps.append(str(exc))
+            return list(page_ids), []
+        core = []
+        for batch in batches:
+            full_pages = [
+                source
+                for source in sources
+                if int(source["page"]) in {int(item["page"]) for item in batch}
+            ]
+            try:
+                response = invoke(
+                    "source_inventory",
+                    batch,
+                    source_scope="page_map",
+                    output=NAV_OUTPUT,
+                    later=_units(
+                        full_pages,
+                        purpose="synthesize_views",
+                        source_scope="full_context",
+                        report=report,
+                        identity=identity,
+                        output=BODY_OUTPUT,
+                    ),
+                )
+            except (ValueError, LlmError, SemanticProviderError) as exc:
+                gaps.append(f"direct_core_navigation_incomplete:{exc}")
+                return list(page_ids), []
+            for page_no in response.requested_pages:
+                page_no = int(page_no)
+                if page_no in page_ids and page_no not in core:
+                    core.append(page_no)
+        return core, [page_no for page_no in page_ids if page_no not in core]
 
     def bind_reused_candidates() -> list[ReportViewClaim]:
         bound_claims: list[ReportViewClaim] = []
@@ -1025,7 +1156,10 @@ def interpret_direct_core(
             if by_page.get(page_no, {}).get("status") != "read"
         ]
         if remaining:
-            read_selected(remaining)
+            core, extra = priority_order(remaining)
+            supplementary.update(extra)
+            if core:
+                read_selected(core)
     elif selected_order:
         read_selected(selected_order)
 
@@ -1066,8 +1200,12 @@ def interpret_direct_core(
         if gap not in gaps:
             gaps.append(gap)
     unread = selected - {int(item["page"]) for item in coverage if item["status"] == "read"}
-    for page_no in sorted(unread):
+    for page_no in sorted(unread - supplementary):
         gap = f"necessary_unread:{page_no}"
+        if gap not in gaps:
+            gaps.append(gap)
+    for page_no in sorted(supplementary - {int(item["page"]) for item in coverage if item["status"] == "read"}):
+        gap = f"supplementary_unread:{page_no}"
         if gap not in gaps:
             gaps.append(gap)
     for gap in _completeness_gaps(claims, conditions, checks, records):

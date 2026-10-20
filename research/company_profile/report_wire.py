@@ -199,6 +199,7 @@ def instructions(request: ReportSemanticRequestV3) -> str:
             selection = (
                 "Select physical requested_pages for the main business, how it is earned, "
                 "important inputs, upstream/downstream roles, and continuation pages. "
+                "Return them in that reading order. Omit a page that is only supplementary. "
                 "Do not select a page only because it is a supplementary note. "
             )
         else:

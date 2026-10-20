@@ -439,6 +439,12 @@ def test_coverage_verification_includes_the_verified_claim():
                     purpose=request.purpose,
                     checks=(
                         {
+                            "target_type": "claim",
+                            "target_id": "cloud-only",
+                            "status": "pass",
+                            "explanation": "主张本身仍成立。",
+                        },
+                        {
                             "target_type": "condition",
                             "target_id": "design-business",
                             "status": "pass",
@@ -474,3 +480,98 @@ def test_coverage_verification_includes_the_verified_claim():
     )
     assert result.draft_complete is False
     assert any(item.claim_id == "cloud-only" and item.status == "observed" for item in result.claims)
+
+
+def test_a_later_block_retracts_that_claim_and_keeps_another():
+    report = _report()
+    text = "公司提供云计算服务，并向家庭用户收费。"
+    quote = text[:8]
+
+    def claim(claim_id, dimension):
+        return ReportViewClaim(
+            claim_id=claim_id,
+            dimension=dimension,
+            status="observed",
+            answer="云计算服务。",
+            evidence=(
+                _evidence(report, text=quote, page=1).model_copy(
+                    update={"evidence_id": f"{claim_id}-evidence"}
+                ),
+            ),
+        )
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(1,),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        claim("kept", "products_services"),
+                        claim("blocked", "principal_business"),
+                    ),
+                )
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=(
+                        {
+                            "condition_id": "design-business",
+                            "dimension": "principal_business",
+                            "description": "另一主要业务是工业设计。",
+                            "evidence": (
+                                _evidence(report, text=quote, page=1).model_copy(
+                                    update={"evidence_id": "design-evidence"}
+                                ),
+                            ),
+                            "major": True,
+                            "statement_status": "current",
+                        },
+                    ),
+                )
+            blocked_now = bool(request.source_conditions)
+            checks = [
+                {
+                    "target_type": "claim",
+                    "target_id": item.claim_id,
+                    "status": "block" if blocked_now and item.claim_id == "blocked" else "pass",
+                    "explanation": "离线",
+                }
+                for item in request.claims
+            ]
+            checks.extend(
+                {
+                    "target_type": "condition",
+                    "target_id": item.condition_id,
+                    "status": "pass",
+                    "explanation": "引用了已被否定的主张。",
+                    "covers_target_type": "claim",
+                    "covers_target_id": "blocked",
+                }
+                for item in request.source_conditions
+            )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(checks),
+            )
+
+    result = _run(
+        _Provider(),
+        pages=({"page": 1, "text": text, "readable": True},),
+        processing_identity=direct_core_processing_identity(),
+        report=report,
+    )
+    assert any(item.claim_id == "kept" and item.status == "observed" for item in result.claims)
+    assert any(item.claim_id == "blocked" and item.status == "unclear" for item in result.claims)
+    assert any("design-business" in gap for gap in result.gaps)
+    assert result.draft_complete is False
