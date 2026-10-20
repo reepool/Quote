@@ -217,3 +217,18 @@ After candidate-free source discovery, the owner MUST compare major conditions w
 - **WHEN** a valid check in the current coverage request blocks or cannot verify a previously supported claim or a native record
 - **THEN** that negative result updates the object's reliability and dependent answers through the authoritative owner, and coverage that depends on it cannot remain satisfied
 - **AND** an earlier pass or an existing object ID cannot preserve completeness, while unrelated verified objects remain available
+
+#### Scenario: A source-first core package shares support and coverage verification
+- **WHEN** candidate-free discovery has independently identified the package's major source conditions before its candidates are generated
+- **THEN** one verification request MAY return separate support, dependency and coverage checks, with support and dependency dispositions applied before accepting coverage against those delivered objects
+- **AND** identical versioned source scopes do not require another full-page inventory solely because support checking has completed; new source scopes and unresolved major risks still require independent source review
+- **AND** valid existing candidates may still be independently verified and published as partial results if source discovery fails
+
+#### Scenario: Two evidence paragraphs share a physical page
+- **WHEN** a verification package contains two claims citing different paragraphs on one page
+- **THEN** packing preserves both source ranges and their necessary qualifiers, deduplicating overlap by source location rather than dropping a paragraph because its page number already exists
+
+#### Scenario: An explicitly authorized company task continues across work windows
+- **WHEN** the current card has obtained explicit authority for a finite number of work windows and a cumulative company budget
+- **THEN** existing checkpoints continue only unfinished work under the same frozen identity while preserving cumulative charges, unknown reservations and consumed recoveries
+- **AND** exhausting a company limit stops the task, pending authorization creates no real attempt, and a result requiring expanded development resources does not establish ordinary single-window resource acceptance or authorize another company
