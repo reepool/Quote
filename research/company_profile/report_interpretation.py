@@ -2437,9 +2437,23 @@ def research_views(result: ReportInterpretation) -> dict[str, Any]:
                 {
                     **item.model_dump(mode="json"),
                     "review_state": (
-                        "pending_verification"
-                        if item.limitation == "pending_verification"
-                        else "verified"
+                        "verified"
+                        if (
+                            item.status == "observed"
+                            and item.claim_id
+                            in {
+                                check.target_id
+                                for check in result.checks
+                                if check.target_type == "claim" and check.status == "pass"
+                            }
+                            and item.limitation
+                            not in {
+                                "pending_verification",
+                                "claim_or_dependency_not_verified",
+                                "evidence_not_located",
+                            }
+                        )
+                        else "pending_verification"
                         if item.status == "observed"
                         else "not_reliable"
                     ),

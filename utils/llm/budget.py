@@ -122,9 +122,21 @@ class LlmRunBudget:
         prior_logical_attempts: tuple[Mapping[str, Any], ...] | list[Mapping[str, Any]] = (),
         run_authorization: str | None = None,
     ):
+        authorized_e2 = run_authorization == "company_profile_e2.2026-10-20"
         authorized_e1 = run_authorization == "company_profile_e1.2026-10-20"
-        token_cap = 240_000 if authorized_e1 else 120_000
-        request_cap = 24 if authorized_e1 else 16
+        if authorized_e2:
+            token_cap, request_cap = 180_000, 20
+        elif authorized_e1:
+            token_cap, request_cap = 240_000, 24
+        else:
+            token_cap, request_cap = 120_000, 16
+        e2_shaped = (
+            (max_tokens > 120_000 or max_requests > 16)
+            and max_tokens <= 180_000
+            and max_requests <= 20
+        )
+        if authorized_e1 and e2_shaped:
+            raise ValueError("invalid bounded run limits")
         if (
             not math.isfinite(deadline)
             or not 0 < max_tokens <= token_cap

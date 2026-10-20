@@ -396,6 +396,9 @@ def interpret_direct_core(
                     "necessary_unread:",
                     "necessary_fragment",
                     "major_condition_not_verified:",
+                    "navigation_incomplete:",
+                    "view_not_substantive:",
+                    "core_dimension_missing:",
                 )
             )
             for gap in gaps
@@ -470,260 +473,322 @@ def interpret_direct_core(
         )
         return response
 
-    try:
-        nav = navigation_batches(sources, report, identity, limit)
-    except ValueError as exc:
-        gaps.append(str(exc))
-        return _result()
-
     selected: set[int] = set()
-    try:
-        for index, batch in enumerate(nav):
-            later_nav = sum(
-                _units(
-                    item,
-                    purpose="source_inventory",
-                    source_scope="page_map",
-                    report=report,
-                    identity=identity,
-                    output=NAV_OUTPUT,
-                )
-                for item in nav[index + 1 :]
-            )
-            response = invoke(
-                "source_inventory",
-                batch,
-                source_scope="page_map",
-                output=NAV_OUTPUT,
-                later=later_nav,
-            )
-            if response.source_conditions:
-                raise ValueError("page_map_cannot_establish_source_conditions")
-            selected.update(int(page) for page in response.requested_pages)
-            for page in batch:
-                by_page[int(page["page"])].update(
-                    structure_indexed=True,
-                    map_checked=True,
-                    map_selected=int(page["page"]) in response.requested_pages,
-                    status="partially_checked",
-                )
-    except (ValueError, LlmError, SemanticProviderError) as exc:
-        gaps.append(f"direct_core_navigation_stopped:{exc}")
-        return _result()
-    if not selected:
-        gaps.append("core_chapters_not_selected")
-        return _result()
-
-    chosen = [page for page in sources if int(page["page"]) in selected and page["readable"]]
-    try:
-        packages = body_packages(chosen, report, identity, limit)
-    except ValueError as exc:
-        gaps.append(str(exc))
-        return _result()
-    queued_pages = set(selected)
+    selected_order: list[int] = []
+    covered_nav: set[int] = set()
+    queued_pages: set[int] = set()
     supplement_pages: list[int] = []
-    packages = list(packages)
-    index = 0
-    while index < len(packages) and index < 8:
-        package = packages[index]
-        package_pages = {int(page["page"]) for page in package}
-        try:
-            drafted = invoke(
-                "synthesize_views",
-                package,
-                source_scope="full_context",
-                output=BODY_OUTPUT,
-                later=_units(
-                    package,
-                    purpose="source_inventory",
-                    source_scope="full_context",
-                    report=report,
-                    identity=identity,
-                    output=BODY_OUTPUT,
-                )
-                + _units(
-                    package,
-                    purpose="verify_views",
-                    source_scope="full_context",
-                    report=report,
-                    identity=identity,
-                    output=VERIFY_OUTPUT,
-                ),
+
+    def remember_map(batch, requested) -> None:
+        requested_ids = []
+        for page in requested:
+            page_no = int(page)
+            if page_no not in requested_ids:
+                requested_ids.append(page_no)
+            if page_no not in selected:
+                selected_order.append(page_no)
+            selected.add(page_no)
+        requested_set = set(requested_ids)
+        for page in batch:
+            page_no = int(page["page"] if isinstance(page, dict) else page)
+            covered_nav.add(page_no)
+            if page_no not in by_page:
+                continue
+            by_page[page_no].update(
+                structure_indexed=True,
+                map_checked=True,
+                map_selected=page_no in requested_set,
+                status="partially_checked",
             )
-        except (ValueError, LlmError, SemanticProviderError) as exc:
-            gaps.append(f"direct_core_package_stopped:{exc}")
-            for page_no in selected - {int(item["page"]) for item in coverage if item["status"] == "read"}:
-                gaps.append(f"necessary_unread:{page_no}")
-            break
-        package_claims: list[ReportViewClaim] = []
-        for claim in drafted.claims:
-            bound = []
-            failed = False
-            for evidence in claim.evidence:
-                located = _bind_source_evidence(evidence, report, package)
-                if located is None:
-                    failed = True
-                    break
-                bound.append(located)
-            if failed or not bound:
-                gaps.append(f"evidence_not_located:{claim.claim_id}")
-                package_claims.append(
-                    claim.model_copy(
-                        update={
-                            "status": "unclear",
-                            "limitation": "evidence_not_located",
+
+    def read_selected(page_ids) -> None:
+        ordered = []
+        for page in page_ids:
+            page_no = int(page)
+            if page_no in queued_pages or page_no in ordered:
+                continue
+            ordered.append(page_no)
+        if not ordered:
+            return
+        queued_pages.update(ordered)
+        by_id = {int(page["page"]): page for page in sources}
+        chosen = [
+            by_id[page_no]
+            for page_no in ordered
+            if page_no in by_id and by_id[page_no]["readable"]
+        ]
+        try:
+            packages = list(body_packages(chosen, report, identity, limit))
+        except ValueError as exc:
+            gaps.append(str(exc))
+            return
+        index = 0
+        while index < len(packages) and index < 8:
+            package = packages[index]
+            package_pages = {int(page["page"]) for page in package}
+            try:
+                drafted = invoke(
+                    "synthesize_views",
+                    package,
+                    source_scope="full_context",
+                    output=BODY_OUTPUT,
+                    later=_units(
+                        package,
+                        purpose="source_inventory",
+                        source_scope="full_context",
+                        report=report,
+                        identity=identity,
+                        output=BODY_OUTPUT,
+                    )
+                    + _units(
+                        package,
+                        purpose="verify_views",
+                        source_scope="full_context",
+                        report=report,
+                        identity=identity,
+                        output=VERIFY_OUTPUT,
+                    ),
+                )
+            except (ValueError, LlmError, SemanticProviderError) as exc:
+                gaps.append(f"direct_core_package_stopped:{exc}")
+                for page_no in package_pages:
+                    gap = f"necessary_unread:{page_no}"
+                    if gap not in gaps:
+                        gaps.append(gap)
+                if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
+                    return
+                index += 1
+                continue
+            package_claims: list[ReportViewClaim] = []
+            for claim in drafted.claims:
+                bound = []
+                failed = False
+                for evidence in claim.evidence:
+                    located = _bind_source_evidence(evidence, report, package)
+                    if located is None:
+                        failed = True
+                        break
+                    bound.append(located)
+                if failed or not bound:
+                    gaps.append(f"evidence_not_located:{claim.claim_id}")
+                    package_claims.append(
+                        claim.model_copy(
+                            update={
+                                "status": "unclear",
+                                "limitation": "evidence_not_located",
+                            }
+                        )
+                    )
+                    continue
+                package_claims.append(claim.model_copy(update={"evidence": tuple(bound)}))
+            try:
+                reviewed = invoke(
+                    "source_inventory",
+                    package,
+                    source_scope="full_context",
+                    output=BODY_OUTPUT,
+                    later=_units(
+                        package,
+                        purpose="verify_views",
+                        source_scope="full_context",
+                        report=report,
+                        identity=identity,
+                        output=VERIFY_OUTPUT,
+                    ),
+                )
+            except (ValueError, LlmError, SemanticProviderError) as exc:
+                gaps.append(f"direct_core_gap_check_stopped:{exc}")
+                claims.extend(
+                    item.model_copy(update={"limitation": "pending_verification"})
+                    if item.status == "observed"
+                    else item
+                    for item in package_claims
+                )
+                publish()
+                if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
+                    return
+                index += 1
+                continue
+            accepted, location_gaps = _located_conditions(
+                reviewed.source_conditions,
+                report,
+                package,
+                request_id=receipts[-1]["request_id"],
+                seen=seen,
+            )
+            gaps.extend(location_gaps)
+            conditions.extend(accepted)
+            for page_no in reviewed.requested_pages:
+                page_no = int(page_no)
+                if page_no in by_page and by_page[page_no]["status"] != "read":
+                    selected.add(page_no)
+                    if page_no not in queued_pages:
+                        supplement_pages.append(page_no)
+                        queued_pages.add(page_no)
+            related = tuple(
+                record
+                for record in structured.values()
+                if any(evidence.page in package_pages for evidence in record.evidence)
+            )
+            try:
+                verified = invoke(
+                    "verify_views",
+                    package,
+                    source_scope="full_context",
+                    output=VERIFY_OUTPUT,
+                    later=0,
+                    extra={
+                        "source_conditions": tuple(accepted),
+                        "claims": tuple(
+                            item for item in package_claims if item.status == "observed"
+                        ),
+                        "records": related,
+                    },
+                )
+            except (ValueError, LlmError, SemanticProviderError) as exc:
+                gaps.append(f"direct_core_verify_stopped:{exc}")
+                claims.extend(
+                    item.model_copy(update={"limitation": "pending_verification"})
+                    if item.status == "observed"
+                    else item
+                    for item in package_claims
+                )
+                publish()
+                if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
+                    return
+                index += 1
+                continue
+            verdicts = {
+                (item.target_type, item.target_id): item.status for item in verified.checks
+            }
+            quarantined = {
+                item.target_id
+                for item in verified.checks
+                if item.target_type == "record" and item.status != "pass"
+            }
+            for key in quarantined:
+                if key in structured:
+                    dispositions.append(
+                        {
+                            "record_id": key,
+                            "status": "quarantined",
+                            "reason": "record_semantic_conflict",
                         }
                     )
+                    gaps.append(f"record_semantic_conflict:{key}")
+                    for claim_index, earlier in enumerate(claims):
+                        if (
+                            key not in earlier.supporting_record_ids
+                            or earlier.status != "observed"
+                        ):
+                            continue
+                        claims[claim_index] = earlier.model_copy(
+                            update={
+                                "status": "unclear",
+                                "answer": "结论未通过证据或语义核验。",
+                                "limitation": "claim_or_dependency_not_verified",
+                            }
+                        )
+                        gaps.append(f"claim_not_verified:{earlier.claim_id}")
+            kept_records = [item for item in related if item.record_id not in quarantined]
+            records[:] = [
+                item for item in records if item.record_id not in {row.record_id for row in related}
+            ]
+            records.extend(kept_records)
+            accepted_ids = {item.record_id for item in records}
+            for claim in package_claims:
+                dependency_blocked = bool(claim.supporting_record_ids) and (
+                    not set(claim.supporting_record_ids) <= accepted_ids
+                    or any(
+                        verdicts.get(("record", key)) != "pass"
+                        for key in claim.supporting_record_ids
+                    )
                 )
-                continue
-            package_claims.append(claim.model_copy(update={"evidence": tuple(bound)}))
-        try:
-            reviewed = invoke(
-                "source_inventory",
-                package,
-                source_scope="full_context",
-                output=BODY_OUTPUT,
-                later=_units(
-                    package,
-                    purpose="verify_views",
-                    source_scope="full_context",
-                    report=report,
-                    identity=identity,
-                    output=VERIFY_OUTPUT,
-                ),
-            )
-        except (ValueError, LlmError, SemanticProviderError) as exc:
-            gaps.append(f"direct_core_gap_check_stopped:{exc}")
-            claims.extend(package_claims)
-            publish()
-            break
-        accepted, location_gaps = _located_conditions(
-            reviewed.source_conditions,
-            report,
-            package,
-            request_id=receipts[-1]["request_id"],
-            seen=seen,
-        )
-        gaps.extend(location_gaps)
-        conditions.extend(accepted)
-        for page_no in reviewed.requested_pages:
-            page_no = int(page_no)
-            if page_no in by_page and by_page[page_no]["status"] != "read":
-                selected.add(page_no)
-                if page_no not in queued_pages:
-                    supplement_pages.append(page_no)
-                    queued_pages.add(page_no)
-        related = tuple(
-            record
-            for record in structured.values()
-            if any(evidence.page in package_pages for evidence in record.evidence)
-        )
-        try:
-            verified = invoke(
-                "verify_views",
-                package,
-                source_scope="full_context",
-                output=VERIFY_OUTPUT,
-                later=0,
-                extra={
-                    "source_conditions": tuple(accepted),
-                    "claims": tuple(
-                        item for item in package_claims if item.status == "observed"
-                    ),
-                    "records": related,
-                },
-            )
-        except (ValueError, LlmError, SemanticProviderError) as exc:
-            gaps.append(f"direct_core_verify_stopped:{exc}")
-            claims.extend(
-                item.model_copy(update={"limitation": "pending_verification"})
-                if item.status == "observed"
-                else item
-                for item in package_claims
-            )
-            publish()
-            break
-        verdicts = {
-            (item.target_type, item.target_id): item.status for item in verified.checks
-        }
-        quarantined = {
-            item.target_id
-            for item in verified.checks
-            if item.target_type == "record" and item.status != "pass"
-        }
-        for key in quarantined:
-            if key in structured:
-                dispositions.append(
-                    {
-                        "record_id": key,
-                        "status": "quarantined",
-                        "reason": "record_semantic_conflict",
-                    }
+                blocked = (
+                    claim.status != "observed"
+                    or verdicts.get(("claim", claim.claim_id)) != "pass"
+                    or not all(
+                        _evidence_valid(evidence, report, package)
+                        for evidence in claim.evidence
+                    )
+                    or dependency_blocked
                 )
-                gaps.append(f"record_semantic_conflict:{key}")
-                for index, earlier in enumerate(claims):
-                    if key not in earlier.supporting_record_ids or earlier.status != "observed":
-                        continue
-                    claims[index] = earlier.model_copy(
+                if blocked and claim.status == "observed":
+                    claim = claim.model_copy(
                         update={
                             "status": "unclear",
                             "answer": "结论未通过证据或语义核验。",
                             "limitation": "claim_or_dependency_not_verified",
                         }
                     )
-                    gaps.append(f"claim_not_verified:{earlier.claim_id}")
-        kept_records = [item for item in related if item.record_id not in quarantined]
-        records = [item for item in records if item.record_id not in {r.record_id for r in related}]
-        records.extend(kept_records)
-        accepted_ids = {item.record_id for item in records}
-        for claim in package_claims:
-            dependency_blocked = bool(claim.supporting_record_ids) and (
-                not set(claim.supporting_record_ids) <= accepted_ids
-                or any(
-                    verdicts.get(("record", key)) != "pass"
-                    for key in claim.supporting_record_ids
-                )
+                    gaps.append(f"claim_not_verified:{claim.claim_id}")
+                claims.append(claim)
+            checks.extend(verified.checks)
+            for page in package:
+                by_page[int(page["page"])]["status"] = "read"
+            publish()
+            if supplement_pages:
+                extra = [
+                    page
+                    for page in sources
+                    if int(page["page"]) in supplement_pages
+                    and int(page["page"]) not in package_pages
+                ]
+                supplement_pages.clear()
+                if extra:
+                    try:
+                        packages.extend(body_packages(extra, report, identity, limit))
+                    except ValueError as exc:
+                        gaps.append(str(exc))
+            index += 1
+            if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
+                return
+
+    for item in identity.get("accepted_page_map_receipts") or ():
+        payload = item.get("response_payload") or {}
+        if payload.get("claims") or payload.get("source_conditions"):
+            raise ValueError("reused_navigation_contains_semantic_output")
+        remember_map(item.get("source_pages") or [], payload.get("requested_pages") or [])
+        receipts.append({**item, "physical_request": False, "reused_navigation": True})
+    if selected_order:
+        read_selected(selected_order)
+
+    try:
+        nav = navigation_batches(
+            [page for page in sources if int(page["page"]) not in covered_nav],
+            report,
+            identity,
+            limit,
+        )
+    except ValueError as exc:
+        gaps.append(str(exc))
+        nav = []
+    for batch in nav:
+        try:
+            response = invoke(
+                "source_inventory",
+                batch,
+                source_scope="page_map",
+                output=NAV_OUTPUT,
+                later=0,
             )
-            blocked = (
-                claim.status != "observed"
-                or verdicts.get(("claim", claim.claim_id)) != "pass"
-                or not all(
-                    _evidence_valid(evidence, report, package)
-                    for evidence in claim.evidence
-                )
-                or dependency_blocked
-            )
-            if blocked and claim.status == "observed":
-                claim = claim.model_copy(
-                    update={
-                        "status": "unclear",
-                        "answer": "结论未通过证据或语义核验。",
-                        "limitation": "claim_or_dependency_not_verified",
-                    }
-                )
-                gaps.append(f"claim_not_verified:{claim.claim_id}")
-            claims.append(claim)
-        checks.extend(verified.checks)
-        for page in package:
-            by_page[int(page["page"])]["status"] = "read"
-        publish()
-        if supplement_pages:
-            extra = [
-                page
-                for page in sources
-                if int(page["page"]) in supplement_pages and int(page["page"]) not in {
-                    int(item["page"]) for done in packages[: index + 1] for item in done
-                }
-            ]
-            supplement_pages.clear()
-            if extra:
-                try:
-                    packages.extend(body_packages(extra, report, identity, limit))
-                except ValueError as exc:
-                    gaps.append(str(exc))
-        index += 1
-        if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
-            break
+            if response.source_conditions:
+                raise ValueError("page_map_cannot_establish_source_conditions")
+            new_pages = [int(page) for page in response.requested_pages]
+            remember_map(batch, new_pages)
+        except (ValueError, LlmError, SemanticProviderError) as exc:
+            gaps.append(f"direct_core_navigation_incomplete:{exc}")
+            if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
+                break
+            continue
+        read_selected(new_pages)
+
+    for page in coverage:
+        if page.get("map_checked"):
+            continue
+        gap = f"navigation_incomplete:{page['page']}"
+        if gap not in gaps:
+            gaps.append(gap)
     unread = selected - {int(item["page"]) for item in coverage if item["status"] == "read"}
     for page_no in sorted(unread):
         gap = f"necessary_unread:{page_no}"

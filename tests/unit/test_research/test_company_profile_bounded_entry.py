@@ -254,6 +254,59 @@ def test_e1_budget_stops_at_the_authorized_physical_cap():
         raise AssertionError("the authorized window accepted a request past its cap")
 
 
+def test_e2_budget_is_separate_from_the_e1_authorization():
+    import time
+
+    from utils.llm.budget import DEVELOPMENT_UNPRICED_BILLING, LlmRunBudget
+
+    try:
+        LlmRunBudget(
+            deadline=time.monotonic() + 30,
+            prices={},
+            max_tokens=180_000,
+            max_requests=20,
+            billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        )
+    except ValueError as exc:
+        assert str(exc) == "invalid bounded run limits"
+    else:
+        raise AssertionError("an unauthorized 180000 ledger was accepted")
+    try:
+        LlmRunBudget(
+            deadline=time.monotonic() + 30,
+            prices={},
+            max_tokens=180_000,
+            max_requests=20,
+            billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+            run_authorization="company_profile_e1.2026-10-20",
+        )
+    except ValueError as exc:
+        assert str(exc) == "invalid bounded run limits"
+    else:
+        raise AssertionError("the E1 marker unlocked the E2 window")
+    try:
+        LlmRunBudget(
+            deadline=time.monotonic() + 30,
+            prices={},
+            max_tokens=240_000,
+            max_requests=24,
+            billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+            run_authorization="company_profile_e2.2026-10-20",
+        )
+    except ValueError as exc:
+        assert str(exc) == "invalid bounded run limits"
+    else:
+        raise AssertionError("the E2 marker unlocked the E1 window")
+    LlmRunBudget(
+        deadline=time.monotonic() + 30,
+        prices={},
+        max_tokens=180_000,
+        max_requests=20,
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        run_authorization="company_profile_e2.2026-10-20",
+    )
+
+
 def test_layered_entry_refuses_old_semantic_receipts():
     from research.company_profile.bounded_entry import (
         refuse_layered_semantic_continuation,

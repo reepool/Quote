@@ -593,7 +593,10 @@ class LlmClient:
             return None
         route_cap = request.metadata.get("max_route_attempts")
         if route_cap:
-            eligible_attempt_count = min(eligible_attempt_count, int(route_cap))
+            eligible_attempt_count = min(
+                eligible_attempt_count,
+                max(int(route_cap) - int(failover_count), 0),
+            )
         if eligible_attempt_count <= 1:
             return None
         remaining = budget.remaining(time.monotonic())

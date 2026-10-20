@@ -91,6 +91,31 @@ def preflight_partial(binding: dict) -> dict:
     return plan
 
 
+def load_twelfth_navigation(binding: dict) -> list:
+    """Reuse only the twelfth run's two successful page maps. No old claims."""
+    query = json.loads(Path(binding["accepted_navigation_query"]).read_text())
+    profile = query["profiles"][0]
+    if profile["report"].get("document_version") != binding["asset"]["content_hash"]:
+        raise ValueError("reused_navigation_source_mismatch")
+    receipts = [
+        item
+        for item in profile["three_views"]["call_receipts"]
+        if item.get("status") == "success" and item.get("source_scope") == "page_map"
+    ]
+    ranges = []
+    for item in receipts:
+        pages = [int(page) for page in item.get("source_pages") or []]
+        payload = item.get("response_payload") or {}
+        if payload.get("claims") or payload.get("source_conditions"):
+            raise ValueError("reused_navigation_contains_semantic_output")
+        if not pages or pages != list(range(pages[0], pages[-1] + 1)):
+            raise ValueError("reused_navigation_pages_not_contiguous")
+        ranges.append((pages[0], pages[-1]))
+    if ranges != [(1, 85), (86, 170)]:
+        raise ValueError("reused_navigation_does_not_match_twelfth_run")
+    return receipts
+
+
 def preflight_direct_core(binding: dict) -> dict:
     """Admit the first chapter package with the same reservation the send uses."""
     import gzip
@@ -316,9 +341,15 @@ def validate_binding(
     asset = binding["asset"]
     if digest(Path(asset["archive_path"])) != asset["content_hash"]:
         raise ValueError("frozen PDF hash mismatch")
-    if not 0 < binding["max_elapsed_seconds"] <= (
-        1800 if binding.get("run_authorization") == "company_profile_e1.2026-10-20" else 900
-    ):
+    elapsed = binding["max_elapsed_seconds"]
+    auth = binding.get("run_authorization")
+    if auth == "company_profile_e2.2026-10-20":
+        allowed = 0 < elapsed <= 1200
+    elif auth == "company_profile_e1.2026-10-20":
+        allowed = 0 < elapsed <= 900 or 1200 < elapsed <= 1800
+    else:
+        allowed = 0 < elapsed <= 900
+    if not allowed:
         raise ValueError("entry deadline exceeds the card")
     if real:
         if (
@@ -339,6 +370,7 @@ def validate_binding(
                 "window10",
                 "direct1",
                 "e1",
+                "e2",
             }
             or not authorization.get("approval_reference")
         ):
@@ -754,6 +786,8 @@ def _worker(
         identity["protect_tail"] = not bool(
             binding.get("defer_tail_to_next_window")
         )
+        if binding.get("accepted_navigation_query"):
+            identity["accepted_page_map_receipts"] = load_twelfth_navigation(binding)
         refuse_layered_semantic_continuation(binding)
     if binding.get("partial_slice"):
         identity.update(
@@ -773,7 +807,7 @@ def _worker(
         provider=provider,
         processing_identity=identity,
         execution_budget=budget,
-        token_budget=120_000,
+        token_budget=int(binding["max_tokens"]),
         shared_asset_access=SimpleNamespace(),
     )
     announcement = binding["announcement"]
@@ -868,10 +902,16 @@ def main() -> int:
         preflight_partial(binding)
     if binding.get("reading_strategy") == "layered_v3":
         preflight_layered(binding)
-    if binding.get("reading_strategy") == "direct_core_v1" and args.worker_deadline is None:
+    if (
+        binding.get("reading_strategy") == "direct_core_v1"
+        and args.worker_deadline is None
+        and not binding.get("accepted_navigation_query")
+    ):
         direct_plan = preflight_direct_core(binding)
     else:
         direct_plan = None
+    if binding.get("accepted_navigation_query") and args.worker_deadline is None:
+        load_twelfth_navigation(binding)
     if args.worker_deadline is not None:
         finish_worker(
             run_root,
@@ -932,6 +972,8 @@ def main() -> int:
             raise ValueError("direct1 requires the protected window10 marker")
         if authorization["attempt"] == "e1" and not (attempts / "direct1.json").is_file():
             raise ValueError("e1 requires the protected direct1 marker")
+        if authorization["attempt"] == "e2" and not (attempts / "e1.json").is_file():
+            raise ValueError("e2 requires the protected e1 marker")
         if authorization["attempt"] == "layered" and not (
             (attempts / "first.json").is_file()
             and (attempts / "successor.json").is_file()
