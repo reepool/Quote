@@ -316,7 +316,9 @@ def validate_binding(
     asset = binding["asset"]
     if digest(Path(asset["archive_path"])) != asset["content_hash"]:
         raise ValueError("frozen PDF hash mismatch")
-    if not 0 < binding["max_elapsed_seconds"] <= 900:
+    if not 0 < binding["max_elapsed_seconds"] <= (
+        1800 if binding.get("run_authorization") == "company_profile_e1.2026-10-20" else 900
+    ):
         raise ValueError("entry deadline exceeds the card")
     if real:
         if (
@@ -336,6 +338,7 @@ def validate_binding(
                 "decision",
                 "window10",
                 "direct1",
+                "e1",
             }
             or not authorization.get("approval_reference")
         ):
@@ -509,7 +512,7 @@ def _worker(
         recovery_policy=(
             LogicalRecoveryPolicy(
                 max_recoveries=(
-                    1
+                    min(2, int(binding.get("max_recoveries", 2)))
                     if binding.get("reading_strategy") == "direct_core_v1"
                     else int(binding.get("max_recoveries", 4))
                 ),
@@ -519,6 +522,7 @@ def _worker(
             else None
         ),
         prior_logical_attempts=prior_attempts,
+        run_authorization=binding.get("run_authorization"),
     )
     transport_requests = []
     map_replies = {"count": 0}
@@ -926,6 +930,8 @@ def main() -> int:
             (attempts / "window10.json").is_file()
         ):
             raise ValueError("direct1 requires the protected window10 marker")
+        if authorization["attempt"] == "e1" and not (attempts / "direct1.json").is_file():
+            raise ValueError("e1 requires the protected direct1 marker")
         if authorization["attempt"] == "layered" and not (
             (attempts / "first.json").is_file()
             and (attempts / "successor.json").is_file()

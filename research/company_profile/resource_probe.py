@@ -343,7 +343,7 @@ def _source_sentences(request: dict) -> list[tuple[int, str]]:
             if len(quote) < 8 or quote not in text:
                 continue
             found.append((int(page["page"]), quote[:40]))
-            if len(found) == 2:
+            if len(found) == 5:
                 return found
     return found
 
@@ -373,6 +373,14 @@ def direct_chain_reply(request: dict) -> dict:
         result["requested_pages"] = chosen[:2]
         return result
     sentences = _source_sentences(request)
+    dimensions = (
+        "principal_business",
+        "products_services",
+        "revenue_model",
+        "output_exposure",
+        "supply_chain_role",
+    )
+    paired = list(zip(dimensions, sentences, strict=False))
     if request["purpose"] == "source_inventory":
         if request.get("claims"):
             raise ValueError("gap_request_contains_candidates")
@@ -380,27 +388,27 @@ def direct_chain_reply(request: dict) -> dict:
         result["source_conditions"] = [
             {
                 "condition_id": f"chain-{index}",
-                "dimension": "principal_business",
+                "dimension": dimension,
                 "description": "模拟正文条件，不是年报结论。",
                 "evidence": [{"page": page, "quote": quote}],
                 "major": True,
                 "statement_status": "current",
             }
-            for index, (page, quote) in enumerate(sentences)
+            for index, (dimension, (page, quote)) in enumerate(paired)
         ]
         return result
     if request["purpose"] == "synthesize_views":
         result["claims"] = [
             {
                 "claim_id": f"chain-claim-{index}",
-                "dimension": "principal_business",
+                "dimension": dimension,
                 "status": "observed",
                 "answer": "模拟主张，不是年报结论。",
                 "condition_ids": [],
                 "supporting_record_ids": [],
                 "evidence": [{"page": page, "quote": quote}],
             }
-            for index, (page, quote) in enumerate(sentences)
+            for index, (dimension, (page, quote)) in enumerate(paired)
         ]
         return result
     result["checks"] = [

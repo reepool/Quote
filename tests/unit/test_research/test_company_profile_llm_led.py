@@ -3127,3 +3127,190 @@ def test_direct_core_publishes_one_verified_package_and_keeps_it_when_the_next_s
         "source_inventory",
         "verify_views",
     ]
+
+
+def test_empty_product_and_supply_views_are_not_complete():
+    from research.company_profile.contracts import ReportSemanticResponseV3, ReportViewClaim
+    from research.company_profile.report_interpretation import direct_core_processing_identity
+
+    report = _report()
+    text = "公司经营有线电视网络传输，并向用户提供接入服务。"
+    quote = text[:12]
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(1,),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="only-principal",
+                            dimension="principal_business",
+                            status="observed",
+                            answer="只写了主营。",
+                            evidence=(
+                                _evidence(report, text=quote, page=1).model_copy(
+                                    update={"evidence_id": "only-principal-evidence"}
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=(
+                        {
+                            "condition_id": "only-principal-condition",
+                            "dimension": "principal_business",
+                            "description": "只有主营。",
+                            "evidence": (
+                                _evidence(report, text=quote, page=1).model_copy(
+                                    update={"evidence_id": "only-principal-source"}
+                                ),
+                            ),
+                            "major": True,
+                            "statement_status": "current",
+                        },
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "claim",
+                        "target_id": item.claim_id,
+                        "status": "pass",
+                        "explanation": "离线",
+                    }
+                    for item in request.claims
+                )
+                + tuple(
+                    {
+                        "target_type": "condition",
+                        "target_id": item.condition_id,
+                        "status": "pass",
+                        "explanation": "离线",
+                    }
+                    for item in request.source_conditions
+                ),
+            )
+
+    result = _run(
+        _Provider(),
+        pages=({"page": 1, "text": text, "readable": True},),
+        processing_identity=direct_core_processing_identity(),
+        report=report,
+    )
+    assert result.draft_complete is False
+    assert any(gap.startswith("view_not_substantive:") for gap in result.gaps)
+    assert result.real_semantic_complete is False
+
+
+def test_blocked_major_conditions_keep_the_report_incomplete():
+    from research.company_profile.contracts import ReportSemanticResponseV3, ReportViewClaim
+    from research.company_profile.report_interpretation import (
+        DIMENSIONS,
+        direct_core_processing_identity,
+    )
+
+    report = _report()
+    text = "公司经营有线电视网络传输，并向用户提供接入服务，收入来自收视费。"
+    quote = text[:12]
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(1,),
+                )
+            evidence = _evidence(report, text=quote, page=1)
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=tuple(
+                        ReportViewClaim(
+                            claim_id=f"claim-{dimension}",
+                            dimension=dimension,
+                            status="observed",
+                            answer="定位到了原文，但核验未接受。",
+                            evidence=(
+                                evidence.model_copy(
+                                    update={"evidence_id": f"claim-{dimension}"}
+                                ),
+                            ),
+                        )
+                        for dimension in DIMENSIONS
+                    ),
+                )
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=tuple(
+                        {
+                            "condition_id": f"cond-{dimension}",
+                            "dimension": dimension,
+                            "description": "主要条件。",
+                            "evidence": (
+                                evidence.model_copy(
+                                    update={"evidence_id": f"cond-{dimension}"}
+                                ),
+                            ),
+                            "major": True,
+                            "statement_status": "current",
+                        }
+                        for dimension in DIMENSIONS
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "claim",
+                        "target_id": item.claim_id,
+                        "status": "pass",
+                        "explanation": "主张通过",
+                    }
+                    for item in request.claims
+                )
+                + tuple(
+                    {
+                        "target_type": "condition",
+                        "target_id": item.condition_id,
+                        "status": "block",
+                        "explanation": "主要条件未通过",
+                    }
+                    for item in request.source_conditions
+                ),
+            )
+
+    result = _run(
+        _Provider(),
+        pages=({"page": 1, "text": text, "readable": True},),
+        processing_identity=direct_core_processing_identity(),
+        report=report,
+    )
+    assert result.draft_complete is False
+    assert (
+        sum(gap.startswith("major_condition_not_verified:") for gap in result.gaps)
+        == len(DIMENSIONS)
+    )
+    assert result.real_semantic_complete is False

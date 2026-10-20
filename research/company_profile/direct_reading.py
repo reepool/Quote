@@ -24,6 +24,7 @@ from research.company_profile.contracts import (
 from research.company_profile.models import ReportIdentity, SemanticRecord
 from research.company_profile.reading_budget import request_reservation
 from research.company_profile.report_interpretation import (
+    VIEWS,
     ReportInterpretation,
     _bind_source_evidence,
     _evidence_valid,
@@ -54,29 +55,25 @@ def _fit(pages, *, purpose, source_scope, report, identity, output, limit):
     )
 
 
-def _claim_covers(condition: ReportSourceCondition, claim: ReportViewClaim) -> bool:
-    """One claim does not cover a second major business in the same dimension."""
-    if claim.status != "observed":
-        return False
-    if any(
-        condition.condition_id == key or condition.condition_id.endswith(":" + key)
-        for key in claim.condition_ids
-    ):
-        return True
-
-    def quote(evidence) -> str:
-        return str(getattr(evidence.anchor, "bounded_quote", "") or "")
-
-    for left in condition.evidence:
-        for right in claim.evidence:
-            if int(left.page) != int(right.page):
-                continue
-            left_quote, right_quote = quote(left), quote(right)
-            if left_quote and right_quote and (
-                left_quote in right_quote or right_quote in left_quote
-            ):
-                return True
-    return False
+def _completeness_gaps(claims, conditions, checks) -> list[str]:
+    """Three views and every major condition's verification decide completeness."""
+    observed = {item.dimension for item in claims if item.status == "observed"}
+    found = []
+    for view, dimensions in VIEWS.items():
+        if not observed & set(dimensions):
+            found.append(f"view_not_substantive:{view}")
+    for dimension in ("principal_business", "products_services", "revenue_model"):
+        if dimension not in observed:
+            found.append(f"core_dimension_missing:{dimension}")
+    if not observed & {"supply_chain_role", "upstream_downstream"}:
+        found.append("core_dimension_missing:operating_role")
+    verdicts = {(item.target_type, item.target_id): item.status for item in checks}
+    for condition in conditions:
+        if not condition.major:
+            continue
+        if verdicts.get(("condition", condition.condition_id)) != "pass":
+            found.append(f"major_condition_not_verified:{condition.condition_id}")
+    return found
 
 
 def _structure_preview(text: str) -> str:
@@ -392,17 +389,18 @@ def interpret_direct_core(
 
     def _result() -> ReportInterpretation:
         observed = {item.dimension for item in claims if item.status == "observed"}
-        blocking = any(
+        dynamic = _completeness_gaps(claims, conditions, checks)
+        blocking = bool(dynamic) or any(
             gap.startswith(
                 (
-                    "major_condition_not_delivered:",
                     "necessary_unread:",
                     "necessary_fragment",
+                    "major_condition_not_verified:",
                 )
             )
             for gap in gaps
         )
-        draft_complete = any(item.status == "observed" for item in claims) and not blocking
+        draft_complete = bool(observed) and not blocking
         return ReportInterpretation(
             report=report,
             processing_identity=identity,
@@ -731,12 +729,7 @@ def interpret_direct_core(
         gap = f"necessary_unread:{page_no}"
         if gap not in gaps:
             gaps.append(gap)
-    for condition in conditions:
-        if not condition.major:
-            continue
-        if any(_claim_covers(condition, claim) for claim in claims):
-            continue
-        gap = f"major_condition_not_delivered:{condition.condition_id}"
+    for gap in _completeness_gaps(claims, conditions, checks):
         if gap not in gaps:
             gaps.append(gap)
     return _result()

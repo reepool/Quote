@@ -201,6 +201,59 @@ def test_existing_direct_binding_still_excludes_pool_routes(pool_binding):
     assert list(prices) == [(direct["provider_resource"], direct["model"])]
 
 
+def test_e1_budget_stops_at_the_authorized_physical_cap():
+    import time
+
+    from utils.llm.budget import DEVELOPMENT_UNPRICED_BILLING, LlmRunBudget
+    from utils.llm.errors import LlmDeadlineExceededError
+
+    try:
+        LlmRunBudget(
+            deadline=time.monotonic() + 30,
+            prices={},
+            max_tokens=240_000,
+            max_requests=24,
+            billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        )
+    except ValueError as exc:
+        assert str(exc) == "invalid bounded run limits"
+    else:
+        raise AssertionError("an unauthorized 240000 ledger was accepted")
+    budget = LlmRunBudget(
+        deadline=time.monotonic() + 30,
+        prices={},
+        max_tokens=240_000,
+        max_requests=1,
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        run_authorization="company_profile_e1.2026-10-20",
+    )
+    payload = {"messages": [{"role": "user", "content": "测"}], "max_tokens": 8}
+    assert (
+        budget.reserve(
+            resource="offline",
+            model="offline",
+            profile="semantic_extraction",
+            payload=payload,
+            request_id="first",
+            attempt=1,
+        )
+        == 0
+    )
+    try:
+        budget.reserve(
+            resource="offline",
+            model="offline",
+            profile="semantic_extraction",
+            payload=payload,
+            request_id="second",
+            attempt=1,
+        )
+    except LlmDeadlineExceededError as exc:
+        assert "budget_exhausted" in str(exc)
+    else:
+        raise AssertionError("the authorized window accepted a request past its cap")
+
+
 def test_layered_entry_refuses_old_semantic_receipts():
     from research.company_profile.bounded_entry import (
         refuse_layered_semantic_continuation,
@@ -281,6 +334,14 @@ def test_direct_chain_entry_completes_and_keeps_a_verified_package():
     assert sum(claim["dimension"] == "principal_business" for claim in claims) >= 2
     assert profile["draft_complete"] is True
     assert profile["real_semantic_complete"] is False
+    assert all(
+        profile["views"][name]["claims"]
+        for name in (
+            "company_profile",
+            "product_exposure",
+            "supply_chain_position",
+        )
+    )
     assert not any(gap.startswith("necessary_unread:") for gap in profile["gaps"])
 
     failed = run("direct_chain_fail_v1", "d2-chain-fail")

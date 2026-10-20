@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-20，[A审核§54](#54-a审核52529b85工程部分接受合并推进真实产品交付)）：D2工程部分接受，B1/A1未通过。正常模拟仅公司画像4条主营，产品暴露和供应链为空却完整；主要条件核验不通过仍可完整，两项P1未关闭，不能宣称完成核心三视图。原§1—53及D2证据不改。只按执行卡§27/E1合并修阻塞、必要验证和一次条件真实完整交付0/1，第12次未启动，资源/例外见验收§7.20。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。十一入口账不改，不归档、不扩批，生产not_authorized、规模声明false。A本轮真实调用0。
+当前状态（2026-10-20，[B交接§55](#55-b交接e1第12次真实窗口导航中断三视图为空)）：空视图和未通过的主要条件不能再标完整。第12次真实窗口已用，三个视图都是空的，B1/A1未通过。无第13次。十一入口原账不改；本窗 supervisor 281.313秒、4次物理请求、账本40322（有效usage 14541，未知预留25781），费用unknown。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产not_authorized、规模声明false。原§1—54保留。
 
 ## 1. 唯一实施指引
 
@@ -2279,3 +2279,44 @@ A作两项内存离线挑战，均经同一`interpret_direct_core`和现有测�
 - 定向命令：`source scripts/quote_dev_env.sh`后，执行`/home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_llm_led.py::test_direct_core_publishes_one_verified_package_and_keeps_it_when_the_next_stops`，**1 passed/5.99秒**；只证局部保留，不证明三视图或真实业务。本轮两项失败挑战如§54.2，不宣称完整测试通过。
 - D2三份持久证据hash与§53一致，历史B正文不变；未重复生成两个208页测试库。B报约5.7MB释放量未由A重测，两目录已不存在，QuoteBak约87MB；A本轮没有新增大库或删除未知归属内容。后续仍先核引用/占用、清无依赖垃圾再开发，临时产物只进QuoteBak，必要证据一套。
 - A仅更新审核/计划/任务卡文档，业务修复留B。`OPENSPEC_TELEMETRY=0 openspec validate restore-company-profile-llm-led-generalization --strict`、`git diff --check`通过；29份既有文件SHA保护、原审核§1—53/验收§7.1—7.19/执行卡§2—26正文保护及D2三份hash通过。新增本地链接可达；两处历史诊断脚本链接已失效，原件保留、当前卡不依赖，不重建脚本。原13份已跟踪改动、16项未跟踪内容不纳入提交；验收计划已有历史折叠区改动仅隔离保护。A活跃审核未完整计时，不用测试耗时冒充总审核时间；新阻塞2项。
+
+## 55. B交接：E1第12次真实窗口导航中断，三视图为空
+
+本节不改§1—54。模拟完整不是19项核心或6项负例的成绩。B不自评准确率。原19项和6项负例这次没有可核原文，记为未评估。
+
+### 55.1 真实三个视图
+
+查询 `delivered=1`，但公司画像、产品暴露、供应链定位的主张都是 0。`draft_complete`、`semantic_complete`、`real_semantic_complete` 都是 false。没有可引用的正文主张。
+
+冻结绑定 `b1-pool-e1-binding.json`，SHA-256 `bbb832d80e3555f11694ff940d56ff93b511d2fe13c4430b3ddb664adbe5313c`。授权 attempt `e1`。池指纹沿用当时工作区配置 `193be2135e4a93eab9f476676f68b374dd9316ee37f9236fe7780dae97128311`，配置文件未提交。
+
+命令：
+
+```bash
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m research.company_profile.bounded_entry \
+  --binding openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-e1-binding.json \
+  --authorization openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-e1-authorization.json \
+  --run-root data/QuoteBak/b1-e1-20261020 \
+  --real
+```
+
+进程退出码 0。入口 supervisor 计时 281.313 秒。账本 4 次物理请求、40322。其中 gemini 7923、zai 6618 有 usage，合计有效 14541；grok 12885、deepseek 12896 没有 usage，按预留保留，合计未知 25781。费用 unknown。恢复按逻辑请求计 1 次已用后，下一次换源被拒绝。
+
+前两批导航成功。第三批 grok 在 60 秒超时，deepseek 恢复约 30 秒后也超时，再换源时 `logical_recovery_already_used`。阅读循环在这里返回，没有进入正文。所以前两批选出的页也没有被读。缺口只有 `direct_core_navigation_stopped:logical_recovery_already_used`。
+
+这不是可用公司。按卡停止：不改冻结代码再跑，无第13次，不换公司，不开短段。若要恢复，需要导航中途失败时保留已成功批次并继续正文；当前没有已核主张可留。
+
+### 55.2 本卡先改了什么
+
+报告要同时满足三件事才标完整：三个视图各自有已观察主张；主营、产品服务、收入机制，以及供应链角色或上下游至少各有一条；每个主要条件的核验结果是 pass。引文互相包含或同一维度已有一条主张，不再单独放行。主要条件核验为 block、unclear 或缺失时，完整为 false。
+
+直接测试：只有主营时 `view_not_substantive` 且不完整；七个主要条件全部 block 时七条 `major_condition_not_verified` 且不完整；后包失败仍保留已核主张。未授权的 240000/24 仍被拒绝；带本卡授权时，用尽 1 次物理请求后下一次停止。公共默认仍是 120000/16。
+
+同一 `bounded_entry` 和替换传输的正常路径，三个视图都有主张，草稿完整为 true，模拟 `real_semantic_complete` 为 false。失败路径保留已核主张并标不完整。这些模拟不计 19/6。
+
+### 55.3 进度
+
+十一入口原账 526249 / 2977.711851 秒 / 31 请求不改。本窗另计后合计 566571 账本、3259.024851 秒、35 请求。费用 unknown。观察 1/4，可用 0/4；S1 0/12，S2 0/20，S3 0/100。不归档，不扩批，生产 not_authorized。
+
+持久证据在 [b1-e1-evidence](b1-e1-evidence/)：`query.json` SHA-256 `3a665c0c4a2556b3458819f3e784eed457ac70dd8b665c732870332c96b27db9`，`budget-final.json` `685cdb4212d7c5bc90210a85f6b11b6e78c5c44aaf89aafef22258d157fa59a3`，`entry-result.json` `0cfec9c6a4a76f712784c19d80e835073d0aae6dba3e4a53660f2258b57ebc6d`，`supervisor.json` `96ac9b39c2313986e7d895c752901e2e7356c9630c5647d60eea3d6a3f2b0e32`。离线三视图证明在 [b1-e1-offline-evidence](b1-e1-offline-evidence/)，`success-query.json` `f1e7fa6e400b359d016d7289c60c78fcdbeeeb700276d143fc0aeeddba9a1506`。可重建的离线运行目录已删。第12次运行目录和十一入口原件保留。
+

@@ -120,11 +120,15 @@ class LlmRunBudget:
         billing_mode: str = STRICT_BILLING,
         recovery_policy: LogicalRecoveryPolicy | None = None,
         prior_logical_attempts: tuple[Mapping[str, Any], ...] | list[Mapping[str, Any]] = (),
+        run_authorization: str | None = None,
     ):
+        authorized_e1 = run_authorization == "company_profile_e1.2026-10-20"
+        token_cap = 240_000 if authorized_e1 else 120_000
+        request_cap = 24 if authorized_e1 else 16
         if (
             not math.isfinite(deadline)
-            or not 0 < max_tokens <= 120_000
-            or not 0 < max_requests <= 16
+            or not 0 < max_tokens <= token_cap
+            or not 0 < max_requests <= request_cap
         ):
             raise ValueError("invalid bounded run limits")
         if not max_cost_cny.is_finite() or not 0 < max_cost_cny <= 10:
