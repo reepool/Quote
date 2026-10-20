@@ -73,6 +73,26 @@ The new processing policy MUST route every new report's open-language interpreta
 - **THEN** logical and physical attempt timeouts are consistent with that task's recovery policy and remaining entry time, without treating a routing log's logical remaining time as the entry's remaining time
 - **AND** readiness uses actual nonempty verification payloads and avoids repeating expensive identical preparation in parent, worker and business paths
 
+#### Scenario: A later navigation batch fails after an earlier batch selected readable core pages
+- **WHEN** one navigation batch has selected usable contexts and a later navigation batch fails within its bounded recovery allowance
+- **THEN** the existing owner reads, source-reviews, verifies and publishes independent supported claims from the selected contexts while recording the failed navigation range and dependencies
+- **AND** future execution interleaves each useful navigation batch with its first business delivery instead of requiring all navigation calls to succeed first; unresolved major-business risk still prevents company completeness
+
+#### Scenario: One independent business package fails while the global budget remains usable
+- **WHEN** bounded synthesis, source review or verification fails for one package and another independent core context is available
+- **THEN** the failure is scoped and retained, unverified candidates cannot become reliable answers, and the existing loop may continue the independent package within the same frozen window and remaining global limits
+- **AND** the LLM may prioritize revenue, product, input and role contexts from the full report structure rather than processing every supplementary selected page in natural page order
+
+#### Scenario: Independent source review fails after candidates were generated
+- **WHEN** synthesis returns observed candidates but source-led review fails before verification
+- **THEN** retained candidates remain pending or unreliable in persisted query/export and no claim can be projected as verified merely from the model's observed status
+- **AND** unrelated genuinely verified claims remain queryable, while another independent package can proceed within the original frozen global limits
+
+#### Scenario: The final allowed source attempt receives the remaining logical deadline
+- **WHEN** a task allows two source attempts and the first has consumed part of their shared deadline
+- **THEN** timeout allocation accounts for the attempt already consumed and does not divide the remaining time as though two further attempts were still authorized
+- **AND** physical profile limits, entry deadline, shared recovery policy and actual send accounting remain enforced without authorizing an extra source attempt
+
 ### Requirement: Discovery and omission checking are source-led
 The system MUST account for every physical page through full-report navigation and bounded discovery. The real LLM MUST select substantive business, product, income, input and role contexts and read their necessary paragraphs, headers and continuations. Navigation-only coverage, full-text reading coverage and verified core usability MUST be recorded separately. Sending every readable supplementary note verbatim MUST NOT be a prerequisite for core delivery. Regex-only page whitelists MUST NOT determine all model visibility; unfamiliar locations and unsampled text MUST remain reachable through bounded model-led context recovery. A source-first omission review in a separate context without candidate answers or evaluation Gold MUST be compared with delivered claims and reliable major revenue composition. Unresolved major-business or necessary-context gaps MUST prevent core completeness. Unsupported or unread sources MUST remain missing or unclear rather than not_disclosed. Historical full-text contracts and scores MUST NOT be reevaluated under this policy.
 
