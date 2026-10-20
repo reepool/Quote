@@ -91,6 +91,47 @@ def preflight_partial(binding: dict) -> dict:
     return plan
 
 
+def assert_f1_candidate_window(binding: dict) -> None:
+    """The thirteenth-candidate continuation opens only with the F1 authorization."""
+    if not binding.get("accepted_candidate_query"):
+        return
+    if binding.get("run_authorization") != "company_profile_f1.2026-10-20":
+        raise ValueError("f1_authorization_required")
+    if (
+        int(binding.get("max_tokens") or 0) > 90_000
+        or int(binding.get("max_physical_requests") or 0) > 13
+        or int(binding.get("max_elapsed_seconds") or 0) > 900
+    ):
+        raise ValueError("f1 window exceeds its card")
+
+
+def load_thirteenth_candidates(binding: dict) -> list:
+    """Reuse the thirteenth run's two body readings. They are not verified."""
+    query = json.loads(Path(binding["accepted_candidate_query"]).read_text())
+    profile = query["profiles"][0]
+    if profile["report"].get("document_version") != binding["asset"]["content_hash"]:
+        raise ValueError("reused_candidate_source_mismatch")
+    receipts = [
+        item
+        for item in profile["three_views"]["call_receipts"]
+        if item.get("status") == "success" and item.get("purpose") == "synthesize_views"
+    ]
+    expected = {
+        (12, 13, 14, 15): 5,
+        (16, 17, 18, 19, 20, 21): 7,
+    }
+    found = {}
+    for item in receipts:
+        pages = tuple(int(page) for page in item.get("source_pages") or [])
+        payload = item.get("response_payload") or {}
+        if payload.get("checks") or payload.get("source_conditions"):
+            raise ValueError("reused_candidate_contains_verification")
+        found[pages] = len(payload.get("claims") or [])
+    if found != expected:
+        raise ValueError("reused_candidates_do_not_match_thirteenth_run")
+    return receipts
+
+
 def load_twelfth_navigation(binding: dict) -> list:
     """Reuse only the twelfth run's two successful page maps. No old claims."""
     query = json.loads(Path(binding["accepted_navigation_query"]).read_text())
@@ -338,12 +379,15 @@ def validate_binding(
     for name, expected in binding["file_hashes"].items():
         if digest(Path(name)) != expected:
             raise ValueError(f"frozen execution file changed: {name}")
+    assert_f1_candidate_window(binding)
     asset = binding["asset"]
     if digest(Path(asset["archive_path"])) != asset["content_hash"]:
         raise ValueError("frozen PDF hash mismatch")
     elapsed = binding["max_elapsed_seconds"]
     auth = binding.get("run_authorization")
-    if auth == "company_profile_e2.2026-10-20":
+    if auth == "company_profile_f1.2026-10-20":
+        allowed = 0 < elapsed <= 900
+    elif auth == "company_profile_e2.2026-10-20":
         allowed = 0 < elapsed <= 1200
     elif auth == "company_profile_e1.2026-10-20":
         allowed = 0 < elapsed <= 900 or 1200 < elapsed <= 1800
@@ -371,6 +415,7 @@ def validate_binding(
                 "direct1",
                 "e1",
                 "e2",
+                "f1",
             }
             or not authorization.get("approval_reference")
         ):
@@ -788,6 +833,8 @@ def _worker(
         )
         if binding.get("accepted_navigation_query"):
             identity["accepted_page_map_receipts"] = load_twelfth_navigation(binding)
+        if binding.get("accepted_candidate_query"):
+            identity["accepted_candidate_receipts"] = load_thirteenth_candidates(binding)
         refuse_layered_semantic_continuation(binding)
     if binding.get("partial_slice"):
         identity.update(
@@ -912,6 +959,8 @@ def main() -> int:
         direct_plan = None
     if binding.get("accepted_navigation_query") and args.worker_deadline is None:
         load_twelfth_navigation(binding)
+    if binding.get("accepted_candidate_query") and args.worker_deadline is None:
+        load_thirteenth_candidates(binding)
     if args.worker_deadline is not None:
         finish_worker(
             run_root,
@@ -974,6 +1023,8 @@ def main() -> int:
             raise ValueError("e1 requires the protected direct1 marker")
         if authorization["attempt"] == "e2" and not (attempts / "e1.json").is_file():
             raise ValueError("e2 requires the protected e1 marker")
+        if authorization["attempt"] == "f1" and not (attempts / "e2.json").is_file():
+            raise ValueError("f1 requires the protected e2 marker")
         if authorization["attempt"] == "layered" and not (
             (attempts / "first.json").is_file()
             and (attempts / "successor.json").is_file()

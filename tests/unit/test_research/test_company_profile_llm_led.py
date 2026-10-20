@@ -3121,10 +3121,9 @@ def test_direct_core_publishes_one_verified_package_and_keeps_it_when_the_next_s
     assert any(gap.startswith("record_semantic_conflict:rev-in") for gap in result.gaps)
     assert any(gap.startswith("direct_core_package_stopped:") for gap in result.gaps)
     assert result.real_semantic_complete is False
-    assert [item.purpose for item in provider.requests][:4] == [
+    assert [item.purpose for item in provider.requests][:3] == [
         "source_inventory",
         "synthesize_views",
-        "source_inventory",
         "verify_views",
     ]
 

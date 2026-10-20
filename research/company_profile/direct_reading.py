@@ -1,9 +1,8 @@
 """Core-chapter reading for one report.
 
-Navigation selects chapters. The chapter text produces claims directly.
-An independent source request then lists what that text supports, without
-the claims. Verification and the original progress callback follow each
-package. This module does not open a second writer or gateway.
+A body candidate is verified as its own evidence unit and saved before the
+next unit. The report-level source check lists what the text supports and
+does not include those candidates. It cannot block a unit already verified.
 """
 
 from __future__ import annotations
@@ -399,6 +398,8 @@ def interpret_direct_core(
                     "navigation_incomplete:",
                     "view_not_substantive:",
                     "core_dimension_missing:",
+                    "direct_core_gap_check_stopped",
+                    "claim_pending:",
                 )
             )
             for gap in gaps
@@ -501,6 +502,330 @@ def interpret_direct_core(
                 status="partially_checked",
             )
 
+    def claim_pages(claim) -> list[dict]:
+        needed: list[int] = []
+        for evidence in claim.evidence:
+            for page_no in (evidence.page, *getattr(evidence, "continuation_pages", ())):
+                page_no = int(page_no)
+                if page_no not in needed:
+                    needed.append(page_no)
+        by_id = {int(page["page"]): page for page in sources}
+        return [by_id[page_no] for page_no in needed if page_no in by_id and by_id[page_no]["readable"]]
+
+    def group_pages(group, related) -> list[dict]:
+        pages: list[dict] = []
+        seen_pages: set[int] = set()
+        for claim in group:
+            for page in claim_pages(claim):
+                page_no = int(page["page"])
+                if page_no not in seen_pages:
+                    pages.append(page)
+                    seen_pages.add(page_no)
+        for record in related:
+            for evidence in record.evidence:
+                page_no = int(evidence.page)
+                page = next((item for item in sources if int(item["page"]) == page_no), None)
+                if page is not None and page_no not in seen_pages and page["readable"]:
+                    pages.append(page)
+                    seen_pages.add(page_no)
+        return pages
+
+    def related_records(group):
+        wanted = {key for claim in group for key in claim.supporting_record_ids}
+        return tuple(record for record in structured.values() if record.record_id in wanted)
+
+    def verify_units(group, pages, related) -> int:
+        return request_reservation(
+            ReportSemanticRequestV3(
+                request_id=f"{work_id}:verify-size",
+                purpose="verify_views",
+                report=report,
+                processing_identity=identity,
+                source_pages=tuple(pages),
+                source_scope="full_context",
+                claims=tuple(group),
+                records=tuple(related),
+                max_output_tokens=VERIFY_OUTPUT,
+                timeout_seconds=float(identity.get("logical_request_timeout_seconds") or 120),
+            )
+        )
+
+    def keep_pending(claim, reason: str) -> None:
+        gaps.append(f"{reason}:{claim.claim_id}")
+        claims.append(
+            claim.model_copy(update={"limitation": "pending_verification"})
+            if claim.status == "observed"
+            else claim
+        )
+
+    def apply_verdict(group, verified, pages) -> None:
+        verdicts = {
+            (item.target_type, item.target_id): item.status for item in verified.checks
+        }
+        quarantined = {
+            item.target_id
+            for item in verified.checks
+            if item.target_type == "record" and item.status != "pass"
+        }
+        for key in quarantined:
+            if key in structured:
+                dispositions.append(
+                    {
+                        "record_id": key,
+                        "status": "quarantined",
+                        "reason": "record_semantic_conflict",
+                    }
+                )
+                gaps.append(f"record_semantic_conflict:{key}")
+                for claim_index, earlier in enumerate(claims):
+                    if key not in earlier.supporting_record_ids or earlier.status != "observed":
+                        continue
+                    claims[claim_index] = earlier.model_copy(
+                        update={
+                            "status": "unclear",
+                            "answer": "结论未通过证据或语义核验。",
+                            "limitation": "claim_or_dependency_not_verified",
+                        }
+                    )
+                    gaps.append(f"claim_not_verified:{earlier.claim_id}")
+        kept_records = [item for item in related_records(group) if item.record_id not in quarantined]
+        records[:] = [
+            item
+            for item in records
+            if item.record_id not in {row.record_id for row in related_records(group)}
+        ]
+        records.extend(kept_records)
+        accepted_ids = {item.record_id for item in records}
+        for claim in group:
+            dependency_blocked = bool(claim.supporting_record_ids) and (
+                not set(claim.supporting_record_ids) <= accepted_ids
+                or any(
+                    verdicts.get(("record", key)) != "pass"
+                    for key in claim.supporting_record_ids
+                )
+            )
+            verdict = verdicts.get(("claim", claim.claim_id))
+            evidence_ok = all(
+                _evidence_valid(evidence, report, pages) for evidence in claim.evidence
+            )
+            if verdict != "pass" or not evidence_ok or dependency_blocked:
+                if verdict is None:
+                    keep_pending(claim, "claim_pending")
+                else:
+                    claims.append(
+                        claim.model_copy(
+                            update={
+                                "status": "unclear",
+                                "answer": "结论未通过证据或语义核验。",
+                                "limitation": "claim_or_dependency_not_verified",
+                            }
+                        )
+                    )
+                    gaps.append(f"claim_not_verified:{claim.claim_id}")
+                continue
+            claims.append(claim)
+        checks.extend(verified.checks)
+
+    def settle_claims(package_claims) -> None:
+        observable = []
+        for claim in package_claims:
+            if claim.status != "observed":
+                claims.append(claim)
+                continue
+            if not claim_pages(claim):
+                gaps.append(f"evidence_not_located:{claim.claim_id}")
+                claims.append(
+                    claim.model_copy(
+                        update={
+                            "status": "unclear",
+                            "limitation": "evidence_not_located",
+                        }
+                    )
+                )
+                continue
+            observable.append(claim)
+        groups: list[list] = []
+        current: list = []
+        for claim in observable:
+            alone_pages = group_pages([claim], related_records([claim]))
+            if verify_units([claim], alone_pages, related_records([claim])) > limit:
+                keep_pending(claim, "verify_unit_not_admitted")
+                publish()
+                continue
+            if current and verify_units(
+                current + [claim],
+                group_pages(current + [claim], related_records(current + [claim])),
+                related_records(current + [claim]),
+            ) > limit:
+                groups.append(current)
+                current = [claim]
+            else:
+                current.append(claim)
+        if current:
+            groups.append(current)
+        for group in groups:
+            related = related_records(group)
+            pages = group_pages(group, related)
+            try:
+                verified = invoke(
+                    "verify_views",
+                    pages,
+                    source_scope="full_context",
+                    output=VERIFY_OUTPUT,
+                    later=0,
+                    extra={"claims": tuple(group), "records": related},
+                )
+            except (ValueError, LlmError, SemanticProviderError) as exc:
+                gaps.append(f"direct_core_verify_stopped:{exc}")
+                for claim in group:
+                    keep_pending(claim, "claim_pending")
+                publish()
+                if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
+                    return
+                continue
+            apply_verdict(group, verified, pages)
+            for page in pages:
+                by_page[int(page["page"])]["status"] = "read"
+            publish()
+            if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
+                return
+
+    def report_gap(page_ids) -> None:
+        by_id = {int(page["page"]): page for page in sources}
+        pages = [
+            by_id[int(page_no)]
+            for page_no in page_ids
+            if int(page_no) in by_id and by_id[int(page_no)]["readable"]
+        ]
+        if not pages:
+            gaps.append("direct_core_gap_check_stopped:no_core_context")
+            return
+        batches: list[list] = []
+        batch: list = []
+        for page in pages:
+            trial = batch + [page]
+            units = _units(
+                trial,
+                purpose="source_inventory",
+                source_scope="full_context",
+                report=report,
+                identity=identity,
+                output=BODY_OUTPUT,
+            )
+            if units <= limit:
+                batch = trial
+                continue
+            if batch:
+                batches.append(batch)
+            single = _units(
+                [page],
+                purpose="source_inventory",
+                source_scope="full_context",
+                report=report,
+                identity=identity,
+                output=BODY_OUTPUT,
+            )
+            if single > limit:
+                gaps.append(f"gap_page_not_admitted:{page['page']}")
+                batch = []
+            else:
+                batch = [page]
+        if batch:
+            batches.append(batch)
+        found = []
+        for piece in batches:
+            try:
+                reviewed = invoke(
+                    "source_inventory",
+                    piece,
+                    source_scope="full_context",
+                    output=BODY_OUTPUT,
+                    later=0,
+                )
+            except (ValueError, LlmError, SemanticProviderError) as exc:
+                gaps.append(f"direct_core_gap_check_stopped:{exc}")
+                return
+            accepted, location_gaps = _located_conditions(
+                reviewed.source_conditions,
+                report,
+                piece,
+                request_id=receipts[-1]["request_id"],
+                seen=seen,
+            )
+            gaps.extend(location_gaps)
+            conditions.extend(accepted)
+            found.extend(item for item in accepted if item.major)
+            for page_no in reviewed.requested_pages:
+                page_no = int(page_no)
+                if page_no in by_page and by_page[page_no]["status"] != "read" and page_no not in queued_pages:
+                    supplement_pages.append(page_no)
+        if found:
+            settle_conditions(found)
+        if supplement_pages:
+            extra = list(supplement_pages)
+            supplement_pages.clear()
+            read_selected(extra)
+
+    def settle_conditions(found) -> None:
+        current = []
+        groups = []
+        def sized(group) -> int:
+            pages = []
+            seen_pages = set()
+            for condition in group:
+                for evidence in condition.evidence:
+                    page_no = int(evidence.page)
+                    if page_no in seen_pages:
+                        continue
+                    page = next((item for item in sources if int(item["page"]) == page_no), None)
+                    if page is not None:
+                        pages.append(page)
+                        seen_pages.add(page_no)
+            return request_reservation(
+                ReportSemanticRequestV3(
+                    request_id=f"{work_id}:condition-size",
+                    purpose="verify_views",
+                    report=report,
+                    processing_identity=identity,
+                    source_pages=tuple(pages),
+                    source_scope="full_context",
+                    source_conditions=tuple(group),
+                    max_output_tokens=VERIFY_OUTPUT,
+                    timeout_seconds=float(identity.get("logical_request_timeout_seconds") or 120),
+                )
+            ), pages
+        for condition in found:
+            units, _pages = sized([condition])
+            if units > limit:
+                gaps.append(f"major_condition_not_verified:{condition.condition_id}")
+                continue
+            if current:
+                units, _pages = sized(current + [condition])
+                if units > limit:
+                    groups.append(current)
+                    current = [condition]
+                else:
+                    current.append(condition)
+            else:
+                current = [condition]
+        if current:
+            groups.append(current)
+        for group in groups:
+            _units_now, pages = sized(group)
+            try:
+                verified = invoke(
+                    "verify_views",
+                    pages,
+                    source_scope="full_context",
+                    output=VERIFY_OUTPUT,
+                    later=0,
+                    extra={"source_conditions": tuple(group)},
+                )
+            except (ValueError, LlmError, SemanticProviderError) as exc:
+                gaps.append(f"direct_core_verify_stopped:{exc}")
+                continue
+            checks.extend(verified.checks)
+
     def read_selected(page_ids) -> None:
         ordered = []
         for page in page_ids:
@@ -532,22 +857,7 @@ def interpret_direct_core(
                     package,
                     source_scope="full_context",
                     output=BODY_OUTPUT,
-                    later=_units(
-                        package,
-                        purpose="source_inventory",
-                        source_scope="full_context",
-                        report=report,
-                        identity=identity,
-                        output=BODY_OUTPUT,
-                    )
-                    + _units(
-                        package,
-                        purpose="verify_views",
-                        source_scope="full_context",
-                        report=report,
-                        identity=identity,
-                        output=VERIFY_OUTPUT,
-                    ),
+                    later=0,
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
                 gaps.append(f"direct_core_package_stopped:{exc}")
@@ -581,168 +891,52 @@ def interpret_direct_core(
                     )
                     continue
                 package_claims.append(claim.model_copy(update={"evidence": tuple(bound)}))
-            try:
-                reviewed = invoke(
-                    "source_inventory",
-                    package,
-                    source_scope="full_context",
-                    output=BODY_OUTPUT,
-                    later=_units(
-                        package,
-                        purpose="verify_views",
-                        source_scope="full_context",
-                        report=report,
-                        identity=identity,
-                        output=VERIFY_OUTPUT,
-                    ),
-                )
-            except (ValueError, LlmError, SemanticProviderError) as exc:
-                gaps.append(f"direct_core_gap_check_stopped:{exc}")
-                claims.extend(
-                    item.model_copy(update={"limitation": "pending_verification"})
-                    if item.status == "observed"
-                    else item
-                    for item in package_claims
-                )
-                publish()
-                if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
-                    return
-                index += 1
-                continue
-            accepted, location_gaps = _located_conditions(
-                reviewed.source_conditions,
-                report,
-                package,
-                request_id=receipts[-1]["request_id"],
-                seen=seen,
-            )
-            gaps.extend(location_gaps)
-            conditions.extend(accepted)
-            for page_no in reviewed.requested_pages:
-                page_no = int(page_no)
-                if page_no in by_page and by_page[page_no]["status"] != "read":
-                    selected.add(page_no)
-                    if page_no not in queued_pages:
-                        supplement_pages.append(page_no)
-                        queued_pages.add(page_no)
-            related = tuple(
-                record
-                for record in structured.values()
-                if any(evidence.page in package_pages for evidence in record.evidence)
-            )
-            try:
-                verified = invoke(
-                    "verify_views",
-                    package,
-                    source_scope="full_context",
-                    output=VERIFY_OUTPUT,
-                    later=0,
-                    extra={
-                        "source_conditions": tuple(accepted),
-                        "claims": tuple(
-                            item for item in package_claims if item.status == "observed"
-                        ),
-                        "records": related,
-                    },
-                )
-            except (ValueError, LlmError, SemanticProviderError) as exc:
-                gaps.append(f"direct_core_verify_stopped:{exc}")
-                claims.extend(
-                    item.model_copy(update={"limitation": "pending_verification"})
-                    if item.status == "observed"
-                    else item
-                    for item in package_claims
-                )
-                publish()
-                if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
-                    return
-                index += 1
-                continue
-            verdicts = {
-                (item.target_type, item.target_id): item.status for item in verified.checks
-            }
-            quarantined = {
-                item.target_id
-                for item in verified.checks
-                if item.target_type == "record" and item.status != "pass"
-            }
-            for key in quarantined:
-                if key in structured:
-                    dispositions.append(
-                        {
-                            "record_id": key,
-                            "status": "quarantined",
-                            "reason": "record_semantic_conflict",
-                        }
-                    )
-                    gaps.append(f"record_semantic_conflict:{key}")
-                    for claim_index, earlier in enumerate(claims):
-                        if (
-                            key not in earlier.supporting_record_ids
-                            or earlier.status != "observed"
-                        ):
-                            continue
-                        claims[claim_index] = earlier.model_copy(
-                            update={
-                                "status": "unclear",
-                                "answer": "结论未通过证据或语义核验。",
-                                "limitation": "claim_or_dependency_not_verified",
-                            }
-                        )
-                        gaps.append(f"claim_not_verified:{earlier.claim_id}")
-            kept_records = [item for item in related if item.record_id not in quarantined]
-            records[:] = [
-                item for item in records if item.record_id not in {row.record_id for row in related}
-            ]
-            records.extend(kept_records)
-            accepted_ids = {item.record_id for item in records}
-            for claim in package_claims:
-                dependency_blocked = bool(claim.supporting_record_ids) and (
-                    not set(claim.supporting_record_ids) <= accepted_ids
-                    or any(
-                        verdicts.get(("record", key)) != "pass"
-                        for key in claim.supporting_record_ids
-                    )
-                )
-                blocked = (
-                    claim.status != "observed"
-                    or verdicts.get(("claim", claim.claim_id)) != "pass"
-                    or not all(
-                        _evidence_valid(evidence, report, package)
-                        for evidence in claim.evidence
-                    )
-                    or dependency_blocked
-                )
-                if blocked and claim.status == "observed":
-                    claim = claim.model_copy(
-                        update={
-                            "status": "unclear",
-                            "answer": "结论未通过证据或语义核验。",
-                            "limitation": "claim_or_dependency_not_verified",
-                        }
-                    )
-                    gaps.append(f"claim_not_verified:{claim.claim_id}")
-                claims.append(claim)
-            checks.extend(verified.checks)
-            for page in package:
-                by_page[int(page["page"])]["status"] = "read"
-            publish()
-            if supplement_pages:
-                extra = [
-                    page
-                    for page in sources
-                    if int(page["page"]) in supplement_pages
-                    and int(page["page"]) not in package_pages
-                ]
-                supplement_pages.clear()
-                if extra:
-                    try:
-                        packages.extend(body_packages(extra, report, identity, limit))
-                    except ValueError as exc:
-                        gaps.append(str(exc))
+            settle_claims(package_claims)
             index += 1
             if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
                 return
+        report_gap(
+            [
+                int(page["page"])
+                for page in chosen
+                if by_page[int(page["page"])]["status"] == "read"
+            ]
+        )
+
+    def bind_reused_candidates() -> list[ReportViewClaim]:
+        bound_claims: list[ReportViewClaim] = []
+        for item in identity.get("accepted_candidate_receipts") or ():
+            payload = item.get("response_payload") or {}
+            if item.get("purpose") != "synthesize_views" or payload.get("checks"):
+                raise ValueError("reused_candidate_is_not_an_unverified_body_reading")
+            response = ReportSemanticResponseV3.model_validate_json(
+                json.dumps(payload, ensure_ascii=False)
+            )
+            page_ids = [int(page) for page in item.get("source_pages") or []]
+            package = [page for page in sources if int(page["page"]) in page_ids]
+            for claim in response.claims:
+                located = []
+                failed = False
+                for evidence in claim.evidence:
+                    bound = _bind_source_evidence(evidence, report, package)
+                    if bound is None:
+                        failed = True
+                        break
+                    located.append(bound)
+                if failed or not located:
+                    gaps.append(f"evidence_not_located:{claim.claim_id}")
+                    claims.append(
+                        claim.model_copy(
+                            update={
+                                "status": "unclear",
+                                "limitation": "evidence_not_located",
+                            }
+                        )
+                    )
+                    continue
+                bound_claims.append(claim.model_copy(update={"evidence": tuple(located)}))
+            receipts.append({**item, "physical_request": False, "reused_candidate": True})
+        return bound_claims
 
     for item in identity.get("accepted_page_map_receipts") or ():
         payload = item.get("response_payload") or {}
@@ -750,7 +944,17 @@ def interpret_direct_core(
             raise ValueError("reused_navigation_contains_semantic_output")
         remember_map(item.get("source_pages") or [], payload.get("requested_pages") or [])
         receipts.append({**item, "physical_request": False, "reused_navigation": True})
-    if selected_order:
+    reused = bind_reused_candidates()
+    if reused:
+        settle_claims(reused)
+        report_gap(
+            [
+                int(page["page"])
+                for page in coverage
+                if page["status"] == "read"
+            ]
+        )
+    elif selected_order:
         read_selected(selected_order)
 
     try:

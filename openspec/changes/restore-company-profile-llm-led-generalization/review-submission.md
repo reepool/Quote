@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-20，[A审核§58](#58-a审核ad1a2a7e结束整包前置分开可信度与覆盖)）：E2工程部分接受、业务失败结束。第13次12条草稿全待核、已核0，B1/A1未过；只执行[§29/F1](b1-execution-card.md#29-f1证据单元核验与报告级查漏)及产品v5，条件接续0/1（第14次、未启动），不恢复E2。13入口673371账本/3695.4643782573456秒/42请求原样保留。观察1/4、可用0/4，S1/S2/S3仍0；不归档扩批，生产not_authorized、规模false，原§1—57不改。
+当前状态（2026-10-20，[B交接§59](#59-f1第14次核验了真实候选公司仍不完整)）：F1已执行。第14次首个物理请求核验了第13次正文候选，查询中10条已核、2条未通过。公司完整为 false，B1/A1未过。按卡停止首家实验，无第15次。原13入口673371账本/3695.4643782573456秒/42请求保留。本窗 supervisor 408.0487765856087秒、外层412.000秒、6请求、账本77032，六次都有 usage，费用 unknown。十四入口合计750403账本、4103.5131548429543秒、48请求。观察1/4、可用0/4；S1 0/12、S2 0/20、S3 0/100。不归档、不扩批，生产not_authorized、规模声明false；原§1—58不改。
 
 ## 1. 唯一实施指引
 
@@ -2442,3 +2442,48 @@ bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m r
 独立命令：source scripts/quote_dev_env.sh后执行 /home/python/miniconda3/envs/Quote/bin/python -m pytest -q tests/unit/test_research/test_company_profile_direct_progress.py tests/unit/test_research/test_company_profile_bounded_entry.py::test_e2_budget_is_separate_from_the_e1_authorization tests/unit/test_research/test_company_profile_llm_led.py::test_empty_product_and_supply_views_are_not_complete tests/unit/test_research/test_company_profile_llm_led.py::test_blocked_major_conditions_keep_the_report_incomplete。结果**6 passed/9.75秒**，7条既有依赖warnings；不声明全套通过，不算公司成绩。本轮A真实调用0，未改业务代码。
 
 第13次query/budget-final/entry-result/supervisor/entry.log五份SHA与B§57一致，第12次必要日志已持久；历史原件保留。QuoteBak约87MB，仍有历史运行/测试目录，B本轮缺具体清理回执，不能判定已全面清理；F1必须先核引用/活跃占用/持久副本后清无依赖垃圾，不删来源、唯一证据或未知归属文件。A不建新208页库，结束清本人验证临时产物。OpenSpec本change严格校验及diff检查通过，15个新增本地链接可达；29份既有文件SHA保护、原审核§1—57/执行卡§2—28/验收§7.1—7.21正文保留，验收文档既有历史折叠区改动隔离不提交。A活跃审核时间未完整计，记未知，不以9.75秒替代。
+
+## 59. F1：第14次核验了真实候选，公司仍不完整
+
+### 59.1 结果
+
+第14次已启动并结束。进程退出码 0。supervisor **408.0487765856087 秒**，外层 412.000 秒。物理请求 6，账本 **77032**，六次都有 usage（gemini 8639、zai 7779、grok 13923、deepseek-v4.1-flash 7218、deepseek-flash 25134、deepseek-flash 14339），未知预留 0。费用 unknown。
+
+首个物理请求是核验，不是新的导航或正文生成。第12次两笔页图和第13次两笔正文回执只作兼容复用。第一包核验第12页和第14页上的四条候选。随后又核了两包。三包核验之后才做报告级源查漏，查漏请求里没有候选答案。查漏给出的主要条件还没核完，账本占用就挡住了后续请求。171–208页仍未做结构导航。`draft_complete`、`semantic_complete`、`real_semantic_complete` 都是 false。
+
+查询投影：10条 `verified`，2条 `not_reliable`。query 与 export 的 profiles 一致，`delivered=1`。这是部分已核，不是可用公司。19项核心和6项负例仍未逐项评估。按卡停止：不改冻结代码再跑，无第15次，不换公司，不开短段。
+
+### 59.2 已核与未通过的原文
+
+已核，查询状态为 verified：
+
+- 第12页主营：公司主要负责北京市广播电视网络的开发、经营管理和维护，并从事节目收转传送、网络信息服务、视频点播，以及基于有线电视网的互联网接入和数据传送增值业务。
+- 第14页收入：频道收转经营创收成果显著，现金到账额创近五年新高。核验说明还提到传输、政企和信息化项目。
+- 第16页主营：在北京市拥有有线电视网络经营权，并写覆盖全市16个区。
+- 第16–17页产品：已建成“歌华云”平台；开发系列机顶盒，推进4K超高清智能机顶盒。
+- 第18页收入：2025年营业收入 221,975.46 万元，较上年同期减少 9,438.40 万元。
+- 第12页输出暴露：同一段网络经营表述被核为下游/输出暴露。
+- 第18页输出暴露：北京地区收入数字。
+- 第19页投入：折旧 373,377,347.39 元。
+- 第19页供应链字段：前五名客户销售额 49,827.02 万元，占年度销售总额 22.45%。这条检查通过了，但句子本身是客户集中度，不能单独当成经营角色已经成立。
+
+未通过：
+
+- `claim_products_services_1` 被 block。核验说明写“千兆宽带业务”在所给原文里没有出现。
+- `claim_supply_chain_role_1` 为 unclear。转型表述能对上第12页，但“党媒政网”不在送核的页面里。
+
+### 59.3 为什么仍不完整
+
+报告级查漏在两批已读正文上返回了条件，其中 18 条主要条件没有核验检查。171–208页记为 `navigation_incomplete`。已选但未读完的页记为 `necessary_unread`。后续请求被 `direct_core_ledger_hold` 挡住。供应链视图状态仍是 `extraction_failed`，因为上下游维度没有已核主张。
+
+直接测试 10 passed：源查漏失败之后已核主张还在；后一个核验单元失败不抹掉前一个；F1 的 90000/13 不能用 E1、E2 或空授权打开候选窗口；原三视图完整性和待核投影测试仍在。这些模拟不是 19/6。
+
+### 59.4 账、清理与停止
+
+十三入口原账 673371 / 3695.4643782573456 秒 / 42 请求不改。本窗按 supervisor 另计后合计 **750403 账本、4103.5131548429543 秒、48 请求**。费用 unknown。原累计上限没有提高。观察 1/4，可用 0/4。
+
+清理：删除 57 个空的 `quote_pytest_logs_*` 目录，其中没有文件。第12、13、14次运行副本在证据复制后删除。尝试标记 `e1.json`、`e2.json`、`f1.json` 保留。v61、window10、direct1 等历史运行目录没有证明可以删，仍留在 QuoteBak。
+
+持久证据在 [b1-f1-evidence](b1-f1-evidence/)：`query.json` SHA-256 `5459078d06db90d39ced6e584f2971dd6720b861637e7f561579bf9b5ccf1dde`，`budget-final.json` `e167aac9252f5a59f84ed494e23f5e363c8ab4cad20ad0ddd6ec2c9e8c89389d`，`entry-result.json` `c674c0832d9c5cb05baf1180e1746957b9ba30dbcf0aeb540f11cdfcafcc273c`，`supervisor.json` `bf7f244b64c216c50c68de97a157826f4fb6a3be5283819166e9df54d4575901`，`entry.log` `3f523cc12494e36f060d7860258f5a6d7a00529999aef1eaf7a1d94ecd5e7871`。
+
+若要补完这家公司，需要另一次授权来核完主要条件并读完未导航的页。当前窗口不能再发请求。

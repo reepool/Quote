@@ -307,6 +307,51 @@ def test_e2_budget_is_separate_from_the_e1_authorization():
     )
 
 
+def test_f1_authorization_is_required_for_the_candidate_window():
+    import time
+
+    from research.company_profile.bounded_entry import assert_f1_candidate_window
+    from utils.llm.budget import DEVELOPMENT_UNPRICED_BILLING, LlmRunBudget
+
+    window = {
+        "accepted_candidate_query": "query.json",
+        "max_tokens": 90_000,
+        "max_physical_requests": 13,
+        "max_elapsed_seconds": 900,
+    }
+    for auth in (None, "company_profile_e1.2026-10-20", "company_profile_e2.2026-10-20"):
+        try:
+            assert_f1_candidate_window({**window, "run_authorization": auth})
+        except ValueError as exc:
+            assert str(exc) == "f1_authorization_required"
+        else:
+            raise AssertionError(auth)
+    assert_f1_candidate_window(
+        {**window, "run_authorization": "company_profile_f1.2026-10-20"}
+    )
+    LlmRunBudget(
+        deadline=time.monotonic() + 30,
+        prices={},
+        max_tokens=90_000,
+        max_requests=13,
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        run_authorization="company_profile_f1.2026-10-20",
+    )
+    try:
+        LlmRunBudget(
+            deadline=time.monotonic() + 30,
+            prices={},
+            max_tokens=180_000,
+            max_requests=20,
+            billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+            run_authorization="company_profile_f1.2026-10-20",
+        )
+    except ValueError as exc:
+        assert str(exc) == "invalid bounded run limits"
+    else:
+        raise AssertionError("F1 opened the E2 window")
+
+
 def test_layered_entry_refuses_old_semantic_receipts():
     from research.company_profile.bounded_entry import (
         refuse_layered_semantic_continuation,

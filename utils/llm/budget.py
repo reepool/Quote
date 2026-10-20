@@ -122,9 +122,12 @@ class LlmRunBudget:
         prior_logical_attempts: tuple[Mapping[str, Any], ...] | list[Mapping[str, Any]] = (),
         run_authorization: str | None = None,
     ):
+        authorized_f1 = run_authorization == "company_profile_f1.2026-10-20"
         authorized_e2 = run_authorization == "company_profile_e2.2026-10-20"
         authorized_e1 = run_authorization == "company_profile_e1.2026-10-20"
-        if authorized_e2:
+        if authorized_f1:
+            token_cap, request_cap = 90_000, 13
+        elif authorized_e2:
             token_cap, request_cap = 180_000, 20
         elif authorized_e1:
             token_cap, request_cap = 240_000, 24
