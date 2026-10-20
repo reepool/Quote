@@ -177,3 +177,21 @@ The new-policy requirements MUST supersede legacy no-provider completion, fixed 
 #### Scenario: Developer opens an old sample specification
 - **WHEN** its rules require no-LLM completion under a frozen historical identity
 - **THEN** its scope notice routes new work to this change and the current product/acceptance documents, without altering the historical result
+
+### Requirement: Evidence support and report coverage are separate decisions
+Under an explicitly enabled v5 policy, the authoritative owner MUST verify actual candidate evidence units independently of report-level omission review. Only genuinely verified claims and valid dependencies may enter reliable query/export; report completeness MUST still require independent candidate-free source review, major-condition checks and necessary reading.
+
+#### Scenario: Source inventory is unavailable after real candidates were saved
+- **WHEN** a source-led inventory call fails but located candidates and their full semantic context remain available
+- **THEN** bounded independent support verification can execute without waiting for an entire source-condition list, and successful units are published before the next unit
+- **AND** missing report-level review or major conditions keep company completeness false
+
+#### Scenario: Real generated targets exceed a package verification limit
+- **WHEN** the actual claims, source conditions and context no longer fit one request
+- **THEN** verification is repacked using real targets, required contextual qualifications and actual dependencies; every target has a check or an explicit pending disposition
+- **AND** no synthetic representative target, truncated qualifier, silent omission or raised limit substitutes for actual send admission
+
+#### Scenario: A new development card revalidates saved unverified candidates
+- **WHEN** the card explicitly permits compatible real receipts with source, model, prompt, request and version lineage
+- **THEN** old candidates remain unverified until new genuine verification succeeds, original failures and charges remain unchanged, and the result is reported as development continuation rather than a fresh first-run score
+- **AND** this exception does not authorize other receipts, another entrance, production or a general semantic-resume acceptance claim
