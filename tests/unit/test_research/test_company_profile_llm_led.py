@@ -3121,11 +3121,14 @@ def test_direct_core_publishes_one_verified_package_and_keeps_it_when_the_next_s
     assert any(gap.startswith("record_semantic_conflict:rev-in") for gap in result.gaps)
     assert any(gap.startswith("direct_core_package_stopped:") for gap in result.gaps)
     assert result.real_semantic_complete is False
-    assert [item.purpose for item in provider.requests][:3] == [
+    assert [item.purpose for item in provider.requests][:4] == [
+        "source_inventory",
         "source_inventory",
         "synthesize_views",
         "verify_views",
     ]
+    assert provider.requests[0].source_scope == "page_map"
+    assert provider.requests[1].claims == ()
 
 
 def test_empty_product_and_supply_views_are_not_complete():

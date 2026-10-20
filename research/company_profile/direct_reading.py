@@ -26,7 +26,6 @@ from research.company_profile.report_interpretation import (
     VIEWS,
     ReportInterpretation,
     _bind_source_evidence,
-    _evidence_valid,
     _located_conditions,
     _pages,
     fits_card_reservation,
@@ -507,6 +506,7 @@ def interpret_direct_core(
     covered_nav: set[int] = set()
     queued_pages: set[int] = set()
     supplement_pages: list[int] = []
+    discovered_scopes: set[frozenset[int]] = set()
 
     def remember_map(batch, requested) -> None:
         requested_ids = []
@@ -573,22 +573,7 @@ def interpret_direct_core(
         return pages_for([claim])
 
     def group_pages(group, related) -> list[dict]:
-        pages: list[dict] = []
-        seen_pages: set[int] = set()
-        for claim in group:
-            for page in claim_pages(claim):
-                page_no = int(page["page"])
-                if page_no not in seen_pages:
-                    pages.append(page)
-                    seen_pages.add(page_no)
-        for record in related:
-            for evidence in record.evidence:
-                page_no = int(evidence.page)
-                page = next((item for item in sources if int(item["page"]) == page_no), None)
-                if page is not None and page_no not in seen_pages and page["readable"]:
-                    pages.append(page)
-                    seen_pages.add(page_no)
-        return pages
+        return pages_for([*group, *related])
 
     def related_records(group):
         wanted = {key for claim in group for key in claim.supporting_record_ids}
@@ -666,7 +651,13 @@ def interpret_direct_core(
             )
             verdict = verdicts.get(("claim", claim.claim_id))
             evidence_ok = all(
-                _evidence_valid(evidence, report, pages) for evidence in claim.evidence
+                any(
+                    evidence.anchor.bounded_quote
+                    and evidence.anchor.bounded_quote in str(page.get("text") or "")
+                    and int(page["page"]) == int(evidence.page)
+                    for page in pages
+                )
+                for evidence in claim.evidence
             )
             if verdict != "pass" or not evidence_ok or dependency_blocked:
                 if verdict is None:
@@ -730,7 +721,7 @@ def interpret_direct_core(
                 )
                 gaps.append(f"claim_not_verified:{earlier.claim_id}")
 
-    def settle_claims(package_claims) -> None:
+    def settle_claims(package_claims, package_conditions=()) -> None:
         observable = []
         for claim in package_claims:
             if claim.status != "observed":
@@ -770,6 +761,12 @@ def interpret_direct_core(
         for group in groups:
             related = related_records(group)
             pages = group_pages(group, related)
+            relevant_conditions = tuple(
+                item
+                for item in package_conditions
+                if {int(evidence.page) for evidence in item.evidence}
+                & {int(page["page"]) for page in pages}
+            )
             try:
                 verified = invoke(
                     "verify_views",
@@ -777,7 +774,11 @@ def interpret_direct_core(
                     source_scope="full_context",
                     output=VERIFY_OUTPUT,
                     later=0,
-                    extra={"claims": tuple(group), "records": related},
+                    extra={
+                        "claims": tuple(group),
+                        "records": related,
+                        "source_conditions": relevant_conditions,
+                    },
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
                 gaps.append(f"direct_core_verify_stopped:{exc}")
@@ -788,6 +789,20 @@ def interpret_direct_core(
                     return
                 continue
             apply_verdict(group, verified, pages)
+            retract_rejected(group, verified)
+            checks[:] = [
+                check
+                for check in checks
+                if not (
+                    check.target_type == "condition"
+                    and check.status == "pass"
+                    and check.covers_target_type == "claim"
+                    and not any(
+                        item.claim_id == check.covers_target_id and item.status == "observed"
+                        for item in claims
+                    )
+                )
+            ]
             for page in pages:
                 by_page[int(page["page"])]["status"] = "read"
             publish()
@@ -998,6 +1013,42 @@ def interpret_direct_core(
         while index < len(packages) and index < 8:
             package = packages[index]
             package_pages = {int(page["page"]) for page in package}
+            scope = frozenset(package_pages)
+            package_conditions = [
+                item
+                for item in conditions
+                if scope & {int(evidence.page) for evidence in item.evidence}
+            ]
+            if scope not in discovered_scopes:
+                try:
+                    reviewed = invoke(
+                        "source_inventory",
+                        package,
+                        source_scope="full_context",
+                        output=BODY_OUTPUT,
+                        later=_nonempty_verify_units(package, report=report, identity=identity),
+                    )
+                    discovered_scopes.add(scope)
+                    accepted, location_gaps = _located_conditions(
+                        reviewed.source_conditions,
+                        report,
+                        package,
+                        request_id=receipts[-1]["request_id"],
+                        seen=seen,
+                    )
+                    gaps.extend(location_gaps)
+                    conditions.extend(accepted)
+                    package_conditions = accepted
+                    for page_no in reviewed.requested_pages:
+                        page_no = int(page_no)
+                        if (
+                            page_no in by_page
+                            and by_page[page_no]["status"] != "read"
+                            and page_no not in queued_pages
+                        ):
+                            supplement_pages.append(page_no)
+                except (ValueError, LlmError, SemanticProviderError) as exc:
+                    gaps.append(f"direct_core_gap_check_stopped:{exc}")
             try:
                 drafted = invoke(
                     "synthesize_views",
@@ -1038,17 +1089,14 @@ def interpret_direct_core(
                     )
                     continue
                 package_claims.append(claim.model_copy(update={"evidence": tuple(bound)}))
-            settle_claims(package_claims)
+            settle_claims(package_claims, package_conditions)
             index += 1
             if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
                 return
-        report_gap(
-            [
-                int(page["page"])
-                for page in chosen
-                if by_page[int(page["page"])]["status"] == "read"
-            ]
-        )
+        if supplement_pages:
+            extra = list(supplement_pages)
+            supplement_pages.clear()
+            read_selected(extra)
 
     def priority_order(page_ids):
         """Ask which already selected pages are the core reading order."""

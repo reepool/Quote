@@ -88,7 +88,8 @@ def test_a_navigation_batch_is_read_before_the_next_batch_is_sent():
     finally:
         direct_reading.navigation_batches = original
     assert result.call_receipts[0]["source_scope"] == "page_map"
-    assert result.call_receipts[1]["purpose"] == "synthesize_views"
+    assert any(item["purpose"] == "synthesize_views" for item in result.call_receipts)
+    assert result.call_receipts[0]["purpose"] == "source_inventory"
     assert any(item.status == "observed" for item in result.claims)
     assert any("later-navigation-failed" in gap for gap in result.gaps)
 
@@ -575,3 +576,82 @@ def test_a_later_block_retracts_that_claim_and_keeps_another():
     assert any(item.claim_id == "blocked" and item.status == "unclear" for item in result.claims)
     assert any("design-business" in gap for gap in result.gaps)
     assert result.draft_complete is False
+
+
+def test_two_paragraphs_on_one_page_both_reach_verification():
+    report = _report()
+    first = "公司向家庭用户提供有线电视服务，并按月收取收视维护费。"
+    second = "公司采购机顶盒和智能卡，由外部设备制造商供应。"
+    text = first + "\n\n" + second
+    sent = []
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(1,),
+                )
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="service",
+                            dimension="principal_business",
+                            status="observed",
+                            answer="向家庭用户提供有线电视服务。",
+                            evidence=(
+                                _evidence(report, text=first, page=1).model_copy(
+                                    update={"evidence_id": "service-evidence"}
+                                ),
+                            ),
+                        ),
+                        ReportViewClaim(
+                            claim_id="supply",
+                            dimension="input_exposure",
+                            status="observed",
+                            answer="采购机顶盒和智能卡。",
+                            evidence=(
+                                _evidence(report, text=second, page=1).model_copy(
+                                    update={"evidence_id": "supply-evidence"}
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+            sent.append("\n".join(page["text"] for page in request.source_pages))
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "claim",
+                        "target_id": item.claim_id,
+                        "status": "pass",
+                        "explanation": "离线",
+                    }
+                    for item in request.claims
+                ),
+            )
+
+    result = _run(
+        _Provider(),
+        pages=({"page": 1, "text": text, "readable": True},),
+        processing_identity=direct_core_processing_identity(),
+        report=report,
+    )
+    assert sent
+    assert first in sent[0]
+    assert second in sent[0]
+    assert any(item.claim_id == "service" and item.status == "observed" for item in result.claims)
+    assert any(item.claim_id == "supply" and item.status == "observed" for item in result.claims)
