@@ -2,7 +2,7 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-10-20。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。A审核`f73bedcb`：F1结束，10模型已核/2拒绝，公司限用，B1/A1未过。当前仅[§30/G1](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md#30-g1公司级覆盖闭环与首家实验收口无外呼)修正公司级覆盖并收口；新增真实0、无第15次。原结果/阈值/累计限不变，进度唯一见验收§7.23/§8。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。A审核`6a68d8a2`：G1部分接受，整卡未完成、B1/A1未过。当前只按[§31/G1-R](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md#31-g1-r同卡合并返修不重置次数无外呼)在原G1剩余迭代内合并收口；新增真实0，无第15次。进度/资源唯一见验收§7.24/§8，旧结果不改。
 
 ## 1. 开发者必须先理解的纠偏
 
@@ -10,7 +10,7 @@
 
 现有公告、PDF/布局缓存、Evidence、事实模型、队列、公共LLM网关和查询/导出继续使用。修正`provider=None`可成功冒充语义完成、同field短路、正则决定全文可见性/正文完整性的路径。不要新建agent平台、网关、审计系统或并行writer。
 
-产品不变量：正式年报、真实LLM理解、独立源查漏/核验、原owner三视图交付。产品v5的证据单元核验保留；报告源发现后必须与实际已核主张/事实进行语义覆盖对照，不能只核条件本身。公司级核心阅读、补读和末端核验统筹；主要业务缺口继续阻止完整。当前只离线修闭环，不启动新实验。
+产品不变量：正式年报、真实LLM理解、独立源查漏/核验、原owner三视图交付。保留证据单元可信交付及G1覆盖对象绑定；负面核验必须撤回受影响结论和覆盖。公司核心范围由LLM按业务主次和必要上下文选择/排序，支持性与覆盖核验复用最小充分源范围，主要缺口仍阻止完整。当前仅同卡离线返修，不启新实验。
 
 ## 2. A/B分工、交接和审核顺序
 
@@ -50,20 +50,20 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 
 - 目标：选定1家历史报告作为B1输入，确认其具备主营、收入表、投入/角色披露；核对不在S2留出20家内，冻结来源hash、知识截止日、合同、模型/提示词/预处理版本、费用和调用预算。
 - A交付：一张可执行的B1卡，写明唯一owner、允许修改目录、输入输出、验证命令、一个证据入口和停止条件。A不要求B按指定函数实现。
-- 当前：[执行卡§30/G1](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md#30-g1公司级覆盖闭环与首家实验收口无外呼)保留歌华原19/6和14次真实结果；F1已用1/1且结束，不再签发歌华第15次。G1只做离线修正与收口，资源唯一见验收§7.23。
-- B开始条件：先清已证明无依赖的历史临时产物、保护基线；连续实现覆盖对照、公司级核心阅读/末端次序，直接验证及现有回执收口。无需逐函数等待A，不创建真实绑定、attempt标记或新公司数据。
+- 当前：[执行卡§31/G1-R](../../openspec/changes/restore-company-profile-llm-led-generalization/b1-execution-card.md#31-g1-r同卡合并返修不重置次数无外呼)接续G1未完成条件，沿原最多两次共性修复的剩余次数；不追加真实运行或改原19/6、原结果/预算。
+- B开始条件：先清已证明无依赖历史临时产物并保护基线，说明G1已用/剩余迭代；在原owner连续完成负面核验生效、公司核心阅读与末端资源路径及直接验证/交接。原次数用尽即停止交失败，不新建真实绑定或attempt。
 
-### B1：一家公司真实解读闭环（未通过；当前仅G1离线收口）
+### B1：一家公司真实解读闭环（未通过；当前G1同卡返修）
 
 - 目标：从已有历史报告选1家同时含主营描述、收入表及投入/角色的公司，真实LLM生成三视图，并从query/export读回；选择不得触碰S2留出20家。
 - 方向：保留F1证据单元独立核验和原owner即时交付；以报告级独立源发现与实际交付语义对照闭合覆盖，再决定缺项补读及完整性。不得用条件自身pass、同维度存在或客户集中度替代主要业务/角色成立。
 - 入口/owner：`company_profile_common_core` → `research/company_profile/operations.py` → runtime/workflow及`CommonGatewaySemanticProvider` → 原repository/read service；统一走`utils/llm`公共网关。
-- 本卡实现：按§30沿原provider/runtime/writer修正覆盖对照与核心优先执行；原结构/正文/核验覆盖分别记录，必要上下文不截断。A Gold只供隔离评分，不能写入生成器或选择器。
+- 本卡实现：按§31修当前核验状态与覆盖的收束，按业务核心选择/排序阅读并组织最小充分上下文，测全正文、支持性核验、独立源发现/覆盖和必要补读末端。原主体/数字/时态/来源底线不降，A Gold只在隔离评分侧。
 - 输出：三视图、原文引用、缺项/冲突说明、真实模型/请求/usage、页覆盖、query/export一致；provider未配置或不可用明确失败/限用。
 - 验证：同一报告完整端到端；增加缺provider、已存在overview仍需语义阅读、否定/计划/第三方及真实冲突的直接测试；源先行检查要能找出故意移除的主要板块。模型调用量不作为质量替代。
-- B自主范围：按§30在一连续窗口完成两个主因的局部实现、P0—P3修复、直接验证和现有真实证据收口；目标一工作日、最多两次共性修复。无外呼，不跑全208页fake，不建平台，不动用户池/公共预算或既有脏文件。
+- B自主范围：按§31合并处理G1范围P0—P3和直接回归/Review；不逐函数等A，不另交准备卡，不重置原两次修复，不跑全208页fake，不建平台或修改用户池/公共预算。
 - B交接条件：提交一个`review-submission.md`，同时给出首次/后继、三视图逐项证据、真实provider/model/request/usage、query/export、测试和未解决项；代码、提示词、输入和制品版本可重建。
-- 停止：14入口及F1真实实验结束，G1不授权第15次/其他公司/短段或新费用。到两次修复仍不成立交具体失败结论，不生同类准备续卡；A据G1作技术/范围裁决，另行明确前真实运行暂停。A1未过不进B2。
+- 停止：14次真实实验已结束，返修新增真实0；原G1次数用尽或量化路径仍不成立，交具体失败和技术/范围取舍，由A整体裁决，不自动第三轮、第15次或同类续卡。A1未过不进B2。
 
 ### A1：B1独立审核与放行（A负责）
 

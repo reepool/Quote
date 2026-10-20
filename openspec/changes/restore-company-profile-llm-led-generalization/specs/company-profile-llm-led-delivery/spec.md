@@ -212,3 +212,8 @@ After candidate-free source discovery, the owner MUST compare major conditions w
 - **WHEN** the current card permits only offline correction and closeout of saved real receipts
 - **THEN** the existing entry may prove engineering corrections in isolated storage, but the original real results and charges remain unchanged
 - **AND** offline success does not create newly verified business content, authorize another real entrance or move to another company
+
+#### Scenario: Coverage verification later rejects a delivered object
+- **WHEN** a valid check in the current coverage request blocks or cannot verify a previously supported claim or a native record
+- **THEN** that negative result updates the object's reliability and dependent answers through the authoritative owner, and coverage that depends on it cannot remain satisfied
+- **AND** an earlier pass or an existing object ID cannot preserve completeness, while unrelated verified objects remain available
