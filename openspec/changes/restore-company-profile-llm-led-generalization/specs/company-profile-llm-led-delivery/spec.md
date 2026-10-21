@@ -239,3 +239,15 @@ After candidate-free source discovery, the owner MUST compare major conditions w
 - **WHEN** the current card has obtained explicit authority for a finite number of work windows and a cumulative company budget
 - **THEN** existing checkpoints continue only unfinished work under the same frozen identity while preserving cumulative charges, unknown reservations and consumed recoveries
 - **AND** exhausting a company limit stops the task, pending authorization creates no real attempt, and a result requiring expanded development resources does not establish ordinary single-window resource acceptance or authorize another company
+
+### Requirement: Progressive delivery isolates temporary failures
+The company-profile owner MUST scope a transient provider or navigation failure to its current logical request and dependent evidence. A source that is temporarily failed MUST remain eligible for a later independent logical request when the existing pool health and authentication policy allow it; one historical failure MUST NOT permanently blacklist that source for the whole task. The owner MUST persist each valid non-empty candidate and verified batch before starting an independent later batch, so later failure cannot erase unrelated reliable results. Company completeness MUST remain false while a necessary major scope is unread or unverified.
+
+#### Scenario: A later logical request can reuse a recovered source
+- **WHEN** a source has succeeded earlier, then has a transient request failure, and a later independent logical request starts while the source is healthy under the existing pool policy
+- **THEN** the later request may select that source again, while the current logical request's recovery exclusion and all cumulative unknown usage, request and recovery counts remain enforced
+
+#### Scenario: A later batch fails after an earlier batch was persisted
+- **WHEN** an earlier non-empty batch has been written and independently verified, and a later navigation, synthesis or verification batch fails
+- **THEN** the earlier query/export result and its new-instance read remain available, the failed scope is recorded as an explicit gap, and no unrelated claim is cleared or promoted by the failure
+- **AND** an offline replacement transport may prove this persistence path but MUST NOT advance real semantic completion or company acceptance
