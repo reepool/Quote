@@ -233,6 +233,12 @@ After candidate-free source discovery, the owner MUST compare major conditions w
 - **WHEN** a verification package contains two claims citing different paragraphs on one page
 - **THEN** packing preserves both source ranges and their necessary qualifiers, deduplicating overlap by source location rather than dropping a paragraph because its page number already exists
 
+#### Scenario: Support and coverage targets cannot fit in one verification request
+- **WHEN** actual claims, source conditions and necessary context exceed a request limit
+- **THEN** the owner partitions support checks and coverage comparisons without replaying the whole condition inventory for every candidate or repeatedly checking identical support solely because coverage was split
+- **AND** every valid candidate receives an explicit disposition, including product and operating-role candidates; all major conditions remain covered or explicit gaps, and cross-package comparisons wait for their actual relevant delivered objects
+- **AND** candidate-free source discovery, source qualifiers, native dependencies and later negative-check retraction remain mandatory; one claim in a dimension cannot stand in for another major business
+
 #### Scenario: The current card aggregates core evidence for the whole company
 - **WHEN** the card replaces repeated per-page synthesis with one company-level core delivery
 - **THEN** report-wide structural discovery selects substantive scopes for all major businesses, monetization, important inputs and operating roles before supplementary details consume their resource allowance, and candidate-free source conditions precede company-view generation
