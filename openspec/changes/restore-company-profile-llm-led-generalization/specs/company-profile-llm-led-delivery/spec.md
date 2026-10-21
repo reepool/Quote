@@ -112,6 +112,11 @@ The system MUST account for every physical page through full-report navigation a
 - **AND** the first verified business package becomes durably queryable before later packages, while report-level usability still requires all necessary core reading, omission checks and the unchanged acceptance thresholds
 - **AND** this replaces the superseded orchestration rather than adding a parallel writer or inferring real-call permission from old budget balances
 
+#### Scenario: One navigation batch selects multiple independent body packages
+- **WHEN** an early navigation result selects several body packages and the first has sufficient valid evidence for a business conclusion
+- **THEN** its synthesis, verification and authoritative persistence occur before inventorying a later independent package, without waiting for every selected package to be inventoried
+- **AND** later failures retain the earlier pending or genuinely verified claims, while major unread or unverified gaps still prevent report completeness
+
 #### Scenario: Requested necessary reading crosses a batch boundary
 - **WHEN** a model requests necessary context in more than one batch and only the first batch or a fragment has been read
 - **THEN** every outstanding necessary scope remains explicit and blocks affected core completeness; it cannot be relabeled as an ordinary unread supplementary note, nor may a fragment imply the entire page was read
