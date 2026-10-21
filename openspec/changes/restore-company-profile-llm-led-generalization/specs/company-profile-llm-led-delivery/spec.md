@@ -228,6 +228,13 @@ After candidate-free source discovery, the owner MUST compare major conditions w
 - **WHEN** a verification package contains two claims citing different paragraphs on one page
 - **THEN** packing preserves both source ranges and their necessary qualifiers, deduplicating overlap by source location rather than dropping a paragraph because its page number already exists
 
+#### Scenario: The current card aggregates core evidence for the whole company
+- **WHEN** the card replaces repeated per-page synthesis with one company-level core delivery
+- **THEN** report-wide structural discovery selects substantive scopes for all major businesses, monetization, important inputs and operating roles before supplementary details consume their resource allowance, and candidate-free source conditions precede company-view generation
+- **AND** source-backed company views are generated from that collected core evidence, with support and omission coverage assessed against actual delivered objects; neither a page-order loop nor one claim in a dimension establishes completeness
+- **AND** verification batches retain one current state per unique claim, a later negative check retracts affected content and coverage, and a later failed batch preserves independent verified results
+- **AND** the explicitly authorized fresh experiment reuses only PDF/layout caches and valid native structured facts, rejects prior semantic inputs and does not require cross-entry semantic continuation as B1 readiness; continuation remains to be accepted before S3 if needed
+
 #### Scenario: An explicitly authorized company task continues across work windows
 - **WHEN** the current card has obtained explicit authority for a finite number of work windows and a cumulative company budget
 - **THEN** existing checkpoints continue only unfinished work under the same frozen identity while preserving cumulative charges, unknown reservations and consumed recoveries
