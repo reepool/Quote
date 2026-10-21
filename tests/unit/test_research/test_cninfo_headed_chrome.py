@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import asyncio
 import inspect
+import sys
+import types
 
 import pytest
 
@@ -618,6 +620,90 @@ def test_nodriver_close_accepts_sync_stop():
 
     session._browser = _Browser()
     session.close()
+
+
+def test_nodriver_start_failure_reclaims_and_retries(monkeypatch):
+    state = {"start_calls": 0, "kill_calls": []}
+
+    async def fake_start(**kwargs):
+        state["start_calls"] += 1
+        if state["start_calls"] <= 2:
+            raise Exception("Failed to connect to browser")
+        return _FakeStartBrowser()
+
+    def fake_kill(user_data_dir):
+        state["kill_calls"].append(user_data_dir)
+        return 3
+
+    monkeypatch.setitem(
+        sys.modules, "nodriver", types.SimpleNamespace(start=fake_start)
+    )
+    monkeypatch.setattr(
+        "research.providers.nodriver_session.kill_browser_processes_for_user_data_dir",
+        fake_kill,
+    )
+
+    session = _NodriverPageSession(
+        start_retry_attempts=2,
+        start_retry_backoff_seconds=0,
+    )
+    try:
+        bootstrap = session.start(HOMEPAGE)
+    finally:
+        session.close()
+
+    assert bootstrap["status"] == 200
+    assert state["start_calls"] == 3
+    assert len(state["kill_calls"]) == 3  # two failures + close-time straggler sweep
+
+
+def test_nodriver_start_failure_raises_after_retries_exhausted(monkeypatch):
+    state = {"start_calls": 0, "kill_calls": []}
+
+    async def fake_start(**kwargs):
+        state["start_calls"] += 1
+        raise Exception("Failed to connect to browser")
+
+    def fake_kill(user_data_dir):
+        state["kill_calls"].append(user_data_dir)
+        return 4
+
+    monkeypatch.setitem(
+        sys.modules, "nodriver", types.SimpleNamespace(start=fake_start)
+    )
+    monkeypatch.setattr(
+        "research.providers.nodriver_session.kill_browser_processes_for_user_data_dir",
+        fake_kill,
+    )
+
+    session = _NodriverPageSession(
+        start_retry_attempts=1,
+        start_retry_backoff_seconds=0,
+    )
+    try:
+        with pytest.raises(Exception, match="Failed to connect to browser"):
+            session.start(HOMEPAGE)
+    finally:
+        session.close()
+
+    assert state["start_calls"] == 2
+    assert len(state["kill_calls"]) == 2
+
+
+class _FakeStartPage:
+    async def evaluate(self, script):
+        return "CNInfo"
+
+    async def sleep(self, seconds):
+        return None
+
+
+class _FakeStartBrowser:
+    async def get(self, url):
+        return _FakeStartPage()
+
+    def stop(self):
+        return None
 
 
 def test_attach_cninfo_access_does_not_construct_headed_chrome_at_factory_time():

@@ -27,6 +27,10 @@ from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 import requests
 
+from research.providers.nodriver_session import (
+    reclaim_nodriver_user_data_dir,
+    start_nodriver_with_reclaim,
+)
 from utils.proxy_patch_runtime import request_with_akshare_proxy
 
 
@@ -499,12 +503,17 @@ class _NodriverPageSession:
         *,
         browser_executable_path: str = "",
         timeout_seconds: float = _DEFAULT_TIMEOUT,
+        start_retry_attempts: int = 2,
+        start_retry_backoff_seconds: float = 2.0,
     ) -> None:
         self.browser_executable_path = browser_executable_path
         self.timeout_seconds = timeout_seconds
+        self.start_retry_attempts = start_retry_attempts
+        self.start_retry_backoff_seconds = start_retry_backoff_seconds
         self._loop: Optional[asyncio.AbstractEventLoop] = None
         self._browser: Any = None
         self._page: Any = None
+        self._active_user_data_dir: Optional[str] = None
         self._document_tab: Any = None
         self._document_capture: Optional[dict[str, Any]] = None
         self._document_event: Optional[asyncio.Event] = None
@@ -577,7 +586,7 @@ class _NodriverPageSession:
 
     async def _async_start(self, homepage: str) -> dict[str, Any]:
         try:
-            import nodriver as uc
+            import nodriver  # noqa: F401 - presence check; the shared helper owns startup
         except Exception as exc:
             raise _ChromeUnusable(
                 "CNInfo headed Chrome requires optional dependency nodriver"
@@ -596,9 +605,16 @@ class _NodriverPageSession:
         }
         if self.browser_executable_path:
             kwargs["browser_executable_path"] = self.browser_executable_path
-        self._browser = await asyncio.wait_for(
-            uc.start(**kwargs),
-            timeout=self.timeout_seconds,
+        # nodriver's fixed ~3s DevTools connect budget leaks Chrome under
+        # momentary load; startup goes through the shared reclaim-and-retry helper.
+        self._browser, self._active_user_data_dir = await start_nodriver_with_reclaim(
+            start_timeout_seconds=self.timeout_seconds,
+            retry_attempts=self.start_retry_attempts,
+            retry_backoff_seconds=self.start_retry_backoff_seconds,
+            user_data_dir_prefix="uc_cninfo_",
+            start_logger=LOGGER,
+            log_prefix="[CninfoHeadedChrome]",
+            **kwargs,
         )
         self._page = await asyncio.wait_for(
             self._browser.get(homepage),
@@ -1326,19 +1342,28 @@ class _NodriverPageSession:
         browser = self._browser
         self._page = None
         self._browser = None
-        if browser is None:
-            return
-        stop = getattr(browser, "stop", None)
-        if callable(stop):
-            maybe = stop()
-            if asyncio.iscoroutine(maybe) or asyncio.isfuture(maybe):
-                await maybe
-            return
-        close = getattr(browser, "close", None)
-        if callable(close):
-            maybe = close()
-            if asyncio.isfuture(maybe) or asyncio.iscoroutine(maybe):
-                await maybe
+        user_data_dir = self._active_user_data_dir
+        self._active_user_data_dir = None
+        if browser is not None:
+            stop = getattr(browser, "stop", None)
+            if callable(stop):
+                maybe = stop()
+                if asyncio.iscoroutine(maybe) or asyncio.isfuture(maybe):
+                    await maybe
+            else:
+                close = getattr(browser, "close", None)
+                if callable(close):
+                    maybe = close()
+                    if asyncio.isfuture(maybe) or asyncio.iscoroutine(maybe):
+                        await maybe
+        if user_data_dir:
+            stragglers = reclaim_nodriver_user_data_dir(user_data_dir)
+            if stragglers:
+                LOGGER.warning(
+                    "[CninfoHeadedChrome] close reclaimed %s stray processes for %s",
+                    stragglers,
+                    user_data_dir,
+                )
 
 
 class CninfoHeadedChromeAccess:

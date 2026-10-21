@@ -2468,7 +2468,7 @@ def test_dce_browser_start_failure_reclaims_leaked_processes_and_retries(monkeyp
     monkeypatch.setitem(sys.modules, "nodriver", types.SimpleNamespace(start=fake_start))
     monkeypatch.setattr(DceOfficialBrowserClient, "_start_virtual_display_if_needed", lambda self: None)
     monkeypatch.setattr(
-        "research.providers.official_futures.kill_browser_processes_for_user_data_dir",
+        "research.providers.nodriver_session.kill_browser_processes_for_user_data_dir",
         fake_kill,
     )
 
@@ -2508,7 +2508,7 @@ def test_dce_browser_start_failure_raises_after_retries_exhausted(monkeypatch):
     monkeypatch.setitem(sys.modules, "nodriver", types.SimpleNamespace(start=fake_start))
     monkeypatch.setattr(DceOfficialBrowserClient, "_start_virtual_display_if_needed", lambda self: None)
     monkeypatch.setattr(
-        "research.providers.official_futures.kill_browser_processes_for_user_data_dir",
+        "research.providers.nodriver_session.kill_browser_processes_for_user_data_dir",
         fake_kill,
     )
 
