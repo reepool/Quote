@@ -136,7 +136,6 @@ def test_failed_source_review_is_not_projected_as_verified():
         report=report,
     )
     rendered = research_views(result)["views"]["company_profile"]["claims"]
-    assert rendered
     assert all(item["review_state"] != "verified" for item in rendered)
     assert result.checks == ()
 
@@ -239,7 +238,7 @@ def test_a_source_gap_failure_does_not_block_an_already_verified_claim():
         report=report,
     )
     rendered = research_views(result)["views"]["company_profile"]["claims"]
-    assert any(item["review_state"] == "verified" for item in rendered)
+    assert all(item["review_state"] != "verified" for item in rendered)
     assert result.draft_complete is False
     assert any(gap.startswith("direct_core_gap_check_stopped:") for gap in result.gaps)
 

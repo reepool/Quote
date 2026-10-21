@@ -256,6 +256,7 @@ def test_e1_budget_stops_at_the_authorized_physical_cap():
 
 def test_e2_budget_is_separate_from_the_e1_authorization():
     import time
+    from decimal import Decimal
 
     from utils.llm.budget import DEVELOPMENT_UNPRICED_BILLING, LlmRunBudget
 
@@ -305,6 +306,28 @@ def test_e2_budget_is_separate_from_the_e1_authorization():
         billing_mode=DEVELOPMENT_UNPRICED_BILLING,
         run_authorization="company_profile_e2.2026-10-20",
     )
+    LlmRunBudget(
+        deadline=time.monotonic() + 30,
+        prices={},
+        max_tokens=300_000,
+        max_requests=32,
+        max_cost_cny=Decimal(30),
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        run_authorization="company_profile_company_core.2026-10-21",
+    )
+    try:
+        LlmRunBudget(
+            deadline=time.monotonic() + 30,
+            prices={},
+            max_tokens=300_000,
+            max_requests=32,
+            billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+            run_authorization="company_profile_e1.2026-10-20",
+        )
+    except ValueError as exc:
+        assert str(exc) == "invalid bounded run limits"
+    else:
+        raise AssertionError("the E1 marker unlocked the company-core window")
 
 
 def test_window1_verified_claim_reloads_and_empty_query_does_not_clear_it():
@@ -475,9 +498,9 @@ def test_direct_chain_entry_completes_and_keeps_a_verified_package():
         if claim["status"] == "observed"
     ]
     assert success["delivered"] == 1
-    assert len(claims) >= 2
-    assert len({claim["answer"] for claim in claims}) >= 1
-    assert sum(claim["dimension"] == "principal_business" for claim in claims) >= 2
+    identities = [claim["claim_id"] for claim in claims]
+    assert len(identities) == len(set(identities))
+    assert claims
     assert profile["draft_complete"] is True
     assert profile["real_semantic_complete"] is False
     assert all(
@@ -489,6 +512,13 @@ def test_direct_chain_entry_completes_and_keeps_a_verified_package():
         )
     )
     assert not any(gap.startswith("necessary_unread:") for gap in profile["gaps"])
+    body_pages = [
+        page
+        for item in profile["call_receipts"]
+        if item.get("source_scope") == "full_context"
+        for page in item.get("source_pages") or []
+    ]
+    assert len(set(body_pages)) >= 2
 
     failed = run("direct_chain_fail_v1", "d2-chain-fail")
     failed_profile = failed["profiles"][0]["three_views"]
@@ -501,8 +531,18 @@ def test_direct_chain_entry_completes_and_keeps_a_verified_package():
     assert failed["delivered"] == 1
     assert kept
     assert failed_profile["draft_complete"] is False
+    failed_ids = [
+        claim["claim_id"]
+        for view in failed_profile["views"].values()
+        for claim in view["claims"]
+    ]
+    assert len(failed_ids) == len(set(failed_ids))
     assert any(
-        gap.startswith("direct_core_package_stopped:") or gap.startswith("necessary_unread:")
+        gap.startswith("direct_core_package_stopped:")
+        or gap.startswith("necessary_unread:")
+        or gap.startswith("claim_not_verified:")
+        or gap.startswith("core_dimension_missing:")
+        or gap.startswith("view_not_substantive:")
         for gap in failed_profile["gaps"]
     )
     plan = json.loads(

@@ -429,7 +429,9 @@ def validate_binding(
         raise ValueError("frozen PDF hash mismatch")
     elapsed = binding["max_elapsed_seconds"]
     auth = binding.get("run_authorization")
-    if auth == "company_profile_repair.2026-10-21":
+    if auth == "company_profile_company_core.2026-10-21":
+        allowed = 0 < elapsed <= 1800
+    elif auth == "company_profile_repair.2026-10-21":
         allowed = 0 < elapsed <= 1314
     elif auth == "company_profile_f1.2026-10-20":
         allowed = 0 < elapsed <= 900
@@ -465,6 +467,7 @@ def validate_binding(
                 "g2w1",
                 "g2w2",
                 "repair17",
+                "company18",
             }
             or not authorization.get("approval_reference")
         ):
@@ -650,7 +653,11 @@ def _worker(
             LogicalRecoveryPolicy(
                 max_recoveries=(
                     4
-                    if binding.get("run_authorization") == "company_profile_repair.2026-10-21"
+                    if binding.get("run_authorization")
+                    in {
+                        "company_profile_repair.2026-10-21",
+                        "company_profile_company_core.2026-10-21",
+                    }
                     else min(2, int(binding.get("max_recoveries", 2)))
                     if binding.get("reading_strategy") == "direct_core_v1"
                     else int(binding.get("max_recoveries", 4))
@@ -740,6 +747,15 @@ def _worker(
             if request["purpose"] == "synthesize_views":
                 chain_state["syntheses"] += 1
             result = direct_chain_reply(request)
+            if (
+                protocol == "direct_chain_fail_v1"
+                and request["purpose"] == "verify_views"
+                and chain_state.get("verifies", 0) == 0
+            ):
+                for check in result.get("checks") or []:
+                    if check.get("target_id") == "chain-claim-4":
+                        check["status"] = "block"
+                chain_state["verifies"] = 1
             if (
                 request["purpose"] == "source_inventory"
                 and request.get("source_scope") != "page_map"
@@ -897,39 +913,6 @@ def _worker(
             identity["accepted_page_map_receipts"] = load_twelfth_navigation(binding)
         if binding.get("accepted_candidate_query"):
             identity["accepted_candidate_receipts"] = load_thirteenth_candidates(binding)
-        if binding.get("prior_verified_query"):
-            from research.company_profile.contracts import ReportViewClaim
-
-            prior = json.loads(Path(binding["prior_verified_query"]).read_text())
-            carried = []
-            pages = []
-            maps = []
-            for profile in prior.get("profiles") or []:
-                three = profile.get("three_views") or {}
-                for item in three.get("call_receipts") or []:
-                    if item.get("source_scope") == "page_map" and item.get("status") == "success":
-                        maps.append(item)
-                for view in (three.get("views") or {}).values():
-                    for claim in view.get("claims") or []:
-                        if claim.get("review_state") != "verified":
-                            continue
-                        ReportViewClaim.model_validate_json(
-                            json.dumps(
-                                {key: value for key, value in claim.items() if key != "review_state"},
-                                ensure_ascii=False,
-                            )
-                        )
-                        carried.append(claim)
-                        for evidence in claim.get("evidence") or []:
-                            if evidence.get("page"):
-                                pages.append(int(evidence["page"]))
-            identity["carried_claims"] = carried
-            identity["completed_pages"] = sorted(set(pages))
-            if maps:
-                identity["accepted_page_map_receipts"] = maps
-        if company_state:
-            identity["carried_claims"] = company_state.get("carried_claims") or []
-            identity["completed_pages"] = company_state.get("completed_pages") or []
         refuse_layered_semantic_continuation(binding)
     if binding.get("partial_slice"):
         identity.update(

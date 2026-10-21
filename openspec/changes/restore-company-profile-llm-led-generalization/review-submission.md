@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-21，[A审核§71](#71-a审核ecb0f79b第17次失败结束替换整公司交付编排)）：第17次及§33失败结束，工程就绪不接受。独立10 passed、1 failed；主要变现/投入未读，供应链空，同ID多状态。原17入口971570账本/5249.453228311677秒/68请求、费用unknown保持。当前唯一执行卡为§34整公司核心证据汇总交付：实际入口非空成功/失败验证并冻结后，同卡仅一次新歌华实验，资源只认验收§7.29；原G2余额结束，无自动第19次。观察1/4、可用0/4，S1/S2/S3未启动，生产not_authorized、规模false。原§1—70及受保护结果不改。
+当前状态（2026-10-21，[B交接§72](#72-b交接34整公司实验未形成主张)）：§34整公司实验已消耗，进程退出0，三个视图主张数都是0。结构定位选中了页165–169，正文阅读在合成前失败；页53、页116未被选中。本入口139115账本、826.8285275865346秒、11次请求，费用unknown。路线累计1110685账本、6076.2817558982115秒、79次请求。B不计19/6通过。无第19次。观察1/4、可用0/4，S1/S2/S3未启动；生产not_authorized、规模false。原§1—71不改。
 
 ## 1. 唯一实施指引
 
@@ -2962,3 +2962,67 @@ A前卡仍把跨窗口恢复放在业务核心前置，既未确认实际入口�
 本轮依据用户允许费用上调，具体授权验收§7.29的新任务300000账本/1800秒/32请求，有价≤30元、无价unknown，最多累计第18入口；不继承旧语义、不使用旧G2余额，不是常规成本达标。实际非空入口成功/失败未证明不创建attempt；成立并冻结后B同卡直接发送，无需再次确认。结束/到限即停，无自动第19次或换公司/短段。不归档、不扩批；真实结果19至少18/6实查、三视图七维及主要业务/变现、已审≥98%/底线0不降。次要遗漏/有据unclear可限用，不能用整维度空缺当容错；无法补救按源/原因/尝试/影响/限制/恢复条件说明。
 
 规划验证：本change OpenSpec严格校验通过，git diff --check通过；新增本地链接有效，既有历史两处batch-review-audit.py链接缺目标在HEAD已有，未追改原记录。只提交本轮可隔离的规划/审核文档，原受保护证据和业务代码不改；Git提交/推送结果随最终交接报告。以上不是业务验收通过。
+
+## 72. B交接：§34整公司实验未形成主张
+
+日期：2026-10-21。公司仍为歌华有线 600037.SH，2025年报，版本 `b5b6be18424b7c3d7d7988f755ff7083141831904d4347c07cba1da8452c8b76`。本段只记录累计第18次、授权 `company_profile_company_core.2026-10-21` 的结果。没有载入前17次的导航、条件、草稿、checks或query。B不计19/6，也不与旧成绩合并。观察1/4、可用0/4。生产 `not_authorized`，`scale_quality_claim_allowed=false`。无第19次。
+
+### 72.1 业务结果
+
+三个视图的主张数都是0。`draft_complete`、`semantic_complete`、`real_semantic_complete` 均为 false。画像、产品暴露、供应链都没有可引用文本。查询与导出的 `profiles` 一致，入口记录 `query_export_equal=true`。
+
+实际阅读停在来源清点，没有进入整公司成稿：
+
+- 结构定位成功两批：页1–85，页86–169。页170–208未定位，原因是下一批被 `logical_recovery_already_used` 拒绝。
+- 正文清点成功的页：4、10、11、13、14、15、16、17、18、19。
+- 已选中但没有读完的页包括20–21、24–31、93–96、123、128、131、142、152、156、165–169、12。其中165–169是收入明细所在区间，清点请求失败。
+- 页53、页116不在已选页，也不在未定位页。结构预览经过了它们，模型没有把它们选进正文。
+
+失败原因写在缺口里：6次 `direct_core_gap_check_stopped`（请求截止、空响应、无可用池成员），2次 `direct_core_package_stopped`。因此没有合成，也没有可核验主张。同ID多状态在本入口没有对象可出现。
+
+### 72.2 19项与6项负例
+
+没有交付文本，19项和6项负例都是未评估。B不计通过，也不写已审准确率。已知底线错误外放0条，因为没有外放结论。页165未读，不能把未读写成未披露。
+
+### 72.3 发送前的实际入口证明
+
+发送前用真实 CLI，外部传输替换为离线协议，跑了非空成功和失败两条：
+
+`pytest -q tests/unit/test_research/test_company_profile_direct_progress.py tests/unit/test_research/test_company_profile_bounded_entry.py::test_e2_budget_is_separate_from_the_e1_authorization tests/unit/test_research/test_company_profile_bounded_entry.py::test_direct_chain_entry_completes_and_keeps_a_verified_package`
+
+11 passed，7 warnings，330.07秒。成功路径三个视图都有主张、主张ID不重复、`real_semantic_complete=false`、补读页进入了正文请求。失败路径保留已观察主张且草稿不完整。E2的180000/20不再被修复授权的数值区间拒绝；本卡300000/32/30元只在 `company_profile_company_core.2026-10-21` 下放开，E1授权不能打开它。这是协议证明，不是歌华成绩。
+
+### 72.4 资源
+
+冻结绑定 `b1-pool-company18-binding.json` SHA-256 `71330448003a98c8957a7967cc74e3054a2e49140ebc684e6fb4e8772f04e6a6`。上限300000账本、32次请求、1800秒、最多4次恢复、有价30元。
+
+本入口：账本139115，物理请求11，逻辑请求9，恢复2次。有效usage 59225，未知预留79890，费用 unknown，停止原因为空。监督耗时826.8285275865346秒。出现的模型：`gemini-3.8-flash-high`、`glm-5.3-flash`、`grok-4.7`、`deepseek-v4.1-flash`、`deepseek-flash`。一次 `grok-4.7`、一次 `glm-5.3-flash`、一次 `deepseek-flash`、一次 `gemini-3.8-flash-high` 的usage为空，预留保留。
+
+本任务剩余160885账本、973.1714724134654秒、21次请求。这些剩余不构成第19次。
+
+路线累计：971570+139115=1110685账本；5249.453228311677+826.8285275865346=6076.2817558982115秒；68+11=79次请求。原17次账不改。
+
+### 72.5 证据、清理与停止
+
+证据目录 `b1-company18-evidence/`：
+
+- query `ea147c8133b75ca20034e56f9a798d47dbb5ed891be19d1730bcc776fe1f2ba8`
+- export `64ffa3e097bbed65ed077a929657e8ae6ce19452de6ec74d2a585c088844ebbf`
+- budget `471b940b3fba047a818677a4d68943fcc6b14aad61667664690cb39de51c0095`
+- supervisor `10c56373fa37a9646bae7a12b59c17eb3809e5725f6091050618a8b44860c64e`
+- entry.log `a7f899d64b1e0919580ee48eafee075b4dc32df230b2d7e73c6442878165f659`
+
+命令：
+
+```bash
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m research.company_profile.bounded_entry \
+  --binding openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-company18-binding.json \
+  --authorization openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-company18-authorization.json \
+  --run-root /home/python/Quote/data/QuoteBak/b1-company18-20261021 --real
+```
+
+清理：删除7个空的 `quote_pytest_logs_*` 目录；删除本卡离线证明目录 `d2-chain-success`、`d2-chain-fail` 及两份绑定，合计约6MB，可按上述测试重建。保留PDF、前17次证据、`b1-company18-20261021` 运行根、`company18.json`，以及归属未核的 v61、window10、direct1。运行根在证据已复制后仍保留，清理时点是下一卡确认持久哈希一致之后。
+
+若要再读页165的收入构成、页116的收费确认和页53的采购，需要新的入口授权。本卡剩余资源不自动变成第19次。
+
+无法补救的影响：三视图为空，公司仍不可用。限制是不能把页4–19的清点回执当成经营结论。恢复条件是新的阅读授权，并且正文请求能够在合成前完成页165一带及收费、采购相关范围。

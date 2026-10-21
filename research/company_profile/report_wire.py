@@ -190,10 +190,12 @@ def instructions(request: ReportSemanticRequestV3) -> str:
     if request.source_scope == "page_map":
         if direct:
             selection = (
-                "Select physical requested_pages for the core chapters that state "
-                "the main business, how it is earned, products or services, inputs "
-                "and operating roles, plus any continuation page needed to finish "
-                "that passage. Do not select ordinary notes. "
+                "This batch is one slice of the whole report. Select physical "
+                "requested_pages for the main business lines, revenue composition "
+                "and fee recognition, key inputs, and upstream or downstream "
+                "operating roles, plus a continuation page needed to finish that "
+                "passage. Do not treat an unfamiliar heading as minor. Do not "
+                "select ordinary notes. "
             )
         elif layered:
             selection = (
