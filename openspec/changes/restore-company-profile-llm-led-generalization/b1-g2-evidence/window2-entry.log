@@ -1,0 +1,125 @@
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-21 08:33:09][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-21 08:33:09][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-21 08:33:09][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.00s
+[INFO][2026-10-21 08:33:10][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-21 08:33:10][tgbot.py:15] - [tgbot] Reading system configuration...
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+[INFO][2026-10-21 08:33:45][business_profile_async_production.py:3197] - business-profile stage start stage=acquire max_items=1 concurrency=1 max_elapsed_seconds=801.0454388279468 high_water_mark=1000
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-21 08:33:46][logging_manager.py:710] - Logging system initialized successfully
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-21 08:33:46][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-21 08:33:46][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-21 08:33:46][logging_manager.py:710] - Logging system initialized successfully
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-10-21 08:33:46][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-10-21 08:33:46][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.01s
+[INFO][2026-10-21 08:33:46][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-21 08:33:46][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-21 08:33:46][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-10-21 08:33:46][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.06s
+[INFO][2026-10-21 08:33:46][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.07s
+[INFO][2026-10-21 08:33:47][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.14s
+[INFO][2026-10-21 08:33:47][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-21 08:33:47][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-21 08:33:47][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-10-21 08:33:48][tgbot.py:15] - [tgbot] Reading system configuration...
+[INFO][2026-10-21 08:33:48][aes.py:23] - libssl detected, it will be used for encryption
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+[INFO][2026-10-21 08:33:48][tgbot.py:15] - [tgbot] Reading system configuration...
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+[INFO][2026-10-21 08:33:48][tgbot.py:15] - [tgbot] Reading system configuration...
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+[INFO][2026-10-21 08:33:48][tgbot.py:15] - [tgbot] Reading system configuration...
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+[INFO][2026-10-21 08:33:52][business_profile_pdf_artifacts.py:1271] - business-profile pdf artifact extracted source_file_id=None bytes=1263185 pages=208 status=parsed parser_warnings=0 timings={'hash_read_seconds': 0.002027, 'cache_read_seconds': 0.0, 'extract_seconds': 5.453428, 'write_seconds': 0.243618, 'total_seconds': 5.70973} path=/home/python/Quote/data/QuoteBak/b1-g2-company-20261021/window2/pdf-cache/derived/business_profile_pdfium_recovery.v4/b5b6be18424b7c3d7d7988f755ff7083141831904d4347c07cba1da8452c8b76_57e1dd4f16ef40ff.json.gz
+[INFO][2026-10-21 08:33:56][business_profile_async_production.py:3466] - business-profile stage item stage=acquire work_id=bp-work-89548e03e2573af7a2fcd8bb instrument_id=600037.SH duration_seconds=10.477 claimed=1 completed=1 retried=0 terminal_failures=0
+[INFO][2026-10-21 08:33:56][business_profile_async_production.py:3576] - business-profile stage progress stage=acquire finished=1 in_flight=0 claimed=1 completed=1 retried=0 terminal_failures=0 effective_concurrency=1 elapsed_seconds=11.573 active_seconds=10.478
+[INFO][2026-10-21 08:33:56][business_profile_async_production.py:3671] - business-profile stage end stage=acquire status=success claimed=1 completed=1 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=1 elapsed_seconds=11.634 active_work_seconds=10.478 peak_in_flight=1 queue_underfilled_slots=0 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 3, 'wait_seconds': 4e-05, 'write_seconds': 0.257276, 'observation_seconds': 14.01419, 'transaction_p50_seconds': 0.11663, 'transaction_p95_seconds': 0.129948, 'transaction_max_seconds': 0.131428, 'writer_lock_duty': 0.018358, 'inter_write_idle_seconds': 10.392951, 'inter_write_seconds': 0.01}
+[INFO][2026-10-21 08:33:57][business_profile_async_production.py:3197] - business-profile stage start stage=parse max_items=1 concurrency=1 max_elapsed_seconds=801.0454388279468 high_water_mark=1000
+[INFO][2026-10-21 08:33:59][business_profile_async_production.py:3466] - business-profile stage item stage=parse work_id=bp-work-89548e03e2573af7a2fcd8bb instrument_id=600037.SH duration_seconds=1.604 claimed=1 completed=1 retried=0 terminal_failures=0
+[INFO][2026-10-21 08:33:59][business_profile_async_production.py:3576] - business-profile stage progress stage=parse finished=1 in_flight=0 claimed=1 completed=1 retried=0 terminal_failures=0 effective_concurrency=1 elapsed_seconds=2.792 active_seconds=1.605
+[INFO][2026-10-21 08:33:59][business_profile_async_production.py:3671] - business-profile stage end stage=parse status=success claimed=1 completed=1 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=1 elapsed_seconds=2.86 active_work_seconds=1.605 peak_in_flight=1 queue_underfilled_slots=0 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 5, 'wait_seconds': 6.8e-05, 'write_seconds': 0.518284, 'observation_seconds': 16.936631, 'transaction_p50_seconds': 0.121158, 'transaction_p95_seconds': 0.138165, 'transaction_max_seconds': 0.13985, 'writer_lock_duty': 0.030601, 'inter_write_idle_seconds': 12.98435, 'inter_write_seconds': 0.01}
+[INFO][2026-10-21 08:33:59][business_profile_async_production.py:3197] - business-profile stage start stage=semantic max_items=1 concurrency=1 max_elapsed_seconds=801.0454388279468 high_water_mark=1000
+[WARNING][2026-10-21 08:34:02][business_profile_async_production.py:3445] - business-profile work failed work_id=bp-work-89548e03e2573af7a2fcd8bb instrument_id=600037.SH stage=semantic disposition=terminal_failure category=ValidationError error=3 validation errors for ReportViewClaim condition_ids   Input should be a valid tuple [type=tuple_type, input_value=[], input_type=list]     For further information visit https://errors.pydantic.dev/2.11/v/tuple_type supporting_record_ids   Input should be a valid tuple [type=tuple_type, input_value=[], input_type=list]     For further information visit https://errors.pydantic.dev/2.11/v/tuple_type evidence   Input should be a valid tuple [type=tuple_type, input_value=[{'anchor': {'anchor_type...ct_evidence_pages': []}], input_type=list]     For further information visit https://errors.pydantic.dev/2.11/v/tuple_type
+[DEBUG][2026-10-21 08:34:02][business_profile_async_production.py:3455] - business-profile work failure traceback work_id=bp-work-89548e03e2573af7a2fcd8bb instrument_id=600037.SH stage=semantic
+Traceback (most recent call last):
+  File "/home/python/Quote/research/business_profile_async_production.py", line 3254, in run_one
+    result = dict(await self.stage_runner(stage, item))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/Quote/research/company_profile/runtime.py", line 390, in __call__
+    return await _run_thread_call(self.run_stage, stage, item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/Quote/research/business_profile_async_production.py", line 56, in _run_thread_call
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/Quote/research/company_profile/runtime.py", line 413, in run_stage
+    return self._semantic(state)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/Quote/research/company_profile/runtime.py", line 541, in _semantic
+    state.report_interpretation = self._semantic_service.run_report(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/Quote/research/company_profile/workflow.py", line 123, in run_report
+    return interpret_report(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/Quote/research/company_profile/report_interpretation.py", line 724, in interpret_report
+    return interpret_direct_core(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/Quote/research/company_profile/direct_reading.py", line 425, in interpret_direct_core
+    claim = payload if isinstance(payload, ReportViewClaim) else ReportViewClaim.model_validate(payload)
+                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/pydantic/main.py", line 693, in model_validate
+    return cls.__pydantic_validator__.validate_python(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 3 validation errors for ReportViewClaim
+condition_ids
+  Input should be a valid tuple [type=tuple_type, input_value=[], input_type=list]
+    For further information visit https://errors.pydantic.dev/2.11/v/tuple_type
+supporting_record_ids
+  Input should be a valid tuple [type=tuple_type, input_value=[], input_type=list]
+    For further information visit https://errors.pydantic.dev/2.11/v/tuple_type
+evidence
+  Input should be a valid tuple [type=tuple_type, input_value=[{'anchor': {'anchor_type...ct_evidence_pages': []}], input_type=list]
+    For further information visit https://errors.pydantic.dev/2.11/v/tuple_type
+[INFO][2026-10-21 08:34:02][business_profile_async_production.py:3466] - business-profile stage item stage=semantic work_id=bp-work-89548e03e2573af7a2fcd8bb instrument_id=600037.SH duration_seconds=1.305 claimed=1 completed=0 retried=0 terminal_failures=1
+[INFO][2026-10-21 08:34:02][business_profile_async_production.py:3576] - business-profile stage progress stage=semantic finished=1 in_flight=0 claimed=1 completed=0 retried=0 terminal_failures=1 effective_concurrency=1 elapsed_seconds=2.527 active_seconds=1.361
+[WARNING][2026-10-21 08:34:02][business_profile_async_production.py:3671] - business-profile stage end stage=semantic status=success claimed=1 completed=0 retried=0 terminal_failures=1 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=1 elapsed_seconds=2.577 active_work_seconds=1.361 peak_in_flight=1 queue_underfilled_slots=0 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 7, 'wait_seconds': 8.9e-05, 'write_seconds': 0.78635, 'observation_seconds': 19.576759, 'transaction_p50_seconds': 0.131428, 'transaction_p95_seconds': 0.138533, 'transaction_max_seconds': 0.13985, 'writer_lock_duty': 0.040168, 'inter_write_idle_seconds': 15.19914, 'inter_write_seconds': 0.01}
+[INFO][2026-10-21 08:34:02][business_profile_async_production.py:3197] - business-profile stage start stage=verify max_items=1 concurrency=1 max_elapsed_seconds=801.0454388279468 high_water_mark=1000
+[INFO][2026-10-21 08:34:03][business_profile_async_production.py:3671] - business-profile stage end stage=verify status=success claimed=0 completed=0 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=0 elapsed_seconds=0.509 active_work_seconds=0.0 peak_in_flight=0 queue_underfilled_slots=1 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 7, 'wait_seconds': 8.9e-05, 'write_seconds': 0.78635, 'observation_seconds': 20.147926, 'transaction_p50_seconds': 0.131428, 'transaction_p95_seconds': 0.138533, 'transaction_max_seconds': 0.13985, 'writer_lock_duty': 0.039029, 'inter_write_idle_seconds': 15.19914, 'inter_write_seconds': 0.01}
+[INFO][2026-10-21 08:34:03][business_profile_async_production.py:3197] - business-profile stage start stage=publish max_items=1 concurrency=1 max_elapsed_seconds=801.0454388279468 high_water_mark=1000
+[INFO][2026-10-21 08:34:03][business_profile_async_production.py:3671] - business-profile stage end stage=publish status=success claimed=0 completed=0 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=0 elapsed_seconds=0.496 active_work_seconds=0.0 peak_in_flight=0 queue_underfilled_slots=1 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 7, 'wait_seconds': 8.9e-05, 'write_seconds': 0.78635, 'observation_seconds': 20.648566, 'transaction_p50_seconds': 0.131428, 'transaction_p95_seconds': 0.138533, 'transaction_max_seconds': 0.13985, 'writer_lock_duty': 0.038083, 'inter_write_idle_seconds': 15.19914, 'inter_write_seconds': 0.01}

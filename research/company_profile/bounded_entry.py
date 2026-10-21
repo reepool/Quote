@@ -19,6 +19,39 @@ from pathlib import Path
 from typing import Any
 
 
+G2_AUTHORIZATION = "company_profile_g2.2026-10-20"
+
+
+def company_window_limits(binding: dict, state: dict | None) -> tuple[int, int]:
+    """Return this window's ledger and request cap inside the company total."""
+    if binding.get("run_authorization") != G2_AUTHORIZATION:
+        raise ValueError("g2_authorization_required")
+    state = state or {}
+    if int(state.get("windows_used") or 0) >= 2:
+        raise ValueError("g2_company_window_cap")
+    charged = int(state.get("charged_tokens") or 0)
+    used_requests = int(state.get("physical_requests") or 0)
+    tokens = min(120_000, 240_000 - charged)
+    requests = min(16, 32 - used_requests)
+    if tokens <= 0 or requests <= 0:
+        raise ValueError("g2_company_budget_exhausted")
+    return tokens, requests
+
+
+def load_company_task(path: Path | None) -> dict:
+    if path is None or not path.is_file():
+        return {
+            "charged_tokens": 0,
+            "physical_requests": 0,
+            "recoveries": 0,
+            "windows_used": 0,
+            "completed_pages": [],
+            "carried_claims": [],
+            "attempts": [],
+        }
+    return json.loads(path.read_text())
+
+
 def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -416,6 +449,8 @@ def validate_binding(
                 "e1",
                 "e2",
                 "f1",
+                "g2w1",
+                "g2w2",
             }
             or not authorization.get("approval_reference")
         ):
@@ -573,7 +608,18 @@ def _worker(
             attach_quotes_db=False,
         )
     )
+    company_path = (
+        Path(binding["company_task_state"]) if binding.get("company_task_state") else None
+    )
+    company_state = None
+    if binding.get("run_authorization") == G2_AUTHORIZATION:
+        company_state = load_company_task(company_path)
+        tokens, requests = company_window_limits(binding, company_state)
+        binding["max_tokens"] = tokens
+        binding["max_physical_requests"] = requests
     prior_attempts = ()
+    if company_state and company_state.get("attempts"):
+        prior_attempts = tuple(company_state["attempts"])
     continuation_budget = binding.get("continuation_budget")
     if continuation_budget:
         prior_payload = json.loads(Path(continuation_budget).read_text())
@@ -835,6 +881,9 @@ def _worker(
             identity["accepted_page_map_receipts"] = load_twelfth_navigation(binding)
         if binding.get("accepted_candidate_query"):
             identity["accepted_candidate_receipts"] = load_thirteenth_candidates(binding)
+        if company_state:
+            identity["carried_claims"] = company_state.get("carried_claims") or []
+            identity["completed_pages"] = company_state.get("completed_pages") or []
         refuse_layered_semantic_continuation(binding)
     if binding.get("partial_slice"):
         identity.update(
@@ -911,6 +960,38 @@ def _worker(
         result = asyncio.run(execute())
     finally:
         write_json(run_root / "budget-final.json", budget.snapshot())
+        if company_path is not None and company_state is not None:
+            snapshot = budget.snapshot()
+            company_state["charged_tokens"] = int(company_state.get("charged_tokens") or 0) + int(
+                snapshot.get("charged_tokens") or 0
+            )
+            company_state["physical_requests"] = int(
+                company_state.get("physical_requests") or 0
+            ) + int(snapshot.get("physical_requests") or 0)
+            company_state["recoveries"] = int(company_state.get("recoveries") or 0) + sum(
+                1 for item in snapshot.get("attempts") or [] if int(item.get("attempt") or 1) > 1
+            )
+            company_state["windows_used"] = int(company_state.get("windows_used") or 0) + 1
+            company_state["attempts"] = list(company_state.get("attempts") or []) + list(
+                snapshot.get("attempts") or []
+            )
+            query_path = run_root / "query.json"
+            if query_path.is_file():
+                query = json.loads(query_path.read_text())
+                carried = []
+                pages = set(company_state.get("completed_pages") or [])
+                for profile in query.get("profiles") or []:
+                    views = (profile.get("three_views") or {}).get("views") or {}
+                    for view in views.values():
+                        for claim in view.get("claims") or []:
+                            if claim.get("review_state") == "verified":
+                                carried.append(claim)
+                                for evidence in claim.get("evidence") or []:
+                                    if evidence.get("page"):
+                                        pages.add(int(evidence["page"]))
+                company_state["carried_claims"] = carried
+                company_state["completed_pages"] = sorted(pages)
+            write_json(company_path, company_state)
         write_json(
             run_root / "offline-transport.json",
             {"real_calls": 0 if not real else None, "requests": transport_requests},
@@ -1025,6 +1106,8 @@ def main() -> int:
             raise ValueError("e2 requires the protected e1 marker")
         if authorization["attempt"] == "f1" and not (attempts / "e2.json").is_file():
             raise ValueError("f1 requires the protected e2 marker")
+        if authorization["attempt"] == "g2w2" and not (attempts / "g2w1.json").is_file():
+            raise ValueError("g2w2 requires the protected g2w1 marker")
         if authorization["attempt"] == "layered" and not (
             (attempts / "first.json").is_file()
             and (attempts / "successor.json").is_file()

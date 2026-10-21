@@ -307,6 +307,27 @@ def test_e2_budget_is_separate_from_the_e1_authorization():
     )
 
 
+def test_company_window_keeps_the_cumulative_cap():
+    from research.company_profile.bounded_entry import company_window_limits
+
+    binding = {"run_authorization": "company_profile_g2.2026-10-20"}
+    try:
+        company_window_limits({"run_authorization": "company_profile_e1.2026-10-20"}, {})
+    except ValueError as exc:
+        assert str(exc) == "g2_authorization_required"
+    else:
+        raise AssertionError("another authorization opened the G2 company task")
+    tokens, requests = company_window_limits(binding, {"charged_tokens": 150000, "physical_requests": 20, "windows_used": 1})
+    assert tokens == 90000
+    assert requests == 12
+    try:
+        company_window_limits(binding, {"windows_used": 2})
+    except ValueError as exc:
+        assert str(exc) == "g2_company_window_cap"
+    else:
+        raise AssertionError("a third window was admitted")
+
+
 def test_f1_authorization_is_required_for_the_candidate_window():
     import time
 

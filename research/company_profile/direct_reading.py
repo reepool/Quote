@@ -197,6 +197,34 @@ def body_packages(pages, report, identity, limit: int):
     )
 
 
+def joint_verify_reservation(
+    report,
+    identity,
+    pages,
+    claims=(),
+    conditions=(),
+    records=(),
+) -> int:
+    """Size the verify request that will actually be sent."""
+    if not pages:
+        return 10**9
+    return request_reservation(
+        ReportSemanticRequestV3(
+            request_id="direct-core-joint-verify",
+            purpose="verify_views",
+            report=report,
+            processing_identity=dict(identity),
+            source_pages=tuple(pages),
+            source_scope="full_context",
+            source_conditions=tuple(conditions),
+            claims=tuple(claims),
+            records=tuple(records),
+            max_output_tokens=VERIFY_OUTPUT,
+            timeout_seconds=float(identity.get("logical_request_timeout_seconds") or 120),
+        )
+    )
+
+
 def _units(pages, *, purpose, source_scope, report, identity, output) -> int:
     return request_reservation(
         ReportSemanticRequestV3(
@@ -389,6 +417,19 @@ def interpret_direct_core(
         for page in sources
     ]
     by_page = {item["page"]: item for item in coverage}
+    completed_pages = {int(page) for page in identity.get("completed_pages") or ()}
+    for raw in identity.get("carried_claims") or ():
+        payload = raw if isinstance(raw, ReportViewClaim) else {
+            key: value for key, value in dict(raw).items() if key != "review_state"
+        }
+        claim = payload if isinstance(payload, ReportViewClaim) else ReportViewClaim.model_validate(payload)
+        claims.append(claim)
+        for evidence in claim.evidence:
+            page_no = int(evidence.page)
+            if page_no in by_page:
+                by_page[page_no]["status"] = "read"
+                by_page[page_no]["full_text_sent"] = True
+            completed_pages.add(page_no)
     structured = {
         item.record_id: item for item in structured_records if item.report == report
     }
@@ -739,34 +780,56 @@ def interpret_direct_core(
                 )
                 continue
             observable.append(claim)
-        groups: list[list] = []
+        def measure(group, conditions):
+            related = related_records(group)
+            pages = pages_for([*group, *conditions, *related])
+            units = joint_verify_reservation(
+                report, identity, pages, group, conditions, related
+            )
+            return units, pages, related
+
+        batches: list[tuple[list, list]] = []
+        pending_claims: list = []
         current: list = []
         for claim in observable:
-            alone_pages = group_pages([claim], related_records([claim]))
-            if verify_units([claim], alone_pages, related_records([claim])) > limit:
-                keep_pending(claim, "verify_unit_not_admitted")
+            if measure([claim], [])[0] > limit:
+                pending_claims.append(claim)
+                continue
+            trial = current + [claim]
+            if measure(trial, list(package_conditions))[0] <= limit:
+                current = trial
+                continue
+            if current:
+                batches.append((current, list(package_conditions)))
+                current = [claim]
+                continue
+            bucket: list = []
+            for condition in package_conditions:
+                if measure([claim], bucket + [condition])[0] <= limit:
+                    bucket.append(condition)
+                    continue
+                if bucket:
+                    batches.append(([claim], bucket))
+                if measure([claim], [condition])[0] > limit:
+                    gaps.append(f"major_condition_not_verified:{condition.condition_id}")
+                    bucket = []
+                else:
+                    bucket = [condition]
+            if bucket or not package_conditions:
+                batches.append(([claim], bucket))
+            current = []
+        if current:
+            batches.append((current, list(package_conditions)))
+        for claim in pending_claims:
+            keep_pending(claim, "verify_unit_not_admitted")
+            publish()
+        for group, sent_conditions in batches:
+            units, pages, related = measure(group, sent_conditions)
+            if units > limit or not pages:
+                for claim in group:
+                    keep_pending(claim, "verify_unit_not_admitted")
                 publish()
                 continue
-            if current and verify_units(
-                current + [claim],
-                group_pages(current + [claim], related_records(current + [claim])),
-                related_records(current + [claim]),
-            ) > limit:
-                groups.append(current)
-                current = [claim]
-            else:
-                current.append(claim)
-        if current:
-            groups.append(current)
-        for group in groups:
-            related = related_records(group)
-            pages = group_pages(group, related)
-            relevant_conditions = tuple(
-                item
-                for item in package_conditions
-                if {int(evidence.page) for evidence in item.evidence}
-                & {int(page["page"]) for page in pages}
-            )
             try:
                 verified = invoke(
                     "verify_views",
@@ -777,7 +840,7 @@ def interpret_direct_core(
                     extra={
                         "claims": tuple(group),
                         "records": related,
-                        "source_conditions": relevant_conditions,
+                        "source_conditions": tuple(sent_conditions),
                     },
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
@@ -992,7 +1055,7 @@ def interpret_direct_core(
         ordered = []
         for page in page_ids:
             page_no = int(page)
-            if page_no in queued_pages or page_no in ordered:
+            if page_no in completed_pages or page_no in queued_pages or page_no in ordered:
                 continue
             ordered.append(page_no)
         if not ordered:
