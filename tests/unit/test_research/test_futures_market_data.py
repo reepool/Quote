@@ -2433,6 +2433,105 @@ def test_dce_browser_evaluation_timeout_is_hard_bounded_and_opens_circuit(monkey
     assert metrics["dce_circuit_break_count"] == 1
 
 
+def test_dce_browser_start_failure_reclaims_leaked_processes_and_retries(monkeypatch):
+    state = {"start_calls": 0, "start_dirs": [], "kill_calls": []}
+
+    class FakePage:
+        async def sleep(self, seconds):
+            return None
+
+        async def evaluate(self, script, await_promise=False, return_by_value=False):
+            return json.dumps({
+                "status": 200,
+                "ok": True,
+                "text": json.dumps({"success": True, "data": []}),
+            })
+
+    class FakeBrowser:
+        async def get(self, url):
+            return FakePage()
+
+        def stop(self):
+            return None
+
+    async def fake_start(**kwargs):
+        state["start_calls"] += 1
+        state["start_dirs"].append(kwargs.get("user_data_dir"))
+        if state["start_calls"] <= 2:
+            raise Exception("Failed to connect to browser")
+        return FakeBrowser()
+
+    def fake_kill(user_data_dir):
+        state["kill_calls"].append(user_data_dir)
+        return 3
+
+    monkeypatch.setitem(sys.modules, "nodriver", types.SimpleNamespace(start=fake_start))
+    monkeypatch.setattr(DceOfficialBrowserClient, "_start_virtual_display_if_needed", lambda self: None)
+    monkeypatch.setattr(
+        "research.providers.official_futures.kill_browser_processes_for_user_data_dir",
+        fake_kill,
+    )
+
+    client = DceOfficialBrowserClient({
+        "settle_seconds": 0,
+        "readiness_timeout_seconds": 0.1,
+        "retry_backoff_seconds": 0,
+        "browser_start_retry_attempts": 2,
+        "browser_executable_path": "/tmp/fake-chrome",
+    })
+    try:
+        payload = client.fetch_day_quotes_payload("2026-10-21")
+    finally:
+        client.close()
+
+    assert payload == {"success": True, "data": []}
+    assert state["start_calls"] == 3
+    # each failed attempt reclaims its own leaked profile dir before retry
+    assert state["kill_calls"][:2] == state["start_dirs"][:2]
+    # a unique user-data-dir is assigned per attempt
+    assert len(set(state["start_dirs"])) == 3
+    # stop() sweeps the active session dir as a straggler guard
+    assert state["kill_calls"][2] == state["start_dirs"][2]
+
+
+def test_dce_browser_start_failure_raises_after_retries_exhausted(monkeypatch):
+    state = {"start_calls": 0, "kill_calls": []}
+
+    async def fake_start(**kwargs):
+        state["start_calls"] += 1
+        raise Exception("Failed to connect to browser")
+
+    def fake_kill(user_data_dir):
+        state["kill_calls"].append(user_data_dir)
+        return 5
+
+    monkeypatch.setitem(sys.modules, "nodriver", types.SimpleNamespace(start=fake_start))
+    monkeypatch.setattr(DceOfficialBrowserClient, "_start_virtual_display_if_needed", lambda self: None)
+    monkeypatch.setattr(
+        "research.providers.official_futures.kill_browser_processes_for_user_data_dir",
+        fake_kill,
+    )
+
+    client = DceOfficialBrowserClient({
+        "settle_seconds": 0,
+        "readiness_timeout_seconds": 0.1,
+        "retry_backoff_seconds": 0,
+        "browser_start_retry_attempts": 2,
+        "browser_executable_path": "/tmp/fake-chrome",
+    })
+    try:
+        with pytest.raises(
+            OfficialFuturesSourceUnavailable,
+            match="browser session failed",
+        ):
+            client.fetch_day_quotes_payload("2026-10-21")
+    finally:
+        client.close()
+
+    assert state["start_calls"] == 3
+    assert len(state["kill_calls"]) == 3
+
+
 def test_non_dce_product_page_browser_fallback_does_not_use_dce_readiness(monkeypatch, tmp_path):
     provider = OfficialFuturesMarketDataProvider(_research_config(tmp_path))
     calls = []

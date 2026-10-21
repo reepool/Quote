@@ -8,6 +8,8 @@ import json
 import logging
 import os
 import re
+import shutil
+import tempfile
 import time
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
@@ -43,6 +45,44 @@ logger = logging.getLogger(__name__)
 
 class OfficialFuturesSourceUnavailable(RuntimeError):
     """Raised when an official source is unsupported, empty, or failed."""
+
+
+def kill_browser_processes_for_user_data_dir(user_data_dir: str) -> int:
+    """Terminate browser processes still bound to a nodriver profile directory.
+
+    nodriver registers its Browser object globally before the DevTools connect
+    loop finishes, so a failed start leaves the spawned Chrome alive without any
+    owner reference. The per-session user-data-dir is the only stable identity
+    to reclaim those processes.
+    """
+    try:
+        import psutil
+    except ImportError:  # pragma: no cover - psutil ships with the runtime env
+        return 0
+    marker = f"--user-data-dir={user_data_dir}"
+    targets: List[Any] = []
+    for proc in psutil.process_iter(["pid", "cmdline"]):
+        info = proc.info or {}
+        try:
+            cmdline = info.get("cmdline") or []
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
+        if marker in cmdline:
+            targets.append(proc)
+    for proc in targets:
+        try:
+            proc.terminate()
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
+    if targets:
+        psutil.wait_procs(targets, timeout=3.0)
+        for proc in targets:
+            try:
+                if proc.is_running():
+                    proc.kill()
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                continue
+    return len(targets)
 
 
 class DceOfficialBrowserClient:
@@ -108,6 +148,10 @@ class DceOfficialBrowserClient:
             1.0,
             float(cfg.get("browser_start_timeout_seconds", self.timeout_seconds)),
         )
+        self.browser_start_retry_attempts = max(
+            0,
+            int(cfg.get("browser_start_retry_attempts", 2)),
+        )
         self.navigation_timeout_seconds = max(
             1.0,
             float(cfg.get("navigation_timeout_seconds", self.timeout_seconds)),
@@ -129,6 +173,7 @@ class DceOfficialBrowserClient:
         self._browser: Any = None
         self._page: Any = None
         self._display: Any = None
+        self._active_user_data_dir: Optional[str] = None
         self._proxy_forwarder: Optional[DceBrowserProxyForwarder] = None
         self._pending_proxy_lease: Optional[AkshareProxyLease] = None
         self._route_kind = ""
@@ -263,10 +308,46 @@ class DceOfficialBrowserClient:
                 os.environ.get("DISPLAY") or "",
                 self.browser_args,
             )
-            self._browser = await asyncio.wait_for(
-                uc.start(**kwargs),
-                timeout=self.browser_start_timeout_seconds,
-            )
+            # nodriver's DevTools connect loop has a fixed ~3s budget that is not
+            # exposed via config; under momentary load Chrome can outlive it. A
+            # unique user-data-dir per attempt lets us reclaim the leaked Chrome
+            # processes before retrying.
+            start_attempts = 1 + self.browser_start_retry_attempts
+            start_error: Optional[BaseException] = None
+            for attempt in range(1, start_attempts + 1):
+                user_data_dir = tempfile.mkdtemp(prefix="uc_dce_")
+                try:
+                    self._browser = await asyncio.wait_for(
+                        uc.start(user_data_dir=user_data_dir, **kwargs),
+                        timeout=self.browser_start_timeout_seconds,
+                    )
+                except Exception as exc:
+                    start_error = exc
+                    leaked_kills = kill_browser_processes_for_user_data_dir(user_data_dir)
+                    shutil.rmtree(user_data_dir, ignore_errors=True)
+                    logger.warning(
+                        "[OfficialFutures] DCE browser start failed attempt=%s/%s "
+                        "reclaimed_leaked_processes=%s error=%s: %s",
+                        attempt,
+                        start_attempts,
+                        leaked_kills,
+                        type(exc).__name__,
+                        exc,
+                    )
+                    if attempt < start_attempts:
+                        await asyncio.sleep(
+                            min(self.retry_backoff_seconds * attempt, 5.0)
+                        )
+                    continue
+                self._active_user_data_dir = user_data_dir
+                start_error = None
+                break
+            if self._browser is None:
+                if start_error is None:  # pragma: no cover - defensive
+                    start_error = OfficialFuturesSourceUnavailable(
+                        "official DCE browser start failed without error"
+                    )
+                raise start_error
             if self._pending_proxy_lease is not None and self._pending_proxy_lease.cookie:
                 self._page = await asyncio.wait_for(
                     self._browser.get("about:blank"),
@@ -888,6 +969,17 @@ class DceOfficialBrowserClient:
         self._proxy_forwarder = None
         self._pending_proxy_lease = None
         self._session_ready = False
+        user_data_dir = self._active_user_data_dir
+        self._active_user_data_dir = None
+        if user_data_dir:
+            stragglers = kill_browser_processes_for_user_data_dir(user_data_dir)
+            if stragglers:
+                logger.warning(
+                    "[OfficialFutures] DCE browser stop reclaimed %s stray processes for %s",
+                    stragglers,
+                    user_data_dir,
+                )
+            shutil.rmtree(user_data_dir, ignore_errors=True)
 
     def _start_virtual_display_if_needed(self) -> None:
         if self._display is not None:

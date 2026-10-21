@@ -737,6 +737,7 @@
           "check_disk_space": true,
           "check_memory_usage": true,
           "check_telegram": true,
+          "check_orphan_processes": true,
           "disk_space_threshold_mb": 1000,
           "memory_threshold_percent": 85,
           "health_check_timeout_sec": 30,

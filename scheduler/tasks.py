@@ -13433,12 +13433,26 @@ class ScheduledTasks:
         finally:
             self._active_tasks.discard('risk_snapshot_rebuild')
 
+    async def _check_orphan_browser_processes(self) -> Dict[str, Any]:
+        """清理孤儿浏览器进程与残留 profile 目录，返回清理摘要。"""
+        def _sweep() -> Dict[str, Any]:
+            from utils.process_hygiene import sweep_orphan_browser_artifacts
+
+            return sweep_orphan_browser_artifacts()
+
+        try:
+            return await asyncio.to_thread(_sweep)
+        except Exception as exc:
+            scheduler_logger.warning(f"[Scheduler] 孤儿浏览器进程清理失败: {exc}")
+            return {"error": str(exc)}
+
     async def system_health_check(self,
                                 check_data_sources: bool = True,
                                 check_database: bool = True,
                                 check_disk_space: bool = True,
                                 check_memory_usage: bool = True,
                                 check_telegram: bool = True,
+                                check_orphan_processes: bool = True,
                                 disk_space_threshold_mb: int = 1000,
                                 memory_threshold_percent: int = 85,
                                 health_check_timeout_sec: int = 30,
@@ -13542,6 +13556,11 @@ class ScheduledTasks:
             if check_memory_usage:
                 await self._check_memory_usage(memory_threshold_percent)
 
+            # 清理孤儿浏览器进程与残留 profile 目录
+            orphan_sweep: Dict[str, Any] = {}
+            if check_orphan_processes:
+                orphan_sweep = await self._check_orphan_browser_processes()
+
             # 检查Telegram连接状态
             if check_telegram:
                 telegram_result = await self._check_telegram_connection()
@@ -13582,6 +13601,32 @@ class ScheduledTasks:
             if check_memory_usage:
                 # _check_memory_usage 内部会记录警告，这里假设它成功则为正常
                 check_results.append({"check_name": "内存使用", "result": "正常", "status_icon": "✅"}) # TODO: 实际应根据_check_memory_usage的返回值判断
+            # 孤儿浏览器进程清理
+            if check_orphan_processes:
+                if orphan_sweep.get("error"):
+                    check_results.append({
+                        "check_name": "孤儿浏览器进程",
+                        "result": f"清理失败: {orphan_sweep['error']}",
+                        "status_icon": "❌"
+                    })
+                else:
+                    killed = int(orphan_sweep.get("orphans_killed") or 0)
+                    stale_removed = int(orphan_sweep.get("stale_profile_dirs_removed") or 0)
+                    rss_freed = orphan_sweep.get("rss_freed_mb") or 0
+                    if killed or stale_removed:
+                        result_text = (
+                            f"已清理孤儿进程 {killed} 个(释放 {rss_freed}MB)、"
+                            f"残留目录 {stale_removed} 个"
+                        )
+                    else:
+                        result_text = (
+                            f"无泄漏(在管浏览器进程 {orphan_sweep.get('live_target_count') or 0} 个)"
+                        )
+                    check_results.append({
+                        "check_name": "孤儿浏览器进程",
+                        "result": result_text,
+                        "status_icon": "✅"
+                    })
             # Telegram连接检查
             if check_telegram:
                 is_tg_healthy = "✅" in telegram_result
