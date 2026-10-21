@@ -655,3 +655,105 @@ def test_two_paragraphs_on_one_page_both_reach_verification():
     assert second in sent[0]
     assert any(item.claim_id == "service" and item.status == "observed" for item in result.claims)
     assert any(item.claim_id == "supply" and item.status == "observed" for item in result.claims)
+
+
+def test_the_first_package_is_persisted_before_the_second_package_is_inventoried():
+    from research.company_profile.direct_reading import body_packages
+
+    report = _report()
+    identity = direct_core_processing_identity()
+    text = {
+        1: "公司经营有线电视网络传输，并向用户提供接入服务。" + ("甲" * 4500),
+        2: "公司采购节目传输与系统维护服务，面向家庭用户提供接入。" + ("乙" * 4500),
+    }
+    pages = tuple(
+        {"page": page, "text": body, "readable": True} for page, body in text.items()
+    )
+    assert len(list(body_packages(pages, report, identity, 24_000))) >= 2
+    persists = {"count": 0}
+
+    class _Provider:
+        offline_only = True
+
+        def __init__(self):
+            self.inventories = 0
+
+        def interpret(self, request):
+            current = tuple(int(page["page"]) for page in request.source_pages)
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(1, 2),
+                )
+            if request.purpose == "source_inventory" and request.source_scope != "page_map":
+                self.inventories += 1
+                if self.inventories >= 2:
+                    assert persists["count"] >= 1
+                    if persists.get("fail"):
+                        raise ValueError("second-package-inventory-failed")
+            if request.purpose == "synthesize_views":
+                page = current[0]
+                quote = text[page][:12]
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id=f"package-{page}",
+                            dimension="principal_business",
+                            status="observed",
+                            answer=f"第{page}包已核。",
+                            evidence=(
+                                _evidence(report, text=quote, page=page).model_copy(
+                                    update={"evidence_id": f"package-{page}-evidence"}
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+            if request.purpose == "verify_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    checks=tuple(
+                        {
+                            "target_type": "claim",
+                            "target_id": claim.claim_id,
+                            "status": "pass",
+                            "explanation": "离线",
+                        }
+                        for claim in request.claims
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+            )
+
+    provider = _Provider()
+    result = _run(
+        provider,
+        pages=pages,
+        processing_identity=identity,
+        report=report,
+        on_progress=lambda _result: persists.__setitem__("count", persists["count"] + 1),
+    )
+    assert persists["count"] >= 1
+    assert {item.claim_id for item in result.claims if item.status == "observed"} >= {
+        "package-1",
+        "package-2",
+    }
+
+    persists["count"] = 0
+    persists["fail"] = True
+    failed = _run(
+        _Provider(),
+        pages=pages,
+        processing_identity=identity,
+        report=report,
+        on_progress=lambda _result: persists.__setitem__("count", persists["count"] + 1),
+    )
+    assert any(item.claim_id == "package-1" and item.status == "observed" for item in failed.claims)
+    assert any("second-package-inventory-failed" in gap for gap in failed.gaps)
+    assert failed.draft_complete is False

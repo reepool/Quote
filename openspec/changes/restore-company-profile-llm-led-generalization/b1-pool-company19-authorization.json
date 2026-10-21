@@ -1,0 +1,10 @@
+{
+  "status": "authorized",
+  "attempt": "company19",
+  "binding_sha256": "6eb61c03c5e19e44877ea70f26f74d5b41763e6d7d3e2fa4b59784ac0f7f53df",
+  "document_version": "b5b6be18424b7c3d7d7988f755ff7083141831904d4347c07cba1da8452c8b76",
+  "approval_reference": "acceptance program section 7.31 and b1-execution-card section 36, 2026-10-21",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed"
+}

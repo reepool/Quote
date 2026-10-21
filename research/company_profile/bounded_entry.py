@@ -468,6 +468,8 @@ def validate_binding(
                 "g2w2",
                 "repair17",
                 "company18",
+                "company19",
+                "company20",
             }
             or not authorization.get("approval_reference")
         ):
@@ -1138,6 +1140,10 @@ def main() -> int:
             raise ValueError("e2 requires the protected e1 marker")
         if authorization["attempt"] == "f1" and not (attempts / "e2.json").is_file():
             raise ValueError("f1 requires the protected e2 marker")
+        if authorization["attempt"] == "company20" and not (
+            (attempts / "company19.json").is_file()
+        ):
+            raise ValueError("company20 requires the protected company19 marker")
         if authorization["attempt"] == "g2w2" and not (attempts / "g2w1.json").is_file():
             raise ValueError("g2w2 requires the protected g2w1 marker")
         if authorization["attempt"] == "layered" and not (

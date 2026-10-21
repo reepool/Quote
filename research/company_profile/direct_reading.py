@@ -1345,6 +1345,9 @@ def interpret_direct_core(
                 page_no = int(page_no)
                 if page_no in by_page and page_no not in inventoried and page_no not in follow:
                     follow.append(page_no)
+            compose([int(page["page"]) for page in package])
+            if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
+                return follow
         return follow
 
     composed: set[int] = set()
