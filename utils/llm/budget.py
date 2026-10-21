@@ -122,10 +122,13 @@ class LlmRunBudget:
         prior_logical_attempts: tuple[Mapping[str, Any], ...] | list[Mapping[str, Any]] = (),
         run_authorization: str | None = None,
     ):
+        authorized_repair = run_authorization == "company_profile_repair.2026-10-21"
         authorized_f1 = run_authorization == "company_profile_f1.2026-10-20"
         authorized_e2 = run_authorization == "company_profile_e2.2026-10-20"
         authorized_e1 = run_authorization == "company_profile_e1.2026-10-20"
-        if authorized_f1:
+        if authorized_repair:
+            token_cap, request_cap = 153_695, 23
+        elif authorized_f1:
             token_cap, request_cap = 90_000, 13
         elif authorized_e2:
             token_cap, request_cap = 180_000, 20
@@ -133,6 +136,9 @@ class LlmRunBudget:
             token_cap, request_cap = 240_000, 24
         else:
             token_cap, request_cap = 120_000, 16
+        repair_shaped = (120_000 < max_tokens <= 153_695) or (16 < max_requests <= 23)
+        if repair_shaped and not authorized_repair:
+            raise ValueError("invalid bounded run limits")
         e2_shaped = (
             (max_tokens > 120_000 or max_requests > 16)
             and max_tokens <= 180_000

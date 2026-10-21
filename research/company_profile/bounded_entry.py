@@ -38,6 +38,17 @@ def company_window_limits(binding: dict, state: dict | None) -> tuple[int, int]:
     return tokens, requests
 
 
+def logical_recovery_count(attempts) -> int:
+    """Count logical requests that used a second physical send."""
+    counts: dict[str, int] = {}
+    for item in attempts or []:
+        logical = str(item.get("logical_request_id") or item.get("request_id") or "")
+        if not logical:
+            continue
+        counts[logical] = counts.get(logical, 0) + 1
+    return sum(1 for count in counts.values() if count >= 2)
+
+
 def load_company_task(path: Path | None) -> dict:
     if path is None or not path.is_file():
         return {
@@ -418,7 +429,9 @@ def validate_binding(
         raise ValueError("frozen PDF hash mismatch")
     elapsed = binding["max_elapsed_seconds"]
     auth = binding.get("run_authorization")
-    if auth == "company_profile_f1.2026-10-20":
+    if auth == "company_profile_repair.2026-10-21":
+        allowed = 0 < elapsed <= 1314
+    elif auth == "company_profile_f1.2026-10-20":
         allowed = 0 < elapsed <= 900
     elif auth == "company_profile_e2.2026-10-20":
         allowed = 0 < elapsed <= 1200
@@ -451,6 +464,7 @@ def validate_binding(
                 "f1",
                 "g2w1",
                 "g2w2",
+                "repair17",
             }
             or not authorization.get("approval_reference")
         ):
@@ -635,7 +649,9 @@ def _worker(
         recovery_policy=(
             LogicalRecoveryPolicy(
                 max_recoveries=(
-                    min(2, int(binding.get("max_recoveries", 2)))
+                    4
+                    if binding.get("run_authorization") == "company_profile_repair.2026-10-21"
+                    else min(2, int(binding.get("max_recoveries", 2)))
                     if binding.get("reading_strategy") == "direct_core_v1"
                     else int(binding.get("max_recoveries", 4))
                 ),
@@ -881,6 +897,36 @@ def _worker(
             identity["accepted_page_map_receipts"] = load_twelfth_navigation(binding)
         if binding.get("accepted_candidate_query"):
             identity["accepted_candidate_receipts"] = load_thirteenth_candidates(binding)
+        if binding.get("prior_verified_query"):
+            from research.company_profile.contracts import ReportViewClaim
+
+            prior = json.loads(Path(binding["prior_verified_query"]).read_text())
+            carried = []
+            pages = []
+            maps = []
+            for profile in prior.get("profiles") or []:
+                three = profile.get("three_views") or {}
+                for item in three.get("call_receipts") or []:
+                    if item.get("source_scope") == "page_map" and item.get("status") == "success":
+                        maps.append(item)
+                for view in (three.get("views") or {}).values():
+                    for claim in view.get("claims") or []:
+                        if claim.get("review_state") != "verified":
+                            continue
+                        ReportViewClaim.model_validate_json(
+                            json.dumps(
+                                {key: value for key, value in claim.items() if key != "review_state"},
+                                ensure_ascii=False,
+                            )
+                        )
+                        carried.append(claim)
+                        for evidence in claim.get("evidence") or []:
+                            if evidence.get("page"):
+                                pages.append(int(evidence["page"]))
+            identity["carried_claims"] = carried
+            identity["completed_pages"] = sorted(set(pages))
+            if maps:
+                identity["accepted_page_map_receipts"] = maps
         if company_state:
             identity["carried_claims"] = company_state.get("carried_claims") or []
             identity["completed_pages"] = company_state.get("completed_pages") or []
@@ -968,29 +1014,32 @@ def _worker(
             company_state["physical_requests"] = int(
                 company_state.get("physical_requests") or 0
             ) + int(snapshot.get("physical_requests") or 0)
-            company_state["recoveries"] = int(company_state.get("recoveries") or 0) + sum(
-                1 for item in snapshot.get("attempts") or [] if int(item.get("attempt") or 1) > 1
-            )
+            company_state["recoveries"] = logical_recovery_count(company_state["attempts"])
             company_state["windows_used"] = int(company_state.get("windows_used") or 0) + 1
-            company_state["attempts"] = list(company_state.get("attempts") or []) + list(
-                snapshot.get("attempts") or []
-            )
+            previous_claims = list(company_state.get("carried_claims") or [])
             query_path = run_root / "query.json"
             if query_path.is_file():
                 query = json.loads(query_path.read_text())
-                carried = []
-                pages = set(company_state.get("completed_pages") or [])
-                for profile in query.get("profiles") or []:
-                    views = (profile.get("three_views") or {}).get("views") or {}
-                    for view in views.values():
-                        for claim in view.get("claims") or []:
-                            if claim.get("review_state") == "verified":
-                                carried.append(claim)
-                                for evidence in claim.get("evidence") or []:
-                                    if evidence.get("page"):
-                                        pages.add(int(evidence["page"]))
-                company_state["carried_claims"] = carried
-                company_state["completed_pages"] = sorted(pages)
+                profiles = query.get("profiles") or []
+                if profiles and (profiles[0].get("three_views") or {}).get("views"):
+                    carried = []
+                    pages = set()
+                    for profile in profiles:
+                        views = (profile.get("three_views") or {}).get("views") or {}
+                        for view in views.values():
+                            for claim in view.get("claims") or []:
+                                if claim.get("review_state") == "verified":
+                                    carried.append(claim)
+                                    for evidence in claim.get("evidence") or []:
+                                        if evidence.get("page"):
+                                            pages.add(int(evidence["page"]))
+                    if carried:
+                        company_state["carried_claims"] = carried
+                        company_state["completed_pages"] = sorted(pages)
+                    else:
+                        company_state["carried_claims"] = previous_claims
+                else:
+                    company_state["carried_claims"] = previous_claims
             write_json(company_path, company_state)
         write_json(
             run_root / "offline-transport.json",

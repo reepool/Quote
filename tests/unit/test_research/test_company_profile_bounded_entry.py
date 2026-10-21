@@ -307,7 +307,34 @@ def test_e2_budget_is_separate_from_the_e1_authorization():
     )
 
 
-def test_company_window_keeps_the_cumulative_cap():
+def test_window1_verified_claim_reloads_and_empty_query_does_not_clear_it():
+    import json
+    from pathlib import Path
+
+    from research.company_profile.bounded_entry import logical_recovery_count
+    from research.company_profile.contracts import ReportViewClaim
+
+    query = json.loads(
+        Path(
+            "openspec/changes/restore-company-profile-llm-led-generalization/b1-g2-evidence/window1-query.json"
+        ).read_text()
+    )
+    claim = next(
+        item
+        for view in query["profiles"][0]["three_views"]["views"].values()
+        for item in view["claims"]
+        if item["review_state"] == "verified"
+    )
+    loaded = ReportViewClaim.model_validate_json(
+        json.dumps({key: value for key, value in claim.items() if key != "review_state"})
+    )
+    assert loaded.status == "observed"
+    budget = json.loads(
+        Path(
+            "openspec/changes/restore-company-profile-llm-led-generalization/b1-g2-evidence/window1-budget-final.json"
+        ).read_text()
+    )
+    assert logical_recovery_count(budget["attempts"]) == 2
     from research.company_profile.bounded_entry import company_window_limits
 
     binding = {"run_authorization": "company_profile_g2.2026-10-20"}

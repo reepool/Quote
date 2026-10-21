@@ -419,10 +419,14 @@ def interpret_direct_core(
     by_page = {item["page"]: item for item in coverage}
     completed_pages = {int(page) for page in identity.get("completed_pages") or ()}
     for raw in identity.get("carried_claims") or ():
-        payload = raw if isinstance(raw, ReportViewClaim) else {
-            key: value for key, value in dict(raw).items() if key != "review_state"
-        }
-        claim = payload if isinstance(payload, ReportViewClaim) else ReportViewClaim.model_validate(payload)
+        claim = ReportViewClaim.model_validate_json(
+            json.dumps(
+                {key: value for key, value in dict(raw).items() if key != "review_state"}
+                if not isinstance(raw, ReportViewClaim)
+                else raw.model_dump(mode="json"),
+                ensure_ascii=False,
+            )
+        )
         claims.append(claim)
         for evidence in claim.evidence:
             page_no = int(evidence.page)
@@ -440,7 +444,12 @@ def interpret_direct_core(
         return execution_budget.snapshot()
 
     def recovery_used() -> bool:
-        return any(int(item.get("attempt") or 1) > 1 for item in snapshot().get("attempts") or ())
+        counts: dict[str, int] = {}
+        for item in snapshot().get("attempts") or ():
+            logical = str(item.get("logical_request_id") or item.get("request_id") or "")
+            if logical:
+                counts[logical] = counts.get(logical, 0) + 1
+        return any(count >= 2 for count in counts.values())
 
     def charged() -> int:
         return int(snapshot().get("charged_tokens") or 0)
@@ -788,6 +797,26 @@ def interpret_direct_core(
             )
             return units, pages, related
 
+        def split_group(group, conditions):
+            if measure(group, list(conditions))[0] <= limit:
+                return [(group, list(conditions))]
+            pieces = []
+            bucket: list = []
+            for condition in conditions:
+                if measure(group, bucket + [condition])[0] <= limit:
+                    bucket.append(condition)
+                    continue
+                if bucket:
+                    pieces.append((group, bucket))
+                if measure(group, [condition])[0] > limit:
+                    gaps.append(f"major_condition_not_verified:{condition.condition_id}")
+                    bucket = []
+                else:
+                    bucket = [condition]
+            if bucket or not conditions:
+                pieces.append((group, bucket))
+            return pieces
+
         batches: list[tuple[list, list]] = []
         pending_claims: list = []
         current: list = []
@@ -799,8 +828,12 @@ def interpret_direct_core(
             if measure(trial, list(package_conditions))[0] <= limit:
                 current = trial
                 continue
-            if current:
+            if current and measure(current, list(package_conditions))[0] <= limit:
                 batches.append((current, list(package_conditions)))
+                current = [claim]
+                continue
+            if current:
+                batches.extend(split_group(current, package_conditions))
                 current = [claim]
                 continue
             bucket: list = []
@@ -819,7 +852,7 @@ def interpret_direct_core(
                 batches.append(([claim], bucket))
             current = []
         if current:
-            batches.append((current, list(package_conditions)))
+            batches.extend(split_group(current, package_conditions))
         for claim in pending_claims:
             keep_pending(claim, "verify_unit_not_admitted")
             publish()
