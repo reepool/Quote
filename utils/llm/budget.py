@@ -389,6 +389,45 @@ class LlmRunBudget:
                 raise LlmDeadlineExceededError(self._stopped)
             self._persist()
 
+    def note_source_error(self, *, source_label: str, error_code: str) -> None:
+        """Record why a physical send failed. The ledger itself is not cleared."""
+        with self._lock:
+            for item in reversed(self.attempts):
+                if item.get("source_label") != source_label:
+                    continue
+                if item.get("status") not in {
+                    "reserved",
+                    "http_failure",
+                    "failed",
+                    "failed_or_cancelled",
+                }:
+                    continue
+                item["error_code"] = error_code
+                self._persist()
+                return
+
+    def hard_excluded_source_labels(self) -> set[str]:
+        """Authentication and configuration failures stay out of later requests.
+
+        A timeout or an empty response does not. A later success clears the ban.
+        """
+        hard = {"authentication_error", "configuration_error"}
+        latest: dict[str, str] = {}
+        for item in [*self.prior_logical_attempts, *self.attempts]:
+            label = str(item.get("source_label") or "")
+            if not label:
+                continue
+            if item.get("status") == "success":
+                latest[label] = "success"
+                continue
+            code = item.get("error_code")
+            if code in hard:
+                latest[label] = str(code)
+            elif item.get("status") in {"http_failure", "failed", "failed_or_cancelled"}:
+                if latest.get(label) not in hard:
+                    latest[label] = "transient"
+        return {label for label, state in latest.items() if state in hard}
+
     def failed_source_labels(self) -> set[str]:
         """Sources that already failed in this card. Successes stay eligible."""
         labels = set()

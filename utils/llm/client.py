@@ -241,7 +241,9 @@ class LlmClient:
         attempts: list[dict[str, Any]] = []
         excluded_sources: set[str] = set()
         if self.physical_budget is not None:
-            excluded_sources.update(self.physical_budget.failed_source_labels())
+            excluded_sources.update(
+                self.physical_budget.hard_excluded_source_labels()
+            )
         metadata_logical = request.metadata.get("logical_request_id")
         logical_request_id = (
             str(metadata_logical) if metadata_logical else route_request_id
@@ -333,6 +335,11 @@ class LlmClient:
                     }
                     attempts.append(attempt)
                     excluded_sources.add(selected_source)
+                    if self.physical_budget is not None:
+                        self.physical_budget.note_source_error(
+                            source_label=selected_source,
+                            error_code=exc.code,
+                        )
                     llm_logger.warning(
                         "event=llm.route.source_failed pool=%s logical_profile=%s "
                         "source_label=%s selected_profile=%s route_request_id=%s "

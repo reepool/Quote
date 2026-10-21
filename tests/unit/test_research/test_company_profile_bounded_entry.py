@@ -512,6 +512,14 @@ def test_direct_chain_entry_completes_and_keeps_a_verified_package():
         )
     )
     assert not any(gap.startswith("necessary_unread:") for gap in profile["gaps"])
+    kinds = [
+        "page_map" if item.get("source_scope") == "page_map" else item.get("purpose")
+        for item in profile["call_receipts"]
+    ]
+    assert "synthesize_views" in kinds and "verify_views" in kinds
+    assert kinds.index("synthesize_views") < max(
+        index for index, kind in enumerate(kinds) if kind == "page_map"
+    )
     body_pages = [
         page
         for item in profile["call_receipts"]

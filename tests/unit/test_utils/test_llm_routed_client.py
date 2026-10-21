@@ -802,3 +802,152 @@ async def test_terminal_route_log_has_safe_exception_context(caplog):
     assert provider_detail not in "".join(
         logging.Formatter().formatException(record.exc_info)
     )
+
+
+@pytest.mark.asyncio
+async def test_a_transient_source_failure_does_not_ban_the_next_logical_request():
+    from decimal import Decimal
+
+    from utils.llm.budget import DEVELOPMENT_UNPRICED_BILLING, LogicalRecoveryPolicy, LlmRunBudget
+
+    budget = LlmRunBudget(
+        deadline=time.monotonic() + 30,
+        prices={},
+        max_tokens=20_000,
+        max_requests=8,
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        recovery_policy=LogicalRecoveryPolicy(max_recoveries=1, max_per_logical_request=1),
+    )
+    transport = ScriptedTransport([
+        _success("first", "grok-4.5"),
+        _success("second", "grok-4.5"),
+    ])
+    client = LlmClient(
+        _config(failure_threshold=5),
+        transport=transport,
+        environment={
+            "TEST_GROK_KEY": "grok-secret",
+            "TEST_LUNA_KEY": "luna-secret",
+        },
+        limiter_registry=ProfileLimiterRegistry(),
+        provider_coordinator_registry=ProviderCoordinatorRegistry(),
+        pool_coordinator_registry=LlmPoolCoordinatorRegistry(),
+        physical_budget=budget,
+    )
+    first = await client.complete(_request(
+        max_output_tokens=32,
+        metadata={
+            "workload": "semantic",
+            "business_item_key": "item-1",
+            "logical_request_id": "logical-a",
+        },
+    ))
+    assert first.source_label == "pipio:grok-4.5"
+    ticket = budget.reserve(
+        resource="grok-resource",
+        model="grok-4.5",
+        profile="semantic__grok",
+        payload={"model": "grok-4.5", "max_tokens": 16},
+        request_id="timeout-1",
+        attempt=1,
+        logical_request_id="logical-b",
+        source_label="pipio:grok-4.5",
+    )
+    budget.settle(ticket, None, status="failed_or_cancelled")
+    budget.note_source_error(source_label="pipio:grok-4.5", error_code="deadline_exceeded")
+    charged_after_timeout = sum(item["charged_tokens"] for item in budget.attempts)
+    assert charged_after_timeout > 0
+    assert "pipio:grok-4.5" not in budget.hard_excluded_source_labels()
+    second = await client.complete(_request(
+        max_output_tokens=32,
+        metadata={
+            "workload": "semantic",
+            "business_item_key": "item-2",
+            "logical_request_id": "logical-c",
+        },
+    ))
+    assert second.source_label == "pipio:grok-4.5"
+    assert any(item["request_id"] == "timeout-1" for item in budget.attempts)
+    assert sum(item["charged_tokens"] for item in budget.attempts) >= charged_after_timeout
+
+    banned = LlmRunBudget(
+        deadline=time.monotonic() + 30,
+        prices={},
+        max_tokens=20_000,
+        max_requests=4,
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+    )
+    auth_ticket = banned.reserve(
+        resource="grok-resource",
+        model="grok-4.5",
+        profile="semantic__grok",
+        payload={"model": "grok-4.5", "max_tokens": 16},
+        request_id="auth-1",
+        attempt=1,
+        logical_request_id="logical-auth",
+        source_label="pipio:grok-4.5",
+    )
+    banned.settle(auth_ticket, None, status="failed_or_cancelled")
+    banned.note_source_error(
+        source_label="pipio:grok-4.5", error_code="authentication_error"
+    )
+    assert banned.hard_excluded_source_labels() == {"pipio:grok-4.5"}
+    auth_client = LlmClient(
+        _config(),
+        transport=ScriptedTransport([_success("luna", "gpt-5.6-luna")]),
+        environment={"TEST_GROK_KEY": "grok-secret", "TEST_LUNA_KEY": "luna-secret"},
+        limiter_registry=ProfileLimiterRegistry(),
+        provider_coordinator_registry=ProviderCoordinatorRegistry(),
+        pool_coordinator_registry=LlmPoolCoordinatorRegistry(),
+        physical_budget=banned,
+    )
+    routed = await auth_client.complete(_request(
+        max_output_tokens=32,
+        metadata={
+            "workload": "semantic",
+            "business_item_key": "item-3",
+            "logical_request_id": "logical-d",
+        },
+    ))
+    assert routed.source_label == "pipio:gpt-5.6-luna"
+    assert len(auth_client.transport.calls) == 1
+
+    from utils.llm.errors import LlmDeadlineExceededError
+
+    recovery = LlmRunBudget(
+        deadline=time.monotonic() + 30,
+        prices={},
+        max_tokens=20_000,
+        max_requests=6,
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        recovery_policy=LogicalRecoveryPolicy(max_recoveries=1, max_per_logical_request=1),
+    )
+    for index in range(2):
+        sent = recovery.reserve(
+            resource="grok-resource",
+            model="grok-4.5",
+            profile="semantic__grok",
+            payload={"model": "grok-4.5", "max_tokens": 16},
+            request_id=f"same-{index}",
+            attempt=1,
+            logical_request_id="logical-same",
+            source_label="pipio:grok-4.5",
+        )
+        recovery.settle(sent, None, status="success")
+    try:
+        recovery.reserve(
+            resource="grok-resource",
+            model="grok-4.5",
+            profile="semantic__grok",
+            payload={"model": "grok-4.5", "max_tokens": 16},
+            request_id="same-2",
+            attempt=1,
+            logical_request_id="logical-same",
+            source_label="pipio:grok-4.5",
+        )
+    except LlmDeadlineExceededError as exc:
+        assert "logical_recovery_already_used" in str(exc)
+    else:
+        raise AssertionError("a third send of one logical request was accepted")
+    assert len(recovery.attempts) == 2
+    assert Decimal(recovery.attempts[0]["charged_tokens"]) > 0

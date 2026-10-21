@@ -1347,14 +1347,21 @@ def interpret_direct_core(
                     follow.append(page_no)
         return follow
 
+    composed: set[int] = set()
+
     def compose(page_ids) -> None:
-        """One company draft from the pages already read, not one claim set per page."""
+        """Draft and verify one package before the next. A later failure keeps earlier claims."""
         by_id = {int(page["page"]): page for page in sources}
         chosen = []
         seen_pages: set[int] = set()
         for page in page_ids:
             page_no = int(page)
-            if page_no in seen_pages or page_no not in inventoried or page_no not in by_id:
+            if (
+                page_no in seen_pages
+                or page_no in composed
+                or page_no not in by_id
+                or not by_id[page_no].get("readable", True)
+            ):
                 continue
             seen_pages.add(page_no)
             chosen.append(by_id[page_no])
@@ -1365,7 +1372,6 @@ def interpret_direct_core(
         except ValueError as exc:
             gaps.append(str(exc))
             return
-        drafted_claims: list[ReportViewClaim] = []
         for package in packages[:4]:
             try:
                 drafted = invoke(
@@ -1378,6 +1384,7 @@ def interpret_direct_core(
             except (ValueError, LlmError, SemanticProviderError) as exc:
                 gaps.append(f"direct_core_package_stopped:{exc}")
                 return
+            package_claims: list[ReportViewClaim] = []
             for claim in drafted.claims:
                 bound = []
                 failed = False
@@ -1389,7 +1396,7 @@ def interpret_direct_core(
                     bound.append(located)
                 if failed or not bound:
                     gaps.append(f"evidence_not_located:{claim.claim_id}")
-                    drafted_claims.append(
+                    package_claims.append(
                         claim.model_copy(
                             update={
                                 "status": "unclear",
@@ -1398,24 +1405,31 @@ def interpret_direct_core(
                         )
                     )
                     continue
-                drafted_claims.append(claim.model_copy(update={"evidence": tuple(bound)}))
-        unique: dict[str, ReportViewClaim] = {}
-        for claim in drafted_claims:
-            unique[claim.claim_id] = claim
-        page_set = {int(page["page"]) for page in chosen}
-        related = [
-            item
-            for item in conditions
-            if page_set & {int(evidence.page) for evidence in item.evidence}
-        ]
-        settle_claims(list(unique.values()), related)
+                package_claims.append(claim.model_copy(update={"evidence": tuple(bound)}))
+            for page in package:
+                page_no = int(page["page"])
+                composed.add(page_no)
+                by_page[page_no]["status"] = "read"
+                by_page[page_no]["full_text_sent"] = True
+            page_set = {int(page["page"]) for page in package}
+            related = [
+                item
+                for item in conditions
+                if page_set & {int(evidence.page) for evidence in item.evidence}
+            ]
+            settle_claims(package_claims, related)
+            if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
+                return
 
     try:
         nav = navigation_batches(list(sources), report, identity, limit)
     except ValueError as exc:
         gaps.append(str(exc))
         nav = []
+    delivered = False
+    pending_follow: list[int] = []
     for batch in nav:
+        before = set(selected)
         try:
             response = invoke(
                 "source_inventory",
@@ -1430,15 +1444,28 @@ def interpret_direct_core(
         except (ValueError, LlmError, SemanticProviderError) as exc:
             gaps.append(f"direct_core_navigation_incomplete:{exc}")
             break
-    follow = inventory_pages(selected_order)
-    compose(selected_order)
-    if follow and not any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
-        for page_no in follow:
+        if delivered:
+            continue
+        fresh = [page_no for page_no in selected_order if page_no not in before]
+        if not fresh:
+            continue
+        pending_follow.extend(inventory_pages(fresh))
+        compose(fresh)
+        delivered = True
+        if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
+            break
+    if delivered and not any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
+        remaining = [page_no for page_no in selected_order if page_no not in composed]
+        if remaining:
+            pending_follow.extend(inventory_pages(remaining))
+            compose(remaining)
+    if pending_follow and not any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
+        for page_no in pending_follow:
             if page_no not in selected:
                 selected.add(page_no)
                 selected_order.append(page_no)
-        inventory_pages(follow)
-        compose(follow)
+        inventory_pages(pending_follow)
+        compose(pending_follow)
     for page in coverage:
         if page.get("map_checked"):
             continue

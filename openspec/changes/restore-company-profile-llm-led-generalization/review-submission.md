@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-21，[B交接§72](#72-b交接34整公司实验未形成主张)，[A审核§73](#73-a审核34d09540第18次失败转真实故障修复2026-10-21)）：§34整公司实验已消耗且失败，进程退出0，三个视图主张数都是0。第18次结果不可用；当前只执行§35工程修复，真实调用0、无第19次。原§1—72不改。观察1/4、可用0/4，S1/S2/S3未启动；生产not_authorized、规模false。
+当前状态（2026-10-21，[B交接§74](#74-b交接35故障隔离与渐进交付)）：§35工程修复已完成，真实调用0、新增attempt 0。超时来源不再挡住下一独立请求；首批核验先落盘，后续失败保留已核主张。第18次三视图仍为空，可用0/4。无第19次。观察1/4，S1/S2/S3未启动；生产not_authorized、规模false。原§1—73不改。
 
 ## 1. 唯一实施指引
 
@@ -3063,3 +3063,54 @@ B在一个连续工作窗口完成以上P0—P3，最多两次局部共性修正
 本次同时修正A的任务切分：此前“先收齐核心再成稿”容易造成串行等待，本卡改为“公司级一致性是最终结果要求，可靠部分可渐进交付”。开发者必须按[A/B流程v3](../../../docs/development/ab_role_development_workflow.md)报告复现序列、修复前后状态、非空断言、失败前后持久查询和清理范围；不得删除非空断言或用`all(... not verified)`替代原合同。原第18次回执和历史记录只读保留，缺失正文不能用usage重建。
 
 本轮文档范围Review、OpenSpec本change严格校验、diff检查和新增本地链接检查通过；仅调整权威规划/审核文档，不改业务代码或池。13份既有已跟踪改动及16项未跟踪内容保持；验收计划仅提交活动区，原历史在途修改隔离保留。已删除A本次空pytest日志目录和隔离暂存补丁，不删除历史有用途或归属未核的运行目录；第18次run-root待B按§35核持久副本后清理。审核活跃耗时未单独可靠计量，记未知，不与机器或人工补救混报。
+
+## 74. B交接：§35故障隔离与渐进交付
+
+日期：2026-10-21。本卡真实调用 0，新增真实 attempt 0。第18次歌华三视图仍然为空，19项和6项负例仍是未评估。本段只记录三个故障的修复和入口证明，不计公司可用。观察1/4、可用0/4。生产 `not_authorized`，规模 false。无第19次。
+
+### 74.1 修复前
+
+第18次预算里，同一来源可以先成功再超时。`LlmClient` 把整份账本里所有失败来源放进之后每一个逻辑请求的排除集。被排除的4个来源中有3个此前成功过，两个成稿请求因此变成 `no eligible LLM pool member`，没有发出。
+
+阅读顺序是先跑完导航和来源清点，再成稿。后一批合成失败时，前一批候选还停在内存里，查询里看不到。`test_a_source_gap_failure_does_not_block_an_already_verified_claim` 曾被改成“全部不是 verified 也通过”。
+
+### 74.2 修复后
+
+- 超时、空响应这类暂时失败只排除当前逻辑请求里的后续换源。下一独立逻辑请求按池的冷却和熔断重新选择。认证失败和配置错误仍排除该来源，直到同一来源有成功记录。账本、unknown 和恢复次数不清除。
+- 第一批定位选出的页，在后续导航之前完成来源清点、候选、核验和原 writer 落盘。每个合成包核验后立即保存。后一个包失败时，前一个包的主张还在。主要缺口仍使 `draft_complete=false`。候选本身不是已核。
+- 原断言已恢复：后续源查漏失败时，已核主张仍然存在，并且草稿不完整。
+
+### 74.3 证明
+
+直接阅读测试恢复原断言后通过。路由反例 `test_a_transient_source_failure_does_not_ban_the_next_logical_request`：同一账本里 grok 先成功、再记一次超时，下一个逻辑请求仍选 grok；认证失败的 grok 不会被当成暂时故障继续发送，下一请求改走 luna；同一逻辑请求的第三次发送被拒绝，前两次账本还在。
+
+实际跑过的命令：
+
+```bash
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q \
+  tests/unit/test_research/test_company_profile_direct_progress.py \
+  tests/unit/test_research/test_company_profile_bounded_entry.py::test_e2_budget_is_separate_from_the_e1_authorization
+```
+
+9项阅读测试加 E2 预算测试通过，其中源查漏失败仍保留已核主张。
+
+```bash
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q \
+  tests/unit/test_utils/test_llm_routed_client.py::test_a_transient_source_failure_does_not_ban_the_next_logical_request
+```
+
+1 passed，1.44秒。
+
+```bash
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q \
+  tests/unit/test_research/test_company_profile_bounded_entry.py::test_direct_chain_entry_completes_and_keeps_a_verified_package
+```
+
+1 passed，316.37秒。成功路径三个视图非空，`real_semantic_complete=false`，查询、导出和新读实例一致，第一份成稿回执早于最后一次导航。失败路径保留已有主张，草稿不完整，同 ID 不出现多种状态。这些是协议证明，不是歌华19/6。
+
+### 74.4 清理与账
+
+第18次持久证据 `b1-company18-evidence/` 与运行根的 query、export、budget、supervisor、entry.log 哈希一致后，删除运行根 `b1-company18-20261021`，约3.2MB。尝试标记 `b1-company18-attempts/company18.json` 保留。本卡离线入口目录 `d2-chain-success`、`d2-chain-fail` 及绑定约6.2MB，测试通过后删除，可按上面的命令重建。另删5个空的 `quote_pytest_logs_*`。PDF、前17次证据、v61、window10、direct1 未动。
+
+路线累计仍是1110685账本、6076.2817558982115秒、79次请求。本卡不改这本账。第18次剩余资源不构成第19次。
+
