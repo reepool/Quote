@@ -1259,6 +1259,106 @@ def test_synthesis_keeps_the_conditions_that_fit_the_reservation():
     assert any("major_condition_not_in_synthesis:" in gap and gap.endswith("fee") for gap in result.gaps)
 
 
+def test_saved_source_conditions_are_drafted_without_rereading():
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    text = "公司经营有线电视网络，并按合同期限确认收看维护费。"
+    condition = ReportSourceCondition(
+        condition_id="business",
+        dimension="principal_business",
+        description="经营有线电视网络。",
+        evidence=(
+            _evidence(report, text="公司经营有线电视网络", page=1).model_copy(
+                update={"evidence_id": "saved-business"}
+            ),
+        ),
+        major=True,
+        statement_status="current",
+    )
+    receipt = {
+        "request_id": "saved-1",
+        "purpose": "source_inventory",
+        "status": "success",
+        "source_scope": "full_context",
+        "source_pages": [1],
+        "physical_request": True,
+        "response_payload": ReportSemanticResponseV3(
+            request_id="saved-1",
+            purpose="source_inventory",
+            source_conditions=(condition,),
+        ).model_dump(mode="json"),
+    }
+
+    class _Provider:
+        offline_only = True
+
+        def __init__(self):
+            self.purposes = []
+
+        def interpret(self, request):
+            self.purposes.append(request.purpose)
+            assert request.purpose != "source_inventory"
+            if request.purpose == "synthesize_views":
+                assert request.source_conditions
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="business-claim",
+                            dimension="principal_business",
+                            status="observed",
+                            answer="公司经营有线电视网络。",
+                            evidence=(
+                                _evidence(report, text="公司经营有线电视网络", page=1).model_copy(
+                                    update={"evidence_id": "draft-business"}
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=(
+                    {
+                        "target_type": "claim",
+                        "target_id": "business-claim",
+                        "status": "pass",
+                        "explanation": "整句有引文。",
+                    },
+                    {
+                        "target_type": "condition",
+                        "target_id": request.source_conditions[0].condition_id,
+                        "status": "pass",
+                        "explanation": "已由主张覆盖。",
+                        "covers_target_type": "claim",
+                        "covers_target_id": "business-claim",
+                    },
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["accepted_source_receipts"] = [receipt]
+    identity["isolated_claim_ids"] = ["claim_cond_sc_01"]
+    provider = _Provider()
+    result = _run(
+        provider,
+        pages=({"page": 1, "text": text, "readable": True},),
+        processing_identity=identity,
+        report=report,
+    )
+    assert provider.purposes[0] == "synthesize_views"
+    assert "source_inventory" not in provider.purposes
+    rendered = research_views(result)
+    claim = rendered["views"]["company_profile"]["claims"][0]
+    assert claim["claim_id"] == "business-claim"
+    assert "公司经营有线电视网络" in claim["answer"]
+    assert claim["review_state"] == "verified"
+    assert any(gap == "isolated_unreliable_claim:claim_cond_sc_01" for gap in result.gaps)
+
+
 def test_logical_identity_separates_entries_and_verification_targets():
     from research.company_profile.stage5_provider import _logical_report_request_id
     from utils.llm.budget import LogicalRecoveryPolicy, _recovery_block

@@ -21,7 +21,10 @@ from research.company_profile.contracts import (
     SemanticProviderError,
 )
 from research.company_profile.models import ReportIdentity, SemanticRecord
-from research.company_profile.reading_budget import request_reservation
+from research.company_profile.reading_budget import (
+    request_payload_bytes,
+    request_reservation,
+)
 from research.company_profile.report_interpretation import (
     VIEWS,
     ReportInterpretation,
@@ -531,6 +534,10 @@ def interpret_direct_core(
     dispositions: list[dict[str, Any]] = []
     receipts: list[dict[str, Any]] = []
     seen: set[str] = set()
+    for claim_id in identity.get("isolated_claim_ids") or ():
+        gap = f"isolated_unreliable_claim:{claim_id}"
+        if gap not in gaps:
+            gaps.append(gap)
     coverage = [
         {
             "page": page["page"],
@@ -806,7 +813,6 @@ def interpret_direct_core(
                     claims[claim_index] = earlier.model_copy(
                         update={
                             "status": "unclear",
-                            "answer": "结论未通过证据或语义核验。",
                             "limitation": "claim_or_dependency_not_verified",
                         }
                     )
@@ -845,7 +851,6 @@ def interpret_direct_core(
                         claim.model_copy(
                             update={
                                 "status": "unclear",
-                                "answer": "结论未通过证据或语义核验。",
                                 "limitation": "claim_or_dependency_not_verified",
                             }
                         )
@@ -870,7 +875,6 @@ def interpret_direct_core(
                 claims[index] = earlier.model_copy(
                     update={
                         "status": "unclear",
-                        "answer": "结论未通过证据或语义核验。",
                         "limitation": "claim_or_dependency_not_verified",
                     }
                 )
@@ -893,7 +897,6 @@ def interpret_direct_core(
                 claims[index] = earlier.model_copy(
                     update={
                         "status": "unclear",
-                        "answer": "结论未通过证据或语义核验。",
                         "limitation": "claim_or_dependency_not_verified",
                     }
                 )
@@ -937,6 +940,25 @@ def interpret_direct_core(
             units = joint_verify_reservation(
                 report, identity, pages, group, conditions, related
             )
+            if pages:
+                sized = ReportSemanticRequestV3(
+                    request_id=f"{work_id}:verify-size",
+                    purpose="verify_views",
+                    report=report,
+                    processing_identity=identity,
+                    source_pages=tuple(pages),
+                    source_scope="full_context",
+                    claims=tuple(group),
+                    records=tuple(related),
+                    source_conditions=tuple(conditions),
+                    max_output_tokens=VERIFY_OUTPUT,
+                    timeout_seconds=float(
+                        identity.get("logical_request_timeout_seconds") or 120
+                    ),
+                )
+                cap = int(identity.get("max_payload_utf8_bytes") or 60_000)
+                if request_payload_bytes(sized) > cap:
+                    return limit + 1, pages, related
             return units, pages, related
 
         support_groups: list[list] = []
@@ -1675,58 +1697,209 @@ def interpret_direct_core(
         if drafted_all:
             settle_claims(drafted_all, related)
 
-    readable_order = [
-        int(page["page"])
-        for page in sources
-        if page.get("readable", True) and str(page.get("text") or "").strip()
-    ]
-    readable_pages = [page for page in sources if int(page["page"]) in set(readable_order)]
-    try:
-        planned = list(source_discovery_slices(readable_pages, report, identity, limit))
-    except ValueError as exc:
-        gaps.append(str(exc))
-        planned = []
-    if planned:
-        slice_units = [
-            _units(
-                batch,
-                purpose="source_inventory",
-                source_scope="full_context",
-                report=report,
-                identity=identity,
-                output=SOURCE_OUTPUT,
-            )
-            for batch in planned
-        ]
-        sample = planned[0]
-        tail_hold = (
-            _units(
-                sample,
+    def draft_reused_sources() -> None:
+        """Write pending drafts from saved source conditions, then verify."""
+        rank = {
+            "principal_business": 0,
+            "revenue_model": 1,
+            "products_services": 2,
+            "input_exposure": 3,
+            "supply_chain_role": 4,
+            "upstream_downstream": 5,
+            "output_exposure": 6,
+        }
+        payload_cap = int(identity.get("max_payload_utf8_bytes") or 60_000)
+        draft_cap = min(payload_cap, 32_000)
+
+        def synthesis_request(pages, selected):
+            return ReportSemanticRequestV3(
+                request_id=f"{work_id}:synthesis-size",
                 purpose="synthesize_views",
-                source_scope="full_context",
                 report=report,
-                identity=identity,
-                output=BODY_OUTPUT,
+                processing_identity=identity,
+                source_pages=tuple(pages),
+                source_scope="full_context",
+                source_conditions=tuple(selected),
+                max_output_tokens=BODY_OUTPUT,
+                timeout_seconds=float(
+                    identity.get("logical_request_timeout_seconds") or 120
+                ),
             )
-            + _nonempty_verify_units(sample, report=report, identity=identity)
-            + 2 * max(slice_units)
+
+        def fits_synthesis(pages, selected) -> bool:
+            if not pages:
+                return False
+            request = synthesis_request(pages, selected)
+            return (
+                request_payload_bytes(request) <= draft_cap
+                and request_reservation(request) <= limit
+            )
+
+        ordered = sorted(
+            conditions,
+            key=lambda item: (rank.get(item.dimension, 50), item.condition_id),
         )
-    follow = inventory_pages(readable_order)
-    tail_hold = 0
-    compose(readable_order)
-    if (
-        follow
-        and not any(gap.startswith("direct_core_ledger_hold") for gap in gaps)
-        and any(
-            gap.startswith(("core_dimension_missing:", "view_not_substantive:"))
-            for gap in _completeness_gaps(claims, conditions, checks, records)
-        )
-    ):
-        inventory_pages(follow)
-        compose(follow)
+        groups: list[list[ReportSourceCondition]] = []
+        current: list[ReportSourceCondition] = []
+        for condition in ordered:
+            quotes = [
+                evidence
+                for item in [*current, condition]
+                for evidence in item.evidence
+            ]
+            pages = [dict(page) for page in cited_quote_pages(quotes)]
+            if current and not fits_synthesis(pages, [*current, condition]):
+                groups.append(current)
+                current = []
+            alone = [dict(page) for page in cited_quote_pages(condition.evidence)]
+            if not current and not fits_synthesis(alone, [condition]):
+                gap = f"synthesis_context_not_sendable:{condition.condition_id}"
+                if gap not in gaps:
+                    gaps.append(gap)
+                continue
+            current.append(condition)
+        if current:
+            groups.append(current)
+        drafted_clean: list[ReportViewClaim] = []
+        sent_conditions: list[ReportSourceCondition] = []
+        for group in groups:
+            pages = [
+                dict(page)
+                for page in cited_quote_pages(
+                    evidence for item in group for evidence in item.evidence
+                )
+            ]
+            try:
+                drafted = invoke(
+                    "synthesize_views",
+                    pages,
+                    source_scope="full_context",
+                    output=BODY_OUTPUT,
+                    later=0,
+                    extra={"source_conditions": tuple(group)},
+                )
+            except (ValueError, LlmError, SemanticProviderError) as exc:
+                gaps.append(f"direct_core_package_stopped:{exc}")
+                continue
+            sent_conditions.extend(group)
+            for claim in drafted.claims:
+                bound = []
+                failed = False
+                for evidence in claim.evidence:
+                    located = _bind_source_evidence(evidence, report, sources)
+                    if located is None:
+                        failed = True
+                        break
+                    bound.append(located)
+                if failed or not bound:
+                    gaps.append(f"evidence_not_located:{claim.claim_id}")
+                    claim = claim.model_copy(
+                        update={
+                            "status": "unclear",
+                            "limitation": "evidence_not_located",
+                            "evidence": tuple(bound),
+                        }
+                    )
+                    upsert(claim)
+                else:
+                    claim = claim.model_copy(update={"evidence": tuple(bound)})
+                    drafted_clean.append(claim)
+                    upsert(
+                        claim.model_copy(
+                            update={"limitation": "pending_verification"}
+                        )
+                    )
+                publish()
+        if drafted_clean:
+            settle_claims(drafted_clean, sent_conditions)
+
+    reused_receipts = list(identity.get("accepted_source_receipts") or ())
+    if reused_receipts:
+        for item in reused_receipts:
+            payload = item.get("response_payload") or {}
+            response = ReportSemanticResponseV3.model_validate_json(
+                json.dumps(payload, ensure_ascii=False)
+            )
+            accepted, location_gaps = _located_conditions(
+                response.source_conditions,
+                report,
+                sources,
+                request_id=str(item.get("request_id") or work_id),
+                seen=seen,
+            )
+            gaps.extend(location_gaps)
+            conditions.extend(accepted)
+            receipts.append(
+                {**item, "physical_request": False, "reused_source": True}
+            )
+            for page_no in item.get("source_pages") or []:
+                page_no = int(page_no)
+                if page_no not in by_page:
+                    continue
+                by_page[page_no]["status"] = "read"
+                by_page[page_no]["reused_source"] = True
+        draft_reused_sources()
+        follow = []
+    else:
+        readable_order = [
+            int(page["page"])
+            for page in sources
+            if page.get("readable", True) and str(page.get("text") or "").strip()
+        ]
+        readable_pages = [
+            page for page in sources if int(page["page"]) in set(readable_order)
+        ]
+        try:
+            planned = list(
+                source_discovery_slices(readable_pages, report, identity, limit)
+            )
+        except ValueError as exc:
+            gaps.append(str(exc))
+            planned = []
+        if planned:
+            slice_units = [
+                _units(
+                    batch,
+                    purpose="source_inventory",
+                    source_scope="full_context",
+                    report=report,
+                    identity=identity,
+                    output=SOURCE_OUTPUT,
+                )
+                for batch in planned
+            ]
+            sample = planned[0]
+            tail_hold = (
+                _units(
+                    sample,
+                    purpose="synthesize_views",
+                    source_scope="full_context",
+                    report=report,
+                    identity=identity,
+                    output=BODY_OUTPUT,
+                )
+                + _nonempty_verify_units(sample, report=report, identity=identity)
+                + 2 * max(slice_units)
+            )
+        follow = inventory_pages(readable_order)
+        tail_hold = 0
+        compose(readable_order)
+        if (
+            follow
+            and not any(gap.startswith("direct_core_ledger_hold") for gap in gaps)
+            and any(
+                gap.startswith(("core_dimension_missing:", "view_not_substantive:"))
+                for gap in _completeness_gaps(claims, conditions, checks, records)
+            )
+        ):
+            inventory_pages(follow)
+            compose(follow)
     read_pages = {int(item["page"]) for item in coverage if item["status"] == "read"}
-    for page_no in readable_order:
+    for page in sources:
+        page_no = int(page["page"])
         if page_no in read_pages:
+            continue
+        if not page.get("readable", True) or not str(page.get("text") or "").strip():
             continue
         gap = f"necessary_unread:{page_no}"
         if gap not in gaps:

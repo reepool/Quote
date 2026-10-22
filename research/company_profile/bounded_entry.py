@@ -149,6 +149,31 @@ def assert_f1_candidate_window(binding: dict) -> None:
         raise ValueError("f1 window exceeds its card")
 
 
+def load_saved_source_discovery(binding: dict) -> list:
+    """Reuse one saved full-text source discovery. It is not a draft or a verdict."""
+    query = json.loads(Path(binding["accepted_source_query"]).read_text())
+    profile = query["profiles"][0]
+    if profile["report"].get("document_version") != binding["asset"]["content_hash"]:
+        raise ValueError("reused_source_discovery_mismatch")
+    receipts = []
+    count = 0
+    for item in profile["three_views"]["call_receipts"]:
+        if item.get("status") != "success" or item.get("purpose") != "source_inventory":
+            continue
+        if item.get("source_scope") == "page_map":
+            continue
+        payload = item.get("response_payload") or {}
+        if payload.get("claims"):
+            raise ValueError("reused_source_contains_answers")
+        conditions = payload.get("source_conditions") or []
+        count += len(conditions)
+        receipts.append(item)
+    expected = binding.get("expected_source_conditions")
+    if not receipts or (expected is not None and count != int(expected)):
+        raise ValueError("reused_source_conditions_do_not_match")
+    return receipts
+
+
 def load_thirteenth_candidates(binding: dict) -> list:
     """Reuse the thirteenth run's two body readings. They are not verified."""
     query = json.loads(Path(binding["accepted_candidate_query"]).read_text())
@@ -483,6 +508,8 @@ def validate_binding(
                 "company23",
                 "company24",
                 "company25",
+                "company26",
+                "company27",
             }
             or not authorization.get("approval_reference")
         ):
@@ -957,8 +984,12 @@ def _worker(
                         maps.append(item)
             if len(maps) == 1 and len(maps[0].get("source_pages") or []) == 208:
                 identity["accepted_page_map_receipts"] = maps
+        if binding.get("accepted_source_query"):
+            identity["accepted_source_receipts"] = load_saved_source_discovery(binding)
         if binding.get("accepted_candidate_query"):
             identity["accepted_candidate_receipts"] = load_thirteenth_candidates(binding)
+        if binding.get("isolated_claim_ids"):
+            identity["isolated_claim_ids"] = list(binding["isolated_claim_ids"])
         refuse_layered_semantic_continuation(binding)
     if binding.get("partial_slice"):
         identity.update(
@@ -1197,6 +1228,14 @@ def main() -> int:
             (attempts / "company24.json").is_file()
         ):
             raise ValueError("company25 requires the protected company24 marker")
+        if authorization["attempt"] == "company26" and not (
+            (attempts / "company25.json").is_file()
+        ):
+            raise ValueError("company26 requires the protected company25 marker")
+        if authorization["attempt"] == "company27" and not (
+            (attempts / "company26.json").is_file()
+        ):
+            raise ValueError("company27 requires the protected company26 marker")
         if authorization["attempt"] == "company20" and not (
             (attempts / "company19.json").is_file()
         ):
