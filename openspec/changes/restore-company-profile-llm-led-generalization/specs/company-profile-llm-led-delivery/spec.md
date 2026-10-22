@@ -109,13 +109,13 @@ The system MUST account for every physical page through full-report navigation a
 - **WHEN** A authorizes the D1 replacement within the same company-profile owner
 - **THEN** a selected complete source context may directly yield evidence-linked candidates for the three views without a mandatory inventory-to-separate-synthesis stage
 - **AND** source-led omission review still uses a separate request without candidate answers or Gold, followed by comparison and verification of the candidates and their actual native dependencies; one source-review receipt may serve only the source scopes it actually covers
-- **AND** the first verified business package becomes durably queryable before later packages, while report-level usability still requires all necessary core reading, omission checks and the unchanged acceptance thresholds
+- **AND** each successful verification group becomes durably queryable before the next verification group, while report-level usability still requires all necessary core reading, omission checks and the unchanged acceptance thresholds
 - **AND** this replaces the superseded orchestration rather than adding a parallel writer or inferring real-call permission from old budget balances
 
-#### Scenario: One navigation batch selects multiple independent body packages
-- **WHEN** an early navigation result selects several body packages and the first has sufficient valid evidence for a business conclusion
-- **THEN** its synthesis, verification and authoritative persistence occur before inventorying a later independent package, without waiting for every selected package to be inventoried
-- **AND** later failures retain the earlier pending or genuinely verified claims, while major unread or unverified gaps still prevent report completeness
+#### Scenario: Core evidence spans early and late source chapters
+- **WHEN** the explicitly enabled v6 policy identifies business descriptions in an early chapter and major revenue, monetization or input evidence in a later chapter
+- **THEN** those core scopes receive reading opportunities before the owner exhausts resources inventorying and verifying supplementary details from the first page package, and company-level synthesis can use their combined source context
+- **AND** transport partitioning does not impose a separate inventory, seven-dimension synthesis and complete verification loop for every page package; unread major scopes still prevent completeness and successful verification groups are persisted before later verification groups
 
 #### Scenario: Requested necessary reading crosses a batch boundary
 - **WHEN** a model requests necessary context in more than one batch and only the first batch or a fragment has been read
@@ -184,7 +184,7 @@ The new-policy requirements MUST supersede legacy no-provider completion, fixed 
 - **THEN** its scope notice routes new work to this change and the current product/acceptance documents, without altering the historical result
 
 ### Requirement: Evidence support and report coverage are separate decisions
-Under an explicitly enabled v5 policy, the authoritative owner MUST verify actual candidate evidence units independently of report-level omission review. Only genuinely verified claims and valid dependencies may enter reliable query/export; report completeness MUST still require independent candidate-free source review, major-condition checks and necessary reading.
+Under the explicitly enabled current semantic policy, the authoritative owner MUST verify actual candidate evidence units independently of report-level omission review. Only genuinely verified claims and valid dependencies may enter reliable query/export; report completeness MUST still require independent candidate-free source review, major-condition checks and necessary reading. The v6 orchestration MUST prioritize company-level core evidence and MAY combine its support and coverage decisions into bounded verification groups without reproducing a per-page business loop.
 
 #### Scenario: Source inventory is unavailable after real candidates were saved
 - **WHEN** a source-led inventory call fails but located candidates and their full semantic context remain available
@@ -246,13 +246,23 @@ After candidate-free source discovery, the owner MUST compare major conditions w
 - **AND** verification batches retain one current state per unique claim, a later negative check retracts affected content and coverage, and a later failed batch preserves independent verified results
 - **AND** the explicitly authorized fresh experiment reuses only PDF/layout caches and valid native structured facts, rejects prior semantic inputs and does not require cross-entry semantic continuation as B1 readiness; continuation remains to be accepted before S3 if needed
 
+#### Scenario: One sourced fact supports more than one research view
+- **WHEN** a company-level source fact or operating-role statement is relevant to multiple views
+- **THEN** the views may reference the same evidence and share a support-verification group without independently regenerating and rechecking synonymous facts solely because their projection differs
+- **AND** every projected conclusion retains valid evidence and dependencies; no pending legacy candidate is promoted merely because a similar statement exists in another view
+
+#### Scenario: A company-evidence replacement experiment is explicitly authorized
+- **WHEN** A ends the exhausted twentieth-entry card and issues execution card section 38 under the user's existing execution and cost authority
+- **THEN** only that card's fresh single-entry limits apply, with local versioned budget compatibility rather than expansion of previous authorizations or global defaults
+- **AND** actual payloads and necessary downstream checks are measured under the frozen algorithm, unknown usage remains reserved, and an incomplete or exhausted run does not authorize another entry, short slice, company or production use
+
 #### Scenario: An explicitly authorized company task continues across work windows
 - **WHEN** the current card has obtained explicit authority for a finite number of work windows and a cumulative company budget
 - **THEN** existing checkpoints continue only unfinished work under the same frozen identity while preserving cumulative charges, unknown reservations and consumed recoveries
 - **AND** exhausting a company limit stops the task, pending authorization creates no real attempt, and a result requiring expanded development resources does not establish ordinary single-window resource acceptance or authorize another company
 
 ### Requirement: Progressive delivery isolates temporary failures
-The company-profile owner MUST scope a transient provider or navigation failure to its current logical request and dependent evidence. A source that is temporarily failed MUST remain eligible for a later independent logical request when the existing pool health and authentication policy allow it; one historical failure MUST NOT permanently blacklist that source for the whole task. The owner MUST persist each valid non-empty candidate and verified batch before starting an independent later batch, so later failure cannot erase unrelated reliable results. Company completeness MUST remain false while a necessary major scope is unread or unverified.
+The company-profile owner MUST scope a transient provider or navigation failure to its current logical request and dependent evidence. A source that is temporarily failed MUST remain eligible for a later independent logical request when the existing pool health and authentication policy allow it; one historical failure MUST NOT permanently blacklist that source for the whole task. The owner MUST persist each valid non-empty synthesis result and verified group before starting the next corresponding synthesis or verification group, so later failure cannot erase unrelated reliable results. This persistence rule MUST NOT force an inventory-to-verification cycle for each source transport package. Company completeness MUST remain false while a necessary major scope is unread or unverified.
 
 #### Scenario: A later logical request can reuse a recovered source
 - **WHEN** a source has succeeded earlier, then has a transient request failure, and a later independent logical request starts while the source is healthy under the existing pool policy
