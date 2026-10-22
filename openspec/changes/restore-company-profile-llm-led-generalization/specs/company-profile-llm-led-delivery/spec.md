@@ -1,4 +1,4 @@
-Current policy: product contract v7, acceptance section 7.36 and execution card section 41 govern new execution. Company-wide synthesis is a semantic responsibility, not a single-HTTP-request constraint. Earlier strategy-specific sequencing, mandatory full rereading after code changes and resume prohibitions apply only to their frozen historical cards. Only the explicitly authorized development continuation of company25 source-discovery receipts is permitted; historical inputs, failures, charges and scores remain unchanged.
+Current policy: the user's 2026-10-22 correction, acceptance section 7.37 and revised execution card section 41 govern development. Produce and persist a readable real-LLM three-view draft first, verify and correct its content next, then optimize cost. The earlier unused single-entry/resource caps and full-verification-chain readiness prerequisite are superseded; B may adjust isolated task resources for continuous development of the same company using the existing pool. Prior inputs, failures, charges and scores remain unchanged; a pending draft is not an accepted company or trusted output.
 
 ## ADDED Requirements
 
@@ -105,20 +105,25 @@ The current v7 policy MUST give every readable source range a bounded, candidate
 
 #### Scenario: Accumulated source conditions exceed a single synthesis request
 - **WHEN** the actual company-wide source conditions and necessary evidence exceed either the physical payload-byte limit or the reservation limit
-- **THEN** the authoritative owner uses a compact source-derived company index and a finite set of cross-chapter business evidence groups for generation, preserving necessary context and a disposition for every major condition
-- **AND** actual client serialization MUST satisfy bytes, requested output and reservation limits together; fitting reservation alone, keeping only the first package or silently dropping major conditions MUST NOT admit the request
-- **AND** generated targets are repacked for nonempty support and coverage verification, successful groups are persisted immediately, and company-level completeness remains dependent on substantive major-business coverage
+- **THEN** the authoritative owner adjusts the isolated development reservation or groups cross-chapter business evidence to fit actual service capabilities, preserving necessary context and major content
+- **AND** self-imposed payload or reservation projections MUST NOT alone prevent producing a draft under the user's current resource authorization; keeping only the first package or silently dropping major conditions is not a substitute
+- **AND** each real draft is persisted immediately with pending status and readable text before subsequent support and coverage verification; company usability still requires substantive major-business coverage and the unchanged quality thresholds
 
 #### Scenario: A local payload rejection is found after valid full-text discovery
 - **WHEN** the A card explicitly authorizes development continuation of identified same-report real source-discovery receipts after a terminal packaging change
 - **THEN** the entry reloads persistent JSON and revalidates source identity, original sent ranges, evidence location, necessary context and version lineage before genuinely generating and verifying new claims
 - **AND** unchanged successful discovery is not repeated over the whole report, raw conditions are not promoted to verified claims, earlier answers are not mixed in, and historical attempts and unknown charges remain unchanged
-- **AND** the continuation is not a new first-run evaluation and requires its own explicit finite entry and resource authorization rather than permission inferred from unused balance
+- **AND** the continuation is not a new first-run evaluation and uses the user's explicit current-task authorization rather than permission inferred from unused balance
 
 #### Scenario: Readiness is tested against only a small source fragment
 - **WHEN** a readiness plan uses the first source fragment, one synthetic verification target or simulated low usage instead of the actual accumulated company source conditions
 - **THEN** it does not establish readiness for a real company run
-- **AND** readiness evidence MUST cover persistent entry loading, all actual generation groups, nonempty verification, physical payload admission, authorized recovery reserve and query/export/fresh-reader delivery; simulations remain protocol evidence only
+- **AND** the first draft needs only the directly necessary input/send/pending-persistence checks; complete verification-chain readiness and projected recovery reserves MUST NOT postpone the first real answer, while simulations remain protocol evidence only
+
+#### Scenario: Verification has not completed after a real draft was generated
+- **WHEN** a real-LLM draft contains three-view text and source references but support verification is pending or fails
+- **THEN** query and export preserve the readable draft with pending or unclear status and specific limitations rather than replacing it with empty views or a generic workflow message
+- **AND** only genuinely verified content enters trusted projections; known errors are isolated or corrected, draft delivery does not count as company acceptance, and cost optimization follows content review
 
 #### Scenario: A verified compound claim contains an unsupported relationship
 - **WHEN** source review establishes an operating right but cannot support an added upstream relationship in the same claim
