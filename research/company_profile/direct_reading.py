@@ -789,6 +789,20 @@ def interpret_direct_core(
                 )
                 continue
             observable.append(claim)
+        observable.sort(
+            key=lambda claim: (
+                {
+                    "principal_business": 0,
+                    "revenue_model": 1,
+                    "products_services": 2,
+                    "input_exposure": 3,
+                    "supply_chain_role": 4,
+                    "upstream_downstream": 5,
+                    "output_exposure": 6,
+                }.get(claim.dimension, 50),
+                claim.claim_id,
+            )
+        )
         def measure(group, conditions):
             related = related_records(group)
             pages = pages_for([*group, *conditions, *related])
@@ -797,27 +811,7 @@ def interpret_direct_core(
             )
             return units, pages, related
 
-        def split_group(group, conditions):
-            if measure(group, list(conditions))[0] <= limit:
-                return [(group, list(conditions))]
-            pieces = []
-            bucket: list = []
-            for condition in conditions:
-                if measure(group, bucket + [condition])[0] <= limit:
-                    bucket.append(condition)
-                    continue
-                if bucket:
-                    pieces.append((group, bucket))
-                if measure(group, [condition])[0] > limit:
-                    gaps.append(f"major_condition_not_verified:{condition.condition_id}")
-                    bucket = []
-                else:
-                    bucket = [condition]
-            if bucket or not conditions:
-                pieces.append((group, bucket))
-            return pieces
-
-        batches: list[tuple[list, list]] = []
+        support_groups: list[list] = []
         pending_claims: list = []
         current: list = []
         for claim in observable:
@@ -825,44 +819,35 @@ def interpret_direct_core(
                 pending_claims.append(claim)
                 continue
             trial = current + [claim]
-            if measure(trial, list(package_conditions))[0] <= limit:
+            if current and measure(trial, [])[0] > limit:
+                support_groups.append(current)
+                current = [claim]
+            else:
                 current = trial
-                continue
-            if current and measure(current, list(package_conditions))[0] <= limit:
-                batches.append((current, list(package_conditions)))
-                current = [claim]
-                continue
-            if current:
-                batches.extend(split_group(current, package_conditions))
-                current = [claim]
-                continue
-            bucket: list = []
-            for condition in package_conditions:
-                if measure([claim], bucket + [condition])[0] <= limit:
-                    bucket.append(condition)
-                    continue
-                if bucket:
-                    batches.append(([claim], bucket))
-                if measure([claim], [condition])[0] > limit:
-                    gaps.append(f"major_condition_not_verified:{condition.condition_id}")
-                    bucket = []
-                else:
-                    bucket = [condition]
-            if bucket or not package_conditions:
-                batches.append(([claim], bucket))
-            current = []
         if current:
-            batches.extend(split_group(current, package_conditions))
-        for claim in pending_claims:
-            keep_pending(claim, "verify_unit_not_admitted")
-            publish()
-        for group, sent_conditions in batches:
-            units, pages, related = measure(group, sent_conditions)
+            support_groups.append(current)
+        sent_conditions: set[str] = set()
+
+        def attach(group, pool):
+            chosen = []
+            for condition in pool:
+                if condition.condition_id in sent_conditions:
+                    continue
+                if measure(group, chosen + [condition])[0] <= limit:
+                    chosen.append(condition)
+            return chosen
+
+        def send(group, sent, *, support: bool) -> bool:
+            units, pages, related = measure(group, sent)
             if units > limit or not pages:
-                for claim in group:
-                    keep_pending(claim, "verify_unit_not_admitted")
-                publish()
-                continue
+                if support:
+                    for claim in group:
+                        keep_pending(claim, "verify_unit_not_admitted")
+                    publish()
+                else:
+                    for condition in sent:
+                        gaps.append(f"major_condition_not_verified:{condition.condition_id}")
+                return False
             try:
                 verified = invoke(
                     "verify_views",
@@ -873,19 +858,33 @@ def interpret_direct_core(
                     extra={
                         "claims": tuple(group),
                         "records": related,
-                        "source_conditions": tuple(sent_conditions),
+                        "source_conditions": tuple(sent),
                     },
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
                 gaps.append(f"direct_core_verify_stopped:{exc}")
-                for claim in group:
-                    keep_pending(claim, "claim_pending")
+                if support:
+                    for claim in group:
+                        keep_pending(claim, "claim_pending")
                 publish()
-                if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
-                    return
-                continue
-            apply_verdict(group, verified, pages)
-            retract_rejected(group, verified)
+                return False
+            if support:
+                apply_verdict(group, verified, pages)
+                retract_rejected(group, verified)
+            else:
+                blocked = {
+                    item.target_id
+                    for item in verified.checks
+                    if item.target_type == "claim" and item.status != "pass"
+                }
+                if blocked:
+                    retract_rejected(
+                        [claim for claim in group if claim.claim_id in blocked],
+                        verified,
+                    )
+                checks.extend(
+                    item for item in verified.checks if item.target_type == "condition"
+                )
             checks[:] = [
                 check
                 for check in checks
@@ -901,9 +900,46 @@ def interpret_direct_core(
             ]
             for page in pages:
                 by_page[int(page["page"])]["status"] = "read"
+            for condition in sent:
+                sent_conditions.add(condition.condition_id)
             publish()
-            if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
-                return
+            return True
+
+        for claim in pending_claims:
+            keep_pending(claim, "verify_unit_not_admitted")
+            publish()
+        for group in support_groups:
+            if not send(group, attach(group, package_conditions), support=True):
+                if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
+                    return
+        remaining = [
+            condition
+            for condition in package_conditions
+            if condition.condition_id not in sent_conditions
+        ]
+        by_dimension: dict[str, list] = {}
+        for condition in remaining:
+            by_dimension.setdefault(condition.dimension, []).append(condition)
+        for dimension, group in by_dimension.items():
+            related = [claim for claim in observable if claim.dimension == dimension]
+            bucket = []
+            for condition in group:
+                if measure(related, bucket + [condition])[0] <= limit:
+                    bucket.append(condition)
+                    continue
+                gaps.append(f"major_condition_not_verified:{condition.condition_id}")
+                sent_conditions.add(condition.condition_id)
+            if not bucket:
+                continue
+            if not send(related, bucket, support=False):
+                if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
+                    return
+                for condition in bucket:
+                    if condition.condition_id not in sent_conditions:
+                        gaps.append(
+                            f"major_condition_not_verified:{condition.condition_id}"
+                        )
+                        sent_conditions.add(condition.condition_id)
 
     def report_gap(page_ids) -> None:
         by_id = {int(page["page"]): page for page in sources}

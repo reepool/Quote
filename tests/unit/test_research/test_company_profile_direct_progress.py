@@ -757,3 +757,157 @@ def test_the_first_package_is_persisted_before_the_second_package_is_inventoried
     assert any(item.claim_id == "package-1" and item.status == "observed" for item in failed.claims)
     assert any("second-package-inventory-failed" in gap for gap in failed.gaps)
     assert failed.draft_complete is False
+
+
+def test_company19_candidates_are_verified_once_and_roles_are_included():
+    """Offline replay of the real 7 claims and 15 conditions. Not a company score."""
+    import gzip
+    import json
+    from pathlib import Path
+
+    from research.company_profile.contracts import ReportSourceCondition, ReportViewClaim
+    from research.company_profile.direct_reading import interpret_direct_core
+
+    root = Path("/home/python/Quote")
+    evidence = root / (
+        "openspec/changes/restore-company-profile-llm-led-generalization/"
+        "b1-company19-evidence/query.json"
+    )
+    checkpoint = root / (
+        "openspec/changes/restore-company-profile-llm-led-generalization/"
+        "b1-resource-evidence/iteration2/checkpoint.json.gz"
+    )
+    query = json.loads(evidence.read_text())
+    receipts = query["profiles"][0]["three_views"]["call_receipts"]
+    synthesized = next(
+        item["response_payload"]["claims"]
+        for item in receipts
+        if item.get("purpose") == "synthesize_views"
+    )
+    conditions = next(
+        item["response_payload"]["source_conditions"]
+        for item in receipts
+        if item.get("purpose") == "source_inventory" and item.get("source_scope") != "page_map"
+    )
+    assert len(synthesized) == 7
+    assert len(conditions) == 15
+    saved_claims = tuple(
+        ReportViewClaim.model_validate_json(json.dumps(item, ensure_ascii=False))
+        for item in synthesized
+    )
+    saved_conditions = tuple(
+        ReportSourceCondition.model_validate_json(json.dumps(item, ensure_ascii=False))
+        for item in conditions
+    )
+    report = _report()
+    report = report.model_copy(update={"instrument_id": "600037.SH"})
+    # The saved claims cite the real report identity. Use that identity.
+    report = saved_claims[0].evidence[0].report
+    pages = []
+    payload = json.loads(gzip.decompress(checkpoint.read_bytes()))
+    for page in payload["pages"]:
+        if int(page["page"]) in {15, 16, 17, 18, 19}:
+            pages.append(
+                {
+                    "page": int(page["page"]),
+                    "text": str(page.get("text") or ""),
+                    "readable": True,
+                }
+            )
+    seen = []
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=tuple(
+                        int(page["page"])
+                        for page in request.source_pages
+                        if int(page["page"]) in {15, 16, 17, 18, 19}
+                    ),
+                )
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=saved_conditions,
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=saved_claims,
+                )
+            seen.append(request)
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "claim",
+                        "target_id": claim.claim_id,
+                        "status": "pass",
+                        "explanation": "离线",
+                    }
+                    for claim in request.claims
+                )
+                + tuple(
+                    {
+                        "target_type": "condition",
+                        "target_id": condition.condition_id,
+                        "status": "pass",
+                        "covers_target_type": "claim",
+                        "covers_target_id": next(
+                            (
+                                claim.claim_id
+                                for claim in request.claims
+                                if claim.dimension == condition.dimension
+                            ),
+                            request.claims[0].claim_id if request.claims else "",
+                        ),
+                        "explanation": "离线",
+                    }
+                    for condition in request.source_conditions
+                    if request.claims
+                ),
+            )
+
+    result = interpret_direct_core(
+        report=report,
+        pages=pages,
+        processing_identity=direct_core_processing_identity(),
+        provider=_Provider(),
+        work_id="company19-replay",
+        token_budget=120_000,
+        started_at=0,
+    )
+    claim_hits = {}
+    condition_hits = {}
+    for request in seen:
+        for claim in request.claims:
+            claim_hits[claim.claim_id] = claim_hits.get(claim.claim_id, 0) + 1
+        for condition in request.source_conditions:
+            key = condition.condition_id.split(":")[-1]
+            condition_hits[key] = condition_hits.get(key, 0) + 1
+    assert len(seen) <= 6
+    assert set(claim_hits) == {claim.claim_id for claim in saved_claims}
+    assert max(claim_hits.values()) <= 2
+    assert all(count == 1 for count in condition_hits.values())
+    missing = [
+        condition.condition_id
+        for condition in saved_conditions
+        if condition.condition_id not in condition_hits
+    ]
+    assert all(any(condition_id in gap for gap in result.gaps) for condition_id in missing)
+    assert len(condition_hits) + len(missing) == 15
+    for claim_id in (
+        "claim_output_exposure_1",
+        "claim_input_exposure_1",
+        "claim_supply_chain_role_1",
+        "claim_upstream_downstream_1",
+    ):
+        assert any(claim.claim_id == claim_id and claim.status == "observed" for claim in result.claims)

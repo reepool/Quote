@@ -430,7 +430,7 @@ def validate_binding(
     elapsed = binding["max_elapsed_seconds"]
     auth = binding.get("run_authorization")
     if auth == "company_profile_company_core.2026-10-21":
-        allowed = 0 < elapsed <= 1800
+        allowed = 0 < elapsed <= 2400
     elif auth == "company_profile_repair.2026-10-21":
         allowed = 0 < elapsed <= 1314
     elif auth == "company_profile_f1.2026-10-20":
@@ -654,12 +654,12 @@ def _worker(
         recovery_policy=(
             LogicalRecoveryPolicy(
                 max_recoveries=(
-                    4
+                    6
                     if binding.get("run_authorization")
-                    in {
-                        "company_profile_repair.2026-10-21",
-                        "company_profile_company_core.2026-10-21",
-                    }
+                    == "company_profile_company_core.2026-10-21"
+                    else 4
+                    if binding.get("run_authorization")
+                    == "company_profile_repair.2026-10-21"
                     else min(2, int(binding.get("max_recoveries", 2)))
                     if binding.get("reading_strategy") == "direct_core_v1"
                     else int(binding.get("max_recoveries", 4))

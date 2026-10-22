@@ -309,9 +309,9 @@ def test_e2_budget_is_separate_from_the_e1_authorization():
     LlmRunBudget(
         deadline=time.monotonic() + 30,
         prices={},
-        max_tokens=300_000,
-        max_requests=32,
-        max_cost_cny=Decimal(30),
+        max_tokens=400_000,
+        max_requests=40,
+        max_cost_cny=Decimal(50),
         billing_mode=DEVELOPMENT_UNPRICED_BILLING,
         run_authorization="company_profile_company_core.2026-10-21",
     )
