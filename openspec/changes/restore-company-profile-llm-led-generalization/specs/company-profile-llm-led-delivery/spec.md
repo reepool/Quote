@@ -251,6 +251,26 @@ After candidate-free source discovery, the owner MUST compare major conditions w
 - **THEN** the views may reference the same evidence and share a support-verification group without independently regenerating and rechecking synonymous facts solely because their projection differs
 - **AND** every projected conclusion retains valid evidence and dependencies; no pending legacy candidate is promoted merely because a similar statement exists in another view
 
+#### Scenario: Transport packages feed one company-level synthesis
+- **WHEN** early business descriptions and later monetization, revenue or input evidence require several source transport packages
+- **THEN** company-view synthesis receives their collected source-linked core evidence and necessary qualifiers, rather than merely concatenating independently generated package answers
+- **AND** different sourced business claims that share a model-local claim ID remain distinct with correct verification-reference mappings; only genuinely equivalent content may be explicitly merged, and conflicts cannot be silently overwritten
+
+#### Scenario: Reservation fits but the physical payload is oversized
+- **WHEN** a request fits its combined reservation allowance but its fully serialized client payload exceeds the card's separate byte or output limit
+- **THEN** it is repacked before transmission using source and evidence boundaries, preserving necessary context and all actual targets, and every resulting request is checked against all applicable limits and provider framing
+- **AND** a local oversized-package refusal does not poison the cumulative budget for otherwise admissible requests; actual cumulative budget, deadline, recovery and permission exhaustion still stop further transmission, with unknown usage retained
+
+#### Scenario: Card-specific physical timeouts share a public client
+- **WHEN** a company development card requires a per-attempt timeout cap
+- **THEN** the cap is enabled only by the explicit card binding or request metadata, without changing unrelated routed requests' existing deadline allocation merely because their logical timeout is at least 180 seconds
+
+#### Scenario: A explicitly reallocates unused company-evidence resources
+- **WHEN** A ends section 38 after entry 21 and issues section 39 under the user's existing execution authority
+- **THEN** only entries company22 and at most one root-cause-remedied company23 share the explicitly reallocated unused ledger, wall time, physical requests and recoveries, without increasing the phase ceiling or resetting prior charges
+- **AND** only entry 21 navigation may be reused after source and semantic compatibility validation; prior business conditions, drafts and verification results are excluded, and each final-version business result receives genuine reading and verification
+- **AND** prior failures remain immutable, actual and unknown usage remain charged, and an incomplete result authorizes neither another entry, another company nor production
+
 #### Scenario: A company-evidence replacement experiment is explicitly authorized
 - **WHEN** A ends the exhausted twentieth-entry card and issues execution card section 38 under the user's existing execution and cost authority
 - **THEN** only that card's fresh single-entry limits apply, with local versioned budget compatibility rather than expansion of previous authorizations or global defaults
