@@ -123,12 +123,15 @@ class LlmRunBudget:
         run_authorization: str | None = None,
     ):
         authorized_evidence = run_authorization == "company_profile_company_evidence.2026-10-22"
+        authorized_fulltext = run_authorization == "company_profile_fulltext_core.2026-10-22"
         authorized_company = run_authorization == "company_profile_company_core.2026-10-21"
         authorized_repair = run_authorization == "company_profile_repair.2026-10-21"
         authorized_f1 = run_authorization == "company_profile_f1.2026-10-20"
         authorized_e2 = run_authorization == "company_profile_e2.2026-10-20"
         authorized_e1 = run_authorization == "company_profile_e1.2026-10-20"
-        if authorized_evidence:
+        if authorized_fulltext:
+            token_cap, request_cap, cost_cap = 2_000_000, 64, Decimal(100)
+        elif authorized_evidence:
             token_cap, request_cap, cost_cap = 400_000, 24, Decimal(50)
         elif authorized_company:
             token_cap, request_cap, cost_cap = 400_000, 40, Decimal(50)
@@ -245,7 +248,11 @@ class LlmRunBudget:
             context_exceeded = priced and tokens > price.context_tokens
             payload_limit = (
                 60_000
-                if self.run_authorization == "company_profile_company_evidence.2026-10-22"
+                if self.run_authorization
+                in {
+                    "company_profile_company_evidence.2026-10-22",
+                    "company_profile_fulltext_core.2026-10-22",
+                }
                 else DEVELOPMENT_PAYLOAD_BYTE_LIMIT
             )
             payload_exceeded = self.billing_mode == DEVELOPMENT_UNPRICED_BILLING and (

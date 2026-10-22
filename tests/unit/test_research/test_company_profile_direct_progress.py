@@ -12,9 +12,7 @@ from tests.unit.test_research.test_company_profile_llm_led import (
 )
 
 
-def test_a_navigation_batch_is_read_before_the_next_batch_is_sent():
-    from research.company_profile import direct_reading
-
+def test_a_failed_slice_does_not_drop_an_earlier_reading():
     report = _report()
     text = "公司经营有线电视网络传输，并向用户提供接入服务。"
     quote = text[:12]
@@ -23,14 +21,9 @@ def test_a_navigation_batch_is_read_before_the_next_batch_is_sent():
         offline_only = True
 
         def interpret(self, request):
-            if request.source_scope == "page_map" and request.source_pages[0]["page"] == 2:
-                raise ValueError("later-navigation-failed")
-            if request.source_scope == "page_map":
-                return ReportSemanticResponseV3(
-                    request_id=request.request_id,
-                    purpose=request.purpose,
-                    requested_pages=(1,),
-                )
+            pages = tuple(int(page["page"]) for page in request.source_pages)
+            if request.purpose == "source_inventory" and 2 in pages and 1 not in pages:
+                raise ValueError("later-slice-failed")
             if request.purpose == "synthesize_views":
                 return ReportSemanticResponseV3(
                     request_id=request.request_id,
@@ -67,14 +60,24 @@ def test_a_navigation_batch_is_read_before_the_next_batch_is_sent():
                 ),
             )
 
-    def batches(pages, report, identity, limit):
+    from research.company_profile import direct_reading
+
+    def slices(pages, report, identity, limit):
         return [
-            [{"page": page["page"], "text": "目录 业务", "readable": True}]
+            [
+                {
+                    "page": page["page"],
+                    "text": page["text"],
+                    "readable": True,
+                    "offset": 0,
+                    "scope": "full_page",
+                }
+            ]
             for page in pages
         ]
 
-    original = direct_reading.navigation_batches
-    direct_reading.navigation_batches = batches
+    original = direct_reading.source_discovery_slices
+    direct_reading.source_discovery_slices = slices
     try:
         result = _run(
             _Provider(),
@@ -86,12 +89,12 @@ def test_a_navigation_batch_is_read_before_the_next_batch_is_sent():
             report=report,
         )
     finally:
-        direct_reading.navigation_batches = original
-    assert result.call_receipts[0]["source_scope"] == "page_map"
+        direct_reading.source_discovery_slices = original
+    assert any(item["purpose"] == "source_inventory" for item in result.call_receipts)
     assert any(item["purpose"] == "synthesize_views" for item in result.call_receipts)
-    assert result.call_receipts[0]["purpose"] == "source_inventory"
     assert any(item.status == "observed" for item in result.claims)
-    assert any("later-navigation-failed" in gap for gap in result.gaps)
+    assert any("later-slice-failed" in gap for gap in result.gaps)
+    assert any(gap == "necessary_unread:2" for gap in result.gaps)
 
 
 def test_failed_source_review_is_not_projected_as_verified():
@@ -1039,3 +1042,289 @@ def test_company19_candidates_are_verified_once_and_roles_are_included():
         "claim_upstream_downstream_1",
     ):
         assert any(claim.claim_id == claim_id and claim.status == "observed" for claim in result.claims)
+
+
+def test_navigation_does_not_decide_which_body_is_read():
+    report = _report()
+    seen = []
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            pages = tuple(int(page["page"]) for page in request.source_pages)
+            seen.append((request.purpose, request.source_scope, pages))
+            if request.purpose == "source_inventory":
+                assert not request.claims
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="fee",
+                            dimension="revenue_model",
+                            status="observed",
+                            answer="按合同期限确认收看维护费。",
+                            evidence=(
+                                _evidence(
+                                    report,
+                                    text="按合同期限确认收看维护费",
+                                    page=116,
+                                ).model_copy(update={"evidence_id": "fee-evidence"}),
+                            ),
+                        ),
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=(
+                    {
+                        "target_type": "claim",
+                        "target_id": "fee",
+                        "status": "pass",
+                        "explanation": "整句有引文。",
+                    },
+                ),
+            )
+
+    result = _run(
+        _Provider(),
+        pages=(
+            {"page": 1, "text": "公司经营有线电视网络。", "readable": True},
+            {"page": 116, "text": "公司按合同期限确认收看维护费。", "readable": True},
+        ),
+        processing_identity=direct_core_processing_identity(),
+        report=report,
+    )
+    inventoried = {
+        page
+        for purpose, _scope, pages in seen
+        if purpose == "source_inventory"
+        for page in pages
+    }
+    assert {1, 116} <= inventoried
+    assert all(scope != "page_map" for _purpose, scope, _pages in seen)
+    assert any(item.claim_id == "fee" and item.status == "observed" for item in result.claims)
+
+
+def test_an_unclear_composite_claim_is_not_reliable():
+    report = _report()
+    text = "在北京市拥有有线电视网络的经营权。"
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="role",
+                            dimension="supply_chain_role",
+                            status="observed",
+                            answer="公司拥有网络经营权，并连接上游节目内容与网络设备资源。",
+                            evidence=(
+                                _evidence(report, text=text, page=1).model_copy(
+                                    update={"evidence_id": "role-evidence"}
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+            if request.purpose == "verify_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    checks=(
+                        {
+                            "target_type": "claim",
+                            "target_id": "role",
+                            "status": "unclear",
+                            "explanation": "经营权有引文，上游关系没有引文。",
+                        },
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+            )
+
+    result = _run(
+        _Provider(),
+        pages=({"page": 1, "text": text, "readable": True},),
+        processing_identity=direct_core_processing_identity(),
+        report=report,
+    )
+    rendered = research_views(result)
+    claim = rendered["views"]["supply_chain_position"]["claims"][0]
+    assert claim["review_state"] != "verified"
+    assert claim["status"] == "unclear"
+
+
+def test_synthesis_keeps_the_conditions_that_fit_the_reservation():
+    from research.company_profile import direct_reading
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    text = "公司经营有线电视网络，并按合同期限确认收看维护费。"
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=(
+                        ReportSourceCondition(
+                            condition_id="business",
+                            dimension="principal_business",
+                            description="经营有线电视网络。",
+                            evidence=(_evidence(report, text="公司经营有线电视网络", page=1),),
+                            major=True,
+                            statement_status="current",
+                        ),
+                        ReportSourceCondition(
+                            condition_id="fee",
+                            dimension="revenue_model",
+                            description="按合同期限确认收看维护费。",
+                            evidence=(_evidence(report, text="按合同期限确认收看维护费", page=1),),
+                            major=True,
+                            statement_status="current",
+                        ),
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                assert len(request.source_conditions) == 1
+                assert request.source_conditions[0].condition_id.endswith("business")
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="business-claim",
+                            dimension="principal_business",
+                            status="observed",
+                            answer="公司经营有线电视网络。",
+                            evidence=(
+                                _evidence(report, text="公司经营有线电视网络", page=1).model_copy(
+                                    update={"evidence_id": "business-evidence"}
+                                ),
+                            ),
+                            condition_ids=("business",),
+                        ),
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=(
+                    {
+                        "target_type": "claim",
+                        "target_id": "business-claim",
+                        "status": "pass",
+                        "explanation": "整句有引文。",
+                    },
+                ),
+            )
+
+    def sized(request):
+        if request.purpose == "synthesize_views" and len(request.source_conditions) >= 2:
+            return 10**9
+        return 100
+
+    identity = direct_core_processing_identity()
+    identity["request_reservation_limit"] = 65_536
+    original = direct_reading.request_reservation
+    direct_reading.request_reservation = sized
+    try:
+        result = _run(
+            _Provider(),
+            pages=({"page": 1, "text": text, "readable": True},),
+            processing_identity=identity,
+            report=report,
+        )
+    finally:
+        direct_reading.request_reservation = original
+    assert any(item.claim_id == "business-claim" for item in result.claims)
+    assert any("major_condition_not_in_synthesis:" in gap and gap.endswith("fee") for gap in result.gaps)
+
+
+def test_logical_identity_separates_entries_and_verification_targets():
+    from research.company_profile.stage5_provider import _logical_report_request_id
+    from utils.llm.budget import LogicalRecoveryPolicy, _recovery_block
+
+    page = {"page": 12, "text": "公司经营有线电视网络。", "offset": 0, "scope": "full_page"}
+    base = {
+        "purpose": "verify_views",
+        "source_scope": "full_context",
+        "reading_strategy": "direct_core_v1",
+        "source_pages": [page],
+    }
+    first = _logical_report_request_id({**base, "logical_entry_id": "company24", "logical_targets": ["role"]})
+    same = _logical_report_request_id({**base, "logical_entry_id": "company24", "logical_targets": ["role"]})
+    other_entry = _logical_report_request_id(
+        {**base, "logical_entry_id": "company25", "logical_targets": ["role"]}
+    )
+    other_target = _logical_report_request_id(
+        {**base, "logical_entry_id": "company24", "logical_targets": ["fee"]}
+    )
+    assert first == same
+    assert len({first, other_entry, other_target}) == 3
+    policy = LogicalRecoveryPolicy(max_recoveries=1, max_per_logical_request=1)
+    history = [{"logical_request_id": first}, {"logical_request_id": first}]
+    assert _recovery_block(history, first, policy) is not None
+    assert _recovery_block(history, other_target, policy) is None
+
+
+def test_full_report_slices_fit_one_entry():
+    import gzip
+    import json
+    from pathlib import Path
+
+    from research.company_profile.direct_reading import fulltext_entry_plan
+    from research.company_profile.models import ReportIdentity
+
+    checkpoint = json.loads(
+        gzip.decompress(
+            (
+                Path("/home/python/Quote")
+                / "openspec/changes/restore-company-profile-llm-led-generalization/b1-resource-evidence/iteration2/checkpoint.json.gz"
+            ).read_bytes()
+        )
+    )
+    pages = [
+        {
+            "page": int(page["page"]),
+            "text": str(page.get("text") or ""),
+            "readable": bool(str(page.get("text") or "").strip()),
+        }
+        for page in checkpoint["pages"]
+    ]
+    report = ReportIdentity.model_validate(checkpoint["report"])
+    identity = direct_core_processing_identity()
+    identity["max_payload_utf8_bytes"] = 60_000
+    identity["request_reservation_limit"] = 65_536
+    identity["logical_request_timeout_seconds"] = 300
+    identity["logical_entry_id"] = "company24"
+    plan = fulltext_entry_plan(
+        pages,
+        report,
+        identity,
+        ledger=1_200_000,
+        reservation_limit=65_536,
+        request_cap=36,
+    )
+    assert plan["readable_pages"]
+    assert set(plan["readable_pages"]) <= set(plan["covered_pages"])
+    assert plan["fits_entry"]
+    assert max(plan["source_units"]) <= 65_536

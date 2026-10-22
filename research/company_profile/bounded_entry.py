@@ -429,7 +429,13 @@ def validate_binding(
         raise ValueError("frozen PDF hash mismatch")
     elapsed = binding["max_elapsed_seconds"]
     auth = binding.get("run_authorization")
-    if auth == "company_profile_company_evidence.2026-10-22":
+    if auth == "company_profile_fulltext_core.2026-10-22":
+        allowed = (
+            0 < elapsed <= 3600
+            and int(binding.get("max_tokens") or 0) <= 1_200_000
+            and int(binding.get("max_physical_requests") or 0) <= 36
+        )
+    elif auth == "company_profile_company_evidence.2026-10-22":
         allowed = 0 < elapsed <= 2400
     elif auth == "company_profile_company_core.2026-10-21":
         allowed = 0 < elapsed <= 2400
@@ -475,6 +481,8 @@ def validate_binding(
                 "company21",
                 "company22",
                 "company23",
+                "company24",
+                "company25",
             }
             or not authorization.get("approval_reference")
         ):
@@ -659,7 +667,14 @@ def _worker(
         recovery_policy=(
             LogicalRecoveryPolicy(
                 max_recoveries=(
-                    4
+                    min(
+                        12,
+                        logical_recovery_count(prior_attempts)
+                        + min(6, int(binding.get("max_recoveries", 6))),
+                    )
+                    if binding.get("run_authorization")
+                    == "company_profile_fulltext_core.2026-10-22"
+                    else 4
                     if binding.get("run_authorization")
                     == "company_profile_company_evidence.2026-10-22"
                     else 6
@@ -926,6 +941,8 @@ def _worker(
             )
         if binding.get("max_payload_utf8_bytes"):
             identity["max_payload_utf8_bytes"] = int(binding["max_payload_utf8_bytes"])
+        if authorization:
+            identity["logical_entry_id"] = str(authorization.get("attempt") or "")
         identity["protect_tail"] = not bool(
             binding.get("defer_tail_to_next_window")
         )
@@ -1095,6 +1112,7 @@ def main() -> int:
         binding.get("reading_strategy") == "direct_core_v1"
         and args.worker_deadline is None
         and not binding.get("accepted_navigation_query")
+        and binding.get("run_authorization") != "company_profile_fulltext_core.2026-10-22"
     ):
         direct_plan = preflight_direct_core(binding)
     else:
@@ -1175,6 +1193,10 @@ def main() -> int:
             (attempts / "company22.json").is_file()
         ):
             raise ValueError("company23 requires the protected company22 marker")
+        if authorization["attempt"] == "company25" and not (
+            (attempts / "company24.json").is_file()
+        ):
+            raise ValueError("company25 requires the protected company24 marker")
         if authorization["attempt"] == "company20" and not (
             (attempts / "company19.json").is_file()
         ):

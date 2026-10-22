@@ -71,6 +71,8 @@ def _logical_report_request_id(payload: Mapping[str, Any]) -> str:
             "purpose": payload.get("purpose"),
             "source_scope": payload.get("source_scope"),
             "reading_strategy": payload.get("reading_strategy"),
+            "logical_entry_id": payload.get("logical_entry_id") or "",
+            "logical_targets": payload.get("logical_targets") or [],
             "pages": pages,
         },
         ensure_ascii=False,
@@ -4181,11 +4183,25 @@ class CommonGatewaySemanticProvider:
                     "reading_strategy": request.processing_identity.get(
                         "reading_strategy"
                     ),
+                    "discovery_scope": request.processing_identity.get(
+                        "discovery_scope"
+                    ),
                     "max_route_attempts": request.processing_identity.get(
                         "max_route_attempts"
                     ),
                     "max_physical_attempt_seconds": request.processing_identity.get(
                         "max_physical_attempt_seconds"
+                    ),
+                    "logical_entry_id": str(
+                        request.processing_identity.get("logical_entry_id") or ""
+                    ),
+                    "logical_targets": (
+                        sorted(
+                            [claim.claim_id for claim in request.claims]
+                            + [item.condition_id for item in request.source_conditions]
+                        )
+                        if request.purpose == "verify_views"
+                        else []
                     ),
                 },
                 response_model=ReportSemanticResponseV3,
@@ -4398,6 +4414,9 @@ class CommonGatewaySemanticProvider:
                         "timeout_seconds",
                         "partial_slice",
                         "reading_strategy",
+                        "discovery_scope",
+                        "logical_entry_id",
+                        "logical_targets",
                     }
                 }, ensure_ascii=False, separators=(",", ":")
             )

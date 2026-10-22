@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-22，[A审核§83](#83-a审核7bc37ec2结束选页方案改为全文核心读源)）：第22/23次分列且均非可用公司，§39及旧余额关闭。第22次9条程序已核中角色对象无支持，A可确认3/19、负例完成3/6；第23次7条全待核，核验0，不拼成绩。唯一活动[执行卡§40](b1-execution-card.md#40-b1替代方案全文分片读源后统一公司交付)新增v7全文核心读源任务，最多company24＋一次company25，不是旧方案自动续跑；资源验收§7.35。观察1/4、可用0/4，生产not_authorized、规模false；原§1—82及真实原件不改。
+当前状态（2026-10-22，[B交接§84](#84-b交接全文已读源公司成稿未发出本方案停止)）：§40已执行。第24次和第25次都把208页送进源发现，收费、采购和收入分项形成了有引文的源条件，但公司成稿请求没有发出，三视图主张为0。19/6未评估，B1/A1仍待A判，本方案停止，不发第26次。观察1/4、可用0/4，生产not_authorized、规模false；原§1—83保留。
 
 ## 1. 唯一实施指引
 
@@ -3678,3 +3678,92 @@ A另用现有`pack_fitting_batches`、`ReportSemanticRequestV3`及当前池`requ
 ### 83.5 文档、清理与保护
 
 本轮更新产品v7、验收活动段/唯一台账、交付路径、proposal/design/tasks、delta、执行卡及本审核入口。§39标历史、旧方案余额关闭，proposal删重复版本执行摘要，避免新旧活动指令并行；历史真实原件不改。B22/23运行根已删的说明接受，attempt/持久证据保留；QuoteBak约83M并含更早任务材料，未证明无依赖的不盲删，先清理仍是下一卡前置。A确认本次pytest已退出、日志目录为空且无引用后，删除本人生成的`quote_pytest_logs_g7ufil2k`（无实质数据，释放约4KiB目录项）；未删旧任务材料。9份文档新增/修改链接、预算算术、OpenSpec严格校验及diff检查通过。13份已跟踪/16项未跟踪基线hash/列表保护通过；验收历史后缀既有改动隔离不提交。审核活跃耗时未独立计时，不编造成公司运行/补救成本。
+
+## 84. B交接：全文已读源，公司成稿未发出，本方案停止
+
+日期：2026-10-22。公司仍为歌华有线 600037.SH，2025年报，版本 `b5b6be18424b7c3d7d7988f755ff7083141831904d4347c07cba1da8452c8b76`，208页。本段只记录[执行卡§40](b1-execution-card.md#40-b1替代方案全文分片读源后统一公司交付)。第24次和第25次分列，没有导入上一版主张。B自检不是A的19/6分数。观察1/4、可用0/4。生产 `not_authorized`，规模 false。无第26次。
+
+### 84.1 编排和直接证明
+
+主入口不再用导航决定正文。全部可读页按60000字节分片做不带候选的源发现，片边带上一片的首行；成功条件再进入一次公司成稿和有限核验。一片失败留未读并继续其他片。恢复拒绝只挡住同一次逻辑请求的再发，不把账本停掉。不同入口、不同核验目标使用不同逻辑身份。复合主张若核验返回 unclear，整条退出可靠结果。第22次原query/export没有改写。
+
+208页缓存上的新提示词计划：9个源片、13次物理（含一次成稿、一次核验、一次补源和两次最大请求恢复）、853186账本，208个可读页都进入分片，单入口1200000/36装得下。这是发送计划，不是召回成绩。
+
+```bash
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_navigation_does_not_decide_which_body_is_read \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_an_unclear_composite_claim_is_not_reliable \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_logical_identity_separates_entries_and_verification_targets \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_full_report_slices_fit_one_entry \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_synthesis_keeps_the_conditions_that_fit_the_reservation \
+  tests/unit/test_utils/test_llm_routed_client.py::test_four_model_route_shares_remaining_deadline_fairly \
+  tests/unit/test_research/test_company_profile_bounded_entry.py::test_an_oversized_payload_does_not_stop_the_remaining_ledger
+```
+
+导航、复合主张、逻辑身份、公平超时和载荷拒绝为9项里的短测，连同既有章节顺序和预算隔离，短测9 passed、7 warnings、19.96秒。208页计划1 passed、132.63秒。成稿裁条件1 passed、3.25秒。未跑全套。
+
+### 84.2 第24次：208页已读，成稿因预留超限没有发出
+
+绑定 `b1-pool-company24-binding.json`。没有复用旧导航或旧主张。14次源发现回执覆盖页1—208，没有 `necessary_unread`。源条件里已经出现页12主业句、页16经营权、页19供应商集中度、页53数据传输服务费、页116分期确认和10年入网、页165收看维护收入、页166租赁收入。这些是源条件，不是已核主张。
+
+成稿在发出前被拒绝：`direct_core_package_stopped:card_request_reservation_exceeded`。条件和引文合在一起超过65536预留，请求没有送到模型。三视图主张数都是0。`draft_complete`、`semantic_complete`、`real_semantic_complete` 都是 false。query与export的profiles一致。核验检查数是0。
+
+账本748651，有效327683，未知预留420968；物理25、逻辑19、其中6个逻辑各有2次物理；费用unknown；监督耗时2614.390667054802秒；`stopped_reason` 为空。恢复拒绝记为 `logical_recovery_already_used` 和 `card_recovery_exhausted`，没有把账本停成载荷耗尽。精确停止点是成稿预留超限，不是恢复耗尽。
+
+### 84.3 第25次：按预留裁过条件，实际载荷仍超60000
+
+根因是成稿把全部条件塞进一次请求。修复只保留预留装得下的条件，装不下的写入 `major_condition_not_in_synthesis`，然后重新读源、成稿和核验。没有导入第24次条件或主张。绑定 `b1-pool-company25-binding.json` SHA-256 `be5094e501de92ce9cf6793c6bf2ac815ee217912624a2f6dedd4c66a6e65fbf`。
+
+再次14次源发现覆盖页1—208，未读页为空，源条件45条。页116引文含收看维护、工程、入网按10年分期。页165引文含收看维护 `724,769,470.04`。页166引文含租赁 `162,672,085.77`。页53引文含数据传输服务费 `52,396,499.89`。页12引文含主业句和政府、企事业、家庭用户。这些仍只在源条件里。
+
+成稿请求被拒：`direct_core_package_stopped:payload_not_admitted`。裁剪用的是65536预留，留下的包实际UTF-8载荷仍超过60000。请求没有发出。三视图主张数仍是0，核验0，三个完整标志false。query与export的profiles一致。`stopped_reason` 为空；最后拒绝原因是 `payload_not_admitted`，不是恢复耗尽。恢复拒绝另有记录，且发生在成稿之前。
+
+账本727028，有效306060，未知预留420968；物理25、逻辑19、6次恢复；费用unknown；监督耗时2541.7521064607427秒。
+
+### 84.4 19项、6项负例和停止决定
+
+两版都没有已发布主张，所以19项全部未评估，6项负例没有可核对的交付文本，不能按通过计。源条件里的数字和分期句子没有经过成稿和核验，不能当成确定事实。第22次原件保持不动，其中无引文支持的上游关系仍不作为本卡可靠结论。
+
+| 项 | 第24次/第25次交付 |
+| --- | --- |
+| C01—C12、E01—E03、S01—S04 | 未评估。相关句子出现在源条件引文中，成稿和核验都没有发出 |
+| N01—N06 | 未评估。没有已发布文本可核对列次、购销方向或具名对象 |
+
+本路线已经能做的：取消导航筛选后，208页都能进入源发现；收费、采购、收入分项和租赁续页能形成带页码的引文条件；一片超时后可以拆开继续；恢复拒绝不毒化账本。本路线在60000字节限制下做不到的：把这些跨章条件连同必要引文装进一次公司成稿。第24次死在65536预留，第25次按预留裁剪后仍死在60000字节，主张保持为0。
+
+任务已用1475679账本、5156.142773515545秒、50次物理、12次恢复。剩余524321账本、2043.857226484455秒、14次请求、0次恢复。这不够再完成一次全年报读源加成稿核验，本卡也没有第26次。阶段累计2067119+1475679=3542798账本，9832.296526315686+5156.142773515545=14988.439299831231秒，143+50=193次物理。费用unknown。阶段上限4067119账本、17032.296526315686秒、207次物理没有提高。
+
+若还要这家公司，成稿裁剪必须按实际60000字节而不是只按65536预留，或者按业务维度分成几次仍带跨章条件的成稿。那是另一个方案，不是本卡的下一次入口。
+
+### 84.5 证据、命令和保护
+
+第24次证据 `b1-company24-evidence/`：
+
+- query `113464bc9a6a45a5259d727905b345d6f4c8f495b31ce6fa19f39e55a9c53ad5`
+- export `7e49c7fd896f93d0a43acc059bd7b48764a8c2142a6fcd340eb0203d1a605b91`
+- budget `840ee3ddae36335122f0111daff3b9789cb6e6be6714a199e76a0f63d1b8f755`
+- supervisor `0e544cff6de540702dcb9acabe0d21e111392fe7985db8ca742f6a4fdc2585b6`
+- entry.log `e464352b7617157f69734f98608ef65c81d4024f5853cae0dd0db53e2b5c6df3`
+
+第25次证据 `b1-company25-evidence/`：
+
+- query `1eeb632f457b840505290716ac1fd5488d5cb85f5218cfac78138d1e2942923e`
+- export `714d196ddbffbba89b62d148f01c92d1055032c6938a1d0512c51fd3ca3e98de`
+- budget `ca29bdbc2f8c6396f7963f39ec4177ce05787982dc4fff07866b766d07eecfb8`
+- supervisor `e2bf6bfa7b123e6e8d65149c51c34f01b0084b2b7442a39c7009022cf4f70c3a`
+- entry.log `75e3398769ce8ce206ad93de5faef7cbdf1b9c7584c97f39f8b3bfb0db62b370`
+
+两份运行根在哈希一致后删除。尝试标记 `b1-company24-attempts/company24.json` 和 `company25.json` 保留。第22次、第23次及更早证据和PDF未改。
+
+```bash
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m research.company_profile.bounded_entry \
+  --binding openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-company24-binding.json \
+  --authorization openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-company24-authorization.json \
+  --run-root /home/python/Quote/data/QuoteBak/b1-company24-20261022 --real
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m research.company_profile.bounded_entry \
+  --binding openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-company25-binding.json \
+  --authorization openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-company25-authorization.json \
+  --run-root /home/python/Quote/data/QuoteBak/b1-company25-20261022 --real
+```
+
+既有13份修改和16项未跟踪内容没有暂存。验收计划仍由A维护，本段没有改它。

@@ -130,10 +130,11 @@ def offline_processing_identity() -> dict[str, Any]:
 
 
 def direct_core_processing_identity() -> dict[str, Any]:
-    """Core-chapter reading: navigate, then write claims from the chapter text."""
-    identity = compact_processing_identity(discovery_scope="page_map")
+    """Read every readable page, then write one company draft from the evidence."""
+    identity = compact_processing_identity(discovery_scope="full_text")
     identity["reading_strategy"] = "direct_core_v1"
-    identity["prompt_version"] = "company_profile_report_reading.2026-10-19.direct-core.v1"
+    identity["prompt_version"] = "company_profile_report_reading.2026-10-22.fulltext-core.v1"
+    identity["preprocessing_version"] = "full_page_slices.v1"
     identity["product_contract"] = (
         "company_profile_product_contract.2026-10-18.llm-led.v3"
     )

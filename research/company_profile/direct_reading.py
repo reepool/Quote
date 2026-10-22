@@ -38,6 +38,7 @@ from utils.llm.errors import LlmError
 NAV_OUTPUT = 1000
 BODY_OUTPUT = 2500
 VERIFY_OUTPUT = 2000
+SOURCE_OUTPUT = 4000
 RESERVATION_LIMIT = 24_000
 LEDGER_LIMIT = 79_000
 
@@ -151,6 +152,129 @@ def navigation_batches(pages, report, identity, limit: int):
         ),
         split_mode="boundary",
     )
+
+
+def _boundary_header(text: str) -> str:
+    """Carry the previous slice's leading line so a table or paragraph is not cut blind."""
+    for raw in str(text).splitlines():
+        line = raw.strip()
+        if line:
+            return line[:120]
+    return ""
+
+
+def source_discovery_slices(pages, report, identity, limit: int):
+    """Pack every readable page. Navigation does not choose which text is sent."""
+    fragments = tuple(
+        {
+            "page": page["page"],
+            "text": page["text"],
+            "readable": True,
+            "offset": 0,
+            "scope": "full_page",
+        }
+        for page in pages
+        if page.get("readable", True) and str(page.get("text") or "").strip()
+    )
+
+    def fits(batch) -> bool:
+        return _fit(
+            batch,
+            purpose="source_inventory",
+            source_scope="full_context",
+            report=report,
+            identity=identity,
+            output=SOURCE_OUTPUT,
+            limit=limit,
+        )
+
+    batches = pack_fitting_batches(fragments, fits, split_mode="boundary")
+    overlapped = []
+    previous_text = ""
+    previous_page = None
+    for batch in batches:
+        header = _boundary_header(previous_text)
+        if header and previous_page is not None:
+            context = {
+                "page": previous_page,
+                "text": header,
+                "readable": True,
+                "offset": 0,
+                "scope": "boundary_context",
+            }
+            trial = [context, *batch]
+            if fits(trial):
+                batch = trial
+        overlapped.append(batch)
+        previous_text = str(batch[-1].get("text") or "")
+        previous_page = batch[-1].get("page")
+    return overlapped
+
+
+def fulltext_entry_plan(
+    pages: Sequence[Mapping[str, Any]],
+    report: ReportIdentity,
+    identity: Mapping[str, Any],
+    *,
+    ledger: int,
+    reservation_limit: int,
+    request_cap: int,
+) -> dict[str, Any]:
+    """Measure every source slice plus one draft, one verify, one supplement and two recoveries."""
+    slices = source_discovery_slices(pages, report, identity, reservation_limit)
+    if not slices:
+        raise ValueError("direct_core_fulltext_has_no_slice")
+    source_units = [
+        _units(
+            batch,
+            purpose="source_inventory",
+            source_scope="full_context",
+            report=report,
+            identity=identity,
+            output=SOURCE_OUTPUT,
+        )
+        for batch in slices
+    ]
+    sample = slices[0]
+    synthesis_units = _units(
+        sample,
+        purpose="synthesize_views",
+        source_scope="full_context",
+        report=report,
+        identity=identity,
+        output=BODY_OUTPUT,
+    )
+    verification_units = _nonempty_verify_units(sample, report=report, identity=identity)
+    largest = max(source_units)
+    supplement_units = largest
+    recovery_units = 2 * largest
+    total_units = (
+        sum(source_units)
+        + synthesis_units
+        + verification_units
+        + supplement_units
+        + recovery_units
+    )
+    physical_requests = len(slices) + 4
+    covered = sorted({int(page["page"]) for batch in slices for page in batch})
+    readable = sorted(
+        int(page["page"])
+        for page in pages
+        if page.get("readable", True) and str(page.get("text") or "").strip()
+    )
+    return {
+        "source_slices": len(slices),
+        "source_units": source_units,
+        "synthesis_units": synthesis_units,
+        "verification_units": verification_units,
+        "supplement_units": supplement_units,
+        "recovery_units": recovery_units,
+        "total_units": total_units,
+        "physical_requests": physical_requests,
+        "covered_pages": covered,
+        "readable_pages": readable,
+        "fits_entry": total_units <= ledger and physical_requests <= request_cap,
+    }
 
 
 def body_packages(pages, report, identity, limit: int):
@@ -455,11 +579,13 @@ def interpret_direct_core(
                     "necessary_unread:",
                     "necessary_fragment",
                     "major_condition_not_verified:",
+                    "major_condition_not_in_synthesis:",
                     "navigation_incomplete:",
                     "view_not_substantive:",
                     "core_dimension_missing:",
                     "direct_core_gap_check_stopped",
                     "claim_pending:",
+                    "company_synthesis_context_truncated",
                 )
             )
             for gap in gaps
@@ -486,9 +612,10 @@ def interpret_direct_core(
             elapsed_seconds=max(0.0, time.monotonic() - started_at),
         )
 
+    tail_hold = 0
+
     def admit(units: int, later: int) -> bool:
-        hold = 0 if recovery_used() else units
-        if charged() + units + later + hold > ledger:
+        if charged() + units + later + tail_hold > ledger:
             gaps.append("direct_core_ledger_hold")
             return False
         if physical_count() + 1 > request_cap:
@@ -1342,21 +1469,29 @@ def interpret_direct_core(
             if by_id[page_no].get("readable", True)
         ]
         try:
-            packages = list(body_packages(chosen, report, identity, limit))
+            packages = list(source_discovery_slices(chosen, report, identity, limit))
         except ValueError as exc:
             gaps.append(str(exc))
+            for page_no in ordered:
+                gap = f"necessary_unread:{page_no}"
+                if gap not in gaps:
+                    gaps.append(gap)
             return follow
-        for package in packages[:8]:
+        for package in packages:
             try:
                 reviewed = invoke(
                     "source_inventory",
                     package,
                     source_scope="full_context",
-                    output=BODY_OUTPUT,
-                    later=_nonempty_verify_units(package, report=report, identity=identity),
+                    output=SOURCE_OUTPUT,
+                    later=0,
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
-                gaps.append(f"direct_core_gap_check_stopped:{exc}")
+                text = str(exc)
+                if "card_recovery_exhausted" in text or "logical_recovery_already_used" in text:
+                    gaps.append(f"direct_core_recovery_refused:{text}")
+                else:
+                    gaps.append(f"direct_core_gap_check_stopped:{text}")
                 if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
                     return follow
                 if len(package) > 1:
@@ -1374,6 +1509,8 @@ def interpret_direct_core(
                         gaps.append(gap)
                 continue
             for page in package:
+                if page.get("scope") == "boundary_context":
+                    continue
                 page_no = int(page["page"])
                 inventoried.add(page_no)
                 by_page[page_no]["status"] = "read"
@@ -1432,13 +1569,62 @@ def interpret_direct_core(
             return
         if len(packages) > 1:
             gaps.append("company_synthesis_context_truncated")
+            kept_pages = {int(page["page"]) for page in packages[0]}
+            for condition in conditions:
+                if kept_pages & {int(evidence.page) for evidence in condition.evidence}:
+                    continue
+                gap = f"major_condition_not_in_synthesis:{condition.condition_id}"
+                if gap not in gaps:
+                    gaps.append(gap)
         package = packages[0]
         page_set = {int(page["page"]) for page in chosen}
-        related = [
-            item
-            for item in conditions
-            if page_set & {int(evidence.page) for evidence in item.evidence}
-        ]
+        rank = {
+            "principal_business": 0,
+            "revenue_model": 1,
+            "products_services": 2,
+            "input_exposure": 3,
+            "supply_chain_role": 4,
+            "upstream_downstream": 5,
+            "output_exposure": 6,
+        }
+        related = sorted(
+            (
+                item
+                for item in conditions
+                if page_set & {int(evidence.page) for evidence in item.evidence}
+            ),
+            key=lambda item: (rank.get(item.dimension, 50), item.condition_id),
+        )
+
+        def synthesis_units(selected) -> int:
+            return request_reservation(
+                ReportSemanticRequestV3(
+                    request_id=f"{work_id}:synthesis-size",
+                    purpose="synthesize_views",
+                    report=report,
+                    processing_identity=identity,
+                    source_pages=tuple(package),
+                    source_scope="full_context",
+                    source_conditions=tuple(selected),
+                    max_output_tokens=BODY_OUTPUT,
+                    timeout_seconds=float(
+                        identity.get("logical_request_timeout_seconds") or 120
+                    ),
+                )
+            )
+
+        fitting: list[ReportSourceCondition] = []
+        if synthesis_units(()) > limit:
+            gaps.append("company_synthesis_context_truncated")
+            return
+        for condition in related:
+            if synthesis_units([*fitting, condition]) <= limit:
+                fitting.append(condition)
+                continue
+            gap = f"major_condition_not_in_synthesis:{condition.condition_id}"
+            if gap not in gaps:
+                gaps.append(gap)
+        related = fitting
         try:
             drafted = invoke(
                 "synthesize_views",
@@ -1489,37 +1675,45 @@ def interpret_direct_core(
         if drafted_all:
             settle_claims(drafted_all, related)
 
-    reused_navigation = False
-    for item in identity.get("accepted_page_map_receipts") or ():
-        payload = item.get("response_payload") or {}
-        if item.get("source_scope") != "page_map" or payload.get("claims") or payload.get("source_conditions"):
-            continue
-        remember_map(item.get("source_pages") or [], payload.get("requested_pages") or [])
-        receipts.append({**item, "physical_request": False, "reused_navigation": True})
-        reused_navigation = True
-    if not reused_navigation:
-        try:
-            nav = navigation_batches(list(sources), report, identity, limit)
-        except ValueError as exc:
-            gaps.append(str(exc))
-            nav = []
-        for batch in nav:
-            try:
-                response = invoke(
-                    "source_inventory",
-                    batch,
-                    source_scope="page_map",
-                    output=NAV_OUTPUT,
-                    later=0,
-                )
-                if response.source_conditions:
-                    raise ValueError("page_map_cannot_establish_source_conditions")
-                remember_map(batch, [int(page) for page in response.requested_pages])
-            except (ValueError, LlmError, SemanticProviderError) as exc:
-                gaps.append(f"direct_core_navigation_incomplete:{exc}")
-                break
-    follow = inventory_pages(selected_order[:])
-    compose(selected_order)
+    readable_order = [
+        int(page["page"])
+        for page in sources
+        if page.get("readable", True) and str(page.get("text") or "").strip()
+    ]
+    readable_pages = [page for page in sources if int(page["page"]) in set(readable_order)]
+    try:
+        planned = list(source_discovery_slices(readable_pages, report, identity, limit))
+    except ValueError as exc:
+        gaps.append(str(exc))
+        planned = []
+    if planned:
+        slice_units = [
+            _units(
+                batch,
+                purpose="source_inventory",
+                source_scope="full_context",
+                report=report,
+                identity=identity,
+                output=SOURCE_OUTPUT,
+            )
+            for batch in planned
+        ]
+        sample = planned[0]
+        tail_hold = (
+            _units(
+                sample,
+                purpose="synthesize_views",
+                source_scope="full_context",
+                report=report,
+                identity=identity,
+                output=BODY_OUTPUT,
+            )
+            + _nonempty_verify_units(sample, report=report, identity=identity)
+            + 2 * max(slice_units)
+        )
+    follow = inventory_pages(readable_order)
+    tail_hold = 0
+    compose(readable_order)
     if (
         follow
         and not any(gap.startswith("direct_core_ledger_hold") for gap in gaps)
@@ -1528,20 +1722,12 @@ def interpret_direct_core(
             for gap in _completeness_gaps(claims, conditions, checks, records)
         )
     ):
-        for page_no in follow:
-            if page_no not in selected:
-                selected.add(page_no)
-                selected_order.append(page_no)
         inventory_pages(follow)
         compose(follow)
-    for page in coverage:
-        if page.get("map_checked"):
+    read_pages = {int(item["page"]) for item in coverage if item["status"] == "read"}
+    for page_no in readable_order:
+        if page_no in read_pages:
             continue
-        gap = f"navigation_incomplete:{page['page']}"
-        if gap not in gaps:
-            gaps.append(gap)
-    unread = selected - {int(item["page"]) for item in coverage if item["status"] == "read"}
-    for page_no in sorted(unread - supplementary):
         gap = f"necessary_unread:{page_no}"
         if gap not in gaps:
             gaps.append(gap)
