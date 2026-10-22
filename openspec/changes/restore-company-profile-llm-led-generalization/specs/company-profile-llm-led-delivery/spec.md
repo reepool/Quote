@@ -1,3 +1,5 @@
+Current policy: product contract v7 and execution card section 40 govern new execution. Earlier strategy-specific sequencing and navigation-resume scenarios below apply only to their frozen historical cards; they do not authorize new calls or override the full-text source-reading replacement. Historical inputs, failures and scores remain unchanged.
+
 ## ADDED Requirements
 
 ### Requirement: New-report interpretation has a real semantic execution path
@@ -94,7 +96,23 @@ The new processing policy MUST route every new report's open-language interpreta
 - **AND** physical profile limits, entry deadline, shared recovery policy and actual send accounting remain enforced without authorizing an extra source attempt
 
 ### Requirement: Discovery and omission checking are source-led
-The system MUST account for every physical page through full-report navigation and bounded discovery. The real LLM MUST select substantive business, product, income, input and role contexts and read their necessary paragraphs, headers and continuations. Navigation-only coverage, full-text reading coverage and verified core usability MUST be recorded separately. Sending every readable supplementary note verbatim MUST NOT be a prerequisite for core delivery. Regex-only page whitelists MUST NOT determine all model visibility; unfamiliar locations and unsampled text MUST remain reachable through bounded model-led context recovery. A source-first omission review in a separate context without candidate answers or evaluation Gold MUST be compared with delivered claims and reliable major revenue composition. Unresolved major-business or necessary-context gaps MUST prevent core completeness. Unsupported or unread sources MUST remain missing or unclear rather than not_disclosed. Historical full-text contracts and scores MUST NOT be reevaluated under this policy.
+The current v7 policy MUST give every readable source range a bounded, candidate-free real-LLM source-discovery opportunity. Navigation MAY guide ordering but MUST NOT exclude text from reading. Source discovery MUST collect core business, products, monetization, major income composition, material inputs, customers and operating-role evidence with necessary paragraphs, headers, units and continuations; it MUST NOT require exhaustive extraction of every supplementary note or synthesize and verify all views after each transport fragment. A cross-chapter company synthesis MUST use the collected core evidence before bounded support and major-condition coverage verification. Source-first discovery MUST NOT receive candidate answers or evaluation Gold and MUST NOT be redundantly repeated as another full-report inventory. Input-range coverage, successful source reading and audited semantic recall MUST be reported separately. Unresolved major-business or necessary-context gaps MUST prevent completeness; failed or unread ranges MUST remain missing rather than not_disclosed. Historical navigation-first policies, contracts and scores MUST remain unchanged under their frozen identities.
+
+#### Scenario: Navigation omits a fee or purchasing disclosure
+- **WHEN** a readable disclosure is absent from the navigation selection
+- **THEN** the full-text source-reading plan still sends its range without candidate answers, with the original table and continuation context preserved
+- **AND** a source condition discovered there can influence company synthesis and coverage review without a company-specific page whitelist
+
+#### Scenario: A verified compound claim contains an unsupported relationship
+- **WHEN** source review establishes an operating right but cannot support an added upstream relationship in the same claim
+- **THEN** that object and dependent coverage MUST leave reliable query/export until a narrowed candidate is genuinely verified; the original frozen receipt and output remain unchanged
+- **AND** acknowledging the unsupported clause only in a handoff report MUST NOT permit the object to remain a reliable published fact
+
+#### Scenario: A new full-text development task replaces an exhausted selection strategy
+- **WHEN** the current A card explicitly authorizes the v7 replacement under the user's existing execution and cost authority
+- **THEN** the authoritative owner uses only the new task and per-entry limits, keeps all prior charges and failures intact, and does not treat old unused balance as permission
+- **AND** offline readiness covers actual full-report payloads, nonempty company synthesis and verification, required context recovery and the card's failure reserve; simulated usage never proves real resource feasibility
+- **AND** exhausted recovery prevents another recovery of the same logical request, not a genuinely new request still within authorized total limits, while retry and repair cannot reset logical recovery identity
 
 #### Scenario: Supplementary notes remain unread after the core is verified
 - **WHEN** real reading and source-first omission checks support all substantive core views and no known major-business gap remains, while supplementary notes have not been read in full
@@ -184,7 +202,7 @@ The new-policy requirements MUST supersede legacy no-provider completion, fixed 
 - **THEN** its scope notice routes new work to this change and the current product/acceptance documents, without altering the historical result
 
 ### Requirement: Evidence support and report coverage are separate decisions
-Under the explicitly enabled current semantic policy, the authoritative owner MUST verify actual candidate evidence units independently of report-level omission review. Only genuinely verified claims and valid dependencies may enter reliable query/export; report completeness MUST still require independent candidate-free source review, major-condition checks and necessary reading. The v6 orchestration MUST prioritize company-level core evidence and MAY combine its support and coverage decisions into bounded verification groups without reproducing a per-page business loop.
+Under the explicitly enabled current semantic policy, the authoritative owner MUST verify actual candidate evidence units independently of candidate-free source discovery. Only genuinely verified claims and valid dependencies may enter reliable query/export; report completeness MUST still require independent source reading, major-condition checks and necessary context recovery. The v7 orchestration MUST combine cross-chapter core evidence before company synthesis and MAY share bounded verification groups for separate support and coverage decisions without reproducing a per-page business loop.
 
 #### Scenario: Source inventory is unavailable after real candidates were saved
 - **WHEN** a source-led inventory call fails but located candidates and their full semantic context remain available
