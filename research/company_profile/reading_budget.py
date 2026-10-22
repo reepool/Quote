@@ -41,6 +41,38 @@ def reservation_units(payload: Mapping[str, Any], max_output: int) -> int:
     return len(encoded) + 256 + max_output
 
 
+def request_payload_bytes(request: ReportSemanticRequestV3) -> int:
+    """Largest UTF-8 payload the current pool would actually send."""
+    sizes = []
+    for profile in _profiles():
+        payload = LlmClient._build_payload(
+            model=profile.model,
+            messages=[
+                {"role": "system", "content": instructions(request)},
+                {
+                    "role": "user",
+                    "content": json.dumps(
+                        compact_request(request),
+                        ensure_ascii=False,
+                        separators=(",", ":"),
+                    ),
+                },
+            ],
+            schema=response_schema(request),
+            schema_name="company_profile_report_response",
+            mode="json_object",
+            temperature=0,
+            max_output_tokens=request.max_output_tokens,
+            max_output_tokens_field=profile.max_output_tokens_field,
+            stream=profile.stream,
+            stream_include_usage=profile.stream_include_usage,
+        )
+        sizes.append(
+            len(json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode())
+        )
+    return max(sizes) if sizes else 0
+
+
 def request_reservation(request: ReportSemanticRequestV3) -> int:
     """Largest physical reservation of this request across the current pool."""
     bounds = []

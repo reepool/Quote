@@ -471,6 +471,25 @@ class ReportSemanticResponse(_StrictModel):
             self.source_conditions or self.claims or self.records
         ):
             raise ValueError("verification cannot mutate facts or summaries")
+        seen_claims = {}
+        renamed_claims = []
+        changed = False
+        for item in self.claims:
+            prior = seen_claims.get(item.claim_id)
+            if prior is None:
+                seen_claims[item.claim_id] = item
+                renamed_claims.append(item)
+                continue
+            changed = True
+            if prior.answer == item.answer:
+                continue
+            renamed = item.model_copy(
+                update={"claim_id": f"{item.claim_id}__{len(seen_claims)}"}
+            )
+            seen_claims[renamed.claim_id] = renamed
+            renamed_claims.append(renamed)
+        if changed:
+            object.__setattr__(self, "claims", tuple(renamed_claims))
         for items, key in (
             (self.source_conditions, "condition_id"),
             (self.claims, "claim_id"),

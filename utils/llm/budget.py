@@ -269,9 +269,19 @@ class LlmRunBudget:
                 }
                 self._persist()
                 raise LlmDeadlineExceededError(blocked)
+            if payload_exceeded:
+                self._denied_request = {
+                    "request_id": request_id,
+                    "payload_utf8_bytes": payload_bytes,
+                    "reserved_input_tokens": inputs,
+                    "reserved_output_tokens": output,
+                    "required_tokens": tokens,
+                    "reason": "payload_not_admitted",
+                }
+                self._persist()
+                raise LlmDeadlineExceededError("payload_not_admitted")
             if (
                 context_exceeded
-                or payload_exceeded
                 or len(self.attempts) >= self.max_requests
                 or used_tokens + tokens > self.max_tokens
                 or (
@@ -281,11 +291,7 @@ class LlmRunBudget:
                     and used_cost + cost > self.max_cost_cny
                 )
             ):
-                self._stopped = (
-                    "physical_payload_or_output_limit"
-                    if payload_exceeded
-                    else "physical_request_token_context_or_cost_budget_exhausted"
-                )
+                self._stopped = "physical_request_token_context_or_cost_budget_exhausted"
                 self._denied_request = {
                     "request_id": request_id,
                     "payload_utf8_bytes": payload_bytes,

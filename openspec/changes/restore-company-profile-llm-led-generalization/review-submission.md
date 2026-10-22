@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-22，[A审核§81](#81-a审核a3afc162正文未发送v6未实现完成)）：第21次只发208页导航，正文61120字节被60000上限拦下，三视图为空，B1/A1未过。A另复现公司合成未统一、跨包ID覆盖及共享超时回归；合并交[执行卡§39](b1-execution-card.md#39-b1公司交付卡修复实载与统一合成完成一次可用公司)。不增加阶段总额，显式重分配383786账本/2212.608378083445秒/23物理/4恢复，最多company22＋一次company23，共用余额。仅可兼容复用第21次导航，旧业务答案不载入。观察1/4、可用0/4，生产not_authorized、规模false；原§1—80保留。
+当前状态（2026-10-22，[B交接§82](#82-b交接第22次与第23次分列公司交付未达标并停止)）：§39四项修复已用于第22次和第23次，两版分列，不拼成绩。第22次复用第21次导航，程序核过9条主张，页165—166未读。第23次拆开超时包并读到页165收入分项引文，恢复被拒绝后核验未发，7条主张保持待核。19项核心和6项负例都未达到可发布标准，本方案停止，不发第24次。观察1/4、可用0/4，生产not_authorized、规模false；原§1—81保留。
 
 ## 1. 唯一实施指引
 
@@ -3515,3 +3515,111 @@ A依据用户既有明确执行及费用上调授权，结束§38，**显式把�
 本轮仅更新9份权威需求/计划/OpenSpec活动文档，未改业务代码。当前change的OpenSpec严格校验、15个新增活动链接/锚点、资源算术及范围diff检查通过；不将这些文档检查替代上面的2 passed/1 failed或业务未过结论。范围Review已把本轮授权、仅导航复用、两版本不拼成绩和公共默认隔离同步到活动入口，历史§1—80及原失败不追改。
 
 其他12份既有脏文件hash不变；验收计划以原活动前缀拼回当前历史后缀的hash与开始基线一致，既有历史更新未触碰、未纳入本轮提交。16项未跟踪列表不变，暂存只隔离本人9份文档。两次本轮诊断的空pytest日志目录在进程结束后用rmdir删除，共8192字节目录占用；未生成测试库/一次性脚本，未删历史必要材料。第21次运行根已删、attempt仍在。所有临时物继续QuoteBak；必要证据一套，未另建清理台账。
+
+## 82. B交接：第22次与第23次分列，公司交付未达标并停止
+
+日期：2026-10-22。公司仍为歌华有线 600037.SH，2025年报，版本 `b5b6be18424b7c3d7d7988f755ff7083141831904d4347c07cba1da8452c8b76`，208页。本段只记录[执行卡§39](b1-execution-card.md#39-b1公司交付卡修复实载与统一合成完成一次可用公司)。两版结果分列，没有把第22次主张导入第23次。B自检不是A的19/6分数，也不把程序 `review_state=verified` 写成已审准确率。观察1/4、可用0/4。生产 `not_authorized`，规模 false。无第24次。
+
+### 82.1 四项修复与直接证明
+
+发送前同时检查完整预留和本卡60000字节载荷。过大正文在发出前按页重包。载荷拒绝记 `payload_not_admitted`，不把账本停在 `physical_payload_or_output_limit`。公司成稿只发一包跨页引文和源条件，不再把各包局部答案拼成公司理解。相同局部主张ID、不同业务会改成带后缀的ID，相同答案才合并。90秒物理上限只在本卡metadata里生效；旧的四模型公平分配测试仍要求第二跳约100秒。
+
+直接验证5 passed、7 warnings、51.37秒：
+
+```bash
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q \
+  tests/unit/test_utils/test_llm_routed_client.py::test_four_model_route_shares_remaining_deadline_fairly \
+  tests/unit/test_research/test_company_profile_bounded_entry.py::test_an_oversized_payload_does_not_stop_the_remaining_ledger \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_selected_chapters_are_read_before_the_company_draft \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_same_local_claim_id_does_not_drop_a_different_business \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_company21_core_pages_pack_inside_the_byte_cap
+```
+
+其中22页实载包每包载荷不超过60000字节，并覆盖第21次选出的全部22页。这只证明控制流和打包，不是歌华分数。未跑全套，也未再跑208页fake。
+
+### 82.2 第22次：程序核过9条，收入分项页未读
+
+复用第21次page_map，208页，`reused_navigation=true`。没有载入第21次业务条件或主张。顺序是一次库存17页（4、12—20、25—31），一次合成8页（12、14—20），一次核验。页93、94、165、166、197为 `necessary_unread`。`draft_complete`、`semantic_complete`、`real_semantic_complete` 都是 false。query与export的profiles一致。
+
+程序把下列9条标成 `review_state=verified`，核验回执46条检查均为pass。这是模型核验结果，不是A的源审通过。
+
+- 主业 `claim_cond_pb_01`，页12引文为“公司主要负责北京市广播电视网络的开发、经营管理和维护……互联网数据传送增值业务等。”页18另有行业行 `2,219,754,557.95`。
+- 变现 `claim_cond_rm_01`。页17引文为“2025年，公司实现营业收入221,975.46万元……同比下降4.08%。”页14引文是频道收转到账，页20是偶发贸易 `67,290,058.81`。没有分期确认。
+- 产品四条：收转/点播；千兆宽带与5G物联网卡；政企和家庭“智慧广电”；推广4K机顶盒56.45万端。引文分别在页12、14、15、17。
+- 投入 `claim_cond_ie_01`，页19。引文是折旧、摊销、业务运行、人工、网络运行成本和前五名供应商31.90%。不是数据传送、节目、出口流量或维护采购对象。
+- 产出 `claim_cond_oe_01`，页18—19。引文含北京 `2,217,111,146.02` 和前五名客户22.45%。
+- 角色 `claim_cond_sc_01`。页16引文是北京市有线电视网络经营权及覆盖16个区的基础网络。页12另一句是“重要支撑平台”。主张里“连接上游节目内容与网络设备资源”不在这两段引文中，B不把它当确定事实。
+
+对照19项：C01、C02、C03、C07的原文句或营业收入总额出现在上述引文中，待A核源，B不计通过。C04—C06、C08—C12、E01—E03、S03、S04不满足：收费分期、十年入网、收入分项和采购对象所在页没有读到。S01的经营权句待A核源，上游连接句不作为确定事实。S02的政府、企事业和家庭用户出现在产品引文中，没有编造客户名称，待A核源。
+
+6项负例：页165—166未读，N01、N02未评估，不以缺页当通过。采购明细未读，N03未评估。N04的草稿写的是研发推广终端，没有写成设备制造，待A。N05只写前五名合计，没有点名，待A。N06保留了服务和偶发商品销售，没有写成零商品暴露，待A。负例不是6/6。
+
+资源：账本173995，有效75267，未知预留98728；物理7、逻辑4、其中3个逻辑各有2次物理；费用unknown；监督耗时585.5874215047807秒；`stopped_reason` 为空。根因是后一个多页库存请求超时，整包被标成未读，所以页165—166没有进入成稿。
+
+### 82.3 第23次：读到页165，核验没有发出
+
+只复用第21次page_map。绑定 `b1-pool-company23-binding.json` SHA-256 `0a20e63b884ff3992bb33cdd439e20ebda520ab6056856ea44935457d9def377`。授权尝试 `company23`。本入口上限是剩余209791账本、1627.0209565786645秒、16次物理；恢复仍按共用4次计算，并带上第22次账本，使已发生的恢复继续占用额度。没有导入第22次主张。
+
+实际顺序：复用208页导航；库存4、12—20、25—31；超时后拆包，再库存94、165、197；一次合成页12—20、94、165。页93、166仍是 `necessary_unread`。合成之后出现 `logical_recovery_already_used`、`card_recovery_exhausted`、`direct_core_ledger_hold` 和 `direct_core_verify_stopped:direct_core_admission_stopped`。核验检查数是0。7条主张都是 `pending_verification`，没有晋升。`accepted_facts` 为0，`core_complete` 为false，三个完整标志都是false。query与export的profiles一致。
+
+待核草稿里，页12引文仍是经营管理那句；主张正文写成“建设、管理和维护”，与页94“建设、管理和经营”混写，待核，不发布为事实。页165引文含收看维护 `724,769,470.04`、信息业务 `897,897,997.75`、频道收转 `165,529,697.84`、工程建设 `151,340,245.65`、商品销售 `67,290,058.81`、广告、入网和5G业务代理费 `22,879,452.01`。每条分项引文后面还并列另一个数字，草稿没有标明本期列。租赁收入 `162,672,085.77` 未出现，页166未读。全文没有“分期”或“10年”。投入草稿仍是页19成本和前五名31.90%，没有采购对象。
+
+因此第23次19项全部不能计为已核。C08—C11和5G代理费只存在于待核引文。C04—C06、C12、E02、E03、S03不满足。6项负例没有核验，不能判通过；分项引文并列两个数字，N01尤其不能按通过处理。
+
+资源：账本115051，有效79225，未知预留35826；物理10、逻辑10，本入口账本里没有重复逻辑ID；费用unknown；监督耗时727.2062738873065秒；`stopped_reason` 为空。最后一条拒绝原因是 `card_recovery_exhausted`。恢复拒绝没有把账本停成载荷耗尽，但下一次核验已被准入拦住。
+
+### 82.4 逐项对照与停止决定
+
+| 项 | 第22次 | 第23次 |
+| --- | --- | --- |
+| C01—C03 | 引文含主业、收转/点播/互联网和政企家庭智慧广电；待A核源 | 同题待核，且主业措辞被改写 |
+| C04—C06 | 不满足 | 不满足；无分期、无十年入网 |
+| C07 | 页17有221,975.46万元；待A核源 | 待核行业行含2,219,754,557.95 |
+| C08—C11 | 不满足，页165未读 | 数字在待核引文，未核验 |
+| C12 | 不满足 | 不满足，页166未读，租赁数未出现 |
+| E01 | 不满足 | 四条收入分项在待核引文，租赁缺失 |
+| E02—E03 | 不满足；只有成本构成和供应商集中度 | 同，仍不满足 |
+| S01—S02 | 经营权及政企家庭待A核源；上游连接句不作为事实 | 待核；角色句含战略转型 |
+| S03—S04 | 不满足 | 代理费数字在待核引文；采购方向不满足 |
+| N01—N06 | 未全查；未读页不能算通过 | 核验未发，不能算通过 |
+
+两版都不达到至少18/19、6项负例实际全过、已审准确率≥98%。已知不能当确定事实发布的内容：第22次角色主张中的上游连接句；第23次全部待核主张，包括被改写的主业措辞和未标明列次的收入分项。
+
+共用余额账上还剩94740账本、899.8146826913578秒、6次物理。恢复在第23次已被拒绝，不够再完成一次“重读未读页、重新成稿、完成核验”的业务尾部。本卡只允许这一次后继，因此不创建第24次。
+
+本路线已经能做的：208页导航可以复用；正文按60000字节重包后能够发出；超时的多页包可以拆开再读；跨页引文可以进入一次公司合成；待核不晋升；局部载荷拒绝不毒化账本；其他调用方的公平超时已恢复。本路线在这份额度里做不到的：第21次选出的22页不含收费附注页116和采购明细页53，复用该导航补不出分期确认和采购对象；恢复用尽后页93、166留在未读，核验发不出去。替代决定留给A：若还要这家公司，需要新的导航覆盖收费与采购页，并单独给予能完成核验的额度。不要把两版答案合并，也不要再自动发同链局部修补卡。
+
+阶段累计：1778073+173995+115051=2067119账本；8519.502830923599+585.5874215047807+727.2062738873065=9832.296526315686秒；126+7+10=143次物理。其中本卡新增有效154492、新增未知134554。第21次之前的未知958077不释放。费用仍为unknown，不宣称人民币成本通过。阶段上限2161859账本、10732.111209007044秒、149次物理没有提高。
+
+### 82.5 证据、命令、清理和保护
+
+第22次证据 `b1-company22-evidence/`，与当时运行根一致后已删运行根：
+
+- query `92418ea76468fd8c89a632e6fa2b5ee6260c5bf3bc8defa60fdfc062df073b7f`
+- export `c7f27cc06bea732f3864415fde6c2c133229d48f938736bb28c112773b69e538`
+- budget `936709e970240f442ae20f0d287d5b934f415bdf4ed3229887157e5efa3cfb7d`
+- supervisor `adec0f840b5e0d8c9729804fc55cb0be6047cae712a30e0b1378737ad0e27178`
+- entry.log `f6629f588797d4bef1ddf50d200f3f196cd943efbaa19855546b0ebaf71b02b0`
+
+第23次证据 `b1-company23-evidence/`，复制后哈希一致，运行根已删：
+
+- query `a1e9eb9020b6259f24828ba8ff1d7b543081568637777c918cff698713ae71f4`
+- export `86d38927ba5674c7c335c3b5f39fd959033291f328cafb014af81982e5f17bd9`
+- budget `a78f08c48823b5d8a3a3679c86cff4116dbe0f62dccc02499d308e21b60df7a0`
+- supervisor `7e238d7ce605fcf0b8479612c35fd9337040410b6a515abe64c69586a9b25578`
+- entry.log `e77335bd2683d4a36c3140c5dd09863bd6268b80c3b1ca02d8eaecf12ad4400b`
+
+尝试标记 `b1-company21-attempts/company22.json` 和 `company23.json` 保留。PDF、第21次及更早证据、v61、window10、direct1 未动。交接前删除8个空的 `quote_pytest_logs_*`。未另建清理台账。
+
+```bash
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m research.company_profile.bounded_entry \
+  --binding openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-company22-binding.json \
+  --authorization openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-company22-authorization.json \
+  --run-root /home/python/Quote/data/QuoteBak/b1-company22-20261022 --real
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m research.company_profile.bounded_entry \
+  --binding openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-company23-binding.json \
+  --authorization openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-company23-authorization.json \
+  --run-root /home/python/Quote/data/QuoteBak/b1-company23-20261022 --real
+```
+
+既有脏文件未暂存：`config/13_llm.json`、两份gateway文档、验收计划、PDF评估JSON、prepare-company-profile三份文档、`core_evidence_selection.py`、`core_skeleton.py`、`test_company_profile_core_skeleton.py`、`test_company_profile_owned_page_facts.py`、`test_llm_routing_config.py`，以及16项未跟踪内容。验收计划仍由A维护，本段没有改它。

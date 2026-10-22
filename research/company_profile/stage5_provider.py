@@ -4184,6 +4184,9 @@ class CommonGatewaySemanticProvider:
                     "max_route_attempts": request.processing_identity.get(
                         "max_route_attempts"
                     ),
+                    "max_physical_attempt_seconds": request.processing_identity.get(
+                        "max_physical_attempt_seconds"
+                    ),
                 },
                 response_model=ReportSemanticResponseV3,
                 schema_name="company_profile_report_response",
@@ -4647,6 +4650,15 @@ class CommonGatewaySemanticProvider:
                 **(
                     {"max_route_attempts": int(runtime_payload["max_route_attempts"])}
                     if report_reading and runtime_payload.get("max_route_attempts")
+                    else {}
+                ),
+                **(
+                    {
+                        "max_physical_attempt_seconds": int(
+                            runtime_payload["max_physical_attempt_seconds"]
+                        )
+                    }
+                    if report_reading and runtime_payload.get("max_physical_attempt_seconds")
                     else {}
                 ),
             },

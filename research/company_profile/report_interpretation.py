@@ -48,6 +48,7 @@ from .reading_budget import (
     _evidence_in_fragments,
     partial_slice_plan,
     records_for_fragments,
+    request_payload_bytes,
     request_reservation,
     reused_map_receipts,
     send_admission_hold,
@@ -276,7 +277,13 @@ def fits_card_reservation(
         max_output_tokens=max_output_tokens,
         timeout_seconds=30,
     )
-    return request_reservation(request) <= int(reservation_limit)
+    reservation = request_reservation(request)
+    if reservation > int(reservation_limit):
+        return False
+    byte_limit = identity.get("max_payload_utf8_bytes")
+    if byte_limit and request_payload_bytes(request) > int(byte_limit):
+        return False
+    return True
 
 
 def fits_development_payload(

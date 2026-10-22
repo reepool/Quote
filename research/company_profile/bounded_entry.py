@@ -473,6 +473,8 @@ def validate_binding(
                 "company19",
                 "company20",
                 "company21",
+                "company22",
+                "company23",
             }
             or not authorization.get("approval_reference")
         ):
@@ -918,11 +920,26 @@ def _worker(
             identity["logical_request_timeout_seconds"] = int(
                 binding["logical_request_timeout_seconds"]
             )
+        if binding.get("max_physical_attempt_seconds"):
+            identity["max_physical_attempt_seconds"] = int(
+                binding["max_physical_attempt_seconds"]
+            )
+        if binding.get("max_payload_utf8_bytes"):
+            identity["max_payload_utf8_bytes"] = int(binding["max_payload_utf8_bytes"])
         identity["protect_tail"] = not bool(
             binding.get("defer_tail_to_next_window")
         )
         if binding.get("accepted_navigation_query"):
             identity["accepted_page_map_receipts"] = load_twelfth_navigation(binding)
+        if binding.get("reused_page_map_query"):
+            prior = json.loads(Path(binding["reused_page_map_query"]).read_text())
+            maps = []
+            for profile in prior.get("profiles") or []:
+                for item in (profile.get("three_views") or {}).get("call_receipts") or []:
+                    if item.get("source_scope") == "page_map" and item.get("status") == "success":
+                        maps.append(item)
+            if len(maps) == 1 and len(maps[0].get("source_pages") or []) == 208:
+                identity["accepted_page_map_receipts"] = maps
         if binding.get("accepted_candidate_query"):
             identity["accepted_candidate_receipts"] = load_thirteenth_candidates(binding)
         refuse_layered_semantic_continuation(binding)
@@ -1150,6 +1167,14 @@ def main() -> int:
             raise ValueError("e2 requires the protected e1 marker")
         if authorization["attempt"] == "f1" and not (attempts / "e2.json").is_file():
             raise ValueError("f1 requires the protected e2 marker")
+        if authorization["attempt"] == "company22" and not (
+            (attempts / "company21.json").is_file()
+        ):
+            raise ValueError("company22 requires the protected company21 marker")
+        if authorization["attempt"] == "company23" and not (
+            (attempts / "company22.json").is_file()
+        ):
+            raise ValueError("company23 requires the protected company22 marker")
         if authorization["attempt"] == "company20" and not (
             (attempts / "company19.json").is_file()
         ):

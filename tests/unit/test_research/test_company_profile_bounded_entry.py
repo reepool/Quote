@@ -330,6 +330,50 @@ def test_e2_budget_is_separate_from_the_e1_authorization():
         raise AssertionError("the E1 marker unlocked the company-core window")
 
 
+def test_an_oversized_payload_does_not_stop_the_remaining_ledger():
+    import time
+
+    from utils.llm.budget import DEVELOPMENT_UNPRICED_BILLING, LlmRunBudget
+    from utils.llm.errors import LlmDeadlineExceededError
+
+    budget = LlmRunBudget(
+        deadline=time.monotonic() + 30,
+        prices={},
+        max_tokens=100_000,
+        max_requests=4,
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        run_authorization="company_profile_company_evidence.2026-10-22",
+    )
+    huge = "甲" * 60_000
+    try:
+        budget.reserve(
+            resource="grok",
+            model="grok",
+            profile="semantic",
+            payload={"model": "grok", "max_tokens": 16, "messages": [{"content": huge}]},
+            request_id="too-big",
+            attempt=1,
+            logical_request_id="logical-big",
+            source_label="grok",
+        )
+    except LlmDeadlineExceededError as exc:
+        assert str(exc) == "payload_not_admitted"
+    else:
+        raise AssertionError("a payload over 60000 bytes was admitted")
+    assert budget._stopped is None
+    ticket = budget.reserve(
+        resource="grok",
+        model="grok",
+        profile="semantic",
+        payload={"model": "grok", "max_tokens": 16},
+        request_id="still-legal",
+        attempt=1,
+        logical_request_id="logical-small",
+        source_label="grok",
+    )
+    assert ticket == 0
+
+
 def test_window1_verified_claim_reloads_and_empty_query_does_not_clear_it():
     import json
     from pathlib import Path

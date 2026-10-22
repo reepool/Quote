@@ -605,16 +605,7 @@ class LlmClient:
                 max(int(route_cap) - int(failover_count), 0),
             )
         if eligible_attempt_count <= 1:
-            if float(request.timeout_seconds or 0) < 180:
-                return None
-            remaining = budget.remaining(time.monotonic())
-            if remaining is None:
-                remaining = float(request.timeout_seconds or profile.timeout_seconds)
-            return (
-                min(90.0, remaining)
-                if remaining >= config.min_attempt_seconds
-                else None
-            )
+            return self._physical_attempt_cap(request, budget, config, profile)
         remaining = budget.remaining(time.monotonic())
         if remaining is None:
             remaining = float(request.timeout_seconds or profile.timeout_seconds)
@@ -622,9 +613,32 @@ class LlmClient:
         if remaining <= eligible_attempt_count * minimum:
             return None
         attempt_window = remaining / eligible_attempt_count
-        if float(request.timeout_seconds or 0) >= 180:
-            attempt_window = min(attempt_window, 90.0)
-        return attempt_window if attempt_window >= minimum else None
+        capped = self._apply_physical_cap(request, attempt_window)
+        return capped if capped >= minimum else None
+
+    @staticmethod
+    def _physical_cap_seconds(request: LlmRequest) -> float | None:
+        raw = request.metadata.get("max_physical_attempt_seconds")
+        if raw in (None, ""):
+            return None
+        return float(raw)
+
+    def _physical_attempt_cap(self, request, budget, config, profile) -> float | None:
+        """Last hop keeps the remaining logical window unless this card sets a cap."""
+        cap = self._physical_cap_seconds(request)
+        if cap is None:
+            return None
+        remaining = budget.remaining(time.monotonic())
+        if remaining is None:
+            remaining = float(request.timeout_seconds or profile.timeout_seconds)
+        window = min(cap, remaining)
+        return window if window >= config.min_attempt_seconds else None
+
+    def _apply_physical_cap(self, request: LlmRequest, attempt_window: float) -> float:
+        cap = self._physical_cap_seconds(request)
+        if cap is None:
+            return attempt_window
+        return min(attempt_window, cap)
 
     async def _complete_concrete(
         self,

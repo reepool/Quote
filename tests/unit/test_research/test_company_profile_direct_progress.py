@@ -663,13 +663,12 @@ def test_selected_chapters_are_read_before_the_company_draft():
     report = _report()
     identity = direct_core_processing_identity()
     text = {
-        1: "公司经营有线电视网络传输，并向用户提供接入服务。" + ("甲" * 4500),
-        9: "公司按合同期限确认频道收看维护费，并采购数据传输与系统维护服务。" + ("乙" * 4500),
+        1: "公司经营有线电视网络传输，并向用户提供接入服务。",
+        9: "公司按合同期限确认频道收看维护费，并采购数据传输与系统维护服务。",
     }
     pages = tuple(
         {"page": page, "text": body, "readable": True} for page, body in text.items()
     )
-    assert len(list(body_packages(pages, report, identity, 24_000))) >= 2
     persists = {"count": 0}
 
     class _Provider:
@@ -695,23 +694,22 @@ def test_selected_chapters_are_read_before_the_company_draft():
                     raise ValueError("second-package-inventory-failed")
             if request.purpose == "synthesize_views":
                 self.events.append(("synthesize", current))
-                page = current[0]
-                quote = text[page][:12]
                 return ReportSemanticResponseV3(
                     request_id=request.request_id,
                     purpose=request.purpose,
-                    claims=(
+                    claims=tuple(
                         ReportViewClaim(
                             claim_id=f"package-{page}",
-                            dimension="principal_business",
+                            dimension="principal_business" if page == 1 else "revenue_model",
                             status="observed",
-                            answer=f"第{page}包已核。",
+                            answer=f"第{page}页已核。",
                             evidence=(
-                                _evidence(report, text=quote, page=page).model_copy(
+                                _evidence(report, text=text[page][:12], page=page).model_copy(
                                     update={"evidence_id": f"package-{page}-evidence"}
                                 ),
                             ),
-                        ),
+                        )
+                        for page in current
                     ),
                 )
             if request.purpose == "verify_views":
@@ -750,19 +748,143 @@ def test_selected_chapters_are_read_before_the_company_draft():
     assert "inventory" in names and "synthesize" in names
     assert names.index("synthesize") > names.index("inventory")
     assert {page for name, pages in provider.events if name == "inventory" for page in pages} >= {1, 9}
+    assert sum(name == "synthesize" for name, _pages in provider.events) == 1
 
-    persists["count"] = 0
-    persists["fail"] = True
-    failed = _run(
+
+def test_same_local_claim_id_does_not_drop_a_different_business():
+    report = _report()
+    text = "公司经营有线电视网络。公司按合同期限确认收看维护费。"
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(1,),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="same",
+                            dimension="principal_business",
+                            status="observed",
+                            answer="经营有线电视网络。",
+                            evidence=(
+                                _evidence(report, text="公司经营有线电视网络", page=1).model_copy(
+                                    update={"evidence_id": "biz-1"}
+                                ),
+                            ),
+                        ),
+                        ReportViewClaim(
+                            claim_id="same",
+                            dimension="revenue_model",
+                            status="observed",
+                            answer="按合同期限确认收看维护费。",
+                            evidence=(
+                                _evidence(report, text="按合同期限确认收看维护费", page=1).model_copy(
+                                    update={"evidence_id": "fee-1"}
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+            if request.purpose == "verify_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    checks=tuple(
+                        {
+                            "target_type": "claim",
+                            "target_id": claim.claim_id,
+                            "status": "pass",
+                            "explanation": "离线",
+                        }
+                        for claim in request.claims
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id, purpose=request.purpose
+            )
+
+    result = _run(
         _Provider(),
-        pages=pages,
-        processing_identity=identity,
+        pages=({"page": 1, "text": text, "readable": True},),
+        processing_identity=direct_core_processing_identity(),
         report=report,
-        on_progress=lambda _result: persists.__setitem__("count", persists["count"] + 1),
     )
-    assert any(item.claim_id == "package-1" and item.status == "observed" for item in failed.claims)
-    assert any("second-package-inventory-failed" in gap for gap in failed.gaps)
-    assert failed.draft_complete is False
+    answers = {item.answer for item in result.claims}
+    assert "经营有线电视网络。" in answers
+    assert "按合同期限确认收看维护费。" in answers
+    assert len({item.claim_id for item in result.claims}) == 2
+
+
+def test_company21_core_pages_pack_inside_the_byte_cap():
+    import gzip
+    import json
+    from pathlib import Path
+
+    from research.company_profile.contracts import ReportSemanticRequestV3
+    from research.company_profile.direct_reading import body_packages
+    from research.company_profile.reading_budget import request_payload_bytes
+
+    root = Path("/home/python/Quote")
+    query = json.loads(
+        (
+            root
+            / "openspec/changes/restore-company-profile-llm-led-generalization/b1-company21-evidence/query.json"
+        ).read_text()
+    )
+    selected = set(
+        next(
+            item["response_payload"]["requested_pages"]
+            for item in query["profiles"][0]["three_views"]["call_receipts"]
+            if item.get("source_scope") == "page_map"
+        )
+    )
+    checkpoint = json.loads(
+        gzip.decompress(
+            (
+                root
+                / "openspec/changes/restore-company-profile-llm-led-generalization/b1-resource-evidence/iteration2/checkpoint.json.gz"
+            ).read_bytes()
+        )
+    )
+    pages = [
+        {
+            "page": int(page["page"]),
+            "text": str(page.get("text") or ""),
+            "readable": True,
+        }
+        for page in checkpoint["pages"]
+        if int(page["page"]) in selected
+    ]
+    assert len(pages) == len(selected) == 22
+    report = _report()
+    identity = direct_core_processing_identity()
+    identity["max_payload_utf8_bytes"] = 60_000
+    identity["request_reservation_limit"] = 65_536
+    packages = list(body_packages(pages, report, identity, 65_536))
+    covered = []
+    for package in packages:
+        request = ReportSemanticRequestV3(
+            request_id="pack-check",
+            purpose="source_inventory",
+            report=report,
+            processing_identity=identity,
+            source_pages=tuple(package),
+            source_scope="full_context",
+            max_output_tokens=2500,
+            timeout_seconds=180,
+        )
+        assert request_payload_bytes(request) <= 60_000
+        covered.extend(int(page["page"]) for page in package)
+    assert set(covered) == selected
 
 
 def test_company19_candidates_are_verified_once_and_roles_are_included():
