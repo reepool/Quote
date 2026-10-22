@@ -429,7 +429,9 @@ def validate_binding(
         raise ValueError("frozen PDF hash mismatch")
     elapsed = binding["max_elapsed_seconds"]
     auth = binding.get("run_authorization")
-    if auth == "company_profile_company_core.2026-10-21":
+    if auth == "company_profile_company_evidence.2026-10-22":
+        allowed = 0 < elapsed <= 2400
+    elif auth == "company_profile_company_core.2026-10-21":
         allowed = 0 < elapsed <= 2400
     elif auth == "company_profile_repair.2026-10-21":
         allowed = 0 < elapsed <= 1314
@@ -470,6 +472,7 @@ def validate_binding(
                 "company18",
                 "company19",
                 "company20",
+                "company21",
             }
             or not authorization.get("approval_reference")
         ):
@@ -654,7 +657,10 @@ def _worker(
         recovery_policy=(
             LogicalRecoveryPolicy(
                 max_recoveries=(
-                    6
+                    4
+                    if binding.get("run_authorization")
+                    == "company_profile_company_evidence.2026-10-22"
+                    else 6
                     if binding.get("run_authorization")
                     == "company_profile_company_core.2026-10-21"
                     else 4
@@ -908,6 +914,10 @@ def _worker(
         identity["request_reservation_limit"] = int(
             binding.get("request_reservation_limit", 24_000)
         )
+        if binding.get("logical_request_timeout_seconds"):
+            identity["logical_request_timeout_seconds"] = int(
+                binding["logical_request_timeout_seconds"]
+            )
         identity["protect_tail"] = not bool(
             binding.get("defer_tail_to_next_window")
         )

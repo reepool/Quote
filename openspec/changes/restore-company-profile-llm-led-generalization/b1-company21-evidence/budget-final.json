@@ -1,0 +1,45 @@
+{
+  "physical_requests": 1,
+  "charged_tokens": 16214,
+  "charged_cost_cny": "unknown",
+  "cost_status": "unknown",
+  "billing_mode": "development_unpriced",
+  "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+  "stopped_reason": "physical_payload_or_output_limit",
+  "denied_request": {
+    "request_id": "32427c3334d64cceb7a833aa25ece624",
+    "payload_utf8_bytes": 61120,
+    "reserved_input_tokens": 61376,
+    "reserved_output_tokens": 2500,
+    "required_tokens": 63876,
+    "remaining_tokens": 383786,
+    "required_cost_cny": "unknown",
+    "remaining_cost_cny": "unknown",
+    "context_tokens": null,
+    "remaining_requests": 23
+  },
+  "attempts": [
+    {
+      "sequence": 1,
+      "request_id": "a93f82d1621344458c2f808f5515e4ac",
+      "logical_request_id": "832ecea0e39a75a889a9711afefebca98d8f2fca07922a01f8c4bee13f007894",
+      "source_label": "scorpio:gemini-3.8-flash-high",
+      "attempt": 1,
+      "profile": "semantic_extraction__scorpio_gemini",
+      "provider_resource": "scorpio:gemini",
+      "model": "gemini-3.8-flash-high",
+      "reserved_input_tokens": 52070,
+      "reserved_output_tokens": 1000,
+      "charged_tokens": 16214,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 15056,
+        "output_tokens": 1158,
+        "total_tokens": 16214
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown"
+    }
+  ]
+}

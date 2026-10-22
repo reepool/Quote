@@ -657,14 +657,14 @@ def test_two_paragraphs_on_one_page_both_reach_verification():
     assert any(item.claim_id == "supply" and item.status == "observed" for item in result.claims)
 
 
-def test_the_first_package_is_persisted_before_the_second_package_is_inventoried():
+def test_selected_chapters_are_read_before_the_company_draft():
     from research.company_profile.direct_reading import body_packages
 
     report = _report()
     identity = direct_core_processing_identity()
     text = {
         1: "公司经营有线电视网络传输，并向用户提供接入服务。" + ("甲" * 4500),
-        2: "公司采购节目传输与系统维护服务，面向家庭用户提供接入。" + ("乙" * 4500),
+        9: "公司按合同期限确认频道收看维护费，并采购数据传输与系统维护服务。" + ("乙" * 4500),
     }
     pages = tuple(
         {"page": page, "text": body, "readable": True} for page, body in text.items()
@@ -677,6 +677,7 @@ def test_the_first_package_is_persisted_before_the_second_package_is_inventoried
 
         def __init__(self):
             self.inventories = 0
+            self.events = []
 
         def interpret(self, request):
             current = tuple(int(page["page"]) for page in request.source_pages)
@@ -684,15 +685,16 @@ def test_the_first_package_is_persisted_before_the_second_package_is_inventoried
                 return ReportSemanticResponseV3(
                     request_id=request.request_id,
                     purpose=request.purpose,
-                    requested_pages=(1, 2),
+                    requested_pages=(1, 9),
                 )
             if request.purpose == "source_inventory" and request.source_scope != "page_map":
+                assert not request.claims
                 self.inventories += 1
-                if self.inventories >= 2:
-                    assert persists["count"] >= 1
-                    if persists.get("fail"):
-                        raise ValueError("second-package-inventory-failed")
+                self.events.append(("inventory", current))
+                if self.inventories >= 2 and persists.get("fail"):
+                    raise ValueError("second-package-inventory-failed")
             if request.purpose == "synthesize_views":
+                self.events.append(("synthesize", current))
                 page = current[0]
                 quote = text[page][:12]
                 return ReportSemanticResponseV3(
@@ -742,8 +744,12 @@ def test_the_first_package_is_persisted_before_the_second_package_is_inventoried
     assert persists["count"] >= 1
     assert {item.claim_id for item in result.claims if item.status == "observed"} >= {
         "package-1",
-        "package-2",
+        "package-9",
     }
+    names = [name for name, _pages in provider.events]
+    assert "inventory" in names and "synthesize" in names
+    assert names.index("synthesize") > names.index("inventory")
+    assert {page for name, pages in provider.events if name == "inventory" for page in pages} >= {1, 9}
 
     persists["count"] = 0
     persists["fail"] = True

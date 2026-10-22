@@ -605,7 +605,16 @@ class LlmClient:
                 max(int(route_cap) - int(failover_count), 0),
             )
         if eligible_attempt_count <= 1:
-            return None
+            if float(request.timeout_seconds or 0) < 180:
+                return None
+            remaining = budget.remaining(time.monotonic())
+            if remaining is None:
+                remaining = float(request.timeout_seconds or profile.timeout_seconds)
+            return (
+                min(90.0, remaining)
+                if remaining >= config.min_attempt_seconds
+                else None
+            )
         remaining = budget.remaining(time.monotonic())
         if remaining is None:
             remaining = float(request.timeout_seconds or profile.timeout_seconds)
@@ -613,6 +622,8 @@ class LlmClient:
         if remaining <= eligible_attempt_count * minimum:
             return None
         attempt_window = remaining / eligible_attempt_count
+        if float(request.timeout_seconds or 0) >= 180:
+            attempt_window = min(attempt_window, 90.0)
         return attempt_window if attempt_window >= minimum else None
 
     async def _complete_concrete(

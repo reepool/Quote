@@ -122,12 +122,15 @@ class LlmRunBudget:
         prior_logical_attempts: tuple[Mapping[str, Any], ...] | list[Mapping[str, Any]] = (),
         run_authorization: str | None = None,
     ):
+        authorized_evidence = run_authorization == "company_profile_company_evidence.2026-10-22"
         authorized_company = run_authorization == "company_profile_company_core.2026-10-21"
         authorized_repair = run_authorization == "company_profile_repair.2026-10-21"
         authorized_f1 = run_authorization == "company_profile_f1.2026-10-20"
         authorized_e2 = run_authorization == "company_profile_e2.2026-10-20"
         authorized_e1 = run_authorization == "company_profile_e1.2026-10-20"
-        if authorized_company:
+        if authorized_evidence:
+            token_cap, request_cap, cost_cap = 400_000, 24, Decimal(50)
+        elif authorized_company:
             token_cap, request_cap, cost_cap = 400_000, 40, Decimal(50)
         elif authorized_repair:
             token_cap, request_cap, cost_cap = 153_695, 23, Decimal(10)
@@ -157,6 +160,7 @@ class LlmRunBudget:
         if billing_mode not in {STRICT_BILLING, DEVELOPMENT_UNPRICED_BILLING}:
             raise ValueError("unknown billing mode")
         self.deadline = deadline
+        self.run_authorization = run_authorization
         self.prices = dict(prices)
         self.max_tokens = max_tokens
         self.max_requests = max_requests
@@ -239,8 +243,13 @@ class LlmRunBudget:
             cost_known = priced and len(known_costs) == len(self.attempts)
             used_cost = sum(known_costs, Decimal(0)) if cost_known else None
             context_exceeded = priced and tokens > price.context_tokens
+            payload_limit = (
+                60_000
+                if self.run_authorization == "company_profile_company_evidence.2026-10-22"
+                else DEVELOPMENT_PAYLOAD_BYTE_LIMIT
+            )
             payload_exceeded = self.billing_mode == DEVELOPMENT_UNPRICED_BILLING and (
-                payload_bytes > DEVELOPMENT_PAYLOAD_BYTE_LIMIT
+                payload_bytes > payload_limit
                 or output > DEVELOPMENT_MAX_OUTPUT_TOKENS
             )
             logical_id = str(logical_request_id or request_id)

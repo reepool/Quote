@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-22，[A审核§79](#79-a审核5f910a27结束页包循环替换为公司核心证据优先2026-10-22)）：审核5f910a27，第20次4条已核/3条待核，已审主张4/4、核心2/19、负例2/6实查通过，公司限用，B1/A1未过。结束§37及余额，终止旧页包循环；唯一活动卡§38公司核心证据优先的替代实现，新授权一次真实入口（累计第21次），尚未使用，无自动第22次。观察1/4、可用0/4；S1/S2/S3未启动。生产not_authorized、规模false。原§1—78结果不改。
+当前状态（2026-10-22，[B交接§80](#80-b交接38第21次导航后正文载荷被拒绝)）：全报告208页已一次定位。随后正文载荷61120字节超过60000上限，账本停止，三视图为空。本入口16214账本、187.39162191655487秒、1次请求，费用unknown。无第22次。观察1/4、可用0/4。生产not_authorized、规模false。原§1—79不改。
 
 ## 1. 唯一实施指引
 
@@ -3415,3 +3415,49 @@ bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m p
 本轮规划只更新9份权威活动文档、OpenSpec和本审核；`openspec validate restore-company-profile-llm-led-generalization --strict`、16个新增活动链接/锚点、资源算术及`git diff --check`通过。对照开始基线，其他12份脏文件hash不变；验收计划以原活动前缀拼回当前历史后缀的hash与开始时一致，历史既有改动未动；16项未跟踪列表不变。提交仅隔离本轮9份文档，不包含既有历史后缀。A不替B改业务代码。
 
 本轮两次诊断命令留下的2个空pytest日志目录已在进程结束后删除，共8192字节目录占用；未生成测试库/完整正文副本，未删历史必要材料。临时物统一QuoteBak，必要证据只保权威一套。不归档、不扩批，生产not_authorized、规模false。
+
+## 80. B交接：§38第21次导航后正文载荷被拒绝
+
+日期：2026-10-22。公司仍为歌华有线 600037.SH，2025年报，版本 `b5b6be18424b7c3d7d7988f755ff7083141831904d4347c07cba1da8452c8b76`。本段记录页包循环替换和第21次。没有载入旧语义。观察1/4、可用0/4。生产 `not_authorized`，规模 false。无第22次。
+
+### 80.1 编排
+
+全报告结构预览先全部定位，再读已选正文，然后一次公司成稿和有限核验。不再在每个正文包里走完核验才读下一包。小型跨章节输入里，页1和页9都在成稿前进入不带候选的源审。直接测试 `test_selected_chapters_are_read_before_the_company_draft`、源查漏保留、导航失败保留和 E2 预算隔离 4 passed，17.81秒。这是协议证明，不是歌华分数。
+
+### 80.2 第21次结果
+
+三视图主张数都是 0。`draft_complete` 为 false。查询与导出的 profiles 一致。
+
+实际顺序：一次 `page_map` 覆盖全部 208 页，模型 `gemini-3.8-flash-high`，usage 15056 输入 + 1158 输出 = 16214。下一请求是正文，UTF-8 载荷 61120 字节，输出预留 2500，合计预留 63876。新授权把载荷上限定为 60000 字节，这次预留被拒绝，账本状态写成 `physical_payload_or_output_limit`，后面的阅读没有再发。收费、收入分项和采购没有进入答案。
+
+19项和6项负例都是未评估。没有已发布主张，也没有已发现的底线错误外放。
+
+### 80.3 资源
+
+冻结绑定 `b1-pool-company21-binding.json` SHA-256 `b38f860f2dba1031bcdf48511924830345a8bd6271c3233e472b648c5e4a8fd3`。授权 `company_profile_company_evidence.2026-10-22`，尝试 `company21`。旧卡余额没有并入。
+
+本入口：账本 16214，全部为有效 usage，未知预留 0；物理请求 1；恢复 0；费用 unknown。监督耗时 187.39162191655487 秒。
+
+整卡剩余 383786 账本、2212.608378083445 秒、23 次请求、4 次恢复。这些剩余不构成第22次。
+
+路线累计：1761859+16214=1778073 账本；8332.111209007044+187.39162191655487=8519.502830923599 秒；125+1=126 次请求。原20次账不改。
+
+未在发送前用 208 页实载测量正文包字节。结构预览按 65536 预留装进了一次导航，正文包则越过了 60000 字节上限，拒绝后又停止了整个账本，没有改成更小的包再发。
+
+### 80.4 证据与清理
+
+`b1-company21-evidence/` 与运行根五份哈希一致后删除运行根。尝试标记 `b1-company21-attempts/company21.json` 保留。开发前删除 1 个空的 `quote_pytest_logs_*`。PDF、前20次证据、v61、window10、direct1 未动。
+
+- query `047ce9a347cf9aa05d78a7151b7610001cd5b6536b5deefcccba2815e4548ea3`
+- export `8157ec47a459cdf4cda7ee359039c572d2acade5f7c81d6080f050e8baaef8b6`
+- budget `4fe6b9403f8d3e5a52adbb3fe77d4f3e6b089f5343ec3bb3be32b85a52db060a`
+- supervisor `c9603a6c4e64c8eecaf53e83149f36ab1835c51d05e16ffc8dea8a656c8e7730`
+- entry.log `805c1169fe230e5a5235b58ed8f6276b8ea7411a9ef348ffbd98fc195d0e0028`
+
+```bash
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m research.company_profile.bounded_entry \
+  --binding openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-company21-binding.json \
+  --authorization openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-company21-authorization.json \
+  --run-root /home/python/Quote/data/QuoteBak/b1-company21-20261022 --real
+```
+
