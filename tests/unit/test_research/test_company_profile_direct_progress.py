@@ -1731,8 +1731,140 @@ def test_same_local_claim_id_keeps_both_revenue_answers():
         report=report,
     )
     answers = [claim.answer for claim in result.claims]
-    assert any("897,897,997.75" in answer for answer in answers)
-    assert any("724,769,470.04" in answer for answer in answers)
+    assert sum("897,897,997.75" in answer for answer in answers) == 1
+    assert sum("724,769,470.04" in answer for answer in answers) == 1
+    rendered = research_views(result)
+    found = {
+        claim["answer"]: claim
+        for view in rendered["views"].values()
+        for claim in view["claims"]
+        if "897,897,997.75" in claim["answer"] or "724,769,470.04" in claim["answer"]
+    }
+    assert len(found) == 2
+    assert {claim["review_state"] for claim in found.values()} == {"verified"}
+    assert len({claim["claim_id"] for claim in found.values()}) == 2
+
+
+def test_an_unclear_renamed_claim_does_not_replace_the_other_answer():
+    import json
+
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    kept = ReportViewClaim(
+        claim_id="kept-role",
+        dimension="supply_chain_role",
+        status="observed",
+        answer="公司经营有线电视网络。",
+        evidence=(
+            _evidence(report, text="公司经营有线电视网络", page=1).model_copy(
+                update={"evidence_id": "kept-evidence"}
+            ),
+        ),
+    )
+    first = ReportSourceCondition(
+        condition_id="info-revenue",
+        dimension="products_services",
+        description="信息业务收入。",
+        evidence=(
+            _evidence(report, text="信息业务收入 897,897,997.75", page=1).model_copy(
+                update={"evidence_id": "info-evidence"}
+            ),
+        ),
+        major=True,
+        statement_status="current",
+    )
+    second = ReportSourceCondition(
+        condition_id="maintenance-revenue",
+        dimension="products_services",
+        description="收看维护收入。",
+        evidence=(
+            _evidence(report, text="有线电视收看维护收入 724,769,470.04", page=1).model_copy(
+                update={"evidence_id": "maintenance-evidence"}
+            ),
+        ),
+        major=True,
+        statement_status="current",
+    )
+    receipt = {
+        "request_id": "saved-source",
+        "purpose": "source_inventory",
+        "status": "success",
+        "source_scope": "full_context",
+        "source_pages": [1],
+        "response_payload": ReportSemanticResponseV3(
+            request_id="saved-source",
+            purpose="source_inventory",
+            source_conditions=(first, second),
+        ).model_dump(mode="json"),
+    }
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            if request.purpose == "synthesize_views":
+                quote = request.source_conditions[0].evidence[0].anchor.bounded_quote
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="claim-1",
+                            dimension="products_services",
+                            status="observed",
+                            answer=f"本期{quote}元。",
+                            condition_ids=(request.source_conditions[0].condition_id,),
+                            evidence=(
+                                _evidence(report, text=quote, page=1).model_copy(
+                                    update={"evidence_id": f"draft-{quote[:4]}"}
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "claim",
+                        "target_id": claim.claim_id,
+                        "status": "pass" if "897,897,997.75" in claim.answer else "unclear",
+                        "explanation": "只否定第二条。",
+                    }
+                    for claim in request.claims
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["accepted_source_receipts"] = [receipt]
+    identity["accepted_prior_draft"] = {
+        "claims": [json.loads(kept.model_dump_json())],
+        "checks": [],
+    }
+    result = _run(
+        _Provider(),
+        pages=(
+            {
+                "page": 1,
+                "text": "信息业务收入 897,897,997.75。有线电视收看维护收入 724,769,470.04。公司经营有线电视网络。",
+                "readable": True,
+            },
+        ),
+        processing_identity=identity,
+        report=report,
+    )
+    rendered = research_views(result)
+    found = {
+        claim["answer"]: claim["review_state"]
+        for view in rendered["views"].values()
+        for claim in view["claims"]
+        if "897,897,997.75" in claim["answer"] or "724,769,470.04" in claim["answer"]
+    }
+    assert found["本期信息业务收入 897,897,997.75元。"] == "verified"
+    assert found["本期有线电视收看维护收入 724,769,470.04元。"] != "verified"
+    assert sum("724,769,470.04" in claim.answer for claim in result.claims) == 1
 
 
 def test_logical_identity_separates_entries_and_verification_targets():

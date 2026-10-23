@@ -82,9 +82,79 @@ def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
             "evidence_not_located",
         }
     }
+    passed_claims = {
+        check.target_id
+        for check in checks
+        if check.target_type == "claim" and check.status == "pass"
+    }
+
+    def _norm(text: str) -> str:
+        return "".join(str(text or "").split())
+
+    def _supplementary(condition) -> bool:
+        text = condition.description or ""
+        return any(
+            word in text
+            for word in (
+                "计划",
+                "目标",
+                "拟",
+                "前五",
+                "存货",
+                "定位",
+                "打造",
+                "收费",
+                "收视费",
+                "增值税",
+                "核销",
+            )
+        )
+
+    def _reliable(claim) -> bool:
+        return claim.claim_id in verified_claims and claim.claim_id in passed_claims
+
+    def _quote_covered(condition) -> bool:
+        if any(
+            condition.condition_id in (claim.condition_ids or ())
+            for claim in claims
+            if _reliable(claim)
+        ):
+            return True
+        needles = [
+            _norm(evidence.anchor.bounded_quote)
+            for evidence in condition.evidence
+            if len(_norm(evidence.anchor.bounded_quote)) >= 24
+        ]
+        if not needles:
+            return False
+        hay = [
+            _norm(evidence.anchor.bounded_quote)
+            for claim in claims
+            if _reliable(claim)
+            for evidence in claim.evidence
+        ]
+        return all(
+            any(
+                needle[:80] in item or (len(item) >= 40 and item[:40] in needle)
+                for item in hay
+            )
+            for needle in needles
+        )
+
     accepted_records = {item.record_id for item in records}
     for condition in conditions:
-        if not condition.major:
+        if not condition.major or _supplementary(condition):
+            continue
+        text = condition.description or ""
+        if condition.dimension == "products_services" and "收入" not in text and "代理" not in text:
+            continue
+        if condition.dimension not in {
+            "principal_business",
+            "products_services",
+            "revenue_model",
+            "supply_chain_role",
+            "upstream_downstream",
+        }:
             continue
         covered = False
         for check in checks:
@@ -102,6 +172,8 @@ def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
                 and check.covers_target_id in accepted_records
             ):
                 covered = True
+        if not covered and _quote_covered(condition):
+            covered = True
         if not covered:
             found.append(f"major_condition_not_verified:{condition.condition_id}")
     return found
@@ -529,6 +601,7 @@ def interpret_direct_core(
     request_cap = int(identity.get("max_physical_requests") or 16)
     gaps: list[str] = []
     conditions: list[ReportSourceCondition] = []
+    conditions_to_draft: list[ReportSourceCondition] = conditions
     claims: list[ReportViewClaim] = []
     checks: list[ReportViewCheck] = []
     records: list[SemanticRecord] = []
@@ -765,8 +838,8 @@ def interpret_direct_core(
             )
         )
 
-    def upsert(claim) -> None:
-        """One claim id keeps one current state. A different answer gets its own id."""
+    def upsert(claim):
+        """Keep one object per id. A different answer is a new object with a stable id."""
         for index, earlier in enumerate(claims):
             if earlier.claim_id != claim.claim_id:
                 continue
@@ -785,10 +858,11 @@ def interpret_direct_core(
                 "evidence_not_located",
             }
             if verified and claim.limitation == "pending_verification":
-                return
+                return earlier
             claims[index] = claim
-            return
+            return claim
         claims.append(claim)
+        return claim
 
     def keep_pending(claim, reason: str) -> None:
         gaps.append(f"{reason}:{claim.claim_id}")
@@ -1749,11 +1823,21 @@ def interpret_direct_core(
             )
 
         ordered = sorted(
-            conditions,
+            conditions_to_draft,
             key=lambda item: (rank.get(item.dimension, 50), item.condition_id),
         )
         if identity.get("accepted_prior_draft"):
-            groups = [[condition] for condition in ordered]
+            principal = [
+                condition
+                for condition in ordered
+                if condition.dimension == "principal_business"
+            ]
+            groups = []
+            if principal:
+                groups.append(principal)
+            groups.extend(
+                [[condition] for condition in ordered if condition not in principal]
+            )
         else:
             groups = []
             current = []
@@ -1824,12 +1908,12 @@ def interpret_direct_core(
                     upsert(claim)
                 else:
                     claim = claim.model_copy(update={"evidence": tuple(bound)})
-                    drafted_clean.append(claim)
-                    upsert(
+                    stored = upsert(
                         claim.model_copy(
                             update={"limitation": "pending_verification"}
                         )
                     )
+                    drafted_clean.append(stored.model_copy(update={"limitation": None}))
                 publish()
         if drafted_clean:
             settle_claims(drafted_clean, sent_conditions)
@@ -1915,8 +1999,20 @@ def interpret_direct_core(
             cited_ids = {
                 condition_id
                 for claim in claims
-                if claim.claim_id not in retract
-                and claim.limitation != "retracted_pending_correction"
+                if claim.status == "observed"
+                and claim.limitation
+                not in {
+                    "pending_verification",
+                    "claim_or_dependency_not_verified",
+                    "evidence_not_located",
+                    "retracted_pending_correction",
+                }
+                and any(
+                    check.target_type == "claim"
+                    and check.target_id == claim.claim_id
+                    and check.status == "pass"
+                    for check in checks
+                )
                 for condition_id in (claim.condition_ids or [])
             }
             answer_text = "\n".join(claim.answer for claim in claims)
@@ -1935,6 +2031,14 @@ def interpret_direct_core(
                     len(quote_amounts) != 1 or quote_amounts[0] in answer_text
                 )
                 if condition.condition_id in cited_ids and amount_already_answered:
+                    continue
+                if (
+                    condition.dimension == "principal_business"
+                    and condition.major
+                    and ("从事" in condition.description or "负责" in condition.description)
+                    and not any(word in condition.description for word in ("计划", "目标"))
+                ):
+                    selected_conditions.append(condition)
                     continue
                 if condition.dimension not in {"revenue_model", "products_services"}:
                     continue
@@ -2002,7 +2106,7 @@ def interpret_direct_core(
                         selected_conditions.extend(extra)
                 except (ValueError, LlmError, SemanticProviderError) as exc:
                     gaps.append(f"direct_core_gap_check_stopped:{exc}")
-            conditions[:] = selected_conditions
+            conditions_to_draft = list(selected_conditions)
         draft_reused_sources()
         if prior:
             fresh_ids = {item.claim_id for item in claims}

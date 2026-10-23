@@ -2436,6 +2436,26 @@ def research_views(result: ReportInterpretation) -> dict[str, Any]:
     for name, dimensions in VIEWS.items():
         claims = [item for item in result.claims if item.dimension in dimensions]
         projected = set((result.processing_identity or {}).get("project_claim_ids") or ())
+        if name == "product_exposure":
+            claims.extend(
+                item
+                for item in result.claims
+                if item.dimension in {"products_services", "revenue_model"}
+                and item not in claims
+                and item.status == "observed"
+                and item.limitation
+                not in {
+                    "pending_verification",
+                    "claim_or_dependency_not_verified",
+                    "evidence_not_located",
+                }
+                and any(
+                    check.target_type == "claim"
+                    and check.target_id == item.claim_id
+                    and check.status == "pass"
+                    for check in result.checks
+                )
+            )
         if name == "supply_chain_position" and projected:
             claims.extend(
                 item

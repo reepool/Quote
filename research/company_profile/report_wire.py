@@ -265,7 +265,11 @@ def instructions(request: ReportSemanticRequestV3) -> str:
             lead = (
                 "The supplied quotes and source conditions are the cross-chapter evidence. "
                 "Use every supplied condition. Do not drop a later chapter because an "
-                "earlier passage already has an answer. Return a claim only when the "
+                "earlier passage already has an answer. Quotes about the same company "
+                "and the same period may jointly support one current-business summary; "
+                "cite each quote, and do not require one quote to repeat the whole "
+                "sentence. Keep a plan or goal, and a general tax or fee policy, out of "
+                "that current-business sentence. Return a claim only when the "
                 "supplied text supports the whole answer, with a {page,quote} copied from "
                 "that text. Do not fill a dimension the text does not support. "
             )
@@ -311,7 +315,9 @@ def instructions(request: ReportSemanticRequestV3) -> str:
         "Judge each claim as a whole. If any clause, relationship, number, column "
         "or purchase/sale direction is not supported by the supplied quotes, return "
         "unclear for that entire claim. One correct sentence does not make an "
-        "unsupported inference pass. "
+        "unsupported inference pass. Quotes about the same company and period may "
+        "jointly support a summary; do not reject it only because no single quote "
+        "repeats every clause. "
         "A general tax, fee, or price policy does not prove the company collects that "
         "fee. Selling for another party is not selling to that party. An ending balance "
         "is not a current-period purchase or expense. "

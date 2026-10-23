@@ -596,6 +596,7 @@ def validate_binding(
                 "company29",
                 "company30",
                 "company31",
+                "company32",
             }
             or not authorization.get("approval_reference")
         ):
@@ -1352,6 +1353,10 @@ def main() -> int:
             (attempts / "company30.json").is_file()
         ):
             raise ValueError("company31 requires the protected company30 marker")
+        if authorization["attempt"] == "company32" and not (
+            (attempts / "company31.json").is_file()
+        ):
+            raise ValueError("company32 requires the protected company31 marker")
         if authorization["attempt"] == "company20" and not (
             (attempts / "company19.json").is_file()
         ):
