@@ -536,7 +536,13 @@ def validate_binding(
         raise ValueError("frozen PDF hash mismatch")
     elapsed = binding["max_elapsed_seconds"]
     auth = binding.get("run_authorization")
-    if auth == "company_profile_fulltext_core.2026-10-22":
+    if auth == "company_profile_b2_cross_industry.2026-10-23":
+        allowed = (
+            0 < elapsed <= 7200
+            and int(binding.get("max_tokens") or 0) <= 2_400_000
+            and int(binding.get("max_physical_requests") or 0) <= 128
+        )
+    elif auth == "company_profile_fulltext_core.2026-10-22":
         allowed = (
             0 < elapsed <= 3600
             and int(binding.get("max_tokens") or 0) <= 1_200_000
@@ -597,6 +603,9 @@ def validate_binding(
                 "company30",
                 "company31",
                 "company32",
+                "saic1",
+                "spdb1",
+                "tongfang1",
             }
             or not authorization.get("approval_reference")
         ):
@@ -787,7 +796,10 @@ def _worker(
                         + min(6, int(binding.get("max_recoveries", 6))),
                     )
                     if binding.get("run_authorization")
-                    == "company_profile_fulltext_core.2026-10-22"
+                    in {
+                        "company_profile_fulltext_core.2026-10-22",
+                        "company_profile_b2_cross_industry.2026-10-23",
+                    }
                     else 4
                     if binding.get("run_authorization")
                     == "company_profile_company_evidence.2026-10-22"
@@ -1244,7 +1256,11 @@ def main() -> int:
         binding.get("reading_strategy") == "direct_core_v1"
         and args.worker_deadline is None
         and not binding.get("accepted_navigation_query")
-        and binding.get("run_authorization") != "company_profile_fulltext_core.2026-10-22"
+        and binding.get("run_authorization")
+        not in {
+            "company_profile_fulltext_core.2026-10-22",
+            "company_profile_b2_cross_industry.2026-10-23",
+        }
     ):
         direct_plan = preflight_direct_core(binding)
     else:

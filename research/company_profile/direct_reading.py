@@ -82,79 +82,15 @@ def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
             "evidence_not_located",
         }
     }
-    passed_claims = {
-        check.target_id
-        for check in checks
-        if check.target_type == "claim" and check.status == "pass"
-    }
-
-    def _norm(text: str) -> str:
-        return "".join(str(text or "").split())
-
-    def _supplementary(condition) -> bool:
-        text = condition.description or ""
-        return any(
-            word in text
-            for word in (
-                "计划",
-                "目标",
-                "拟",
-                "前五",
-                "存货",
-                "定位",
-                "打造",
-                "收费",
-                "收视费",
-                "增值税",
-                "核销",
-            )
-        )
-
-    def _reliable(claim) -> bool:
-        return claim.claim_id in verified_claims and claim.claim_id in passed_claims
-
-    def _quote_covered(condition) -> bool:
-        if any(
-            condition.condition_id in (claim.condition_ids or ())
-            for claim in claims
-            if _reliable(claim)
-        ):
-            return True
-        needles = [
-            _norm(evidence.anchor.bounded_quote)
-            for evidence in condition.evidence
-            if len(_norm(evidence.anchor.bounded_quote)) >= 24
-        ]
-        if not needles:
-            return False
-        hay = [
-            _norm(evidence.anchor.bounded_quote)
-            for claim in claims
-            if _reliable(claim)
-            for evidence in claim.evidence
-        ]
-        return all(
-            any(
-                needle[:80] in item or (len(item) >= 40 and item[:40] in needle)
-                for item in hay
-            )
-            for needle in needles
-        )
-
+    claims_by_id = {item.claim_id: item for item in claims}
     accepted_records = {item.record_id for item in records}
+    record_verdicts = {
+        check.target_id: check.status
+        for check in checks
+        if check.target_type == "record"
+    }
     for condition in conditions:
-        if not condition.major or _supplementary(condition):
-            continue
-        text = condition.description or ""
-        if condition.dimension == "products_services" and "收入" not in text and "代理" not in text:
-            continue
-        if condition.dimension not in {
-            "principal_business",
-            "products_services",
-            "revenue_model",
-            "supply_chain_role",
-            "upstream_downstream",
-        }:
+        if not condition.major or condition.statement_status != "current":
             continue
         covered = False
         for check in checks:
@@ -167,13 +103,21 @@ def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
             if (
                 check.covers_target_type == "claim"
                 and check.covers_target_id in verified_claims
-            ) or (
+            ):
+                claim = claims_by_id[check.covers_target_id]
+                dependencies = set(claim.supporting_record_ids)
+                if dependencies and (
+                    not dependencies <= accepted_records
+                    or any(record_verdicts.get(key) not in {None, "pass"} for key in dependencies)
+                ):
+                    continue
+                covered = True
+            elif (
                 check.covers_target_type == "record"
                 and check.covers_target_id in accepted_records
+                and record_verdicts.get(check.covers_target_id) in {None, "pass"}
             ):
                 covered = True
-        if not covered and _quote_covered(condition):
-            covered = True
         if not covered:
             found.append(f"major_condition_not_verified:{condition.condition_id}")
     return found

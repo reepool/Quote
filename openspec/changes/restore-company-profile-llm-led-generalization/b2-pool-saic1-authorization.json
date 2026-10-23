@@ -1,0 +1,10 @@
+{
+  "status": "authorized",
+  "attempt": "saic1",
+  "binding_sha256": "34d737e07ffd15753193f69068aef5f7f3c9d10184bca9253f36603477643261",
+  "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+  "approval_reference": "acceptance program section 7.41 and b2-execution-card, 2026-10-23",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed"
+}

@@ -383,6 +383,163 @@ def test_a_condition_pass_without_a_delivered_object_is_not_coverage():
     assert not any(gap.startswith("major_condition_not_verified:") for gap in gaps)
 
 
+def test_keywords_and_shared_quotes_do_not_cover_an_unanswered_major_business():
+    from research.company_profile.contracts import ReportSourceCondition, ReportViewCheck
+    from research.company_profile.direct_reading import _completeness_gaps
+
+    report = _report()
+    shared = "公司提供云服务并取得云服务收入；另有独立的工业设计服务，其面向设备制造客户提供收费设计服务。"
+    claims = []
+    checks = []
+    for claim_id, dimension in (
+        ("cloud-business", "principal_business"),
+        ("cloud-product", "products_services"),
+        ("cloud-revenue", "revenue_model"),
+        ("cloud-input", "input_exposure"),
+        ("cloud-role", "supply_chain_role"),
+    ):
+        claims.append(
+            ReportViewClaim(
+                claim_id=claim_id,
+                dimension=dimension,
+                status="observed",
+                answer="公司提供云服务并取得云服务收入。",
+                condition_ids=("cloud-only",),
+                evidence=(_evidence(report, text=shared, page=1),),
+            )
+        )
+        checks.append(
+            ReportViewCheck(
+                target_type="claim",
+                target_id=claim_id,
+                status="pass",
+                explanation="只核了云服务。",
+            )
+        )
+    missing = (
+        ("usage-fee", "revenue_model", "公司的另一主要变现机制是按使用量收费。"),
+        ("design-product", "products_services", "另一主要产品是工业设计服务。"),
+        ("cloud-infrastructure", "input_exposure", "公司关键投入是云计算基础设施。"),
+        ("design-business", "principal_business", "另一主要业务是工业设计。"),
+    )
+    conditions = [
+        ReportSourceCondition(
+            condition_id=condition_id,
+            dimension=dimension,
+            description=description,
+            evidence=(_evidence(report, text=shared, page=1),),
+            major=True,
+            statement_status="current",
+        )
+        for condition_id, dimension, description in missing
+    ]
+    gaps = _completeness_gaps(claims, conditions, checks)
+    assert gaps == [f"major_condition_not_verified:{item[0]}" for item in missing]
+    covered = [
+        *checks,
+        ReportViewCheck(
+            target_type="condition",
+            target_id="design-business",
+            status="pass",
+            explanation="工业设计已由对应主张覆盖。",
+            covers_target_type="claim",
+            covers_target_id="cloud-business",
+        ),
+    ]
+    answered = [
+        claims[0].model_copy(update={"answer": "公司从事工业设计。"}),
+        *claims[1:],
+    ]
+    remaining = _completeness_gaps(answered, conditions, covered)
+    assert "major_condition_not_verified:design-business" not in remaining
+    assert "major_condition_not_verified:design-product" in remaining
+    planned = conditions[0].model_copy(update={"statement_status": "planned"})
+    minor = conditions[1].model_copy(update={"major": False})
+    quiet = _completeness_gaps(claims, [planned, minor], checks)
+    assert quiet == []
+
+
+def test_direct_reading_does_not_publish_an_uncovered_major_business():
+    from research.company_profile.contracts import ReportSourceCondition
+    from research.company_profile.report_interpretation import core_assessment
+
+    report = _report()
+    text = "公司提供云服务并取得云服务收入；另有独立的工业设计服务，其面向设备制造客户提供收费设计服务。"
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=(
+                        ReportSourceCondition(
+                            condition_id="design-business",
+                            dimension="principal_business",
+                            description="另一主要业务是工业设计。",
+                            evidence=(
+                                _evidence(report, text=text, page=1).model_copy(
+                                    update={"evidence_id": "design-evidence"}
+                                ),
+                            ),
+                            major=True,
+                            statement_status="current",
+                        ),
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="cloud-business",
+                            dimension="principal_business",
+                            status="observed",
+                            answer="公司提供云服务并取得云服务收入。",
+                            evidence=(
+                                _evidence(report, text=text, page=1).model_copy(
+                                    update={"evidence_id": "cloud-evidence"}
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=(
+                    {
+                        "target_type": "claim",
+                        "target_id": "cloud-business",
+                        "status": "pass",
+                        "explanation": "只核了云服务。",
+                    },
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["discovery_scope"] = "full_text"
+    result = _run(
+        _Provider(),
+        pages=({"page": 1, "text": text, "readable": True},),
+        processing_identity=identity,
+        report=report,
+    )
+    assert any(
+        gap.startswith("major_condition_not_verified:") and gap.endswith("design-business")
+        for gap in result.gaps
+    )
+    assert result.draft_complete is False
+    rendered = research_views(result)
+    assert rendered["draft_complete"] is False
+    assert rendered["semantic_complete"] is False
+    assert rendered["real_semantic_complete"] is False
+    assert core_assessment(result).core_complete is False
+
+
 def test_coverage_verification_includes_the_verified_claim():
     report = _report()
     text = "公司提供云计算服务，不包含其他主业。"
@@ -1506,13 +1663,12 @@ def test_a_kept_claim_survives_and_a_retracted_claim_is_not_verified():
     assert "724,769,470.04" in found["maintenance-claim"]["answer"]
 
 
-def test_unchanged_claim_keeps_its_check_across_two_disk_loads():
+def test_unchanged_claim_keeps_its_check_across_two_disk_loads(tmp_path):
     import json
-    from pathlib import Path
 
     from research.company_profile.bounded_entry import load_saved_draft
 
-    root = Path("/home/python/Quote/data/QuoteBak/b1-check-carry-20261023")
+    root = tmp_path / "check-carry"
     root.mkdir(parents=True, exist_ok=True)
     claim = {
         "claim_id": "kept-role",
