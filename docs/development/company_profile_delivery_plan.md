@@ -2,7 +2,7 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-10-22。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前按验收§7.41及[B2卡](../../openspec/changes/restore-company-profile-llm-led-generalization/b2-execution-card.md)执行：第32次首家内容有限通过，先局部修语义覆盖共性P1，再交制造/金融/综合其余3家；不再为歌华次要遗漏真实重跑。先有真实答案、再核正确性、后校准成本的原则不变。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前按验收§7.42及[B2卡§7](../../openspec/changes/restore-company-profile-llm-led-generalization/b2-execution-card.md#7-b2接续先兑现已有正文按业务组收口三家公司)执行：覆盖误判根因接受，上汽已有可查询的限用正文，先离线导出已有成果，再合并修复成稿/核验粒度和超时交接；完成其余三类公司后交A2，不转入S1。
 
 ## 1. 开发者必须先理解的纠偏
 
@@ -10,7 +10,7 @@
 
 现有公告、PDF/布局缓存、Evidence、事实模型、队列、公共LLM网关和查询/导出继续使用。修正`provider=None`可成功冒充语义完成、同field短路、正则决定全文可见性/正文完整性的路径。不要新建agent平台、网关、审计系统或并行writer。
 
-产品不变量：正式源、真实LLM、独立源查漏/核验及原owner三视图。当前开发顺序先成稿可见、再核验、后优化；待核正文不是可靠结论，已知错误隔离。实际服务限额通过拆包/换源处理，程序自设预留不足可调本任务额度，不丢主要条件或清空草稿。本次只复用第25次有效读源，不算新首发；资源按用户新授权及验收§7.37，旧账/unknown不清。历史错误退出可靠消费，原件保留。
+产品不变量：正式源、真实LLM、独立源查漏/核验及原owner三视图。当前开发顺序先成稿可见、再核验、后优化；待核正文不是可靠结论，已知错误隔离。实际服务限额通过拆包/换源处理，不丢主要条件或清空草稿。当前B2同源接续可复用已成功源/候选及有效检查，首次不得载入旧语义答案；资源按验收§7.42，旧账/unknown不清。第25次复用及§7.37无限调通只属已结束的歌华任务。
 
 ## 2. A/B分工、交接和审核顺序
 
@@ -76,11 +76,11 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 
 ### B2：四类通用性验证与修复（B连续实施）
 
-- 当前唯一活动卡：[b2-execution-card.md](../../openspec/changes/restore-company-profile-llm-led-generalization/b2-execution-card.md)。顺序为先修语义覆盖P1并局部证明，再在同一B窗口执行固定3家，整卡末端交A2；来源、合同、预算/unknown例外及停止条件以验收§7.41/该卡为准，旧§7.37无限接续只属于已结束的原公司任务。
+- 当前唯一活动卡：[b2-execution-card.md§7](../../openspec/changes/restore-company-profile-llm-led-generalization/b2-execution-card.md#7-b2接续先兑现已有正文按业务组收口三家公司)。覆盖误判根因A已接受；先从上汽原writer结果离线生成查询/导出，再于本次合并修复窗口关闭成功源未及时持久、逐条件串行成稿/核验后置、末端交接及母公司限定丢失，按业务组直接收口三家。浦发首发在本轮审核期间7200秒124停止，源条件未持久；核可恢复性后按新快照后继，不能凭usage伪造复用。同方在小型实际入口证明后首发。来源、12/6合同、累计资源及停止见验收§7.42，不另开准备卡或逐步等A。
 - 输入：历史公司中制造、非金融服务、金融、综合各1家，共4家，包含L0那1家；沿同一实现，不加公司/代码/页码生产分支。
 - 交付：4家三视图及源审查；新句式/续页/未披露/冲突均可表达；有歧义的可正确限用，但不能把主营缺失包装为通过。4家最终均达到公司可用标准才进入S1。
 - 验证：保留首发失败，4家真实语义结果和源核验全部可追溯；报告冷/热解析、请求/token/费用、总时长。用4家实测决定是否放行S1，超预算先裁决，不偷偷改阈值。
-- B自主范围：沿B1同一实现连续完成4家和直接回归；最多两次共性修复迭代，每家公司最多一次正式后继；不增加第5家、不按公司写规则分支。
+- B自主范围：沿B1同一实现连续完成4家和直接回归；最多两次共性修复迭代，每家公司最多一次正式后继；上汽依验收§7.42仅额外一次定向开发收口另列。当前剩余合并修复及累计资源按该节/B2§7，不增加第5家、不按公司写规则分支。
 - 停止：达到修复/预算上限仍不具备通用性，B提交完整失败材料，A2裁决是否收窄能力或重做方案；不新增第5家调参稀释失败。
 
 ### A2：四类通用性审核与S1放行（A负责）
