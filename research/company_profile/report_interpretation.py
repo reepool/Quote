@@ -2435,6 +2435,13 @@ def research_views(result: ReportInterpretation) -> dict[str, Any]:
     views = {}
     for name, dimensions in VIEWS.items():
         claims = [item for item in result.claims if item.dimension in dimensions]
+        projected = set((result.processing_identity or {}).get("project_claim_ids") or ())
+        if name == "supply_chain_position" and projected:
+            claims.extend(
+                item
+                for item in result.claims
+                if item.claim_id in projected and item not in claims
+            )
         views[name] = {
             "assessment_status": (
                 "assessed"

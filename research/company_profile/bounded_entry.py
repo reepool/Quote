@@ -174,9 +174,52 @@ def load_saved_source_discovery(binding: dict) -> list:
     return receipts
 
 
+def _claim_signature(claim: dict) -> tuple:
+    """Identity of a claim's text and quotes. A pass applies only while this is unchanged."""
+    quotes = tuple(
+        sorted(
+            (
+                int((evidence or {}).get("page") or 0),
+                str(((evidence or {}).get("anchor") or {}).get("bounded_quote") or ""),
+            )
+            for evidence in claim.get("evidence") or []
+        )
+    )
+    return (str(claim.get("answer") or ""), quotes)
+
+
+def _query_claim_passes(path: Path) -> dict[str, list[dict]]:
+    query = json.loads(path.read_text())
+    profile = query["profiles"][0]
+    claims = {}
+    for view in (profile.get("three_views") or {}).get("views", {}).values():
+        for claim in view.get("claims") or []:
+            claims[claim.get("claim_id")] = claim
+    found: dict[str, list[dict]] = {}
+    for item in (profile.get("three_views") or {}).get("call_receipts") or []:
+        if item.get("purpose") != "verify_views" or item.get("status") not in {None, "success"}:
+            continue
+        for check in (item.get("response_payload") or {}).get("checks") or []:
+            if check.get("target_type") != "claim" or check.get("status") != "pass":
+                continue
+            target = check.get("target_id")
+            claim = claims.get(target)
+            if not claim:
+                continue
+            found.setdefault(target, []).append(
+                {"signature": _claim_signature(claim), "check": check}
+            )
+    return found
+
+
 def load_saved_draft(binding: dict) -> dict:
-    """Load one saved draft for continuation. It does not rewrite that draft."""
-    query = json.loads(Path(binding["accepted_draft_query"]).read_text())
+    """Load the latest draft and real checks for unchanged claims.
+
+    Checks come only from verify receipts in the approved history. A stored
+    review_state is not a pass. A retracted claim does not get its old pass back.
+    """
+    latest = Path(binding["accepted_draft_query"])
+    query = json.loads(latest.read_text())
     profile = query["profiles"][0]
     if profile["report"].get("document_version") != binding["asset"]["content_hash"]:
         raise ValueError("reused_draft_source_mismatch")
@@ -184,13 +227,32 @@ def load_saved_draft(binding: dict) -> dict:
     for view in (profile.get("three_views") or {}).get("views", {}).values():
         for claim in view.get("claims") or []:
             claims.append({key: value for key, value in claim.items() if key != "review_state"})
-    checks = []
-    for item in (profile.get("three_views") or {}).get("call_receipts") or []:
-        if item.get("purpose") != "verify_views":
-            continue
-        checks.extend((item.get("response_payload") or {}).get("checks") or [])
     if not claims:
         raise ValueError("reused_draft_has_no_claims")
+    history = [Path(item) for item in binding.get("verification_history_queries") or []]
+    if latest not in history:
+        history.append(latest)
+    retract = set(binding.get("retract_claim_ids") or ())
+    passes: dict[str, list[dict]] = {}
+    for path in history:
+        for target, rows in _query_claim_passes(path).items():
+            passes.setdefault(target, []).extend(rows)
+    checks = []
+    seen = set()
+    for claim in claims:
+        target = claim.get("claim_id")
+        if target in retract:
+            continue
+        signature = _claim_signature(claim)
+        for row in passes.get(target) or []:
+            if row["signature"] != signature:
+                continue
+            marker = (target, row["check"].get("explanation"), row["check"].get("status"))
+            if marker in seen:
+                continue
+            seen.add(marker)
+            checks.append(row["check"])
+            break
     return {"claims": claims, "checks": checks}
 
 
@@ -532,6 +594,8 @@ def validate_binding(
                 "company27",
                 "company28",
                 "company29",
+                "company30",
+                "company31",
             }
             or not authorization.get("approval_reference")
         ):
@@ -1014,8 +1078,14 @@ def _worker(
             identity["retract_claim_ids"] = list(binding["retract_claim_ids"])
         if binding.get("defer_claim_ids"):
             identity["defer_claim_ids"] = list(binding["defer_claim_ids"])
+        if binding.get("verification_history_queries"):
+            identity["verification_history_queries"] = list(
+                binding["verification_history_queries"]
+            )
         if binding.get("supplement_context_terms"):
             identity["supplement_context_terms"] = list(binding["supplement_context_terms"])
+        if binding.get("project_claim_ids"):
+            identity["project_claim_ids"] = list(binding["project_claim_ids"])
         if binding.get("accepted_candidate_query"):
             identity["accepted_candidate_receipts"] = load_thirteenth_candidates(binding)
         if binding.get("isolated_claim_ids"):
@@ -1274,6 +1344,14 @@ def main() -> int:
             (attempts / "company28.json").is_file()
         ):
             raise ValueError("company29 requires the protected company28 marker")
+        if authorization["attempt"] == "company30" and not (
+            (attempts / "company29.json").is_file()
+        ):
+            raise ValueError("company30 requires the protected company29 marker")
+        if authorization["attempt"] == "company31" and not (
+            (attempts / "company30.json").is_file()
+        ):
+            raise ValueError("company31 requires the protected company30 marker")
         if authorization["attempt"] == "company20" and not (
             (attempts / "company19.json").is_file()
         ):

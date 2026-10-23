@@ -1422,10 +1422,6 @@ def test_a_kept_claim_survives_and_a_retracted_claim_is_not_verified():
         def interpret(self, request):
             self.sent.append(request)
             if request.purpose == "synthesize_views":
-                assert any("724,769,470.04" in item.description or any(
-                    "724,769,470.04" in evidence.anchor.bounded_quote
-                    for evidence in item.evidence
-                ) for item in request.source_conditions)
                 return ReportSemanticResponseV3(
                     request_id=request.request_id,
                     purpose=request.purpose,
@@ -1482,8 +1478,9 @@ def test_a_kept_claim_survives_and_a_retracted_claim_is_not_verified():
         ],
     }
     identity["retract_claim_ids"] = ["bad-direction"]
+    provider = _Provider()
     result = _run(
-        _Provider(),
+        provider,
         pages=({"page": 1, "text": text + "公司经营有线电视网络。", "readable": True},),
         processing_identity=identity,
         report=report,
@@ -1498,7 +1495,244 @@ def test_a_kept_claim_survives_and_a_retracted_claim_is_not_verified():
     assert found["kept-role"]["answer"] == "公司经营有线电视网络。"
     assert found["bad-direction"]["review_state"] != "verified"
     assert "向其销售" in found["bad-direction"]["answer"]
+    sent_text = " ".join(
+        evidence.anchor.bounded_quote
+        for request in provider.sent
+        if request.purpose == "synthesize_views"
+        for item in request.source_conditions
+        for evidence in item.evidence
+    )
+    assert "724,769,470.04" in sent_text
     assert "724,769,470.04" in found["maintenance-claim"]["answer"]
+
+
+def test_unchanged_claim_keeps_its_check_across_two_disk_loads():
+    import json
+    from pathlib import Path
+
+    from research.company_profile.bounded_entry import load_saved_draft
+
+    root = Path("/home/python/Quote/data/QuoteBak/b1-check-carry-20261023")
+    root.mkdir(parents=True, exist_ok=True)
+    claim = {
+        "claim_id": "kept-role",
+        "dimension": "supply_chain_role",
+        "status": "observed",
+        "answer": "公司经营有线电视网络。",
+        "condition_ids": [],
+        "supporting_record_ids": [],
+        "evidence": [
+            {
+                "evidence_id": "kept-evidence",
+                "page": 1,
+                "anchor": {"bounded_quote": "公司经营有线电视网络。"},
+            }
+        ],
+        "limitation": None,
+    }
+    bad = {
+        **claim,
+        "claim_id": "bad-direction",
+        "answer": "公司向其销售终端。",
+    }
+    check = {
+        "target_type": "claim",
+        "target_id": "kept-role",
+        "status": "pass",
+        "explanation": "第一次核验。",
+    }
+    bad_check = {**check, "target_id": "bad-direction", "explanation": "错误通过。"}
+
+    def write(path, checks):
+        path.write_text(
+            json.dumps(
+                {
+                    "profiles": [
+                        {
+                            "report": {"document_version": "doc-1"},
+                            "three_views": {
+                                "views": {
+                                    "supply_chain_position": {
+                                        "claims": [claim, bad]
+                                    }
+                                },
+                                "call_receipts": [
+                                    {
+                                        "purpose": "verify_views",
+                                        "status": "success",
+                                        "response_payload": {"checks": checks},
+                                    }
+                                ],
+                            },
+                        }
+                    ]
+                },
+                ensure_ascii=False,
+            )
+        )
+
+    first = root / "first.json"
+    second = root / "second.json"
+    write(first, [check, bad_check])
+    binding = {
+        "accepted_draft_query": str(first),
+        "asset": {"content_hash": "doc-1"},
+        "verification_history_queries": [str(first)],
+        "retract_claim_ids": ["bad-direction"],
+    }
+    loaded = load_saved_draft(binding)
+    assert [item["target_id"] for item in loaded["checks"]] == ["kept-role"]
+    write(
+        second,
+        [
+            {
+                "target_type": "claim",
+                "target_id": "kept-role",
+                "status": "pass",
+                "explanation": "第一次核验。",
+            }
+        ],
+    )
+    again = load_saved_draft(
+        {
+            **binding,
+            "accepted_draft_query": str(second),
+            "verification_history_queries": [str(first), str(second)],
+        }
+    )
+    assert [item["target_id"] for item in again["checks"]] == ["kept-role"]
+    changed_path = root / "changed.json"
+    changed = json.loads(second.read_text())
+    changed["profiles"][0]["three_views"]["views"]["supply_chain_position"]["claims"][0][
+        "answer"
+    ] = "公司改写了经营范围。"
+    changed["profiles"][0]["three_views"]["call_receipts"] = [
+        {"purpose": "verify_views", "status": "success", "response_payload": {"checks": []}}
+    ]
+    changed_path.write_text(json.dumps(changed, ensure_ascii=False))
+    lost = load_saved_draft(
+        {
+            **binding,
+            "accepted_draft_query": str(changed_path),
+            "verification_history_queries": [str(first)],
+        }
+    )
+    assert lost["checks"] == []
+
+
+def test_same_local_claim_id_keeps_both_revenue_answers():
+    import json
+
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    kept = ReportViewClaim(
+        claim_id="kept-role",
+        dimension="supply_chain_role",
+        status="observed",
+        answer="公司经营有线电视网络。",
+        evidence=(
+            _evidence(report, text="公司经营有线电视网络", page=1).model_copy(
+                update={"evidence_id": "kept-evidence"}
+            ),
+        ),
+    )
+    first = ReportSourceCondition(
+        condition_id="info-revenue",
+        dimension="products_services",
+        description="信息业务收入。",
+        evidence=(
+            _evidence(report, text="信息业务收入 897,897,997.75", page=1).model_copy(
+                update={"evidence_id": "info-evidence"}
+            ),
+        ),
+        major=True,
+        statement_status="current",
+    )
+    second = ReportSourceCondition(
+        condition_id="maintenance-revenue",
+        dimension="products_services",
+        description="收看维护收入。",
+        evidence=(
+            _evidence(report, text="有线电视收看维护收入 724,769,470.04", page=1).model_copy(
+                update={"evidence_id": "maintenance-evidence"}
+            ),
+        ),
+        major=True,
+        statement_status="current",
+    )
+    receipt = {
+        "request_id": "saved-source",
+        "purpose": "source_inventory",
+        "status": "success",
+        "source_scope": "full_context",
+        "source_pages": [1],
+        "response_payload": ReportSemanticResponseV3(
+            request_id="saved-source",
+            purpose="source_inventory",
+            source_conditions=(first, second),
+        ).model_dump(mode="json"),
+    }
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            if request.purpose == "synthesize_views":
+                quote = request.source_conditions[0].evidence[0].anchor.bounded_quote
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="claim-1",
+                            dimension="products_services",
+                            status="observed",
+                            answer=f"本期{quote}元。",
+                            condition_ids=(request.source_conditions[0].condition_id,),
+                            evidence=(
+                                _evidence(report, text=quote, page=1).model_copy(
+                                    update={"evidence_id": f"draft-{quote[:4]}"}
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "claim",
+                        "target_id": claim.claim_id,
+                        "status": "pass",
+                        "explanation": "金额与引文一致。",
+                    }
+                    for claim in request.claims
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["accepted_source_receipts"] = [receipt]
+    identity["accepted_prior_draft"] = {
+        "claims": [json.loads(kept.model_dump_json())],
+        "checks": [],
+    }
+    result = _run(
+        _Provider(),
+        pages=(
+            {
+                "page": 1,
+                "text": "信息业务收入 897,897,997.75。有线电视收看维护收入 724,769,470.04。公司经营有线电视网络。",
+                "readable": True,
+            },
+        ),
+        processing_identity=identity,
+        report=report,
+    )
+    answers = [claim.answer for claim in result.claims]
+    assert any("897,897,997.75" in answer for answer in answers)
+    assert any("724,769,470.04" in answer for answer in answers)
 
 
 def test_logical_identity_separates_entries_and_verification_targets():

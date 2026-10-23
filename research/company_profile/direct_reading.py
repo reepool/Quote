@@ -8,6 +8,7 @@ does not include those candidates. It cannot block a unit already verified.
 from __future__ import annotations
 
 import json
+import re
 import time
 from collections.abc import Mapping, Sequence
 from typing import Any
@@ -765,10 +766,19 @@ def interpret_direct_core(
         )
 
     def upsert(claim) -> None:
-        """One claim id keeps one current state. A later pending chunk cannot erase a pass."""
+        """One claim id keeps one current state. A different answer gets its own id."""
         for index, earlier in enumerate(claims):
             if earlier.claim_id != claim.claim_id:
                 continue
+            if earlier.answer != claim.answer:
+                taken = {item.claim_id for item in claims}
+                number = 2
+                renamed = f"{claim.claim_id}__{number}"
+                while renamed in taken:
+                    number += 1
+                    renamed = f"{claim.claim_id}__{number}"
+                claim = claim.model_copy(update={"claim_id": renamed})
+                break
             verified = earlier.status == "observed" and earlier.limitation not in {
                 "pending_verification",
                 "claim_or_dependency_not_verified",
@@ -967,6 +977,9 @@ def interpret_direct_core(
         for claim in observable:
             if measure([claim], [])[0] > limit:
                 pending_claims.append(claim)
+                continue
+            if identity.get("accepted_prior_draft"):
+                support_groups.append([claim])
                 continue
             trial = current + [claim]
             if current and measure(trial, [])[0] > limit:
@@ -1739,27 +1752,30 @@ def interpret_direct_core(
             conditions,
             key=lambda item: (rank.get(item.dimension, 50), item.condition_id),
         )
-        groups: list[list[ReportSourceCondition]] = []
-        current: list[ReportSourceCondition] = []
-        for condition in ordered:
-            quotes = [
-                evidence
-                for item in [*current, condition]
-                for evidence in item.evidence
-            ]
-            pages = [dict(page) for page in cited_quote_pages(quotes)]
-            if current and not fits_synthesis(pages, [*current, condition]):
+        if identity.get("accepted_prior_draft"):
+            groups = [[condition] for condition in ordered]
+        else:
+            groups = []
+            current = []
+            for condition in ordered:
+                quotes = [
+                    evidence
+                    for item in [*current, condition]
+                    for evidence in item.evidence
+                ]
+                pages = [dict(page) for page in cited_quote_pages(quotes)]
+                if current and not fits_synthesis(pages, [*current, condition]):
+                    groups.append(current)
+                    current = []
+                alone = [dict(page) for page in cited_quote_pages(condition.evidence)]
+                if not current and not fits_synthesis(alone, [condition]):
+                    gap = f"synthesis_context_not_sendable:{condition.condition_id}"
+                    if gap not in gaps:
+                        gaps.append(gap)
+                    continue
+                current.append(condition)
+            if current:
                 groups.append(current)
-                current = []
-            alone = [dict(page) for page in cited_quote_pages(condition.evidence)]
-            if not current and not fits_synthesis(alone, [condition]):
-                gap = f"synthesis_context_not_sendable:{condition.condition_id}"
-                if gap not in gaps:
-                    gaps.append(gap)
-                continue
-            current.append(condition)
-        if current:
-            groups.append(current)
         drafted_clean: list[ReportViewClaim] = []
         sent_conditions: list[ReportSourceCondition] = []
         for group in groups:
@@ -1779,7 +1795,12 @@ def interpret_direct_core(
                     extra={"source_conditions": tuple(group)},
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
-                gaps.append(f"direct_core_package_stopped:{exc}")
+                if len(group) > 1 and "deadline" in str(exc).lower():
+                    middle = max(1, len(group) // 2)
+                    groups.append(group[:middle])
+                    groups.append(group[middle:])
+                else:
+                    gaps.append(f"direct_core_package_stopped:{exc}")
                 continue
             sent_conditions.extend(group)
             for claim in drafted.claims:
@@ -1876,6 +1897,9 @@ def interpret_direct_core(
                 kept_answers.append(claim.answer)
                 upsert(claim)
                 if claim.claim_id not in defer and claim.limitation == "pending_verification" and claim.dimension in {
+                    "principal_business",
+                    "revenue_model",
+                    "products_services",
                     "input_exposure",
                     "supply_chain_role",
                     "upstream_downstream",
@@ -1888,54 +1912,44 @@ def interpret_direct_core(
                     continue
                 kept_checks.append(check)
             checks.extend(kept_checks)
-            answered = "\n".join(kept_answers)
-
-            def money_amounts(text: str) -> list[str]:
-                found = []
-                token: list[str] = []
-                for char in f"{text} ":
-                    if char.isdigit() or (char in ",." and token):
-                        token.append(char)
-                        continue
-                    piece = "".join(token).strip(",.")
-                    digits = piece.replace(",", "").split(".", 1)[0]
-                    if len(digits) >= 6:
-                        found.append(piece)
-                    token = []
-                return found
-
-            has_upstream = any(
-                item.dimension == "upstream_downstream" and item.claim_id not in retract
-                for item in claims
-            )
+            cited_ids = {
+                condition_id
+                for claim in claims
+                if claim.claim_id not in retract
+                and claim.limitation != "retracted_pending_correction"
+                for condition_id in (claim.condition_ids or [])
+            }
+            answer_text = "\n".join(claim.answer for claim in claims)
             selected_conditions = []
             for condition in conditions:
                 if condition.condition_id.startswith("correction:"):
                     selected_conditions.append(condition)
                     continue
-                amounts = money_amounts(
-                    " ".join(
+                quote_amounts = re.findall(
+                    r"\d{1,3}(?:,\d{3})+(?:\.\d+)?",
+                    "\n".join(
                         evidence.anchor.bounded_quote for evidence in condition.evidence
-                    )
+                    ),
                 )
-                if amounts and any(amount not in answered for amount in amounts):
-                    selected_conditions.append(condition)
+                amount_already_answered = (
+                    len(quote_amounts) != 1 or quote_amounts[0] in answer_text
+                )
+                if condition.condition_id in cited_ids and amount_already_answered:
                     continue
-                if condition.dimension in {"supply_chain_role", "upstream_downstream"}:
-                    if not any(
-                        item.dimension == condition.dimension
-                        and item.claim_id not in retract
-                        and item.limitation != "retracted_pending_correction"
-                        for item in claims
-                    ):
-                        selected_conditions.append(condition)
+                if condition.dimension not in {"revenue_model", "products_services"}:
                     continue
-                if (
-                    not has_upstream
-                    and condition.dimension == "input_exposure"
-                    and "采购" in condition.description
-                ):
-                    selected_conditions.append(condition)
+                if "收入" not in condition.description and "代理" not in condition.description:
+                    continue
+                if any(word in condition.description for word in ("计划", "目标")):
+                    continue
+                selected_conditions.append(condition)
+            selected_conditions.sort(
+                key=lambda item: (
+                    item.condition_id.startswith("correction:"),
+                    item.dimension != "revenue_model",
+                    item.condition_id,
+                )
+            )
             terms = [
                 str(term)
                 for term in identity.get("supplement_context_terms") or ()
@@ -2068,6 +2082,22 @@ def interpret_direct_core(
         gap = f"supplementary_unread:{page_no}"
         if gap not in gaps:
             gaps.append(gap)
+    if checks:
+        receipts.append(
+            {
+                "request_id": f"{work_id}:carried-checks",
+                "purpose": "verify_views",
+                "status": "success",
+                "physical_request": False,
+                "carried_verification": True,
+                "source_pages": [],
+                "response_payload": {
+                    "request_id": f"{work_id}:carried-checks",
+                    "purpose": "verify_views",
+                    "checks": [item.model_dump(mode="json") for item in checks],
+                },
+            }
+        )
     for gap in _completeness_gaps(claims, conditions, checks, records):
         if gap not in gaps:
             gaps.append(gap)
