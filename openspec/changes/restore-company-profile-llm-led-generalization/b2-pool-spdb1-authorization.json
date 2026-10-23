@@ -1,7 +1,7 @@
 {
   "status": "authorized",
   "attempt": "spdb1",
-  "binding_sha256": "f2c18989cce16b898acf63b92c7b373680bde6ab6e324d5d05b2709db211b671",
+  "binding_sha256": "a83e42bc5d68d22ce14906151713e816a33ba8a2534556b796f91fa382240da3",
   "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
   "approval_reference": "acceptance program section 7.41 and b2-execution-card, 2026-10-23",
   "billing_mode": "development_unpriced",

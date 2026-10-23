@@ -46,7 +46,7 @@
     "research/company_profile/shadow_batch_audit.py": "04f12d98d3819bfc02c683b3620e83c753be66c6377610ae8076c5153157a2ad",
     "research/company_profile/stage5.py": "47de653324c80e1eb1d615e179c2818eafdf568abd328698e92459122244da0c",
     "research/company_profile/core_skeleton.py": "288c1e58ee1f4d94096a19bc5e27df516c49bc7a2caa6b3329414dd1756027bc",
-    "research/company_profile/bounded_entry.py": "9d9f3bccaeb22c2c76f81dbdb8e0ed6f73c8ddd2646fb48b2fec1e7808ca473e",
+    "research/company_profile/bounded_entry.py": "9e5c0bcce74b93b586351b6f9138427b7aff2c393613a8157d8c87ee21a95142",
     "research/company_profile/stage5_bundle.py": "008b8c7d4de24ce03a75b95fbf97c47b24663d5950f53600761206e6397921c8",
     "research/company_profile/execution.py": "8649d1c31e081e168994a7fe433fa0b1d41616ea2039b78449b99e96065e2267",
     "research/company_profile/legacy_retirement.py": "3e01e1a88369f866790e65a7c4b04a3e9e5e4480fc099eef55303a5e34386b0c",
@@ -80,7 +80,7 @@
     "research/company_profile/report_wire.py": "2ad03e2e2484b2319b8308120271b83013a8df5b163fb43ff7c1e80477edfc11",
     "research/company_profile/resource_probe.py": "b36d2492af755281f505263fad6f19933eb47441174c41fac26b846bc7742884",
     "research/company_profile/reading_budget.py": "b3c088198fbed76a03a7e09c39fee90e2802e0d6038f3dae991f2317fc78b39b",
-    "research/company_profile/direct_reading.py": "de4e0e515bc59cc0ae5f5c6e594d7f07e9cedf320cba4199ebf69df5498215a1"
+    "research/company_profile/direct_reading.py": "dd13b031493d2807dd68c1fe91efcc8d0f75aae1b8db8b06947d8f78ef0abca2"
   },
   "asset": {
     "instrument_id": "600000.SH",

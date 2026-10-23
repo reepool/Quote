@@ -1,7 +1,7 @@
 {
   "status": "authorized",
   "attempt": "tongfang1",
-  "binding_sha256": "3ac01e41faccb66ae3cbc859ebfcf6e3297ceb653c88cd2e8021997de8520e31",
+  "binding_sha256": "8066f0835ad8aa1e7f3ea7f0c3489d14c2af06a1aa7247baf468f3f33b88f5df",
   "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
   "approval_reference": "acceptance program section 7.41 and b2-execution-card, 2026-10-23",
   "billing_mode": "development_unpriced",

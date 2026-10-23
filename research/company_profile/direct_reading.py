@@ -1678,47 +1678,56 @@ def interpret_direct_core(
             if gap not in gaps:
                 gaps.append(gap)
         related = fitting
-        try:
-            drafted = invoke(
-                "synthesize_views",
-                package,
-                source_scope="full_context",
-                output=BODY_OUTPUT,
-                later=_nonempty_verify_units(package, report=report, identity=identity),
-                extra={"source_conditions": tuple(related)},
-            )
-        except (ValueError, LlmError, SemanticProviderError) as exc:
-            gaps.append(f"direct_core_package_stopped:{exc}")
-            return
         drafted_all: list[ReportViewClaim] = []
         seen_ids: dict[str, ReportViewClaim] = {}
-        for claim in drafted.claims:
-            bound = []
-            failed = False
-            for evidence in claim.evidence:
-                located = _bind_source_evidence(evidence, report, chosen)
-                if located is None:
-                    failed = True
-                    break
-                bound.append(located)
-            if failed or not bound:
-                gaps.append(f"evidence_not_located:{claim.claim_id}")
-                claim = claim.model_copy(
-                    update={"status": "unclear", "limitation": "evidence_not_located", "evidence": tuple(bound)}
+        for condition in related:
+            cond_pages = [
+                dict(page)
+                for page in cited_quote_pages(condition.evidence)
+            ] or package
+            try:
+                drafted = invoke(
+                    "synthesize_views",
+                    cond_pages,
+                    source_scope="full_context",
+                    output=BODY_OUTPUT,
+                    later=0,
+                    extra={"source_conditions": (condition,)},
                 )
-            else:
-                claim = claim.model_copy(update={"evidence": tuple(bound)})
-            prior = seen_ids.get(claim.claim_id)
-            if prior is not None:
-                same = prior.answer == claim.answer and tuple(
-                    item.anchor.bounded_quote for item in prior.evidence
-                ) == tuple(item.anchor.bounded_quote for item in claim.evidence)
-                if same:
-                    continue
-                gaps.append(f"claim_id_conflict:{claim.claim_id}")
-                claim = claim.model_copy(update={"claim_id": f"{claim.claim_id}__{len(seen_ids)}"})
-            seen_ids[claim.claim_id] = claim
-            drafted_all.append(claim)
+            except (ValueError, LlmError, SemanticProviderError) as exc:
+                gaps.append(f"direct_core_package_stopped:{exc}")
+                continue
+            for claim in drafted.claims:
+                bound = []
+                failed = False
+                for evidence in claim.evidence:
+                    located = _bind_source_evidence(evidence, report, chosen)
+                    if located is None:
+                        failed = True
+                        break
+                    bound.append(located)
+                if failed or not bound:
+                    gaps.append(f"evidence_not_located:{claim.claim_id}")
+                    claim = claim.model_copy(
+                        update={"status": "unclear", "limitation": "evidence_not_located", "evidence": tuple(bound)}
+                    )
+                else:
+                    claim = claim.model_copy(update={"evidence": tuple(bound)})
+                prior = seen_ids.get(claim.claim_id)
+                if prior is not None:
+                    same = prior.answer == claim.answer and tuple(
+                        item.anchor.bounded_quote for item in prior.evidence
+                    ) == tuple(item.anchor.bounded_quote for item in claim.evidence)
+                    if same:
+                        continue
+                    gaps.append(f"claim_id_conflict:{claim.claim_id}")
+                    claim = claim.model_copy(update={"claim_id": f"{claim.claim_id}__{len(seen_ids)}"})
+                seen_ids[claim.claim_id] = claim
+                stored = upsert(
+                    claim.model_copy(update={"limitation": "pending_verification"})
+                )
+                drafted_all.append(stored.model_copy(update={"limitation": None}))
+                publish()
         for page in package:
             page_no = int(page["page"])
             composed.add(page_no)
@@ -1777,33 +1786,16 @@ def interpret_direct_core(
                 if condition.dimension == "principal_business"
             ]
             groups = []
-            if principal:
-                groups.append(principal)
-            groups.extend(
-                [[condition] for condition in ordered if condition not in principal]
-            )
+            if len(principal) <= 2:
+                if principal:
+                    groups.append(principal)
+                groups.extend(
+                    [[condition] for condition in ordered if condition not in principal]
+                )
+            else:
+                groups = [[condition] for condition in ordered]
         else:
-            groups = []
-            current = []
-            for condition in ordered:
-                quotes = [
-                    evidence
-                    for item in [*current, condition]
-                    for evidence in item.evidence
-                ]
-                pages = [dict(page) for page in cited_quote_pages(quotes)]
-                if current and not fits_synthesis(pages, [*current, condition]):
-                    groups.append(current)
-                    current = []
-                alone = [dict(page) for page in cited_quote_pages(condition.evidence)]
-                if not current and not fits_synthesis(alone, [condition]):
-                    gap = f"synthesis_context_not_sendable:{condition.condition_id}"
-                    if gap not in gaps:
-                        gaps.append(gap)
-                    continue
-                current.append(condition)
-            if current:
-                groups.append(current)
+            groups = [[condition] for condition in ordered]
         drafted_clean: list[ReportViewClaim] = []
         sent_conditions: list[ReportSourceCondition] = []
         for group in groups:

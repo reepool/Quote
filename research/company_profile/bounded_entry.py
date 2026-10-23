@@ -604,6 +604,7 @@ def validate_binding(
                 "company31",
                 "company32",
                 "saic1",
+                "saic2",
                 "spdb1",
                 "tongfang1",
             }
@@ -1373,6 +1374,8 @@ def main() -> int:
             (attempts / "company31.json").is_file()
         ):
             raise ValueError("company32 requires the protected company31 marker")
+        if authorization["attempt"] == "saic2" and not (attempts / "saic1.json").is_file():
+            raise ValueError("saic2 requires the protected saic1 marker")
         if authorization["attempt"] == "company20" and not (
             (attempts / "company19.json").is_file()
         ):
