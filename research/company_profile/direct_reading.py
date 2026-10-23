@@ -1838,7 +1838,167 @@ def interpret_direct_core(
                     continue
                 by_page[page_no]["status"] = "read"
                 by_page[page_no]["reused_source"] = True
+        prior = identity.get("accepted_prior_draft") or {}
+        if prior:
+            retract = set(identity.get("retract_claim_ids") or ())
+            defer = set(identity.get("defer_claim_ids") or ())
+            kept_answers: list[str] = []
+            pending_core: list[ReportViewClaim] = []
+            for raw in prior.get("claims") or []:
+                claim = ReportViewClaim.model_validate_json(
+                    json.dumps(raw, ensure_ascii=False)
+                )
+                if claim.claim_id in retract:
+                    gaps.append(f"retracted_for_correction:{claim.claim_id}")
+                    upsert(
+                        claim.model_copy(
+                            update={
+                                "status": "unclear",
+                                "limitation": "retracted_pending_correction",
+                            }
+                        )
+                    )
+                    conditions.append(
+                        ReportSourceCondition(
+                            condition_id=f"correction:{claim.claim_id}",
+                            dimension=claim.dimension,
+                            description=(
+                                "只根据这些引文重写。一般税收、收费或价格政策不是公司实际收取的费用。"
+                                "为对方销售不是向对方销售。期末应付款或应收款余额不是本期采购或本期费用。"
+                                "分开表述的金额不要相加。"
+                            ),
+                            evidence=claim.evidence,
+                            major=True,
+                            statement_status="current",
+                        )
+                    )
+                    continue
+                kept_answers.append(claim.answer)
+                upsert(claim)
+                if claim.claim_id not in defer and claim.limitation == "pending_verification" and claim.dimension in {
+                    "input_exposure",
+                    "supply_chain_role",
+                    "upstream_downstream",
+                }:
+                    pending_core.append(claim)
+            kept_checks = []
+            for raw_check in prior.get("checks") or []:
+                check = ReportViewCheck.model_validate(raw_check)
+                if check.target_id in retract:
+                    continue
+                kept_checks.append(check)
+            checks.extend(kept_checks)
+            answered = "\n".join(kept_answers)
+
+            def money_amounts(text: str) -> list[str]:
+                found = []
+                token: list[str] = []
+                for char in f"{text} ":
+                    if char.isdigit() or (char in ",." and token):
+                        token.append(char)
+                        continue
+                    piece = "".join(token).strip(",.")
+                    digits = piece.replace(",", "").split(".", 1)[0]
+                    if len(digits) >= 6:
+                        found.append(piece)
+                    token = []
+                return found
+
+            has_upstream = any(
+                item.dimension == "upstream_downstream" and item.claim_id not in retract
+                for item in claims
+            )
+            selected_conditions = []
+            for condition in conditions:
+                if condition.condition_id.startswith("correction:"):
+                    selected_conditions.append(condition)
+                    continue
+                amounts = money_amounts(
+                    " ".join(
+                        evidence.anchor.bounded_quote for evidence in condition.evidence
+                    )
+                )
+                if amounts and any(amount not in answered for amount in amounts):
+                    selected_conditions.append(condition)
+                    continue
+                if condition.dimension in {"supply_chain_role", "upstream_downstream"}:
+                    if not any(
+                        item.dimension == condition.dimension
+                        and item.claim_id not in retract
+                        and item.limitation != "retracted_pending_correction"
+                        for item in claims
+                    ):
+                        selected_conditions.append(condition)
+                    continue
+                if (
+                    not has_upstream
+                    and condition.dimension == "input_exposure"
+                    and "采购" in condition.description
+                ):
+                    selected_conditions.append(condition)
+            terms = [
+                str(term)
+                for term in identity.get("supplement_context_terms") or ()
+                if str(term).strip()
+            ]
+            quoted = "\n".join(
+                evidence.anchor.bounded_quote
+                for condition in conditions
+                for evidence in condition.evidence
+            )
+            supplement_pages = []
+            for page in sources:
+                text = str(page.get("text") or "")
+                if any(term in text and term not in quoted for term in terms):
+                    supplement_pages.append(page)
+            if supplement_pages:
+                try:
+                    slices = list(
+                        source_discovery_slices(
+                            supplement_pages[:2], report, identity, limit
+                        )
+                    )
+                    package = next(
+                        (
+                            item
+                            for item in slices
+                            if any(
+                                term in "".join(str(page.get("text") or "") for page in item)
+                                for term in terms
+                            )
+                        ),
+                        slices[0] if slices else None,
+                    )
+                    if package:
+                        reviewed = invoke(
+                            "source_inventory",
+                            package,
+                            source_scope="full_context",
+                            output=SOURCE_OUTPUT,
+                            later=0,
+                        )
+                        extra, extra_gaps = _located_conditions(
+                            reviewed.source_conditions,
+                            report,
+                            package,
+                            request_id=receipts[-1]["request_id"],
+                            seen=seen,
+                        )
+                        gaps.extend(extra_gaps)
+                        selected_conditions.extend(extra)
+                except (ValueError, LlmError, SemanticProviderError) as exc:
+                    gaps.append(f"direct_core_gap_check_stopped:{exc}")
+            conditions[:] = selected_conditions
         draft_reused_sources()
+        if prior:
+            fresh_ids = {item.claim_id for item in claims}
+            still_pending = [
+                item.model_copy(update={"limitation": None})
+                for item in pending_core
+                if item.claim_id in fresh_ids
+            ]
+            if still_pending:
+                settle_claims(still_pending, [item for item in conditions if not item.condition_id.startswith("correction:")])
         follow = []
     else:
         readable_order = [

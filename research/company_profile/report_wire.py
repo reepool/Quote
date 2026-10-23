@@ -296,6 +296,14 @@ def instructions(request: ReportSemanticRequestV3) -> str:
             "and retained locally; do not echo or generate records. Describe every major "
             "business and earning mechanism the supplied text supports. "
             "Revenue total alone is insufficient. "
+            "When a supplied condition states a current-period line amount, the claim "
+            "answer must include the line name, the period, and that amount. Leaving "
+            "the amount only inside a quote is not an answer. State each amount with "
+            "its own label; do not add amounts that the source keeps separate. "
+            "A general tax, fee, or price policy is not proof that the company itself "
+            "collects that fee. Selling for another party is not selling to that party. "
+            "An ending payable or receivable balance is that balance, not a current-period "
+            "purchase or expense. "
             "Only full relevant reading can support not_disclosed; keep missing/conflicting "
             "information unclear. A summary never overwrites original facts."
         )
@@ -304,6 +312,9 @@ def instructions(request: ReportSemanticRequestV3) -> str:
         "or purchase/sale direction is not supported by the supplied quotes, return "
         "unclear for that entire claim. One correct sentence does not make an "
         "unsupported inference pass. "
+        "A general tax, fee, or price policy does not prove the company collects that "
+        "fee. Selling for another party is not selling to that party. An ending balance "
+        "is not a current-period purchase or expense. "
         if fulltext
         else ""
     )

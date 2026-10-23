@@ -1359,6 +1359,148 @@ def test_saved_source_conditions_are_drafted_without_rereading():
     assert any(gap == "isolated_unreliable_claim:claim_cond_sc_01" for gap in result.gaps)
 
 
+def test_a_kept_claim_survives_and_a_retracted_claim_is_not_verified():
+    import json
+
+    from research.company_profile.contracts import ReportSourceCondition, ReportViewCheck
+
+    report = _report()
+    text = "有线电视收看维护收入 724,769,470.04。公司为对方销售终端。"
+    kept = ReportViewClaim(
+        claim_id="kept-role",
+        dimension="supply_chain_role",
+        status="observed",
+        answer="公司经营有线电视网络。",
+        evidence=(
+            _evidence(report, text="公司经营有线电视网络", page=1).model_copy(
+                update={"evidence_id": "kept-evidence"}
+            ),
+        ),
+    )
+    retracted = ReportViewClaim(
+        claim_id="bad-direction",
+        dimension="products_services",
+        status="observed",
+        answer="公司向其销售终端。",
+        evidence=(
+            _evidence(report, text="公司为对方销售终端", page=1).model_copy(
+                update={"evidence_id": "bad-evidence"}
+            ),
+        ),
+    )
+    amount = ReportSourceCondition(
+        condition_id="maintenance-revenue",
+        dimension="revenue_model",
+        description="收看维护收入。",
+        evidence=(
+            _evidence(report, text="有线电视收看维护收入 724,769,470.04", page=1).model_copy(
+                update={"evidence_id": "amount-evidence"}
+            ),
+        ),
+        major=True,
+        statement_status="current",
+    )
+    receipt = {
+        "request_id": "saved-source",
+        "purpose": "source_inventory",
+        "status": "success",
+        "source_scope": "full_context",
+        "source_pages": [1],
+        "response_payload": ReportSemanticResponseV3(
+            request_id="saved-source",
+            purpose="source_inventory",
+            source_conditions=(amount,),
+        ).model_dump(mode="json"),
+    }
+
+    class _Provider:
+        offline_only = True
+
+        def __init__(self):
+            self.sent = []
+
+        def interpret(self, request):
+            self.sent.append(request)
+            if request.purpose == "synthesize_views":
+                assert any("724,769,470.04" in item.description or any(
+                    "724,769,470.04" in evidence.anchor.bounded_quote
+                    for evidence in item.evidence
+                ) for item in request.source_conditions)
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="maintenance-claim",
+                            dimension="revenue_model",
+                            status="observed",
+                            answer="本期有线电视收看维护收入 724,769,470.04 元。",
+                            evidence=(
+                                _evidence(
+                                    report,
+                                    text="有线电视收看维护收入 724,769,470.04",
+                                    page=1,
+                                ).model_copy(update={"evidence_id": "maintenance-draft"}),
+                            ),
+                        ),
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "claim",
+                        "target_id": claim.claim_id,
+                        "status": "pass",
+                        "explanation": "金额和方向与引文一致。",
+                    }
+                    for claim in request.claims
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["accepted_source_receipts"] = [receipt]
+    identity["accepted_prior_draft"] = {
+        "claims": [
+            json.loads(kept.model_dump_json()),
+            json.loads(retracted.model_dump_json()),
+        ],
+        "checks": [
+            ReportViewCheck(
+                target_type="claim",
+                target_id="kept-role",
+                status="pass",
+                explanation="原核验。",
+            ).model_dump(mode="json"),
+            ReportViewCheck(
+                target_type="claim",
+                target_id="bad-direction",
+                status="pass",
+                explanation="旧的错误通过。",
+            ).model_dump(mode="json"),
+        ],
+    }
+    identity["retract_claim_ids"] = ["bad-direction"]
+    result = _run(
+        _Provider(),
+        pages=({"page": 1, "text": text + "公司经营有线电视网络。", "readable": True},),
+        processing_identity=identity,
+        report=report,
+    )
+    rendered = research_views(result)
+    found = {
+        claim["claim_id"]: claim
+        for view in rendered["views"].values()
+        for claim in view["claims"]
+    }
+    assert found["kept-role"]["review_state"] == "verified"
+    assert found["kept-role"]["answer"] == "公司经营有线电视网络。"
+    assert found["bad-direction"]["review_state"] != "verified"
+    assert "向其销售" in found["bad-direction"]["answer"]
+    assert "724,769,470.04" in found["maintenance-claim"]["answer"]
+
+
 def test_logical_identity_separates_entries_and_verification_targets():
     from research.company_profile.stage5_provider import _logical_report_request_id
     from utils.llm.budget import LogicalRecoveryPolicy, _recovery_block

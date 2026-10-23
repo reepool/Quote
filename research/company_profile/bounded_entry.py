@@ -174,6 +174,26 @@ def load_saved_source_discovery(binding: dict) -> list:
     return receipts
 
 
+def load_saved_draft(binding: dict) -> dict:
+    """Load one saved draft for continuation. It does not rewrite that draft."""
+    query = json.loads(Path(binding["accepted_draft_query"]).read_text())
+    profile = query["profiles"][0]
+    if profile["report"].get("document_version") != binding["asset"]["content_hash"]:
+        raise ValueError("reused_draft_source_mismatch")
+    claims = []
+    for view in (profile.get("three_views") or {}).get("views", {}).values():
+        for claim in view.get("claims") or []:
+            claims.append({key: value for key, value in claim.items() if key != "review_state"})
+    checks = []
+    for item in (profile.get("three_views") or {}).get("call_receipts") or []:
+        if item.get("purpose") != "verify_views":
+            continue
+        checks.extend((item.get("response_payload") or {}).get("checks") or [])
+    if not claims:
+        raise ValueError("reused_draft_has_no_claims")
+    return {"claims": claims, "checks": checks}
+
+
 def load_thirteenth_candidates(binding: dict) -> list:
     """Reuse the thirteenth run's two body readings. They are not verified."""
     query = json.loads(Path(binding["accepted_candidate_query"]).read_text())
@@ -510,6 +530,8 @@ def validate_binding(
                 "company25",
                 "company26",
                 "company27",
+                "company28",
+                "company29",
             }
             or not authorization.get("approval_reference")
         ):
@@ -986,6 +1008,14 @@ def _worker(
                 identity["accepted_page_map_receipts"] = maps
         if binding.get("accepted_source_query"):
             identity["accepted_source_receipts"] = load_saved_source_discovery(binding)
+        if binding.get("accepted_draft_query"):
+            identity["accepted_prior_draft"] = load_saved_draft(binding)
+        if binding.get("retract_claim_ids"):
+            identity["retract_claim_ids"] = list(binding["retract_claim_ids"])
+        if binding.get("defer_claim_ids"):
+            identity["defer_claim_ids"] = list(binding["defer_claim_ids"])
+        if binding.get("supplement_context_terms"):
+            identity["supplement_context_terms"] = list(binding["supplement_context_terms"])
         if binding.get("accepted_candidate_query"):
             identity["accepted_candidate_receipts"] = load_thirteenth_candidates(binding)
         if binding.get("isolated_claim_ids"):
@@ -1236,6 +1266,14 @@ def main() -> int:
             (attempts / "company26.json").is_file()
         ):
             raise ValueError("company27 requires the protected company26 marker")
+        if authorization["attempt"] == "company28" and not (
+            (attempts / "company27.json").is_file()
+        ):
+            raise ValueError("company28 requires the protected company27 marker")
+        if authorization["attempt"] == "company29" and not (
+            (attempts / "company28.json").is_file()
+        ):
+            raise ValueError("company29 requires the protected company28 marker")
         if authorization["attempt"] == "company20" and not (
             (attempts / "company19.json").is_file()
         ):
