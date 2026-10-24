@@ -2,7 +2,7 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-10-22。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前按验收§7.42及[B2卡§7](../../openspec/changes/restore-company-profile-llm-led-generalization/b2-execution-card.md#7-b2接续先兑现已有正文按业务组收口三家公司)执行：覆盖误判根因接受，上汽已有可查询的限用正文，先离线导出已有成果，再合并修复成稿/核验粒度和超时交接；完成其余三类公司后交A2，不转入S1。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前按验收§7.43及[B2卡§7.6](../../openspec/changes/restore-company-profile-llm-led-generalization/b2-execution-card.md#76-当前任务卡保住有效答案纠正主体误拦后交齐b2结果)执行：上汽离线交付接受，追加收口未通过且停止外呼；合并纠正主体误拦、核验凭据丢失和重复准备，完成同方/浦发未用正式后继，交A2，不转入S1。
 
 ## 1. 开发者必须先理解的纠偏
 
@@ -76,11 +76,11 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 
 ### B2：四类通用性验证与修复（B连续实施）
 
-- 当前唯一活动卡：[b2-execution-card.md§7](../../openspec/changes/restore-company-profile-llm-led-generalization/b2-execution-card.md#7-b2接续先兑现已有正文按业务组收口三家公司)。覆盖误判根因A已接受；先从上汽原writer结果离线生成查询/导出，再于本次合并修复窗口关闭成功源未及时持久、逐条件串行成稿/核验后置、末端交接及母公司限定丢失，按业务组直接收口三家。浦发首发在本轮审核期间7200秒124停止，源条件未持久；核可恢复性后按新快照后继，不能凭usage伪造复用。同方在小型实际入口证明后首发。来源、12/6合同、累计资源及停止见验收§7.42，不另开准备卡或逐步等A。
+- 当前唯一活动卡：[b2-execution-card.md§7.6](../../openspec/changes/restore-company-profile-llm-led-generalization/b2-execution-card.md#76-当前任务卡保住有效答案纠正主体误拦后交齐b2结果)。上汽离线交付接受、追加到限，不新增外呼；源片及时持久和逐组交付部分接受。当前主阻塞是错误标题/词语门禁拦主体语义、接续丢有效pass及核心角色后置。保护同方在途首发后，一次显式追加合并纠偏，直接完成其未用正式后继和浦发一次后继；上汽只离线恢复有效凭据/退出已知错误。首发与追加失败保留，资源沿§7.42不增加，运行/次数/停止见§7.43，不新增准备卡或逐步等A。
 - 输入：历史公司中制造、非金融服务、金融、综合各1家，共4家，包含L0那1家；沿同一实现，不加公司/代码/页码生产分支。
 - 交付：4家三视图及源审查；新句式/续页/未披露/冲突均可表达；有歧义的可正确限用，但不能把主营缺失包装为通过。4家最终均达到公司可用标准才进入S1。
 - 验证：保留首发失败，4家真实语义结果和源核验全部可追溯；报告冷/热解析、请求/token/费用、总时长。用4家实测决定是否放行S1，超预算先裁决，不偷偷改阈值。
-- B自主范围：沿B1同一实现连续完成4家和直接回归；最多两次共性修复迭代，每家公司最多一次正式后继；上汽依验收§7.42仅额外一次定向开发收口另列。当前剩余合并修复及累计资源按该节/B2§7，不增加第5家、不按公司写规则分支。
+- B自主范围：原两次共性修复及上汽额外定向开发收口均已用；验收§7.43显式追加一次范围收敛的纠偏，未用后继改绑冻结修复版，上汽仅离线安全交付，累计额不增加。连续P0—P3和必要P4，不增加第5家、不按公司写规则分支。
 - 停止：达到修复/预算上限仍不具备通用性，B提交完整失败材料，A2裁决是否收窄能力或重做方案；不新增第5家调参稀释失败。
 
 ### A2：四类通用性审核与S1放行（A负责）
