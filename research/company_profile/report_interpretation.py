@@ -601,6 +601,39 @@ def _heading_and_paragraph(text: str, start: int, end: int) -> tuple[str, str]:
     return heading, paragraph
 
 
+def _is_subject_limit(text: str) -> bool:
+    """A parent, company-only, consolidated, or segment heading. A report title is not one."""
+    if not text or "年度报告" in text:
+        return False
+    return any(mark in text for mark in ("母公司", "本公司", "合并", "分部"))
+
+
+def governing_subject_heading(
+    pages: Sequence[Mapping[str, Any]], page_number: int
+) -> str:
+    """Nearest earlier heading that limits who the statement is about."""
+    earlier = sorted(
+        (
+            page
+            for page in pages
+            if page.get("readable", True) is not False and int(page["page"]) <= int(page_number)
+        ),
+        key=lambda page: int(page["page"]),
+        reverse=True,
+    )
+    for page in earlier:
+        for raw in reversed(str(page.get("text") or "").splitlines()):
+            stripped = " ".join(raw.split())
+            if (
+                stripped
+                and 1 < len(stripped) <= 40
+                and not stripped.endswith(("。", "；", "！", "？"))
+                and _is_subject_limit(stripped)
+            ):
+                return stripped
+    return ""
+
+
 def locate_source_quote(
     quote: str, pages: Sequence[Mapping[str, Any]], *, page_number: int
 ) -> tuple[str, int, str, str] | None:
@@ -645,6 +678,10 @@ def _bind_source_evidence(
     if located is None:
         return None
     source, offset, heading, paragraph = located
+    if not _is_subject_limit(heading):
+        earlier = governing_subject_heading(pages, evidence.page)
+        if earlier:
+            heading = earlier
     anchor = evidence.anchor.model_copy(
         update={
             "bounded_quote": source,

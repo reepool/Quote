@@ -1,0 +1,13 @@
+{
+  "state": "found",
+  "delivered": 1,
+  "profiles_equal": true,
+  "draft_complete": false,
+  "counts": {
+    "company_profile": 40,
+    "product_exposure": 29,
+    "supply_chain_position": 4
+  },
+  "exit": 124,
+  "note": "Read from the last published runtime after the successor was killed. No new semantic run."
+}

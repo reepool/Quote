@@ -484,6 +484,32 @@ def preflight_layered(binding: dict) -> dict:
     }
 
 
+def deliver_saved_profile(run_root: Path, instrument_id: str) -> None:
+    """Query and export the last published profile without another semantic run."""
+    try:
+        from research.company_profile.reads import CompanyProfileReadService
+
+        service = CompanyProfileReadService(run_root / "output")
+        query = service.query((instrument_id,))
+        export = service.export((instrument_id,), run_root / "export")
+        write_json(run_root / "query.json", query)
+        write_json(run_root / "export.json", export)
+        reloaded = CompanyProfileReadService(run_root / "output").query((instrument_id,))
+        write_json(
+            run_root / "delivery.json",
+            {
+                "delivered": query.get("delivered"),
+                "query_export_equal": query.get("profiles") == export.get("profiles"),
+                "reload_equal": query.get("profiles") == reloaded.get("profiles"),
+            },
+        )
+    except Exception as exc:  # noqa: BLE001 - delivery must not hide the timeout
+        write_json(
+            run_root / "delivery.json",
+            {"delivered": 0, "error_type": type(exc).__name__, "error": str(exc)[:500]},
+        )
+
+
 def finish_worker(run_root: Path, worker) -> dict:
     """Persist the entry receipt even when the worker raises, then re-raise."""
     try:
@@ -538,9 +564,9 @@ def validate_binding(
     auth = binding.get("run_authorization")
     if auth == "company_profile_b2_cross_industry.2026-10-23":
         allowed = (
-            0 < elapsed <= 7200
-            and int(binding.get("max_tokens") or 0) <= 2_400_000
-            and int(binding.get("max_physical_requests") or 0) <= 128
+            0 < elapsed <= 14400
+            and int(binding.get("max_tokens") or 0) <= 3_600_000
+            and int(binding.get("max_physical_requests") or 0) <= 160
         )
     elif auth == "company_profile_fulltext_core.2026-10-22":
         allowed = (
@@ -605,7 +631,9 @@ def validate_binding(
                 "company32",
                 "saic1",
                 "saic2",
+                "saic-closeout",
                 "spdb1",
+                "spdb-successor",
                 "tongfang1",
             }
             or not authorization.get("approval_reference")
@@ -792,9 +820,9 @@ def _worker(
             LogicalRecoveryPolicy(
                 max_recoveries=(
                     min(
-                        12,
+                        16,
                         logical_recovery_count(prior_attempts)
-                        + min(6, int(binding.get("max_recoveries", 6))),
+                        + int(binding.get("max_recoveries", 4)),
                     )
                     if binding.get("run_authorization")
                     in {
@@ -1442,6 +1470,7 @@ def main() -> int:
                 "elapsed_seconds": time.monotonic() - started,
             },
         )
+        deliver_saved_profile(run_root, binding["asset"]["instrument_id"])
         return 124
 
 

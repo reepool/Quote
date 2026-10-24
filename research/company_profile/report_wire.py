@@ -269,7 +269,10 @@ def instructions(request: ReportSemanticRequestV3) -> str:
                 "and the same period may jointly support one current-business summary; "
                 "cite each quote, and do not require one quote to repeat the whole "
                 "sentence. Keep a plan or goal, and a general tax or fee policy, out of "
-                "that current-business sentence. Return a claim only when the "
+                "that current-business sentence. A heading that limits the statement "
+                "to the parent-company statements, the company alone, a named "
+                "subsidiary, or one segment must stay in the answer. Do not generalize "
+                "that statement to the whole group. Return a claim only when the "
                 "supplied text supports the whole answer, with a {page,quote} copied from "
                 "that text. Do not fill a dimension the text does not support. "
             )
@@ -326,7 +329,9 @@ def instructions(request: ReportSemanticRequestV3) -> str:
     )
     return common + whole_claim + (
         "Return exactly one check for EVERY condition, claim and original record. "
-        "Read section_title and context_before, not only the short quote. "
+        "A heading or preceding section that limits the subject to the parent company, "
+        "the company alone, a named subsidiary, or one segment must remain in the "
+        "claim. Dropping that limit and stating the group result is not a pass. "
         "A located quote is not by itself a supported claim. An industry or technical "
         "environment statement is not a completed company action. A strategic goal or "
         "transformation target is not the company's current identity. "

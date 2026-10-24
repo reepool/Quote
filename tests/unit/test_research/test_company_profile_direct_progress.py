@@ -2023,6 +2023,303 @@ def test_an_unclear_renamed_claim_does_not_replace_the_other_answer():
     assert sum("724,769,470.04" in claim.answer for claim in result.claims) == 1
 
 
+def test_parent_heading_is_kept_as_the_section_limit():
+    from research.company_profile.report_interpretation import _bind_source_evidence
+
+    report = _report()
+    evidence = _evidence(
+        report,
+        text="公司主营业务收入及其他业务收入主要在某一时点确认。",
+        page=2,
+    )
+    bound = _bind_source_evidence(
+        evidence,
+        report,
+        (
+            {"page": 1, "text": "十九、母公司财务报表主要项目注释\n其他说明。", "readable": True},
+            {
+                "page": 2,
+                "text": "公司主营业务收入及其他业务收入主要在某一时点确认。",
+                "readable": True,
+            },
+        ),
+    )
+    assert bound is not None
+    assert "母公司" in bound.section_title
+
+
+def test_core_groups_place_the_role_before_later_subsidiaries():
+    from research.company_profile.contracts import ReportSourceCondition
+    from research.company_profile.direct_reading import _business_groups
+
+    report = _report()
+
+    def condition(condition_id, dimension):
+        return ReportSourceCondition(
+            condition_id=condition_id,
+            dimension=dimension,
+            description=condition_id,
+            evidence=(_evidence(report, text="公司经营业务。", page=1),),
+            major=True,
+            statement_status="current",
+        )
+
+    groups = _business_groups(
+        [
+            condition("principal-a", "principal_business"),
+            condition("principal-b", "principal_business"),
+            condition("revenue", "revenue_model"),
+            condition("role", "supply_chain_role"),
+        ]
+    )
+    first = {item.dimension for item in groups[0]}
+    assert {"principal_business", "revenue_model", "supply_chain_role"} <= first
+    assert all(item.condition_id != "principal-b" for item in groups[0])
+
+
+def test_one_group_is_verified_before_the_next_group_is_drafted():
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    text = "公司经营整车制造并确认整车收入。公司同时经营零部件。公司向上游采购钢材。"
+
+    def condition(condition_id, dimension, quote):
+        return ReportSourceCondition(
+            condition_id=condition_id,
+            dimension=dimension,
+            description=condition_id,
+            evidence=(
+                _evidence(report, text=quote, page=1).model_copy(
+                    update={"evidence_id": condition_id}
+                ),
+            ),
+            major=True,
+            statement_status="current",
+        )
+
+    saved = (
+        condition("principal-a", "principal_business", "公司经营整车制造"),
+        condition("principal-b", "principal_business", "公司同时经营零部件"),
+        condition("revenue", "revenue_model", "确认整车收入"),
+        condition("role", "supply_chain_role", "公司向上游采购钢材"),
+    )
+
+    class _Provider:
+        offline_only = True
+
+        def __init__(self):
+            self.calls = []
+
+        def interpret(self, request):
+            ids = tuple(item.condition_id for item in request.source_conditions)
+            self.calls.append((request.purpose, ids))
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=saved,
+                )
+            if request.purpose == "synthesize_views":
+                if sum(item[0] == "synthesize_views" for item in self.calls) > 1:
+                    raise ValueError("later-group-blocked")
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="core-group",
+                            dimension="principal_business",
+                            status="observed",
+                            answer="公司经营整车制造，并向上游采购钢材。",
+                            evidence=saved[0].evidence,
+                            condition_ids=ids,
+                        ),
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=(
+                    {
+                        "target_type": "claim",
+                        "target_id": "core-group",
+                        "status": "pass",
+                        "explanation": "第一组已核。",
+                        "covers_target_type": "claim",
+                        "covers_target_id": "core-group",
+                    },
+                    {
+                        "target_type": "condition",
+                        "target_id": "principal-a",
+                        "status": "pass",
+                        "explanation": "第一组覆盖。",
+                        "covers_target_type": "claim",
+                        "covers_target_id": "core-group",
+                    },
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["discovery_scope"] = "full_text"
+    provider = _Provider()
+    result = _run(
+        provider,
+        pages=({"page": 1, "text": text, "readable": True},),
+        processing_identity=identity,
+        report=report,
+    )
+    purposes = [item[0] for item in provider.calls]
+    synth = [index for index, purpose in enumerate(purposes) if purpose == "synthesize_views"]
+    verified = [index for index, purpose in enumerate(purposes) if purpose == "verify_views"]
+    assert verified and synth and verified[0] < synth[1]
+
+    def has(ids, name):
+        return any(item == name or str(item).endswith(":" + name) for item in ids)
+
+    first_ids = provider.calls[synth[0]][1]
+    assert has(first_ids, "role") and has(first_ids, "principal-a")
+    assert not has(first_ids, "principal-b")
+    assert len(first_ids) > 1
+    kept = next(item for item in result.claims if item.claim_id == "core-group")
+    assert kept.status == "observed"
+    assert any(gap.startswith("direct_core_package_stopped:") for gap in result.gaps)
+
+
+def test_parent_limit_is_not_promoted_to_the_group():
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    quote = "公司主营业务收入及其他业务收入主要在某一时点确认。"
+    pages = (
+        {"page": 1, "text": "十九、母公司财务报表主要项目注释\n其他说明。", "readable": True},
+        {"page": 2, "text": "上海汽车集团股份有限公司2025年年度报告\n" + quote, "readable": True},
+    )
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=(
+                        ReportSourceCondition(
+                            condition_id="parent-income",
+                            dimension="revenue_model",
+                            description="收入确认时点。",
+                            evidence=(
+                                _evidence(report, text=quote, page=2).model_copy(
+                                    update={"evidence_id": "parent-income"}
+                                ),
+                            ),
+                            major=True,
+                            statement_status="current",
+                        ),
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                assert any("母公司" in str(page.get("text") or "") for page in request.source_pages)
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="timing",
+                            dimension="revenue_model",
+                            status="observed",
+                            answer=quote,
+                            evidence=(
+                                _evidence(report, text=quote, page=2).model_copy(
+                                    update={"evidence_id": "timing"}
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=(),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["discovery_scope"] = "full_text"
+    result = _run(_Provider(), pages=pages, processing_identity=identity, report=report)
+    claim = next(item for item in result.claims if item.claim_id == "timing")
+    assert claim.status == "unclear"
+    assert claim.limitation == "subject_scope_omitted"
+    assert "母公司" in claim.evidence[0].section_title
+
+
+def test_shared_evidence_id_does_not_abort_group_verification():
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    quote = "公司主营业务收入及其他业务收入主要在某一时点确认。"
+    evidence = _evidence(report, text=quote, page=2).model_copy(
+        update={"evidence_id": "shared-income"}
+    )
+    pages = (
+        {"page": 1, "text": "十九、母公司财务报表主要项目注释\n其他说明。", "readable": True},
+        {"page": 2, "text": "上海汽车集团股份有限公司2025年年度报告\n" + quote, "readable": True},
+    )
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=(
+                        ReportSourceCondition(
+                            condition_id="parent-income",
+                            dimension="revenue_model",
+                            description="母公司收入确认时点。",
+                            evidence=(evidence,),
+                            major=True,
+                            statement_status="current",
+                        ),
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="timing",
+                            dimension="revenue_model",
+                            status="observed",
+                            answer="母公司主营业务收入及其他业务收入主要在某一时点确认。",
+                            evidence=(evidence,),
+                        ),
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=(
+                    {
+                        "target_type": "claim",
+                        "target_id": "timing",
+                        "status": "pass",
+                        "explanation": "保留了母公司限定。",
+                    },
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["discovery_scope"] = "full_text"
+    result = _run(_Provider(), pages=pages, processing_identity=identity, report=report)
+    claim = next(item for item in result.claims if item.claim_id == "timing")
+    assert claim.status == "observed"
+    assert "母公司" in claim.answer
+    assert "母公司" in claim.evidence[0].section_title
+
+
 def test_logical_identity_separates_entries_and_verification_targets():
     from research.company_profile.stage5_provider import _logical_report_request_id
     from utils.llm.budget import LogicalRecoveryPolicy, _recovery_block

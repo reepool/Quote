@@ -1,0 +1,16 @@
+{
+  "window": "追加开发收口",
+  "exit_code": 0,
+  "stopped_reason": "physical_request_token_context_or_cost_budget_exhausted",
+  "this_slice_physical": 20,
+  "this_slice_tokens": 218648,
+  "elapsed_seconds": 1098.8322021253407,
+  "prior_stopped_slice_physical": 4,
+  "prior_stopped_slice_tokens": 27991,
+  "company_physical_cap": 128,
+  "note": "同一追加窗口两段合计24次物理。公司累计物理已到128，不再追加。",
+  "query.json": "cab23a2baf27a3f4fb211f68c736432ecbccf0d8c12f0c8724f3be9aff995af6",
+  "export.json": "d192590de564dc04bc42b7fe66a2b11501a1821cbe08955a7a0b0d69aec43d60",
+  "budget-final.json": "912cec3a112d0019e134279080a09c476423de597e6bca73feb4e38eaf814793",
+  "supervisor.json": "039122117523a33e5a123b207a8c0ead72fe767a8d6d6dc2f2208df77e582a08"
+}

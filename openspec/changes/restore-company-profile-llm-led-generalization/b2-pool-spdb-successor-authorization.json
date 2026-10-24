@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "spdb-successor",
+  "binding_sha256": "3914d4c82f7f45bb2270915d7107a38a4f4e9fd4765f57a34b41756c60fa8c66",
+  "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+  "approval_reference": "acceptance program section 7.42 and b2-execution-card section 7, 2026-10-24",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "正式后继"
+}

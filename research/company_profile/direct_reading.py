@@ -34,6 +34,7 @@ from research.company_profile.report_interpretation import (
     _pages,
     fits_card_reservation,
     cited_quote_pages,
+    governing_subject_heading,
     pack_fitting_batches,
 )
 from utils.llm.budget import LlmRunBudget
@@ -59,6 +60,60 @@ def _fit(pages, *, purpose, source_scope, report, identity, output, limit):
     )
 
 
+def _business_groups(conditions: Sequence[ReportSourceCondition]) -> list[list[ReportSourceCondition]]:
+    """Interleave core dimensions so the first groups are not only subsidiaries."""
+    order = (
+        "principal_business",
+        "revenue_model",
+        "products_services",
+        "input_exposure",
+        "supply_chain_role",
+        "upstream_downstream",
+        "output_exposure",
+    )
+    buckets: dict[str, list[ReportSourceCondition]] = {name: [] for name in order}
+    later: list[ReportSourceCondition] = []
+    for condition in conditions:
+        if condition.statement_status == "current" and condition.dimension in buckets:
+            buckets[condition.dimension].append(condition)
+        else:
+            later.append(condition)
+    groups: list[list[ReportSourceCondition]] = []
+    while any(buckets.values()):
+        group: list[ReportSourceCondition] = []
+        for name in order:
+            if not buckets[name]:
+                continue
+            group.append(buckets[name].pop(0))
+            if len(group) == 6:
+                break
+        if group:
+            groups.append(group)
+    for start in range(0, len(later), 6):
+        groups.append(later[start : start + 6])
+    return groups
+
+
+def subject_limit_omitted(claim) -> bool:
+    """A parent, company-only, or segment heading cannot be dropped from the answer."""
+    headings = "\n".join(
+        str(getattr(evidence, "section_title", "") or "") for evidence in claim.evidence
+    )
+    answer = str(getattr(claim, "answer", "") or "")
+    if "母公司" in headings and "母公司" not in answer:
+        return True
+    if "分部" in headings and "分部" not in answer:
+        return True
+    if (
+        "本公司" in headings
+        and "子公司" not in headings
+        and "合并" not in headings
+        and "本公司" not in answer
+    ):
+        return True
+    return False
+
+
 def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
     """Three views and covered major conditions decide completeness."""
     observed = {item.dimension for item in claims if item.status == "observed"}
@@ -80,6 +135,8 @@ def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
             "pending_verification",
             "claim_or_dependency_not_verified",
             "evidence_not_located",
+            "subject_scope_omitted",
+            "retracted_pending_correction",
         }
     }
     claims_by_id = {item.claim_id: item for item in claims}
@@ -947,6 +1004,17 @@ def interpret_direct_core(
                     )
                 )
                 continue
+            if subject_limit_omitted(claim):
+                gaps.append(f"subject_scope_omitted:{claim.claim_id}")
+                upsert(
+                    claim.model_copy(
+                        update={
+                            "status": "unclear",
+                            "limitation": "subject_scope_omitted",
+                        }
+                    )
+                )
+                continue
             observable.append(claim)
         observable.sort(
             key=lambda claim: (
@@ -965,9 +1033,12 @@ def interpret_direct_core(
         def measure(group, conditions):
             related = related_records(group)
             pages = pages_for([*group, *conditions, *related])
-            units = joint_verify_reservation(
-                report, identity, pages, group, conditions, related
-            )
+            try:
+                units = joint_verify_reservation(
+                    report, identity, pages, group, conditions, related
+                )
+            except ValueError:
+                return limit + 1, pages, related
             if pages:
                 sized = ReportSemanticRequestV3(
                     request_id=f"{work_id}:verify-size",
@@ -1581,6 +1652,8 @@ def interpret_direct_core(
                 page_no = int(page_no)
                 if page_no in by_page and page_no not in inventoried and page_no not in follow:
                     follow.append(page_no)
+            publish()
+            draft_ready_core()
         return follow
 
     composed: set[int] = set()
@@ -1649,93 +1722,19 @@ def interpret_direct_core(
             key=lambda item: (rank.get(item.dimension, 50), item.condition_id),
         )
 
-        def synthesis_units(selected) -> int:
-            return request_reservation(
-                ReportSemanticRequestV3(
-                    request_id=f"{work_id}:synthesis-size",
-                    purpose="synthesize_views",
-                    report=report,
-                    processing_identity=identity,
-                    source_pages=tuple(package),
-                    source_scope="full_context",
-                    source_conditions=tuple(selected),
-                    max_output_tokens=BODY_OUTPUT,
-                    timeout_seconds=float(
-                        identity.get("logical_request_timeout_seconds") or 120
-                    ),
-                )
-            )
-
-        fitting: list[ReportSourceCondition] = []
-        if synthesis_units(()) > limit:
-            gaps.append("company_synthesis_context_truncated")
-            return
-        for condition in related:
-            if synthesis_units([*fitting, condition]) <= limit:
-                fitting.append(condition)
-                continue
-            gap = f"major_condition_not_in_synthesis:{condition.condition_id}"
-            if gap not in gaps:
-                gaps.append(gap)
-        related = fitting
-        drafted_all: list[ReportViewClaim] = []
-        seen_ids: dict[str, ReportViewClaim] = {}
-        for condition in related:
-            cond_pages = [
-                dict(page)
-                for page in cited_quote_pages(condition.evidence)
-            ] or package
-            try:
-                drafted = invoke(
-                    "synthesize_views",
-                    cond_pages,
-                    source_scope="full_context",
-                    output=BODY_OUTPUT,
-                    later=0,
-                    extra={"source_conditions": (condition,)},
-                )
-            except (ValueError, LlmError, SemanticProviderError) as exc:
-                gaps.append(f"direct_core_package_stopped:{exc}")
-                continue
-            for claim in drafted.claims:
-                bound = []
-                failed = False
-                for evidence in claim.evidence:
-                    located = _bind_source_evidence(evidence, report, chosen)
-                    if located is None:
-                        failed = True
-                        break
-                    bound.append(located)
-                if failed or not bound:
-                    gaps.append(f"evidence_not_located:{claim.claim_id}")
-                    claim = claim.model_copy(
-                        update={"status": "unclear", "limitation": "evidence_not_located", "evidence": tuple(bound)}
-                    )
-                else:
-                    claim = claim.model_copy(update={"evidence": tuple(bound)})
-                prior = seen_ids.get(claim.claim_id)
-                if prior is not None:
-                    same = prior.answer == claim.answer and tuple(
-                        item.anchor.bounded_quote for item in prior.evidence
-                    ) == tuple(item.anchor.bounded_quote for item in claim.evidence)
-                    if same:
-                        continue
-                    gaps.append(f"claim_id_conflict:{claim.claim_id}")
-                    claim = claim.model_copy(update={"claim_id": f"{claim.claim_id}__{len(seen_ids)}"})
-                seen_ids[claim.claim_id] = claim
-                stored = upsert(
-                    claim.model_copy(update={"limitation": "pending_verification"})
-                )
-                drafted_all.append(stored.model_copy(update={"limitation": None}))
-                publish()
+        pending = [
+            item
+            for item in related
+            if item.condition_id not in drafted_condition_ids
+        ]
+        for group in _business_groups(pending):
+            deliver_group(group)
         for page in package:
             page_no = int(page["page"])
             composed.add(page_no)
             if page_no in by_page:
                 by_page[page_no]["status"] = "read"
                 by_page[page_no]["full_text_sent"] = True
-        if drafted_all:
-            settle_claims(drafted_all, related)
 
     def draft_reused_sources() -> None:
         """Write pending drafts from saved source conditions, then verify."""
@@ -1775,84 +1774,153 @@ def interpret_direct_core(
                 and request_reservation(request) <= limit
             )
 
-        ordered = sorted(
-            conditions_to_draft,
-            key=lambda item: (rank.get(item.dimension, 50), item.condition_id),
-        )
-        if identity.get("accepted_prior_draft"):
-            principal = [
-                condition
-                for condition in ordered
-                if condition.dimension == "principal_business"
-            ]
-            groups = []
-            if len(principal) <= 2:
-                if principal:
-                    groups.append(principal)
-                groups.extend(
-                    [[condition] for condition in ordered if condition not in principal]
-                )
-            else:
-                groups = [[condition] for condition in ordered]
-        else:
-            groups = [[condition] for condition in ordered]
-        drafted_clean: list[ReportViewClaim] = []
-        sent_conditions: list[ReportSourceCondition] = []
-        for group in groups:
-            pages = [
-                dict(page)
-                for page in cited_quote_pages(
-                    evidence for item in group for evidence in item.evidence
-                )
-            ]
-            try:
-                drafted = invoke(
-                    "synthesize_views",
-                    pages,
-                    source_scope="full_context",
-                    output=BODY_OUTPUT,
-                    later=0,
-                    extra={"source_conditions": tuple(group)},
-                )
-            except (ValueError, LlmError, SemanticProviderError) as exc:
-                if len(group) > 1 and "deadline" in str(exc).lower():
-                    middle = max(1, len(group) // 2)
-                    groups.append(group[:middle])
-                    groups.append(group[middle:])
-                else:
-                    gaps.append(f"direct_core_package_stopped:{exc}")
+        ordered = [
+            condition
+            for condition in sorted(
+                conditions_to_draft,
+                key=lambda item: (rank.get(item.dimension, 50), item.condition_id),
+            )
+            if condition.condition_id not in drafted_condition_ids
+        ]
+        for group in _business_groups(ordered):
+            deliver_group(group)
+
+    drafted_condition_ids: set[str] = set()
+
+    def deliver_group(group: list[ReportSourceCondition]) -> None:
+        """Save one business group, verify it, and publish before the next group."""
+        pending = [
+            condition
+            for condition in group
+            if condition.condition_id not in drafted_condition_ids
+        ]
+        if not pending:
+            return
+        pages = [
+            dict(page)
+            for page in cited_quote_pages(
+                evidence for item in pending for evidence in item.evidence
+            )
+        ]
+        for evidence in (item for condition in pending for item in condition.evidence):
+            heading = governing_subject_heading(sources, int(evidence.page))
+            if not heading:
                 continue
-            sent_conditions.extend(group)
-            for claim in drafted.claims:
-                bound = []
-                failed = False
-                for evidence in claim.evidence:
-                    located = _bind_source_evidence(evidence, report, sources)
-                    if located is None:
-                        failed = True
-                        break
-                    bound.append(located)
-                if failed or not bound:
-                    gaps.append(f"evidence_not_located:{claim.claim_id}")
-                    claim = claim.model_copy(
-                        update={
-                            "status": "unclear",
-                            "limitation": "evidence_not_located",
-                            "evidence": tuple(bound),
-                        }
-                    )
-                    upsert(claim)
-                else:
-                    claim = claim.model_copy(update={"evidence": tuple(bound)})
-                    stored = upsert(
-                        claim.model_copy(
-                            update={"limitation": "pending_verification"}
-                        )
-                    )
-                    drafted_clean.append(stored.model_copy(update={"limitation": None}))
-                publish()
-        if drafted_clean:
-            settle_claims(drafted_clean, sent_conditions)
+            for page in pages:
+                if int(page["page"]) == int(evidence.page) and heading not in str(
+                    page.get("text") or ""
+                ):
+                    page["text"] = f"{heading}\n{page.get('text') or ''}"
+        if len(pending) > 1:
+            sized = ReportSemanticRequestV3(
+                request_id=f"{work_id}:group-size",
+                purpose="synthesize_views",
+                report=report,
+                processing_identity=identity,
+                source_pages=tuple(pages),
+                source_scope="full_context",
+                source_conditions=tuple(pending),
+                max_output_tokens=BODY_OUTPUT,
+                timeout_seconds=float(
+                    identity.get("logical_request_timeout_seconds") or 120
+                ),
+            )
+            if request_payload_bytes(sized) > int(
+                identity.get("max_payload_utf8_bytes") or 60_000
+            ):
+                middle = max(1, len(pending) // 2)
+                deliver_group(pending[:middle])
+                deliver_group(pending[middle:])
+                return
+        try:
+            drafted = invoke(
+                "synthesize_views",
+                pages,
+                source_scope="full_context",
+                output=BODY_OUTPUT,
+                later=0,
+                extra={"source_conditions": tuple(pending)},
+            )
+        except (ValueError, LlmError, SemanticProviderError) as exc:
+            if len(pending) > 1 and "deadline" in str(exc).lower():
+                middle = max(1, len(pending) // 2)
+                deliver_group(pending[:middle])
+                deliver_group(pending[middle:])
+            else:
+                gaps.append(f"direct_core_package_stopped:{exc}")
+            return
+        drafted_group: list[ReportViewClaim] = []
+        for claim in drafted.claims:
+            bound = []
+            failed = False
+            for evidence in claim.evidence:
+                located = _bind_source_evidence(evidence, report, sources)
+                if located is None:
+                    failed = True
+                    break
+                bound.append(located)
+            if failed or not bound:
+                gaps.append(f"evidence_not_located:{claim.claim_id}")
+                claim = claim.model_copy(
+                    update={
+                        "status": "unclear",
+                        "limitation": "evidence_not_located",
+                        "evidence": tuple(bound),
+                    }
+                )
+                upsert(claim)
+            else:
+                claim = claim.model_copy(update={"evidence": tuple(bound)})
+                stored = upsert(
+                    claim.model_copy(update={"limitation": "pending_verification"})
+                )
+                drafted_group.append(stored.model_copy(update={"limitation": None}))
+            publish()
+        for condition in pending:
+            drafted_condition_ids.add(condition.condition_id)
+        located_conditions = []
+        for condition in pending:
+            bound_evidence = []
+            failed = False
+            for evidence in condition.evidence:
+                located = _bind_source_evidence(evidence, report, sources)
+                if located is None:
+                    failed = True
+                    break
+                bound_evidence.append(located)
+            located_conditions.append(
+                condition
+                if failed
+                else condition.model_copy(update={"evidence": tuple(bound_evidence)})
+            )
+        if drafted_group:
+            settle_claims(drafted_group, located_conditions)
+            publish()
+
+    def draft_ready_core() -> None:
+        """Draft the next core group once principal and revenue evidence both exist."""
+        pending = [
+            condition
+            for condition in conditions
+            if condition.condition_id not in drafted_condition_ids
+            and condition.statement_status == "current"
+            and condition.major
+            and condition.dimension
+            in {
+                "principal_business",
+                "revenue_model",
+                "products_services",
+                "input_exposure",
+                "supply_chain_role",
+                "upstream_downstream",
+            }
+        ]
+        dims = {condition.dimension for condition in pending}
+        if "principal_business" not in dims or not (
+            {"revenue_model", "products_services"} & dims
+        ):
+            return
+        deliver_group(_business_groups(pending)[0])
 
     reused_receipts = list(identity.get("accepted_source_receipts") or ())
     if reused_receipts:

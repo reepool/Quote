@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "saic-closeout",
+  "binding_sha256": "3dc5390bdd6ca2406e585716f47e39cc85ea84ce214fc11c0a7a8a53a6003920",
+  "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+  "approval_reference": "acceptance program section 7.42 and b2-execution-card section 7, 2026-10-24",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "追加开发收口"
+}
