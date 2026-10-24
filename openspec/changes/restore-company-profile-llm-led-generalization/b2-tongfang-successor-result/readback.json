@@ -1,0 +1,18 @@
+{
+  "window": "同方正式后继",
+  "exit_code": 0,
+  "elapsed_seconds": 2001.7676861146465,
+  "physical": 37,
+  "charged_tokens": 329645,
+  "recoveries": 1,
+  "cost": "unknown",
+  "stopped_reason": "physical_request_token_context_or_cost_budget_exhausted",
+  "delivered": 1,
+  "views": "54/30/1",
+  "observed_company": 23,
+  "supply_observed": 1,
+  "flags": false,
+  "query.json": "de4f6e57eba83f3388cdf3e12d6f5bc18e893c9ae29248eee8d913ce3f965ed7",
+  "budget-final.json": "cc5050c46a87d9aa76fb9a84d54d20077e757d63c6afb0a10af7c734cb12aaa9",
+  "supervisor.json": "2f7946916a98ec17cbdc984a04e4b5035a872b1817969154f7011115a1cf46b9"
+}

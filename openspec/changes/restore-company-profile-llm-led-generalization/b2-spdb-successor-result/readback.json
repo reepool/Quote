@@ -1,0 +1,19 @@
+{
+  "window": "浦发正式后继",
+  "exit_code": 124,
+  "elapsed_seconds": 6600.057614570484,
+  "physical": 76,
+  "charged_tokens": 1480604,
+  "recoveries": 10,
+  "cost": "unknown",
+  "delivered": 1,
+  "views": "15/10/4",
+  "observed_company": 9,
+  "supply_observed": 4,
+  "flags": false,
+  "inventory_conditions": 122,
+  "query.json": "55651729345dc4adbc91fda694fc38d84f864b17b66aed6567f66cdade01289f",
+  "export.json": "8ca8b2eab9c758c9e0e22eb847a176b2736856e72086b4bf3f7d9eaed416443a",
+  "physical-budget.json": "5db9d86f66d49446aa76f1ae22dbc8a4932892f4e95daf29bec48a6c206a903e",
+  "supervisor.json": "1724439c5a932752c3fcf7f94bb8e0c254175e56aa83261e37d283e8c5522fff"
+}
