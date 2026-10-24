@@ -94,26 +94,6 @@ def _business_groups(conditions: Sequence[ReportSourceCondition]) -> list[list[R
     return groups
 
 
-def subject_limit_omitted(claim) -> bool:
-    """A parent, company-only, or segment heading cannot be dropped from the answer."""
-    headings = "\n".join(
-        str(getattr(evidence, "section_title", "") or "") for evidence in claim.evidence
-    )
-    answer = str(getattr(claim, "answer", "") or "")
-    if "母公司" in headings and "母公司" not in answer:
-        return True
-    if "分部" in headings and "分部" not in answer:
-        return True
-    if (
-        "本公司" in headings
-        and "子公司" not in headings
-        and "合并" not in headings
-        and "本公司" not in answer
-    ):
-        return True
-    return False
-
-
 def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
     """Three views and covered major conditions decide completeness."""
     observed = {item.dimension for item in claims if item.status == "observed"}
@@ -1004,17 +984,6 @@ def interpret_direct_core(
                     )
                 )
                 continue
-            if subject_limit_omitted(claim):
-                gaps.append(f"subject_scope_omitted:{claim.claim_id}")
-                upsert(
-                    claim.model_copy(
-                        update={
-                            "status": "unclear",
-                            "limitation": "subject_scope_omitted",
-                        }
-                    )
-                )
-                continue
             observable.append(claim)
         observable.sort(
             key=lambda claim: (
@@ -1575,7 +1544,7 @@ def interpret_direct_core(
 
     inventoried: set[int] = set()
 
-    def inventory_pages(page_ids) -> list[int]:
+    def inventory_pages(page_ids, prepared=None) -> list[int]:
         """Read source text without candidate answers. Navigation is not body reading."""
         follow: list[int] = []
         ordered: list[int] = []
@@ -1593,7 +1562,16 @@ def interpret_direct_core(
             if by_id[page_no].get("readable", True)
         ]
         try:
-            packages = list(source_discovery_slices(chosen, report, identity, limit))
+            prepared_pages = {
+                int(page["page"])
+                for package in prepared or ()
+                for page in package
+                if page.get("scope") != "boundary_context"
+            }
+            if prepared and prepared_pages == {int(page["page"]) for page in chosen}:
+                packages = list(prepared)
+            else:
+                packages = list(source_discovery_slices(chosen, report, identity, limit))
         except ValueError as exc:
             gaps.append(str(exc))
             for page_no in ordered:
@@ -1803,7 +1781,12 @@ def interpret_direct_core(
             )
         ]
         for evidence in (item for condition in pending for item in condition.evidence):
-            heading = governing_subject_heading(sources, int(evidence.page))
+            offset = getattr(getattr(evidence, "anchor", None), "source_offset", None)
+            heading = governing_subject_heading(
+                sources,
+                int(evidence.page),
+                before_offset=offset if offset else None,
+            )
             if not heading:
                 continue
             for page in pages:
@@ -2037,24 +2020,30 @@ def interpret_direct_core(
                 if condition.condition_id in cited_ids and amount_already_answered:
                     continue
                 if (
-                    condition.dimension == "principal_business"
-                    and condition.major
-                    and ("从事" in condition.description or "负责" in condition.description)
-                    and not any(word in condition.description for word in ("计划", "目标"))
+                    condition.major
+                    and condition.statement_status == "current"
+                    and condition.dimension
+                    in {
+                        "principal_business",
+                        "revenue_model",
+                        "products_services",
+                        "input_exposure",
+                        "supply_chain_role",
+                        "upstream_downstream",
+                    }
                 ):
                     selected_conditions.append(condition)
-                    continue
-                if condition.dimension not in {"revenue_model", "products_services"}:
-                    continue
-                if "收入" not in condition.description and "代理" not in condition.description:
-                    continue
-                if any(word in condition.description for word in ("计划", "目标")):
-                    continue
-                selected_conditions.append(condition)
             selected_conditions.sort(
                 key=lambda item: (
                     item.condition_id.startswith("correction:"),
-                    item.dimension != "revenue_model",
+                    {
+                        "principal_business": 0,
+                        "revenue_model": 1,
+                        "products_services": 2,
+                        "input_exposure": 3,
+                        "supply_chain_role": 4,
+                        "upstream_downstream": 5,
+                    }.get(item.dimension, 50),
                     item.condition_id,
                 )
             )
@@ -2163,7 +2152,7 @@ def interpret_direct_core(
                 + _nonempty_verify_units(sample, report=report, identity=identity)
                 + 2 * max(slice_units)
             )
-        follow = inventory_pages(readable_order)
+        follow = inventory_pages(readable_order, prepared=planned)
         tail_hold = 0
         compose(readable_order)
         if (

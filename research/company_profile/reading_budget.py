@@ -41,24 +41,24 @@ def reservation_units(payload: Mapping[str, Any], max_output: int) -> int:
     return len(encoded) + 256 + max_output
 
 
-def request_payload_bytes(request: ReportSemanticRequestV3) -> int:
-    """Largest UTF-8 payload the current pool would actually send."""
-    sizes = []
+def _profile_payloads(request: ReportSemanticRequestV3):
+    """Build each pool payload once. Fit checks must not serialize the same request twice."""
+    user = json.dumps(
+        compact_request(request),
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
+    system = instructions(request)
+    schema = response_schema(request)
+    built = []
     for profile in _profiles():
         payload = LlmClient._build_payload(
             model=profile.model,
             messages=[
-                {"role": "system", "content": instructions(request)},
-                {
-                    "role": "user",
-                    "content": json.dumps(
-                        compact_request(request),
-                        ensure_ascii=False,
-                        separators=(",", ":"),
-                    ),
-                },
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
             ],
-            schema=response_schema(request),
+            schema=schema,
             schema_name="company_profile_report_response",
             mode="json_object",
             temperature=0,
@@ -67,41 +67,29 @@ def request_payload_bytes(request: ReportSemanticRequestV3) -> int:
             stream=profile.stream,
             stream_include_usage=profile.stream_include_usage,
         )
-        sizes.append(
-            len(json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode())
-        )
-    return max(sizes) if sizes else 0
+        built.append(payload)
+    return built
+
+
+def request_bounds(request: ReportSemanticRequestV3) -> tuple[int, int]:
+    """Reservation tokens and UTF-8 bytes from one payload build."""
+    reservations = []
+    sizes = []
+    for payload in _profile_payloads(request):
+        output = payload.get("max_completion_tokens", payload.get("max_tokens"))
+        reservations.append(reservation_units(payload, int(output)))
+        sizes.append(len(json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode()))
+    return (max(reservations) if reservations else 0, max(sizes) if sizes else 0)
+
+
+def request_payload_bytes(request: ReportSemanticRequestV3) -> int:
+    """Largest UTF-8 payload the current pool would actually send."""
+    return request_bounds(request)[1]
 
 
 def request_reservation(request: ReportSemanticRequestV3) -> int:
     """Largest physical reservation of this request across the current pool."""
-    bounds = []
-    for profile in _profiles():
-        payload = LlmClient._build_payload(
-            model=profile.model,
-            messages=[
-                {"role": "system", "content": instructions(request)},
-                {
-                    "role": "user",
-                    "content": json.dumps(
-                        compact_request(request),
-                        ensure_ascii=False,
-                        separators=(",", ":"),
-                    ),
-                },
-            ],
-            schema=response_schema(request),
-            schema_name="company_profile_report_response",
-            mode="json_object",
-            temperature=0,
-            max_output_tokens=request.max_output_tokens,
-            max_output_tokens_field=profile.max_output_tokens_field,
-            stream=profile.stream,
-            stream_include_usage=profile.stream_include_usage,
-        )
-        output = payload.get("max_completion_tokens", payload.get("max_tokens"))
-        bounds.append(reservation_units(payload, int(output)))
-    return max(bounds)
+    return request_bounds(request)[0]
 
 
 def contiguous_runs(page_ids: Sequence[int]) -> list[list[int]]:

@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "tongfang-successor",
+  "binding_sha256": "23af4f99eb030d55b9406d40d90320cd774fc24cf137df37a33c748392ded69e",
+  "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+  "approval_reference": "acceptance program section 7.42 and b2-execution-card section 7.6, 2026-10-24",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "正式后继"
+}

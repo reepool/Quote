@@ -1,0 +1,11 @@
+{
+  "window": "上汽离线安全交付",
+  "model_calls": 0,
+  "delivered": 1,
+  "observed_company_claims": 32,
+  "retracted": "claim-1",
+  "supply_chain_position": 4,
+  "flags": false,
+  "original_runtime_unchanged": "ec6aabb1fcd50a13c4646d3083237fb9ed0a99e9d056ed20dc2d980df3abf4e3",
+  "query": "629e86bc6ea9767bec6ad385e0e73ec229effa9f0c8f310851567471e945a2b6"
+}

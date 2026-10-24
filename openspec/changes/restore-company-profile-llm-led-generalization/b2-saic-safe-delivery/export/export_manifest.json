@@ -1,0 +1,24 @@
+{
+  "schema_version": "company_profile_common_core_export.v1",
+  "production_authorization": "not_authorized",
+  "scale_quality_claim_allowed": false,
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "profile_state": "found",
+  "delivered": 1,
+  "restricted_delivered": 0,
+  "profiles": [
+    {
+      "instrument_id": "600104.SH",
+      "report_period": "2025-12-31",
+      "file": "600104.SH_2025-12-31.json"
+    }
+  ],
+  "restricted_views": [],
+  "files": [
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/b2-saic-safe-delivery/export/600104.SH_2025-12-31.json",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/b2-saic-safe-delivery/export/profiles.csv",
+    "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/b2-saic-safe-delivery/export/export_manifest.json"
+  ],
+  "legacy_export_used": false
+}

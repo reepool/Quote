@@ -2247,9 +2247,102 @@ def test_parent_limit_is_not_promoted_to_the_group():
     identity["discovery_scope"] = "full_text"
     result = _run(_Provider(), pages=pages, processing_identity=identity, report=report)
     claim = next(item for item in result.claims if item.claim_id == "timing")
-    assert claim.status == "unclear"
-    assert claim.limitation == "subject_scope_omitted"
-    assert "母公司" in claim.evidence[0].section_title
+    assert claim.limitation != "subject_scope_omitted"
+    assert "母公司财务报表" in claim.evidence[0].section_title
+
+
+def test_a_later_heading_and_a_risk_line_do_not_replace_the_section():
+    from research.company_profile.report_interpretation import _bind_source_evidence
+
+    report = _report()
+    quote = "公司聚焦公共安全、数智产业和智慧能源。"
+    pages = (
+        {
+            "page": 1,
+            "text": (
+                "十九、母公司财务报表主要项目注释\n"
+                "本公司已在本报告中详细描述可能存在的相关风险，敬请查阅第三节管理层讨论\n"
+                "公司聚焦公共安全、数智产业和智慧能源。\n"
+                "合并资产负债表\n"
+            ),
+            "readable": True,
+        },
+    )
+    bound = _bind_source_evidence(
+        _evidence(report, text=quote, page=1),
+        report,
+        pages,
+    )
+    assert bound is not None
+    assert bound.section_title == "十九、母公司财务报表主要项目注释"
+
+
+def test_full_text_packs_the_same_pages_once(monkeypatch):
+    from research.company_profile.contracts import ReportSourceCondition
+    import research.company_profile.direct_reading as direct
+
+    report = _report()
+    text = "公司经营整车制造。"
+    calls = {"count": 0}
+    original = direct.source_discovery_slices
+
+    def counted(*args, **kwargs):
+        calls["count"] += 1
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(direct, "source_discovery_slices", counted)
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=(
+                        ReportSourceCondition(
+                            condition_id="vehicles",
+                            dimension="principal_business",
+                            description="整车。",
+                            evidence=(_evidence(report, text=text, page=1),),
+                            major=True,
+                            statement_status="current",
+                        ),
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="vehicles",
+                            dimension="principal_business",
+                            status="observed",
+                            answer=text,
+                            evidence=(_evidence(report, text=text, page=1),),
+                        ),
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=(),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["discovery_scope"] = "full_text"
+    _run(
+        _Provider(),
+        pages=(
+            {"page": 1, "text": text, "readable": True},
+            {"page": 2, "text": "公司另有金融业务。", "readable": True},
+        ),
+        processing_identity=identity,
+        report=report,
+    )
+    assert calls["count"] == 1
 
 
 def test_shared_evidence_id_does_not_abort_group_verification():

@@ -1,0 +1,19 @@
+{
+  "window": "同方首发",
+  "exit_code": 0,
+  "elapsed_seconds": 5835.109751760028,
+  "physical": 91,
+  "charged_tokens": 1151536,
+  "recoveries": 15,
+  "cost": "unknown",
+  "delivered": 1,
+  "company_profile": "38 claims, 16 observed, 18 subject_scope_omitted",
+  "product_exposure": "22 claims, 15 observed",
+  "supply_chain_position": 0,
+  "source_conditions": 57,
+  "inventory_receipts": 20,
+  "query.json": "a7753ee189c59432037a909c4e5fd4fdd1fb06ccc2b8ae5e65d04eef620728b5",
+  "export.json": "af00a0d92e29c14da9eac777217b136db327417b67c0b517543744c9a23514c3",
+  "budget-final.json": "008fdd03dca0bccd131b6b733491a91eb0366e6eb757bfaf274e49713daf83d3",
+  "supervisor.json": "9f4e3851f0f6592473d307a3bd669d52f92d2b06242e620cb6954348b4c25638"
+}

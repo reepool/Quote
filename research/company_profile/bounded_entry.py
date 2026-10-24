@@ -635,6 +635,7 @@ def validate_binding(
                 "spdb1",
                 "spdb-successor",
                 "tongfang1",
+                "tongfang-successor",
             }
             or not authorization.get("approval_reference")
         ):

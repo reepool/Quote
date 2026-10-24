@@ -10,7 +10,7 @@
   "route_fingerprint": "193be2135e4a93eab9f476676f68b374dd9316ee37f9236fe7780dae97128311",
   "fallback_allowed": true,
   "resource_feasibility_passed": true,
-  "max_elapsed_seconds": 7200,
+  "max_elapsed_seconds": 6600,
   "max_tokens": 2031935,
   "max_physical_requests": 88,
   "max_payload_utf8_bytes": 60000,
@@ -46,7 +46,7 @@
     "research/company_profile/shadow_batch_audit.py": "04f12d98d3819bfc02c683b3620e83c753be66c6377610ae8076c5153157a2ad",
     "research/company_profile/stage5.py": "47de653324c80e1eb1d615e179c2818eafdf568abd328698e92459122244da0c",
     "research/company_profile/core_skeleton.py": "288c1e58ee1f4d94096a19bc5e27df516c49bc7a2caa6b3329414dd1756027bc",
-    "research/company_profile/bounded_entry.py": "f29c2ffa4dda272eabe03b6df75f851ee3bc85e607bd6e02f7ef4b8fe40f231f",
+    "research/company_profile/bounded_entry.py": "ed99e660cf3695b05969048dbb3570cda91cce0970fc1412d40f465102160d58",
     "research/company_profile/stage5_bundle.py": "008b8c7d4de24ce03a75b95fbf97c47b24663d5950f53600761206e6397921c8",
     "research/company_profile/execution.py": "8649d1c31e081e168994a7fe433fa0b1d41616ea2039b78449b99e96065e2267",
     "research/company_profile/legacy_retirement.py": "3e01e1a88369f866790e65a7c4b04a3e9e5e4480fc099eef55303a5e34386b0c",
@@ -57,7 +57,7 @@
     "research/company_profile/acceptance_policy.py": "d7b96d51401b7c4baac7c56db36d99ae3e5ffb8742c6cac4edc07a7d99776d5c",
     "research/company_profile/__init__.py": "41e5f0c5c3562e789053ce756fe342d1cb8b2c34f4049920eb246855bdbf1364",
     "research/company_profile/core_evidence_selection.py": "ec85df0ec7f0c89e13f6dd1bbeecd4b4838f3af587819a8c4014c95fe60f5f1d",
-    "research/company_profile/report_interpretation.py": "863930afea5d1ea2286f6735ae2e6eb344e3c45d5493b42ad5bcf8d70ea86784",
+    "research/company_profile/report_interpretation.py": "5717be30aed274c8ad381ecd1d3d76c56e09ef6f76d041c623bf4ccda35d875a",
     "research/company_profile/shadow_batch_service.py": "bc3be4bd327b49f4abbec98d83cbbd6108993f9ac1253ecf2b42620c0a5dec74",
     "research/company_profile/live_run.py": "ee7208f40879a12f2e87270743475a91aaf178a7bc2ec979cb36e059b4fb1933",
     "research/company_profile/first_expansion.py": "a37fef38017082f82e71036d470462f08a92ed05324a4685b21572fef91bf661",
@@ -79,8 +79,8 @@
     "research/business_profile_production_operations.py": "b35e6659cd9926ac3623f055ff2d4061a25e3a37ef7b1104bd7afb81fb84ebad",
     "research/company_profile/report_wire.py": "3a7329b892cfbca76b1e85dfa28479c7d4ed48b9ec149dba64b8e591201a7e2b",
     "research/company_profile/resource_probe.py": "b36d2492af755281f505263fad6f19933eb47441174c41fac26b846bc7742884",
-    "research/company_profile/reading_budget.py": "b3c088198fbed76a03a7e09c39fee90e2802e0d6038f3dae991f2317fc78b39b",
-    "research/company_profile/direct_reading.py": "7bc1badcdaac27a621fe50abc81e6b64c05676265cdb37b32684344781e90158"
+    "research/company_profile/reading_budget.py": "89d24dcb2a43648f1f3dfb671f50e659ca504190910b814ff5f3444972199be8",
+    "research/company_profile/direct_reading.py": "7147d1fb73bf3cec2b8312a99dfc4a237b50bb644c6d314023cfb6463102c4ac"
   },
   "asset": {
     "instrument_id": "600000.SH",
@@ -157,13 +157,13 @@
       "configured_requests_per_minute": 0
     }
   ],
-  "approval_reference": "acceptance program section 7.42 and b2-execution-card section 7, 2026-10-24",
+  "approval_reference": "acceptance program section 7.42 and b2-execution-card section 7.6, 2026-10-24",
   "same_source_max_retries": 0,
   "retry_override_note": "正式后继：本窗最多10次新恢复，与既有6次合计不超过16。",
   "egress_policy": "run outside the sandbox proxy; do not change global proxy or TLS verification",
   "navigation_source_receipt": "openspec/changes/restore-company-profile-llm-led-generalization/b1-pool-observation-evidence/layered/source-receipt.json",
   "navigation_checkpoint": "openspec/changes/restore-company-profile-llm-led-generalization/b1-resource-evidence/iteration2/checkpoint.json.gz",
-  "resource_note": "浦发正式后继。首发源响应正文未能从持久检查点恢复，本窗按修复后的链重读未恢复范围并立即保存。不沿未持久的旧链热换。",
+  "resource_note": "浦发正式后继。发送前取消的本地准备不消耗这次后继，见 attempt-stopped-before-send.json。首发源正文未能恢复，本窗重读未恢复范围并立即保存。准备时间按日志下界218秒计入累计，不记为0。",
   "partial_slice": false,
   "reading_strategy": "direct_core_v1",
   "max_recoveries": 10,
@@ -172,5 +172,6 @@
   "run_authorization": "company_profile_b2_cross_industry.2026-10-23",
   "logical_request_timeout_seconds": 300,
   "max_physical_attempt_seconds": 150,
-  "continuation_budget": "openspec/changes/restore-company-profile-llm-led-generalization/b2-spdb1-evidence/physical-budget.json"
+  "continuation_budget": "openspec/changes/restore-company-profile-llm-led-generalization/b2-spdb1-evidence/physical-budget.json",
+  "cancellation_record": "data/QuoteBak/b2-spdb-successor-20261024/attempt-stopped-before-send.json"
 }

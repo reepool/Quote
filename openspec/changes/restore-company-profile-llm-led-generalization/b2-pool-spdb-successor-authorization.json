@@ -1,9 +1,9 @@
 {
   "status": "authorized",
   "attempt": "spdb-successor",
-  "binding_sha256": "3914d4c82f7f45bb2270915d7107a38a4f4e9fd4765f57a34b41756c60fa8c66",
+  "binding_sha256": "a1d24d08cd1568eb8a83b4563b367ad2a5541c2f95a4dbd109627f622ae6f942",
   "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
-  "approval_reference": "acceptance program section 7.42 and b2-execution-card section 7, 2026-10-24",
+  "approval_reference": "acceptance program section 7.42 and b2-execution-card section 7.6, 2026-10-24",
   "billing_mode": "development_unpriced",
   "cost_limit_evaluated": false,
   "review_status": "card_execution_not_code_reviewed",
