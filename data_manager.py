@@ -20426,6 +20426,38 @@ class DataManager:
             return True
         return int(quote_state.get('stock_failure_count') or 0) > 0
 
+    async def _is_latest_quote_suspended(
+        self,
+        instrument_id: str,
+        latest_quote_date: Optional[Union[date, datetime]],
+    ) -> bool:
+        """Return True when the latest persisted quote row shows a suspension.
+
+        Uses the instrument's own latest row as evidence so a suspended stock's
+        empty daily result can be exempted from exchange failure counting,
+        matching the coverage semantics that already exclude suspended-latest
+        instruments. Fails closed: missing date, missing row, unavailable
+        getter, or lookup errors all count as not suspended.
+        """
+
+        if latest_quote_date is None:
+            return False
+        getter = getattr(self.db_ops, 'get_daily_quote', None)
+        if not callable(getter) or not inspect.iscoroutinefunction(getter):
+            return False
+        try:
+            row = await getter(instrument_id, latest_quote_date)
+        except Exception:
+            dm_logger.warning(
+                "[DataManager] Failed to load suspension evidence for %s; "
+                "treating as not suspended",
+                instrument_id,
+            )
+            return False
+        if not isinstance(row, Mapping):
+            return False
+        return row.get('tradestatus') == 0
+
     @staticmethod
     def _sum_exchange_stat(
         exchange_stats: Mapping[str, Any],
@@ -38497,9 +38529,33 @@ class DataManager:
                                     exchange_result['integrity_stats']['quality_rejected'] += rejected_count
                                     update_results['integrity_stats']['quality_rejected'] += rejected_count
                                 if not prepared_data:
-                                    if instrument.get('trading_status') not in (None, 1):
+                                    master_exempt = (
+                                        instrument.get('trading_status')
+                                        not in (None, 1)
+                                    )
+                                    suspension_exempt = False
+                                    if (
+                                        not master_exempt
+                                        and is_a_stock
+                                        and instrument.get('type', 'stock') == 'stock'
+                                        and not rejected_count
+                                    ):
+                                        suspension_exempt = (
+                                            await self._is_latest_quote_suspended(
+                                                instrument['instrument_id'],
+                                                latest_date,
+                                            )
+                                        )
+                                    if master_exempt or suspension_exempt:
                                         exchange_result['integrity_stats']['legitimate_no_quote'] += 1
                                         update_results['integrity_stats']['legitimate_no_quote'] += 1
+                                        if suspension_exempt:
+                                            dm_logger.info(
+                                                "[DataManager] No daily quote for suspended "
+                                                "A-share stock %s; classified as "
+                                                "legitimate_no_quote",
+                                                instrument.get('instrument_id'),
+                                            )
                                     else:
                                         exchange_result['integrity_stats']['empty_unresolved'] += 1
                                         update_results['integrity_stats']['empty_unresolved'] += 1

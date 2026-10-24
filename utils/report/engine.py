@@ -287,15 +287,27 @@ class ReportEngine:
         empty_unresolved = int(integrity_stats.get('empty_unresolved', 0) or 0)
         stale_source = int(integrity_stats.get('stale_source', 0) or 0)
         quality_rejected = int(integrity_stats.get('quality_rejected', 0) or 0)
+        legitimate_no_quote = int(
+            integrity_stats.get('legitimate_no_quote', 0) or 0
+        )
         samples = integrity_stats.get('samples') or []
         retry_attempted = int(official_retry_stats.get('attempted', 0) or 0)
         retry_recovered = int(official_retry_stats.get('recovered', 0) or 0)
-        if empty_unresolved <= 0 and not samples and retry_attempted <= 0:
+        if (
+            empty_unresolved <= 0
+            and legitimate_no_quote <= 0
+            and not samples
+            and retry_attempted <= 0
+        ):
             return ''
 
-        lines = [
-            f"未覆盖: {empty_unresolved}，陈旧源: {stale_source}，质量拒绝: {quality_rejected}",
-        ]
+        integrity_line = (
+            f"未覆盖: {empty_unresolved}，陈旧源: {stale_source}，"
+            f"质量拒绝: {quality_rejected}"
+        )
+        if legitimate_no_quote > 0:
+            integrity_line += f"，停牌无行情: {legitimate_no_quote}"
+        lines = [integrity_line]
         if retry_attempted > 0:
             source_label = ','.join(
                 str(item) for item in (official_retry_stats.get('sources') or [])[:4]
