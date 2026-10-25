@@ -29,13 +29,19 @@ Investigation on 2026-10-25 (evidence: `data/financials.db`, live CNInfo data20 
 
 The repair module (`financial_statement_maintenance_repair.py`) already owns the readiness view after the CNInfo pass (`_merge_official_cninfo_readiness`, `_ready_target_keys`). It will pass a per-target `official_facts` map (field → value + source_file_id) into the fallback run, and the core snapshot build in `financial_statements_sync.py` will compose the final row official-first per canonical field. Alternatives considered: post-write recomposition (rejected — double writes and changelog noise) and merging only in the read path (rejected — leaves authoritative tier wrong).
 
-### D2. Provenance: `lineage_json.field_sources`
+Governance note: `run_local_core_dryrun` lives under `scripts/dev_validation/` but is already the production fallback entry; this change keeps it a parameter pass-through only. The merge, comparison, and cleanup logic SHALL be implemented in `research/` modules, not added to the script.
 
-Each written core row gains `lineage_json.field_sources = {<canonical_fact>: {source, source_file_id, role}}` where role is `official_structured` or `fallback_fill`. The row-level `source_file_id` continues to identify the writing bundle (write-path traceability); per-field authority is `field_sources`. Readers that need per-field authority read `field_sources` and fall back to row-level semantics when absent (historical rows unchanged). No schema migration.
+### D2. Provenance and availability semantics of a merged row
+
+Each written core row gains `lineage_json.field_sources = {<canonical_fact>: {source, source_file_id, role}}` where role is `official_structured` or `fallback_fill`. The row-level `source_file_id` continues to identify the writing bundle (write-path traceability); per-field authority is `field_sources`. Readers that need per-field authority read `field_sources` and fall back to row-level semantics when absent (historical rows unchanged). No schema migration: `facts_json`/`lineage_json` exist on `financial_facts`, `financial_core_facts_hot`, and `financial_core_facts_history`, and all three receive the same snapshot payload through the existing write path.
+
+Row-level `publish_date`/`data_available_date` keep the writing (fallback) bundle's values, preserving today's availability semantics; data20 condensed endpoints carry no per-fact announcement date, so per-field availability refinement is deferred and out of scope. Consumers requiring point-in-time dates continue to use row-level dates as today.
 
 ### D3. Comparison semantics
 
-Both sides are CNY-normalized numeric facts already. Comparison uses relative tolerance `source_fact_reconciliation.relative_tolerance` (default `0.005`) with absolute floor `absolute_floor_cny` (default `1.0`): equal if `abs(a-b) <= max(floor, tolerance * max(abs(a), abs(b)))`. Beyond tolerance → discrepancy record with both values and relative difference. Only canonical facts the reconciliation scope covers (start with the five core facts) are compared.
+Both sides are CNY-normalized numeric facts already. Comparison uses relative tolerance `source_fact_reconciliation.relative_tolerance` (default `0.005`) with absolute floor `absolute_floor_cny` (default `1.0`): equal if `abs(a-b) <= max(floor, tolerance * max(abs(a), abs(b)))`. Beyond tolerance → discrepancy record with both values and relative difference. The comparison scope starts with the five required core facts and is configurable; expanding it must not require code changes.
+
+Single-sourced fill fields (no second source to compare, today `equity_parent`) additionally get a definitional plausibility check against same-row official facts: implied minority interest = `equity_total` − `equity_parent` must be non-negative and within a loose configurable share of `equity_total` (default `0.5`); violations are marked as review-only anomalies, reported, and do not block the write. Rationale: the only field without a second source should not be the only field without any quality check; minority interest can legitimately be large but rarely dominates total equity.
 
 ### D4. Comparison storage: run-scoped table, single-run retention
 
@@ -44,6 +50,8 @@ New table `financial_source_fact_comparison_results` (run_id, instrument_id, rep
 ### D5. Cleanup of fetched-but-unused fallback facts
 
 Fallback numeric facts that were not used for field-level fill (comparison-only overlap fields) are deleted at the end of the run, identified by the fallback bundle's `source_file_id` minus the fill-used field set. Persist-then-clean is chosen over never-persisting so the existing write path and in-run auditability are preserved.
+
+Compatibility constraint: `financial_numeric_facts_hot` has other readers (`scripts/dev_validation/audit_financial_numeric_fact_coverage.py`, `scripts/dev_validation/live_audit_sina_ths_local_core.py`, `scripts/research_financial_l1_full_import.py`). Before enabling deletion, the change SHALL verify none of these consumers asserts the presence of fallback numeric facts for filled targets; audit tools that merely report coverage counts are expected to reflect the new retention policy rather than fail.
 
 ### D6. Flag consumption and rollback
 

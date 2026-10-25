@@ -12,7 +12,7 @@ The official-versus-fallback fact comparison SHALL operate on the fallback data 
 
 ### Requirement: Discrepancies Are Marked With Both Values
 
-Canonical facts available from both official and fallback sources SHALL be compared under a configurable tolerance; facts beyond tolerance SHALL be marked as discrepancies recording both values and the relative difference.
+Canonical facts within the configured comparison scope that are available from both official and fallback sources SHALL be compared under a configurable tolerance; facts beyond tolerance SHALL be marked as discrepancies recording both values and the relative difference. The initial comparison scope SHALL cover the required core canonical facts and SHALL be extensible by configuration without code changes.
 
 #### Scenario: Values match within tolerance
 
@@ -28,6 +28,17 @@ Canonical facts available from both official and fallback sources SHALL be compa
 
 - **WHEN** only one of the two sources provides a canonical fact
 - **THEN** the fact SHALL be skipped for comparison and SHALL not be flagged as a discrepancy
+
+### Requirement: Single-Sourced Fill Fields Get Definitional Sanity Checks
+
+Canonical facts filled from fallback with no official counterpart available for comparison SHALL receive a definitional plausibility check against same-row official facts when a definitional relationship exists; implausible results SHALL be marked as review-only anomalies and SHALL NOT block the write.
+
+#### Scenario: Implied minority interest is implausible
+
+- **WHEN** `equity_parent` is fallback-filled and official `equity_total` is present
+- **AND** the implied minority interest (`equity_total` minus `equity_parent`) is negative or exceeds the configured loose share threshold of `equity_total`
+- **THEN** the run SHALL mark a review-only anomaly recording both values and the implied minority share
+- **AND** the filled value SHALL remain written and reported for review
 
 ### Requirement: Comparison Results Are Transient Process Data
 
