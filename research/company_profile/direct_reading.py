@@ -1972,6 +1972,7 @@ def interpret_direct_core(
                     continue
                 by_page[page_no]["status"] = "read"
                 by_page[page_no]["reused_source"] = True
+        conditions_to_draft = []
         prior = identity.get("accepted_prior_draft") or {}
         if prior:
             retract = set(identity.get("retract_claim_ids") or ())
@@ -2084,6 +2085,7 @@ def interpret_direct_core(
                     "subject_scope_omitted",
                 }
             )
+            selected_conditions = []
             if identity.get("core_gap_closeout"):
                 role_evidence = []
                 for claim in claims:

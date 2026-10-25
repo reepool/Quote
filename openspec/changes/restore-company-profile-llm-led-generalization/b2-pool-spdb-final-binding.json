@@ -80,7 +80,7 @@
     "research/company_profile/report_wire.py": "b85f30aab8d813195d47524ac9e76513b9949f7424d671c3f8deaa27d5ea9dc4",
     "research/company_profile/resource_probe.py": "b36d2492af755281f505263fad6f19933eb47441174c41fac26b846bc7742884",
     "research/company_profile/reading_budget.py": "89d24dcb2a43648f1f3dfb671f50e659ca504190910b814ff5f3444972199be8",
-    "research/company_profile/direct_reading.py": "95fdcb6bde9617048bdc740e0e1710cadc01f9eeed512ef05e014a78e0a86d83"
+    "research/company_profile/direct_reading.py": "c6e36513a67b9977da0117e1bed55b051e7db551a3d9a1766003085c1f457413"
   },
   "asset": {
     "instrument_id": "600000.SH",
