@@ -1,7 +1,7 @@
 ## 1. Field-level fallback fill
 
-- [ ] 1.1 Implement the per-field official-first source preference in `derive_financial_core_facts_from_numeric_facts` (numeric facts pool resolution), gated by `fallback_only_missing_or_ambiguous_facts` (`false` preserves today's alias-order resolution).
-- [ ] 1.2 Ensure `lineage_json.core_fact_alias_matches` entries persist `source`, `source_file_id`, and `role` on write (production rows today drop the source file reference) and expose them through the core fact read paths; confirm the preference resolves before any filing-vintage append.
+- [ ] 1.1 Implement the per-field official-first source preference as an opt-in parameter of `derive_financial_core_facts_from_numeric_facts` (numeric facts pool resolution), passed by the disclosure incremental/reconciliation path and gated by `fallback_only_missing_or_ambiguous_facts` (`false`, or absent callers, preserve today's alias-order resolution).
+- [ ] 1.2 Ensure `lineage_json.core_fact_alias_matches` entries persist `source`, `source_file_id`, and `role` on write (production rows today drop the source file reference) and expose them through the core fact read paths; leave the filing-vintage stage untouched (the latent PIT constraint is documented in design D2 and binds when the stage is enabled).
 - [ ] 1.3 Keep `financial_statement_maintenance_repair.py` readiness/fallback-target selection unchanged, with `run_local_core_dryrun` remaining a parameter pass-through (no merge logic in `scripts/dev_validation/`).
 - [ ] 1.4 Unit tests: mixed-pool derivation prefers official values; fallback fills only fields the official source lacks; flag-off preserves legacy resolution; historical rows without labels read with row-level semantics.
 
