@@ -2482,8 +2482,31 @@ def core_assessment(result: ReportInterpretation) -> CompanyProfileCoreAssessmen
     )
 
 
+def _claim_is_trusted(claim: Any, checks: tuple[Any, ...]) -> bool:
+    """A trusted claim is observed, unrestricted, and has a passing claim check."""
+    if claim.status != "observed" or claim.limitation in {
+        "pending_verification",
+        "claim_or_dependency_not_verified",
+        "evidence_not_located",
+        "subject_scope_omitted",
+        "retracted_pending_correction",
+    }:
+        return False
+    return any(
+        check.target_type == "claim"
+        and check.target_id == claim.claim_id
+        and check.status == "pass"
+        for check in checks
+    )
+
+
 def research_views(result: ReportInterpretation) -> dict[str, Any]:
     """Render the same persisted projection for query and export."""
+    answers_with_untrusted_copy = {
+        item.answer
+        for item in result.claims
+        if item.answer and not _claim_is_trusted(item, result.checks)
+    }
     views = {}
     for name, dimensions in VIEWS.items():
         claims = [item for item in result.claims if item.dimension in dimensions]
@@ -2494,25 +2517,22 @@ def research_views(result: ReportInterpretation) -> dict[str, Any]:
                 for item in result.claims
                 if item.dimension in {"products_services", "revenue_model"}
                 and item not in claims
-                and item.status == "observed"
-                and item.limitation
-                not in {
-                    "pending_verification",
-                    "claim_or_dependency_not_verified",
-                    "evidence_not_located",
-                }
-                and any(
-                    check.target_type == "claim"
-                    and check.target_id == item.claim_id
-                    and check.status == "pass"
-                    for check in result.checks
-                )
+                and _claim_is_trusted(item, result.checks)
             )
-        if name == "supply_chain_position" and projected:
+        if name == "supply_chain_position":
+            if projected:
+                claims.extend(
+                    item
+                    for item in result.claims
+                    if item.claim_id in projected and item not in claims
+                )
             claims.extend(
                 item
                 for item in result.claims
-                if item.claim_id in projected and item not in claims
+                if item.dimension in {"input_exposure", "output_exposure"}
+                and item not in claims
+                and _claim_is_trusted(item, result.checks)
+                and item.answer not in answers_with_untrusted_copy
             )
         views[name] = {
             "assessment_status": (
@@ -2525,21 +2545,10 @@ def research_views(result: ReportInterpretation) -> dict[str, Any]:
                     **item.model_dump(mode="json"),
                     "review_state": (
                         "verified"
-                        if (
-                            item.status == "observed"
-                            and item.claim_id
-                            in {
-                                check.target_id
-                                for check in result.checks
-                                if check.target_type == "claim" and check.status == "pass"
-                            }
-                            and item.limitation
-                            not in {
-                                "pending_verification",
-                                "claim_or_dependency_not_verified",
-                                "evidence_not_located",
-                            }
-                        )
+                        if _claim_is_trusted(item, result.checks)
+                        and item.answer not in answers_with_untrusted_copy
+                        else "not_reliable"
+                        if item.answer in answers_with_untrusted_copy
                         else "pending_verification"
                         if item.status == "observed"
                         else "not_reliable"

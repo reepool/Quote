@@ -1,0 +1,538 @@
+[
+  {
+    "claim_id": "claim:principal_business_breakdown",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      155
+    ],
+    "answer": "公司主营业务包括整车业务、零部件业务、劳务及其他。本年累计营业收入分别为：整车业务410,196,473,001.11元，零部件业务203,019,866,775.26元，劳务及其他18,791,117,696.37元。"
+  },
+  {
+    "claim_id": "bp-work-5157694452e829569d6a42f3:report:26:claim-001",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      11
+    ],
+    "answer": "公司主营业务按行业分为汽车制造业与金融业，按产品分为整车业务、零部件业务、劳务及其他与金融业务。报告期（2025年度）内：汽车制造业营业收入646,152,101,889.30元，金融业营业收入10,091,710,191.88元；整车业务营业收入410,196,473,001.11元，零部件业务营业收入203,019,866,775.26元，劳务及其他营业"
+  },
+  {
+    "claim_id": "principal_business_vehicle_parts_production_sales",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      170,
+      171
+    ],
+    "answer": "Named subsidiaries state business natures covering production and sales of automobiles and parts, production and sales of automobile transmissions and parts, development, manufactu"
+  },
+  {
+    "claim_id": "claim_principal_business_segments",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      192
+    ],
+    "answer": "公司设两个报告分部：整车及零部件分部负责生产并销售整车及零部件；金融服务分部负责提供金融服务。"
+  },
+  {
+    "claim_id": "c1",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      192
+    ],
+    "answer": "本集团有 2 个报告分部：整车及零部件分部负责生产并销售整车及零部件；金融服务分部负责提供金融服务。"
+  },
+  {
+    "claim_id": "principal_business_1",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      20
+    ],
+    "answer": "本公司属于汽车制造行业，业务布局广，投资类型多。"
+  },
+  {
+    "claim_id": "claim-principal_business-1",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      61
+    ],
+    "answer": "上汽集团主要业务为生产并销售整车。"
+  },
+  {
+    "claim_id": "bp-work-5157694452e829569d6a42f3:report:35:principal_business_scope",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      81
+    ],
+    "answer": "公司经批准的经营范围为汽车、摩托车、拖拉机等各种机动车整车，机械设备，总成及零部件的生产、销售。"
+  },
+  {
+    "claim_id": "revenue_model_main_and_other_current",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      155
+    ],
+    "answer": "截至2025年12月31日报告期，营业收入分为主营业务和其他业务。本期主营业务收入为632,007,457,472.74元，本期其他业务收入为14,144,644,416.56元。其他业务本年累计营业收入中，材料及废料销售为7,098,573,219.12元，劳务为4,767,911,918.73元，租赁为1,094,574,636.74元，其他为1,183"
+  },
+  {
+    "claim_id": "products_services_other_business_lines",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      155
+    ],
+    "answer": "其他业务包括材料及废料销售、劳务、租赁和其他。"
+  },
+  {
+    "claim_id": "revenue_model_2025",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      156
+    ],
+    "answer": "2025年度主营业务收入中，在某一时点确认620,175,451,544.57元，在某一时段内确认11,832,005,928.17元；其他业务收入14,144,644,416.56元。"
+  },
+  {
+    "claim_id": "products_services_2025",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      156
+    ],
+    "answer": "2025年度主营业务收入按业务划分为整车业务、零部件业务和劳务及其他；其中整车业务收入410,196,473,001.11元，零部件业务收入203,019,866,775.26元，劳务及其他收入18,791,117,696.37元。"
+  },
+  {
+    "claim_id": "revenue-model-2025-1",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      11
+    ],
+    "answer": "2025年主营业务收入按产品/业务划分：整车业务营业收入410,196,473,001.11元；零部件业务营业收入203,019,866,775.26元；劳务及其他营业收入32,935,762,112.94元；金融业务营业收入10,091,710,191.88元；合计营业收入656,243,812,081.18元。公司营业收入主要来源于整车销售、零部件销售、"
+  },
+  {
+    "claim_id": "claim-revenue-model-subsidiaries",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      172
+    ],
+    "answer": "本期重要非全资子公司财务信息显示：华域汽车本期发生额营业收入为183,998,900,513.66元，净利润为8,226,592,261.99元（上期发生额营业收入为168,852,183,839.32元，净利润为7,482,264,275.10元）；通用五菱本期发生额营业收入为86,149,883,158.29元，净利润为1,529,578,066.88元"
+  },
+  {
+    "claim_id": "revenue_model_related_party_jv_lines_fy2025",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      184,
+      185
+    ],
+    "answer": "公司与合营企业的关联交易构成本期（2025年度）关联方收入的多个来源：销售商品本期发生额52,027,039,912.73元，销售材料本期发生额618,808,267.44元，提供劳务本期发生额4,884,467,932.01元，收取技术提成费及技术转让费本期发生额9,111,568.59元，租赁收入本期发生额177,345,271.26元（单位：元，币种："
+  },
+  {
+    "claim_id": "rm_external_revenue_by_segment_2025",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      193
+    ],
+    "answer": "2025年度，公司对外交易收入合计656,243,812,081.18元，其中整车及零部件分部对外交易收入为644,665,370,348.55元，金融业分部对外交易收入为11,578,441,732.63元。"
+  },
+  {
+    "claim_id": "pb_reportable_segments",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      193
+    ],
+    "answer": "公司分部信息列示的报告分部为整车及零部件和金融业。"
+  },
+  {
+    "claim_id": "ps_vehicles_parts_and_finance",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      193
+    ],
+    "answer": "公司披露的分部业务包括整车及零部件以及金融业。"
+  },
+  {
+    "claim_id": "claim-revenue-model-1",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      61
+    ],
+    "answer": "上汽集团整车销售收入确认模式：根据合同约定，通过经销商电子交易平台等移交整车权属并完成相关交易，或将整车按照合同规定运至约定交货地点并完成相关货物交接后确认收入。"
+  },
+  {
+    "claim_id": "bp-work-5157694452e829569d6a42f3:report:45:products-services-1",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      9,
+      17,
+      18
+    ],
+    "answer": "公司整车业务覆盖基本乘用车、运动型多用途车（SUV）、多功能乘用车（MPV）、交叉型乘用车、客车、载货汽车等车型；报告期内（2025年）新能源汽车乘用车累计销量1,481,504辆、商用车累计销量161,505辆，总计累计销量1,643,009辆、累计产量1,683,460辆。零部件业务主要由下属控股子公司华域汽车系统股份有限公司（股票代码：600741）开"
+  },
+  {
+    "claim_id": "products_services_new_energy_and_batteries",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      171
+    ],
+    "answer": "The stated business of 飞凡汽车科技有限公司 includes sales of new energy vehicle complete vehicles, sales of new energy vehicle electrical accessories, and research and development of automo"
+  },
+  {
+    "claim_id": "claim_products_services_dongli_diesel",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      26
+    ],
+    "answer": "动力新科为子公司，主要业务为柴油机及配件的生产销售。"
+  },
+  {
+    "claim_id": "claim_products_services_huayu",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      26
+    ],
+    "answer": "公司子公司华域汽车从事汽车零部件生产、销售业务。"
+  },
+  {
+    "claim_id": "products_services_saic_finance_subsidiary",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      26
+    ],
+    "answer": "上汽财务公司为子公司，主要业务为金融服务。"
+  },
+  {
+    "claim_id": "claim_saic_maxus_products_services",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      26
+    ],
+    "answer": "上汽大通为子公司，业务为汽车生产、销售。"
+  },
+  {
+    "claim_id": "claim_products_services_zhiji_nev",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      26
+    ],
+    "answer": "智己汽车为子公司，主要从事新能源汽车生产、销售。"
+  },
+  {
+    "claim_id": "claim-products_services-zhonglian",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      26
+    ],
+    "answer": "公司子公司中联汽车电子有限公司主要业务为汽车用电子产品的生产、经营和研发。"
+  },
+  {
+    "claim_id": "products_services_traditional_fuel_vehicle",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      36
+    ],
+    "answer": "相关企业本次计提资产减值准备主要针对传统燃油车业务相关资产。"
+  },
+  {
+    "claim_id": "claim_products_services_01",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      97
+    ],
+    "answer": "本集团生产整车及零部件等产品并销售予相关客户。"
+  },
+  {
+    "claim_id": "products_services-complete-vehicles",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      61
+    ],
+    "answer": "销售整车。"
+  },
+  {
+    "claim_id": "revenue_model-vehicle-sales",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      61
+    ],
+    "answer": "通过销售整车取得收入；2025年度销售整车的收入约为人民币4,101.96亿元。"
+  },
+  {
+    "claim_id": "principal_business-vehicle-sales",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      61
+    ],
+    "answer": "销售整车，2025年度销售整车的收入约为人民币4,101.96亿元，约占营业总收入的62.51%。"
+  },
+  {
+    "claim_id": "claim-products-services",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      143
+    ],
+    "answer": "公司合同负债相关预收款项包括预收整车款、材料款、配件款等。"
+  },
+  {
+    "claim_id": "claim-principal-business__2",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      28
+    ],
+    "answer": "公司业务涉及整车板块、零部件板块、移动出行和服务板块（含物流、销售服务、出行服务业务）以及金融板块。"
+  },
+  {
+    "claim_id": "claim-products-services__2",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      28
+    ],
+    "answer": "公司绿色低碳业务涉及纯电动、混合动力产品，并推进燃料电池产品投放及V2G应用探索。"
+  },
+  {
+    "claim_id": "input_exposure:prepayment_supplier_material_inputs:bp-work-5157694452e829569d6a42f3:report:58",
+    "dimension": "input_exposure",
+    "views": [
+      "product_exposure",
+      "supply_chain_position"
+    ],
+    "pages": [
+      114,
+      115
+    ],
+    "answer": "公司采购依赖供应商并存在供应商集中度：于2025年12月31日及2024年12月31日，账龄超过一年的重要预付款项主要为预付供应商未结算的材料款；2025年12月31日（期末）预付款项期末余额前五名单位合计15,120,305,828.26元，占预付款项期末余额合计数的71.86%，其中单位一期末余额7,312,419,684.55元占34.75%，单位二期"
+  },
+  {
+    "claim_id": "input_exposure-cost-composition-and-supplier-procurement",
+    "dimension": "input_exposure",
+    "views": [
+      "product_exposure",
+      "supply_chain_position"
+    ],
+    "pages": [
+      12,
+      13
+    ],
+    "answer": "2025年公司营业成本构成主要为原材料、人工工资、折旧、能源等，该等成本项目列于汽车制造业。2025年前五名供应商采购额为2,149.67亿元（21,496,663.81万元），占年度采购总额37%；其中前五名供应商采购额中关联方采购额为459,389.23万元，占年度采购总额0.79%。"
+  },
+  {
+    "claim_id": "claim:bp-work-1e963e4dd353ef49595b0d50:input_exposure_related_party_purchases",
+    "dimension": "input_exposure",
+    "views": [
+      "product_exposure",
+      "supply_chain_position"
+    ],
+    "pages": [
+      184
+    ],
+    "answer": "关联方采购与接受劳务包括商品、材料及劳务、长期资产及研发支出。合营企业采购商品、材料及劳务本期发生额为216,788,642,447.89元；联营企业采购商品、材料及劳务本期发生额为10,428,505,729.58元；合营企业购买长期资产本期发生额为349,527,085.59元；其他关联方接受劳务-研发支出本期发生额为973,049,572.09元。"
+  },
+  {
+    "claim_id": "claim-input-exposure",
+    "dimension": "input_exposure",
+    "views": [
+      "product_exposure",
+      "supply_chain_position"
+    ],
+    "pages": [
+      114,
+      115
+    ],
+    "answer": "于2025年12月31日及2024年12月31日，公司账龄超过一年的重要预付款项主要为预付供应商未结算的材料款；预付款项期末余额前五名单位合计金额为15,120,305,828.26元，占预付款项期末余额合计数的比例为71.86%，其中单位一期末余额7,312,419,684.55元（占比34.75%），单位二期末余额6,779,147,465.26元（占比"
+  },
+  {
+    "claim_id": "claim-input-exposure__2",
+    "dimension": "input_exposure",
+    "views": [
+      "product_exposure",
+      "supply_chain_position"
+    ],
+    "pages": [
+      184
+    ],
+    "answer": "关联方交易中，合营企业采购商品、材料及劳务本期发生额为216,788,642,447.89元；联营企业采购商品、材料及劳务本期发生额为10,428,505,729.58元；合营企业购买长期资产本期发生额为349,527,085.59元；其他关联方接受劳务-研发支出本期发生额为973,049,572.09元。"
+  },
+  {
+    "claim_id": "claim-upstream-downstream-customer-concentration",
+    "dimension": "upstream_downstream",
+    "views": [
+      "supply_chain_position"
+    ],
+    "pages": [
+      155
+    ],
+    "answer": "2025年度，集团前五名客户营业收入合计75,458,211,510.20元，占本集团全部营业收入的比例为11.68%。其中：客户一营业收入为33,120,406,668.62元，占比5.13%；客户二营业收入为15,730,209,886.40元，占比2.43%；客户三营业收入为9,957,610,546.75元，占比1.54%；客户四营业收入为9,523"
+  },
+  {
+    "claim_id": "claim:bp-work-5157694452e829569d6a42f3:report:65:upstream_downstream_related_party_jv_associate",
+    "dimension": "upstream_downstream",
+    "views": [
+      "supply_chain_position"
+    ],
+    "pages": [
+      184
+    ],
+    "answer": "公司本期（2025年度）与合营企业及联营企业同时发生采购与销售两类关联交易：向合营企业采购商品、材料及劳务216,788,642,447.89元，向联营企业采购商品、材料及劳务10,428,505,729.58元；向合营企业销售商品52,027,039,912.73元，向联营企业销售商品4,067,284,982.00元。合营企业与联营企业同时作为公司的供应"
+  },
+  {
+    "claim_id": "claim-supply-chain-role",
+    "dimension": "supply_chain_role",
+    "views": [
+      "supply_chain_position"
+    ],
+    "pages": [
+      170,
+      171
+    ],
+    "answer": "公司下属子公司业务涵盖产业链多个业务环节：华域汽车系统股份有限公司业务性质为汽车零部件总成的设计、生产和销售；上汽安吉物流股份有限公司业务性质为汽车整车、零部件、口岸物流等；上海汽车集团财务有限责任公司业务性质为汽车金融；上海汽车集团保险有限公司业务性质为汽车保险及相关财产保险业务等；中国汽车工业投资开发有限公司业务性质为汽车销售、售后服务。"
+  },
+  {
+    "claim_id": "claim-upstream-downstream",
+    "dimension": "upstream_downstream",
+    "views": [
+      "supply_chain_position"
+    ],
+    "pages": [
+      155
+    ],
+    "answer": "集团前五名客户营业收入合计75,458,211,510.20元，占本集团全部营业收入的比例为11.68%；其中客户一营业收入为33,120,406,668.62元，占本集团全部营业收入的比例为5.13%。"
+  },
+  {
+    "claim_id": "claim-operating-role-001",
+    "dimension": "supply_chain_role",
+    "views": [
+      "supply_chain_position"
+    ],
+    "pages": [
+      11,
+      155,
+      170,
+      171,
+      192
+    ],
+    "answer": "集团处于汽车制造与金融服务产业链，设有整车及零部件分部（负责生产并销售整车及零部件）和金融服务分部（负责提供金融服务）。当前主要业务及产品包括整车业务、零部件业务（含汽车变速器及零配件、发动机等开发制造销售）、劳务及其他，以及金融业务（包括汽车金融等服务）。2025年整车业务营业收入为410,196,473,001.11元，零部件业务营业收入为203,019"
+  }
+]

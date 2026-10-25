@@ -1,7 +1,12 @@
 """Progressive reading and unverified-draft projection. Not a business score."""
 
-from research.company_profile.contracts import ReportSemanticResponseV3, ReportViewClaim
+from research.company_profile.contracts import (
+    ReportSemanticResponseV3,
+    ReportViewCheck,
+    ReportViewClaim,
+)
 from research.company_profile.report_interpretation import (
+    ReportInterpretation,
     direct_core_processing_identity,
     research_views,
 )
@@ -2968,6 +2973,122 @@ def test_role_closeout_sends_source_text_not_page_metadata():
     assert "source_inventory" not in provider.purposes
     assert any(text in (page or "") for pages in provider.pages for page in pages)
     assert "status" not in "".join(page or "" for pages in provider.pages for page in pages)
+
+
+def test_the_same_sentence_cannot_stay_verified_on_another_id():
+    report = _report()
+    sentence = "公司主营业务包括整车业务。2025年度，整车业务实现主营业务收入57,126,986,013.91元。"
+    evidence = (_evidence(report, text="整车业务 57,126,986,013.91", page=203),)
+    isolated = ReportViewClaim(
+        claim_id="claim-principal-business-1",
+        dimension="principal_business",
+        status="unclear",
+        answer=sentence,
+        evidence=evidence,
+        limitation="claim_or_dependency_not_verified",
+    )
+    published = isolated.model_copy(
+        update={"claim_id": "claim-principal-business", "status": "observed", "limitation": None}
+    )
+    purchase = ReportViewClaim(
+        claim_id="purchase",
+        dimension="input_exposure",
+        status="observed",
+        answer="向关联方采购商品947,841,284.24元。",
+        evidence=(_evidence(report, text="采购商品", page=222),),
+    )
+    rendered = research_views(
+        ReportInterpretation(
+            report=report,
+            processing_identity=direct_core_processing_identity(),
+            execution_mode="offline_fake",
+            claims=(isolated, published, purchase),
+            checks=(
+                ReportViewCheck(
+                    target_type="claim",
+                    target_id="claim-principal-business",
+                    status="pass",
+                    explanation="金额与表一致。",
+                ),
+                ReportViewCheck(
+                    target_type="claim",
+                    target_id="purchase",
+                    status="pass",
+                    explanation="采购额有原文。",
+                ),
+            ),
+        )
+    )
+    company = {
+        item["claim_id"]: item["review_state"]
+        for item in rendered["views"]["company_profile"]["claims"]
+    }
+    assert company["claim-principal-business"] == "not_reliable"
+    assert company["claim-principal-business-1"] == "not_reliable"
+    supply_ids = [item["claim_id"] for item in rendered["views"]["supply_chain_position"]["claims"]]
+    product_ids = [item["claim_id"] for item in rendered["views"]["product_exposure"]["claims"]]
+    assert supply_ids == ["purchase"]
+    assert product_ids == ["purchase"]
+
+
+def test_a_saved_query_keeps_a_real_receipt_without_a_hand_merge(tmp_path):
+    import json
+
+    from research.company_profile.bounded_entry import load_saved_draft
+
+    body = {
+        "claim_id": "kept",
+        "dimension": "revenue_model",
+        "status": "observed",
+        "answer": "知识服务以机构订阅为主。",
+        "evidence": [{"page": 12, "section_title": "经营", "anchor": {"bounded_quote": "机构订阅"}}],
+        "supporting_record_ids": [],
+    }
+    saved = tmp_path / "saved.json"
+    saved.write_text(
+        json.dumps(
+            _draft_query(
+                [body],
+                [
+                    {
+                        "request_id": "verify-1",
+                        "purpose": "verify_views",
+                        "status": "success",
+                        "physical_request": False,
+                        "reused_verification": True,
+                        "request_targets": [{**body, "target_type": "claim", "target_id": "kept"}],
+                        "response_payload": {
+                            "claims": [],
+                            "checks": [
+                                {
+                                    "target_type": "claim",
+                                    "target_id": "kept",
+                                    "status": "pass",
+                                    "explanation": "原核验",
+                                }
+                            ],
+                        },
+                    },
+                    {
+                        "request_id": "run:carried-checks",
+                        "purpose": "verify_views",
+                        "status": "success",
+                        "carried_verification": True,
+                        "response_payload": {"claims": [], "checks": []},
+                    },
+                ],
+            )
+        )
+    )
+    loaded = load_saved_draft(
+        {
+            "accepted_draft_query": str(saved),
+            "verification_history_queries": [str(saved)],
+            "asset": {"content_hash": "doc-1"},
+        }
+    )
+    assert any(item.get("target_id") == "kept" and item.get("status") == "pass" for item in loaded["checks"])
+    assert any(item.get("request_id") == "verify-1" for item in loaded["verify_receipts"])
 
 
 

@@ -1,0 +1,746 @@
+[
+  {
+    "claim_id": "bp-work-7d3c3d28e43b6cb8cd3b745d:claim:pb-advantage-lines-2025",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      9
+    ],
+    "answer": "2025年，安检安保、数据治理、人工智能等为公司优势业务，相关收入实现较好增长。"
+  },
+  {
+    "claim_id": "bp-work-7d3c3d28e43b6cb8cd3b745d:claim:rm-2025-revenue-composition",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      9
+    ],
+    "answer": "2025年，公司实现营业收入150.65亿元；其中，安检安保、数据治理、人工智能等优势业务收入实现较好增长；海外市场营收同比增长6.51亿元，增幅14.15%。同时，公司主动收缩智慧能源等产业的低毛利业务规模，并受上年计算机硬件业务出表影响，整体收入规模较上年出现一定下降。"
+  },
+  {
+    "claim_id": "bp-work-7d3c3d28e43b6cb8cd3b745d:report:6:claim-principal-business-contraction",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      9
+    ],
+    "answer": "2025年，公司为进一步提升发展质量，主动收缩了智慧能源等产业的低毛利业务规模。"
+  },
+  {
+    "claim_id": "bp-work-7d3c3d28e43b6cb8cd3b745d:report:6:claim-revenue-model-digital-intelligence",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      12
+    ],
+    "answer": "数智产业中，知识服务盈利模式以机构订阅为主，辅以个人按需付费等；数智转型服务盈利模式涵盖技术授权、软件设计与开发等。"
+  },
+  {
+    "claim_id": "bp-work-7d3c3d28e43b6cb8cd3b745d:report:6:claim-products-services-public-safety",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      12
+    ],
+    "answer": "公共安全产业深耕民航、海关、铁路、公路、轨道交通、邮政物流、公安司法、大型活动赛事等领域，提供基于辐射成像技术的智能检查系统、解决方案及全生命周期运维服务。"
+  },
+  {
+    "claim_id": "claim-principal_business",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      12,
+      13
+    ],
+    "answer": "公司主营业务归属于公共安全、数智产业和智慧能源等产业领域，聚焦公共安全、数智产业、智慧能源等产业领域；按照所处行业及经营模式可分为制造业和软件与信息技术服务业。"
+  },
+  {
+    "claim_id": "claim-products_services",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      12
+    ],
+    "answer": "在数智产业领域，公司聚焦“知识服务”和“数智转型服务”两大主营业务方向：知识服务领域依托CNKI平台，为全球3.5万家机构及1.5亿个人用户提供学术资源检索、知识管理及智能问答等服务，核心产品包括CNKI系列数据库、CNKI AI工具及知网AI+图书平台等；数智转型服务领域以自研华知大模型为技术底座，面向政务、企业等行业提供智能化解决方案，核心产品包括定制化"
+  },
+  {
+    "claim_id": "claim-principal-business",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      24,
+      38
+    ],
+    "answer": "公司聚焦公共安全、数智产业、智慧能源等产业领域，核心产业板块包括公共安全、智慧能源和数智产业。"
+  },
+  {
+    "claim_id": "claim-products-services-smart-energy",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      13
+    ],
+    "answer": "智慧能源产业面向北方供暖、清洁供热、建筑园区、城市轨道交通、数据中心等城市主要用能场景，开发热泵装备、多种储冷/热/电系统、控制器产品、软件平台和能源系统算法，并通过规划咨询、产品供应、工程建设、节能服务、运维托管等方式，为用户提供“智慧、绿色、低碳”一体化解决方案与运维服务。"
+  },
+  {
+    "claim_id": "principal_business-1",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      91
+    ],
+    "answer": "同方股份的主营业务较多且复杂，主要有公共安全业务、数智产业业务、智慧能源业务、总部投资及科技园等业务。"
+  },
+  {
+    "claim_id": "products_services-1",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      23
+    ],
+    "answer": "公司聚焦知识服务、数智转型服务、人工智能、数据要素四大核心方向，通过打造和完善知识服务平台矩阵、行业解决方案的产品化与智能化升级，持续巩固和提升知识服务、政务数智化、企业数智化业务竞争优势，积极服务支撑中核集团数字化转型。"
+  },
+  {
+    "claim_id": "claim-principal-business__2",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      112
+    ],
+    "answer": "主营业务归属于公共安全、数智产业和智慧能源等产业领域。按照所处行业及经营模式可分为制造业和软件与信息技术服务业。"
+  },
+  {
+    "claim_id": "claim-revenue-model",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      112
+    ],
+    "answer": "公司以拥有自主技术的产品为核心，通过产品销售、工程实施和技术服务经营模式等具体实施。"
+  },
+  {
+    "claim_id": "claim-products-services",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      23
+    ],
+    "answer": "智慧能源板块聚焦能源高效转化和管理方向，以全系列热泵产品、能源管理技术为根本，提供贯穿能源生产、输配和消费全过程的综合智慧能源解决方案。"
+  },
+  {
+    "claim_id": "claim_products_services_tongfang_technovator",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      35
+    ],
+    "answer": "同方泰德主要从事楼宇自动化系统、能源管理系统、安控系统、消防系统产品的开发、制造和销售，并提供全方位解决方案和服务。"
+  },
+  {
+    "claim_id": "bp-work-7d3c3d28e43b6cb8cd3b745d:report:44:claim-principal-business",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      9
+    ],
+    "answer": "2025年公司实现营业收入150.65亿元（营业收入，2025年），其中安检安保、数据治理、人工智能等优势业务收入实现较好增长；同时公司主动收缩了智慧能源等产业的低毛利业务规模，并受上年计算机硬件业务出表影响，整体收入规模较上年出现一定下降。"
+  },
+  {
+    "claim_id": "bp-work-7d3c3d28e43b6cb8cd3b745d:report:44:claim-revenue-subsidiaries",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      204
+    ],
+    "answer": "本年（2025年度）公司重要非全资子公司营业收入分别为：同方泰德国际科技有限公司1,487,560,861.32元，同方友友控股有限公司766,378,780.71元，同方威视技术股份有限公司6,992,719,435.23元。"
+  },
+  {
+    "claim_id": "claim:products_services_main",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      112
+    ],
+    "answer": "公司主要产品包括安防安检设备、CNKI知识数据产品、大数据应用、楼宇智能化及节能化应用、城市热网、轨道交通的智能化、热泵节能产品、照明以及科工装备等，以及为推动科技创新发展助力的科技金融服务。"
+  },
+  {
+    "claim_id": "claim:revenue_model_segment_digital_intelligence",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      249
+    ],
+    "answer": "分部信息显示，本期数智产业分部主营业务收入为2,750,721,999.45元，主营业务成本为1,466,938,463.36元，利润总额为447,185,830.29元。"
+  },
+  {
+    "claim_id": "claim-1",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      192
+    ],
+    "answer": "子公司同方威视技术股份有限公司主要从事民用核放射集装箱/物品检查系统、工业射线装置业务。"
+  },
+  {
+    "claim_id": "claim-2",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      249
+    ],
+    "answer": "分部信息显示，本年数其他业务报告分部主营业务收入677,586,129.17元，主营业务成本608,211,547.15元，利润总额-227,692,997.44元。"
+  },
+  {
+    "claim_id": "claim-products-services-subsidiary",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      192
+    ],
+    "answer": "子公司同方智慧能源有限责任公司从事供电业务、热力生产和供应、环境评估服务、工程管理服务及新能源领域内的技术开发、技术咨询、技术转让、技术推广、技术服务等。"
+  },
+  {
+    "claim_id": "claim-revenue-model-public-security-segment",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      249
+    ],
+    "answer": "本年数公共安全报告分部的主营业务收入为6,980,575,849.42元，主营业务成本为4,899,346,383.60元，利润总额为463,300,129.90元。"
+  },
+  {
+    "claim_id": "claim_smart_energy_segment_revenue",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      249
+    ],
+    "answer": "本年数，智慧能源报告分部的主营业务收入为4,504,196,896.13元，主营业务成本为4,018,148,390.53元，利润总额为-643,205,228.48元。"
+  },
+  {
+    "claim_id": "products_services_subsidiary_shenyang_tongfang_multimedia",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      192
+    ],
+    "answer": "子公司沈阳同方多媒体科技有限公司从事数字电视及数字音视频产品、液晶模组产品的开发与生产。该表述仅限于该命名子公司，不推广至集团整体。"
+  },
+  {
+    "claim_id": "claim-products-services-1",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      193
+    ],
+    "answer": "子公司Technovator International Limited从事综合楼宇自动化与能源管理系统及安防与消防系统的设计、制造、销售。"
+  },
+  {
+    "claim_id": "ps-named-subsidiaries-building-automation",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      197
+    ],
+    "answer": "子公司TONGFANG TECHNOVATOR (S.E.A) PTE. LTD.从事综合楼宇自动化与能源管理系统及安防与消防系统的设计、制造、销售；子公司同方泰德国际科技（北京）有限公司从事楼宇自动化解决方案的设计、制造、销售。"
+  },
+  {
+    "claim_id": "claim-products-services-sc-energy-heat",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      197,
+      198,
+      200
+    ],
+    "answer": "子公司业务涉及合同能源管理，城市热网节能方案的设计、制造、销售；制冷系统、供热系统的开发、建设、运营、管理、维修维护及相关技术咨询和技术服务；空气净化设备、水处理设备、节能环保设备的销售、安装；以及热力生产和供应。"
+  },
+  {
+    "claim_id": "bp-work-7d3c3d28e43b6cb8cd3b745d:report:64:products_services:sc-led-lighting",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      200,
+      201
+    ],
+    "answer": "子公司广东同方灯饰有限公司的业务为生产、研发、销售 LED 一般照明、发光二极管、LED 芯片、LED 外延片及 LED 封装等；子公司Neo-Neon (VietNam) Development Company Limited的业务为 LED 照明、装饰灯系列产品生产及销售，米泡装饰灯生产及装饰灯配件生产及销售，以及舞台灯系列产品生产及销售；子公司Amer"
+  },
+  {
+    "claim_id": "bp-work-7d3c3d28e43b6cb8cd3b745d:report:66:products_services:1",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      196,
+      198,
+      202
+    ],
+    "answer": "子公司业务涉及 X 射线检查设备的安装、销售及维护，集装箱检查系统的安装服务与技术支持，安检设备的安装及维护服务，民用核仪器仪表的研究、开发、生产、销售及设备安装服务，以及社会公共安全设备及器材的制造、销售。"
+  },
+  {
+    "claim_id": "claim-1__2",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      212
+    ],
+    "answer": "本公司下属同方威视技术股份有限公司、TongFang Global Limited、同方泰德国际科技有限公司、同方友友控股有限公司、同方知网数字科技有限公司等控股子公司，均不同程度地面向国际市场开展以外币计价结算的产品购销和技术服务业务；除上述控股子公司之外的业务单元，则主要开展以人民币计价结算的经营业务。"
+  },
+  {
+    "claim_id": "claim-2__2",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      9
+    ],
+    "answer": "2025年，公司实现营业收入150.65亿元，其中安检安保、数据治理、人工智能等优势业务收入实现较好增长，海外市场营收同比增长6.51亿元（增幅14.15%）；因主动收缩智慧能源等产业低毛利业务规模以及上年计算机硬件业务出表影响，整体收入规模较上年出现一定下降。"
+  },
+  {
+    "claim_id": "claim-3__2",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      23
+    ],
+    "answer": "公司聚焦知识服务、数智转型服务、人工智能、数据要素四大核心方向，通过打造和完善知识服务平台矩阵、行业解决方案的产品化与智能化升级，持续巩固和提升知识服务、政务数智化、企业数智化业务竞争优势，积极服务支撑中核集团数字化转型。"
+  },
+  {
+    "claim_id": "bp-work-ed8b66051184281bc5c38634:report:25:principal_business",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      112
+    ],
+    "answer": "公司主营业务归属于公共安全、数智产业和智慧能源等产业领域；按照所处行业及经营模式，公司经营可分为制造业和软件与信息技术服务业。"
+  },
+  {
+    "claim_id": "bp-work-ed8b66051184281bc5c38634:report:25:products_services",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      112
+    ],
+    "answer": "公司主要产品包括了安防安检设备、CNKI知识数据产品、大数据应用、楼宇智能化及节能化应用、城市热网、轨道交通的智能化、热泵节能产品、照明以及科工装备等，以及为推动科技创新发展助力的科技金融服务。"
+  },
+  {
+    "claim_id": "claim-products_services-1",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      192
+    ],
+    "answer": "子公司同方智慧能源有限责任公司从事供电业务、热力生产和供应、环境评估服务、工程管理服务，以及新能源领域内的技术开发、技术咨询、技术转让、技术推广、技术服务等业务。"
+  },
+  {
+    "claim_id": "products_services-cond-4",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      192
+    ],
+    "answer": "子公司同方人工环境有限公司主要产品包括中央空调机组、空气和水净化系统。"
+  },
+  {
+    "claim_id": "claim-1__4",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      192
+    ],
+    "answer": "沈阳同方多媒体科技有限公司业务包括数字电视及数字音视频产品、液晶模组产品的开发与生产。"
+  },
+  {
+    "claim_id": "ps-named-subsidiaries-building-automation__2",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      197
+    ],
+    "answer": "TONGFANG TECHNOVATOR (S.E.A) PTE. LTD.从事综合楼宇自动化与能源管理系统及安防与消防系统的设计、制造、销售；同方泰德国际科技（北京）有限公司从事楼宇自动化解决方案的设计、制造、销售。"
+  },
+  {
+    "claim_id": "bp-work-7d3c3d28e43b6cb8cd3b745d:report:5:cond-2",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      12
+    ],
+    "answer": "公共安全产业深耕民航、海关、铁路、公路、轨道交通、邮政物流、公安司法、大型活动赛事等领域，提供基于辐射成像技术的智能检查系统、解决方案及全生命周期运维服务。"
+  },
+  {
+    "claim_id": "claim-principal_business-1",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      24,
+      38
+    ],
+    "answer": "公司聚焦公共安全、数智产业、智慧能源等产业领域。从成本结构看，核心产业板块包括公共安全（2025年主营业务成本489,934.64万元，占比44.53%）、智慧能源（2025年主营业务成本401,814.84万元，占比36.52%）和数智产业（2025年主营业务成本146,693.85万元，占比13.33%）。"
+  },
+  {
+    "claim_id": "claim-products_services-1__2",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      23
+    ],
+    "answer": "智慧能源板块聚焦能源高效转化和管理方向，以全系列热泵产品、能源管理技术为根本，提供贯穿能源生产、输配和消费全过程的综合智慧能源解决方案。"
+  },
+  {
+    "claim_id": "claim-revenue_model-1",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      9
+    ],
+    "answer": "2025年，公司实现营业收入150.65亿元，其中安检安保、数据治理、人工智能等优势业务收入实现较好增长，海外市场营收同比增长6.51亿元（增幅14.15%）；同时，为进一步提升发展质量，公司主动收缩了智慧能源等产业的低毛利业务规模，以及受到上年计算机硬件业务出表影响，整体收入规模较上年出现了一定下降。"
+  },
+  {
+    "claim_id": "claim-principal-business-contraction-2025",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      9
+    ],
+    "answer": "2025年，公司主动收缩了智慧能源等产业的低毛利业务规模。"
+  },
+  {
+    "claim_id": "claim-revenue-composition-current",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      178
+    ],
+    "answer": "2025年，公司营业收入和营业成本按主营业务与其他业务列示：主营业务收入14,970,095,547.03元、成本11,003,122,146.88元；其他业务收入94,796,549.06元、成本31,765,787.28元；合计收入15,064,892,096.09元、成本11,034,887,934.16元。"
+  },
+  {
+    "claim_id": "bp-work-5afbd72175a9acc778b833d3:report:25:principal_business",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      112
+    ],
+    "answer": "公司主营业务归属于公共安全、数智产业和智慧能源等产业领域；按照所处行业及经营模式可分为制造业和软件与信息技术服务业。"
+  },
+  {
+    "claim_id": "bp-work-5afbd72175a9acc778b833d3:report:25:products_services_nuctech",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      192
+    ],
+    "answer": "子公司同方威视技术股份有限公司主要从事民用核放射集装箱/物品检查系统、工业射线装置业务。该表述限于该子公司，不代表集团全部业务。"
+  },
+  {
+    "claim_id": "claim-principal-business__3",
+    "dimension": "principal_business",
+    "views": [
+      "company_profile"
+    ],
+    "pages": [
+      12,
+      13
+    ],
+    "answer": "公司明确“数智技术与核技术创新融合的高科技企业”定位，聚焦公共安全、数智产业、智慧能源等产业领域；公司主营业务归属于公共安全、数智产业和智慧能源等产业领域，按照所处行业及经营模式可分为制造业和软件与信息技术服务业。"
+  },
+  {
+    "claim_id": "claim-revenue-model__2",
+    "dimension": "revenue_model",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      12
+    ],
+    "answer": "数智产业中，知识服务的盈利模式以机构订阅为主，辅以个人按需付费等；数智转型服务的盈利模式涵盖技术授权、软件设计与开发等。"
+  },
+  {
+    "claim_id": "claim-products-services__2",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      192
+    ],
+    "answer": "子公司同方智慧能源有限责任公司从事供电业务、热力生产和供应、环境评估服务、工程管理服务，以及新能源领域内的技术开发、技术咨询、技术转让、技术推广、技术服务等。"
+  },
+  {
+    "claim_id": "claim-products-services-1__2",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      192
+    ],
+    "answer": "子公司沈阳同方多媒体科技有限公司从事数字电视及数字音视频产品、液晶模组产品的开发与生产。"
+  },
+  {
+    "claim_id": "claim-building-automation-subsidiaries",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      197
+    ],
+    "answer": "在子公司业务方面，TONGFANG TECHNOVATOR (S.E.A) PTE. LTD.从事综合楼宇自动化与能源管理系统及安防与消防系统的设计、制造、销售；同方泰德国际科技（北京）有限公司从事楼宇自动化解决方案的设计、制造、销售。"
+  },
+  {
+    "claim_id": "ps-shanxi-tongfang-cnki",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      196
+    ],
+    "answer": "山西同方知网数字出版技术有限公司的业务范围为数据库、计算机软硬件、计算机网络系统的开发，数据库、计算机软硬件、计算机网络系统的销售，以及电子技术的技术开发、技术转让、技术咨询。该范围仅限于该公司，不代表集团整体。"
+  },
+  {
+    "claim_id": "ps-beijing-tongfang-cnki",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      197
+    ],
+    "answer": "同方知网（北京）技术有限公司的业务为网络知识存储与信息检索。该表述仅限于该公司，不代表集团整体。"
+  },
+  {
+    "claim_id": "ps-us-tongfang-cnki",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      199
+    ],
+    "answer": "同方知网（美国）技术有限公司的业务为数字出版产品国际内容销售。该表述仅限于该公司，不代表集团整体。"
+  },
+  {
+    "claim_id": "claim-1__6",
+    "dimension": "products_services",
+    "views": [
+      "company_profile",
+      "product_exposure"
+    ],
+    "pages": [
+      12
+    ],
+    "answer": "公司聚焦“知识服务”和“数智转型服务”两大主营业务方向：在知识服务领域，依托CNKI平台，为全球机构及个人用户提供学术资源检索、知识管理及智能问答等服务，核心产品包括CNKI系列数据库、CNKI AI工具及知网AI+图书平台等；在数智转型服务领域，以自研华知大模型为技术底座，面向政务、企业等行业提供智能化解决方案，核心产品包括定制化的行业数智化解决方案、数字"
+  },
+  {
+    "claim_id": "claim-input_exposure",
+    "dimension": "input_exposure",
+    "views": [
+      "product_exposure",
+      "supply_chain_position"
+    ],
+    "pages": [
+      25
+    ],
+    "answer": "报告期内（2025年度）公司前五名供应商采购额为89,780.00万元，占年度采购总额8.16%；其中前五名供应商采购额中关联方采购额为31,805.83万元，占年度采购总额2.89%。"
+  },
+  {
+    "claim_id": "claim_input_exposure_related_party_purchases",
+    "dimension": "input_exposure",
+    "views": [
+      "product_exposure",
+      "supply_chain_position"
+    ],
+    "pages": [
+      222,
+      224
+    ],
+    "answer": "公司向关联方采购商品/接受劳务：本年发生额合计947,841,284.24元，上年发生额593,881,916.54元；其中向《中国学术期刊（光盘版）》电子杂志社有限公司采购商品/接受劳务本年发生额318,894,624.75元、上年发生额306,019,345.75元；向同核科技（江苏）有限公司采购商品/接受劳务本年发生额255,257,457.36元、上"
+  },
+  {
+    "claim_id": "claim-4",
+    "dimension": "input_exposure",
+    "views": [
+      "product_exposure",
+      "supply_chain_position"
+    ],
+    "pages": [
+      25
+    ],
+    "answer": "2025年度公司前五名供应商采购额为89,780.00万元，占年度采购总额8.16%；其中前五名供应商采购额中关联方采购额为31,805.83万元，占年度采购总额2.89%。"
+  },
+  {
+    "claim_id": "claim-input_exposure-1",
+    "dimension": "input_exposure",
+    "views": [
+      "product_exposure",
+      "supply_chain_position"
+    ],
+    "pages": [
+      189
+    ],
+    "answer": "2025年研发支出按性质分类，本年发生额合计1,500,030,364.93元，其中费用化研发支出765,446,381.73元、资本化研发支出734,583,983.20元。具体构成项目本年发生额为：职工薪酬789,941,787.79元，咨询费、服务费、中介费、评审费21,101,114.30元，产品设计费及委外232,196,356.67元，物料消耗1"
+  },
+  {
+    "claim_id": "claim-5",
+    "dimension": "upstream_downstream",
+    "views": [
+      "supply_chain_position"
+    ],
+    "pages": [
+      170
+    ],
+    "answer": "2025年年末，公司合同负债中的“预收货款及工程款等”年末余额为3,295,822,047.40元。"
+  },
+  {
+    "claim_id": "claim-operating-role-from-current-business",
+    "dimension": "supply_chain_role",
+    "views": [
+      "supply_chain_position"
+    ],
+    "pages": [
+      9,
+      12,
+      13,
+      24,
+      38
+    ],
+    "answer": "公司聚焦于公共安全、数智产业、智慧能源等产业领域，按所处行业及经营模式可分为制造业和软件与信息技术服务业： 1. 公共安全产业：深耕民航、海关、铁路、公路、轨道交通、邮政物流、公安司法、大型活动赛事等领域，提供基于辐射成像技术的智能检查系统、解决方案及全生命周期运维服务；2025年该板块主营业务成本为489,934.64万元。 2. 数智产业：聚焦“知识服务"
+  }
+]
