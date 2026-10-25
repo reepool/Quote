@@ -46,7 +46,7 @@
     "research/company_profile/shadow_batch_audit.py": "04f12d98d3819bfc02c683b3620e83c753be66c6377610ae8076c5153157a2ad",
     "research/company_profile/stage5.py": "47de653324c80e1eb1d615e179c2818eafdf568abd328698e92459122244da0c",
     "research/company_profile/core_skeleton.py": "288c1e58ee1f4d94096a19bc5e27df516c49bc7a2caa6b3329414dd1756027bc",
-    "research/company_profile/bounded_entry.py": "0391c4725f03288ff4408e531d0f6fdd00531c07ad0473d3137f2419c259abf9",
+    "research/company_profile/bounded_entry.py": "8ae2fe1b676ed50a56c86a18e42c0add1a394bbf90447a5b7ea0938d7eb6cd0e",
     "research/company_profile/stage5_bundle.py": "008b8c7d4de24ce03a75b95fbf97c47b24663d5950f53600761206e6397921c8",
     "research/company_profile/execution.py": "8649d1c31e081e168994a7fe433fa0b1d41616ea2039b78449b99e96065e2267",
     "research/company_profile/legacy_retirement.py": "3e01e1a88369f866790e65a7c4b04a3e9e5e4480fc099eef55303a5e34386b0c",
@@ -77,10 +77,10 @@
     "research/business_profile_pdf_artifacts.py": "fc3861ab57b15af21434fafd0ed889a5a01cef180f91727bb7a29ab2b0450970",
     "research/business_profile_async_production.py": "439ff3be654b4886b8b84c343ae87187787c4e616a5a951b3e400a2f3f2deed4",
     "research/business_profile_production_operations.py": "b35e6659cd9926ac3623f055ff2d4061a25e3a37ef7b1104bd7afb81fb84ebad",
-    "research/company_profile/report_wire.py": "3a7329b892cfbca76b1e85dfa28479c7d4ed48b9ec149dba64b8e591201a7e2b",
+    "research/company_profile/report_wire.py": "b85f30aab8d813195d47524ac9e76513b9949f7424d671c3f8deaa27d5ea9dc4",
     "research/company_profile/resource_probe.py": "b36d2492af755281f505263fad6f19933eb47441174c41fac26b846bc7742884",
     "research/company_profile/reading_budget.py": "89d24dcb2a43648f1f3dfb671f50e659ca504190910b814ff5f3444972199be8",
-    "research/company_profile/direct_reading.py": "3d4247701c011b8d301d555e753592b1e13800423d18573475243c77b948d2ff"
+    "research/company_profile/direct_reading.py": "23198ab0bdbf173a985c65a17e3035c06d8a9edf2e101fa9d0eec83230678aff"
   },
   "asset": {
     "instrument_id": "600104.SH",

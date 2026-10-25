@@ -1,0 +1,17 @@
+{
+  "window": "浦发核心缺口",
+  "exit_code": 0,
+  "elapsed_seconds": 1355.0482534421608,
+  "physical": 16,
+  "charged_tokens": 398653,
+  "recoveries": 4,
+  "cost": "unknown",
+  "stopped_reason": "physical_request_token_context_or_cost_budget_exhausted",
+  "delivered": 1,
+  "unread_gaps": 158,
+  "flags": false,
+  "new_sentence": "非利息净收入534.81亿元，其中手续费及佣金净收入227.25亿元，其他非利息收益307.56亿元",
+  "query.json": "2ce677f6fdb10f2b3aa5619e97b346540c83efa2c0424a0f21bca1675729b5a1",
+  "budget-final.json": "ec4a66f9530d81b75324a6516cdb3ef8da27fdcdf907bee6d5553c7e236eea5b",
+  "supervisor.json": "86a7b07c373278da44bb571f146ea401895d2f84ce27bd2c59815c2a993c80a4"
+}

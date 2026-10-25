@@ -259,6 +259,14 @@ def instructions(request: ReportSemanticRequestV3) -> str:
             "No candidate answers are supplied. Preserve uncertainty, original names and units. "
             "A secondary footnote line need not each become a condition, but do not omit a "
             "major business, product, earning mechanism, input or role the supplied text supports."
+            + (
+                " When this closeout still lacks an operating role and the supplied text states "
+                "a current service, customer, supplier or upstream/downstream position, include "
+                "that condition. An ending balance is not that role."
+                if isinstance(getattr(request, "processing_identity", None), dict)
+                and request.processing_identity.get("core_gap_closeout")
+                else ""
+            )
         )
     if request.purpose == "synthesize_views":
         if fulltext:

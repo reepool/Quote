@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "tongfang-gap-continue",
+  "binding_sha256": "26a22de6859cd08f9ebf9c0a5e501df4edf9d23a1b6da9ddce9ddcfb663965c3",
+  "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+  "approval_reference": "acceptance section 7.45 and b2 card section 7.8, 2026-10-25",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "核心缺口收口"
+}

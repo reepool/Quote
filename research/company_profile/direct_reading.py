@@ -2143,7 +2143,11 @@ def interpret_direct_core(
                     if amounts and any(amount not in answer_text for amount in amounts):
                         revenue_missing.append(condition)
                 if not has_role:
-                    selected_pool = pool
+                    selected_pool = [
+                        condition
+                        for condition in pool
+                        if condition.dimension in {"supply_chain_role", "upstream_downstream"}
+                    ]
                 else:
                     selected_pool = revenue_missing[:4]
                 grouped = _business_groups(selected_pool)

@@ -713,6 +713,7 @@ def validate_binding(
                 "tongfang-gap",
                 "saic-gap",
                 "spdb-gap",
+                "tongfang-gap-continue",
             }
             or not authorization.get("approval_reference")
         ):
