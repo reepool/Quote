@@ -1365,6 +1365,82 @@ def test_merge_repair_summaries_keeps_later_profile_reconciliation(tmp_path):
     }
 
 
+def test_run_targeted_import_clears_comparison_once_across_profiles(tmp_path):
+    storage = _FakeStorage(ready=True)
+    config = ResearchConfig(
+        enabled=True,
+        modules={
+            "financial_statements": {
+                "enabled": True,
+                "readiness": {
+                    "required_core_facts": ["total_assets"],
+                    "required_core_facts_by_profile": {
+                        "bank": ["total_assets", "equity_parent"],
+                        "nonbank": ["total_assets"],
+                    },
+                },
+            }
+        },
+        storage=ResearchStorageConfig(
+            db_path=str(tmp_path / "research.db"),
+            financials_db_path=str(tmp_path / "financials.db"),
+            attach_quotes_db=False,
+        ),
+        budget=ResearchBudgetConfig(),
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=storage,
+        research_config=config,
+        announcement_service=_FakeAnnouncementService([]),
+    )
+    captured: list = []
+
+    async def _fake_repair(**kwargs):
+        captured.append(kwargs.get("clear_source_fact_comparison"))
+        summary = service.repair_router.default_summary()
+        summary["cninfo_attempts"] = len(kwargs["targets"])
+        summary["cninfo_successes"] = len(kwargs["targets"])
+        return summary
+
+    service.repair_router.repair_targets = _fake_repair
+    candidates = [
+        FinancialDisclosureMaintenanceCandidate(
+            instrument_id="601187.SH",
+            symbol="601187",
+            exchange="SSE",
+            report_period="2026-03-31",
+            profile="bank",
+            reasons=["missing_or_incomplete_local_core"],
+        ),
+        FinancialDisclosureMaintenanceCandidate(
+            instrument_id="002731.SZ",
+            symbol="002731",
+            exchange="SZSE",
+            report_period="2026-03-31",
+            profile="nonbank",
+            reasons=["missing_or_incomplete_local_core"],
+        ),
+    ]
+
+    result = _run(
+        service._run_targeted_import(
+            candidates=candidates,
+            required_core_facts=["total_assets"],
+            mapping_version="test",
+            db_path=tmp_path / "financials.db",
+            request_interval_seconds=0.0,
+            request_timeout_seconds=1.0,
+        )
+    )
+
+    # Two profile groups run; the run boundary clears once and neither
+    # per-group invocation clears again.
+    assert result["cninfo_attempts"] == 2
+    assert captured == [False, False]
+    assert storage.cleared_comparison_results == 1
+
+
 def test_incremental_sync_is_degraded_for_unresolved_pending_recheck(tmp_path):
     record = _record(
         announcement_id="pending-q2-report",
@@ -1650,6 +1726,8 @@ def test_repair_router_keeps_partial_cninfo_and_falls_back_for_missing_fact(
     assert result["fallback_successes"] == 1
     assert result["final_source"] == "mixed"
     assert result["errors"] == []
+    # Standalone router invocations clear the comparison table themselves.
+    assert storage.cleared_comparison_results == 1
 
 
 def test_repair_router_falls_back_when_cninfo_data20_source_fails(

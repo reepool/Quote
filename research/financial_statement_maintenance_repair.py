@@ -109,6 +109,7 @@ class FinancialMaintenanceRepairRouter:
         accepted_gap_classifications: Sequence[
             str
         ] = ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS,
+        clear_source_fact_comparison: bool = True,
     ) -> Dict[str, Any]:
         from scripts.dev_validation.live_audit_sina_ths_local_core import LiveAuditTarget
         from scripts.dev_validation.validate_sina_ths_local_core_dryrun import (
@@ -251,11 +252,13 @@ class FinancialMaintenanceRepairRouter:
             for target in fallback_targets
             if target.classification in accepted_classification_set
         }
-        if reconciliation_enabled:
+        if reconciliation_enabled and clear_source_fact_comparison:
             # One clear per maintenance run: the fallback loop below runs once
             # per report period, and each dry-run call uses a fresh service
             # instance, so per-call clearing would drop earlier exchanges'
-            # records. The table keeps exactly the latest run this way.
+            # records. Callers that drive repair_targets once per profile in a
+            # single run pass clear_source_fact_comparison=False and clear once
+            # themselves, keeping the table equal to the whole run's records.
             self.storage.clear_financial_source_fact_comparison_results()
         period_reconciliations: List[Dict[str, Any]] = []
         for report_period, period_targets in grouped.items():

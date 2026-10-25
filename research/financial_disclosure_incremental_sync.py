@@ -1667,6 +1667,12 @@ class FinancialDisclosureIncrementalSyncService:
                 )
             )
             grouped.setdefault(profile_required, []).append(candidate)
+        if grouped and self._source_fact_reconciliation_enabled():
+            # One clear per maintenance run at the run boundary: each profile
+            # group below invokes repair_targets, and per-invocation clearing
+            # would drop earlier groups' records when profiles require
+            # different core facts.
+            self.storage.clear_financial_source_fact_comparison_results()
         for profile_required, group in grouped.items():
             summary = await self.repair_router.repair_targets(
                 targets=[
@@ -1679,9 +1685,24 @@ class FinancialDisclosureIncrementalSyncService:
                 request_interval_seconds=request_interval_seconds,
                 request_timeout_seconds=request_timeout_seconds,
                 accepted_gap_classifications=ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS,
+                clear_source_fact_comparison=False,
             )
             merged = self._merge_repair_summaries(merged, summary)
         return merged
+
+    def _source_fact_reconciliation_cfg(self) -> Dict[str, Any]:
+        module_cfg = self.research_config.modules.get(
+            "financial_statements", {}
+        )
+        return (
+            module_cfg.get("disclosure_incremental_sync", {}).get(
+                "source_fact_reconciliation"
+            )
+            or {}
+        )
+
+    def _source_fact_reconciliation_enabled(self) -> bool:
+        return bool(self._source_fact_reconciliation_cfg().get("enabled", True))
 
     def _readiness_for_candidate(
         self,
@@ -1816,15 +1837,7 @@ class FinancialDisclosureIncrementalSyncService:
         `source_fact_reconciliation` / `official_core_fill` (dict(left)
         copies extras) and drops every later profile's counts.
         """
-        module_cfg = self.research_config.modules.get(
-            "financial_statements", {}
-        )
-        reconciliation_cfg = (
-            module_cfg.get("disclosure_incremental_sync", {}).get(
-                "source_fact_reconciliation"
-            )
-            or {}
-        )
+        reconciliation_cfg = self._source_fact_reconciliation_cfg()
         reconciliation_summaries = [
             summary
             for summary in (

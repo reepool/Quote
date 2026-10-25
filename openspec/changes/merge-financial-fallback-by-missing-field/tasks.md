@@ -38,3 +38,4 @@
 - [x] 6.2 Make `report_top_n` the single end-to-end bound for comparison samples (summary, every aggregation level, rendering) instead of the mixed 5/10/3 caps.
 - [x] 6.3 Derive the merge field inventory from the configured core alias mapping ∪ lineage match keys; delete the mirrored `_CORE_FILL_FIELD_NAMES` tuple so config-added core fields participate automatically.
 - [x] 6.4 Aggregate reconciliation summaries through one shared `merge_reconciliation_summaries` helper across exchange-, period-, and profile-level merging; multi-profile incremental runs no longer drop later profiles' `source_fact_reconciliation`/`official_core_fill`.
+- [x] 6.5 Clear the comparison table once per maintenance run at the incremental service's run boundary (`clear_source_fact_comparison` opt-out on the router), so per-profile repair invocations cannot wipe earlier groups' records when profiles require different core facts.
