@@ -5,6 +5,7 @@ pytest configuration and fixtures for Quote System tests
 import pytest
 import tempfile
 import shutil
+import logging
 from pathlib import Path
 from datetime import datetime, date
 from unittest.mock import Mock, AsyncMock
@@ -50,6 +51,10 @@ LoggingManager().configure(
 
 def pytest_sessionfinish(session, exitstatus):
     """Remove temporary test logs so pytest never pollutes production log files."""
+    # Close log file handles first: on the NFS QuoteBak mount an open handle
+    # keeps a .nfs* silly-rename alive and rmtree silently fails, leaking one
+    # empty quote_pytest_logs_* directory per pytest session.
+    logging.shutdown()
     shutil.rmtree(_TEST_LOG_DIR, ignore_errors=True)
 
 
