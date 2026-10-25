@@ -1,8 +1,8 @@
 # 公司画像交付路径与开发任务卡
 
-> 类型：requirements / execution plan；版本：3；更新：2026-10-22。
+> 类型：requirements / execution plan；版本：3；更新：2026-10-25。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前按验收§7.44及[B2卡§7.7](../../openspec/changes/restore-company-profile-llm-led-generalization/b2-execution-card.md#77-当前任务卡复用已有成果连续交付三家可靠核心答案)执行：三家有正文但仍限用，旧正式方案结束、A2当前不通过；新增同源连续开发收口，复用成功源、纠正接续信任/旧误拦和逐条核验，先交齐可靠核心，不转入S1。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前按验收§7.45及[B2卡§7.8](../../openspec/changes/restore-company-profile-llm-led-generalization/b2-execution-card.md#78-当前接续卡先补核心缺口再完成必要读源)执行：三家追加收口均已交正文，仍限用、A2当前不通过。在§7.44同一新增任务余额内，先补角色和主要收入，再完成必要未成功读源；不新增总额、不转入S1。
 
 ## 1. 开发者必须先理解的纠偏
 
@@ -76,11 +76,11 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 
 ### B2：四类通用性验证与修复（B连续实施）
 
-- 当前唯一活动卡：[b2-execution-card.md§7.7](../../openspec/changes/restore-company-profile-llm-led-generalization/b2-execution-card.md#77-当前任务卡复用已有成果连续交付三家可靠核心答案)。上汽安全稿接受；同方/浦发正式后继均结束，三家仍限用，A2当前不通过。新增同三份报告的开发收口，原正式失败与次数不改；先保最后有效可信基线，处理磁盘旧误拦，以跨章核心组核验/发布，浦发只续未成功范围。时间、请求与恢复一起按§7.44保障，不再以单次入口切碎同一业务，不交只有工程测试的准备报告。
+- 当前唯一活动卡：[b2-execution-card.md§7.8](../../openspec/changes/restore-company-profile-llm-led-generalization/b2-execution-card.md#78-当前接续卡先补核心缺口再完成必要读源)。三家追加收口已停止并交付，但仍限用，A2当前不通过。保有效正文/检查，修真实请求目标未持久及条件旧pass复活；按尚缺核心选择业务组，同方角色→上汽经营/口径→浦发主要净收入和未成功范围。沿§7.44同一任务余额连续交付，不为每项条件逐条扩写核验、不另交准备报告。
 - 输入：历史公司中制造、非金融服务、金融、综合各1家，共4家，包含L0那1家；沿同一实现，不加公司/代码/页码生产分支。
 - 交付：4家三视图及源审查；新句式/续页/未披露/冲突均可表达；有歧义的可正确限用，但不能把主营缺失包装为通过。4家最终均达到公司可用标准才进入S1。
 - 验证：保留首发失败，4家真实语义结果和源核验全部可追溯；报告冷/热解析、请求/token/费用、总时长。用4家实测决定是否放行S1，超预算先裁决，不偷偷改阈值。
-- B自主范围：原正式与纠偏窗口已用尽；验收§7.44显式授权新的同源连续开发及新增整任务额度，范围内P0—P3和必要P4合并完成。原两家成功全文源不重读、有效对象不反复重核，只补核心缺项/必要上下文；不增加第5家、不按公司写规则分支、不新建平台。各窗口冻结版本/实际资源，B可在新增整任务总额内分配，不逐次请批。
+- B自主范围：原正式与纠偏窗口已用尽；验收§7.45接续§7.44同一新增任务，余量不再受已停窗口的初始分公司配额约束。范围内P0—P3和必要P4合并完成，先修实际磁盘路径并小型验证，直接真实交付。原两家成功全文源不重读、有效对象不反复重核，只补核心缺项/必要上下文；不增加第5家、不按公司写规则分支、不新建平台。B在整任务剩余总额内重分并冻结窗口，不逐次请批；物理余额包含恢复，不额外叠加。
 - 停止：达到§7.44新增总额、源/账号/服务实际不可用、既有改动不可隔离或用户停止，交最后可查正文及具体核心限制；公司达标就停，不追全次要附注。仍未达标交明确失败/适用边界，不能自行再加预算、公司或S1。
 
 ### A2：四类通用性审核与S1放行（A负责）
