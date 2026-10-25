@@ -174,49 +174,65 @@ def load_saved_source_discovery(binding: dict) -> list:
     return receipts
 
 
-def _claim_signature(claim: dict) -> tuple:
-    """Identity of a claim's text and quotes. A pass applies only while this is unchanged."""
+def _claim_scope(claim: dict) -> tuple:
+    """Text, quotes, subject headings and record dependencies. A pass dies when any changes."""
     quotes = tuple(
         sorted(
             (
                 int((evidence or {}).get("page") or 0),
                 str(((evidence or {}).get("anchor") or {}).get("bounded_quote") or ""),
+                str((evidence or {}).get("section_title") or ""),
             )
             for evidence in claim.get("evidence") or []
         )
     )
-    return (str(claim.get("answer") or ""), quotes)
+    dependencies = tuple(sorted(str(item) for item in claim.get("supporting_record_ids") or []))
+    return (str(claim.get("answer") or ""), quotes, dependencies)
 
 
-def _query_claim_passes(path: Path) -> dict[str, list[dict]]:
+def _history_claim_events(path: Path) -> list[dict]:
+    """Every claim check in file order, including a requested claim that got no check."""
     query = json.loads(path.read_text())
     profile = query["profiles"][0]
-    claims = {}
+    current = {}
     for view in (profile.get("three_views") or {}).get("views", {}).values():
         for claim in view.get("claims") or []:
-            claims[claim.get("claim_id")] = claim
-    found: dict[str, list[dict]] = {}
+            current[claim.get("claim_id")] = claim
+    events = []
     for item in (profile.get("three_views") or {}).get("call_receipts") or []:
         if item.get("purpose") != "verify_views" or item.get("status") not in {None, "success"}:
             continue
-        for check in (item.get("response_payload") or {}).get("checks") or []:
-            if check.get("target_type") != "claim" or check.get("status") != "pass":
+        payload = item.get("response_payload") or {}
+        sent = {
+            claim.get("claim_id"): claim
+            for claim in payload.get("claims") or []
+            if claim.get("claim_id")
+        }
+        returned = {}
+        for check in payload.get("checks") or []:
+            if check.get("target_type") != "claim" or not check.get("target_id"):
                 continue
-            target = check.get("target_id")
-            claim = claims.get(target)
-            if not claim:
+            returned.setdefault(check["target_id"], check)
+        for target in [*sent, *[key for key in returned if key not in sent]]:
+            body = sent.get(target) or current.get(target)
+            if not body:
                 continue
-            found.setdefault(target, []).append(
-                {"signature": _claim_signature(claim), "check": check}
-            )
-    return found
+            check = returned.get(target) or {
+                "target_type": "claim",
+                "target_id": target,
+                "status": "missing",
+                "explanation": "requested claim returned no check",
+            }
+            events.append({"target": target, "scope": _claim_scope(body), "check": check})
+    return events
 
 
 def load_saved_draft(binding: dict) -> dict:
-    """Load the latest draft and real checks for unchanged claims.
+    """Load the latest draft and the last effective check for an unchanged claim.
 
-    Checks come only from verify receipts in the approved history. A stored
-    review_state is not a pass. A retracted claim does not get its old pass back.
+    A stored review_state is not a pass. A later block, unclear result, missing
+    check, retraction, or a change of subject, period text or record dependency
+    removes the older pass. An untouched claim keeps its last pass.
     """
     latest = Path(binding["accepted_draft_query"])
     query = json.loads(latest.read_text())
@@ -224,8 +240,12 @@ def load_saved_draft(binding: dict) -> dict:
     if profile["report"].get("document_version") != binding["asset"]["content_hash"]:
         raise ValueError("reused_draft_source_mismatch")
     claims = []
+    seen_ids = set()
     for view in (profile.get("three_views") or {}).get("views", {}).values():
         for claim in view.get("claims") or []:
+            if claim.get("claim_id") in seen_ids:
+                continue
+            seen_ids.add(claim.get("claim_id"))
             claims.append({key: value for key, value in claim.items() if key != "review_state"})
     if not claims:
         raise ValueError("reused_draft_has_no_claims")
@@ -233,26 +253,40 @@ def load_saved_draft(binding: dict) -> dict:
     if latest not in history:
         history.append(latest)
     retract = set(binding.get("retract_claim_ids") or ())
-    passes: dict[str, list[dict]] = {}
+    events: dict[str, list[dict]] = {}
     for path in history:
-        for target, rows in _query_claim_passes(path).items():
-            passes.setdefault(target, []).extend(rows)
+        for event in _history_claim_events(path):
+            events.setdefault(event["target"], []).append(event)
     checks = []
-    seen = set()
+    valid_ids = set()
     for claim in claims:
         target = claim.get("claim_id")
         if target in retract:
             continue
-        signature = _claim_signature(claim)
-        for row in passes.get(target) or []:
-            if row["signature"] != signature:
+        scope = _claim_scope(claim)
+        matched = [event for event in events.get(target) or [] if event["scope"] == scope]
+        if not matched or matched[-1]["check"].get("status") != "pass":
+            continue
+        valid_ids.add(target)
+        checks.append(matched[-1]["check"])
+    seen_conditions = set()
+    for path in history:
+        query_history = json.loads(path.read_text())
+        for item in (query_history["profiles"][0].get("three_views") or {}).get("call_receipts") or []:
+            if item.get("purpose") != "verify_views":
                 continue
-            marker = (target, row["check"].get("explanation"), row["check"].get("status"))
-            if marker in seen:
-                continue
-            seen.add(marker)
-            checks.append(row["check"])
-            break
+            for check in (item.get("response_payload") or {}).get("checks") or []:
+                if (
+                    check.get("target_type") != "condition"
+                    or check.get("status") != "pass"
+                    or check.get("covers_target_id") not in valid_ids
+                ):
+                    continue
+                marker = (check.get("target_id"), check.get("covers_target_id"))
+                if marker in seen_conditions:
+                    continue
+                seen_conditions.add(marker)
+                checks.append(check)
     return {"claims": claims, "checks": checks}
 
 
@@ -562,7 +596,13 @@ def validate_binding(
         raise ValueError("frozen PDF hash mismatch")
     elapsed = binding["max_elapsed_seconds"]
     auth = binding.get("run_authorization")
-    if auth == "company_profile_b2_cross_industry.2026-10-23":
+    if auth == "company_profile_b2_core_closeout.2026-10-25":
+        allowed = (
+            0 < elapsed <= 27000
+            and int(binding.get("max_tokens") or 0) <= 5_400_000
+            and int(binding.get("max_physical_requests") or 0) <= 208
+        )
+    elif auth == "company_profile_b2_cross_industry.2026-10-23":
         allowed = (
             0 < elapsed <= 14400
             and int(binding.get("max_tokens") or 0) <= 3_600_000
@@ -636,6 +676,9 @@ def validate_binding(
                 "spdb-successor",
                 "tongfang1",
                 "tongfang-successor",
+                "saic-core",
+                "tongfang-core",
+                "spdb-core",
             }
             or not authorization.get("approval_reference")
         ):
@@ -820,7 +863,10 @@ def _worker(
         recovery_policy=(
             LogicalRecoveryPolicy(
                 max_recoveries=(
-                    min(
+                    min(40, int(binding.get("max_recoveries", 4)))
+                    if binding.get("run_authorization")
+                    == "company_profile_b2_core_closeout.2026-10-25"
+                    else min(
                         16,
                         logical_recovery_count(prior_attempts)
                         + int(binding.get("max_recoveries", 4)),
@@ -1290,6 +1336,7 @@ def main() -> int:
         not in {
             "company_profile_fulltext_core.2026-10-22",
             "company_profile_b2_cross_industry.2026-10-23",
+            "company_profile_b2_core_closeout.2026-10-25",
         }
     ):
         direct_plan = preflight_direct_core(binding)

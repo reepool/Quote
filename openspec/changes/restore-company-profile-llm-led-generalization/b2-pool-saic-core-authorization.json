@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "saic-core",
+  "binding_sha256": "e31c93f3cef439fb55c8bb604f6ac3198919f2893ab237cf554c5f03b256481f",
+  "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+  "approval_reference": "acceptance section 7.44 and b2 card section 7.7, 2026-10-25",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "追加开发收口"
+}

@@ -2482,3 +2482,239 @@ def test_full_report_slices_fit_one_entry():
     assert set(plan["readable_pages"]) <= set(plan["covered_pages"])
     assert plan["fits_entry"]
     assert max(plan["source_units"]) <= 65_536
+
+
+def _draft_query(claims, receipts):
+    return {
+        "profiles": [
+            {
+                "report": {"document_version": "doc-1"},
+                "three_views": {
+                    "views": {"company_profile": {"claims": claims}},
+                    "call_receipts": receipts,
+                },
+            }
+        ]
+    }
+
+
+def _verify_receipt(request_id, claims, checks):
+    return {
+        "request_id": request_id,
+        "purpose": "verify_views",
+        "status": "success",
+        "response_payload": {"claims": claims, "checks": checks},
+    }
+
+
+def test_a_later_block_or_scope_change_removes_the_old_pass(tmp_path):
+    import json
+    from research.company_profile.bounded_entry import load_saved_draft
+
+    def claim(claim_id, answer, title="经营情况", records=()):
+        return {
+            "claim_id": claim_id,
+            "dimension": "principal_business",
+            "status": "observed",
+            "answer": answer,
+            "evidence": [
+                {
+                    "page": 12,
+                    "section_title": title,
+                    "anchor": {"bounded_quote": answer[:8]},
+                }
+            ],
+            "supporting_record_ids": list(records),
+            "review_state": "verified",
+        }
+
+    kept = claim("kept", "公司经营公共安全业务。")
+    blocked = claim("blocked", "公司经营数智产业。")
+    shifted = claim("shifted", "公司经营智慧能源。", title="母公司财务报表主要项目注释")
+    older = tmp_path / "older.json"
+    newer = tmp_path / "newer.json"
+    older.write_text(
+        json.dumps(
+            _draft_query(
+                [kept, blocked, claim("shifted", "公司经营智慧能源。", title="合并财务报表")],
+                [
+                    _verify_receipt(
+                        "old",
+                        [kept, blocked, claim("shifted", "公司经营智慧能源。", title="合并财务报表")],
+                        [
+                            {"target_type": "claim", "target_id": "kept", "status": "pass", "explanation": "旧通过"},
+                            {"target_type": "claim", "target_id": "blocked", "status": "pass", "explanation": "旧通过"},
+                            {"target_type": "claim", "target_id": "shifted", "status": "pass", "explanation": "旧通过"},
+                        ],
+                    )
+                ],
+            )
+        )
+    )
+    newer.write_text(
+        json.dumps(
+            _draft_query(
+                [kept, blocked, shifted],
+                [
+                    _verify_receipt(
+                        "new",
+                        [blocked],
+                        [
+                            {
+                                "target_type": "claim",
+                                "target_id": "blocked",
+                                "status": "block",
+                                "explanation": "后置否定",
+                            }
+                        ],
+                    )
+                ],
+            )
+        )
+    )
+    loaded = load_saved_draft(
+        {
+            "accepted_draft_query": str(newer),
+            "verification_history_queries": [str(older), str(newer)],
+            "asset": {"content_hash": "doc-1"},
+        }
+    )
+    passed = {item["target_id"] for item in loaded["checks"] if item["status"] == "pass"}
+    assert "kept" in passed
+    assert "blocked" not in passed
+    assert "shifted" not in passed
+    assert "review_state" not in loaded["claims"][0]
+
+
+def test_a_requested_claim_without_a_check_does_not_keep_the_old_pass(tmp_path):
+    import json
+    from research.company_profile.bounded_entry import load_saved_draft
+
+    body = {
+        "claim_id": "income",
+        "dimension": "revenue_model",
+        "status": "observed",
+        "answer": "公司实现营业收入。",
+        "evidence": [{"page": 21, "section_title": "收入", "anchor": {"bounded_quote": "营业收入"}}],
+        "supporting_record_ids": [],
+    }
+    older = tmp_path / "older.json"
+    newer = tmp_path / "newer.json"
+    older.write_text(
+        json.dumps(
+            _draft_query(
+                [body],
+                [
+                    _verify_receipt(
+                        "old",
+                        [body],
+                        [{"target_type": "claim", "target_id": "income", "status": "pass", "explanation": "通过"}],
+                    )
+                ],
+            )
+        )
+    )
+    newer.write_text(
+        json.dumps(_draft_query([body], [_verify_receipt("new", [body], [])]))
+    )
+    loaded = load_saved_draft(
+        {
+            "accepted_draft_query": str(newer),
+            "verification_history_queries": [str(older), str(newer)],
+            "asset": {"content_hash": "doc-1"},
+        }
+    )
+    assert not [item for item in loaded["checks"] if item.get("target_id") == "income" and item.get("status") == "pass"]
+
+
+def test_a_saved_draft_verifies_related_claims_in_one_request():
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    text = "公司经营整车制造，并向上游采购钢材。"
+    business = ReportSourceCondition(
+        condition_id="vehicles",
+        dimension="principal_business",
+        description="整车制造。",
+        evidence=(_evidence(report, text="公司经营整车制造", page=1).model_copy(update={"evidence_id": "vehicles-evidence"}),),
+        major=True,
+        statement_status="current",
+    )
+    role = ReportSourceCondition(
+        condition_id="steel",
+        dimension="supply_chain_role",
+        description="向上游采购钢材。",
+        evidence=(_evidence(report, text="向上游采购钢材", page=1).model_copy(update={"evidence_id": "steel-evidence"}),),
+        major=True,
+        statement_status="current",
+    )
+    receipt = {
+        "request_id": "saved-core",
+        "purpose": "source_inventory",
+        "status": "success",
+        "source_scope": "full_context",
+        "source_pages": [1],
+        "physical_request": True,
+        "response_payload": ReportSemanticResponseV3(
+            request_id="saved-core",
+            purpose="source_inventory",
+            source_conditions=(business, role),
+        ).model_dump(mode="json"),
+    }
+
+    def saved_claim(claim_id, answer, quote):
+        return {
+            "claim_id": claim_id,
+            "dimension": "principal_business" if claim_id == "vehicles" else "supply_chain_role",
+            "status": "observed",
+            "answer": answer,
+            "limitation": "pending_verification",
+            "evidence": [
+                _evidence(report, text=quote, page=1).model_copy(update={"evidence_id": claim_id}).model_dump(mode="json")
+            ],
+            "condition_ids": [claim_id],
+            "supporting_record_ids": [],
+        }
+
+    class _Provider:
+        offline_only = True
+
+        def __init__(self):
+            self.verified = []
+
+        def interpret(self, request):
+            if request.purpose == "verify_views":
+                self.verified.append(tuple(claim.claim_id for claim in request.claims))
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "claim",
+                        "target_id": claim.claim_id,
+                        "status": "pass",
+                        "explanation": "同组已核",
+                    }
+                    for claim in request.claims
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["accepted_source_receipts"] = [receipt]
+    identity["accepted_prior_draft"] = {
+        "claims": [
+            saved_claim("vehicles", "公司经营整车制造。", "公司经营整车制造"),
+            saved_claim("steel", "公司向上游采购钢材。", "向上游采购钢材"),
+        ],
+        "checks": [],
+    }
+    provider = _Provider()
+    _run(
+        provider,
+        pages=({"page": 1, "text": text, "readable": True},),
+        processing_identity=identity,
+        report=report,
+    )
+    assert any({"vehicles", "steel"} <= set(item) for item in provider.verified)
+
+

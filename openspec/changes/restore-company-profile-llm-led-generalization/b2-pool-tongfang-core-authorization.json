@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "tongfang-core",
+  "binding_sha256": "6553b667a73d9495857df73ca8b4e04401f0a3f2003b970257a122805356e520",
+  "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+  "approval_reference": "acceptance section 7.44 and b2 card section 7.7, 2026-10-25",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "追加开发收口"
+}

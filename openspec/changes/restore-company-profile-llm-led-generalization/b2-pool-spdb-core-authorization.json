@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "spdb-core",
+  "binding_sha256": "a3644804c0743d6d82aae24694edaebd9c3a07447660a63c8b6b3556de93b61e",
+  "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+  "approval_reference": "acceptance section 7.44 and b2 card section 7.7, 2026-10-25",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "追加开发收口"
+}

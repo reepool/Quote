@@ -1006,27 +1006,27 @@ def interpret_direct_core(
                 units = joint_verify_reservation(
                     report, identity, pages, group, conditions, related
                 )
+                if pages:
+                    sized = ReportSemanticRequestV3(
+                        request_id=f"{work_id}:verify-size",
+                        purpose="verify_views",
+                        report=report,
+                        processing_identity=identity,
+                        source_pages=tuple(pages),
+                        source_scope="full_context",
+                        claims=tuple(group),
+                        records=tuple(related),
+                        source_conditions=tuple(conditions),
+                        max_output_tokens=VERIFY_OUTPUT,
+                        timeout_seconds=float(
+                            identity.get("logical_request_timeout_seconds") or 120
+                        ),
+                    )
+                    cap = int(identity.get("max_payload_utf8_bytes") or 60_000)
+                    if request_payload_bytes(sized) > cap:
+                        return limit + 1, pages, related
             except ValueError:
                 return limit + 1, pages, related
-            if pages:
-                sized = ReportSemanticRequestV3(
-                    request_id=f"{work_id}:verify-size",
-                    purpose="verify_views",
-                    report=report,
-                    processing_identity=identity,
-                    source_pages=tuple(pages),
-                    source_scope="full_context",
-                    claims=tuple(group),
-                    records=tuple(related),
-                    source_conditions=tuple(conditions),
-                    max_output_tokens=VERIFY_OUTPUT,
-                    timeout_seconds=float(
-                        identity.get("logical_request_timeout_seconds") or 120
-                    ),
-                )
-                cap = int(identity.get("max_payload_utf8_bytes") or 60_000)
-                if request_payload_bytes(sized) > cap:
-                    return limit + 1, pages, related
             return units, pages, related
 
         support_groups: list[list] = []
@@ -1035,9 +1035,6 @@ def interpret_direct_core(
         for claim in observable:
             if measure([claim], [])[0] > limit:
                 pending_claims.append(claim)
-                continue
-            if identity.get("accepted_prior_draft"):
-                support_groups.append([claim])
                 continue
             trial = current + [claim]
             if current and measure(trial, [])[0] > limit:
@@ -1965,6 +1962,29 @@ def interpret_direct_core(
                         )
                     )
                     continue
+                if claim.limitation == "subject_scope_omitted" and claim.claim_id not in defer:
+                    rebound = []
+                    for evidence in claim.evidence:
+                        located = _bind_source_evidence(evidence, report, sources)
+                        rebound.append(located or evidence)
+                    claim = claim.model_copy(
+                        update={
+                            "evidence": tuple(rebound),
+                            "status": "observed",
+                            "limitation": "pending_verification",
+                        }
+                    )
+                    upsert(claim)
+                    if claim.dimension in {
+                        "principal_business",
+                        "revenue_model",
+                        "products_services",
+                        "input_exposure",
+                        "supply_chain_role",
+                        "upstream_downstream",
+                    }:
+                        pending_core.append(claim.model_copy(update={"limitation": None}))
+                    continue
                 kept_answers.append(claim.answer)
                 upsert(claim)
                 if claim.claim_id not in defer and claim.limitation == "pending_verification" and claim.dimension in {
@@ -2110,7 +2130,14 @@ def interpret_direct_core(
             ]
             if still_pending:
                 settle_claims(still_pending, [item for item in conditions if not item.condition_id.startswith("correction:")])
-        follow = []
+        unread = [
+            int(page["page"])
+            for page in sources
+            if page.get("readable", True)
+            and str(page.get("text") or "").strip()
+            and by_page[int(page["page"])]["status"] != "read"
+        ]
+        follow = inventory_pages(unread) if unread else []
     else:
         readable_order = [
             int(page["page"])

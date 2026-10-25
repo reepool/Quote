@@ -528,7 +528,9 @@ def _ends_sentence(line: str) -> bool:
 
 def _is_heading_line(line: str) -> bool:
     # A full PDF wrap is about forty characters and must stay inside the paragraph.
-    return 1 < len(line) <= 20 and not line.endswith(("。", "；", "！", "？"))
+    return 1 < len(line) <= 20 and not line.endswith(("。", "；", "！", "？")) and not (
+        sum(ch.isdigit() for ch in line) and sum(ch.isdigit() for ch in line) * 2 >= len(line)
+    )
 
 
 def _bounded_governing_context(
