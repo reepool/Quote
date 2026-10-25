@@ -739,6 +739,7 @@ class ResearchStorageManager:
             "financial_numeric_facts",
             "financial_numeric_facts_history",
             "financial_numeric_facts_hot",
+            "financial_source_fact_comparison_results",
             "financial_source_field_mappings",
             "financial_source_files",
             "financial_source_mapping_audits",
@@ -7276,6 +7277,64 @@ class ResearchStorageManager:
             "stale_hot_rows": stale_hot_rows,
         }
 
+    def clear_financial_source_fact_comparison_results(self) -> int:
+        """Drop prior-run comparison rows; the table keeps only the latest run."""
+        with self.financial_database_scope():
+            with self.get_connection() as conn:
+                self._apply_pragmas(conn)
+                cursor = conn.execute(
+                    "DELETE FROM financial_source_fact_comparison_results"
+                )
+                conn.commit()
+                return int(cursor.rowcount or 0)
+
+    def insert_financial_source_fact_comparison_records(
+        self,
+        records: List[Dict[str, Any]],
+        *,
+        run_id: Optional[int] = None,
+    ) -> int:
+        """Persist one run's comparison and sanity records (process data)."""
+        if not records:
+            return 0
+        now = get_shanghai_time().isoformat()
+        with self.financial_database_scope():
+            with self.get_connection() as conn:
+                self._apply_pragmas(conn)
+                inserted = 0
+                for record in records:
+                    conn.execute(
+                        """
+                        INSERT OR REPLACE INTO financial_source_fact_comparison_results (
+                            run_id, instrument_id, report_period, canonical_fact,
+                            record_kind, official_source, official_value,
+                            fallback_source, fallback_value, relative_diff,
+                            detail_json, compared_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            run_id,
+                            str(record.get("instrument_id") or ""),
+                            str(record.get("report_period") or ""),
+                            str(record.get("canonical_fact") or ""),
+                            str(record.get("record_kind") or ""),
+                            record.get("official_source"),
+                            record.get("official_value"),
+                            record.get("fallback_source"),
+                            record.get("fallback_value"),
+                            record.get("relative_diff"),
+                            json.dumps(
+                                record.get("detail_json") or {},
+                                ensure_ascii=False,
+                                sort_keys=True,
+                            ),
+                            now,
+                        ),
+                    )
+                    inserted += 1
+                conn.commit()
+                return inserted
+
     def derive_financial_core_facts_from_numeric_facts(
         self,
         instrument_id: str,
@@ -13450,6 +13509,25 @@ class ResearchStorageManager:
 
             CREATE INDEX IF NOT EXISTS idx_financial_disclosure_event_state_status
             ON financial_disclosure_event_state(status, pending_recheck_until, updated_at);
+
+            CREATE TABLE IF NOT EXISTS financial_source_fact_comparison_results (
+                run_id INTEGER,
+                instrument_id TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                canonical_fact TEXT NOT NULL,
+                record_kind TEXT NOT NULL,
+                official_source TEXT,
+                official_value REAL,
+                fallback_source TEXT,
+                fallback_value REAL,
+                relative_diff REAL,
+                detail_json TEXT NOT NULL DEFAULT '{}',
+                compared_at TEXT NOT NULL,
+                PRIMARY KEY (instrument_id, report_period, canonical_fact, record_kind)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_fin_source_fact_comparison_run
+            ON financial_source_fact_comparison_results(run_id, record_kind);
 
             CREATE TABLE IF NOT EXISTS shareholder_change_manifest (
                 instrument_id TEXT PRIMARY KEY,

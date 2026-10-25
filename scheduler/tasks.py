@@ -2980,11 +2980,103 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
         missing_official_facts = source_routing.get(
             "cninfo_missing_required_core_facts"
         ) or []
+        fill_reconciliation = source_routing.get(
+            "source_fact_reconciliation"
+        ) or {}
         if missing_official_facts:
-            lines.append(
-                "CNInfo待补字段: "
-                + "，".join(str(item) for item in missing_official_facts)
+            present_counts = (
+                fill_reconciliation.get("official_present_core_fact_counts")
+                or {}
             )
+            targets_with_official = int(
+                fill_reconciliation.get("targets_with_official_rows") or 0
+            )
+            systematic: list = []
+            incidental: list = []
+            if present_counts and targets_with_official > 0:
+                for item in missing_official_facts:
+                    fact = str(item)
+                    present = int(present_counts.get(fact, 0) or 0)
+                    missing_count = max(0, targets_with_official - present)
+                    if missing_count * 2 > targets_with_official:
+                        systematic.append(
+                            f"{fact}（缺 {missing_count}/{targets_with_official}）"
+                        )
+                    else:
+                        incidental.append(fact)
+            if systematic:
+                lines.append(
+                    "CNInfo系统性缺失字段: " + "，".join(systematic)
+                )
+            if incidental:
+                lines.append(
+                    "CNInfo个别缺失字段: " + "，".join(incidental)
+                )
+            if not systematic and not incidental:
+                lines.append(
+                    "CNInfo待补字段: "
+                    + "，".join(str(item) for item in missing_official_facts)
+                )
+        fill_info = source_routing.get("official_core_fill") or {}
+        if fill_info.get("enabled"):
+            official_sources_text = (
+                "、".join(
+                    str(item) for item in fill_info.get("official_sources") or []
+                )
+                or "官方"
+            )
+            merged_fields = int(
+                fill_reconciliation.get("merged_official_fields", 0) or 0
+            )
+            filled_fields = int(
+                fill_reconciliation.get("filled_fallback_fields", 0) or 0
+            )
+            cleaned_facts = int(
+                fill_reconciliation.get("cleaned_fallback_facts", 0) or 0
+            )
+            lines.append(
+                f"字段级补缺: 官方优先来源（{official_sources_text}）保留官方值 "
+                f"{merged_fields} 项，第三方补缺 {filled_fields} 项，"
+                f"清理对照过程数据 {cleaned_facts} 项"
+            )
+            if fill_reconciliation.get("enabled"):
+                compared = int(fill_reconciliation.get("compared_facts", 0) or 0)
+                consistent = int(
+                    fill_reconciliation.get("consistent_facts", 0) or 0
+                )
+                differences = int(
+                    fill_reconciliation.get("source_differences", 0) or 0
+                )
+                sanity = int(fill_reconciliation.get("sanity_reviews", 0) or 0)
+                comparison_line = (
+                    f"来源对照: 比较 {compared} 项，一致 {consistent} 项，"
+                    f"差异 {differences} 项"
+                )
+                if sanity:
+                    comparison_line += f"，复核提示 {sanity} 项"
+                lines.append(comparison_line)
+                for sample in (fill_reconciliation.get("samples") or [])[:3]:
+                    lines.append(
+                        f"对照差异: {sample.get('instrument_id')}@"
+                        f"{sample.get('report_period')} "
+                        f"{sample.get('canonical_fact')}: "
+                        f"官方 {sample.get('official_value')} "
+                        f"({sample.get('official_source')}) vs "
+                        f"第三方 {sample.get('fallback_value')} "
+                        f"({sample.get('fallback_source')})"
+                    )
+                for sample in (
+                    fill_reconciliation.get("sanity_samples") or []
+                )[:3]:
+                    lines.append(
+                        f"复核提示: {sample.get('instrument_id')}@"
+                        f"{sample.get('report_period')} "
+                        f"{sample.get('canonical_fact')} "
+                        f"定义校验异常（参考官方值 "
+                        f"{sample.get('official_value')}，"
+                        f"补缺值 {sample.get('fallback_value')}），"
+                        f"仅提示不阻断"
+                    )
         final_source = str(source_routing.get("final_source") or "").lower()
         if not final_source:
             cninfo_successes = int(source_routing.get("cninfo_successes", 0) or 0)

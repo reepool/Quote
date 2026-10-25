@@ -15,6 +15,9 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 from research.financial_disclosure_events import (
     ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS,
 )
+from research.official_financial_source_profiles import (
+    OFFICIAL_FINANCIAL_SOURCE_PROFILES,
+)
 from research.storage import ResearchStorageManager
 from utils import dm_logger
 from utils.config_manager import ResearchConfig
@@ -114,10 +117,45 @@ class FinancialMaintenanceRepairRouter:
         summary = self.default_summary()
         summary["source_order"] = source_order
         summary["fallback_sources"] = fallback_sources
+        module_cfg = self.research_config.modules.get("financial_statements", {})
+        maintenance_cfg = module_cfg.get("disclosure_incremental_sync", {})
+        fill_enabled = bool(
+            maintenance_cfg.get(
+                "fallback_only_missing_or_ambiguous_facts",
+                True,
+            )
+        )
+        official_core_fill_sources: Tuple[str, ...] = ()
+        if fill_enabled:
+            for profile_id in source_order:
+                profile = OFFICIAL_FINANCIAL_SOURCE_PROFILES.get(
+                    str(profile_id).strip()
+                )
+                if profile is None:
+                    continue
+                if profile.source not in official_core_fill_sources:
+                    official_core_fill_sources += (profile.source,)
+        reconciliation_cfg = dict(
+            maintenance_cfg.get("source_fact_reconciliation") or {}
+        )
+        reconciliation_enabled = bool(
+            reconciliation_cfg.get("enabled", True)
+        )
+        reconciliation_cfg.setdefault(
+            "scope_canonical_facts", list(required_core_facts)
+        )
+        summary["official_core_fill"] = {
+            "enabled": fill_enabled,
+            "official_sources": list(official_core_fill_sources),
+        }
         dm_logger.info(
-            "[FinancialMaintenanceRepair] start targets=%s source_order=%s",
+            "[FinancialMaintenanceRepair] start targets=%s source_order=%s "
+            "fill_enabled=%s official_sources=%s reconciliation_enabled=%s",
             len(targets),
             source_order,
+            fill_enabled,
+            list(official_core_fill_sources),
+            reconciliation_enabled,
         )
 
         if "cninfo_data20" in source_order:
@@ -193,6 +231,12 @@ class FinancialMaintenanceRepairRouter:
             for target in fallback_targets
             if target.classification in accepted_classification_set
         }
+        if reconciliation_enabled:
+            # One clear per maintenance run: the fallback loop below runs once
+            # per report period, and each dry-run call uses a fresh service
+            # instance, so per-call clearing would drop earlier exchanges'
+            # records. The table keeps exactly the latest run this way.
+            self.storage.clear_financial_source_fact_comparison_results()
         for report_period, period_targets in grouped.items():
             dm_logger.info(
                 "[FinancialFetch] fallback start report_period=%s targets=%s sources=%s",
@@ -208,18 +252,62 @@ class FinancialMaintenanceRepairRouter:
                 )
                 for target in period_targets
             ]
-            await run_local_core_dryrun(
-                targets=live_targets,
-                report_periods=[report_period],
-                db_path=db_path,
-                mapping_version=mapping_version,
-                source_order=fallback_sources,
-                required_canonical_facts=required_core_facts,
-                request_interval_seconds=request_interval_seconds,
-                request_timeout_seconds=request_timeout_seconds,
-                accepted_source_gaps=accepted_source_gaps,
-                accepted_source_gap_exchanges=(),
-            )
+            dryrun_result = (
+                await run_local_core_dryrun(
+                    targets=live_targets,
+                    report_periods=[report_period],
+                    db_path=db_path,
+                    mapping_version=mapping_version,
+                    source_order=fallback_sources,
+                    required_canonical_facts=required_core_facts,
+                    request_interval_seconds=request_interval_seconds,
+                    request_timeout_seconds=request_timeout_seconds,
+                    accepted_source_gaps=accepted_source_gaps,
+                    accepted_source_gap_exchanges=(),
+                    official_core_fill_sources=(
+                        official_core_fill_sources or None
+                    ),
+                    source_fact_reconciliation_cfg=(
+                        reconciliation_cfg if reconciliation_enabled else None
+                    ),
+                )
+            ) or {}
+            period_reconciliation = dryrun_result.get(
+                "source_fact_reconciliation"
+            ) or {}
+            prior = summary.get("source_fact_reconciliation")
+            if not prior:
+                summary["source_fact_reconciliation"] = period_reconciliation
+            else:
+                for key in (
+                    "compared_facts",
+                    "consistent_facts",
+                    "source_differences",
+                    "sanity_reviews",
+                    "merged_instruments",
+                    "merged_official_fields",
+                    "filled_fallback_fields",
+                    "cleaned_fallback_facts",
+                    "targets_with_official_rows",
+                ):
+                    prior[key] = int(prior.get(key, 0) or 0) + int(
+                        period_reconciliation.get(key, 0) or 0
+                    )
+                for key in ("samples", "sanity_samples"):
+                    prior[key] = list(prior.get(key) or []) + list(
+                        period_reconciliation.get(key) or []
+                    )
+                presence = prior.get("official_present_core_fact_counts") or {}
+                for canonical, count in (
+                    period_reconciliation.get(
+                        "official_present_core_fact_counts"
+                    )
+                    or {}
+                ).items():
+                    presence[str(canonical)] = (
+                        presence.get(str(canonical), 0) + int(count or 0)
+                    )
+                prior["official_present_core_fact_counts"] = presence
         ready_keys_after_fallback = self._ready_target_keys(
             fallback_targets,
             required_core_facts=required_core_facts,

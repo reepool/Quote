@@ -319,6 +319,8 @@ async def run_local_core_dryrun(
     request_timeout_seconds: float = 20.0,
     accepted_source_gaps: Optional[AcceptedSourceGaps] = None,
     accepted_source_gap_exchanges: Optional[Sequence[str]] = None,
+    official_core_fill_sources: Optional[Sequence[str]] = None,
+    source_fact_reconciliation_cfg: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     if not targets:
         raise ValueError("At least one dry-run target is required")
@@ -356,6 +358,8 @@ async def run_local_core_dryrun(
         db_ops=StaticInstrumentDbOps(targets),
         storage=storage,
         research_config=research_config,
+        official_core_fill_sources=official_core_fill_sources,
+        source_fact_reconciliation_cfg=source_fact_reconciliation_cfg,
     )
     LOGGER.info("[L1LocalCoreDryRun] sync started")
     sync_result = await service.sync(
@@ -420,6 +424,9 @@ async def run_local_core_dryrun(
         "db_path": str(db_path),
         "mapping_version": mapping_version,
         "source_order": list(source_order),
+        "source_fact_reconciliation": sync_result.get(
+            "source_fact_reconciliation"
+        ),
         "target_count": len(targets),
         "sample_count": len(targets) * len(report_periods),
         "report_periods": list(report_periods),

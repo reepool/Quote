@@ -132,6 +132,11 @@ class _FakeStorage:
         self.stale_runs = list(stale_runs or [])
         self.generic_scan_states = []
         self.generic_audits = []
+        self.cleared_comparison_results = 0
+
+    def clear_financial_source_fact_comparison_results(self):
+        self.cleared_comparison_results += 1
+        return 0
 
     @contextmanager
     def financial_database_scope(self):

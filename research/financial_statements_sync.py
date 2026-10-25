@@ -12,8 +12,19 @@ from typing import Any, Dict, List, Optional, Sequence
 
 from research.empty_support import allows_optional_empty_exchange
 from research.financial_fact_aliases import (
+    describe_core_financial_fact_alias,
     describe_financial_numeric_fact_name,
     get_core_financial_fact_aliases,
+)
+from research.financial_source_fact_reconciliation import (
+    DEFAULT_ABSOLUTE_FLOOR_CNY,
+    DEFAULT_COMPARISON_SCOPE,
+    DEFAULT_RELATIVE_TOLERANCE,
+    DEFAULT_SANITY_MINORITY_SHARE_MAX,
+    SourceFactComparisonRecord,
+    compare_official_and_fallback_facts,
+    evaluate_single_sourced_sanity,
+    summarize_comparison_records,
 )
 from research.financial_source_field_mapping import (
     FINANCIAL_STATEMENT_PROFILES,
@@ -127,6 +138,7 @@ class FinancialStatementsExchangeSyncResult:
     available_date_backfill: Optional[Dict[str, Any]] = None
     coverage_gaps: Optional[Dict[str, Any]] = None
     official_fallback_reasons: List[str] = field(default_factory=list)
+    source_fact_reconciliation: Optional[Dict[str, Any]] = None
     error_message: Optional[str] = None
 
 
@@ -182,6 +194,8 @@ class FinancialStatementsShadowSyncService:
         registry: Optional[FinancialStatementsProviderRegistry] = None,
         official_registry: Optional[OfficialFinancialFilingProviderRegistry] = None,
         numeric_fact_parser: Optional[Any] = None,
+        official_core_fill_sources: Optional[Sequence[str]] = None,
+        source_fact_reconciliation_cfg: Optional[Dict[str, Any]] = None,
     ):
         self.db_ops = db_ops
         self.storage = storage
@@ -192,6 +206,18 @@ class FinancialStatementsShadowSyncService:
         )
         self.official_registry = official_registry or OfficialFinancialFilingProviderRegistry(
             research_config=self.research_config,
+        )
+        # Opt-in field-level fill: when set, fallback bundle core snapshots keep
+        # official values for canonical facts these sources supply and label
+        # per-field provenance; callers absent this keep legacy whole-bundle
+        # behavior.
+        self._official_core_fill_sources: tuple[str, ...] = tuple(
+            str(source).strip()
+            for source in (official_core_fill_sources or ())
+            if str(source).strip()
+        )
+        self._source_fact_reconciliation_cfg: Dict[str, Any] = dict(
+            source_fact_reconciliation_cfg or {}
         )
         parser_cfg = self._module_config().get("parser", {})
         parser_version = str(
@@ -264,6 +290,54 @@ class FinancialStatementsShadowSyncService:
         )
         success_count = sum(1 for result in results if result.status == "success")
 
+        reconciliation_summaries = [
+            result.source_fact_reconciliation
+            for result in results
+            if result.source_fact_reconciliation
+            and result.source_fact_reconciliation.get("enabled")
+        ]
+        aggregated_reconciliation: Optional[Dict[str, Any]] = None
+        if reconciliation_summaries:
+            count_keys = (
+                "compared_facts",
+                "consistent_facts",
+                "source_differences",
+                "sanity_reviews",
+                "merged_instruments",
+                "merged_official_fields",
+                "filled_fallback_fields",
+                "cleaned_fallback_facts",
+                "targets_with_official_rows",
+            )
+            aggregated_reconciliation = {
+                "enabled": True,
+                "scope_canonical_facts": list(
+                    reconciliation_summaries[0].get("scope_canonical_facts") or []
+                ),
+            }
+            for key in count_keys:
+                aggregated_reconciliation[key] = sum(
+                    int(summary.get(key, 0) or 0)
+                    for summary in reconciliation_summaries
+                )
+            presence_totals: Dict[str, int] = {}
+            for summary in reconciliation_summaries:
+                for canonical, count in (
+                    summary.get("official_present_core_fact_counts") or {}
+                ).items():
+                    presence_totals[str(canonical)] = presence_totals.get(
+                        str(canonical), 0
+                    ) + int(count or 0)
+            aggregated_reconciliation["official_present_core_fact_counts"] = (
+                presence_totals
+            )
+            sample_keys = ("samples", "sanity_samples")
+            for key in sample_keys:
+                merged_samples: List[Dict[str, Any]] = []
+                for summary in reconciliation_summaries:
+                    merged_samples.extend(summary.get(key) or [])
+                aggregated_reconciliation[key] = merged_samples[:10]
+
         return {
             "status": "success" if success_count else "degraded",
             "sync_mode": sync_mode,
@@ -277,6 +351,7 @@ class FinancialStatementsShadowSyncService:
             "total_unchanged_files_skipped": total_unchanged_skipped,
             "successful_exchanges": success_count,
             "attempted_exchanges": len(results),
+            "source_fact_reconciliation": aggregated_reconciliation,
         }
 
     async def _sync_exchange(
@@ -497,6 +572,9 @@ class FinancialStatementsShadowSyncService:
                         "unchanged_files_skipped"
                     ],
                     official_fallback_reasons=official_fallback_reasons,
+                    source_fact_reconciliation=fallback_result.get(
+                        "source_fact_reconciliation"
+                    ),
                     financial_statement_profile_resolutions=profile_resolutions,
                     financial_statement_profile_summary=profile_summary,
                     local_core_mapping_catalog=local_core_mapping_catalog,
@@ -904,7 +982,7 @@ class FinancialStatementsShadowSyncService:
         sync_mode: str,
         force_full: bool,
         financial_statement_profile_resolutions: Optional[List[Dict[str, Any]]] = None,
-    ) -> Dict[str, int]:
+    ) -> Dict[str, Any]:
         bundles_written = 0
         raw_rows_written = 0
         manifests_written = 0
@@ -917,6 +995,25 @@ class FinancialStatementsShadowSyncService:
             if item.get("instrument_id") and item.get("profile")
         }
         mapping_version = self._local_core_mapping_version()
+        merge_active = bool(self._official_core_fill_sources)
+        reconciliation_cfg = self._source_fact_reconciliation_cfg
+        reconciliation_enabled = bool(reconciliation_cfg)
+        scope_canonical_facts: List[str] = list(
+            reconciliation_cfg.get("scope_canonical_facts")
+            or DEFAULT_COMPARISON_SCOPE
+        )
+        reconciliation_records: List[SourceFactComparisonRecord] = []
+        reconciliation_compared_facts = 0
+        merge_stats = {
+            "merged_instruments": 0,
+            "merged_official_fields": 0,
+            "filled_fallback_fields": 0,
+            "cleaned_fallback_facts": 0,
+        }
+        official_presence_counts: Dict[str, int] = {
+            canonical: 0 for canonical in scope_canonical_facts
+        }
+        targets_with_official_rows = 0
 
         for bundle in bundles:
             payload_hash = self._hash_payload(bundle.raw_payload)
@@ -952,6 +1049,27 @@ class FinancialStatementsShadowSyncService:
                 source_file_id=source_file_id,
                 payload_hash=payload_hash,
             )
+            merge_meta: Dict[str, Any] = {}
+            if merge_active and bundle_to_write.facts is not None:
+                bundle_to_write, merge_meta = (
+                    self._merge_official_core_facts_into_snapshot(
+                        bundle_to_write,
+                        source_file_id=source_file_id,
+                    )
+                )
+                if merge_meta:
+                    merge_stats["merged_instruments"] += 1
+                    merge_stats["merged_official_fields"] += merge_meta[
+                        "merged_official_fields"
+                    ]
+                    merge_stats["filled_fallback_fields"] += merge_meta[
+                        "filled_fallback_fields"
+                    ]
+                    if merge_meta["official_rows"]:
+                        targets_with_official_rows += 1
+                    for canonical in official_presence_counts:
+                        if canonical in merge_meta["official_facts_by_canonical"]:
+                            official_presence_counts[canonical] += 1
             self.storage.upsert_financial_statement_bundle(
                 bundle_to_write,
                 ingestion_run_id=run_id,
@@ -977,11 +1095,54 @@ class FinancialStatementsShadowSyncService:
                 numeric_facts,
                 ingestion_run_id=run_id,
             )
+            if reconciliation_enabled:
+                records, compared_facts = (
+                    self._reconcile_bundle_against_official_facts(
+                        bundle_to_write=bundle_to_write,
+                        numeric_facts=numeric_facts,
+                        merge_meta=merge_meta,
+                        fallback_source=str(source),
+                        scope_canonical_facts=scope_canonical_facts,
+                    )
+                )
+                reconciliation_records.extend(records)
+                reconciliation_compared_facts += compared_facts
+                if merge_active:
+                    merge_stats["cleaned_fallback_facts"] += (
+                        self._cleanup_comparison_only_fallback_facts(
+                            numeric_facts=numeric_facts,
+                            official_facts_by_canonical=merge_meta.get(
+                                "official_facts_by_canonical"
+                            )
+                            or {},
+                            scope_canonical_facts=scope_canonical_facts,
+                            source_file_id=source_file_id,
+                            ingestion_run_id=run_id,
+                        )
+                    )
             manifests_written += 1
             bundles_written += 1
             raw_rows_written += len(bundle.raw_statements)
             if bundle.facts is not None:
                 core_facts_written += 1
+
+        if reconciliation_enabled:
+            self.storage.insert_financial_source_fact_comparison_records(
+                [
+                    record.as_storage_row()
+                    for record in reconciliation_records
+                ],
+                run_id=run_id,
+            )
+        reconciliation_summary = self._build_reconciliation_summary(
+            enabled=reconciliation_enabled,
+            records=reconciliation_records,
+            compared_facts=reconciliation_compared_facts,
+            merge_stats=merge_stats,
+            scope_canonical_facts=scope_canonical_facts,
+            official_presence_counts=official_presence_counts,
+            targets_with_official_rows=targets_with_official_rows,
+        )
 
         return {
             "bundles_written": bundles_written,
@@ -990,7 +1151,337 @@ class FinancialStatementsShadowSyncService:
             "numeric_facts_written": numeric_facts_written,
             "core_facts_written": core_facts_written,
             "unchanged_files_skipped": unchanged_skipped,
+            "source_fact_reconciliation": reconciliation_summary,
         }
+
+    _CORE_FILL_FIELD_NAMES: tuple[str, ...] = (
+        "revenue",
+        "gross_profit",
+        "operating_profit",
+        "pre_tax_profit",
+        "net_income",
+        "operating_cf",
+        "total_cf",
+        "total_assets",
+        "total_liabilities",
+        "equity",
+        "current_assets",
+        "current_liabilities",
+        "inventory",
+        "receivables",
+        "fixed_assets",
+        "intangible_assets",
+        "shares_outstanding",
+    )
+
+    def _merge_official_core_facts_into_snapshot(
+        self,
+        bundle_to_write: FinancialStatementBundle,
+        *,
+        source_file_id: str,
+    ) -> tuple[FinancialStatementBundle, Dict[str, Any]]:
+        """Compose the fallback core snapshot official-first per canonical field.
+
+        The semantic gate binds before source preference: an official numeric
+        fact fills a core field only when its canonical semantic matches the
+        field's required semantics, so total-equity officials can never fill
+        the parent-attributable equity field. Overridden fields get
+        `official_structured` provenance; kept bundle fields get
+        `fallback_fill` provenance persisted through `core_fact_alias_matches`.
+        """
+        facts = bundle_to_write.facts
+        if facts is None:
+            return bundle_to_write, {}
+        official_sources = set(self._official_core_fill_sources)
+        rows = self.storage.get_financial_numeric_facts(
+            str(bundle_to_write.instrument_id),
+            include_history=True,
+            report_period=bundle_to_write.report_period,
+        )
+        official_rows = [
+            row
+            for row in rows
+            if str(row.get("source") or "") in official_sources
+            and row.get("canonical_fact_name")
+            and row.get("fact_value") is not None
+        ]
+        alias_mapping = self._core_fact_alias_mapping()
+
+        def _official_candidate(field_name: str) -> Optional[Dict[str, Any]]:
+            # Same alias order and semantic gate as core derivation: an
+            # official fact fills a field only when its fact name is a
+            # canonical-compatible alias of that field.
+            for alias in alias_mapping.get(field_name, []):
+                for row in official_rows:
+                    if str(row.get("fact_name") or "") != str(alias):
+                        continue
+                    alias_info = describe_core_financial_fact_alias(
+                        field_name,
+                        str(alias),
+                    )
+                    if alias_info["canonical_compatible"]:
+                        return row
+            return None
+
+        def _equity_total_reference() -> Optional[Dict[str, Any]]:
+            for alias in alias_mapping.get("equity", []):
+                for row in official_rows:
+                    if str(row.get("fact_name") or "") != str(alias):
+                        continue
+                    alias_info = describe_core_financial_fact_alias(
+                        "equity",
+                        str(alias),
+                    )
+                    if (
+                        not alias_info["canonical_compatible"]
+                        and alias_info["alias_semantic"]
+                        == "total_owners_equity"
+                    ):
+                        return row
+            return None
+
+        matches = dict(
+            (facts.lineage_json or {}).get("core_fact_alias_matches") or {}
+        )
+        replacements: Dict[str, float] = {}
+        merged_official_fields = 0
+        filled_fallback_fields = 0
+        equity_filled_by_fallback = False
+        fallback_source_label = str(
+            bundle_to_write.source or facts.source or ""
+        )
+        for field_name in self._CORE_FILL_FIELD_NAMES:
+            official_row = _official_candidate(field_name)
+            if official_row is not None:
+                official_value = float(official_row["fact_value"])
+                replacements[field_name] = official_value
+                merged_official_fields += 1
+                matches[field_name] = {
+                    "core_field": field_name,
+                    "fact_name": official_row.get("fact_name"),
+                    "fact_value": official_value,
+                    "statement_family": official_row.get("statement_family"),
+                    "source_file_id": official_row.get("source_file_id"),
+                    "parser_version": official_row.get("parser_version"),
+                    "unit": official_row.get("unit"),
+                    "currency": official_row.get("currency"),
+                    "canonical_fact_name": official_row.get(
+                        "canonical_fact_name"
+                    ),
+                    "canonical_compatible": True,
+                    "source": official_row.get("source"),
+                    "role": "official_structured",
+                }
+                continue
+            entry = matches.get(field_name)
+            if isinstance(entry, dict) and entry.get("fact_value") is not None:
+                matches[field_name] = {
+                    **entry,
+                    "source": fallback_source_label,
+                    "source_file_id": source_file_id,
+                    "role": "fallback_fill",
+                }
+                filled_fallback_fields += 1
+                if field_name == "equity":
+                    equity_filled_by_fallback = True
+
+        facts_json = {
+            **(facts.facts_json or {}),
+            "core_fact_alias_matches": matches,
+        }
+        lineage_json = {
+            **(facts.lineage_json or {}),
+            "core_fact_alias_matches": matches,
+        }
+        new_facts = replace(
+            facts,
+            facts_json=facts_json,
+            lineage_json=lineage_json,
+            **replacements,
+        )
+        official_facts_by_canonical = {
+            str(row.get("canonical_fact_name")): float(row.get("fact_value"))
+            for row in official_rows
+        }
+        sanity_records: List[SourceFactComparisonRecord] = []
+        if equity_filled_by_fallback:
+            reference_row = _equity_total_reference()
+            if (
+                reference_row is not None
+                and new_facts.equity is not None
+            ):
+                record = evaluate_single_sourced_sanity(
+                    instrument_id=str(bundle_to_write.instrument_id),
+                    report_period=str(bundle_to_write.report_period),
+                    filled_fact="equity_parent",
+                    filled_value=float(new_facts.equity),
+                    fallback_source=fallback_source_label,
+                    reference_fact=str(
+                        reference_row.get("canonical_fact_name") or ""
+                    ),
+                    reference_value=float(reference_row["fact_value"]),
+                    reference_source=str(reference_row.get("source") or ""),
+                    minority_share_max=float(
+                        self._source_fact_reconciliation_cfg.get(
+                            "sanity_minority_share_max",
+                            DEFAULT_SANITY_MINORITY_SHARE_MAX,
+                        )
+                    ),
+                )
+                if record is not None:
+                    sanity_records.append(record)
+
+        return replace(bundle_to_write, facts=new_facts), {
+            "merged_official_fields": merged_official_fields,
+            "filled_fallback_fields": filled_fallback_fields,
+            "official_facts_by_canonical": official_facts_by_canonical,
+            "official_rows": official_rows,
+            "sanity_records": sanity_records,
+        }
+
+    def _reconcile_bundle_against_official_facts(
+        self,
+        *,
+        bundle_to_write: FinancialStatementBundle,
+        numeric_facts: List[Any],
+        merge_meta: Dict[str, Any],
+        fallback_source: str,
+        scope_canonical_facts: List[str],
+    ) -> tuple[List[SourceFactComparisonRecord], int]:
+        """Same-fetch comparison of official pool facts versus bundle facts."""
+        cfg = self._source_fact_reconciliation_cfg
+        official_rows = list(merge_meta.get("official_rows") or [])
+        if not official_rows:
+            official_sources = set(self._official_core_fill_sources)
+            rows = self.storage.get_financial_numeric_facts(
+                str(bundle_to_write.instrument_id),
+                include_history=True,
+                report_period=bundle_to_write.report_period,
+            )
+            official_rows = [
+                row
+                for row in rows
+                if str(row.get("source") or "") in official_sources
+                and row.get("canonical_fact_name")
+                and row.get("fact_value") is not None
+            ]
+        official_by_canonical: Dict[str, float] = {}
+        official_source_label = ""
+        for row in official_rows:
+            canonical = str(row.get("canonical_fact_name") or "")
+            if canonical and canonical not in official_by_canonical:
+                official_by_canonical[canonical] = float(row["fact_value"])
+            if not official_source_label:
+                official_source_label = str(row.get("source") or "")
+        fallback_by_canonical: Dict[str, float] = {}
+        for fact in numeric_facts:
+            canonical = str(getattr(fact, "canonical_fact_name", "") or "")
+            if (
+                canonical in scope_canonical_facts
+                and canonical not in fallback_by_canonical
+                and getattr(fact, "fact_value", None) is not None
+            ):
+                fallback_by_canonical[canonical] = float(fact.fact_value)
+
+        compared_facts = sum(
+            1
+            for canonical in scope_canonical_facts
+            if canonical in official_by_canonical
+            and canonical in fallback_by_canonical
+        )
+        records = compare_official_and_fallback_facts(
+            instrument_id=str(bundle_to_write.instrument_id),
+            report_period=str(bundle_to_write.report_period),
+            official_facts=official_by_canonical,
+            fallback_facts=fallback_by_canonical,
+            official_source=official_source_label,
+            fallback_source=fallback_source,
+            scope=scope_canonical_facts,
+            relative_tolerance=float(
+                cfg.get("relative_tolerance", DEFAULT_RELATIVE_TOLERANCE)
+            ),
+            absolute_floor_cny=float(
+                cfg.get("absolute_floor_cny", DEFAULT_ABSOLUTE_FLOOR_CNY)
+            ),
+        )
+        records.extend(merge_meta.get("sanity_records") or [])
+        return records, compared_facts
+
+    def _cleanup_comparison_only_fallback_facts(
+        self,
+        *,
+        numeric_facts: List[Any],
+        official_facts_by_canonical: Dict[str, float],
+        scope_canonical_facts: List[str],
+        source_file_id: str,
+        ingestion_run_id: int,
+    ) -> int:
+        """Delete fallback facts kept only as the comparison substrate.
+
+        Scope-bounded: fallback rows for canonical facts the official source
+        already supplied (within the comparison scope) are removed; fill-used
+        and out-of-scope facts persist as before.
+        """
+        if not numeric_facts or not official_facts_by_canonical:
+            return 0
+        scope_set = set(scope_canonical_facts)
+        kept: List[Any] = []
+        removed = 0
+        for fact in numeric_facts:
+            canonical = str(getattr(fact, "canonical_fact_name", "") or "")
+            if canonical in scope_set and canonical in official_facts_by_canonical:
+                removed += 1
+                continue
+            kept.append(fact)
+        if removed:
+            self.storage.replace_financial_numeric_facts_for_source_file(
+                source_file_id,
+                kept,
+                ingestion_run_id=ingestion_run_id,
+            )
+        return removed
+
+    def _build_reconciliation_summary(
+        self,
+        *,
+        enabled: bool,
+        records: List[SourceFactComparisonRecord],
+        compared_facts: int,
+        merge_stats: Dict[str, Any],
+        scope_canonical_facts: List[str],
+        official_presence_counts: Dict[str, int],
+        targets_with_official_rows: int,
+    ) -> Dict[str, Any]:
+        if not enabled:
+            return {
+                "enabled": False,
+                "targets_with_official_rows": targets_with_official_rows,
+                "official_present_core_fact_counts": dict(
+                    official_presence_counts
+                ),
+                **merge_stats,
+            }
+        summary: Dict[str, Any] = {
+            "enabled": True,
+            "scope_canonical_facts": list(scope_canonical_facts),
+            "targets_with_official_rows": targets_with_official_rows,
+            "official_present_core_fact_counts": dict(official_presence_counts),
+        }
+        summary.update(
+            summarize_comparison_records(
+                records,
+                report_top_n=int(
+                    self._source_fact_reconciliation_cfg.get("report_top_n", 5)
+                ),
+            )
+        )
+        summary["compared_facts"] = int(compared_facts)
+        summary["consistent_facts"] = max(
+            0,
+            int(compared_facts) - int(summary.get("source_differences", 0) or 0),
+        )
+        summary.update(merge_stats)
+        return summary
 
     @staticmethod
     def _numeric_facts_from_fallback_bundle(
@@ -1146,6 +1637,7 @@ class FinancialStatementsShadowSyncService:
         core_facts_written: int = 0,
         unchanged_files_skipped: int = 0,
         official_fallback_reasons: Optional[List[str]] = None,
+        source_fact_reconciliation: Optional[Dict[str, Any]] = None,
         financial_statement_profile_resolutions: Optional[List[Dict[str, Any]]] = None,
         financial_statement_profile_summary: Optional[Dict[str, Any]] = None,
         local_core_mapping_catalog: Optional[Dict[str, Any]] = None,

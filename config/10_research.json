@@ -718,8 +718,15 @@
           ],
           "official_first": true,
           "fallback_only_missing_or_ambiguous_facts": true,
+          "source_fact_reconciliation": {
+            "enabled": true,
+            "relative_tolerance": 0.005,
+            "absolute_floor_cny": 1.0,
+            "sanity_minority_share_max": 0.5,
+            "report_top_n": 5
+          },
           "max_pages_per_market": 0,
-          "note": "Financial disclosure incremental and reconciliation maintenance use CNInfo data20 official structured facts first, then THS/Sina only for missing, failed, or semantically ambiguous canonical facts. Announcement scans use adaptive pagination with max_pages_per_market 0, so they stop at watermark, last page, or the market-reported total instead of a fixed page cap."
+          "note": "Financial disclosure incremental and reconciliation maintenance use CNInfo data20 official structured facts first, then THS/Sina only for missing, failed, or semantically ambiguous canonical facts. Field-level fill keeps official values where the official source supplies them and labels per-field provenance; the same-fetch reconciliation marks official/fallback discrepancies and single-sourced sanity anomalies as process data retained for the latest run only. Announcement scans use adaptive pagination with max_pages_per_market 0, so they stop at watermark, last page, or the market-reported total instead of a fixed page cap."
         },
         "readiness": {
           "required_core_facts": [
