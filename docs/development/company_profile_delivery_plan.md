@@ -2,7 +2,7 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-10-25。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前按验收§7.46及[B2卡§7.9](../../openspec/changes/restore-company-profile-llm-led-generalization/b2-execution-card.md#79-当前任务卡用现存业务证据交付角色保住原核验链)执行：浦发净收入金额已交，角色与合法检查接续仍阻塞，A2当前不通过。最后6次物理余额交同方、上汽有源角色，保旧核心；停止空补源/标签驱动路线，浦发暂保限用，不新增总额、不转入S1。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前按验收§7.47及[B2卡§7.10](../../openspec/changes/restore-company-profile-llm-led-generalization/b2-execution-card.md#710-当前任务卡交同方上汽最终核心验收包)执行：两家有源角色已接受，转主体歧义、有效事实投影及最终核心验收收口，不再补角色。原任务余2物理仅按需补核心对照；浦发158页未读保限用，可用1/4、A2当前不通过，不新增总额、不转入S1。
 
 ## 1. 开发者必须先理解的纠偏
 
@@ -76,11 +76,11 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 
 ### B2：四类通用性验证与修复（B连续实施）
 
-- 当前唯一活动卡：[b2-execution-card.md§7.9](../../openspec/changes/restore-company-profile-llm-led-generalization/b2-execution-card.md#79-当前任务卡用现存业务证据交付角色保住原核验链)。浦发两项净收入已交；同方、上汽角色未成，空补源实为无正文，下一代绑定仍丢原检查。用已独立发现的真实业务原文直接生成角色并核验，保合法来源链和旧核心；不要求先抽到同名role标签、不再重复清单。最后6次物理仅分这两家，浦发158页未读保限用；小型实际证明后直接交业务答案。
+- 当前唯一活动卡：[b2-execution-card.md§7.10](../../openspec/changes/restore-company-profile-llm-led-generalization/b2-execution-card.md#710-当前任务卡交同方上汽最终核心验收包)。同方、上汽角色及关键金额经A核源接受；不再增加角色正文。保有效事实/检查，撤出上汽同句不同ID的母公司主体歧义，补相连视图并交两家最终12/6证据映射。默认离线，余2物理仅按需补核心支持/覆盖，不再全文读源或重复旧核验；浦发158页未读保持。
 - 输入：历史公司中制造、非金融服务、金融、综合各1家，共4家，包含L0那1家；沿同一实现，不加公司/代码/页码生产分支。
 - 交付：4家三视图及源审查；新句式/续页/未披露/冲突均可表达；有歧义的可正确限用，但不能把主营缺失包装为通过。4家最终均达到公司可用标准才进入S1。
 - 验证：保留首发失败，4家真实语义结果和源核验全部可追溯；报告冷/热解析、请求/token/费用、总时长。用4家实测决定是否放行S1，超预算先裁决，不偷偷改阈值。
-- B自主范围：验收§7.46显式将§7.44同一任务最后6次物理改绑到修复后同方、上汽角色链；范围内P0—P3和必要P4合并完成，不再纯准备卡。原成功全文源不重读，未变有效检查沿真实来源复用，不反复付费；不增加第5家、不按公司写规则分支、不新建平台。B分配并冻结剩余窗口，不逐次请批；恢复包含于6次物理，不额外叠加。
+- B自主范围：验收§7.47显式将§7.44同一任务最后2物理改绑到两家按需的核心对照核验，各至多1次且含恢复；原owner内P0—P3/必要P4、直接验证、冻结和交付连续完成，不逐项请批。有效核心优先离线复用，不重读全文、不重生成角色、不全量重核旧对象；无第5家/新预算/正式后继/平台，不能按公司写生产规则。
 - 停止：达到§7.44新增总额、源/账号/服务实际不可用、既有改动不可隔离或用户停止，交最后可查正文及具体核心限制；公司达标就停，不追全次要附注。仍未达标交明确失败/适用边界，不能自行再加预算、公司或S1。
 
 ### A2：四类通用性审核与S1放行（A负责）
