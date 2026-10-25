@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "spdb-draft",
+  "binding_sha256": "f9e6f0b9cb4568725fdc3fa72aed221f72d495a5364d3d962901f3e2dcb54913",
+  "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+  "approval_reference": "acceptance section 7.48 and b2 card section 7.11, 2026-10-25",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "浦发新源成稿"
+}

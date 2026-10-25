@@ -2211,10 +2211,20 @@ def interpret_direct_core(
                 except (ValueError, LlmError, SemanticProviderError) as exc:
                     gaps.append(f"direct_core_gap_check_stopped:{exc}")
             if identity.get("continue_unread"):
+                fresh_ids = set()
+                for item in identity.get("accepted_source_receipts") or []:
+                    if not item.get("physical_request"):
+                        continue
+                    request_id = str(item.get("request_id") or "")
+                    for condition in (item.get("response_payload") or {}).get("source_conditions") or []:
+                        condition_id = str(condition.get("condition_id") or "")
+                        if request_id and condition_id:
+                            fresh_ids.add(f"{request_id}:{condition_id}")
                 conditions_to_draft = [
                     condition
                     for condition in selected_conditions
-                    if "funding_and_capital" in condition.condition_id
+                    if condition.condition_id in fresh_ids
+                    or "funding_and_capital" in condition.condition_id
                 ]
             else:
                 conditions_to_draft = list(selected_conditions)
