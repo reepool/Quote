@@ -15,6 +15,9 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 from research.financial_disclosure_events import (
     ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS,
 )
+from research.financial_source_fact_reconciliation import (
+    merge_reconciliation_summaries,
+)
 from research.official_financial_source_profiles import (
     OFFICIAL_FINANCIAL_SOURCE_PROFILES,
 )
@@ -158,7 +161,9 @@ class FinancialMaintenanceRepairRouter:
             reconciliation_enabled,
         )
 
-        if "cninfo_data20" in source_order:
+        missing_by_target: Dict[Tuple[str, str], List[str]] = {}
+        cninfo_imported = "cninfo_data20" in source_order
+        if cninfo_imported:
             cninfo_summary = await self._run_cninfo_data20_import(
                 targets=targets,
                 db_path=db_path,
@@ -170,6 +175,7 @@ class FinancialMaintenanceRepairRouter:
                 targets,
                 required_core_facts=required_core_facts,
                 mapping_version=mapping_version,
+                missing_by_target=missing_by_target,
             )
             summary.update(
                 {
@@ -204,17 +210,31 @@ class FinancialMaintenanceRepairRouter:
             )
             summary["errors"].extend(cninfo_summary.get("errors") or [])
 
-        ready_keys_after_cninfo = self._ready_target_keys(
-            targets,
-            required_core_facts=required_core_facts,
-            mapping_version=mapping_version,
-        )
+        # The post-import readiness view equals the one already computed for
+        # cninfo_successes — nothing is written between the two calls — so
+        # reuse it instead of repeating the full per-target readiness pass.
+        if cninfo_imported:
+            ready_keys_after_cninfo = cninfo_ready_keys
+        else:
+            ready_keys_after_cninfo = self._ready_target_keys(
+                targets,
+                required_core_facts=required_core_facts,
+                mapping_version=mapping_version,
+                missing_by_target=missing_by_target,
+            )
         fallback_targets = [
             target
             for target in targets
             if target.key not in ready_keys_after_cninfo
         ]
         summary["fallback_attempts"] = len(fallback_targets)
+        summary["cninfo_missing_required_core_fact_samples"] = (
+            self._missing_fact_samples(
+                fallback_targets,
+                missing_by_target=missing_by_target,
+                sample_cap=int(reconciliation_cfg.get("report_top_n", 5)),
+            )
+        )
         if not fallback_targets or not fallback_sources:
             self._finalize_source_summary(summary)
             return summary
@@ -237,6 +257,7 @@ class FinancialMaintenanceRepairRouter:
             # instance, so per-call clearing would drop earlier exchanges'
             # records. The table keeps exactly the latest run this way.
             self.storage.clear_financial_source_fact_comparison_results()
+        period_reconciliations: List[Dict[str, Any]] = []
         for report_period, period_targets in grouped.items():
             dm_logger.info(
                 "[FinancialFetch] fallback start report_period=%s targets=%s sources=%s",
@@ -274,40 +295,18 @@ class FinancialMaintenanceRepairRouter:
             ) or {}
             period_reconciliation = dryrun_result.get(
                 "source_fact_reconciliation"
-            ) or {}
-            prior = summary.get("source_fact_reconciliation")
-            if not prior:
-                summary["source_fact_reconciliation"] = period_reconciliation
-            else:
-                for key in (
-                    "compared_facts",
-                    "consistent_facts",
-                    "source_differences",
-                    "sanity_reviews",
-                    "merged_instruments",
-                    "merged_official_fields",
-                    "filled_fallback_fields",
-                    "cleaned_fallback_facts",
-                    "targets_with_official_rows",
-                ):
-                    prior[key] = int(prior.get(key, 0) or 0) + int(
-                        period_reconciliation.get(key, 0) or 0
-                    )
-                for key in ("samples", "sanity_samples"):
-                    prior[key] = list(prior.get(key) or []) + list(
-                        period_reconciliation.get(key) or []
-                    )
-                presence = prior.get("official_present_core_fact_counts") or {}
-                for canonical, count in (
-                    period_reconciliation.get(
-                        "official_present_core_fact_counts"
-                    )
-                    or {}
-                ).items():
-                    presence[str(canonical)] = (
-                        presence.get(str(canonical), 0) + int(count or 0)
-                    )
-                prior["official_present_core_fact_counts"] = presence
+            )
+            if period_reconciliation:
+                period_reconciliations.append(period_reconciliation)
+        summary["source_fact_reconciliation"] = (
+            merge_reconciliation_summaries(
+                period_reconciliations,
+                report_top_n=int(
+                    reconciliation_cfg.get("report_top_n", 5)
+                ),
+            )
+            or {}
+        )
         ready_keys_after_fallback = self._ready_target_keys(
             fallback_targets,
             required_core_facts=required_core_facts,
@@ -350,6 +349,7 @@ class FinancialMaintenanceRepairRouter:
         *,
         required_core_facts: Sequence[str],
         mapping_version: str,
+        missing_by_target: Optional[Dict[Tuple[str, str], List[str]]] = None,
     ) -> set[Tuple[str, str]]:
         """Return targets that are ready, using a fresh storage view after writes."""
         ready = self._ready_target_keys_with_storage(
@@ -357,6 +357,7 @@ class FinancialMaintenanceRepairRouter:
             targets,
             required_core_facts=required_core_facts,
             mapping_version=mapping_version,
+            missing_by_target=missing_by_target,
         )
         if len(ready) == len(targets):
             return ready
@@ -367,10 +368,30 @@ class FinancialMaintenanceRepairRouter:
                 targets,
                 required_core_facts=required_core_facts,
                 mapping_version=mapping_version,
+                missing_by_target=missing_by_target,
             )
         except Exception:
             return ready
         return ready
+
+    @staticmethod
+    def _missing_fact_samples(
+        fallback_targets: Sequence[FinancialMaintenanceRepairTarget],
+        *,
+        missing_by_target: Mapping[Tuple[str, str], List[str]],
+        sample_cap: int,
+    ) -> Dict[str, List[str]]:
+        """Sample instruments per still-missing canonical fact for the report."""
+        samples: Dict[str, List[str]] = {}
+        for target in fallback_targets:
+            for fact in missing_by_target.get(target.key) or []:
+                instrument_ids = samples.setdefault(str(fact), [])
+                if (
+                    target.instrument_id not in instrument_ids
+                    and len(instrument_ids) < max(0, int(sample_cap))
+                ):
+                    instrument_ids.append(target.instrument_id)
+        return samples
 
     def _ready_target_keys_with_storage(
         self,
@@ -379,6 +400,7 @@ class FinancialMaintenanceRepairRouter:
         *,
         required_core_facts: Sequence[str],
         mapping_version: str,
+        missing_by_target: Optional[Dict[Tuple[str, str], List[str]]] = None,
     ) -> set[Tuple[str, str]]:
         router = (
             self
@@ -390,12 +412,21 @@ class FinancialMaintenanceRepairRouter:
         )
         ready: set[Tuple[str, str]] = set()
         for target in targets:
-            if router.readiness_for_target(
+            readiness = router.readiness_for_target(
                 target,
                 required_core_facts=required_core_facts,
                 mapping_version=mapping_version,
-            ).get("ready"):
+            )
+            if readiness.get("ready"):
                 ready.add(target.key)
+            elif missing_by_target is not None:
+                missing_by_target[target.key] = sorted(
+                    {
+                        str(item.get("canonical_fact"))
+                        for item in readiness.get("missing_fields") or []
+                        if item.get("canonical_fact")
+                    }
+                )
         return ready
 
     async def _run_cninfo_data20_import(

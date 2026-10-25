@@ -34,6 +34,9 @@ from research.financial_disclosure_events import (
     is_financial_disclosure_like_title,
     is_non_primary_financial_announcement_title,
 )
+from research.financial_source_fact_reconciliation import (
+    merge_reconciliation_summaries,
+)
 from research.financial_source_field_mapping import MAPPING_VERSION
 from research.financial_statement_maintenance_repair import (
     FinancialMaintenanceRepairRouter,
@@ -1742,8 +1745,8 @@ class FinancialDisclosureIncrementalSyncService:
         reasons = cls._missing_reasons(readiness)
         return bool(reasons) and not bool(reasons - {"missing_local_core_fact"})
 
-    @staticmethod
     def _merge_repair_summaries(
+        self,
         left: Dict[str, Any],
         right: Dict[str, Any],
     ) -> Dict[str, Any]:
@@ -1775,6 +1778,7 @@ class FinancialDisclosureIncrementalSyncService:
         merged["fallback_sources"] = list(
             right.get("fallback_sources") or merged.get("fallback_sources") or []
         )
+        self._merge_reconciliation_into_repair_summary(merged, left, right)
         cninfo_successes = int(merged.get("cninfo_successes", 0) or 0)
         cninfo_parsed = int(
             merged.get("cninfo_parsed_instrument_periods", 0) or 0
@@ -1799,6 +1803,72 @@ class FinancialDisclosureIncrementalSyncService:
         }
         merged["source_collection_complete"] = completed >= attempted
         return merged
+
+    def _merge_reconciliation_into_repair_summary(
+        self,
+        merged: Dict[str, Any],
+        left: Mapping[str, Any],
+        right: Mapping[str, Any],
+    ) -> None:
+        """Merge per-profile fill/reconciliation report data in place.
+
+        Without this, a multi-profile run keeps only the first profile's
+        `source_fact_reconciliation` / `official_core_fill` (dict(left)
+        copies extras) and drops every later profile's counts.
+        """
+        module_cfg = self.research_config.modules.get(
+            "financial_statements", {}
+        )
+        reconciliation_cfg = (
+            module_cfg.get("disclosure_incremental_sync", {}).get(
+                "source_fact_reconciliation"
+            )
+            or {}
+        )
+        reconciliation_summaries = [
+            summary
+            for summary in (
+                left.get("source_fact_reconciliation"),
+                right.get("source_fact_reconciliation"),
+            )
+            if summary
+        ]
+        if reconciliation_summaries:
+            merged["source_fact_reconciliation"] = (
+                merge_reconciliation_summaries(
+                    reconciliation_summaries,
+                    report_top_n=int(reconciliation_cfg.get("report_top_n", 5)),
+                )
+            )
+        fills = [
+            fill
+            for fill in (
+                left.get("official_core_fill"),
+                right.get("official_core_fill"),
+            )
+            if fill
+        ]
+        if fills:
+            official_sources: List[str] = []
+            for fill in fills:
+                for source in fill.get("official_sources") or []:
+                    if source not in official_sources:
+                        official_sources.append(str(source))
+            merged["official_core_fill"] = {
+                "enabled": any(bool(fill.get("enabled")) for fill in fills),
+                "official_sources": official_sources,
+            }
+        fact_samples: Dict[str, List[str]] = {}
+        for source in (left, right):
+            for fact, instrument_ids in (
+                source.get("cninfo_missing_required_core_fact_samples") or {}
+            ).items():
+                entry = fact_samples.setdefault(str(fact), [])
+                for instrument_id in instrument_ids or []:
+                    if instrument_id not in entry:
+                        entry.append(str(instrument_id))
+        if fact_samples:
+            merged["cninfo_missing_required_core_fact_samples"] = fact_samples
 
     @staticmethod
     def _repair_target_for_candidate(

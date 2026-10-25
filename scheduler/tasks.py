@@ -2991,6 +2991,9 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
             targets_with_official = int(
                 fill_reconciliation.get("targets_with_official_rows") or 0
             )
+            fact_samples = source_routing.get(
+                "cninfo_missing_required_core_fact_samples"
+            ) or {}
             systematic: list = []
             incidental: list = []
             if present_counts and targets_with_official > 0:
@@ -3003,7 +3006,15 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
                             f"{fact}（缺 {missing_count}/{targets_with_official}）"
                         )
                     else:
-                        incidental.append(fact)
+                        sample_instruments = [
+                            str(instrument_id)
+                            for instrument_id in (fact_samples.get(fact) or [])[:3]
+                        ]
+                        incidental.append(
+                            f"{fact}（样例 {'、'.join(sample_instruments)}）"
+                            if sample_instruments
+                            else fact
+                        )
             if systematic:
                 lines.append(
                     "CNInfo系统性缺失字段: " + "，".join(systematic)
@@ -3055,7 +3066,9 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
                 if sanity:
                     comparison_line += f"，复核提示 {sanity} 项"
                 lines.append(comparison_line)
-                for sample in (fill_reconciliation.get("samples") or [])[:3]:
+                # Samples are already bounded by report_top_n at every
+                # aggregation level; rendering takes what the summary carries.
+                for sample in fill_reconciliation.get("samples") or []:
                     lines.append(
                         f"对照差异: {sample.get('instrument_id')}@"
                         f"{sample.get('report_period')} "
@@ -3065,9 +3078,7 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
                         f"第三方 {sample.get('fallback_value')} "
                         f"({sample.get('fallback_source')})"
                     )
-                for sample in (
-                    fill_reconciliation.get("sanity_samples") or []
-                )[:3]:
+                for sample in fill_reconciliation.get("sanity_samples") or []:
                     lines.append(
                         f"复核提示: {sample.get('instrument_id')}@"
                         f"{sample.get('report_period')} "

@@ -31,3 +31,10 @@
 - [x] 5.1 Run focused suites: financial disclosure incremental, statements sync, storage, scheduler report tests.
 - [ ] 5.2 On the first live nightly run after rollout, confirm in the report and by SQL: a mixed-provenance row (four official fields plus one fallback-filled field, with `source`/`source_file_id`/`role` persisted in `core_fact_alias_matches`), comparison counts present, zero leftover comparison-only facts, and prior-run comparison rows cleared.
 - [ ] 5.3 Diff review of the change; update this change's tasks status and archive when accepted.
+
+## 6. Review follow-ups (2026-10-25)
+
+- [x] 6.1 Report per-instrument missing official fields with sample instruments: `cninfo_missing_required_core_fact_samples` (fact → instrument ids) collected from the post-import readiness pass on the incidental line; the duplicated second readiness pass is removed.
+- [x] 6.2 Make `report_top_n` the single end-to-end bound for comparison samples (summary, every aggregation level, rendering) instead of the mixed 5/10/3 caps.
+- [x] 6.3 Derive the merge field inventory from the configured core alias mapping ∪ lineage match keys; delete the mirrored `_CORE_FILL_FIELD_NAMES` tuple so config-added core fields participate automatically.
+- [x] 6.4 Aggregate reconciliation summaries through one shared `merge_reconciliation_summaries` helper across exchange-, period-, and profile-level merging; multi-profile incremental runs no longer drop later profiles' `source_fact_reconciliation`/`official_core_fill`.

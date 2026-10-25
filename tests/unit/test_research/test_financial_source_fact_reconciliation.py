@@ -8,6 +8,7 @@ from research.financial_source_fact_reconciliation import (
     RECORD_KIND_SOURCE_DIFFERENCE,
     compare_official_and_fallback_facts,
     evaluate_single_sourced_sanity,
+    merge_reconciliation_summaries,
     summarize_comparison_records,
     values_match_within_tolerance,
 )
@@ -129,3 +130,67 @@ def test_summarize_counts_and_bounds_samples():
     assert summary["samples"][0]["canonical_fact"] == "revenue"
     assert summary["samples"][0]["official_source"] == "cninfo"
     assert DEFAULT_ABSOLUTE_FLOOR_CNY == 1.0
+
+
+def _summary_fixture(**overrides):
+    summary = {
+        "enabled": True,
+        "scope_canonical_facts": ["revenue", "equity_parent"],
+        "compared_facts": 4,
+        "consistent_facts": 3,
+        "source_differences": 1,
+        "sanity_reviews": 1,
+        "merged_instruments": 2,
+        "merged_official_fields": 8,
+        "filled_fallback_fields": 2,
+        "cleaned_fallback_facts": 8,
+        "targets_with_official_rows": 2,
+        "official_present_core_fact_counts": {"revenue": 2},
+        "samples": [{"instrument_id": "A"}],
+        "sanity_samples": [{"instrument_id": "A"}],
+    }
+    summary.update(overrides)
+    return summary
+
+
+def test_merge_summaries_adds_counts_and_caps_samples():
+    merged = merge_reconciliation_summaries(
+        [
+            _summary_fixture(),
+            _summary_fixture(
+                compared_facts=2,
+                consistent_facts=2,
+                source_differences=0,
+                official_present_core_fact_counts={"revenue": 1, "equity_parent": 1},
+                samples=[{"instrument_id": "B"}, {"instrument_id": "C"}],
+                sanity_samples=[],
+            ),
+            None,
+        ],
+        report_top_n=2,
+    )
+    assert merged["enabled"] is True
+    assert merged["scope_canonical_facts"] == ["revenue", "equity_parent"]
+    assert merged["compared_facts"] == 6
+    assert merged["consistent_facts"] == 5
+    assert merged["source_differences"] == 1
+    assert merged["merged_official_fields"] == 16
+    assert merged["official_present_core_fact_counts"] == {
+        "revenue": 3,
+        "equity_parent": 1,
+    }
+    assert [sample["instrument_id"] for sample in merged["samples"]] == ["A", "B"]
+    assert [sample["instrument_id"] for sample in merged["sanity_samples"]] == ["A"]
+
+
+def test_merge_summaries_keeps_disabled_fill_counts_and_handles_empty():
+    merged = merge_reconciliation_summaries(
+        [
+            {"enabled": False, "merged_official_fields": 3},
+            {"enabled": False, "merged_official_fields": 1},
+        ]
+    )
+    assert merged["enabled"] is False
+    assert merged["merged_official_fields"] == 4
+    assert merged["compared_facts"] == 0
+    assert merge_reconciliation_summaries([None, {}]) is None

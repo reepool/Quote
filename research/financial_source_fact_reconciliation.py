@@ -220,3 +220,62 @@ def summarize_comparison_records(
         "samples": [render(record) for record in differences[:report_top_n]],
         "sanity_samples": [render(record) for record in sanity[:report_top_n]],
     }
+
+
+_AGGREGATE_COUNT_KEYS: tuple[str, ...] = (
+    "compared_facts",
+    "consistent_facts",
+    "source_differences",
+    "sanity_reviews",
+    "merged_instruments",
+    "merged_official_fields",
+    "filled_fallback_fields",
+    "cleaned_fallback_facts",
+    "targets_with_official_rows",
+)
+
+
+def merge_reconciliation_summaries(
+    summaries: Sequence[Optional[Mapping[str, Any]]],
+    *,
+    report_top_n: int = 5,
+) -> Optional[Dict[str, Any]]:
+    """Merge per-scope reconciliation summaries into one report summary.
+
+    One aggregation contract for every level that combines summaries —
+    exchanges within a sync call, report periods within a repair run, and
+    profiles within an incremental run: additive counts, summed official
+    presence counts, and samples concatenated then bounded once by
+    ``report_top_n`` so that single knob is the end-to-end report bound.
+    """
+    merged_summaries = [summary for summary in summaries if summary]
+    if not merged_summaries:
+        return None
+    merged: Dict[str, Any] = {
+        "enabled": any(
+            bool(summary.get("enabled")) for summary in merged_summaries
+        ),
+        "scope_canonical_facts": list(
+            merged_summaries[0].get("scope_canonical_facts") or []
+        ),
+    }
+    for key in _AGGREGATE_COUNT_KEYS:
+        merged[key] = sum(
+            int(summary.get(key, 0) or 0) for summary in merged_summaries
+        )
+    presence_totals: Dict[str, int] = {}
+    for summary in merged_summaries:
+        for canonical, count in (
+            summary.get("official_present_core_fact_counts") or {}
+        ).items():
+            presence_totals[str(canonical)] = (
+                presence_totals.get(str(canonical), 0) + int(count or 0)
+            )
+    merged["official_present_core_fact_counts"] = presence_totals
+    bound = max(0, int(report_top_n))
+    for key in ("samples", "sanity_samples"):
+        combined: List[Dict[str, Any]] = []
+        for summary in merged_summaries:
+            combined.extend(summary.get(key) or [])
+        merged[key] = combined[:bound]
+    return merged

@@ -37,10 +37,28 @@ def test_missing_fields_split_into_systematic_and_incidental():
             "equity_parent": 0,
         },
     }
+    result["source_routing"]["cninfo_missing_required_core_fact_samples"] = {
+        "revenue": ["002254.SZ", "600000.SH", "000001.SZ", "300750.SZ"],
+    }
     report = _format_financial_disclosure_scheduler_report(result)
     assert "CNInfo系统性缺失字段: equity_parent（缺 100/100）" in report
-    assert "CNInfo个别缺失字段: revenue" in report
+    assert "CNInfo个别缺失字段: revenue（样例 002254.SZ、600000.SH、000001.SZ）" in report
     assert "CNInfo待补字段:" not in report
+
+
+def test_incidental_fields_without_samples_render_plain():
+    result = _base_result()
+    result["source_routing"]["source_fact_reconciliation"] = {
+        "enabled": True,
+        "targets_with_official_rows": 10,
+        "official_present_core_fact_counts": {
+            "revenue": 9,
+            "equity_parent": 0,
+        },
+    }
+    report = _format_financial_disclosure_scheduler_report(result)
+    assert "CNInfo系统性缺失字段: equity_parent（缺 10/10）" in report
+    assert "CNInfo个别缺失字段: revenue" in report
 
 
 def test_fill_and_reconciliation_lines_rendered():
@@ -60,15 +78,8 @@ def test_fill_and_reconciliation_lines_rendered():
             "source_differences": 1,
             "sanity_reviews": 0,
             "samples": [
-                {
-                    "instrument_id": "002254.SZ",
-                    "report_period": "2026-09-30",
-                    "canonical_fact": "revenue",
-                    "official_source": "cninfo",
-                    "official_value": 100.0,
-                    "fallback_source": "akshare",
-                    "fallback_value": 150.0,
-                }
+                {"instrument_id": f"00225{i}.SZ", "report_period": "2026-09-30", "canonical_fact": "revenue", "official_source": "cninfo", "official_value": 100.0, "fallback_source": "akshare", "fallback_value": 150.0}
+                for i in range(4)
             ],
             "sanity_samples": [],
         }
@@ -76,10 +87,8 @@ def test_fill_and_reconciliation_lines_rendered():
     report = _format_financial_disclosure_scheduler_report(result)
     assert "字段级补缺: 官方优先来源（cninfo）保留官方值 4 项，第三方补缺 1 项，清理对照过程数据 4 项" in report
     assert "来源对照: 比较 4 项，一致 3 项，差异 1 项" in report
-    assert (
-        "对照差异: 002254.SZ@2026-09-30 revenue: 官方 100.0 (cninfo) vs 第三方 150.0 (akshare)"
-        in report
-    )
+    # Rendering takes what the summary carries; report_top_n already bounded it.
+    assert sum(1 for line in report.splitlines() if line.startswith("对照差异:")) == 4
 
 
 def test_sanity_samples_rendered_as_review_only():

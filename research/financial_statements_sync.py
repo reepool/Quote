@@ -24,6 +24,7 @@ from research.financial_source_fact_reconciliation import (
     SourceFactComparisonRecord,
     compare_official_and_fallback_facts,
     evaluate_single_sourced_sanity,
+    merge_reconciliation_summaries,
     summarize_comparison_records,
 )
 from research.financial_source_field_mapping import (
@@ -290,53 +291,16 @@ class FinancialStatementsShadowSyncService:
         )
         success_count = sum(1 for result in results if result.status == "success")
 
-        reconciliation_summaries = [
-            result.source_fact_reconciliation
-            for result in results
-            if result.source_fact_reconciliation
-            and result.source_fact_reconciliation.get("enabled")
-        ]
-        aggregated_reconciliation: Optional[Dict[str, Any]] = None
-        if reconciliation_summaries:
-            count_keys = (
-                "compared_facts",
-                "consistent_facts",
-                "source_differences",
-                "sanity_reviews",
-                "merged_instruments",
-                "merged_official_fields",
-                "filled_fallback_fields",
-                "cleaned_fallback_facts",
-                "targets_with_official_rows",
-            )
-            aggregated_reconciliation = {
-                "enabled": True,
-                "scope_canonical_facts": list(
-                    reconciliation_summaries[0].get("scope_canonical_facts") or []
-                ),
-            }
-            for key in count_keys:
-                aggregated_reconciliation[key] = sum(
-                    int(summary.get(key, 0) or 0)
-                    for summary in reconciliation_summaries
-                )
-            presence_totals: Dict[str, int] = {}
-            for summary in reconciliation_summaries:
-                for canonical, count in (
-                    summary.get("official_present_core_fact_counts") or {}
-                ).items():
-                    presence_totals[str(canonical)] = presence_totals.get(
-                        str(canonical), 0
-                    ) + int(count or 0)
-            aggregated_reconciliation["official_present_core_fact_counts"] = (
-                presence_totals
-            )
-            sample_keys = ("samples", "sanity_samples")
-            for key in sample_keys:
-                merged_samples: List[Dict[str, Any]] = []
-                for summary in reconciliation_summaries:
-                    merged_samples.extend(summary.get(key) or [])
-                aggregated_reconciliation[key] = merged_samples[:10]
+        # Aggregate disabled summaries too: field-level fill counts and
+        # official presence still belong in the report when reconciliation
+        # alone is switched off; the shared merge keeps every level
+        # (exchange, period, profile) on one aggregation contract.
+        aggregated_reconciliation = merge_reconciliation_summaries(
+            [result.source_fact_reconciliation for result in results],
+            report_top_n=int(
+                self._source_fact_reconciliation_cfg.get("report_top_n", 5)
+            ),
+        )
 
         return {
             "status": "success" if success_count else "degraded",
@@ -1154,26 +1118,6 @@ class FinancialStatementsShadowSyncService:
             "source_fact_reconciliation": reconciliation_summary,
         }
 
-    _CORE_FILL_FIELD_NAMES: tuple[str, ...] = (
-        "revenue",
-        "gross_profit",
-        "operating_profit",
-        "pre_tax_profit",
-        "net_income",
-        "operating_cf",
-        "total_cf",
-        "total_assets",
-        "total_liabilities",
-        "equity",
-        "current_assets",
-        "current_liabilities",
-        "inventory",
-        "receivables",
-        "fixed_assets",
-        "intangible_assets",
-        "shares_outstanding",
-    )
-
     def _merge_official_core_facts_into_snapshot(
         self,
         bundle_to_write: FinancialStatementBundle,
@@ -1250,7 +1194,13 @@ class FinancialStatementsShadowSyncService:
         fallback_source_label = str(
             bundle_to_write.source or facts.source or ""
         )
-        for field_name in self._CORE_FILL_FIELD_NAMES:
+        # Field inventory comes from the configured alias vocabulary plus any
+        # provider lineage matches, never a mirrored field list — a core field
+        # added through `core_fact_alias_overrides` participates automatically.
+        fill_field_names = list(alias_mapping) + [
+            field_name for field_name in matches if field_name not in alias_mapping
+        ]
+        for field_name in fill_field_names:
             official_row = _official_candidate(field_name)
             if official_row is not None:
                 official_value = float(official_row["fact_value"])

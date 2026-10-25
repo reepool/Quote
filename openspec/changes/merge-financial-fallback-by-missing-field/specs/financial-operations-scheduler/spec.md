@@ -23,7 +23,7 @@ Financial disclosure incremental and reconciliation reports SHALL include a summ
 
 - **WHEN** the reconciliation stage compared overlapping canonical facts and found discrepancies
 - **THEN** the report SHALL include compared field count, consistent count, discrepancy count
-- **AND** SHALL list a bounded number of discrepancy samples with instrument, report period, canonical fact, and both values
+- **AND** SHALL list discrepancy samples with instrument, report period, canonical fact, and both values, bounded end-to-end by the configured `report_top_n`
 
 #### Scenario: Comparison runs with no discrepancies
 

@@ -1297,6 +1297,74 @@ def test_repair_summary_classifies_cninfo_and_mixed_sources(tmp_path):
     assert mixed["source_collection_complete"] is True
 
 
+def test_merge_repair_summaries_keeps_later_profile_reconciliation(tmp_path):
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=_FakeStorage(ready=True),
+        research_config=_research_config(tmp_path),
+        announcement_service=_FakeAnnouncementService([]),
+    )
+
+    first = service.repair_router.default_summary()
+    first.update(
+        {
+            "cninfo_attempts": 1,
+            "cninfo_successes": 1,
+            "source_fact_reconciliation": {
+                "enabled": True,
+                "compared_facts": 4,
+                "merged_official_fields": 4,
+                "samples": [{"instrument_id": "A"}],
+            },
+            "official_core_fill": {
+                "enabled": True,
+                "official_sources": ["cninfo"],
+            },
+            "cninfo_missing_required_core_fact_samples": {
+                "equity_parent": ["000001.SZ"]
+            },
+        }
+    )
+    second = service.repair_router.default_summary()
+    second.update(
+        {
+            "cninfo_attempts": 1,
+            "cninfo_successes": 1,
+            "source_fact_reconciliation": {
+                "enabled": True,
+                "compared_facts": 6,
+                "merged_official_fields": 8,
+                "samples": [{"instrument_id": "B"}],
+            },
+            "official_core_fill": {
+                "enabled": True,
+                "official_sources": ["cninfo"],
+            },
+            "cninfo_missing_required_core_fact_samples": {
+                "equity_parent": ["000001.SZ"],
+                "revenue": ["600000.SH"],
+            },
+        }
+    )
+
+    merged = service._merge_repair_summaries(first, second)
+
+    assert merged["cninfo_attempts"] == 2
+    reconciliation = merged["source_fact_reconciliation"]
+    assert reconciliation["enabled"] is True
+    assert reconciliation["compared_facts"] == 10
+    assert reconciliation["merged_official_fields"] == 12
+    assert [sample["instrument_id"] for sample in reconciliation["samples"]] == [
+        "A",
+        "B",
+    ]
+    assert merged["official_core_fill"]["official_sources"] == ["cninfo"]
+    assert merged["cninfo_missing_required_core_fact_samples"] == {
+        "equity_parent": ["000001.SZ"],
+        "revenue": ["600000.SH"],
+    }
+
+
 def test_incremental_sync_is_degraded_for_unresolved_pending_recheck(tmp_path):
     record = _record(
         announcement_id="pending-q2-report",
@@ -1575,6 +1643,9 @@ def test_repair_router_keeps_partial_cninfo_and_falls_back_for_missing_fact(
     assert result["cninfo_parsed_instrument_periods"] == 1
     assert result["cninfo_source_failures"] == 0
     assert result["cninfo_missing_required_core_facts"] == ["equity_parent"]
+    assert result["cninfo_missing_required_core_fact_samples"] == {
+        "equity_parent": ["002731.SZ"]
+    }
     assert result["fallback_attempts"] == 1
     assert result["fallback_successes"] == 1
     assert result["final_source"] == "mixed"
