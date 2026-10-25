@@ -1,554 +1,6 @@
 {
   "action": "export",
   "state": "completed",
-  "task": {
-    "task_name": "company_profile_common_core",
-    "actions": [
-      "preview",
-      "run",
-      "status",
-      "pause",
-      "resume",
-      "query",
-      "export"
-    ],
-    "parameters": {
-      "action": [
-        "preview",
-        "run",
-        "status",
-        "pause",
-        "resume",
-        "query",
-        "export"
-      ],
-      "knowledge_cutoff": null,
-      "instrument_ids": [],
-      "max_items": 2,
-      "token_budget": 50000,
-      "max_elapsed_seconds": 300.0,
-      "reason": "operator_request",
-      "output_directory": null
-    },
-    "storage_namespace": "company_profile_common_core.v1",
-    "writer": "company_profile_research_writer.v1",
-    "production_authorization": "not_authorized",
-    "legacy_task_names_not_connected": [
-      "business_profile_daily_incremental",
-      "business_profile_backfill",
-      "business_profile_backfill_control",
-      "business_profile_semantic_repair",
-      "company_profile_shadow_sync"
-    ],
-    "stage5_connected": true
-  },
-  "control": {
-    "schema_version": "company_profile_task_control.v1",
-    "state": "completed",
-    "run_id": "company_profile_common_core-b2bac20bd3d8",
-    "action": "run",
-    "started_at": "2026-10-25T17:03:12.474718+08:00",
-    "updated_at": "2026-10-25T17:06:59.199287+08:00",
-    "finished_at": "2026-10-25T17:06:59.199287+08:00",
-    "stop_requested": false,
-    "reason": null,
-    "parameters": {
-      "knowledge_cutoff": "2026-09-17",
-      "instrument_ids": [
-        "600104.SH"
-      ],
-      "max_items": 1,
-      "token_budget": 1449357,
-      "max_elapsed_seconds": 6964.018481660634
-    },
-    "latest_result": {
-      "action": "run",
-      "state": "completed",
-      "task": {
-        "task_name": "company_profile_common_core",
-        "actions": [
-          "preview",
-          "run",
-          "status",
-          "pause",
-          "resume",
-          "query",
-          "export"
-        ],
-        "parameters": {
-          "action": [
-            "preview",
-            "run",
-            "status",
-            "pause",
-            "resume",
-            "query",
-            "export"
-          ],
-          "knowledge_cutoff": null,
-          "instrument_ids": [],
-          "max_items": 2,
-          "token_budget": 50000,
-          "max_elapsed_seconds": 300.0,
-          "reason": "operator_request",
-          "output_directory": null
-        },
-        "storage_namespace": "company_profile_common_core.v1",
-        "writer": "company_profile_research_writer.v1",
-        "production_authorization": "not_authorized",
-        "legacy_task_names_not_connected": [
-          "business_profile_daily_incremental",
-          "business_profile_backfill",
-          "business_profile_backfill_control",
-          "business_profile_semantic_repair",
-          "company_profile_shadow_sync"
-        ],
-        "stage5_connected": true
-      },
-      "control": {
-        "schema_version": "company_profile_task_control.v1",
-        "state": "running",
-        "run_id": "company_profile_common_core-b2bac20bd3d8",
-        "action": "run",
-        "started_at": "2026-10-25T17:03:12.474718+08:00",
-        "updated_at": "2026-10-25T17:03:12.474718+08:00",
-        "finished_at": null,
-        "stop_requested": false,
-        "reason": null,
-        "parameters": {
-          "knowledge_cutoff": "2026-09-17",
-          "instrument_ids": [
-            "600104.SH"
-          ],
-          "max_items": 1,
-          "token_budget": 1449357,
-          "max_elapsed_seconds": 6964.018481660634
-        },
-        "latest_result": null
-      },
-      "queue": {
-        "as_of": "2026-10-25T17:06:57.882956+08:00",
-        "total": 1,
-        "running": 0,
-        "claimable": 0,
-        "terminal": 0,
-        "completed": 1,
-        "machine_rework": 0,
-        "finalized": 1,
-        "groups": [
-          {
-            "stage": "publish",
-            "status": "completed",
-            "row_count": 1,
-            "oldest_created_at": "2026-10-25T17:03:13.461856+08:00",
-            "oldest_age_seconds": 224.812161
-          }
-        ]
-      },
-      "production_authorization": "not_authorized",
-      "storage_namespace": "company_profile_common_core.v1",
-      "writer": "company_profile_research_writer.v1",
-      "knowledge_cutoff": "2026-09-17",
-      "enqueue": {
-        "eligible": 1,
-        "inserted": 1,
-        "reused": 0,
-        "reset": 0,
-        "checkpoint_rotated": 0,
-        "checkpoint_deleted": 0,
-        "checkpoint_delete_failures": [],
-        "superseded": 0,
-        "identity_superseded": 0,
-        "work_ids": [
-          "bp-work-0273003e8879dbf54f9fe1be"
-        ]
-      },
-      "drain": {
-        "acquire": {
-          "status": "success",
-          "stop_requested": false,
-          "claimed": 1,
-          "completed": 1,
-          "finalized": 0,
-          "retried": 0,
-          "terminal_failures": 0,
-          "lease_conflicts": 0,
-          "configuration_blocked": 0,
-          "machine_rework_deferred": 0,
-          "artifact_replay_deferred": 0,
-          "context_reselect_deferred": 0,
-          "claim_exclusions": 1,
-          "empty_polls": 0,
-          "queue_underfilled_slots": 0,
-          "peak_in_flight": 1,
-          "active_work_seconds": 13.638,
-          "errors": [],
-          "quality": {
-            "blocking_machine_rework": 0,
-            "selected_documents": 0,
-            "selected_pages": 0,
-            "outline_pages_scoped": 0,
-            "evidence_records": 0,
-            "record_count": 0,
-            "verified_records": 0,
-            "empty_output_documents": 0,
-            "expected_non_disclosure_documents": 0,
-            "structured_fallback_required": 0,
-            "structured_fallback_calls": 0,
-            "structured_fallback_accepted_records": 0,
-            "structured_fallback_rejected": 0,
-            "page_artifact_cache_hits": 0,
-            "page_artifact_cache_misses": 0,
-            "pdf_parser_warning_count": 0,
-            "outline_sources": {},
-            "outline_confidences": {},
-            "empty_output_reasons": {},
-            "blocked_configuration_reasons": {},
-            "machine_rework_reasons": {}
-          },
-          "execution_mode": null,
-          "elapsed_seconds": 15.898,
-          "writer": {
-            "pending_writers": 0,
-            "active_writers": 0,
-            "max_pending_writers": 1,
-            "max_active_writers": 1,
-            "write_transactions": 3,
-            "wait_seconds": 4.4e-05,
-            "write_seconds": 0.846946,
-            "observation_seconds": 19.100738,
-            "transaction_p50_seconds": 0.286154,
-            "transaction_p95_seconds": 0.338701,
-            "transaction_max_seconds": 0.344539,
-            "writer_lock_duty": 0.044341,
-            "inter_write_idle_seconds": 13.114095,
-            "inter_write_seconds": 0.01
-          },
-          "gateway_admission": {
-            "requested_concurrency": 1,
-            "effective_concurrency": 1,
-            "admitted_requests": 1,
-            "throttled_requests": 0,
-            "queue_underfilled_slots": 0,
-            "provider_congestion_events": 0,
-            "provider_congestion_failures": 0,
-            "in_flight": 0,
-            "peak_in_flight": 1
-          }
-        },
-        "parse": {
-          "status": "success",
-          "stop_requested": false,
-          "claimed": 1,
-          "completed": 1,
-          "finalized": 0,
-          "retried": 0,
-          "terminal_failures": 0,
-          "lease_conflicts": 0,
-          "configuration_blocked": 0,
-          "machine_rework_deferred": 0,
-          "artifact_replay_deferred": 0,
-          "context_reselect_deferred": 0,
-          "claim_exclusions": 1,
-          "empty_polls": 0,
-          "queue_underfilled_slots": 0,
-          "peak_in_flight": 1,
-          "active_work_seconds": 2.766,
-          "errors": [],
-          "quality": {
-            "blocking_machine_rework": 0,
-            "selected_documents": 0,
-            "selected_pages": 0,
-            "outline_pages_scoped": 0,
-            "evidence_records": 0,
-            "record_count": 0,
-            "verified_records": 0,
-            "empty_output_documents": 0,
-            "expected_non_disclosure_documents": 0,
-            "structured_fallback_required": 0,
-            "structured_fallback_calls": 0,
-            "structured_fallback_accepted_records": 0,
-            "structured_fallback_rejected": 0,
-            "page_artifact_cache_hits": 0,
-            "page_artifact_cache_misses": 0,
-            "pdf_parser_warning_count": 0,
-            "outline_sources": {},
-            "outline_confidences": {},
-            "empty_output_reasons": {},
-            "blocked_configuration_reasons": {},
-            "machine_rework_reasons": {}
-          },
-          "execution_mode": null,
-          "elapsed_seconds": 4.845,
-          "writer": {
-            "pending_writers": 0,
-            "active_writers": 0,
-            "max_pending_writers": 1,
-            "max_active_writers": 1,
-            "write_transactions": 5,
-            "wait_seconds": 7.2e-05,
-            "write_seconds": 1.288669,
-            "observation_seconds": 24.049428,
-            "transaction_p50_seconds": 0.231792,
-            "transaction_p95_seconds": 0.332862,
-            "transaction_max_seconds": 0.344539,
-            "writer_lock_duty": 0.053584,
-            "inter_write_idle_seconds": 17.688526,
-            "inter_write_seconds": 0.01
-          },
-          "gateway_admission": {
-            "requested_concurrency": 1,
-            "effective_concurrency": 1,
-            "admitted_requests": 1,
-            "throttled_requests": 0,
-            "queue_underfilled_slots": 0,
-            "provider_congestion_events": 0,
-            "provider_congestion_failures": 0,
-            "in_flight": 0,
-            "peak_in_flight": 1
-          }
-        },
-        "semantic": {
-          "status": "success",
-          "stop_requested": false,
-          "claimed": 1,
-          "completed": 1,
-          "finalized": 0,
-          "retried": 0,
-          "terminal_failures": 0,
-          "lease_conflicts": 0,
-          "configuration_blocked": 0,
-          "machine_rework_deferred": 0,
-          "artifact_replay_deferred": 0,
-          "context_reselect_deferred": 0,
-          "claim_exclusions": 1,
-          "empty_polls": 0,
-          "queue_underfilled_slots": 0,
-          "peak_in_flight": 1,
-          "active_work_seconds": 194.043,
-          "errors": [],
-          "quality": {
-            "blocking_machine_rework": 0,
-            "selected_documents": 0,
-            "selected_pages": 0,
-            "outline_pages_scoped": 0,
-            "evidence_records": 0,
-            "record_count": 0,
-            "verified_records": 0,
-            "empty_output_documents": 0,
-            "expected_non_disclosure_documents": 0,
-            "structured_fallback_required": 0,
-            "structured_fallback_calls": 0,
-            "structured_fallback_accepted_records": 0,
-            "structured_fallback_rejected": 0,
-            "page_artifact_cache_hits": 0,
-            "page_artifact_cache_misses": 0,
-            "pdf_parser_warning_count": 0,
-            "outline_sources": {},
-            "outline_confidences": {},
-            "empty_output_reasons": {},
-            "blocked_configuration_reasons": {},
-            "machine_rework_reasons": {}
-          },
-          "execution_mode": null,
-          "elapsed_seconds": 196.23,
-          "writer": {
-            "pending_writers": 0,
-            "active_writers": 0,
-            "max_pending_writers": 1,
-            "max_active_writers": 1,
-            "write_transactions": 24,
-            "wait_seconds": 0.0003,
-            "write_seconds": 5.503894,
-            "observation_seconds": 220.34269,
-            "transaction_p50_seconds": 0.223118,
-            "transaction_p95_seconds": 0.29851,
-            "transaction_max_seconds": 0.344539,
-            "writer_lock_duty": 0.024979,
-            "inter_write_idle_seconds": 209.830495,
-            "inter_write_seconds": 0.01
-          },
-          "gateway_admission": {
-            "requested_concurrency": 1,
-            "effective_concurrency": 1,
-            "admitted_requests": 1,
-            "throttled_requests": 0,
-            "queue_underfilled_slots": 0,
-            "provider_congestion_events": 0,
-            "provider_congestion_failures": 0,
-            "in_flight": 0,
-            "peak_in_flight": 1
-          }
-        },
-        "verify": {
-          "status": "success",
-          "stop_requested": false,
-          "claimed": 1,
-          "completed": 1,
-          "finalized": 0,
-          "retried": 0,
-          "terminal_failures": 0,
-          "lease_conflicts": 0,
-          "configuration_blocked": 0,
-          "machine_rework_deferred": 0,
-          "artifact_replay_deferred": 0,
-          "context_reselect_deferred": 0,
-          "claim_exclusions": 1,
-          "empty_polls": 0,
-          "queue_underfilled_slots": 0,
-          "peak_in_flight": 1,
-          "active_work_seconds": 1.726,
-          "errors": [],
-          "quality": {
-            "blocking_machine_rework": 0,
-            "selected_documents": 0,
-            "selected_pages": 0,
-            "outline_pages_scoped": 0,
-            "evidence_records": 0,
-            "record_count": 0,
-            "verified_records": 0,
-            "empty_output_documents": 0,
-            "expected_non_disclosure_documents": 0,
-            "structured_fallback_required": 0,
-            "structured_fallback_calls": 0,
-            "structured_fallback_accepted_records": 0,
-            "structured_fallback_rejected": 0,
-            "page_artifact_cache_hits": 0,
-            "page_artifact_cache_misses": 0,
-            "pdf_parser_warning_count": 0,
-            "outline_sources": {},
-            "outline_confidences": {},
-            "empty_output_reasons": {},
-            "blocked_configuration_reasons": {},
-            "machine_rework_reasons": {}
-          },
-          "execution_mode": null,
-          "elapsed_seconds": 3.085,
-          "writer": {
-            "pending_writers": 0,
-            "active_writers": 0,
-            "max_pending_writers": 1,
-            "max_active_writers": 1,
-            "write_transactions": 26,
-            "wait_seconds": 0.000333,
-            "write_seconds": 5.845227,
-            "observation_seconds": 223.49057,
-            "transaction_p50_seconds": 0.213513,
-            "transaction_p95_seconds": 0.297227,
-            "transaction_max_seconds": 0.344539,
-            "writer_lock_duty": 0.026154,
-            "inter_write_idle_seconds": 212.602818,
-            "inter_write_seconds": 0.01
-          },
-          "gateway_admission": {
-            "requested_concurrency": 1,
-            "effective_concurrency": 1,
-            "admitted_requests": 1,
-            "throttled_requests": 0,
-            "queue_underfilled_slots": 0,
-            "provider_congestion_events": 0,
-            "provider_congestion_failures": 0,
-            "in_flight": 0,
-            "peak_in_flight": 1
-          }
-        },
-        "publish": {
-          "status": "success",
-          "stop_requested": false,
-          "claimed": 1,
-          "completed": 1,
-          "finalized": 0,
-          "retried": 0,
-          "terminal_failures": 0,
-          "lease_conflicts": 0,
-          "configuration_blocked": 0,
-          "machine_rework_deferred": 0,
-          "artifact_replay_deferred": 0,
-          "context_reselect_deferred": 0,
-          "claim_exclusions": 1,
-          "empty_polls": 0,
-          "queue_underfilled_slots": 0,
-          "peak_in_flight": 1,
-          "active_work_seconds": 1.586,
-          "errors": [],
-          "quality": {
-            "blocking_machine_rework": 0,
-            "selected_documents": 0,
-            "selected_pages": 0,
-            "outline_pages_scoped": 0,
-            "evidence_records": 0,
-            "record_count": 0,
-            "verified_records": 0,
-            "empty_output_documents": 0,
-            "expected_non_disclosure_documents": 0,
-            "structured_fallback_required": 0,
-            "structured_fallback_calls": 0,
-            "structured_fallback_accepted_records": 0,
-            "structured_fallback_rejected": 0,
-            "page_artifact_cache_hits": 0,
-            "page_artifact_cache_misses": 0,
-            "pdf_parser_warning_count": 0,
-            "outline_sources": {},
-            "outline_confidences": {},
-            "empty_output_reasons": {},
-            "blocked_configuration_reasons": {},
-            "machine_rework_reasons": {}
-          },
-          "execution_mode": null,
-          "elapsed_seconds": 2.985,
-          "writer": {
-            "pending_writers": 0,
-            "active_writers": 0,
-            "max_pending_writers": 1,
-            "max_active_writers": 1,
-            "write_transactions": 28,
-            "wait_seconds": 0.000357,
-            "write_seconds": 6.328865,
-            "observation_seconds": 226.53989,
-            "transaction_p50_seconds": 0.213513,
-            "transaction_p95_seconds": 0.295944,
-            "transaction_max_seconds": 0.344539,
-            "writer_lock_duty": 0.027937,
-            "inter_write_idle_seconds": 215.153508,
-            "inter_write_seconds": 0.01
-          },
-          "gateway_admission": {
-            "requested_concurrency": 1,
-            "effective_concurrency": 1,
-            "admitted_requests": 1,
-            "throttled_requests": 0,
-            "queue_underfilled_slots": 0,
-            "provider_congestion_events": 0,
-            "provider_congestion_failures": 0,
-            "in_flight": 0,
-            "peak_in_flight": 1
-          }
-        }
-      }
-    }
-  },
-  "queue": {
-    "as_of": "2026-10-25T17:07:00.226061+08:00",
-    "total": 1,
-    "running": 0,
-    "claimable": 0,
-    "terminal": 0,
-    "completed": 1,
-    "machine_rework": 0,
-    "finalized": 1,
-    "groups": [
-      {
-        "stage": "publish",
-        "status": "completed",
-        "row_count": 1,
-        "oldest_created_at": "2026-10-25T17:03:13.461856+08:00",
-        "oldest_age_seconds": 227.169094
-      }
-    ]
-  },
-  "production_authorization": "not_authorized",
-  "storage_namespace": "company_profile_common_core.v1",
-  "writer": "company_profile_research_writer.v1",
   "requested_instrument_ids": [
     "600104.SH"
   ],
@@ -738,7 +190,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "bp-work-5157694452e829569d6a42f3:report:26:claim-001",
@@ -803,7 +255,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "principal_business_vehicle_parts_production_sales",
@@ -1018,7 +470,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "claim_principal_business_segments",
@@ -1058,7 +510,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "c1",
@@ -1098,7 +550,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "claim-principal-business-1",
@@ -1218,7 +670,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "claim:principal_business:1",
@@ -1298,7 +750,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "bp-work-5157694452e829569d6a42f3:report:35:principal_business_scope",
@@ -1363,7 +815,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "revenue_model_main_and_other_current",
@@ -1478,7 +930,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "products_services_other_business_lines",
@@ -1543,7 +995,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "revenue_model_2025",
@@ -1583,7 +1035,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "products_services_2025",
@@ -1621,7 +1073,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "revenue-model-2025-1",
@@ -1661,7 +1113,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "claim-revenue-model-subsidiaries",
@@ -1751,7 +1203,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "revenue_model_related_party_jv_lines_fy2025",
@@ -1891,7 +1343,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "rm_external_revenue_by_segment_2025",
@@ -1956,7 +1408,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "pb_reportable_segments",
@@ -1996,7 +1448,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "ps_vehicles_parts_and_finance",
@@ -2036,7 +1488,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "claim-1",
@@ -2116,7 +1568,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "claim-1__2",
@@ -2296,7 +1748,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "products_services_new_energy_and_batteries",
@@ -2411,7 +1863,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "claim-products-services-1",
@@ -2516,7 +1968,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "claim_products_services_huayu",
@@ -2556,7 +2008,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "bp-work-5157694452e829569d6a42f3:report:50:claim:products_services:qimeng_investment_consulting",
@@ -2663,7 +2115,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "claim_saic_maxus_products_services",
@@ -2703,7 +2155,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "claim_products_services_zhiji_nev",
@@ -2743,7 +2195,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "claim-products_services-zhonglian",
@@ -2783,7 +2235,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "products_services-001",
@@ -2888,7 +2340,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "claim_products_services_01",
@@ -2928,7 +2380,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "products_services-complete-vehicles",
@@ -2993,7 +2445,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "revenue_model-vehicle-sales",
@@ -3058,7 +2510,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "principal_business-vehicle-sales",
@@ -3123,7 +2575,7 @@
                 ],
                 "limitation": null,
                 "generation_method": "evidence_supported_llm_summary",
-                "review_state": "pending_verification"
+                "review_state": "verified"
               },
               {
                 "claim_id": "claim-principal-business",
@@ -5547,6 +4999,1434 @@
                       "match_index": 0,
                       "model_quote": null,
                       "source_offset": 609
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "revenue_model_main_and_other_current",
+                "dimension": "revenue_model",
+                "status": "observed",
+                "answer": "截至2025年12月31日报告期，营业收入分为主营业务和其他业务。本期主营业务收入为632,007,457,472.74元，本期其他业务收入为14,144,644,416.56元。其他业务本年累计营业收入中，材料及废料销售为7,098,573,219.12元，劳务为4,767,911,918.73元，租赁为1,094,574,636.74元，其他为1,183,584,641.97元。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:17:revenue_composition_main_and_other"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:6606cfe538499514aa95",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 155,
+                    "printed_page_label": null,
+                    "section_title": "单位：元 币种：人民币",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "项目\r\n本期发生额 上期发生额\r\n收入 成本 收入 成本\r\n主营业务 632,007,457,472.74 570,847,895,293.20 598,531,183,108.65 544,284,899,090.84\r\n其他业务 14,144,644,416.56 10,096,088,356.21 15,542,878,709.48 12,165,137,595.60",
+                      "context_before": "项目",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": "项目\n本期发生额 上期发生额\n收入 成本 收入 成本\n主营业务 632,007,457,472.74 570,847,895,293.20 598,531,183,108.65 544,284,899,090.84\n其他业务 14,144,644,416.56 10,096,088,356.21 15,542,878,709.48 12,165,137,595.60",
+                      "source_offset": 343
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:efa473e4d5f5510958e8",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 155,
+                    "printed_page_label": null,
+                    "section_title": "营业收入 营业成本 营业收入 营业成本",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "2)其他业务\r\n单位：元 币种：人民币\r\n本年累计数 上年累计数\r\n营业收入 营业成本 营业收入 营业成本\r\n材料及废料销售 7,098,573,219.12 6,096,170,041.72 8,779,227,318.09 7,737,015,738.38\r\n劳务 4,767,911,918.73 2,431,470,349.22 4,276,894,747.65 2,986,622,739.70\r\n租赁 1,094,574,636.74 905,212,467.87 1,106,119,074.87 899,680,879.52\r\n其他 1,183,584,641.97 663,235,497.40 1,380,637,568.87 541,818,238.00",
+                      "context_before": "整车业务 410,196,473,001.11 392,545,642,811.17 381,262,343,730.33 366,534,174,722.96\r\n零部件业务 203,019,866,775.26 164,149,718,120.28 190,675,933,362.83 156,532,375,412.29\r\n劳务及其他 18,791,117,696.37 14,152,534,361.75 26,592,906,015.49 21,218,348,955.59\r\n合计 632,007,457,472.74 570,847,895,293.20 598,531,183,108.65 544,284,899,090.84\r\n2)其他业务",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": "2)其他业务\n单位：元 币种：人民币\n本年累计数 上年累计数\n营业收入 营业成本 营业收入 营业成本\n材料及废料销售 7,098,573,219.12 6,096,170,041.72 8,779,227,318.09 7,737,015,738.38\n劳务 4,767,911,918.73 2,431,470,349.22 4,276,894,747.65 2,986,622,739.70\n租赁 1,094,574,636.74 905,212,467.87 1,106,119,074.87 899,680,879.52\n其他 1,183,584,641.97 663,235,497.40 1,380,637,568.87 541,818,238.00",
+                      "source_offset": 992
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:164320d35cb0da01d8f6",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 155,
+                    "printed_page_label": null,
+                    "section_title": "项目",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "本期发生额 上期发生额\r\n收入 成本 收入 成本\r\n主营业务 632,007,457,472.74 570,847,895,293.20 598,531,183,108.65 544,284,899,090.84\r\n其他业务 14,144,644,416.56 10,096,088,356.21 15,542,878,709.48 12,165,137,595.60",
+                      "context_before": "本期发生额 上期发生额",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": "本期发生额 上期发生额\n收入 成本 收入 成本\n主营业务 632,007,457,472.74 570,847,895,293.20 598,531,183,108.65 544,284,899,090.84\n其他业务 14,144,644,416.56 10,096,088,356.21 15,542,878,709.48 12,165,137,595.60",
+                      "source_offset": 347
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:efa473e4d5f5510958e8",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 155,
+                    "printed_page_label": null,
+                    "section_title": "营业收入 营业成本 营业收入 营业成本",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "2)其他业务\r\n单位：元 币种：人民币\r\n本年累计数 上年累计数\r\n营业收入 营业成本 营业收入 营业成本\r\n材料及废料销售 7,098,573,219.12 6,096,170,041.72 8,779,227,318.09 7,737,015,738.38\r\n劳务 4,767,911,918.73 2,431,470,349.22 4,276,894,747.65 2,986,622,739.70\r\n租赁 1,094,574,636.74 905,212,467.87 1,106,119,074.87 899,680,879.52\r\n其他 1,183,584,641.97 663,235,497.40 1,380,637,568.87 541,818,238.00",
+                      "context_before": "整车业务 410,196,473,001.11 392,545,642,811.17 381,262,343,730.33 366,534,174,722.96\r\n零部件业务 203,019,866,775.26 164,149,718,120.28 190,675,933,362.83 156,532,375,412.29\r\n劳务及其他 18,791,117,696.37 14,152,534,361.75 26,592,906,015.49 21,218,348,955.59\r\n合计 632,007,457,472.74 570,847,895,293.20 598,531,183,108.65 544,284,899,090.84\r\n2)其他业务",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": "2)其他业务\n单位：元 币种：人民币\n本年累计数 上年累计数\n营业收入 营业成本 营业收入 营业成本\n材料及废料销售 7,098,573,219.12 6,096,170,041.72 8,779,227,318.09 7,737,015,738.38\n劳务 4,767,911,918.73 2,431,470,349.22 4,276,894,747.65 2,986,622,739.70\n租赁 1,094,574,636.74 905,212,467.87 1,106,119,074.87 899,680,879.52\n其他 1,183,584,641.97 663,235,497.40 1,380,637,568.87 541,818,238.00",
+                      "source_offset": 992
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "products_services_other_business_lines",
+                "dimension": "products_services",
+                "status": "observed",
+                "answer": "其他业务包括材料及废料销售、劳务、租赁和其他。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:17:revenue_composition_main_and_other"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:efa473e4d5f5510958e8",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 155,
+                    "printed_page_label": null,
+                    "section_title": "营业收入 营业成本 营业收入 营业成本",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "2)其他业务\r\n单位：元 币种：人民币\r\n本年累计数 上年累计数\r\n营业收入 营业成本 营业收入 营业成本\r\n材料及废料销售 7,098,573,219.12 6,096,170,041.72 8,779,227,318.09 7,737,015,738.38\r\n劳务 4,767,911,918.73 2,431,470,349.22 4,276,894,747.65 2,986,622,739.70\r\n租赁 1,094,574,636.74 905,212,467.87 1,106,119,074.87 899,680,879.52\r\n其他 1,183,584,641.97 663,235,497.40 1,380,637,568.87 541,818,238.00",
+                      "context_before": "整车业务 410,196,473,001.11 392,545,642,811.17 381,262,343,730.33 366,534,174,722.96\r\n零部件业务 203,019,866,775.26 164,149,718,120.28 190,675,933,362.83 156,532,375,412.29\r\n劳务及其他 18,791,117,696.37 14,152,534,361.75 26,592,906,015.49 21,218,348,955.59\r\n合计 632,007,457,472.74 570,847,895,293.20 598,531,183,108.65 544,284,899,090.84\r\n2)其他业务",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": "2)其他业务\n单位：元 币种：人民币\n本年累计数 上年累计数\n营业收入 营业成本 营业收入 营业成本\n材料及废料销售 7,098,573,219.12 6,096,170,041.72 8,779,227,318.09 7,737,015,738.38\n劳务 4,767,911,918.73 2,431,470,349.22 4,276,894,747.65 2,986,622,739.70\n租赁 1,094,574,636.74 905,212,467.87 1,106,119,074.87 899,680,879.52\n其他 1,183,584,641.97 663,235,497.40 1,380,637,568.87 541,818,238.00",
+                      "source_offset": 992
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:0bccec12da1aa671c871",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 155,
+                    "printed_page_label": null,
+                    "section_title": "营业收入 营业成本 营业收入 营业成本",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "材料及废料销售 7,098,573,219.12 6,096,170,041.72 8,779,227,318.09 7,737,015,738.38\r\n劳务 4,767,911,918.73 2,431,470,349.22 4,276,894,747.65 2,986,622,739.70\r\n租赁 1,094,574,636.74 905,212,467.87 1,106,119,074.87 899,680,879.52\r\n其他 1,183,584,641.97 663,235,497.40 1,380,637,568.87 541,818,238.00",
+                      "context_before": "材料及废料销售 7,098,573,219.12 6,096,170,041.72 8,779,227,318.09 7,737,015,738.38\r\n劳务 4,767,911,918.73 2,431,470,349.22 4,276,894,747.65 2,986,622,739.70\r\n租赁 1,094,574,636.74 905,212,467.87 1,106,119,074.87 899,680,879.52\r\n其他 1,183,584,641.97 663,235,497.40 1,380,637,568.87 541,818,238.00\r\n合计 14,144,644,416.56 10,096,088,356.21 15,542,878,709.48 12,165,137,595.60",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": "材料及废料销售 7,098,573,219.12 6,096,170,041.72 8,779,227,318.09 7,737,015,738.38\n劳务 4,767,911,918.73 2,431,470,349.22 4,276,894,747.65 2,986,622,739.70\n租赁 1,094,574,636.74 905,212,467.87 1,106,119,074.87 899,680,879.52\n其他 1,183,584,641.97 663,235,497.40 1,380,637,568.87 541,818,238.00",
+                      "source_offset": 1047
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "revenue_model_2025",
+                "dimension": "revenue_model",
+                "status": "observed",
+                "answer": "2025年度主营业务收入中，在某一时点确认620,175,451,544.57元，在某一时段内确认11,832,005,928.17元；其他业务收入14,144,644,416.56元。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:17:revenue_recognition_timing"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:4c6e97a1dd4296af6cbc",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 156,
+                    "printed_page_label": null,
+                    "section_title": "√适用 □不适用",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "2025 年度\r\n单位：元 币种：人民币\r\n整车业务 零部件业务 劳务及其他 其他 合计\r\n主营业务收入\r\n其中：在某一时点确认 410,196,473,001.11 203,019,866,775.26 6,959,111,768.20 620,175,451,544.57\r\n在某一时段内确认 11,832,005,928.17 11,832,005,928.17\r\n其他业务收入 14,144,644,416.56 14,144,644,416.56\r\n合计 410,196,473,001.11 203,019,866,775.26 18,791,117,696.37 14,144,644,416.56 646,152,101,889.30",
+                      "context_before": "2025 年度",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": "2025 年度\n单位：元 币种：人民币\n整车业务 零部件业务 劳务及其他 其他 合计\n主营业务收入\n其中：在某一时点确认 410,196,473,001.11 203,019,866,775.26 6,959,111,768.20 620,175,451,544.57\n在某一时段内确认 11,832,005,928.17 11,832,005,928.17\n其他业务收入 14,144,644,416.56 14,144,644,416.56\n合计 410,196,473,001.11 203,019,866,775.26 18,791,117,696.37 14,144,644,416.56 646,152,101,889.30",
+                      "source_offset": 52
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "products_services_2025",
+                "dimension": "products_services",
+                "status": "observed",
+                "answer": "2025年度主营业务收入按业务划分为整车业务、零部件业务和劳务及其他；其中整车业务收入410,196,473,001.11元，零部件业务收入203,019,866,775.26元，劳务及其他收入18,791,117,696.37元。",
+                "condition_ids": [],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:4c6e97a1dd4296af6cbc",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 156,
+                    "printed_page_label": null,
+                    "section_title": "√适用 □不适用",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "2025 年度\r\n单位：元 币种：人民币\r\n整车业务 零部件业务 劳务及其他 其他 合计\r\n主营业务收入\r\n其中：在某一时点确认 410,196,473,001.11 203,019,866,775.26 6,959,111,768.20 620,175,451,544.57\r\n在某一时段内确认 11,832,005,928.17 11,832,005,928.17\r\n其他业务收入 14,144,644,416.56 14,144,644,416.56\r\n合计 410,196,473,001.11 203,019,866,775.26 18,791,117,696.37 14,144,644,416.56 646,152,101,889.30",
+                      "context_before": "2025 年度",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": "2025 年度\n单位：元 币种：人民币\n整车业务 零部件业务 劳务及其他 其他 合计\n主营业务收入\n其中：在某一时点确认 410,196,473,001.11 203,019,866,775.26 6,959,111,768.20 620,175,451,544.57\n在某一时段内确认 11,832,005,928.17 11,832,005,928.17\n其他业务收入 14,144,644,416.56 14,144,644,416.56\n合计 410,196,473,001.11 203,019,866,775.26 18,791,117,696.37 14,144,644,416.56 646,152,101,889.30",
+                      "source_offset": 52
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "revenue-model-2025-1",
+                "dimension": "revenue_model",
+                "status": "observed",
+                "answer": "2025年主营业务收入按产品/业务划分：整车业务营业收入410,196,473,001.11元；零部件业务营业收入203,019,866,775.26元；劳务及其他营业收入32,935,762,112.94元；金融业务营业收入10,091,710,191.88元；合计营业收入656,243,812,081.18元。公司营业收入主要来源于整车销售、零部件销售、劳务及其他以及汽车金融业务，其中整车业务收入占比最高。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:1:cond-3"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:49178bfa98d0f07b60ac",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 11,
+                    "printed_page_label": null,
+                    "section_title": "（%）",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "主营业务分产品情况\r\n分产品 营业收入 营业成本\r\n毛利\r\n率\r\n（%）\r\n营业收入\r\n比上年增\r\n减（%）\r\n营业成本\r\n比上年增\r\n减（%）\r\n毛利率比上年增减\r\n（%）\r\n整车业务 410,196,473,001.11 392,545,642,811.16 4.30 7.59 7.10 增加 0.44 个百分点\r\n零部件业务 203,019,866,775.26 164,149,718,120.28 19.15 6.47 4.87 增加 1.24 个百分点\r\n劳务及其他 32,935,762,112.94 24,248,622,717.97 26.38 -21.83 -27.36 增加 5.61 个百分点\r\n金融业务 10,091,710,191.88 1,163,322,101.92 88.47 -25.33 -42.04 增加 3.32 个百分点\r\n合计 656,243,812,081.18 582,107,305,751.33 11.30 4.57 4.23 增加 0.28 个百分点",
+                      "context_before": "汽车制造业 646,152,101,889.30 580,943,983,649.41 10.09 5.22 4.40 增加 0.71 个百分点\r\n金融业 10,091,710,191.88 1,163,322,101.92 88.47 -25.33 -42.04 增加 3.32 个百分点\r\n合计 656,243,812,081.18 582,107,305,751.33 11.30 4.57 4.23 增加 0.28 个百分点\r\n主营业务分产品情况",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 905
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "claim-revenue-model-subsidiaries",
+                "dimension": "revenue_model",
+                "status": "observed",
+                "answer": "本期重要非全资子公司财务信息显示：华域汽车本期发生额营业收入为183,998,900,513.66元，净利润为8,226,592,261.99元（上期发生额营业收入为168,852,183,839.32元，净利润为7,482,264,275.10元）；通用五菱本期发生额营业收入为86,149,883,158.29元，净利润为1,529,578,066.88元（上期发生额营业收入为77,933,714,925.81元，净利润为1,055,538,250.07元）。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:21:revenue_model_major_subsidiary_revenue"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:93439e02ee37f074945b",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 172,
+                    "printed_page_label": null,
+                    "section_title": "期末余额 期初余额",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "子公司名称\r\n本期发生额 上期发生额\r\n营业收入 净利润 综合收益总额 经营活动现金流量 营业收入 净利润 综合收益总额 经营活动现金流量",
+                      "context_before": "流动资产 非流动资产 资产合计 流动负债 非流动负债 负债合计 流动资产 非流动资产 资产合计 流动负债 非流动负债 负债合计\r\n华域汽车 134,652,179,035.10 64,534,271,897.29 199,186,450,932.39 119,206,467,987.31 8,842,199,944.49 128,048,667,931.80 118,027,669,734.43 66,978,288,389.50 185,005,958,123.93 109,259,514,834.09 9,626,087,750.04 118,885,602,584.13 通用五菱 50,006,464,073.96 15,738,437,511.58 65,744,901,585.54 51,489,939,410.96 3,512,334,794.12 55,002,274,205.08 42,120,129,858.21 14,860,881,185.46 56,981,011,043.67 43,088,366,595.06 3,864,852,533.24 46,953,219,128.30 子公司名称",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": "子公司名称 本期发生额 上期发生额 营业收入 净利润 综合收益总额 经营活动现金流量 营业收入 净利润 综合收益总额 经营活动现金流量",
+                      "source_offset": 909
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:7e03f82705850d0f12a1",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 172,
+                    "printed_page_label": null,
+                    "section_title": "本期发生额 上期发生额",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "华域汽车 183,998,900,513.66 8,226,592,261.99 8,622,509,162.31 9,523,102,797.47 168,852,183,839.32 7,482,264,275.10 7,449,986,804.38 8,139,847,784.94",
+                      "context_before": "营业收入 净利润 综合收益总额 经营活动现金流量 营业收入 净利润 综合收益总额 经营活动现金流量\r\n华域汽车 183,998,900,513.66 8,226,592,261.99 8,622,509,162.31 9,523,102,797.47 168,852,183,839.32 7,482,264,275.10 7,449,986,804.38 8,139,847,784.94\r\n通用五菱 86,149,883,158.29 1,529,578,066.88 1,524,669,122.06 8,208,654,150.61 77,933,714,925.81 1,055,538,250.07 1,055,202,581.10 9,846,353,371.37",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 980
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:fd1852f6d52b2cc217c0",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 172,
+                    "printed_page_label": null,
+                    "section_title": "本期发生额 上期发生额",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "通用五菱 86,149,883,158.29 1,529,578,066.88 1,524,669,122.06 8,208,654,150.61 77,933,714,925.81 1,055,538,250.07 1,055,202,581.10 9,846,353,371.37",
+                      "context_before": "营业收入 净利润 综合收益总额 经营活动现金流量 营业收入 净利润 综合收益总额 经营活动现金流量\r\n华域汽车 183,998,900,513.66 8,226,592,261.99 8,622,509,162.31 9,523,102,797.47 168,852,183,839.32 7,482,264,275.10 7,449,986,804.38 8,139,847,784.94\r\n通用五菱 86,149,883,158.29 1,529,578,066.88 1,524,669,122.06 8,208,654,150.61 77,933,714,925.81 1,055,538,250.07 1,055,202,581.10 9,846,353,371.37",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 1126
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "revenue_model_related_party_jv_lines_fy2025",
+                "dimension": "revenue_model",
+                "status": "observed",
+                "answer": "公司与合营企业的关联交易构成本期（2025年度）关联方收入的多个来源：销售商品本期发生额52,027,039,912.73元，销售材料本期发生额618,808,267.44元，提供劳务本期发生额4,884,467,932.01元，收取技术提成费及技术转让费本期发生额9,111,568.59元，租赁收入本期发生额177,345,271.26元（单位：元，币种：人民币）。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:21:revenue_model_related_party_sales_goods_services"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:2822b9010815407bac78",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 184,
+                    "printed_page_label": null,
+                    "section_title": "单位：元 币种：人民币",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "合营企业 销售商品 52,027,039,912.73 47,141,717,497.25",
+                      "context_before": "关联方 关联交易内容 本期发生额 上期发生额\r\n合营企业 销售商品 52,027,039,912.73 47,141,717,497.25\r\n联营企业 销售商品 4,067,284,982.00 5,106,952,757.21\r\n上汽总公司之子公司 销售商品 1,739,149,572.80 1,002,384,286.13\r\n上汽总公司之联营企业 销售商品 250,550,820.65\r\n合营企业 销售材料 618,808,267.44 1,117,558,205.15\r\n联营企业 销售材料 109,412,285.78 155,975,990.18\r\n其他关联方 销售材料 - 28,476.00\r\n合营企业 提供劳务 4,884,467,932.01 4,523,486,160.52\r\n上汽总公司 提供劳务 710,362,377.72 839,118,954.84\r\n联营企业 提供劳务 542,184,502.36 364,170,986.44\r\n上汽总公司之子公司 提供劳务 107,448,784.49 143,466,318.14\r\n上汽总公司之联营企业 提供劳务 10,752,263.43 4,982,990.62",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 1237
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:777aace7b8aab5cfada1",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 184,
+                    "printed_page_label": null,
+                    "section_title": "单位：元 币种：人民币",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "合营企业 销售材料 618,808,267.44 1,117,558,205.15",
+                      "context_before": "关联方 关联交易内容 本期发生额 上期发生额\r\n合营企业 销售商品 52,027,039,912.73 47,141,717,497.25\r\n联营企业 销售商品 4,067,284,982.00 5,106,952,757.21\r\n上汽总公司之子公司 销售商品 1,739,149,572.80 1,002,384,286.13\r\n上汽总公司之联营企业 销售商品 250,550,820.65\r\n合营企业 销售材料 618,808,267.44 1,117,558,205.15\r\n联营企业 销售材料 109,412,285.78 155,975,990.18\r\n其他关联方 销售材料 - 28,476.00\r\n合营企业 提供劳务 4,884,467,932.01 4,523,486,160.52\r\n上汽总公司 提供劳务 710,362,377.72 839,118,954.84\r\n联营企业 提供劳务 542,184,502.36 364,170,986.44\r\n上汽总公司之子公司 提供劳务 107,448,784.49 143,466,318.14\r\n上汽总公司之联营企业 提供劳务 10,752,263.43 4,982,990.62",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 1411
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:04d0dc2570eba8d3f916",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 184,
+                    "printed_page_label": null,
+                    "section_title": "单位：元 币种：人民币",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "合营企业 提供劳务 4,884,467,932.01 4,523,486,160.52",
+                      "context_before": "关联方 关联交易内容 本期发生额 上期发生额\r\n合营企业 销售商品 52,027,039,912.73 47,141,717,497.25\r\n联营企业 销售商品 4,067,284,982.00 5,106,952,757.21\r\n上汽总公司之子公司 销售商品 1,739,149,572.80 1,002,384,286.13\r\n上汽总公司之联营企业 销售商品 250,550,820.65\r\n合营企业 销售材料 618,808,267.44 1,117,558,205.15\r\n联营企业 销售材料 109,412,285.78 155,975,990.18\r\n其他关联方 销售材料 - 28,476.00\r\n合营企业 提供劳务 4,884,467,932.01 4,523,486,160.52\r\n上汽总公司 提供劳务 710,362,377.72 839,118,954.84\r\n联营企业 提供劳务 542,184,502.36 364,170,986.44\r\n上汽总公司之子公司 提供劳务 107,448,784.49 143,466,318.14\r\n上汽总公司之联营企业 提供劳务 10,752,263.43 4,982,990.62",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 1519
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:f8c8b560b97fee376743",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 184,
+                    "printed_page_label": null,
+                    "section_title": "单位：元 币种：人民币",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "合营企业\r\n收取技术提成费及技\r\n术转让费\r\n9,111,568.59 41,243,193.40",
+                      "context_before": "关联方 关联交易内容 本期发生额 上期发生额\r\n合营企业 销售商品 52,027,039,912.73 47,141,717,497.25\r\n联营企业 销售商品 4,067,284,982.00 5,106,952,757.21\r\n上汽总公司之子公司 销售商品 1,739,149,572.80 1,002,384,286.13\r\n上汽总公司之联营企业 销售商品 250,550,820.65\r\n合营企业 销售材料 618,808,267.44 1,117,558,205.15\r\n联营企业 销售材料 109,412,285.78 155,975,990.18\r\n其他关联方 销售材料 - 28,476.00\r\n合营企业 提供劳务 4,884,467,932.01 4,523,486,160.52\r\n上汽总公司 提供劳务 710,362,377.72 839,118,954.84\r\n联营企业 提供劳务 542,184,502.36 364,170,986.44\r\n上汽总公司之子公司 提供劳务 107,448,784.49 143,466,318.14\r\n上汽总公司之联营企业 提供劳务 10,752,263.43 4,982,990.62\r\n合营企业",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": "合营企业 收取技术提成费及技术转让费 9,111,568.59 41,243,193.40",
+                      "source_offset": 1737
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:a8a9f72ddc13f8c3b4f8",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 185,
+                    "printed_page_label": null,
+                    "section_title": "185 / 205",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "合营企业 租赁收入 177,345,271.26 146,793,802.17",
+                      "context_before": "合营企业 租赁收入 177,345,271.26 146,793,802.17\r\n联营企业 租赁收入 39,643,714.99 33,904,327.70\r\n上汽总公司之子公司 租赁收入 2,940,066.60 5,689,722.67\r\n上汽总公司之联营企业 租赁收入 1,000,000.00",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 35
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "rm_external_revenue_by_segment_2025",
+                "dimension": "revenue_model",
+                "status": "observed",
+                "answer": "2025年度，公司对外交易收入合计656,243,812,081.18元，其中整车及零部件分部对外交易收入为644,665,370,348.55元，金融业分部对外交易收入为11,578,441,732.63元。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:22:cond_segment_revenue_composition"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:7e949ab036fc79573c64",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 193,
+                    "printed_page_label": null,
+                    "section_title": "193 / 205",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "项目 整车及零部件 金融业 分部间抵销 合计\r\n对外交易收入 644,665,370,348.55 11,578,441,732.63 656,243,812,081.18",
+                      "context_before": "项目 整车及零部件 金融业 分部间抵销 合计\r\n对外交易收入 644,665,370,348.55 11,578,441,732.63 656,243,812,081.18\r\n分部间交易收入 36,066,953.66 -36,066,953.66\r\n营业总成本 -642,480,819,098.34 -6,487,261,701.98 30,117,242.97 -648,937,963,557.35\r\n加：其他收益 4,156,368,658.31 222,013,891.09 4,378,382,549.40\r\n投资收益 11,882,157,267.63 1,670,930,089.43 -120,442,736.14 13,432,644,620.92\r\n汇兑收益 53,642,948.70 53,642,948.70\r\n公允价值变动收益 5,145,257,105.45 1,460,233,330.96 6,605,490,436.41\r\n信用减值损失 -314,210,632.52 -772,573,060.85 -4,279,402.56 -1,091,063,095.93\r\n资产减值(损失)/转回 -5,691,384,491.27 8,995,431.96 -5,682,389,059.31\r\n资产处置收益/(损失) 455,263,294.10 -25,533,792.05 429,729,502.05\r\n营业利润 17,818,002,451.91 7,744,955,823.55 -130,671,849.39 25,432,286,426.07\r\n加：营业外收入 584,848,865.46 17,523,773.74 602,372,639.20\r\n减：营业外支出 -1,121,006,861.61 -4,642,719.58 -1,125,649,581.19\r\n利润总额 17,281,844,455.76 7,757,836,877.71 -130,671,849.39 24,909,009,484.08\r\n减：所得税费用 -5,865,047,346.58 -1,600,038,295.04 -7,465,085,641.62\r\n净利润 11,416,797,109.18 6,157,798,582.67 -130,671,849.39 17,443,923,842.46\r\n资产总额 726,364,191,856.95 355,233,575,765.85 -121,390,306,172.11 960,207,461,450.69\r\n负债总额 501,660,152,156.15 218,520,680,495.01 -121,278,932,356.28 598,901,900,294.88\r\n折旧和摊销支出 21,574,812,303.92 71,093,452.28 21,645,905,756.20\r\n资本性支出 22,161,653,803.64 737,886.18 22,162,391,689.82\r\n经营活动产生/(使用)的现金流量净额 54,984,211,155.24 -20,677,609,249.26 34,306,601,905.98\r\n(3).公司无报告分部的，或者不能披露各报告分部的资产总额和负债总额的，应说明原因",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 35
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:7e949ab036fc79573c64",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 193,
+                    "printed_page_label": null,
+                    "section_title": "193 / 205",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "项目 整车及零部件 金融业 分部间抵销 合计\r\n对外交易收入 644,665,370,348.55 11,578,441,732.63 656,243,812,081.18",
+                      "context_before": "项目 整车及零部件 金融业 分部间抵销 合计\r\n对外交易收入 644,665,370,348.55 11,578,441,732.63 656,243,812,081.18\r\n分部间交易收入 36,066,953.66 -36,066,953.66\r\n营业总成本 -642,480,819,098.34 -6,487,261,701.98 30,117,242.97 -648,937,963,557.35\r\n加：其他收益 4,156,368,658.31 222,013,891.09 4,378,382,549.40\r\n投资收益 11,882,157,267.63 1,670,930,089.43 -120,442,736.14 13,432,644,620.92\r\n汇兑收益 53,642,948.70 53,642,948.70\r\n公允价值变动收益 5,145,257,105.45 1,460,233,330.96 6,605,490,436.41\r\n信用减值损失 -314,210,632.52 -772,573,060.85 -4,279,402.56 -1,091,063,095.93\r\n资产减值(损失)/转回 -5,691,384,491.27 8,995,431.96 -5,682,389,059.31\r\n资产处置收益/(损失) 455,263,294.10 -25,533,792.05 429,729,502.05\r\n营业利润 17,818,002,451.91 7,744,955,823.55 -130,671,849.39 25,432,286,426.07\r\n加：营业外收入 584,848,865.46 17,523,773.74 602,372,639.20\r\n减：营业外支出 -1,121,006,861.61 -4,642,719.58 -1,125,649,581.19\r\n利润总额 17,281,844,455.76 7,757,836,877.71 -130,671,849.39 24,909,009,484.08\r\n减：所得税费用 -5,865,047,346.58 -1,600,038,295.04 -7,465,085,641.62\r\n净利润 11,416,797,109.18 6,157,798,582.67 -130,671,849.39 17,443,923,842.46\r\n资产总额 726,364,191,856.95 355,233,575,765.85 -121,390,306,172.11 960,207,461,450.69\r\n负债总额 501,660,152,156.15 218,520,680,495.01 -121,278,932,356.28 598,901,900,294.88\r\n折旧和摊销支出 21,574,812,303.92 71,093,452.28 21,645,905,756.20\r\n资本性支出 22,161,653,803.64 737,886.18 22,162,391,689.82\r\n经营活动产生/(使用)的现金流量净额 54,984,211,155.24 -20,677,609,249.26 34,306,601,905.98\r\n(3).公司无报告分部的，或者不能披露各报告分部的资产总额和负债总额的，应说明原因",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 35
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "ps_vehicles_parts_and_finance",
+                "dimension": "products_services",
+                "status": "observed",
+                "answer": "公司披露的分部业务包括整车及零部件以及金融业。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:22:cond_segment_revenue_composition"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:7e949ab036fc79573c64",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 193,
+                    "printed_page_label": null,
+                    "section_title": "193 / 205",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "项目 整车及零部件 金融业 分部间抵销 合计\r\n对外交易收入 644,665,370,348.55 11,578,441,732.63 656,243,812,081.18",
+                      "context_before": "项目 整车及零部件 金融业 分部间抵销 合计\r\n对外交易收入 644,665,370,348.55 11,578,441,732.63 656,243,812,081.18\r\n分部间交易收入 36,066,953.66 -36,066,953.66\r\n营业总成本 -642,480,819,098.34 -6,487,261,701.98 30,117,242.97 -648,937,963,557.35\r\n加：其他收益 4,156,368,658.31 222,013,891.09 4,378,382,549.40\r\n投资收益 11,882,157,267.63 1,670,930,089.43 -120,442,736.14 13,432,644,620.92\r\n汇兑收益 53,642,948.70 53,642,948.70\r\n公允价值变动收益 5,145,257,105.45 1,460,233,330.96 6,605,490,436.41\r\n信用减值损失 -314,210,632.52 -772,573,060.85 -4,279,402.56 -1,091,063,095.93\r\n资产减值(损失)/转回 -5,691,384,491.27 8,995,431.96 -5,682,389,059.31\r\n资产处置收益/(损失) 455,263,294.10 -25,533,792.05 429,729,502.05\r\n营业利润 17,818,002,451.91 7,744,955,823.55 -130,671,849.39 25,432,286,426.07\r\n加：营业外收入 584,848,865.46 17,523,773.74 602,372,639.20\r\n减：营业外支出 -1,121,006,861.61 -4,642,719.58 -1,125,649,581.19\r\n利润总额 17,281,844,455.76 7,757,836,877.71 -130,671,849.39 24,909,009,484.08\r\n减：所得税费用 -5,865,047,346.58 -1,600,038,295.04 -7,465,085,641.62\r\n净利润 11,416,797,109.18 6,157,798,582.67 -130,671,849.39 17,443,923,842.46\r\n资产总额 726,364,191,856.95 355,233,575,765.85 -121,390,306,172.11 960,207,461,450.69\r\n负债总额 501,660,152,156.15 218,520,680,495.01 -121,278,932,356.28 598,901,900,294.88\r\n折旧和摊销支出 21,574,812,303.92 71,093,452.28 21,645,905,756.20\r\n资本性支出 22,161,653,803.64 737,886.18 22,162,391,689.82\r\n经营活动产生/(使用)的现金流量净额 54,984,211,155.24 -20,677,609,249.26 34,306,601,905.98\r\n(3).公司无报告分部的，或者不能披露各报告分部的资产总额和负债总额的，应说明原因",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 35
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "claim-revenue-model-1",
+                "dimension": "revenue_model",
+                "status": "observed",
+                "answer": "上汽集团整车销售收入确认模式：根据合同约定，通过经销商电子交易平台等移交整车权属并完成相关交易，或将整车按照合同规定运至约定交货地点并完成相关货物交接后确认收入。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:5:cond-3"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:7e078a9061161c2b6fc0",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 61,
+                    "printed_page_label": null,
+                    "section_title": "model-selected full source context",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "根据\r\n合同约定，上汽集团通过经销商电子\r\n交易平台等移交整车的权属并完成\r\n相关交易，或将整车按照合同规定运\r\n至约定交货地点并完成相关货物交\r\n接后确认收入。",
+                      "context_before": "上汽集团主要生产并销售整车。根据",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 106
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "bp-work-5157694452e829569d6a42f3:report:45:products-services-1",
+                "dimension": "products_services",
+                "status": "observed",
+                "answer": "公司整车业务覆盖基本乘用车、运动型多用途车（SUV）、多功能乘用车（MPV）、交叉型乘用车、客车、载货汽车等车型；报告期内（2025年）新能源汽车乘用车累计销量1,481,504辆、商用车累计销量161,505辆，总计累计销量1,643,009辆、累计产量1,683,460辆。零部件业务主要由下属控股子公司华域汽车系统股份有限公司（股票代码：600741）开展；汽车金融业务披露子公司为上海汽车集团财务有限责任公司；移动出行和服务板块聚焦服务整车业务，报告期内安吉物流有8艘滚装新船启航，进一步提升至南美、欧洲等航线的运能。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:1:cond-2"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:0959e39f9d9ad95afef9",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 17,
+                    "printed_page_label": null,
+                    "section_title": "（%）",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "基本乘用车 2,175,039 2,019,811 7.69 2,222,164 2,009,712 10.57\r\n运动型多用途车（SUV） 1,303,095 1,155,054 12.82 1,328,384 1,146,178 15.90\r\n多功能乘用车（MPV） 337,749 249,946 35.13 334,093 257,786 29.60\r\n交叉型乘用车 254,168 204,041 24.57 264,153 208,109 26.93\r\n客车 114,247 92,932 22.94 113,478 93,089 21.90\r\n载货汽车 323,220 291,216 10.99 339,690 292,978 15.94",
+                      "context_before": "基本乘用车 2,175,039 2,019,811 7.69 2,222,164 2,009,712 10.57\r\n运动型多用途车（SUV） 1,303,095 1,155,054 12.82 1,328,384 1,146,178 15.90\r\n多功能乘用车（MPV） 337,749 249,946 35.13 334,093 257,786 29.60\r\n交叉型乘用车 254,168 204,041 24.57 264,153 208,109 26.93\r\n客车 114,247 92,932 22.94 113,478 93,089 21.90\r\n载货汽车 323,220 291,216 10.99 339,690 292,978 15.94\r\n总计 4,507,518 4,013,000 12.32 4,601,962 4,007,852 14.82",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 220
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:0d4afc8e8d78b0d085f5",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 17,
+                    "printed_page_label": null,
+                    "section_title": "√适用 □不适用",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "公司的零部件业务主要由下属控股子公司华域汽车系统股份有限公司（股票代码：600741）\r\n开展",
+                      "context_before": "公司的零部件业务主要由下属控股子公司华域汽车系统股份有限公司（股票代码：600741）\r\n开展，其 2025 年业务情况详见华域汽车（600741）在上海证券交易所 www.sse.com.cn 发布的 2025\r\n年年报。",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 1076
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:a767372e49b3513996c6",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 18,
+                    "printed_page_label": null,
+                    "section_title": "model-selected full source context",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "新能源汽车产销量\r\n√适用 □不适用\r\n销量（辆） 产量（辆）\r\n车型类别 本年累计 去年累计\r\n累计同比增\r\n减（%）\r\n本年累计 去年累计\r\n累计同比增\r\n减（%）\r\n乘用车 1,481,504 1,139,255 30.04 1,520,384 1,146,193 32.65\r\n商用车 161,505 94,821 70.33 163,076 98,968 64.78\r\n总计 1,643,009 1,234,076 33.14 1,683,460 1,245,161 35.20",
+                      "context_before": "新能源汽车产销量",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 465
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:b0c2956c4f2c6b994546",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 18,
+                    "printed_page_label": null,
+                    "section_title": "商用车 1,431,094 0 0%",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "5、 汽车金融业务\r\n√适用 □不适用\r\n汽车金融业务情况\r\n√适用 □不适用\r\n单位：亿元 币种：人民币\r\n子公司名称 上海汽车集团财务有限责任公司",
+                      "context_before": "5、 汽车金融业务",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 815
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:8e330339e3827061dada",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 9,
+                    "printed_page_label": null,
+                    "section_title": "model-selected full source context",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "移动出行和服务板块聚焦服务整车业务，报告期内安吉物流有 8 艘滚\r\n装新船启航，进一步提升至南美、欧洲等航线的运能。",
+                      "context_before": "5. 构建板块联动新优势。零部件、金融、移动出行和服务板块协同联动，持续为整车业务提\r\n供有力支撑。零部件板块完善智能电动化核心技术布局，整合优势资源，加快推进固态电池、智\r\n能底盘等技术的产业化落地。金融板块加强汽车金融服务的精细化发展，积极支持尚界等新业务，\r\n并加快拓展海外金融服务。移动出行和服务板块聚焦服务整车业务，报告期内安吉物流有 8 艘滚\r\n装新船启航，进一步提升至南美、欧洲等航线的运能。",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": "移动出行和服务板块聚焦服务整车业务，报告期内安吉物流有 8 艘滚装新船启航，进一步提升至南美、欧洲等航线的运能。",
+                      "source_offset": 1889
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "products_services_new_energy_and_batteries",
+                "dimension": "products_services",
+                "status": "observed",
+                "answer": "The stated business of 飞凡汽车科技有限公司 includes sales of new energy vehicle complete vehicles, sales of new energy vehicle electrical accessories, and research and development of automotive parts, among other activities. The stated business of 上汽时代动力电池系统有限公司 is the development, production, and sales of power battery modules and systems.",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:21:products_services_new_energy_and_batteries"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:1c30c4fa1dea2f42536c",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 171,
+                    "printed_page_label": null,
+                    "section_title": "84.22 通过设立",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "飞凡汽车科技有限公司 人民币 7,000,000.00 中国上海\r\n新能源汽车整车销售、\r\n新能源汽车电附件销\r\n售、汽车零部件研发等\r\n100.00 通过设立",
+                      "context_before": "飞凡汽车科技有限公司 人民币 7,000,000.00 中国上海",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": "飞凡汽车科技有限公司 人民币 7,000,000.00 中国上海 新能源汽车整车销售、新能源汽车电附件销售、汽车零部件研发等 100.00 通过设立",
+                      "source_offset": 1180
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:899cb4f59a181ccc9d26",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 171,
+                    "printed_page_label": null,
+                    "section_title": "印尼卢",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "上汽时代动力电池系统有限公司 人民币 300,000.00 中国江苏\r\n动力电池模块和系统的\r\n开发、生产及销售\r\n51.00 通过设立",
+                      "context_before": "比\r\n600,000,000.00 印度尼西亚 多元金融服务 62.00 通过设立\r\n上汽时代动力电池系统有限公司 人民币 300,000.00 中国江苏",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": "上汽时代动力电池系统有限公司 人民币 300,000.00 中国江苏 动力电池模块和系统的开发、生产及销售 51.00 通过设立",
+                      "source_offset": 853
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:bbd5f05890de9566f3e9",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 171,
+                    "printed_page_label": null,
+                    "section_title": "84.22 通过设立",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "飞凡汽车科技有限公司 人民币 7,000,000.00 中国上海\r\n新能源汽车整车销售、\r\n新能源汽车电附件销\r\n售、汽车零部件研发等\r\n100.00 通过设立",
+                      "context_before": "飞凡汽车科技有限公司 人民币 7,000,000.00 中国上海",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 1180
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:d759d614b87070d59587",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 171,
+                    "printed_page_label": null,
+                    "section_title": "印尼卢",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "上汽时代动力电池系统有限公司 人民币 300,000.00 中国江苏\r\n动力电池模块和系统的\r\n开发、生产及销售\r\n51.00 通过设立",
+                      "context_before": "比\r\n600,000,000.00 印度尼西亚 多元金融服务 62.00 通过设立\r\n上汽时代动力电池系统有限公司 人民币 300,000.00 中国江苏",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 853
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "claim_products_services_dongli_diesel",
+                "dimension": "products_services",
+                "status": "observed",
+                "answer": "动力新科为子公司，主要业务为柴油机及配件的生产销售。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:2:sc_subsidiary_dongli_diesel"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:1731aeb568e9adf357f3",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 26,
+                    "printed_page_label": null,
+                    "section_title": "公司净利",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "动力新科 子公司 柴油机及配件的生产销售",
+                      "context_before": "润\r\n华域汽车 子公司 汽车零部件生产、销售 315,272 19,918,645.09 6,714,457.33 18,399,890.05 943,418.20 720,726.81\r\n动力新科 子公司 柴油机及配件的生产销售 138,782.18 1,075,095.65 638,118.32 573,954.10 293,719.80 287,200.46\r\n智己汽车 子公司 新能源汽车生产、销售 1,400,997.60 2,297,331.28 211,367.08 1,541,140.76 -359,798.69 -359,815.59\r\n上汽大通 子公司 汽车生产、销售 1,032,911.00 2,606,631.03 225,613.89 2,533,685.67 -160,815.73 -161,123.82\r\n上汽财务公司 子公司 金融服务 1,538,000.00 25,421,723.32 5,848,599.88 946,887.95 525,072.96 316,901.15",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 271
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "claim_products_services_huayu",
+                "dimension": "products_services",
+                "status": "observed",
+                "answer": "公司子公司华域汽车从事汽车零部件生产、销售业务。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:2:sc_subsidiary_huayu_auto_parts"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:bffd67c6069f34235d5a",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 26,
+                    "printed_page_label": null,
+                    "section_title": "公司净利",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "华域汽车 子公司 汽车零部件生产、销售",
+                      "context_before": "润\r\n华域汽车 子公司 汽车零部件生产、销售 315,272 19,918,645.09 6,714,457.33 18,399,890.05 943,418.20 720,726.81\r\n动力新科 子公司 柴油机及配件的生产销售 138,782.18 1,075,095.65 638,118.32 573,954.10 293,719.80 287,200.46\r\n智己汽车 子公司 新能源汽车生产、销售 1,400,997.60 2,297,331.28 211,367.08 1,541,140.76 -359,798.69 -359,815.59\r\n上汽大通 子公司 汽车生产、销售 1,032,911.00 2,606,631.03 225,613.89 2,533,685.67 -160,815.73 -161,123.82\r\n上汽财务公司 子公司 金融服务 1,538,000.00 25,421,723.32 5,848,599.88 946,887.95 525,072.96 316,901.15",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 179
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "products_services_saic_finance_subsidiary",
+                "dimension": "products_services",
+                "status": "observed",
+                "answer": "上汽财务公司为子公司，主要业务为金融服务。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:2:sc_subsidiary_saic_finance"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:d7464749f85d4ad9ddfe",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 26,
+                    "printed_page_label": null,
+                    "section_title": "公司净利",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "上汽财务公司 子公司 金融服务",
+                      "context_before": "润\r\n华域汽车 子公司 汽车零部件生产、销售 315,272 19,918,645.09 6,714,457.33 18,399,890.05 943,418.20 720,726.81\r\n动力新科 子公司 柴油机及配件的生产销售 138,782.18 1,075,095.65 638,118.32 573,954.10 293,719.80 287,200.46\r\n智己汽车 子公司 新能源汽车生产、销售 1,400,997.60 2,297,331.28 211,367.08 1,541,140.76 -359,798.69 -359,815.59\r\n上汽大通 子公司 汽车生产、销售 1,032,911.00 2,606,631.03 225,613.89 2,533,685.67 -160,815.73 -161,123.82\r\n上汽财务公司 子公司 金融服务 1,538,000.00 25,421,723.32 5,848,599.88 946,887.95 525,072.96 316,901.15",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 548
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:d7464749f85d4ad9ddfe",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 26,
+                    "printed_page_label": null,
+                    "section_title": "公司净利",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "上汽财务公司 子公司 金融服务",
+                      "context_before": "润\r\n华域汽车 子公司 汽车零部件生产、销售 315,272 19,918,645.09 6,714,457.33 18,399,890.05 943,418.20 720,726.81\r\n动力新科 子公司 柴油机及配件的生产销售 138,782.18 1,075,095.65 638,118.32 573,954.10 293,719.80 287,200.46\r\n智己汽车 子公司 新能源汽车生产、销售 1,400,997.60 2,297,331.28 211,367.08 1,541,140.76 -359,798.69 -359,815.59\r\n上汽大通 子公司 汽车生产、销售 1,032,911.00 2,606,631.03 225,613.89 2,533,685.67 -160,815.73 -161,123.82\r\n上汽财务公司 子公司 金融服务 1,538,000.00 25,421,723.32 5,848,599.88 946,887.95 525,072.96 316,901.15",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 548
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "claim_saic_maxus_products_services",
+                "dimension": "products_services",
+                "status": "observed",
+                "answer": "上汽大通为子公司，业务为汽车生产、销售。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:2:sc_subsidiary_saic_maxus_vehicle"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:3ae2d8c074882070366c",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 26,
+                    "printed_page_label": null,
+                    "section_title": "公司净利",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "上汽大通 子公司 汽车生产、销售",
+                      "context_before": "润\r\n华域汽车 子公司 汽车零部件生产、销售 315,272 19,918,645.09 6,714,457.33 18,399,890.05 943,418.20 720,726.81\r\n动力新科 子公司 柴油机及配件的生产销售 138,782.18 1,075,095.65 638,118.32 573,954.10 293,719.80 287,200.46\r\n智己汽车 子公司 新能源汽车生产、销售 1,400,997.60 2,297,331.28 211,367.08 1,541,140.76 -359,798.69 -359,815.59\r\n上汽大通 子公司 汽车生产、销售 1,032,911.00 2,606,631.03 225,613.89 2,533,685.67 -160,815.73 -161,123.82\r\n上汽财务公司 子公司 金融服务 1,538,000.00 25,421,723.32 5,848,599.88 946,887.95 525,072.96 316,901.15",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 456
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "claim_products_services_zhiji_nev",
+                "dimension": "products_services",
+                "status": "observed",
+                "answer": "智己汽车为子公司，主要从事新能源汽车生产、销售。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:2:sc_subsidiary_zhiji_nev"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:fcbf286db8435f199b29",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 26,
+                    "printed_page_label": null,
+                    "section_title": "公司净利",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "智己汽车 子公司 新能源汽车生产、销售",
+                      "context_before": "润\r\n华域汽车 子公司 汽车零部件生产、销售 315,272 19,918,645.09 6,714,457.33 18,399,890.05 943,418.20 720,726.81\r\n动力新科 子公司 柴油机及配件的生产销售 138,782.18 1,075,095.65 638,118.32 573,954.10 293,719.80 287,200.46\r\n智己汽车 子公司 新能源汽车生产、销售 1,400,997.60 2,297,331.28 211,367.08 1,541,140.76 -359,798.69 -359,815.59\r\n上汽大通 子公司 汽车生产、销售 1,032,911.00 2,606,631.03 225,613.89 2,533,685.67 -160,815.73 -161,123.82\r\n上汽财务公司 子公司 金融服务 1,538,000.00 25,421,723.32 5,848,599.88 946,887.95 525,072.96 316,901.15",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 361
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "claim-products_services-zhonglian",
+                "dimension": "products_services",
+                "status": "observed",
+                "answer": "公司子公司中联汽车电子有限公司主要业务为汽车用电子产品的生产、经营和研发。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:2:sc_subsidiary_zhonglian_auto_electronics"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:995d8aa127b24f54afb8",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 26,
+                    "printed_page_label": null,
+                    "section_title": "公司净利",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "中联汽车电子有\r\n限公司\r\n子公司\r\n汽车用电子产品的生产、\r\n经营和研发",
+                      "context_before": "润\r\n华域汽车 子公司 汽车零部件生产、销售 315,272 19,918,645.09 6,714,457.33 18,399,890.05 943,418.20 720,726.81\r\n动力新科 子公司 柴油机及配件的生产销售 138,782.18 1,075,095.65 638,118.32 573,954.10 293,719.80 287,200.46\r\n智己汽车 子公司 新能源汽车生产、销售 1,400,997.60 2,297,331.28 211,367.08 1,541,140.76 -359,798.69 -359,815.59\r\n上汽大通 子公司 汽车生产、销售 1,032,911.00 2,606,631.03 225,613.89 2,533,685.67 -160,815.73 -161,123.82\r\n上汽财务公司 子公司 金融服务 1,538,000.00 25,421,723.32 5,848,599.88 946,887.95 525,072.96 316,901.15\r\n中联汽车电子有",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": "中联汽车电子有限公司 子公司 汽车用电子产品的生产、经营和研发",
+                      "source_offset": 638
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "products_services_traditional_fuel_vehicle",
+                "dimension": "products_services",
+                "status": "observed",
+                "answer": "相关企业本次计提资产减值准备主要针对传统燃油车业务相关资产。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:4:products_services_traditional_fuel_vehicle"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:7007536836c189c1bc4a",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 36,
+                    "printed_page_label": null,
+                    "section_title": "model-selected full source context",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "相关企业本次计提\r\n资产减值准备主要\r\n针对传统燃油车业\r\n务相关资产，是顺\r\n应产业趋势加快转\r\n型 升 级 的 积 极 举\r\n措",
+                      "context_before": "相关企业本次计提",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": "相关企业本次计提资产减值准备主要针对传统燃油车业务相关资产，是顺应产业趋势加快转型升级的积极举措",
+                      "source_offset": 719
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:7007536836c189c1bc4a",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 36,
+                    "printed_page_label": null,
+                    "section_title": "model-selected full source context",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "相关企业本次计提\r\n资产减值准备主要\r\n针对传统燃油车业\r\n务相关资产，是顺\r\n应产业趋势加快转\r\n型 升 级 的 积 极 举\r\n措",
+                      "context_before": "相关企业本次计提",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": "相关企业本次计提资产减值准备主要针对传统燃油车业务相关资产，是顺应产业趋势加快转型升级的积极举措",
+                      "source_offset": 719
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "claim_products_services_01",
+                "dimension": "products_services",
+                "status": "observed",
+                "answer": "本集团生产整车及零部件等产品并销售予相关客户。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:7:cond-1"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:47fb64a2cb98523a4b41",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 97,
+                    "printed_page_label": null,
+                    "section_title": "(a) 销售商品",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "本集团生产整车及零部件等产品并销售予相关客户。",
+                      "context_before": "本集团生产整车及零部件等产品并销售予相关客户。根据合同约定，本集团通过经销商电子\r\n交易平台等移交相关整车产品的权属并完成相关交易，或将上述产品按照合同规定运至约定交货",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 841
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "products_services-complete-vehicles",
+                "dimension": "products_services",
+                "status": "observed",
+                "answer": "销售整车。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:5:cond-4"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:163dc6e7b38c0a896387",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 61,
+                    "printed_page_label": null,
+                    "section_title": "61 / 205",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "中 销 售 整 车 的 收 入 约 为 人 民 币\r\n4,101.96 亿元，约占营业总收入的\r\n62.51%。",
+                      "context_before": "中 销 售 整 车 的 收 入 约 为 人 民 币",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 34
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:163dc6e7b38c0a896387",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 61,
+                    "printed_page_label": null,
+                    "section_title": "61 / 205",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "中 销 售 整 车 的 收 入 约 为 人 民 币\r\n4,101.96 亿元，约占营业总收入的\r\n62.51%。",
+                      "context_before": "中 销 售 整 车 的 收 入 约 为 人 民 币",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 34
+                    }
+                  }
+                ],
+                "limitation": null,
+                "generation_method": "evidence_supported_llm_summary",
+                "review_state": "verified"
+              },
+              {
+                "claim_id": "revenue_model-vehicle-sales",
+                "dimension": "revenue_model",
+                "status": "observed",
+                "answer": "通过销售整车取得收入；2025年度销售整车的收入约为人民币4,101.96亿元。",
+                "condition_ids": [
+                  "bp-work-1e963e4dd353ef49595b0d50:report:5:cond-4"
+                ],
+                "supporting_record_ids": [],
+                "evidence": [
+                  {
+                    "evidence_id": "reading:163dc6e7b38c0a896387",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 61,
+                    "printed_page_label": null,
+                    "section_title": "61 / 205",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "中 销 售 整 车 的 收 入 约 为 人 民 币\r\n4,101.96 亿元，约占营业总收入的\r\n62.51%。",
+                      "context_before": "中 销 售 整 车 的 收 入 约 为 人 民 币",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 34
+                    }
+                  },
+                  {
+                    "evidence_id": "reading:163dc6e7b38c0a896387",
+                    "report": {
+                      "instrument_id": "600104.SH",
+                      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+                      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+                      "report_period": "2025-12-31",
+                      "published_at": "2026-04-01T16:00:00+00:00",
+                      "document_type": "annual_report"
+                    },
+                    "page": 61,
+                    "printed_page_label": null,
+                    "section_title": "61 / 205",
+                    "continuation_pages": [],
+                    "subject_evidence_pages": [],
+                    "anchor": {
+                      "anchor_type": "text",
+                      "bounded_quote": "中 销 售 整 车 的 收 入 约 为 人 民 币\r\n4,101.96 亿元，约占营业总收入的\r\n62.51%。",
+                      "context_before": "中 销 售 整 车 的 收 入 约 为 人 民 币",
+                      "context_after": null,
+                      "match_index": 0,
+                      "model_quote": null,
+                      "source_offset": 34
                     }
                   }
                 ],
@@ -14183,6 +15063,863 @@
                 }
               ]
             }
+          },
+          {
+            "request_id": "bp-work-5157694452e829569d6a42f3:report:68",
+            "purpose": "verify_views",
+            "status": "success",
+            "source_scope": "full_context",
+            "source_pages": [
+              11,
+              203,
+              81,
+              192,
+              61,
+              155,
+              193,
+              61,
+              20,
+              170,
+              170,
+              171,
+              203,
+              172,
+              172
+            ],
+            "response_payload": {
+              "schema_version": "company_profile_report_response.v3",
+              "request_id": "bp-work-5157694452e829569d6a42f3:report:68",
+              "purpose": "verify_views",
+              "source_conditions": [],
+              "claims": [],
+              "records": [],
+              "checks": [
+                {
+                  "target_type": "condition",
+                  "target_id": "bp-work-1e963e4dd353ef49595b0d50:report:17:principal_business_vehicle_parts_services",
+                  "status": "pass",
+                  "explanation": "该条件已被诉求 claim:principal_business_breakdown 准确完整覆盖，主营业务构成及整车、零部件、劳务及其他本年累计营业收入金额与财务报表附注披露一致。",
+                  "covers_target_type": "claim",
+                  "covers_target_id": "claim:principal_business_breakdown"
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "bp-work-5157694452e829569d6a42f3:report:26:claim-001",
+                  "status": "pass",
+                  "explanation": "主营业务分行业及分产品的分类和对应营业收入金额与报告第11页披露一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "bp-work-5157694452e829569d6a42f3:report:31:claim-001",
+                  "status": "pass",
+                  "explanation": "零部件业务2025年度主营业务收入及成本数据与报告第203页母公司财务报表附注披露一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "bp-work-5157694452e829569d6a42f3:report:35:principal_business_scope",
+                  "status": "pass",
+                  "explanation": "公司经批准的经营范围内容与报告第81页披露一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "c1",
+                  "status": "pass",
+                  "explanation": "分部报告中整车及零部件分部与金融服务分部的职责描述与报告第192页披露一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim-principal-business-1",
+                  "status": "pass",
+                  "explanation": "整车业务2025年度主营业务收入及成本数据与报告第203页母公司财务报表附注披露一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim-principal_business-1",
+                  "status": "pass",
+                  "explanation": "上汽集团主要业务为生产并销售整车的表述与报告第61页审计报告披露一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim:principal_business_breakdown",
+                  "status": "pass",
+                  "explanation": "合并财务报表主营业务分项（整车业务、零部件业务、劳务及其他）及本年累计营业收入数据与报告第155页披露一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim_principal_business_segments",
+                  "status": "pass",
+                  "explanation": "公司报告分部的划分及职责描述与报告第192页披露一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "pb_reportable_segments",
+                  "status": "pass",
+                  "explanation": "报告分部列示为整车及零部件与金融业与报告第193页分部信息表头列示一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "principal_business-vehicle-sales",
+                  "status": "pass",
+                  "explanation": "2025年度销售整车收入金额及占营业总收入比例与报告第61页关键审计事项披露一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "principal_business_1",
+                  "status": "pass",
+                  "explanation": "公司所属汽车制造行业及业务特点描述与报告第20页披露一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "principal_business_vehicle_parts_production_sales",
+                  "status": "pass",
+                  "explanation": "提及的子公司业务性质描述与报告第170-171页子公司权益披露一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim-1",
+                  "status": "pass",
+                  "explanation": "主营业务收入及其他业务收入主要在某一时点确认与报告第203页披露一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim-revenue-model-1",
+                  "status": "pass",
+                  "explanation": "整车销售收入确认模式与报告第61页披露的会计政策及关键审计事项内容一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim-revenue-model-subsidiaries",
+                  "status": "pass",
+                  "explanation": "华域汽车与通用五菱的本期及上期营业收入与净利润数据与报告第172页披露一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                }
+              ],
+              "requested_pages": []
+            },
+            "physical_request": false,
+            "reused_verification": true
+          },
+          {
+            "request_id": "bp-work-5157694452e829569d6a42f3:report:69",
+            "purpose": "verify_views",
+            "status": "success",
+            "source_scope": "full_context",
+            "source_pages": [
+              11,
+              61,
+              156,
+              155,
+              184,
+              184,
+              185,
+              193,
+              17,
+              17,
+              18,
+              9,
+              26,
+              143,
+              203,
+              61
+            ],
+            "response_payload": {
+              "schema_version": "company_profile_report_response.v3",
+              "request_id": "bp-work-5157694452e829569d6a42f3:report:69",
+              "purpose": "verify_views",
+              "source_conditions": [],
+              "claims": [],
+              "records": [],
+              "checks": [
+                {
+                  "target_type": "condition",
+                  "target_id": "bp-work-1e963e4dd353ef49595b0d50:report:5:cond-1",
+                  "status": "pass",
+                  "explanation": "该条件由已核验的 products-services-1 claim 覆盖：该 claim 说明公司整车业务覆盖基本乘用车、SUV、MPV、交叉型乘用车、客车和载货汽车，并披露2025年新能源整车产量/销量，能支持‘主要生产并销售整车’。",
+                  "covers_target_type": "claim",
+                  "covers_target_id": "bp-work-5157694452e829569d6a42f3:report:45:products-services-1"
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "revenue-model-2025-1",
+                  "status": "pass",
+                  "explanation": "第11页主营业务分产品表列示整车业务410,196,473,001.11元、零部件业务203,019,866,775.26元、劳务及其他32,935,762,112.94元、金融业务10,091,710,191.88元，合计656,243,812,081.18元；整车业务金额最高，与claim一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "revenue_model-vehicle-sales",
+                  "status": "pass",
+                  "explanation": "第61页审计关键事项披露销售整车收入约为人民币4,101.96亿元，约占营业总收入的62.51%，支持通过销售整车取得收入及该金额。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "revenue_model_2025",
+                  "status": "pass",
+                  "explanation": "第156页表格列示2025年度在某一时点确认620,175,451,544.57元、在某一时段内确认11,832,005,928.17元，其他业务收入14,144,644,416.56元，均与claim一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "revenue_model_main_and_other_current",
+                  "status": "pass",
+                  "explanation": "第155页表格列示本期主营业务收入632,007,457,472.74元、其他业务收入14,144,644,416.56元；其他业务中材料及废料销售7,098,573,219.12元、劳务4,767,911,918.73元、租赁1,094,574,636.74元、其他1,183,584,641.97元，与claim一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "revenue_model_related_party_jv_lines_fy2025",
+                  "status": "pass",
+                  "explanation": "第184-185页关联方出售商品/提供劳务表列示合营企业销售商品52,027,039,912.73元、销售材料618,808,267.44元、提供劳务4,884,467,932.01元、技术提成费及技术转让费9,111,568.59元、租赁收入177,345,271.26元，均与claim一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "rm_external_revenue_by_segment_2025",
+                  "status": "pass",
+                  "explanation": "第193页分部表列示对外交易收入合计656,243,812,081.18元，其中整车及零部件分部644,665,370,348.55元、金融业分部11,578,441,732.63元，数值一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "bp-work-5157694452e829569d6a42f3:report:45:products-services-1",
+                  "status": "pass",
+                  "explanation": "第17页列示基本乘用车、SUV、MPV、交叉型乘用车、客车、载货汽车等车型及华域汽车开展零部件业务；第18页列示2025年新能源乘用车销量1,481,504辆、商用车销量161,505辆、总计销量1,643,009辆、产量1,683,460辆及上汽财务公司；第9页列示安吉物流8艘滚装新船启航，各子句均有据。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "bp-work-5157694452e829569d6a42f3:report:50:claim:products_services:qimeng_investment_consulting",
+                  "status": "pass",
+                  "explanation": "第26页主要控股参股公司表列示上海颀盟企业管理合伙企业（有限合伙）为子公司，主要业务为投资及咨询服务，支持该claim。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim-1__2",
+                  "status": "unclear",
+                  "explanation": "第143页引文只列示预收整车款、材料款、配件款等余额，未在给定引文或章节标题中将其标明为合同负债；‘合同负债列示’这一分类缺乏所引证据支持。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim-products-services-1",
+                  "status": "unclear",
+                  "explanation": "第203页表列示其他业务收入合计9,165,375,849.96元及明细，但第155页合并口径其他业务收入为14,144,644,416.56元；所给证据未表明第203页为合并口径，将9,165,375,849.96元直接作为公司口径其他业务收入存在范围/口径不清。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "record",
+                  "target_id": "reading:7d2e3ae1f3be4d0c5528",
+                  "status": "pass",
+                  "explanation": "第26页表格列示上海颀盟企业管理合伙企业（有限合伙）为子公司、主要业务为投资及咨询服务，与该record/evidence一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                }
+              ],
+              "requested_pages": []
+            },
+            "physical_request": false,
+            "reused_verification": true
+          },
+          {
+            "request_id": "bp-work-5157694452e829569d6a42f3:report:70",
+            "purpose": "verify_views",
+            "status": "success",
+            "source_scope": "full_context",
+            "source_pages": [
+              26,
+              97,
+              26,
+              28,
+              61,
+              156,
+              171,
+              155,
+              155,
+              36,
+              193,
+              29,
+              192,
+              203
+            ],
+            "response_payload": {
+              "schema_version": "company_profile_report_response.v3",
+              "request_id": "bp-work-5157694452e829569d6a42f3:report:70",
+              "purpose": "verify_views",
+              "source_conditions": [],
+              "claims": [],
+              "records": [],
+              "checks": [
+                {
+                  "target_type": "condition",
+                  "target_id": "bp-work-1e963e4dd353ef49595b0d50:report:22:cond_segment_financial_services",
+                  "status": "unclear",
+                  "explanation": "No verified claim states that the company established a financial-services report segment responsible for providing financial services. The finance-subsidiary claim names a different entity, and the segment claim only says disclosed segments include 金融业.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "condition",
+                  "target_id": "bp-work-1e963e4dd353ef49595b0d50:report:22:cond_segment_vehicle_parts",
+                  "status": "unclear",
+                  "explanation": "No verified claim covers both establishment of an 整车及零部件 report segment and that segment’s responsibility to produce and sell vehicles and parts. Production-and-sales wording and the segment-name wording appear in different claims.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "condition",
+                  "target_id": "bp-work-1e963e4dd353ef49595b0d50:report:24:cond-1",
+                  "status": "unclear",
+                  "explanation": "No verified claim covers 2025 vehicle main-business revenue of 57,126,986,013.91 yuan and cost of 54,770,228,270.45 yuan. The passing vehicle-revenue claim uses 410,196,473,001.11 yuan, so it does not cover this condition.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "condition",
+                  "target_id": "bp-work-1e963e4dd353ef49595b0d50:report:24:cond-2",
+                  "status": "unclear",
+                  "explanation": "No verified claim covers 2025 parts main-business revenue of 2,580,352,381.62 yuan and cost of 1,644,953,369.00 yuan. The passing parts-revenue claim uses 203,019,866,775.26 yuan, so it does not cover this condition.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim-products_services-zhonglian",
+                  "status": "pass",
+                  "explanation": "The subsidiary table states that 中联汽车电子有限公司 is a subsidiary whose main business is production, operation, and R&D of automotive electronic products.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim_products_services_01",
+                  "status": "pass",
+                  "explanation": "The sales-of-goods note states that the group produces complete vehicles, parts, and similar products and sells them to relevant customers.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim_products_services_dongli_diesel",
+                  "status": "pass",
+                  "explanation": "The subsidiary table states that 动力新科 is a subsidiary whose main business is production and sale of diesel engines and accessories.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim_products_services_huayu",
+                  "status": "pass",
+                  "explanation": "The subsidiary table states that 华域汽车 is a subsidiary engaged in production and sale of automotive parts.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim_products_services_zhiji_nev",
+                  "status": "pass",
+                  "explanation": "The subsidiary table states that 智己汽车 is a subsidiary whose main business is production and sale of new-energy vehicles.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim_saic_maxus_products_services",
+                  "status": "pass",
+                  "explanation": "The subsidiary table states that 上汽大通 is a subsidiary whose business is automobile production and sale.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "products_services-001",
+                  "status": "unclear",
+                  "explanation": "The green low-carbon wording supports raising pure-electric and hybrid penetration, accelerating fuel-cell product launch, and preliminary V2G exploration. It does not support launching pure-electric, hybrid, and fuel-cell complete vehicles as one current product action.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "products_services-complete-vehicles",
+                  "status": "pass",
+                  "explanation": "The audit discussion states revenue from selling complete vehicles and that the group mainly produces and sells complete vehicles.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "products_services_2025",
+                  "status": "pass",
+                  "explanation": "The 2025 main-business breakdown supports vehicle revenue of 410,196,473,001.11 yuan, parts revenue of 203,019,866,775.26 yuan, and labor-and-other revenue of 18,791,117,696.37 yuan.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "products_services_new_energy_and_batteries",
+                  "status": "pass",
+                  "explanation": "The subsidiary list states 飞凡汽车科技有限公司’s business as new-energy vehicle sales, electrical-accessory sales, and parts R&D, among other items, and 上汽时代动力电池系统有限公司’s business as development, production, and sale of power-battery modules and systems.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "products_services_other_business_lines",
+                  "status": "pass",
+                  "explanation": "The other-business breakdown lists materials and scrap sales, labor services, leasing, and other.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "products_services_saic_finance_subsidiary",
+                  "status": "pass",
+                  "explanation": "The subsidiary table states that 上汽财务公司 is a subsidiary whose main business is financial services.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "products_services_traditional_fuel_vehicle",
+                  "status": "pass",
+                  "explanation": "The committee note states that the related enterprises’ impairment provision was mainly against assets related to the traditional fuel-vehicle business.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "ps_vehicles_parts_and_finance",
+                  "status": "pass",
+                  "explanation": "The segment disclosure presents report segments and financial columns for 整车及零部件 and 金融业/金融服务.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim-input-exposure-1",
+                  "status": "unclear",
+                  "explanation": "The risk note supports only that a continued sharp rise in prices of some upstream materials and memory chips may pressure production supply and cost control. It does not state that production supply depends on those inputs.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                }
+              ],
+              "requested_pages": []
+            },
+            "physical_request": false,
+            "reused_verification": true
+          },
+          {
+            "request_id": "bp-work-5157694452e829569d6a42f3:report:71",
+            "purpose": "verify_views",
+            "status": "success",
+            "source_scope": "full_context",
+            "source_pages": [
+              11,
+              203,
+              81,
+              192,
+              61,
+              155,
+              193,
+              61,
+              20,
+              170,
+              170,
+              171,
+              36
+            ],
+            "response_payload": {
+              "schema_version": "company_profile_report_response.v3",
+              "request_id": "bp-work-5157694452e829569d6a42f3:report:71",
+              "purpose": "verify_views",
+              "source_conditions": [],
+              "claims": [],
+              "records": [],
+              "checks": [
+                {
+                  "target_type": "condition",
+                  "target_id": "bp-work-1e963e4dd353ef49595b0d50:report:1:cond-1",
+                  "status": "pass",
+                  "explanation": "Claim bp-work-5157694452e829569d6a42f3:report:26:claim-001 correctly covers the condition with the page 11 industry and product breakdown and exact 2025 revenue figures.",
+                  "covers_target_type": "claim",
+                  "covers_target_id": "bp-work-5157694452e829569d6a42f3:report:26:claim-001"
+                },
+                {
+                  "target_type": "condition",
+                  "target_id": "bp-work-1e963e4dd353ef49595b0d50:report:21:principal_business_vehicle_parts_production_sales",
+                  "status": "pass",
+                  "explanation": "The claim principal_business_vehicle_parts_production_sales covers the condition by citing subsidiary business natures for vehicle, parts, transmission, engine, commercial vehicle and passenger vehicle production/sales.",
+                  "covers_target_type": "claim",
+                  "covers_target_id": "principal_business_vehicle_parts_production_sales"
+                },
+                {
+                  "target_type": "condition",
+                  "target_id": "bp-work-1e963e4dd353ef49595b0d50:report:2:sc_principal_industry",
+                  "status": "pass",
+                  "explanation": "Claim principal_business_1 directly states that the company belongs to the automobile manufacturing industry with broad business layout and many investment types.",
+                  "covers_target_type": "claim",
+                  "covers_target_id": "principal_business_1"
+                },
+                {
+                  "target_type": "condition",
+                  "target_id": "bp-work-1e963e4dd353ef49595b0d50:report:4:principal_business_vehicle_main",
+                  "status": "unclear",
+                  "explanation": "No supplied claim covers the strategic committee statement about focusing on the vehicle main business, deepening reform, and enhancing the industrial-chain system; the source text alone is not claim coverage.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "condition",
+                  "target_id": "bp-work-1e963e4dd353ef49595b0d50:report:6:principal_business_scope",
+                  "status": "pass",
+                  "explanation": "Claim bp-work-5157694452e829569d6a42f3:report:35:principal_business_scope accurately restates the approved business scope from page 81 covering vehicles, motorcycles, tractors, machinery, assemblies and parts production/sale.",
+                  "covers_target_type": "claim",
+                  "covers_target_id": "bp-work-5157694452e829569d6a42f3:report:35:principal_business_scope"
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "bp-work-5157694452e829569d6a42f3:report:26:claim-001",
+                  "status": "pass",
+                  "explanation": "Page 11 shows the same two industry segments and four product categories with the exact 2025 revenue figures cited; the claim is fully supported.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "bp-work-5157694452e829569d6a42f3:report:31:claim-001",
+                  "status": "unclear",
+                  "explanation": "The cited page 203 table shows parts main-business revenue 2,580,352,381.62 and cost 1,644,953,369.00, but the quote does not identify consolidated versus parent-company scope; these figures conflict with the consolidated parts revenue 203,019,866,775.26 on page 11/155, so the company-level assertion is not fully supported.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "bp-work-5157694452e829569d6a42f3:report:35:principal_business_scope",
+                  "status": "pass",
+                  "explanation": "Page 81 states the approved business scope includes production and sale of automobiles, motorcycles, tractors and other motor vehicles, machinery, assemblies and parts, matching the claim.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "c1",
+                  "status": "pass",
+                  "explanation": "Page 192 states the group has two reportable segments: the vehicle and parts segment responsible for producing and selling vehicles and parts, and the financial services segment responsible for providing financial services.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim-principal-business-1",
+                  "status": "unclear",
+                  "explanation": "Page 203 shows vehicle main-business revenue 57,126,986,013.91 and cost 54,770,228,270.45, but the quote lacks entity/consolidation context and conflicts with consolidated vehicle revenue 410,196,473,001.11; the company-level attribution is unclear.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim-principal_business-1",
+                  "status": "pass",
+                  "explanation": "Page 61 states that SAIC Group mainly produces and sells complete vehicles, supporting the claim.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim:principal_business_breakdown",
+                  "status": "pass",
+                  "explanation": "Page 155 shows 2025 main-business revenue of 410,196,473,001.11 for vehicles, 203,019,866,775.26 for parts, and 18,791,117,696.37 for labor and other, matching the claim.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim_principal_business_segments",
+                  "status": "pass",
+                  "explanation": "Page 192 identifies the two reportable segments and their responsibilities exactly as stated in the claim.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "pb_reportable_segments",
+                  "status": "pass",
+                  "explanation": "Page 193 lists the reportable segment columns as vehicle and parts and financial industry, consistent with the page 192 segment description; the claim is supported.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "principal_business-vehicle-sales",
+                  "status": "pass",
+                  "explanation": "Page 61 states that 2025 vehicle sales revenue was approximately RMB 4,101.96 hundred million and about 62.51% of total operating revenue, matching the claim.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "principal_business_1",
+                  "status": "pass",
+                  "explanation": "Page 20 states the company belongs to the automobile manufacturing industry with broad business layout and many investment types, exactly matching the claim.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "principal_business_vehicle_parts_production_sales",
+                  "status": "pass",
+                  "explanation": "Pages 170-171 list subsidiaries whose stated business natures cover vehicle and parts production/sales, transmission and parts production/sales, automobile engine and component development/manufacturing/sales, and commercial/passenger vehicle and parts development/manufacturing.",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                }
+              ],
+              "requested_pages": []
+            },
+            "physical_request": false,
+            "reused_verification": true
+          },
+          {
+            "request_id": "bp-work-5157694452e829569d6a42f3:report:72",
+            "purpose": "verify_views",
+            "status": "success",
+            "source_scope": "full_context",
+            "source_pages": [
+              29,
+              184,
+              12,
+              13,
+              114,
+              115
+            ],
+            "response_payload": {
+              "schema_version": "company_profile_report_response.v3",
+              "request_id": "bp-work-5157694452e829569d6a42f3:report:72",
+              "purpose": "verify_views",
+              "source_conditions": [],
+              "claims": [],
+              "records": [],
+              "checks": [
+                {
+                  "target_type": "condition",
+                  "target_id": "bp-work-1e963e4dd353ef49595b0d50:report:10:prepayment_supplier_material_inputs",
+                  "status": "pass",
+                  "explanation": "该条件关于预付款项主要为预付未结算材料款及前五名预付供应商集中度的陈述，已由陈述该事实的已核验观点完全覆盖。",
+                  "covers_target_type": "claim",
+                  "covers_target_id": "input_exposure:prepayment_supplier_material_inputs:bp-work-5157694452e829569d6a42f3:report:58"
+                },
+                {
+                  "target_type": "condition",
+                  "target_id": "bp-work-1e963e4dd353ef49595b0d50:report:1:cond-5",
+                  "status": "pass",
+                  "explanation": "该条件关于营业成本构成及2025年前五名供应商采购额与占比的要求，已由核验通过的采购与成本观点完全覆盖。",
+                  "covers_target_type": "claim",
+                  "covers_target_id": "input_exposure-cost-composition-and-supplier-procurement"
+                },
+                {
+                  "target_type": "condition",
+                  "target_id": "bp-work-1e963e4dd353ef49595b0d50:report:21:input_exposure_related_party_purchases",
+                  "status": "pass",
+                  "explanation": "该条件关于关联方采购与接受劳务（包含商品、材料、劳务、长期资产及研发支出）的内容，已由对应的关联采购观点完全覆盖。",
+                  "covers_target_type": "claim",
+                  "covers_target_id": "claim:bp-work-1e963e4dd353ef49595b0d50:input_exposure_related_party_purchases"
+                },
+                {
+                  "target_type": "condition",
+                  "target_id": "bp-work-1e963e4dd353ef49595b0d50:report:3:cond-3",
+                  "status": "pass",
+                  "explanation": "该条件关于公司生产保供依赖上游原材料及存储芯片供应的内容，已由核验通过的原材料与芯片保供风险观点覆盖。",
+                  "covers_target_type": "claim",
+                  "covers_target_id": "claim-input-exposure-1"
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim-input-exposure-1",
+                  "status": "pass",
+                  "explanation": "观点内容与年报第29页关于上游原材料及存储芯片价格大幅上行对生产保供及成本管控造成较大压力的披露完全相符。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim:bp-work-1e963e4dd353ef49595b0d50:input_exposure_related_party_purchases",
+                  "status": "pass",
+                  "explanation": "观点陈述的合营企业与联营企业采购商品、材料及劳务金额、合营企业购买长期资产金额以及其他关联方接受研发支出劳务金额与第184页关联交易表格完全吻合。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "input_exposure-cost-composition-and-supplier-procurement",
+                  "status": "pass",
+                  "explanation": "观点陈述的汽车制造业成本构成及第13页前五名供应商采购总额与占比数据完全吻合。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "input_exposure:prepayment_supplier_material_inputs:bp-work-5157694452e829569d6a42f3:report:58",
+                  "status": "pass",
+                  "explanation": "观点中关于账龄超过1年的重要预付款项性质以及期末余额前五名预付单位金额与占比陈述均与年报第114页及第115页明细完全一致。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                }
+              ],
+              "requested_pages": []
+            },
+            "physical_request": false,
+            "reused_verification": true
+          },
+          {
+            "request_id": "bp-work-5157694452e829569d6a42f3:report:73",
+            "purpose": "verify_views",
+            "status": "success",
+            "source_scope": "full_context",
+            "source_pages": [
+              9,
+              10,
+              145
+            ],
+            "response_payload": {
+              "schema_version": "company_profile_report_response.v3",
+              "request_id": "bp-work-5157694452e829569d6a42f3:report:73",
+              "purpose": "verify_views",
+              "source_conditions": [],
+              "claims": [],
+              "records": [],
+              "checks": [
+                {
+                  "target_type": "condition",
+                  "target_id": "bp-work-1e963e4dd353ef49595b0d50:report:14:other_payables_dealer_deposits",
+                  "status": "pass",
+                  "explanation": "该条件由 claim_supply_chain_role_dealer_deposits 覆盖：该 claim 明确说明其他应付款按款项性质包括经销商保证金及其他押金，并给出期末 1,173,733,050.69 元、期初 1,048,195,307.94 元，与 page 145 表格行一致。",
+                  "covers_target_type": "claim",
+                  "covers_target_id": "claim_supply_chain_role_dealer_deposits"
+                },
+                {
+                  "target_type": "condition",
+                  "target_id": "bp-work-1e963e4dd353ef49595b0d50:report:1:cond-6",
+                  "status": "unclear",
+                  "explanation": "没有单一已核验 claim 覆盖该条件的全部条款：claim1 覆盖整车制造/综合服务、板块协同、国内供应链、经销及海外网点等，但未覆盖上游汽车芯片、各类零部件及原材料供应商，也未覆盖直营销售渠道；因此条件覆盖不完整。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "bp-work-5157694452e829569d6a42f3:report:63:supply_chain_role:1",
+                  "status": "pass",
+                  "explanation": "该 claim 的板块协同、国内供应链/经销网络/汽车金融、出海布局、3000 余个海外网点、170 多个国家和地区及 8 艘滚装新船等均与 page 9、page 10 引文一致；下游销售与出行/金融服务表述可由两页联合概括支持，未发现数字、主体或期间错误。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim_supply_chain_role_dealer_deposits",
+                  "status": "pass",
+                  "explanation": "结合该条件所述其他应付款按款项性质列示，page 145 表格行“经销商保证金及其他押金 1,173,733,050.69 1,048,195,307.94”与 claim 的期末/期初金额完全一致，列向和数字均正确。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                }
+              ],
+              "requested_pages": []
+            },
+            "physical_request": false,
+            "reused_verification": true
+          },
+          {
+            "request_id": "bp-work-5157694452e829569d6a42f3:report:74",
+            "purpose": "verify_views",
+            "status": "success",
+            "source_scope": "full_context",
+            "source_pages": [
+              155,
+              184,
+              184
+            ],
+            "response_payload": {
+              "schema_version": "company_profile_report_response.v3",
+              "request_id": "bp-work-5157694452e829569d6a42f3:report:74",
+              "purpose": "verify_views",
+              "source_conditions": [],
+              "claims": [],
+              "records": [],
+              "checks": [
+                {
+                  "target_type": "condition",
+                  "target_id": "bp-work-1e963e4dd353ef49595b0d50:report:17:top_five_customer_concentration",
+                  "status": "pass",
+                  "explanation": "条件要求前五名客户合计75,458,211,510.20元占11.68%、客户一33,120,406,668.62元占5.13%。第155页'3) 集团前五名客户的营业收入情况'（reading:994cd0743ee382bdab31）逐项列示：客户一33,120,406,668.62元占5.13%、客户二15,730,209,886.40元占2.43%、客户三9,957,610,546.75元占1.54%、客户四9,523,196,371.07元占1.47%、客户五7,126,788,037.36元占1.10%、合计75,458,211,510.20元占11.68%，与条件一致。该条件已被已验证通过的claim-upstream-downstream-customer-concentration完整覆盖。",
+                  "covers_target_type": "claim",
+                  "covers_target_id": "claim-upstream-downstream-customer-concentration"
+                },
+                {
+                  "target_type": "condition",
+                  "target_id": "bp-work-1e963e4dd353ef49595b0d50:report:21:upstream_downstream_jvs_associates_suppliers_customers",
+                  "status": "pass",
+                  "explanation": "条件要求合营企业与联营企业在关联采购和销售中同时作为供应商和客户。第184页关联交易表显示：公司向合营企业采购商品、材料及劳务本期216,788,642,447.89元（reading:a5835fa76c6ae967d59a）、向联营企业采购10,428,505,729.58元（reading:37b20fa5fa19f9205058），并向合营企业销售商品本期52,027,039,912.73元（reading:2822b9010815407bac78）、向联营企业销售商品4,067,284,982.00元（reading:7e55496ea582d39b20a3）。两类交易方向相反且主体相同，支持合营与联营企业同时作为供应商和客户的表述。该条件已被已验证通过的claim:bp-work-5157694452e829569d6a42f3:report:65:upstream_downstream_related_party_jv_associate完整覆盖。",
+                  "covers_target_type": "claim",
+                  "covers_target_id": "claim:bp-work-5157694452e829569d6a42f3:report:65:upstream_downstream_related_party_jv_associate"
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim-upstream-downstream-customer-concentration",
+                  "status": "pass",
+                  "explanation": "第155页前五名客户营业收入表（reading:994cd0743ee382bdab31）与答案逐项核对一致：合计75,458,211,510.20元占本集团全部营业收入11.68%；客户一33,120,406,668.62元占5.13%；客户二15,730,209,886.40元占2.43%；客户三9,957,610,546.75元占1.54%；客户四9,523,196,371.07元占1.47%；客户五7,126,788,037.36元占1.10%。该表位于2025年年度报告营业收入和营业成本附注内，'2025年度'与本期口径一致，金额、比例、主体均被引用支持。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                },
+                {
+                  "target_type": "claim",
+                  "target_id": "claim:bp-work-5157694452e829569d6a42f3:report:65:upstream_downstream_related_party_jv_associate",
+                  "status": "pass",
+                  "explanation": "第184页关联交易表与答案逐项核对一致：向合营企业采购商品、材料及劳务本期216,788,642,447.89元（reading:a5835fa76c6ae967d59a）、向联营企业采购10,428,505,729.58元（reading:37b20fa5fa19f9205058）；向合营企业销售商品本期52,027,039,912.73元（reading:2822b9010815407bac78）、向联营企业销售商品4,067,284,982.00元（reading:7e55496ea582d39b20a3）。采购方向为公司向合营/联营企业购买、销售方向为公司向合营/联营企业出售，与答案表述一致；'本期（2025年度）'对应表中本期发生额，主体、金额、方向均被引用支持，由此得出合营与联营企业同时作为供应商和客户的结论成立。",
+                  "covers_target_type": null,
+                  "covers_target_id": null
+                }
+              ],
+              "requested_pages": []
+            },
+            "physical_request": false,
+            "reused_verification": true
           }
         ],
         "record_dispositions": [],
@@ -14247,6 +15984,9 @@
     }
   ],
   "stage4_restricted_views": [],
+  "production_authorization": "not_authorized",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
   "legacy_export_used": false,
   "profile_state": "found",
   "restricted_delivered": 0,
