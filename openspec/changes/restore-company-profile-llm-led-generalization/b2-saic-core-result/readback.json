@@ -1,0 +1,18 @@
+{
+  "window": "上汽追加开发收口",
+  "exit_code": 0,
+  "elapsed_seconds": 1182.2998621268198,
+  "physical": 17,
+  "charged_tokens": 255918,
+  "recoveries": 3,
+  "cost": "unknown",
+  "delivered": 1,
+  "views": "44/32/6",
+  "observed_company": 36,
+  "supply_observed": 4,
+  "claim1": "retracted",
+  "flags": false,
+  "query.json": "3de94bd09cd3b4c587bd908ed43dcebc2d90dfe07b46e394a580a36aea7276fe",
+  "budget-final.json": "f423cd30e10a7f346cf9d25ae6a075c8217a54cbcb6b4afe64da007729536b79",
+  "supervisor.json": "8b0767abd13b0d130c14b9fa41540727761506fcead97eb9cb7eb6d7ee940f09"
+}

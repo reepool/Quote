@@ -1,0 +1,20 @@
+{
+  "window": "浦发追加开发收口",
+  "exit_code": 0,
+  "elapsed_seconds": 6711.719531926326,
+  "physical": 128,
+  "charged_tokens": 1445332,
+  "recoveries": 18,
+  "cost": "unknown",
+  "stopped_reason": "physical_request_token_context_or_cost_budget_exhausted",
+  "delivered": 1,
+  "views": "86/64/11",
+  "observed_company": 68,
+  "supply_observed": 11,
+  "unread_gaps": 180,
+  "flags": false,
+  "missing": "手续费及佣金净收入与其他净收入的金额未进入已核正文",
+  "query.json": "c9b34f894741bb4e75e6b7a14f4d18a164e5ad53381c3fba8e9bfe0f32453551",
+  "budget-final.json": "95fe618206c302fe00e25ae2bbba1ec2e3441ed71fd251aee3eeb2f40a35edfb",
+  "supervisor.json": "aba9d9fb8b71c357575aba97371cc3c826b8a5d03a6dff125ece8cbeb7f6f221"
+}

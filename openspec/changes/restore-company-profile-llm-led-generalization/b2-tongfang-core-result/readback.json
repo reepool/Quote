@@ -1,0 +1,17 @@
+{
+  "window": "同方追加开发收口",
+  "exit_code": 0,
+  "elapsed_seconds": 2005.6252929139882,
+  "physical": 35,
+  "charged_tokens": 418403,
+  "recoveries": 7,
+  "cost": "unknown",
+  "delivered": 1,
+  "views": "74/55/1",
+  "observed_company": 58,
+  "supply": "contract liability balance only",
+  "flags": false,
+  "query.json": "57e6cb6a60f3b00053ac21a0374004aa7be5cc959cd1d85bc781c595a35c3bdb",
+  "budget-final.json": "0de58f3d593f030fafb7a11849018f7735f1c7583837af1e4436bee8b24c6d4f",
+  "supervisor.json": "fe40e251ab4263be67b9ef0f94851b76e909ce3e8e6f6b192528cd915ba32b34"
+}
