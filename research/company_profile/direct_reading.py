@@ -710,6 +710,31 @@ def interpret_direct_core(
             response = ReportSemanticResponseV3.model_validate_json(
                 json.dumps(response, ensure_ascii=False)
             )
+        request_targets = []
+        for claim in request.claims:
+            request_targets.append(
+                {
+                    "target_type": "claim",
+                    "target_id": claim.claim_id,
+                    "answer": claim.answer,
+                    "supporting_record_ids": list(claim.supporting_record_ids),
+                    "evidence": [
+                        {
+                            "page": evidence.page,
+                            "section_title": evidence.section_title,
+                            "anchor": {"bounded_quote": evidence.anchor.bounded_quote},
+                        }
+                        for evidence in claim.evidence
+                    ],
+                }
+            )
+        for condition in request.source_conditions:
+            request_targets.append(
+                {
+                    "target_type": "condition",
+                    "target_id": condition.condition_id,
+                }
+            )
         receipts.append(
             {
                 "request_id": request.request_id,
@@ -717,6 +742,7 @@ def interpret_direct_core(
                 "status": "success",
                 "source_scope": source_scope,
                 "source_pages": [int(page["page"]) for page in request.source_pages],
+                "request_targets": request_targets,
                 "response_payload": response.model_dump(mode="json"),
                 "physical_request": True,
             }
@@ -1628,7 +1654,8 @@ def interpret_direct_core(
                 if page_no in by_page and page_no not in inventoried and page_no not in follow:
                     follow.append(page_no)
             publish()
-            draft_ready_core()
+            if not identity.get("core_gap_closeout"):
+                draft_ready_core()
         return follow
 
     composed: set[int] = set()
@@ -2022,51 +2049,150 @@ def interpret_direct_core(
                 )
                 for condition_id in (claim.condition_ids or [])
             }
-            answer_text = "\n".join(claim.answer for claim in claims)
-            selected_conditions = []
-            for condition in conditions:
-                if condition.condition_id.startswith("correction:"):
-                    selected_conditions.append(condition)
-                    continue
-                quote_amounts = re.findall(
-                    r"\d{1,3}(?:,\d{3})+(?:\.\d+)?",
-                    "\n".join(
-                        evidence.anchor.bounded_quote for evidence in condition.evidence
-                    ),
-                )
-                amount_already_answered = (
-                    len(quote_amounts) != 1 or quote_amounts[0] in answer_text
-                )
-                if condition.condition_id in cited_ids and amount_already_answered:
-                    continue
-                if (
-                    condition.major
-                    and condition.statement_status == "current"
-                    and condition.dimension
-                    in {
-                        "principal_business",
-                        "revenue_model",
-                        "products_services",
-                        "input_exposure",
-                        "supply_chain_role",
-                        "upstream_downstream",
-                    }
-                ):
-                    selected_conditions.append(condition)
-            selected_conditions.sort(
-                key=lambda item: (
-                    item.condition_id.startswith("correction:"),
-                    {
-                        "principal_business": 0,
-                        "revenue_model": 1,
-                        "products_services": 2,
-                        "input_exposure": 3,
-                        "supply_chain_role": 4,
-                        "upstream_downstream": 5,
-                    }.get(item.dimension, 50),
-                    item.condition_id,
-                )
+            answer_text = "\n".join(
+                claim.answer
+                for claim in claims
+                if claim.status == "observed"
+                and claim.limitation
+                not in {
+                    "pending_verification",
+                    "claim_or_dependency_not_verified",
+                    "evidence_not_located",
+                    "retracted_pending_correction",
+                    "subject_scope_omitted",
+                }
             )
+            has_role = any(
+                claim.status == "observed"
+                and not claim.limitation
+                and claim.dimension == "supply_chain_role"
+                for claim in claims
+            )
+            if identity.get("core_gap_closeout") and not has_role and not any(
+                condition.dimension in {"supply_chain_role", "upstream_downstream"}
+                and "余额" not in "\n".join(evidence.anchor.bounded_quote for evidence in condition.evidence)
+                for condition in conditions
+            ):
+                role_pages = []
+                seen_pages = set()
+                for claim in claims:
+                    if claim.dimension not in {"principal_business", "products_services"}:
+                        continue
+                    if claim.status != "observed" or claim.limitation:
+                        continue
+                    for evidence in claim.evidence:
+                        page_no = int(evidence.page)
+                        if page_no in seen_pages or page_no not in by_page:
+                            continue
+                        seen_pages.add(page_no)
+                        role_pages.append(by_page[page_no])
+                if role_pages:
+                    try:
+                        reviewed = invoke(
+                            "source_inventory",
+                            role_pages[:4],
+                            source_scope="full_context",
+                            output=SOURCE_OUTPUT,
+                            later=0,
+                        )
+                        extra, extra_gaps = _located_conditions(
+                            reviewed.source_conditions,
+                            report,
+                            role_pages[:4],
+                            request_id=receipts[-1]["request_id"],
+                            seen=seen,
+                        )
+                        gaps.extend(extra_gaps)
+                        conditions.extend(
+                            item
+                            for item in extra
+                            if item.dimension in {"supply_chain_role", "upstream_downstream", "input_exposure"}
+                        )
+                    except (ValueError, LlmError, SemanticProviderError) as exc:
+                        gaps.append(f"direct_core_gap_check_stopped:{exc}")
+            selected_conditions = []
+            if identity.get("core_gap_closeout"):
+                covered_conditions = {
+                    check.target_id
+                    for check in checks
+                    if check.target_type == "condition"
+                    and check.status == "pass"
+                    and check.covers_target_id
+                    in {
+                        claim.claim_id
+                        for claim in claims
+                        if claim.status == "observed" and not claim.limitation
+                    }
+                }
+                pool = []
+                revenue_missing = []
+                for condition in conditions:
+                    if not condition.major or condition.statement_status != "current":
+                        continue
+                    if condition.condition_id in covered_conditions:
+                        continue
+                    quotes = "\n".join(evidence.anchor.bounded_quote for evidence in condition.evidence)
+                    if condition.dimension in {"supply_chain_role", "upstream_downstream", "input_exposure"}:
+                        if "余额" in quotes:
+                            continue
+                        pool.append(condition)
+                        continue
+                    if condition.dimension != "revenue_model":
+                        continue
+                    amounts = re.findall(r"\d{1,3}(?:,\d{3})+(?:\.\d+)?", quotes)
+                    if amounts and any(amount not in answer_text for amount in amounts):
+                        revenue_missing.append(condition)
+                if not has_role:
+                    selected_pool = pool
+                else:
+                    selected_pool = revenue_missing[:4]
+                grouped = _business_groups(selected_pool)
+                selected_conditions = grouped[0] if grouped else []
+            else:
+                for condition in conditions:
+                    if condition.condition_id.startswith("correction:"):
+                        selected_conditions.append(condition)
+                        continue
+                    quote_amounts = re.findall(
+                        r"\d{1,3}(?:,\d{3})+(?:\.\d+)?",
+                        "\n".join(
+                            evidence.anchor.bounded_quote for evidence in condition.evidence
+                        ),
+                    )
+                    amount_already_answered = (
+                        len(quote_amounts) != 1 or quote_amounts[0] in answer_text
+                    )
+                    if condition.condition_id in cited_ids and amount_already_answered:
+                        continue
+                    if (
+                        condition.major
+                        and condition.statement_status == "current"
+                        and condition.dimension
+                        in {
+                            "principal_business",
+                            "revenue_model",
+                            "products_services",
+                            "input_exposure",
+                            "supply_chain_role",
+                            "upstream_downstream",
+                        }
+                    ):
+                        selected_conditions.append(condition)
+            if not identity.get("core_gap_closeout"):
+                selected_conditions.sort(
+                    key=lambda item: (
+                        item.condition_id.startswith("correction:"),
+                        {
+                            "principal_business": 0,
+                            "revenue_model": 1,
+                            "products_services": 2,
+                            "input_exposure": 3,
+                            "supply_chain_role": 4,
+                            "upstream_downstream": 5,
+                        }.get(item.dimension, 50),
+                        item.condition_id,
+                    )
+                )
             terms = [
                 str(term)
                 for term in identity.get("supplement_context_terms") or ()
@@ -2133,7 +2259,8 @@ def interpret_direct_core(
         unread = [
             int(page["page"])
             for page in sources
-            if page.get("readable", True)
+            if identity.get("continue_unread")
+            and page.get("readable", True)
             and str(page.get("text") or "").strip()
             and by_page[int(page["page"])]["status"] != "read"
         ]

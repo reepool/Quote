@@ -2627,6 +2627,99 @@ def test_a_requested_claim_without_a_check_does_not_keep_the_old_pass(tmp_path):
     assert not [item for item in loaded["checks"] if item.get("target_id") == "income" and item.get("status") == "pass"]
 
 
+def test_empty_response_claims_use_saved_request_targets(tmp_path):
+    import json
+    from research.company_profile.bounded_entry import load_saved_draft
+
+    body = {
+        "claim_id": "income",
+        "dimension": "revenue_model",
+        "status": "observed",
+        "answer": "公司实现营业收入。",
+        "evidence": [{"page": 71, "section_title": "收入", "anchor": {"bounded_quote": "营业收入"}}],
+        "supporting_record_ids": [],
+    }
+    other = {
+        "claim_id": "kept",
+        "dimension": "principal_business",
+        "status": "observed",
+        "answer": "公司提供金融服务。",
+        "evidence": [{"page": 62, "section_title": "业务", "anchor": {"bounded_quote": "金融服务"}}],
+        "supporting_record_ids": [],
+    }
+    older = tmp_path / "older.json"
+    newer = tmp_path / "newer.json"
+    older.write_text(
+        json.dumps(
+            _draft_query(
+                [body, other],
+                [
+                    {
+                        "request_id": "old",
+                        "purpose": "verify_views",
+                        "status": "success",
+                        "request_targets": [
+                            {**body, "target_type": "claim", "target_id": "income"},
+                            {**other, "target_type": "claim", "target_id": "kept"},
+                            {"target_type": "condition", "target_id": "fee"},
+                        ],
+                        "response_payload": {
+                            "claims": [],
+                            "checks": [
+                                {"target_type": "claim", "target_id": "income", "status": "pass", "explanation": "旧通过"},
+                                {"target_type": "claim", "target_id": "kept", "status": "pass", "explanation": "保持"},
+                                {"target_type": "condition", "target_id": "fee", "status": "pass", "covers_target_id": "income"},
+                            ],
+                        },
+                    }
+                ],
+            )
+        )
+    )
+    newer.write_text(
+        json.dumps(
+            _draft_query(
+                [body, other],
+                [
+                    {
+                        "request_id": "new",
+                        "purpose": "verify_views",
+                        "status": "success",
+                        "request_targets": [
+                            {**body, "target_type": "claim", "target_id": "income"},
+                            {"target_type": "condition", "target_id": "fee"},
+                        ],
+                        "response_payload": {"claims": [], "checks": []},
+                    },
+                    {
+                        "request_id": "run:carried-checks",
+                        "purpose": "verify_views",
+                        "status": "success",
+                        "carried_verification": True,
+                        "response_payload": {
+                            "claims": [],
+                            "checks": [
+                                {"target_type": "claim", "target_id": "income", "status": "pass", "explanation": "汇总复活"},
+                                {"target_type": "condition", "target_id": "fee", "status": "pass", "covers_target_id": "income"},
+                            ],
+                        },
+                    },
+                ],
+            )
+        )
+    )
+    loaded = load_saved_draft(
+        {
+            "accepted_draft_query": str(newer),
+            "verification_history_queries": [str(older), str(newer)],
+            "asset": {"content_hash": "doc-1"},
+        }
+    )
+    assert not any(item.get("target_id") == "income" and item.get("status") == "pass" for item in loaded["checks"])
+    assert not any(item.get("target_id") == "fee" and item.get("status") == "pass" for item in loaded["checks"])
+    assert any(item.get("target_id") == "kept" and item.get("status") == "pass" for item in loaded["checks"])
+
+
 def test_a_saved_draft_verifies_related_claims_in_one_request():
     from research.company_profile.contracts import ReportSourceCondition
 

@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "saic-gap",
+  "binding_sha256": "48c15118e4dcfc315bf66cfa5c9e5e60cbe89d0ef1563fb566bbd1963046b658",
+  "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+  "approval_reference": "acceptance section 7.45 and b2 card section 7.8, 2026-10-25",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "核心缺口收口"
+}

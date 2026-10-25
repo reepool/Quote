@@ -202,12 +202,17 @@ def _history_claim_events(path: Path) -> list[dict]:
     for item in (profile.get("three_views") or {}).get("call_receipts") or []:
         if item.get("purpose") != "verify_views" or item.get("status") not in {None, "success"}:
             continue
+        if item.get("carried_verification"):
+            continue
         payload = item.get("response_payload") or {}
         sent = {
             claim.get("claim_id"): claim
             for claim in payload.get("claims") or []
             if claim.get("claim_id")
         }
+        for target in item.get("request_targets") or []:
+            if target.get("target_type") == "claim" and target.get("target_id"):
+                sent.setdefault(target["target_id"], target)
         returned = {}
         for check in payload.get("checks") or []:
             if check.get("target_type") != "claim" or not check.get("target_id"):
@@ -215,14 +220,26 @@ def _history_claim_events(path: Path) -> list[dict]:
             returned.setdefault(check["target_id"], check)
         for target in [*sent, *[key for key in returned if key not in sent]]:
             body = sent.get(target) or current.get(target)
+            requested = target in sent or any(
+                item.get("target_id") == target and item.get("target_type") == "claim"
+                for item in item.get("request_targets") or []
+            )
+            if not requested and target not in returned:
+                continue
             if not body:
                 continue
-            check = returned.get(target) or {
-                "target_type": "claim",
-                "target_id": target,
-                "status": "missing",
-                "explanation": "requested claim returned no check",
-            }
+            if target not in returned and not requested:
+                continue
+            check = returned.get(target)
+            if check is None and requested and (sent or item.get("request_targets")):
+                check = {
+                    "target_type": "claim",
+                    "target_id": target,
+                    "status": "missing",
+                    "explanation": "requested claim returned no check",
+                }
+            if check is None:
+                continue
             events.append({"target": target, "scope": _claim_scope(body), "check": check})
     return events
 
@@ -269,24 +286,38 @@ def load_saved_draft(binding: dict) -> dict:
             continue
         valid_ids.add(target)
         checks.append(matched[-1]["check"])
-    seen_conditions = set()
+    condition_state: dict[tuple, dict] = {}
     for path in history:
         query_history = json.loads(path.read_text())
         for item in (query_history["profiles"][0].get("three_views") or {}).get("call_receipts") or []:
-            if item.get("purpose") != "verify_views":
+            if item.get("purpose") != "verify_views" or item.get("carried_verification"):
                 continue
-            for check in (item.get("response_payload") or {}).get("checks") or []:
-                if (
-                    check.get("target_type") != "condition"
-                    or check.get("status") != "pass"
-                    or check.get("covers_target_id") not in valid_ids
-                ):
+            payload = item.get("response_payload") or {}
+            returned = {
+                check.get("target_id"): check
+                for check in payload.get("checks") or []
+                if check.get("target_type") == "condition" and check.get("target_id")
+            }
+            requested = [
+                target.get("target_id")
+                for target in item.get("request_targets") or []
+                if target.get("target_type") == "condition" and target.get("target_id")
+            ]
+            for target_id in [*requested, *[key for key in returned if key not in requested]]:
+                check = returned.get(target_id)
+                if check is None and target_id in requested:
+                    check = {
+                        "target_type": "condition",
+                        "target_id": target_id,
+                        "status": "missing",
+                    }
+                if check is None:
                     continue
-                marker = (check.get("target_id"), check.get("covers_target_id"))
-                if marker in seen_conditions:
-                    continue
-                seen_conditions.add(marker)
-                checks.append(check)
+                marker = target_id
+                condition_state[marker] = check
+    for check in condition_state.values():
+        if check.get("status") == "pass" and check.get("covers_target_id") in valid_ids:
+            checks.append(check)
     return {"claims": claims, "checks": checks}
 
 
@@ -679,6 +710,9 @@ def validate_binding(
                 "saic-core",
                 "tongfang-core",
                 "spdb-core",
+                "tongfang-gap",
+                "saic-gap",
+                "spdb-gap",
             }
             or not authorization.get("approval_reference")
         ):
@@ -1163,6 +1197,10 @@ def _worker(
             identity["accepted_source_receipts"] = load_saved_source_discovery(binding)
         if binding.get("accepted_draft_query"):
             identity["accepted_prior_draft"] = load_saved_draft(binding)
+        if binding.get("core_gap_closeout"):
+            identity["core_gap_closeout"] = True
+        if binding.get("continue_unread"):
+            identity["continue_unread"] = True
         if binding.get("retract_claim_ids"):
             identity["retract_claim_ids"] = list(binding["retract_claim_ids"])
         if binding.get("defer_claim_ids"):

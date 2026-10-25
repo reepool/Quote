@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "spdb-gap",
+  "binding_sha256": "37015d2231709c6ffed7dcd283f89f2fe95102dfc894cb74d5ba37c08fd0615b",
+  "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+  "approval_reference": "acceptance section 7.45 and b2 card section 7.8, 2026-10-25",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "核心缺口收口"
+}
