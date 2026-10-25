@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "saic-role",
+  "binding_sha256": "e772543ad7ae36d72d5434682ec5cf0ca5ca57b66f834a7b045dad46a3ead486",
+  "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+  "approval_reference": "acceptance section 7.46 and b2 card section 7.9, 2026-10-25",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "角色交付"
+}

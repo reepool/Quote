@@ -1804,6 +1804,24 @@ def interpret_direct_core(
                 evidence for item in pending for evidence in item.evidence
             )
         ]
+        if identity.get("core_gap_closeout"):
+            full_pages = []
+            for page in pages:
+                source = next(
+                    (
+                        item
+                        for item in sources
+                        if int(item["page"]) == int(page["page"]) and str(item.get("text") or "").strip()
+                    ),
+                    None,
+                )
+                if source is None:
+                    continue
+                full_pages.append(
+                    {"page": int(page["page"]), "text": str(source["text"]), "readable": True}
+                )
+            if full_pages:
+                pages = full_pages
         for evidence in (item for condition in pending for item in condition.evidence):
             offset = getattr(getattr(evidence, "anchor", None), "source_offset", None)
             heading = governing_subject_heading(
@@ -2030,6 +2048,10 @@ def interpret_direct_core(
                     continue
                 kept_checks.append(check)
             checks.extend(kept_checks)
+            for item in prior.get("verify_receipts") or []:
+                receipts.append(
+                    {**item, "physical_request": False, "reused_verification": True}
+                )
             cited_ids = {
                 condition_id
                 for claim in claims
@@ -2062,96 +2084,33 @@ def interpret_direct_core(
                     "subject_scope_omitted",
                 }
             )
-            has_role = any(
-                claim.status == "observed"
-                and not claim.limitation
-                and claim.dimension == "supply_chain_role"
-                for claim in claims
-            )
-            if identity.get("core_gap_closeout") and not has_role and not any(
-                condition.dimension in {"supply_chain_role", "upstream_downstream"}
-                and "余额" not in "\n".join(evidence.anchor.bounded_quote for evidence in condition.evidence)
-                for condition in conditions
-            ):
-                role_pages = []
-                seen_pages = set()
+            if identity.get("core_gap_closeout"):
+                role_evidence = []
                 for claim in claims:
-                    if claim.dimension not in {"principal_business", "products_services"}:
+                    if claim.dimension not in {
+                        "principal_business",
+                        "products_services",
+                        "revenue_model",
+                    }:
                         continue
                     if claim.status != "observed" or claim.limitation:
                         continue
-                    for evidence in claim.evidence:
-                        page_no = int(evidence.page)
-                        if page_no in seen_pages or page_no not in by_page:
-                            continue
-                        seen_pages.add(page_no)
-                        role_pages.append(by_page[page_no])
-                if role_pages:
-                    try:
-                        reviewed = invoke(
-                            "source_inventory",
-                            role_pages[:4],
-                            source_scope="full_context",
-                            output=SOURCE_OUTPUT,
-                            later=0,
+                    role_evidence.extend(claim.evidence)
+                selected_conditions = []
+                if role_evidence:
+                    selected_conditions.append(
+                        ReportSourceCondition(
+                            condition_id="operating-role-from-current-business",
+                            dimension="supply_chain_role",
+                            description=(
+                                "只根据所供原文归纳公司当前生产或提供的产品与服务、服务对象和上下游位置。"
+                                "期末余额不是经营角色。不要把计划中的目标写成已经实现的身份，也不要编造原文没有的客户。"
+                            ),
+                            evidence=tuple(role_evidence[:12]),
+                            major=True,
+                            statement_status="current",
                         )
-                        extra, extra_gaps = _located_conditions(
-                            reviewed.source_conditions,
-                            report,
-                            role_pages[:4],
-                            request_id=receipts[-1]["request_id"],
-                            seen=seen,
-                        )
-                        gaps.extend(extra_gaps)
-                        conditions.extend(
-                            item
-                            for item in extra
-                            if item.dimension in {"supply_chain_role", "upstream_downstream", "input_exposure"}
-                        )
-                    except (ValueError, LlmError, SemanticProviderError) as exc:
-                        gaps.append(f"direct_core_gap_check_stopped:{exc}")
-            selected_conditions = []
-            if identity.get("core_gap_closeout"):
-                covered_conditions = {
-                    check.target_id
-                    for check in checks
-                    if check.target_type == "condition"
-                    and check.status == "pass"
-                    and check.covers_target_id
-                    in {
-                        claim.claim_id
-                        for claim in claims
-                        if claim.status == "observed" and not claim.limitation
-                    }
-                }
-                pool = []
-                revenue_missing = []
-                for condition in conditions:
-                    if not condition.major or condition.statement_status != "current":
-                        continue
-                    if condition.condition_id in covered_conditions:
-                        continue
-                    quotes = "\n".join(evidence.anchor.bounded_quote for evidence in condition.evidence)
-                    if condition.dimension in {"supply_chain_role", "upstream_downstream", "input_exposure"}:
-                        if "余额" in quotes:
-                            continue
-                        pool.append(condition)
-                        continue
-                    if condition.dimension != "revenue_model":
-                        continue
-                    amounts = re.findall(r"\d{1,3}(?:,\d{3})+(?:\.\d+)?", quotes)
-                    if amounts and any(amount not in answer_text for amount in amounts):
-                        revenue_missing.append(condition)
-                if not has_role:
-                    selected_pool = [
-                        condition
-                        for condition in pool
-                        if condition.dimension in {"supply_chain_role", "upstream_downstream"}
-                    ]
-                else:
-                    selected_pool = revenue_missing[:4]
-                grouped = _business_groups(selected_pool)
-                selected_conditions = grouped[0] if grouped else []
+                    )
             else:
                 for condition in conditions:
                     if condition.condition_id.startswith("correction:"):

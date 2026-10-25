@@ -2811,3 +2811,163 @@ def test_a_saved_draft_verifies_related_claims_in_one_request():
     assert any({"vehicles", "steel"} <= set(item) for item in provider.verified)
 
 
+def test_a_second_generation_keeps_an_earlier_real_pass(tmp_path):
+    import json
+    from research.company_profile.bounded_entry import load_saved_draft
+
+    body = {
+        "claim_id": "kept",
+        "dimension": "revenue_model",
+        "status": "observed",
+        "answer": "知识服务以机构订阅为主。",
+        "evidence": [{"page": 12, "section_title": "经营", "anchor": {"bounded_quote": "机构订阅"}}],
+        "supporting_record_ids": [],
+    }
+    first = tmp_path / "first.json"
+    second = tmp_path / "second.json"
+    first.write_text(
+        json.dumps(
+            _draft_query(
+                [body],
+                [
+                    {
+                        "request_id": "verify-1",
+                        "purpose": "verify_views",
+                        "status": "success",
+                        "request_targets": [{**body, "target_type": "claim", "target_id": "kept"}],
+                        "response_payload": {
+                            "claims": [],
+                            "checks": [
+                                {"target_type": "claim", "target_id": "kept", "status": "pass", "explanation": "原核验"}
+                            ],
+                        },
+                    }
+                ],
+            )
+        )
+    )
+    second.write_text(
+        json.dumps(
+            _draft_query(
+                [body],
+                [
+                    {
+                        "request_id": "run:carried-checks",
+                        "purpose": "verify_views",
+                        "status": "success",
+                        "carried_verification": True,
+                        "response_payload": {"claims": [], "checks": []},
+                    }
+                ],
+            )
+        )
+    )
+    loaded = load_saved_draft(
+        {
+            "accepted_draft_query": str(second),
+            "verification_history_queries": [str(first), str(second)],
+            "asset": {"content_hash": "doc-1"},
+        }
+    )
+    assert any(item.get("target_id") == "kept" and item.get("status") == "pass" for item in loaded["checks"])
+    assert any(item.get("request_id") == "verify-1" for item in loaded["verify_receipts"])
+
+
+def test_role_closeout_sends_source_text_not_page_metadata():
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    text = "公司提供智能检查系统和知网机构订阅服务，并向机构客户交付。"
+    condition = ReportSourceCondition(
+        condition_id="service",
+        dimension="products_services",
+        description="检查系统与订阅服务。",
+        evidence=(_evidence(report, text="公司提供智能检查系统", page=1),),
+        major=True,
+        statement_status="current",
+    )
+    receipt = {
+        "request_id": "saved-service",
+        "purpose": "source_inventory",
+        "status": "success",
+        "source_scope": "full_context",
+        "source_pages": [1],
+        "response_payload": ReportSemanticResponseV3(
+            request_id="saved-service",
+            purpose="source_inventory",
+            source_conditions=(condition,),
+        ).model_dump(mode="json"),
+    }
+
+    class _Provider:
+        offline_only = True
+
+        def __init__(self):
+            self.pages = []
+            self.purposes = []
+
+        def interpret(self, request):
+            self.purposes.append(request.purpose)
+            self.pages.append(tuple(page.get("text") for page in request.source_pages))
+            if request.purpose == "source_inventory":
+                raise AssertionError("role closeout must not send another empty inventory")
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                claims=(
+                    ReportViewClaim(
+                        claim_id="role",
+                        dimension="supply_chain_role",
+                        status="observed",
+                        answer="公司向机构客户提供智能检查系统和订阅服务。",
+                        evidence=(_evidence(report, text="公司提供智能检查系统", page=1),),
+                    ),
+                )
+                if request.purpose == "synthesize_views"
+                else (),
+                checks=(
+                    (
+                        {
+                            "target_type": "claim",
+                            "target_id": "role",
+                            "status": "pass",
+                            "explanation": "角色有原文。",
+                        },
+                    )
+                    if request.purpose == "verify_views"
+                    else ()
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["core_gap_closeout"] = True
+    identity["accepted_source_receipts"] = [receipt]
+    identity["accepted_prior_draft"] = {
+        "claims": [
+            {
+                "claim_id": "service",
+                "dimension": "products_services",
+                "status": "observed",
+                "answer": "公司提供智能检查系统和知网机构订阅服务。",
+                "evidence": [
+                    _evidence(report, text="公司提供智能检查系统", page=1).model_dump(mode="json")
+                ],
+                "supporting_record_ids": [],
+            }
+        ],
+        "checks": [],
+        "verify_receipts": [],
+    }
+    provider = _Provider()
+    _run(
+        provider,
+        pages=({"page": 1, "text": text, "readable": True},),
+        processing_identity=identity,
+        report=report,
+    )
+    assert "source_inventory" not in provider.purposes
+    assert any(text in (page or "") for pages in provider.pages for page in pages)
+    assert "status" not in "".join(page or "" for pages in provider.pages for page in pages)
+
+
+

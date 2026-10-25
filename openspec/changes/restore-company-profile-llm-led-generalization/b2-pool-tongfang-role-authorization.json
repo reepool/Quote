@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "tongfang-role",
+  "binding_sha256": "9b6f2fb4d1b6a4cbb193d3ed73a2e169c1b42cf8e0d54f915b7059a22372d7d8",
+  "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+  "approval_reference": "acceptance section 7.46 and b2 card section 7.9, 2026-10-25",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "角色交付"
+}

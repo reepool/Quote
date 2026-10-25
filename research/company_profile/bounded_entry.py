@@ -286,6 +286,18 @@ def load_saved_draft(binding: dict) -> dict:
             continue
         valid_ids.add(target)
         checks.append(matched[-1]["check"])
+    verify_receipts = []
+    seen_requests = set()
+    for path in history:
+        history_query = json.loads(path.read_text())
+        for item in (history_query["profiles"][0].get("three_views") or {}).get("call_receipts") or []:
+            if item.get("purpose") != "verify_views" or item.get("carried_verification"):
+                continue
+            request_id = str(item.get("request_id") or "")
+            if not request_id or request_id in seen_requests:
+                continue
+            seen_requests.add(request_id)
+            verify_receipts.append(item)
     condition_state: dict[tuple, dict] = {}
     for path in history:
         query_history = json.loads(path.read_text())
@@ -318,7 +330,7 @@ def load_saved_draft(binding: dict) -> dict:
     for check in condition_state.values():
         if check.get("status") == "pass" and check.get("covers_target_id") in valid_ids:
             checks.append(check)
-    return {"claims": claims, "checks": checks}
+    return {"claims": claims, "checks": checks, "verify_receipts": verify_receipts}
 
 
 def load_thirteenth_candidates(binding: dict) -> list:
@@ -713,7 +725,8 @@ def validate_binding(
                 "tongfang-gap",
                 "saic-gap",
                 "spdb-gap",
-                "tongfang-gap-continue",
+                "saic-role",
+                "tongfang-role",
             }
             or not authorization.get("approval_reference")
         ):
