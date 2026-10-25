@@ -727,6 +727,7 @@ def validate_binding(
                 "spdb-gap",
                 "saic-role",
                 "tongfang-role",
+                "spdb-final",
             }
             or not authorization.get("approval_reference")
         ):

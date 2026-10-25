@@ -3031,6 +3031,77 @@ def test_the_same_sentence_cannot_stay_verified_on_another_id():
     assert product_ids == ["purchase"]
 
 
+def test_a_strategy_sentence_can_be_withdrawn_without_dropping_the_adjacent_fact():
+    report = _report()
+    strategy = ReportViewClaim(
+        claim_id="claim-products-services__2",
+        dimension="products_services",
+        status="unclear",
+        answer="公司绿色低碳业务涉及纯电动、混合动力产品，并推进燃料电池产品投放及V2G应用探索。",
+        evidence=(_evidence(report, text="加快燃料电池产品投放，初步探索 V2G", page=28),),
+        limitation="retracted_pending_correction",
+    )
+    other_wording = ReportViewClaim(
+        claim_id="products_services-001",
+        dimension="products_services",
+        status="unclear",
+        answer="公司推进纯电动、混合动力及燃料电池等整车产品投放，并初步探索 V2G 应用。",
+        evidence=(_evidence(report, text="加快燃料电池产品投放，初步探索 V2G", page=28),),
+        limitation="claim_or_dependency_not_verified",
+    )
+    plates = ReportViewClaim(
+        claim_id="claim-principal-business__2",
+        dimension="principal_business",
+        status="observed",
+        answer="公司业务涉及整车板块、零部件板块、移动出行和服务板块以及金融板块。",
+        evidence=(_evidence(report, text="整车板块发挥龙头牵引作用", page=28),),
+    )
+    sales = ReportViewClaim(
+        claim_id="nev-sales",
+        dimension="products_services",
+        status="observed",
+        answer="报告期内新能源汽车乘用车累计销量1,481,504辆。",
+        evidence=(_evidence(report, text="新能源汽车乘用车累计销量1,481,504辆", page=18),),
+    )
+    rendered = research_views(
+        ReportInterpretation(
+            report=report,
+            processing_identity=direct_core_processing_identity(),
+            execution_mode="offline_fake",
+            claims=(strategy, other_wording, plates, sales),
+            checks=(
+                ReportViewCheck(
+                    target_type="claim",
+                    target_id="claim-products-services__2",
+                    status="pass",
+                    explanation="旧通过。",
+                ),
+                ReportViewCheck(
+                    target_type="claim",
+                    target_id="claim-principal-business__2",
+                    status="pass",
+                    explanation="板块概括有原文。",
+                ),
+                ReportViewCheck(
+                    target_type="claim",
+                    target_id="nev-sales",
+                    status="pass",
+                    explanation="销量有原文。",
+                ),
+            ),
+        )
+    )
+    states = {
+        item["claim_id"]: item["review_state"]
+        for view in rendered["views"].values()
+        for item in view["claims"]
+    }
+    assert states["claim-products-services__2"] == "not_reliable"
+    assert states["products_services-001"] == "not_reliable"
+    assert states["claim-principal-business__2"] == "verified"
+    assert states["nev-sales"] == "verified"
+
+
 def test_a_saved_query_keeps_a_real_receipt_without_a_hand_merge(tmp_path):
     import json
 

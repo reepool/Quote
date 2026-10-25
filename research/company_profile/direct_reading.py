@@ -2208,7 +2208,24 @@ def interpret_direct_core(
                         selected_conditions.extend(extra)
                 except (ValueError, LlmError, SemanticProviderError) as exc:
                     gaps.append(f"direct_core_gap_check_stopped:{exc}")
-            conditions_to_draft = list(selected_conditions)
+            if identity.get("continue_unread"):
+                conditions_to_draft = [
+                    condition
+                    for condition in selected_conditions
+                    if "funding_and_capital" in condition.condition_id
+                ]
+            else:
+                conditions_to_draft = list(selected_conditions)
+        unread = [
+            int(page["page"])
+            for page in sources
+            if identity.get("continue_unread")
+            and page.get("readable", True)
+            and str(page.get("text") or "").strip()
+            and by_page[int(page["page"])]["status"] != "read"
+        ]
+        if unread:
+            inventory_pages(unread)
         draft_reused_sources()
         if prior:
             fresh_ids = {item.claim_id for item in claims}
@@ -2219,15 +2236,6 @@ def interpret_direct_core(
             ]
             if still_pending:
                 settle_claims(still_pending, [item for item in conditions if not item.condition_id.startswith("correction:")])
-        unread = [
-            int(page["page"])
-            for page in sources
-            if identity.get("continue_unread")
-            and page.get("readable", True)
-            and str(page.get("text") or "").strip()
-            and by_page[int(page["page"])]["status"] != "read"
-        ]
-        follow = inventory_pages(unread) if unread else []
     else:
         readable_order = [
             int(page["page"])
