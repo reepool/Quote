@@ -61,5 +61,5 @@ The comparison logic SHALL be a standalone capability over provided fact sets, c
 
 #### Scenario: Standalone audit invocation
 
-- **WHEN** the comparison is invoked with stored official and fallback fact sets
-- **THEN** it SHALL produce the same comparison records and counts without any network access
+- **WHEN** the comparison is invoked with caller-provided official and fallback fact sets
+- **THEN** it SHALL produce the same comparison records and counts without any network access of its own

@@ -30,6 +30,11 @@ Financial disclosure incremental and reconciliation reports SHALL include a summ
 - **WHEN** all compared facts are within tolerance
 - **THEN** the report SHALL state the compared and consistent counts without listing samples
 
+#### Scenario: Sanity anomalies from single-sourced fill fields
+
+- **WHEN** definitional sanity checks on fallback-filled fields without an official counterpart produce review-only marks
+- **THEN** the report SHALL list them alongside comparison discrepancies, labeled as review-only and not as source differences
+
 #### Scenario: Comparison disabled
 
 - **WHEN** source-fact reconciliation is disabled by configuration

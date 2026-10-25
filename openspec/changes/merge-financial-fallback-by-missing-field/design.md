@@ -25,15 +25,21 @@ Investigation on 2026-10-25 (evidence: `data/financials.db`, live CNInfo data20 
 
 ## Decisions
 
-### D1. Merge point: fallback write path takes official facts as input
+### D1. Merge point: official-first source preference at core-fact derivation
 
-The repair module (`financial_statement_maintenance_repair.py`) already owns the readiness view after the CNInfo pass (`_merge_official_cninfo_readiness`, `_ready_target_keys`). It will pass a per-target `official_facts` map (field → value + source_file_id) into the fallback run, and the core snapshot build in `financial_statements_sync.py` will compose the final row official-first per canonical field. Alternatives considered: post-write recomposition (rejected — double writes and changelog noise) and merging only in the read path (rejected — leaves authoritative tier wrong).
+Core rows are not built from the fallback bundle alone: `FinancialStatementsShadowSyncService` derives each core row via `storage.derive_financial_core_facts_from_numeric_facts(instrument, period, alias_mapping)`, which reads the pooled numeric facts — at fallback time the pool already holds both the CNInfo facts (written by the official pass earlier in the same run) and the freshly written fallback facts. Today multi-source collisions resolve implicitly: `facts_by_name` keeps one row per `fact_name` (last write wins) and alias iteration order decides across differently-named facts, which is why the fallback bundle stamps the row.
 
-Governance note: `run_local_core_dryrun` lives under `scripts/dev_validation/` but is already the production fallback entry; this change keeps it a parameter pass-through only. The merge, comparison, and cleanup logic SHALL be implemented in `research/` modules, not added to the script.
+The field-level policy is therefore implemented as an explicit official-first source preference per core field at this derivation step: for each core field, prefer the fact whose source profile is the official one (`cninfo_data20`), and take a fallback alias only when the official fact is absent or invalid. No `official_facts` map needs to be threaded through the shadow sync service; the repair module's post-CNInfo readiness view (`_merge_official_cninfo_readiness`, `_ready_target_keys`) remains the readiness authority and the fallback-target selector.
 
-### D2. Provenance and availability semantics of a merged row
+Alternatives considered: threading an `official_facts` map through the service (heavier, duplicates what derivation already sees) and post-write recomposition of core rows (rejected — double writes and changelog noise).
 
-Each written core row gains `lineage_json.field_sources = {<canonical_fact>: {source, source_file_id, role}}` where role is `official_structured` or `fallback_fill`. The row-level `source_file_id` continues to identify the writing bundle (write-path traceability); per-field authority is `field_sources`. Readers that need per-field authority read `field_sources` and fall back to row-level semantics when absent (historical rows unchanged). No schema migration: `facts_json`/`lineage_json` exist on `financial_facts`, `financial_core_facts_hot`, and `financial_core_facts_history`, and all three receive the same snapshot payload through the existing write path.
+Governance note: `run_local_core_dryrun` lives under `scripts/dev_validation/` but is already the production fallback entry; this change keeps it a parameter pass-through only. The preference, comparison, and cleanup logic SHALL be implemented in `research/` modules, not added to the script.
+
+### D2. Provenance, PIT ordering, and availability semantics of a merged row
+
+Per-field provenance extends the existing `lineage_json.core_fact_alias_matches[<core_field>]` entries — they already record `fact_name`, `source_file_id`, and `parser_version` per field — with explicit `source` and `role` (`official_structured` / `fallback_fill`) labels. Readers take per-field authority from this structure and fall back to row-level semantics when labels are absent (historical rows unchanged). A parallel provenance key is deliberately not introduced. The row-level `source_file_id` continues to identify the writing bundle. No schema migration: `facts_json`/`lineage_json` exist on `financial_facts`, `financial_core_facts_hot`, and `financial_core_facts_history`, and all three receive the same snapshot payload through the existing write path.
+
+PIT ordering: `_append_financial_vintage` appends immutable point-in-time revisions before the latest-tier writes. The official-first preference MUST be resolved before any vintage append so PIT revisions record merged values; the vintage stage is currently disabled (report line `Filing vintage: disabled, blockers 1`), so this is a latent requirement that binds when it is re-enabled.
 
 Row-level `publish_date`/`data_available_date` keep the writing (fallback) bundle's values, preserving today's availability semantics; data20 condensed endpoints carry no per-fact announcement date, so per-field availability refinement is deferred and out of scope. Consumers requiring point-in-time dates continue to use row-level dates as today.
 
@@ -45,11 +51,11 @@ Single-sourced fill fields (no second source to compare, today `equity_parent`) 
 
 ### D4. Comparison storage: run-scoped table, single-run retention
 
-New table `financial_source_fact_comparison_results` (run_id, instrument_id, report_period, canonical_fact, official_source, official_value, fallback_source, fallback_value, relative_diff, compared_at). At run start the runner deletes prior rows; at run end the table holds only the latest run's discrepancies plus counts in run metadata. This is process data, not durable acceptance evidence — durable evidence is the operator report and, when needed, an escalated issue.
+New table `financial_source_fact_comparison_results` (run_id, instrument_id, report_period, canonical_fact, record_kind, official_source, official_value, fallback_source, fallback_value, relative_diff, compared_at) where `record_kind` distinguishes `source_difference` from `sanity_review` (definitional sanity marks on single-sourced fill fields). At run start the runner deletes prior rows; at run end the table holds only the latest run's records plus counts in run metadata. This is process data, not durable acceptance evidence — durable evidence is the operator report and, when needed, an escalated issue.
 
 ### D5. Cleanup of fetched-but-unused fallback facts
 
-Fallback numeric facts that were not used for field-level fill (comparison-only overlap fields) are deleted at the end of the run, identified by the fallback bundle's `source_file_id` minus the fill-used field set. Persist-then-clean is chosen over never-persisting so the existing write path and in-run auditability are preserved.
+Fallback numeric facts that were not used for field-level fill (comparison-only overlap fields) are deleted at the end of the run, identified by the fallback bundle's `source_file_id` minus the fill-used field set, reusing the existing per-source-file fact replacement path (`_replace_parsed_numeric_facts_for_source_file`). Deletion covers the physical tier table(s) the run actually wrote (hot tier; history only if the run wrote it) — same-run writes are process data, not immutable evidence. Persist-then-clean is chosen over never-persisting so the existing write path and in-run auditability are preserved.
 
 Compatibility constraint: `financial_numeric_facts_hot` has other readers (`scripts/dev_validation/audit_financial_numeric_fact_coverage.py`, `scripts/dev_validation/live_audit_sina_ths_local_core.py`, `scripts/research_financial_l1_full_import.py`). Before enabling deletion, the change SHALL verify none of these consumers asserts the presence of fallback numeric facts for filled targets; audit tools that merely report coverage counts are expected to reflect the new retention policy rather than fail.
 

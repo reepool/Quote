@@ -1,9 +1,9 @@
 ## 1. Field-level fallback fill
 
-- [ ] 1.1 Add per-target official facts map (canonical fact → value, source_file_id) collection in `financial_statement_maintenance_repair.py` from the post-CNInfo readiness view.
-- [ ] 1.2 Extend the fallback run path (`run_local_core_dryrun` → `FinancialStatementsShadowSyncService`) to accept `official_facts` plus the `fallback_only_missing_or_ambiguous_facts` policy, and compose the core snapshot official-first per canonical field.
-- [ ] 1.3 Record per-field provenance in `lineage_json.field_sources` on write and expose it on read (`financial_facts` / `financial_core_facts_hot` via storage read paths); rows without the key keep row-level semantics.
-- [ ] 1.4 Consume the existing config flag; `false` preserves legacy whole-bundle writes; both branches covered by unit tests.
+- [ ] 1.1 Implement the per-field official-first source preference in `derive_financial_core_facts_from_numeric_facts` (numeric facts pool resolution), gated by `fallback_only_missing_or_ambiguous_facts` (`false` preserves today's alias-order resolution).
+- [ ] 1.2 Extend `lineage_json.core_fact_alias_matches` entries with explicit `source` and `role` labels on write and expose them through the core fact read paths; confirm the preference resolves before any filing-vintage append.
+- [ ] 1.3 Keep `financial_statement_maintenance_repair.py` readiness/fallback-target selection unchanged, with `run_local_core_dryrun` remaining a parameter pass-through (no merge logic in `scripts/dev_validation/`).
+- [ ] 1.4 Unit tests: mixed-pool derivation prefers official values; fallback fills only fields the official source lacks; flag-off preserves legacy resolution; historical rows without labels read with row-level semantics.
 
 ## 2. Same-fetch source reconciliation
 

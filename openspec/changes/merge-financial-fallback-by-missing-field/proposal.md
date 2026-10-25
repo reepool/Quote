@@ -29,11 +29,11 @@ Additionally, the fallback fetch returns complete bundles that overlap four fiel
 
 ## Impact
 
-- `research/financial_statement_maintenance_repair.py`: fallback orchestration passes official field facts and fill policy into the fallback write path; invokes comparison and cleanup.
-- `research/financial_statements_sync.py`: core snapshot build merges official-first per canonical field and records per-field sources.
-- `research/storage.py`: `lineage_json.field_sources` write/read support; new run-scoped comparison result table with single-run retention; cleanup of comparison-only fallback numeric facts.
-- `scheduler/tasks.py`: report rendering for systematic/per-instrument missing fields and comparison summary.
-- `config/10_research.json`: consumes existing flags; adds `source_fact_reconciliation` settings (enabled, relative tolerance, absolute floor, report sample cap).
-- Unit tests for merge, reconciliation, cleanup, retention, and report rendering.
+- `research/storage.py`: official-first per-field source preference in `derive_financial_core_facts_from_numeric_facts` (the numeric-facts pool is where official and fallback facts already coexist at write time); `core_fact_alias_matches` lineage gains source/role labels; run-scoped comparison result table with single-run retention; per-source-file cleanup of comparison-only fallback numeric facts.
+- `research/financial_source_fact_reconciliation.py` (new): pure comparison service (tolerance, discrepancy and sanity records, counts), no network access.
+- `research/financial_statement_maintenance_repair.py`: invokes the comparison and end-of-run cleanup; readiness and fallback-target selection unchanged; `run_local_core_dryrun` stays a parameter pass-through.
+- `scheduler/tasks.py`: report rendering for systematic/per-instrument missing fields, comparison summary, and review-only sanity anomalies.
+- `config/10_research.json`: consumes existing flags; adds `source_fact_reconciliation` settings (enabled, relative tolerance, absolute floor, sanity thresholds, report sample cap).
+- Unit tests for derivation preference, reconciliation, cleanup, retention, and report rendering.
 - No destructive migration: new table is additive; `lineage_json` extension is backward compatible; historical rows are not rewritten.
 - Deferred (explicitly out of scope): CNInfo `getMainIndicators` per-share derivation of `equity_parent`, SSE `sse_commonquery` restoration, historical re-stamping of existing core rows.
