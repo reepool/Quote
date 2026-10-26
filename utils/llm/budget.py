@@ -125,13 +125,16 @@ class LlmRunBudget:
         authorized_evidence = run_authorization == "company_profile_company_evidence.2026-10-22"
         authorized_fulltext = run_authorization == "company_profile_fulltext_core.2026-10-22"
         authorized_b2 = run_authorization == "company_profile_b2_cross_industry.2026-10-23"
+        authorized_s1 = run_authorization == "company_profile_s1_regression.2026-10-26"
         authorized_core = run_authorization == "company_profile_b2_core_closeout.2026-10-25"
         authorized_company = run_authorization == "company_profile_company_core.2026-10-21"
         authorized_repair = run_authorization == "company_profile_repair.2026-10-21"
         authorized_f1 = run_authorization == "company_profile_f1.2026-10-20"
         authorized_e2 = run_authorization == "company_profile_e2.2026-10-20"
         authorized_e1 = run_authorization == "company_profile_e1.2026-10-20"
-        if authorized_core:
+        if authorized_s1:
+            token_cap, request_cap, cost_cap = 1_200_000, 96, Decimal(50)
+        elif authorized_core:
             token_cap, request_cap, cost_cap = 5_400_000, 208, Decimal(200)
         elif authorized_b2:
             token_cap, request_cap, cost_cap = 3_600_000, 160, Decimal(200)
@@ -260,6 +263,7 @@ class LlmRunBudget:
                     "company_profile_fulltext_core.2026-10-22",
                     "company_profile_b2_cross_industry.2026-10-23",
                     "company_profile_b2_core_closeout.2026-10-25",
+                    "company_profile_s1_regression.2026-10-26",
                 }
                 else DEVELOPMENT_PAYLOAD_BYTE_LIMIT
             )

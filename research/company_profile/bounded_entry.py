@@ -639,7 +639,13 @@ def validate_binding(
         raise ValueError("frozen PDF hash mismatch")
     elapsed = binding["max_elapsed_seconds"]
     auth = binding.get("run_authorization")
-    if auth == "company_profile_b2_core_closeout.2026-10-25":
+    if auth == "company_profile_s1_regression.2026-10-26":
+        allowed = (
+            0 < elapsed <= 7200
+            and int(binding.get("max_tokens") or 0) <= 1_200_000
+            and int(binding.get("max_physical_requests") or 0) <= 96
+        )
+    elif auth == "company_profile_b2_core_closeout.2026-10-25":
         allowed = (
             0 < elapsed <= 27000
             and int(binding.get("max_tokens") or 0) <= 5_400_000
@@ -729,6 +735,18 @@ def validate_binding(
                 "tongfang-role",
                 "spdb-final",
                 "spdb-draft",
+                "s1-600094",
+                "s1-600103",
+                "s1-600100",
+                "s1-600107",
+                "s1-600098",
+                "s1-600104",
+                "s1-600088",
+                "s1-600099",
+                "s1-600082",
+                "s1-600097",
+                "s1-600054",
+                "s1-600000",
             }
             or not authorization.get("approval_reference")
         ):
@@ -913,7 +931,10 @@ def _worker(
         recovery_policy=(
             LogicalRecoveryPolicy(
                 max_recoveries=(
-                    min(40, int(binding.get("max_recoveries", 4)))
+                    min(12, int(binding.get("max_recoveries", 12)))
+                    if binding.get("run_authorization")
+                    == "company_profile_s1_regression.2026-10-26"
+                    else min(40, int(binding.get("max_recoveries", 4)))
                     if binding.get("run_authorization")
                     == "company_profile_b2_core_closeout.2026-10-25"
                     else min(
@@ -1391,6 +1412,7 @@ def main() -> int:
             "company_profile_fulltext_core.2026-10-22",
             "company_profile_b2_cross_industry.2026-10-23",
             "company_profile_b2_core_closeout.2026-10-25",
+            "company_profile_s1_regression.2026-10-26",
         }
     ):
         direct_plan = preflight_direct_core(binding)

@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600103",
+  "binding_sha256": "b988f1c68682b72f1ba60e8ff526b8d40d21733a1c044a6c33d4f8e395e94db5",
+  "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+  "approval_reference": "acceptance section 7.50 and b3 s1 card, 2026-10-26",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "S1首发"
+}
