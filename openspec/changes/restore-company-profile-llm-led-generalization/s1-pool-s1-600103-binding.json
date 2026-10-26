@@ -95,7 +95,8 @@
   },
   "announcement": {
     "exchange": "SSE",
-    "title": "2025年年度报告"
+    "title": "2025年年度报告",
+    "source_url": "https://static.cninfo.com.cn/finalpage/2026-04-14/1225099218.PDF"
   },
   "production_authorization": "not_authorized",
   "scale_claim": false,

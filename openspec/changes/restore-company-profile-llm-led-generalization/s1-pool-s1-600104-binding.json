@@ -95,7 +95,8 @@
   },
   "announcement": {
     "exchange": "SSE",
-    "title": "上汽集团2025年年度报告"
+    "title": "上汽集团2025年年度报告",
+    "source_url": "https://static.cninfo.com.cn/finalpage/2026-04-02/1225071780.PDF"
   },
   "production_authorization": "not_authorized",
   "scale_claim": false,
