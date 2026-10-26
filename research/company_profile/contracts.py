@@ -412,7 +412,7 @@ class ReportViewClaim(_StrictModel):
 class ReportViewCheck(_StrictModel):
     target_type: Literal["condition", "claim", "record"]
     target_id: str = Field(min_length=1)
-    status: Literal["pass", "block", "unclear"]
+    status: Literal["pass", "block", "unclear", "supplementary"]
     explanation: str = Field(min_length=1)
     covers_target_type: Literal["claim", "record"] | None = None
     covers_target_id: str | None = None

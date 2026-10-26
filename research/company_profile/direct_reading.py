@@ -156,6 +156,18 @@ def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
             ):
                 covered = True
         if not covered:
+            latest = next(
+                (
+                    check
+                    for check in reversed(tuple(checks))
+                    if check.target_type == "condition"
+                    and check.target_id == condition.condition_id
+                ),
+                None,
+            )
+            if latest is not None and latest.status == "supplementary":
+                found.append(f"supplementary_gap:{condition.condition_id}")
+                continue
             found.append(f"major_condition_not_verified:{condition.condition_id}")
     return found
 
@@ -635,7 +647,10 @@ def interpret_direct_core(
     def _result() -> ReportInterpretation:
         observed = {item.dimension for item in claims if item.status == "observed"}
         dynamic = _completeness_gaps(claims, conditions, checks, records)
-        blocking = bool(dynamic) or any(
+        blocking_gaps = [
+            gap for gap in dynamic if not gap.startswith("supplementary_gap:")
+        ]
+        blocking = bool(blocking_gaps) or any(
             gap.startswith(
                 (
                     "necessary_unread:",

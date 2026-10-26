@@ -3162,4 +3162,56 @@ def test_a_saved_query_keeps_a_real_receipt_without_a_hand_merge(tmp_path):
     assert any(item.get("request_id") == "verify-1" for item in loaded["verify_receipts"])
 
 
+def test_a_supplementary_detail_can_remain_while_a_missing_major_business_blocks():
+    from research.company_profile.contracts import ReportSourceCondition, ReportViewCheck
+    from research.company_profile.direct_reading import _completeness_gaps
+
+    report = _report()
+    claims = [
+        ReportViewClaim(
+            claim_id=claim_id,
+            dimension=dimension,
+            status="observed",
+            answer="公司提供云服务并取得云服务收入。",
+            evidence=(_evidence(report, text="公司提供云服务", page=1),),
+        )
+        for claim_id, dimension in (
+            ("business", "principal_business"),
+            ("product", "products_services"),
+            ("revenue", "revenue_model"),
+            ("input", "input_exposure"),
+            ("role", "supply_chain_role"),
+        )
+    ]
+    footnote = ReportSourceCondition(
+        condition_id="footnote",
+        dimension="products_services",
+        description="附注中的次要注册范围。",
+        evidence=(_evidence(report, text="注册范围包括技术服务。", page=2),),
+        major=True,
+        statement_status="current",
+    )
+    other_business = ReportSourceCondition(
+        condition_id="design",
+        dimension="principal_business",
+        description="另一主要业务是工业设计。",
+        evidence=(_evidence(report, text="工业设计服务面向设备制造客户。", page=3),),
+        major=True,
+        statement_status="current",
+    )
+    checks = [
+        ReportViewCheck(
+            target_type="condition",
+            target_id="footnote",
+            status="supplementary",
+            explanation="不改变主营、变现、收入、投入或角色。",
+        )
+    ]
+    closed = _completeness_gaps(claims, [footnote], checks)
+    assert closed == ["supplementary_gap:footnote"]
+    blocked = _completeness_gaps(claims, [footnote, other_business], checks)
+    assert "supplementary_gap:footnote" in blocked
+    assert "major_condition_not_verified:design" in blocked
+
+
 
