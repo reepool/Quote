@@ -17,7 +17,7 @@
   "max_output_tokens": 4000,
   "max_cost_cny": 50,
   "cost_note": "50 is this company's priced ceiling; the card priced total is 600; unknown prices stay unknown",
-  "physical_pages": 454,
+  "physical_pages": 185,
   "knowledge_cutoff": "2026-09-17",
   "discovery_scope": "full_text",
   "prompt_version": "company_profile_report_reading.2026-10-22.fulltext-core.v1",

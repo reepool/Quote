@@ -1,7 +1,7 @@
 {
   "status": "authorized",
   "attempt": "s1-600107",
-  "binding_sha256": "6d93f409b76b1c40c683b3c8601edf7c017dbf81e5d1c386fc0e61b4b031a40a",
+  "binding_sha256": "c80c16653e9be76ac738ab8d10797c5a1ada5ab9e9a0080397beb552d0e9d904",
   "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
   "approval_reference": "acceptance section 7.50 and b3 s1 card, 2026-10-26",
   "billing_mode": "development_unpriced",

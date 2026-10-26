@@ -52,7 +52,8 @@
       "archive_path": "/home/python/Quote/data/filings/announcements/blobs/f5/f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591.pdf",
       "report_type": "annual_report",
       "title": "上海大名城企业股份有限公司2025年年度报告",
-      "attempt": "s1-600094"
+      "attempt": "s1-600094",
+      "physical_pages": 194
     },
     {
       "instrument_id": "600103.SH",
@@ -65,7 +66,8 @@
       "archive_path": "/home/python/Quote/data/filings/announcements/blobs/68/6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c.pdf",
       "report_type": "annual_report",
       "title": "2025年年度报告",
-      "attempt": "s1-600103"
+      "attempt": "s1-600103",
+      "physical_pages": 220
     },
     {
       "instrument_id": "600100.SH",
@@ -78,7 +80,8 @@
       "archive_path": "/home/python/Quote/data/filings/announcements/blobs/7d/7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497.pdf",
       "report_type": "annual_report",
       "title": "同方股份有限公司2025年年度报告",
-      "attempt": "s1-600100"
+      "attempt": "s1-600100",
+      "physical_pages": 260
     },
     {
       "instrument_id": "600107.SH",
@@ -91,7 +94,8 @@
       "archive_path": "/home/python/Quote/data/filings/announcements/blobs/2d/2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8.pdf",
       "report_type": "annual_report",
       "title": "2025年年度报告",
-      "attempt": "s1-600107"
+      "attempt": "s1-600107",
+      "physical_pages": 243
     },
     {
       "instrument_id": "600098.SH",
@@ -104,7 +108,8 @@
       "archive_path": "/home/python/Quote/data/filings/announcements/blobs/78/78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07.pdf",
       "report_type": "annual_report",
       "title": "广州发展集团股份有限公司2025年年度报告",
-      "attempt": "s1-600098"
+      "attempt": "s1-600098",
+      "physical_pages": 259
     },
     {
       "instrument_id": "600104.SH",
@@ -117,7 +122,8 @@
       "archive_path": "/home/python/Quote/data/filings/announcements/blobs/ac/aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874.pdf",
       "report_type": "annual_report",
       "title": "上汽集团2025年年度报告",
-      "attempt": "s1-600104"
+      "attempt": "s1-600104",
+      "physical_pages": 205
     },
     {
       "instrument_id": "600088.SH",
@@ -130,7 +136,8 @@
       "archive_path": "/home/python/Quote/data/filings/announcements/blobs/5a/5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c.pdf",
       "report_type": "annual_report",
       "title": "中视传媒股份有限公司2025年年度报告",
-      "attempt": "s1-600088"
+      "attempt": "s1-600088",
+      "physical_pages": 177
     },
     {
       "instrument_id": "600099.SH",
@@ -143,7 +150,8 @@
       "archive_path": "/home/python/Quote/data/filings/announcements/blobs/3d/3dbe17e87d3b79bb5327d821786eb7a971ef367b24fd37ac3511da4a212cf07c.pdf",
       "report_type": "annual_report",
       "title": "林海股份有限公司2025年年度报告",
-      "attempt": "s1-600099"
+      "attempt": "s1-600099",
+      "physical_pages": 194
     },
     {
       "instrument_id": "600082.SH",
@@ -156,7 +164,8 @@
       "archive_path": "/home/python/Quote/data/filings/announcements/blobs/97/979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad.pdf",
       "report_type": "annual_report",
       "title": "天津海泰科技发展股份有限公司2025年度报告",
-      "attempt": "s1-600082"
+      "attempt": "s1-600082",
+      "physical_pages": 203
     },
     {
       "instrument_id": "600097.SH",
@@ -169,7 +178,8 @@
       "archive_path": "/home/python/Quote/data/filings/announcements/blobs/4c/4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c.pdf",
       "report_type": "annual_report",
       "title": "开创国际2025年年度报告",
-      "attempt": "s1-600097"
+      "attempt": "s1-600097",
+      "physical_pages": 158
     },
     {
       "instrument_id": "600054.SH",
@@ -182,7 +192,8 @@
       "archive_path": "/home/python/Quote/data/filings/announcements/blobs/f8/f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f.pdf",
       "report_type": "annual_report",
       "title": "黄山旅游2025年年度报告",
-      "attempt": "s1-600054"
+      "attempt": "s1-600054",
+      "physical_pages": 185
     },
     {
       "instrument_id": "600000.SH",
@@ -195,7 +206,8 @@
       "archive_path": "/home/python/Quote/data/filings/announcements/blobs/e4/e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22.pdf",
       "report_type": "annual_report",
       "title": "上海浦东发展银行股份有限公司2025年年度报告",
-      "attempt": "s1-600000"
+      "attempt": "s1-600000",
+      "physical_pages": 454
     }
   ]
 }
