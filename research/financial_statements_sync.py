@@ -1683,6 +1683,7 @@ class FinancialStatementsShadowSyncService:
             available_date_backfill=available_date_backfill,
             coverage_gaps=coverage_gaps,
             official_fallback_reasons=official_fallback_reasons,
+            source_fact_reconciliation=source_fact_reconciliation,
         )
 
     def _build_coverage_gaps(
