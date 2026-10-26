@@ -1,8 +1,8 @@
 # 公司画像交付路径与开发任务卡
 
-> 类型：requirements / execution plan；版本：3；更新：2026-10-25。
+> 类型：requirements / execution plan；版本：3；更新：2026-10-26。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[B3/S1](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md)，依据验收§7.50/A审核§113：浦发12项核心成立，先离线隔离一条托管增速源冲突，安全稿后4/4及A2条件放行生效，同卡自主进入固定12家真实回归。安全稿前可用仍3/4。B2真实收口结束，余25物理不用；S1研发资源单列，不代表常规成本/时间或S2、生产已通过。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[B3/S1](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md)，依据验收§7.51/A审核§115：浦发安全稿已验，补救可用4/4，A2进入S1的条件已满足。S1首发0/12，直接按原卡冻结正式源并连续真实回归，不另等准备审核。资源沿§7.50不增，B2余25物理不用；常规成本/时间、S2及生产未通过。
 
 ## 1. 开发者必须先理解的纠偏
 
@@ -92,6 +92,7 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 
 ### B3 / S1：12家新链回归（A2通过后）
 
+- 2026-10-26审核§115：安全稿确定差异已验，A2前置已满足；本卡进入执行，不再等待另一张启动卡。S1仍0/12，旧62/63评分、首次失败及研发/常规资源区分保留。
 - 当前完整执行卡：[b3-s1-execution-card.md](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md)。先离线安全收尾，再在同一开发窗口完成冻结、直接验证、真实首发及有界统一补救；不逐公司请批，不交另一张纯准备卡。
 - 输入：原12家公司来源和风险合同，代码/模型/提示词/三视图条件重新冻结；旧规则12/12只作历史。
 - B连续完成12家首发、卡内P0/P1修复和一次最终后继，保留首次/补救双列；A只在冻结交接后审核，不在中间逐家改口径。
