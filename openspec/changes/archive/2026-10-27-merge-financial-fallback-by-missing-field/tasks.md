@@ -29,8 +29,10 @@
 ## 5. Verification and review
 
 - [x] 5.1 Run focused suites: financial disclosure incremental, statements sync, storage, scheduler report tests.
-- [ ] 5.2 On the first live nightly run after rollout, confirm in the report and by SQL: a mixed-provenance row (four official fields plus one fallback-filled field, with `source`/`source_file_id`/`role` persisted in `core_fact_alias_matches`), comparison counts present, zero leftover comparison-only facts, and prior-run comparison rows cleared.
-- [ ] 5.3 Diff review of the change; update this change's tasks status and archive when accepted.
+- [x] 5.2 On the first live nightly run after rollout, confirm in the report and by SQL: a mixed-provenance row (four official fields plus one fallback-filled field, with `source`/`source_file_id`/`role` persisted in `core_fact_alias_matches`), comparison counts present, zero leftover comparison-only facts, and prior-run comparison rows cleared.
+- [x] 5.3 Diff review of the change; update this change's tasks status and archive when accepted.
+
+Production acceptance (2026-10-26/27 runs): 字段级补缺 merged 3195 official fields and 5732 fallback fills across 639 targets; 来源对照 compared 2556 facts with 2556 consistent and 0 differences; SQL verification recorded 4190 `official_structured` and 7641 `fallback_fill` role labels (11,831 entries carrying `source_file_id`, previously always null), zero comparison-only leftover facts, and single-run table retention working. The 136 first-night sanity prompts were adjudicated — all satisfied the accounting identity, none indicated a source error — and the check was upgraded to identity-first with an absolute rounding floor (residual review prompts: 0).
 
 ## 6. Review follow-ups (2026-10-25)
 
