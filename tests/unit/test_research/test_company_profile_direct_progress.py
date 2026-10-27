@@ -3214,4 +3214,374 @@ def test_a_supplementary_detail_can_remain_while_a_missing_major_business_blocks
     assert "major_condition_not_verified:design" in blocked
 
 
+def _one_page_slices(pages, report, identity, limit):
+    return [
+        [
+            {
+                "page": page["page"],
+                "text": page["text"],
+                "readable": True,
+                "offset": 0,
+                "scope": "full_page",
+            }
+        ]
+        for page in pages
+    ]
+
+
+def test_core_success_survives_the_next_package_timeout_and_exports():
+    from research.company_profile import direct_reading
+
+    report = _report()
+    kept = "公司主营影视制作并取得制作收入。"
+    other = "附注列示子公司注册地。"
+    progress = []
+
+    class _Provider:
+        offline_only = True
+
+        def __init__(self):
+            self.calls = []
+
+        def interpret(self, request):
+            self.calls.append(request)
+            pages = tuple(int(page["page"]) for page in request.source_pages)
+            if 2 in pages:
+                raise ValueError("card_recovery_exhausted")
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="kept-business",
+                            dimension="principal_business",
+                            status="observed",
+                            answer="公司主营影视制作。",
+                            evidence=(_evidence(report, text=kept, page=1),),
+                        ),
+                    ),
+                )
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=(
+                        __import__(
+                            "research.company_profile.contracts",
+                            fromlist=["ReportSourceCondition"],
+                        ).ReportSourceCondition(
+                            condition_id="kept-business",
+                            dimension="principal_business",
+                            description="主营是影视制作。",
+                            evidence=(_evidence(report, text=kept, page=1),),
+                            major=True,
+                            statement_status="current",
+                        ),
+                        __import__(
+                            "research.company_profile.contracts",
+                            fromlist=["ReportSourceCondition"],
+                        ).ReportSourceCondition(
+                            condition_id="kept-revenue",
+                            dimension="revenue_model",
+                            description="制作收入已经实现。",
+                            evidence=(_evidence(report, text=kept, page=1),),
+                            major=True,
+                            statement_status="current",
+                        ),
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=(
+                    {
+                        "target_type": "claim",
+                        "target_id": "kept-business",
+                        "status": "pass",
+                        "explanation": "主营仍在。",
+                    },
+                ),
+            )
+
+    provider = _Provider()
+    original = direct_reading.source_discovery_slices
+    direct_reading.source_discovery_slices = _one_page_slices
+    try:
+        result = _run(
+            provider,
+            pages=(
+                {"page": 1, "text": kept, "readable": True},
+                {"page": 2, "text": other, "readable": True},
+            ),
+            processing_identity=direct_core_processing_identity(),
+            report=report,
+            on_progress=progress.append,
+        )
+    finally:
+        direct_reading.source_discovery_slices = original
+    assert any(item.claim_id == "kept-business" and item.status == "observed" for item in result.claims)
+    assert any(
+        any(claim.claim_id == "kept-business" for claim in snapshot.claims)
+        for snapshot in progress
+    )
+    assert sum(1 for call in provider.calls if 2 in {int(page["page"]) for page in call.source_pages}) == 1
+    assert result.draft_complete is False
+    assert result.real_semantic_complete is False
+    assert any(gap == "necessary_unread:2" for gap in result.gaps)
+
+
+def test_verified_core_leaves_supplementary_unread_and_a_missing_core_does_not():
+    from decimal import Decimal
+    import time
+
+    from research.company_profile import direct_reading
+    from research.company_profile.contracts import ReportSourceCondition
+    from utils.llm.budget import DEVELOPMENT_UNPRICED_BILLING, LlmRunBudget
+
+    report = _report()
+    sentences = {
+        "principal_business": "公司主营影视制作。",
+        "products_services": "公司提供设备租赁服务。",
+        "revenue_model": "公司营业收入为100万元。",
+        "input_exposure": "公司采购原材料。",
+        "supply_chain_role": "公司向下游客户交付影片。",
+    }
+    page_text = "".join(sentences.values())
+
+    class _Provider:
+        def __init__(self, budget):
+            self.run_budget = budget
+            self.execution_authorization = {"status": "authorized"}
+            self.calls = []
+
+        def interpret(self, request):
+            self.calls.append(request)
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=tuple(
+                        ReportSourceCondition(
+                            condition_id=dimension,
+                            dimension=dimension,
+                            description=sentence,
+                            evidence=(
+                                _evidence(report, text=sentence, page=1).model_copy(
+                                    update={"evidence_id": f"cond-{dimension}"}
+                                ),
+                            ),
+                            major=True,
+                            statement_status="current",
+                        )
+                        for dimension, sentence in sentences.items()
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=tuple(
+                        ReportViewClaim(
+                            claim_id=dimension,
+                            dimension=dimension,
+                            status="observed",
+                            answer=sentence,
+                            evidence=(
+                                _evidence(report, text=sentence, page=1).model_copy(
+                                    update={"evidence_id": f"claim-{dimension}"}
+                                ),
+                            ),
+                        )
+                        for dimension, sentence in sentences.items()
+                    ),
+                )
+            claim_by_dimension = {claim.dimension: claim.claim_id for claim in request.claims}
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "claim",
+                        "target_id": claim.claim_id,
+                        "status": "pass",
+                        "explanation": "与原文一致。",
+                    }
+                    for claim in request.claims
+                )
+                + tuple(
+                    {
+                        "target_type": "condition",
+                        "target_id": condition.condition_id,
+                        "status": "pass",
+                        "covers_target_type": "claim",
+                        "covers_target_id": claim_by_dimension[condition.dimension],
+                        "explanation": "核心条件已覆盖。",
+                    }
+                    for condition in request.source_conditions
+                ),
+            )
+
+    budget = LlmRunBudget(
+        deadline=time.monotonic() + 30,
+        prices={},
+        max_tokens=120_000,
+        max_requests=16,
+        max_cost_cny=Decimal(10),
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+    )
+    provider = _Provider(budget)
+    identity = direct_core_processing_identity()
+    identity["execution_mode"] = "provider"
+    original = direct_reading.source_discovery_slices
+    direct_reading.source_discovery_slices = _one_page_slices
+    try:
+        ready = _run(
+            provider,
+            pages=(
+                {"page": 1, "text": page_text, "readable": True},
+                {"page": 2, "text": "附注列示子公司注册地。", "readable": True},
+            ),
+            processing_identity=identity,
+            report=report,
+            execution_budget=budget,
+        )
+    finally:
+        direct_reading.source_discovery_slices = original
+    assert ready.draft_complete is True
+    assert ready.real_semantic_complete is True
+    assert any(gap == "supplementary_unread:2" for gap in ready.gaps)
+    assert not any(str(gap).startswith("necessary_unread:") for gap in ready.gaps)
+    assert all(int(page["page"]) != 2 for call in provider.calls for page in call.source_pages)
+
+    class _Partial(_Provider):
+        def interpret(self, request):
+            self.calls.append(request)
+            if request.purpose != "synthesize_views":
+                if request.purpose == "source_inventory":
+                    return ReportSemanticResponseV3(
+                        request_id=request.request_id,
+                        purpose=request.purpose,
+                    )
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                claims=(
+                    ReportViewClaim(
+                        claim_id="only-business",
+                        dimension="principal_business",
+                        status="observed",
+                        answer=sentences["principal_business"],
+                        evidence=(
+                            _evidence(report, text=sentences["principal_business"], page=1),
+                        ),
+                    ),
+                ),
+            )
+
+    partial_budget = LlmRunBudget(
+        deadline=time.monotonic() + 30,
+        prices={},
+        max_tokens=120_000,
+        max_requests=16,
+        max_cost_cny=Decimal(10),
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+    )
+    partial = _Partial(partial_budget)
+    direct_reading.source_discovery_slices = _one_page_slices
+    try:
+        missing = _run(
+            partial,
+            pages=(
+                {"page": 1, "text": page_text, "readable": True},
+                {"page": 2, "text": "附注列示子公司注册地。", "readable": True},
+            ),
+            processing_identity=identity,
+            report=report,
+            execution_budget=partial_budget,
+        )
+    finally:
+        direct_reading.source_discovery_slices = original
+    assert missing.draft_complete is False
+    assert missing.real_semantic_complete is False
+
+
+def test_a_claim_without_source_text_is_not_verified():
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    text = "公司主营影视制作。"
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=(
+                        ReportSourceCondition(
+                            condition_id="real-business",
+                            dimension="principal_business",
+                            description="主营是影视制作。",
+                            evidence=(
+                                _evidence(report, text=text, page=1).model_copy(
+                                    update={"evidence_id": "real-evidence"}
+                                ),
+                            ),
+                            major=True,
+                            statement_status="current",
+                        ),
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="invented",
+                            dimension="principal_business",
+                            status="observed",
+                            answer="公司主营航天发射。",
+                            evidence=(
+                                _evidence(report, text="公司主营航天发射。", page=1).model_copy(
+                                    update={"evidence_id": "invented-evidence"}
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=(
+                    {
+                        "target_type": "claim",
+                        "target_id": "invented",
+                        "status": "pass",
+                        "explanation": "模型自说自话。",
+                    },
+                ),
+            )
+
+    result = _run(
+        _Provider(),
+        pages=({"page": 1, "text": text, "readable": True},),
+        processing_identity=direct_core_processing_identity(),
+        report=report,
+    )
+    invented = [item for item in result.claims if item.claim_id == "invented"]
+    assert invented
+    assert invented[0].status != "observed" or invented[0].limitation == "evidence_not_located"
+    assert not any(
+        check.target_id == "invented" and check.status == "pass" for check in result.checks
+    )
+
+
 

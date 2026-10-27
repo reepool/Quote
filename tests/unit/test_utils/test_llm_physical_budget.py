@@ -188,14 +188,14 @@ def test_cross_source_reset_still_consumes_the_logical_recovery():
     with pytest.raises(LlmDeadlineExceededError, match="logical_recovery_already_used"):
         send("a3", "logic-a")
     send("b1", "logic-b")
-    capped = _budget(
+    failover = _budget(
         max_requests=8,
         prices={},
         billing_mode="development_unpriced",
         recovery_policy=LogicalRecoveryPolicy(max_recoveries=1),
         prior_logical_attempts=budget.snapshot()["attempts"][:2],
     )
-    capped.reserve(
+    failover.reserve(
         resource="resource",
         model="model",
         profile="profile",
@@ -203,17 +203,65 @@ def test_cross_source_reset_still_consumes_the_logical_recovery():
         request_id="c1",
         attempt=1,
         logical_request_id="logic-c",
+        source_label="source-c1",
     )
+    failover.reserve(
+        resource="resource",
+        model="model",
+        profile="profile",
+        payload=payload,
+        request_id="c2",
+        attempt=1,
+        logical_request_id="logic-c",
+        source_label="source-c2",
+    )
+    assert len(failover.attempts) == 2
+    same_source = _budget(
+        max_requests=8,
+        prices={},
+        billing_mode="development_unpriced",
+        recovery_policy=LogicalRecoveryPolicy(max_recoveries=1),
+        prior_logical_attempts=[
+            {
+                "logical_request_id": "logic-repair",
+                "request_id": "repair-1",
+                "source_label": "source-a",
+                "status": "success",
+                "charged_tokens": 10,
+            },
+            {
+                "logical_request_id": "logic-repair",
+                "request_id": "repair-2",
+                "source_label": "source-a",
+                "status": "success",
+                "charged_tokens": 12,
+            },
+        ],
+    )
+    opened = same_source.reserve(
+        resource="resource",
+        model="model",
+        profile="profile",
+        payload=payload,
+        request_id="next-1",
+        attempt=1,
+        logical_request_id="logic-next",
+        source_label="source-b",
+    )
+    same_source.settle(opened, None, status="success")
     with pytest.raises(LlmDeadlineExceededError, match="card_recovery_exhausted"):
-        capped.reserve(
+        same_source.reserve(
             resource="resource",
             model="model",
             profile="profile",
             payload=payload,
-            request_id="c2",
+            request_id="next-2",
             attempt=1,
-            logical_request_id="logic-c",
+            logical_request_id="logic-next",
+            source_label="source-b",
         )
+    assert len(same_source.attempts) == 1
+    assert same_source.attempts[0]["charged_tokens"] > 0
 
 
 @pytest.mark.parametrize(

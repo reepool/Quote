@@ -747,6 +747,18 @@ def validate_binding(
                 "s1-600097",
                 "s1-600054",
                 "s1-600000",
+                "s1-600094-r1",
+                "s1-600103-r1",
+                "s1-600100-r1",
+                "s1-600107-r1",
+                "s1-600098-r1",
+                "s1-600104-r1",
+                "s1-600088-r1",
+                "s1-600099-r1",
+                "s1-600082-r1",
+                "s1-600097-r1",
+                "s1-600054-r1",
+                "s1-600000-r1",
             }
             or not authorization.get("approval_reference")
         ):
@@ -1236,6 +1248,8 @@ def _worker(
             identity["accepted_prior_draft"] = load_saved_draft(binding)
         if binding.get("core_gap_closeout"):
             identity["core_gap_closeout"] = True
+        if binding.get("successor_core_closeout"):
+            identity["successor_core_closeout"] = True
         if binding.get("continue_unread"):
             identity["continue_unread"] = True
         if binding.get("retract_claim_ids"):

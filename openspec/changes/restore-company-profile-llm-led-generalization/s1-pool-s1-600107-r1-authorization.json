@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600107-r1",
+  "binding_sha256": "56d9d1a1cfff2af69dc34128a41051f2ba16aa3cd8993d6c23e06613a6a05be8",
+  "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+  "approval_reference": "B3-S1-R1 successor window, 2026-10-27",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "S1唯一后继"
+}

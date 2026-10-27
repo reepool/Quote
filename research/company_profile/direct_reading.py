@@ -172,6 +172,68 @@ def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
     return found
 
 
+_CORE_CLOSEOUT_DIMENSIONS = {
+    "principal_business",
+    "products_services",
+    "revenue_model",
+    "input_exposure",
+    "supply_chain_role",
+    "upstream_downstream",
+}
+_UNTRUSTED_LIMITATIONS = {
+    "pending_verification",
+    "claim_or_dependency_not_verified",
+    "evidence_not_located",
+    "subject_scope_omitted",
+    "retracted_pending_correction",
+    "not_verified",
+    "pending",
+}
+
+
+def _core_closeout_ready(claims, conditions, checks, records=()) -> bool:
+    """Core business is verified, so leftover unread pages are not a core gap.
+
+    A pending, unclear, or not_reliable claim does not satisfy a dimension.
+    An unverified major condition in a core dimension still blocks.
+    """
+    trusted = []
+    for claim in claims:
+        if claim.status != "observed" or claim.limitation in _UNTRUSTED_LIMITATIONS:
+            continue
+        if not any(
+            check.target_type == "claim"
+            and check.target_id == claim.claim_id
+            and check.status == "pass"
+            for check in checks
+        ):
+            continue
+        trusted.append(claim)
+    dimensions = {claim.dimension for claim in trusted}
+    if not {
+        "principal_business",
+        "products_services",
+        "revenue_model",
+        "input_exposure",
+    } <= dimensions:
+        return False
+    if not dimensions & {"supply_chain_role", "upstream_downstream"}:
+        return False
+    for gap in _completeness_gaps(claims, conditions, checks, records):
+        if not gap.startswith("major_condition_not_verified:"):
+            if gap.startswith(("view_not_substantive:", "core_dimension_missing:")):
+                return False
+            continue
+        condition_id = gap.split(":", 1)[1]
+        condition = next(
+            (item for item in conditions if item.condition_id == condition_id),
+            None,
+        )
+        if condition is None or condition.dimension in _CORE_CLOSEOUT_DIMENSIONS:
+            return False
+    return True
+
+
 def _structure_preview(text: str) -> str:
     """Headings a reader can recognize, plus a short body sample. Not an 8-character stub."""
     headings = []
@@ -650,23 +712,37 @@ def interpret_direct_core(
         blocking_gaps = [
             gap for gap in dynamic if not gap.startswith("supplementary_gap:")
         ]
-        blocking = bool(blocking_gaps) or any(
-            gap.startswith(
-                (
-                    "necessary_unread:",
-                    "necessary_fragment",
-                    "major_condition_not_verified:",
-                    "major_condition_not_in_synthesis:",
-                    "navigation_incomplete:",
-                    "view_not_substantive:",
-                    "core_dimension_missing:",
-                    "direct_core_gap_check_stopped",
-                    "claim_pending:",
-                    "company_synthesis_context_truncated",
+        if _core_closeout_ready(claims, conditions, checks, records):
+            blocking = any(
+                gap.startswith(
+                    (
+                        "major_condition_not_verified:",
+                        "major_condition_not_in_synthesis:",
+                        "view_not_substantive:",
+                        "core_dimension_missing:",
+                    )
                 )
+                for gap in [*dynamic, *gaps]
+                if not gap.startswith("supplementary_gap:")
             )
-            for gap in gaps
-        )
+        else:
+            blocking = bool(blocking_gaps) or any(
+                gap.startswith(
+                    (
+                        "necessary_unread:",
+                        "necessary_fragment",
+                        "major_condition_not_verified:",
+                        "major_condition_not_in_synthesis:",
+                        "navigation_incomplete:",
+                        "view_not_substantive:",
+                        "core_dimension_missing:",
+                        "direct_core_gap_check_stopped",
+                        "claim_pending:",
+                        "company_synthesis_context_truncated",
+                    )
+                )
+                for gap in gaps
+            )
         draft_complete = bool(observed) and not blocking
         return ReportInterpretation(
             report=report,
@@ -1628,11 +1704,17 @@ def interpret_direct_core(
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
                 text = str(exc)
-                if "card_recovery_exhausted" in text or "logical_recovery_already_used" in text:
+                recovery_stopped = (
+                    "card_recovery_exhausted" in text
+                    or "logical_recovery_already_used" in text
+                )
+                if recovery_stopped:
                     gaps.append(f"direct_core_recovery_refused:{text}")
                 else:
                     gaps.append(f"direct_core_gap_check_stopped:{text}")
-                if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
+                if recovery_stopped or any(
+                    gap.startswith("direct_core_ledger_hold") for gap in gaps
+                ):
                     return follow
                 if len(package) > 1:
                     middle = len(package) // 2
@@ -1671,12 +1753,16 @@ def interpret_direct_core(
             publish()
             if not identity.get("core_gap_closeout"):
                 draft_ready_core()
+            if _core_closeout_ready(claims, conditions, checks, records):
+                return follow
         return follow
 
     composed: set[int] = set()
 
     def compose(page_ids) -> None:
         """Read every selected chapter, then write one company draft."""
+        if _core_closeout_ready(claims, conditions, checks, records):
+            return
         by_id = {int(page["page"]): page for page in sources}
         chosen = []
         seen_pages: set[int] = set()
@@ -1800,6 +1886,10 @@ def interpret_direct_core(
             if condition.condition_id not in drafted_condition_ids
         ]
         for group in _business_groups(ordered):
+            if identity.get("successor_core_closeout") and _core_closeout_ready(
+                claims, conditions, checks, records
+            ):
+                return
             deliver_group(group)
 
     drafted_condition_ids: set[str] = set()
@@ -2188,7 +2278,7 @@ def interpret_direct_core(
                 text = str(page.get("text") or "")
                 if any(term in text and term not in quoted for term in terms):
                     supplement_pages.append(page)
-            if supplement_pages:
+            if supplement_pages and not identity.get("successor_core_closeout"):
                 try:
                     slices = list(
                         source_discovery_slices(
@@ -2318,13 +2408,18 @@ def interpret_direct_core(
             inventory_pages(follow)
             compose(follow)
     read_pages = {int(item["page"]) for item in coverage if item["status"] == "read"}
+    core_ready = _core_closeout_ready(claims, conditions, checks, records)
     for page in sources:
         page_no = int(page["page"])
         if page_no in read_pages:
             continue
         if not page.get("readable", True) or not str(page.get("text") or "").strip():
             continue
-        gap = f"necessary_unread:{page_no}"
+        gap = (
+            f"supplementary_unread:{page_no}"
+            if core_ready
+            else f"necessary_unread:{page_no}"
+        )
         if gap not in gaps:
             gaps.append(gap)
     for page_no in sorted(supplementary - {int(item["page"]) for item in coverage if item["status"] == "read"}):
