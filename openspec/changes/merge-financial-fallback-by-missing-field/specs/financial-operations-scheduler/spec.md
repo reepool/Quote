@@ -39,3 +39,19 @@ Financial disclosure incremental and reconciliation reports SHALL include a summ
 
 - **WHEN** source-fact reconciliation is disabled by configuration
 - **THEN** the report SHALL omit the comparison summary without warning
+
+### Requirement: Degraded Reports State The Reason In Plain Language
+
+When a financial disclosure task reports a degraded or partial status, the report SHALL state the concrete causes in operator-readable wording and list the pending targets with their retry windows.
+
+#### Scenario: Degraded solely by pending disclosure
+
+- **WHEN** the run's unresolved targets are all pending recheck within their retry windows
+- **THEN** the report SHALL show a reason line such as "N 个标的等待披露方数据，处于重试窗口内"
+- **AND** SHALL list up to three pending samples with instrument, report period, missing fields, and retry deadline
+- **AND** the source-warning note SHALL attribute the routing errors to pending disclosure (empty official responses are expected for unpublished data) rather than to official-source degradation
+
+#### Scenario: Degraded by real collection failures
+
+- **WHEN** unresolved targets exceed the pending-recheck count
+- **THEN** the warning note SHALL keep the official-source degradation wording

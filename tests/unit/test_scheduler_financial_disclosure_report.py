@@ -124,3 +124,59 @@ def test_legacy_report_without_new_keys_unchanged():
     assert "CNInfo待补字段: revenue，equity_parent" in report
     assert "字段级补缺" not in report
     assert "来源对照" not in report
+
+
+def test_degraded_reason_and_pending_samples_rendered():
+    result = _base_result()
+    result["status"] = "degraded"
+    result["pending_recheck_count"] = 1
+    result["pending_recheck_samples"] = [
+        {
+            "instrument_id": "601318.SH",
+            "report_period": "2026-09-30",
+            "missing_fields": [
+                "revenue",
+                "net_income_parent",
+                "equity_parent",
+                "total_assets",
+                "total_liabilities",
+            ],
+            "pending_recheck_until": "2026-10-31T22:18:23.723737+08:00",
+        }
+    ]
+    report = _format_financial_disclosure_scheduler_report(result)
+    assert "本次⚠️原因: 1 个标的等待披露方数据，处于重试窗口内" in report
+    assert (
+        "待复核: 601318.SH@2026-09-30"
+        "（缺 revenue,net_income_parent,equity_parent等，重试至 2026-10-31）" in report
+    )
+
+
+def test_routing_warning_attributed_to_pending_when_unresolved_is_pending():
+    result = _base_result()
+    result["status"] = "degraded"
+    result["pending_recheck_count"] = 1
+    result["source_routing"]["cninfo_parsed_instrument_periods"] = 0
+    result["source_routing"]["fallback_successes"] = 0
+    result["source_routing"]["errors"] = [
+        "cninfo_data20:SSE:2026-09-30:source_failed:failed=1/1"
+    ]
+    report = _format_financial_disclosure_scheduler_report(result)
+    assert "补数警告来自 1 个等待披露数据的标的" in report
+    assert "非官方源故障" in report
+    assert "披露后自动补齐" in report
+    assert "官方结构化源降级" not in report
+
+
+def test_routing_warning_keeps_degradation_wording_for_real_failures():
+    result = _base_result()
+    result["status"] = "degraded"
+    result["pending_recheck_count"] = 0
+    result["source_routing"]["cninfo_parsed_instrument_periods"] = 0
+    result["source_routing"]["fallback_successes"] = 0
+    result["source_routing"]["errors"] = [
+        "cninfo_data20:SSE:2026-09-30:source_failed:failed=50/110"
+    ]
+    report = _format_financial_disclosure_scheduler_report(result)
+    assert "官方结构化源降级" in report
+    assert "非官方源故障" not in report

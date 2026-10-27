@@ -1644,6 +1644,17 @@ class FinancialDisclosureIncrementalSyncService:
             "source_routing": self._last_repair_source_summary
             or self.repair_router.default_summary(),
             "outcomes": outcomes[:50],
+            "pending_recheck_samples": [
+                {
+                    "instrument_id": item.get("instrument_id"),
+                    "report_period": item.get("report_period"),
+                    "missing_field_count": item.get("missing_field_count"),
+                    "missing_fields": item.get("missing_fields") or [],
+                    "pending_recheck_until": item.get("pending_recheck_until"),
+                }
+                for item in outcomes
+                if item.get("status") == "pending_recheck"
+            ][:5],
             "blocker_samples": blocker_samples[:10],
         }
 
@@ -1937,6 +1948,8 @@ class FinancialDisclosureIncrementalSyncService:
         ]
         if missing_names:
             outcome["missing_fields"] = missing_names[:8]
+        if pending_until:
+            outcome["pending_recheck_until"] = pending_until
         if not dry_run:
             with self.storage.financial_database_scope():
                 self.storage.upsert_financial_disclosure_event_state(

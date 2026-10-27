@@ -2929,6 +2929,49 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
         f"历史异常运行: 本轮自动收敛 {result.get('stale_run_count', 0)}",
         f"耗时: `{result.get('elapsed_seconds', 0)}s`",
     ]
+    degraded_reasons: list = []
+    pending_recheck_count = int(result.get("pending_recheck_count", 0) or 0)
+    pending_delisting_count = int(
+        result.get("pending_delisting_risk_count", 0) or 0
+    )
+    failed_count = int(result.get("failed_count", 0) or 0)
+    blocking_count = int(result.get("blocking_gap_count", 0) or 0)
+    if pending_recheck_count:
+        degraded_reasons.append(
+            f"{pending_recheck_count} 个标的等待披露方数据，处于重试窗口内"
+        )
+    if pending_delisting_count:
+        degraded_reasons.append(f"{pending_delisting_count} 个标的待退市风险复核")
+    if failed_count:
+        degraded_reasons.append(f"{failed_count} 个标的采集失败")
+    if blocking_count:
+        degraded_reasons.append(f"{blocking_count} 个阻断项待处理")
+    if degraded_reasons:
+        lines.append("本次⚠️原因: " + "；".join(degraded_reasons))
+    pending_samples = result.get("pending_recheck_samples") or []
+    for sample in pending_samples[:3]:
+        until = str(sample.get("pending_recheck_until") or "")[:10]
+        missing = sample.get("missing_fields") or []
+        missing_text = (
+            f"缺 {','.join(str(item) for item in missing[:3])}"
+            + ("等" if len(missing) > 3 else "")
+            if missing
+            else ""
+        )
+        detail = "，".join(
+            item
+            for item in (
+                missing_text,
+                f"重试至 {until}" if until else "",
+            )
+            if item
+        )
+        sample_line = (
+            f"待复核: {sample.get('instrument_id')}@{sample.get('report_period')}"
+        )
+        if detail:
+            sample_line += f"（{detail}）"
+        lines.append(sample_line)
     stale_local_gap_cleared = int(result.get("stale_local_gap_cleared") or 0)
     if stale_local_gap_cleared:
         lines.append(f"过期本地缺口书签已清理: {stale_local_gap_cleared}")
@@ -3121,9 +3164,25 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
                     "本次结果以 fallback 数据为准，后续可对账官方数据。"
                 )
             else:
-                lines.append(
-                    "说明: 官方结构化源降级，已保留 fallback 结果，后续对账需复核官方数据。"
+                attempted = max(
+                    int(source_routing.get("cninfo_attempts", 0) or 0),
+                    int(source_routing.get("fallback_attempts", 0) or 0),
                 )
+                completed = int(
+                    source_routing.get("cninfo_successes", 0) or 0
+                ) + int(source_routing.get("fallback_successes", 0) or 0)
+                unresolved = max(0, attempted - completed)
+                if unresolved <= pending_recheck_count:
+                    lines.append(
+                        f"说明: 补数警告来自 {unresolved} 个等待披露数据的标的"
+                        "（官方源对其返回空属预期），非官方源故障；"
+                        "披露后自动补齐。"
+                    )
+                else:
+                    lines.append(
+                        "说明: 官方结构化源降级，已保留 fallback 结果，"
+                        "后续对账需复核官方数据。"
+                    )
     scan_errors = result.get("scan_errors") or []
     if scan_errors:
         lines.append("扫描警告: " + "；".join(str(item) for item in scan_errors[:3]))
