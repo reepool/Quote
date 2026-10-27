@@ -15,5 +15,5 @@ Extend the existing per-module test files (no new files; mocked classifier/loade
 ## 3. Verification
 
 - [x] 3.1 Run the affected pytest subset (`test_cninfo_corporate_action_incremental.py`, `test_cninfo_announcement_xdxr_triage.py`, `test_cninfo_primary_daily_maintenance.py`) and record results.
-- [ ] 3.2 Live verification on the first scheduled run after deployment (scheduler daemon reload required): the 600572.SH case routes to `deterministic_excluded`, the report shows `未匹配 0` with no `待处理公告` line for it, and no repeated `action family mismatch` error in the logs; the job completes without the anomaly-governance backlog issue.
-- [ ] 3.3 Confirm on a subsequent run that the healed case is no longer dispatched to the LLM classifier (no new LLM call for `600572.SH`).
+- [x] 3.2 Live verification on the first scheduled run after deployment (scheduler daemon reload required): the 600572.SH case routes to `deterministic_excluded`, the report shows `未匹配 0` with no `待处理公告` line for it, and no repeated `action family mismatch` error in the logs; the job completes without the anomaly-governance backlog issue.
+- [x] 3.3 Confirm on a subsequent run that the healed case is no longer dispatched to the LLM classifier (no new LLM call for `600572.SH`).
