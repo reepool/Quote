@@ -723,6 +723,7 @@
             "relative_tolerance": 0.005,
             "absolute_floor_cny": 1.0,
             "sanity_minority_share_max": 0.5,
+            "sanity_absolute_floor_cny": 1000.0,
             "report_top_n": 5
           },
           "max_pages_per_market": 0,

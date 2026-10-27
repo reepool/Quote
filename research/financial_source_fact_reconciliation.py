@@ -22,6 +22,7 @@ DEFAULT_COMPARISON_SCOPE: tuple[str, ...] = (
 DEFAULT_RELATIVE_TOLERANCE = 0.005
 DEFAULT_ABSOLUTE_FLOOR_CNY = 1.0
 DEFAULT_SANITY_MINORITY_SHARE_MAX = 0.5
+DEFAULT_SANITY_ABSOLUTE_FLOOR_CNY = 1000.0
 
 RECORD_KIND_SOURCE_DIFFERENCE = "source_difference"
 RECORD_KIND_SANITY_REVIEW = "sanity_review"
@@ -148,17 +149,22 @@ def evaluate_single_sourced_sanity(
     reference_value: float,
     reference_source: str,
     minority_share_max: float = DEFAULT_SANITY_MINORITY_SHARE_MAX,
+    absolute_floor_cny: float = DEFAULT_SANITY_ABSOLUTE_FLOOR_CNY,
 ) -> Optional[SourceFactComparisonRecord]:
     """Check a fallback-filled field against its definitional reference fact.
 
     For an equity-parent fill the implied minority interest
-    (`reference_value - filled_value`) must be non-negative and within the
-    configured loose share of the reference value. Violations become
-    review-only `sanity_review` records and never block the write.
+    (`reference_value - filled_value`) must stay within the configured loose
+    share of the reference value on the positive side, and no further below
+    than the absolute floor on the negative side — the floor absorbs the
+    reference source's rounding granularity (data20 reports 万元 with two
+    decimals while the fill carries exact yuan, so zero-minority companies
+    show tiny negative implied interest). Violations become review-only
+    `sanity_review` records and never block the write.
     """
     reference = float(reference_value)
     implied_minority = reference - float(filled_value)
-    if implied_minority >= 0 and implied_minority <= (
+    if implied_minority >= -float(absolute_floor_cny) and implied_minority <= (
         float(minority_share_max) * abs(reference)
     ):
         return None
@@ -178,6 +184,7 @@ def evaluate_single_sourced_sanity(
             "check": "implied_minority_interest_share",
             "implied_minority_interest": implied_minority,
             "minority_share_max": float(minority_share_max),
+            "absolute_floor_cny": float(absolute_floor_cny),
             "reference_fact": str(reference_fact),
         },
     )

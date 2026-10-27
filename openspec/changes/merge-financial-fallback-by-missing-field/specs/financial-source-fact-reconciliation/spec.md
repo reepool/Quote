@@ -36,9 +36,14 @@ Canonical facts filled from fallback with no official counterpart available for 
 #### Scenario: Implied minority interest is implausible
 
 - **WHEN** `equity_parent` is fallback-filled and official `equity_total` is present
-- **AND** the implied minority interest (`equity_total` minus `equity_parent`) is negative or exceeds the configured loose share threshold of `equity_total`
+- **AND** the implied minority interest (`equity_total` minus `equity_parent`) is negative beyond the configured absolute floor or exceeds the configured loose share threshold of `equity_total`
 - **THEN** the run SHALL mark a review-only anomaly recording both values and the implied minority share
 - **AND** the filled value SHALL remain written and reported for review
+
+#### Scenario: Rounding noise passes the sanity check
+
+- **WHEN** the implied minority interest is negative but within the configured absolute floor
+- **THEN** the run SHALL NOT mark a review-only anomaly, because the difference is the reference source's rounding granularity rather than a definitional violation
 
 ### Requirement: Comparison Results Are Transient Process Data
 

@@ -97,6 +97,41 @@ def test_sanity_flags_negative_implied_minority():
     )
 
 
+def test_sanity_passes_rounding_noise_below_absolute_floor():
+    # Zero-minority company: data20 rounds to 万元 (546865.64万 -> 5468656400)
+    # while the fallback fill carries exact yuan — the tiny negative implied
+    # interest is rounding noise, not a definitional violation.
+    record = evaluate_single_sourced_sanity(
+        instrument_id="603893.SH",
+        report_period="2026-09-30",
+        filled_fact="equity_parent",
+        filled_value=5_468_656_431.28,
+        fallback_source="akshare",
+        reference_fact="equity_total",
+        reference_value=5_468_656_400.0,
+        reference_source="cninfo",
+    )
+    assert record is None
+
+
+def test_sanity_flags_negative_beyond_absolute_floor():
+    record = evaluate_single_sourced_sanity(
+        instrument_id="600123.SH",
+        report_period="2026-09-30",
+        filled_fact="equity_parent",
+        filled_value=15_358_155_798.07,
+        fallback_source="akshare",
+        reference_fact="equity_total",
+        reference_value=14_776_745_100.0,
+        reference_source="cninfo",
+    )
+    assert record is not None
+    assert record.detail["implied_minority_interest"] == pytest.approx(
+        -581_410_698.07
+    )
+    assert record.detail["absolute_floor_cny"] == pytest.approx(1000.0)
+
+
 def test_sanity_flags_excessive_minority_share():
     record = evaluate_single_sourced_sanity(
         instrument_id="002254.SZ",

@@ -20,6 +20,7 @@ from research.financial_source_fact_reconciliation import (
     DEFAULT_ABSOLUTE_FLOOR_CNY,
     DEFAULT_COMPARISON_SCOPE,
     DEFAULT_RELATIVE_TOLERANCE,
+    DEFAULT_SANITY_ABSOLUTE_FLOOR_CNY,
     DEFAULT_SANITY_MINORITY_SHARE_MAX,
     SourceFactComparisonRecord,
     compare_official_and_fallback_facts,
@@ -1275,6 +1276,12 @@ class FinancialStatementsShadowSyncService:
                         self._source_fact_reconciliation_cfg.get(
                             "sanity_minority_share_max",
                             DEFAULT_SANITY_MINORITY_SHARE_MAX,
+                        )
+                    ),
+                    absolute_floor_cny=float(
+                        self._source_fact_reconciliation_cfg.get(
+                            "sanity_absolute_floor_cny",
+                            DEFAULT_SANITY_ABSOLUTE_FLOOR_CNY,
                         )
                     ),
                 )
