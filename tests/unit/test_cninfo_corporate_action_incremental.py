@@ -173,6 +173,40 @@ def test_daily_title_trigger_reports_non_xdxr_exclusion_reason(title, reason):
     assert decision["requires_semantic_review"] is False
 
 
+@pytest.mark.parametrize(
+    "title",
+    [
+        "公司股改限售股上市流通公告",
+        "限售股上市流通公告",
+        "济高发展股改限售股上市流通公告",
+    ],
+)
+def test_lockup_listing_title_variants_are_deterministically_excluded(title):
+    decision = classify_daily_corporate_action_title(title)
+
+    assert decision["selected"] is False
+    assert (
+        decision["reason"]
+        == "deterministic_exclusion:restricted_shares_listing_circulation"
+    )
+    assert decision["requires_semantic_review"] is False
+
+
+@pytest.mark.parametrize(
+    "title",
+    [
+        "股改限售股上市流通暨权益分派实施公告",
+        "限售股上市流通暨转增股本实施公告",
+    ],
+)
+def test_lockup_listing_combined_implementation_stays_selectable(title):
+    decision = classify_daily_corporate_action_title(title)
+
+    assert decision["selected"] is True
+    assert decision["subject_markers"]
+    assert decision["implementation_markers"]
+
+
 def test_distribution_implementation_takes_precedence_over_exclusion_words():
     decision = classify_daily_corporate_action_title(
         "2025年度权益分派实施暨回购价格调整公告"

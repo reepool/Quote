@@ -326,8 +326,8 @@ async def test_shadow_removes_newly_excluded_announcement_from_existing_case():
                 "2026-08-25",
             ),
             _announcement(
-                "listing",
-                "济高发展股改限售股上市流通公告",
+                "implementation",
+                "济高发展股权分置改革实施公告",
                 "2026-08-25",
             ),
         ]
@@ -364,9 +364,94 @@ async def test_shadow_removes_newly_excluded_announcement_from_existing_case():
 
     triage_case = result["announcement_xdxr_cases"][0]
     assert [item["announcement_key"] for item in triage_case["announcements"]] == [
-        "listing"
+        "implementation"
     ]
     assert classifier.classify.await_count == 1
+
+
+@pytest.mark.asyncio
+async def test_fully_excluded_case_becomes_terminal_without_dispatch():
+    case = build_announcement_xdxr_cases({
+        "600572.SH": [
+            _announcement(
+                "listing",
+                "公司股改限售股上市流通公告",
+                "2026-10-27",
+            )
+        ]
+    })[0]
+    case["routing_status"] = "active_pending"
+    case["last_error"] = (
+        "ValueError:announcement XDXR action family mismatch"
+    )
+    classifier = SimpleNamespace(classify=AsyncMock())
+    service = CninfoAnnouncementXdxrDailyGovernanceService(
+        CninfoAnnouncementXdxrTriageService(
+            config=AnnouncementXdxrTriageConfig(mode="active"),
+            classifier=classifier,
+            document_loader=AsyncMock(),
+        )
+    )
+
+    result = await service.govern(
+        {
+            "status": "success",
+            "execution_status": "skipped",
+            "unmatched_special_announcements_by_instrument": {
+                "600572.SH": case["announcements"]
+            },
+            "deferred_special_announcements_by_instrument": {},
+        },
+        announcement_scan={"announcement_xdxr_cases": [case]},
+        cninfo_result={},
+        tdx_result={},
+        rebuild_result={},
+    )
+
+    triage_case = result["announcement_xdxr_cases"][0]
+    assert triage_case["routing_status"] == "deterministic_excluded"
+    assert "last_error" not in triage_case
+    classifier.classify.assert_not_awaited()
+    assert result["unmatched_special_announcement_count"] == 0
+
+
+@pytest.mark.asyncio
+async def test_structured_match_keeps_precedence_over_exclusion():
+    case = build_announcement_xdxr_cases({
+        "600807.SH": [
+            _announcement(
+                "listing",
+                "济高发展股改限售股上市流通公告",
+                "2026-08-25",
+            )
+        ]
+    })[0]
+    classifier = SimpleNamespace(classify=AsyncMock())
+    service = CninfoAnnouncementXdxrDailyGovernanceService(
+        CninfoAnnouncementXdxrTriageService(
+            config=AnnouncementXdxrTriageConfig(mode="active"),
+            classifier=classifier,
+            document_loader=AsyncMock(),
+        )
+    )
+
+    result = await service.govern(
+        {
+            "status": "success",
+            "execution_status": "skipped",
+            "unmatched_special_announcements_by_instrument": {},
+            "deferred_special_announcements_by_instrument": {},
+            "matched_exceptional_announcement_keys": ["listing"],
+        },
+        announcement_scan={"announcement_xdxr_cases": [case]},
+        cninfo_result={},
+        tdx_result={},
+        rebuild_result={},
+    )
+
+    triage_case = result["announcement_xdxr_cases"][0]
+    assert triage_case["routing_status"] == "structured_event_available"
+    classifier.classify.assert_not_awaited()
 
 
 def test_source_signal_exposes_best_case_evidence_to_structured_governance():
@@ -410,6 +495,56 @@ async def test_classifier_validates_case_evidence_identities():
     client = SimpleNamespace(complete=AsyncMock(return_value=response))
 
     with pytest.raises(ValueError, match="primary identity is not in evidence"):
+        await CninfoAnnouncementXdxrClassifier(client).classify(
+            case,
+            [{**case["announcements"][0], "text": "公告正文"}],
+        )
+
+
+@pytest.mark.asyncio
+async def test_classifier_accepts_non_xdxr_family_divergence():
+    case = build_announcement_xdxr_cases({
+        "600572.SH": [_announcement(
+            "listing", "公司股改限售股上市流通公告", "2026-10-27"
+        )]
+    })[0]
+    response = SimpleNamespace(
+        data={
+            **_decision(case, likelihood=0.05, confidence=0.95),
+            "action_family": "restricted_share_listing",
+        },
+        model="fixture-model",
+        request_id="request-id",
+        request_hash="request-hash",
+        response_hash="response-hash",
+    )
+    client = SimpleNamespace(complete=AsyncMock(return_value=response))
+
+    decision = await CninfoAnnouncementXdxrClassifier(client).classify(
+        case,
+        [{**case["announcements"][0], "text": "公告正文"}],
+    )
+
+    assert decision["disposition"] == "non_xdxr"
+    assert decision["action_family"] == case["action_family"]
+    assert decision["llm_action_family"] == "restricted_share_listing"
+
+
+@pytest.mark.asyncio
+async def test_classifier_rejects_probable_xdxr_family_divergence():
+    case = build_announcement_xdxr_cases({
+        "600000.SH": [_announcement("notice", "重整实施公告", "2026-01-01")]
+    })[0]
+    response = SimpleNamespace(
+        data={**_decision(case), "action_family": "something_else"},
+        model="fixture-model",
+        request_id="request-id",
+        request_hash="request-hash",
+        response_hash="response-hash",
+    )
+    client = SimpleNamespace(complete=AsyncMock(return_value=response))
+
+    with pytest.raises(ValueError, match="action family mismatch"):
         await CninfoAnnouncementXdxrClassifier(client).classify(
             case,
             [{**case["announcements"][0], "text": "公告正文"}],

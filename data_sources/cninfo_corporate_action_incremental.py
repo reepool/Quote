@@ -180,7 +180,7 @@ def _daily_title_exclusion_reason(normalized_title: str) -> str | None:
     ):
         return "share_reform_listing_review_opinion"
     if (
-        "限售股份" in normalized_title
+        "限售股" in normalized_title
         and "上市流通" in normalized_title
         and not any(
             marker in normalized_title

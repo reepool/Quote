@@ -634,10 +634,18 @@ class CninfoAnnouncementXdxrClassifier:
             raise ValueError("unsupported announcement XDXR disposition")
         if decision.get("event_stage") not in _EVENT_STAGES:
             raise ValueError("unsupported announcement XDXR event stage")
-        if str(decision.get("action_family") or "").strip() != str(
-            case.get("action_family") or ""
-        ).strip():
-            raise ValueError("announcement XDXR action family mismatch")
+        decision_family = str(decision.get("action_family") or "").strip()
+        case_family = str(case.get("action_family") or "").strip()
+        if decision_family != case_family:
+            if str(decision.get("disposition") or "").strip() != "non_xdxr":
+                raise ValueError("announcement XDXR action family mismatch")
+            # An excluding verdict judges the economic action from the full
+            # document text, so disagreement with the title-marker family is
+            # expected (e.g. lockup-listing titles tagged 股改). Keep the
+            # case's stable family and record the model's label instead of
+            # failing the case on every run.
+            decision["action_family"] = case_family
+            decision["llm_action_family"] = decision_family
         primary = str(decision.get("primary_announcement_key") or "").strip()
         supporting = [
             str(item).strip()
@@ -863,6 +871,10 @@ class CninfoAnnouncementXdxrTriageService:
                 config=self.config,
             )
             updated["llm_lineage"] = dict(outcome.get("llm_lineage") or {})
+            if outcome.get("llm_action_family"):
+                updated["llm_action_family"] = str(
+                    outcome["llm_action_family"]
+                )
             source_signals = list(
                 source_signals_by_instrument.get(case["instrument_id"]) or ()
             )
@@ -1051,6 +1063,14 @@ class CninfoAnnouncementXdxrDailyGovernanceService:
             }
             if case_keys & structured_announcement_keys:
                 case["routing_status"] = "structured_event_available"
+            elif not retained_announcements and case.get(
+                "routing_status"
+            ) not in TERMINAL_ROUTING_STATUSES:
+                # Every announcement was deterministically excluded and none
+                # matched a structured event: the case can never produce an
+                # XDXR signal, so close it instead of re-dispatching nightly.
+                case["routing_status"] = "deterministic_excluded"
+                case.pop("last_error", None)
             elif (
                 self.triage_service.config.mode in {"disabled", "shadow"}
                 and not any(
