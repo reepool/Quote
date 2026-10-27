@@ -1,4 +1,4 @@
-Current policy: the user's 2026-10-22 correction, acceptance section 7.37 and revised execution card section 41 govern development. Produce and persist a readable real-LLM three-view draft first, verify and correct its content next, then optimize cost. The earlier unused single-entry/resource caps and full-verification-chain readiness prerequisite are superseded; B may adjust isolated task resources for continuous development of the same company using the existing pool. Prior inputs, failures, charges and scores remain unchanged; a pending draft is not an accepted company or trusted output.
+Current policy: the user's 2026-10-27 correction, product v8, acceptance section 7.54 and B3 execution card section 8 govern development. Existing full-text samples calibrate a key-section reading policy with targeted expansion; ordinary core delivery does not require full-text real-LLM reading. Produce and persist readable three-view drafts, verify support and major-condition coverage, and measure quality and resource use together. Only the current card's explicitly allocated cumulative resources and entries are authorized; earlier unlimited same-company tuning is historical. Prior inputs, failures, charges and scores remain unchanged; a pending draft is not an accepted company or trusted output.
 
 ## ADDED Requirements
 
@@ -78,7 +78,7 @@ The new processing policy MUST route every new report's open-language interpreta
 #### Scenario: A later navigation batch fails after an earlier batch selected readable core pages
 - **WHEN** one navigation batch has selected usable contexts and a later navigation batch fails within its bounded recovery allowance
 - **THEN** the existing owner reads, source-reviews, verifies and publishes independent supported claims from the selected contexts while recording the failed navigation range and dependencies
-- **AND** future execution interleaves each useful navigation batch with its first business delivery instead of requiring all navigation calls to succeed first; unresolved major-business risk still prevents company completeness
+- **AND** this permits independent partial delivery after a navigation failure without imposing a per-fragment business loop; the current section policy still combines cross-chapter core evidence and unresolved major-business risk prevents company completeness
 
 #### Scenario: One independent business package fails while the global budget remains usable
 - **WHEN** bounded synthesis, source review or verification fails for one package and another independent core context is available
@@ -96,12 +96,22 @@ The new processing policy MUST route every new report's open-language interpreta
 - **AND** physical profile limits, entry deadline, shared recovery policy and actual send accounting remain enforced without authorizing an extra source attempt
 
 ### Requirement: Discovery and omission checking are source-led
-The current v7 policy MUST give every readable source range a bounded, candidate-free real-LLM source-discovery opportunity. Navigation MAY guide ordering but MUST NOT exclude text from reading. Source discovery MUST collect core business, products, monetization, major income composition, material inputs, customers and operating-role evidence with necessary paragraphs, headers, units and continuations; it MUST NOT require exhaustive extraction of every supplementary note or synthesize and verify all views after each transport fragment. A cross-chapter company synthesis MUST use the collected core evidence before bounded support and major-condition coverage verification. Source-first discovery MUST NOT receive candidate answers or evaluation Gold and MUST NOT be redundantly repeated as another full-report inventory. Input-range coverage, successful source reading and audited semantic recall MUST be reported separately. Unresolved major-business or necessary-context gaps MUST prevent completeness; failed or unread ranges MUST remain missing rather than not_disclosed. Historical navigation-first policies, contracts and scores MUST remain unchanged under their frozen identities.
+The current v8 policy MUST use key-section reading with targeted expansion for ordinary company delivery. Local parsing and layout or section indexing MAY cover every physical page, but MUST NOT be reported as real-LLM full-text reading. A bounded, source-led section plan MUST locate principal business, products, monetization, major income composition, material inputs, customers and operating-role evidence; section names and locations MAY vary and company-specific page whitelists MUST NOT define the production plan. Candidate-free real-LLM discovery MUST read selected source contexts with necessary paragraphs, headers, units and continuations. Existing full-text development samples SHOULD calibrate section contribution and selection omissions; full-text reading MUST NOT be a completion prerequisite for every company. A cross-chapter synthesis MUST use the collected core evidence before bounded support and major-condition coverage verification. Source-first discovery MUST NOT receive candidate answers or evaluation Gold. Actual reading ranges, audited semantic recall and resource use MUST be reported separately. Unselected pages MUST retain their actual unread status without automatically negating core completeness; known major-business gaps, required unread scopes and necessary-context risks MUST still prevent completeness. Selection alone MUST NOT establish absence, supplementary status or not_disclosed. Historical v7 and earlier contracts, policies and scores MUST remain unchanged under their frozen identities.
 
 #### Scenario: Navigation omits a fee or purchasing disclosure
-- **WHEN** a readable disclosure is absent from the navigation selection
-- **THEN** the full-text source-reading plan still sends its range without candidate answers, with the original table and continuation context preserved
-- **AND** a source condition discovered there can influence company synthesis and coverage review without a company-specific page whitelist
+- **WHEN** source-led review, section references or major income composition reveal a missing fee mechanism or purchasing disclosure
+- **THEN** the owner locates and reads its necessary context without candidate answers, including table headers and continuations, or retains the unresolved major gap
+- **AND** it does not restart an unrelated full-report scan, infer absence from the initial selection or substitute a company-specific page whitelist
+
+#### Scenario: Ordinary delivery uses only key sections
+- **WHEN** selected sections and targeted expansions establish all major business conditions, valid support and coverage checks, and no unresolved necessary source risk remains
+- **THEN** the existing owner may derive core completion while other pages remain not_read; it does not claim full-report review or overwrite their actual states
+- **AND** both core quality and measured reading volume, time, physical calls, effective usage and unknown reservations are reported; fewer pages with lost major content do not establish an efficiency improvement
+
+#### Scenario: Full-text samples calibrate a scalable section policy
+- **WHEN** existing development reports have full-text or extensive source reading and independently identified core sources
+- **THEN** they inform reusable business-question-to-section guidance and omission challenges rather than requiring another full-text pass for every company
+- **AND** a fresh section-policy validation uses its own source reading and does not load prior conditions, candidate answers or verification results as its generated output; its independent core denominator remains unchanged
 
 #### Scenario: Accumulated source conditions exceed a single synthesis request
 - **WHEN** the actual company-wide source conditions and necessary evidence exceed either the physical payload-byte limit or the reservation limit
@@ -224,7 +234,7 @@ The new-policy requirements MUST supersede legacy no-provider completion, fixed 
 - **THEN** its scope notice routes new work to this change and the current product/acceptance documents, without altering the historical result
 
 ### Requirement: Evidence support and report coverage are separate decisions
-Under the explicitly enabled current semantic policy, the authoritative owner MUST verify actual candidate evidence units independently of candidate-free source discovery. Only genuinely verified claims and valid dependencies may enter reliable query/export; report completeness MUST still require independent source reading, major-condition checks and necessary context recovery. The v7 orchestration MUST combine cross-chapter core evidence before company synthesis and MAY share bounded verification groups for separate support and coverage decisions without reproducing a per-page business loop.
+Under the explicitly enabled current semantic policy, the authoritative owner MUST verify actual candidate evidence units independently of candidate-free source discovery. Only genuinely verified claims and valid dependencies may enter reliable query/export; core completeness MUST still require independent reading of necessary sources, major-condition checks and context recovery, but not reading every supplementary page. The v8 orchestration MUST combine selected cross-chapter core evidence before company synthesis and MAY share bounded verification groups for separate support and coverage decisions without reproducing a per-page business loop.
 
 #### Scenario: Source inventory is unavailable after real candidates were saved
 - **WHEN** a source-led inventory call fails but located candidates and their full semantic context remain available
