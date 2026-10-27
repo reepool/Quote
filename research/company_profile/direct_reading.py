@@ -2033,6 +2033,7 @@ def interpret_direct_core(
             return
         deliver_group(_business_groups(pending)[0])
 
+    chapter_required_pages: set[int] | None = None
     reused_receipts = list(identity.get("accepted_source_receipts") or ())
     if reused_receipts:
         for item in reused_receipts:
@@ -2356,13 +2357,15 @@ def interpret_direct_core(
         readable_pages = [
             page for page in sources if int(page["page"]) in set(readable_order)
         ]
-        try:
-            planned = list(
-                source_discovery_slices(readable_pages, report, identity, limit)
-            )
-        except ValueError as exc:
-            gaps.append(str(exc))
-            planned = []
+        planned = []
+        if not identity.get("chapter_select"):
+            try:
+                planned = list(
+                    source_discovery_slices(readable_pages, report, identity, limit)
+                )
+            except ValueError as exc:
+                gaps.append(str(exc))
+                planned = []
         if planned:
             slice_units = [
                 _units(
@@ -2388,25 +2391,62 @@ def interpret_direct_core(
                 + _nonempty_verify_units(sample, report=report, identity=identity)
                 + 2 * max(slice_units)
             )
-        follow = inventory_pages(readable_order, prepared=planned)
-        tail_hold = 0
-        compose(readable_order)
-        if (
-            follow
-            and not any(gap.startswith("direct_core_ledger_hold") for gap in gaps)
-            and any(
-                gap.startswith(("core_dimension_missing:", "view_not_substantive:"))
+        if identity.get("chapter_select"):
+            selected, _deferred = priority_order(readable_order)
+            if not selected:
+                gaps.append("chapter_selection_empty")
+            chapter_required_pages = {int(page) for page in selected}
+            for page_no in readable_order:
+                if page_no in by_page:
+                    by_page[page_no]["map_checked"] = True
+                    by_page[page_no]["structure_indexed"] = True
+            follow = inventory_pages(selected)
+            tail_hold = 0
+            compose(selected)
+            missing_core = any(
+                gap.startswith(
+                    (
+                        "core_dimension_missing:",
+                        "view_not_substantive:",
+                        "major_condition_not_verified:",
+                    )
+                )
                 for gap in _completeness_gaps(claims, conditions, checks, records)
             )
-        ):
-            inventory_pages(follow)
-            compose(follow)
+            expand = [
+                int(page)
+                for page in follow
+                if int(page) not in chapter_required_pages and int(page) in set(readable_order)
+            ]
+            if expand and missing_core and not any(
+                gap.startswith("direct_core_ledger_hold") for gap in gaps
+            ):
+                gaps.append("chapter_gap_expansion")
+                chapter_required_pages.update(expand)
+                inventory_pages(expand)
+                compose(expand)
+        else:
+            follow = inventory_pages(readable_order, prepared=planned)
+            tail_hold = 0
+            compose(readable_order)
+            if (
+                follow
+                and not any(gap.startswith("direct_core_ledger_hold") for gap in gaps)
+                and any(
+                    gap.startswith(("core_dimension_missing:", "view_not_substantive:"))
+                    for gap in _completeness_gaps(claims, conditions, checks, records)
+                )
+            ):
+                inventory_pages(follow)
+                compose(follow)
     read_pages = {int(item["page"]) for item in coverage if item["status"] == "read"}
     for page in sources:
         page_no = int(page["page"])
         if page_no in read_pages:
             continue
         if not page.get("readable", True) or not str(page.get("text") or "").strip():
+            continue
+        if chapter_required_pages is not None and page_no not in chapter_required_pages:
             continue
         gap = f"necessary_unread:{page_no}"
         if gap not in gaps:

@@ -761,6 +761,8 @@ def validate_binding(
                 "s1-600000-r1",
                 "s1-600103-d2",
                 "s1-600000-d2",
+                "s1-600103-d4",
+                "s1-600000-d4",
             }
             or not authorization.get("approval_reference")
         ):
@@ -1269,6 +1271,8 @@ def _worker(
             identity["successor_core_closeout"] = True
         if binding.get("read_remaining_sources"):
             identity["read_remaining_sources"] = True
+        if binding.get("chapter_select"):
+            identity["chapter_select"] = True
         if binding.get("continue_unread"):
             identity["continue_unread"] = True
         if binding.get("retract_claim_ids"):

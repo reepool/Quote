@@ -3701,4 +3701,162 @@ def test_an_unread_later_page_cannot_be_marked_supplementary():
     assert not any(str(gap).startswith("supplementary_unread:") for gap in result.gaps)
 
 
+def test_chapter_selection_can_finish_without_reading_an_ordinary_note():
+    from research.company_profile import direct_reading
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    body = "公司主营造纸并销售纸袋纸。公司营业收入为100万元。公司采购木片。公司向下游客户销售纸制品。"
+    note = "附注列示子公司注册地址。"
+    dimensions = (
+        "principal_business",
+        "products_services",
+        "revenue_model",
+        "input_exposure",
+        "supply_chain_role",
+    )
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            pages = {int(page["page"]) for page in request.source_pages}
+            if request.source_scope == "page_map":
+                assert all(len(str(page.get("text") or "")) <= 180 for page in request.source_pages)
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(1,),
+                )
+            if 2 in pages:
+                raise AssertionError("ordinary note was sent as body text")
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=tuple(
+                        ReportSourceCondition(
+                            condition_id=dimension,
+                            dimension=dimension,
+                            description=body,
+                            evidence=(
+                                _evidence(report, text=body, page=1).model_copy(
+                                    update={"evidence_id": f"ch-{dimension}"}
+                                ),
+                            ),
+                            major=True,
+                            statement_status="current",
+                        )
+                        for dimension in dimensions
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=tuple(
+                        ReportViewClaim(
+                            claim_id=dimension,
+                            dimension=dimension,
+                            status="observed",
+                            answer=body,
+                            evidence=(
+                                _evidence(report, text=body, page=1).model_copy(
+                                    update={"evidence_id": f"ch-claim-{dimension}"}
+                                ),
+                            ),
+                        )
+                        for dimension in dimensions
+                    ),
+                )
+            claim_by_dimension = {claim.dimension: claim.claim_id for claim in request.claims}
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "claim",
+                        "target_id": claim.claim_id,
+                        "status": "pass",
+                        "explanation": "选自正文。",
+                    }
+                    for claim in request.claims
+                )
+                + tuple(
+                    {
+                        "target_type": "condition",
+                        "target_id": condition.condition_id,
+                        "status": "pass",
+                        "covers_target_type": "claim",
+                        "covers_target_id": claim_by_dimension[condition.dimension],
+                        "explanation": "核心条件已覆盖。",
+                    }
+                    for condition in request.source_conditions
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    original = direct_reading.source_discovery_slices
+    direct_reading.source_discovery_slices = _one_page_slices
+    try:
+        result = _run(
+            _Provider(),
+            pages=(
+                {"page": 1, "text": "管理层讨论\n" + body, "readable": True},
+                {"page": 2, "text": note, "readable": True},
+            ),
+            processing_identity=identity,
+            report=report,
+        )
+    finally:
+        direct_reading.source_discovery_slices = original
+    assert result.draft_complete is True
+    assert any(item["page"] == 2 and item["status"] == "not_read" for item in result.page_coverage)
+    assert not any(gap == "necessary_unread:2" for gap in result.gaps)
+
+
+def test_a_requested_continuation_page_still_blocks_when_unread():
+    from research.company_profile import direct_reading
+
+    report = _report()
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            pages = {int(page["page"]) for page in request.source_pages}
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(1, 2),
+                )
+            if 2 in pages:
+                raise ValueError("continuation-not-read")
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+            )
+
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    original = direct_reading.source_discovery_slices
+    direct_reading.source_discovery_slices = _one_page_slices
+    try:
+        result = _run(
+            _Provider(),
+            pages=(
+                {"page": 1, "text": "营业收入构成", "readable": True},
+                {"page": 2, "text": "手续费及佣金净收入续", "readable": True},
+            ),
+            processing_identity=identity,
+            report=report,
+        )
+    finally:
+        direct_reading.source_discovery_slices = original
+    assert result.draft_complete is False
+    assert any(gap == "necessary_unread:2" for gap in result.gaps)
+
+
 

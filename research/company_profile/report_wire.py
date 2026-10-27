@@ -192,7 +192,17 @@ def instructions(request: ReportSemanticRequestV3) -> str:
         "inferred numeric facts, invented names or price/profit sensitivity. "
     )
     if request.source_scope == "page_map":
-        if direct:
+        if direct and identity.get("chapter_select"):
+            selection = (
+                "These previews are a table of contents, not the report body. "
+                "Select the physical requested_pages whose headings belong to the "
+                "business discussion, operating model, revenue composition, "
+                "income-statement or segment notes, and purchases or customers. "
+                "Include a continuation page only when the preview shows the "
+                "passage is cut off. An unfamiliar heading is not automatically "
+                "minor. Do not select ordinary footnotes or every page. "
+            )
+        elif direct:
             selection = (
                 "This batch is one slice of the whole report. Select physical "
                 "requested_pages for the main business lines, revenue composition "
