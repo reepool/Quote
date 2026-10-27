@@ -74,54 +74,29 @@ def _recovery_block(
 ) -> str | None:
     """Return a refusal reason when this send would exceed the card policy.
 
-    The first send of a logical request is the primary request. A later send
-    still consumes that request's own allowance, including a failover whose
-    attempt number was reset to 1. Only a same-source retry, or a send after
-    that request already succeeded, consumes the card recovery cap. A
-    cross-source failover of a request that has not succeeded does not.
+    The first send of a logical request is the primary request. Every later
+    physical send of that same id is one recovery, whether it stays on the
+    same source, switches source, repairs a schema, or resets the attempt
+    number to 1. The third send of that id is refused for that request only.
     """
     if policy is None:
         return None
-    grouped: dict[str, list[Mapping[str, Any]]] = {}
+    del source_label
+    counts: dict[str, int] = {}
     recoveries = 0
     for item in history:
         key = str(item.get("logical_request_id") or item.get("request_id") or "")
         if not key:
             continue
-        rows = grouped.setdefault(key, [])
-        rows.append(item)
-        if len(rows) > 1 and _send_is_card_recovery(rows[:-1], item.get("source_label")):
+        counts[key] = counts.get(key, 0) + 1
+        if counts[key] > 1:
             recoveries += 1
-    rows = grouped.get(logical_id, [])
-    used = len(rows)
+    used = counts.get(logical_id, 0)
     if used >= 1 + policy.max_per_logical_request:
         return "logical_recovery_already_used"
-    if (
-        used >= 1
-        and _send_is_card_recovery(rows, source_label)
-        and recoveries >= policy.max_recoveries
-    ):
+    if used >= 1 and recoveries >= policy.max_recoveries:
         return "card_recovery_exhausted"
     return None
-
-
-def _send_is_card_recovery(previous: list[Mapping[str, Any]], source_label: Any) -> bool:
-    """Whether this extra send spends the card cap rather than only its own slot.
-
-    Rows without a source label keep the previous rule, so an unlabeled retry
-    still counts. A different source after only failures is pool failover.
-    """
-    if not previous:
-        return False
-    if any(str(item.get("status") or "") == "success" for item in previous):
-        return True
-    label = str(source_label or "")
-    previous_labels = [str(item.get("source_label") or "") for item in previous]
-    if label and label in previous_labels:
-        return True
-    if not label and not any(previous_labels):
-        return True
-    return False
 
 
 class LlmRunBudget:

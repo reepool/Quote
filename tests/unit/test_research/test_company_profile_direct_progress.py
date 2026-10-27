@@ -3448,11 +3448,22 @@ def test_verified_core_leaves_supplementary_unread_and_a_missing_core_does_not()
         )
     finally:
         direct_reading.source_discovery_slices = original
+    purposes = [call.purpose for call in provider.calls]
+    assert purposes.index("synthesize_views") > purposes.index("source_inventory")
+    assert any(
+        call.purpose == "source_inventory" and 2 in {int(page["page"]) for page in call.source_pages}
+        for call in provider.calls
+    )
+    assert any(
+        call.purpose == "source_inventory"
+        and 2 in {int(page["page"]) for page in call.source_pages}
+        and provider.calls.index(call) < purposes.index("synthesize_views")
+        for call in provider.calls
+    )
     assert ready.draft_complete is True
     assert ready.real_semantic_complete is True
-    assert any(gap == "supplementary_unread:2" for gap in ready.gaps)
     assert not any(str(gap).startswith("necessary_unread:") for gap in ready.gaps)
-    assert all(int(page["page"]) != 2 for call in provider.calls for page in call.source_pages)
+    assert not any(str(gap).startswith("supplementary_unread:") for gap in ready.gaps)
 
     class _Partial(_Provider):
         def interpret(self, request):
@@ -3582,6 +3593,112 @@ def test_a_claim_without_source_text_is_not_verified():
     assert not any(
         check.target_id == "invented" and check.status == "pass" for check in result.checks
     )
+
+
+def test_an_unread_later_page_cannot_be_marked_supplementary():
+    from research.company_profile import direct_reading
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    first = "公司主营影视制作并取得制作收入。公司提供设备租赁。公司采购原材料。公司向下游客户交付影片。"
+    later = "公司另有独立的海上运输主业，并确认运输收入。"
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            pages = {int(page["page"]) for page in request.source_pages}
+            if request.purpose == "source_inventory" and pages == {2}:
+                raise ValueError("later-page-not-sent")
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=(
+                        ReportSourceCondition(
+                            condition_id=dimension,
+                            dimension=dimension,
+                            description=first,
+                            evidence=(
+                                _evidence(report, text=first, page=1).model_copy(
+                                    update={"evidence_id": f"later-{dimension}"}
+                                ),
+                            ),
+                            major=True,
+                            statement_status="current",
+                        )
+                        for dimension in (
+                            "principal_business",
+                            "products_services",
+                            "revenue_model",
+                            "input_exposure",
+                            "supply_chain_role",
+                        )
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=tuple(
+                        ReportViewClaim(
+                            claim_id=dimension,
+                            dimension=dimension,
+                            status="observed",
+                            answer=first,
+                            evidence=(
+                                _evidence(report, text=first, page=1).model_copy(
+                                    update={"evidence_id": f"later-claim-{dimension}"}
+                                ),
+                            ),
+                        )
+                        for dimension in (
+                            "principal_business",
+                            "products_services",
+                            "revenue_model",
+                            "input_exposure",
+                            "supply_chain_role",
+                        )
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "claim",
+                        "target_id": dimension,
+                        "status": "pass",
+                        "explanation": "已读部分成立。",
+                    }
+                    for dimension in (
+                        "principal_business",
+                        "products_services",
+                        "revenue_model",
+                        "input_exposure",
+                        "supply_chain_role",
+                    )
+                ),
+            )
+
+    original = direct_reading.source_discovery_slices
+    direct_reading.source_discovery_slices = _one_page_slices
+    try:
+        result = _run(
+            _Provider(),
+            pages=(
+                {"page": 1, "text": first, "readable": True},
+                {"page": 2, "text": later, "readable": True},
+            ),
+            processing_identity=direct_core_processing_identity(),
+            report=report,
+        )
+    finally:
+        direct_reading.source_discovery_slices = original
+    assert result.draft_complete is False
+    assert result.real_semantic_complete is False
+    assert any(gap == "necessary_unread:2" for gap in result.gaps)
+    assert not any(str(gap).startswith("supplementary_unread:") for gap in result.gaps)
 
 
 

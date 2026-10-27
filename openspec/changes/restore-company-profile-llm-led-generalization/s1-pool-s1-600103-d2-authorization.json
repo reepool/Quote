@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600103-d2",
+  "binding_sha256": "679a7f1b3d0d28956923c5d428a71e5f9eb61fe4240535000469a138e80a0ccb",
+  "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+  "approval_reference": "B3-D2 section 6 and acceptance 7.52, 2026-10-27",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "D2造纸开发入口"
+}

@@ -759,6 +759,8 @@ def validate_binding(
                 "s1-600097-r1",
                 "s1-600054-r1",
                 "s1-600000-r1",
+                "s1-600103-d2",
+                "s1-600000-d2",
             }
             or not authorization.get("approval_reference")
         ):
@@ -824,6 +826,21 @@ def prepare_gateway(binding: dict, raw_config: dict, *, real: bool):
         ):
             raise ValueError("pool route/failover binding mismatch")
         sources = binding["sources"]
+        labels = binding.get("task_route_labels")
+        if labels:
+            by_label = {member.source_label: member for member in pool.members}
+            chosen = []
+            for index, label in enumerate(labels):
+                member = by_label.get(str(label))
+                if member is None:
+                    raise ValueError(f"task route is not in the current pool: {label}")
+                # The last listed route is the one recovery spare. Earlier
+                # routes stay preferred. This copy is process-local.
+                weight = 1 if index == len(labels) - 1 else 5
+                chosen.append(replace(member, weight=weight))
+            pools = dict(config.pools)
+            pools[pool.name] = replace(pool, members=tuple(chosen))
+            config = replace(config, pools=pools)
     else:
         if name not in config.profiles or binding["fallback_allowed"]:
             raise ValueError(
@@ -1250,6 +1267,8 @@ def _worker(
             identity["core_gap_closeout"] = True
         if binding.get("successor_core_closeout"):
             identity["successor_core_closeout"] = True
+        if binding.get("read_remaining_sources"):
+            identity["read_remaining_sources"] = True
         if binding.get("continue_unread"):
             identity["continue_unread"] = True
         if binding.get("retract_claim_ids"):

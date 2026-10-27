@@ -205,17 +205,18 @@ def test_cross_source_reset_still_consumes_the_logical_recovery():
         logical_request_id="logic-c",
         source_label="source-c1",
     )
-    failover.reserve(
-        resource="resource",
-        model="model",
-        profile="profile",
-        payload=payload,
-        request_id="c2",
-        attempt=1,
-        logical_request_id="logic-c",
-        source_label="source-c2",
-    )
-    assert len(failover.attempts) == 2
+    with pytest.raises(LlmDeadlineExceededError, match="card_recovery_exhausted"):
+        failover.reserve(
+            resource="resource",
+            model="model",
+            profile="profile",
+            payload=payload,
+            request_id="c2",
+            attempt=1,
+            logical_request_id="logic-c",
+            source_label="source-c2",
+        )
+    assert len(failover.attempts) == 1
     same_source = _budget(
         max_requests=8,
         prices={},

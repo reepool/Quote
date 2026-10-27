@@ -712,37 +712,23 @@ def interpret_direct_core(
         blocking_gaps = [
             gap for gap in dynamic if not gap.startswith("supplementary_gap:")
         ]
-        if _core_closeout_ready(claims, conditions, checks, records):
-            blocking = any(
-                gap.startswith(
-                    (
-                        "major_condition_not_verified:",
-                        "major_condition_not_in_synthesis:",
-                        "view_not_substantive:",
-                        "core_dimension_missing:",
-                    )
+        blocking = bool(blocking_gaps) or any(
+            gap.startswith(
+                (
+                    "necessary_unread:",
+                    "necessary_fragment",
+                    "major_condition_not_verified:",
+                    "major_condition_not_in_synthesis:",
+                    "navigation_incomplete:",
+                    "view_not_substantive:",
+                    "core_dimension_missing:",
+                    "direct_core_gap_check_stopped",
+                    "claim_pending:",
+                    "company_synthesis_context_truncated",
                 )
-                for gap in [*dynamic, *gaps]
-                if not gap.startswith("supplementary_gap:")
             )
-        else:
-            blocking = bool(blocking_gaps) or any(
-                gap.startswith(
-                    (
-                        "necessary_unread:",
-                        "necessary_fragment",
-                        "major_condition_not_verified:",
-                        "major_condition_not_in_synthesis:",
-                        "navigation_incomplete:",
-                        "view_not_substantive:",
-                        "core_dimension_missing:",
-                        "direct_core_gap_check_stopped",
-                        "claim_pending:",
-                        "company_synthesis_context_truncated",
-                    )
-                )
-                for gap in gaps
-            )
+            for gap in gaps
+        )
         draft_complete = bool(observed) and not blocking
         return ReportInterpretation(
             report=report,
@@ -1751,18 +1737,12 @@ def interpret_direct_core(
                 if page_no in by_page and page_no not in inventoried and page_no not in follow:
                     follow.append(page_no)
             publish()
-            if not identity.get("core_gap_closeout"):
-                draft_ready_core()
-            if _core_closeout_ready(claims, conditions, checks, records):
-                return follow
         return follow
 
     composed: set[int] = set()
 
     def compose(page_ids) -> None:
-        """Read every selected chapter, then write one company draft."""
-        if _core_closeout_ready(claims, conditions, checks, records):
-            return
+        """Draft from pages that already have a successful source read."""
         by_id = {int(page["page"]): page for page in sources}
         chosen = []
         seen_pages: set[int] = set()
@@ -1773,6 +1753,7 @@ def interpret_direct_core(
                 or page_no in composed
                 or page_no not in by_id
                 or not by_id[page_no].get("readable", True)
+                or by_page.get(page_no, {}).get("status") != "read"
             ):
                 continue
             seen_pages.add(page_no)
@@ -2278,7 +2259,11 @@ def interpret_direct_core(
                 text = str(page.get("text") or "")
                 if any(term in text and term not in quoted for term in terms):
                     supplement_pages.append(page)
-            if supplement_pages and not identity.get("successor_core_closeout"):
+            if (
+                supplement_pages
+                and not identity.get("successor_core_closeout")
+                and not identity.get("read_remaining_sources")
+            ):
                 try:
                     slices = list(
                         source_discovery_slices(
@@ -2336,13 +2321,22 @@ def interpret_direct_core(
         unread = [
             int(page["page"])
             for page in sources
-            if identity.get("continue_unread")
+            if (identity.get("continue_unread") or identity.get("read_remaining_sources"))
             and page.get("readable", True)
             and str(page.get("text") or "").strip()
             and by_page[int(page["page"])]["status"] != "read"
         ]
         if unread:
             inventory_pages(unread)
+        if identity.get("read_remaining_sources"):
+            conditions_to_draft = [
+                condition
+                for condition in conditions
+                if condition.condition_id not in drafted_condition_ids
+                and condition.major
+                and condition.statement_status == "current"
+                and condition.dimension in _CORE_CLOSEOUT_DIMENSIONS
+            ]
         draft_reused_sources()
         if prior:
             fresh_ids = {item.claim_id for item in claims}
@@ -2408,18 +2402,13 @@ def interpret_direct_core(
             inventory_pages(follow)
             compose(follow)
     read_pages = {int(item["page"]) for item in coverage if item["status"] == "read"}
-    core_ready = _core_closeout_ready(claims, conditions, checks, records)
     for page in sources:
         page_no = int(page["page"])
         if page_no in read_pages:
             continue
         if not page.get("readable", True) or not str(page.get("text") or "").strip():
             continue
-        gap = (
-            f"supplementary_unread:{page_no}"
-            if core_ready
-            else f"necessary_unread:{page_no}"
-        )
+        gap = f"necessary_unread:{page_no}"
         if gap not in gaps:
             gaps.append(gap)
     for page_no in sorted(supplementary - {int(item["page"]) for item in coverage if item["status"] == "read"}):
