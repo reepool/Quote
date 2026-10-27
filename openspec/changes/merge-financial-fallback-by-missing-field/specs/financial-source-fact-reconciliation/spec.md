@@ -33,14 +33,24 @@ Canonical facts within the configured comparison scope that are available from b
 
 Canonical facts filled from fallback with no official counterpart available for comparison SHALL receive a definitional plausibility check against same-row official facts when a definitional relationship exists; implausible results SHALL be marked as review-only anomalies and SHALL NOT block the write.
 
-#### Scenario: Implied minority interest is implausible
+#### Scenario: Accounting identity holds with the bundle's minority fact
 
-- **WHEN** `equity_parent` is fallback-filled and official `equity_total` is present
-- **AND** the implied minority interest (`equity_total` minus `equity_parent`) is negative beyond the configured absolute floor or exceeds the configured loose share threshold of `equity_total`
-- **THEN** the run SHALL mark a review-only anomaly recording both values and the implied minority share
+- **WHEN** `equity_parent` is fallback-filled and the fallback bundle also reports `minority_equity`
+- **AND** `equity_parent` plus `minority_equity` reproduces the official `equity_total` within the configured absolute floor
+- **THEN** the run SHALL NOT mark a review-only anomaly, regardless of the minority sign or its share of total equity — negative minority interest and high-minority structures are legitimate reporting, and the identity is the consistency proof
+
+#### Scenario: Accounting identity breaks
+
+- **WHEN** the fallback `equity_parent` plus `minority_equity` diverges from the official `equity_total` beyond the absolute floor
+- **THEN** the run SHALL mark a review-only anomaly recording both values, the minority value, and the identity residual
 - **AND** the filled value SHALL remain written and reported for review
 
-#### Scenario: Rounding noise passes the sanity check
+#### Scenario: No minority fact available
+
+- **WHEN** the fallback bundle does not report `minority_equity`
+- **THEN** the check SHALL fall back to loose implied-minority bounds: the implied minority interest (`equity_total` minus `equity_parent`) must not be negative beyond the configured absolute floor nor exceed the configured loose share threshold of `equity_total`, with violations marked as review-only anomalies
+
+#### Scenario: Rounding noise passes the bounds fallback
 
 - **WHEN** the implied minority interest is negative but within the configured absolute floor
 - **THEN** the run SHALL NOT mark a review-only anomaly, because the difference is the reference source's rounding granularity rather than a definitional violation

@@ -132,6 +132,59 @@ def test_sanity_flags_negative_beyond_absolute_floor():
     assert record.detail["absolute_floor_cny"] == pytest.approx(1000.0)
 
 
+def test_sanity_identity_passes_negative_minority_600123():
+    # The real 600123 structure: parent 153.58亿 + minority -5.81亿 equals
+    # the official equity_total within data20's 万元 rounding — the identity
+    # is the consistency proof, so no review prompt despite the negative
+    # implied minority the bounds check would flag.
+    record = evaluate_single_sourced_sanity(
+        instrument_id="600123.SH",
+        report_period="2026-09-30",
+        filled_fact="equity_parent",
+        filled_value=15_358_155_798.07,
+        fallback_source="akshare",
+        reference_fact="equity_total",
+        reference_value=14_776_745_100.0,
+        reference_source="cninfo",
+        minority_value=-581_410_652.79,
+    )
+    assert record is None
+
+
+def test_sanity_identity_passes_high_minority_structure():
+    # 国电电力-style structure: minority legitimately dominates total equity.
+    record = evaluate_single_sourced_sanity(
+        instrument_id="600795.SH",
+        report_period="2026-09-30",
+        filled_fact="equity_parent",
+        filled_value=61_271_000_000.0,
+        fallback_source="akshare",
+        reference_fact="equity_total",
+        reference_value=138_957_000_000.0,
+        reference_source="cninfo",
+        minority_value=77_686_000_000.0,
+    )
+    assert record is None
+
+
+def test_sanity_identity_flags_broken_residual():
+    record = evaluate_single_sourced_sanity(
+        instrument_id="688112.SH",
+        report_period="2026-09-30",
+        filled_fact="equity_parent",
+        filled_value=1_659_991_203.41,
+        fallback_source="akshare",
+        reference_fact="equity_total",
+        reference_value=1_659_991_200.0,
+        reference_source="cninfo",
+        minority_value=50_000_000.0,
+    )
+    assert record is not None
+    assert record.detail["check"] == "equity_identity_residual"
+    assert record.detail["residual"] == pytest.approx(50_000_003.41)
+    assert record.detail["minority_value"] == pytest.approx(50_000_000.0)
+
+
 def test_sanity_flags_excessive_minority_share():
     record = evaluate_single_sourced_sanity(
         instrument_id="002254.SZ",

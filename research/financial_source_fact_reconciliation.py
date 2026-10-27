@@ -148,22 +148,53 @@ def evaluate_single_sourced_sanity(
     reference_fact: str,
     reference_value: float,
     reference_source: str,
+    minority_value: Optional[float] = None,
     minority_share_max: float = DEFAULT_SANITY_MINORITY_SHARE_MAX,
     absolute_floor_cny: float = DEFAULT_SANITY_ABSOLUTE_FLOOR_CNY,
 ) -> Optional[SourceFactComparisonRecord]:
     """Check a fallback-filled field against its definitional reference fact.
 
-    For an equity-parent fill the implied minority interest
-    (`reference_value - filled_value`) must stay within the configured loose
-    share of the reference value on the positive side, and no further below
-    than the absolute floor on the negative side — the floor absorbs the
-    reference source's rounding granularity (data20 reports 万元 with two
-    decimals while the fill carries exact yuan, so zero-minority companies
-    show tiny negative implied interest). Violations become review-only
-    `sanity_review` records and never block the write.
+    Identity-first: when the fallback side also reports the minority interest,
+    the accounting identity `parent + minority == equity_total` is checked
+    against the official reference within the absolute floor (rounding
+    granularity). A satisfied identity passes regardless of the minority
+    sign or share — negative minority interest and high-minority structures
+    are legitimate reporting, and the identity is the stronger consistency
+    proof. Only a broken identity is flagged.
+
+    Without a minority fact the check falls back to loose bounds: the implied
+    minority interest (`reference_value - filled_value`) must stay within the
+    configured share of the reference on the positive side and no further
+    below than the absolute floor on the negative side. Violations become
+    review-only `sanity_review` records and never block the write.
     """
     reference = float(reference_value)
-    implied_minority = reference - float(filled_value)
+    filled = float(filled_value)
+    if minority_value is not None:
+        residual = filled + float(minority_value) - reference
+        if abs(residual) <= float(absolute_floor_cny):
+            return None
+        return SourceFactComparisonRecord(
+            instrument_id=instrument_id,
+            report_period=report_period,
+            canonical_fact=str(filled_fact),
+            record_kind=RECORD_KIND_SANITY_REVIEW,
+            official_source=reference_source,
+            official_value=reference,
+            fallback_source=fallback_source,
+            fallback_value=filled,
+            relative_diff=(
+                abs(residual) / abs(reference) if reference else None
+            ),
+            detail={
+                "check": "equity_identity_residual",
+                "residual": residual,
+                "minority_value": float(minority_value),
+                "absolute_floor_cny": float(absolute_floor_cny),
+                "reference_fact": str(reference_fact),
+            },
+        )
+    implied_minority = reference - filled
     if implied_minority >= -float(absolute_floor_cny) and implied_minority <= (
         float(minority_share_max) * abs(reference)
     ):

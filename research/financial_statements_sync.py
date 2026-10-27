@@ -1168,30 +1168,12 @@ class FinancialStatementsShadowSyncService:
                         return row
             return None
 
-        def _equity_total_reference() -> Optional[Dict[str, Any]]:
-            for alias in alias_mapping.get("equity", []):
-                for row in official_rows:
-                    if str(row.get("fact_name") or "") != str(alias):
-                        continue
-                    alias_info = describe_core_financial_fact_alias(
-                        "equity",
-                        str(alias),
-                    )
-                    if (
-                        not alias_info["canonical_compatible"]
-                        and alias_info["alias_semantic"]
-                        == "total_owners_equity"
-                    ):
-                        return row
-            return None
-
         matches = dict(
             (facts.lineage_json or {}).get("core_fact_alias_matches") or {}
         )
         replacements: Dict[str, float] = {}
         merged_official_fields = 0
         filled_fallback_fields = 0
-        equity_filled_by_fallback = False
         fallback_source_label = str(
             bundle_to_write.source or facts.source or ""
         )
@@ -1233,8 +1215,6 @@ class FinancialStatementsShadowSyncService:
                     "role": "fallback_fill",
                 }
                 filled_fallback_fields += 1
-                if field_name == "equity":
-                    equity_filled_by_fallback = True
 
         facts_json = {
             **(facts.facts_json or {}),
@@ -1254,46 +1234,12 @@ class FinancialStatementsShadowSyncService:
             str(row.get("canonical_fact_name")): float(row.get("fact_value"))
             for row in official_rows
         }
-        sanity_records: List[SourceFactComparisonRecord] = []
-        if equity_filled_by_fallback:
-            reference_row = _equity_total_reference()
-            if (
-                reference_row is not None
-                and new_facts.equity is not None
-            ):
-                record = evaluate_single_sourced_sanity(
-                    instrument_id=str(bundle_to_write.instrument_id),
-                    report_period=str(bundle_to_write.report_period),
-                    filled_fact="equity_parent",
-                    filled_value=float(new_facts.equity),
-                    fallback_source=fallback_source_label,
-                    reference_fact=str(
-                        reference_row.get("canonical_fact_name") or ""
-                    ),
-                    reference_value=float(reference_row["fact_value"]),
-                    reference_source=str(reference_row.get("source") or ""),
-                    minority_share_max=float(
-                        self._source_fact_reconciliation_cfg.get(
-                            "sanity_minority_share_max",
-                            DEFAULT_SANITY_MINORITY_SHARE_MAX,
-                        )
-                    ),
-                    absolute_floor_cny=float(
-                        self._source_fact_reconciliation_cfg.get(
-                            "sanity_absolute_floor_cny",
-                            DEFAULT_SANITY_ABSOLUTE_FLOOR_CNY,
-                        )
-                    ),
-                )
-                if record is not None:
-                    sanity_records.append(record)
 
         return replace(bundle_to_write, facts=new_facts), {
             "merged_official_fields": merged_official_fields,
             "filled_fallback_fields": filled_fallback_fields,
             "official_facts_by_canonical": official_facts_by_canonical,
             "official_rows": official_rows,
-            "sanity_records": sanity_records,
         }
 
     def _reconcile_bundle_against_official_facts(
@@ -1339,6 +1285,15 @@ class FinancialStatementsShadowSyncService:
                 and getattr(fact, "fact_value", None) is not None
             ):
                 fallback_by_canonical[canonical] = float(fact.fact_value)
+        minority_value: Optional[float] = None
+        for fact in numeric_facts:
+            if (
+                str(getattr(fact, "canonical_fact_name", "") or "")
+                == "minority_equity"
+                and getattr(fact, "fact_value", None) is not None
+            ):
+                minority_value = float(fact.fact_value)
+                break
 
         compared_facts = sum(
             1
@@ -1361,7 +1316,38 @@ class FinancialStatementsShadowSyncService:
                 cfg.get("absolute_floor_cny", DEFAULT_ABSOLUTE_FLOOR_CNY)
             ),
         )
-        records.extend(merge_meta.get("sanity_records") or [])
+        # Definitional sanity on the single-sourced fill field, identity
+        # first: the bundle's own minority equity plus the fallback parent
+        # must reproduce the official equity total within rounding; without
+        # a minority fact the loose implied-share bounds apply.
+        sanity_parent = fallback_by_canonical.get("equity_parent")
+        sanity_reference = official_by_canonical.get("equity_total")
+        if sanity_parent is not None and sanity_reference is not None:
+            sanity_record = evaluate_single_sourced_sanity(
+                instrument_id=str(bundle_to_write.instrument_id),
+                report_period=str(bundle_to_write.report_period),
+                filled_fact="equity_parent",
+                filled_value=float(sanity_parent),
+                fallback_source=fallback_source,
+                reference_fact="equity_total",
+                reference_value=float(sanity_reference),
+                reference_source=official_source_label or "",
+                minority_value=minority_value,
+                minority_share_max=float(
+                    cfg.get(
+                        "sanity_minority_share_max",
+                        DEFAULT_SANITY_MINORITY_SHARE_MAX,
+                    )
+                ),
+                absolute_floor_cny=float(
+                    cfg.get(
+                        "sanity_absolute_floor_cny",
+                        DEFAULT_SANITY_ABSOLUTE_FLOOR_CNY,
+                    )
+                ),
+            )
+            if sanity_record is not None:
+                records.append(sanity_record)
         return records, compared_facts
 
     def _cleanup_comparison_only_fallback_facts(

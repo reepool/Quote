@@ -477,6 +477,141 @@ async def test_sanity_review_recorded_for_implausible_fill(tmp_path):
 
 
 @pytest.mark.asyncio
+async def test_identity_sanity_suppresses_negative_minority_prompt(tmp_path):
+    """600123-style negative minority satisfies the identity, no prompt."""
+    research_config = _build_research_config(tmp_path)
+    storage = ResearchStorageManager(research_config)
+    storage.initialize()
+    _seed_official_facts(storage, source_file_id="cninfo-official-file")
+
+    run_id = storage.start_ingestion_run(
+        domain="financial_statements",
+        job_name="test_identity_pass",
+    )
+    service = _build_service(
+        storage,
+        research_config,
+        official_sources=("cninfo",),
+        reconciliation_cfg={
+            "enabled": True,
+            "scope_canonical_facts": [
+                "revenue",
+                "net_income_parent",
+                "equity_parent",
+                "total_assets",
+                "total_liabilities",
+            ],
+        },
+    )
+    bundle = _build_bundle()
+    # parent 8.5B, minority -565M -> total 7.935B matches official equity_total
+    adjusted_facts = replace(bundle.facts, equity=8_500_000_000.0)
+    lineage = dict(bundle.facts.lineage_json)
+    matches = dict(lineage["core_fact_alias_matches"])
+    matches["equity"] = {**matches["equity"], "fact_value": 8_500_000_000.0}
+    lineage["core_fact_alias_matches"] = matches
+    adjusted_statements = [
+        replace(
+            statement,
+            statement_json={
+                **statement.statement_json,
+                "parent_holder_equity_total": 8_500_000_000.0,
+                "minority_equity": 564_826_200.0 * -1,
+            },
+        )
+        for statement in bundle.raw_statements
+    ]
+    bundle = replace(
+        bundle,
+        raw_statements=adjusted_statements,
+        facts=replace(
+            adjusted_facts,
+            facts_json={**bundle.facts.facts_json, "core_fact_alias_matches": matches},
+            lineage_json=lineage,
+        ),
+    )
+    result = service._write_fallback_bundles(
+        bundles=[bundle],
+        source="akshare",
+        mode="direct",
+        run_id=run_id,
+        sync_mode="backfill",
+        force_full=True,
+    )
+    # 8_500_000_000 + (-564_826_200) == 7_935_173_800 exactly: the identity
+    # holds against the official equity_total, so no review prompt fires even
+    # though the implied minority is negative.
+    assert result["source_fact_reconciliation"]["sanity_reviews"] == 0
+
+
+@pytest.mark.asyncio
+async def test_identity_sanity_flags_broken_residual(tmp_path):
+    research_config = _build_research_config(tmp_path)
+    storage = ResearchStorageManager(research_config)
+    storage.initialize()
+    _seed_official_facts(storage, source_file_id="cninfo-official-file")
+
+    run_id = storage.start_ingestion_run(
+        domain="financial_statements",
+        job_name="test_identity_break",
+    )
+    service = _build_service(
+        storage,
+        research_config,
+        official_sources=("cninfo",),
+        reconciliation_cfg={
+            "enabled": True,
+            "scope_canonical_facts": [
+                "revenue",
+                "net_income_parent",
+                "equity_parent",
+                "total_assets",
+                "total_liabilities",
+            ],
+        },
+    )
+    bundle = _build_bundle()
+    # parent plus a large positive minority overshoots the official total
+    # by exactly 100M -> identity residual far beyond the rounding floor.
+    adjusted_facts = replace(bundle.facts, equity=7_105_855_388.0)
+    lineage = dict(bundle.facts.lineage_json)
+    matches = dict(lineage["core_fact_alias_matches"])
+    lineage["core_fact_alias_matches"] = matches
+    adjusted_statements = [
+        replace(
+            statement,
+            statement_json={
+                **statement.statement_json,
+                "minority_equity": 929_318_412.0,
+            },
+        )
+        for statement in bundle.raw_statements
+    ]
+    bundle = replace(
+        bundle,
+        raw_statements=adjusted_statements,
+        facts=replace(
+            adjusted_facts,
+            facts_json={**bundle.facts.facts_json, "core_fact_alias_matches": matches},
+            lineage_json=lineage,
+        ),
+    )
+    result = service._write_fallback_bundles(
+        bundles=[bundle],
+        source="akshare",
+        mode="direct",
+        run_id=run_id,
+        sync_mode="backfill",
+        force_full=True,
+    )
+    reconciliation = result["source_fact_reconciliation"]
+    assert reconciliation["sanity_reviews"] == 1
+    sample = reconciliation["sanity_samples"][0]
+    assert sample["detail"]["check"] == "equity_identity_residual"
+    assert sample["detail"]["residual"] == pytest.approx(100_000_000.0)
+
+
+@pytest.mark.asyncio
 async def test_legacy_behavior_without_fill_sources(tmp_path):
     research_config = _build_research_config(tmp_path)
     storage = ResearchStorageManager(research_config)
