@@ -1,8 +1,8 @@
 # 公司画像交付路径与开发任务卡
 
-> 类型：requirements / execution plan；版本：3；更新：2026-10-26。
+> 类型：requirements / execution plan；版本：3；更新：2026-10-27。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[B3-D2§6](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#6-b3-d2先完成整家公司再决定回归方案)，依据验收§7.52/A审核§118：原S1首发及唯一后继各12/12已交，自动可用0/12，原方案结束。先600103整家公司成立，再同版600000开发验证；不直接再跑十二家，不改旧成绩，不自动进入S2。L0/L1补救4/4保留，常规效率/成本、S2及生产未通过。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[B3-D3§7](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#7-b3-d3复用已读成果交付一家完整核心)，依据验收§7.53/A审核§120：原S1首发及唯一后继各12/12已交、自动可用0/12，原方案结束。造纸开发已读212/220页但核心未闭合；只用原开发总额的未用资源接续一家核心，银行暂停、不增总额。不直接再跑十二家、不改旧成绩、不自动进入S2。L0/L1补救4/4保留，常规效率/成本、S2及生产未通过。
 
 ## 1. 开发者必须先理解的纠偏
 
@@ -92,6 +92,7 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 
 ### B3 / S1：12家新链回归（A2通过后）
 
+- **2026-10-27审核§120接续裁决：** §6造纸已有实质源覆盖/正文，仍缺8页及核心核验，银行未启动。当前只按[B3-D3§7](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#7-b3-d3复用已读成果交付一家完整核心)复用有效源/检查，补未读、主要收入/机制和三视图核心，修已补救故障与可信覆盖的完成判断；隔离绑定改为DeepSeek首选/Grok备用。原两家总额未用部分显式集中造纸一个接续窗口，唯一额度/费用/停止见验收§7.53，银行不再自动启动。B沿A/B流程v3自主实现、直接验证、Review、冻结及真实交付，不增准备审批；先清无依赖垃圾并交接收尾，正式源/旧失败/并行改动保护。此条替代下方§118的未执行安排。
 - **2026-10-27审核§118：原首发及唯一后继都已结束，自动可用0/12，原正式方案未通过。** 原段以下执行条款保留，不据此开启第三次。当前仅B3-D2：沿原owner完成公司阶段安排、未知未读不假完整、恢复计数纠正及本任务可靠路由冻结，先600103实际核心/自动终态成立再同版600000；一次连续窗口包含最多两次共性局部修复、直接验证和各一真实开发入口。新开发预算/费用/停止唯一见验收§7.52与[B3卡§6](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#6-b3-d2先完成整家公司再决定回归方案)，旧余额不迁移；不改共享默认/生产，不触碰S2，不以两家开发成绩替代12家正式回归。第一家未成立即停第二家。开发前/交接后清无依赖垃圾，保正式源/原失败/并行改动。
 - 2026-10-26审核§115：安全稿确定差异已验，A2前置已满足；本卡进入执行，不再等待另一张启动卡。S1仍0/12，旧62/63评分、首次失败及研发/常规资源区分保留。
 - 当前完整执行卡：[b3-s1-execution-card.md](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md)。先离线安全收尾，再在同一开发窗口完成冻结、直接验证、真实首发及有界统一补救；不逐公司请批，不交另一张纯准备卡。
@@ -103,7 +104,7 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 ### A3：S1审核与S2放行（A负责）
 
 - A审核12家新链的实源语义、三视图、首发/补救、成本和底线错误；通过后才冻结S2，不通过则形成范围收窄或新方案结论。
-- 2026-10-27已作未通过及策略重整裁决，见审核§118。B3-D2成功后仍须A另定12家回归方案；不是直接A3放行或S2运行授权。
+- 2026-10-27已作未通过及策略重整裁决，见审核§118/§120。当前B3-D3先收造纸核心，成功后仍须A另定跨公司验证和12家回归方案；不是直接A3放行或S2运行授权。
 
 ### A4：S2首发材料审核与授权（A3通过后）
 
