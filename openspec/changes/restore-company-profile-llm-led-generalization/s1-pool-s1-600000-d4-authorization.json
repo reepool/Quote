@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600000-d4",
+  "binding_sha256": "33507696728df643f27b23c15267fd0017e6e019ab7add2d517870490ce7162d",
+  "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+  "approval_reference": "B3-D4 section 8 and acceptance 7.54, 2026-10-27",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "D4银行章节验证"
+}
