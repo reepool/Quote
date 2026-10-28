@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600000-d6",
+  "binding_sha256": "7c9c88427b2f0a035028a6e2bb39cbd4cbc30d7d6a9d94c4e38d272f3b42c654",
+  "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+  "approval_reference": "B3-D6 section 10 and acceptance 7.56, 2026-10-28",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "D6银行核心收口第一窗"
+}

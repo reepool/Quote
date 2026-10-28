@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600103-d6b",
+  "binding_sha256": "888fc4b2113aeb52b469e8ec02cc2c8a5a2565e91fb676451cd817576c2ffca5",
+  "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+  "approval_reference": "B3-D6 section 10 second paper window, 2026-10-28",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "D6造纸核心收口第二窗"
+}

@@ -159,50 +159,24 @@ def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
                 found.append(f"supplementary_gap:{condition.condition_id}")
                 continue
             found.append(f"major_condition_not_verified:{condition.condition_id}")
-    if not _operating_revenue_scale_answered(claims, checks):
-        found.append("core_question_unanswered:operating_revenue_scale")
     return found
 
 
-def _operating_revenue_scale_answered(claims, checks) -> bool:
-    """A product-line subtotal does not answer the period operating-revenue total."""
-    saw_breakdown = False
-    for claim in claims:
-        if claim.dimension != "revenue_model":
-            continue
-        latest = None
-        for check in checks:
-            if check.target_type == "claim" and check.target_id == claim.claim_id:
-                latest = check
-        if latest is None or latest.status != "pass":
-            continue
-        if claim.status != "observed":
-            continue
-        text = claim.answer or ""
-        quotes = " ".join(
-            evidence.anchor.bounded_quote
-            for evidence in claim.evidence
-            if getattr(evidence, "anchor", None) is not None
-        )
-        combined = f"{text} {quotes}"
-        breakdown = any(
-            marker in combined
-            for marker in ("分产品", "分行业", "主营业务", "直销", "经销")
-        )
-        if "营业收入" in combined and not breakdown:
-            return True
-        if breakdown:
-            saw_breakdown = True
-    return not saw_breakdown
+def _core_answers_ready(claims, conditions, checks, records=()) -> bool:
+    """Stop only when the current major conditions and core claims are covered.
 
-
-def _core_answers_ready(claims, checks) -> bool:
-    """Stop further groups once the core dimensions and period revenue total are verified."""
-    if not _operating_revenue_scale_answered(claims, checks):
-        return False
+    Dimension presence alone does not retire another unanswered major business.
+    """
     return not any(
-        gap.startswith(("view_not_substantive:", "core_dimension_missing:"))
-        for gap in _completeness_gaps(claims, [], checks)
+        gap.startswith(
+            (
+                "view_not_substantive:",
+                "core_dimension_missing:",
+                "major_condition_not_verified:",
+                "core_question_unanswered:",
+            )
+        )
+        for gap in _completeness_gaps(claims, conditions, checks, records)
     )
 
 
@@ -235,12 +209,11 @@ def _core_closeout_ready(claims, conditions, checks, records=()) -> bool:
     for claim in claims:
         if claim.status != "observed" or claim.limitation in _UNTRUSTED_LIMITATIONS:
             continue
-        if not any(
-            check.target_type == "claim"
-            and check.target_id == claim.claim_id
-            and check.status == "pass"
-            for check in checks
-        ):
+        latest = None
+        for check in checks:
+            if check.target_type == "claim" and check.target_id == claim.claim_id:
+                latest = check
+        if latest is None or latest.status != "pass":
             continue
         trusted.append(claim)
     dimensions = {claim.dimension for claim in trusted}
@@ -1849,7 +1822,7 @@ def interpret_direct_core(
             if item.condition_id not in drafted_condition_ids
         ]
         for group in _business_groups(pending):
-            if _core_answers_ready(claims, checks):
+            if _core_answers_ready(claims, conditions, checks, records):
                 break
             deliver_group(group)
         for page in package:
@@ -1906,7 +1879,7 @@ def interpret_direct_core(
             if condition.condition_id not in drafted_condition_ids
         ]
         for group in _business_groups(ordered):
-            if _core_answers_ready(claims, checks) or (
+            if _core_answers_ready(claims, conditions, checks, records) or (
                 identity.get("successor_core_closeout")
                 and _core_closeout_ready(claims, conditions, checks, records)
             ):
@@ -2074,6 +2047,7 @@ def interpret_direct_core(
         deliver_group(_business_groups(pending)[0])
 
     chapter_required_pages: set[int] | None = None
+    isolated_condition_ids: set[str] = set()
     reused_receipts = list(identity.get("accepted_source_receipts") or ())
     if reused_receipts:
         for item in reused_receipts:
@@ -2159,6 +2133,7 @@ def interpret_direct_core(
                         pending_core.append(claim.model_copy(update={"limitation": None}))
                     continue
                 if claim.claim_id in set(identity.get("isolated_claim_ids") or ()):
+                    isolated_condition_ids.update(claim.condition_ids or ())
                     upsert(
                         claim.model_copy(
                             update={
@@ -2380,29 +2355,67 @@ def interpret_direct_core(
         if unread and not identity.get("core_repair_pages"):
             inventory_pages(unread)
         repair_pages = {int(page) for page in identity.get("core_repair_pages") or ()}
-        if repair_pages:
+        saved_follow = []
+        for item in reused_receipts:
+            if item.get("purpose") != "source_inventory" or item.get("status") != "success":
+                continue
+            requested_here = {
+                int(page) for page in item.get("source_pages") or []
+            }
+            for page in (item.get("response_payload") or {}).get("requested_pages") or []:
+                page_no = int(page)
+                if (
+                    page_no in by_page
+                    and page_no not in requested_here
+                    and page_no not in saved_follow
+                ):
+                    saved_follow.append(page_no)
+        if repair_pages or saved_follow:
             known_ids = {condition.condition_id for condition in conditions}
-            inventory_pages(repair_pages)
-            conditions_to_draft = [
+            chapter_required_pages = {
+                int(item["page"]) for item in coverage if item["status"] == "read"
+            } | repair_pages | set(saved_follow)
+            follow = inventory_pages(repair_pages) if repair_pages else []
+            expand = [
+                int(page)
+                for page in [*saved_follow, *follow]
+                if int(page) in by_page and int(page) not in repair_pages
+            ]
+            if expand and not any(
+                gap.startswith("direct_core_ledger_hold") for gap in gaps
+            ):
+                gaps.append("chapter_gap_expansion")
+                chapter_required_pages.update(expand)
+                inventory_pages(expand)
+            touched = repair_pages | set(saved_follow) | set(expand)
+            fresh = [
                 condition
                 for condition in conditions
                 if condition.condition_id not in known_ids
                 and condition.condition_id not in drafted_condition_ids
-                and condition.dimension == "revenue_model"
-                and any(int(evidence.page) in repair_pages for evidence in condition.evidence)
+                and condition.major
+                and condition.statement_status == "current"
+                and condition.dimension in _CORE_CLOSEOUT_DIMENSIONS
+                and any(int(evidence.page) in touched for evidence in condition.evidence)
             ]
+            drafted_ids = {condition.condition_id for condition in conditions_to_draft}
+            conditions_to_draft.extend(
+                condition for condition in fresh if condition.condition_id not in drafted_ids
+            )
+        elif reused_receipts and not identity.get("read_remaining_sources"):
             chapter_required_pages = {
-                int(item["page"])
-                for item in coverage
-                if item["status"] == "read"
-            } | repair_pages
-        if identity.get("isolated_claim_ids") and not repair_pages:
-            conditions_to_draft = []
-            chapter_required_pages = {
-                int(item["page"])
-                for item in coverage
-                if item["status"] == "read"
+                int(item["page"]) for item in coverage if item["status"] == "read"
             }
+        if isolated_condition_ids:
+            conditions_to_draft = [
+                condition
+                for condition in conditions_to_draft
+                if condition.condition_id not in isolated_condition_ids
+                and not any(
+                    condition.condition_id.endswith(":" + item)
+                    for item in isolated_condition_ids
+                )
+            ]
         if identity.get("read_remaining_sources"):
             conditions_to_draft = [
                 condition
