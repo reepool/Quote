@@ -113,6 +113,21 @@ The current v8 policy MUST use key-section reading with targeted expansion for o
 - **THEN** they inform reusable business-question-to-section guidance and omission challenges rather than requiring another full-text pass for every company
 - **AND** a fresh section-policy validation uses its own source reading and does not load prior conditions, candidate answers or verification results as its generated output; its independent core denominator remains unchanged
 
+#### Scenario: The source inventory omits an explicitly disclosed core answer
+- **WHEN** selected source text discloses a required core answer such as current-period operating revenue but the inventory omits it or only records principal-business revenue
+- **THEN** candidate-free discovery and substantive coverage remain accountable to the declared business questions, not only the conditions the model happened to enumerate
+- **AND** unresolved core omissions remain visible without substituting a different total, a future target or evaluation Gold; the frozen acceptance denominator and permitted minor omissions remain unchanged
+
+#### Scenario: Many supplementary conditions remain after major business is answered
+- **WHEN** source-backed business grouping and current valid support and coverage checks establish the substantive core while repeated brands, regional examples or supplementary indicators remain
+- **THEN** the owner stops core generation rather than generating and verifying one sentence for every remaining raw condition
+- **AND** another real major business or monetization mechanism cannot be removed merely to reduce requests, and necessary context remains available for each verified group
+
+#### Scenario: Source discovery requests a continuation after navigation
+- **WHEN** body discovery requests necessary continuation outside the initial section selection even though existing dimensions already have passing checks
+- **THEN** the requested scope becomes necessary and is read before core completion, or its unresolved unread status prevents completion
+- **AND** navigation failure does not silently select the entire report as a full-text fallback
+
 #### Scenario: Accumulated source conditions exceed a single synthesis request
 - **WHEN** the actual company-wide source conditions and necessary evidence exceed either the physical payload-byte limit or the reservation limit
 - **THEN** the authoritative owner adjusts the isolated development reservation or groups cross-chapter business evidence to fit actual service capabilities, preserving necessary context and major content
