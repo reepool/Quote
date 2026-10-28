@@ -770,6 +770,10 @@ def validate_binding(
                 "s1-600000-d6",
                 "s1-600103-d7",
                 "s1-600000-d7",
+                "s1-600103-d8",
+                "s1-600103-d8b",
+                "s1-600000-d8",
+                "s1-600000-d8b",
             }
             or not authorization.get("approval_reference")
         ):

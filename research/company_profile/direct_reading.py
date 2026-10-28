@@ -21,7 +21,7 @@ from research.company_profile.contracts import (
     ReportViewClaim,
     SemanticProviderError,
 )
-from research.company_profile.models import ReportIdentity, SemanticRecord
+from research.company_profile.models import Evidence, ReportIdentity, SemanticRecord, TextAnchor
 from research.company_profile.reading_budget import (
     request_payload_bytes,
     request_reservation,
@@ -154,44 +154,24 @@ def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
                 and record_verdicts.get(check.covers_target_id) in {None, "pass"}
             ):
                 covered = True
-        if covered or (latest is not None and latest.status == "supplementary"):
-            if not covered:
-                found.append(f"supplementary_gap:{condition.condition_id}")
+        if covered:
             continue
-        referenced = [
-            claim
-            for claim in claims_covering_condition(condition, claims)
-            if claim.claim_id in verified_claims
-        ]
-        if latest is not None and latest.status == "block" and referenced:
-            found.append(f"major_condition_not_verified:{condition.condition_id}")
+        if latest is not None and latest.status == "supplementary":
+            found.append(f"supplementary_gap:{condition.condition_id}")
             continue
-        if (
-            latest is not None
-            and latest.status == "unclear"
-            and referenced
-            and condition.dimension
-            in {"input_exposure", "supply_chain_role", "upstream_downstream"}
-        ):
-            found.append(f"major_condition_not_verified:{condition.condition_id}")
-            continue
-        if (
-            latest is None
-            and condition.dimension == "principal_business"
-            and "principal_business" in observed
-        ):
-            found.append(f"major_condition_not_verified:{condition.condition_id}")
-            continue
-        if condition.dimension not in observed and condition.dimension in {
-            "principal_business",
-            "products_services",
-            "revenue_model",
-            "input_exposure",
-            "supply_chain_role",
-            "upstream_downstream",
-        }:
-            found.append(f"major_condition_not_verified:{condition.condition_id}")
+        found.append(f"major_condition_not_verified:{condition.condition_id}")
     return found
+
+
+def operating_revenue_statement_pages(sources) -> list[int]:
+    """Income-statement pages, not the pages an older product-line claim happened to cite."""
+    found = []
+    for source in sources:
+        text = str(source.get("text") or "")
+        if "利润表" not in text or "营业收入" not in text or "本期" not in text:
+            continue
+        found.append(int(source["page"]))
+    return found[:1]
 
 
 def claims_covering_condition(condition, candidates) -> list:
@@ -2540,7 +2520,6 @@ def interpret_direct_core(
             ]
         recheck_conditions = []
         core_answers = []
-        seen_core = set()
         for condition in list(conditions_to_draft):
             latest = None
             tail = condition.condition_id.split(":")[-1]
@@ -2550,69 +2529,117 @@ def interpret_direct_core(
                     tail,
                 }:
                     latest = check
+            if latest is not None and latest.status in {"pass", "supplementary"}:
+                continue
             referenced = [
                 claim
                 for claim in claims_covering_condition(condition, claims)
                 if claim.status == "observed"
             ]
-            if referenced and latest is not None and latest.status in {"block", "unclear"}:
-                if condition.dimension in {
-                    "input_exposure",
-                    "supply_chain_role",
-                    "upstream_downstream",
-                }:
-                    recheck_conditions.append(condition)
+            if referenced:
+                recheck_conditions.append(condition)
                 continue
-            if condition.dimension in seen_core:
-                continue
-            if condition.dimension in _CORE_CLOSEOUT_DIMENSIONS and (
-                latest is None or latest.status not in {"pass", "supplementary"}
-            ):
+            if condition.dimension in _CORE_CLOSEOUT_DIMENSIONS:
                 core_answers.append(condition)
-                seen_core.add(condition.dimension)
-        if reused_receipts and "revenue_model" not in {
-            claim.dimension
-            for claim in claims
-            if claim.status == "observed"
-            and claim.claim_id.startswith("core-question:")
-        }:
-            revenue_claims = [
-                claim
-                for claim in claims
-                if claim.dimension == "revenue_model" and claim.status == "observed" and claim.evidence
-            ]
-            if revenue_claims and not any(
-                condition.condition_id.startswith("core-question:period-operating-revenue")
-                for condition in conditions
-            ):
-                evidence = []
-                seen_pages = set()
-                for claim in revenue_claims:
-                    for item in claim.evidence:
-                        if int(item.page) in seen_pages:
-                            continue
-                        seen_pages.add(int(item.page))
-                        evidence.append(item)
-                        if len(evidence) == 4:
-                            break
-                    if len(evidence) == 4:
+        if reused_receipts:
+            statement_pages = operating_revenue_statement_pages(sources)
+            evidence = []
+            for page_no in statement_pages:
+                source = next(
+                    (item for item in sources if int(item["page"]) == page_no),
+                    None,
+                )
+                if source is None:
+                    continue
+                quote = next(
+                    (
+                        line.strip()
+                        for line in str(source.get("text") or "").splitlines()
+                        if "营业收入" in line and "分产品" not in line and line.strip()
+                    ),
+                    "",
+                )
+                if not quote:
+                    continue
+                evidence.append(
+                    Evidence(
+                        evidence_id=f"statement-page-{page_no}",
+                        report=report,
+                        page=page_no,
+                        section_title="利润表",
+                        anchor=TextAnchor(bounded_quote=quote[:180]),
+                    )
+                )
+            if not evidence:
+                for claim in claims:
+                    if claim.dimension == "revenue_model" and claim.status == "observed" and claim.evidence:
+                        evidence.append(claim.evidence[0])
                         break
+            existing_question = next(
+                (
+                    condition
+                    for condition in conditions
+                    if condition.condition_id.startswith("core-question:period-operating-revenue")
+                ),
+                None,
+            )
+            question_passed = False
+            if existing_question is not None:
+                for check in checks:
+                    if (
+                        check.target_type == "condition"
+                        and check.target_id == existing_question.condition_id
+                        and check.status == "pass"
+                    ):
+                        question_passed = True
+            if evidence and not question_passed:
                 question = ReportSourceCondition(
                     condition_id="core-question:period-operating-revenue",
                     dimension="revenue_model",
                     description=(
                         "State the reporting entity's current-period operating revenue "
-                        "total when the supplied text states it. A principal-business, "
-                        "product-line, region, or sales-channel subtotal does not replace "
-                        "that total. If the text does not state the total, say so."
+                        "total when the supplied text states it, using only the line, "
+                        "period and unit printed there. A principal-business, product-line, "
+                        "region, or sales-channel subtotal does not replace that total. "
+                        "Do not add a statement name the text does not use. If the text "
+                        "does not state the total, say so."
                     ),
                     evidence=tuple(evidence),
                     major=True,
                     statement_status="current",
                 )
-                conditions.append(question)
+                if existing_question is None:
+                    conditions.append(question)
+                else:
+                    conditions[:] = [
+                        question if item.condition_id == existing_question.condition_id else item
+                        for item in conditions
+                    ]
+                core_answers = [
+                    item
+                    for item in core_answers
+                    if item.condition_id != question.condition_id
+                ]
                 core_answers.append(question)
-        conditions_to_draft = core_answers
+        question_items = [
+            condition
+            for condition in core_answers
+            if condition.condition_id.startswith("core-question:")
+        ]
+        other_items = [
+            condition for condition in core_answers if condition not in question_items
+        ]
+        grouped = [
+            condition
+            for group in _business_groups(other_items)[:2]
+            for condition in group
+        ]
+        conditions_to_draft = [*grouped, *question_items]
+        recheck_conditions.sort(
+            key=lambda condition: condition.dimension
+            not in {"input_exposure", "supply_chain_role", "upstream_downstream"}
+        )
+        recheck_conditions = recheck_conditions[:6]
         if recheck_conditions:
             recheck_claims = []
             for condition in recheck_conditions:

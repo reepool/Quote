@@ -4624,4 +4624,203 @@ def test_a_deposit_condition_uses_the_deposit_claim_not_an_unrelated_product():
     assert [item.claim_id for item in matched] == ["claim_input_exposure"]
 
 
+def test_operating_revenue_is_taken_from_the_statement_page_not_the_old_quote():
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    saved = ReportSourceCondition(
+        condition_id="lines",
+        dimension="revenue_model",
+        description="分产品合计。",
+        evidence=(
+            _evidence(report, text="主营业务分产品合计。", page=17).model_copy(
+                update={"evidence_id": "lines"}
+            ),
+        ),
+        major=True,
+        statement_status="current",
+    )
+    receipt = {
+        "request_id": "saved-17",
+        "purpose": "source_inventory",
+        "status": "success",
+        "source_scope": "full_context",
+        "source_pages": [17],
+        "physical_request": True,
+        "response_payload": ReportSemanticResponseV3(
+            request_id="saved-17",
+            purpose="source_inventory",
+            source_conditions=(saved,),
+        ).model_dump(mode="json"),
+    }
+    sent = []
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            sent.append((request.purpose, tuple(int(page["page"]) for page in request.source_pages)))
+            if request.purpose == "synthesize_views" and any(
+                item.condition_id.startswith("core-question:")
+                for item in request.source_conditions
+            ):
+                assert any(int(page["page"]) == 16 for page in request.source_pages)
+                assert any(
+                    "营业收入 100元" in str(page.get("text") or "")
+                    for page in request.source_pages
+                    if int(page["page"]) == 16
+                )
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="period-total",
+                            dimension="revenue_model",
+                            status="observed",
+                            answer="本期营业收入100元。",
+                            evidence=(
+                                _evidence(report, text="营业收入 100元", page=16).model_copy(
+                                    update={"evidence_id": "period-total"}
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=(
+                    {
+                        "target_type": "claim",
+                        "target_id": "period-total",
+                        "status": "pass",
+                        "explanation": "总额已核。",
+                    },
+                    {
+                        "target_type": "condition",
+                        "target_id": "core-question:period-operating-revenue",
+                        "status": "pass",
+                        "covers_target_type": "claim",
+                        "covers_target_id": "period-total",
+                        "explanation": "覆盖总额。",
+                    },
+                ),
+            )
+
+    import json
+
+    kept = ReportViewClaim(
+        claim_id="kept-lines",
+        dimension="revenue_model",
+        status="observed",
+        answer="主营业务分产品合计。",
+        evidence=saved.evidence,
+    )
+    identity = direct_core_processing_identity()
+    identity["accepted_source_receipts"] = [receipt]
+    identity["accepted_prior_draft"] = {
+        "claims": [json.loads(kept.model_dump_json())],
+        "checks": [
+            {
+                "target_type": "claim",
+                "target_id": "kept-lines",
+                "status": "pass",
+                "explanation": "分项已核。",
+            }
+        ],
+    }
+    result = _run(
+        _Provider(),
+        pages=(
+            {
+                "page": 16,
+                "text": "利润表及现金流量表相关科目变动分析表\n科目 本期数 上年同期数\n营业收入 100元",
+                "readable": True,
+            },
+            {"page": 17, "text": "主营业务分产品合计。", "readable": True},
+        ),
+        processing_identity=identity,
+        report=report,
+    )
+    assert any(purpose == "synthesize_views" and 16 in pages for purpose, pages in sent)
+    assert any(item.claim_id == "period-total" for item in result.claims)
+
+
+def test_same_dimension_does_not_hide_another_unanswered_business():
+    from research.company_profile.contracts import ReportSourceCondition
+    from research.company_profile.direct_reading import _completeness_gaps
+
+    report = _report()
+    claims = [
+        ReportViewClaim(
+            claim_id=claim_id,
+            dimension=dimension,
+            status="observed",
+            answer="公司经营造纸并取得收入。",
+            evidence=(_evidence(report, text="公司经营造纸。", page=1),),
+        )
+        for claim_id, dimension in (
+            ("business", "principal_business"),
+            ("product", "products_services"),
+            ("revenue", "revenue_model"),
+            ("input", "input_exposure"),
+            ("role", "supply_chain_role"),
+        )
+    ]
+    checks = [
+        ReportViewCheck(
+            target_type="claim",
+            target_id=item.claim_id,
+            status="pass",
+            explanation="已核。",
+        )
+        for item in claims
+    ]
+    other = ReportSourceCondition(
+        condition_id="other-product",
+        dimension="products_services",
+        description="另一主要产品是工业设计。",
+        evidence=(_evidence(report, text="另一主要产品是工业设计。", page=2),),
+        major=True,
+        statement_status="current",
+    )
+
+    def gap_ids(extra_checks=()):
+        gaps = _completeness_gaps(claims, [other], [*checks, *extra_checks])
+        return [gap for gap in gaps if gap.startswith("major_condition_not_verified:")]
+
+    assert gap_ids() == ["major_condition_not_verified:other-product"]
+    blocked = ReportViewCheck(
+        target_type="condition",
+        target_id="other-product",
+        status="block",
+        explanation="没有对应主张。",
+    )
+    assert "major_condition_not_verified:other-product" in gap_ids((blocked,))
+    unclear = ReportViewCheck(
+        target_type="condition",
+        target_id="other-product",
+        status="unclear",
+        explanation="对象还不能覆盖。",
+    )
+    claims[1] = claims[1].model_copy(update={"condition_ids": ("other-product",)})
+    assert "major_condition_not_verified:other-product" in _completeness_gaps(
+        claims, [other], [*checks, unclear]
+    )
+    supplementary = ReportViewCheck(
+        target_type="condition",
+        target_id="other-product",
+        status="supplementary",
+        explanation="只是举例。",
+    )
+    assert "major_condition_not_verified:other-product" not in gap_ids((supplementary,))
+
+
 

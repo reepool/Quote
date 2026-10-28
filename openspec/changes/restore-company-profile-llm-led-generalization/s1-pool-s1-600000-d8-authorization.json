@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600000-d8",
+  "binding_sha256": "f10cc691c3b6629ac8fac1b1e0cd68418eb811ca0fdfecd6c377d6e76d1c8f9e",
+  "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+  "approval_reference": "B3-D8 section 12 and acceptance 7.58, 2026-10-28",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "D8银行核心补齐第一窗"
+}

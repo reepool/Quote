@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600103-d8",
+  "binding_sha256": "3274db67205d9cf6cc7daa253b1af01dbecc00f67544507297499ed3fdec6d63",
+  "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+  "approval_reference": "B3-D8 section 12 and acceptance 7.58, 2026-10-28",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "D8造纸核心补源第一窗"
+}
