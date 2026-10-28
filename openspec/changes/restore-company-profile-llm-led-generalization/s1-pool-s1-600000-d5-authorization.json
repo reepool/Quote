@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600000-d5",
+  "binding_sha256": "4d4d4588ef98e4110323d6b7be0bc747000b6937bca2e8b935093d8c8d51b607",
+  "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+  "approval_reference": "B3-D5 section 9 and acceptance 7.55, 2026-10-28",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "D5银行托管冲突离线隔离"
+}

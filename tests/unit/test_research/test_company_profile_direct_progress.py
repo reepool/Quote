@@ -383,7 +383,15 @@ def test_a_condition_pass_without_a_delivered_object_is_not_coverage():
             *claims[1:],
         ],
         [condition],
-        [covered],
+        [
+            covered,
+            ReportViewCheck(
+                target_type="claim",
+                target_id="cloud-business",
+                status="pass",
+                explanation="工业设计主张已核。",
+            ),
+        ],
     )
     assert not any(gap.startswith("major_condition_not_verified:") for gap in gaps)
 
@@ -3201,6 +3209,14 @@ def test_a_supplementary_detail_can_remain_while_a_missing_major_business_blocks
     )
     checks = [
         ReportViewCheck(
+            target_type="claim",
+            target_id=claim.claim_id,
+            status="pass",
+            explanation="核心主张已核。",
+        )
+        for claim in claims
+    ] + [
+        ReportViewCheck(
             target_type="condition",
             target_id="footnote",
             status="supplementary",
@@ -3857,6 +3873,438 @@ def test_a_requested_continuation_page_still_blocks_when_unread():
         direct_reading.source_discovery_slices = original
     assert result.draft_complete is False
     assert any(gap == "necessary_unread:2" for gap in result.gaps)
+
+
+def test_a_body_requested_continuation_is_read_after_the_core_dimensions_pass():
+    from research.company_profile import direct_reading
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    body = "公司主营影视制作。公司营业收入为100万元。公司采购设备。公司向客户交付影片。"
+    sent = []
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            pages = tuple(int(page["page"]) for page in request.source_pages)
+            sent.append((request.source_scope, request.purpose, pages))
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(1,),
+                )
+            if request.purpose == "source_inventory" and pages == (1,):
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(2,),
+                    source_conditions=tuple(
+                        ReportSourceCondition(
+                            condition_id=dimension,
+                            dimension=dimension,
+                            description=body,
+                            evidence=(
+                                _evidence(report, text=body, page=1).model_copy(
+                                    update={"evidence_id": f"follow-{dimension}"}
+                                ),
+                            ),
+                            major=True,
+                            statement_status="current",
+                        )
+                        for dimension in (
+                            "principal_business",
+                            "products_services",
+                            "revenue_model",
+                            "input_exposure",
+                            "supply_chain_role",
+                        )
+                    ),
+                )
+            if request.purpose == "source_inventory" and 2 in pages:
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=(
+                        ReportSourceCondition(
+                            condition_id="revenue-total",
+                            dimension="revenue_model",
+                            description="本期营业收入总额。",
+                            evidence=(
+                                _evidence(report, text="续页营业收入为200万元。", page=2).model_copy(
+                                    update={"evidence_id": "follow-total"}
+                                ),
+                            ),
+                            major=True,
+                            statement_status="current",
+                        ),
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="revenue-total",
+                            dimension="revenue_model",
+                            status="observed",
+                            answer="公司本期营业收入为200万元。",
+                            evidence=(
+                                _evidence(report, text="续页营业收入为200万元。", page=2).model_copy(
+                                    update={"evidence_id": "follow-total-claim"}
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=(
+                    {
+                        "target_type": "claim",
+                        "target_id": "revenue-total",
+                        "status": "pass",
+                        "explanation": "总额已核。",
+                    },
+                    {
+                        "target_type": "condition",
+                        "target_id": "revenue-total",
+                        "status": "pass",
+                        "covers_target_type": "claim",
+                        "covers_target_id": "revenue-total",
+                        "explanation": "覆盖总额。",
+                    },
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    original = direct_reading.source_discovery_slices
+    direct_reading.source_discovery_slices = _one_page_slices
+    try:
+        result = _run(
+            _Provider(),
+            pages=(
+                {"page": 1, "text": body, "readable": True},
+                {"page": 2, "text": "续页营业收入为200万元。", "readable": True},
+            ),
+            processing_identity=identity,
+            report=report,
+        )
+    finally:
+        direct_reading.source_discovery_slices = original
+    stopped = [gap for gap in result.gaps if gap.startswith("direct_core_gap_check_stopped")]
+    assert not stopped, stopped
+    assert any(item[0] == "full_context" and 2 in item[2] for item in sent)
+    assert any(item["page"] == 2 and item["status"] == "read" for item in result.page_coverage)
+
+
+def test_navigation_failure_does_not_fall_back_to_the_full_report():
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            raise ValueError("navigation-down")
+
+    result = _run(
+        _Provider(),
+        pages=(
+            {"page": 1, "text": "公司主营造纸并销售纸袋纸。", "readable": True},
+            {"page": 2, "text": "附注披露折旧年限。", "readable": True},
+        ),
+        processing_identity=identity,
+    )
+    assert "chapter_selection_limited" in result.gaps
+    assert result.draft_complete is False
+    assert all(item["status"] != "read" for item in result.page_coverage)
+    assert not any(
+        item.get("source_scope") == "full_context" for item in result.call_receipts
+    )
+
+
+def test_a_product_line_subtotal_does_not_answer_operating_revenue():
+    from research.company_profile.direct_reading import _completeness_gaps
+
+    report = _report()
+    claim = ReportViewClaim(
+        claim_id="lines",
+        dimension="revenue_model",
+        status="observed",
+        answer="2025年主营业务分产品营业收入为纸100元。",
+        evidence=(_evidence(report, text="分产品营业收入", page=1),),
+    )
+    other = [
+        ReportViewClaim(
+            claim_id=claim_id,
+            dimension=dimension,
+            status="observed",
+            answer="公司经营造纸并采购木片，向客户销售纸。",
+            evidence=(_evidence(report, text="公司经营造纸。", page=1),),
+        )
+        for claim_id, dimension in (
+            ("business", "principal_business"),
+            ("product", "products_services"),
+            ("input", "input_exposure"),
+            ("role", "supply_chain_role"),
+        )
+    ]
+    checks = [
+        ReportViewCheck(
+            target_type="claim",
+            target_id=item.claim_id,
+            status="pass",
+            explanation="已核。",
+        )
+        for item in [claim, *other]
+    ]
+    gaps = _completeness_gaps([claim, *other], [], checks)
+    assert "core_question_unanswered:operating_revenue_scale" in gaps
+    channel = claim.model_copy(
+        update={"answer": "直销营业收入为2028696061.86元。", "claim_id": "channel"}
+    )
+    channel_checks = [
+        ReportViewCheck(
+            target_type="claim",
+            target_id="channel" if item.claim_id == "lines" else item.claim_id,
+            status="pass",
+            explanation="已核。",
+        )
+        for item in [claim, *other]
+    ]
+    channel_gaps = _completeness_gaps([channel, *other], [], channel_checks)
+    assert "core_question_unanswered:operating_revenue_scale" in channel_gaps
+
+
+def test_a_later_block_replaces_an_older_pass():
+    from research.company_profile.direct_reading import _completeness_gaps
+    from research.company_profile.report_interpretation import _claim_is_trusted
+
+    report = _report()
+    claim = ReportViewClaim(
+        claim_id="kept",
+        dimension="principal_business",
+        status="observed",
+        answer="公司主营造纸。",
+        evidence=(_evidence(report, text="公司主营造纸。", page=1),),
+    )
+    checks = [
+        ReportViewCheck(
+            target_type="claim",
+            target_id="kept",
+            status="pass",
+            explanation="先通过。",
+        ),
+        ReportViewCheck(
+            target_type="claim",
+            target_id="kept",
+            status="block",
+            explanation="后否定。",
+        ),
+    ]
+    assert _claim_is_trusted(claim, tuple(checks)) is False
+    gaps = _completeness_gaps([claim], [], checks)
+    assert "core_dimension_missing:principal_business" in gaps
+
+
+def test_a_core_repair_rereads_only_the_requested_page_and_drafts_the_new_total():
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    saved = ReportSourceCondition(
+        condition_id="product-lines",
+        dimension="revenue_model",
+        description="分产品收入。",
+        evidence=(
+            _evidence(report, text="分产品营业收入", page=7).model_copy(
+                update={"evidence_id": "saved-lines"}
+            ),
+        ),
+        major=True,
+        statement_status="current",
+    )
+    receipt = {
+        "request_id": "saved-page",
+        "purpose": "source_inventory",
+        "status": "success",
+        "source_scope": "full_context",
+        "source_pages": [7],
+        "physical_request": True,
+        "response_payload": ReportSemanticResponseV3(
+            request_id="saved-page",
+            purpose="source_inventory",
+            source_conditions=(saved,),
+        ).model_dump(mode="json"),
+    }
+    sent = []
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            pages = tuple(int(page["page"]) for page in request.source_pages)
+            sent.append((request.purpose, pages))
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=(
+                        ReportSourceCondition(
+                            condition_id="period-total",
+                            dimension="revenue_model",
+                            description="本期营业收入总额。",
+                            evidence=(
+                                _evidence(report, text="营业收入 2418990221.17元", page=16).model_copy(
+                                    update={"evidence_id": "period-total"}
+                                ),
+                            ),
+                            major=True,
+                            statement_status="current",
+                        ),
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="period-total",
+                            dimension="revenue_model",
+                            status="observed",
+                            answer="本期营业收入为2418990221.17元。",
+                            evidence=(
+                                _evidence(report, text="营业收入 2418990221.17元", page=16).model_copy(
+                                    update={"evidence_id": "period-total-claim"}
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=(
+                    {
+                        "target_type": "claim",
+                        "target_id": "period-total",
+                        "status": "pass",
+                        "explanation": "总额已核。",
+                    },
+                    {
+                        "target_type": "condition",
+                        "target_id": "period-total",
+                        "status": "pass",
+                        "covers_target_type": "claim",
+                        "covers_target_id": "period-total",
+                        "explanation": "覆盖总额。",
+                    },
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["accepted_source_receipts"] = [receipt]
+    identity["core_repair_pages"] = [16]
+    result = _run(
+        _Provider(),
+        pages=(
+            {"page": 7, "text": "分产品营业收入合计。", "readable": True},
+            {"page": 16, "text": "营业收入 2418990221.17元。", "readable": True},
+            {"page": 99, "text": "附注披露折旧年限。", "readable": True},
+        ),
+        processing_identity=identity,
+        report=report,
+    )
+    assert sent[0] == ("source_inventory", (16,))
+    assert not any(7 in pages or 99 in pages for _purpose, pages in sent)
+    assert any(claim.claim_id == "period-total" for claim in result.claims)
+    assert not any(gap == "necessary_unread:99" for gap in result.gaps)
+
+
+def test_an_isolated_conflict_is_not_trusted_and_is_not_redrafted():
+    import json
+
+    from research.company_profile.contracts import ReportSourceCondition as _Condition
+    from research.company_profile.report_interpretation import _claim_is_trusted
+
+    report = _report()
+
+    saved = _Condition(
+        condition_id="custody",
+        dimension="revenue_model",
+        description="托管收入。",
+        evidence=(
+            _evidence(report, text="托管收入24.81亿元", page=1).model_copy(
+                update={"evidence_id": "custody-source"}
+            ),
+        ),
+        major=True,
+        statement_status="current",
+    )
+    claim = ReportViewClaim(
+        claim_id="claim-sc-011",
+        dimension="revenue_model",
+        status="observed",
+        answer="托管收入24.81亿元，同比增长7.23%，托管规模增长11.45%。",
+        evidence=(
+            _evidence(report, text="托管收入24.81亿元", page=1).model_copy(
+                update={"evidence_id": "custody-claim"}
+            ),
+        ),
+    )
+    receipt = {
+        "request_id": "saved-custody",
+        "purpose": "source_inventory",
+        "status": "success",
+        "source_scope": "full_context",
+        "source_pages": [1],
+        "physical_request": True,
+        "response_payload": ReportSemanticResponseV3(
+            request_id="saved-custody",
+            purpose="source_inventory",
+            source_conditions=(saved,),
+        ).model_dump(mode="json"),
+    }
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            raise AssertionError(request.purpose)
+
+    identity = direct_core_processing_identity()
+    identity["accepted_source_receipts"] = [receipt]
+    identity["accepted_prior_draft"] = {
+        "claims": [json.loads(claim.model_dump_json())],
+        "checks": [
+            {
+                "target_type": "claim",
+                "target_id": "claim-sc-011",
+                "status": "pass",
+                "explanation": "旧通过。",
+            }
+        ],
+    }
+    identity["isolated_claim_ids"] = ["claim-sc-011"]
+    result = _run(
+        _Provider(),
+        pages=(
+            {"page": 1, "text": "托管收入24.81亿元。", "readable": True},
+            {"page": 2, "text": "附注披露折旧年限。", "readable": True},
+        ),
+        processing_identity=identity,
+        report=report,
+    )
+    isolated = next(item for item in result.claims if item.claim_id == "claim-sc-011")
+    assert isolated.status == "unclear"
+    assert _claim_is_trusted(isolated, result.checks) is False
+    assert not any(gap == "necessary_unread:2" for gap in result.gaps)
+    assert "isolated_unreliable_claim:claim-sc-011" in result.gaps
 
 
 

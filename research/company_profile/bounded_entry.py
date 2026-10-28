@@ -763,6 +763,8 @@ def validate_binding(
                 "s1-600000-d2",
                 "s1-600103-d4",
                 "s1-600000-d4",
+                "s1-600103-d5",
+                "s1-600000-d5",
             }
             or not authorization.get("approval_reference")
         ):
@@ -1273,6 +1275,10 @@ def _worker(
             identity["read_remaining_sources"] = True
         if binding.get("chapter_select"):
             identity["chapter_select"] = True
+        if binding.get("core_repair_pages"):
+            identity["core_repair_pages"] = [
+                int(page) for page in binding["core_repair_pages"]
+            ]
         if binding.get("continue_unread"):
             identity["continue_unread"] = True
         if binding.get("retract_claim_ids"):

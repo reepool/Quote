@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600103-d5",
+  "binding_sha256": "4df0045aa6bb9bcf1d04f982c83c985fae6daf153290c745342f04c185cb2f17",
+  "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+  "approval_reference": "B3-D5 section 9 and acceptance 7.55, 2026-10-28",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "D5造纸营业收入总额纠错"
+}

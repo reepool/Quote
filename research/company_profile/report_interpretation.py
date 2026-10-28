@@ -2492,12 +2492,11 @@ def _claim_is_trusted(claim: Any, checks: tuple[Any, ...]) -> bool:
         "retracted_pending_correction",
     }:
         return False
-    return any(
-        check.target_type == "claim"
-        and check.target_id == claim.claim_id
-        and check.status == "pass"
-        for check in checks
-    )
+    latest = None
+    for check in checks:
+        if check.target_type == "claim" and check.target_id == claim.claim_id:
+            latest = check
+    return latest is not None and latest.status == "pass"
 
 
 def research_views(result: ReportInterpretation) -> dict[str, Any]:

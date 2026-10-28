@@ -247,7 +247,9 @@ def instructions(request: ReportSemanticRequestV3) -> str:
             scope = (
                 "This request contains source text only. No candidate answer is included. "
                 "List the major businesses, products, earning mechanisms, inputs and roles "
-                "the supplied text itself supports. "
+                "the supplied text itself supports. If the text states the period "
+                "operating revenue total, return that total as its own condition. "
+                "A product-line or principal-business subtotal does not replace it. "
             )
         else:
             scope = (

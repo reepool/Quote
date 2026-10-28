@@ -61,7 +61,7 @@ def _fit(pages, *, purpose, source_scope, report, identity, output, limit):
 
 
 def _business_groups(conditions: Sequence[ReportSourceCondition]) -> list[list[ReportSourceCondition]]:
-    """Interleave core dimensions so the first groups are not only subsidiaries."""
+    """Interleave current core dimensions, and do not draft the non-current tail."""
     order = (
         "principal_business",
         "revenue_model",
@@ -72,12 +72,9 @@ def _business_groups(conditions: Sequence[ReportSourceCondition]) -> list[list[R
         "output_exposure",
     )
     buckets: dict[str, list[ReportSourceCondition]] = {name: [] for name in order}
-    later: list[ReportSourceCondition] = []
     for condition in conditions:
         if condition.statement_status == "current" and condition.dimension in buckets:
             buckets[condition.dimension].append(condition)
-        else:
-            later.append(condition)
     groups: list[list[ReportSourceCondition]] = []
     while any(buckets.values()):
         group: list[ReportSourceCondition] = []
@@ -89,14 +86,34 @@ def _business_groups(conditions: Sequence[ReportSourceCondition]) -> list[list[R
                 break
         if group:
             groups.append(group)
-    for start in range(0, len(later), 6):
-        groups.append(later[start : start + 6])
     return groups
 
 
 def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
     """Three views and covered major conditions decide completeness."""
-    observed = {item.dimension for item in claims if item.status == "observed"}
+    def latest_check(target_type: str, target_id: str):
+        found_check = None
+        for check in checks:
+            if check.target_type == target_type and check.target_id == target_id:
+                found_check = check
+        return found_check
+
+    verified_claims = set()
+    for item in claims:
+        if item.status != "observed" or item.limitation in {
+            "pending_verification",
+            "claim_or_dependency_not_verified",
+            "evidence_not_located",
+            "subject_scope_omitted",
+            "retracted_pending_correction",
+        }:
+            continue
+        latest = latest_check("claim", item.claim_id)
+        if latest is not None and latest.status == "pass":
+            verified_claims.add(item.claim_id)
+    observed = {
+        item.dimension for item in claims if item.claim_id in verified_claims
+    }
     found = []
     for view, dimensions in VIEWS.items():
         if not observed & set(dimensions):
@@ -106,19 +123,6 @@ def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
             found.append(f"core_dimension_missing:{dimension}")
     if not observed & {"supply_chain_role", "upstream_downstream"}:
         found.append("core_dimension_missing:operating_role")
-    verified_claims = {
-        item.claim_id
-        for item in claims
-        if item.status == "observed"
-        and item.limitation
-        not in {
-            "pending_verification",
-            "claim_or_dependency_not_verified",
-            "evidence_not_located",
-            "subject_scope_omitted",
-            "retracted_pending_correction",
-        }
-    }
     claims_by_id = {item.claim_id: item for item in claims}
     accepted_records = {item.record_id for item in records}
     record_verdicts = {
@@ -129,26 +133,21 @@ def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
     for condition in conditions:
         if not condition.major or condition.statement_status != "current":
             continue
+        latest = latest_check("condition", condition.condition_id)
         covered = False
-        for check in checks:
-            if (
-                check.target_type != "condition"
-                or check.target_id != condition.condition_id
-                or check.status != "pass"
-            ):
-                continue
+        check = latest
+        if check is not None and check.status == "pass":
             if (
                 check.covers_target_type == "claim"
                 and check.covers_target_id in verified_claims
             ):
                 claim = claims_by_id[check.covers_target_id]
                 dependencies = set(claim.supporting_record_ids)
-                if dependencies and (
-                    not dependencies <= accepted_records
-                    or any(record_verdicts.get(key) not in {None, "pass"} for key in dependencies)
+                if not dependencies or (
+                    dependencies <= accepted_records
+                    and all(record_verdicts.get(key) in {None, "pass"} for key in dependencies)
                 ):
-                    continue
-                covered = True
+                    covered = True
             elif (
                 check.covers_target_type == "record"
                 and check.covers_target_id in accepted_records
@@ -156,20 +155,55 @@ def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
             ):
                 covered = True
         if not covered:
-            latest = next(
-                (
-                    check
-                    for check in reversed(tuple(checks))
-                    if check.target_type == "condition"
-                    and check.target_id == condition.condition_id
-                ),
-                None,
-            )
             if latest is not None and latest.status == "supplementary":
                 found.append(f"supplementary_gap:{condition.condition_id}")
                 continue
             found.append(f"major_condition_not_verified:{condition.condition_id}")
+    if not _operating_revenue_scale_answered(claims, checks):
+        found.append("core_question_unanswered:operating_revenue_scale")
     return found
+
+
+def _operating_revenue_scale_answered(claims, checks) -> bool:
+    """A product-line subtotal does not answer the period operating-revenue total."""
+    saw_breakdown = False
+    for claim in claims:
+        if claim.dimension != "revenue_model":
+            continue
+        latest = None
+        for check in checks:
+            if check.target_type == "claim" and check.target_id == claim.claim_id:
+                latest = check
+        if latest is None or latest.status != "pass":
+            continue
+        if claim.status != "observed":
+            continue
+        text = claim.answer or ""
+        quotes = " ".join(
+            evidence.anchor.bounded_quote
+            for evidence in claim.evidence
+            if getattr(evidence, "anchor", None) is not None
+        )
+        combined = f"{text} {quotes}"
+        breakdown = any(
+            marker in combined
+            for marker in ("分产品", "分行业", "主营业务", "直销", "经销")
+        )
+        if "营业收入" in combined and not breakdown:
+            return True
+        if breakdown:
+            saw_breakdown = True
+    return not saw_breakdown
+
+
+def _core_answers_ready(claims, checks) -> bool:
+    """Stop further groups once the core dimensions and period revenue total are verified."""
+    if not _operating_revenue_scale_answered(claims, checks):
+        return False
+    return not any(
+        gap.startswith(("view_not_substantive:", "core_dimension_missing:"))
+        for gap in _completeness_gaps(claims, [], checks)
+    )
 
 
 _CORE_CLOSEOUT_DIMENSIONS = {
@@ -725,6 +759,7 @@ def interpret_direct_core(
                     "direct_core_gap_check_stopped",
                     "claim_pending:",
                     "company_synthesis_context_truncated",
+                    "core_question_unanswered:",
                 )
             )
             for gap in gaps
@@ -1571,7 +1606,8 @@ def interpret_direct_core(
             batches = navigation_batches(previews, report, identity, limit)
         except ValueError as exc:
             gaps.append(str(exc))
-            return list(page_ids), []
+            gaps.append("chapter_selection_limited")
+            return [], list(page_ids)
         core = []
         for batch in batches:
             full_pages = [
@@ -1596,7 +1632,8 @@ def interpret_direct_core(
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
                 gaps.append(f"direct_core_navigation_incomplete:{exc}")
-                return list(page_ids), []
+                gaps.append("chapter_selection_limited")
+                return core, [page_no for page_no in page_ids if page_no not in core]
             for page_no in response.requested_pages:
                 page_no = int(page_no)
                 if page_no in page_ids and page_no not in core:
@@ -1812,6 +1849,8 @@ def interpret_direct_core(
             if item.condition_id not in drafted_condition_ids
         ]
         for group in _business_groups(pending):
+            if _core_answers_ready(claims, checks):
+                break
             deliver_group(group)
         for page in package:
             page_no = int(page["page"])
@@ -1867,8 +1906,9 @@ def interpret_direct_core(
             if condition.condition_id not in drafted_condition_ids
         ]
         for group in _business_groups(ordered):
-            if identity.get("successor_core_closeout") and _core_closeout_ready(
-                claims, conditions, checks, records
+            if _core_answers_ready(claims, checks) or (
+                identity.get("successor_core_closeout")
+                and _core_closeout_ready(claims, conditions, checks, records)
             ):
                 return
             deliver_group(group)
@@ -2118,6 +2158,16 @@ def interpret_direct_core(
                     }:
                         pending_core.append(claim.model_copy(update={"limitation": None}))
                     continue
+                if claim.claim_id in set(identity.get("isolated_claim_ids") or ()):
+                    upsert(
+                        claim.model_copy(
+                            update={
+                                "status": "unclear",
+                                "limitation": "retracted_pending_correction",
+                            }
+                        )
+                    )
+                    continue
                 kept_answers.append(claim.answer)
                 upsert(claim)
                 if claim.claim_id not in defer and claim.limitation == "pending_verification" and claim.dimension in {
@@ -2327,8 +2377,32 @@ def interpret_direct_core(
             and str(page.get("text") or "").strip()
             and by_page[int(page["page"])]["status"] != "read"
         ]
-        if unread:
+        if unread and not identity.get("core_repair_pages"):
             inventory_pages(unread)
+        repair_pages = {int(page) for page in identity.get("core_repair_pages") or ()}
+        if repair_pages:
+            known_ids = {condition.condition_id for condition in conditions}
+            inventory_pages(repair_pages)
+            conditions_to_draft = [
+                condition
+                for condition in conditions
+                if condition.condition_id not in known_ids
+                and condition.condition_id not in drafted_condition_ids
+                and condition.dimension == "revenue_model"
+                and any(int(evidence.page) in repair_pages for evidence in condition.evidence)
+            ]
+            chapter_required_pages = {
+                int(item["page"])
+                for item in coverage
+                if item["status"] == "read"
+            } | repair_pages
+        if identity.get("isolated_claim_ids") and not repair_pages:
+            conditions_to_draft = []
+            chapter_required_pages = {
+                int(item["page"])
+                for item in coverage
+                if item["status"] == "read"
+            }
         if identity.get("read_remaining_sources"):
             conditions_to_draft = [
                 condition
@@ -2401,30 +2475,19 @@ def interpret_direct_core(
                     by_page[page_no]["map_checked"] = True
                     by_page[page_no]["structure_indexed"] = True
             follow = inventory_pages(selected)
-            tail_hold = 0
-            compose(selected)
-            missing_core = any(
-                gap.startswith(
-                    (
-                        "core_dimension_missing:",
-                        "view_not_substantive:",
-                        "major_condition_not_verified:",
-                    )
-                )
-                for gap in _completeness_gaps(claims, conditions, checks, records)
-            )
             expand = [
                 int(page)
                 for page in follow
                 if int(page) not in chapter_required_pages and int(page) in set(readable_order)
             ]
-            if expand and missing_core and not any(
+            if expand and not any(
                 gap.startswith("direct_core_ledger_hold") for gap in gaps
             ):
                 gaps.append("chapter_gap_expansion")
                 chapter_required_pages.update(expand)
                 inventory_pages(expand)
-                compose(expand)
+            tail_hold = 0
+            compose([*selected, *expand])
         else:
             follow = inventory_pages(readable_order, prepared=planned)
             tail_hold = 0
