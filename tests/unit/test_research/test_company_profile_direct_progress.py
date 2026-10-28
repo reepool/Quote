@@ -4440,26 +4440,16 @@ def test_a_saved_source_review_follow_page_is_read_on_the_repair_path():
             pages = tuple(int(page["page"]) for page in request.source_pages)
             sent.append((request.purpose, pages))
             if request.purpose == "source_inventory":
-                assert pages == (17,)
-                return ReportSemanticResponseV3(
-                    request_id=request.request_id,
-                    purpose=request.purpose,
-                    source_conditions=(
-                        ReportSourceCondition(
-                            condition_id="period-total",
-                            dimension="revenue_model",
-                            description="本期营业收入总额。",
-                            evidence=(
-                                _evidence(report, text="本期营业收入100元。", page=17).model_copy(
-                                    update={"evidence_id": "period-total"}
-                                ),
-                            ),
-                            major=True,
-                            statement_status="current",
-                        ),
-                    ),
-                )
+                raise AssertionError(pages)
             if request.purpose == "synthesize_views":
+                if any(
+                    item.condition_id.startswith("core-question:")
+                    for item in request.source_conditions
+                ):
+                    assert any(
+                        "本期营业收入100元。" in str(page.get("text") or "")
+                        for page in request.source_pages
+                    )
                 return ReportSemanticResponseV3(
                     request_id=request.request_id,
                     purpose=request.purpose,
@@ -4511,8 +4501,32 @@ def test_a_saved_source_review_follow_page_is_read_on_the_repair_path():
             source_conditions=(),
         ).model_dump(mode="json"),
     }
+    import json
+
+    kept = ReportViewClaim(
+        claim_id="kept-revenue",
+        dimension="revenue_model",
+        status="observed",
+        answer="分行业营业收入已列。",
+        evidence=(
+            _evidence(report, text="本期营业收入100元。", page=17).model_copy(
+                update={"evidence_id": "kept-revenue"}
+            ),
+        ),
+    )
     identity = direct_core_processing_identity()
     identity["accepted_source_receipts"] = [earlier, receipt]
+    identity["accepted_prior_draft"] = {
+        "claims": [json.loads(kept.model_dump_json())],
+        "checks": [
+            {
+                "target_type": "claim",
+                "target_id": "kept-revenue",
+                "status": "pass",
+                "explanation": "分项已核。",
+            }
+        ],
+    }
     result = _run(
         _Provider(),
         pages=(
@@ -4523,10 +4537,91 @@ def test_a_saved_source_review_follow_page_is_read_on_the_repair_path():
         processing_identity=identity,
         report=report,
     )
-    assert ("source_inventory", (17,)) in sent
+    assert not any(purpose == "source_inventory" for purpose, _pages in sent)
+    assert any(purpose == "synthesize_views" and 17 in pages for purpose, pages in sent)
     assert not any(99 in pages for _purpose, pages in sent)
-    assert any(item.claim_id == "period-total" for item in result.claims)
     assert not any(gap == "necessary_unread:99" for gap in result.gaps)
+    assert any(item.claim_id == "period-total" for item in result.claims)
+
+
+def test_a_resolved_gap_drops_and_a_new_block_remains():
+    from research.company_profile.contracts import ReportSourceCondition
+    from research.company_profile.direct_reading import _completeness_gaps, _current_gaps
+
+    report = _report()
+    claim = ReportViewClaim(
+        claim_id="claim_principal_business_bank_profile",
+        dimension="principal_business",
+        status="observed",
+        answer="公司为全国性银行。",
+        condition_ids=("principal_bank_profile",),
+        evidence=(_evidence(report, text="公司为全国性银行。", page=1),),
+    )
+    condition = ReportSourceCondition(
+        condition_id="principal_bank_profile",
+        dimension="principal_business",
+        description="公司定位。",
+        evidence=claim.evidence,
+        major=True,
+        statement_status="current",
+    )
+    passed = ReportViewCheck(
+        target_type="condition",
+        target_id="principal_bank_profile",
+        status="pass",
+        explanation="已覆盖。",
+        covers_target_type="claim",
+        covers_target_id=claim.claim_id,
+    )
+    claim_pass = ReportViewCheck(
+        target_type="claim",
+        target_id=claim.claim_id,
+        status="pass",
+        explanation="已核。",
+    )
+    stale = ["major_condition_not_verified:principal_bank_profile"]
+    current = _current_gaps(stale, [claim], [condition], [passed, claim_pass])
+    assert "major_condition_not_verified:principal_bank_profile" not in current
+    blocked = ReportViewCheck(
+        target_type="condition",
+        target_id="principal_bank_profile",
+        status="block",
+        explanation="后否定。",
+    )
+    gaps = _completeness_gaps([claim], [condition], [passed, claim_pass, blocked])
+    assert "major_condition_not_verified:principal_bank_profile" in gaps
+
+
+def test_a_deposit_condition_uses_the_deposit_claim_not_an_unrelated_product():
+    from research.company_profile.contracts import ReportSourceCondition
+    from research.company_profile.direct_reading import claims_covering_condition
+
+    report = _report()
+    condition = ReportSourceCondition(
+        condition_id="bp-work:report:3:input_deposits_funding",
+        dimension="input_exposure",
+        description="存款总额。",
+        evidence=(_evidence(report, text="存款总额55,824.35亿元。", page=1),),
+        major=True,
+        statement_status="current",
+    )
+    deposit = ReportViewClaim(
+        claim_id="claim_input_exposure",
+        dimension="input_exposure",
+        status="observed",
+        answer="集团本外币存款总额为55,824.35亿元。",
+        condition_ids=("bp-work:report:3:input_deposits_funding",),
+        evidence=condition.evidence,
+    )
+    product = ReportViewClaim(
+        claim_id="claim-products-services-006",
+        dimension="products_services",
+        status="observed",
+        answer="另一项产品。",
+        evidence=(_evidence(report, text="另一项产品。", page=1),),
+    )
+    matched = claims_covering_condition(condition, [deposit, product])
+    assert [item.claim_id for item in matched] == ["claim_input_exposure"]
 
 
 

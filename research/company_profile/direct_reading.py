@@ -154,12 +154,106 @@ def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
                 and record_verdicts.get(check.covers_target_id) in {None, "pass"}
             ):
                 covered = True
-        if not covered:
-            if latest is not None and latest.status == "supplementary":
+        if covered or (latest is not None and latest.status == "supplementary"):
+            if not covered:
                 found.append(f"supplementary_gap:{condition.condition_id}")
-                continue
+            continue
+        referenced = [
+            claim
+            for claim in claims_covering_condition(condition, claims)
+            if claim.claim_id in verified_claims
+        ]
+        if latest is not None and latest.status == "block" and referenced:
+            found.append(f"major_condition_not_verified:{condition.condition_id}")
+            continue
+        if (
+            latest is not None
+            and latest.status == "unclear"
+            and referenced
+            and condition.dimension
+            in {"input_exposure", "supply_chain_role", "upstream_downstream"}
+        ):
+            found.append(f"major_condition_not_verified:{condition.condition_id}")
+            continue
+        if (
+            latest is None
+            and condition.dimension == "principal_business"
+            and "principal_business" in observed
+        ):
+            found.append(f"major_condition_not_verified:{condition.condition_id}")
+            continue
+        if condition.dimension not in observed and condition.dimension in {
+            "principal_business",
+            "products_services",
+            "revenue_model",
+            "input_exposure",
+            "supply_chain_role",
+            "upstream_downstream",
+        }:
             found.append(f"major_condition_not_verified:{condition.condition_id}")
     return found
+
+
+def claims_covering_condition(condition, candidates) -> list:
+    """Claims whose saved condition ids actually name this condition.
+
+    A same-dimension product claim is not a cover for a different question.
+    """
+    cid = str(condition.condition_id)
+    tail = cid.split(":")[-1]
+    matched = []
+    for claim in candidates:
+        if getattr(claim, "status", None) not in {None, "observed"}:
+            continue
+        ids = [str(item) for item in (getattr(claim, "condition_ids", ()) or ())]
+        if any(
+            item == cid
+            or item == tail
+            or cid.endswith(":" + item)
+            or item.endswith(":" + tail)
+            for item in ids
+        ):
+            matched.append(claim)
+    return matched
+
+
+def _current_gaps(accumulated, claims, conditions, checks, records=()) -> list[str]:
+    """Publish the latest coverage, and keep live operational gaps.
+
+    A resolved condition gap is not revived from the historical list. A later
+    block or a still-missing core question remains.
+    """
+    dynamic = _completeness_gaps(claims, conditions, checks, records)
+    live = []
+    for gap in accumulated:
+        if gap.startswith(
+            (
+                "major_condition_not_verified:",
+                "major_condition_not_in_synthesis:",
+                "supplementary_gap:",
+            )
+        ):
+            continue
+        if gap.startswith(
+            (
+                "necessary_unread:",
+                "necessary_fragment",
+                "navigation_incomplete:",
+                "direct_core_",
+                "isolated_unreliable_claim:",
+                "chapter_",
+                "evidence_not_located:",
+                "major_evidence_not_located:",
+                "claim_pending:",
+                "company_synthesis_context_truncated",
+                "retracted_for_correction:",
+            )
+        ) and gap not in live:
+            live.append(gap)
+    for gap in dynamic:
+        if gap not in live:
+            live.append(gap)
+    return live
 
 
 def _core_answers_ready(claims, conditions, checks, records=()) -> bool:
@@ -715,11 +809,11 @@ def interpret_direct_core(
 
     def _result() -> ReportInterpretation:
         observed = {item.dimension for item in claims if item.status == "observed"}
-        dynamic = _completeness_gaps(claims, conditions, checks, records)
+        published = _current_gaps(gaps, claims, conditions, checks, records)
         blocking_gaps = [
-            gap for gap in dynamic if not gap.startswith("supplementary_gap:")
+            gap for gap in published if not gap.startswith("supplementary_gap:")
         ]
-        blocking = bool(blocking_gaps) or any(
+        blocking = any(
             gap.startswith(
                 (
                     "necessary_unread:",
@@ -735,7 +829,7 @@ def interpret_direct_core(
                     "core_question_unanswered:",
                 )
             )
-            for gap in gaps
+            for gap in blocking_gaps
         )
         draft_complete = bool(observed) and not blocking
         return ReportInterpretation(
@@ -749,7 +843,7 @@ def interpret_direct_core(
             checks=tuple(checks),
             record_dispositions=tuple(dispositions),
             call_receipts=tuple(receipts),
-            gaps=tuple(gaps),
+            gaps=tuple(published),
             verified_dimensions=tuple(sorted(observed)),
             draft_complete=draft_complete,
             semantic_complete=draft_complete,
@@ -1162,6 +1256,8 @@ def interpret_direct_core(
             for condition in pool:
                 if condition.condition_id in sent_conditions:
                     continue
+                if not claims_covering_condition(condition, group):
+                    continue
                 if measure(group, chosen + [condition])[0] <= limit:
                     chosen.append(condition)
             return chosen
@@ -1250,7 +1346,15 @@ def interpret_direct_core(
         for condition in remaining:
             by_dimension.setdefault(condition.dimension, []).append(condition)
         for dimension, group in by_dimension.items():
-            related = [claim for claim in observable if claim.dimension == dimension]
+            related = []
+            for condition in group:
+                for claim in claims:
+                    if claim.status != "observed":
+                        continue
+                    if claim not in related and claims_covering_condition(condition, [claim]):
+                        related.append(claim)
+            if not related:
+                related = [claim for claim in observable if claim.dimension == dimension]
             bucket = []
             for condition in group:
                 if measure(related, bucket + [condition])[0] <= limit:
@@ -1903,6 +2007,23 @@ def interpret_direct_core(
                 evidence for item in pending for evidence in item.evidence
             )
         ]
+        if any(condition.condition_id.startswith("core-question:") for condition in pending):
+            full_pages = []
+            for page in pages:
+                source = next(
+                    (
+                        item
+                        for item in sources
+                        if int(item["page"]) == int(page["page"]) and str(item.get("text") or "").strip()
+                    ),
+                    None,
+                )
+                if source is not None:
+                    full_pages.append(
+                        {"page": int(page["page"]), "text": str(source["text"]), "readable": True}
+                    )
+            if full_pages:
+                pages = full_pages
         if identity.get("core_gap_closeout"):
             full_pages = []
             for page in pages:
@@ -2366,6 +2487,7 @@ def interpret_direct_core(
                 page_no = int(page)
                 if (
                     page_no in by_page
+                    and by_page[page_no]["status"] != "read"
                     and page_no not in requested_here
                     and page_no not in saved_follow
                 ):
@@ -2416,6 +2538,89 @@ def interpret_direct_core(
                     for item in isolated_condition_ids
                 )
             ]
+        recheck_conditions = []
+        core_answers = []
+        seen_core = set()
+        for condition in list(conditions_to_draft):
+            latest = None
+            tail = condition.condition_id.split(":")[-1]
+            for check in checks:
+                if check.target_type == "condition" and check.target_id in {
+                    condition.condition_id,
+                    tail,
+                }:
+                    latest = check
+            referenced = [
+                claim
+                for claim in claims_covering_condition(condition, claims)
+                if claim.status == "observed"
+            ]
+            if referenced and latest is not None and latest.status in {"block", "unclear"}:
+                if condition.dimension in {
+                    "input_exposure",
+                    "supply_chain_role",
+                    "upstream_downstream",
+                }:
+                    recheck_conditions.append(condition)
+                continue
+            if condition.dimension in seen_core:
+                continue
+            if condition.dimension in _CORE_CLOSEOUT_DIMENSIONS and (
+                latest is None or latest.status not in {"pass", "supplementary"}
+            ):
+                core_answers.append(condition)
+                seen_core.add(condition.dimension)
+        if reused_receipts and "revenue_model" not in {
+            claim.dimension
+            for claim in claims
+            if claim.status == "observed"
+            and claim.claim_id.startswith("core-question:")
+        }:
+            revenue_claims = [
+                claim
+                for claim in claims
+                if claim.dimension == "revenue_model" and claim.status == "observed" and claim.evidence
+            ]
+            if revenue_claims and not any(
+                condition.condition_id.startswith("core-question:period-operating-revenue")
+                for condition in conditions
+            ):
+                evidence = []
+                seen_pages = set()
+                for claim in revenue_claims:
+                    for item in claim.evidence:
+                        if int(item.page) in seen_pages:
+                            continue
+                        seen_pages.add(int(item.page))
+                        evidence.append(item)
+                        if len(evidence) == 4:
+                            break
+                    if len(evidence) == 4:
+                        break
+                question = ReportSourceCondition(
+                    condition_id="core-question:period-operating-revenue",
+                    dimension="revenue_model",
+                    description=(
+                        "State the reporting entity's current-period operating revenue "
+                        "total when the supplied text states it. A principal-business, "
+                        "product-line, region, or sales-channel subtotal does not replace "
+                        "that total. If the text does not state the total, say so."
+                    ),
+                    evidence=tuple(evidence),
+                    major=True,
+                    statement_status="current",
+                )
+                conditions.append(question)
+                core_answers.append(question)
+        conditions_to_draft = core_answers
+        if recheck_conditions:
+            recheck_claims = []
+            for condition in recheck_conditions:
+                for claim in claims_covering_condition(condition, claims):
+                    if claim.status == "observed" and claim not in recheck_claims:
+                        recheck_claims.append(claim)
+            if recheck_claims:
+                settle_claims(recheck_claims, recheck_conditions)
         if identity.get("read_remaining_sources"):
             conditions_to_draft = [
                 condition
@@ -2434,7 +2639,14 @@ def interpret_direct_core(
                 if item.claim_id in fresh_ids
             ]
             if still_pending:
-                settle_claims(still_pending, [item for item in conditions if not item.condition_id.startswith("correction:")])
+                related_conditions = [
+                    item
+                    for item in conditions
+                    if not item.condition_id.startswith("correction:")
+                    and claims_covering_condition(item, still_pending)
+                ]
+                if related_conditions:
+                    settle_claims(still_pending, related_conditions)
     else:
         readable_order = [
             int(page["page"])

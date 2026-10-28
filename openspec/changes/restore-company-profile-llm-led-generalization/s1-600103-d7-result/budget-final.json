@@ -1,0 +1,78 @@
+{
+  "physical_requests": 3,
+  "charged_tokens": 20298,
+  "charged_cost_cny": "unknown",
+  "cost_status": "unknown",
+  "billing_mode": "development_unpriced",
+  "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+  "stopped_reason": null,
+  "denied_request": null,
+  "attempts": [
+    {
+      "sequence": 1,
+      "request_id": "cdb2383f77674fa3bc5fb17c0b62a943",
+      "logical_request_id": "f3523101614e8aa4e778eb3f6fefb282d29a739b84fbacdf7b71bccfd91dc50f",
+      "source_label": "deepseek:deepseek-flash",
+      "attempt": 1,
+      "profile": "semantic_extraction__deepseek",
+      "provider_resource": "deepseek",
+      "model": "deepseek-flash",
+      "reserved_input_tokens": 12476,
+      "reserved_output_tokens": 2500,
+      "charged_tokens": 9622,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 3665,
+        "output_tokens": 5957,
+        "total_tokens": 9622
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown"
+    },
+    {
+      "sequence": 2,
+      "request_id": "3fa523d6bed44b839f523c4f847bc983",
+      "logical_request_id": "dc86eddc16151c9dfa97d5ae1bc7f816268d222bb6598200352cc6e5b4687caf",
+      "source_label": "deepseek:deepseek-flash",
+      "attempt": 1,
+      "profile": "semantic_extraction__deepseek",
+      "provider_resource": "deepseek",
+      "model": "deepseek-flash",
+      "reserved_input_tokens": 11920,
+      "reserved_output_tokens": 2000,
+      "charged_tokens": 4618,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 3648,
+        "output_tokens": 970,
+        "total_tokens": 4618
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown"
+    },
+    {
+      "sequence": 3,
+      "request_id": "0b70d306d9a242ed8eaf3e3901f27ec6",
+      "logical_request_id": "61c4463e74e09fd28777602c10cd7f21943e52eca361ef0da18e8f27b3a24d71",
+      "source_label": "deepseek:deepseek-flash",
+      "attempt": 1,
+      "profile": "semantic_extraction__deepseek",
+      "provider_resource": "deepseek",
+      "model": "deepseek-flash",
+      "reserved_input_tokens": 12009,
+      "reserved_output_tokens": 2000,
+      "charged_tokens": 6058,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 3652,
+        "output_tokens": 2406,
+        "total_tokens": 6058
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown"
+    }
+  ]
+}

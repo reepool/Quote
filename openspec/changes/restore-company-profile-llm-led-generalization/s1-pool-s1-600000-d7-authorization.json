@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600000-d7",
+  "binding_sha256": "caef93c0d5bad37596ca6f1f048c3e5a6418ff78734b641bdbe7ad4065525cfa",
+  "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+  "approval_reference": "B3-D7 section 11 and acceptance 7.57, 2026-10-28",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "D7银行核心问题收口"
+}

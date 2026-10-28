@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600103-d7",
+  "binding_sha256": "b8a3cdfa3e2e9d88638fec6eb5cf769988c877ab31c3fc7679f332514621a664",
+  "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+  "approval_reference": "B3-D7 section 11 and acceptance 7.57, 2026-10-28",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "D7造纸核心问题收口"
+}
