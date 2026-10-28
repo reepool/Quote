@@ -1,8 +1,8 @@
 # 公司画像交付路径与开发任务卡
 
-> 类型：requirements / execution plan；版本：3；更新：2026-10-28。
+> 类型：requirements / execution plan；版本：3；更新：2026-10-29。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[B3-D8§12](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#12-b3-d8补齐真实核心不以维度代替覆盖)，依据验收§7.58/A审核§129：D7银行补出总额，造纸仍送错原文；新覆盖逻辑静默隐藏主要条件，不能接受“只剩13项”。结束D7按维度截取/单入口安排，恢复有效对象覆盖、按问题定位必要源并连续补齐两家核心；有限新增资源见验收，不逐58条扩写。暂停无旧语义重跑，不全文重读、不改原S1自动可用0/12、L0/L1补救4/4及旧结果；新整组S1、S2、生产及常规规模可行性未授权/未通过。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[B3-D8-R§12.5](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#125-d8-r先核已有答案的核心覆盖再补真缺项当前执行)，依据验收§7.59/A审核§131：造纸总额已核、保守主要缺口恢复接受，但已有答案未进入覆盖核验，银行只重复总额。先核已有核心覆盖、语义后置补充，只补真缺项，在原余额内公司级连续收口，不加资源、不逐58条重写。暂停无旧语义重跑，不全文重读、不改原S1自动可用0/12、L0/L1补救4/4及旧结果；新整组S1、S2、生产及常规规模可行性未授权/未通过。
 
 ## 1. 开发者必须先理解的纠偏
 
@@ -10,7 +10,7 @@
 
 现有公告、PDF/布局缓存、Evidence、事实模型、队列、公共LLM网关和查询/导出继续使用。修正`provider=None`可成功冒充语义完成、同field短路、正则决定全文可见性/正文完整性的路径。不要新建agent平台、网关、审计系统或并行writer。
 
-产品不变量：正式源、真实LLM、独立源查漏/核验及原owner三视图。常规路径本地全页索引→关键章节无候选读源→跨章核心草稿及时可见→核验及必要定向扩读；不以全文完读为前置，不以未选中证明不存在。核心质量和吞吐同时验证；待核不是可靠结论，已知错误隔离。实际服务限额通过拆包/换源处理，不丢主要条件或清空草稿。当前按验收§7.58兼容复用两家D7及有效源/正文/检查链，找源不锁旧claim引页，以有源核心业务归并而非每维度取一条收口；更正对象真实重验，不当新首发或吞吐，旧账/unknown不清。第25次复用及§7.37无限调通只属已结束的歌华任务。
+产品不变量：正式源、真实LLM、独立源查漏/核验及原owner三视图。常规路径本地全页索引→关键章节无候选读源→跨章核心草稿及时可见→核验及必要定向扩读；不以全文完读为前置，不以未选中证明不存在。核心质量和吞吐同时验证；待核不是可靠结论，已知错误隔离。实际服务限额通过拆包/换源处理，不丢主要条件或清空草稿。当前按验收§7.59兼容复用两家D8及有效源/正文/检查链，先兑现已有核心覆盖，只补真缺项，不按维度首条或首两组结束公司任务；更正对象真实重验，不当新首发或吞吐，旧账/unknown不清。第25次复用及§7.37无限调通只属已结束的歌华任务。
 
 ## 2. A/B分工、交接和审核顺序
 
