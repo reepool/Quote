@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-29，[A审核§133](#133-a审核d8-r造纸研发收束银行转入真实缺答闭环)）：L0/L1补救4/4与原分数不改。造纸本轮研发覆盖/程序收束有限通过，银行已有答案覆盖有实质进展，但真实缺答闭环仍未交。旧D8-R三入口已结束，当前仅[银行核心交付§12.6](b3-s1-execution-card.md#126-银行核心交付闭环当前执行)，资源见验收§7.60；S1原自动可用0/12不改，S2/生产/归档未授权。
+当前状态（2026-10-29，[B交接§134](#134-b交接银行核心交付)）：L0/L1补救4/4与原分数不改。§12.6已跑银行一个入口。输出暴露和母公司贷款已对照现成正文，托管新句不含争议增速。基金子公司口号包和制造业投向明细因8次物理上限未完成，两标志仍false。S1原自动可用0/12不改，S2/生产/归档未授权。
 
 ## 1. 唯一实施指引
 
@@ -5761,3 +5761,34 @@ D8三运行根约8.9/9.4/28MB，仍有本家解析/检查点接续用途；B未�
 定向命令：`bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest tests/unit/test_research/test_company_profile_direct_progress.py -q -k 'cited_conditions_without_a_coverage_pass_are_still_verified or saved_answers_are_sent_to_coverage_on_the_real_continuation or same_dimension_does_not_hide_another_unanswered_business'`，**3 passed/58 deselected/12 warnings，134.41秒**，其中真实磁盘替换传输用例130.85秒。它证实已有答案进入覆盖、不藏另一主业，不证明unclear后的真实补答、全部10项路由或公司质量；未把模拟当业务分数。源码/持久JSON核查确认上述一个业务阻塞类（队列/状态/核心混合）及一个传输阻塞类；A未修改应用代码，交B同一卡处理。`openspec validate restore-company-profile-llm-led-generalization --strict`及`git diff --check`通过。规划Review只修活动授权/历史链接及计次表述，非阻塞架构/风格后置。
 
 B只清临时对照脚本，三个新运行根约9.8/28/30MB仍在；不能将所有历代根永留作接续。下一卡先核输入/测试引用、活跃占用及持久hash清无依赖副本，保必要解析缓存、原失败、正式源及并行内容，交接记释放量和保留用途。A本轮无业务库/临时脚本/真实模型调用，测试沿统一QuoteBak管理；未证明归属/依赖解除的目录未删除。基线13份修改及9项未跟踪保护，验收计划历史details既有修改不纳本人提交。A活跃审核约20分钟（估算，含工具交错，不等同模型运行工时），不另建计时台账。
+
+## 134. B交接银行核心交付
+
+日期：2026-10-29。按§12.6执行，只跑银行，没有重跑造纸。S1仍为0/12。
+
+### 134.1 §132摘要hash口径
+
+§132写的是三视图对象排序后JSON的SHA-256，不是query文件原字节。A在§133核的原字节与持久文件一致：造纸D8-R `bcaaee63e1a2fe4fe3d4a8bc27586acbdc384b861bd92aec964efda518620425`，银行D8b `49951b66a278845723dffbcf0bfd0539631553f689a96de86d60a3d614a83c8a`，银行D8-R `79ee97235d27033549673016ddbcfcfb14e12c0b6b2fde21350f9302a4b68a9f`。文件没有改，也不为此重跑。
+
+### 134.2 本入口实际发送
+
+`s1-600000-d9`：8次成功物理、账本58484、费用unknown、恢复0、监督464.348664秒。7次DeepSeek、1次Grok，attempt均为1。没有载荷拒绝。第8次后物理上限挡住基金子公司条件的成稿，`direct_core_request_cap`、`direct_core_package_stopped:direct_core_admission_stopped`。按停止规则没有再开第二个入口。
+
+覆盖核验：
+
+- `C017`、`output_loan_exposure_manufacturing_and_five_tracks`、`C002`、`parent_corporate_loan_balance`均pass，分别指向`claim_output_exposure_shanghai_financing`、`claim_output_exposure`、`claim-c002`、`claim-principal-business`。母公司对公贷款仍是36,654.74亿元，没有升成集团收入。
+- `manufacturing_credit_exposure` unclear：现成主张只有上海制造业贷款568亿元，没有写出集成电路、生物医药、人工智能等投向。本入口已无额度再补这句。
+
+补答后核验：
+
+- `sc-001`新句同时写下母公司贷款金额和信贷资源投向，pass，指向`claim_principal_business_sc-001`。
+- 交易银行`sc-003`新句覆盖G/B/C、北斗司库、云资金监管、浦掌柜和收管付；核验写明引文没有境内贸易金融，不把这句判成漏答。
+- `sc-012`新句包含跨境结算清算，pass，指向`claim-1`。
+- 托管新句`claim-2`：托管规模20.21万亿元、托管收入24.81亿元，没有7.23%和11.45%。条件pass指向`claim-2`，不指向`claim-sc-011`。旧句仍unclear / retracted。
+- 基金子公司`report:7:sc-003`（口号）没有发出。两标志仍false。当前主要未覆盖是`manufacturing_credit_exposure`和该`sc-003`。C004、sc-010仍是证据未定位，不是这两条。
+
+query、export、新实例的三视图一致，SHA-256 `587c2a2c9e129c5d526a2deea127c32c02d1954ad7664322d02f2cd1cfe80a8c`。这是三视图口径，不是文件原字节。
+
+### 134.3 资源与清理
+
+本卡可用207503账本/10物理/4恢复/约5346秒。本入口用58484账本/8物理/0恢复/464秒。约剩149019账本/2物理/4恢复。没有购买额度，没有改共享池。造纸未调用。临时计划脚本已删。D8-R与本入口运行根保留作解析缓存和首次结果。既有工作区改动未纳入。S2、生产和归档未授权。

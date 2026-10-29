@@ -280,6 +280,14 @@ def load_saved_draft(binding: dict) -> dict:
         target = claim.get("claim_id")
         if target in retract:
             continue
+        if claim.get("status") != "observed" or claim.get("limitation") in {
+            "pending_verification",
+            "claim_or_dependency_not_verified",
+            "evidence_not_located",
+            "retracted_pending_correction",
+            "subject_scope_omitted",
+        }:
+            continue
         scope = _claim_scope(claim)
         matched = [event for event in events.get(target) or [] if event["scope"] == scope]
         if not matched or matched[-1]["check"].get("status") != "pass":
@@ -328,7 +336,10 @@ def load_saved_draft(binding: dict) -> dict:
                 marker = target_id
                 condition_state[marker] = check
     for check in condition_state.values():
-        if check.get("status") == "pass" and check.get("covers_target_id") in valid_ids:
+        status = check.get("status")
+        if status == "pass" and check.get("covers_target_id") in valid_ids:
+            checks.append(check)
+        elif status in {"supplementary", "unclear", "block", "missing"}:
             checks.append(check)
     return {"claims": claims, "checks": checks, "verify_receipts": verify_receipts}
 
@@ -776,6 +787,8 @@ def validate_binding(
                 "s1-600000-d8",
                 "s1-600000-d8b",
                 "s1-600000-d8r",
+                "s1-600000-d9",
+                "s1-600000-d9b",
             }
             or not authorization.get("approval_reference")
         ):

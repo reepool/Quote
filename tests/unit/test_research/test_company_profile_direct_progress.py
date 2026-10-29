@@ -4922,6 +4922,236 @@ def test_same_dimension_does_not_hide_another_unanswered_business():
     assert "major_condition_not_verified:other-product" not in gap_ids((supplementary,))
 
 
+def test_output_exposure_is_checked_and_unclear_is_not_repeated():
+    import json
+
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    text = "公司发放制造业贷款，并引导信贷投向。"
+    output = ReportSourceCondition(
+        condition_id="loan-output",
+        dimension="output_exposure",
+        description="制造业贷款投放。",
+        evidence=(_evidence(report, text=text, page=1).model_copy(update={"evidence_id": "loan-output"}),),
+        major=True,
+        statement_status="current",
+    )
+    direction = ReportSourceCondition(
+        condition_id="credit-direction",
+        dimension="principal_business",
+        description="引导信贷投向。",
+        evidence=(_evidence(report, text=text, page=1).model_copy(update={"evidence_id": "credit-direction"}),),
+        major=True,
+        statement_status="current",
+    )
+    output_claim = ReportViewClaim(
+        claim_id="claim-output",
+        dimension="output_exposure",
+        status="observed",
+        answer="公司发放制造业贷款。",
+        condition_ids=("loan-output",),
+        evidence=output.evidence,
+    )
+    direction_claim = ReportViewClaim(
+        claim_id="claim-direction",
+        dimension="principal_business",
+        status="observed",
+        answer="公司发放贷款。",
+        condition_ids=("credit-direction",),
+        evidence=direction.evidence,
+    )
+    receipt = {
+        "request_id": "saved-items",
+        "purpose": "source_inventory",
+        "status": "success",
+        "source_scope": "full_context",
+        "source_pages": [1],
+        "physical_request": True,
+        "response_payload": ReportSemanticResponseV3(
+            request_id="saved-items",
+            purpose="source_inventory",
+            source_conditions=(output, direction),
+        ).model_dump(mode="json"),
+    }
+    purposes = []
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            purposes.append(request.purpose)
+            claim_ids = {item.claim_id for item in request.claims}
+            if request.purpose == "verify_views" and claim_ids == {"claim-direction"}:
+                raise AssertionError("unclear package was sent again")
+            if request.purpose == "synthesize_views":
+                condition = request.source_conditions[0]
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="claim-new",
+                            dimension=condition.dimension,
+                            status="observed",
+                            answer="公司引导信贷投向。",
+                            condition_ids=(condition.condition_id,),
+                            evidence=condition.evidence,
+                        ),
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "condition",
+                        "target_id": item.condition_id,
+                        "status": "pass",
+                        "covers_target_type": "claim",
+                        "covers_target_id": request.claims[0].claim_id,
+                        "explanation": "已有正文覆盖。",
+                    }
+                    for item in request.source_conditions
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["request_reservation_limit"] = 65536
+    identity["accepted_source_receipts"] = [receipt]
+    identity["accepted_prior_draft"] = {
+        "claims": [
+            json.loads(output_claim.model_dump_json()),
+            json.loads(direction_claim.model_dump_json()),
+        ],
+        "checks": [
+            {"target_type": "claim", "target_id": "claim-output", "status": "pass", "explanation": "已核。"},
+            {"target_type": "claim", "target_id": "claim-direction", "status": "pass", "explanation": "已核。"},
+            {
+                "target_type": "condition",
+                "target_id": "credit-direction",
+                "status": "unclear",
+                "explanation": "还没有投向。",
+            },
+        ],
+        "verify_receipts": [
+            {
+                "request_id": "old-direction",
+                "purpose": "verify_views",
+                "status": "success",
+                "request_targets": [
+                    {"target_type": "claim", "target_id": "claim-direction"},
+                    {"target_type": "condition", "target_id": "credit-direction"},
+                ],
+                "response_payload": {
+                    "checks": [
+                        {
+                            "target_type": "condition",
+                            "target_id": "credit-direction",
+                            "status": "unclear",
+                        }
+                    ]
+                },
+            }
+        ],
+    }
+    result = _run(
+        _Provider(),
+        pages=({"page": 1, "text": text, "readable": True},),
+        processing_identity=identity,
+        report=report,
+    )
+    assert purposes[0] == "verify_views"
+    assert "synthesize_views" in purposes
+    assert not any(gap.endswith("loan-output") for gap in result.gaps)
+
+
+def test_a_rejected_payload_is_repacked_in_the_same_entry():
+    from research.company_profile.contracts import ReportSourceCondition
+    from utils.llm.errors import LlmDeadlineExceededError
+
+    report = _report()
+    text = "公司经营两项贷款服务。"
+    conditions = []
+    for name in ("east", "west"):
+        conditions.append(
+            ReportSourceCondition(
+                condition_id=name,
+                dimension="output_exposure",
+                description=f"{name}贷款。",
+                evidence=(_evidence(report, text=text, page=1).model_copy(update={"evidence_id": name}),),
+                major=True,
+                statement_status="current",
+            )
+        )
+    claim = ReportViewClaim(
+        claim_id="claim-loans",
+        dimension="output_exposure",
+        status="observed",
+        answer="公司经营两项贷款服务。",
+        condition_ids=("east", "west"),
+        evidence=conditions[0].evidence,
+    )
+    receipt = {
+        "request_id": "saved-items",
+        "purpose": "source_inventory",
+        "status": "success",
+        "source_scope": "full_context",
+        "source_pages": [1],
+        "physical_request": True,
+        "response_payload": ReportSemanticResponseV3(
+            request_id="saved-items",
+            purpose="source_inventory",
+            source_conditions=tuple(conditions),
+        ).model_dump(mode="json"),
+    }
+    seen = []
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            ids = tuple(item.condition_id.split(":")[-1] for item in request.source_conditions)
+            if request.purpose == "verify_views" and len(ids) > 1:
+                raise LlmDeadlineExceededError("payload_not_admitted")
+            seen.extend(ids)
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "condition",
+                        "target_id": item.condition_id,
+                        "status": "pass",
+                        "covers_target_type": "claim",
+                        "covers_target_id": "claim-loans",
+                        "explanation": "已覆盖。",
+                    }
+                    for item in request.source_conditions
+                ),
+            )
+
+    import json
+
+    identity = direct_core_processing_identity()
+    identity["request_reservation_limit"] = 65536
+    identity["accepted_source_receipts"] = [receipt]
+    identity["accepted_prior_draft"] = {
+        "claims": [json.loads(claim.model_dump_json())],
+        "checks": [
+            {"target_type": "claim", "target_id": "claim-loans", "status": "pass", "explanation": "已核。"}
+        ],
+    }
+    result = _run(
+        _Provider(),
+        pages=({"page": 1, "text": text, "readable": True},),
+        processing_identity=identity,
+        report=report,
+    )
+    assert {"east", "west"} <= set(seen), (seen, result.gaps[:8])
+    assert not any("payload_not_admitted" in gap for gap in result.gaps)
+
+
 def test_saved_answers_are_sent_to_coverage_on_the_real_continuation():
     """D8b/D8 disk continuation: existing claims enter coverage, the total is not redrafted."""
     import gzip

@@ -207,13 +207,26 @@ def recheck_claims_for(condition, candidates) -> list:
     if linked:
         return linked
     pages = {int(item.page) for item in condition.evidence}
-    return [
-        claim
-        for claim in candidates
-        if getattr(claim, "status", None) == "observed"
-        and getattr(claim, "dimension", None) == condition.dimension
-        and pages & {int(item.page) for item in claim.evidence}
-    ]
+    left = "".join(
+        "".join(str(item.anchor.bounded_quote or "").split())
+        for item in condition.evidence
+    )
+    amounts = re.findall(r"\d{1,3}(?:,\d{3})+(?:\.\d+)?", left)
+
+    def answers_this(claim) -> bool:
+        if getattr(claim, "status", None) != "observed":
+            return False
+        if not pages & {int(item.page) for item in claim.evidence}:
+            return False
+        right = "".join(str(claim.answer or "").split())
+        if any(amount in right for amount in amounts):
+            return True
+        return len(left) >= 16 and any(
+            left[index : index + 16] in right for index in range(0, len(left) - 15)
+        )
+
+    found = [claim for claim in candidates if answers_this(claim)]
+    return found
 
 
 def compatible_evidence_targets(claims, conditions) -> list:
@@ -327,6 +340,7 @@ _CORE_CLOSEOUT_DIMENSIONS = {
     "input_exposure",
     "supply_chain_role",
     "upstream_downstream",
+    "output_exposure",
 }
 _UNTRUSTED_LIMITATIONS = {
     "pending_verification",
@@ -1250,8 +1264,6 @@ def interpret_direct_core(
                 claim.claim_id,
             )
         )
-        payload_margin = [2048]
-
         def already_trusted(claim) -> bool:
             if claim.status != "observed" or claim.limitation in {
                 "pending_verification",
@@ -1277,7 +1289,7 @@ def interpret_direct_core(
                 )
                 if pages:
                     sized = ReportSemanticRequestV3(
-                        request_id=f"{work_id}:verify-size",
+                        request_id=f"{work_id}:report:{len(receipts) + 1}",
                         purpose="verify_views",
                         report=report,
                         processing_identity=identity,
@@ -1292,8 +1304,7 @@ def interpret_direct_core(
                         ),
                     )
                     cap = int(identity.get("max_payload_utf8_bytes") or 60_000)
-                    # The gateway counts a few more bytes than this compact size.
-                    if request_payload_bytes(sized) > cap - payload_margin[0]:
+                    if request_payload_bytes(sized) > cap:
                         return limit + 1, pages, related, conditions
             except ValueError:
                 return limit + 1, pages, related, conditions
@@ -1425,6 +1436,7 @@ def interpret_direct_core(
                 }
             ]
 
+        pack_limit = [10**9]
         while pending_conditions:
             condition = pending_conditions.pop(0)
             chosen = list(usable_claims(condition))
@@ -1437,6 +1449,9 @@ def interpret_direct_core(
             batch = [condition]
             later = []
             for other in pending_conditions:
+                if len(batch) >= pack_limit[0]:
+                    later.append(other)
+                    continue
                 extra = [claim for claim in usable_claims(other) if claim not in chosen]
                 if not extra and not claims_covering_condition(other, chosen):
                     later.append(other)
@@ -1454,13 +1469,18 @@ def interpret_direct_core(
                 if len(batch) > 1 and any(
                     "payload_not_admitted" in gap for gap in gaps
                 ):
-                    payload_margin[0] += 4096
+                    gaps[:] = [
+                        gap for gap in gaps if "payload_not_admitted" not in gap
+                    ]
+                    pack_limit[0] = max(1, len(batch) // 2)
                     pending_conditions = [*batch, *pending_conditions]
                     continue
                 for item in batch:
                     if item.condition_id not in sent_conditions:
                         gaps.append(f"major_condition_not_verified:{item.condition_id}")
                         sent_conditions.add(item.condition_id)
+            else:
+                pack_limit[0] = 10**9
 
     def report_gap(page_ids) -> None:
         by_id = {int(page["page"]): page for page in sources}
@@ -2146,7 +2166,7 @@ def interpret_direct_core(
                     page["text"] = f"{heading}\n{page.get('text') or ''}"
         if len(pending) > 1:
             sized = ReportSemanticRequestV3(
-                request_id=f"{work_id}:group-size",
+                request_id=f"{work_id}:report:{len(receipts) + 1}",
                 purpose="synthesize_views",
                 report=report,
                 processing_identity=identity,
@@ -2229,6 +2249,40 @@ def interpret_direct_core(
         if drafted_group:
             settle_claims(drafted_group, located_conditions)
             publish()
+        returned_ids = {
+            str(item)
+            for claim in drafted.claims
+            for item in (claim.condition_ids or ())
+        }
+        quiet = [
+            condition
+            for condition in located_conditions
+            if condition.condition_id not in returned_ids
+            and not any(
+                condition.condition_id.endswith(":" + item)
+                or item.endswith(":" + condition.condition_id.split(":")[-1])
+                for item in returned_ids
+            )
+        ]
+        if quiet:
+            related = []
+            for condition in quiet:
+                for claim in recheck_claims_for(condition, claims):
+                    if claim.limitation in {
+                        "pending_verification",
+                        "claim_or_dependency_not_verified",
+                        "evidence_not_located",
+                        "retracted_pending_correction",
+                        "subject_scope_omitted",
+                    }:
+                        continue
+                    if claim.claim_id in set(identity.get("isolated_claim_ids") or ()):
+                        continue
+                    if claim not in related:
+                        related.append(claim)
+            if related:
+                settle_claims(related, quiet)
+                publish()
 
     def draft_ready_core() -> None:
         """Draft the next core group once principal and revenue evidence both exist."""
@@ -2448,15 +2502,7 @@ def interpret_direct_core(
                     if (
                         condition.major
                         and condition.statement_status == "current"
-                        and condition.dimension
-                        in {
-                            "principal_business",
-                            "revenue_model",
-                            "products_services",
-                            "input_exposure",
-                            "supply_chain_role",
-                            "upstream_downstream",
-                        }
+                        and condition.dimension in _CORE_CLOSEOUT_DIMENSIONS
                     ):
                         selected_conditions.append(condition)
             if not identity.get("core_gap_closeout"):
@@ -2611,35 +2657,32 @@ def interpret_direct_core(
             chapter_required_pages = {
                 int(item["page"]) for item in coverage if item["status"] == "read"
             }
-        if isolated_condition_ids:
-            conditions_to_draft = [
-                condition
-                for condition in conditions_to_draft
-                if condition.condition_id not in isolated_condition_ids
-                and not any(
-                    condition.condition_id.endswith(":" + item)
-                    for item in isolated_condition_ids
-                )
-            ]
-        recheck_conditions = []
-        core_answers = []
-        for condition in list(conditions_to_draft):
-            latest = None
+        def shown_claim_ids(condition) -> set[str]:
+            """Claims in the latest verification that already judged this condition."""
             tail = condition.condition_id.split(":")[-1]
-            for check in checks:
-                if check.target_type == "condition" and check.target_id in {
-                    condition.condition_id,
-                    tail,
-                }:
-                    latest = check
-            if latest is not None and latest.status in {
-                "pass",
-                "supplementary",
-                "unclear",
-                "block",
-            }:
-                continue
-            referenced = [
+            shown: set[str] = set()
+            for item in receipts:
+                if item.get("purpose") != "verify_views":
+                    continue
+                targets = item.get("request_targets") or []
+                cond_ids = [
+                    str(target.get("target_id") or "")
+                    for target in targets
+                    if target.get("target_type") == "condition"
+                ]
+                if condition.condition_id not in cond_ids and not any(
+                    item_id.split(":")[-1] == tail for item_id in cond_ids
+                ):
+                    continue
+                shown = {
+                    str(target.get("target_id"))
+                    for target in targets
+                    if target.get("target_type") == "claim" and target.get("target_id")
+                }
+            return shown
+
+        def trusted_for(condition) -> list:
+            return [
                 claim
                 for claim in recheck_claims_for(condition, claims)
                 if claim.limitation
@@ -2650,12 +2693,76 @@ def interpret_direct_core(
                     "retracted_pending_correction",
                     "subject_scope_omitted",
                 }
+                and claim.claim_id not in set(identity.get("isolated_claim_ids") or ())
             ]
+
+        def gap_copy(condition, referenced) -> ReportSourceCondition:
+            lines = [condition.description]
             if referenced:
-                recheck_conditions.append(condition)
+                lines.append(
+                    "已有正文如下。只补充这些正文没有写出、且所供引文里确实写出的业务事实。"
+                    "战略口号、地区名次和增长率不是新的主业。引文没有的分句不要写。"
+                    "若没有需要新增的事实，不要返回主张。"
+                )
+                lines.extend(claim.answer for claim in referenced[:3])
+            if condition.condition_id in isolated_condition_ids or any(
+                condition.condition_id.endswith(":" + item)
+                for item in isolated_condition_ids
+            ):
+                lines.append(
+                    "被撤回的旧句不要照抄，不要写入该句的增长率；只写服务和本期水平金额。"
+                )
+            return condition.model_copy(update={"description": "\n".join(lines)})
+
+        recheck_pairs: list[tuple[ReportSourceCondition, list]] = []
+        core_answers = []
+        for condition in list(conditions_to_draft):
+            latest = None
+            tail = condition.condition_id.split(":")[-1]
+            for check in checks:
+                if check.target_type == "condition" and check.target_id in {
+                    condition.condition_id,
+                    tail,
+                }:
+                    latest = check
+            if latest is not None and latest.status == "supplementary":
+                continue
+            if latest is not None and latest.status == "pass":
+                cover = next(
+                    (claim for claim in claims if claim.claim_id == latest.covers_target_id),
+                    None,
+                )
+                if (
+                    cover is not None
+                    and cover.status == "observed"
+                    and cover.limitation
+                    not in {
+                        "pending_verification",
+                        "claim_or_dependency_not_verified",
+                        "evidence_not_located",
+                        "retracted_pending_correction",
+                        "subject_scope_omitted",
+                    }
+                    and cover.claim_id not in set(identity.get("isolated_claim_ids") or ())
+                ):
+                    continue
+            referenced = trusted_for(condition)
+            if latest is not None and latest.status in {"unclear", "block"}:
+                fresh = [
+                    claim
+                    for claim in referenced
+                    if claim.claim_id not in shown_claim_ids(condition)
+                ]
+                if fresh:
+                    recheck_pairs.append((condition, fresh))
+                elif condition.dimension in _CORE_CLOSEOUT_DIMENSIONS:
+                    core_answers.append(gap_copy(condition, referenced))
+                continue
+            if referenced:
+                recheck_pairs.append((condition, referenced))
                 continue
             if condition.dimension in _CORE_CLOSEOUT_DIMENSIONS:
-                core_answers.append(condition)
+                core_answers.append(gap_copy(condition, referenced))
         if reused_receipts:
             statement_pages = operating_revenue_statement_pages(sources)
             evidence = []
@@ -2733,7 +2840,7 @@ def interpret_direct_core(
                 for item in (claim.condition_ids or ())
             )
             if existing_question is not None and not question_passed and verified_revenue:
-                recheck_conditions.append(existing_question)
+                recheck_pairs.append((existing_question, verified_revenue))
             elif (
                 evidence
                 and not question_passed
@@ -2782,20 +2889,15 @@ def interpret_direct_core(
             for condition in group
         ]
         conditions_to_draft = [*grouped, *question_items]
-        if recheck_conditions:
-            recheck_claims = []
-            for condition in recheck_conditions:
-                for claim in recheck_claims_for(condition, claims):
-                    if claim not in recheck_claims and claim.limitation not in {
-                        "pending_verification",
-                        "claim_or_dependency_not_verified",
-                        "evidence_not_located",
-                        "retracted_pending_correction",
-                        "subject_scope_omitted",
-                    }:
-                        recheck_claims.append(claim)
-            if recheck_claims:
-                settle_claims(recheck_claims, recheck_conditions)
+        if recheck_pairs:
+            grouped_pairs: dict[tuple[str, ...], list] = {}
+            grouped_claims: dict[tuple[str, ...], list] = {}
+            for condition, chosen in recheck_pairs:
+                key = tuple(claim.claim_id for claim in chosen)
+                grouped_pairs.setdefault(key, []).append(condition)
+                grouped_claims[key] = chosen
+            for key, paired in grouped_pairs.items():
+                settle_claims(grouped_claims[key], paired)
         if identity.get("read_remaining_sources"):
             conditions_to_draft = [
                 condition
