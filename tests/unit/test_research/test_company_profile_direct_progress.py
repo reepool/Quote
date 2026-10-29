@@ -4753,6 +4753,105 @@ def test_operating_revenue_is_taken_from_the_statement_page_not_the_old_quote():
     assert any(item.claim_id == "period-total" for item in result.claims)
 
 
+def test_cited_conditions_without_a_coverage_pass_are_still_verified():
+    import json
+
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    saved = []
+    claims = []
+    for index in range(8):
+        condition = ReportSourceCondition(
+            condition_id=f"item-{index}",
+            dimension="products_services",
+            description=f"第{index}项主要产品。",
+            evidence=(
+                _evidence(report, text=f"第{index}项主要产品。", page=1).model_copy(
+                    update={"evidence_id": f"item-{index}"}
+                ),
+            ),
+            major=True,
+            statement_status="current",
+        )
+        saved.append(condition)
+        claims.append(
+            ReportViewClaim(
+                claim_id=f"claim-{index}",
+                dimension="products_services",
+                status="observed",
+                answer=f"第{index}项主要产品已经经营。",
+                condition_ids=(f"item-{index}",),
+                evidence=condition.evidence,
+            )
+        )
+    receipt = {
+        "request_id": "saved-items",
+        "purpose": "source_inventory",
+        "status": "success",
+        "source_scope": "full_context",
+        "source_pages": [1],
+        "physical_request": True,
+        "response_payload": ReportSemanticResponseV3(
+            request_id="saved-items",
+            purpose="source_inventory",
+            source_conditions=tuple(saved),
+        ).model_dump(mode="json"),
+    }
+    seen = []
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            if request.purpose == "synthesize_views":
+                raise AssertionError("cited conditions must be checked, not rewritten")
+            ids = tuple(item.condition_id.split(":")[-1] for item in request.source_conditions)
+            seen.extend(ids)
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "condition",
+                        "target_id": item.condition_id,
+                        "status": "pass",
+                        "covers_target_type": "claim",
+                        "covers_target_id": f"claim-{item.condition_id.split(':')[-1].split('-')[-1]}",
+                        "explanation": "已有正文覆盖。",
+                    }
+                    for item in request.source_conditions
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["request_reservation_limit"] = 65536
+    identity["accepted_source_receipts"] = [receipt]
+    identity["accepted_prior_draft"] = {
+        "claims": [json.loads(item.model_dump_json()) for item in claims],
+        "checks": [
+            {
+                "target_type": "claim",
+                "target_id": item.claim_id,
+                "status": "pass",
+                "explanation": "主张已核。",
+            }
+            for item in claims
+        ],
+    }
+    result = _run(
+        _Provider(),
+        pages=({"page": 1, "text": " ".join(f"第{index}项主要产品。" for index in range(8)), "readable": True},),
+        processing_identity=identity,
+        report=report,
+    )
+    assert {f"item-{index}" for index in range(8)} <= set(seen), (seen, result.gaps[:12])
+    assert all(item.status == "observed" for item in result.claims)
+    assert not any(
+        gap.startswith("major_condition_not_verified:saved-items:item-") for gap in result.gaps
+    )
+
+
 def test_same_dimension_does_not_hide_another_unanswered_business():
     from research.company_profile.contracts import ReportSourceCondition
     from research.company_profile.direct_reading import _completeness_gaps
@@ -4821,6 +4920,170 @@ def test_same_dimension_does_not_hide_another_unanswered_business():
         explanation="只是举例。",
     )
     assert "major_condition_not_verified:other-product" not in gap_ids((supplementary,))
+
+
+def test_saved_answers_are_sent_to_coverage_on_the_real_continuation():
+    """D8b/D8 disk continuation: existing claims enter coverage, the total is not redrafted."""
+    import gzip
+    import json
+    import time
+    from pathlib import Path
+
+    from research.company_profile.bounded_entry import (
+        load_saved_draft,
+        load_saved_source_discovery,
+    )
+    from research.company_profile.direct_reading import interpret_direct_core
+    from research.company_profile.models import ReportIdentity
+
+    change = Path(
+        "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization"
+    )
+
+    def pages_from(cache: Path):
+        with gzip.open(cache, "rt") as handle:
+            payload = json.load(handle)
+        return tuple(
+            {
+                "page": int(item["page_number"]),
+                "text": item.get("text") or "",
+                "readable": True,
+            }
+            for item in payload["pages"]
+        )
+
+    def continue_saved(query_path: Path, cache: Path, *, isolated=()):
+        query = json.loads(query_path.read_text())
+        report = ReportIdentity.model_validate(query["profiles"][0]["report"])
+        binding = {
+            "accepted_source_query": str(query_path),
+            "accepted_draft_query": str(query_path),
+            "asset": {"content_hash": report.document_version},
+        }
+        calls = []
+
+        class _Provider:
+            offline_only = True
+
+            def interpret(self, request):
+                calls.append(
+                    {
+                        "purpose": request.purpose,
+                        "conditions": tuple(
+                            item.condition_id for item in request.source_conditions
+                        ),
+                        "claims": tuple(item.claim_id for item in request.claims),
+                    }
+                )
+                checks = []
+                if request.purpose == "verify_views":
+                    for condition in request.source_conditions:
+                        tail = condition.condition_id.split(":")[-1]
+                        cover = next(
+                            (
+                                claim.claim_id
+                                for claim in request.claims
+                                if any(
+                                    str(item) == tail or str(item).endswith(":" + tail)
+                                    for item in (claim.condition_ids or ())
+                                )
+                            ),
+                            request.claims[0].claim_id if request.claims else "",
+                        )
+                        checks.append(
+                            {
+                                "target_type": "condition",
+                                "target_id": condition.condition_id,
+                                "status": "pass",
+                                "covers_target_type": "claim",
+                                "covers_target_id": cover,
+                                "explanation": "已有正文覆盖。",
+                            }
+                        )
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    checks=tuple(checks),
+                )
+
+        identity = direct_core_processing_identity()
+        identity["request_reservation_limit"] = 65536
+        identity["max_physical_requests"] = 80
+        identity["ledger_tokens"] = 800_000
+        identity["accepted_source_receipts"] = load_saved_source_discovery(binding)
+        identity["accepted_prior_draft"] = load_saved_draft(binding)
+        if isolated:
+            identity["isolated_claim_ids"] = list(isolated)
+        result = interpret_direct_core(
+            report=report,
+            pages=pages_from(cache),
+            processing_identity=identity,
+            provider=_Provider(),
+            work_id="saved-coverage",
+            token_budget=800_000,
+            started_at=time.monotonic(),
+        )
+        return calls, result
+
+    paper_calls, paper = continue_saved(
+        change / "s1-600103-d8b-result" / "query.json",
+        Path(
+            "/home/python/Quote/data/QuoteBak/s1-600103-d8b-20261028/pdf-cache/derived/"
+            "business_profile_pdfium_recovery.v4/"
+            "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c_57e1dd4f16ef40ff.json.gz"
+        ),
+    )
+    paper_verify = [item for item in paper_calls if item["purpose"] == "verify_views"]
+
+    def paired(tail, claim_id):
+        return any(
+            any(cond.endswith(tail) for cond in item["conditions"])
+            and claim_id in item["claims"]
+            for item in paper_verify
+        )
+
+    assert paired("industry_segments_001", "claim_principal_business_001"), paper_verify
+    assert paired("product_portfolio_001", "claim_products_services_001"), paper_verify
+    assert not any(
+        "period-operating-revenue" in cond
+        for item in paper_calls
+        for cond in item["conditions"]
+    ), paper_calls
+    assert not any(
+        gap.startswith("major_condition_not_verified:")
+        and gap.endswith(("industry_segments_001", "product_portfolio_001"))
+        for gap in paper.gaps
+    )
+
+    bank_cache = next(
+        Path("/home/python/Quote/data/QuoteBak/s1-600000-d8-20261028/pdf-cache").rglob(
+            "*.json.gz"
+        )
+    )
+    bank_calls, bank = continue_saved(
+        change / "s1-600000-d8-result" / "query.json",
+        bank_cache,
+        isolated=("claim-sc-011",),
+    )
+    bank_verify = [item for item in bank_calls if item["purpose"] == "verify_views"]
+    covered = {
+        cond.split(":")[-1]
+        for item in bank_verify
+        for cond in item["conditions"]
+    }
+    assert len(covered) > 6, covered
+    deposit = [
+        item
+        for item in bank_verify
+        if any(cond.endswith("input_deposits_funding") for cond in item["conditions"])
+    ]
+    assert deposit and any("claim_input_exposure" in item["claims"] for item in deposit)
+    assert all("claim-sc-011" not in item["claims"] for item in bank_verify)
+    assert not any(
+        gap.startswith("major_condition_not_verified:")
+        and gap.endswith("input_deposits_funding")
+        for gap in bank.gaps
+    )
 
 
 

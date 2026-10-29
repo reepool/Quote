@@ -197,6 +197,72 @@ def claims_covering_condition(condition, candidates) -> list:
     return matched
 
 
+def recheck_claims_for(condition, candidates) -> list:
+    """Claims that can be shown to a coverage check. A link is not itself a pass."""
+    linked = [
+        claim
+        for claim in claims_covering_condition(condition, candidates)
+        if getattr(claim, "status", None) == "observed"
+    ]
+    if linked:
+        return linked
+    pages = {int(item.page) for item in condition.evidence}
+    return [
+        claim
+        for claim in candidates
+        if getattr(claim, "status", None) == "observed"
+        and getattr(claim, "dimension", None) == condition.dimension
+        and pages & {int(item.page) for item in claim.evidence}
+    ]
+
+
+def compatible_evidence_targets(claims, conditions) -> list:
+    """Give a coverage request one body per evidence id.
+
+    A saved claim and a rebound condition can share an evidence id after the
+    quote is located. The wire refuses that conflict and the condition would
+    never be checked. The stored objects stay unchanged.
+    """
+    catalog: dict[str, str] = {}
+
+    def body(evidence) -> str:
+        return json.dumps(
+            evidence.model_dump(mode="json", exclude={"report"}),
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+
+    for claim in claims:
+        for evidence in claim.evidence:
+            catalog.setdefault(evidence.evidence_id, body(evidence))
+    fixed = []
+    for condition in conditions:
+        updated = []
+        changed = False
+        for evidence in condition.evidence:
+            dumped = body(evidence)
+            prior = catalog.get(evidence.evidence_id)
+            if prior is None or prior == dumped:
+                catalog.setdefault(evidence.evidence_id, dumped)
+                updated.append(evidence)
+                continue
+            number = 2
+            new_id = f"{evidence.evidence_id}__{number}"
+            while new_id in catalog:
+                number += 1
+                new_id = f"{evidence.evidence_id}__{number}"
+            renamed = evidence.model_copy(update={"evidence_id": new_id})
+            catalog[new_id] = body(renamed)
+            updated.append(renamed)
+            changed = True
+        fixed.append(
+            condition.model_copy(update={"evidence": tuple(updated)})
+            if changed
+            else condition
+        )
+    return fixed
+
+
 def _current_gaps(accumulated, claims, conditions, checks, records=()) -> list[str]:
     """Publish the latest coverage, and keep live operational gaps.
 
@@ -1184,7 +1250,25 @@ def interpret_direct_core(
                 claim.claim_id,
             )
         )
+        payload_margin = [2048]
+
+        def already_trusted(claim) -> bool:
+            if claim.status != "observed" or claim.limitation in {
+                "pending_verification",
+                "claim_or_dependency_not_verified",
+                "evidence_not_located",
+                "retracted_pending_correction",
+                "subject_scope_omitted",
+            }:
+                return False
+            latest = None
+            for check in checks:
+                if check.target_type == "claim" and check.target_id == claim.claim_id:
+                    latest = check
+            return latest is not None and latest.status == "pass"
+
         def measure(group, conditions):
+            conditions = compatible_evidence_targets(group, conditions)
             related = related_records(group)
             pages = pages_for([*group, *conditions, *related])
             try:
@@ -1208,16 +1292,19 @@ def interpret_direct_core(
                         ),
                     )
                     cap = int(identity.get("max_payload_utf8_bytes") or 60_000)
-                    if request_payload_bytes(sized) > cap:
-                        return limit + 1, pages, related
+                    # The gateway counts a few more bytes than this compact size.
+                    if request_payload_bytes(sized) > cap - payload_margin[0]:
+                        return limit + 1, pages, related, conditions
             except ValueError:
-                return limit + 1, pages, related
-            return units, pages, related
+                return limit + 1, pages, related, conditions
+            return units, pages, related, conditions
 
         support_groups: list[list] = []
         pending_claims: list = []
         current: list = []
         for claim in observable:
+            if already_trusted(claim):
+                continue
             if measure([claim], [])[0] > limit:
                 pending_claims.append(claim)
                 continue
@@ -1243,7 +1330,7 @@ def interpret_direct_core(
             return chosen
 
         def send(group, sent, *, support: bool) -> bool:
-            units, pages, related = measure(group, sent)
+            units, pages, related, sent = measure(group, sent)
             if units > limit or not pages:
                 if support:
                     for claim in group:
@@ -1317,42 +1404,63 @@ def interpret_direct_core(
             if not send(group, attach(group, package_conditions), support=True):
                 if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
                     return
-        remaining = [
+        pending_conditions = [
             condition
             for condition in package_conditions
             if condition.condition_id not in sent_conditions
         ]
-        by_dimension: dict[str, list] = {}
-        for condition in remaining:
-            by_dimension.setdefault(condition.dimension, []).append(condition)
-        for dimension, group in by_dimension.items():
-            related = []
-            for condition in group:
-                for claim in claims:
-                    if claim.status != "observed":
-                        continue
-                    if claim not in related and claims_covering_condition(condition, [claim]):
-                        related.append(claim)
-            if not related:
-                related = [claim for claim in observable if claim.dimension == dimension]
-            bucket = []
-            for condition in group:
-                if measure(related, bucket + [condition])[0] <= limit:
-                    bucket.append(condition)
-                    continue
+
+        def usable_claims(item):
+            return [
+                claim
+                for claim in recheck_claims_for(item, observable)
+                if claim.status == "observed"
+                and claim.limitation
+                not in {
+                    "pending_verification",
+                    "claim_or_dependency_not_verified",
+                    "evidence_not_located",
+                    "retracted_pending_correction",
+                    "subject_scope_omitted",
+                }
+            ]
+
+        while pending_conditions:
+            condition = pending_conditions.pop(0)
+            chosen = list(usable_claims(condition))
+            while chosen and measure(chosen, [condition])[0] > limit:
+                chosen.pop()
+            if not chosen:
                 gaps.append(f"major_condition_not_verified:{condition.condition_id}")
                 sent_conditions.add(condition.condition_id)
-            if not bucket:
                 continue
-            if not send(related, bucket, support=False):
+            batch = [condition]
+            later = []
+            for other in pending_conditions:
+                extra = [claim for claim in usable_claims(other) if claim not in chosen]
+                if not extra and not claims_covering_condition(other, chosen):
+                    later.append(other)
+                    continue
+                trial = [*chosen, *extra]
+                if measure(trial, batch + [other])[0] <= limit:
+                    chosen = trial
+                    batch.append(other)
+                else:
+                    later.append(other)
+            pending_conditions = later
+            if not send(chosen, batch, support=False):
                 if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
                     return
-                for condition in bucket:
-                    if condition.condition_id not in sent_conditions:
-                        gaps.append(
-                            f"major_condition_not_verified:{condition.condition_id}"
-                        )
-                        sent_conditions.add(condition.condition_id)
+                if len(batch) > 1 and any(
+                    "payload_not_admitted" in gap for gap in gaps
+                ):
+                    payload_margin[0] += 4096
+                    pending_conditions = [*batch, *pending_conditions]
+                    continue
+                for item in batch:
+                    if item.condition_id not in sent_conditions:
+                        gaps.append(f"major_condition_not_verified:{item.condition_id}")
+                        sent_conditions.add(item.condition_id)
 
     def report_gap(page_ids) -> None:
         by_id = {int(page["page"]): page for page in sources}
@@ -2337,11 +2445,6 @@ def interpret_direct_core(
                             evidence.anchor.bounded_quote for evidence in condition.evidence
                         ),
                     )
-                    amount_already_answered = (
-                        len(quote_amounts) != 1 or quote_amounts[0] in answer_text
-                    )
-                    if condition.condition_id in cited_ids and amount_already_answered:
-                        continue
                     if (
                         condition.major
                         and condition.statement_status == "current"
@@ -2529,12 +2632,24 @@ def interpret_direct_core(
                     tail,
                 }:
                     latest = check
-            if latest is not None and latest.status in {"pass", "supplementary"}:
+            if latest is not None and latest.status in {
+                "pass",
+                "supplementary",
+                "unclear",
+                "block",
+            }:
                 continue
             referenced = [
                 claim
-                for claim in claims_covering_condition(condition, claims)
-                if claim.status == "observed"
+                for claim in recheck_claims_for(condition, claims)
+                if claim.limitation
+                not in {
+                    "pending_verification",
+                    "claim_or_dependency_not_verified",
+                    "evidence_not_located",
+                    "retracted_pending_correction",
+                    "subject_scope_omitted",
+                }
             ]
             if referenced:
                 recheck_conditions.append(condition)
@@ -2592,7 +2707,39 @@ def interpret_direct_core(
                         and check.status == "pass"
                     ):
                         question_passed = True
-            if evidence and not question_passed:
+            verified_revenue = [
+                claim
+                for claim in claims
+                if claim.dimension == "revenue_model"
+                and claim.status == "observed"
+                and claim.limitation
+                not in {
+                    "pending_verification",
+                    "claim_or_dependency_not_verified",
+                    "evidence_not_located",
+                    "retracted_pending_correction",
+                    "subject_scope_omitted",
+                }
+                and any(
+                    check.target_type == "claim"
+                    and check.target_id == claim.claim_id
+                    and check.status == "pass"
+                    for check in checks
+                )
+            ]
+            total_already_verified = question_passed or any(
+                "period-operating-revenue" in str(item)
+                for claim in verified_revenue
+                for item in (claim.condition_ids or ())
+            )
+            if existing_question is not None and not question_passed and verified_revenue:
+                recheck_conditions.append(existing_question)
+            elif (
+                evidence
+                and not question_passed
+                and existing_question is None
+                and not total_already_verified
+            ):
                 question = ReportSourceCondition(
                     condition_id="core-question:period-operating-revenue",
                     dimension="revenue_model",
@@ -2631,20 +2778,21 @@ def interpret_direct_core(
         ]
         grouped = [
             condition
-            for group in _business_groups(other_items)[:2]
+            for group in _business_groups(other_items)
             for condition in group
         ]
         conditions_to_draft = [*grouped, *question_items]
-        recheck_conditions.sort(
-            key=lambda condition: condition.dimension
-            not in {"input_exposure", "supply_chain_role", "upstream_downstream"}
-        )
-        recheck_conditions = recheck_conditions[:6]
         if recheck_conditions:
             recheck_claims = []
             for condition in recheck_conditions:
-                for claim in claims_covering_condition(condition, claims):
-                    if claim.status == "observed" and claim not in recheck_claims:
+                for claim in recheck_claims_for(condition, claims):
+                    if claim not in recheck_claims and claim.limitation not in {
+                        "pending_verification",
+                        "claim_or_dependency_not_verified",
+                        "evidence_not_located",
+                        "retracted_pending_correction",
+                        "subject_scope_omitted",
+                    }:
                         recheck_claims.append(claim)
             if recheck_claims:
                 settle_claims(recheck_claims, recheck_conditions)

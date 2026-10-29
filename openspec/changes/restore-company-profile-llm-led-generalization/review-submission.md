@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-29，[A审核§131](#131-a审核d8主要阻塞是答案与覆盖队列脱节)）：L0/L1补救4/4与原分数不改。造纸总额接受；两家主要缺口不再被维度隐藏，但相关已有答案仍被排除在覆盖核验队列外，未可靠收束。当前仅[D8-R§12.5](b3-s1-execution-card.md#125-d8-r先核已有答案的核心覆盖再补真缺项当前执行)在原余额内先核已有核心覆盖、只补真缺项，不增预算、不逐58条重写。S1仍0/12，S2/生产/归档未授权。
+当前状态（2026-10-29，[B交接§132](#132-b交接d8-r已有答案进入覆盖核验)）：L0/L1补救4/4与原分数不改。D8-R已把已有正文送入覆盖核验。造纸程序两标志为true，银行仍false，10条主要条件未收口。S1仍0/12，S2/生产/归档未授权。
 
 ## 1. 唯一实施指引
 
@@ -5706,3 +5706,23 @@ A独立核三份query原字节SHA-256及`profiles == export.profiles`：造纸D8
 定向命令：`bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest tests/unit/test_research/test_company_profile_direct_progress.py -q -k 'operating_revenue_is_taken_from_the_statement_page_not_the_old_quote or same_dimension_does_not_hide_another_unanswered_business or a_later_block_replaces_an_older_pass'`，**3 passed/56 deselected/12 warnings，3.09秒**。接受错引页总额可发送、另一主业不被隐藏和后置block保真；这些测试不覆盖上述真实磁盘队列失败，不等于公司验收。OpenSpec目标change严格校验及`git diff --check`通过。A本轮无真实模型调用、无应用代码改动，Review交B处理上述一个阻塞类；架构/风格及无关旧问题后置。
 
 D8三运行根约8.9/9.4/28MB，仍有本家解析/检查点接续用途；B未说明本轮清理，A没有证明依赖解除，未删除。下一卡先核归属/占用/持久hash清无用重复物及日志，交接收尾，不盲删正式源、失败原件、未知或并行内容。A本轮只读分析、定向测试，未产生运行库/临时脚本；测试产物由统一QuoteBak环境管理。保护开始时13份已跟踪/9项未跟踪改动，验收计划历史details既有修改不纳本人提交。A活跃工时因跨上下文未完整计量记未知；本轮新发现一个阻塞类、两处直接实现原因，计数不冒充业务进展。
+
+## 132. B交接D8-R：已有答案进入覆盖核验
+
+日期：2026-10-29。按§12.5执行。已有可靠主张进入覆盖核验，不再因“已经引用”被排除，也不再以首批2组或6条结束公司。造纸总额没有重写。银行没有逐条新写58项。托管句未恢复。S1仍为0/12，本交接不自评可用公司。
+
+### 132.1 造纸
+
+`s1-600103-d8r`：1次物理、账本8727、费用unknown、恢复0、监督97.140436秒，DeepSeek。一次核验同时带上`claim_principal_business_001`、`claim_products_services_001`与`industry_segments_001`、`product_portfolio_001`。模型判定两条主业收入成本已覆盖，未写毛利率记为补充，不否定已有正文。`claim-revenue-total`仍是已核的2,418,990,221.17元；旧`claim-revenue-total-2025`仍unclear。程序`draft_complete`、`semantic_complete`、`real_semantic_complete`均为true，当前缺口为空。这是程序终态，不是S1可用计数。query/export/新实例SHA-256 `0cd892096c15f466dca37f5a768cf762fc2fb82b935d577e7e1433f5c0a07c59`。
+
+### 132.2 银行
+
+`s1-600000-d8b`：5次成功物理、账本116070、费用unknown、恢复0、监督559.973537秒。4次DeepSeek、1次Grok，attempt均为1。41个条件进入核验，38条pass、3条unclear。存款条件与`claim_input_exposure`同包通过，正文仍是55,824.35亿元和付息率下降38bps。`claim-sc-011`没有进入核验请求。另有一批因网关载荷60007字节、超过60000被拒绝，`denied_request.reason=payload_not_admitted`，未计成功物理。该批条件没有新检查。两个完成标志false。query/export/新实例SHA-256 `df30d3fc0d94028e20a04f6874cf54a1f4369a911e137e996d1cad0765843130`。
+
+返修`s1-600000-d8r`：2次物理、账本48282、费用unknown、恢复0、监督385.189240秒，均DeepSeek。补上被拒批次中有现成主张的条件。集团收入、贸易融资、公司客户、利息收入和手续费等得到对应主张的pass。`sc-001`、`sc-012`、两处`sc-003`再次unclear：现成主张没有覆盖条件里的引导投向、结算或贸易融资分句。历史unclear没有随草稿加载，所以这三条被再送了一次；结果仍是unclear，没有改写成新句。`claim-sc-011`仍隔离。另有`output_loan_exposure_manufacturing_and_five_tracks`、`C002`、`C017`、`manufacturing_credit_exposure`、`parent_corporate_loan_balance`本窗没有新检查。两个完成标志仍false。当前主要未覆盖10条。query/export/新实例SHA-256 `7a94d44b63c67d65b17eb341506fda06e90184b4c7f99b200a41bb308b4a75ee`。
+
+### 132.3 资源与边界
+
+本卡三个入口：造纸1、银行1、银行返修1。合计8次成功物理、173079账本、0恢复、监督1042.303213秒，费用unknown。共享上限230582账本/18物理/12恢复/6388.583473秒，用后约剩57503账本/10物理/12恢复/5346秒。没有购买额度，没有改共享池或`config/13_llm.json`。没有第三家，也没有第四个入口。
+
+定向测试：`test_cited_conditions_without_a_coverage_pass_are_still_verified`、`test_saved_answers_are_sent_to_coverage_on_the_real_continuation`、同维度不隐藏、存款主张不错配。磁盘测试用D8b/D8持久JSON和真实解析缓存，替换传输。清理只删除本轮临时对照脚本；D8与本卡运行根保留作接续缓存。既有工作区改动未纳入。S2、生产和归档未授权。

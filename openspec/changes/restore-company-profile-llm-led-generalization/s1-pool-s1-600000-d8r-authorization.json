@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600000-d8r",
+  "binding_sha256": "cd8c4cb484dfe32689a9e78f990029daf14d2e78cf546f9494851d7825ee65db",
+  "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+  "approval_reference": "acceptance section 7.59 and b3-d8-r card section 12.5 repair, 2026-10-29",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "D8-R银行载荷返修"
+}

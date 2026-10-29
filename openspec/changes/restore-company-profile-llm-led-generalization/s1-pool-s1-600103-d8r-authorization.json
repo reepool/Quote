@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600103-d8r",
+  "binding_sha256": "fb8e33f605ebcde6e621781741923d11e3806eecc08881f7ba1baac84feb388f",
+  "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+  "approval_reference": "acceptance section 7.59 and b3-d8-r card section 12.5, 2026-10-29",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "D8-R造纸覆盖核验"
+}
