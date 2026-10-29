@@ -1,8 +1,8 @@
 # 公司画像交付路径与开发任务卡
 
-> 类型：requirements / execution plan；版本：3；更新：2026-10-29。
+> 类型：requirements / execution plan；版本：3；更新：2026-10-30。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[章节核心整份交付§13](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#13-章节核心整份交付与常规资源验证当前执行)，依据验收§7.62/A审核§137。D9b两句新增及五句撤回接受，银行仍限用；旧接续结束、余额不用。新方案固定同两份正式PDF重新章节处理，少数跨章核心摘要及合并核验，不载旧语义；按常规资源观察并有界补救。其余十家/S2/生产仍未授权，原S1自动可用0/12不改。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[精简整链交付§14](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#14-精简章节读写核链并交付银行核心当前执行)，依据验收§7.63/A审核§139。C1两家观察2/2、已核正文0，停止预留补丁安排；只将银行未用唯一后继改绑综合纠偏后的冻结版，不增次数/预算、不重跑造纸。按业务问题选小节、紧凑独立源证据、少数成稿及合并核验，不加载旧语义。其余十家/S2/生产未授权，原S1自动可用0/12不改。
 
 ## 1. 开发者必须先理解的纠偏
 
@@ -10,7 +10,7 @@
 
 现有公告、PDF/布局缓存、Evidence、事实模型、队列、公共LLM网关和查询/导出继续使用。修正`provider=None`可成功冒充语义完成、同field短路、正则决定全文可见性/正文完整性的路径。不要新建agent平台、网关、审计系统或并行writer。
 
-产品不变量：正式源、真实LLM、独立源查漏/核验及原owner三视图。常规路径本地全页索引→关键章节无候选读源→跨章核心草稿及时可见→核验及必要定向扩读；不以全文完读为前置，不以未选中证明不存在。核心质量和吞吐同时验证；待核不是可靠结论，已知错误隔离。实际服务限额通过拆包/换源处理，不丢主要条件或清空草稿。当前按验收§7.62检验从正式PDF到完整核心的常规路径：模型按业务归纳主要板块/变现/收入/投入/角色，不把源条件按维度轮流取六条当作业务分组，不逐源片反复写核。复用解析，不加载旧语义；旧限用稿和有效研发成果保留，历史消耗不清。第25次复用及§7.37无限调通只属已结束的歌华任务。
+产品不变量：正式源、真实LLM、独立源查漏/核验及原owner三视图。常规路径本地全页索引→关键章节无候选读源→跨章核心草稿及时可见→核验及必要定向扩读；不以全文完读为前置，不以未选中证明不存在。核心质量和吞吐同时验证；待核不是可靠结论，已知错误隔离。实际服务限额通过去重/必要拆包/换源处理，不丢主要条件或清空草稿。当前按验收§7.63纠正源条件输出及多阶段载荷膨胀、预留/实际发送错配和任务路由行为，以首个完整核心包实际读写核为最小业务验证；不是再改一个later常数。复用解析、不加载旧语义，不按维度轮取或逐条件扩写；旧限用稿/研发成果及消耗保留。第25次复用及§7.37无限调通只属已结束的歌华任务。
 
 ## 2. A/B分工、交接和审核顺序
 
