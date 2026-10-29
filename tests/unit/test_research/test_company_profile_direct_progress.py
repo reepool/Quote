@@ -5061,8 +5061,8 @@ def test_output_exposure_is_checked_and_unclear_is_not_repeated():
         processing_identity=identity,
         report=report,
     )
-    assert purposes[0] == "verify_views"
     assert "synthesize_views" in purposes
+    assert "verify_views" in purposes
     assert not any(gap.endswith("loan-output") for gap in result.gaps)
 
 
@@ -5314,6 +5314,283 @@ def test_saved_answers_are_sent_to_coverage_on_the_real_continuation():
         and gap.endswith("input_deposits_funding")
         for gap in bank.gaps
     )
+
+
+def test_cross_page_existing_answer_enters_coverage():
+    from research.company_profile.contracts import ReportSourceCondition
+    from research.company_profile.direct_reading import recheck_claims_for
+
+    report = _report()
+    condition = ReportSourceCondition(
+        condition_id="manufacturing_credit_exposure",
+        dimension="output_exposure",
+        description="重点聚焦集成电路、生物医药、人工智能、新能源汽车、高端装备、新材料。",
+        evidence=(
+            _evidence(
+                report,
+                text="重点聚焦集成电路、生物医药、人工智能、新能源汽车、高端装备、新材料。上海地区制造业贷款余额达568亿元。",
+                page=54,
+            ),
+        ),
+        major=True,
+        statement_status="current",
+    )
+    same_page = ReportViewClaim(
+        claim_id="claim_output_exposure_shanghai_financing",
+        dimension="output_exposure",
+        status="observed",
+        answer="报告期末上海地区制造业贷款余额达568亿元。",
+        condition_ids=("C017",),
+        evidence=condition.evidence,
+    )
+    other_page = ReportViewClaim(
+        claim_id="claim-manufacturing-loans",
+        dimension="products_services",
+        status="observed",
+        answer="公司聚焦集成电路、生物医药、人工智能、高端装备，加大对制造业特别是中长期制造业贷款的投入。",
+        condition_ids=("C005",),
+        evidence=(_evidence(report, text="集成电路、生物医药、人工智能、高端装备。", page=49),),
+    )
+    found = recheck_claims_for(condition, [same_page, other_page])
+    assert {item.claim_id for item in found} == {
+        "claim_output_exposure_shanghai_financing",
+        "claim-manufacturing-loans",
+    }
+
+
+def test_same_tail_ids_do_not_mix_two_businesses():
+    from research.company_profile.contracts import ReportSourceCondition
+    from research.company_profile.direct_reading import claims_covering_condition
+
+    report = _report()
+    transaction = ReportSourceCondition(
+        condition_id="bp-work-a:report:6:sc-003",
+        dimension="products_services",
+        description="交易银行场景服务。",
+        evidence=(_evidence(report, text="北斗司库、云资金监管。", page=63),),
+        major=True,
+        statement_status="current",
+    )
+    fund = ReportSourceCondition(
+        condition_id="bp-work-a:report:7:sc-003",
+        dimension="principal_business",
+        description="基金子公司。",
+        evidence=(_evidence(report, text="浦银安盛基金管理有限公司。", page=92),),
+        major=True,
+        statement_status="current",
+    )
+    transaction_claim = ReportViewClaim(
+        claim_id="claim-transaction",
+        dimension="products_services",
+        status="observed",
+        answer="公司提供北斗司库和云资金监管。",
+        condition_ids=("bp-work-a:report:6:sc-003",),
+        evidence=transaction.evidence,
+    )
+    fund_claim = ReportViewClaim(
+        claim_id="claim-fund",
+        dimension="principal_business",
+        status="observed",
+        answer="浦银安盛基金管理有限公司持有51%股份。",
+        condition_ids=("bp-work-a:report:7:sc-003",),
+        evidence=fund.evidence,
+    )
+    assert [item.claim_id for item in claims_covering_condition(transaction, [transaction_claim, fund_claim])] == [
+        "claim-transaction"
+    ]
+    assert [item.claim_id for item in claims_covering_condition(fund, [transaction_claim, fund_claim])] == [
+        "claim-fund"
+    ]
+
+
+def test_new_unclear_in_this_entry_is_drafted():
+    import json
+
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    text = "公司开展自营投资交易，并以浦银避险向客户提供代客避险服务。"
+    condition = ReportSourceCondition(
+        condition_id="financial-markets",
+        dimension="principal_business",
+        description="自营投资交易与代客避险。",
+        evidence=(_evidence(report, text=text, page=1).model_copy(update={"evidence_id": "markets"}),),
+        major=True,
+        statement_status="current",
+    )
+    old = ReportViewClaim(
+        claim_id="claim-old-markets",
+        dimension="revenue_model",
+        status="observed",
+        answer="公司开展自营投资交易，并以浦银避险向客户提供债券投资。",
+        condition_ids=("financial-markets",),
+        evidence=(_evidence(report, text="人民币债券投资。", page=2),),
+    )
+    purposes = []
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            purposes.append(request.purpose)
+            if request.purpose == "verify_views" and "synthesize_views" not in purposes:
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    checks=tuple(
+                        {
+                            "target_type": "condition",
+                            "target_id": item.condition_id,
+                            "status": "unclear",
+                            "explanation": "现有收入叙述没有写出代客避险。",
+                        }
+                        for item in request.source_conditions
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                target = request.source_conditions[0]
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="claim-markets",
+                            dimension="principal_business",
+                            status="observed",
+                            answer="公司开展自营投资交易，并以浦银避险向客户提供代客避险。",
+                            condition_ids=(target.condition_id,),
+                            evidence=target.evidence,
+                        ),
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    [
+                        {
+                            "target_type": "claim",
+                            "target_id": item.claim_id,
+                            "status": "pass",
+                            "explanation": "已核。",
+                        }
+                        for item in request.claims
+                    ]
+                    + [
+                        {
+                            "target_type": "condition",
+                            "target_id": item.condition_id,
+                            "status": "pass",
+                            "covers_target_type": "claim",
+                            "covers_target_id": request.claims[0].claim_id if request.claims else "",
+                            "explanation": "新正文覆盖。",
+                        }
+                        for item in request.source_conditions
+                    ]
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["request_reservation_limit"] = 65536
+    identity["accepted_source_receipts"] = [
+        {
+            "request_id": "saved-markets",
+            "purpose": "source_inventory",
+            "status": "success",
+            "source_scope": "full_context",
+            "source_pages": [1],
+            "physical_request": True,
+            "response_payload": ReportSemanticResponseV3(
+                request_id="saved-markets",
+                purpose="source_inventory",
+                source_conditions=(condition,),
+            ).model_dump(mode="json"),
+        }
+    ]
+    identity["accepted_prior_draft"] = {
+        "claims": [json.loads(old.model_dump_json())],
+        "checks": [
+            {"target_type": "claim", "target_id": "claim-old-markets", "status": "pass", "explanation": "已核。"}
+        ],
+    }
+    result = _run(
+        _Provider(),
+        pages=(
+            {"page": 1, "text": text, "readable": True},
+            {"page": 2, "text": "人民币债券投资。", "readable": True},
+        ),
+        processing_identity=identity,
+        report=report,
+    )
+    assert "synthesize_views" in purposes
+    assert "verify_views" in purposes
+    assert not any(gap.endswith("financial-markets") for gap in result.gaps)
+
+
+def test_page63_title_pile_does_not_label_transaction_banking_as_tech_finance():
+    from research.company_profile.report_interpretation import _bind_source_evidence
+
+    report = _report()
+    pages = (
+        {
+            "page": 62,
+            "text": "3.6 公司主要业务情况\n3.6.1 公司所处行业发展情况\n3.6.2 公司金融业务\n对公贷款保持增长。",
+            "readable": True,
+        },
+        {
+            "page": 63,
+            "text": (
+                "投资银行业务\n"
+                "交易银行业务\n"
+                "科技金融业务\n"
+                "浦赢并购：公司打造并购加组合融资。\n"
+                "报告期内，全行国内贸易融资总业务量突破2.8万亿元。\n"
+                "公司以客户为中心，构建G端（政府机关）、B端（企业法人）、C端（零售个人）场景圈链体系，持续完善北斗司库、云资金监管、浦掌柜等拳头产品。\n"
+                "报告期内，公司坚持将科技金融作为企业级战略。\n"
+            ),
+            "readable": True,
+        },
+    )
+    quote = "公司以客户为中心，构建G端（政府机关）、B端（企业法人）、C端（零售个人）场景圈链体系，持续完善北斗司库、云资金监管、浦掌柜等拳头产品。"
+    bound = _bind_source_evidence(_evidence(report, text=quote, page=63), report, pages)
+    assert bound is not None
+    assert "科技金融" not in (bound.section_title or "")
+    assert "公司金融" in (bound.section_title or "")
+
+
+def test_unlocated_major_still_blocks_core_closeout():
+    from research.company_profile.contracts import ReportSourceCondition
+    from research.company_profile.direct_reading import _completeness_gaps
+
+    report = _report()
+    condition = ReportSourceCondition(
+        condition_id="sc-010",
+        dimension="principal_business",
+        description="自营投资交易与浦银避险。",
+        evidence=(_evidence(report, text="原文没有的错引。", page=70),),
+        major=True,
+        statement_status="current",
+    )
+    claim = ReportViewClaim(
+        claim_id="other-revenue",
+        dimension="revenue_model",
+        status="observed",
+        answer="公司取得利息收入。",
+        evidence=(_evidence(report, text="公司取得利息收入。", page=1),),
+    )
+    gaps = _completeness_gaps(
+        [claim],
+        [condition],
+        [
+            ReportViewCheck(
+                target_type="claim",
+                target_id="other-revenue",
+                status="pass",
+                explanation="已核。",
+            )
+        ],
+    )
+    assert "major_condition_not_verified:sc-010" in gaps
 
 
 

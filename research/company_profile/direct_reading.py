@@ -174,59 +174,85 @@ def operating_revenue_statement_pages(sources) -> list[int]:
     return found[:1]
 
 
+def _condition_id_names(item: str, cid: str, *, tail_unique: bool) -> bool:
+    """Full source-request identity. A shared short tail is not enough."""
+    if item == cid:
+        return True
+    shorter, longer = (item, cid) if len(item) <= len(cid) else (cid, item)
+    if not longer.endswith(":" + shorter):
+        return False
+    tail = cid.split(":")[-1]
+    if shorter == tail:
+        return tail_unique
+    return True
+
+
 def claims_covering_condition(condition, candidates) -> list:
     """Claims whose saved condition ids actually name this condition.
 
     A same-dimension product claim is not a cover for a different question.
+    Two businesses that share only a short tail stay separate.
     """
     cid = str(condition.condition_id)
     tail = cid.split(":")[-1]
+    named_ids = []
+    for claim in candidates:
+        named_ids.extend(str(item) for item in (getattr(claim, "condition_ids", ()) or ()))
+    tail_hits = {
+        item
+        for item in named_ids
+        if item == tail or item.endswith(":" + tail)
+    }
+    tail_unique = len(tail_hits) == 1
     matched = []
     for claim in candidates:
         if getattr(claim, "status", None) not in {None, "observed"}:
             continue
         ids = [str(item) for item in (getattr(claim, "condition_ids", ()) or ())]
-        if any(
-            item == cid
-            or item == tail
-            or cid.endswith(":" + item)
-            or item.endswith(":" + tail)
-            for item in ids
-        ):
+        if any(_condition_id_names(item, cid, tail_unique=tail_unique) for item in ids):
             matched.append(claim)
     return matched
 
 
 def recheck_claims_for(condition, candidates) -> list:
-    """Claims that can be shown to a coverage check. A link is not itself a pass."""
+    """Claims that can be shown to a coverage check. A link is not itself a pass.
+
+    Page, quote window and amount only nominate candidates, including across
+    pages. They do not decide coverage.
+    """
     linked = [
         claim
         for claim in claims_covering_condition(condition, candidates)
         if getattr(claim, "status", None) == "observed"
     ]
-    if linked:
-        return linked
-    pages = {int(item.page) for item in condition.evidence}
     left = "".join(
         "".join(str(item.anchor.bounded_quote or "").split())
         for item in condition.evidence
     )
     amounts = re.findall(r"\d{1,3}(?:,\d{3})+(?:\.\d+)?", left)
+    description = "".join(str(getattr(condition, "description", "") or "").split())
 
-    def answers_this(claim) -> bool:
+    def related(claim) -> bool:
         if getattr(claim, "status", None) != "observed":
             return False
-        if not pages & {int(item.page) for item in claim.evidence}:
+        if claim in linked:
             return False
         right = "".join(str(claim.answer or "").split())
         if any(amount in right for amount in amounts):
             return True
-        return len(left) >= 16 and any(
-            left[index : index + 16] in right for index in range(0, len(left) - 15)
+        if len(left) < 16 and len(description) < 16:
+            return False
+        source = left if len(left) >= 16 else description
+        return any(
+            source[index : index + 16] in right
+            for index in range(0, len(source) - 15)
+            if "报告期内" not in source[index : index + 16]
+            and "同比增长" not in source[index : index + 16]
+            and "较上年末" not in source[index : index + 16]
         )
 
-    found = [claim for claim in candidates if answers_this(claim)]
-    return found
+    found = [claim for claim in candidates if related(claim)]
+    return [*linked, *found]
 
 
 def compatible_evidence_targets(claims, conditions) -> list:
@@ -2099,6 +2125,23 @@ def interpret_direct_core(
             deliver_group(group)
 
     drafted_condition_ids: set[str] = set()
+    pending_coverage: list[tuple[ReportSourceCondition, list]] = []
+
+    def consume_coverage(drafted, draft_conditions) -> None:
+        """Attach leftover coverage checks to this verify. Page hints are not a pass."""
+        extra_claims = []
+        extra_conds = []
+        seen_ids = {claim.claim_id for claim in drafted}
+        while pending_coverage:
+            condition, chosen = pending_coverage.pop(0)
+            extra_conds.append(condition)
+            for claim in chosen:
+                if claim.claim_id in seen_ids:
+                    continue
+                extra_claims.append(claim)
+                seen_ids.add(claim.claim_id)
+        settle_claims([*drafted, *extra_claims], [*draft_conditions, *extra_conds])
+        publish()
 
     def deliver_group(group: list[ReportSourceCondition]) -> None:
         """Save one business group, verify it, and publish before the next group."""
@@ -2246,9 +2289,8 @@ def interpret_direct_core(
                 if failed
                 else condition.model_copy(update={"evidence": tuple(bound_evidence)})
             )
-        if drafted_group:
-            settle_claims(drafted_group, located_conditions)
-            publish()
+        if drafted_group or pending_coverage:
+            consume_coverage(drafted_group, located_conditions)
         returned_ids = {
             str(item)
             for claim in drafted.claims
@@ -2259,8 +2301,16 @@ def interpret_direct_core(
             for condition in located_conditions
             if condition.condition_id not in returned_ids
             and not any(
-                condition.condition_id.endswith(":" + item)
-                or item.endswith(":" + condition.condition_id.split(":")[-1])
+                _condition_id_names(
+                    item,
+                    condition.condition_id,
+                    tail_unique=sum(
+                        1
+                        for other in returned_ids
+                        if other.split(":")[-1] == condition.condition_id.split(":")[-1]
+                    )
+                    == 1,
+                )
                 for item in returned_ids
             )
         ]
@@ -2318,10 +2368,16 @@ def interpret_direct_core(
             response = ReportSemanticResponseV3.model_validate_json(
                 json.dumps(payload, ensure_ascii=False)
             )
+            sent = {int(page) for page in item.get("source_pages") or []}
+            locate_pages = [
+                page
+                for page in sources
+                if not sent or int(page["page"]) in sent
+            ] or list(sources)
             accepted, location_gaps = _located_conditions(
                 response.source_conditions,
                 report,
-                sources,
+                locate_pages,
                 request_id=str(item.get("request_id") or work_id),
                 seen=seen,
             )
@@ -2365,6 +2421,8 @@ def interpret_direct_core(
                                 "只根据这些引文重写。一般税收、收费或价格政策不是公司实际收取的费用。"
                                 "为对方销售不是向对方销售。期末应付款或应收款余额不是本期采购或本期费用。"
                                 "分开表述的金额不要相加。"
+                                "同页连续标题不能当作后面每一段的业务名；无法区分时保留上层已写明的业务语境，不要猜最近标题。"
+                                "只写核心服务或角色，不要把增长率、品牌口号或地区名次写成新的主业。"
                             ),
                             evidence=claim.evidence,
                             major=True,
@@ -2670,9 +2728,21 @@ def interpret_direct_core(
                     for target in targets
                     if target.get("target_type") == "condition"
                 ]
-                if condition.condition_id not in cond_ids and not any(
-                    item_id.split(":")[-1] == tail for item_id in cond_ids
-                ):
+                named = any(
+                    item_id == condition.condition_id
+                    or _condition_id_names(
+                        item_id,
+                        condition.condition_id,
+                        tail_unique=sum(
+                            1
+                            for other in cond_ids
+                            if other.split(":")[-1] == tail
+                        )
+                        == 1,
+                    )
+                    for item_id in cond_ids
+                )
+                if condition.condition_id not in cond_ids and not named:
                     continue
                 shown = {
                     str(target.get("target_id"))
@@ -2889,15 +2959,7 @@ def interpret_direct_core(
             for condition in group
         ]
         conditions_to_draft = [*grouped, *question_items]
-        if recheck_pairs:
-            grouped_pairs: dict[tuple[str, ...], list] = {}
-            grouped_claims: dict[tuple[str, ...], list] = {}
-            for condition, chosen in recheck_pairs:
-                key = tuple(claim.claim_id for claim in chosen)
-                grouped_pairs.setdefault(key, []).append(condition)
-                grouped_claims[key] = chosen
-            for key, paired in grouped_pairs.items():
-                settle_claims(grouped_claims[key], paired)
+        pending_coverage.extend(recheck_pairs)
         if identity.get("read_remaining_sources"):
             conditions_to_draft = [
                 condition
@@ -2908,6 +2970,68 @@ def interpret_direct_core(
                 and condition.dimension in _CORE_CLOSEOUT_DIMENSIONS
             ]
         draft_reused_sources()
+        if pending_coverage:
+            leftover = list(pending_coverage)
+            pending_coverage.clear()
+            grouped_pairs: dict[tuple[str, ...], list] = {}
+            grouped_claims: dict[tuple[str, ...], list] = {}
+            for condition, chosen in leftover:
+                key = tuple(claim.claim_id for claim in chosen)
+                grouped_pairs.setdefault(key, []).append(condition)
+                grouped_claims[key] = chosen
+            for key, paired in grouped_pairs.items():
+                settle_claims(grouped_claims[key], paired)
+                publish()
+        this_entry_unclear = set()
+        for item in receipts:
+            if not item.get("physical_request") or item.get("purpose") != "verify_views":
+                continue
+            for raw_check in (item.get("response_payload") or {}).get("checks") or []:
+                if (
+                    raw_check.get("target_type") == "condition"
+                    and raw_check.get("status") in {"unclear", "block"}
+                ):
+                    this_entry_unclear.add(str(raw_check.get("target_id") or ""))
+        more = []
+        for condition in list(conditions):
+            if condition.condition_id in drafted_condition_ids:
+                continue
+            if condition.dimension not in _CORE_CLOSEOUT_DIMENSIONS:
+                continue
+            if condition.condition_id not in this_entry_unclear and not any(
+                _condition_id_names(
+                    item,
+                    condition.condition_id,
+                    tail_unique=sum(
+                        1
+                        for other in this_entry_unclear
+                        if other.split(":")[-1] == condition.condition_id.split(":")[-1]
+                    )
+                    == 1,
+                )
+                for item in this_entry_unclear
+            ):
+                continue
+            latest = None
+            for check in checks:
+                if check.target_type == "condition" and (
+                    check.target_id == condition.condition_id
+                    or _condition_id_names(
+                        check.target_id, condition.condition_id, tail_unique=True
+                    )
+                ):
+                    latest = check
+            if latest is None or latest.status not in {"unclear", "block"}:
+                continue
+            referenced = trusted_for(condition)
+            if any(
+                claim.claim_id not in shown_claim_ids(condition) for claim in referenced
+            ):
+                continue
+            more.append(gap_copy(condition, referenced))
+        if more:
+            conditions_to_draft = more
+            draft_reused_sources()
         if prior:
             fresh_ids = {item.claim_id for item in claims}
             still_pending = [

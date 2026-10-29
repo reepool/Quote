@@ -7,6 +7,7 @@ contexts. All semantic decisions come from those contexts, not phrase gates.
 from __future__ import annotations
 
 import json
+import re
 import time
 from collections.abc import Mapping, Sequence
 from pathlib import Path
@@ -533,6 +534,15 @@ def _is_heading_line(line: str) -> bool:
     )
 
 
+def _is_numbered_heading(line: str) -> bool:
+    """Outline numbers mark a real section. A piled sibling name does not."""
+    stripped = str(line or "").strip()
+    return bool(
+        re.match(r"^\d+(?:\.\d+)*\s", stripped)
+        or re.match(r"^[一二三四五六七八九十]+、", stripped)
+    )
+
+
 def _bounded_governing_context(
     text: str, paragraph_start: int, paragraph_end: int, start: int, end: int
 ) -> str:
@@ -593,15 +603,21 @@ def _heading_and_paragraph(text: str, start: int, end: int) -> tuple[str, str]:
             text, paragraph_start, paragraph_end, start, end
         )
     heading = ""
+    pile: list[str] = []
     for span in reversed(lines[:para_start]):
         stripped = _line_text(text, span)
         if not stripped:
-            if heading:
-                break
-            continue
+            if pile:
+                continue
+            break
         if _is_heading_line(stripped):
-            heading = stripped
+            pile.append(stripped)
+            continue
         break
+    if len(pile) == 1:
+        heading = pile[0]
+    elif pile and all(_is_numbered_heading(item) for item in pile):
+        heading = pile[0]
     return heading, paragraph
 
 
@@ -627,6 +643,15 @@ def governing_subject_heading(
 ) -> str:
     """Nearest real heading before the quote. A later heading does not govern it."""
     found = ""
+    pile: list[str] = []
+    heading_before_pile = ""
+
+    def close_pile() -> None:
+        nonlocal found, pile, heading_before_pile
+        if len(pile) > 1 and not all(_is_numbered_heading(item) for item in pile):
+            found = heading_before_pile
+        pile = []
+
     for page in sorted(
         (
             item
@@ -641,11 +666,19 @@ def governing_subject_heading(
             start = cursor
             cursor += len(raw)
             if int(page["page"]) == int(page_number) and before_offset is not None and start >= int(before_offset):
-                break
+                close_pile()
+                return found
             stripped = " ".join(raw.split())
-            if not _is_heading_line(stripped) or _is_page_header(stripped, pages):
+            if not stripped or _is_page_header(stripped, pages):
                 continue
-            found = stripped
+            if _is_heading_line(stripped):
+                if not pile:
+                    heading_before_pile = found
+                pile.append(stripped)
+                found = stripped
+                continue
+            close_pile()
+    close_pile()
     return found
 
 
@@ -690,11 +723,29 @@ def _bind_source_evidence(
         return None
     model_quote = evidence.anchor.model_quote or evidence.anchor.bounded_quote
     located = locate_source_quote(model_quote, pages, page_number=evidence.page)
+    page_no = int(evidence.page)
     if located is None:
-        return None
-    source, offset, heading, paragraph = located
+        relocated: list[tuple[int, str, int, str, str]] = []
+        for fragment in pages:
+            if fragment.get("readable", True) is False:
+                continue
+            text = str(fragment.get("text") or "")
+            spans = _spans_in_text(model_quote, text)
+            if len(spans) != 1:
+                continue
+            start, end = spans[0]
+            heading, paragraph = _heading_and_paragraph(text, start, end)
+            base = int(fragment.get("offset") or 0)
+            relocated.append(
+                (int(fragment["page"]), text[start:end], base + start, heading, paragraph)
+            )
+        if len(relocated) != 1:
+            return None
+        page_no, source, offset, heading, paragraph = relocated[0]
+    else:
+        source, offset, heading, paragraph = located
     if not heading or _is_page_header(heading, pages):
-        earlier = governing_subject_heading(pages, evidence.page, before_offset=offset)
+        earlier = governing_subject_heading(pages, page_no, before_offset=offset)
         if earlier:
             heading = earlier
     anchor = evidence.anchor.model_copy(
@@ -708,6 +759,7 @@ def _bind_source_evidence(
     return evidence.model_copy(
         update={
             "anchor": anchor,
+            "page": page_no,
             "section_title": heading or evidence.section_title,
         }
     )
