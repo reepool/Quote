@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600103-c1",
+  "binding_sha256": "6971905cffaf8f5cbb39597a9bc3d6308d54ae32fb8bdf26b7c64377b395b58f",
+  "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+  "approval_reference": "acceptance section 7.62 and b3 card section 13, 2026-10-29",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "§13造纸章节核心整份新处理"
+}

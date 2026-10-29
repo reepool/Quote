@@ -1,0 +1,5322 @@
+{
+  "action": "export",
+  "state": "completed",
+  "task": {
+    "task_name": "company_profile_common_core",
+    "actions": [
+      "preview",
+      "run",
+      "status",
+      "pause",
+      "resume",
+      "query",
+      "export"
+    ],
+    "parameters": {
+      "action": [
+        "preview",
+        "run",
+        "status",
+        "pause",
+        "resume",
+        "query",
+        "export"
+      ],
+      "knowledge_cutoff": null,
+      "instrument_ids": [],
+      "max_items": 2,
+      "token_budget": 50000,
+      "max_elapsed_seconds": 300.0,
+      "reason": "operator_request",
+      "output_directory": null
+    },
+    "storage_namespace": "company_profile_common_core.v1",
+    "writer": "company_profile_research_writer.v1",
+    "production_authorization": "not_authorized",
+    "legacy_task_names_not_connected": [
+      "business_profile_daily_incremental",
+      "business_profile_backfill",
+      "business_profile_backfill_control",
+      "business_profile_semantic_repair",
+      "company_profile_shadow_sync"
+    ],
+    "stage5_connected": true
+  },
+  "control": {
+    "schema_version": "company_profile_task_control.v1",
+    "state": "completed",
+    "run_id": "company_profile_common_core-219eff1f30c8",
+    "action": "run",
+    "started_at": "2026-10-29T20:53:04.158483+08:00",
+    "updated_at": "2026-10-29T20:54:01.738100+08:00",
+    "finished_at": "2026-10-29T20:54:01.738100+08:00",
+    "stop_requested": false,
+    "reason": null,
+    "parameters": {
+      "knowledge_cutoff": "2026-09-17",
+      "instrument_ids": [
+        "600103.SH"
+      ],
+      "max_items": 1,
+      "token_budget": 120000,
+      "max_elapsed_seconds": 867.558351892978
+    },
+    "latest_result": {
+      "action": "run",
+      "state": "completed",
+      "task": {
+        "task_name": "company_profile_common_core",
+        "actions": [
+          "preview",
+          "run",
+          "status",
+          "pause",
+          "resume",
+          "query",
+          "export"
+        ],
+        "parameters": {
+          "action": [
+            "preview",
+            "run",
+            "status",
+            "pause",
+            "resume",
+            "query",
+            "export"
+          ],
+          "knowledge_cutoff": null,
+          "instrument_ids": [],
+          "max_items": 2,
+          "token_budget": 50000,
+          "max_elapsed_seconds": 300.0,
+          "reason": "operator_request",
+          "output_directory": null
+        },
+        "storage_namespace": "company_profile_common_core.v1",
+        "writer": "company_profile_research_writer.v1",
+        "production_authorization": "not_authorized",
+        "legacy_task_names_not_connected": [
+          "business_profile_daily_incremental",
+          "business_profile_backfill",
+          "business_profile_backfill_control",
+          "business_profile_semantic_repair",
+          "company_profile_shadow_sync"
+        ],
+        "stage5_connected": true
+      },
+      "control": {
+        "schema_version": "company_profile_task_control.v1",
+        "state": "running",
+        "run_id": "company_profile_common_core-219eff1f30c8",
+        "action": "run",
+        "started_at": "2026-10-29T20:53:04.158483+08:00",
+        "updated_at": "2026-10-29T20:53:04.158483+08:00",
+        "finished_at": null,
+        "stop_requested": false,
+        "reason": null,
+        "parameters": {
+          "knowledge_cutoff": "2026-09-17",
+          "instrument_ids": [
+            "600103.SH"
+          ],
+          "max_items": 1,
+          "token_budget": 120000,
+          "max_elapsed_seconds": 867.558351892978
+        },
+        "latest_result": null
+      },
+      "queue": {
+        "as_of": "2026-10-29T20:54:00.062320+08:00",
+        "total": 1,
+        "running": 0,
+        "claimable": 0,
+        "terminal": 0,
+        "completed": 1,
+        "machine_rework": 0,
+        "finalized": 1,
+        "groups": [
+          {
+            "stage": "publish",
+            "status": "completed",
+            "row_count": 1,
+            "oldest_created_at": "2026-10-29T20:53:04.826189+08:00",
+            "oldest_age_seconds": 56.004695
+          }
+        ]
+      },
+      "production_authorization": "not_authorized",
+      "storage_namespace": "company_profile_common_core.v1",
+      "writer": "company_profile_research_writer.v1",
+      "knowledge_cutoff": "2026-09-17",
+      "enqueue": {
+        "eligible": 1,
+        "inserted": 1,
+        "reused": 0,
+        "reset": 0,
+        "checkpoint_rotated": 0,
+        "checkpoint_deleted": 0,
+        "checkpoint_delete_failures": [],
+        "superseded": 0,
+        "identity_superseded": 0,
+        "work_ids": [
+          "bp-work-460748705d215556388c5f08"
+        ]
+      },
+      "drain": {
+        "acquire": {
+          "status": "success",
+          "stop_requested": false,
+          "claimed": 1,
+          "completed": 1,
+          "finalized": 0,
+          "retried": 0,
+          "terminal_failures": 0,
+          "lease_conflicts": 0,
+          "configuration_blocked": 0,
+          "machine_rework_deferred": 0,
+          "artifact_replay_deferred": 0,
+          "context_reselect_deferred": 0,
+          "claim_exclusions": 1,
+          "empty_polls": 0,
+          "queue_underfilled_slots": 0,
+          "peak_in_flight": 1,
+          "active_work_seconds": 10.745,
+          "errors": [],
+          "quality": {
+            "blocking_machine_rework": 0,
+            "selected_documents": 0,
+            "selected_pages": 0,
+            "outline_pages_scoped": 0,
+            "evidence_records": 0,
+            "record_count": 0,
+            "verified_records": 0,
+            "empty_output_documents": 0,
+            "expected_non_disclosure_documents": 0,
+            "structured_fallback_required": 0,
+            "structured_fallback_calls": 0,
+            "structured_fallback_accepted_records": 0,
+            "structured_fallback_rejected": 0,
+            "page_artifact_cache_hits": 0,
+            "page_artifact_cache_misses": 0,
+            "pdf_parser_warning_count": 0,
+            "outline_sources": {},
+            "outline_confidences": {},
+            "empty_output_reasons": {},
+            "blocked_configuration_reasons": {},
+            "machine_rework_reasons": {}
+          },
+          "execution_mode": null,
+          "elapsed_seconds": 12.069,
+          "writer": {
+            "pending_writers": 0,
+            "active_writers": 0,
+            "max_pending_writers": 1,
+            "max_active_writers": 1,
+            "write_transactions": 3,
+            "wait_seconds": 0.096533,
+            "write_seconds": 0.525419,
+            "observation_seconds": 14.300365,
+            "transaction_p50_seconds": 0.161025,
+            "transaction_p95_seconds": 0.246747,
+            "transaction_max_seconds": 0.256272,
+            "writer_lock_duty": 0.036742,
+            "inter_write_idle_seconds": 10.363399,
+            "inter_write_seconds": 0.01
+          },
+          "gateway_admission": {
+            "requested_concurrency": 1,
+            "effective_concurrency": 1,
+            "admitted_requests": 1,
+            "throttled_requests": 0,
+            "queue_underfilled_slots": 0,
+            "provider_congestion_events": 0,
+            "provider_congestion_failures": 0,
+            "in_flight": 0,
+            "peak_in_flight": 1
+          }
+        },
+        "parse": {
+          "status": "success",
+          "stop_requested": false,
+          "claimed": 1,
+          "completed": 1,
+          "finalized": 0,
+          "retried": 0,
+          "terminal_failures": 0,
+          "lease_conflicts": 0,
+          "configuration_blocked": 0,
+          "machine_rework_deferred": 0,
+          "artifact_replay_deferred": 0,
+          "context_reselect_deferred": 0,
+          "claim_exclusions": 1,
+          "empty_polls": 0,
+          "queue_underfilled_slots": 0,
+          "peak_in_flight": 1,
+          "active_work_seconds": 1.89,
+          "errors": [],
+          "quality": {
+            "blocking_machine_rework": 0,
+            "selected_documents": 0,
+            "selected_pages": 0,
+            "outline_pages_scoped": 0,
+            "evidence_records": 0,
+            "record_count": 0,
+            "verified_records": 0,
+            "empty_output_documents": 0,
+            "expected_non_disclosure_documents": 0,
+            "structured_fallback_required": 0,
+            "structured_fallback_calls": 0,
+            "structured_fallback_accepted_records": 0,
+            "structured_fallback_rejected": 0,
+            "page_artifact_cache_hits": 0,
+            "page_artifact_cache_misses": 0,
+            "pdf_parser_warning_count": 0,
+            "outline_sources": {},
+            "outline_confidences": {},
+            "empty_output_reasons": {},
+            "blocked_configuration_reasons": {},
+            "machine_rework_reasons": {}
+          },
+          "execution_mode": null,
+          "elapsed_seconds": 3.387,
+          "writer": {
+            "pending_writers": 0,
+            "active_writers": 0,
+            "max_pending_writers": 1,
+            "max_active_writers": 1,
+            "write_transactions": 5,
+            "wait_seconds": 0.096562,
+            "write_seconds": 0.890236,
+            "observation_seconds": 17.774034,
+            "transaction_p50_seconds": 0.17836,
+            "transaction_p95_seconds": 0.242309,
+            "transaction_max_seconds": 0.256272,
+            "writer_lock_duty": 0.050086,
+            "inter_write_idle_seconds": 13.512348,
+            "inter_write_seconds": 0.01
+          },
+          "gateway_admission": {
+            "requested_concurrency": 1,
+            "effective_concurrency": 1,
+            "admitted_requests": 1,
+            "throttled_requests": 0,
+            "queue_underfilled_slots": 0,
+            "provider_congestion_events": 0,
+            "provider_congestion_failures": 0,
+            "in_flight": 0,
+            "peak_in_flight": 1
+          }
+        },
+        "semantic": {
+          "status": "success",
+          "stop_requested": false,
+          "claimed": 1,
+          "completed": 1,
+          "finalized": 0,
+          "retried": 0,
+          "terminal_failures": 0,
+          "lease_conflicts": 0,
+          "configuration_blocked": 0,
+          "machine_rework_deferred": 0,
+          "artifact_replay_deferred": 0,
+          "context_reselect_deferred": 0,
+          "claim_exclusions": 1,
+          "empty_polls": 0,
+          "queue_underfilled_slots": 0,
+          "peak_in_flight": 1,
+          "active_work_seconds": 31.665,
+          "errors": [],
+          "quality": {
+            "blocking_machine_rework": 0,
+            "selected_documents": 0,
+            "selected_pages": 0,
+            "outline_pages_scoped": 0,
+            "evidence_records": 0,
+            "record_count": 0,
+            "verified_records": 0,
+            "empty_output_documents": 0,
+            "expected_non_disclosure_documents": 0,
+            "structured_fallback_required": 0,
+            "structured_fallback_calls": 0,
+            "structured_fallback_accepted_records": 0,
+            "structured_fallback_rejected": 0,
+            "page_artifact_cache_hits": 0,
+            "page_artifact_cache_misses": 0,
+            "pdf_parser_warning_count": 0,
+            "outline_sources": {},
+            "outline_confidences": {},
+            "empty_output_reasons": {},
+            "blocked_configuration_reasons": {},
+            "machine_rework_reasons": {}
+          },
+          "execution_mode": null,
+          "elapsed_seconds": 33.199,
+          "writer": {
+            "pending_writers": 0,
+            "active_writers": 0,
+            "max_pending_writers": 1,
+            "max_active_writers": 1,
+            "write_transactions": 9,
+            "wait_seconds": 0.096603,
+            "write_seconds": 1.708209,
+            "observation_seconds": 51.027883,
+            "transaction_p50_seconds": 0.186456,
+            "transaction_p95_seconds": 0.248656,
+            "transaction_max_seconds": 0.256272,
+            "writer_lock_duty": 0.033476,
+            "inter_write_idle_seconds": 45.931234,
+            "inter_write_seconds": 0.01
+          },
+          "gateway_admission": {
+            "requested_concurrency": 1,
+            "effective_concurrency": 1,
+            "admitted_requests": 1,
+            "throttled_requests": 0,
+            "queue_underfilled_slots": 0,
+            "provider_congestion_events": 0,
+            "provider_congestion_failures": 0,
+            "in_flight": 0,
+            "peak_in_flight": 1
+          }
+        },
+        "verify": {
+          "status": "success",
+          "stop_requested": false,
+          "claimed": 1,
+          "completed": 1,
+          "finalized": 0,
+          "retried": 0,
+          "terminal_failures": 0,
+          "lease_conflicts": 0,
+          "configuration_blocked": 0,
+          "machine_rework_deferred": 0,
+          "artifact_replay_deferred": 0,
+          "context_reselect_deferred": 0,
+          "claim_exclusions": 1,
+          "empty_polls": 0,
+          "queue_underfilled_slots": 0,
+          "peak_in_flight": 1,
+          "active_work_seconds": 1.335,
+          "errors": [],
+          "quality": {
+            "blocking_machine_rework": 0,
+            "selected_documents": 0,
+            "selected_pages": 0,
+            "outline_pages_scoped": 0,
+            "evidence_records": 0,
+            "record_count": 0,
+            "verified_records": 0,
+            "empty_output_documents": 0,
+            "expected_non_disclosure_documents": 0,
+            "structured_fallback_required": 0,
+            "structured_fallback_calls": 0,
+            "structured_fallback_accepted_records": 0,
+            "structured_fallback_rejected": 0,
+            "page_artifact_cache_hits": 0,
+            "page_artifact_cache_misses": 0,
+            "pdf_parser_warning_count": 0,
+            "outline_sources": {},
+            "outline_confidences": {},
+            "empty_output_reasons": {},
+            "blocked_configuration_reasons": {},
+            "machine_rework_reasons": {}
+          },
+          "execution_mode": null,
+          "elapsed_seconds": 2.701,
+          "writer": {
+            "pending_writers": 0,
+            "active_writers": 0,
+            "max_pending_writers": 1,
+            "max_active_writers": 1,
+            "write_transactions": 11,
+            "wait_seconds": 0.096625,
+            "write_seconds": 2.057031,
+            "observation_seconds": 53.783017,
+            "transaction_p50_seconds": 0.17836,
+            "transaction_p95_seconds": 0.246752,
+            "transaction_max_seconds": 0.256272,
+            "writer_lock_duty": 0.038247,
+            "inter_write_idle_seconds": 48.329456,
+            "inter_write_seconds": 0.01
+          },
+          "gateway_admission": {
+            "requested_concurrency": 1,
+            "effective_concurrency": 1,
+            "admitted_requests": 1,
+            "throttled_requests": 0,
+            "queue_underfilled_slots": 0,
+            "provider_congestion_events": 0,
+            "provider_congestion_failures": 0,
+            "in_flight": 0,
+            "peak_in_flight": 1
+          }
+        },
+        "publish": {
+          "status": "success",
+          "stop_requested": false,
+          "claimed": 1,
+          "completed": 1,
+          "finalized": 0,
+          "retried": 0,
+          "terminal_failures": 0,
+          "lease_conflicts": 0,
+          "configuration_blocked": 0,
+          "machine_rework_deferred": 0,
+          "artifact_replay_deferred": 0,
+          "context_reselect_deferred": 0,
+          "claim_exclusions": 1,
+          "empty_polls": 0,
+          "queue_underfilled_slots": 0,
+          "peak_in_flight": 1,
+          "active_work_seconds": 1.319,
+          "errors": [],
+          "quality": {
+            "blocking_machine_rework": 0,
+            "selected_documents": 0,
+            "selected_pages": 0,
+            "outline_pages_scoped": 0,
+            "evidence_records": 0,
+            "record_count": 0,
+            "verified_records": 0,
+            "empty_output_documents": 0,
+            "expected_non_disclosure_documents": 0,
+            "structured_fallback_required": 0,
+            "structured_fallback_calls": 0,
+            "structured_fallback_accepted_records": 0,
+            "structured_fallback_rejected": 0,
+            "page_artifact_cache_hits": 0,
+            "page_artifact_cache_misses": 0,
+            "pdf_parser_warning_count": 0,
+            "outline_sources": {},
+            "outline_confidences": {},
+            "empty_output_reasons": {},
+            "blocked_configuration_reasons": {},
+            "machine_rework_reasons": {}
+          },
+          "execution_mode": null,
+          "elapsed_seconds": 2.734,
+          "writer": {
+            "pending_writers": 0,
+            "active_writers": 0,
+            "max_pending_writers": 1,
+            "max_active_writers": 1,
+            "write_transactions": 13,
+            "wait_seconds": 0.096649,
+            "write_seconds": 2.368867,
+            "observation_seconds": 56.589548,
+            "transaction_p50_seconds": 0.176706,
+            "transaction_p95_seconds": 0.244848,
+            "transaction_max_seconds": 0.256272,
+            "writer_lock_duty": 0.041861,
+            "inter_write_idle_seconds": 50.849114,
+            "inter_write_seconds": 0.01
+          },
+          "gateway_admission": {
+            "requested_concurrency": 1,
+            "effective_concurrency": 1,
+            "admitted_requests": 1,
+            "throttled_requests": 0,
+            "queue_underfilled_slots": 0,
+            "provider_congestion_events": 0,
+            "provider_congestion_failures": 0,
+            "in_flight": 0,
+            "peak_in_flight": 1
+          }
+        }
+      }
+    }
+  },
+  "queue": {
+    "as_of": "2026-10-29T20:54:02.539887+08:00",
+    "total": 1,
+    "running": 0,
+    "claimable": 0,
+    "terminal": 0,
+    "completed": 1,
+    "machine_rework": 0,
+    "finalized": 1,
+    "groups": [
+      {
+        "stage": "publish",
+        "status": "completed",
+        "row_count": 1,
+        "oldest_created_at": "2026-10-29T20:53:04.826189+08:00",
+        "oldest_age_seconds": 58.142351
+      }
+    ]
+  },
+  "production_authorization": "not_authorized",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "requested_instrument_ids": [
+    "600103.SH"
+  ],
+  "missing_instrument_ids": [],
+  "delivered": 1,
+  "profiles": [
+    {
+      "schema_version": "company_profile_common_core_profile.v2",
+      "production_authorization": "not_authorized",
+      "storage_namespace": "company_profile_common_core.v1",
+      "writer": "company_profile_research_writer.v1",
+      "work_id": "bp-work-460748705d215556388c5f08",
+      "instrument_id": "600103.SH",
+      "report": {
+        "instrument_id": "600103.SH",
+        "report_id": "ann_e26654bf6cc4bf44f45f6c342da566e4",
+        "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-13T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "freshness": {
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-13T16:00:00+00:00",
+        "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+        "knowledge_time": "2026-04-13T16:00:00+00:00"
+      },
+      "core_complete": false,
+      "dimensions": [
+        {
+          "dimension_id": "principal_business",
+          "answered": false,
+          "excerpt": null,
+          "supporting_record_ids": [],
+          "evidence_ids": [],
+          "anchor": null,
+          "missing_reason": "no_qualifying_source"
+        },
+        {
+          "dimension_id": "products_services",
+          "answered": false,
+          "excerpt": null,
+          "supporting_record_ids": [],
+          "evidence_ids": [],
+          "anchor": null,
+          "missing_reason": "no_qualifying_source"
+        },
+        {
+          "dimension_id": "revenue_model",
+          "answered": false,
+          "excerpt": null,
+          "supporting_record_ids": [],
+          "evidence_ids": [],
+          "anchor": null,
+          "missing_reason": "no_qualifying_source"
+        }
+      ],
+      "accepted_facts": [],
+      "gaps": [],
+      "evidence_gap_codes": [],
+      "commodity_exposure": {
+        "assessment": {
+          "schema_version": "company_profile_commodity_exposure.v1",
+          "production_authorization": "not_authorized",
+          "report": {
+            "instrument_id": "600103.SH",
+            "report_id": "ann_e26654bf6cc4bf44f45f6c342da566e4",
+            "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+            "report_period": "2025-12-31",
+            "published_at": "2026-04-13T16:00:00+00:00",
+            "document_type": "annual_report"
+          },
+          "assessment_status": "not_assessed",
+          "checked_evidence_ids": [],
+          "exposures": []
+        },
+        "reported_period": "2025-12-31",
+        "knowledge_time": "2026-04-13T16:00:00+00:00",
+        "consumer_authorization": {
+          "dcf": false,
+          "trading": false,
+          "price_sensitivity": false
+        }
+      },
+      "three_views": {
+        "schema_version": "company_profile_three_views.v2",
+        "views": {
+          "company_profile": {
+            "assessment_status": "extraction_failed",
+            "claims": [],
+            "checked_pages": [
+              {
+                "page": 1,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 2,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 3,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 4,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 5,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 6,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 7,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 8,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 9,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 10,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 11,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 12,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 13,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 14,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 15,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 16,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 17,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 18,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 19,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 20,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 21,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 22,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 23,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 24,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 25,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 26,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 27,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 28,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 29,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 30,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 31,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 32,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 33,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 34,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 35,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 36,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 37,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 38,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 39,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 40,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 41,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 42,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 43,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 44,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 45,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 46,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 47,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 48,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 49,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 50,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 51,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 52,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 53,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 54,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 55,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 56,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 57,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 58,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 59,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 60,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 61,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 62,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 63,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 64,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 65,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 66,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 67,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 68,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 69,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 70,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 71,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 72,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 73,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 74,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 75,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 76,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 77,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 78,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 79,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 80,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 81,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 82,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 83,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 84,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 85,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 86,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 87,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 88,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 89,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 90,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 91,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 92,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 93,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 94,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 95,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 96,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 97,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 98,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 99,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 100,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 101,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 102,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 103,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 104,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 105,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 106,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 107,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 108,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 109,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 110,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 111,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 112,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 113,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 114,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 115,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 116,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 117,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 118,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 119,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 120,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 121,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 122,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 123,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 124,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 125,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 126,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 127,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 128,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 129,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 130,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 131,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 132,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 133,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 134,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 135,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 136,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 137,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 138,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 139,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 140,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 141,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 142,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 143,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 144,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 145,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 146,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 147,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 148,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 149,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 150,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 151,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 152,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 153,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 154,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 155,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 156,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 157,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 158,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 159,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 160,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 161,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 162,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 163,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 164,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 165,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 166,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 167,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 168,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 169,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 170,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 171,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 172,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 173,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 174,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 175,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 176,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 177,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 178,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 179,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 180,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 181,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 182,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 183,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 184,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 185,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 186,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 187,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 188,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 189,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 190,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 191,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 192,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 193,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 194,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 195,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 196,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 197,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 198,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 199,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 200,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 201,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 202,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 203,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 204,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 205,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 206,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 207,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 208,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 209,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 210,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 211,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 212,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 213,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 214,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 215,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 216,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 217,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 218,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 219,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 220,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              }
+            ]
+          },
+          "product_exposure": {
+            "assessment_status": "extraction_failed",
+            "claims": [],
+            "checked_pages": [
+              {
+                "page": 1,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 2,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 3,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 4,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 5,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 6,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 7,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 8,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 9,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 10,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 11,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 12,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 13,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 14,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 15,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 16,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 17,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 18,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 19,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 20,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 21,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 22,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 23,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 24,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 25,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 26,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 27,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 28,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 29,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 30,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 31,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 32,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 33,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 34,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 35,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 36,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 37,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 38,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 39,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 40,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 41,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 42,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 43,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 44,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 45,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 46,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 47,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 48,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 49,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 50,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 51,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 52,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 53,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 54,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 55,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 56,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 57,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 58,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 59,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 60,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 61,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 62,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 63,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 64,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 65,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 66,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 67,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 68,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 69,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 70,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 71,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 72,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 73,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 74,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 75,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 76,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 77,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 78,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 79,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 80,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 81,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 82,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 83,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 84,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 85,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 86,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 87,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 88,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 89,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 90,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 91,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 92,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 93,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 94,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 95,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 96,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 97,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 98,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 99,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 100,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 101,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 102,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 103,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 104,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 105,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 106,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 107,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 108,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 109,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 110,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 111,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 112,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 113,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 114,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 115,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 116,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 117,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 118,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 119,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 120,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 121,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 122,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 123,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 124,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 125,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 126,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 127,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 128,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 129,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 130,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 131,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 132,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 133,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 134,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 135,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 136,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 137,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 138,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 139,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 140,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 141,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 142,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 143,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 144,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 145,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 146,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 147,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 148,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 149,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 150,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 151,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 152,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 153,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 154,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 155,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 156,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 157,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 158,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 159,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 160,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 161,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 162,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 163,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 164,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 165,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 166,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 167,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 168,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 169,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 170,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 171,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 172,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 173,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 174,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 175,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 176,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 177,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 178,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 179,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 180,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 181,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 182,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 183,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 184,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 185,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 186,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 187,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 188,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 189,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 190,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 191,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 192,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 193,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 194,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 195,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 196,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 197,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 198,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 199,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 200,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 201,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 202,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 203,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 204,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 205,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 206,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 207,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 208,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 209,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 210,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 211,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 212,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 213,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 214,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 215,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 216,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 217,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 218,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 219,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 220,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              }
+            ]
+          },
+          "supply_chain_position": {
+            "assessment_status": "extraction_failed",
+            "claims": [],
+            "checked_pages": [
+              {
+                "page": 1,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 2,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 3,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 4,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 5,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 6,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 7,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 8,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 9,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 10,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 11,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 12,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 13,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 14,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 15,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 16,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 17,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 18,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 19,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 20,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 21,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 22,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 23,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 24,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 25,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 26,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 27,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 28,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 29,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 30,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 31,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 32,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 33,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 34,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 35,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 36,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 37,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 38,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 39,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 40,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 41,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 42,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 43,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 44,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 45,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 46,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 47,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 48,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 49,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 50,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 51,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 52,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 53,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 54,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 55,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 56,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 57,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 58,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 59,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 60,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 61,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 62,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 63,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 64,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 65,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 66,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 67,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 68,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 69,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 70,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 71,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 72,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 73,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 74,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 75,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 76,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 77,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 78,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 79,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 80,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 81,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 82,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 83,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 84,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 85,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 86,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 87,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 88,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 89,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 90,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 91,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 92,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 93,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 94,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 95,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 96,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 97,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 98,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 99,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 100,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 101,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 102,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 103,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 104,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 105,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 106,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 107,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 108,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 109,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 110,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 111,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 112,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 113,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 114,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 115,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 116,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 117,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 118,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 119,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 120,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 121,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 122,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 123,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 124,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 125,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 126,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 127,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 128,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 129,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 130,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 131,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 132,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 133,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 134,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 135,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 136,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 137,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 138,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 139,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 140,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 141,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 142,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 143,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 144,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 145,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 146,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 147,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 148,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 149,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 150,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 151,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 152,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 153,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 154,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 155,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 156,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 157,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 158,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 159,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 160,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 161,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 162,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 163,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 164,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 165,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 166,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 167,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 168,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 169,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 170,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 171,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 172,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 173,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 174,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 175,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 176,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 177,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 178,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 179,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 180,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 181,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 182,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 183,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 184,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 185,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 186,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 187,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 188,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 189,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 190,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 191,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 192,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 193,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 194,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 195,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 196,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 197,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 198,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 199,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 200,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 201,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 202,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 203,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 204,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 205,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 206,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 207,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 208,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 209,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 210,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 211,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 212,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 213,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 214,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 215,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 216,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 217,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 218,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 219,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              },
+              {
+                "page": 220,
+                "status": "not_read",
+                "chunks": [],
+                "structure_indexed": true,
+                "map_checked": true
+              }
+            ]
+          }
+        },
+        "semantic_complete": false,
+        "draft_complete": false,
+        "real_semantic_complete": false,
+        "execution_mode": "provider",
+        "gaps": [
+          "direct_core_ledger_hold",
+          "direct_core_navigation_incomplete:direct_core_admission_stopped",
+          "chapter_selection_limited",
+          "chapter_selection_empty",
+          "view_not_substantive:company_profile",
+          "view_not_substantive:product_exposure",
+          "view_not_substantive:supply_chain_position",
+          "core_dimension_missing:principal_business",
+          "core_dimension_missing:products_services",
+          "core_dimension_missing:revenue_model",
+          "core_dimension_missing:operating_role"
+        ],
+        "call_receipts": [],
+        "record_dispositions": [],
+        "budget_ledger": {
+          "physical_requests": 0,
+          "charged_tokens": 0,
+          "charged_cost_cny": "0",
+          "cost_status": "priced",
+          "billing_mode": "development_unpriced",
+          "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+          "stopped_reason": null,
+          "denied_request": null,
+          "attempts": []
+        },
+        "classification": "limited"
+      }
+    }
+  ],
+  "stage4_restricted_views": [],
+  "legacy_export_used": false,
+  "profile_state": "found",
+  "restricted_delivered": 0,
+  "export_directory": "/home/python/Quote/data/QuoteBak/s1-600103-c1-20261029/export",
+  "files": [
+    "/home/python/Quote/data/QuoteBak/s1-600103-c1-20261029/export/600103.SH_2025-12-31.json",
+    "/home/python/Quote/data/QuoteBak/s1-600103-c1-20261029/export/profiles.csv",
+    "/home/python/Quote/data/QuoteBak/s1-600103-c1-20261029/export/export_manifest.json"
+  ]
+}

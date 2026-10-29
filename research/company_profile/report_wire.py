@@ -250,6 +250,9 @@ def instructions(request: ReportSemanticRequestV3) -> str:
                 "the supplied text itself supports. If the text states the period "
                 "operating revenue total, return that total as its own condition. "
                 "A product-line or principal-business subtotal does not replace it. "
+                "A regional ranking, strategy slogan, repeated amount, or ordinary note "
+                "is supplementary: do not list it as a major source_condition. "
+                "Keep every distinct current major business even when names are unfamiliar. "
             )
         else:
             scope = (
@@ -301,6 +304,10 @@ def instructions(request: ReportSemanticRequestV3) -> str:
                 "The supplied text is the source. Return a claim only when that text "
                 "supports it, with a {page,quote} copied from the supplied text. "
                 "Do not fill a dimension the text does not support. "
+                "Write one readable current-business summary for every distinct major "
+                "business, earning mechanism, input and operating role the supplied "
+                "conditions support. Do not drop a later chapter because an earlier "
+                "passage already has an answer. "
             )
         else:
             lead = (

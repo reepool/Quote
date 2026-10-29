@@ -2145,7 +2145,7 @@ def test_one_group_is_verified_before_the_next_group_is_drafted():
                             status="observed",
                             answer="公司经营整车制造，并向上游采购钢材。",
                             evidence=saved[0].evidence,
-                            condition_ids=ids,
+                            condition_ids=("principal-a", "role"),
                         ),
                     ),
                 )
@@ -2184,18 +2184,186 @@ def test_one_group_is_verified_before_the_next_group_is_drafted():
     purposes = [item[0] for item in provider.calls]
     synth = [index for index, purpose in enumerate(purposes) if purpose == "synthesize_views"]
     verified = [index for index, purpose in enumerate(purposes) if purpose == "verify_views"]
-    assert verified and synth and verified[0] < synth[1]
+    assert len(synth) == 1
+    assert verified and verified[0] > synth[0]
 
     def has(ids, name):
         return any(item == name or str(item).endswith(":" + name) for item in ids)
 
     first_ids = provider.calls[synth[0]][1]
     assert has(first_ids, "role") and has(first_ids, "principal-a")
-    assert not has(first_ids, "principal-b")
-    assert len(first_ids) > 1
+    assert has(first_ids, "principal-b") and has(first_ids, "revenue")
     kept = next(item for item in result.claims if item.claim_id == "core-group")
     assert kept.status == "observed"
-    assert any(gap.startswith("direct_core_package_stopped:") for gap in result.gaps)
+    assert any("major_condition_not_verified" in gap for gap in result.gaps)
+
+
+def test_chapter_select_refuses_saved_semantics():
+    import pytest
+
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    identity["accepted_source_receipts"] = (
+        {
+            "request_id": "old-source",
+            "source_pages": [1],
+            "response_payload": {
+                "request_id": "old-source",
+                "purpose": "source_inventory",
+                "source_conditions": [],
+            },
+        },
+    )
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            raise AssertionError("saved semantics must not reach the model")
+
+    with pytest.raises(ValueError, match="chapter_select_refuses_saved_semantics"):
+        _run(
+            _Provider(),
+            pages=({"page": 1, "text": "公司主营造纸。", "readable": True},),
+            processing_identity=identity,
+        )
+
+
+def test_cross_chapter_majors_enter_one_core_draft_and_merged_verify():
+    from research.company_profile import direct_reading
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    business = "公司主营纸袋纸制造并向客户销售。"
+    revenue = "本期营业收入为100万元。"
+    input_text = "公司采购木片作为主要原料。"
+    role = "公司处于造纸产业链中游并向下游客户供货。"
+
+    def condition(condition_id, dimension, quote, page):
+        return ReportSourceCondition(
+            condition_id=condition_id,
+            dimension=dimension,
+            description=quote,
+            evidence=(
+                _evidence(report, text=quote, page=page).model_copy(
+                    update={"evidence_id": condition_id}
+                ),
+            ),
+            major=True,
+            statement_status="current",
+        )
+
+    saved = (
+        condition("principal", "principal_business", business, 1),
+        condition("product", "products_services", business, 1),
+        condition("revenue", "revenue_model", revenue, 2),
+        condition("input", "input_exposure", input_text, 2),
+        condition("role", "supply_chain_role", role, 2),
+    )
+
+    class _Provider:
+        offline_only = True
+
+        def __init__(self):
+            self.calls = []
+
+        def interpret(self, request):
+            pages = {int(page["page"]) for page in request.source_pages}
+            ids = tuple(item.condition_id for item in request.source_conditions)
+            self.calls.append((request.purpose, ids, pages))
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(1, 2),
+                )
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=saved,
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=tuple(
+                        ReportViewClaim(
+                            claim_id=item.condition_id,
+                            dimension=item.dimension,
+                            status="observed",
+                            answer=item.description,
+                            evidence=item.evidence,
+                            condition_ids=(item.condition_id,),
+                        )
+                        for item in request.source_conditions
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "condition",
+                        "target_id": item.condition_id,
+                        "status": "pass",
+                        "covers_target_type": "claim",
+                        "covers_target_id": item.condition_id,
+                        "explanation": "跨章已核。",
+                    }
+                    for item in request.source_conditions
+                )
+                + tuple(
+                    {
+                        "target_type": "claim",
+                        "target_id": claim.claim_id,
+                        "status": "pass",
+                        "explanation": "正文支持。",
+                    }
+                    for claim in request.claims
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    provider = _Provider()
+    original = direct_reading.source_discovery_slices
+    direct_reading.source_discovery_slices = (
+        lambda pages, report, identity, limit: [[dict(page, offset=0, scope="full_page") for page in pages]]
+    )
+    try:
+        result = _run(
+            provider,
+            pages=(
+                {"page": 1, "text": "管理层讨论与分析\n" + business, "readable": True},
+                {"page": 2, "text": "营业收入与采购\n" + revenue + input_text + role, "readable": True},
+                {"page": 3, "text": "附注列示子公司注册地址。", "readable": True},
+            ),
+            processing_identity=identity,
+            report=report,
+        )
+    finally:
+        direct_reading.source_discovery_slices = original
+    synth = [item for item in provider.calls if item[0] == "synthesize_views"]
+    verified = [item for item in provider.calls if item[0] == "verify_views"]
+    assert len(synth) == 1
+    assert {item.split(":")[-1] for item in synth[0][1]} == {
+        "principal",
+        "product",
+        "revenue",
+        "input",
+        "role",
+    }
+    assert len(verified) == 1
+    assert {item.split(":")[-1] for item in verified[0][1]} == {
+        "principal",
+        "product",
+        "revenue",
+        "input",
+        "role",
+    }
+    assert any(item["page"] == 3 and item["status"] == "not_read" for item in result.page_coverage)
+    assert result.draft_complete is True
 
 
 def test_parent_limit_is_not_promoted_to_the_group():
@@ -4000,6 +4168,54 @@ def test_a_body_requested_continuation_is_read_after_the_core_dimensions_pass():
     assert not stopped, stopped
     assert any(item[0] == "full_context" and 2 in item[2] for item in sent)
     assert any(item["page"] == 2 and item["status"] == "read" for item in result.page_coverage)
+
+
+def test_chapter_navigation_is_admitted_without_reserving_the_unread_report():
+    report = _report()
+    pages = tuple(
+        {
+            "page": page,
+            "text": f"第{page}节 经营情况讨论与分析。" + ("公司主营造纸并销售纸袋纸。" * 40),
+            "readable": True,
+        }
+        for page in range(1, 61)
+    )
+
+    class _Provider:
+        offline_only = True
+
+        def __init__(self):
+            self.scopes = []
+
+        def interpret(self, request):
+            self.scopes.append(request.source_scope)
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(1, 2),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+            )
+
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    identity["ledger_tokens"] = 120_000
+    provider = _Provider()
+    result = _run(
+        provider,
+        pages=pages,
+        processing_identity=identity,
+        report=report,
+        token_budget=120_000,
+    )
+    assert "page_map" in provider.scopes
+    assert "full_context" in provider.scopes
+    assert "chapter_selection_empty" not in result.gaps
+    assert not any("direct_core_admission_stopped" in gap for gap in result.gaps)
+    assert not any(gap == "direct_core_ledger_hold" for gap in result.gaps)
 
 
 def test_navigation_failure_does_not_fall_back_to_the_full_report():

@@ -1827,18 +1827,26 @@ def interpret_direct_core(
                 if int(source["page"]) in {int(item["page"]) for item in batch}
             ]
             try:
+                reserve_pages = full_pages[:2] if identity.get("chapter_select") else full_pages
                 response = invoke(
                     "source_inventory",
                     batch,
                     source_scope="page_map",
                     output=NAV_OUTPUT,
                     later=_units(
-                        full_pages,
+                        reserve_pages,
                         purpose="synthesize_views",
                         source_scope="full_context",
                         report=report,
                         identity=identity,
                         output=BODY_OUTPUT,
+                    )
+                    + (
+                        _nonempty_verify_units(
+                            reserve_pages, report=report, identity=identity
+                        )
+                        if identity.get("chapter_select")
+                        else 0
                     ),
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
@@ -1891,6 +1899,7 @@ def interpret_direct_core(
         return bound_claims
 
     inventoried: set[int] = set()
+    source_later = 0
 
     def inventory_pages(page_ids, prepared=None) -> list[int]:
         """Read source text without candidate answers. Navigation is not body reading."""
@@ -1919,7 +1928,11 @@ def interpret_direct_core(
             if prepared and prepared_pages == {int(page["page"]) for page in chosen}:
                 packages = list(prepared)
             else:
-                packages = list(source_discovery_slices(chosen, report, identity, limit))
+                room = ledger - charged() - source_later
+                slice_limit = max(1024, min(limit, room))
+                packages = list(
+                    source_discovery_slices(chosen, report, identity, slice_limit)
+                )
         except ValueError as exc:
             gaps.append(str(exc))
             for page_no in ordered:
@@ -1934,7 +1947,7 @@ def interpret_direct_core(
                     package,
                     source_scope="full_context",
                     output=SOURCE_OUTPUT,
-                    later=0,
+                    later=source_later,
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
                 text = str(exc)
@@ -2058,11 +2071,12 @@ def interpret_direct_core(
             item
             for item in related
             if item.condition_id not in drafted_condition_ids
+            and item.major
+            and item.statement_status == "current"
+            and item.dimension in _CORE_CLOSEOUT_DIMENSIONS
         ]
-        for group in _business_groups(pending):
-            if _core_answers_ready(claims, conditions, checks, records):
-                break
-            deliver_group(group)
+        if pending:
+            deliver_group(pending)
         for page in package:
             page_no = int(page["page"])
             composed.add(page_no)
@@ -2362,6 +2376,10 @@ def interpret_direct_core(
     chapter_required_pages: set[int] | None = None
     isolated_condition_ids: set[str] = set()
     reused_receipts = list(identity.get("accepted_source_receipts") or ())
+    if identity.get("chapter_select") and (
+        reused_receipts or identity.get("accepted_prior_draft")
+    ):
+        raise ValueError("chapter_select_refuses_saved_semantics")
     if reused_receipts:
         for item in reused_receipts:
             payload = item.get("response_payload") or {}
@@ -3100,6 +3118,23 @@ def interpret_direct_core(
                 if page_no in by_page:
                     by_page[page_no]["map_checked"] = True
                     by_page[page_no]["structure_indexed"] = True
+            hold_pages = [
+                page
+                for page in sources
+                if int(page["page"]) in chapter_required_pages
+            ][:2]
+            if hold_pages:
+                source_later = (
+                    _units(
+                        hold_pages,
+                        purpose="synthesize_views",
+                        source_scope="full_context",
+                        report=report,
+                        identity=identity,
+                        output=BODY_OUTPUT,
+                    )
+                    + _nonempty_verify_units(hold_pages, report=report, identity=identity)
+                )
             follow = inventory_pages(selected)
             expand = [
                 int(page)

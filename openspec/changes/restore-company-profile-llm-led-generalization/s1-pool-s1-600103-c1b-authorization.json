@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600103-c1b",
+  "binding_sha256": "33c89feca1cb034c1fcd3850449bea7cb5f659106819d222ebc073ec913c033c",
+  "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+  "approval_reference": "acceptance section 7.62 and b3 card section 13, 2026-10-29",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "§13造纸同卡后继：导航不再预留未读全文"
+}
