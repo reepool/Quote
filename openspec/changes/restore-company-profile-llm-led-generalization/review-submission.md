@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-30，[B交付§146](#146-b交付单一账本与入口阶段轨迹)）：重复记账已修；实际入口+公共网关+query/export已跑通，发送与usage一一对应。120秒是整段业务期限，主要耗在本地库/解析/语义而非池等待或传输。D2夹具仍因tail_hold截断后续切片而不完整，未冻结外呼。新增真实模型0，S1仍0/12。
+当前状态（2026-10-30，[A审核§147](#147-a审核单一账本成立纠正旧全文夹具阻挡章节交付)）：§146单一记账修复和替换传输入口增量接受，真实业务新增0、S1仍0/12。D2是歌华208页旧全文绑定，不能据此判定当前章节造纸必然被同一tail_hold截断；不取消已选必要未读。当前执行卡§16.6核当前章节实际入口及核心交付，必要修正后直接冻结先造纸后银行，原授权未用/不加额、不再等新方案审批。旧余额不用，质量/停止/扩批边界不变。
 
 ## 1. 唯一实施指引
 
@@ -6226,3 +6226,41 @@ C1b四项直接复验仍通过。`CompanyProfileTaskService.execute("run")`经`b
 ### 146.4 验证、Git、清理
 
 通过：admission、s16绑定正反、gateway一次usage、空白限定、引文金额不自证、C1b三读、后包失败保前组。`test_direct_chain_entry`仍因夹具完整性失败，不改断言。未改`config/13_llm.json`。既有13份修改及9项未跟踪未纳入。可重建的d2-chain/diagnose/测试库已或将按AGENTS§2.4清理；C1b回执/正式PDF/解析缓存/offline-s15保留。S1仍0/12。
+
+## 147. A审核单一账本成立，纠正旧全文夹具阻挡章节交付
+
+日期：2026-10-30。审核`d6ebd018`/§146，依产品v8→验收§7.66→交付路径→A/B流程v3→当前change与直接证据。A仅审核/规划，未实现应用代码或真实外呼。
+
+### 147.1 主线判断与实际进展
+
+方向仍是正式年报章节选读→核心答案→核验/三视图，而非全附注收齐或历史mock全绿。本轮有工程进展：网关已结算发送不再被invoke补一条offline账，替换传输可以经过TaskService及原持久查询；不是供应商多收费。**新增真实模型0、可用业务新增0，S1仍0/12；不能将delivered=1或离线检查算作真实公司通过。** C1b局部证明与旧D2入口部分成功也不能拼成当前章节公司正常收束。
+
+主要矛盾现在是**测试/就绪条件与实际章节路线错位**，不是先决定再给多少时间。A此前强调入口整链，却未明确排除旧全文/旧顺序fixture作为门槛；这会把B拉回错误路径。本轮显式收敛到当前章节入口和首个可交付核心包，复用已成立证明，不再自动续派全文预留返修卡。
+
+### 147.2 独立证据与裁决
+
+- **重复计账P1关闭。** `direct_reading.invoke`已删除按业务ID误匹配网关哈希ID后的offline reserve/settle；真实gateway预算只结算一次。A复验`test_gateway_usage_is_booked_once_not_reserved_again`通过：传输数=物理账数，charged=120×发送数，无offline_substitute。unknown/失败/重试仍由原网关负责，不改历史账。
+- **期限诊断接受，但不归罪于LLM。** A复验准入占槽未发送就耗尽业务deadline成立；§146离线阶段账所示库/入队约45秒、解析约13秒、语义/持久至约118秒，是替换传输/旧夹具轨迹，不是正式LLM耗时。正式1200/1800秒授权与逻辑请求时限分开，真实共享池不隔离，不能把离线快等同实际吞吐。
+- **新确认P2：旧D2不代表本卡。** `test_direct_chain_entry`加载`b1-pool-direct1-binding.json`，证券600037.SH/208页、direct_core_v1、未设chapter_select；其成功断言还要求首份synthesize早于最后page_map，属于已被v8替代的顺序。`direct_reading`仅在`not chapter_select`时规划全文并设`synth+verify+2×最大源片`的tail_hold。章节分支走选章及source_later；A对现有章节正例跟踪所选9/12页，inventory的source_later=18728，admit的tail_hold始终0。故旧全文失败真实存在，但“同样会截220页造纸”尚无证据。此跟踪仅为小型协议路径，不证明造纸已就绪或章节资源充分。
+- **裁决不降覆盖，亦不扩修历史全文。** 不批准首包已核就取消其余已选必要未读；普通未选章节本来就不挡。B应验证实际`chapter_select=true`绑定及多片/续页到正常交付。若该路径确有预留阻塞，才按剩余账本/未完成实际请求局部重包，不能清unknown、重复保留已完成阶段或假目标低估末端。没有触发就不改旧tail_hold。依v8允许显式更换旧测试顺序/输入，非空三视图、有效支持/覆盖、完整性与失败保留断言不得删弱。
+
+### 147.3 后续任务与停止边界
+
+当前唯一[执行卡§16.6](b3-s1-execution-card.md#166-对齐章节入口直接兑现原授权当前执行)/验收§7.67，接续原§16，不新增方案、额度、真实入口或后继。B按[A/B流程v3](../../../docs/development/ab_role_development_workflow.md)在原owner连续完成当前章节实际入口证明、必要P0—P3、Review和冻结，随后**直接执行原未用造纸入口；核心/终态/三读及B源核成立才同版银行，不再交纯准备卡等A批准**。已有C1b/记账/限定/失败保留回执复用，不重跑旧D2或全仓。
+
+原逐家及累计硬限不改：造纸160000/1200秒/16物理/2恢复；银行240000/1800秒/24物理/3恢复；总400000/3000秒/40物理/5恢复。有价≤20/20/40元及unknown限制、正式准备/等待/零请求失败/导出连续计时、每家一冻结入口/不热改/无正式后继沿§16.3。首家失败停第二家；达限/新程序阻塞保最后正文并交接。全部主要业务/变现/三视图和质量底线不降，次要口号/排名/冲突增速后置。原S1失败/0可用不改；开发两家不折算S1，不放其他十家/S1重测/S2/S3/生产/归档。清理前置/收尾及既有并行保护写入卡，原首次材料/PDF/必要缓存保留。
+
+### 147.4 验证与审核成本
+
+在`d6ebd018`上A实际运行（统一QuoteBak；无网络传输）：
+
+```text
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_gateway_usage_is_booked_once_not_reserved_again \
+  tests/unit/test_research/test_company_profile_bounded_entry.py::test_s16_authorization_binds_paper_and_bank_windows \
+  tests/unit/test_research/test_company_profile_bounded_entry.py::test_admission_wait_exhausts_business_deadline_without_a_send \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_chapter_select_does_not_send_every_page_opening_as_navigation \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_a_requested_continuation_page_still_blocks_when_unread
+```
+
+结果5 passed、12 warnings、16.84秒；不等于语义质量、付费能力或全市场吞吐通过。代码/绑定及上述章节正例的只读调用跟踪支持策略差异；不再运行会删除固定d2-chain目录且约120秒的旧测试。OpenSpec严格校验和git diff --check通过；本轮仅改审核/任务及活动指引文档，Review未发现需新增开发范围的阻塞。新增阻塞1类（当前章节实际入口完整交付证据缺失/旧fixture错位）；旧记账缺陷关闭，不把未经实际触发的source_later风险另立任务。已清本人pytest-6可重建目录及指向它的测试链接，约16KB；其他测试目录归属未核，不删。正式源/首次结果/C1b及offline-s15未动，既有13份修改和9项未跟踪保留；验收文档历史details脏块不纳本人提交。A活跃审核约30分钟（估算，含必要规划整理；机器测试另见上），未核实B活跃/等待时间，不把历史运行耗时等同开发投入。

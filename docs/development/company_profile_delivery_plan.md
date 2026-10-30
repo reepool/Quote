@@ -2,7 +2,7 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-10-30。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[§16.5连续接续](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#165-入口期限与单一账本接续当前执行)，依据验收§7.66/A审核§145。§144局部修复成立，实际入口超时未定位且一次发送重复计账已复现，新增真实模型调用0。原§16两家授权未用、不加额；B修通原TaskService/gateway实际入口与单一账本，证明成立后自主冻结先造纸后银行，不等新方案审批。旧入口/余额不用，质量及停止不变，其余十家/S2/生产未授权，S1仍0/12。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[§16.6章节交付接续](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#166-对齐章节入口直接兑现原授权当前执行)，依据验收§7.67/A审核§147。§146单一记账及替换传输入口增量成立，新增真实模型调用0；旧D2全文绑定/边读边成稿断言不能代表当前章节路线，不取消已选必要未读。B核当前章节实际入口，必要局部修正后直接冻结先造纸后银行；原§16两家授权未用、不加额、不再等新方案审批。旧入口/余额不用，质量及停止不变，其余十家/S2/生产未授权，S1仍0/12。
 
 ## 1. 开发者必须先理解的纠偏
 
