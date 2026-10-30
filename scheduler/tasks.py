@@ -7,6 +7,8 @@ import asyncio
 import hashlib
 import json
 import os
+import subprocess
+import sys
 import threading
 import time as time_module
 from datetime import datetime, date, timedelta, time
@@ -13844,14 +13846,55 @@ class ScheduledTasks:
             )
             return False
 
+    def _launch_akshare_upgrade_worker(self, targets: Dict[str, Optional[str]]) -> bool:
+        """派生独立 akshare 升级 worker（脱离本进程会话，重启服务不影响其运行）。
+
+        worker 自带 flock 防重入与 no-op 判断；此处只负责拉起并记录日志。
+        """
+        try:
+            script = Path(__file__).resolve().parent.parent / "scripts" / "upgrade_akshare.py"
+            if not script.exists():
+                scheduler_logger.warning(
+                    "[Scheduler] akshare upgrade worker script missing: %s", script
+                )
+                return False
+            log_dir = Path(__file__).resolve().parent.parent / "log"
+            log_dir.mkdir(parents=True, exist_ok=True)
+            worker_log = open(log_dir / "akshare_upgrade.log", "ab")
+            process = subprocess.Popen(
+                [sys.executable, str(script), "--target", "latest"],
+                cwd=str(script.parent.parent),
+                stdout=worker_log,
+                stderr=subprocess.STDOUT,
+                stdin=subprocess.DEVNULL,
+                start_new_session=True,
+            )
+            scheduler_logger.info(
+                "[Scheduler] akshare upgrade worker launched pid=%s targets=%s",
+                process.pid,
+                targets,
+            )
+            return True
+        except Exception as exc:
+            scheduler_logger.error(
+                "[Scheduler] failed to launch akshare upgrade worker: %s", exc
+            )
+            return False
+
     async def market_dependency_version_check(
         self,
         packages: Optional[List[Dict[str, str]]] = None,
         timeout_sec: float = 10.0,
         notify_when_latest: bool = False,
+        auto_upgrade_packages: Optional[List[str]] = None,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
-        """检查行情数据相关 Python 包是否有可升级版本，并通过 Telegram 通知。"""
+        """检查行情数据相关 Python 包是否有可升级版本，并通过 Telegram 通知。
+
+        auto_upgrade_packages 中的包（当前用于 akshare）在检测到新版时会派生
+        scripts/upgrade_akshare.py 独立 worker：升级 → 冒烟 → 成功重启/失败回滚，
+        结果由 worker 直接报告；其余包维持只报告不升级。
+        """
         self._active_tasks.add('market_dependency_version_check')
         try:
             from utils.market_dependency_versions import (
@@ -13868,10 +13911,30 @@ class ScheduledTasks:
 
             updates = result.get('updates') or []
             errors = result.get('errors') or []
+            auto_upgrade_launched = False
+            auto_names = {
+                str(item).strip()
+                for item in (auto_upgrade_packages or [])
+                if str(item).strip()
+            }
+            if auto_names:
+                due = [
+                    item
+                    for item in updates
+                    if str(item.get('name')) in auto_names and item.get('update_available')
+                ]
+                if due:
+                    auto_upgrade_launched = self._launch_akshare_upgrade_worker(
+                        targets={
+                            str(item.get('name')): item.get('latest_version')
+                            for item in due
+                        }
+                    )
             scheduler_logger.info(
-                "[Scheduler] Market dependency version check completed: updates=%d, errors=%d",
+                "[Scheduler] Market dependency version check completed: updates=%d, errors=%d, auto_upgrade_launched=%s",
                 len(updates),
                 len(errors),
+                auto_upgrade_launched,
             )
             for item in result.get('statuses') or []:
                 scheduler_logger.info(
@@ -13883,8 +13946,13 @@ class ScheduledTasks:
                     item.get('error'),
                 )
 
-            if (updates or errors or notify_when_latest) and self.telegram_enabled and self.bot:
+            if (updates or errors or notify_when_latest or auto_upgrade_launched) and self.telegram_enabled and self.bot:
                 message = format_market_dependency_version_message(result)
+                if auto_upgrade_launched:
+                    message += (
+                        "\n\nakshare 已触发自动升级流程：升级 → 冒烟验证 → "
+                        "成功自动重启 / 失败自动回滚，结果将单独报告。"
+                    )
                 level = 'warning' if updates or errors else 'success'
                 await self.bot.send_task_notification(
                     message,

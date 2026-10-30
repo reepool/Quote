@@ -792,6 +792,7 @@
           ],
           "timeout_sec": 10.0,
           "notify_when_latest": false,
+          "auto_upgrade_packages": ["akshare"],
           "max_runtime_seconds": 120
         }
       },
