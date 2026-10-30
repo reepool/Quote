@@ -332,6 +332,7 @@ def _current_gaps(accumulated, claims, conditions, checks, records=()) -> list[s
                 "claim_pending:",
                 "company_synthesis_context_truncated",
                 "retracted_for_correction:",
+                "read_but_missed:",
             )
         ) and gap not in live:
             live.append(gap)
@@ -614,21 +615,22 @@ def chapter_candidate_pages(pages, limit: int = 16) -> list[int]:
 def compact_source_conditions(
     conditions: Sequence[ReportSourceCondition],
 ) -> list[ReportSourceCondition]:
-    """Drop exact-quote or exact-name repeats. Keep each distinct major."""
+    """Drop exact-quote+name repeats. Keep distinct majors on the same quote."""
     kept: list[ReportSourceCondition] = []
     quotes: set[tuple[Any, ...]] = set()
     names: set[tuple[Any, ...]] = set()
     for item in conditions:
+        description = " ".join(str(item.description or "").split())
         quote_key = None
         if item.evidence:
             evidence = item.evidence[0]
             quote = str(getattr(getattr(evidence, "anchor", None), "bounded_quote", "") or "")
-            quote_key = (int(evidence.page), quote, item.dimension)
+            quote_key = (int(evidence.page), quote, item.dimension, description)
             if quote_key in quotes:
                 continue
         name_key = (
             item.dimension,
-            " ".join(str(item.description or "").split()),
+            description,
             item.statement_status,
             item.major,
         )
@@ -640,6 +642,297 @@ def compact_source_conditions(
             names.add(name_key)
         kept.append(item)
     return kept
+
+
+def _norm_source_text(text: str) -> str:
+    return re.sub(r"\s+", "", str(text or ""))
+
+
+def unique_context_prefix(context: str, quote: str) -> str:
+    """Keep header/period/unit text that is not already the quote."""
+    context = str(context or "")
+    quote = str(quote or "")
+    if not context:
+        return ""
+    if not quote:
+        return context.strip()
+    index = context.find(quote)
+    if index < 0:
+        compact_context = _norm_source_text(context)
+        compact_quote = _norm_source_text(quote)
+        if compact_quote and compact_quote in compact_context:
+            return ""
+        return context.strip()
+    prefix = context[:index].strip()
+    suffix = context[index + len(quote) :].strip()
+    kept = [part for part in (prefix, suffix) if part and part != quote]
+    return "\n".join(kept)
+
+
+def compact_evidence_item(evidence: Evidence) -> Evidence:
+    """Drop quote copies from context_before and an identical model_quote."""
+    anchor = getattr(evidence, "anchor", None)
+    if not isinstance(anchor, TextAnchor):
+        return evidence
+    quote = str(anchor.bounded_quote or "")
+    context = unique_context_prefix(str(anchor.context_before or ""), quote)
+    model = str(anchor.model_quote or "")
+    if model and _norm_source_text(model) == _norm_source_text(quote):
+        model = ""
+    if context == str(anchor.context_before or "") and model == str(anchor.model_quote or ""):
+        return evidence
+    return evidence.model_copy(
+        update={
+            "anchor": anchor.model_copy(
+                update={
+                    "context_before": context or None,
+                    "model_quote": model or None,
+                }
+            )
+        }
+    )
+
+
+def _compact_object_evidence(item):
+    if not getattr(item, "evidence", None):
+        return item
+    compacted = tuple(compact_evidence_item(evidence) for evidence in item.evidence)
+    if compacted == item.evidence:
+        return item
+    return item.model_copy(update={"evidence": compacted})
+
+
+def compact_source_pages(
+    pages: Sequence[Mapping[str, Any]],
+    objects: Sequence[Any],
+) -> list[dict[str, Any]]:
+    """Keep page text that is not already an exact quote or its context."""
+    quotes: dict[int, list[str]] = {}
+    for item in objects:
+        for evidence in getattr(item, "evidence", ()) or ():
+            quote = str(getattr(getattr(evidence, "anchor", None), "bounded_quote", "") or "")
+            if not quote:
+                continue
+            quotes.setdefault(int(evidence.page), []).append(quote)
+            context = unique_context_prefix(
+                str(getattr(getattr(evidence, "anchor", None), "context_before", "") or ""),
+                quote,
+            )
+            if context:
+                quotes[int(evidence.page)].append(context)
+            heading = str(getattr(evidence, "section_title", "") or "")
+            if heading:
+                quotes[int(evidence.page)].append(heading)
+    compacted = []
+    seen: set[tuple[int, str]] = set()
+    for page in pages:
+        page_no = int(page["page"])
+        text = str(page.get("text") or "")
+        for quote in quotes.get(page_no, ()):
+            if quote and quote in text:
+                text = text.replace(quote, "\n")
+        text = re.sub(r"\n{2,}", "\n", text).strip()
+        if not text:
+            continue
+        key = (page_no, text)
+        if key in seen:
+            continue
+        seen.add(key)
+        compacted.append({**dict(page), "page": page_no, "text": text, "readable": True})
+    if compacted:
+        return compacted
+    return [
+        {"page": int(page["page"]), "text": str(page.get("text") or "")[:80], "readable": True}
+        for page in pages[:1]
+        if page.get("text")
+    ]
+
+
+def compact_verify_targets(claims, conditions, records=()):
+    """One wire copy of each exact location for a verify or coverage request."""
+    claims = [_compact_object_evidence(item) for item in claims]
+    conditions = [_compact_object_evidence(item) for item in conditions]
+    records = [_compact_object_evidence(item) for item in records]
+    return claims, conditions, records
+
+
+_REVENUE_TOTAL = re.compile(
+    r"(?:本集团|本公司|合并)?营业收入[^。\n]{0,32}?"
+    r"(\d{1,3}(?:,\d{3})*(?:\.\d+)?)\s*(亿元|万元|百万元|元)"
+)
+_NET_INCOME_LINES = (
+    ("利息净收入", "net_interest_income"),
+    ("手续费及佣金净收入", "net_fee_income"),
+    ("其他净收入", "other_net_income"),
+)
+_LINE_AMOUNT = re.compile(r"(\d{1,3}(?:,\d{3})+(?:\.\d+)?)")
+
+
+def disclosed_core_revenue_facts(sources: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Group operating-revenue totals and the three net-income lines on read pages."""
+    found: list[dict[str, Any]] = []
+    seen: set[tuple[str, str]] = set()
+    for source in sources:
+        text = str(source.get("text") or "")
+        page = int(source["page"])
+        for match in _REVENUE_TOTAL.finditer(text):
+            window = text[max(0, match.start() - 24) : match.end() + 16]
+            if any(mark in window for mark in ("分产品", "分行业", "分地区")):
+                continue
+            amount = match.group(1)
+            unit = match.group(2)
+            if unit != "亿元" and "," not in amount:
+                continue
+            key = (amount.replace(",", ""), unit)
+            if key in seen:
+                continue
+            seen.add(key)
+            found.append(
+                {
+                    "kind": "operating_revenue_total",
+                    "page": page,
+                    "amount": amount,
+                    "unit": unit,
+                    "quote": match.group(0)[:180],
+                }
+            )
+        for match in re.finditer(r"营业收入\s+(\d{1,3}(?:,\d{3})+(?:\.\d+)?)", text):
+            window = text[max(0, match.start() - 24) : match.end() + 16]
+            if any(mark in window for mark in ("分产品", "分行业", "分地区", "%", "占")):
+                continue
+            amount = match.group(1)
+            key = (amount.replace(",", ""), "")
+            if key in seen:
+                continue
+            seen.add(key)
+            found.append(
+                {
+                    "kind": "operating_revenue_total",
+                    "page": page,
+                    "amount": amount,
+                    "unit": "",
+                    "quote": match.group(0)[:180],
+                }
+            )
+        for label, kind in _NET_INCOME_LINES:
+            for match in re.finditer(re.escape(label) + r"[^\n]{0,40}", text):
+                window = match.group(0)
+                if "占" in window or "%" in window:
+                    continue
+                number = _LINE_AMOUNT.search(window)
+                if number is None:
+                    continue
+                amount = number.group(1)
+                key = (kind, amount.replace(",", ""))
+                if key in seen:
+                    continue
+                seen.add(key)
+                found.append(
+                    {
+                        "kind": kind,
+                        "page": page,
+                        "amount": amount,
+                        "unit": "",
+                        "quote": window[:180],
+                    }
+                )
+    return found
+
+
+def missed_core_revenue_facts(
+    sources: Sequence[Mapping[str, Any]],
+    conditions=(),
+    claims=(),
+) -> list[dict[str, Any]]:
+    """Facts already printed on read pages but absent from conditions and answers."""
+    blob = _norm_source_text(
+        "\n".join(
+            [
+                *(str(getattr(item, "description", "") or "") for item in conditions),
+                *(
+                    str(getattr(getattr(evidence, "anchor", None), "bounded_quote", "") or "")
+                    for item in (*conditions, *claims)
+                    for evidence in getattr(item, "evidence", ()) or ()
+                ),
+                *(str(getattr(item, "answer", "") or "") for item in claims),
+            ]
+        )
+    )
+    missed = []
+    for fact in disclosed_core_revenue_facts(sources):
+        amount = fact["amount"].replace(",", "")
+        if amount and amount in blob:
+            continue
+        display = _norm_source_text(fact["amount"] + fact.get("unit", ""))
+        if display and display in blob:
+            continue
+        missed.append(fact)
+    return missed
+
+
+def related_conflict_pages(claim, sources: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Other read pages that print a different rate for the same named metric."""
+    answer = str(getattr(claim, "answer", "") or "")
+    quotes = "\n".join(
+        str(getattr(getattr(evidence, "anchor", None), "bounded_quote", "") or "")
+        for evidence in getattr(claim, "evidence", ()) or ()
+    )
+    cited = {int(evidence.page) for evidence in getattr(claim, "evidence", ()) or ()}
+    rates = re.findall(r"(\d{1,2}\.\d{2})\s*%", answer + "\n" + quotes)
+    if not rates:
+        return []
+    stems = [
+        token
+        for token in ("托管", "受托", "资产托管", "规模")
+        if token in answer or token in quotes
+    ]
+    if not stems:
+        return []
+    extra = []
+    seen: set[int] = set()
+    for source in sources:
+        page_no = int(source["page"])
+        if page_no in cited or page_no in seen:
+            continue
+        text = str(source.get("text") or "")
+        if not any(stem in text for stem in stems):
+            continue
+        other = set(re.findall(r"(\d{1,2}\.\d{2})\s*%", text))
+        if other and other != set(rates) and other & set(rates) != other:
+            extra.append({"page": page_no, "text": text, "readable": True})
+            seen.add(page_no)
+    return extra
+
+
+def make_operating_revenue_question(report, facts: Sequence[Mapping[str, Any]]):
+    """Ask for the printed group total and the three net-income amounts."""
+    evidence = []
+    for fact in facts:
+        evidence.append(
+            Evidence(
+                evidence_id=f"read-missed-{fact['kind']}-{fact['page']}",
+                report=report,
+                page=int(fact["page"]),
+                section_title="营业收入",
+                anchor=TextAnchor(bounded_quote=str(fact["quote"])[:180]),
+            )
+        )
+    return ReportSourceCondition(
+        condition_id="core-question:period-operating-revenue",
+        dimension="revenue_model",
+        description=(
+            "State the reporting entity's current-period operating revenue "
+            "total when the supplied text states it, using only the line, "
+            "period and unit printed there. If the same statement prints "
+            "net interest income, net fee and commission income, and other "
+            "net income amounts, state those amounts too. A share, "
+            "principal-business, product-line, region, or sales-channel "
+            "subtotal does not replace that total."
+        ),
+        evidence=tuple(evidence),
+        major=True,
+        statement_status="current",
+    )
 
 
 PREPARED_NAV: list[list[int]] | None = None
@@ -1137,7 +1430,12 @@ def interpret_direct_core(
         return any(count >= 2 for count in counts.values())
 
     def charged() -> int:
-        return int(snapshot().get("charged_tokens") or 0)
+        prior = int(identity.get("prior_charged_tokens") or 0)
+        return prior + int(snapshot().get("charged_tokens") or 0)
+
+    def pack_room() -> int:
+        remaining = ledger - charged() - tail_hold
+        return min(int(limit), max(0, remaining))
 
     def physical_count() -> int:
         return sum(1 for item in receipts if item.get("physical_request", True))
@@ -1208,6 +1506,20 @@ def interpret_direct_core(
         return True
 
     def invoke(purpose: str, source_pages, *, source_scope: str, output: int, later: int, extra: dict | None = None):
+        extra = dict(extra or {})
+        if purpose == "verify_views":
+            claims = list(extra.get("claims") or ())
+            conditions = list(extra.get("source_conditions") or ())
+            records = list(extra.get("records") or ())
+            claims, conditions, records = compact_verify_targets(
+                claims, conditions, records
+            )
+            source_pages = compact_source_pages(
+                source_pages, [*claims, *conditions, *records]
+            )
+            extra["claims"] = tuple(claims)
+            extra["source_conditions"] = tuple(conditions)
+            extra["records"] = tuple(records)
         request = ReportSemanticRequestV3(
             request_id=f"{work_id}:report:{len(receipts) + 1}",
             purpose=purpose,
@@ -1217,7 +1529,7 @@ def interpret_direct_core(
             source_scope=source_scope,
             max_output_tokens=output,
             timeout_seconds=float(identity.get("logical_request_timeout_seconds") or 120),
-            **(extra or {}),
+            **extra,
         )
         units = request_reservation(request)
         if units > limit:
@@ -1307,11 +1619,17 @@ def interpret_direct_core(
         paragraph = str(getattr(evidence.anchor, "context_before", "") or "").strip()
         quote = str(getattr(evidence.anchor, "bounded_quote", "") or "").strip()
         heading = str(getattr(evidence, "section_title", "") or "").strip()
-        if not paragraph or (quote and quote not in paragraph):
-            return source
-        parts = [heading] if heading and heading not in paragraph else []
-        parts.append(paragraph)
-        return {"page": page_no, "text": "\n".join(parts), "readable": True}
+        unique = unique_context_prefix(paragraph, quote) if quote else paragraph
+        parts = []
+        if heading and heading not in unique and heading not in quote:
+            parts.append(heading)
+        if unique:
+            parts.append(unique)
+        if parts:
+            return {"page": page_no, "text": "\n".join(parts), "readable": True}
+        if quote:
+            return {"page": page_no, "text": heading or quote[:40], "readable": True}
+        return source
 
     def pages_for(items) -> list[dict]:
         pages = []
@@ -1445,11 +1763,18 @@ def interpret_direct_core(
             )
             verdict = verdicts.get(("claim", claim.claim_id))
             evidence_ok = all(
-                any(
-                    evidence.anchor.bounded_quote
-                    and evidence.anchor.bounded_quote in str(page.get("text") or "")
-                    and int(page["page"]) == int(evidence.page)
-                    for page in pages
+                bool(getattr(getattr(evidence, "anchor", None), "bounded_quote", ""))
+                and (
+                    any(
+                        evidence.anchor.bounded_quote in str(page.get("text") or "")
+                        and int(page["page"]) == int(evidence.page)
+                        for page in pages
+                    )
+                    or any(
+                        evidence.anchor.bounded_quote in str(source.get("text") or "")
+                        and int(source["page"]) == int(evidence.page)
+                        for source in sources
+                    )
                 )
                 for evidence in claim.evidence
             )
@@ -1562,7 +1887,16 @@ def interpret_direct_core(
         def measure(group, conditions):
             conditions = compatible_evidence_targets(group, conditions)
             related = related_records(group)
+            group, conditions, related = compact_verify_targets(
+                group, conditions, related
+            )
             pages = pages_for([*group, *conditions, *related])
+            for claim in group:
+                for extra in related_conflict_pages(claim, sources):
+                    if int(extra["page"]) not in {int(page["page"]) for page in pages}:
+                        pages.append(extra)
+            pages = compact_source_pages(pages, [*group, *conditions, *related])
+            room = pack_room()
             try:
                 units = joint_verify_reservation(
                     report, identity, pages, group, conditions, related
@@ -1584,10 +1918,10 @@ def interpret_direct_core(
                         ),
                     )
                     cap = int(identity.get("max_payload_utf8_bytes") or 60_000)
-                    if request_payload_bytes(sized) > cap:
-                        return limit + 1, pages, related, conditions
+                    if request_payload_bytes(sized) > cap or units > room:
+                        return room + 1, pages, related, conditions
             except ValueError:
-                return limit + 1, pages, related, conditions
+                return room + 1, pages, related, conditions
             return units, pages, related, conditions
 
         support_groups: list[list] = []
@@ -1596,11 +1930,11 @@ def interpret_direct_core(
         for claim in observable:
             if already_trusted(claim):
                 continue
-            if measure([claim], [])[0] > limit:
+            if measure([claim], [])[0] > pack_room():
                 pending_claims.append(claim)
                 continue
             trial = current + [claim]
-            if current and measure(trial, [])[0] > limit:
+            if current and measure(trial, [])[0] > pack_room():
                 support_groups.append(current)
                 current = [claim]
             else:
@@ -1616,13 +1950,13 @@ def interpret_direct_core(
                     continue
                 if not claims_covering_condition(condition, group):
                     continue
-                if measure(group, chosen + [condition])[0] <= limit:
+                if measure(group, chosen + [condition])[0] <= pack_room():
                     chosen.append(condition)
             return chosen
 
         def send(group, sent, *, support: bool) -> bool:
             units, pages, related, sent = measure(group, sent)
-            if units > limit or not pages:
+            if units > pack_room() or not pages:
                 if support:
                     for claim in group:
                         keep_pending(claim, "verify_unit_not_admitted")
@@ -1720,7 +2054,7 @@ def interpret_direct_core(
         while pending_conditions:
             condition = pending_conditions.pop(0)
             chosen = list(usable_claims(condition))
-            while chosen and measure(chosen, [condition])[0] > limit:
+            while chosen and measure(chosen, [condition])[0] > pack_room():
                 chosen.pop()
             if not chosen:
                 gaps.append(f"major_condition_not_verified:{condition.condition_id}")
@@ -1737,7 +2071,7 @@ def interpret_direct_core(
                     later.append(other)
                     continue
                 trial = [*chosen, *extra]
-                if measure(trial, batch + [other])[0] <= limit:
+                if measure(trial, batch + [other])[0] <= pack_room():
                     chosen = trial
                     batch.append(other)
                 else:
@@ -2250,6 +2584,40 @@ def interpret_direct_core(
             publish()
         return follow
 
+    def note_missed_core_revenue():
+        """Turn already-read totals into a core question, not a page whitelist."""
+        read_sources = [
+            page
+            for page in sources
+            if by_page.get(int(page["page"]), {}).get("status") == "read"
+        ]
+        if not read_sources:
+            cited = {
+                int(evidence.page)
+                for item in (*conditions, *claims)
+                for evidence in getattr(item, "evidence", ()) or ()
+            }
+            read_sources = [page for page in sources if int(page["page"]) in cited]
+        missed = missed_core_revenue_facts(read_sources, conditions, claims)
+        if not missed:
+            return None
+        gap = "read_but_missed:period-operating-revenue"
+        if gap not in gaps:
+            gaps.append(gap)
+        existing = next(
+            (
+                item
+                for item in conditions
+                if item.condition_id.startswith("core-question:period-operating-revenue")
+            ),
+            None,
+        )
+        if existing is not None:
+            return existing
+        question = make_operating_revenue_question(report, missed)
+        conditions.append(question)
+        return question
+
     composed: set[int] = set()
 
     def compose(page_ids) -> None:
@@ -2416,6 +2784,7 @@ def interpret_direct_core(
         ]
         if not pending:
             return
+        pending = compatible_evidence_targets([], pending)
         pages = [
             dict(page)
             for page in cited_quote_pages(
@@ -2743,6 +3112,7 @@ def interpret_direct_core(
                     "upstream_downstream",
                 }:
                     pending_core.append(claim)
+                    drafted_condition_ids.update(str(item) for item in (claim.condition_ids or ()))
             kept_checks = []
             for raw_check in prior.get("checks") or []:
                 check = ReportViewCheck.model_validate(raw_check)
@@ -3101,6 +3471,14 @@ def interpret_direct_core(
                 continue
             if condition.dimension in _CORE_CLOSEOUT_DIMENSIONS:
                 core_answers.append(gap_copy(condition, referenced))
+        missed_question = note_missed_core_revenue()
+        if missed_question is not None:
+            core_answers = [
+                item
+                for item in core_answers
+                if item.condition_id != missed_question.condition_id
+            ]
+            core_answers.append(missed_question)
         if reused_receipts:
             statement_pages = operating_revenue_statement_pages(sources)
             evidence = []
@@ -3413,10 +3791,12 @@ def interpret_direct_core(
                 chapter_required_pages.update(expand)
                 inventory_pages(expand)
             tail_hold = 0
+            note_missed_core_revenue()
             compose([*selected, *expand])
         else:
             follow = inventory_pages(readable_order, prepared=planned)
             tail_hold = 0
+            note_missed_core_revenue()
             compose(readable_order)
             if (
                 follow
