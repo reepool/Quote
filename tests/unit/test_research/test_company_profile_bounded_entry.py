@@ -493,13 +493,17 @@ def test_layered_entry_refuses_old_semantic_receipts():
 
 
 def test_direct_chain_entry_completes_and_keeps_a_verified_package():
-    """The real entry, with the network replaced. Not a business score."""
+    """Current chapter entry, network replaced. Not a company score.
+
+    v8 order: locate selected chapters, read the necessary body and
+    continuation, then draft. A later unread continuation still blocks.
+    """
     import hashlib
     import json
     import shutil
     from pathlib import Path
 
-    from research.company_profile.bounded_entry import main
+    from research.company_profile.bounded_entry import S16_AUTHORIZATION, main
     from research.company_profile.reads import CompanyProfileReadService
 
     root = Path("/home/python/Quote")
@@ -517,8 +521,21 @@ def test_direct_chain_entry_completes_and_keeps_a_verified_package():
             shutil.rmtree(run_root)
         binding = dict(source)
         binding["offline_protocol"] = protocol
+        binding["chapter_select"] = True
+        binding["run_authorization"] = S16_AUTHORIZATION
         binding["max_elapsed_seconds"] = 400
         binding["max_tokens"] = 120_000
+        binding["max_physical_requests"] = 16
+        binding["max_recoveries"] = 2
+        for retired in (
+            "accepted_navigation_query",
+            "accepted_source_query",
+            "accepted_draft_query",
+            "accepted_candidate_query",
+            "navigation_query",
+            "continuation_checkpoint",
+        ):
+            binding.pop(retired, None)
         path = root / "data/QuoteBak" / f"{folder}-binding.json"
         path.write_text(json.dumps(binding, ensure_ascii=False))
         import sys
@@ -543,7 +560,7 @@ def test_direct_chain_entry_completes_and_keeps_a_verified_package():
         assert query["profiles"] == exported["profiles"] == reloaded["profiles"]
         return query
 
-    success = run("direct_chain_v1", "d2-chain-success")
+    success = run("direct_chain_v1", "s16-chapter-success")
     profile = success["profiles"][0]["three_views"]
     claims = [
         claim
@@ -552,9 +569,18 @@ def test_direct_chain_entry_completes_and_keeps_a_verified_package():
         if claim["status"] == "observed"
     ]
     assert success["delivered"] == 1
-    identities = [claim["claim_id"] for claim in claims]
-    assert len(identities) == len(set(identities))
     assert claims
+    for view in profile["views"].values():
+        view_ids = [claim["claim_id"] for claim in view.get("claims") or []]
+        assert len(view_ids) == len(set(view_ids))
+    work_path = next(
+        (root / "data/QuoteBak/s16-chapter-success/output").rglob("bp-work-*.json")
+    )
+    stored = json.loads(work_path.read_text())
+    interpretation = stored.get("report_interpretation") or stored
+    assert interpretation.get("processing_identity", {}).get("chapter_select") is True
+    stored_ids = [claim["claim_id"] for claim in interpretation.get("claims") or []]
+    assert stored_ids and len(stored_ids) == len(set(stored_ids))
     assert profile["draft_complete"] is True
     assert profile["real_semantic_complete"] is False
     assert all(
@@ -569,20 +595,28 @@ def test_direct_chain_entry_completes_and_keeps_a_verified_package():
     kinds = [
         "page_map" if item.get("source_scope") == "page_map" else item.get("purpose")
         for item in profile["call_receipts"]
+        if item.get("physical_request", True)
     ]
+    assert "page_map" in kinds
+    assert "source_inventory" in kinds
     assert "synthesize_views" in kinds and "verify_views" in kinds
+    assert kinds.index("page_map") < kinds.index("source_inventory")
+    assert kinds.index("source_inventory") < kinds.index("synthesize_views")
     assert kinds.index("synthesize_views") < max(
-        index for index, kind in enumerate(kinds) if kind == "page_map"
+        index for index, kind in enumerate(kinds) if kind == "verify_views"
     )
     body_pages = [
         page
         for item in profile["call_receipts"]
-        if item.get("source_scope") == "full_context"
+        if item.get("source_scope") == "full_context" and item.get("physical_request", True)
         for page in item.get("source_pages") or []
     ]
     assert len(set(body_pages)) >= 2
+    coverage = next(iter(profile["views"].values())).get("checked_pages") or []
+    assert any(item.get("status") == "not_read" for item in coverage)
+    assert any(item.get("status") == "read" for item in coverage)
 
-    failed = run("direct_chain_fail_v1", "d2-chain-fail")
+    failed = run("direct_chain_fail_v1", "s16-chapter-fail")
     failed_profile = failed["profiles"][0]["three_views"]
     kept = [
         claim
@@ -593,32 +627,26 @@ def test_direct_chain_entry_completes_and_keeps_a_verified_package():
     assert failed["delivered"] == 1
     assert kept
     assert failed_profile["draft_complete"] is False
-    failed_ids = [
-        claim["claim_id"]
-        for view in failed_profile["views"].values()
-        for claim in view["claims"]
-    ]
-    assert len(failed_ids) == len(set(failed_ids))
+    for view in failed_profile["views"].values():
+        failed_ids = [claim["claim_id"] for claim in view.get("claims") or []]
+        assert len(failed_ids) == len(set(failed_ids))
     assert any(
         gap.startswith("direct_core_package_stopped:")
         or gap.startswith("necessary_unread:")
+        or gap.startswith("direct_core_gap_check_stopped:")
         or gap.startswith("claim_not_verified:")
         or gap.startswith("core_dimension_missing:")
         or gap.startswith("view_not_substantive:")
         for gap in failed_profile["gaps"]
     )
-    plan = json.loads(
-        (root / "data/QuoteBak/d2-chain-success/direct-plan.json").read_text()
-    )
-    assert plan["nonempty_verify_units"] > plan["empty_verify_units"]
     stages = json.loads(
-        (root / "data/QuoteBak/d2-chain-success/entry-stages.json").read_text()
+        (root / "data/QuoteBak/s16-chapter-success/entry-stages.json").read_text()
     )
     transport = json.loads(
-        (root / "data/QuoteBak/d2-chain-success/offline-transport.json").read_text()
+        (root / "data/QuoteBak/s16-chapter-success/offline-transport.json").read_text()
     )
     budget = json.loads(
-        (root / "data/QuoteBak/d2-chain-success/budget-final.json").read_text()
+        (root / "data/QuoteBak/s16-chapter-success/budget-final.json").read_text()
     )
     assert stages["transport_sends"] == budget["physical_requests"]
     assert stages["transport_sends"] == len(transport["requests"])

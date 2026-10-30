@@ -2933,8 +2933,11 @@ def interpret_direct_core(
                     identity.get("logical_request_timeout_seconds") or 120
                 ),
             )
-            if request_payload_bytes(sized) > int(
-                identity.get("max_payload_utf8_bytes") or 60_000
+            cap = int(identity.get("max_payload_utf8_bytes") or 60_000)
+            room = pack_room()
+            if (
+                request_payload_bytes(sized) > cap
+                or request_reservation(sized) > room
             ):
                 middle = max(1, len(pending) // 2)
                 deliver_group(pending[:middle])
@@ -2950,7 +2953,13 @@ def interpret_direct_core(
                 extra={"source_conditions": tuple(pending)},
             )
         except (ValueError, LlmError, SemanticProviderError) as exc:
-            if len(pending) > 1 and "deadline" in str(exc).lower():
+            text = str(exc)
+            retryable = (
+                "deadline" in text.lower()
+                or "card_request_reservation_exceeded" in text
+                or "direct_core_admission_stopped" in text
+            )
+            if len(pending) > 1 and retryable:
                 middle = max(1, len(pending) // 2)
                 deliver_group(pending[:middle])
                 deliver_group(pending[middle:])

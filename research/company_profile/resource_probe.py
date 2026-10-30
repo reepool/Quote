@@ -334,17 +334,37 @@ def protocol_reply(request: dict) -> dict:
     return result
 
 
-def _source_sentences(request: dict) -> list[tuple[int, str]]:
+def _informative_quote(quote: str) -> bool:
+    letters = sum(1 for char in quote if char.isalnum() or "\u4e00" <= char <= "\u9fff")
+    return letters >= 8
+
+
+def _compact_quotes(request: dict, count: int) -> list[tuple[int, str]]:
+    """Unique compact slices from each sent page. Not a company reading."""
     found: list[tuple[int, str]] = []
+    used: set[str] = set()
+    page_texts: list[tuple[int, str]] = []
     for page in request.get("source_pages") or []:
-        text = str(page.get("text") or "")
-        for piece in text.split("。"):
-            quote = piece.strip()
-            if len(quote) < 8 or quote not in text:
-                continue
-            found.append((int(page["page"]), quote[:40]))
-            if len(found) == 5:
-                return found
+        compact = "".join(str(page.get("text") or "").split())
+        if len(compact) < 12:
+            continue
+        page_texts.append((int(page["page"]), compact))
+    step = 0
+    while page_texts and len(found) < count:
+        progressed = False
+        for page_no, compact in page_texts:
+            if len(found) >= count:
+                break
+            length = min(80, len(compact))
+            start = 0 if len(compact) <= length else min(step * length, len(compact) - length)
+            quote = compact[start : start + length]
+            if quote not in used and _informative_quote(quote):
+                used.add(quote)
+                found.append((page_no, quote))
+                progressed = True
+        if not progressed:
+            break
+        step += 1
     return found
 
 
@@ -359,28 +379,24 @@ def direct_chain_reply(request: dict) -> dict:
         chosen = [
             int(page["page"])
             for page in request.get("source_pages") or []
-            if any(
-                mark in str(page.get("text") or "")
-                for mark in ("业务", "收入", "产品", "管理")
-            )
+            if page.get("readable", True) and str(page.get("text") or "").strip()
         ]
-        if not chosen:
-            chosen = [
-                int(page["page"])
-                for page in request.get("source_pages") or []
-                if str(page.get("text") or "").strip()
-            ][:1]
-        result["requested_pages"] = chosen[:2]
+        if len(chosen) >= 2:
+            distant = next((page for page in chosen if abs(page - chosen[0]) >= 8), chosen[-1])
+            result["requested_pages"] = [chosen[0], distant]
+        else:
+            result["requested_pages"] = chosen[:1]
         return result
-    sentences = _source_sentences(request)
     dimensions = (
         "principal_business",
         "products_services",
         "revenue_model",
-        "output_exposure",
+        "input_exposure",
         "supply_chain_role",
+        "output_exposure",
     )
-    paired = list(zip(dimensions, sentences, strict=False))
+    quotes = _compact_quotes(request, len(dimensions))
+    paired = list(zip(dimensions, quotes, strict=False))
     if request["purpose"] == "source_inventory":
         if request.get("claims"):
             raise ValueError("gap_request_contains_candidates")
@@ -398,6 +414,44 @@ def direct_chain_reply(request: dict) -> dict:
         ]
         return result
     if request["purpose"] == "synthesize_views":
+        conditions = [
+            item
+            for item in request.get("source_conditions") or []
+            if item.get("statement_status") == "current"
+        ]
+        if conditions:
+            catalog = request.get("evidence_catalog") or {}
+            result["claims"] = []
+            for index, item in enumerate(conditions):
+                refs = list(item.get("evidence_refs") or [])
+                evidence = list(refs)
+                if not evidence:
+                    for raw in item.get("evidence") or []:
+                        if isinstance(raw, str):
+                            evidence.append(raw)
+                            continue
+                        body = catalog.get(raw.get("evidence_id") or "") or raw
+                        anchor = body.get("anchor") or {}
+                        quote = (
+                            anchor.get("bounded_quote")
+                            or anchor.get("model_quote")
+                            or raw.get("quote")
+                        )
+                        page = body.get("page", raw.get("page"))
+                        if page is not None and quote:
+                            evidence.append({"page": int(page), "quote": quote})
+                result["claims"].append(
+                    {
+                        "claim_id": f"chain-claim-{item.get('condition_id') or index}",
+                        "dimension": item["dimension"],
+                        "status": "observed",
+                        "answer": "模拟主张，不是年报结论。",
+                        "condition_ids": [item["condition_id"]] if item.get("condition_id") else [],
+                        "supporting_record_ids": [],
+                        "evidence": evidence,
+                    }
+                )
+            return result
         result["claims"] = [
             {
                 "claim_id": f"chain-claim-{index}",

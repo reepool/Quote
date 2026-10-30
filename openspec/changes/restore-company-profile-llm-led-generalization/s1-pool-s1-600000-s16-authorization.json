@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600000-s16",
+  "binding_sha256": "07fb6326d1522c9ada938e507e46745480244769b4bd91c5cf46fadb731869cc",
+  "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+  "approval_reference": "acceptance section 7.67 and b3 card section 16.6, 2026-10-30",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "§16.6 unused bank chapter entry"
+}

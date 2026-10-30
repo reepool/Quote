@@ -1152,6 +1152,13 @@ def _worker(
                         check["status"] = "block"
                 chain_state["verifies"] = 1
             if (
+                protocol == "direct_chain_fail_v1"
+                and request["purpose"] == "source_inventory"
+                and request.get("source_scope") != "page_map"
+                and chain_state["gaps"] >= 1
+            ):
+                raise ValueError("controlled_later_package")
+            if (
                 request["purpose"] == "source_inventory"
                 and request.get("source_scope") != "page_map"
                 and chain_state["gaps"] == 0
@@ -1159,7 +1166,11 @@ def _worker(
                 page = int(request["source_pages"][0]["page"])
                 result["requested_pages"] = [page + 1]
                 chain_state["gaps"] += 1
-            if request["purpose"] == "verify_views" and not chain_state["delayed"]:
+            if (
+                request["purpose"] == "verify_views"
+                and not chain_state["delayed"]
+                and not binding.get("chapter_select")
+            ):
                 await asyncio.sleep(8)
                 chain_state["delayed"] = True
         encoded = json.dumps(result, ensure_ascii=False)
@@ -1544,6 +1555,7 @@ def main() -> int:
         binding.get("reading_strategy") == "direct_core_v1"
         and args.worker_deadline is None
         and not binding.get("accepted_navigation_query")
+        and not binding.get("chapter_select")
         and binding.get("run_authorization")
         not in {
             "company_profile_fulltext_core.2026-10-22",

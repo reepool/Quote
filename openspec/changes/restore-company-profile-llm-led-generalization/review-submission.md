@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-30，[A审核§147](#147-a审核单一账本成立纠正旧全文夹具阻挡章节交付)）：§146单一记账修复和替换传输入口增量接受，真实业务新增0、S1仍0/12。D2是歌华208页旧全文绑定，不能据此判定当前章节造纸必然被同一tail_hold截断；不取消已选必要未读。当前执行卡§16.6核当前章节实际入口及核心交付，必要修正后直接冻结先造纸后银行，原授权未用/不加额、不再等新方案审批。旧余额不用，质量/停止/扩批边界不变。
+当前状态（2026-10-30，[B交接§148](#148-b交接章节入口贯通并冻结运行原授权两家)）：§16.6已将实际入口改验`direct_core_v1 + chapter_select`，成稿按剩余账本拆包后离线整链通过；同版冻结后造纸、银行各用一个原未用真实入口。S1仍0/12，B不自评可用。旧全文D2不再作为门槛。既有13份修改和9项未跟踪未纳入。
 
 ## 1. 唯一实施指引
 
@@ -6264,3 +6264,40 @@ bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m p
 ```
 
 结果5 passed、12 warnings、16.84秒；不等于语义质量、付费能力或全市场吞吐通过。代码/绑定及上述章节正例的只读调用跟踪支持策略差异；不再运行会删除固定d2-chain目录且约120秒的旧测试。OpenSpec严格校验和git diff --check通过；本轮仅改审核/任务及活动指引文档，Review未发现需新增开发范围的阻塞。新增阻塞1类（当前章节实际入口完整交付证据缺失/旧fixture错位）；旧记账缺陷关闭，不把未经实际触发的source_later风险另立任务。已清本人pytest-6可重建目录及指向它的测试链接，约16KB；其他测试目录归属未核，不删。正式源/首次结果/C1b及offline-s15未动，既有13份修改和9项未跟踪保留；验收文档历史details脏块不纳本人提交。A活跃审核约30分钟（估算，含必要规划整理；机器测试另见上），未核实B活跃/等待时间，不把历史运行耗时等同开发投入。
+
+## 148. B交接：章节入口贯通并冻结运行原授权两家
+
+日期：2026-10-30。执行[§16.6](b3-s1-execution-card.md#166-对齐章节入口直接兑现原授权当前执行)/验收§7.67。B实现与真实外呼；不自评S1可用，不改原首次成绩。
+
+### 148.1 当前章节入口
+
+`test_direct_chain_entry`已改为`direct_core_v1 + chapter_select=true`、S16授权窗口、正式解析输入；去掉旧“首份成稿早于最后一次page_map”。现断言v8顺序：定位（page_map）→所选正文/续页→成稿→核验；未选页可`not_read`；必要未读仍阻塞；后包失败保前组；query/export/新实例一致；发送数=账本物理数。歌华PDF只作官方解析输入，不加载旧导航/源条件/草稿。`chapter_select`跳过旧全文`preflight_direct_core`/`PREPARED_NAV`。
+
+离线成功例：选中跨章页并读续页后成稿，`draft_complete=true`，工作副本12条主张唯一，覆盖208页中3读/205未读。失败例：续页未读则`draft_complete=false`且保留已观察主张。A定向5项及续页正例复验通过。
+
+### 148.2 确有触发的拆包
+
+章节成稿一次带11条条件时实际预留29009，超过24000上限；旧拆包只看60KB载荷，故未切开。`deliver_group`现按`pack_room()`（剩余账本与请求上限的较小值）和实际成稿载荷对半拆组，成功消费后继续；捕获`card_request_reservation_exceeded`同样重拆。未改旧全文`tail_hold`，未取消已选必要未读。协议回包改为引用已定位`evidence_refs`并从各送出页取可定位紧凑摘录，避免目录页无句号或线格式空证据。
+
+### 148.3 冻结后的两家真实入口
+
+冻结代码/提示/路由后直接运行，未再交准备卡。绑定`s1-pool-s1-600103-s16` / `s1-pool-s1-600000-s16`：`chapter_select=true`，`company_profile_s16_core.2026-10-30`，首选`deepseek:deepseek-flash`、备用`scorpio:grok-4.7`，无旧导航/源条件/草稿。有价均为unknown。
+
+造纸`600103.SH`（220页，`data/QuoteBak/s1-600103-s16-20261030`，回执`s1-600103-s16-result`）：监督退出0，约597秒/1200，6物理/16，143938账本/160000。`chapter_select`传到owner。query=export=新实例，`delivered=1`，`draft_complete/semantic_complete/real_semantic_complete=true`。定位页`[4,16,18,22,85,92]`，正文续页`[17,19,20,21]`，读10页、未读210。已核主张含分行业纸/浆、直销/经销、分产品纸/浆粕、营业收入241,899.02万元、前五客户/供应商；B对照解析原文，抽查`2,028,696,061.86`、`1,195,472,819.30`、`241,899.02`、`52,052.72`、`66,455.25`、`754,038,839.61`均在引用页。仍记`main_business_revenue_composition`/`total_and_regional_revenue`未定位，以及`read_but_missed:period-operating-revenue`（241,899.02万元在审计关键事项，不是利润表本期行）。
+
+银行`600000.SH`（454页，`data/QuoteBak/s1-600000-s16-20261030`，回执`s1-600000-s16-result`）：因造纸核心/终态/三读及B抽查成立而同版启动。监督退出0，约1067秒/1800，7物理/24，140180账本/240000。三读一致，`delivered=1`，`chapter_select`传到owner，读14页、未读440。`draft_complete=false`：利润表营业收入未收成核心问题、部分核验单元未准入、财富管理/同业客户/托管等主要条件未核完。已核主张覆盖对公金融服务、利息净收入占比、托管规模、供应链延伸等；B抽查`100,817.46`在p32、`69.26`在p71、`1,739.64`在p32、`20.21`/`24.81`在p69、`2,900`在p65。`173,964`百万元换算不在p32原文，该条已被标`not_reliable`。Grok一次核验超时后DeepSeek失败转移，计入物理账。未开后继、未热改。
+
+### 148.4 验证、清理与边界
+
+```text
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research \
+  tests/unit/test_research/test_company_profile_bounded_entry.py::test_direct_chain_entry_completes_and_keeps_a_verified_package \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_gateway_usage_is_booked_once_not_reserved_again \
+  tests/unit/test_research/test_company_profile_bounded_entry.py::test_s16_authorization_binds_paper_and_bank_windows \
+  tests/unit/test_research/test_company_profile_bounded_entry.py::test_admission_wait_exhausts_business_deadline_without_a_send \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_chapter_select_does_not_send_every_page_opening_as_navigation \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_a_requested_continuation_page_still_blocks_when_unread \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_a_body_requested_continuation_is_read_after_the_core_dimensions_pass
+```
+
+章节入口1 passed（约202秒）；A五项5 passed（16.73秒）；续页/一次记账2 passed。不等于12核心质量、S1通过或付费能力。S1仍0/12。已清可重建的`s16-chapter-*`测试目录及冻结脚本；正式PDF、C1/C1b回执、两家S16运行目录和openspec瘦回执保留。未改`config/13_llm.json`，未触既有13份修改/9项未跟踪。生产仍`not_authorized`，`scale_quality_claim_allowed=false`。
