@@ -42,27 +42,27 @@
 - `requirements.txt` 的 pin 变更**不自动 git 提交**：收到成功报告后人工确认
   diff 并提交（属于仓库 Git 闭环授权的正常提交）。
 
-## 3. 前提配置（一次性）：允许重启服务的 polkit 规则
+## 3. 重启授权（本机已就绪）
 
-`python` 用户默认无权 `systemctl restart quote-system.service`。未配置时自动
-流程仍能完成升级/冒烟/回滚/报告，但报告会提示**手动重启**。要实现全自动，
-由管理员执行一次：
+升级 worker 通过 `sudo -n systemctl restart quote-system.service` 发起重启。
+本机 sudoers 已为 `python` 用户配置单命令免密白名单（`visudo` 查看）：
 
-```bash
-sudo tee /etc/polkit-1/rules.d/50-quote-system-restart.rules <<'EOF'
-polkit.addRule(function(action, subject) {
-    if (action.id == "org.freedesktop.systemd1.manage-units" &&
-        subject.user == "python") {
-        var unit = action.lookup("unit");
-        if (unit == "quote-system.service") { return polkit.Result.YES; }
-    }
-});
-EOF
+```text
+python ALL=(root) NOPASSWD: /usr/bin/systemctl restart quote-system.service
 ```
 
-规则只放行 `python` 用户对 `quote-system.service` 单个单元的管理，不放开其他
-单元。worker 发起重启后自身会被 systemd 终止（属于 `KillMode=control-group`
-的预期行为），因此重启始终是 worker 的最后一个动作。
+- 只放行对 `quote-system.service` 的 restart 这一个动作，不放开其他命令或单元；
+- worker 使用 `sudo -n`（非交互）：白名单命中直接执行，缺失时立即失败并
+  在报告中提示手动重启（`sudoers` 变更后无需重启任何服务，立即生效）；
+- worker 发起重启后自身会被 systemd 终止（`KillMode=control-group` 的预期
+  行为），因此重启始终是 worker 的最后一个动作。
+
+其他机器部署本流程时，若无此类白名单，可由管理员二选一：
+  1. `visudo` 添加上述单命令白名单（推荐，范围最小）；
+  2. 或按 polkit 规则放行 `python` 用户管理该单元：
+     `/etc/polkit-1/rules.d/50-quote-system-restart.rules`
+     （`org.freedesktop.systemd1.manage-units` + `unit == "quote-system.service"`
+     时返回 `YES`）。
 
 ## 4. 手动升级 / 回滚 SOP
 
@@ -107,7 +107,7 @@ sudo systemctl restart quote-system.service
 | 调度报 `akshare_unavailable`（file_fold 之类 FileNotFoundError） | 环境被就地换过包：`pip install --no-deps --force-reinstall akshare==<requirements pin>` 后重启服务 |
 | 冒烟失败、自动回滚成功 | 看报告中的失败用例；多半是 akshare 新版改了接口/列名 → 等 akshare 修复版，或在 provider 配置层适配 |
 | 回滚后冒烟也失败 | 环境/网络问题，人工介入：先跑 `akshare_smoke.py --list-cases` 定位，再检查网络与代理 |
-| 报告"服务重启 manual_required" | polkit 规则未配置或被移除：手动 `sudo systemctl restart quote-system.service`，并按第 3 节补规则 |
+| 报告"服务重启 manual_required" | sudoers 白名单缺失或被移除：手动 `sudo systemctl restart quote-system.service`，并按第 3 节恢复白名单 |
 | 12:00 后没收到任何升级报告 | 查 `log/akshare_upgrade.log` 与 `akshare_upgrade_result.json`；worker 防重入锁 `log/akshare_upgrade.lock` 不会死锁（进程退出自动释放） |
 
 ## 7. 相关文件

@@ -103,15 +103,17 @@ def _install(version: str, *, reinstall: bool = False) -> subprocess.CompletedPr
 
 
 def _restart_service(service: str) -> str:
-    """发起服务重启；polkit 未授权时返回 manual_required。
+    """通过本机既有的 sudoers 白名单发起服务重启；被拒时返回 manual_required。
 
-    授权路径下 systemd 执行 restart 的 stop 阶段会终止本 worker（control-group
-    级杀灭），因此超时意味着重启已在执行；拒绝路径 systemctl 立即非零返回。
-    重启必须是本 worker 的最后一个动作。
+    python 用户被 sudoers 授权 `NOPASSWD: systemctl restart quote-system.service`
+    （见 runbook 第 3 节），因此使用 `sudo -n`：白名单内免密直接放行，白名单
+    缺失时立即非零返回而不是挂起等密码。授权路径下 systemd 执行 restart 的
+    stop 阶段会终止本 worker（control-group 级杀灭），因此超时意味着重启已在
+    执行；重启必须是本 worker 的最后一个动作。
     """
     try:
         process = subprocess.run(
-            ["systemctl", "restart", service],
+            ["sudo", "-n", "systemctl", "restart", service],
             capture_output=True,
             text=True,
             timeout=8,
