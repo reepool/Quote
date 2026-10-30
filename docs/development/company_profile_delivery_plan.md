@@ -2,7 +2,7 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-10-30。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[实载闭环纠偏§15](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#15-实载闭环纠偏停止付费试错当前执行)，依据验收§7.64/A审核§141。银行已交12条pending、核验未发，接受草稿增量但核心交付0/2；§13—§14真实入口全部结束。B连续修通实际目标/账本下的章节核心链，新增真实模型请求/预算0，不借余额接续或重跑两家；实载工程交付后由A裁决新方案，不再付费试已知程序错误。其余十家/S2/生产未授权，原S1自动可用0/12不改。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[核心交付验证§16](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#16-核心交付验证修正与真实运行合在一个窗口)，依据验收§7.65/A审核§143。§15部分接受工程增量、未认定真实就绪，新增实际模型请求0；旧入口/余额均结束。B合并语境/覆盖直接修正、实际owner动态账本及持久三读证明，成立后直接冻结执行两家有界新处理，不再逐项准备送审。资源唯一见验收§7.65，不载旧语义，先造纸成立再银行，各一入口、失败止损；其余十家/S2/生产未授权，S1自动可用0/12不改。
 
 ## 1. 开发者必须先理解的纠偏
 
@@ -10,7 +10,7 @@
 
 现有公告、PDF/布局缓存、Evidence、事实模型、队列、公共LLM网关和查询/导出继续使用。修正`provider=None`可成功冒充语义完成、同field短路、正则决定全文可见性/正文完整性的路径。不要新建agent平台、网关、审计系统或并行writer。
 
-产品不变量：正式源、真实LLM、独立源查漏/核验及原owner三视图。常规路径本地全页索引→关键章节无候选读源→跨章核心草稿及时可见→核验及必要定向扩读；不以全文完读为前置，不以未选中证明不存在。核心质量和吞吐同时验证；待核不是可靠结论，已知错误隔离。实际服务限额通过去重/必要拆包/换源处理，不丢主要条件或清空草稿。当前按验收§7.64停止真实试错，用C1b实际12目标/消费轨迹修通核心摘要及末端，不把3页同一句fixture当公司就绪。新处理禁旧语义，原响应仅作隔离故障回放；不按维度轮取或逐条件扩写，旧限用稿/研发成果及消耗保留。第25次复用及§7.37无限调通只属已结束的歌华任务。
+产品不变量：正式源、真实LLM、独立源查漏/核验及原owner三视图。常规路径本地全页索引→关键章节无候选读源→跨章核心草稿及时可见→核验及必要定向扩读；不以全文完读为前置，不以未选中证明不存在。核心质量和吞吐同时验证；待核不是可靠结论，已知错误隔离。实际服务限额通过去重/必要拆包/换源处理，不丢主要条件或清空草稿。当前验收§7.65将直接修正、实载入口证明及有限真实开发合成一张卡，不把同类型JSON往返/固定消费测试provider当原owner三读，不把引文金额或条件存在当已答。新处理禁旧语义，C1b原响应仅作隔离故障回放；不按维度轮取或逐条件扩写，旧限用稿/研发成果及消耗保留。第25次复用及§7.37无限调通只属已结束的歌华任务。
 
 ## 2. A/B分工、交接和审核顺序
 
