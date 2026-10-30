@@ -38,7 +38,8 @@ from research.company_profile.report_interpretation import (
     pack_fitting_batches,
 )
 from utils.llm.budget import LlmRunBudget
-from utils.llm.errors import LlmError
+from utils.llm.errors import LlmDeadlineExceededError, LlmError
+from utils.llm.models import LlmUsage
 
 NAV_OUTPUT = 1000
 BODY_OUTPUT = 2500
@@ -46,6 +47,22 @@ VERIFY_OUTPUT = 2000
 SOURCE_OUTPUT = 4000
 RESERVATION_LIMIT = 24_000
 LEDGER_LIMIT = 79_000
+
+
+def _nav_output(identity) -> int:
+    return int((identity or {}).get("nav_output_tokens") or NAV_OUTPUT)
+
+
+def _source_output(identity) -> int:
+    return int((identity or {}).get("source_output_tokens") or SOURCE_OUTPUT)
+
+
+def _body_output(identity) -> int:
+    return int((identity or {}).get("body_output_tokens") or BODY_OUTPUT)
+
+
+def _verify_output(identity) -> int:
+    return int((identity or {}).get("verify_output_tokens") or VERIFY_OUTPUT)
 
 
 def _fit(pages, *, purpose, source_scope, report, identity, output, limit):
@@ -330,6 +347,7 @@ def _current_gaps(accumulated, claims, conditions, checks, records=()) -> list[s
                 "evidence_not_located:",
                 "major_evidence_not_located:",
                 "claim_pending:",
+                "verify_unit_not_admitted:",
                 "company_synthesis_context_truncated",
                 "retracted_for_correction:",
                 "read_but_missed:",
@@ -648,8 +666,36 @@ def _norm_source_text(text: str) -> str:
     return re.sub(r"\s+", "", str(text or ""))
 
 
+def _whitespace_span(context: str, quote: str) -> tuple[int, int] | None:
+    """Locate quote inside context when only whitespace differs."""
+    compact_quote = _norm_source_text(quote)
+    if not compact_quote:
+        return None
+    length = len(context)
+    cursor = 0
+    while cursor < length:
+        while cursor < length and context[cursor].isspace():
+            cursor += 1
+        if cursor >= length:
+            break
+        matched = 0
+        end = cursor
+        while end < length and matched < len(compact_quote):
+            if context[end].isspace():
+                end += 1
+                continue
+            if context[end] != compact_quote[matched]:
+                break
+            matched += 1
+            end += 1
+        if matched == len(compact_quote):
+            return cursor, end
+        cursor += 1
+    return None
+
+
 def unique_context_prefix(context: str, quote: str) -> str:
-    """Keep header/period/unit text that is not already the quote."""
+    """Keep subject, period, unit and negation around the quote."""
     context = str(context or "")
     quote = str(quote or "")
     if not context:
@@ -657,15 +703,15 @@ def unique_context_prefix(context: str, quote: str) -> str:
     if not quote:
         return context.strip()
     index = context.find(quote)
+    end = index + len(quote) if index >= 0 else -1
     if index < 0:
-        compact_context = _norm_source_text(context)
-        compact_quote = _norm_source_text(quote)
-        if compact_quote and compact_quote in compact_context:
-            return ""
-        return context.strip()
+        span = _whitespace_span(context, quote)
+        if span is None:
+            return context.strip()
+        index, end = span
     prefix = context[:index].strip()
-    suffix = context[index + len(quote) :].strip()
-    kept = [part for part in (prefix, suffix) if part and part != quote]
+    suffix = context[end:].strip()
+    kept = [part for part in (prefix, suffix) if part and _norm_source_text(part) != _norm_source_text(quote)]
     return "\n".join(kept)
 
 
@@ -839,35 +885,56 @@ def disclosed_core_revenue_facts(sources: Sequence[Mapping[str, Any]]) -> list[d
     return found
 
 
+def _answer_covers_revenue_fact(answers: str, fact: Mapping[str, Any]) -> bool:
+    """A number in a quote or another object does not answer this fact."""
+    amount = str(fact.get("amount") or "").replace(",", "")
+    display = _norm_source_text(str(fact.get("amount") or "") + str(fact.get("unit") or ""))
+    compact = _norm_source_text(answers)
+    if not amount or (amount not in compact and display not in compact):
+        return False
+    labels = {
+        "operating_revenue_total": ("营业收入", "营业总收入"),
+        "net_interest_income": ("利息净收入",),
+        "net_fee_income": ("手续费及佣金净收入", "手续费"),
+        "other_net_income": ("其他净收入",),
+    }
+    return any(label in answers for label in labels.get(str(fact.get("kind") or ""), ("营业收入",)))
+
+
 def missed_core_revenue_facts(
     sources: Sequence[Mapping[str, Any]],
     conditions=(),
     claims=(),
 ) -> list[dict[str, Any]]:
-    """Facts already printed on read pages but absent from conditions and answers."""
-    blob = _norm_source_text(
-        "\n".join(
-            [
-                *(str(getattr(item, "description", "") or "") for item in conditions),
-                *(
-                    str(getattr(getattr(evidence, "anchor", None), "bounded_quote", "") or "")
-                    for item in (*conditions, *claims)
-                    for evidence in getattr(item, "evidence", ()) or ()
-                ),
-                *(str(getattr(item, "answer", "") or "") for item in claims),
-            ]
-        )
-    )
+    """Facts already printed on read pages but absent from delivered answers."""
+    answers = "\n".join(str(getattr(item, "answer", "") or "") for item in claims)
     missed = []
     for fact in disclosed_core_revenue_facts(sources):
-        amount = fact["amount"].replace(",", "")
-        if amount and amount in blob:
-            continue
-        display = _norm_source_text(fact["amount"] + fact.get("unit", ""))
-        if display and display in blob:
+        if _answer_covers_revenue_fact(answers, fact):
             continue
         missed.append(fact)
     return missed
+
+
+_RATE_STOP = frozenset(
+    {"增长", "增速", "增幅", "变动", "增加", "减少", "同比", "分别", "其中", "达到", "实现"}
+)
+
+
+def _metric_labels(text: str) -> list[str]:
+    """Nearby names for a printed rate. Fixed bank words are only hints."""
+    labels: list[str] = []
+    for match in re.finditer(
+        r"([\u4e00-\u9fff]{2,12})(?:增长|增速|增幅|变动)\s*\d{1,2}\.\d{2}\s*%",
+        text,
+    ):
+        label = match.group(1)
+        if label not in _RATE_STOP:
+            labels.append(label)
+    for hint in ("托管", "受托", "资产托管"):
+        if hint in text:
+            labels.append(hint)
+    return list(dict.fromkeys(label for label in labels if label))
 
 
 def related_conflict_pages(claim, sources: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
@@ -878,15 +945,10 @@ def related_conflict_pages(claim, sources: Sequence[Mapping[str, Any]]) -> list[
         for evidence in getattr(claim, "evidence", ()) or ()
     )
     cited = {int(evidence.page) for evidence in getattr(claim, "evidence", ()) or ()}
-    rates = re.findall(r"(\d{1,2}\.\d{2})\s*%", answer + "\n" + quotes)
-    if not rates:
-        return []
-    stems = [
-        token
-        for token in ("托管", "受托", "资产托管", "规模")
-        if token in answer or token in quotes
-    ]
-    if not stems:
+    body = answer + "\n" + quotes
+    rates = re.findall(r"(\d{1,2}\.\d{2})\s*%", body)
+    labels = _metric_labels(body)
+    if not rates or not labels:
         return []
     extra = []
     seen: set[int] = set()
@@ -895,7 +957,7 @@ def related_conflict_pages(claim, sources: Sequence[Mapping[str, Any]]) -> list[
         if page_no in cited or page_no in seen:
             continue
         text = str(source.get("text") or "")
-        if not any(stem in text for stem in stems):
+        if not any(label in text for label in labels):
             continue
         other = set(re.findall(r"(\d{1,2}\.\d{2})\s*%", text))
         if other and other != set(rates) and other & set(rates) != other:
@@ -965,7 +1027,7 @@ def navigation_batches(pages, report, identity, limit: int):
             source_scope="page_map",
             report=report,
             identity=identity,
-            output=NAV_OUTPUT,
+            output=_nav_output(identity),
             limit=limit,
         ),
         split_mode="boundary",
@@ -1002,7 +1064,7 @@ def source_discovery_slices(pages, report, identity, limit: int):
             source_scope="full_context",
             report=report,
             identity=identity,
-            output=SOURCE_OUTPUT,
+            output=_source_output(identity),
             limit=limit,
         )
 
@@ -1049,7 +1111,7 @@ def fulltext_entry_plan(
             source_scope="full_context",
             report=report,
             identity=identity,
-            output=SOURCE_OUTPUT,
+            output=_source_output(identity),
         )
         for batch in slices
     ]
@@ -1060,7 +1122,7 @@ def fulltext_entry_plan(
         source_scope="full_context",
         report=report,
         identity=identity,
-        output=BODY_OUTPUT,
+        output=_body_output(identity),
     )
     verification_units = _nonempty_verify_units(sample, report=report, identity=identity)
     largest = max(source_units)
@@ -1115,7 +1177,7 @@ def body_packages(pages, report, identity, limit: int):
             source_scope="full_context",
             report=report,
             identity=identity,
-            output=BODY_OUTPUT,
+            output=_body_output(identity),
             limit=limit,
         )
         and _fit(
@@ -1124,7 +1186,7 @@ def body_packages(pages, report, identity, limit: int):
             source_scope="full_context",
             report=report,
             identity=identity,
-            output=BODY_OUTPUT,
+            output=_body_output(identity),
             limit=limit,
         )
         and _fit(
@@ -1133,7 +1195,7 @@ def body_packages(pages, report, identity, limit: int):
             source_scope="full_context",
             report=report,
             identity=identity,
-            output=VERIFY_OUTPUT,
+            output=_verify_output(identity),
             limit=limit,
         ),
         split_mode="boundary",
@@ -1162,7 +1224,7 @@ def joint_verify_reservation(
             source_conditions=tuple(conditions),
             claims=tuple(claims),
             records=tuple(records),
-            max_output_tokens=VERIFY_OUTPUT,
+            max_output_tokens=_verify_output(identity),
             timeout_seconds=float(identity.get("logical_request_timeout_seconds") or 120),
         )
     )
@@ -1200,7 +1262,7 @@ def _first_delivery_tail(pages, *, report, identity, limit: int) -> int:
             source_scope="full_context",
             report=report,
             identity=identity,
-            output=SOURCE_OUTPUT,
+            output=_source_output(identity),
         )
         + _units(
             first,
@@ -1208,7 +1270,7 @@ def _first_delivery_tail(pages, *, report, identity, limit: int) -> int:
             source_scope="full_context",
             report=report,
             identity=identity,
-            output=BODY_OUTPUT,
+            output=_body_output(identity),
         )
         + _nonempty_verify_units(first, report=report, identity=identity)
     )
@@ -1224,7 +1286,7 @@ def _compose_tail(pages, *, report, identity) -> int:
             source_scope="full_context",
             report=report,
             identity=identity,
-            output=BODY_OUTPUT,
+            output=_body_output(identity),
         )
         + _nonempty_verify_units(pages, report=report, identity=identity)
     )
@@ -1267,7 +1329,7 @@ def _nonempty_verify_units(piece, *, report, identity) -> int:
             source_scope="full_context",
             source_conditions=(condition,),
             claims=(claim,),
-            max_output_tokens=VERIFY_OUTPUT,
+            max_output_tokens=_verify_output(identity),
             timeout_seconds=float(
                 identity.get("logical_request_timeout_seconds") or 120
             ),
@@ -1302,7 +1364,7 @@ def first_package_plan(
             source_scope="page_map",
             report=report,
             identity=identity,
-            output=NAV_OUTPUT,
+            output=_nav_output(identity),
         )
         for batch in nav
     ]
@@ -1312,7 +1374,7 @@ def first_package_plan(
         source_scope="full_context",
         report=report,
         identity=identity,
-        output=BODY_OUTPUT,
+        output=_body_output(identity),
     )
     gap_units = _units(
         piece,
@@ -1320,7 +1382,7 @@ def first_package_plan(
         source_scope="full_context",
         report=report,
         identity=identity,
-        output=BODY_OUTPUT,
+        output=_body_output(identity),
     )
     verify_units = _units(
         piece,
@@ -1328,7 +1390,7 @@ def first_package_plan(
         source_scope="full_context",
         report=report,
         identity=identity,
-        output=VERIFY_OUTPUT,
+        output=_verify_output(identity),
     )
     nonempty_verify = _nonempty_verify_units(
         piece, report=report, identity=identity
@@ -1431,7 +1493,9 @@ def interpret_direct_core(
 
     def charged() -> int:
         prior = int(identity.get("prior_charged_tokens") or 0)
-        return prior + int(snapshot().get("charged_tokens") or 0)
+        live = int(snapshot().get("charged_tokens") or 0)
+        simulated = int(identity.get("offline_charged_tokens") or 0)
+        return prior + max(live, simulated)
 
     def pack_room() -> int:
         remaining = ledger - charged() - tail_hold
@@ -1541,6 +1605,38 @@ def interpret_direct_core(
             response = ReportSemanticResponseV3.model_validate_json(
                 json.dumps(response, ensure_ascii=False)
             )
+        already = any(
+            item.get("logical_request_id") == request.request_id
+            or item.get("request_id") == request.request_id
+            for item in snapshot().get("attempts") or ()
+        )
+        if not already:
+            identity["offline_charged_tokens"] = int(
+                identity.get("offline_charged_tokens") or 0
+            ) + int(units)
+            if execution_budget is not None:
+                try:
+                    ticket = execution_budget.reserve(
+                        resource="offline",
+                        model="offline-substitute",
+                        profile="semantic_extraction",
+                        payload={"max_completion_tokens": min(int(output), 4_000)},
+                        request_id=request.request_id,
+                        attempt=1,
+                        logical_request_id=request.request_id,
+                        source_label="offline_substitute",
+                    )
+                    execution_budget.settle(
+                        ticket,
+                        LlmUsage(
+                            input_tokens=0,
+                            output_tokens=int(units),
+                            total_tokens=int(units),
+                        ),
+                        status="success",
+                    )
+                except (LlmDeadlineExceededError, ValueError):
+                    gaps.append("direct_core_ledger_hold")
         request_targets = []
         for claim in request.claims:
             request_targets.append(
@@ -1677,7 +1773,7 @@ def interpret_direct_core(
                 source_scope="full_context",
                 claims=tuple(group),
                 records=tuple(related),
-                max_output_tokens=VERIFY_OUTPUT,
+                max_output_tokens=_verify_output(identity),
                 timeout_seconds=float(identity.get("logical_request_timeout_seconds") or 120),
             )
         )
@@ -1912,7 +2008,7 @@ def interpret_direct_core(
                         claims=tuple(group),
                         records=tuple(related),
                         source_conditions=tuple(conditions),
-                        max_output_tokens=VERIFY_OUTPUT,
+                        max_output_tokens=_verify_output(identity),
                         timeout_seconds=float(
                             identity.get("logical_request_timeout_seconds") or 120
                         ),
@@ -1924,23 +2020,6 @@ def interpret_direct_core(
                 return room + 1, pages, related, conditions
             return units, pages, related, conditions
 
-        support_groups: list[list] = []
-        pending_claims: list = []
-        current: list = []
-        for claim in observable:
-            if already_trusted(claim):
-                continue
-            if measure([claim], [])[0] > pack_room():
-                pending_claims.append(claim)
-                continue
-            trial = current + [claim]
-            if current and measure(trial, [])[0] > pack_room():
-                support_groups.append(current)
-                current = [claim]
-            else:
-                current = trial
-        if current:
-            support_groups.append(current)
         sent_conditions: set[str] = set()
 
         def attach(group, pool):
@@ -1970,7 +2049,7 @@ def interpret_direct_core(
                     "verify_views",
                     pages,
                     source_scope="full_context",
-                    output=VERIFY_OUTPUT,
+                    output=_verify_output(identity),
                     later=0,
                     extra={
                         "claims": tuple(group),
@@ -2022,13 +2101,39 @@ def interpret_direct_core(
             publish()
             return True
 
-        for claim in pending_claims:
-            keep_pending(claim, "verify_unit_not_admitted")
-            publish()
-        for group in support_groups:
+        remaining = [claim for claim in observable if not already_trusted(claim)]
+        while remaining:
+            room = pack_room()
+            group: list = []
+            next_round: list = []
+            overflow: list = []
+            for claim in remaining:
+                if measure([claim], [])[0] > room:
+                    overflow.append(claim)
+                    continue
+                trial = group + [claim]
+                if group and measure(trial, [])[0] > room:
+                    next_round.append(claim)
+                else:
+                    group = trial
+            if not group:
+                for claim in overflow + next_round:
+                    keep_pending(claim, "verify_unit_not_admitted")
+                    publish()
+                break
             if not send(group, attach(group, package_conditions), support=True):
                 if any(gap.startswith("direct_core_ledger_hold") for gap in gaps):
                     return
+                if any(gap.startswith("direct_core_verify_stopped:") for gap in gaps):
+                    for claim in next_round:
+                        keep_pending(claim, "claim_pending")
+                    for claim in overflow:
+                        keep_pending(claim, "verify_unit_not_admitted")
+                    return
+            remaining = next_round
+            for claim in overflow:
+                keep_pending(claim, "verify_unit_not_admitted")
+                publish()
         pending_conditions = [
             condition
             for condition in package_conditions
@@ -2116,7 +2221,7 @@ def interpret_direct_core(
                 source_scope="full_context",
                 report=report,
                 identity=identity,
-                output=BODY_OUTPUT,
+                output=_body_output(identity),
             )
             if units <= limit:
                 batch = trial
@@ -2129,7 +2234,7 @@ def interpret_direct_core(
                 source_scope="full_context",
                 report=report,
                 identity=identity,
-                output=BODY_OUTPUT,
+                output=_body_output(identity),
             )
             if single > limit:
                 gaps.append(f"gap_page_not_admitted:{page['page']}")
@@ -2145,7 +2250,7 @@ def interpret_direct_core(
                     "source_inventory",
                     piece,
                     source_scope="full_context",
-                    output=BODY_OUTPUT,
+                    output=_body_output(identity),
                     later=_nonempty_verify_units(piece, report=report, identity=identity),
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
@@ -2207,7 +2312,7 @@ def interpret_direct_core(
                     source_scope="full_context",
                     source_conditions=tuple(group),
                     claims=tuple(delivered),
-                    max_output_tokens=VERIFY_OUTPUT,
+                    max_output_tokens=_verify_output(identity),
                     timeout_seconds=float(identity.get("logical_request_timeout_seconds") or 120),
                 )
             ) if pages else limit + 1
@@ -2251,7 +2356,7 @@ def interpret_direct_core(
                     "verify_views",
                     pages,
                     source_scope="full_context",
-                    output=VERIFY_OUTPUT,
+                    output=_verify_output(identity),
                     later=0,
                     extra={
                         "source_conditions": tuple(group),
@@ -2312,7 +2417,7 @@ def interpret_direct_core(
                         "source_inventory",
                         package,
                         source_scope="full_context",
-                        output=BODY_OUTPUT,
+                        output=_body_output(identity),
                         later=_nonempty_verify_units(package, report=report, identity=identity),
                     )
                     discovered_scopes.add(scope)
@@ -2341,7 +2446,7 @@ def interpret_direct_core(
                     "synthesize_views",
                     package,
                     source_scope="full_context",
-                    output=BODY_OUTPUT,
+                    output=_body_output(identity),
                     later=_nonempty_verify_units(package, report=report, identity=identity),
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
@@ -2420,7 +2525,7 @@ def interpret_direct_core(
                     "source_inventory",
                     batch,
                     source_scope="page_map",
-                    output=NAV_OUTPUT,
+                    output=_nav_output(identity),
                     later=(
                         _first_delivery_tail(
                             reserve_pages,
@@ -2529,7 +2634,7 @@ def interpret_direct_core(
                     "source_inventory",
                     package,
                     source_scope="full_context",
-                    output=SOURCE_OUTPUT,
+                    output=_source_output(identity),
                     later=source_later,
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
@@ -2725,7 +2830,7 @@ def interpret_direct_core(
                 source_pages=tuple(pages),
                 source_scope="full_context",
                 source_conditions=tuple(selected),
-                max_output_tokens=BODY_OUTPUT,
+                max_output_tokens=_body_output(identity),
                 timeout_seconds=float(
                     identity.get("logical_request_timeout_seconds") or 120
                 ),
@@ -2849,7 +2954,7 @@ def interpret_direct_core(
                 source_pages=tuple(pages),
                 source_scope="full_context",
                 source_conditions=tuple(pending),
-                max_output_tokens=BODY_OUTPUT,
+                max_output_tokens=_body_output(identity),
                 timeout_seconds=float(
                     identity.get("logical_request_timeout_seconds") or 120
                 ),
@@ -2866,7 +2971,7 @@ def interpret_direct_core(
                 "synthesize_views",
                 pages,
                 source_scope="full_context",
-                output=BODY_OUTPUT,
+                output=_body_output(identity),
                 later=0,
                 extra={"source_conditions": tuple(pending)},
             )
@@ -3080,14 +3185,7 @@ def interpret_direct_core(
                         }
                     )
                     upsert(claim)
-                    if claim.dimension in {
-                        "principal_business",
-                        "revenue_model",
-                        "products_services",
-                        "input_exposure",
-                        "supply_chain_role",
-                        "upstream_downstream",
-                    }:
+                    if claim.dimension in _CORE_CLOSEOUT_DIMENSIONS:
                         pending_core.append(claim.model_copy(update={"limitation": None}))
                     continue
                 if claim.claim_id in set(identity.get("isolated_claim_ids") or ()):
@@ -3103,14 +3201,11 @@ def interpret_direct_core(
                     continue
                 kept_answers.append(claim.answer)
                 upsert(claim)
-                if claim.claim_id not in defer and claim.limitation == "pending_verification" and claim.dimension in {
-                    "principal_business",
-                    "revenue_model",
-                    "products_services",
-                    "input_exposure",
-                    "supply_chain_role",
-                    "upstream_downstream",
-                }:
+                if (
+                    claim.claim_id not in defer
+                    and claim.limitation == "pending_verification"
+                    and claim.dimension in _CORE_CLOSEOUT_DIMENSIONS
+                ):
                     pending_core.append(claim)
                     drafted_condition_ids.update(str(item) for item in (claim.condition_ids or ()))
             kept_checks = []
@@ -3258,7 +3353,7 @@ def interpret_direct_core(
                             "source_inventory",
                             package,
                             source_scope="full_context",
-                            output=SOURCE_OUTPUT,
+                            output=_source_output(identity),
                             later=0,
                         )
                         extra, extra_gaps = _located_conditions(
@@ -3720,7 +3815,7 @@ def interpret_direct_core(
                     source_scope="full_context",
                     report=report,
                     identity=identity,
-                    output=SOURCE_OUTPUT,
+                    output=_source_output(identity),
                 )
                 for batch in planned
             ]
@@ -3732,7 +3827,7 @@ def interpret_direct_core(
                     source_scope="full_context",
                     report=report,
                     identity=identity,
-                    output=BODY_OUTPUT,
+                    output=_body_output(identity),
                 )
                 + _nonempty_verify_units(sample, report=report, identity=identity)
                 + 2 * max(slice_units)

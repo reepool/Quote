@@ -1272,6 +1272,16 @@ def _worker(
         identity["request_reservation_limit"] = int(
             binding.get("request_reservation_limit", 24_000)
         )
+        if binding.get("prior_charged_tokens"):
+            identity["prior_charged_tokens"] = int(binding["prior_charged_tokens"])
+        for key in (
+            "nav_output_tokens",
+            "source_output_tokens",
+            "body_output_tokens",
+            "verify_output_tokens",
+        ):
+            if binding.get(key):
+                identity[key] = int(binding[key])
         if binding.get("logical_request_timeout_seconds"):
             identity["logical_request_timeout_seconds"] = int(
                 binding["logical_request_timeout_seconds"]

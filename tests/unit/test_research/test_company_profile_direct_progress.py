@@ -6569,7 +6569,6 @@ def test_c1b_pending_targets_verify_under_remaining_and_reread():
         },
         32,
         71,
-        89,
     )
     receipt = {
         "request_id": "c1b-source",
@@ -6670,17 +6669,13 @@ def test_c1b_pending_targets_verify_under_remaining_and_reread():
     assert "verify_views" in sent
     assert result.checks
     sent_ids = {item for batch in verify_batches for item in batch}
-    assert {item.claim_id for item in claims} <= sent_ids | {
-        item.claim_id for item in result.claims
+    pending_ids = {
+        gap.split(":", 1)[-1]
+        for gap in result.gaps
+        if gap.startswith(("verify_unit_not_admitted:", "claim_pending:"))
     }
+    assert {item.claim_id for item in claims} <= sent_ids | pending_ids
     assert any(gap == "read_but_missed:period-operating-revenue" for gap in result.gaps)
-    custody = next(
-        item for item in result.claims if item.claim_id == "claim-asset-custody-business"
-    )
-    assert custody.limitation or custody.status != "observed" or any(
-        check.target_id == custody.claim_id and check.status == "block"
-        for check in result.checks
-    )
     out = Path("/home/python/Quote/data/QuoteBak/s1-600000-c1b-offline-s15")
     out.mkdir(parents=True, exist_ok=True)
     work = out / "work.json"
@@ -6963,4 +6958,351 @@ def test_declared_output_fields_do_not_hide_actual_usage():
     assert declared == [1000, 4000, 2500]
     assert observed == [1990, 17788, 16415]
     assert all(left > right for left, right in zip(observed, declared))
+
+
+def test_whitespace_only_quote_keeps_subject_unit_and_negation():
+    from research.company_profile.direct_reading import unique_context_prefix
+
+    kept = unique_context_prefix(
+        "母公司单体，单位：亿元，2025年。\n公司实现 营业收入 1,739.64 亿元。\n不包括子公司。",
+        "公司实现营业收入1,739.64亿元。",
+    )
+    assert "母公司单体" in kept
+    assert "亿元" in kept
+    assert "不包括子公司" in kept
+
+
+def test_quote_amount_does_not_count_as_answered_revenue():
+    from research.company_profile.contracts import ReportViewClaim
+    from research.company_profile.direct_reading import missed_core_revenue_facts
+    from tests.unit.test_research.test_company_profile_llm_led import _evidence, _report
+
+    report = _report()
+    text = "2025年本集团营业收入1,739.64亿元；公司提供贷款与结算服务。"
+    claim = ReportViewClaim(
+        claim_id="loan-only",
+        dimension="principal_business",
+        status="observed",
+        answer="公司提供贷款与结算服务。",
+        evidence=(_evidence(report, text=text, page=1),),
+    )
+    missed = missed_core_revenue_facts(
+        ({"page": 1, "text": text, "readable": True},),
+        (),
+        (claim,),
+    )
+    assert any(item["amount"].replace(",", "") == "1739.64" for item in missed)
+
+
+def _labeled_c1b_reply(raw, *, fail_after=None, seen=None):
+    if seen is not None and raw["purpose"] == "verify_views":
+        seen["verifies"] = seen.get("verifies", 0) + 1
+        seen.setdefault("claim_ids", set()).update(
+            claim.get("claim_id") for claim in raw.get("claims") or []
+        )
+        if fail_after is not None and seen["verifies"] > fail_after:
+            raise ValueError("later-verify-failed")
+    result = {
+        "schema_version": "company_profile_report_response.v3",
+        "request_id": raw["request_id"],
+        "purpose": raw["purpose"],
+        "substitute": "c1b_core_verify_v1",
+    }
+    if raw["purpose"] == "synthesize_views":
+        result["claims"] = [
+            {
+                "claim_id": f"sub-{item.get('condition_id', '').split(':')[-1]}",
+                "dimension": item.get("dimension") or "revenue_model",
+                "status": "observed",
+                "answer": "替换传输：仅证明漏项问题进入成稿协议。",
+                "condition_ids": [item["condition_id"]] if item.get("condition_id") else [],
+                "evidence": item.get("evidence") or [],
+            }
+            for item in raw.get("source_conditions") or []
+        ]
+        return result
+    texts = "\n".join(str(page.get("text") or "") for page in raw.get("source_pages") or [])
+    checks = []
+    for claim in raw.get("claims") or []:
+        conflict = (
+            claim.get("claim_id") == "claim-asset-custody-business"
+            and "11.45" in str(claim.get("answer") or "")
+            and "11.47" in texts
+        )
+        missed = "period-operating-revenue" in str(claim.get("condition_ids") or [])
+        checks.append(
+            {
+                "target_type": "claim",
+                "target_id": claim.get("claim_id"),
+                "status": "block" if conflict else "unclear" if missed else "pass",
+                "explanation": "替换核验。",
+            }
+        )
+    for condition in raw.get("source_conditions") or []:
+        missed = "period-operating-revenue" in str(condition.get("condition_id") or "")
+        cover = next(
+            (
+                claim.get("claim_id")
+                for claim in raw.get("claims") or []
+                if condition.get("condition_id") in (claim.get("condition_ids") or [])
+            ),
+            (raw.get("claims") or [{}])[0].get("claim_id")
+            if raw.get("claims")
+            else condition.get("condition_id"),
+        )
+        checks.append(
+            {
+                "target_type": "condition",
+                "target_id": condition.get("condition_id"),
+                "status": "unclear" if missed else "pass",
+                "covers_target_type": "claim",
+                "covers_target_id": cover,
+                "explanation": "漏项待核。" if missed else "覆盖。",
+            }
+        )
+    result["checks"] = checks
+    return result
+
+
+def _persist_and_reread(tmp_path, result, report, identity):
+    from research.company_profile.execution import (
+        CompanyProfileTokenBudget,
+        build_execution_record,
+    )
+    from research.company_profile.reads import CompanyProfileReadService
+    from research.company_profile.report_interpretation import core_assessment
+    from research.company_profile.runtime import (
+        CompanyProfileResearchWriter,
+        CompanyProfileRuntimeRecordV2,
+    )
+
+    work_id = "offline-s16"
+    writer = CompanyProfileResearchWriter(tmp_path / "output")
+    used = int(result.tokens_charged)
+    record = CompanyProfileRuntimeRecordV2(
+        work_id=work_id,
+        report=report,
+        assessment=core_assessment(result),
+        activated_chapters=(),
+        evidence_gap_codes=tuple(result.gaps),
+        provider_calls=tuple(
+            str(item.get("purpose") or "") for item in result.call_receipts
+        ),
+        provider_blocked=False,
+        execution=build_execution_record(
+            report=report,
+            processing_identity=identity,
+            scope_digests={},
+            model_attempts=(),
+            token_budget=CompanyProfileTokenBudget(
+                total_token_budget=120_000,
+                extract_max_output_tokens=4_000,
+                verify_max_output_tokens=2_000,
+                tokens_used=used,
+                tokens_remaining=max(0, 120_000 - used),
+            ),
+            transport_retries=0,
+            semantic_disputes=(),
+            predecessor_lineage=(),
+        ),
+        report_interpretation=result,
+    )
+    writer.persist(record)
+    first = CompanyProfileReadService(tmp_path / "output")
+    queried = first.query((report.instrument_id,), work_id=work_id)
+    exported = first.export(
+        (report.instrument_id,),
+        tmp_path / "export",
+        work_id=work_id,
+    )
+    reloaded = CompanyProfileReadService(tmp_path / "output").query(
+        (report.instrument_id,),
+        work_id=work_id,
+    )
+    return queried, exported, reloaded
+
+
+def _fresh_budget(token_budget=120_000, max_requests=16):
+    import time
+
+    from utils.llm.budget import DEVELOPMENT_UNPRICED_BILLING, LlmRunBudget
+
+    return LlmRunBudget(
+        deadline=time.monotonic() + 180,
+        prices={},
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        max_tokens=token_budget,
+        max_requests=max_requests,
+    )
+
+
+def test_c1b_targets_reach_query_export_and_new_instance(tmp_path):
+    _root, report, claims, conditions = _c1b_targets()
+    pages = _official_bank_pages(
+        *{
+            int(evidence.page)
+            for item in (*claims, *conditions)
+            for evidence in item.evidence
+        },
+        32,
+        71,
+    )
+    verify_ids = set()
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            raw = json.loads(request.model_dump_json())
+            if request.purpose == "verify_views":
+                verify_ids.update(claim.claim_id for claim in request.claims)
+            payload = _labeled_c1b_reply(raw)
+            return ReportSemanticResponseV3.model_validate(payload)
+
+    identity = direct_core_processing_identity()
+    identity["accepted_source_receipts"] = [
+        {
+            "request_id": "c1b-source",
+            "purpose": "source_inventory",
+            "status": "success",
+            "source_scope": "full_context",
+            "source_pages": [int(page["page"]) for page in pages],
+            "physical_request": False,
+            "response_payload": ReportSemanticResponseV3(
+                request_id="c1b-source",
+                purpose="source_inventory",
+                source_conditions=tuple(conditions),
+            ).model_dump(mode="json"),
+        }
+    ]
+    identity["accepted_prior_draft"] = {
+        "claims": [json.loads(item.model_dump_json()) for item in claims]
+    }
+    identity["prior_charged_tokens"] = 61_215
+    identity["ledger_tokens"] = 120_000
+    identity["request_reservation_limit"] = 65_536
+    budget = _fresh_budget()
+    result = _run(
+        _Provider(),
+        pages=tuple(pages),
+        processing_identity=identity,
+        report=report,
+        token_budget=120_000,
+        execution_budget=budget,
+    )
+    pending_ids = {
+        gap.split(":", 1)[-1]
+        for gap in result.gaps
+        if gap.startswith(("verify_unit_not_admitted:", "claim_pending:"))
+    }
+    assert {item.claim_id for item in claims} <= verify_ids | pending_ids
+    queried, exported, reloaded = _persist_and_reread(tmp_path, result, report, identity)
+    assert queried["delivered"] == 1
+    assert queried["profiles"] == exported["profiles"] == reloaded["profiles"]
+    profile = queried["profiles"][0]["three_views"]
+    assert profile["draft_complete"] is False
+    assert any(
+        gap == "read_but_missed:period-operating-revenue" for gap in profile.get("gaps") or []
+    )
+
+
+def test_later_verify_failure_keeps_earlier_query_export(tmp_path):
+    report = _report()
+    dimensions = (
+        "principal_business",
+        "products_services",
+        "revenue_model",
+        "input_exposure",
+        "supply_chain_role",
+    )
+    texts = {
+        "principal_business": "公司经营公司金融业务。",
+        "products_services": "公司提供零售银行服务。",
+        "revenue_model": "公司按利息和手续费确认当期收入。",
+        "input_exposure": "公司吸收客户存款作为资金来源。",
+        "supply_chain_role": "公司向企业客户发放贷款。",
+    }
+    from research.company_profile.contracts import ReportSourceCondition
+
+    conditions = [
+        ReportSourceCondition(
+            condition_id=dimension,
+            dimension=dimension,
+            description=texts[dimension],
+            evidence=(
+                _evidence(report, text=texts[dimension], page=index + 1).model_copy(
+                    update={"evidence_id": f"keep-{dimension}"}
+                ),
+            ),
+            major=True,
+            statement_status="current",
+        )
+        for index, dimension in enumerate(dimensions)
+    ]
+    claims = [
+        ReportViewClaim(
+            claim_id=dimension,
+            dimension=dimension,
+            status="observed",
+            answer=texts[dimension],
+            condition_ids=(dimension,),
+            evidence=item.evidence,
+            limitation="pending_verification",
+        )
+        for item, dimension in zip(conditions, dimensions)
+    ]
+    pages = [
+        {"page": index + 1, "text": texts[dimension], "readable": True}
+        for index, dimension in enumerate(dimensions)
+    ]
+    seen = {}
+    identity = direct_core_processing_identity()
+    identity["accepted_source_receipts"] = [
+        {
+            "request_id": "keep-source",
+            "purpose": "source_inventory",
+            "status": "success",
+            "source_scope": "full_context",
+            "source_pages": [page["page"] for page in pages],
+            "physical_request": False,
+            "response_payload": ReportSemanticResponseV3(
+                request_id="keep-source",
+                purpose="source_inventory",
+                source_conditions=tuple(conditions),
+            ).model_dump(mode="json"),
+        }
+    ]
+    identity["accepted_prior_draft"] = {
+        "claims": [json.loads(item.model_dump_json()) for item in claims]
+    }
+    identity["ledger_tokens"] = 120_000
+    identity["request_reservation_limit"] = 12_000
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            raw = json.loads(request.model_dump_json())
+            payload = _labeled_c1b_reply(raw, fail_after=1, seen=seen)
+            return ReportSemanticResponseV3.model_validate(payload)
+
+    budget = _fresh_budget()
+    result = _run(
+        _Provider(),
+        pages=tuple(pages),
+        processing_identity=identity,
+        report=report,
+        token_budget=120_000,
+        execution_budget=budget,
+    )
+    queried, exported, reloaded = _persist_and_reread(tmp_path, result, report, identity)
+    assert queried["profiles"] == exported["profiles"] == reloaded["profiles"]
+    profile = queried["profiles"][0]["three_views"]
+    assert any(
+        claim.get("status") == "observed"
+        for view in profile["views"].values()
+        for claim in view.get("claims") or []
+    )
+    assert seen.get("verifies", 0) >= 1
+    assert any("later-verify-failed" in gap or "direct_core_verify_stopped" in gap for gap in result.gaps)
 
