@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-30，[A审核§145](#145-a审核入口期限与账本接线仍未闭环)）：§16局部修复成立，但实际入口证明仍未完成，且A复现一次传输被计成两次物理/额外消费。新增真实模型调用0，S1仍0/12。当前仅原§16的[连续接续§16.5](b3-s1-execution-card.md#165-入口期限与单一账本接续当前执行)，不加额度；修通实际入口并冻结后直接先造纸后银行，不另等逐项审批。未就绪不外呼，旧余额/其他十家/S2/生产仍不授权。
+当前状态（2026-10-30，[B交付§146](#146-b交付单一账本与入口阶段轨迹)）：重复记账已修；实际入口+公共网关+query/export已跑通，发送与usage一一对应。120秒是整段业务期限，主要耗在本地库/解析/语义而非池等待或传输。D2夹具仍因tail_hold截断后续切片而不完整，未冻结外呼。新增真实模型0，S1仍0/12。
 
 ## 1. 唯一实施指引
 
@@ -6179,3 +6179,50 @@ B本次按前置不成立而未外呼是正确止损；但“修完后再等A批
 ### 145.4 验证、清理与范围
 
 A的零外呼反例仅用内联替换传输、独立coordinator和内存预算，未创建新运行库或模型binding；本轮四项pytest结束后，核确切路径并删除本人两套可重建的读回/导出输出，约748K，可由上述测试重建。保留B的C1b首次回执/12草稿、正式PDF、必要解析缓存及约392K的offline-s15；无权威替换件前不删，未知归属/并行内容不动。B开始前及交接时按AGENTS§2.4核可重建测试副本，只留一套必要证据。A仅更新审核和活动规划，不改应用/测试/共享配置；既有13份修改及9项未跟踪内容继续保护。OpenSpec严格校验、19处新增本地链接/锚点及`git diff --check`通过；Review只要求上述直接阻塞及本卡必要绑定，不派生无关旧测试/架构任务。
+
+## 146. B交付单一账本与入口阶段轨迹
+
+日期：2026-10-30。实施`bbf459dc`之后的§16.5。**不自评S1，不外呼。**
+
+### 146.1 重复记账
+
+`invoke`不再用业务`request_id`去对网关的哈希`logical_request_id`，也不再补一条`offline`物理账。真实/Probe+`physical_budget`只认网关usage；`offline_charged_tokens`只留给没有物理账本的明确`offline_only`假provider。
+
+A反例路径复现后：一次替换usage=120只记1物理/120，不再出现2/4329。`test_gateway_usage_is_booked_once_not_reserved_again`通过。实际入口`bounded_entry`一次成功轨迹：传输3、账本3、charged=360=120×3；三次attempt的`request_id`与哈希`logical_request_id`不同，旧匹配本来就会再记一笔。供应商只看到3次替换发送。
+
+### 146.2 120秒在哪
+
+`LlmClient.complete`用`asyncio.timeout(physical_budget.remaining())`包住整次complete（含准入）。共享限流槽被占时，1.2秒业务期限会在未发送时以`business entry deadline exhausted`结束；隔离限流后立即发送。`test_admission_wait_exhausts_business_deadline_without_a_send`通过。
+
+实际入口（`bounded_entry.main` → 子进程`TaskService.execute("run")` → 公共网关 + 替换传输）一份阶段账：
+
+| 阶段 | 相对worker起点 | 含义 |
+| --- | --- | --- |
+| client_ready | 0.0s | 离线已隔离limiter/provider/pool，不是共享池排队 |
+| execute_start | ~45s | 本地research库初始化/入队 |
+| pages_loaded | ~58s | 正式PDF解析/页绑定 |
+| 3次替换发送 | admission_wait 0–1ms，verify含协议8s sleep | 传输本身 |
+| execute_done | ~118s | 语义+verify+publish |
+| query_export_done | +1s | 原owner读回 |
+
+先前两次~120秒失败是把整段业务期限当成“一次模型等待”。本地库+解析+语义已接近120秒；再叠加共享池等待就会在发送前耗尽。不是模型慢，也不是加时能消掉的重复记账。离线入口现在隔离协调器；正式入口仍走共享池，造纸授权是1200秒。
+
+启动命令（可复现，替换传输，非公司成绩）：
+
+```text
+pytest tests/unit/test_research/test_company_profile_bounded_entry.py::test_direct_chain_entry_completes_and_keeps_a_verified_package --confcutdir=tests/unit/test_research
+```
+
+### 146.3 整链与未外呼
+
+C1b四项直接复验仍通过。`CompanyProfileTaskService.execute("run")`经`bounded_entry`公共网关、替换usage入账、query/export/新实例一致、delivered=1。不是手工writer。
+
+`test_direct_chain_entry`在上述3发送轨迹上仍`draft_complete=false`：首个source切片发出后，`tail_hold`（synth+verify+2×最大切片）把120000账本占满，后续切片`direct_core_ledger_hold`/`necessary_unread`。这是程序完整性，不是LLM。曾把已发送切片从`tail_hold`扣除，该次只剩1次发送且query delivered=0，已撤回，不把空稿当成功。
+
+因此未冻结、未使用原§16造纸/银行授权。同一结构会出现在220页造纸上；继续加时或再拆准备卡不能消掉。取舍交给A：在已核首包后不再把未读页标成`necessary_unread`，还是改`tail_hold`让后续切片按剩余账本进，而不是再要额度。
+
+§16授权名`company_profile_s16_core.2026-10-30`已接到`validate_binding`与`LlmRunBudget`：1200/1800秒、16/24/40物理、2/3恢复、attempt `s1-600103-s16`/`s1-600000-s16`。不借用`s1_regression`的7200秒窗。无授权名的1200秒仍拒绝。
+
+### 146.4 验证、Git、清理
+
+通过：admission、s16绑定正反、gateway一次usage、空白限定、引文金额不自证、C1b三读、后包失败保前组。`test_direct_chain_entry`仍因夹具完整性失败，不改断言。未改`config/13_llm.json`。既有13份修改及9项未跟踪未纳入。可重建的d2-chain/diagnose/测试库已或将按AGENTS§2.4清理；C1b回执/正式PDF/解析缓存/offline-s15保留。S1仍0/12。

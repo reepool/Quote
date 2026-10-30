@@ -7306,3 +7306,142 @@ def test_later_verify_failure_keeps_earlier_query_export(tmp_path):
     assert seen.get("verifies", 0) >= 1
     assert any("later-verify-failed" in gap or "direct_core_verify_stopped" in gap for gap in result.gaps)
 
+
+def _isolated_gateway(budget, reply, *, sends=None, usage=120):
+    from utils.llm import CallableTransport, LlmClient, LlmConfig, LlmPoolCoordinatorRegistry
+    from utils.llm.orchestration import ProviderCoordinatorRegistry
+    from utils.llm.rate_limit import ProfileLimiterRegistry
+    from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
+
+    async def transport(_url, _headers, payload, _timeout):
+        request = json.loads(
+            next(item["content"] for item in payload["messages"] if item["role"] == "user")
+        )
+        if sends is not None:
+            sends.append(request.get("purpose"))
+        encoded = json.dumps(reply(request), ensure_ascii=False)
+        return {
+            "status_code": 200,
+            "data": {
+                "choices": [{"message": {"content": encoded}}],
+                "usage": {
+                    "prompt_tokens": 80,
+                    "completion_tokens": 40,
+                    "total_tokens": usage,
+                },
+            },
+        }
+
+    config = LlmConfig.from_mapping(
+        {
+            "enabled": True,
+            "provider_resources": {
+                "openai_compatible:TEST_LLM_KEY": {"requests_per_minute": 0}
+            },
+            "profiles": {
+                "test": {
+                    "enabled": True,
+                    "base_url": "https://provider.example/v1",
+                    "endpoint": "/v1/chat/completions",
+                    "api_key_env": "TEST_LLM_KEY",
+                    "model": "test-model",
+                    "structured_output_mode": "json_object",
+                    "supported_structured_output_modes": ["json_object"],
+                    "timeout_seconds": 8,
+                    "queue_timeout_seconds": 2,
+                    "attempt_timeout_seconds": 8,
+                    "max_retries": 0,
+                    "max_schema_repair_attempts": 0,
+                    "max_concurrency": 2,
+                    "requests_per_minute": 0,
+                    "retry_backoff_seconds": 0,
+                }
+            },
+        }
+    )
+    client = LlmClient(
+        config,
+        transport=CallableTransport(transport),
+        environment={"TEST_LLM_KEY": "fake"},
+        physical_budget=budget,
+        limiter_registry=ProfileLimiterRegistry(),
+        provider_coordinator_registry=ProviderCoordinatorRegistry(),
+        pool_coordinator_registry=LlmPoolCoordinatorRegistry(),
+    )
+
+    class _Provider(CommonGatewaySemanticProvider):
+        offline_only = True
+
+    return _Provider(
+        client=client,
+        profile="test",
+        max_output_tokens=4000,
+        timeout_seconds=30,
+    )
+
+
+def test_gateway_usage_is_booked_once_not_reserved_again():
+    report = _report()
+    text = "公司经营公司金融业务，并向企业客户发放贷款。"
+    pages = ({"page": 1, "text": text, "readable": True},)
+    condition = {
+        "condition_id": "principal_business",
+        "dimension": "principal_business",
+        "description": text,
+        "evidence": [
+            json.loads(
+                _evidence(report, text=text[:12], page=1)
+                .model_copy(update={"evidence_id": "once-e"})
+                .model_dump_json()
+            )
+        ],
+        "major": True,
+        "statement_status": "current",
+    }
+    claim = {
+        "claim_id": "principal_business",
+        "dimension": "principal_business",
+        "status": "observed",
+        "answer": text,
+        "condition_ids": ["principal_business"],
+        "evidence": condition["evidence"],
+        "limitation": "pending_verification",
+    }
+    identity = direct_core_processing_identity()
+    identity["accepted_source_receipts"] = [
+        {
+            "request_id": "once-source",
+            "purpose": "source_inventory",
+            "status": "success",
+            "source_scope": "full_context",
+            "source_pages": [1],
+            "physical_request": False,
+            "response_payload": {
+                "request_id": "once-source",
+                "purpose": "source_inventory",
+                "source_conditions": [condition],
+            },
+        }
+    ]
+    identity["accepted_prior_draft"] = {"claims": [claim]}
+    identity["ledger_tokens"] = 120_000
+    identity["request_reservation_limit"] = 12_000
+    sends = []
+    budget = _fresh_budget()
+    result = _run(
+        _isolated_gateway(budget, _labeled_c1b_reply, sends=sends, usage=120),
+        pages=pages,
+        processing_identity=identity,
+        report=report,
+        token_budget=120_000,
+        execution_budget=budget,
+    )
+    snapshot = budget.snapshot()
+    assert sends
+    assert snapshot["physical_requests"] == len(sends)
+    assert snapshot["charged_tokens"] == 120 * len(sends)
+    assert all(item.get("source_label") != "offline_substitute" for item in snapshot["attempts"])
+    assert result.tokens_charged == snapshot["charged_tokens"]
+
+
+

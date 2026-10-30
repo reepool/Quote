@@ -39,7 +39,6 @@ from research.company_profile.report_interpretation import (
 )
 from utils.llm.budget import LlmRunBudget
 from utils.llm.errors import LlmDeadlineExceededError, LlmError
-from utils.llm.models import LlmUsage
 
 NAV_OUTPUT = 1000
 BODY_OUTPUT = 2500
@@ -1605,38 +1604,13 @@ def interpret_direct_core(
             response = ReportSemanticResponseV3.model_validate_json(
                 json.dumps(response, ensure_ascii=False)
             )
-        already = any(
-            item.get("logical_request_id") == request.request_id
-            or item.get("request_id") == request.request_id
-            for item in snapshot().get("attempts") or ()
+        gateway_budget = getattr(
+            getattr(provider, "client", None), "physical_budget", None
         )
-        if not already:
+        if getattr(provider, "offline_only", False) and gateway_budget is None:
             identity["offline_charged_tokens"] = int(
                 identity.get("offline_charged_tokens") or 0
             ) + int(units)
-            if execution_budget is not None:
-                try:
-                    ticket = execution_budget.reserve(
-                        resource="offline",
-                        model="offline-substitute",
-                        profile="semantic_extraction",
-                        payload={"max_completion_tokens": min(int(output), 4_000)},
-                        request_id=request.request_id,
-                        attempt=1,
-                        logical_request_id=request.request_id,
-                        source_label="offline_substitute",
-                    )
-                    execution_budget.settle(
-                        ticket,
-                        LlmUsage(
-                            input_tokens=0,
-                            output_tokens=int(units),
-                            total_tokens=int(units),
-                        ),
-                        status="success",
-                    )
-                except (LlmDeadlineExceededError, ValueError):
-                    gaps.append("direct_core_ledger_hold")
         request_targets = []
         for claim in request.claims:
             request_targets.append(

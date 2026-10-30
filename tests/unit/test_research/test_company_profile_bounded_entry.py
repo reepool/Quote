@@ -611,3 +611,167 @@ def test_direct_chain_entry_completes_and_keeps_a_verified_package():
         (root / "data/QuoteBak/d2-chain-success/direct-plan.json").read_text()
     )
     assert plan["nonempty_verify_units"] > plan["empty_verify_units"]
+    stages = json.loads(
+        (root / "data/QuoteBak/d2-chain-success/entry-stages.json").read_text()
+    )
+    transport = json.loads(
+        (root / "data/QuoteBak/d2-chain-success/offline-transport.json").read_text()
+    )
+    budget = json.loads(
+        (root / "data/QuoteBak/d2-chain-success/budget-final.json").read_text()
+    )
+    assert stages["transport_sends"] == budget["physical_requests"]
+    assert stages["transport_sends"] == len(transport["requests"])
+    assert budget["charged_tokens"] == 120 * budget["physical_requests"]
+    assert stages["execute_done"] > stages["execute_start"]
+    assert stages["pages_loaded"] >= stages["client_ready"]
+
+
+def test_s16_authorization_binds_paper_and_bank_windows(tmp_path):
+    from research.company_profile.bounded_entry import S16_AUTHORIZATION
+
+    source = tmp_path / "source.pdf"
+    source.write_bytes(b"offline source")
+    binding = {
+        "file_hashes": {},
+        "asset": {"archive_path": str(source), "content_hash": digest(source)},
+        "run_authorization": S16_AUTHORIZATION,
+        "max_elapsed_seconds": 1200,
+        "max_tokens": 160_000,
+        "max_physical_requests": 16,
+        "max_recoveries": 2,
+    }
+    validate_binding(binding, real=False, authorization={}, binding_hash="frozen")
+    binding.update(
+        max_elapsed_seconds=1800,
+        max_tokens=240_000,
+        max_physical_requests=24,
+        max_recoveries=3,
+    )
+    validate_binding(binding, real=False, authorization={}, binding_hash="frozen")
+    binding["max_elapsed_seconds"] = 1801
+    with pytest.raises(ValueError, match="entry deadline exceeds the card"):
+        validate_binding(binding, real=False, authorization={}, binding_hash="frozen")
+    binding.update(max_elapsed_seconds=1200, max_tokens=400_001, max_recoveries=3)
+    with pytest.raises(ValueError, match="entry deadline exceeds the card"):
+        validate_binding(binding, real=False, authorization={}, binding_hash="frozen")
+    sneak = {
+        "file_hashes": {},
+        "asset": {"archive_path": str(source), "content_hash": digest(source)},
+        "max_elapsed_seconds": 1200,
+    }
+    with pytest.raises(ValueError, match="entry deadline exceeds the card"):
+        validate_binding(sneak, real=False, authorization={}, binding_hash="frozen")
+    from decimal import Decimal
+
+    from utils.llm.budget import DEVELOPMENT_UNPRICED_BILLING, LlmRunBudget
+
+    LlmRunBudget(
+        deadline=time.monotonic() + 30,
+        prices={},
+        max_tokens=160_000,
+        max_requests=16,
+        max_cost_cny=Decimal(20),
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        run_authorization=S16_AUTHORIZATION,
+    )
+    LlmRunBudget(
+        deadline=time.monotonic() + 30,
+        prices={},
+        max_tokens=240_000,
+        max_requests=24,
+        max_cost_cny=Decimal(20),
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        run_authorization=S16_AUTHORIZATION,
+    )
+    with pytest.raises(ValueError, match="invalid bounded run limits"):
+        LlmRunBudget(
+            deadline=time.monotonic() + 30,
+            prices={},
+            max_tokens=400_001,
+            max_requests=24,
+            billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+            run_authorization=S16_AUTHORIZATION,
+        )
+
+
+def test_admission_wait_exhausts_business_deadline_without_a_send():
+    """The 120s entry error is budget-wrapped admission wait, not local persist."""
+    import asyncio
+
+    from tests.unit.test_utils.test_llm_gateway import _config, _request, _response
+    from utils.llm import LlmClient, LlmDeadlineExceededError
+    from utils.llm.budget import DEVELOPMENT_UNPRICED_BILLING, LlmRunBudget
+    from utils.llm.orchestration import (
+        LlmPoolCoordinatorRegistry,
+        ProviderCoordinatorRegistry,
+    )
+    from utils.llm.rate_limit import ProfileLimiterRegistry
+    from utils.llm.testing import ScriptedTransport
+
+    shared_limiters = ProfileLimiterRegistry()
+    config = _config(max_concurrency=1, timeout_seconds=8, queue_timeout_seconds=8)
+    holder_started = asyncio.Event()
+
+    class HoldingTransport(ScriptedTransport):
+        async def send(self, *args, **kwargs):
+            holder_started.set()
+            await asyncio.sleep(3)
+            return await super().send(*args, **kwargs)
+
+    async def hold_slot():
+        client = LlmClient(
+            config,
+            transport=HoldingTransport([_response({"label": "hold", "score": 1})]),
+            environment={"TEST_LLM_KEY": "fake"},
+            limiter_registry=shared_limiters,
+            provider_coordinator_registry=ProviderCoordinatorRegistry(),
+            pool_coordinator_registry=LlmPoolCoordinatorRegistry(),
+        )
+        await client.complete(_request())
+
+    async def waiter():
+        await holder_started.wait()
+        started = time.monotonic()
+        budget = LlmRunBudget(
+            deadline=started + 1.2,
+            prices={},
+            billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        )
+        client = LlmClient(
+            config,
+            transport=ScriptedTransport([_response({"label": "late", "score": 1})]),
+            environment={"TEST_LLM_KEY": "fake"},
+            physical_budget=budget,
+            limiter_registry=shared_limiters,
+            provider_coordinator_registry=ProviderCoordinatorRegistry(),
+            pool_coordinator_registry=LlmPoolCoordinatorRegistry(),
+        )
+        with pytest.raises(LlmDeadlineExceededError, match="business entry"):
+            await client.complete(_request())
+        assert time.monotonic() - started < 2.5
+        assert budget.snapshot()["physical_requests"] == 0
+
+    async def isolated_send():
+        budget = LlmRunBudget(
+            deadline=time.monotonic() + 2,
+            prices={},
+            billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        )
+        client = LlmClient(
+            config,
+            transport=ScriptedTransport([_response({"label": "ok", "score": 1})]),
+            environment={"TEST_LLM_KEY": "fake"},
+            physical_budget=budget,
+            limiter_registry=ProfileLimiterRegistry(),
+            provider_coordinator_registry=ProviderCoordinatorRegistry(),
+            pool_coordinator_registry=LlmPoolCoordinatorRegistry(),
+        )
+        await client.complete(_request(max_output_tokens=100))
+        assert budget.snapshot()["physical_requests"] == 1
+
+    async def together():
+        await asyncio.gather(hold_slot(), waiter())
+
+    asyncio.run(together())
+    asyncio.run(isolated_send())

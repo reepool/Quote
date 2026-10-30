@@ -20,6 +20,7 @@ from typing import Any
 
 
 G2_AUTHORIZATION = "company_profile_g2.2026-10-20"
+S16_AUTHORIZATION = "company_profile_s16_core.2026-10-30"
 
 
 def company_window_limits(binding: dict, state: dict | None) -> tuple[int, int]:
@@ -686,6 +687,13 @@ def validate_binding(
         allowed = 0 < elapsed <= 1200
     elif auth == "company_profile_e1.2026-10-20":
         allowed = 0 < elapsed <= 900 or 1200 < elapsed <= 1800
+    elif auth == S16_AUTHORIZATION:
+        allowed = (
+            0 < elapsed <= 1800
+            and int(binding.get("max_tokens") or 0) <= 400_000
+            and int(binding.get("max_physical_requests") or 0) <= 40
+            and int(binding.get("max_recoveries") or 0) <= 3
+        )
     else:
         allowed = 0 < elapsed <= 900
     if not allowed:
@@ -793,6 +801,8 @@ def validate_binding(
                 "s1-600103-c1b",
                 "s1-600000-c1",
                 "s1-600000-c1b",
+                "s1-600103-s16",
+                "s1-600000-s16",
             }
             or not authorization.get("approval_reference")
         ):
@@ -955,8 +965,15 @@ def _worker(
     from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
     from research.storage import ResearchStorageManager
     from utils.config_manager import ResearchConfig, ResearchStorageConfig
-    from utils.llm import CallableTransport, LlmClient, load_project_environment
+    from utils.llm import (
+        CallableTransport,
+        LlmClient,
+        LlmPoolCoordinatorRegistry,
+        load_project_environment,
+    )
     from utils.llm.budget import LlmRunBudget, LogicalRecoveryPolicy
+    from utils.llm.orchestration import ProviderCoordinatorRegistry
+    from utils.llm.rate_limit import ProfileLimiterRegistry
 
     asset = binding["asset"]
     raw_config = json.loads(Path(binding["config_path"]).read_text())["llm"]
@@ -1024,6 +1041,8 @@ def _worker(
                     else 4
                     if binding.get("run_authorization")
                     == "company_profile_repair.2026-10-21"
+                    else min(3, int(binding.get("max_recoveries", 3)))
+                    if binding.get("run_authorization") == S16_AUTHORIZATION
                     else min(2, int(binding.get("max_recoveries", 2)))
                     if binding.get("reading_strategy") == "direct_core_v1"
                     else int(binding.get("max_recoveries", 4))
@@ -1039,6 +1058,14 @@ def _worker(
     transport_requests = []
     map_replies = {"count": 0}
     chain_state = {"syntheses": 0, "gaps": 0, "delayed": False}
+    stages = {
+        "worker_start": time.monotonic(),
+        "deadline": deadline,
+        "absolute_deadline_seconds": binding["max_elapsed_seconds"],
+        "logical_timeout_seconds": int(
+            binding.get("logical_request_timeout_seconds") or 120
+        ),
+    }
 
     async def empty_inventory(_url, _headers, payload, _timeout):
         request = json.loads(
@@ -1048,6 +1075,8 @@ def _worker(
             {
                 "purpose": request["purpose"],
                 "source_scope": request.get("source_scope", "full_context"),
+                "phase": "replaced_transport",
+                "sent_at": time.monotonic(),
                 "pages": [p["page"] for p in request["source_pages"]],
                 "payload_utf8_bytes": len(
                     json.dumps(
@@ -1160,9 +1189,13 @@ def _worker(
                     p.api_key_env: "offline-placeholder"
                     for p in gateway_config.concrete_profiles_for(profile_name)
                 },
+                "limiter_registry": ProfileLimiterRegistry(),
+                "provider_coordinator_registry": ProviderCoordinatorRegistry(),
+                "pool_coordinator_registry": LlmPoolCoordinatorRegistry(),
             }
         ),
     )
+    stages["client_ready"] = time.monotonic()
 
     class ProbeProvider(CommonGatewaySemanticProvider):
         offline_only = True
@@ -1229,6 +1262,7 @@ def _worker(
             if expected != source_receipt["page_text_sha256"]:
                 raise ValueError("navigation_page_hash_mismatch")
         write_json(run_root / "source-receipt.json", source_receipt)
+        stages["pages_loaded"] = time.monotonic()
         budget.remaining()
         return source
 
@@ -1388,6 +1422,8 @@ def _worker(
 
     async def execute():
         try:
+            stages["execute_start"] = time.monotonic()
+            stages["budget_remaining_before_execute"] = budget.remaining_time()
             ran = await service.execute(
                 "run",
                 knowledge_cutoff=binding["knowledge_cutoff"],
@@ -1395,6 +1431,7 @@ def _worker(
                 max_items=1,
                 max_elapsed_seconds=budget.remaining(),
             )
+            stages["execute_done"] = time.monotonic()
             query = await service.execute(
                 "query", instrument_ids=(asset["instrument_id"],)
             )
@@ -1403,6 +1440,7 @@ def _worker(
                 instrument_ids=(asset["instrument_id"],),
                 output_directory=str(run_root / "export"),
             )
+            stages["query_export_done"] = time.monotonic()
             budget.remaining_time()
             write_json(run_root / "query.json", query)
             write_json(run_root / "export.json", export)
@@ -1417,7 +1455,18 @@ def _worker(
     try:
         result = asyncio.run(execute())
     finally:
-        write_json(run_root / "budget-final.json", budget.snapshot())
+        snapshot = budget.snapshot()
+        write_json(run_root / "budget-final.json", snapshot)
+        write_json(
+            run_root / "entry-stages.json",
+            {
+                **stages,
+                "transport_sends": len(transport_requests),
+                "ledger_physical_requests": snapshot.get("physical_requests"),
+                "ledger_charged_tokens": snapshot.get("charged_tokens"),
+                "worker_elapsed_seconds": time.monotonic() - stages["worker_start"],
+            },
+        )
         if company_path is not None and company_state is not None:
             snapshot = budget.snapshot()
             company_state["charged_tokens"] = int(company_state.get("charged_tokens") or 0) + int(
