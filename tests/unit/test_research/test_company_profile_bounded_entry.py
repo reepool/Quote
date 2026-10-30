@@ -173,6 +173,16 @@ def test_pool_binding_rejects_route_or_source_drift_before_client(pool_binding, 
         prepare_gateway(binding, raw, real=False)
 
 
+def test_task_route_first_only_binds_the_preferred_source_alone(pool_binding):
+    binding, raw = pool_binding
+    labels = [member["source_label"] for member in raw["pools"]["semantic-pool"]["members"]]
+    binding["task_route_labels"] = labels
+    binding["task_route_first_only"] = True
+    config, _prices = prepare_gateway(binding, raw, real=False)
+    pool = config.pools["semantic-pool"]
+    assert [member.source_label for member in pool.members] == [labels[0]]
+
+
 def test_same_source_retry_override_does_not_change_route_fingerprint(pool_binding):
     binding, raw = pool_binding
     fingerprint = binding["route_fingerprint"]

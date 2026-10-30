@@ -194,13 +194,14 @@ def instructions(request: ReportSemanticRequestV3) -> str:
     if request.source_scope == "page_map":
         if direct and identity.get("chapter_select"):
             selection = (
-                "These previews are a table of contents, not the report body. "
-                "Select the physical requested_pages whose headings belong to the "
-                "business discussion, operating model, revenue composition, "
-                "income-statement or segment notes, and purchases or customers. "
-                "Include a continuation page only when the preview shows the "
-                "passage is cut off. An unfamiliar heading is not automatically "
-                "minor. Do not select ordinary footnotes or every page. "
+                "These previews are already located subsection candidates, not "
+                "every page opening. Select the physical requested_pages whose "
+                "headings belong to the current main businesses, operating model, "
+                "revenue total or composition, income-statement or segment notes, "
+                "and purchases or customers. Include a continuation page only "
+                "when the preview shows the passage is cut off. An unfamiliar "
+                "heading is not automatically minor. Do not select ordinary "
+                "footnotes, rankings or slogans. "
             )
         elif direct:
             selection = (
@@ -247,12 +248,14 @@ def instructions(request: ReportSemanticRequestV3) -> str:
             scope = (
                 "This request contains source text only. No candidate answer is included. "
                 "List the major businesses, products, earning mechanisms, inputs and roles "
-                "the supplied text itself supports. If the text states the period "
-                "operating revenue total, return that total as its own condition. "
-                "A product-line or principal-business subtotal does not replace it. "
-                "A regional ranking, strategy slogan, repeated amount, or ordinary note "
-                "is supplementary: do not list it as a major source_condition. "
-                "Keep every distinct current major business even when names are unfamiliar. "
+                "the supplied text itself supports. Merge repeated amounts, channels or "
+                "examples of the same current business into one condition. Keep each "
+                "distinct major and the period operating-revenue total as its own "
+                "condition. A product-line or principal-business subtotal does not "
+                "replace that total. A regional ranking, strategy slogan, repeated "
+                "amount, or ordinary note is supplementary: do not list it as a major "
+                "source_condition. Keep every distinct current major business even "
+                "when names are unfamiliar. "
             )
         else:
             scope = (

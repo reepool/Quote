@@ -423,23 +423,230 @@ def _core_closeout_ready(claims, conditions, checks, records=()) -> bool:
 
 def _structure_preview(text: str) -> str:
     """Headings a reader can recognize, plus a short body sample. Not an 8-character stub."""
-    headings = []
-    for raw in text.splitlines():
+    headings = _heading_lines(text, limit=2)
+    sample = " ".join(text.split())[:48]
+    return " / ".join([*headings, sample])[:180]
+
+
+_DOTTED_TOC = re.compile(r"^(?P<title>.+?)\s*[\.·．…\s]{2,}(?P<page>\d{1,3})$")
+_SECTION_TITLE = re.compile(r"^第[一二三四五六七八九十百零0-9]+节\s+\S+")
+_NUMBERED_TITLE = re.compile(r"^\d+(?:\.\d+)+\s+\S+")
+_PRINTED_NUM = re.compile(r"^0*(\d{1,3})$")
+_HEADER_PAGE = re.compile(r"(?<!\d)(\d{1,3})\s*/\s*\d{2,4}(?!\d)")
+_BUSINESS_MARKERS = (
+    "管理层讨论",
+    "经营情况",
+    "经营讨论",
+    "主营业务",
+    "主要业务",
+    "业务情况",
+    "经营模式",
+    "利润表",
+    "营业收入",
+    "营业总收入",
+    "分部",
+    "财务报告",
+    "采购",
+    "供应商",
+    "主要客户",
+    "前五名",
+    "手续费",
+    "佣金净收入",
+    "利息净收入",
+)
+_SKIP_MARKERS = (
+    "重要提示",
+    "释义",
+    "公司治理",
+    "环境和社会",
+    "重要事项",
+    "股份变动",
+    "股东情况",
+    "债券相关",
+    "备查文件",
+    "目录和释义",
+    "公司简介和主要财务指标",
+    "会计数据和财务指标",
+)
+
+
+def _heading_lines(text: str, limit: int = 8) -> list[str]:
+    headings: list[str] = []
+    for raw in str(text).splitlines():
         line = " ".join(raw.split())
         if not line or len(line) > 40 or line.endswith(("。", "！", "？", "；")):
             continue
         headings.append(line)
-        if len(headings) == 2:
+        if len(headings) >= limit:
             break
-    sample = " ".join(text.split())[:48]
-    return " / ".join([*headings, sample])[:180]
+    return headings
+
+
+def _looks_like_toc(text: str) -> bool:
+    head = str(text)[:800]
+    return ("目录" in head or "目 录" in head) and ("第" in head and "节" in head)
+
+
+def _is_business_title(title: str) -> bool:
+    if any(skip in title for skip in _SKIP_MARKERS) and not any(
+        mark in title for mark in _BUSINESS_MARKERS
+    ):
+        return False
+    if any(mark in title for mark in _BUSINESS_MARKERS):
+        return True
+    return bool(
+        _NUMBERED_TITLE.match(title)
+        and any(token in title for token in ("业务", "经营", "利润", "收入", "采购", "客户"))
+    )
+
+
+def _parse_toc_entries(text: str) -> list[tuple[str, int | None]]:
+    entries: list[tuple[str, int | None]] = []
+    titles: list[str] = []
+    numbers: list[int] = []
+    for raw in str(text).splitlines():
+        line = " ".join(raw.split())
+        if not line:
+            continue
+        dotted = _DOTTED_TOC.match(line)
+        if dotted:
+            entries.append((dotted.group("title").strip(), int(dotted.group("page"))))
+            continue
+        printed = _PRINTED_NUM.match(line)
+        if printed and len(line) <= 3:
+            numbers.append(int(printed.group(1)))
+            continue
+        if _SECTION_TITLE.match(line) or _NUMBERED_TITLE.match(line):
+            titles.append(line)
+    if not entries and titles:
+        if numbers and len(numbers) >= len(titles):
+            entries.extend(zip(titles, numbers))
+        else:
+            entries.extend((title, None) for title in titles)
+    return entries
+
+
+def _printed_to_physical(pages) -> dict[int, int]:
+    mapping: dict[int, int] = {}
+    for source in pages:
+        text = str(source.get("text") or "")
+        match = _HEADER_PAGE.search(text[:120]) or _HEADER_PAGE.search(text[-80:])
+        if match is None:
+            continue
+        mapping.setdefault(int(match.group(1)), int(source["page"]))
+    return mapping
+
+
+def _page_has_title(source, title: str) -> bool:
+    needle = " ".join(str(title).split())
+    if not needle:
+        return False
+    text = " ".join(str(source.get("text") or "").split())
+    if needle in text[:900]:
+        return True
+    short = needle[:16]
+    return any(short in line or needle in line for line in _heading_lines(str(source.get("text") or "")))
+
+
+def chapter_candidate_pages(pages, limit: int = 16) -> list[int]:
+    """Locate business subsections from TOC and headings. Not every page opening."""
+    readable = [
+        source
+        for source in pages
+        if source.get("readable", True) and str(source.get("text") or "").strip()
+    ]
+    chosen: list[int] = []
+    seen: set[int] = set()
+
+    def add(page_no: int) -> None:
+        page_no = int(page_no)
+        if page_no in seen:
+            return
+        seen.add(page_no)
+        chosen.append(page_no)
+
+    toc_entries: list[tuple[str, int | None]] = []
+    for source in readable[:24]:
+        text = str(source.get("text") or "")
+        if not _looks_like_toc(text):
+            continue
+        add(int(source["page"]))
+        toc_entries.extend(_parse_toc_entries(text))
+    printed_map = _printed_to_physical(readable)
+    available = {int(source["page"]) for source in readable}
+    for title, printed in toc_entries:
+        if not _is_business_title(title):
+            continue
+        located = next(
+            (int(source["page"]) for source in readable if _page_has_title(source, title)),
+            None,
+        )
+        if located is None and printed is not None:
+            located = printed_map.get(int(printed))
+            if located is None and int(printed) in available:
+                located = int(printed)
+        if located is not None:
+            add(located)
+    seen_heading: set[str] = set()
+    for source in readable:
+        for heading in _heading_lines(str(source.get("text") or "")):
+            if not _is_business_title(heading):
+                continue
+            if not (
+                _SECTION_TITLE.match(heading)
+                or _NUMBERED_TITLE.match(heading)
+                or heading.startswith(("一、", "二、", "三、", "四、", "(一)", "（一）"))
+                or heading.endswith("续")
+                or any(heading.startswith(mark) for mark in _BUSINESS_MARKERS)
+            ):
+                continue
+            key = re.sub(r"\d+", "N", heading)[:28]
+            if key in seen_heading:
+                continue
+            seen_heading.add(key)
+            add(int(source["page"]))
+            break
+    if not chosen and readable:
+        add(int(readable[0]["page"]))
+    return chosen[: max(1, int(limit))]
+
+
+def compact_source_conditions(
+    conditions: Sequence[ReportSourceCondition],
+) -> list[ReportSourceCondition]:
+    """Drop exact-quote or exact-name repeats. Keep each distinct major."""
+    kept: list[ReportSourceCondition] = []
+    quotes: set[tuple[Any, ...]] = set()
+    names: set[tuple[Any, ...]] = set()
+    for item in conditions:
+        quote_key = None
+        if item.evidence:
+            evidence = item.evidence[0]
+            quote = str(getattr(getattr(evidence, "anchor", None), "bounded_quote", "") or "")
+            quote_key = (int(evidence.page), quote, item.dimension)
+            if quote_key in quotes:
+                continue
+        name_key = (
+            item.dimension,
+            " ".join(str(item.description or "").split()),
+            item.statement_status,
+            item.major,
+        )
+        if item.major and name_key in names:
+            continue
+        if quote_key is not None:
+            quotes.add(quote_key)
+        if item.major:
+            names.add(name_key)
+        kept.append(item)
+    return kept
 
 
 PREPARED_NAV: list[list[int]] | None = None
 
 
 def navigation_batches(pages, report, identity, limit: int):
-    """Pack a recognizable structure preview of every page."""
+    """Pack short previews of already located candidate pages."""
     previews = [
         {
             "page": source["page"],
@@ -680,6 +887,53 @@ def _units(pages, *, purpose, source_scope, report, identity, output) -> int:
             max_output_tokens=output,
             timeout_seconds=float(identity.get("logical_request_timeout_seconds") or 120),
         )
+    )
+
+
+def _first_delivery_tail(pages, *, report, identity, limit: int) -> int:
+    """Reserve the first real source+draft+verify object, not a two-page stub."""
+    if not pages:
+        return 0
+    pack_limit = min(int(limit), RESERVATION_LIMIT)
+    try:
+        slices = list(source_discovery_slices(pages, report, identity, pack_limit))
+    except ValueError:
+        slices = [list(pages[:1])]
+    first = slices[0] if slices else list(pages[:1])
+    return (
+        _units(
+            first,
+            purpose="source_inventory",
+            source_scope="full_context",
+            report=report,
+            identity=identity,
+            output=SOURCE_OUTPUT,
+        )
+        + _units(
+            first,
+            purpose="synthesize_views",
+            source_scope="full_context",
+            report=report,
+            identity=identity,
+            output=BODY_OUTPUT,
+        )
+        + _nonempty_verify_units(first, report=report, identity=identity)
+    )
+
+
+def _compose_tail(pages, *, report, identity) -> int:
+    if not pages:
+        return 0
+    return (
+        _units(
+            pages,
+            purpose="synthesize_views",
+            source_scope="full_context",
+            report=report,
+            identity=identity,
+            output=BODY_OUTPUT,
+        )
+        + _nonempty_verify_units(pages, report=report, identity=identity)
     )
 
 
@@ -1827,23 +2081,18 @@ def interpret_direct_core(
                 if int(source["page"]) in {int(item["page"]) for item in batch}
             ]
             try:
-                reserve_pages = full_pages[:2] if identity.get("chapter_select") else full_pages
+                reserve_pages = full_pages if identity.get("chapter_select") else full_pages
                 response = invoke(
                     "source_inventory",
                     batch,
                     source_scope="page_map",
                     output=NAV_OUTPUT,
-                    later=_units(
-                        reserve_pages,
-                        purpose="synthesize_views",
-                        source_scope="full_context",
-                        report=report,
-                        identity=identity,
-                        output=BODY_OUTPUT,
-                    )
-                    + (
-                        _nonempty_verify_units(
-                            reserve_pages, report=report, identity=identity
+                    later=(
+                        _first_delivery_tail(
+                            reserve_pages,
+                            report=report,
+                            identity=identity,
+                            limit=limit,
                         )
                         if identity.get("chapter_select")
                         else 0
@@ -1991,6 +2240,7 @@ def interpret_direct_core(
                 request_id=receipts[-1]["request_id"],
                 seen=seen,
             )
+            accepted = compact_source_conditions(accepted)
             gaps.extend(location_gaps)
             conditions.extend(accepted)
             for page_no in reviewed.requested_pages:
@@ -3110,30 +3360,45 @@ def interpret_direct_core(
                 + 2 * max(slice_units)
             )
         if identity.get("chapter_select"):
-            selected, _deferred = priority_order(readable_order)
+            candidates = chapter_candidate_pages(sources)
+            candidate_pages = [
+                page
+                for page in sources
+                if int(page["page"]) in set(candidates)
+            ]
+            selected, _deferred = priority_order(candidates)
             if not selected:
                 gaps.append("chapter_selection_empty")
             chapter_required_pages = {int(page) for page in selected}
-            for page_no in readable_order:
+            for page_no in candidates:
                 if page_no in by_page:
                     by_page[page_no]["map_checked"] = True
                     by_page[page_no]["structure_indexed"] = True
             hold_pages = [
                 page
                 for page in sources
-                if int(page["page"]) in chapter_required_pages
-            ][:2]
+                if int(page["page"]) in (chapter_required_pages or set(candidates))
+            ]
             if hold_pages:
-                source_later = (
-                    _units(
-                        hold_pages,
-                        purpose="synthesize_views",
-                        source_scope="full_context",
-                        report=report,
-                        identity=identity,
-                        output=BODY_OUTPUT,
+                try:
+                    hold_slices = list(
+                        source_discovery_slices(
+                            hold_pages,
+                            report,
+                            identity,
+                            min(int(limit), RESERVATION_LIMIT),
+                        )
                     )
-                    + _nonempty_verify_units(hold_pages, report=report, identity=identity)
+                except ValueError:
+                    hold_slices = [hold_pages[:1]]
+                source_later = _compose_tail(
+                    hold_slices[0] if hold_slices else hold_pages[:1],
+                    report=report,
+                    identity=identity,
+                )
+            elif candidate_pages:
+                source_later = _first_delivery_tail(
+                    candidate_pages, report=report, identity=identity, limit=limit
                 )
             follow = inventory_pages(selected)
             expand = [

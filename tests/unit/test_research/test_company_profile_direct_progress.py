@@ -860,11 +860,33 @@ def test_selected_chapters_are_read_before_the_company_draft():
                     requested_pages=(1, 9),
                 )
             if request.purpose == "source_inventory" and request.source_scope != "page_map":
+                from research.company_profile.contracts import ReportSourceCondition
+
                 assert not request.claims
                 self.inventories += 1
                 self.events.append(("inventory", current))
                 if self.inventories >= 2 and persists.get("fail"):
                     raise ValueError("second-package-inventory-failed")
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=tuple(
+                        ReportSourceCondition(
+                            condition_id=f"page-{page}",
+                            dimension="principal_business" if page == 1 else "revenue_model",
+                            description=text[page],
+                            evidence=(
+                                _evidence(report, text=text[page][:12], page=page).model_copy(
+                                    update={"evidence_id": f"cond-{page}"}
+                                ),
+                            ),
+                            major=True,
+                            statement_status="current",
+                        )
+                        for page in current
+                        if page in text
+                    ),
+                )
             if request.purpose == "synthesize_views":
                 self.events.append(("synthesize", current))
                 return ReportSemanticResponseV3(
@@ -5809,4 +5831,601 @@ def test_unlocated_major_still_blocks_core_closeout():
     assert "major_condition_not_verified:sc-010" in gaps
 
 
+def test_chapter_candidates_come_from_toc_and_headings_not_every_page():
+    from research.company_profile.direct_reading import chapter_candidate_pages
+
+    pages = [
+        {
+            "page": 4,
+            "text": (
+                "目录\n"
+                "第一节 释义 ......................................................... 5\n"
+                "第三节 管理层讨论与分析 ............................................. 9\n"
+                "第四节 公司治理、环境和社会 ........................................ 37\n"
+                "第八节 财务报告 .................................................... 85\n"
+            ),
+            "readable": True,
+        },
+        {"page": 5, "text": "第一节 释义\n常用词语释义\n报告期 指 2025 年年度", "readable": True},
+        {
+            "page": 9,
+            "text": "第三节 管理层讨论与分析\n一、经营情况讨论与分析\n公司主营造纸并销售纸袋纸。",
+            "readable": True,
+        },
+        {"page": 10, "text": "公司营业收入为100万元。", "readable": True},
+        {"page": 37, "text": "第四节 公司治理、环境和社会\n董事会出席情况。", "readable": True},
+        {"page": 55, "text": "附注列示子公司注册地址。", "readable": True},
+        {"page": 85, "text": "第八节 财务报告\n合并利润表\n营业收入 100", "readable": True},
+    ]
+    chosen = chapter_candidate_pages(pages)
+    assert 4 in chosen and 9 in chosen and 85 in chosen
+    assert 37 not in chosen
+    assert 55 not in chosen
+    assert len(chosen) < len(pages)
+
+
+def test_compact_source_conditions_keep_distinct_majors():
+    from research.company_profile.contracts import ReportSourceCondition
+    from research.company_profile.direct_reading import compact_source_conditions
+
+    report = _report()
+    paper = ReportSourceCondition(
+        condition_id="paper",
+        dimension="principal_business",
+        description="公司主营造纸。",
+        evidence=(_evidence(report, text="公司主营造纸。", page=9),),
+        major=True,
+        statement_status="current",
+    )
+    repeat = paper.model_copy(update={"condition_id": "paper-repeat"})
+    pharma = ReportSourceCondition(
+        condition_id="pharma",
+        dimension="principal_business",
+        description="公司另有药品销售。",
+        evidence=(_evidence(report, text="公司另有药品销售。", page=12),),
+        major=True,
+        statement_status="current",
+    )
+    kept = compact_source_conditions((paper, repeat, pharma))
+    assert {item.condition_id for item in kept} == {"paper", "pharma"}
+
+
+def test_chapter_select_does_not_send_every_page_opening_as_navigation():
+    report = _report()
+    sent = []
+    body = "公司主营造纸并销售纸袋纸。公司营业收入为100万元。公司采购木片。公司向下游客户销售纸制品。"
+    pages = [
+        {
+            "page": 4,
+            "text": "目录\n第三节 管理层讨论与分析 ............................................. 9\n第八节 财务报告 .................................................... 12\n",
+            "readable": True,
+        },
+        {"page": 9, "text": "第三节 管理层讨论与分析\n" + body, "readable": True},
+        {"page": 10, "text": "附注列示子公司注册地址。", "readable": True},
+        {"page": 12, "text": "第八节 财务报告\n合并利润表\n营业收入 100万元。", "readable": True},
+    ]
+    for page in range(13, 41):
+        pages.append({"page": page, "text": f"第{page}页普通附注。", "readable": True})
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            current = tuple(int(page["page"]) for page in request.source_pages)
+            sent.append((request.source_scope, request.purpose, current))
+            if request.source_scope == "page_map":
+                assert set(current) <= {4, 9, 12}
+                assert 10 not in current
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(9, 12),
+                )
+            if request.purpose == "source_inventory":
+                from research.company_profile.contracts import ReportSourceCondition
+
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=tuple(
+                        ReportSourceCondition(
+                            condition_id=dimension,
+                            dimension=dimension,
+                            description=body,
+                            evidence=(
+                                _evidence(report, text=body[:12], page=9).model_copy(
+                                    update={"evidence_id": f"nav-{dimension}"}
+                                ),
+                            ),
+                            major=True,
+                            statement_status="current",
+                        )
+                        for dimension in (
+                            "principal_business",
+                            "products_services",
+                            "revenue_model",
+                            "input_exposure",
+                            "supply_chain_role",
+                        )
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=tuple(
+                        ReportViewClaim(
+                            claim_id=item.condition_id,
+                            dimension=item.dimension,
+                            status="observed",
+                            answer=body,
+                            evidence=item.evidence,
+                        )
+                        for item in request.source_conditions
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "claim",
+                        "target_id": claim.claim_id,
+                        "status": "pass",
+                        "explanation": "已核。",
+                    }
+                    for claim in request.claims
+                )
+                + tuple(
+                    {
+                        "target_type": "condition",
+                        "target_id": condition.condition_id,
+                        "status": "pass",
+                        "covers_target_type": "claim",
+                        "covers_target_id": condition.condition_id,
+                        "explanation": "覆盖。",
+                    }
+                    for condition in request.source_conditions
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    result = _run(_Provider(), pages=tuple(pages), processing_identity=identity, report=report)
+    nav_pages = {page for scope, _purpose, pages in sent if scope == "page_map" for page in pages}
+    assert nav_pages <= {4, 9, 12}
+    assert 10 not in nav_pages
+    assert result.draft_complete is True
+    assert any(item["page"] == 10 and item["status"] == "not_read" for item in result.page_coverage)
+
+
+def test_a_local_conflict_is_isolated_on_the_new_chapter_path():
+    from research.company_profile.contracts import ReportSourceCondition
+    from research.company_profile.report_interpretation import _claim_is_trusted
+
+    report = _report()
+    dimensions = (
+        "principal_business",
+        "products_services",
+        "revenue_model",
+        "input_exposure",
+        "supply_chain_role",
+    )
+    body = {
+        "principal_business": "公司经营公司金融。",
+        "products_services": "个人住房贷款是主要业务。",
+        "revenue_model": "托管收入24.81亿元，该口径已更正，不再采用。",
+        "input_exposure": "公司吸收存款。",
+        "supply_chain_role": "公司向企业客户提供贷款。",
+    }
+    sent = []
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            sent.append(request.purpose)
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(1,),
+                )
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=tuple(
+                        ReportSourceCondition(
+                            condition_id=dimension,
+                            dimension=dimension,
+                            description=body[dimension],
+                            evidence=(
+                                _evidence(report, text=body[dimension], page=1).model_copy(
+                                    update={"evidence_id": f"iso-{dimension}"}
+                                ),
+                            ),
+                            major=True,
+                            statement_status="current",
+                        )
+                        for dimension in dimensions
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=tuple(
+                        ReportViewClaim(
+                            claim_id=dimension,
+                            dimension=dimension,
+                            status="observed",
+                            answer=body[dimension],
+                            evidence=(
+                                _evidence(report, text=body[dimension], page=1).model_copy(
+                                    update={"evidence_id": f"iso-claim-{dimension}"}
+                                ),
+                            ),
+                        )
+                        for dimension in dimensions
+                    ),
+                )
+            checks = []
+            for claim in request.claims:
+                checks.append(
+                    {
+                        "target_type": "claim",
+                        "target_id": claim.claim_id,
+                        "status": "block" if claim.claim_id == "revenue_model" else "pass",
+                        "explanation": "托管口径已否定。" if claim.claim_id == "revenue_model" else "已核。",
+                    }
+                )
+            for condition in request.source_conditions:
+                if condition.dimension == "revenue_model":
+                    continue
+                checks.append(
+                    {
+                        "target_type": "condition",
+                        "target_id": condition.condition_id,
+                        "status": "pass",
+                        "covers_target_type": "claim",
+                        "covers_target_id": condition.dimension,
+                        "explanation": "覆盖。",
+                    }
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(checks),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    result = _run(
+        _Provider(),
+        pages=(
+            {
+                "page": 1,
+                "text": "管理层讨论\n" + "".join(body.values()),
+                "readable": True,
+            },
+            {"page": 2, "text": "附注披露折旧年限。", "readable": True},
+        ),
+        processing_identity=identity,
+        report=report,
+    )
+    housing = next(item for item in result.claims if item.claim_id == "products_services")
+    custody = next(item for item in result.claims if item.claim_id == "revenue_model")
+    assert _claim_is_trusted(housing, result.checks) is True
+    assert _claim_is_trusted(custody, result.checks) is False
+    assert sent.count("synthesize_views") == 1
+    assert any(item["page"] == 2 and item["status"] == "not_read" for item in result.page_coverage)
+
+
+def test_missing_another_major_keeps_the_company_incomplete():
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    body = "公司主营造纸并销售纸袋纸。公司营业收入为100万元。公司采购木片。"
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(1,),
+                )
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=tuple(
+                        ReportSourceCondition(
+                            condition_id=dimension,
+                            dimension=dimension,
+                            description=body,
+                            evidence=(
+                                _evidence(report, text=body[:12], page=1).model_copy(
+                                    update={"evidence_id": f"miss-{dimension}"}
+                                ),
+                            ),
+                            major=True,
+                            statement_status="current",
+                        )
+                        for dimension in (
+                            "principal_business",
+                            "products_services",
+                            "revenue_model",
+                            "input_exposure",
+                        )
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=tuple(
+                        ReportViewClaim(
+                            claim_id=item.condition_id,
+                            dimension=item.dimension,
+                            status="observed",
+                            answer=body,
+                            evidence=item.evidence,
+                        )
+                        for item in request.source_conditions
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "claim",
+                        "target_id": claim.claim_id,
+                        "status": "pass",
+                        "explanation": "已核。",
+                    }
+                    for claim in request.claims
+                )
+                + tuple(
+                    {
+                        "target_type": "condition",
+                        "target_id": condition.condition_id,
+                        "status": "pass",
+                        "covers_target_type": "claim",
+                        "covers_target_id": condition.condition_id,
+                        "explanation": "覆盖。",
+                    }
+                    for condition in request.source_conditions
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    result = _run(
+        _Provider(),
+        pages=({"page": 1, "text": "管理层讨论\n" + body, "readable": True},),
+        processing_identity=identity,
+        report=report,
+    )
+    assert result.draft_complete is False
+    assert any(item.status == "observed" for item in result.claims)
+    assert any(
+        gap.startswith("core_dimension_missing:") or gap.startswith("view_not_substantive:")
+        for gap in result.gaps
+    )
+
+
+def test_official_parse_first_core_pack_has_tail_room():
+    import gzip
+    import json
+    from pathlib import Path
+
+    from research.company_profile.direct_reading import (
+        SOURCE_OUTPUT,
+        _compose_tail,
+        _first_delivery_tail,
+        _units,
+        chapter_candidate_pages,
+        navigation_batches,
+    )
+    from research.company_profile.report_interpretation import direct_core_processing_identity
+
+    caches = {
+        "paper": Path(
+            "/home/python/Quote/data/QuoteBak/s1-600103-c1-20261029/pdf-cache/derived/"
+            "business_profile_pdfium_recovery.v4/"
+            "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c_57e1dd4f16ef40ff.json.gz"
+        ),
+        "bank": Path(
+            "/home/python/Quote/data/QuoteBak/s1-600000-c1-20261029/pdf-cache/derived/"
+            "business_profile_pdfium_recovery.v4/"
+            "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22_57e1dd4f16ef40ff.json.gz"
+        ),
+    }
+    report = _report()
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    identity["ledger_tokens"] = 120_000
+    for name, path in caches.items():
+        assert path.is_file(), name
+        data = json.loads(gzip.open(path, "rt", encoding="utf-8").read())
+        pages = [
+            {
+                "page": int(item["page_number"]),
+                "text": str(item.get("text") or ""),
+                "readable": bool(str(item.get("text") or "").strip()),
+            }
+            for item in data["pages"]
+        ]
+        chosen = chapter_candidate_pages(pages)
+        assert chosen, name
+        assert len(chosen) <= 16, (name, chosen)
+        if name == "bank":
+            assert len(chosen) < 40
+        selected = [page for page in pages if int(page["page"]) in set(chosen)]
+        batches = navigation_batches(selected, report, identity, 24_000)
+        assert batches, name
+        nav = _units(
+            batches[0],
+            purpose="source_inventory",
+            source_scope="page_map",
+            report=report,
+            identity=identity,
+            output=1000,
+        )
+        from research.company_profile.direct_reading import source_discovery_slices
+
+        first = list(source_discovery_slices(selected, report, identity, 24_000))[0]
+        inventory = _units(
+            first,
+            purpose="source_inventory",
+            source_scope="full_context",
+            report=report,
+            identity=identity,
+            output=SOURCE_OUTPUT,
+        )
+        tail = _compose_tail(first, report=report, identity=identity)
+        assert nav + inventory + tail < 120_000, (
+            name,
+            nav,
+            inventory,
+            tail,
+            chosen,
+            [int(page["page"]) for page in first],
+        )
+        assert inventory > 1_000, (name, inventory)
+        identity["request_reservation_limit"] = 65_536
+        later = _first_delivery_tail(
+            selected, report=report, identity=identity, limit=65_536
+        )
+        assert nav + later < 120_000, (name, nav, later, chosen)
+
+
+def test_representative_source_return_drafts_and_closes_the_first_core_pack():
+    from research.company_profile.contracts import ReportSourceCondition
+
+    report = _report()
+    pages = tuple(
+        {
+            "page": page,
+            "text": (
+                f"第{page}节 经营情况讨论与分析。\n"
+                "公司主营造纸并销售纸袋纸。"
+                + ("纸袋纸产线与销售渠道说明。" * 24)
+                + "公司营业收入为173964000000元。公司采购木片并向下游客户销售纸制品。"
+            ),
+            "readable": True,
+        }
+        for page in (9, 12, 16)
+    )
+    body = pages[0]["text"]
+    quote = "公司主营造纸并销售纸袋纸。"
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            current = tuple(int(page["page"]) for page in request.source_pages)
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=current,
+                )
+            if request.purpose == "source_inventory":
+                assert sum(len(str(page.get("text") or "")) for page in request.source_pages) > 200
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=tuple(
+                        ReportSourceCondition(
+                            condition_id=dimension,
+                            dimension=dimension,
+                            description=quote,
+                            evidence=(
+                                _evidence(report, text=quote, page=current[0]).model_copy(
+                                    update={"evidence_id": f"size-{dimension}"}
+                                ),
+                            ),
+                            major=True,
+                            statement_status="current",
+                        )
+                        for dimension in (
+                            "principal_business",
+                            "products_services",
+                            "revenue_model",
+                            "input_exposure",
+                            "supply_chain_role",
+                        )
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=tuple(
+                        ReportViewClaim(
+                            claim_id=item.condition_id,
+                            dimension=item.dimension,
+                            status="observed",
+                            answer=quote,
+                            condition_ids=(item.condition_id,),
+                            evidence=item.evidence,
+                        )
+                        for item in request.source_conditions
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "claim",
+                        "target_id": claim.claim_id,
+                        "status": "pass",
+                        "explanation": "已核。",
+                    }
+                    for claim in request.claims
+                )
+                + tuple(
+                    {
+                        "target_type": "condition",
+                        "target_id": condition.condition_id,
+                        "status": "pass",
+                        "covers_target_type": "claim",
+                        "covers_target_id": next(
+                            (
+                                claim.claim_id
+                                for claim in request.claims
+                                if claim.dimension == condition.dimension
+                            ),
+                            condition.condition_id,
+                        ),
+                        "explanation": "覆盖。",
+                    }
+                    for condition in request.source_conditions
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    identity["ledger_tokens"] = 120_000
+    result = _run(
+        _Provider(),
+        pages=pages,
+        processing_identity=identity,
+        report=report,
+        token_budget=120_000,
+    )
+    assert result.draft_complete is True
+    assert {item.dimension for item in result.claims if item.status == "observed"} >= {
+        "principal_business",
+        "revenue_model",
+    }
+    assert not any(gap.startswith("direct_core_ledger_hold") for gap in result.gaps)
+    assert not any(gap.startswith("direct_core_admission_stopped") for gap in result.gaps)
 

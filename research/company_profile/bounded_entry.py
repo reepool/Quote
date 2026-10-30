@@ -861,14 +861,21 @@ def prepare_gateway(binding: dict, raw_config: dict, *, real: bool):
         labels = binding.get("task_route_labels")
         if labels:
             by_label = {member.source_label: member for member in pool.members}
+            if binding.get("task_route_first_only"):
+                labels = list(labels)[:1]
             chosen = []
+            preferred_first = bool(binding.get("task_route_preferred_first"))
             for index, label in enumerate(labels):
                 member = by_label.get(str(label))
                 if member is None:
                     raise ValueError(f"task route is not in the current pool: {label}")
-                # The last listed route is the one recovery spare. Earlier
-                # routes stay preferred. This copy is process-local.
-                weight = 1 if index == len(labels) - 1 else 5
+                # Process-local only. first_only binds the preferred source
+                # alone. preferred_first keeps a spare but does not let it
+                # win the opening pick the way a 5:1 weight did on C1.
+                if preferred_first:
+                    weight = 10_000 if index == 0 else 1
+                else:
+                    weight = 1 if index == len(labels) - 1 else 5
                 chosen.append(replace(member, weight=weight))
             pools = dict(config.pools)
             pools[pool.name] = replace(pool, members=tuple(chosen))
