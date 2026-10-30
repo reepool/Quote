@@ -125,6 +125,22 @@ def build_upgrade_report(
     return "\n".join(lines)
 
 
+def extract_telegram_targets(tg_data: Dict[str, Any]) -> tuple[Optional[str], List[str]]:
+    """从原始 telegram_config 提取 bot_token 与目标 chat 列表。
+
+    配置文件使用单数键 `chat_id`（历史原因），`chat_ids` 作为兼容备选；
+    两者都缺失时返回空目标，调用方应跳过通知。
+    """
+    token = str(tg_data.get("bot_token") or "").strip() or None
+    raw_chats = tg_data.get("chat_ids")
+    if not raw_chats:
+        raw_chats = tg_data.get("chat_id")
+    if isinstance(raw_chats, (str, int)):
+        raw_chats = [raw_chats]
+    chats = [str(item) for item in (raw_chats or []) if str(item).strip()]
+    return token, chats
+
+
 def send_upgrade_notification(message: str, *, level: str = "info") -> bool:
     """通过 Bot HTTP API 发送升级通知；独立于服务的 telethon session。
 
@@ -133,11 +149,10 @@ def send_upgrade_notification(message: str, *, level: str = "info") -> bool:
     try:
         from utils import config_manager
 
-        telegram = config_manager.get_telegram_config()
-        token = telegram.bot_token
-        chat_ids: List[str] = list(telegram.chat_ids or [])
+        tg_data = config_manager.get_nested("telegram_config", {}) or {}
+        token, chat_ids = extract_telegram_targets(tg_data)
         if not token or not chat_ids:
-            logger.warning("[akshare-upgrade] telegram bot_token/chat_ids missing, skip notify")
+            logger.warning("[akshare-upgrade] telegram bot_token/chat targets missing, skip notify")
             return False
         prefix = {"success": "✅", "warning": "⚠️", "error": "❌"}.get(level, "ℹ️")
         sent = False

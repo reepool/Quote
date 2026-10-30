@@ -7,10 +7,34 @@ import pytest
 
 from utils.akshare_upgrade import (
     build_upgrade_report,
+    extract_telegram_targets,
     parse_smoke_summary,
     summarize_smoke,
     update_requirements_pin,
 )
+
+
+def test_extract_telegram_targets_reads_singular_chat_id():
+    token, chats = extract_telegram_targets(
+        {"bot_token": "abc", "chat_id": ["123", "456"]}
+    )
+    assert token == "abc"
+    assert chats == ["123", "456"]
+
+
+def test_extract_telegram_targets_prefers_chat_ids_and_scalar():
+    token, chats = extract_telegram_targets(
+        {"bot_token": "abc", "chat_ids": ["1"], "chat_id": ["2"]}
+    )
+    assert chats == ["1"]
+    token, chats = extract_telegram_targets({"bot_token": "abc", "chat_id": 471105519})
+    assert chats == ["471105519"]
+
+
+def test_extract_telegram_targets_empty_when_missing():
+    assert extract_telegram_targets({"chat_id": ["1"]}) == (None, ["1"])
+    assert extract_telegram_targets({"bot_token": "abc"}) == ("abc", [])
+    assert extract_telegram_targets({}) == (None, [])
 
 
 def test_update_requirements_pin_replaces_bare_name(tmp_path: Path):
