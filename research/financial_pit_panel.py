@@ -274,11 +274,13 @@ class FinancialPitPanelStore:
         self,
         financials_db_path: str,
         quotes_db_path: Optional[str] = None,
+        valuation_db_path: Optional[str] = None,
         *,
         delay_grace_days: int = _DELAY_GRACE_DAYS_DEFAULT,
     ) -> None:
         self.db_path = str(financials_db_path)
         self.quotes_db_path = str(quotes_db_path) if quotes_db_path else None
+        self.valuation_db_path = str(valuation_db_path) if valuation_db_path else None
         self.delay_grace_days = int(delay_grace_days)
 
     # ------------------------------------------------------------------ base
@@ -399,6 +401,89 @@ class FinancialPitPanelStore:
                 elif value > 0:
                     entry.setdefault("share_capital", value)
         return enrichment
+
+    def _load_valuation_shares(
+        self, instrument_ids: Sequence[str]
+    ) -> Dict[str, List[Tuple[str, float]]]:
+        """Implied total shares (market_cap / close_price) per instrument.
+
+        This is the same denominator eastmoney uses for its per-share net
+        asset values, so preferring it aligns bps/ocfps with the AKShare
+        dual-source contract. ``share_capital_amount`` facts carry mixed
+        semantics across sources (some map an equity item into the canonical
+        name, e.g. 600398.SH) and must pass a consistency check against this
+        series before use.
+        """
+        shares: Dict[str, List[Tuple[str, float]]] = {}
+        if not self.valuation_db_path or not instrument_ids:
+            return shares
+        ids = list(instrument_ids)
+        try:
+            with sqlite3.connect(
+                f"file:{self.valuation_db_path}?mode=ro", uri=True, timeout=30
+            ) as connection:
+                for start in range(0, len(ids), 500):
+                    chunk = ids[start : start + 500]
+                    placeholders = ",".join("?" for _ in chunk)
+                    rows = connection.execute(
+                        f"""
+                        SELECT instrument_id, as_of_date, market_cap, close_price
+                        FROM valuation_history
+                        WHERE instrument_id IN ({placeholders})
+                          AND market_cap IS NOT NULL AND market_cap > 0
+                          AND close_price IS NOT NULL AND close_price > 0
+                        ORDER BY instrument_id, as_of_date
+                        """,
+                        chunk,
+                    ).fetchall()
+                    for instrument_id, as_of_date, market_cap, close_price in rows:
+                        shares.setdefault(instrument_id, []).append(
+                            (str(as_of_date)[:10], float(market_cap) / float(close_price))
+                        )
+        except sqlite3.Error as exc:
+            logger.warning(
+                "financial_pit_panel: valuation shares unavailable (%s); "
+                "falling back to share_capital_amount facts",
+                exc,
+            )
+        return shares
+
+    @staticmethod
+    def _resolve_denominator_shares(
+        instrument_id: str,
+        period: str,
+        fact_shares: Optional[float],
+        valuation_series: Optional[Sequence[Tuple[str, float]]],
+    ) -> Optional[float]:
+        """Resolve the period-end share-count denominator.
+
+        Policy (measured on 2026-10-31 against the AKShare dual source):
+        the share_capital fact is correct for ~90% of rows, but a minority
+        of sources map an equity item into the canonical name (catastrophic,
+        e.g. 3.2x). The valuation-implied series itself is ~18% low for a
+        cluster of instruments and has no rows for migrated BSE 920xxx
+        codes, so it must NOT be preferred on ordinary disagreement.
+
+        Intervene only on catastrophic disagreement: when an in-window
+        (period_end, +45 days] valuation reference exists and the fact is
+        >= 50% off it (either direction), the fact is almost surely the
+        mis-mapped equity item (real case 600398.SH: fact = 0.31x true
+        shares) and the valuation count is the far smaller error. Observed
+        valuation-reference bias stays within ~33% (p5 0.749 / p95 1.333),
+        so 50% separates the two clusters; everything else keeps the fact.
+        """
+        fact_value = float(fact_shares) if fact_shares and float(fact_shares) > 0 else None
+        if fact_value is None or not valuation_series:
+            return fact_value
+        period_end = str(period)[:10]
+        window_end = _shift_iso_date(period_end, 45)
+        in_window = [v for d, v in valuation_series if period_end < d <= window_end]
+        if not in_window:
+            return fact_value
+        reference = in_window[0]
+        if abs(fact_value / reference - 1.0) >= 0.5:
+            return reference
+        return fact_value
 
     def _load_trading_days(self) -> Dict[str, List[str]]:
         """Trading-day lists per exchange for effective-date derivation."""
@@ -585,12 +670,16 @@ class FinancialPitPanelStore:
         source_row: Dict[str, Any],
         sibling_periods: Dict[str, Dict[str, Any]],
         share_entry: Optional[Dict[str, Any]],
+        valuation_series: Optional[Sequence[Tuple[str, float]]] = None,
     ) -> None:
         """Compute eps/bps/ocfps and YoY/TTM in place (null outside boundaries)."""
         period = panel_row["report_period"]
-        shares = source_row.get("shares_outstanding")
-        if not shares and share_entry:
-            shares = share_entry.get("share_capital")
+        fact_shares = source_row.get("shares_outstanding")
+        if not fact_shares and share_entry:
+            fact_shares = share_entry.get("share_capital")
+        shares = FinancialPitPanelStore._resolve_denominator_shares(
+            panel_row["instrument_id"], period, fact_shares, valuation_series
+        )
         net_income = source_row.get("net_income")
         equity = source_row.get("equity")
         operating_cf = source_row.get("operating_cf")
@@ -646,6 +735,7 @@ class FinancialPitPanelStore:
         trading_days: Dict[str, List[str]],
         panel_version: str,
         built_at: str,
+        valuation_shares: Optional[Dict[str, List[Tuple[str, float]]]] = None,
     ) -> List[Dict[str, Any]]:
         by_instrument: Dict[str, Dict[str, Dict[str, Any]]] = {}
         for row in fact_rows:
@@ -673,7 +763,11 @@ class FinancialPitPanelStore:
                     base["available_at"],
                 )
                 self._apply_derivations(
-                    base, row, periods, share_facts.get((instrument_id, period))
+                    base,
+                    row,
+                    periods,
+                    share_facts.get((instrument_id, period)),
+                    (valuation_shares or {}).get(instrument_id),
                 )
                 panel_rows.append(base)
         return panel_rows
@@ -700,6 +794,12 @@ class FinancialPitPanelStore:
                 f"SELECT {_SELECT_FACT_COLUMNS} FROM financial_facts"
             ).fetchall()
         trading_days = self._load_trading_days()
+        instrument_ids = sorted({row["instrument_id"] for row in fact_rows})
+        logger.info(
+            "financial_pit_panel: loading valuation-implied share counts "
+            "for %d instruments", len(instrument_ids),
+        )
+        valuation_shares = self._load_valuation_shares(instrument_ids)
         panel_rows = self._derive_all_rows(
             fact_rows,
             indicator_rows,
@@ -709,6 +809,7 @@ class FinancialPitPanelStore:
             trading_days,
             panel_version,
             built_at,
+            valuation_shares,
         )
         with self.connect() as connection:
             connection.execute("BEGIN")
@@ -742,6 +843,9 @@ class FinancialPitPanelStore:
         if not normalized:
             return {"refreshed": 0}
         trading_days = self._load_trading_days()
+        valuation_shares = self._load_valuation_shares(
+            sorted({instrument_id for instrument_id, _ in normalized})
+        )
         refreshed = 0
         with self.connect() as connection:
             for instrument_id, period in normalized:
@@ -792,7 +896,13 @@ class FinancialPitPanelStore:
                 share_entry = self._load_single_share_facts(
                     connection, instrument_id, period
                 )
-                self._apply_derivations(base, item, siblings, share_entry)
+                self._apply_derivations(
+                    base,
+                    item,
+                    siblings,
+                    share_entry,
+                    valuation_shares.get(instrument_id),
+                )
                 columns = list(base.keys())
                 placeholders = ",".join("?" for _ in columns)
                 column_list = ",".join(columns)

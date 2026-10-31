@@ -1133,14 +1133,14 @@ class FinancialDisclosureIncrementalSyncService:
 
             store = getattr(self, "_pit_panel_store", None)
             if store is None:
-                quotes_db_path = (
-                    getattr(self.research_config.storage, "quotes_db_path", None)
-                    if getattr(self, "research_config", None) is not None
-                    else None
-                )
+                storage_cfg = (
+                    getattr(self, "research_config", None) is not None
+                    and getattr(self.research_config, "storage", None)
+                ) or None
                 store = FinancialPitPanelStore(
                     self.storage.financials_db_path,
-                    quotes_db_path=quotes_db_path,
+                    quotes_db_path=getattr(storage_cfg, "quotes_db_path", None),
+                    valuation_db_path=getattr(storage_cfg, "valuation_db_path", None),
                 )
                 store.initialize()
                 self._pit_panel_store = store

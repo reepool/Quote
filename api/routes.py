@@ -204,6 +204,9 @@ def _pit_panel_store() -> FinancialPitPanelStore:
     store = FinancialPitPanelStore(
         research_config.storage.financials_db_path,
         quotes_db_path=quotes_db_path,
+        valuation_db_path=getattr(
+            research_config.storage, "valuation_db_path", None
+        ),
     )
     store.initialize()
     return store

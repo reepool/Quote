@@ -71,14 +71,24 @@ LINEAGE_MIXED = (
 )
 
 
-def _make_dbs(tmp_path: Path) -> tuple[Path, Path]:
+VALUATION_DDL = """
+CREATE TABLE valuation_history (
+    instrument_id TEXT, as_of_date TEXT, close_price REAL, market_cap REAL
+);
+"""
+
+
+def _make_dbs(tmp_path: Path) -> tuple[Path, Path, Path]:
     financials = tmp_path / "financials.db"
     quotes = tmp_path / "quotes.db"
+    valuation = tmp_path / "valuation.db"
     with sqlite3.connect(financials) as conn:
         conn.executescript(FINANCIALS_DDL)
     with sqlite3.connect(quotes) as conn:
         conn.executescript(QUOTES_DDL)
-    return financials, quotes
+    with sqlite3.connect(valuation) as conn:
+        conn.executescript(VALUATION_DDL)
+    return financials, quotes, valuation
 
 
 def _insert_fact(
@@ -144,7 +154,7 @@ def _add_change(
 
 @pytest.fixture()
 def store(tmp_path: Path) -> FinancialPitPanelStore:
-    financials, quotes = _make_dbs(tmp_path)
+    financials, quotes, valuation = _make_dbs(tmp_path)
     with sqlite3.connect(financials) as conn:
         # exact publish date
         _insert_fact(
@@ -310,7 +320,46 @@ def store(tmp_path: Path) -> FinancialPitPanelStore:
             ],
         )
         conn.commit()
-    store = FinancialPitPanelStore(str(financials), str(quotes))
+    # 600007.SH: mis-mapped share fact (an equity item, 3.2x off) that the
+    # valuation-implied share count must correct
+    with sqlite3.connect(financials) as conn:
+        _insert_fact(
+            conn,
+            "600007.SH",
+            "2024-12-31",
+            net_income=700.0,
+            equity=4800.0,
+            publish_date="2025-04-01",
+        )
+        conn.execute(
+            """
+            INSERT INTO financial_numeric_facts_hot (
+                instrument_id, report_period, canonical_fact_name, fact_name,
+                fact_value, updated_at
+            ) VALUES ('600007.SH', '2024-12-31', 'share_capital_amount', 'equity',
+                      1000.0, '2025-04-01T20:00:00')
+            """
+        )
+        conn.commit()
+    with sqlite3.connect(valuation) as vconn:
+        vconn.executemany(
+            """
+            INSERT INTO valuation_history (
+                instrument_id, as_of_date, close_price, market_cap
+            ) VALUES (?, ?, ?, ?)
+            """,
+            [
+                # 600001: consistent with its fact (80.0)
+                ("600001.SH", "2025-01-10", 10.0, 800.0),
+                # 600007: true shares 3200.0, fact says 1000.0 (3.2x off)
+                ("600007.SH", "2025-01-10", 5.0, 16000.0),
+            ],
+        )
+        vconn.commit()
+
+    store = FinancialPitPanelStore(
+        str(financials), str(quotes), str(valuation)
+    )
     store.initialize()
     return store
 
@@ -325,7 +374,7 @@ def test_statutory_deadline_mapping() -> None:
 
 def test_full_build_and_idempotency(store: FinancialPitPanelStore) -> None:
     stats = store.build_full("test-v1")
-    assert stats["rows"] == 12
+    assert stats["rows"] == 13
     with store.connect() as conn:
         first = conn.execute(
             "SELECT COUNT(*), SUM(revenue) FROM financial_pit_panel"
@@ -413,12 +462,12 @@ def test_cross_section_stats_and_universe_note(
     store.build_full("test-v1")
     result = store.query_cross_section("20260101")
     # 600006 delayed_estimate (2026-08-08) is correctly invisible at 2026-01-01
-    assert result["total"] == 5
+    assert result["total"] == 6
     assert "period_lag_distribution" in result["stats"]
     assert result["stats"]["available_at_quality"].get("exact", 0) >= 1
     assert "delisted not covered" in result["universe_note"]
     later = store.query_cross_section("20260901")
-    assert later["total"] == 6  # delayed filer becomes visible after estimate
+    assert later["total"] == 7  # delayed filer becomes visible after estimate
 
 
 def test_attribution_quality_marking(store: FinancialPitPanelStore) -> None:
@@ -457,6 +506,26 @@ def test_per_share_derivations_use_reported_facts(
     assert row["roe"] == pytest.approx(2.67)
     assert row["gross_margin"] == pytest.approx(91.4)
     assert row["current_ratio"] == pytest.approx(1.9)
+    # consistent fact kept (600001 fact 80.0 == valuation-implied 80.0)
+    assert row["shares_outstanding"] == pytest.approx(80.0)
+
+
+def test_mismatched_share_fact_corrected_by_valuation(
+    store: FinancialPitPanelStore,
+) -> None:
+    """A mis-mapped share fact (equity item) must be rejected by the
+    valuation-implied denominator (real case: 600398.SH, 3.2x error)."""
+    store.build_full("test-v1")
+    with store.connect() as conn:
+        row = conn.execute(
+            """
+            SELECT bps, shares_outstanding FROM financial_pit_panel
+            WHERE instrument_id = '600007.SH' AND report_period = '2024-12-31'
+            """
+        ).fetchone()
+    # fact=1000 (3.2x off) rejected -> valuation-implied 3200.0 used
+    assert row["shares_outstanding"] == pytest.approx(3200.0)
+    assert row["bps"] == pytest.approx(4800.0 / 3200.0)
     # missing share facts -> null per-share, never zero placeholders
     with store.connect() as conn:
         row = conn.execute(
@@ -515,8 +584,12 @@ def test_coverage_expected_gap_and_sparse(store: FinancialPitPanelStore) -> None
     bulk = by_period["20241231"]
     assert bulk["is_bulk_period"] is True
     assert bulk["expected_count"] == 6  # lifecycle universe at 2024-12-31
-    assert bulk["actual_count"] == 5
+    # 600007.SH is a pre-IPO-style row outside the lifecycle universe: actual
+    # 6 = 5 in-universe + 600007; gap stays set-based (600002 missing), and
+    # the extra row surfaces as a reverse discrepancy instead of masking it
+    assert bulk["actual_count"] == 6
     assert bulk["gap_count"] == 1
+    assert bulk["reverse_discrepancy_count"] == 1
     assert bulk["is_complete"] is True  # deadline 2025-04-30 already passed
     sparse = by_period["20221231"]
     assert sparse.get("sparse") is True
@@ -526,7 +599,6 @@ def test_coverage_expected_gap_and_sparse(store: FinancialPitPanelStore) -> None
     # reverse discrepancy: 600001.SH is in the lifecycle universe, but the
     # 2024-12-31 panel set also includes instruments listed later (none in
     # this fixture) -> 0; expected/gap/reverse all populated on bulk periods
-    assert bulk["reverse_discrepancy_count"] == 0
     assert "recent_source_change_count" in bulk
     # every panel endpoint carries the universe note (spec: any panel API)
     assert "delisted not covered" in result["universe_note"]
@@ -557,7 +629,7 @@ def test_measure_revision_impact_thresholds(
     store.build_full("test-v1")
     impact = store.measure_revision_impact()
     assert impact["revised_rows"] == 1
-    assert impact["total_rows"] == 12
+    assert impact["total_rows"] == 13
     # 1/12 = 8.3% > 5% ratio threshold -> guard required even without quarter crossing
     assert impact["guard_required"] is True
 
