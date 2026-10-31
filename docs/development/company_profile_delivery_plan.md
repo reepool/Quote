@@ -2,7 +2,7 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-10-31。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[真实源到核心答案§20](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#20-真实源到核心答案修正首包失败策略)，依据验收§7.71/A审核§155。§19一次真跑结束，6页/14源条件但零主张；纠正5:1轮询冒充备用与首包unknown后无交付空间。复用本次真实源、单DeepSeek及少数跨章组交可审正文/pending/有效核验/三读，不重读成功章节、不建平台。工程连续推进，新一次真实方案待用户明确批准，不借旧余额。质量不降，S1仍0/12，银行/其余十家/S1重测/S2/生产未授权。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[真实源到核心答案§20](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#20-真实源到核心答案修正首包失败策略)，依据验收§7.71/A审核§155。§19一次真跑结束，6页/14源条件但零主张；纠正5:1轮询冒充备用与首包unknown后无交付空间。复用本次真实源、单DeepSeek及少数跨章组交可审正文/pending/有效核验/三读，不重读成功章节、不建平台。用户已批准这一次成稿核验验证，工程成立后B同卡直接冻结执行一次，尚未启动，不借旧余额。质量不降，S1仍0/12，银行/其余十家/S1重测/S2/生产未授权。
 
 ## 1. 开发者必须先理解的纠偏
 
@@ -92,7 +92,7 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 
 ### B3 / S1：12家新链回归（A2通过后）
 
-- **2026-10-31审核§155（当前）：** §19唯一真跑已用、零主张，不继续旧30802余额或重跑读源。当前仅[§20](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#20-真实源到核心答案修正首包失败策略)/验收§7.71：兼容复用本次真实两笔正文源、任务单DeepSeek、少数跨章组及时成稿/pending持久并核验，真实14长条件及首包unknown后非空交付的同入口证明与直接修正合并推进。B按v3自主P0—P3/至多两次共性修正、必要Review/清理；新一次真实方案待用户明确批准，批准且工程成立后同卡冻结执行一次，不逐项等待。不称首发/常规效率，不动原分、不启动银行/其他公司/S2/生产。以下历史安排不再授权外呼。
+- **2026-10-31审核§155（当前，用户确认见§155.5）：** §19唯一真跑已用、零主张，不继续旧30802余额或重跑读源。当前仅[§20](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#20-真实源到核心答案修正首包失败策略)/验收§7.71：兼容复用本次真实两笔正文源、任务单DeepSeek、少数跨章组及时成稿/pending持久并核验，真实14长条件及首包unknown后非空交付的同入口证明与直接修正合并推进。B按v3自主P0—P3/至多两次共性修正、必要Review/清理；用户已批准这一次成稿核验验证，工程成立后同卡直接冻结执行一次，无需再请批，尚未启动。不称首发/常规效率，不动原分、不启动银行/其他公司/S2/生产。以下历史安排不再授权外呼。
 
 - **2026-10-31审核§151（已结束）：** §17新增可靠答案0，付费兼容接续结束，不开第三窗/银行旧绑定。曾执行[§18](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#18-章节缺口闭环重整停止17真实接续)/验收§7.69的直接链工程整合，真实调用/预算0，旧余额不用；结果见§152—153。清理前置/收尾及原质量/分数/生产边界不变。
 
