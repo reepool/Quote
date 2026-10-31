@@ -9021,14 +9021,15 @@ class ResearchStorageManager:
                     "taxonomy_version": row["taxonomy_version"],
                     "industry_code": industry_code,
                     "industry_name": industry_name,
-                    "effective_from": str(row["effective_from"])[:10],
-                    "effective_to": str(row["effective_to"])[:10]
+                    # API layer date convention: YYYYMMDD (PIT panel family).
+                    "effective_from": str(row["effective_from"])[:10].replace("-", ""),
+                    "effective_to": str(row["effective_to"])[:10].replace("-", "")
                     if row["effective_to"]
                     else None,
                 }
             )
         return {
-            "as_of": as_of_str,
+            "as_of": as_of_str.replace("-", ""),
             "taxonomy_system": taxonomy_system,
             "total": total,
             "limit": limit,

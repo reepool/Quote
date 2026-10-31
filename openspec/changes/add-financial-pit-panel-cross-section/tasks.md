@@ -90,3 +90,36 @@
       （1.4 注记）、revision_guard 未实现（2.5 阈值判定）、is_complete
       截止日当天计 True（时间判据字面语义）。
 - [x] 5.4 提交并推送；change 待验收方确认后归档。
+
+## 6. 交付后对照审计（2026-10-31，需求 v1.2 + openspec 逐场景核对）
+
+审计发现 8 项与 spec/需求不符，全部修复并有测试或真库冒烟验证：
+
+1. **revision_guard 参数违反 spec**（P0）：实测阈值未触发（2.47%<5%、0.39<1 期），
+   spec 明文"未超阈值不得实现"，但代码实现了 lenient 分支（与 2.5 记录矛盾）。
+   已移除参数与分支，strict 为唯一行为，响应保留 `guard: strict` 声明；
+   `announcement_available_at` 列保留用于诊断与未来超阈值时再启用。
+   测试改为断言 lenient 不可用（TypeError）。
+2. **universe_note 缺失于 panel/coverage/changes 端点**（spec："any panel API
+   endpoint"）：已补，三端点 + cross-section 全部携带。
+3. **最新报告期披露窗口未完状态未声明**（spec R3 子句）：`_universe_note` 在
+   newest 期截止日未过时附加 `newest_period=... incomplete`。
+4. **coverage 反向差异数缺失**（spec R9 + 需求 §5.3 + 任务 1.3 承诺）：已补
+   `reverse_discrepancy_count`；真库 2023Q4=274、2024Q1=161（= pre-IPO 行）。
+5. **修复过程中发现并二次修正**：gap 若按计数相减会被反向行抵消（2024Q1 真缺
+   80 被掩盖成 0），改为**集合差**计算——`gap_count = |lifecycle_set − panel_set|`，
+   真库 2024Q1 gap=80 与 1.3 校准结论精确吻合；2026Q3 gap=642（当期披露中）。
+6. **coverage 近 7 天源变更行数缺失**（spec R9 + 需求 §5.3）：已补
+   `recent_source_change_count`（真库 2026Q3=4,431，披露季活跃，历史期 0）。
+7. **披露事件更新未触发面板重推导**（spec R10 场景）：
+   `financial_disclosure_incremental_sync` 三个 upsert 点全部补
+   `_refresh_pit_panel_for_event`（best-effort + 实例级 store 缓存）。
+8. **industries/as-of 日期格式为 ISO**（spec 场景要求 YYYYMMDD）：已改，
+   as_of/effective_from/effective_to 全部 YYYYMMDD，真库冒烟通过。
+
+次要修复：share facts 查询加 `ORDER BY updated_at DESC, rowid DESC`（多源文件
+重复事实的确定性）；`is_delisted` 预留声明写入 API docstring（spec R1 场景）；
+测试 fixture 长表 DDL 补 updated_at 列对齐真表。
+
+审计后验证：单测 16/16；披露/财报同步回归（含新钩子）通过；真库 coverage
+冒烟 2.3s（反向差异/集合差 gap/近源变更/全端点 universe_note 全部可见）。

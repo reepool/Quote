@@ -215,11 +215,14 @@ async def get_financial_pit_cross_section(
     report_period: Optional[str] = Query(None, description="报告期过滤，YYYYMMDD"),
     exchange: Optional[str] = Query(None, description="SSE/SZSE/BSE，逗号分隔"),
     fields: Optional[str] = Query(None, description="字段投影，逗号分隔"),
-    revision_guard: str = Query("strict", description="strict|lenient；lenient 重新引入更正前视"),
     limit: int = Query(1000, ge=1, le=2000),
     offset: int = Query(0, ge=0),
 ):
-    """时点横截面：每票截至 as_of 最新可知报告期（服务端装配，无未来函数）。"""
+    """时点横截面：每票截至 as_of 最新可知报告期（服务端装配，无未来函数）。
+
+    恒为 strict 更正防护（实测影响面低于阈值，未提供宽松模式）；
+    is_delisted 为预留字段（本期恒 false，无数据承诺）。
+    """
     try:
         field_list = (
             [item.strip() for item in fields.split(",") if item.strip()]
@@ -231,7 +234,6 @@ async def get_financial_pit_cross_section(
             report_period=report_period,
             exchanges=exchange,
             fields=field_list,
-            revision_guard=revision_guard,
             limit=limit,
             offset=offset,
         )

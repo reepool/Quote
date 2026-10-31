@@ -1113,6 +1113,45 @@ class FinancialDisclosureIncrementalSyncService:
                 },
                 ingestion_run_id=run_id,
             )
+        self._refresh_pit_panel_for_event(
+            instrument_id=str(state.get("instrument_id") or ""),
+            report_period=str(state.get("report_period") or ""),
+        )
+
+    def _refresh_pit_panel_for_event(self, *, instrument_id: str, report_period: str) -> None:
+        """Best-effort PIT panel availability re-derivation after an event upsert.
+
+        Disclosure events feed the availability chain (exact_event /
+        delayed_estimate), so an insert or update must re-evaluate the affected
+        panel row. Failures are logged, never raised: the panel is a derived
+        read model and a later full rebuild converges.
+        """
+        if not instrument_id or not report_period:
+            return
+        try:
+            from research.financial_pit_panel import FinancialPitPanelStore
+
+            store = getattr(self, "_pit_panel_store", None)
+            if store is None:
+                quotes_db_path = (
+                    getattr(self.research_config.storage, "quotes_db_path", None)
+                    if getattr(self, "research_config", None) is not None
+                    else None
+                )
+                store = FinancialPitPanelStore(
+                    self.storage.financials_db_path,
+                    quotes_db_path=quotes_db_path,
+                )
+                store.initialize()
+                self._pit_panel_store = store
+            store.refresh_pairs([(instrument_id, str(report_period)[:10])])
+        except Exception as exc:  # noqa: BLE001 - derived model must not block sync
+            dm_logger.warning(
+                "financial_pit_panel refresh after disclosure event failed for %s %s: %s",
+                instrument_id,
+                report_period,
+                exc,
+            )
 
     @classmethod
     def _state_has_disclosure_risk_reasons(cls, state: Mapping[str, Any]) -> bool:
@@ -1213,6 +1252,10 @@ class FinancialDisclosureIncrementalSyncService:
                 },
                 ingestion_run_id=run_id,
             )
+        self._refresh_pit_panel_for_event(
+            instrument_id=str(state.get("instrument_id") or ""),
+            report_period=str(state.get("report_period") or ""),
+        )
 
     def _candidate_for_event(
         self,
@@ -1972,6 +2015,10 @@ class FinancialDisclosureIncrementalSyncService:
                         "lifecycle_classification": candidate.lifecycle_classification,
                     },
                     ingestion_run_id=run_id,
+                )
+                self._refresh_pit_panel_for_event(
+                    instrument_id=candidate.instrument_id,
+                    report_period=candidate.report_period,
                 )
                 if (
                     str(announcement_id) != local_gap_announcement_id

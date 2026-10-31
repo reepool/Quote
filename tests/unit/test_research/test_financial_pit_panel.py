@@ -36,7 +36,7 @@ CREATE TABLE financial_disclosure_event_state (
 );
 CREATE TABLE financial_numeric_facts_hot (
     instrument_id TEXT, report_period TEXT, canonical_fact_name TEXT,
-    fact_name TEXT, fact_value REAL
+    fact_name TEXT, fact_value REAL, updated_at TEXT
 );
 CREATE TABLE data_change_log (
     sequence_id INTEGER PRIMARY KEY, domain TEXT, dataset TEXT,
@@ -388,11 +388,11 @@ def test_cross_section_visibility_and_fallback(store: FinancialPitPanelStore) ->
     strict = store.query_cross_section("20241101")
     strict_map = {item["instrument_id"]: item for item in strict["items"]}
     assert strict_map["600001.SH"]["report_period"] == "20240630"
-    # lenient mode reinstates announcement-based availability
-    lenient = store.query_cross_section("20241101", revision_guard="lenient")
-    lenient_map = {item["instrument_id"]: item for item in lenient["items"]}
-    assert lenient_map["600001.SH"]["report_period"] == "20240930"
-    assert lenient["revision_guard"] == "lenient"
+    # guard is strict-only: measured thresholds were not exceeded, so the
+    # lenient parameter is intentionally not implemented (spec scenario)
+    assert strict["guard"] == "strict"
+    with pytest.raises(TypeError):
+        store.query_cross_section("20241101", revision_guard="lenient")
     # no future data: 2025Q1 invisible before its publish date
     assert "20250331" not in {
         item["report_period"] for item in result["items"]
@@ -507,7 +507,19 @@ def test_coverage_expected_gap_and_sparse(store: FinancialPitPanelStore) -> None
     sparse = by_period["20221231"]
     assert sparse.get("sparse") is True
     assert sparse["expected_count"] is None
+    assert sparse["reverse_discrepancy_count"] is None
     assert result["expected_count_derivation"]
+    # reverse discrepancy: 600001.SH is in the lifecycle universe, but the
+    # 2024-12-31 panel set also includes instruments listed later (none in
+    # this fixture) -> 0; expected/gap/reverse all populated on bulk periods
+    assert bulk["reverse_discrepancy_count"] == 0
+    assert "recent_source_change_count" in bulk
+    # every panel endpoint carries the universe note (spec: any panel API)
+    assert "delisted not covered" in result["universe_note"]
+    panel_resp = store.query_panel(limit=1)
+    assert "delisted not covered" in panel_resp["universe_note"]
+    changes_resp = store.changes(limit=1)
+    assert "delisted not covered" in changes_resp["universe_note"]
 
 
 def test_changes_cursor_is_monotonic_and_replayable(

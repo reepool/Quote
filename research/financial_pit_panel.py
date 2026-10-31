@@ -11,7 +11,11 @@ Requirement source:
 Availability semantics (weak PIT): a row is visible from ``available_at``
 (announcement semantics, possibly pushed later by delayed-filer events or
 substantive value changes). ``announcement_available_at`` keeps the pre-push
-chain result so ``revision_guard=lenient`` can reinstate it.
+chain result for diagnostics and for a future lenient guard if measured
+thresholds are ever exceeded (2026-10-31 measurement: 2.47% < 5%, 0.39 < 1.0
+periods -> the lenient parameter is intentionally NOT implemented, per the
+spec scenario "when thresholds are not exceeded the parameter SHALL NOT be
+implemented").
 
 Per-share derivations prefer reported disclosure facts: ``eps`` uses the
 cumulative reported basic EPS from the numeric-fact long table, ``bps`` /
@@ -379,6 +383,7 @@ class FinancialPitPanelStore:
                 WHERE instrument_id = ?
                   AND COALESCE(canonical_fact_name, fact_name) IN (?, ?)
                   AND fact_value IS NOT NULL
+                ORDER BY updated_at DESC, rowid DESC
                 """,
                 (instrument_id, _LONG_TABLE_EPS_FACT, _LONG_TABLE_SHARE_FACT),
             ).fetchall()
@@ -874,6 +879,7 @@ class FinancialPitPanelStore:
             WHERE instrument_id = ? AND report_period = ?
               AND COALESCE(canonical_fact_name, fact_name) IN (?, ?)
               AND fact_value IS NOT NULL
+            ORDER BY updated_at DESC, rowid DESC
             """,
             (instrument_id, period, _LONG_TABLE_EPS_FACT, _LONG_TABLE_SHARE_FACT),
         ).fetchall()
@@ -947,6 +953,30 @@ class FinancialPitPanelStore:
                 return period
         return None
 
+    def _universe_note(self, latest_complete: Optional[str]) -> str:
+        """Standard universe/limitation note shared by all panel endpoints.
+
+        Includes the newest period's incomplete status while its disclosure
+        window is still open (spec: universe limitation and completeness are
+        disclosed).
+        """
+        note = (
+            "universe=listed-only; delisted not covered; "
+            f"latest_complete_period={_to_yyyymmdd(latest_complete) or 'none'}"
+        )
+        with self.connect() as connection:
+            newest = connection.execute(
+                "SELECT MAX(report_period) AS newest FROM financial_pit_panel"
+            ).fetchone()["newest"]
+        if newest:
+            newest_deadline = statutory_deadline(newest)
+            if newest_deadline and newest_deadline > _today_iso():
+                note += (
+                    f"; newest_period={_to_yyyymmdd(newest)} incomplete "
+                    "(disclosure window open)"
+                )
+        return note
+
     def query_cross_section(
         self,
         as_of: str,
@@ -954,19 +984,17 @@ class FinancialPitPanelStore:
         report_period: Optional[str] = None,
         exchanges: Optional[Sequence[str]] = None,
         fields: Optional[Sequence[str]] = None,
-        revision_guard: str = "strict",
         limit: int = 1000,
         offset: int = 0,
     ) -> Dict[str, Any]:
-        """Latest visible report period per instrument at ``as_of`` (server-assembled)."""
-        if revision_guard not in ("strict", "lenient"):
-            raise ValueError("revision_guard must be strict or lenient")
+        """Latest visible report period per instrument at ``as_of`` (server-assembled).
+
+        Strict revision guard only: rows whose substantive value changed after
+        the original announcement stay invisible until the change date (see
+        module docstring for why the lenient variant is not implemented).
+        """
         as_of_iso = _from_yyyymmdd(as_of, field="as_of")
-        visibility_column = (
-            "announcement_available_at"
-            if revision_guard == "lenient"
-            else "available_at"
-        )
+        visibility_column = "available_at"
         limit = max(1, min(int(limit), 2000))
         offset = max(0, int(offset))
         filter_params: List[Any] = [as_of_iso]
@@ -1055,14 +1083,11 @@ class FinancialPitPanelStore:
         return {
             "as_of": _to_yyyymmdd(as_of_iso),
             "report_period": _to_yyyymmdd(report_period) if report_period else None,
-            "revision_guard": revision_guard,
+            "guard": "strict",
             "total": total,
             "limit": limit,
             "offset": offset,
-            "universe_note": (
-                "universe=listed-only; delisted not covered; "
-                f"latest_complete_period={_to_yyyymmdd(latest_complete) or 'none'}"
-            ),
+            "universe_note": self._universe_note(latest_complete),
             "stats": {
                 "period_lag_distribution": dict(
                     sorted(lag_distribution.items(), key=lambda kv: kv[0])
@@ -1113,6 +1138,7 @@ class FinancialPitPanelStore:
             "total": total,
             "limit": limit,
             "offset": offset,
+            "universe_note": self._universe_note(self.latest_complete_period()),
             "items": [self._row_to_item(row) for row in rows],
         }
 
@@ -1132,16 +1158,41 @@ class FinancialPitPanelStore:
             summary = [
                 self._coverage_for_period(connection, period) for period in periods
             ]
-        lifecycle = self._load_lifecycle_universe(periods)
+            panel_instruments = {
+                period: {
+                    row["instrument_id"]
+                    for row in connection.execute(
+                        "SELECT instrument_id FROM financial_pit_panel "
+                        "WHERE report_period = ?",
+                        (period,),
+                    ).fetchall()
+                }
+                for period in periods
+            }
+        lifecycle_sets = self._load_lifecycle_sets(periods)
         for item in summary:
-            expected = lifecycle.get(item["report_period"])
-            if item["is_bulk_period"] and expected is not None:
+            period = item["report_period"]
+            lifecycle_set = lifecycle_sets.get(period)
+            if item["is_bulk_period"] and lifecycle_set is not None:
+                expected = len(lifecycle_set)
                 item["expected_count"] = expected
-                item["gap_count"] = max(0, expected - item["actual_count"])
+                # Set-based gap: instruments expected but absent from the panel.
+                # A count difference would be cancelled out by reverse rows
+                # (pre-IPO prospectus financials) and hide true missing names
+                # (real-DB example: 2024Q1 true gap 80 hidden by 161 extra rows).
+                item["gap_count"] = len(
+                    lifecycle_set - panel_instruments.get(period, set())
+                )
+                # Reverse discrepancy: panel rows outside the lifecycle universe
+                # (e.g., pre-IPO prospectus financials; task 1.3 attribution).
+                item["reverse_discrepancy_count"] = len(
+                    panel_instruments.get(period, set()) - lifecycle_set
+                )
             else:
                 item["sparse"] = True
                 item["expected_count"] = None
                 item["gap_count"] = None
+                item["reverse_discrepancy_count"] = None
         today = _today_iso()
         latest_complete = None
         for item in sorted(
@@ -1155,17 +1206,59 @@ class FinancialPitPanelStore:
                 break
         return {
             "latest_complete_period": _to_yyyymmdd(latest_complete),
+            "universe_note": self._universe_note(latest_complete),
             "expected_count_derivation": (
                 "stock instruments on SSE/SZSE/BSE with listed_date <= period end "
                 "and (delisted_date null or > period end), from instruments master; "
                 "bulk periods only (2023-12-31 onward), sparse periods report "
-                "actual counts with a sparse marker"
+                "actual counts with a sparse marker; reverse_discrepancy_count "
+                "covers panel rows outside the lifecycle universe (pre-IPO rows)"
             ),
             "periods": [
                 {**item, "report_period": _to_yyyymmdd(item["report_period"])}
                 for item in summary
             ],
         }
+
+    def _load_lifecycle_sets(
+        self, periods: Sequence[str]
+    ) -> Dict[str, set]:
+        """Expected listed-stock instrument set per report period end.
+
+        Derived from the instruments master lifecycle (listed on or before the
+        period end, not delisted as of the period end). Sets (not counts) so
+        coverage can also expose the reverse discrepancy.
+        """
+        sets: Dict[str, set] = {}
+        if not self.quotes_db_path or not periods:
+            return sets
+        try:
+            with sqlite3.connect(
+                f"file:{self.quotes_db_path}?mode=ro", uri=True, timeout=30
+            ) as connection:
+                for period in periods:
+                    if not statutory_deadline(period):
+                        continue
+                    sets[period] = {
+                        row[0]
+                        for row in connection.execute(
+                            """
+                            SELECT instrument_id FROM instruments
+                            WHERE type = 'stock'
+                              AND exchange IN ('SSE', 'SZSE', 'BSE')
+                              AND listed_date IS NOT NULL AND listed_date != ''
+                              AND substr(listed_date, 1, 10) <= ?
+                              AND (delisted_date IS NULL OR delisted_date = ''
+                                   OR substr(delisted_date, 1, 10) > ?)
+                            """,
+                            (period, period),
+                        ).fetchall()
+                    }
+        except sqlite3.Error as exc:
+            logger.warning(
+                "financial_pit_panel: lifecycle universe unavailable (%s)", exc
+            )
+        return sets
 
     def _load_lifecycle_universe(self, periods: Sequence[str]) -> Dict[str, int]:
         """Expected listed-stock count per report period end (instruments master)."""
@@ -1240,6 +1333,16 @@ class FinancialPitPanelStore:
         is_bulk = period >= _BULK_FIRST_PERIOD
         today = _today_iso()
         deadline = statutory_deadline(period)
+        recent_cutoff = _shift_iso_date(today, -7)
+        recent_source_change = connection.execute(
+            """
+            SELECT COUNT(*) FROM financial_pit_panel
+            WHERE report_period = ?
+              AND source_table_updated_at IS NOT NULL
+              AND source_table_updated_at >= ?
+            """,
+            (period, recent_cutoff),
+        ).fetchone()[0]
         return {
             "report_period": period,
             "actual_count": total,
@@ -1250,6 +1353,7 @@ class FinancialPitPanelStore:
                 row["attribution_quality"]: row["n"] for row in attribution_rows
             },
             "revised_after_publish_count": revised,
+            "recent_source_change_count": recent_source_change,
             "derived_non_null": derived_non_null,
             "is_bulk_period": is_bulk,
             "statutory_deadline": _to_yyyymmdd(deadline),
@@ -1297,6 +1401,7 @@ class FinancialPitPanelStore:
             "next_cursor": next_cursor,
             "limit": limit,
             "has_more": len(entries) == limit,
+            "universe_note": self._universe_note(self.latest_complete_period()),
             "entries": entries,
         }
 
