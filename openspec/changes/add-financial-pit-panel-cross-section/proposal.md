@@ -30,6 +30,8 @@ quantwin 2026-10-31 评审的 4 项 P0 与 7 项 P1 答复）。数据基线为�
   `industry_classification_history`，quantwin P0-4 方案 B）。
 - 派生指标（eps/bps/ocfps/rev_yoy/np_yoy/ttm_*）构建时计算落库，含可计算边界；
   数值缺失一律 null，禁止占位值。
+- 双源拼接支撑（quantwin P0-1）：归母口径对齐承诺 + 2023Q4/2024Q1/2024Q2
+  重叠校验（差异 >2% 股票 <1% 且逐只归因）+ M4 输出拼接建议文档。
 - 面板增量维护挂钩现有财务同步链路，调度复用现有 scheduler 任务位。
 - 语义为弱 PIT：时间严格、数值最新口径；不启用、不回填 vintage 体系。
 

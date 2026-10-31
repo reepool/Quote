@@ -356,7 +356,8 @@ GET /api/v1/research/industries/as-of
 响应 items：`instrument_id / industry_code / industry_name / taxonomy_system /
 effective_from / effective_to`。实现基于 `industry_classification_history`
 （`official_start_date`，单票 as-of 逻辑已有：`get_industry_membership_as_of`，
-storage.py REQ-07.2），本端点补**批量**形态：每票取 as_of 当日生效的最新分类。
+storage.py REQ-07.2），本端点补**批量**形态：每票取 as_of 当日生效的最新分类；
+**as_of 当日无生效分类的股票不返回**（不回填最新分类，保持时点语义）。
 与 P0-4 要求的字段契约一致；quantwin 行业中性化/分组按此关联（验收 #14）。
 
 ---

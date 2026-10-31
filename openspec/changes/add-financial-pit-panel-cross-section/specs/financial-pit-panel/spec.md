@@ -24,7 +24,7 @@ The system SHALL materialize a point-in-time financial panel table `financial_pi
 - **AND** the API documentation SHALL state the field is reserved with no data promise for this change
 
 ### Requirement: Point-in-time availability derivation
-The system SHALL derive each panel row's `available_at` as the maximum of the announcement-date derivation chain result and the last substantive value change date, SHALL derive `effective_at` as the next trading day after `available_at`, and SHALL record a quality level distinguishing real disclosure dates, disclosure-event dates, statutory-deadline fallbacks, and delayed estimates.
+The system SHALL derive each panel row's `available_at` as the maximum of the announcement-date derivation chain result and the last substantive value change date, SHALL derive `effective_at` as the next trading day after `available_at` when the trading calendar covers it (null otherwise), and SHALL record a quality level distinguishing real disclosure dates, disclosure-event dates, statutory-deadline fallbacks, and delayed estimates.
 
 #### Scenario: Real publish date is used when present
 - **WHEN** a panel row's `(instrument_id, report_period)` has a non-empty `financial_facts.publish_date`
@@ -54,9 +54,10 @@ The system SHALL derive each panel row's `available_at` as the maximum of the an
 - **THEN** the row `available_at` SHALL NOT advance due to those updates
 
 #### Scenario: Effective date is the next trading day
-- **WHEN** a panel row has a derived `available_at`
+- **WHEN** a panel row has a derived `available_at` and the trading calendar covers dates after it
 - **THEN** the system SHALL derive `effective_at` as the next trading day strictly after `available_at` using the trading calendar
 - **AND** responses SHALL expose both `available_at` (announcement semantics) and `effective_at` (execution semantics) with their meanings documented
+- **AND** when the trading calendar does not cover dates after `available_at`, `effective_at` SHALL be null rather than approximated
 
 ### Requirement: As-of cross-section query
 The system SHALL provide a batch cross-section query that, for a required `as_of` date, returns for each instrument the latest panel row whose `available_at` is on or before `as_of`, with optional report-period, exchange, field-projection, and pagination controls, assembled server-side in a single query path, using `YYYYMMDD` date formatting at the API layer.
@@ -112,7 +113,7 @@ The system SHALL precompute per-share, year-over-year, and TTM derived indicator
 - **THEN** `eps`, `bps`, and `ocfps` SHALL all be null for that row
 
 ### Requirement: Attribution quality marking
-The system SHALL mark each panel row's `attribution_quality` as `parent`, `mixed`, or `unverified` based on the recorded lineage semantics of `net_income` and `equity`, SHALL keep values computable regardless of marking, and SHALL expose the distribution through coverage and cross-section statistics.
+The system SHALL treat parent-attributable (归母) as the default semantic contract for `net_income` and `equity` (consistent with the AKShare dual-source field alignment), SHALL mark each panel row's `attribution_quality` as `parent`, `mixed`, or `unverified` based on the recorded lineage semantics, SHALL keep values computable regardless of marking, and SHALL expose the distribution through coverage and cross-section statistics.
 
 #### Scenario: Parent-attributable rows are marked parent
 - **WHEN** lineage records both `net_income` and `equity` as parent-attributable semantics
@@ -197,6 +198,10 @@ The system SHALL serve panel queries from the precomputed table without request-
 #### Scenario: Cross-section latency target
 - **WHEN** the cross-section endpoint is called for a page of up to 1000 rows
 - **THEN** warm-query P95 latency SHALL be at most 1 second and cold-start at most 3 seconds
+
+#### Scenario: Paged endpoint latency target
+- **WHEN** the panel raw access, coverage, or industries as-of endpoint is called for a page of up to 2000 rows
+- **THEN** the response SHALL complete within 3 seconds
 
 #### Scenario: Full panel pull target
 - **WHEN** a consumer pulls all report periods (12 periods, roughly 5,500 rows each) through the paged endpoints
