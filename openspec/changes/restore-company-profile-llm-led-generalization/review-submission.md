@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-31，[A审核§151](#151-a审核停止付费尾项接续重整章节缺口闭环)）：§17两窗没有新可靠答案，付费兼容接续结束、银行未用入口关闭，余额不再授权。当前仅§18在原owner重整章节缺口闭环，新增真实调用/预算0。S16有效正文保留，S1仍0/12，不放S2或生产。
+当前状态（2026-10-31，[B交接§152](#152-b交接18缺口闭环入口证明与剩余额度失败边界)）：§18已做两次共性修正并从S17w2磁盘走实际入口；补读正文送到p11，8条主张保留，查询=导出。剩余27259账本无法再准入成稿/核验，未生成新角色答案。银行四目标/p71/p89离线独立证明。新增真实调用0。S1仍0/12，不自评、不放S2或生产。
 
 ## 1. 唯一实施指引
 
@@ -6422,3 +6422,63 @@ A只复跑本次变更直接节点：集中度非角色、印刷页定位、现�
 盘点S16两根3.9/5.8MB、S17两根5.2/5.3MB，当前仍是实载复现输入；offline-s15约292K仍有历史故障用途，未盲删。A未复制业务库、不删除共享pytest缓存；B下一卡先清无依赖重复测试/诊断副本，完成后持久化一套必要轨迹再清运行副本，避免再次提交数万行重复答案。既有13份修改/9项未跟踪不动。A活跃审核未完整计时、合计未知，不能以6.19秒测试耗时冒充审核耗时；无新增付费业务消耗。新发现阻塞归为以上两组，不增加审核平台或报告模板。
 
 本轮OpenSpec严格校验和`git diff --check`通过。Git暂存被安全审查以可能夹带既有修改拒绝；补做本轮任务卡三处hunk归属核查后，验收文档的部分暂存也被拒绝。当前index为空，未commit/push；不绕过拒绝。规划改动保留在工作区，验收文末任务开始前已有历史修改未纳入任何暂存，待用户确认提交范围后再完成Git闭环。
+
+## 152. B交接：§18缺口闭环入口证明与剩余额度失败边界
+
+日期：2026-10-31。执行[任务卡§18](b3-s1-execution-card.md#18-章节缺口闭环重整停止17真实接续)；按产品v8→验收v2§7.69→交付路径→A/B流程v3。未新增§19，未恢复旧入口，未付费，未开造纸第三窗或银行实跑。
+
+### 152.1 结论
+
+**入口已从S17w2磁盘检查点走到实际业务链，并把未读经营角色正文送到源端；没有新的可靠角色答案。** 完成判断已改为“最新有对象覆盖的条件检查”，关键词/维度标签/历史pass不再完成角色或期间总额。两次共性修正后，剩余窗额度`27259`仍无法同时准入“已送4页正式正文之后的成稿+核验”。按卡停止继续局部修补。S1仍0/12，不自评可用。
+
+这是协议/程序证明，不是年报成绩。受控`gap_loop_v1`只在成稿请求发出时按**本请求已送原文**构造答复；本轮该请求未发出。
+
+### 152.2 入口轨迹（造纸S17w2）
+
+入口：`bounded_entry.main()` → `CompanyProfileTaskService.execute("run")` → 公共网关，只替换外部传输。绑定复用`s1-pool-s1-600103-s17w2-binding.json`（刷新file_hashes，`offline_protocol=gap_loop_v1`，`real=false`）。运行根`data/QuoteBak/s18-paper-gap-loop`。
+
+| 项 | 结果 |
+| --- | --- |
+| 退出 | 0；query=export=新实例 |
+| 真实调用 | 0 |
+| 传输 | 1次`source_inventory`，页`[9,10,11,12]`，载荷21080字节 |
+| 账本 | 预留21336+4000，实记120；物理1 |
+| 原8条主张 | 全部保留（含`claim_operating_revenue_2025`/`241,899.02万元`） |
+| 新角色主张 | 无 |
+| 缺口 | `direct_core_ledger_hold`，`direct_core_package_stopped:direct_core_admission_stopped`，`core_dimension_missing:operating_role` |
+
+正式解析p11仍有自主生产/制浆造纸生产线。程序已把该页送进源清单，但成稿请求因剩余额度准入失败未发出。`draft_complete`仍为false。
+
+### 152.3 两次共性修正
+
+1. 完成判断：`_operating_role_established` / `_period_revenue_verified`只看该条件**最后一次**检查；角色还须`covers_target`落到已核主张。目录印刷页无标题时改搜正文页，不把查阅交叉引用当节首。未读角色页按角色陈述优先，首批由预留切片，不再用3页语义门。
+2. 接续：已有未覆盖角色问题按后缀识别（含`s16-source:core-question:operating-role`）重新成稿；无新正文则记`direct_core_no_new_input:operating_role`，不再用旧收入/成本主张空核。首批清单成功后，后续切页准入失败不再用`ledger_hold`堵住已读正文的成稿；必要页只计入本窗实际读入页。
+
+两次之后仍不通：4页正式正文清单预留约25336，实记120后剩余27139，加上角色问题的成稿预留超过`27259`同窗上限。卡内替代（不实施）：只清单1页角色正文再成稿，或复用已发送清单正文而不二次预留整包；提高本窗剩余额度须A新授权。不把该替代自行做成第三轮修补。
+
+### 152.4 银行独立工程验证
+
+未等造纸完成，未实跑银行绑定。`test_s16_bank_single_target_verify_stays_under_payload`：S16磁盘四条待核单目标≤60KB，托管冲突保留p89。`test_bank_period_revenue_on_p71_is_kept_in_packed_pages`：官方p71打包后仍有`173,964`/`120,483`/`22,725`/`30,756`。不相关增长率不再膨胀财富核验。不是银行业务通过。
+
+### 152.5 验证、清理与保护
+
+```text
+source /home/python/Quote/scripts/quote_dev_env.sh
+/home/python/miniconda3/envs/Quote/bin/python -m pytest -q \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_concentration_and_contract_liability_do_not_complete_operating_role \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_direct_sales_revenue_does_not_complete_period_total \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_historical_role_pass_does_not_cover_later_deny \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_role_without_keywords_completes_after_object_covering_pass \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_toc_printed_offset_uses_title_page_not_leftover_or_cross_ref \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_unclear_role_without_new_body_records_no_progress \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_compatible_continue_drafts_existing_role_from_unread_section \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_s16_bank_single_target_verify_stays_under_payload \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_bank_period_revenue_on_p71_is_kept_in_packed_pages \
+  tests/unit/test_research/test_company_profile_bounded_entry.py::test_s17w2_disk_entry_sends_unread_role_body_and_keeps_eight_claims
+```
+
+helper与银行打包先绿；入口测试在两次修正后固定为：p11已送、8条保留、三读一致、成稿被剩余额度拒绝。不把helper绿当成整链业务通过。
+
+开发前已删无依赖的`pytest-of-python`（36K）和`s18-git-isolate`（验收文副本）。保留S16/S17四根运行根、C1/C1b、正式PDF/解析缓存；本卡入口证据只留`s18-paper-gap-loop`一套，不把数万行query抄进OpenSpec。未触开始时既有修改与未跟踪文件，未暂存`config/13_llm.json`或验收文末历史表。
+
+新增真实模型调用0，付费预算0。未恢复旧live入口，未新建真实绑定。

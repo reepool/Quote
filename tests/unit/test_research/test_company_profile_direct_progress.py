@@ -7764,6 +7764,14 @@ def test_chapter_select_compatible_continue_keeps_saved_semantics():
                         status="pass",
                         explanation="角色有原文。",
                     ),
+                    ReportViewCheck(
+                        target_type="condition",
+                        target_id="core-question:operating-role",
+                        status="pass",
+                        explanation="经营角色已核。",
+                        covers_target_type="claim",
+                        covers_target_id="operating-role",
+                    ),
                 ),
             )
 
@@ -7942,6 +7950,8 @@ def test_compatible_continue_drafts_existing_role_from_unread_section():
                         target_id="core-question:operating-role",
                         status="pass",
                         explanation="经营角色已核。",
+                        covers_target_type="claim",
+                        covers_target_id="operating-role",
                     ),
                 ),
             )
@@ -7986,9 +7996,322 @@ def test_compatible_continue_drafts_existing_role_from_unread_section():
         report=report,
     )
     assert 11 in provider.inventoried
-    assert "core-question:operating-role" in provider.drafted
+    assert any(item.endswith("operating-role") for item in provider.drafted)
     assert any(claim.claim_id == "operating-role" for claim in result.claims)
     assert "core_dimension_missing:operating_role" not in result.gaps
+
+
+def test_concentration_and_contract_liability_do_not_complete_operating_role():
+    from research.company_profile.direct_reading import _operating_role_established
+
+    report = _report()
+    claims = [
+        ReportViewClaim(
+            claim_id="concentration",
+            dimension="upstream_downstream",
+            status="observed",
+            answer="前五大客户销售额占比21.52%。",
+            evidence=(_evidence(report, text="前五大客户销售额占比21.52%", page=21),),
+        ),
+        ReportViewClaim(
+            claim_id="liability",
+            dimension="upstream_downstream",
+            status="observed",
+            answer="合同负债预收货款余额3295822047.40元。",
+            evidence=(_evidence(report, text="合同负债余额3295822047.40元", page=16),),
+        ),
+    ]
+    checks = [
+        ReportViewCheck(
+            target_type="claim",
+            target_id="concentration",
+            status="pass",
+            explanation="集中度。",
+        ),
+        ReportViewCheck(
+            target_type="claim",
+            target_id="liability",
+            status="pass",
+            explanation="合同负债。",
+        ),
+        ReportViewCheck(
+            target_type="condition",
+            target_id="core-question:operating-role",
+            status="pass",
+            explanation="标签不能代替覆盖。",
+        ),
+    ]
+    assert _operating_role_established(claims, checks) is False
+
+
+def test_direct_sales_revenue_does_not_complete_period_total():
+    from research.company_profile.direct_reading import _period_revenue_verified
+
+    report = _report()
+    claims = [
+        ReportViewClaim(
+            claim_id="direct-sales",
+            dimension="revenue_model",
+            status="observed",
+            answer="直销业务营业收入233200万元。",
+            evidence=(_evidence(report, text="直销营业收入233200万元", page=16),),
+        )
+    ]
+    checks = [
+        ReportViewCheck(
+            target_type="claim",
+            target_id="direct-sales",
+            status="pass",
+            explanation="分项收入。",
+        ),
+    ]
+    assert _period_revenue_verified(claims, checks) is False
+
+
+def test_historical_role_pass_does_not_cover_later_deny():
+    from research.company_profile.direct_reading import _operating_role_established
+
+    report = _report()
+    claims = [
+        ReportViewClaim(
+            claim_id="operating-role",
+            dimension="supply_chain_role",
+            status="observed",
+            answer="公司向客户提供定制加工并收取加工费。",
+            evidence=(_evidence(report, text="提供定制加工并收取加工费", page=11),),
+        )
+    ]
+    checks = [
+        ReportViewCheck(
+            target_type="condition",
+            target_id="core-question:operating-role",
+            status="pass",
+            explanation="旧通过。",
+            covers_target_type="claim",
+            covers_target_id="operating-role",
+        ),
+        ReportViewCheck(
+            target_type="claim",
+            target_id="operating-role",
+            status="pass",
+            explanation="旧通过。",
+        ),
+        ReportViewCheck(
+            target_type="condition",
+            target_id="core-question:operating-role",
+            status="block",
+            explanation="后一次否定。",
+        ),
+    ]
+    assert _operating_role_established(claims, checks) is False
+
+
+def test_role_without_keywords_completes_after_object_covering_pass():
+    from research.company_profile.direct_reading import _operating_role_established
+
+    report = _report()
+    claims = [
+        ReportViewClaim(
+            claim_id="operating-role",
+            dimension="supply_chain_role",
+            status="observed",
+            answer="公司向客户提供定制加工并收取加工费。",
+            evidence=(_evidence(report, text="提供定制加工并收取加工费", page=11),),
+        )
+    ]
+    checks = [
+        ReportViewCheck(
+            target_type="claim",
+            target_id="operating-role",
+            status="pass",
+            explanation="对象已核。",
+        ),
+        ReportViewCheck(
+            target_type="condition",
+            target_id="core-question:operating-role",
+            status="pass",
+            explanation="对象覆盖通过。",
+            covers_target_type="claim",
+            covers_target_id="operating-role",
+        ),
+    ]
+    assert _operating_role_established(claims, checks) is True
+
+
+def test_toc_printed_offset_uses_title_page_not_leftover_or_cross_ref():
+    from research.company_profile.direct_reading import chapter_candidate_pages
+
+    chosen = chapter_candidate_pages(
+        [
+            {
+                "page": 3,
+                "text": "查阅第三节 管理层讨论与分析。",
+                "readable": True,
+            },
+            {
+                "page": 4,
+                "text": (
+                    "目录\n"
+                    "第三节 管理层讨论与分析 ............................................. 9\n"
+                    "第八节 财务报告 .................................................... 85\n"
+                ),
+                "readable": True,
+            },
+            {
+                "page": 9,
+                "text": "9 / 220\n非经常性损益项目和金额\n十一、 存在股权激励",
+                "readable": True,
+            },
+            {
+                "page": 11,
+                "text": "11 / 220\n第三节 管理层讨论与分析\n公司向客户提供定制加工并收取加工费。",
+                "readable": True,
+            },
+        ]
+    )
+    assert 11 in chosen
+    assert 3 not in chosen
+    assert 9 not in chosen
+
+
+def test_unclear_role_without_new_body_records_no_progress():
+    report = _report()
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    identity["compatible_continue"] = True
+    identity["accepted_source_receipts"] = [
+        {
+            "request_id": "s16-source",
+            "purpose": "source_inventory",
+            "status": "success",
+            "source_pages": [4, 16, 21],
+            "response_payload": {
+                "request_id": "s16-source",
+                "purpose": "source_inventory",
+                "source_conditions": [
+                    {
+                        "condition_id": "core-question:operating-role",
+                        "dimension": "supply_chain_role",
+                        "description": "说明生产加工销售角色",
+                        "major": True,
+                        "statement_status": "current",
+                        "evidence": [
+                            _evidence(
+                                report, text="主营业务分行业纸行业、浆行业。", page=16
+                            ).model_dump(mode="json")
+                        ],
+                    }
+                ],
+            },
+        }
+    ]
+    identity["accepted_prior_draft"] = {
+        "claims": [
+            {
+                "claim_id": "sales",
+                "dimension": "revenue_model",
+                "status": "observed",
+                "answer": "直销营业收入233200万元。",
+                "evidence": [
+                    _evidence(report, text="直销营业收入233200万元", page=16).model_dump(
+                        mode="json"
+                    )
+                ],
+                "supporting_record_ids": [],
+            }
+        ],
+        "checks": [
+            {
+                "target_type": "claim",
+                "target_id": "sales",
+                "status": "pass",
+                "explanation": "分项已核。",
+            },
+            {
+                "target_type": "condition",
+                "target_id": "core-question:operating-role",
+                "status": "unclear",
+                "explanation": "现有声称没有说明经营角色。",
+            },
+        ],
+        "verify_receipts": [
+            {
+                "purpose": "verify_views",
+                "request_targets": [
+                    {
+                        "target_type": "condition",
+                        "target_id": "core-question:operating-role",
+                    },
+                    {"target_type": "claim", "target_id": "sales"},
+                ],
+            }
+        ],
+    }
+
+    class _Provider:
+        offline_only = True
+        drafted = []
+        verified = []
+
+        def interpret(self, request):
+            if request.purpose == "synthesize_views":
+                self.drafted.extend(
+                    item.condition_id for item in request.source_conditions
+                )
+            if request.purpose == "verify_views":
+                self.verified.extend(
+                    item.claim_id for item in request.claims
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+            )
+
+    provider = _Provider()
+    result = _run(
+        provider,
+        pages=(
+            {
+                "page": 4,
+                "text": (
+                    "目录\n"
+                    "第三节 管理层讨论与分析 ............................................. 16\n"
+                ),
+                "readable": True,
+            },
+            {"page": 16, "text": "主营业务分行业纸行业、浆行业。直销营业收入233200万元。", "readable": True},
+            {
+                "page": 21,
+                "text": "前五名客户销售额52,052.72万元，占年度销售总额21.52%。",
+                "readable": True,
+            },
+        ),
+        processing_identity=identity,
+        report=report,
+    )
+    assert "core-question:operating-role" not in provider.drafted
+    assert "sales" not in provider.verified
+    assert "direct_core_no_new_input:operating_role" in result.gaps
+
+
+def test_bank_period_revenue_on_p71_is_kept_in_packed_pages():
+    from research.company_profile.direct_reading import (
+        compact_source_pages,
+        make_operating_revenue_question,
+    )
+
+    pages = _official_bank_pages(71)
+    report = _report()
+    question = make_operating_revenue_question(
+        report,
+        ({"kind": "period-operating-revenue", "page": 71, "quote": "3.7 利润表分析"},),
+    )
+    packed = compact_source_pages(pages, [question])
+    text = "\n".join(str(page.get("text") or "") for page in packed)
+    assert "173,964" in text
+    assert "120,483" in text
+    assert "22,725" in text
+    assert "30,756" in text
 
 
 

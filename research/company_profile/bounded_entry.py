@@ -1143,6 +1143,10 @@ def _worker(
                 ]
                 if any(claim.get("review_state") == "verified" for claim in claims):
                     raise ValueError("controlled_second_batch_failure")
+        elif protocol == "gap_loop_v1":
+            from .resource_probe import gap_loop_reply
+
+            result = gap_loop_reply(request)
         elif protocol in {"direct_chain_v1", "direct_chain_fail_v1"}:
             from .resource_probe import direct_chain_reply
 
@@ -1191,7 +1195,12 @@ def _worker(
         usage = (
             {"prompt_tokens": 80, "completion_tokens": 40, "total_tokens": 120}
             if protocol
-            in {"entry_proof_v3", "direct_chain_v1", "direct_chain_fail_v1"}
+            in {
+                "entry_proof_v3",
+                "direct_chain_v1",
+                "direct_chain_fail_v1",
+                "gap_loop_v1",
+            }
             else None
         )
         data = {"choices": [{"message": {"content": encoded}}]}

@@ -853,3 +853,106 @@ def test_admission_wait_exhausts_business_deadline_without_a_send():
 
     asyncio.run(together())
     asyncio.run(isolated_send())
+
+
+def test_s17w2_disk_entry_sends_unread_role_body_and_keeps_eight_claims():
+    """S17w2 checkpoint through the real entry. Transport only is replaced."""
+    import hashlib
+    import shutil
+    from pathlib import Path
+
+    from research.company_profile.bounded_entry import main
+    from research.company_profile.reads import CompanyProfileReadService
+
+    root = Path("/home/python/Quote")
+    change = root / "openspec/changes/restore-company-profile-llm-led-generalization"
+    source = json.loads((change / "s1-pool-s1-600103-s17w2-binding.json").read_text())
+    source["offline_protocol"] = "gap_loop_v1"
+    source["max_elapsed_seconds"] = 295
+    source["file_hashes"] = {
+        name: hashlib.sha256((root / name).read_bytes()).hexdigest()
+        for name in source["file_hashes"]
+    }
+    run_root = root / "data/QuoteBak/s18-paper-gap-loop"
+    if run_root.exists():
+        shutil.rmtree(run_root)
+    path = root / "data/QuoteBak/s18-paper-gap-loop-binding.json"
+    path.write_text(json.dumps(source, ensure_ascii=False))
+    argv = sys.argv
+    sys.argv = [
+        "bounded_entry",
+        "--binding",
+        str(path),
+        "--run-root",
+        str(run_root),
+    ]
+    try:
+        code = main()
+    finally:
+        sys.argv = argv
+    stages = json.loads((run_root / "entry-stages.json").read_text())
+    transport = json.loads((run_root / "offline-transport.json").read_text())
+    sent_pages = [
+        int(page)
+        for item in transport.get("requests") or []
+        for page in item.get("pages") or []
+    ]
+    if code != 0:
+        result = json.loads((run_root / "entry-result.json").read_text())
+        raise AssertionError(
+            "entry failed before query: "
+            f"code={code} error={result.get('error')} "
+            f"sent_pages={sorted(set(sent_pages))} "
+            f"tokens={stages.get('ledger_charged_tokens')} "
+            f"physical={stages.get('ledger_physical_requests')}"
+        )
+    query = json.loads((run_root / "query.json").read_text())
+    exported = json.loads((run_root / "export.json").read_text())
+    reloaded = CompanyProfileReadService(run_root / "output").query(
+        (source["asset"]["instrument_id"],)
+    )
+    assert query["profiles"] == exported["profiles"] == reloaded["profiles"]
+    assert 11 in sent_pages
+    claims = []
+    seen = set()
+    profile = query["profiles"][0]["three_views"]
+    for view in profile["views"].values():
+        for claim in view.get("claims") or []:
+            if claim.get("claim_id") in seen:
+                continue
+            seen.add(claim.get("claim_id"))
+            claims.append(claim)
+    kept = {
+        "claim_principal_business_2025",
+        "claim_sales_model_2025",
+        "claim_product_revenue_cost_2025",
+        "claim_operating_revenue_2025",
+        "claim_products_services_2025",
+        "claim_input_cost_exposure_2025",
+        "claim_cost_input_composition_2025",
+        "claim_customer_supplier_concentration_2025",
+    }
+    assert kept <= {claim["claim_id"] for claim in claims}
+    role = next(
+        (
+            claim
+            for claim in claims
+            if claim["claim_id"] == "operating-role-from-sent-body"
+        ),
+        None,
+    )
+    gaps = profile.get("gaps") or []
+    if role is None:
+        assert any(
+            gap.startswith("direct_core_ledger_hold")
+            or "direct_core_admission_stopped" in gap
+            for gap in gaps
+        )
+        assert stages.get("ledger_charged_tokens") == 120
+        assert transport.get("real_calls") == 0
+        return
+    assert "自主生产" in str(role.get("answer") or "") or "经营模式" in str(
+        role.get("answer") or ""
+    ) or "生产线" in str(role.get("answer") or "")
+    if profile.get("draft_complete"):
+        assert "core_dimension_missing:operating_role" not in gaps

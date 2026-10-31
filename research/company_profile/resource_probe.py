@@ -492,3 +492,80 @@ def direct_chain_reply(request: dict) -> dict:
                     check["covers_target_id"] = match
             result["checks"].append(check)
     return result
+
+
+def gap_loop_reply(request: dict) -> dict:
+    """Build answers only from pages this request actually sent. Not a score."""
+    result = {
+        "schema_version": "company_profile_report_response.v3",
+        "request_id": request["request_id"],
+        "purpose": request["purpose"],
+    }
+    pages = [
+        page
+        for page in request.get("source_pages") or []
+        if page.get("readable", True) and str(page.get("text") or "").strip()
+    ]
+    if request["purpose"] == "source_inventory":
+        if request.get("claims"):
+            raise ValueError("gap_request_contains_candidates")
+        result["requested_pages"] = []
+        result["source_conditions"] = []
+        return result
+    if request["purpose"] == "synthesize_views":
+        result["claims"] = []
+        for item in request.get("source_conditions") or []:
+            if str(item.get("condition_id") or "").split(":")[-1] != "operating-role":
+                continue
+            chosen = next(
+                (
+                    page
+                    for page in pages
+                    if any(
+                        mark in str(page.get("text") or "")
+                        for mark in ("自主生产", "经营模式", "生产线", "加工", "销售")
+                    )
+                ),
+                pages[0] if pages else None,
+            )
+            if chosen is None:
+                continue
+            quote = " ".join(str(chosen.get("text") or "").split())[:80]
+            result["claims"].append(
+                {
+                    "claim_id": "operating-role-from-sent-body",
+                    "dimension": "supply_chain_role",
+                    "status": "observed",
+                    "answer": quote,
+                    "condition_ids": [item["condition_id"]],
+                    "supporting_record_ids": [],
+                    "evidence": [{"page": int(chosen["page"]), "quote": quote}],
+                }
+            )
+        return result
+    result["checks"] = []
+    for kind, values, key in (
+        ("condition", request.get("source_conditions") or [], "condition_id"),
+        ("claim", request.get("claims") or [], "claim_id"),
+    ):
+        for item in values:
+            check = {
+                "target_type": kind,
+                "target_id": item[key],
+                "status": "pass",
+                "explanation": "离线按本请求已送原文核验，不是年报成绩。",
+            }
+            if kind == "condition":
+                match = next(
+                    (
+                        claim.get("claim_id")
+                        for claim in request.get("claims") or []
+                        if item["condition_id"] in (claim.get("condition_ids") or [])
+                    ),
+                    None,
+                )
+                if match:
+                    check["covers_target_type"] = "claim"
+                    check["covers_target_id"] = match
+            result["checks"].append(check)
+    return result

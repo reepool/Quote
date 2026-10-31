@@ -200,30 +200,39 @@ def _verified_claims(claims, checks):
 
 
 def _has_operating_role_statement(text: str) -> bool:
+    """Locate candidate pages. Words here never complete a dimension."""
     return any(mark in str(text or "") for mark in _ROLE_STATEMENT_MARKS)
 
 
 def _is_concentration_or_cost_substitute(text: str) -> bool:
     """Customer/supplier share or a cost table is not the company's operating role."""
     body = str(text or "")
-    if _has_operating_role_statement(body):
-        return False
     return any(mark in body for mark in (*_CONCENTRATION_MARKS, *_COST_ONLY_MARKS))
 
 
-def _claim_establishes_operating_role(claim) -> bool:
-    text = str(getattr(claim, "answer", "") or "")
-    if _is_concentration_or_cost_substitute(text):
-        return False
-    if getattr(claim, "dimension", "") in {"supply_chain_role", "upstream_downstream"}:
-        return True
-    return _has_operating_role_statement(text)
+def _latest_named_condition_check(checks, needle: str):
+    """Last check whose target is this condition. An older pass does not count."""
+    found = None
+    for check in checks:
+        if check.target_type != "condition":
+            continue
+        target = str(check.target_id or "")
+        tail = needle.split(":")[-1]
+        if target == needle or (
+            target.endswith(":" + tail) and target.split(":")[-1] == tail
+        ):
+            found = check
+    return found
 
 
 def _operating_role_established(claims, checks) -> bool:
-    return any(
-        _claim_establishes_operating_role(claim)
-        for claim in _verified_claims(claims, checks)
+    latest = _latest_named_condition_check(checks, "core-question:operating-role")
+    if latest is None or latest.status != "pass":
+        return False
+    verified = {item.claim_id for item in _verified_claims(claims, checks)}
+    return (
+        latest.covers_target_type == "claim"
+        and latest.covers_target_id in verified
     )
 
 
@@ -252,19 +261,10 @@ def _amounts_equivalent(left: str, left_unit: str, right: str, right_unit: str) 
 
 
 def _period_revenue_verified(claims, checks) -> bool:
-    if any(
-        check.target_type == "condition"
-        and "period-operating-revenue" in str(check.target_id or "")
-        and check.status == "pass"
-        for check in checks
-    ):
-        return True
-    return any(
-        claim.dimension == "revenue_model"
-        and "营业收入" in str(claim.answer or "")
-        and re.search(r"\d", str(claim.answer or ""))
-        for claim in _verified_claims(claims, checks)
+    latest = _latest_named_condition_check(
+        checks, "core-question:period-operating-revenue"
     )
+    return latest is not None and latest.status == "pass"
 
 
 def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
@@ -711,12 +711,24 @@ def _printed_to_physical(pages) -> dict[int, int]:
     return mapping
 
 
+def _is_title_cross_reference(source, title: str) -> bool:
+    needle = " ".join(str(title).split())
+    text = " ".join(str(source.get("text") or "").split())
+    index = text.find(needle)
+    if index < 0:
+        return False
+    window = text[max(0, index - 8) : index]
+    return any(mark in window for mark in ("查阅", "详见", "参见", "见本"))
+
+
 def _page_has_title(source, title: str) -> bool:
+    if _looks_like_toc(str(source.get("text") or "")):
+        return False
     needle = " ".join(str(title).split())
     if not needle:
         return False
     text = " ".join(str(source.get("text") or "").split())
-    if needle in text[:900]:
+    if needle in text and not _is_title_cross_reference(source, title):
         return True
     short = needle[:16]
     return any(short in line or needle in line for line in _heading_lines(str(source.get("text") or "")))
@@ -753,16 +765,21 @@ def chapter_candidate_pages(pages, limit: int = 16) -> list[int]:
             continue
         located = None
         if printed is not None:
-            located = printed_map.get(int(printed))
-            if located is None and int(printed) in available:
-                located = int(printed)
+            candidate = printed_map.get(int(printed))
+            if candidate is None and int(printed) in available:
+                candidate = int(printed)
+            source = next(
+                (item for item in readable if int(item["page"]) == candidate),
+                None,
+            ) if candidate is not None else None
+            if source is not None and _page_has_title(source, title):
+                located = int(candidate)
         if located is None:
             located = next(
                 (
                     int(source["page"])
                     for source in readable
-                    if not _looks_like_toc(str(source.get("text") or ""))
-                    and _page_has_title(source, title)
+                    if _page_has_title(source, title)
                 ),
                 None,
             )
@@ -792,12 +809,11 @@ def chapter_candidate_pages(pages, limit: int = 16) -> list[int]:
     return chosen[: max(1, int(limit))]
 
 
-def _directed_operating_role_pages(sources, by_page, limit: int = 3) -> list[int]:
-    """Unread pages in the TOC business section that can answer the operating role.
+def _directed_operating_role_pages(sources, by_page, limit: int = 8) -> list[int]:
+    """Unread pages after a TOC business start. Reservation, not semantics, slices.
 
-    A TOC hit is the section start, not every later table. Walk a short window
-    forward and keep pages that actually state production, processing, sales or
-    the chain role. Already-read cost or concentration pages are not substitutes.
+    A first window is only the first send. Later requested pages still follow.
+    Already-read cost or concentration pages are not substitutes.
     """
     by_id = {int(page["page"]): page for page in sources}
     starts = []
@@ -811,10 +827,11 @@ def _directed_operating_role_pages(sources, by_page, limit: int = 3) -> list[int
             for mark in ("管理层讨论", "经营情况", "经营模式", "核心竞争力")
         ):
             starts.append(int(page_no))
-    chosen: list[int] = []
+    role_hits: list[int] = []
+    section_hits: list[int] = []
     for start in starts:
-        for page_no in range(start, start + 8):
-            if page_no in chosen or page_no not in by_id:
+        for page_no in range(start, start + 16):
+            if page_no in role_hits or page_no in section_hits or page_no not in by_id:
                 continue
             if by_page.get(page_no, {}).get("status") == "read":
                 continue
@@ -822,14 +839,15 @@ def _directed_operating_role_pages(sources, by_page, limit: int = 3) -> list[int
             preview = " ".join(
                 [*_heading_lines(text, limit=4), " ".join(text.split())[:400]]
             )
-            if _has_operating_role_statement(text) or any(
+            if _has_operating_role_statement(text):
+                role_hits.append(page_no)
+            elif any(
                 mark in preview
                 for mark in ("经营情况", "核心竞争力", "管理层讨论", "经营模式")
             ):
-                chosen.append(page_no)
-            if len(chosen) >= limit:
-                return chosen
-    return chosen[:limit]
+                section_hits.append(page_no)
+    chosen = role_hits + section_hits
+    return chosen[: max(1, int(limit))] if chosen else chosen
 
 
 def compact_source_conditions(
@@ -2950,6 +2968,7 @@ def interpret_direct_core(
                 if gap not in gaps:
                     gaps.append(gap)
             return follow
+        already = set(inventoried)
         for package in packages:
             try:
                 reviewed = invoke(
@@ -2965,6 +2984,13 @@ def interpret_direct_core(
                     "card_recovery_exhausted" in text
                     or "logical_recovery_already_used" in text
                 )
+                if (
+                    inventoried - already
+                    and "direct_core_admission_stopped" in text
+                ):
+                    while "direct_core_ledger_hold" in gaps:
+                        gaps.remove("direct_core_ledger_hold")
+                    return follow
                 if recovery_stopped:
                     gaps.append(f"direct_core_recovery_refused:{text}")
                 else:
@@ -3218,7 +3244,12 @@ def interpret_direct_core(
                 evidence for item in pending for evidence in item.evidence
             )
         ]
-        if any(condition.condition_id.startswith("core-question:") for condition in pending):
+        if any(
+            condition.condition_id.startswith("core-question:")
+            or str(condition.condition_id).split(":")[-1]
+            in {"operating-role", "period-operating-revenue"}
+            for condition in pending
+        ):
             full_pages = []
             for page in pages:
                 source = next(
@@ -3781,6 +3812,7 @@ def interpret_direct_core(
             chapter_required_pages = {
                 int(item["page"]) for item in coverage if item["status"] == "read"
             }
+        unread_role_this_turn: list[int] = []
         if identity.get("compatible_continue"):
             read_sources = [
                 page
@@ -3815,7 +3847,8 @@ def interpret_direct_core(
                 if rebound_claim.dimension in _CORE_CLOSEOUT_DIMENSIONS:
                     pending_core.append(rebound_claim)
             if not _operating_role_established(claims, checks):
-                unread = _directed_operating_role_pages(sources, by_page, limit=3)
+                unread = _directed_operating_role_pages(sources, by_page)
+                unread_role_this_turn = list(unread)
                 if unread:
                     if chapter_required_pages is None:
                         chapter_required_pages = {
@@ -3824,26 +3857,19 @@ def interpret_direct_core(
                             if item["status"] == "read"
                         }
                     inventory_pages(unread)
-                    chapter_required_pages.update(unread)
+                    chapter_required_pages.update(
+                        page for page in unread if page in inventoried
+                    )
+                    unread_role_this_turn = [
+                        page for page in unread if page in inventoried
+                    ]
                 role_pages = [
                     page
                     for page in sources
-                    if int(page["page"]) in set(unread)
-                    and _has_operating_role_statement(str(page.get("text") or ""))
-                ] or [
-                    page
-                    for page in sources
-                    if int(page["page"]) in set(unread)
-                ] or [
-                    page
-                    for page in read_sources
-                    if _has_operating_role_statement(str(page.get("text") or ""))
-                    and not _is_concentration_or_cost_substitute(
-                        str(page.get("text") or "")
-                    )
+                    if int(page["page"]) in set(unread_role_this_turn)
                 ]
                 role_evidence = []
-                for page in role_pages[:6]:
+                for page in role_pages[:4]:
                     snippet = " ".join(str(page.get("text") or "").split())[:180]
                     if not snippet:
                         continue
@@ -3856,19 +3882,11 @@ def interpret_direct_core(
                             anchor=TextAnchor(bounded_quote=snippet),
                         )
                     )
-                if not role_evidence:
-                    for claim in claims:
-                        if claim.dimension in {
-                            "principal_business",
-                            "products_services",
-                            "revenue_model",
-                        } and claim.evidence:
-                            role_evidence.extend(claim.evidence[:2])
                 existing_role = next(
                     (
                         item
                         for item in conditions
-                        if item.condition_id.startswith("core-question:operating-role")
+                        if str(item.condition_id).split(":")[-1] == "operating-role"
                     ),
                     None,
                 )
@@ -3878,13 +3896,15 @@ def interpret_direct_core(
                     )
                     if existing_role is None:
                         conditions.append(question)
-                    elif role_pages:
+                    else:
                         question = existing_role.model_copy(
                             update={"evidence": tuple(role_evidence[:8])}
                         )
                         conditions[conditions.index(existing_role)] = question
                     if question not in conditions_to_draft:
                         conditions_to_draft.append(question)
+                elif existing_role is not None:
+                    gaps.append("direct_core_no_new_input:operating_role")
         def shown_claim_ids(condition) -> set[str]:
             """Claims in the latest verification that already judged this condition."""
             tail = condition.condition_id.split(":")[-1]
@@ -4002,6 +4022,14 @@ def interpret_direct_core(
                 recheck_pairs.append((condition, list(merged.values())))
                 continue
             if latest is not None and latest.status in {"unclear", "block"}:
+                if str(condition.condition_id).split(":")[-1] == "operating-role":
+                    if unread_role_this_turn:
+                        core_answers.append(condition)
+                    else:
+                        gap = "direct_core_no_new_input:operating_role"
+                        if gap not in gaps:
+                            gaps.append(gap)
+                    continue
                 fresh = [
                     claim
                     for claim in referenced
@@ -4149,6 +4177,8 @@ def interpret_direct_core(
             condition
             for condition in core_answers
             if condition.condition_id.startswith("core-question:")
+            or str(condition.condition_id).split(":")[-1]
+            in {"operating-role", "period-operating-revenue"}
         ]
         other_items = [
             condition for condition in core_answers if condition not in question_items
