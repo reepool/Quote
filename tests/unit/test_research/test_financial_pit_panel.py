@@ -255,6 +255,14 @@ def store(tmp_path: Path) -> FinancialPitPanelStore:
                 ("600001.SH", "2023-12-31", "profit_sheet.basic_eps", "x", 1.10),
             ],
         )
+        # indicator rows store fractions; panel contract is percent
+        conn.execute(
+            """
+            INSERT INTO financial_indicator_snapshots (
+                instrument_id, report_period, gross_margin, roe, current_ratio
+            ) VALUES ('600001.SH', '2024-12-31', 0.914, 0.0267, 1.9)
+            """
+        )
         # YoY/TTM history for 600001: 2023 annual + 2024 periods
         _insert_fact(
             conn,
@@ -436,13 +444,19 @@ def test_per_share_derivations_use_reported_facts(
     with store.connect() as conn:
         row = conn.execute(
             """
-            SELECT eps, bps, ocfps, shares_outstanding FROM financial_pit_panel
+            SELECT eps, bps, ocfps, shares_outstanding,
+                   roe, gross_margin, current_ratio
+            FROM financial_pit_panel
             WHERE instrument_id = '600001.SH' AND report_period = '2024-12-31'
             """
         ).fetchone()
     assert row["eps"] == 1.25  # reported basic EPS preferred
     assert row["bps"] == pytest.approx(500.0 / 80.0)
     assert row["ocfps"] == pytest.approx(80.0 / 80.0)
+    # percent-semantic ratios rescaled to percent; multiples stay as-is
+    assert row["roe"] == pytest.approx(2.67)
+    assert row["gross_margin"] == pytest.approx(91.4)
+    assert row["current_ratio"] == pytest.approx(1.9)
     # missing share facts -> null per-share, never zero placeholders
     with store.connect() as conn:
         row = conn.execute(

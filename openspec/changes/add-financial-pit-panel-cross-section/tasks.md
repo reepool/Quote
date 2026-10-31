@@ -151,3 +151,21 @@
 （FY + Q1 − Q1prior）；上年同期为负值时 YoY 照算（标准口径注意事项）。
 
 第二轮后验证：单测 16/16、openspec validate 通过。
+
+## 8. 第三轮审计（2026-10-31，数值单位契约 + 文档-实现漂移）
+
+发现 2 项并修复：
+
+1. **百分比语义列 100 倍口径断裂（P0，直接影响验收 #12）**：
+   `financial_indicator_snapshots` 存分数（000001.SZ roe=0.0267），面板原样透传；
+   而需求 §5.1 示例（roe 15.6）、quantwin 映射（直接使用）、AKShare yjbb
+   （roe 为 %）均为百分数——双源 roe 对比会差 100 倍。修复：面板构建时对
+   gross_margin/operating_margin/net_margin/roe/roa/asset_liability_ratio ×100；
+   current_ratio/quick_ratio 保持倍数、每股类保持元。真库重建（825s）验证：
+   roe=2.669、operating_margin=49.29、asset_liability_ratio=90.98。
+   需求文档 §6.2 补**单位契约**清单；单测加 ×100 与倍数不变断言。
+2. **文档 §4.1 缺 `announcement_available_at` 列**（实现有、文档无的漂移）：
+   已补，注明用途（推导链原始值，诊断与未来 guard 备用）。
+
+另清理死代码 `_DERIVED_COLUMNS`。第三轮后验证：单测 16/16（含单位断言）、
+真库重建全绿、REVISION_IMPACT 与上轮一致（2.47%）、openspec validate 通过。

@@ -166,6 +166,7 @@ report_period TEXT NOT NULL          -- 库内 ISO（2026-09-30）；API 层统�
 report_type TEXT, fiscal_year INT, fiscal_quarter INT
 currency TEXT
 available_at TEXT NOT NULL           -- §3.3 推导链结果（公告日语义）
+announcement_available_at TEXT       -- 推导链原始值（未含实质变更推后），诊断与未来 guard 备用
 effective_at TEXT                    -- available_at 后次一交易日（trading_calendar）
 available_at_quality TEXT NOT NULL   -- exact / exact_event / statutory_deadline / delayed_estimate
 is_delisted INTEGER NOT NULL DEFAULT 0  -- 预留字段：本期恒 0，无数据承诺，后续补退市股时启用
@@ -385,6 +386,11 @@ equity 有值时 100% 命中 `parent_attributable_equity`；net_income 95.5% 命
   `ocfps = operating_cf / shares_outstanding`（分母为 0 或缺失时整体 null）；
 - `rev_yoy / np_yoy`（%）：本期累计 vs 上年同期累计，边界见 §3.4；
 - `ttm_revenue / ttm_net_income`：本期累计 + 上年年报 − 上年同期累计；
+- **单位契约（v1.2 审计补注）**：`roe / gross_margin / operating_margin /
+  net_margin / roa / asset_liability_ratio` 一律**百分数**（15.6 表示 15.6%，
+  与 AKShare yjbb 口径一致；指标源表存分数，面板构建时 ×100）；
+  `current_ratio / quick_ratio` 为倍数；`revenue_per_share /
+  book_value_per_share / eps / bps / ocfps` 为元；`rev_yoy / np_yoy` 为百分数。
 - **`attribution_quality`**（D3 决策：标记照算，不返回 null）：
   - `parent`：net_income 与 equity 的 lineage 语义均为归母；
   - `mixed`：任一字段兜底命中合并口径别名；

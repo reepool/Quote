@@ -142,14 +142,17 @@ _RATIO_COLUMNS: Tuple[str, ...] = (
     "book_value_per_share",
 )
 
-_DERIVED_COLUMNS: Tuple[str, ...] = (
-    "eps",
-    "bps",
-    "ocfps",
-    "rev_yoy",
-    "np_yoy",
-    "ttm_revenue",
-    "ttm_net_income",
+# Ratio columns whose contract unit is percent (doc section 6; AKShare
+# yjbb alignment). financial_indicator_snapshots stores fractions, so the
+# panel build multiplies these by 100. current_ratio/quick_ratio stay as
+# multiples; *_per_share stay in yuan.
+_PERCENT_RATIO_COLUMNS: Tuple[str, ...] = (
+    "gross_margin",
+    "operating_margin",
+    "net_margin",
+    "roe",
+    "roa",
+    "asset_liability_ratio",
 )
 
 _DELAY_GRACE_DAYS_DEFAULT = 90
@@ -554,10 +557,16 @@ class FinancialPitPanelStore:
             "panel_version": panel_version,
             "built_at": built_at,
         }
-        # Base facts and ratios carry straight through from the source rows;
-        # derived columns are layered on by _apply_derivations afterwards.
-        for column in (*_BASE_FACT_COLUMNS, *_RATIO_COLUMNS):
+        # Base facts carry straight through; percent-semantic ratios are
+        # rescaled to percent (source stores fractions); derived columns are
+        # layered on by _apply_derivations afterwards.
+        for column in _BASE_FACT_COLUMNS:
             panel_row[column] = row.get(column)
+        for column in _RATIO_COLUMNS:
+            value = row.get(column)
+            if value is not None and column in _PERCENT_RATIO_COLUMNS:
+                value = float(value) * 100.0
+            panel_row[column] = value
         return panel_row
 
     @staticmethod
