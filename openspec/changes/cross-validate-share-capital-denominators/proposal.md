@@ -19,17 +19,20 @@
 
 ## What Changes
 
-- 面板分母从"单一 fact + 灾难替换"改为**四锚交叉验证**：
-  1. THS `share_capital_amount` fact（期末股数语义）；
-  2. `实收资本(或股本)` fact（元金额，仅当与其他锚一致时才可当股数使用——
-     隐式覆盖非 1 元面值，无需显式面值表）；
-  3. valuation 隐含股本（market_cap/close，期末口径，2024-04-30 起）；
-  4. EPS 隐含股本（净利/披露 basic_eps，加权口径，库内披露自洽）。
-- **共识即通过、分歧即备注**：锚点一致（带宽内）→ 取优先序数值并标记
-  `share_validation=consensus`；分歧 → 按优先序取值，同时输出
-  `share_validation=discrepancy` + `share_candidates`（各锚数值与口径备注），
-  消费方可按标记过滤或排查；
-- 近零净利润季度跳过 EPS 锚（加权锚在该场景失效）；
+- 面板分母从"单一 fact + 灾难替换"改为**多锚交叉验证**（详见 design D0/D1）：
+  1. `shares_outstanding` canonical（期末股数，L1 后新数据）；
+  2. THS `share_capital_amount` fact（期末股数语义，时点语义经 D0-1 前置验证）；
+  3. valuation 隐含股本（market_cap/close，2024-04-30 起，仅 D0-2 核实为
+     总市值的来源可取值）；
+  4. EPS 隐含股本（净利/披露 basic_eps，加权口径，库内披露自洽）；
+  5. `实收资本(或股本)` fact（**元金额，仅作校验锚**：一致投同意票、分歧
+     永不取值——隐式覆盖非 1 元面值，无需显式面值表；仅全库无股数锚时
+     末位兜底并标注面值假设）。
+- **共识即通过、分歧即备注**：以被采纳值为基准，其余锚在带宽内
+  （股数锚 ±5%、EPS 加权锚 ±15%）即 consensus；任一出带 → 仍取优先序值
+  但输出 `share_validation=discrepancy` + `share_candidates`（各锚数值与
+  口径与 absent 原因），消费方可按标记过滤或排查；
+- EPS 锚双条件跳过（净利或 basic_eps 任一近零即失稳）；
 - 映射层启用单位三列：THS equity 声明 `source_unit=shares`；实收资本声明
   `source_unit=CNY` 且不标 `approved_for_core`；`MAPPING_VERSION` v5→v6
   走既有 upsert + audit 管道；

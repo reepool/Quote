@@ -14,7 +14,7 @@ The system SHALL precompute per-share, year-over-year, and TTM derived indicator
 - **AND** for earlier periods these fields SHALL be null
 
 #### Scenario: Denominator cross-validation reaches consensus
-- **WHEN** a panel row's available share anchors (share-capital fact, paid-in-capital fact, valuation-implied shares, EPS-implied shares) agree within their tolerance bands
+- **WHEN** a panel row's available share anchors (shares-outstanding canonical fact, share-capital fact, valuation-implied shares, EPS-implied shares, plus the paid-in-capital fact as a validator) agree within their tolerance bands
 - **THEN** the denominator SHALL be the highest-preference anchor value
 - **AND** the row SHALL carry `share_validation=consensus` with `share_basis` naming the adopted anchor
 
@@ -27,17 +27,21 @@ The system SHALL precompute per-share, year-over-year, and TTM derived indicator
 #### Scenario: Paid-in-capital anchor is implicitly par-validated
 - **WHEN** the paid-in-capital fact (a CNY amount) disagrees with other share-count anchors
 - **THEN** it SHALL NOT be adopted as the denominator and the disagreement SHALL be visible in `share_candidates`
+- **AND** it SHALL be adopted as the denominator only when no share-count anchor of any kind is available, with `share_basis` marking the par-value assumption
 - **AND** no explicit par-value reference table SHALL be required
+
+#### Scenario: EPS anchor is skipped when either operand is unstable
+- **WHEN** net income or the reported basic EPS is near zero
+- **THEN** the EPS-implied anchor SHALL be excluded and the exclusion reason recorded in `share_candidates`
+
+#### Scenario: Multiple facts of one anchor resolve deterministically
+- **WHEN** one anchor type carries multiple facts for the same instrument and period (e.g., express and final filings)
+- **THEN** the latest-updated fact of that anchor SHALL be used and stale facts SHALL NOT create phantom disagreements
 
 #### Scenario: Single-anchor and no-anchor rows are labelled honestly
 - **WHEN** exactly one anchor is available
 - **THEN** the row SHALL carry `share_validation=single_source` with `share_basis` naming it
 - **AND** when no anchor is available the denominator, `eps` (when not reported), `bps`, and `ocfps` SHALL be null
-
-#### Scenario: EPS anchor is skipped near zero profit
-- **WHEN** net income is near zero for the period
-- **THEN** the EPS-implied anchor SHALL be excluded from validation rather than producing an unstable implied share count
-- **AND** the exclusion SHALL be recorded in `share_candidates`
 
 #### Scenario: Quarantined share facts degrade validation transparently
 - **WHEN** a share-capital fact row has been quarantined as `share_capital_suspect`

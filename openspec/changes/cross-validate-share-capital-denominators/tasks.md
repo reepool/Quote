@@ -1,3 +1,11 @@
+## 0. 开发前置验证（D0，结论回填 design 后才可继续）
+
+- [ ] 0.1 THS 股本时点语义：选 3~5 只 2024–2025 有明确股本变动（增发/回购
+      注销）的公司，比对变动前后报告期 THS 股本 fact 是否随之变化，结论
+      （期末 vs 抓取时点）写入 design D0-1。
+- [ ] 0.2 valuation market_cap 语义分类：按 `source`/`calc_method` 分组抽验
+      总市值 vs 流通市值；输出允许进入取值优先序的来源清单，写入 design D0-2。
+
 ## 1. 映射层单位机制（卡 1）
 
 - [ ] 1.1 `financial_source_field_mapping.py`：THS equity 行声明
@@ -12,8 +20,9 @@
 
 ## 2. 全期间坏行扫描与隔离（卡 1）
 
-- [ ] 2.1 实现四锚扫描脚本（复用 pit-panel-dev 双锚脚本升级）：
-      THS / 实收资本 / valuation 隐含 / EPS 隐含，全期间输出候选 suspect 集
+- [ ] 2.1 实现锚扫描脚本（复用 pit-panel-dev 双锚脚本升级）：
+      shares_outstanding / THS / 实收资本 / valuation（0.2 白名单来源）/
+      EPS 隐含，全期间、**hot 与 history 两层**输出候选 suspect 集
       （THS 背离其他 ≥2 锚且 >50%）。
 - [ ] 2.2 suspect 集抽样人工复核 ≥20 只（对交易所披露/公开行情核对），
       复核结论记入本文件。
@@ -23,11 +32,14 @@
 
 ## 3. 面板交叉验证与备注（卡 2）
 
-- [ ] 3.1 分母装配改为 D1 四锚规则：consensus / discrepancy /
-      single_source / null 四态 + `share_basis` + `share_candidates_json`。
+- [ ] 3.1 分母装配改为 D1 锚体系规则（shares_outstanding > THS >
+      valuation 白名单 > EPS 隐含；实收资本仅校验/末位兜底）：
+      consensus / discrepancy / single_source / null 四态 +
+      `share_basis` + `share_candidates_json`。
 - [ ] 3.2 表结构迁移：`financial_pit_panel` 新增三列（ALTER TABLE，
       幂等）；API 与 coverage 透出 `share_validation` 分布。
-- [ ] 3.3 近零净利润跳过 EPS 锚；suspect 行自动降级（D3）。
+- [ ] 3.3 EPS 锚双条件跳过（净利或 basic_eps 近零）；同锚多 fact 取
+      updated_at 最新；suspect 行自动降级（D3）。
 - [ ] 3.4 单测：共识 / 分歧备注 / 单锚 / 零锚 / 近零净利 /
       实收资本面值分歧 / suspect 隔离后降级，全绿。
 - [ ] 3.5 全量重建 + valuation 锚分歧率报告（该序列质量定案，回填文档）。
