@@ -21,6 +21,7 @@ from .models import *
 from research.backtest_data.catalog import load_default_catalog
 from research.backtest_data.quote_store import BacktestQuoteStore
 from research.backtest_data.financial_store import FinancialVintageStore
+from research.financial_pit_panel import FinancialPitPanelStore
 from utils import config_manager
 
 router = APIRouter()
@@ -192,6 +193,129 @@ async def get_financial_facts_as_of(
         raise HTTPException(status_code=400, detail=str(exc))
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Failed to read financial facts: {exc}")
+
+
+def _pit_panel_store() -> FinancialPitPanelStore:
+    """Build the PIT panel store (API entry forwards only; module owns writes)."""
+    research_config = config_manager.get_research_config()
+    quotes_db_path = config_manager.get_nested(
+        "database_config.db_path", "data/quotes.db"
+    )
+    store = FinancialPitPanelStore(
+        research_config.storage.financials_db_path,
+        quotes_db_path=quotes_db_path,
+    )
+    store.initialize()
+    return store
+
+
+@router.get("/research/financials/pit/cross-section", tags=["Research Financials PIT"])
+async def get_financial_pit_cross_section(
+    as_of: str = Query(..., description="时点，YYYYMMDD 或 YYYY-MM-DD"),
+    report_period: Optional[str] = Query(None, description="报告期过滤，YYYYMMDD"),
+    exchange: Optional[str] = Query(None, description="SSE/SZSE/BSE，逗号分隔"),
+    fields: Optional[str] = Query(None, description="字段投影，逗号分隔"),
+    revision_guard: str = Query("strict", description="strict|lenient；lenient 重新引入更正前视"),
+    limit: int = Query(1000, ge=1, le=2000),
+    offset: int = Query(0, ge=0),
+):
+    """时点横截面：每票截至 as_of 最新可知报告期（服务端装配，无未来函数）。"""
+    try:
+        field_list = (
+            [item.strip() for item in fields.split(",") if item.strip()]
+            if fields
+            else None
+        )
+        return _pit_panel_store().query_cross_section(
+            as_of,
+            report_period=report_period,
+            exchanges=exchange,
+            fields=field_list,
+            revision_guard=revision_guard,
+            limit=limit,
+            offset=offset,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to read PIT cross-section: {exc}")
+
+
+@router.get("/research/financials/pit/panel", tags=["Research Financials PIT"])
+async def get_financial_pit_panel(
+    report_period: Optional[str] = Query(None, description="报告期，YYYYMMDD"),
+    instrument_id: Optional[str] = Query(None),
+    available_at_lte: Optional[str] = Query(None, description="YYYYMMDD"),
+    limit: int = Query(2000, ge=1, le=2000),
+    offset: int = Query(0, ge=0),
+):
+    """面板原始行分页访问，供客户端整缓存后离线装配（双源拼接依赖此端点）。"""
+    try:
+        return _pit_panel_store().query_panel(
+            report_period=report_period,
+            instrument_id=instrument_id,
+            available_at_lte=available_at_lte,
+            limit=limit,
+            offset=offset,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to read PIT panel: {exc}")
+
+
+@router.get("/research/financials/pit/coverage", tags=["Research Financials PIT"])
+async def get_financial_pit_coverage(
+    report_period: Optional[str] = Query(None, description="YYYYMMDD；缺省逐期汇总"),
+):
+    """覆盖自检：实际/应有（生命周期推导）/缺口 + 质量分布 + 完整期标记。"""
+    try:
+        return _pit_panel_store().coverage(
+            report_period=report_period,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to read PIT coverage: {exc}")
+
+
+@router.get("/research/financials/pit/changes", tags=["Research Financials PIT"])
+async def get_financial_pit_changes(
+    cursor: Optional[int] = Query(None, description="data_change_log.sequence_id 游标"),
+    limit: int = Query(2000, ge=1, le=5000),
+):
+    """追加型变更流：sequence_id 单调游标，重放幂等。"""
+    try:
+        return _pit_panel_store().changes(cursor=cursor, limit=limit)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to read PIT changes: {exc}")
+
+
+@router.get("/research/industries/as-of", tags=["Research Financials PIT"])
+async def get_industries_as_of(
+    as_of: str = Query(..., description="时点，YYYYMMDD 或 YYYY-MM-DD"),
+    taxonomy_system: Optional[str] = Query(None),
+    exchange: Optional[str] = Query(None),
+    limit: int = Query(2000, ge=1, le=5000),
+    offset: int = Query(0, ge=0),
+):
+    """批量时点行业归属：每票 as_of 当日生效分类；当日无生效分类不返回。"""
+    try:
+        as_of_iso = as_of if "-" in as_of else f"{as_of[:4]}-{as_of[4:6]}-{as_of[6:8]}"
+        result = await data_manager.get_research_industry_memberships_as_of(
+            as_of_iso,
+            taxonomy_system=taxonomy_system,
+            exchange=exchange,
+            limit=limit,
+            offset=offset,
+        )
+        return result
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to read industries as-of: {exc}")
 
 
 @router.get("/corporate-actions/canonical", tags=["Backtest Data"])

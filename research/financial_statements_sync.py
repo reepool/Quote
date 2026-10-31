@@ -770,6 +770,10 @@ class FinancialStatementsShadowSyncService:
             )
             self.storage.upsert_financial_facts(core, ingestion_run_id=run_id)
             core_written = 1
+            self._refresh_pit_panel_row(
+                instrument_id=str(manifest.instrument_id or ""),
+                report_period=str(manifest.report_period or ""),
+            )
 
         parsed_manifest = replace(
             manifest,
@@ -787,6 +791,41 @@ class FinancialStatementsShadowSyncService:
             "numeric_facts_written": numeric_written,
             "core_facts_written": core_written,
         }
+
+    def _refresh_pit_panel_row(self, *, instrument_id: str, report_period: str) -> None:
+        """Best-effort PIT panel refresh after a financial fact upsert.
+
+        The panel is a derived read model: its source rows and data_change_log
+        remain authoritative, so a failed refresh is logged (not raised) and a
+        later full rebuild converges. The store is cached on the instance to
+        keep per-file overhead in bulk sync runs bounded.
+        """
+        if not instrument_id or not report_period:
+            return
+        try:
+            store = getattr(self, "_pit_panel_store", None)
+            if store is None:
+                from research.financial_pit_panel import FinancialPitPanelStore
+
+                quotes_db_path = (
+                    getattr(self.research_config.storage, "quotes_db_path", None)
+                    if getattr(self, "research_config", None) is not None
+                    else None
+                )
+                store = FinancialPitPanelStore(
+                    self.storage.financials_db_path,
+                    quotes_db_path=quotes_db_path,
+                )
+                store.initialize()
+                self._pit_panel_store = store
+            store.refresh_pairs([(instrument_id, report_period)])
+        except Exception as exc:  # noqa: BLE001 - derived model must not block sync
+            dm_logger.warning(
+                "financial_pit_panel incremental refresh failed for %s %s: %s",
+                instrument_id,
+                report_period,
+                exc,
+            )
 
     def _append_financial_vintage(
         self,

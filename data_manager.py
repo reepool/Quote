@@ -9626,6 +9626,28 @@ class DataManager:
             "items": items,
         }
 
+    async def get_research_industry_memberships_as_of(
+        self,
+        as_of_date: str,
+        *,
+        taxonomy_system: Optional[str] = None,
+        exchange: Optional[str] = None,
+        limit: int = 2000,
+        offset: int = 0,
+    ) -> Dict[str, Any]:
+        """批量时点行业归属查询（转发 research storage，REQ-07.2 批量形态）。"""
+        storage = self._require_research_storage()
+        return await asyncio.to_thread(
+            self._run_financial_storage_call,
+            storage,
+            "list_industry_memberships_as_of",
+            as_of_date,
+            taxonomy_system=taxonomy_system,
+            exchange=exchange,
+            limit=limit,
+            offset=offset,
+        )
+
     def _financial_statement_service_layer_config(self) -> Dict[str, Any]:
         module_cfg = self.research_config.modules.get("financial_statements", {})
         module_layers = module_cfg.get("service_layers")

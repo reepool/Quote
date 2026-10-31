@@ -17,7 +17,7 @@ import threading
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 from datetime import timedelta
-from typing import Any, Dict, Generator, List, Optional, Sequence
+from typing import Any, Dict, Generator, List, Optional, Sequence, Tuple
 
 from research.change_watermarks import append_change_record, ensure_change_log_schema
 from research.announcements.models import (
@@ -8925,6 +8925,116 @@ class ResearchStorageManager:
                     return None
                 code = parent
         return None
+
+    def list_industry_memberships_as_of(
+        self,
+        as_of_date: str,
+        *,
+        taxonomy_system: Optional[str] = None,
+        exchange: Optional[str] = None,
+        resolve_l1_name: bool = True,
+        limit: int = 2000,
+        offset: int = 0,
+    ) -> Dict[str, Any]:
+        """批量时点行业归属 (REQ-07.2 批量形态)。
+
+        返回每只股票在 as_of_date 当日生效的最新官方行业分类；as_of 当日
+        无生效分类的股票不返回（不回填最新分类，保持时点语义）。
+        effective_to 取下一任分类的 official_start_date（排他），无后任则为 null。
+        """
+        as_of_str = str(as_of_date)[:10]
+        limit = max(1, min(int(limit), 5000))
+        offset = max(0, int(offset))
+        taxonomy_filter = ""
+        taxonomy_params: List[Any] = []
+        if taxonomy_system:
+            taxonomy_filter = "AND taxonomy_system = ?"
+            taxonomy_params.append(taxonomy_system)
+        exchange_filter = ""
+        if exchange:
+            exchange_filter = "AND exchange = ?"
+            taxonomy_params.append(exchange)
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            total = conn.execute(
+                f"""
+                SELECT COUNT(DISTINCT instrument_id)
+                FROM industry_classification_history
+                WHERE COALESCE(official_start_date, official_update_time, created_at) <= ?
+                  {taxonomy_filter} {exchange_filter}
+                """,
+                [as_of_str, *taxonomy_params],
+            ).fetchone()[0]
+            rows = conn.execute(
+                f"""
+                WITH led AS (
+                    SELECT instrument_id, symbol, exchange, taxonomy_system,
+                           taxonomy_version, official_industry_code,
+                           COALESCE(official_start_date, official_update_time, created_at) AS start_key,
+                           LEAD(COALESCE(official_start_date, official_update_time, created_at))
+                               OVER (
+                                   PARTITION BY instrument_id
+                                   ORDER BY COALESCE(official_start_date, official_update_time, created_at)
+                               ) AS next_start
+                    FROM industry_classification_history
+                    WHERE 1 = 1 {taxonomy_filter} {exchange_filter}
+                ),
+                eligible AS (
+                    SELECT *, ROW_NUMBER() OVER (
+                        PARTITION BY instrument_id ORDER BY start_key DESC
+                    ) AS rn
+                    FROM led WHERE start_key <= ?
+                )
+                SELECT instrument_id, symbol, exchange, taxonomy_system,
+                       taxonomy_version, official_industry_code,
+                       start_key AS effective_from, next_start AS effective_to
+                FROM eligible WHERE rn = 1
+                ORDER BY instrument_id
+                LIMIT ? OFFSET ?
+                """,
+                [*taxonomy_params, as_of_str, limit, offset],
+            ).fetchall()
+        items: List[Dict[str, Any]] = []
+        l1_cache: Dict[Tuple[str, str, str], Optional[str]] = {}
+        for row in rows:
+            industry_code = row["official_industry_code"]
+            industry_name: Optional[str] = None
+            if resolve_l1_name and industry_code:
+                cache_key = (
+                    row["taxonomy_system"],
+                    row["taxonomy_version"] or "",
+                    industry_code,
+                )
+                if cache_key not in l1_cache:
+                    l1_cache[cache_key] = self.resolve_industry_taxonomy_l1_name(
+                        taxonomy_system=row["taxonomy_system"],
+                        taxonomy_version=row["taxonomy_version"],
+                        industry_code=industry_code,
+                    )
+                industry_name = l1_cache[cache_key]
+            items.append(
+                {
+                    "instrument_id": row["instrument_id"],
+                    "symbol": row["symbol"],
+                    "exchange": row["exchange"],
+                    "taxonomy_system": row["taxonomy_system"],
+                    "taxonomy_version": row["taxonomy_version"],
+                    "industry_code": industry_code,
+                    "industry_name": industry_name,
+                    "effective_from": str(row["effective_from"])[:10],
+                    "effective_to": str(row["effective_to"])[:10]
+                    if row["effective_to"]
+                    else None,
+                }
+            )
+        return {
+            "as_of": as_of_str,
+            "taxonomy_system": taxonomy_system,
+            "total": total,
+            "limit": limit,
+            "offset": offset,
+            "items": items,
+        }
 
     # ----- REQ-13: 无风险利率序列 -----
 
