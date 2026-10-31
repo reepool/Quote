@@ -2,7 +2,7 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-10-31。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[§18章节缺口闭环重整](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#18-章节缺口闭环重整停止17真实接续)，依据验收§7.69/A审核§151。§17两窗无新可靠答案，付费兼容接续结束，关闭银行未用入口及旧余额授权。保章节方向和有效答案，在原owner一次贯通缺口→正文→答案→有效覆盖→持久三读，删除关键词/标签代语义捷径；两家公司工程验证不再串行等待。新增真实调用/预算0，不逐函数送审、不建平台。质量不降，原S1仍0/12，其余十家/S1重测/S2/生产未授权。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[公司核心包§19](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#19-公司核心包替代旧余额兼容方案)，依据验收§7.70/A审核§153。§18补读工程增量接受、整链未过；停止旧余额兼容方案，不追加同链第三次修补。回到原owner章节新处理，只复用正式源/解析，把计量、必要上下文、生成/有效覆盖及持久交付合成整份核心工程闭环，不载旧语义。新增真实调用当前授权0；单造纸120000/900秒/16物理的新验证待用户确认后才可同卡执行。质量不降，S1仍0/12，银行/其余十家/S1重测/S2/生产未授权。
 
 ## 1. 开发者必须先理解的纠偏
 
