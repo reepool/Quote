@@ -723,6 +723,56 @@ def test_s16_authorization_binds_paper_and_bank_windows(tmp_path):
         )
 
 
+def test_s17_authorization_binds_continuation_windows(tmp_path):
+    from research.company_profile.bounded_entry import S17_AUTHORIZATION
+
+    source = tmp_path / "source.pdf"
+    source.write_bytes(b"offline source")
+    paper = {
+        "file_hashes": {},
+        "asset": {"archive_path": str(source), "content_hash": digest(source)},
+        "run_authorization": S17_AUTHORIZATION,
+        "max_elapsed_seconds": 400,
+        "max_tokens": 35_000,
+        "max_physical_requests": 6,
+        "max_recoveries": 1,
+    }
+    validate_binding(paper, real=False, authorization={}, binding_hash="frozen")
+    bank = dict(
+        paper,
+        max_elapsed_seconds=900,
+        max_tokens=80_000,
+        max_physical_requests=14,
+        max_recoveries=2,
+    )
+    validate_binding(bank, real=False, authorization={}, binding_hash="frozen")
+    over = dict(bank, max_elapsed_seconds=1301)
+    with pytest.raises(ValueError, match="entry deadline exceeds the card"):
+        validate_binding(over, real=False, authorization={}, binding_hash="frozen")
+    from decimal import Decimal
+
+    from utils.llm.budget import DEVELOPMENT_UNPRICED_BILLING, LlmRunBudget
+
+    LlmRunBudget(
+        deadline=time.monotonic() + 30,
+        prices={},
+        max_tokens=80_000,
+        max_requests=14,
+        max_cost_cny=Decimal(20),
+        billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+        run_authorization=S17_AUTHORIZATION,
+    )
+    with pytest.raises(ValueError, match="invalid bounded run limits"):
+        LlmRunBudget(
+            deadline=time.monotonic() + 30,
+            prices={},
+            max_tokens=115_001,
+            max_requests=14,
+            billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+            run_authorization=S17_AUTHORIZATION,
+        )
+
+
 def test_admission_wait_exhausts_business_deadline_without_a_send():
     """The 120s entry error is budget-wrapped admission wait, not local persist."""
     import asyncio

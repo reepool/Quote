@@ -1,0 +1,11 @@
+{
+  "physical_requests": 0,
+  "charged_tokens": 0,
+  "charged_cost_cny": "0",
+  "cost_status": "priced",
+  "billing_mode": "development_unpriced",
+  "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+  "stopped_reason": null,
+  "denied_request": null,
+  "attempts": []
+}

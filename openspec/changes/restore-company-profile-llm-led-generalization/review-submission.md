@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-10-31，[A审核§149](#149-a审核章节路线已有真实产出主要阻塞转为业务充分性与核验输入膨胀)）：§16两家章节新处理已结束，三视图均非空；造纸程序完成不等于经营角色成立，银行核验受无关冲突上下文膨胀阻塞，不是总时间/总账耗尽。接受已核总额的等价来源，不再指定利润表重复补数。当前仅[§17](b3-s1-execution-card.md#17-章节核心业务验收保已有答案修共同阻塞后一次交两家)兼容修复性接续，原总额内显式重分配未用资源，不重读全文、不改原结果。S1仍0/12，不放S2或生产。
+当前状态（2026-10-31，[B交接§150](#150-b交接保已有答案后造纸角色仍未成立银行未启动)）：§17兼容接续已跑造纸两窗并按卡停止。S16已核正文/总额仍在；造纸经营角色未成立，银行未启动。S1仍0/12，不放S2或生产。不自评可用。
 
 ## 1. 唯一实施指引
 
@@ -6338,3 +6338,54 @@ A也修正自己的任务切分：此前把“必须利润表那一行”当总�
 当前仅[§17](b3-s1-execution-card.md#17-章节核心业务验收保已有答案修共同阻塞后一次交两家)/验收§7.68。A显式把§16未用累计资源中的115000账本/1300秒/20物理/3恢复改绑为两家兼容修复性接续，原总额不增加；不是§16自动后继，不借C1/B2/旧S1余额。造纸至多35000/400秒/6物理/1恢复，银行至多80000/900秒/14物理/2恢复，共同实现后冻结同版，分别复用本家S16读源、正文及仍有效真实检查，变更句重新核验，主要漏项才扩读。先造纸核心与B源自查成立再银行；达标即停，不花余额补排名/增速。本卡失败则交能力边界，A重新裁决路线，不自动续第18张尾项卡。接续效率和S16新处理累计成本同时报告，不称常规新公司达标；新12家同版回归仍需A下一次放行。
 
 A定向复验：`test_unlocated_major_still_blocks_core_closeout`、`test_read_pages_surface_missed_operating_revenue_totals`、`test_custody_conflict_pages_are_kept_with_the_draft`，3 passed / 12 warnings / 5.77秒。它们仅验证现有局部契约，未覆盖上述真实输入膨胀，不能替代本轮挑战。OpenSpec严格校验及差异检查见本次提交。A活跃审核未完整计时、合计未知，不把等待/测试或业务usage当人工时间；无新增业务运行。新发现两项业务阻塞，非阻塞标题/地区/排名细节后置。临时盘点S16两根约3.9/5.8MB、offline-s15约292K，仍有接续/故障复现用途，本轮不盲删；A未复制业务库，保护既有13份修改/9项未跟踪，B下一卡先清无依赖重复产物、接续结束后收尾。
+
+## 150. B交接：保已有答案后造纸角色仍未成立，银行未启动
+
+日期：2026-10-31。执行[§17](b3-s1-execution-card.md#17-章节核心业务验收保已有答案修共同阻塞后一次交两家)/[A审核§149](#149-a审核章节路线已有真实产出主要阻塞转为业务充分性与核验输入膨胀)。不改原S16结果/首次成绩，不自评S1或公司通过。生产仍`not_authorized`。
+
+### 150.1 主要问题 → 本卡交付 / 补充 / 未解决
+
+| 对象 | 本卡做什么 | 结果 |
+| --- | --- | --- |
+| 造纸已核8条及`241,899.02万元` | 兼容加载S16源/草稿/仍有效检查；总额不再指定利润表重写 | 两窗均保留。`claim_operating_revenue_2025`仍pass；`read_but_missed`不再挡完成 |
+| 造纸实质经营角色 | 集中度/成本不再算角色成立；接续应定向读管理层讨论正文 | **未交付。** 两窗都没有读到p11–15的林浆纸/生产线/经营模式 |
+| 银行无关冲突膨胀 | `related_conflict_pages`改为同指标/同条款百分比；托管p89保留 | 离线：S16四条待核单目标≤60KB。**未真实跑银行** |
+| 银行总额与三项净收入、主要服务核验 | 计划在造纸成立后同版跑 | 未启动 |
+| 两份核心齐全三视图 | 卡目标 | 未交。造纸三视图仍缺经营角色；银行未接续 |
+
+### 150.2 共同修正与真实接续
+
+离线先做：经营角色实质性、等价总额覆盖、冲突页约束、`chapter_select+compatible_continue`加载S16回执、S17授权115000/20/¥40。冻结后跑造纸第一窗`s1-600103-s17`（`data/QuoteBak/s1-600103-s17-20261031`，瘦回执`s1-600103-s17-result`）：监督104.908秒、1物理、7741账本、DeepSeek一次核验usage 3690+4051。问了`core-question:operating-role`，但核验对着已有收入/成本声称，结论unclear。未新读角色正文。保留8条已核主张。
+
+第一窗失败根因是把未读章节候选整包送审，触发`direct_core_ledger_hold`/`admission_stopped`。第二次共性修正把定向未读收到≤3页后跑第二窗`s1-600103-s17w2`（同公司剩余27259/295秒/5物理；`data/QuoteBak/s1-600103-s17w2-20261031`，瘦回执`s1-600103-s17w2-result`）：监督78.257秒、**0物理/0账本**，只是把上一窗未完成稿再持久一遍。
+
+第二窗0请求的直接原因：目录项`第三节 管理层讨论与分析`被目录页自己命中（候选`[4,16,18,22,85,92]`，全是已读），角色正文p11–15不在候选；已有`operating-role`问题因“已存在”不再进入成稿队列。B对照正式解析：p11有自主生产/制浆造纸生产线/经营模式，p13有林-浆-纸与经营情况讨论，均未读。
+
+按卡：第一家不成立停止第二家；同根因不第三次付费窗口。银行绑定`s1-pool-s1-600000-s17`已写未跑。交代码里的后续定位（目录改用印刷页、从章节起点短窗取≤3页角色正文、未核验角色问题继续成稿）只作离线证明，**没有第三窗实跑，不计入本卡业务通过**。
+
+### 150.3 资源：接续与S16新处理分开
+
+| 窗口 | 监督秒 | 物理 | 账本 | 恢复 | 终态 |
+| --- | ---: | ---: | ---: | ---: | --- |
+| 造纸S17窗1 | 104.908 | 1 | 7741 | 0 | 退出0，角色未立，三读一致 |
+| 造纸S17窗2 | 78.257 | 0 | 0 | 0 | 退出0，0请求重发上一稿 |
+| 银行S17 | — | 0 | 0 | 0 | 未启动 |
+| **本卡接续合计** | **183.165** | **1** | **7741** | **0** | 造纸剩余约27259/217秒/5物理；整卡未用107259/1117秒/19物理 |
+
+S16新处理原成绩不变：造纸10页/596.842秒/6物理/143938；银行14页/1067.482秒/7物理/140180。本卡接续耗时不能当成新公司900秒/120000/16达标。有价均为unknown。未改`config/13_llm.json`。
+
+### 150.4 验证、清理、边界
+
+```text
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --tb=short \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_concentration_does_not_complete_operating_role \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_s16_bank_single_target_verify_stays_under_payload \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_chapter_select_compatible_continue_keeps_saved_semantics \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_toc_uses_printed_section_start_not_the_toc_page \
+  tests/unit/test_research/test_company_profile_direct_progress.py::test_compatible_continue_drafts_existing_role_from_unread_section \
+  tests/unit/test_research/test_company_profile_bounded_entry.py::test_s17_authorization_binds_continuation_windows
+```
+
+上列6 passed。另复跑`test_chapter_candidates_come_from_toc_and_headings_not_every_page`、`test_official_parse_first_core_pack_has_tail_room`通过。离线不等于两家业务通过。S1仍0/12，L0/L1补救4/4及原S16首次成绩不改。未开第三窗、未跑银行、未扩样本、未归档。
+
+保留：正式PDF与一套解析缓存、C1/C1b、S16两根及openspec瘦回执、本卡两窗运行根和瘦回执、12份既有草稿。未删官方源或他人未跟踪文件。未触开始时既有13份修改与9项未跟踪。

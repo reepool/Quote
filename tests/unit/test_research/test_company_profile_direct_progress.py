@@ -7444,4 +7444,551 @@ def test_gateway_usage_is_booked_once_not_reserved_again():
     assert result.tokens_charged == snapshot["charged_tokens"]
 
 
+def test_concentration_does_not_complete_operating_role():
+    from research.company_profile.direct_reading import _completeness_gaps
+
+    report = _report()
+    concentration = ReportViewClaim(
+        claim_id="concentration",
+        dimension="upstream_downstream",
+        status="observed",
+        answer="2025年度前五名客户销售额52,052.72万元，占年度销售总额21.52%。",
+        evidence=(_evidence(report, text="前五名客户销售额52,052.72万元", page=21),),
+    )
+    business = ReportViewClaim(
+        claim_id="business",
+        dimension="principal_business",
+        status="observed",
+        answer="2025年度主营业务分行业涉及纸行业、浆行业。",
+        evidence=(_evidence(report, text="纸行业、浆行业", page=16),),
+    )
+    products = ReportViewClaim(
+        claim_id="products",
+        dimension="products_services",
+        status="observed",
+        answer="主要产品包括纸、浆粕、浆板。",
+        evidence=(_evidence(report, text="纸、浆粕、浆板", page=17),),
+    )
+    revenue = ReportViewClaim(
+        claim_id="revenue",
+        dimension="revenue_model",
+        status="observed",
+        answer="青山纸业公司2025年度营业收入为241,899.02万元。",
+        evidence=(_evidence(report, text="营业收入为241,899.02万元", page=85),),
+    )
+    checks = [
+        ReportViewCheck(
+            target_type="claim",
+            target_id=item.claim_id,
+            status="pass",
+            explanation="已核。",
+        )
+        for item in (concentration, business, products, revenue)
+    ]
+    gaps = _completeness_gaps(
+        [concentration, business, products, revenue],
+        [],
+        checks,
+    )
+    assert "core_dimension_missing:operating_role" in gaps
+
+
+def test_audit_wan_yuan_covers_income_statement_yuan():
+    from research.company_profile.direct_reading import (
+        _answer_covers_revenue_fact,
+        missed_core_revenue_facts,
+    )
+
+    pages = [
+        {
+            "page": 16,
+            "text": "利润表 本期 营业收入 2,418,990,221.17",
+            "readable": True,
+        },
+        {
+            "page": 85,
+            "text": "青山纸业公司2025年度营业收入为241,899.02万元。",
+            "readable": True,
+        },
+    ]
+    covered = ReportViewClaim(
+        claim_id="claim_operating_revenue_2025",
+        dimension="revenue_model",
+        status="observed",
+        answer="青山纸业公司2025年度营业收入为241,899.02万元。",
+        evidence=(_evidence(_report(), text="营业收入为241,899.02万元", page=85),),
+    )
+    assert _answer_covers_revenue_fact(
+        covered.answer,
+        {
+            "kind": "operating_revenue_total",
+            "amount": "2,418,990,221.17",
+            "unit": "元",
+        },
+    )
+    assert missed_core_revenue_facts(pages, (), [covered]) == []
+
+
+def test_resolved_revenue_miss_is_not_kept_after_equivalent_pass():
+    from research.company_profile.direct_reading import _current_gaps
+
+    report = _report()
+    claim = ReportViewClaim(
+        claim_id="claim_operating_revenue_2025",
+        dimension="revenue_model",
+        status="observed",
+        answer="青山纸业公司2025年度营业收入为241,899.02万元。",
+        evidence=(_evidence(report, text="营业收入为241,899.02万元", page=85),),
+    )
+    checks = [
+        ReportViewCheck(
+            target_type="claim",
+            target_id="claim_operating_revenue_2025",
+            status="pass",
+            explanation="总额已核。",
+        ),
+        ReportViewCheck(
+            target_type="condition",
+            target_id="core-question:period-operating-revenue",
+            status="pass",
+            explanation="总额已核。",
+        ),
+    ]
+    live = _current_gaps(
+        ["read_but_missed:period-operating-revenue", "chapter_gap_expansion"],
+        [claim],
+        [],
+        checks,
+    )
+    assert "read_but_missed:period-operating-revenue" not in live
+    assert "chapter_gap_expansion" in live
+
+
+def test_unrelated_growth_rates_do_not_bloat_wealth_verify():
+    from research.company_profile.direct_reading import related_conflict_pages
+
+    report = _report()
+    wealth = ReportViewClaim(
+        claim_id="products_services_wealth",
+        dimension="products_services",
+        status="observed",
+        answer="财富管理个人AUM余额46,645.33亿元，较上年末增长20.26%。",
+        evidence=(_evidence(report, text="个人AUM余额46,645.33亿元，较上年末增长20.26%", page=39),),
+    )
+    extra = related_conflict_pages(
+        wealth,
+        [
+            {
+                "page": 39,
+                "text": "个人AUM余额46,645.33亿元，较上年末增长20.26%。",
+                "readable": True,
+            },
+            {
+                "page": 57,
+                "text": "本外币贷款总额较上年末增长5.80%，其中五大赛道贷款增长12.15%。托管条线协同推进。",
+                "readable": True,
+            },
+            {
+                "page": 69,
+                "text": "报告期末托管规模20.21万亿元，较上年末增长11.45%。",
+                "readable": True,
+            },
+            {
+                "page": 32,
+                "text": "本集团资产总额增长6.55%，营业收入增长1.88%。",
+                "readable": True,
+            },
+        ],
+    )
+    assert {int(page["page"]) for page in extra} == set()
+
+
+def test_s16_bank_single_target_verify_stays_under_payload():
+    from pathlib import Path
+
+    from research.company_profile.contracts import ReportSemanticRequestV3
+    from research.company_profile.direct_reading import (
+        compact_source_pages,
+        compact_verify_targets,
+        related_conflict_pages,
+    )
+    from research.company_profile.reading_budget import request_payload_bytes
+    from research.company_profile.report_interpretation import (
+        direct_core_processing_identity,
+    )
+
+    query = json.loads(
+        Path(
+            "/home/python/Quote/openspec/changes/"
+            "restore-company-profile-llm-led-generalization/"
+            "s1-600000-s16-result/query.json"
+        ).read_text()
+    )
+    report = None
+    pending = []
+    seen = set()
+    for view in (query["profiles"][0].get("three_views") or {}).get("views", {}).values():
+        for raw in view.get("claims") or []:
+            claim_id = raw.get("claim_id")
+            if claim_id in seen:
+                continue
+            seen.add(claim_id)
+            if claim_id not in {
+                "claim-asset-custody-services",
+                "principal_business",
+                "revenue_model",
+                "products_services_wealth",
+            }:
+                continue
+            payload = {key: value for key, value in raw.items() if key != "review_state"}
+            claim = ReportViewClaim.model_validate_json(
+                json.dumps(payload, ensure_ascii=False)
+            )
+            pending.append(claim)
+            if report is None and claim.evidence:
+                report = claim.evidence[0].report
+    assert len(pending) == 4
+    pages = _official_bank_pages(*range(1, 91))
+    identity = direct_core_processing_identity()
+    for claim in pending:
+        extra = related_conflict_pages(claim, pages)
+        if claim.claim_id == "claim-asset-custody-services":
+            extras = {int(page["page"]) for page in extra}
+            assert 89 in extras
+            assert len(extras) <= 3
+        group, conditions, related = compact_verify_targets([claim], (), ())
+        attached = [
+            {"page": int(item.page), "text": item.anchor.bounded_quote, "readable": True}
+            for item in claim.evidence
+        ]
+        for page in extra:
+            if int(page["page"]) not in {int(item["page"]) for item in attached}:
+                attached.append(page)
+        packed = compact_source_pages(attached, [*group, *conditions, *related])
+        sized = ReportSemanticRequestV3(
+            request_id="s17-verify-size",
+            purpose="verify_views",
+            report=report,
+            processing_identity=identity,
+            source_pages=tuple(packed),
+            source_scope="full_context",
+            claims=tuple(group),
+            max_output_tokens=4000,
+            timeout_seconds=120,
+        )
+        assert request_payload_bytes(sized) <= 60_000
+
+
+def test_chapter_select_compatible_continue_keeps_saved_semantics():
+    report = _report()
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    identity["compatible_continue"] = True
+    identity["accepted_source_receipts"] = [
+        {
+            "request_id": "s16-source",
+            "purpose": "source_inventory",
+            "status": "success",
+            "source_pages": [16, 21],
+            "response_payload": {
+                "request_id": "s16-source",
+                "purpose": "source_inventory",
+                "source_conditions": [],
+            },
+        }
+    ]
+    identity["accepted_prior_draft"] = {
+        "claims": [
+            {
+                "claim_id": "concentration",
+                "dimension": "upstream_downstream",
+                "status": "observed",
+                "answer": "2025年度前五名客户销售额52,052.72万元，占年度销售总额21.52%。",
+                "evidence": [
+                    _evidence(
+                        report, text="前五名客户销售额52,052.72万元", page=21
+                    ).model_dump(mode="json")
+                ],
+                "supporting_record_ids": [],
+            }
+        ],
+        "checks": [
+            {
+                "target_type": "claim",
+                "target_id": "concentration",
+                "status": "pass",
+                "explanation": "集中度已核。",
+            }
+        ],
+        "verify_receipts": [],
+    }
+
+    class _Provider:
+        offline_only = True
+        purposes = []
+
+        def interpret(self, request):
+            self.purposes.append(request.purpose)
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                )
+            if request.purpose == "synthesize_views":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="operating-role",
+                            dimension="supply_chain_role",
+                            status="observed",
+                            answer="公司已形成林-浆-纸产业链协同，拥有制浆造纸生产线。",
+                            evidence=(
+                                _evidence(
+                                    report,
+                                    text="公司目前已形成“林-浆-纸”产业链协同效应",
+                                    page=13,
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=(
+                    ReportViewCheck(
+                        target_type="claim",
+                        target_id="operating-role",
+                        status="pass",
+                        explanation="角色有原文。",
+                    ),
+                ),
+            )
+
+    provider = _Provider()
+    result = _run(
+        provider,
+        pages=(
+            {
+                "page": 13,
+                "text": "三、经营情况讨论与分析 公司目前已形成“林-浆-纸”产业链协同效应，拥有多条制浆造纸生产线。",
+                "readable": True,
+            },
+            {"page": 16, "text": "主营业务分行业纸行业、浆行业。", "readable": True},
+            {
+                "page": 21,
+                "text": "前五名客户销售额52,052.72万元，占年度销售总额21.52%。",
+                "readable": True,
+            },
+        ),
+        processing_identity=identity,
+        report=report,
+    )
+    assert "core_dimension_missing:operating_role" not in result.gaps
+    assert any(claim.claim_id == "operating-role" for claim in result.claims)
+
+
+def test_toc_uses_printed_section_start_not_the_toc_page():
+    from research.company_profile.direct_reading import chapter_candidate_pages
+
+    pages = [
+        {
+            "page": 4,
+            "text": (
+                "目录\n"
+                "第一节 释义 ......................................................... 5\n"
+                "第三节 管理层讨论与分析 ............................................. 9\n"
+                "第八节 财务报告 .................................................... 85\n"
+            ),
+            "readable": True,
+        },
+        {
+            "page": 9,
+            "text": (
+                "福建省青山纸业股份有限公司2025 年年度报告\n"
+                "9 / 220\n"
+                "非经常性损益项目和金额\n"
+                "十一、 存在股权激励\n"
+                "第三节 管理层讨论与分析\n"
+            ),
+            "readable": True,
+        },
+        {
+            "page": 11,
+            "text": "作为制浆造纸企业，公司具备制浆造纸生产线，主要经营模式如下。",
+            "readable": True,
+        },
+        {"page": 16, "text": "主营业务分行业纸行业、浆行业。", "readable": True},
+        {"page": 85, "text": "第八节 财务报告\n合并利润表", "readable": True},
+    ]
+    chosen = chapter_candidate_pages(pages)
+    assert 9 in chosen
+    assert chosen.count(4) <= 1
+
+
+def test_compatible_continue_drafts_existing_role_from_unread_section():
+    report = _report()
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    identity["compatible_continue"] = True
+    identity["accepted_source_receipts"] = [
+        {
+            "request_id": "s16-source",
+            "purpose": "source_inventory",
+            "status": "success",
+            "source_pages": [16, 21],
+            "response_payload": {
+                "request_id": "s16-source",
+                "purpose": "source_inventory",
+                "source_conditions": [
+                    {
+                        "condition_id": "core-question:operating-role",
+                        "dimension": "supply_chain_role",
+                        "description": "说明生产加工销售角色",
+                        "major": True,
+                        "statement_status": "current",
+                        "evidence": [
+                            _evidence(
+                                report, text="主营业务分行业纸行业、浆行业。", page=16
+                            ).model_dump(mode="json")
+                        ],
+                    }
+                ],
+            },
+        }
+    ]
+    identity["accepted_prior_draft"] = {
+        "claims": [
+            {
+                "claim_id": "concentration",
+                "dimension": "upstream_downstream",
+                "status": "observed",
+                "answer": "2025年度前五名客户销售额52,052.72万元，占年度销售总额21.52%。",
+                "evidence": [
+                    _evidence(
+                        report, text="前五名客户销售额52,052.72万元", page=21
+                    ).model_dump(mode="json")
+                ],
+                "supporting_record_ids": [],
+            }
+        ],
+        "checks": [
+            {
+                "target_type": "claim",
+                "target_id": "concentration",
+                "status": "pass",
+                "explanation": "集中度已核。",
+            },
+            {
+                "target_type": "condition",
+                "target_id": "core-question:operating-role",
+                "status": "unclear",
+                "explanation": "现有声称没有说明生产加工销售角色。",
+            },
+        ],
+        "verify_receipts": [],
+    }
+
+    class _Provider:
+        offline_only = True
+        inventoried = []
+        drafted = []
+
+        def interpret(self, request):
+            pages = [int(page["page"]) for page in request.source_pages]
+            if request.purpose == "source_inventory":
+                self.inventoried.extend(pages)
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                )
+            if request.purpose == "synthesize_views":
+                self.drafted.extend(
+                    item.condition_id for item in request.source_conditions
+                )
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=(
+                        ReportViewClaim(
+                            claim_id="operating-role",
+                            dimension="supply_chain_role",
+                            status="observed",
+                            answer="公司浆纸主业自主生产，具备制浆造纸生产线，并形成林-浆-纸一体化。",
+                            evidence=(
+                                _evidence(
+                                    report,
+                                    text="具备制浆造纸生产线及配套系统，主要经营模式如下",
+                                    page=11,
+                                ),
+                            ),
+                        ),
+                    ),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=(
+                    ReportViewCheck(
+                        target_type="claim",
+                        target_id="operating-role",
+                        status="pass",
+                        explanation="角色有原文。",
+                    ),
+                    ReportViewCheck(
+                        target_type="condition",
+                        target_id="core-question:operating-role",
+                        status="pass",
+                        explanation="经营角色已核。",
+                    ),
+                ),
+            )
+
+    provider = _Provider()
+    result = _run(
+        provider,
+        pages=(
+            {
+                "page": 4,
+                "text": (
+                    "目录\n"
+                    "第三节 管理层讨论与分析 ............................................. 9\n"
+                    "第八节 财务报告 .................................................... 85\n"
+                ),
+                "readable": True,
+            },
+            {
+                "page": 9,
+                "text": (
+                    "9 / 220\n非经常性损益项目和金额\n"
+                    "十一、 存在股权激励\n第三节 管理层讨论与分析"
+                ),
+                "readable": True,
+            },
+            {
+                "page": 11,
+                "text": (
+                    "作为制浆造纸企业，公司浆纸主业一直秉承自主生产的经营模式，"
+                    "具备制浆造纸生产线及配套系统，主要经营模式如下。"
+                ),
+                "readable": True,
+            },
+            {"page": 16, "text": "主营业务分行业纸行业、浆行业。", "readable": True},
+            {
+                "page": 21,
+                "text": "前五名客户销售额52,052.72万元，占年度销售总额21.52%。",
+                "readable": True,
+            },
+        ),
+        processing_identity=identity,
+        report=report,
+    )
+    assert 11 in provider.inventoried
+    assert "core-question:operating-role" in provider.drafted
+    assert any(claim.claim_id == "operating-role" for claim in result.claims)
+    assert "core_dimension_missing:operating_role" not in result.gaps
+
+
 

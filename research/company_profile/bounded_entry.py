@@ -21,6 +21,7 @@ from typing import Any
 
 G2_AUTHORIZATION = "company_profile_g2.2026-10-20"
 S16_AUTHORIZATION = "company_profile_s16_core.2026-10-30"
+S17_AUTHORIZATION = "company_profile_s17_continue.2026-10-31"
 
 
 def company_window_limits(binding: dict, state: dict | None) -> tuple[int, int]:
@@ -694,6 +695,13 @@ def validate_binding(
             and int(binding.get("max_physical_requests") or 0) <= 40
             and int(binding.get("max_recoveries") or 0) <= 3
         )
+    elif auth == S17_AUTHORIZATION:
+        allowed = (
+            0 < elapsed <= 1300
+            and int(binding.get("max_tokens") or 0) <= 115_000
+            and int(binding.get("max_physical_requests") or 0) <= 20
+            and int(binding.get("max_recoveries") or 0) <= 3
+        )
     else:
         allowed = 0 < elapsed <= 900
     if not allowed:
@@ -803,6 +811,10 @@ def validate_binding(
                 "s1-600000-c1b",
                 "s1-600103-s16",
                 "s1-600000-s16",
+                "s1-600103-s17",
+                "s1-600000-s17",
+                "s1-600103-s17w2",
+                "s1-600000-s17w2",
             }
             or not authorization.get("approval_reference")
         ):
@@ -1042,7 +1054,8 @@ def _worker(
                     if binding.get("run_authorization")
                     == "company_profile_repair.2026-10-21"
                     else min(3, int(binding.get("max_recoveries", 3)))
-                    if binding.get("run_authorization") == S16_AUTHORIZATION
+                    if binding.get("run_authorization")
+                    in {S16_AUTHORIZATION, S17_AUTHORIZATION}
                     else min(2, int(binding.get("max_recoveries", 2)))
                     if binding.get("reading_strategy") == "direct_core_v1"
                     else int(binding.get("max_recoveries", 4))
@@ -1365,6 +1378,8 @@ def _worker(
             identity["read_remaining_sources"] = True
         if binding.get("chapter_select"):
             identity["chapter_select"] = True
+        if binding.get("compatible_continue"):
+            identity["compatible_continue"] = True
         if binding.get("core_repair_pages"):
             identity["core_repair_pages"] = [
                 int(page) for page in binding["core_repair_pages"]

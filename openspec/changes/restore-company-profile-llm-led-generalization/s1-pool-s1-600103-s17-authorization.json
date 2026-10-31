@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600103-s17",
+  "binding_sha256": "86e4ba17710ca7236b0bb2497ac6a79eeadad2a2d8d3699e846a5b3c580cb56a",
+  "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+  "approval_reference": "acceptance section 7.68 and b3 card section 17, 2026-10-31",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "§17 S16 compatible continue"
+}

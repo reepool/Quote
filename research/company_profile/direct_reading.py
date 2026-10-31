@@ -105,28 +105,174 @@ def _business_groups(conditions: Sequence[ReportSourceCondition]) -> list[list[R
     return groups
 
 
+_UNTRUSTED_LIMITATIONS = {
+    "pending_verification",
+    "claim_or_dependency_not_verified",
+    "evidence_not_located",
+    "subject_scope_omitted",
+    "retracted_pending_correction",
+    "not_verified",
+    "pending",
+}
+_CONCENTRATION_MARKS = (
+    "前五名客户",
+    "前五名供应商",
+    "占年度销售总额",
+    "占年度采购总额",
+)
+_COST_ONLY_MARKS = ("成本构成", "原辅材料价格")
+_ROLE_STATEMENT_MARKS = (
+    "生产线",
+    "林浆纸",
+    "林-浆-纸",
+    "一体化",
+    "产业链",
+    "上游",
+    "下游",
+    "制浆",
+    "自行生产",
+    "延伸服务",
+    "链主",
+)
+_UNIT_TO_YUAN = {
+    "元": 1.0,
+    "万元": 10_000.0,
+    "百万元": 1_000_000.0,
+    "亿元": 100_000_000.0,
+}
+_ANSWER_AMOUNT = re.compile(
+    r"(\d{1,3}(?:,\d{3})*(?:\.\d+)?)\s*(亿元|万元|百万元|元)?"
+)
+_METRIC_SUFFIXES = ("规模", "收入", "余额", "总额", "业务")
+_METRIC_STOP = frozenset(
+    {
+        "增长",
+        "增速",
+        "增幅",
+        "变动",
+        "增加",
+        "减少",
+        "同比",
+        "分别",
+        "其中",
+        "达到",
+        "实现",
+        "报告",
+        "报告期",
+        "报告期内",
+        "报告期末",
+        "较上",
+        "较上年",
+        "上年末",
+        "较上年末增加",
+        "较上年末减少",
+        "增加",
+        "减少",
+        "本集团",
+        "本公司",
+        "公司",
+        "亿元",
+        "万元",
+        "百万元",
+        "万亿元",
+    }
+)
+
+
+def _latest_check(checks, target_type: str, target_id: str):
+    found = None
+    for check in checks:
+        if check.target_type == target_type and check.target_id == target_id:
+            found = check
+    return found
+
+
+def _verified_claims(claims, checks):
+    """Claims a later pass still stands on. A label alone is not enough."""
+    trusted = []
+    for item in claims:
+        if item.status != "observed" or item.limitation in _UNTRUSTED_LIMITATIONS:
+            continue
+        latest = _latest_check(checks, "claim", item.claim_id)
+        if latest is not None and latest.status == "pass":
+            trusted.append(item)
+    return trusted
+
+
+def _has_operating_role_statement(text: str) -> bool:
+    return any(mark in str(text or "") for mark in _ROLE_STATEMENT_MARKS)
+
+
+def _is_concentration_or_cost_substitute(text: str) -> bool:
+    """Customer/supplier share or a cost table is not the company's operating role."""
+    body = str(text or "")
+    if _has_operating_role_statement(body):
+        return False
+    return any(mark in body for mark in (*_CONCENTRATION_MARKS, *_COST_ONLY_MARKS))
+
+
+def _claim_establishes_operating_role(claim) -> bool:
+    text = str(getattr(claim, "answer", "") or "")
+    if _is_concentration_or_cost_substitute(text):
+        return False
+    if getattr(claim, "dimension", "") in {"supply_chain_role", "upstream_downstream"}:
+        return True
+    return _has_operating_role_statement(text)
+
+
+def _operating_role_established(claims, checks) -> bool:
+    return any(
+        _claim_establishes_operating_role(claim)
+        for claim in _verified_claims(claims, checks)
+    )
+
+
+def _amount_in_yuan(amount: str, unit: str) -> float | None:
+    try:
+        value = float(str(amount or "").replace(",", ""))
+    except ValueError:
+        return None
+    scale = _UNIT_TO_YUAN.get(unit or "元")
+    if scale is None:
+        return None
+    return value * scale
+
+
+def _amounts_equivalent(left: str, left_unit: str, right: str, right_unit: str) -> bool:
+    """万元/亿元/元 舍入差别，在主体期间一致时视为同一总额。"""
+    first = _amount_in_yuan(left, left_unit or "元")
+    second = _amount_in_yuan(right, right_unit or "元")
+    if first is None or second is None:
+        return False
+    coarse = max(
+        _UNIT_TO_YUAN.get(left_unit or "元", 1.0),
+        _UNIT_TO_YUAN.get(right_unit or "元", 1.0),
+    )
+    return abs(first - second) <= max(1.0, 0.01 * coarse)
+
+
+def _period_revenue_verified(claims, checks) -> bool:
+    if any(
+        check.target_type == "condition"
+        and "period-operating-revenue" in str(check.target_id or "")
+        and check.status == "pass"
+        for check in checks
+    ):
+        return True
+    return any(
+        claim.dimension == "revenue_model"
+        and "营业收入" in str(claim.answer or "")
+        and re.search(r"\d", str(claim.answer or ""))
+        for claim in _verified_claims(claims, checks)
+    )
+
+
 def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
     """Three views and covered major conditions decide completeness."""
     def latest_check(target_type: str, target_id: str):
-        found_check = None
-        for check in checks:
-            if check.target_type == target_type and check.target_id == target_id:
-                found_check = check
-        return found_check
+        return _latest_check(checks, target_type, target_id)
 
-    verified_claims = set()
-    for item in claims:
-        if item.status != "observed" or item.limitation in {
-            "pending_verification",
-            "claim_or_dependency_not_verified",
-            "evidence_not_located",
-            "subject_scope_omitted",
-            "retracted_pending_correction",
-        }:
-            continue
-        latest = latest_check("claim", item.claim_id)
-        if latest is not None and latest.status == "pass":
-            verified_claims.add(item.claim_id)
+    verified_claims = {item.claim_id for item in _verified_claims(claims, checks)}
     observed = {
         item.dimension for item in claims if item.claim_id in verified_claims
     }
@@ -137,7 +283,7 @@ def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
     for dimension in ("principal_business", "products_services", "revenue_model"):
         if dimension not in observed:
             found.append(f"core_dimension_missing:{dimension}")
-    if not observed & {"supply_chain_role", "upstream_downstream"}:
+    if not _operating_role_established(claims, checks):
         found.append("core_dimension_missing:operating_role")
     claims_by_id = {item.claim_id: item for item in claims}
     accepted_records = {item.record_id for item in records}
@@ -352,6 +498,25 @@ def _current_gaps(accumulated, claims, conditions, checks, records=()) -> list[s
                 "read_but_missed:",
             )
         ) and gap not in live:
+            if gap == "read_but_missed:period-operating-revenue" and _period_revenue_verified(
+                claims, checks
+            ):
+                continue
+            if gap.startswith("evidence_not_located:"):
+                target = gap.split(":", 1)[1]
+                if any(
+                    item.claim_id == target
+                    or target.endswith(":" + item.claim_id)
+                    or item.claim_id.endswith(target.rsplit(":", 1)[-1])
+                    for item in _verified_claims(claims, checks)
+                ):
+                    continue
+                if _period_revenue_verified(claims, checks) and "period-operating-revenue" in target:
+                    continue
+            if gap.startswith("verify_unit_not_admitted:"):
+                target = gap.split(":", 1)[1]
+                if any(item.claim_id == target for item in _verified_claims(claims, checks)):
+                    continue
             live.append(gap)
     for gap in dynamic:
         if gap not in live:
@@ -386,15 +551,6 @@ _CORE_CLOSEOUT_DIMENSIONS = {
     "upstream_downstream",
     "output_exposure",
 }
-_UNTRUSTED_LIMITATIONS = {
-    "pending_verification",
-    "claim_or_dependency_not_verified",
-    "evidence_not_located",
-    "subject_scope_omitted",
-    "retracted_pending_correction",
-    "not_verified",
-    "pending",
-}
 
 
 def _core_closeout_ready(claims, conditions, checks, records=()) -> bool:
@@ -422,7 +578,7 @@ def _core_closeout_ready(claims, conditions, checks, records=()) -> bool:
         "input_exposure",
     } <= dimensions:
         return False
-    if not dimensions & {"supply_chain_role", "upstream_downstream"}:
+    if not _operating_role_established(claims, checks):
         return False
     for gap in _completeness_gaps(claims, conditions, checks, records):
         if not gap.startswith("major_condition_not_verified:"):
@@ -595,14 +751,21 @@ def chapter_candidate_pages(pages, limit: int = 16) -> list[int]:
     for title, printed in toc_entries:
         if not _is_business_title(title):
             continue
-        located = next(
-            (int(source["page"]) for source in readable if _page_has_title(source, title)),
-            None,
-        )
-        if located is None and printed is not None:
+        located = None
+        if printed is not None:
             located = printed_map.get(int(printed))
             if located is None and int(printed) in available:
                 located = int(printed)
+        if located is None:
+            located = next(
+                (
+                    int(source["page"])
+                    for source in readable
+                    if not _looks_like_toc(str(source.get("text") or ""))
+                    and _page_has_title(source, title)
+                ),
+                None,
+            )
         if located is not None:
             add(located)
     seen_heading: set[str] = set()
@@ -627,6 +790,46 @@ def chapter_candidate_pages(pages, limit: int = 16) -> list[int]:
     if not chosen and readable:
         add(int(readable[0]["page"]))
     return chosen[: max(1, int(limit))]
+
+
+def _directed_operating_role_pages(sources, by_page, limit: int = 3) -> list[int]:
+    """Unread pages in the TOC business section that can answer the operating role.
+
+    A TOC hit is the section start, not every later table. Walk a short window
+    forward and keep pages that actually state production, processing, sales or
+    the chain role. Already-read cost or concentration pages are not substitutes.
+    """
+    by_id = {int(page["page"]): page for page in sources}
+    starts = []
+    for page_no in chapter_candidate_pages(sources):
+        source = by_id.get(int(page_no))
+        if source is None:
+            continue
+        text = str(source.get("text") or "")
+        if by_page.get(int(page_no), {}).get("status") != "read" or any(
+            mark in text[:1200]
+            for mark in ("管理层讨论", "经营情况", "经营模式", "核心竞争力")
+        ):
+            starts.append(int(page_no))
+    chosen: list[int] = []
+    for start in starts:
+        for page_no in range(start, start + 8):
+            if page_no in chosen or page_no not in by_id:
+                continue
+            if by_page.get(page_no, {}).get("status") == "read":
+                continue
+            text = str(by_id[page_no].get("text") or "")
+            preview = " ".join(
+                [*_heading_lines(text, limit=4), " ".join(text.split())[:400]]
+            )
+            if _has_operating_role_statement(text) or any(
+                mark in preview
+                for mark in ("经营情况", "核心竞争力", "管理层讨论", "经营模式")
+            ):
+                chosen.append(page_no)
+            if len(chosen) >= limit:
+                return chosen
+    return chosen[:limit]
 
 
 def compact_source_conditions(
@@ -887,17 +1090,25 @@ def disclosed_core_revenue_facts(sources: Sequence[Mapping[str, Any]]) -> list[d
 def _answer_covers_revenue_fact(answers: str, fact: Mapping[str, Any]) -> bool:
     """A number in a quote or another object does not answer this fact."""
     amount = str(fact.get("amount") or "").replace(",", "")
-    display = _norm_source_text(str(fact.get("amount") or "") + str(fact.get("unit") or ""))
+    unit = str(fact.get("unit") or "")
+    display = _norm_source_text(str(fact.get("amount") or "") + unit)
     compact = _norm_source_text(answers)
-    if not amount or (amount not in compact and display not in compact):
-        return False
     labels = {
         "operating_revenue_total": ("营业收入", "营业总收入"),
         "net_interest_income": ("利息净收入",),
         "net_fee_income": ("手续费及佣金净收入", "手续费"),
         "other_net_income": ("其他净收入",),
     }
-    return any(label in answers for label in labels.get(str(fact.get("kind") or ""), ("营业收入",)))
+    if not any(label in answers for label in labels.get(str(fact.get("kind") or ""), ("营业收入",))):
+        return False
+    if amount and (amount in compact or display in compact):
+        return True
+    if not amount:
+        return False
+    for match in _ANSWER_AMOUNT.finditer(answers):
+        if _amounts_equivalent(amount, unit or "元", match.group(1), match.group(2) or "元"):
+            return True
+    return False
 
 
 def missed_core_revenue_facts(
@@ -915,25 +1126,53 @@ def missed_core_revenue_facts(
     return missed
 
 
-_RATE_STOP = frozenset(
-    {"增长", "增速", "增幅", "变动", "增加", "减少", "同比", "分别", "其中", "达到", "实现"}
-)
+def _metric_core(label: str) -> tuple[str, str]:
+    for suffix in _METRIC_SUFFIXES:
+        if label.endswith(suffix) and len(label) > len(suffix):
+            return label[: -len(suffix)], suffix
+    return label, ""
 
 
-def _metric_labels(text: str) -> list[str]:
-    """Nearby names for a printed rate. Fixed bank words are only hints."""
-    labels: list[str] = []
-    for match in re.finditer(
-        r"([\u4e00-\u9fff]{2,12})(?:增长|增速|增幅|变动)\s*\d{1,2}\.\d{2}\s*%",
-        text,
-    ):
-        label = match.group(1)
-        if label not in _RATE_STOP:
-            labels.append(label)
-    for hint in ("托管", "受托", "资产托管"):
-        if hint in text:
-            labels.append(hint)
-    return list(dict.fromkeys(label for label in labels if label))
+def _metric_rate_pairs(text: str) -> list[tuple[str, str]]:
+    """Named metric next to a printed rate. A bare word like 托管 is not a match."""
+    pairs: list[tuple[str, str]] = []
+    for match in re.finditer(r"(\d{1,2}\.\d{2})\s*%", str(text or "")):
+        window = re.split(r"[。；;]", str(text or "")[max(0, match.start() - 36) : match.start()])[-1]
+        prefix = re.sub(
+            r"(?:较上年末|较上年|同比)?(?:增长|增速|增幅|变动|增加)\s*$",
+            "",
+            window,
+        )
+        names = re.findall(r"[\u4e00-\u9fff]{2,12}", prefix)
+        label = next(
+            (
+                name
+                for name in reversed(names)
+                if name not in _METRIC_STOP and not name.startswith("较上")
+            ),
+            None,
+        )
+        if label is None:
+            continue
+        pairs.append((label, match.group(1)))
+    return pairs
+
+
+def _same_metric_label(left: str, right: str) -> bool:
+    if left == right:
+        return True
+    core_left, suffix_left = _metric_core(left)
+    core_right, suffix_right = _metric_core(right)
+    if suffix_left and suffix_right and suffix_left != suffix_right:
+        return False
+    if core_left == core_right:
+        return True
+    shorter, longer = (
+        (core_left, core_right)
+        if len(core_left) <= len(core_right)
+        else (core_right, core_left)
+    )
+    return len(shorter) >= 2 and shorter not in _METRIC_STOP and shorter in longer
 
 
 def related_conflict_pages(claim, sources: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
@@ -945,10 +1184,12 @@ def related_conflict_pages(claim, sources: Sequence[Mapping[str, Any]]) -> list[
     )
     cited = {int(evidence.page) for evidence in getattr(claim, "evidence", ()) or ()}
     body = answer + "\n" + quotes
-    rates = re.findall(r"(\d{1,2}\.\d{2})\s*%", body)
-    labels = _metric_labels(body)
-    if not rates or not labels:
+    claim_pairs = _metric_rate_pairs(body)
+    if not claim_pairs:
         return []
+    claimed: dict[str, set[str]] = {}
+    for label, rate in claim_pairs:
+        claimed.setdefault(label, set()).add(rate)
     extra = []
     seen: set[int] = set()
     for source in sources:
@@ -956,12 +1197,18 @@ def related_conflict_pages(claim, sources: Sequence[Mapping[str, Any]]) -> list[
         if page_no in cited or page_no in seen:
             continue
         text = str(source.get("text") or "")
-        if not any(label in text for label in labels):
+        conflict = False
+        for label, rate in _metric_rate_pairs(text):
+            for claim_label, rates in claimed.items():
+                if _same_metric_label(claim_label, label) and rate not in rates:
+                    conflict = True
+                    break
+            if conflict:
+                break
+        if not conflict:
             continue
-        other = set(re.findall(r"(\d{1,2}\.\d{2})\s*%", text))
-        if other and other != set(rates) and other & set(rates) != other:
-            extra.append({"page": page_no, "text": text, "readable": True})
-            seen.add(page_no)
+        extra.append({"page": page_no, "text": text, "readable": True})
+        seen.add(page_no)
     return extra
 
 
@@ -993,6 +1240,103 @@ def make_operating_revenue_question(report, facts: Sequence[Mapping[str, Any]]):
         evidence=tuple(evidence),
         major=True,
         statement_status="current",
+    )
+
+
+def make_operating_role_question(report, evidence) -> ReportSourceCondition:
+    """Ask what the company produces, processes, sells or serves, and its chain role."""
+    return ReportSourceCondition(
+        condition_id="core-question:operating-role",
+        dimension="supply_chain_role",
+        description=(
+            "根据所供原文说明本公司当前如何生产、加工、销售或提供服务，"
+            "以及有据的上下游角色。客户或供应商集中度、成本构成不能代替经营角色。"
+            "不要把计划目标写成已经实现的身份，也不要编造原文没有的客户。"
+        ),
+        evidence=tuple(evidence),
+        major=True,
+        statement_status="current",
+    )
+
+
+def _printed_amount_needles(amount: str, unit: str) -> list[str]:
+    yuan = _amount_in_yuan(amount, unit or "元")
+    if yuan is None:
+        return []
+    needles = []
+    for name, scale in _UNIT_TO_YUAN.items():
+        value = yuan / scale
+        if value < 0.01:
+            continue
+        rendered = f"{value:,.2f}"
+        compact = rendered.rstrip("0").rstrip(".")
+        needles.append(f"{rendered}{name}")
+        needles.append(f"{compact}{name}")
+        needles.append(f"{rendered} {name}")
+    digits = str(amount or "").replace(",", "")
+    if digits:
+        needles.append(digits)
+    return list(dict.fromkeys(needles))
+
+
+def _bind_equivalent_amount_evidence(evidence, report, pages):
+    """Locate the printed original when the model sent a converted amount."""
+    quote = str(getattr(getattr(evidence, "anchor", None), "bounded_quote", "") or "")
+    model_quote = str(getattr(getattr(evidence, "anchor", None), "model_quote", "") or "")
+    body = model_quote or quote
+    matches = list(_ANSWER_AMOUNT.finditer(body))
+    if not matches:
+        return None
+    found: list[tuple[int, str]] = []
+    seen: set[int] = set()
+    for page in pages:
+        if page.get("readable", True) is False:
+            continue
+        text = str(page.get("text") or "")
+        compact = text.replace(",", "").replace(" ", "")
+        hit = False
+        for match in matches:
+            for needle in _printed_amount_needles(match.group(1), match.group(2) or "元"):
+                if needle.replace(",", "").replace(" ", "") in compact or needle in text:
+                    hit = True
+                    break
+            if hit:
+                break
+        if not hit:
+            continue
+        page_no = int(page["page"])
+        if page_no in seen:
+            continue
+        seen.add(page_no)
+        snippet = next(
+            (
+                line.strip()
+                for line in text.splitlines()
+                if any(
+                    token in line
+                    for token in ("营业收入", "利息净收入", "手续费", "其他净收入")
+                )
+            ),
+            text[:180],
+        )
+        found.append((page_no, snippet[:180]))
+    preferred = int(getattr(evidence, "page", 0) or 0)
+    chosen = next((item for item in found if item[0] == preferred), None)
+    if chosen is None and len(found) == 1:
+        chosen = found[0]
+    if chosen is None:
+        return None
+    page_no, snippet = chosen
+    return evidence.model_copy(
+        update={
+            "page": page_no,
+            "anchor": evidence.anchor.model_copy(
+                update={
+                    "bounded_quote": snippet,
+                    "model_quote": None if snippet == body else body,
+                }
+            ),
+        }
     )
 
 
@@ -2440,6 +2784,10 @@ def interpret_direct_core(
                 for evidence in claim.evidence:
                     located = _bind_source_evidence(evidence, report, package)
                     if located is None:
+                        located = _bind_equivalent_amount_evidence(
+                            evidence, report, package
+                        )
+                    if located is None:
                         failed = True
                         break
                     bound.append(located)
@@ -3083,8 +3431,10 @@ def interpret_direct_core(
     chapter_required_pages: set[int] | None = None
     isolated_condition_ids: set[str] = set()
     reused_receipts = list(identity.get("accepted_source_receipts") or ())
-    if identity.get("chapter_select") and (
-        reused_receipts or identity.get("accepted_prior_draft")
+    if (
+        identity.get("chapter_select")
+        and (reused_receipts or identity.get("accepted_prior_draft"))
+        and not identity.get("compatible_continue")
     ):
         raise ValueError("chapter_select_refuses_saved_semantics")
     if reused_receipts:
@@ -3118,12 +3468,12 @@ def interpret_direct_core(
                 by_page[page_no]["status"] = "read"
                 by_page[page_no]["reused_source"] = True
         conditions_to_draft = []
+        pending_core: list[ReportViewClaim] = []
         prior = identity.get("accepted_prior_draft") or {}
         if prior:
             retract = set(identity.get("retract_claim_ids") or ())
             defer = set(identity.get("defer_claim_ids") or ())
             kept_answers: list[str] = []
-            pending_core: list[ReportViewClaim] = []
             for raw in prior.get("claims") or []:
                 claim = ReportViewClaim.model_validate_json(
                     json.dumps(raw, ensure_ascii=False)
@@ -3431,6 +3781,110 @@ def interpret_direct_core(
             chapter_required_pages = {
                 int(item["page"]) for item in coverage if item["status"] == "read"
             }
+        if identity.get("compatible_continue"):
+            read_sources = [
+                page
+                for page in sources
+                if by_page.get(int(page["page"]), {}).get("status") == "read"
+            ]
+            for index, claim in enumerate(list(claims)):
+                if claim.limitation != "evidence_not_located":
+                    continue
+                bound = []
+                failed = False
+                for evidence in claim.evidence:
+                    located = _bind_source_evidence(evidence, report, read_sources)
+                    if located is None:
+                        located = _bind_equivalent_amount_evidence(
+                            evidence, report, read_sources
+                        )
+                    if located is None:
+                        failed = True
+                        break
+                    bound.append(located)
+                if failed or not bound:
+                    continue
+                rebound_claim = claim.model_copy(
+                    update={
+                        "status": "observed",
+                        "limitation": None,
+                        "evidence": tuple(bound),
+                    }
+                )
+                claims[index] = rebound_claim
+                if rebound_claim.dimension in _CORE_CLOSEOUT_DIMENSIONS:
+                    pending_core.append(rebound_claim)
+            if not _operating_role_established(claims, checks):
+                unread = _directed_operating_role_pages(sources, by_page, limit=3)
+                if unread:
+                    if chapter_required_pages is None:
+                        chapter_required_pages = {
+                            int(item["page"])
+                            for item in coverage
+                            if item["status"] == "read"
+                        }
+                    inventory_pages(unread)
+                    chapter_required_pages.update(unread)
+                role_pages = [
+                    page
+                    for page in sources
+                    if int(page["page"]) in set(unread)
+                    and _has_operating_role_statement(str(page.get("text") or ""))
+                ] or [
+                    page
+                    for page in sources
+                    if int(page["page"]) in set(unread)
+                ] or [
+                    page
+                    for page in read_sources
+                    if _has_operating_role_statement(str(page.get("text") or ""))
+                    and not _is_concentration_or_cost_substitute(
+                        str(page.get("text") or "")
+                    )
+                ]
+                role_evidence = []
+                for page in role_pages[:6]:
+                    snippet = " ".join(str(page.get("text") or "").split())[:180]
+                    if not snippet:
+                        continue
+                    role_evidence.append(
+                        Evidence(
+                            evidence_id=f"operating-role-{page['page']}",
+                            report=report,
+                            page=int(page["page"]),
+                            section_title="经营角色",
+                            anchor=TextAnchor(bounded_quote=snippet),
+                        )
+                    )
+                if not role_evidence:
+                    for claim in claims:
+                        if claim.dimension in {
+                            "principal_business",
+                            "products_services",
+                            "revenue_model",
+                        } and claim.evidence:
+                            role_evidence.extend(claim.evidence[:2])
+                existing_role = next(
+                    (
+                        item
+                        for item in conditions
+                        if item.condition_id.startswith("core-question:operating-role")
+                    ),
+                    None,
+                )
+                if role_evidence:
+                    question = existing_role or make_operating_role_question(
+                        report, role_evidence[:8]
+                    )
+                    if existing_role is None:
+                        conditions.append(question)
+                    elif role_pages:
+                        question = existing_role.model_copy(
+                            update={"evidence": tuple(role_evidence[:8])}
+                        )
+                        conditions[conditions.index(existing_role)] = question
+                    if question not in conditions_to_draft:
+                        conditions_to_draft.append(question)
         def shown_claim_ids(condition) -> set[str]:
             """Claims in the latest verification that already judged this condition."""
             tail = condition.condition_id.split(":")[-1]
@@ -3479,6 +3933,15 @@ def interpret_direct_core(
                     "retracted_pending_correction",
                     "subject_scope_omitted",
                 }
+                and claim.claim_id not in set(identity.get("isolated_claim_ids") or ())
+            ]
+
+        def pending_for(condition) -> list:
+            return [
+                claim
+                for claim in recheck_claims_for(condition, claims)
+                if claim.status == "observed"
+                and claim.limitation == "pending_verification"
                 and claim.claim_id not in set(identity.get("isolated_claim_ids") or ())
             ]
 
@@ -3532,7 +3995,12 @@ def interpret_direct_core(
                     and cover.claim_id not in set(identity.get("isolated_claim_ids") or ())
                 ):
                     continue
+            pending = pending_for(condition)
             referenced = trusted_for(condition)
+            if pending:
+                merged = {claim.claim_id: claim for claim in (*pending, *referenced)}
+                recheck_pairs.append((condition, list(merged.values())))
+                continue
             if latest is not None and latest.status in {"unclear", "block"}:
                 fresh = [
                     claim
@@ -3557,8 +4025,16 @@ def interpret_direct_core(
                 if item.condition_id != missed_question.condition_id
             ]
             core_answers.append(missed_question)
-        if reused_receipts:
-            statement_pages = operating_revenue_statement_pages(sources)
+        if reused_receipts and not _period_revenue_verified(claims, checks):
+            read_for_missed = [
+                page
+                for page in sources
+                if by_page.get(int(page["page"]), {}).get("status") == "read"
+            ]
+            if not missed_core_revenue_facts(read_for_missed, conditions, claims):
+                statement_pages = []
+            else:
+                statement_pages = operating_revenue_statement_pages(sources)
             evidence = []
             for page_no in statement_pages:
                 source = next(
@@ -3586,7 +4062,7 @@ def interpret_direct_core(
                         anchor=TextAnchor(bounded_quote=quote[:180]),
                     )
                 )
-            if not evidence:
+            if not evidence and statement_pages:
                 for claim in claims:
                     if claim.dimension == "revenue_model" and claim.status == "observed" and claim.evidence:
                         evidence.append(claim.evidence[0])
