@@ -384,12 +384,15 @@ equity 有值时 100% 命中 `parent_attributable_equity`；net_income 95.5% 命
 
 - `eps = net_income / shares_outstanding`；`bps = equity / shares_outstanding`；
   `ocfps = operating_cf / shares_outstanding`（分母为 0 或缺失时整体 null）；
-- **分母解析策略（2026-10-31 实测定案）**：宽表股本 0% 填充，分母回退长表
-  `share_capital_amount`（~90% 正确，少数来源把权益科目错映射进该 canonical
-  名，如 600398.SH 为 0.31×真值）；仅当窗口内 valuation 隐含总股本
-  （market_cap/close，2024-04-30 起）与 fact 偏差 ≥50%（灾难级）时替换，
-  其余一律保留 fact——valuation 序列自身对一批股票偏低 ~18% 且缺 920xxx
-  迁移代码，不能作普通基准。详见 openspec change 任务记录 §10；
+- **分母解析策略（v1.2 过渡机制，将被交叉验证机制取代——见 change
+  `cross-validate-share-capital-denominators`）**：宽表股本 0% 填充，分母回退
+  长表 `share_capital_amount`。该 canonical 混有两种来源语义：THS `equity`
+  （股本指标，67,037 行，99.35% 数值即真股数，~405 行为源侧坏值，如
+  600398.SH/600097.SH）与 `实收资本(或股本)`（元金额，面值=1 元时数值恰等
+  股数，面值≠1 的 ~98 行不可直接当股数）。过渡机制：仅当窗口内 valuation
+  隐含股本（market_cap/close，2024-04-30 起）与 fact 偏差 ≥50% 时替换，
+  其余保留 fact。注：此前"valuation 系统性偏低 18%"的说法系测量锚口径
+  伪影（AK 每股净资产扣除永续债等），不作为事实引用；
 - `rev_yoy / np_yoy`（%）：本期累计 vs 上年同期累计，边界见 §3.4；
 - `ttm_revenue / ttm_net_income`：本期累计 + 上年年报 − 上年同期累计；
 - **单位契约（v1.2 审计补注）**：`roe / gross_margin / operating_margin /
