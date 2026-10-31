@@ -949,7 +949,7 @@ class FinancialPitPanelStore:
             ]
         for period in periods:
             deadline = statutory_deadline(period)
-            if deadline and deadline <= today:
+            if deadline and deadline < today:
                 return period
         return None
 
@@ -1193,17 +1193,9 @@ class FinancialPitPanelStore:
                 item["expected_count"] = None
                 item["gap_count"] = None
                 item["reverse_discrepancy_count"] = None
-        today = _today_iso()
-        latest_complete = None
-        for item in sorted(
-            (x for x in summary if x["is_bulk_period"]),
-            key=lambda x: x["report_period"],
-            reverse=True,
-        ):
-            deadline = statutory_deadline(item["report_period"])
-            if deadline and deadline <= today:
-                latest_complete = item["report_period"]
-                break
+        # Latest complete period must reflect the whole panel, not just the
+        # (possibly single-period) filtered summary.
+        latest_complete = self.latest_complete_period()
         return {
             "latest_complete_period": _to_yyyymmdd(latest_complete),
             "universe_note": self._universe_note(latest_complete),
@@ -1358,7 +1350,7 @@ class FinancialPitPanelStore:
             "is_bulk_period": is_bulk,
             "statutory_deadline": _to_yyyymmdd(deadline),
             "is_complete": (
-                bool(deadline and deadline <= today) if is_bulk else None
+                bool(deadline and deadline < today) if is_bulk else None
             ),
         }
 
