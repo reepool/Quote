@@ -34,6 +34,19 @@ The system SHALL precompute per-share, year-over-year, and TTM derived indicator
 - **WHEN** net income or the reported basic EPS is near zero
 - **THEN** the EPS-implied anchor SHALL be excluded and the exclusion reason recorded in `share_candidates`
 
+#### Scenario: Unit-mismatch of the paid-in-capital validator does not flip consensus
+- **WHEN** all available share-count anchors agree with each other but the paid-in-capital fact (a CNY amount) disagrees with them
+- **THEN** the row SHALL remain `share_validation=consensus` with a `unit_mismatch` note (likely non-unit par value) recorded in `share_candidates`
+- **AND** the paid-in-capital disagreement SHALL escalate to `discrepancy` only when fewer than two share-count anchors are available or when it corroborates a dissenting share-count anchor
+
+#### Scenario: Non-positive share values are excluded from anchor assembly
+- **WHEN** an anchor's fact value is zero or negative
+- **THEN** that anchor SHALL be treated as absent with the reason recorded, and SHALL never become the adopted denominator
+
+#### Scenario: Incremental refresh applies the same anchor assembly
+- **WHEN** a panel row is refreshed incrementally after a sync upsert
+- **THEN** its denominator SHALL be resolved by the same cross-validation rules as a full rebuild
+
 #### Scenario: Multiple facts of one anchor resolve deterministically
 - **WHEN** one anchor type carries multiple facts for the same instrument and period (e.g., express and final filings)
 - **THEN** the latest-updated fact of that anchor SHALL be used and stale facts SHALL NOT create phantom disagreements

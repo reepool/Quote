@@ -52,15 +52,29 @@
 par-validated" 的实现）。仅当全库再无任何股数锚时才可作为最后取值，且
 `share_basis` 必须标注 `paid_in_capital_cny_par_assumption`。
 
+**实收资本分歧的分层判定（纸面推演修正）**：面值≠1 的公司（如紫金矿业
+0.1 元）实收资本必然与真股数偏离 ~90%——若"任一出带即 discrepancy"，
+股数锚全体一致的公司会被这个已知异单位校验者永久误标。因此其分歧
+**不直接翻状态**，规则分层：
+- 状态判定的主体是**股数锚之间**（shares_outstanding/THS/valuation/EPS）
+  的分歧；
+- 实收资本分歧时：①股数锚 ≥2 个且相互一致 → 记 `unit_mismatch`
+  （疑面值≠1，可解释差异）注记于 `share_candidates`，状态保持 consensus；
+  ②可用股数锚 <2 个（它成为实质校验者）→ 其分歧计入，状态转 discrepancy；
+  ③它与某个出带的股数锚同向（比值接近）→ 强化该分歧，计入。
+- 一致时：附 `corroborated_by_paid_in_capital` 注记。
+
 **规则**：
-- 组装可用锚集合（缺失记 absent 并注明原因，不参与）；同一锚存在多条
-  fact（快报+正式等多源文件）时取 `updated_at` 最新一条（确定性）；
+- 组装可用锚集合：缺失记 absent 并注明原因；**锚值必须 > 0**（0/负值
+  fact 视同 absent，防毒化被采纳值）；同一锚存在多条 fact（快报+正式等
+  多源文件）时取 `updated_at` 最新一条（确定性）；
 - 取值优先序（全部为真股数口径）：`shares_outstanding` > THS >
   valuation（D0-2 通过的来源）> EPS 隐含 > 实收资本（末位兜底，如上）；
-- 一致性判定以**被采纳值 V** 为基准：其余每个可用锚在其带宽内
-  （股数锚 ±5%；EPS 加权锚 ±15%，实测集群 0.98–1.02 支持宽容差）即为
-  一致——全部一致 → `consensus`；任一出带 → `discrepancy`，仍取 V，
-  `share_candidates` 记录各锚数值+口径+absent 原因；
+- 一致性判定以**被采纳值 V** 为基准：其余每个**股数锚**在其带宽内
+  （期末股数锚 ±5%；EPS 加权锚 ±15%，实测集群 0.98–1.02 支持宽容差）
+  即为一致——股数锚全部一致且实收资本未触发分层②③ → `consensus`；
+  任一股数锚出带（或实收资本触发②③）→ `discrepancy`，仍取 V，
+  `share_candidates` 记录各锚数值+口径+absent/unit_mismatch 原因；
 - EPS 锚跳过条件（双条件）：|净利| 过小 **或** |basic_eps| 过小（任一
   除数失稳即跳过，记 absent 原因）；
 - 仅一锚可用 → `single_source`（如实标注）；零锚 → 分母 null

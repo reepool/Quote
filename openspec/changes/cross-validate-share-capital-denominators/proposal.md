@@ -28,10 +28,13 @@
   5. `实收资本(或股本)` fact（**元金额，仅作校验锚**：一致投同意票、分歧
      永不取值——隐式覆盖非 1 元面值，无需显式面值表；仅全库无股数锚时
      末位兜底并标注面值假设）。
-- **共识即通过、分歧即备注**：以被采纳值为基准，其余锚在带宽内
-  （股数锚 ±5%、EPS 加权锚 ±15%）即 consensus；任一出带 → 仍取优先序值
-  但输出 `share_validation=discrepancy` + `share_candidates`（各锚数值与
-  口径与 absent 原因），消费方可按标记过滤或排查；
+- **共识即通过、分歧即备注（分层）**：以被采纳值为基准，其余**股数锚**
+  在带宽内（期末锚 ±5%、EPS 加权锚 ±15%）且实收资本未触发升级 →
+  consensus；股数锚任一出带（或实收资本在股数锚<2 时实质校验分歧/
+  与出带锚同向）→ 仍取优先序值但输出 `share_validation=discrepancy` +
+  `share_candidates`（各锚数值/口径/absent/unit_mismatch 原因），消费方可
+  按标记过滤或排查。实收资本单位错位在股数锚齐且一致时仅记
+  `unit_mismatch` 注记，不误标状态（面值≠1 公司保护）；
 - EPS 锚双条件跳过（净利或 basic_eps 任一近零即失稳）；
 - 映射层启用单位三列：THS equity 声明 `source_unit=shares`；实收资本声明
   `source_unit=CNY` 且不标 `approved_for_core`；`MAPPING_VERSION` v5→v6
