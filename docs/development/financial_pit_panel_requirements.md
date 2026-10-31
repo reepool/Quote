@@ -1,6 +1,7 @@
 # 全市场财务横截面物化 PIT 面板需求（financial_pit_panel）
 
-> 版本：v1.0（2026-10-31，基于当日对 `data/financials.db` 的实测）
+> 版本：v1.1（2026-10-31，基于当日对 `data/financials.db` 的实测；
+> v1.1 增补 §3.3 实质变更约束（更正防前视）与 §6.3 延期覆盖率验证）
 >
 > 本文档在 quantwin 初稿《stock_server 财务数据批量接口需求》基础上重构而成，
 > 是后续开发的唯一需求依据。与初稿的差异及理由见 §2.3。
@@ -47,6 +48,9 @@ quantwin 是全 A 股月度调仓多因子选股程序，每期调仓需要对�
 | 退市股覆盖 | 抽查乐视 300104、康得新 002450 等 5 只已退市股均为 0 条；5,595 只 ≈ 当前在市 | 面板存在**存活偏差**，2023Q4 以来退市的股票缺失，需在研究结果中声明 |
 | 公告日回退 | 2026Q2 之前各期 `publish_date` 仅 1~2% 非空 | 早期时点的 as-of 精度受 §3.3 回退策略约束 |
 | vintage 体系 | `financial_filing_versions` 等表 0 行，rollout 关闭 | 本需求**不启用、不回填** vintage（见 §2.3） |
+
+基于本面板的回测结论应表述为"**当前在市股票集合内的因子排序证据**"，不得表述为
+策略收益预期——存活偏差与窗口长度（12 期）均不支持后者。
 
 ### 2.3 与 quantwin 初稿的关键差异
 
@@ -98,6 +102,20 @@ quantwin 是全 A 股月度调仓多因子选股程序，每期调仓需要对�
 2. 宽限参数初值 90 天，实现阶段须用事件表实测分布校准后固化到配置；
 3. 覆盖端点（§5.3）暴露各级 quality 的行数分布，quantwin 可选择只消费 `exact*`。
 
+**实质变更约束（更正防前视，v1.1 新增）**：弱 PIT 取库内最新数值，若不加约束，
+更正公告发布**之前**的历史时点会提前用到更正后的数值——财报更正多数是坏消息
+（虚增修正、审计调整），回测等于提前避开这些问题公司，属**业绩高估方向**的偏差。
+规则：
+
+- 面板行 `available_at = max(三级推导结果, 最后一次实质数值变更日)`；
+- 实质变更日取 `data_change_log` 中该 `(instrument, report_period)` 相关记录里
+  `old_hash ≠ new_hash` 的最大 `changed_at`——hash 未变的重解析、字段映射重跑
+  等**不构成**实质变更，不推进 available_at；
+- 变更日晚于公告推导值时，面板行标记 `revised_after_publish = true` 并暴露
+  `last_value_change_at`，coverage 端点（§5.3）统计此类行数；
+- 效果：更正发生前，该期数据对 as-of 查询**整体不可见**（截面回退上一期），
+  而非提前使用更正值。代价是极少数股票在更正窗口附近截面变旧，方向保守。
+
 ### 3.4 派生指标的可计算边界（数据边界，非错误）
 
 YoY 需要 T-1 年同期、TTM 需要上年年报 + 上年同期累计。按现有覆盖推得：
@@ -138,6 +156,8 @@ quick_ratio, asset_liability_ratio, revenue_per_share, book_value_per_share
 eps, bps, ocfps, rev_yoy, np_yoy, ttm_revenue, ttm_net_income
 -- 血缘与版本
 source_table_updated_at TEXT         -- 源行 updated_at，追溯调整探测
+last_value_change_at TEXT            -- 最后一次实质数值变更日（data_change_log，old_hash≠new_hash）
+revised_after_publish INTEGER        -- 1 = 变更日晚于公告推导值，available_at 被推后
 panel_version TEXT NOT NULL          -- 构建版本
 built_at TEXT NOT NULL
 PRIMARY KEY (instrument_id, report_period)
@@ -149,7 +169,8 @@ PRIMARY KEY (instrument_id, report_period)
 ### 4.2 构建与维护
 
 - **一次性构建**：`financial_facts` JOIN `financial_indicator_snapshots`（按
-  instrument_id + report_period），叠加 §3.3 推导链与 §3.4 派生计算，全量写入。
+  instrument_id + report_period），叠加 §3.3 推导链（含实质变更约束）与
+  §3.4 派生计算，全量写入。
 - **增量维护**：挂钩现有财务同步链路（`research/financial_statements_sync.py`
   落库成功后）刷新受影响 `(instrument, period)` 行；`available_at` 推导依赖的
   disclosure 事件更新时同样触发。调度复用现有 scheduler 任务位。
@@ -225,6 +246,8 @@ GET /api/v1/research/financials/pit/cross-section
       "rev_yoy": 11.2, "np_yoy": 13.8,
       "ttm_revenue": null,
       "source_table_updated_at": "2026-08-29T...",
+      "last_value_change_at": null,
+      "revised_after_publish": false,
       "panel_version": "v1",
       "built_at": "2026-10-31T..."
     }
@@ -252,7 +275,8 @@ GET /api/v1/research/financials/pit/coverage
 ```
 
 返回：该期应有/实际股票数、缺失数、`available_at_quality` 分布（exact /
-exact_event / statutory_deadline / delayed_estimate 各多少行）、派生字段非空率、
+exact_event / statutory_deadline / delayed_estimate 各多少行）、
+`revised_after_publish` 行数（更正后移监控）、派生字段非空率、
 `source_table_updated_at` 近 N 天变化行数（追溯调整监控）。
 
 ### 5.4 增量变更流
@@ -291,7 +315,11 @@ GET /api/v1/research/financials/pit/changes
    对公开数值核验后在字段注释与本文档固化结论；
 2. `publish_date` 与交易所披露日的一致性——已抽查分布合理，再抽 10 只对巨潮
    公告时间核验；
-3. 延期股宽限参数——用 `financial_disclosure_event_state` 实测分布校准 §3.3。
+3. 延期股宽限参数——用 `financial_disclosure_event_state` 实测分布校准 §3.3；
+4. 延期股事件表覆盖率——在 `publish_date` 齐全的 2026Q2/Q3 上，统计
+   `publish_date > 法定截止日` 的公司中 `financial_disclosure_event_state` 的
+   命中率（库内可直接测得），作为 §3.3 延期特则有效性的直接证据；命中率不足时
+   须先调整宽限参数或回退策略，方可验收 M2。
 
 ### 6.4 缺失值规则（强制）
 
@@ -326,7 +354,13 @@ GET /api/v1/research/financials/pit/changes
 7. **幂等**：同版本重复构建，行数与内容 hash 不变；
 8. **增量挂钩**：模拟一次 `financial_facts` upsert（updated_at 变化），受影响面板行
    自动刷新且 changes 流可见；
-9. **性能**：§7 各项实测达标。
+9. **更正防前视**：构造一条 `old_hash ≠ new_hash` 且 `changed_at` 晚于公告推导值的
+   变更记录后，对应面板行 `available_at` 推进至变更日、`revised_after_publish=1`，
+   该日之前的 as-of 查询中该股票回退至更早报告期；hash 未变的更新不推进
+   available_at；
+10. **延期覆盖率实测**：§6.3-4 的命中率有实测数字并记入开发记录，达标后方可
+    验收 M2；
+11. **性能**：§7 各项实测达标。
 
 ---
 
@@ -349,7 +383,8 @@ GET /api/v1/research/financials/pit/changes
 
 - **M1 最小闭环**：面板一次性构建（先仅 `exact` 质量的 2026Q2/Q3 子集）+
   cross-section 端点 + as-of 语义单元测试；
-- **M2 完整回溯**：available_at 三级推导链 + 2023Q4 起全量构建 + coverage 端点；
+- **M2 完整回溯**：available_at 推导链（三级来源 + 实质变更约束 + 延期特则）
+  + 2026Q2/Q3 延期覆盖率实测 + 2023Q4 起全量构建 + coverage 端点；
 - **M3 派生与增量**：每股/YoY/TTM 派生（含边界）+ changes 端点 + 同步管线增量挂钩；
 - **M4 测试与回归**：§8 全部验收项 + 金融语义测试（用小型 fixture 数据，不依赖
   实时网络）；
@@ -360,7 +395,8 @@ GET /api/v1/research/financials/pit/changes
 | 风险 | 说明 | 缓解 |
 |---|---|---|
 | 早期时点 as-of 精度 | 2026Q2 前各期靠法定截止日回退，截面新鲜度系统性滞后最多一个披露窗口 | quality 标记 + coverage 暴露分布，客户端可选只消费 exact |
-| 延期股前视 | 回退截止日早于延期股实际披露 | §3.3 延期特则 + 宽限参数实测校准 |
+| 更正前视（数值维度） | 弱 PIT 提前使用更正后数值，高估业绩方向 | 已由 §3.3 实质变更约束消除；残留仅 hash 粒度过细导致的过度保守，实现阶段评估字段级比较 |
+| 延期股前视 | 回退截止日早于延期股实际披露 | §3.3 延期特则 + §6.3-4 覆盖率实测（2026Q2/Q3 库内直接可测）+ 宽限参数校准 |
 | 口径不确定 | net_income 归母/合并、publish_date 一致性 | §6.3 实现前样例核验，结论固化 |
 | 当期披露未完 | 2026Q3 截至 2026-10-31（法定截止日）仍在入库（4,938/预期 ~5,500） | 面板随增量刷新，coverage 反映实际 |
 | BSE 覆盖较薄 | 354 只 | 如实暴露，不特殊处理 |
