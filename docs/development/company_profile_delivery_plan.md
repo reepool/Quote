@@ -1,8 +1,8 @@
 # 公司画像交付路径与开发任务卡
 
-> 类型：requirements / execution plan；版本：3；更新：2026-10-30。
+> 类型：requirements / execution plan；版本：3；更新：2026-10-31。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[§16.6章节交付接续](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#166-对齐章节入口直接兑现原授权当前执行)，依据验收§7.67/A审核§147。§146单一记账及替换传输入口增量成立，新增真实模型调用0；旧D2全文绑定/边读边成稿断言不能代表当前章节路线，不取消已选必要未读。B核当前章节实际入口，必要局部修正后直接冻结先造纸后银行；原§16两家授权未用、不加额、不再等新方案审批。旧入口/余额不用，质量及停止不变，其余十家/S2/生产未授权，S1仍0/12。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[§17章节核心业务验收](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#17-章节核心业务验收保已有答案修共同阻塞后一次交两家)，依据验收§7.68/A审核§149。S16两家已交真实非空三视图，原入口结束；造纸缺实质角色，银行核验被无关冲突上下文撑大，均未可靠收束。接受已有有据总额，不为指定利润表返工。A显式在原累计未用资源中重分配115000账本/1300秒/20物理/3恢复，两家各从本家S16兼容接续，先造纸成立再银行，不重读全年报、不加原总额；修正/实载证明/真实交付合在一窗，不逐项准备送审。质量及停止不变，原S1仍0/12，其余十家/S1重测/S2/生产未授权。
 
 ## 1. 开发者必须先理解的纠偏
 
@@ -91,6 +91,8 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 2026-10-25审核§113已完成四类核心与实际答案审查。浦发补充源冲突须离线撤句，安全稿query/export/新实例一致且独立正确正文/真实检查不丢后，4/4及A2进入S1的条件放行生效；B按下一卡核确定差异、登记证据后自主继续，不另等A返审。常规资源、首次自动表现及未见泛化未通过。
 
 ### B3 / S1：12家新链回归（A2通过后）
+
+- **2026-10-31审核§149（当前）：** §16两家真实入口结束，三视图均非空但可靠核心未过。当前只执行[§17](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#17-章节核心业务验收保已有答案修共同阻塞后一次交两家)/验收§7.68：保S16正确正文/真实检查，纠正集中度代角色与跨指标冲突误扩；已读收入缺项补答核验、必要定向补读，一次交两家公司。明确允许本家S16兼容重验及原总额内子额重分配，不是新公司首发、旧卡自动后继或常规效率通过。清理前置/收尾、v3自主P0—P3/至多两次共性修正/冻结运行及停止写在卡内，不逐函数返A；失败作路线取舍，不自动加尾项窗。以下历史安排不再授权外呼。
 
 - **2026-10-30审核§141：** 当前唯一§15/验收§7.64。§13—§14真实入口已结束，银行新增12条pending但checks=0，核心交付仍0/2。下一窗口沿原owner一次修通实际目标/余额下的章节核心链，真实请求/预算0，不恢复银行/造纸或借余额；完整工程交付后再裁决是否有新真实方案。以下均为历史活动安排，不再授权外呼。
 
