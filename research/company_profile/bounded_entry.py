@@ -23,6 +23,7 @@ G2_AUTHORIZATION = "company_profile_g2.2026-10-20"
 S16_AUTHORIZATION = "company_profile_s16_core.2026-10-30"
 S17_AUTHORIZATION = "company_profile_s17_continue.2026-10-31"
 S19_AUTHORIZATION = "company_profile_s19_core.2026-10-31"
+S20_AUTHORIZATION = "company_profile_s20_draft.2026-10-31"
 
 
 def company_window_limits(binding: dict, state: dict | None) -> tuple[int, int]:
@@ -703,7 +704,7 @@ def validate_binding(
             and int(binding.get("max_physical_requests") or 0) <= 20
             and int(binding.get("max_recoveries") or 0) <= 3
         )
-    elif auth == S19_AUTHORIZATION:
+    elif auth in {S19_AUTHORIZATION, S20_AUTHORIZATION}:
         allowed = (
             0 < elapsed <= 900
             and int(binding.get("max_tokens") or 0) <= 120_000
@@ -824,6 +825,7 @@ def validate_binding(
                 "s1-600103-s17w2",
                 "s1-600000-s17w2",
                 "s1-600103-s19",
+                "s1-600103-s20",
             }
             or not authorization.get("approval_reference")
         ):
@@ -1160,6 +1162,18 @@ def _worker(
             from .resource_probe import core_package_reply
 
             result = core_package_reply(request)
+        elif protocol == "group_recover_v1":
+            from .resource_probe import core_package_reply
+
+            if request["purpose"] == "synthesize_views":
+                chain_state["syntheses"] += 1
+                dimensions = {
+                    str(item.get("dimension") or "")
+                    for item in request.get("source_conditions") or []
+                }
+                if chain_state["syntheses"] == 1 or dimensions == {"input_exposure"}:
+                    raise TimeoutError("controlled_synthesis_timeout")
+            result = core_package_reply(request)
         elif protocol in {"direct_chain_v1", "direct_chain_fail_v1"}:
             from .resource_probe import direct_chain_reply
 
@@ -1214,6 +1228,18 @@ def _worker(
                 "direct_chain_fail_v1",
                 "gap_loop_v1",
             }
+            else {
+                "prompt_tokens": 4000,
+                "completion_tokens": 8000,
+                "total_tokens": 12000,
+            }
+            if protocol == "group_recover_v1" and request["purpose"] == "synthesize_views"
+            else {
+                "prompt_tokens": 2500,
+                "completion_tokens": 3500,
+                "total_tokens": 6000,
+            }
+            if protocol == "group_recover_v1" and request["purpose"] == "verify_views"
             else None
         )
         data = {"choices": [{"message": {"content": encoded}}]}
@@ -1401,6 +1427,9 @@ def _worker(
         if binding.get("chapter_select"):
             identity["chapter_select"] = True
         if binding.get("compatible_continue"):
+            identity["compatible_continue"] = True
+        if binding.get("saved_source_draft"):
+            identity["saved_source_draft"] = True
             identity["compatible_continue"] = True
         if binding.get("core_repair_pages"):
             identity["core_repair_pages"] = [

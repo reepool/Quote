@@ -3233,7 +3233,20 @@ def interpret_direct_core(
             )
             if condition.condition_id not in drafted_condition_ids
         ]
-        for group in _business_groups(ordered):
+        if identity.get("saved_source_draft"):
+            themes = (
+                ("principal_business", "products_services", "supply_chain_role"),
+                ("revenue_model",),
+                ("input_exposure", "output_exposure", "upstream_downstream"),
+            )
+            grouped = []
+            for dims in themes:
+                group = [condition for condition in ordered if condition.dimension in dims]
+                if group:
+                    grouped.append(group)
+        else:
+            grouped = _business_groups(ordered)
+        for group in grouped:
             if _core_answers_ready(claims, conditions, checks, records) or (
                 identity.get("successor_core_closeout")
                 and _core_closeout_ready(claims, conditions, checks, records)
@@ -3260,7 +3273,7 @@ def interpret_direct_core(
         settle_claims([*drafted, *extra_claims], [*draft_conditions, *extra_conds])
         publish()
 
-    def deliver_group(group: list[ReportSourceCondition]) -> None:
+    def deliver_group(group: list[ReportSourceCondition], *, recovered: bool = False) -> None:
         """Save one business group, verify it, and publish before the next group."""
         pending = [
             condition
@@ -3323,42 +3336,27 @@ def interpret_direct_core(
         )
         cap = int(identity.get("max_payload_utf8_bytes") or 60_000)
         room = pack_room()
+        draft_units = request_reservation(sized)
+        verify_units = _nonempty_verify_units(pages, report=report, identity=identity)
+        survives_one_unknown = charged() + draft_units * 2 + verify_units <= ledger
         too_big = (
-            request_payload_bytes(sized) > cap or request_reservation(sized) > room
+            request_payload_bytes(sized) > cap
+            or request_reservation(sized) > room
+            or (
+                identity.get("saved_source_draft")
+                and not survives_one_unknown
+            )
         )
         if too_big and len(pending) > 1:
             middle = max(1, len(pending) // 2)
-            deliver_group(pending[:middle])
-            deliver_group(pending[middle:])
+            deliver_group(pending[:middle], recovered=recovered)
+            deliver_group(pending[middle:], recovered=recovered)
             return
         if too_big:
-            quotes = [
-                str(getattr(getattr(evidence, "anchor", None), "bounded_quote", "") or "")
-                for condition in pending
-                for evidence in condition.evidence
-            ]
-            shrunk = []
-            for page in pages:
-                text = str(page.get("text") or "")
-                kept = next((quote for quote in quotes if quote and quote in text), "")
-                shrunk.append(
-                    {
-                        "page": int(page["page"]),
-                        "text": (kept or text[:180]),
-                        "readable": True,
-                    }
-                )
-            sized = sized.model_copy(update={"source_pages": tuple(shrunk)})
-            if (
-                request_payload_bytes(sized) <= cap
-                and request_reservation(sized) <= room
-            ):
-                pages = shrunk
-            else:
-                gap = f"necessary_fragment:{pending[0].condition_id}"
-                if gap not in gaps:
-                    gaps.append(gap)
-                return
+            gap = f"necessary_fragment:{pending[0].condition_id}"
+            if gap not in gaps:
+                gaps.append(gap)
+            return
         try:
             drafted = invoke(
                 "synthesize_views",
@@ -3372,13 +3370,23 @@ def interpret_direct_core(
             text = str(exc)
             retryable = (
                 "deadline" in text.lower()
+                or "timed out" in text.lower()
+                or "timeout" in text.lower()
+                or "transport callback failed" in text.lower()
                 or "card_request_reservation_exceeded" in text
                 or "direct_core_admission_stopped" in text
             )
+            budget_stopped = "budget_exhausted" in text or "physical_request_token" in text
+            if budget_stopped:
+                gaps.append(f"direct_core_package_stopped:{exc}")
+                return
+            if not recovered and retryable:
+                deliver_group(pending, recovered=True)
+                return
             if len(pending) > 1 and retryable:
                 middle = max(1, len(pending) // 2)
-                deliver_group(pending[:middle])
-                deliver_group(pending[middle:])
+                deliver_group(pending[:middle], recovered=True)
+                deliver_group(pending[middle:], recovered=True)
             else:
                 gaps.append(f"direct_core_package_stopped:{exc}")
             return
@@ -3535,6 +3543,22 @@ def interpret_direct_core(
                     continue
                 by_page[page_no]["status"] = "read"
                 by_page[page_no]["reused_source"] = True
+        if identity.get("saved_source_draft"):
+            kept_conditions = []
+            for condition in conditions:
+                tail = condition.condition_id.split(":")[-1]
+                detail = tail in {
+                    "customer_supplier_concentration_negated",
+                    "revenue_composition_by_region",
+                } or "concentration" in tail or tail.endswith("by_region")
+                if not detail:
+                    kept_conditions.append(condition)
+                    continue
+                kept_conditions.append(condition.model_copy(update={"major": False}))
+                gap = f"deferred_detail:{condition.condition_id}"
+                if gap not in gaps:
+                    gaps.append(gap)
+            conditions[:] = kept_conditions
         conditions_to_draft = []
         pending_core: list[ReportViewClaim] = []
         prior = identity.get("accepted_prior_draft") or {}
@@ -3786,6 +3810,14 @@ def interpret_direct_core(
                 ]
             else:
                 conditions_to_draft = list(selected_conditions)
+        elif identity.get("saved_source_draft"):
+            conditions_to_draft = [
+                condition
+                for condition in conditions
+                if condition.major
+                and condition.statement_status == "current"
+                and condition.dimension in _CORE_CLOSEOUT_DIMENSIONS
+            ]
         unread = [
             int(page["page"])
             for page in sources
@@ -3813,7 +3845,7 @@ def interpret_direct_core(
                     and page_no not in saved_follow
                 ):
                     saved_follow.append(page_no)
-        if repair_pages or saved_follow:
+        if (repair_pages or saved_follow) and not identity.get("saved_source_draft"):
             known_ids = {condition.condition_id for condition in conditions}
             chapter_required_pages = {
                 int(item["page"]) for item in coverage if item["status"] == "read"
@@ -3883,7 +3915,10 @@ def interpret_direct_core(
                 claims[index] = rebound_claim
                 if rebound_claim.dimension in _CORE_CLOSEOUT_DIMENSIONS:
                     pending_core.append(rebound_claim)
-            if not _operating_role_established(claims, checks):
+            if (
+                not identity.get("saved_source_draft")
+                and not _operating_role_established(claims, checks)
+            ):
                 unread = _directed_operating_role_pages(sources, by_page)
                 unread_role_this_turn = list(unread)
                 if unread:

@@ -1055,3 +1055,115 @@ def test_fresh_chapter_core_package_drafts_and_verifies_under_conservative_usage
     charged = int(stages.get("ledger_charged_tokens") or 0)
     assert charged > 120 * len(purposes)
     assert transport.get("real_calls") == 0
+
+
+def test_saved_s19_sources_draft_in_groups_and_keep_earlier_after_timeout():
+    """Reuse the real S19 source receipts. First request is a draft, not a reread.
+
+    One controlled timeout keeps its reservation. A later group failure does
+    not remove the draft already saved. Route is DeepSeek alone.
+    """
+    import hashlib
+    import shutil
+    from pathlib import Path
+
+    from research.company_profile.bounded_entry import S20_AUTHORIZATION, main
+    from research.company_profile.reads import CompanyProfileReadService
+
+    root = Path("/home/python/Quote")
+    change = root / "openspec/changes/restore-company-profile-llm-led-generalization"
+    source = json.loads((change / "s1-pool-s1-600103-s16-binding.json").read_text())
+    for retired in (
+        "accepted_navigation_query",
+        "accepted_draft_query",
+        "accepted_candidate_query",
+        "navigation_query",
+        "continuation_checkpoint",
+        "company_task_state",
+        "continuation_budget",
+        "prior_charged_tokens",
+        "verification_history_queries",
+        "offline_protocol",
+    ):
+        source.pop(retired, None)
+    source["accepted_source_query"] = str(
+        root / "data/QuoteBak/s19-paper-core-20261031/query.json"
+    )
+    source["expected_source_conditions"] = 14
+    source["chapter_select"] = True
+    source["compatible_continue"] = True
+    source["saved_source_draft"] = True
+    source["task_route_labels"] = [
+        "deepseek:deepseek-flash",
+        "scorpio:grok-4.7",
+    ]
+    source["task_route_first_only"] = True
+    source["same_source_max_retries"] = 0
+    source["offline_protocol"] = "group_recover_v1"
+    source["run_authorization"] = S20_AUTHORIZATION
+    source["max_elapsed_seconds"] = 900
+    source["max_tokens"] = 120_000
+    source["max_physical_requests"] = 16
+    source["max_recoveries"] = 2
+    source["max_cost_cny"] = "20"
+    source["file_hashes"] = {
+        name: hashlib.sha256((root / name).read_bytes()).hexdigest()
+        for name in source["file_hashes"]
+    }
+    run_root = root / "data/QuoteBak/s20-paper-draft-offline"
+    if run_root.exists():
+        shutil.rmtree(run_root)
+    path = root / "data/QuoteBak/s20-paper-draft-offline-binding.json"
+    path.write_text(json.dumps(source, ensure_ascii=False))
+    argv = sys.argv
+    sys.argv = ["bounded_entry", "--binding", str(path), "--run-root", str(run_root)]
+    try:
+        code = main()
+    finally:
+        sys.argv = argv
+    budget = json.loads((run_root / "budget-final.json").read_text())
+    labels = [item.get("source_label") for item in budget.get("attempts") or []]
+    query_path = run_root / "query.json"
+    if code != 0 or not query_path.is_file():
+        result = json.loads((run_root / "entry-result.json").read_text())
+        raise AssertionError(
+            f"entry failed code={code} error={result.get('error')} labels={labels}"
+        )
+    query = json.loads(query_path.read_text())
+    exported = json.loads((run_root / "export.json").read_text())
+    reloaded = CompanyProfileReadService(run_root / "output").query(
+        (source["asset"]["instrument_id"],)
+    )
+    assert query["profiles"] == exported["profiles"] == reloaded["profiles"]
+    profile = query["profiles"][0]["three_views"]
+    physical = [
+        item
+        for item in profile.get("call_receipts") or []
+        if item.get("physical_request")
+    ]
+    assert physical, profile.get("gaps")
+    assert physical[0].get("purpose") == "synthesize_views"
+    assert not any(item.get("purpose") == "source_inventory" for item in physical)
+    assert labels
+    assert set(labels) == {"deepseek:deepseek-flash"}
+    assert any(item.get("status") != "success" for item in budget.get("attempts") or [])
+    claims = []
+    seen = set()
+    for view in profile["views"].values():
+        for claim in view.get("claims") or []:
+            if claim.get("claim_id") in seen:
+                continue
+            seen.add(claim.get("claim_id"))
+            claims.append(claim)
+    dimensions = {
+        claim.get("dimension")
+        for claim in claims
+        if claim.get("status") == "observed"
+    }
+    assert "principal_business" in dimensions, (dimensions, profile.get("gaps"))
+    assert "revenue_model" in dimensions, (dimensions, profile.get("gaps"))
+    gaps = profile.get("gaps") or []
+    assert any("input" in gap or "package_stopped" in gap for gap in gaps), gaps
+    assert not any(
+        "concentration" in gap or gap.endswith("by_region") for gap in gaps
+    ), gaps
