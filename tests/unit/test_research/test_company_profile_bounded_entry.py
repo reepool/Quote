@@ -1271,3 +1271,121 @@ def test_s20_disk_closeout_keeps_verified_answers_and_fills_the_total():
     gaps = profile.get("gaps") or []
     assert "core_dimension_missing:operating_role" not in gaps
     assert profile.get("draft_complete") is True, gaps
+
+
+def test_s21_disk_retracts_the_split_product_and_sends_total_context():
+    """S21 disk state through the real entry. Transport only is replaced."""
+    import hashlib
+    import shutil
+    from pathlib import Path
+
+    from research.company_profile.bounded_entry import S22_AUTHORIZATION, main
+    from research.company_profile.reads import CompanyProfileReadService
+
+    root = Path("/home/python/Quote")
+    change = root / "openspec/changes/restore-company-profile-llm-led-generalization"
+    source = json.loads((change / "s1-pool-s1-600103-s16-binding.json").read_text())
+    for retired in (
+        "accepted_navigation_query",
+        "accepted_candidate_query",
+        "navigation_query",
+        "continuation_checkpoint",
+        "company_task_state",
+        "continuation_budget",
+        "prior_charged_tokens",
+        "verification_history_queries",
+        "offline_protocol",
+    ):
+        source.pop(retired, None)
+    source["accepted_source_query"] = str(
+        root / "data/QuoteBak/s19-paper-core-20261031/query.json"
+    )
+    source["accepted_draft_query"] = str(
+        root / "data/QuoteBak/s21-paper-closeout-20261031/query.json"
+    )
+    source["expected_source_conditions"] = 14
+    source["chapter_select"] = True
+    source["compatible_continue"] = True
+    source["saved_source_draft"] = True
+    source["task_route_labels"] = ["deepseek:deepseek-flash", "scorpio:grok-4.7"]
+    source["task_route_first_only"] = True
+    source["same_source_max_retries"] = 0
+    source["offline_protocol"] = "closeout_v1"
+    source["run_authorization"] = S22_AUTHORIZATION
+    source["max_elapsed_seconds"] = 600
+    source["max_tokens"] = 40_000
+    source["max_physical_requests"] = 4
+    source["max_recoveries"] = 1
+    source["max_cost_cny"] = "10"
+    source["file_hashes"] = {
+        name: hashlib.sha256((root / name).read_bytes()).hexdigest()
+        for name in source["file_hashes"]
+    }
+    run_root = root / "data/QuoteBak/s22-paper-core-offline"
+    if run_root.exists():
+        shutil.rmtree(run_root)
+    path = root / "data/QuoteBak/s22-paper-core-offline-binding.json"
+    path.write_text(json.dumps(source, ensure_ascii=False))
+    argv = sys.argv
+    sys.argv = ["bounded_entry", "--binding", str(path), "--run-root", str(run_root)]
+    try:
+        code = main()
+    finally:
+        sys.argv = argv
+    query_path = run_root / "query.json"
+    if code != 0 or not query_path.is_file():
+        result = json.loads((run_root / "entry-result.json").read_text())
+        raise AssertionError(f"entry failed code={code} error={result.get('error')}")
+    query = json.loads(query_path.read_text())
+    exported = json.loads((run_root / "export.json").read_text())
+    reloaded = CompanyProfileReadService(run_root / "output").query(
+        (source["asset"]["instrument_id"],)
+    )
+    assert query["profiles"] == exported["profiles"] == reloaded["profiles"]
+    profile = query["profiles"][0]["three_views"]
+    answers = []
+    seen = set()
+    for view in profile["views"].values():
+        for claim in view.get("claims") or []:
+            if claim.get("claim_id") in seen:
+                continue
+            seen.add(claim.get("claim_id"))
+            if claim.get("review_state") == "verified" or (
+                claim.get("status") == "observed" and not claim.get("limitation")
+            ):
+                answers.append(claim)
+    ids = {claim["claim_id"] for claim in answers}
+    assert "claim-002-products-services" not in ids
+    assert "claim-products-services" in ids
+    assert "claim-006-input-exposure-bamboo-pulp" in ids
+    assert "claim-supply-chain-role" in ids
+    text = "\n".join(str(claim.get("answer") or "") for claim in answers)
+    assert "伸性纸袋纸" in text
+    assert "2,418,990,221.17" in text
+    assert "未显示金额单位" not in text
+    quotes = [
+        str((evidence.get("anchor") or {}).get("bounded_quote") or "")
+        for claim in answers
+        for evidence in claim.get("evidence") or []
+    ]
+    assert all("单位：元 营业收入" not in quote for quote in quotes)
+    total = next(
+        claim
+        for claim in answers
+        if "2,418,990,221.17" in str(claim.get("answer") or "")
+    )
+    total_quotes = [
+        str((evidence.get("anchor") or {}).get("bounded_quote") or "")
+        for evidence in total.get("evidence") or []
+    ]
+    assert any(
+        "营业收入 2,418,990,221.17" in quote
+        and "本期数" in quote
+        and "单位：元" in quote
+        and "单位：元 营业收入" not in quote
+        for quote in total_quotes
+    )
+    gaps = profile.get("gaps") or []
+    assert any(gap.startswith("retracted_cross_page_fragment:claim-002") for gap in gaps)
+    assert not any(gap.startswith("claim_pending:claim-006") for gap in gaps)
+    assert profile.get("draft_complete") is True, gaps

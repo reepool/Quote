@@ -8209,6 +8209,112 @@ def test_historical_role_pass_does_not_cover_later_deny():
     assert _operating_role_established(claims, checks) is False
 
 
+def test_same_tail_and_later_block_do_not_borrow_role_coverage():
+    from research.company_profile.direct_reading import _operating_role_established
+
+    report = _report()
+    answer = "公司向客户提供定制加工并收取加工费。"
+    claims = [
+        ReportViewClaim(
+            claim_id="role",
+            dimension="supply_chain_role",
+            status="observed",
+            answer=answer,
+            condition_ids=("other-report:product_application_and_operating_roles",),
+            evidence=(_evidence(report, text=answer, page=10),),
+        )
+    ]
+    checks = [
+        ReportViewCheck(
+            target_type="claim",
+            target_id="role",
+            status="pass",
+            explanation="主张通过。",
+        ),
+        ReportViewCheck(
+            target_type="condition",
+            target_id="s19-source:product_application_and_operating_roles",
+            status="pass",
+            explanation="另一来源的同尾通过。",
+            covers_target_type="claim",
+            covers_target_id="role",
+        ),
+    ]
+    assert _operating_role_established(claims, checks) is False
+    claims[0] = claims[0].model_copy(
+        update={"condition_ids": ("s19-source:product_application_and_operating_roles",)}
+    )
+    checks.append(
+        ReportViewCheck(
+            target_type="condition",
+            target_id="core-question:operating-role",
+            status="block",
+            explanation="当前问题后置否定。",
+        )
+    )
+    assert _operating_role_established(claims, checks) is False
+
+
+def test_cross_page_fragment_is_retracted_and_header_stays_separate():
+    from research.company_profile.direct_reading import (
+        _cross_page_fragment,
+        disclosed_core_revenue_facts,
+        make_operating_revenue_question,
+    )
+
+    report = _report()
+    truncated = ReportViewClaim(
+        claim_id="claim-002-products-services",
+        dimension="products_services",
+        status="observed",
+        answer="公司产品包括性纸袋纸。",
+        evidence=(
+            _evidence(report, text="性纸袋纸被评为制造业单项冠军产品", page=10),
+        ),
+    )
+    kept = ReportViewClaim(
+        claim_id="claim-products-services",
+        dimension="products_services",
+        status="observed",
+        answer="主要产品为青山牌系列伸性纸袋纸。",
+        evidence=(_evidence(report, text="主要产品为青山牌系列伸性纸袋纸", page=9),),
+    )
+    sources = [
+        {"page": 9, "text": "其中公司主导产品伸"},
+        {
+            "page": 10,
+            "text": "福建省青山纸业股份有限公司2025 年年度报告\n10 / 220\n性纸袋纸被评为制造业单项冠军产品",
+        },
+    ]
+    kept_input = ReportViewClaim(
+        claim_id="claim-006-input-exposure-bamboo-pulp",
+        dimension="input_exposure",
+        status="observed",
+        answer="竹溶解浆为国内首创以毛竹为原料的溶解浆产品。",
+        evidence=(
+            _evidence(report, text="性纸袋纸被评为制造业单项冠军产品；竹溶解浆为国内首创", page=10),
+        ),
+    )
+    assert _cross_page_fragment(truncated, sources) is True
+    assert _cross_page_fragment(kept, sources) is False
+    assert _cross_page_fragment(kept_input, sources) is False
+    text = (
+        "1、利润表及现金流量表相关科目变动分析表\n"
+        "单位：元 币种：人民币\n"
+        "科目 本期数 上年同期数 变动比例（%）\n"
+        "营业收入 2,418,990,221.17 2,600,396,782.74 -6.98\n"
+    )
+    fact = disclosed_core_revenue_facts([{"page": 16, "text": text, "readable": True}])[0]
+    assert "营业收入 2,418,990,221.17" in fact["quote"]
+    assert "本期数" in fact["quote"]
+    assert "单位：元 币种：人民币" in fact["quote"]
+    assert fact["quote"] in text
+    assert "单位：元 营业收入" not in fact["quote"]
+    question = make_operating_revenue_question(report, [fact])
+    quotes = [item.anchor.bounded_quote for item in question.evidence]
+    assert quotes == [fact["quote"]]
+
+
 def test_role_without_keywords_completes_after_object_covering_pass():
     from research.company_profile.direct_reading import _operating_role_established
 

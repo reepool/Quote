@@ -154,20 +154,45 @@ def expand_response(data: dict, request: ReportSemanticRequestV3) -> dict:
     result = dict(data)
     checks = result.get("checks")
     if isinstance(checks, list):
-        rank = {"block": 3, "unclear": 2, "supplementary": 1, "pass": 0}
-        deduped: dict[tuple[str, str], dict] = {}
+        grouped: dict[tuple[str, str], list[dict]] = {}
+        order: list[tuple[str, str]] = []
+        invalid = []
         for check in checks:
-            if not isinstance(check, dict):
-                continue
-            key = (str(check.get("target_type") or ""), str(check.get("target_id") or ""))
-            if not key[0] or not key[1]:
-                continue
-            previous = deduped.get(key)
-            if previous is None or rank.get(str(check.get("status")), 0) >= rank.get(
-                str(previous.get("status")), 0
+            if not isinstance(check, dict) or not check.get("target_type") or not check.get(
+                "target_id"
             ):
-                deduped[key] = check
-        result["checks"] = list(deduped.values())
+                invalid.append(check)
+                continue
+            key = (str(check["target_type"]), str(check["target_id"]))
+            if key not in grouped:
+                order.append(key)
+                grouped[key] = []
+            grouped[key].append(check)
+        merged = []
+        for key in order:
+            items = grouped[key]
+            blocking = [
+                item
+                for item in items
+                if str(item.get("status")) in {"block", "unclear"}
+            ]
+            chosen = blocking or items
+            signature = {
+                (
+                    item.get("status"),
+                    item.get("covers_target_type"),
+                    item.get("covers_target_id"),
+                    item.get("explanation"),
+                )
+                for item in chosen
+            }
+            if len(signature) != 1:
+                raise ValueError(
+                    "ambiguous verification for "
+                    f"{key[0]}:{key[1]}"
+                )
+            merged.append(chosen[0])
+        result["checks"] = [*merged, *invalid]
     if request.source_scope == "page_map" and data.get("source_conditions"):
         raise ValueError("page map cannot establish semantic conditions")
     for key in ("source_conditions", "claims"):

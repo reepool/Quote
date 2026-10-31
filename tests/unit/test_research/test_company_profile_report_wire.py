@@ -1415,3 +1415,47 @@ def test_frozen_span_followup_payload_excludes_unread_record_quotes():
         for item in unrelated
     )
     assert result.real_semantic_complete is False
+
+
+def test_duplicate_checks_collapse_only_when_they_agree():
+    base = request(purpose="verify_views")
+    same = {
+        "target_type": "condition",
+        "target_id": "core-question:period-operating-revenue",
+        "status": "pass",
+        "explanation": "同一回执。",
+        "covers_target_type": "claim",
+        "covers_target_id": "total",
+    }
+    payload = {
+        "schema_version": "company_profile_report_response.v3",
+        "request_id": base.request_id,
+        "purpose": "verify_views",
+    }
+    merged = expand_response({**payload, "checks": [same, dict(same)]}, base)
+    assert len(merged["checks"]) == 1
+    blocked = expand_response(
+        {
+            **payload,
+            "checks": [
+                same,
+                {
+                    **same,
+                    "status": "block",
+                    "explanation": "后置否定。",
+                    "covers_target_type": None,
+                    "covers_target_id": None,
+                },
+            ],
+        },
+        base,
+    )
+    assert blocked["checks"][0]["status"] == "block"
+    with pytest.raises(ValueError, match="ambiguous verification"):
+        expand_response(
+            {
+                **payload,
+                "checks": [same, {**same, "covers_target_id": "other-total"}],
+            },
+            base,
+        )

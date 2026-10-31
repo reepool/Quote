@@ -686,7 +686,16 @@ def core_package_reply(request: dict) -> dict:
                 )
                 if sent is None or not quote:
                     continue
-                compact_page = " ".join(str(sent.get("text") or "").split())
+                page_text = str(sent.get("text") or "")
+                exact = quote.strip()
+                if exact and exact in page_text:
+                    used = exact[:180]
+                    if used in seen_quotes and item.get("dimension") == "revenue_model":
+                        continue
+                    seen_quotes.add(used)
+                    evidence.append({"page": int(page_no), "quote": used})
+                    continue
+                compact_page = " ".join(page_text.split())
                 probe = "".join(quote.split())[:16]
                 folded = "".join(compact_page.split())
                 if probe and probe in folded:
@@ -731,7 +740,7 @@ def core_package_reply(request: dict) -> dict:
                     "answer": evidence[0]["quote"],
                     "condition_ids": [item["condition_id"]] if item.get("condition_id") else [],
                     "supporting_record_ids": [],
-                    "evidence": evidence[:1],
+                    "evidence": evidence,
                 }
             )
         return result
@@ -758,24 +767,6 @@ def core_package_reply(request: dict) -> dict:
                     ),
                     None,
                 )
-                if match is None and condition_id.endswith("period-operating-revenue"):
-                    match = next(
-                        (
-                            claim.get("claim_id")
-                            for claim in claims
-                            if claim.get("dimension") == "revenue_model"
-                        ),
-                        None,
-                    )
-                if match is None and condition_id.endswith("operating-role"):
-                    match = next(
-                        (
-                            claim.get("claim_id")
-                            for claim in claims
-                            if claim.get("dimension") == "supply_chain_role"
-                        ),
-                        None,
-                    )
                 if match:
                     check["covers_target_type"] = "claim"
                     check["covers_target_id"] = match
