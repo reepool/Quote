@@ -780,4 +780,8 @@ def core_package_reply(request: dict) -> dict:
                     check["covers_target_type"] = "claim"
                     check["covers_target_id"] = match
             result["checks"].append(check)
+    deduped: dict[tuple[str, str], dict] = {}
+    for check in result["checks"]:
+        deduped[(check["target_type"], str(check["target_id"]))] = check
+    result["checks"] = list(deduped.values())
     return result

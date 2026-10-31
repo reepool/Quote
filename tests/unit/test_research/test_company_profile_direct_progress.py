@@ -6972,6 +6972,79 @@ def test_whitespace_only_quote_keeps_subject_unit_and_negation():
     assert "不包括子公司" in kept
 
 
+def test_header_percent_does_not_hide_the_period_revenue_total():
+    from research.company_profile.direct_reading import disclosed_core_revenue_facts
+
+    facts = disclosed_core_revenue_facts(
+        (
+            {
+                "page": 16,
+                "text": (
+                    "单位：元 币种：人民币\n"
+                    "科目 本期数 上年同期数 变动比例（%）\n"
+                    "营业收入 2,418,990,221.17 2,600,396,782.74 -6.98\n"
+                ),
+                "readable": True,
+            },
+        )
+    )
+    match = next(item for item in facts if item["amount"] == "2,418,990,221.17")
+    assert match["unit"] == "元"
+    assert not any(
+        item["amount"] == "1,197,089,976.81"
+        for item in disclosed_core_revenue_facts(
+            (
+                {
+                    "page": 16,
+                    "text": "主营业务分行业 营业收入 1,197,089,976.81",
+                    "readable": True,
+                },
+            )
+        )
+    )
+
+
+def test_native_role_coverage_does_not_need_the_fixed_question_id():
+    from research.company_profile.direct_reading import _operating_role_established
+
+    report = _report()
+    role = ReportViewClaim(
+        claim_id="claim-supply-chain-role",
+        dimension="supply_chain_role",
+        status="observed",
+        answer="纸袋纸用于包装，溶解浆用于纺织粘胶。",
+        condition_ids=(
+            "bp-work:report:3:product_application_and_operating_roles",
+        ),
+        evidence=(_evidence(report, text="纸袋纸用于包装", page=10),),
+    )
+    checks = [
+        ReportViewCheck(
+            target_type="claim",
+            target_id="claim-supply-chain-role",
+            status="pass",
+            explanation="角色已核。",
+        ),
+        ReportViewCheck(
+            target_type="condition",
+            target_id="bp-work:report:3:product_application_and_operating_roles",
+            status="pass",
+            explanation="覆盖角色主张。",
+            covers_target_type="claim",
+            covers_target_id="claim-supply-chain-role",
+        ),
+        ReportViewCheck(
+            target_type="condition",
+            target_id="bp-work:report:2:principal_business_integrated_pulp_paper",
+            status="pass",
+            explanation="主营覆盖不能代替角色。",
+            covers_target_type="claim",
+            covers_target_id="claim-principal-business",
+        ),
+    ]
+    assert _operating_role_established([role], checks) is True
+
+
 def test_quote_amount_does_not_count_as_answered_revenue():
     from research.company_profile.contracts import ReportViewClaim
     from research.company_profile.direct_reading import missed_core_revenue_facts

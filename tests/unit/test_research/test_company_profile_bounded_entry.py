@@ -1167,3 +1167,107 @@ def test_saved_s19_sources_draft_in_groups_and_keep_earlier_after_timeout():
     assert not any(
         "concentration" in gap or gap.endswith("by_region") for gap in gaps
     ), gaps
+
+
+def test_s20_disk_closeout_keeps_verified_answers_and_fills_the_total():
+    """Saved S20 draft through the real entry. Transport only is replaced."""
+    import hashlib
+    import shutil
+    from pathlib import Path
+
+    from research.company_profile.bounded_entry import S21_AUTHORIZATION, main
+    from research.company_profile.reads import CompanyProfileReadService
+
+    root = Path("/home/python/Quote")
+    change = root / "openspec/changes/restore-company-profile-llm-led-generalization"
+    source = json.loads((change / "s1-pool-s1-600103-s16-binding.json").read_text())
+    for retired in (
+        "accepted_navigation_query",
+        "accepted_candidate_query",
+        "navigation_query",
+        "continuation_checkpoint",
+        "company_task_state",
+        "continuation_budget",
+        "prior_charged_tokens",
+        "verification_history_queries",
+        "offline_protocol",
+    ):
+        source.pop(retired, None)
+    saved = str(root / "data/QuoteBak/s20-paper-draft-20261031/query.json")
+    source["accepted_source_query"] = saved
+    source["accepted_draft_query"] = saved
+    source["expected_source_conditions"] = 14
+    source["chapter_select"] = True
+    source["compatible_continue"] = True
+    source["saved_source_draft"] = True
+    source["task_route_labels"] = ["deepseek:deepseek-flash", "scorpio:grok-4.7"]
+    source["task_route_first_only"] = True
+    source["same_source_max_retries"] = 0
+    source["offline_protocol"] = "closeout_v1"
+    source["run_authorization"] = S21_AUTHORIZATION
+    source["max_elapsed_seconds"] = 900
+    source["max_tokens"] = 80_000
+    source["max_physical_requests"] = 8
+    source["max_recoveries"] = 2
+    source["max_cost_cny"] = "20"
+    source["file_hashes"] = {
+        name: hashlib.sha256((root / name).read_bytes()).hexdigest()
+        for name in source["file_hashes"]
+    }
+    run_root = root / "data/QuoteBak/s21-paper-closeout-offline"
+    if run_root.exists():
+        shutil.rmtree(run_root)
+    path = root / "data/QuoteBak/s21-paper-closeout-offline-binding.json"
+    path.write_text(json.dumps(source, ensure_ascii=False))
+    argv = sys.argv
+    sys.argv = ["bounded_entry", "--binding", str(path), "--run-root", str(run_root)]
+    try:
+        code = main()
+    finally:
+        sys.argv = argv
+    query_path = run_root / "query.json"
+    if code != 0 or not query_path.is_file():
+        result = json.loads((run_root / "entry-result.json").read_text())
+        raise AssertionError(f"entry failed code={code} error={result.get('error')}")
+    query = json.loads(query_path.read_text())
+    exported = json.loads((run_root / "export.json").read_text())
+    reloaded = CompanyProfileReadService(run_root / "output").query(
+        (source["asset"]["instrument_id"],)
+    )
+    assert query["profiles"] == exported["profiles"] == reloaded["profiles"]
+    profile = query["profiles"][0]["three_views"]
+    physical = [
+        item
+        for item in profile.get("call_receipts") or []
+        if item.get("physical_request")
+    ]
+    assert physical and physical[0].get("purpose") != "source_inventory"
+    assert not any(item.get("purpose") == "source_inventory" for item in physical)
+    budget = json.loads((run_root / "budget-final.json").read_text())
+    labels = {item.get("source_label") for item in budget.get("attempts") or []}
+    assert labels == {"deepseek:deepseek-flash"}
+    kept = {
+        "claim-principal-business",
+        "claim-products-services",
+        "claim_revenue_by_industry",
+        "claim_revenue_by_sales_model",
+        "claim_revenue_composition_by_product",
+        "claim-supply-chain-role",
+    }
+    answers = []
+    seen = set()
+    for view in profile["views"].values():
+        for claim in view.get("claims") or []:
+            if claim.get("claim_id") in seen:
+                continue
+            seen.add(claim.get("claim_id"))
+            if claim.get("review_state") == "verified" or (
+                claim.get("status") == "observed" and not claim.get("limitation")
+            ):
+                answers.append(claim)
+    assert kept <= {claim["claim_id"] for claim in answers}
+    text = "\n".join(str(claim.get("answer") or "") for claim in answers)
+    assert "2,418,990,221.17" in text or "2418990221.17" in text.replace(",", "")
+    gaps = profile.get("gaps") or []
+    assert "core_dimension_missing:operating_role" not in gaps
+    assert profile.get("draft_complete") is True, gaps

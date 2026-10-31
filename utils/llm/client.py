@@ -816,7 +816,9 @@ class LlmClient:
                 workload,
                 business_rate_limit_scope,
             )
-            for attempt_count in range(1, max_attempts + 1):
+            for attempt_count in range(
+                1, max_attempts + profile.max_schema_repair_attempts + 1
+            ):
                 response: Optional[TransportResponse] = None
                 raw_content: Optional[str] = None
                 provider_failure_reported = False
@@ -1267,7 +1269,19 @@ class LlmClient:
                     if not exc.retryable:
                         raise
 
-                if attempt_count >= max_attempts:
+                repair_pending = (
+                    repair_used > 0
+                    and isinstance(
+                        last_error,
+                        (
+                            LlmSchemaValidationError,
+                            LlmResponseParseError,
+                            LlmResponseTruncatedError,
+                        ),
+                    )
+                    and attempt_count < max_attempts + profile.max_schema_repair_attempts
+                )
+                if attempt_count >= max_attempts and not repair_pending:
                     if last_error is not None:
                         raise last_error
                     raise LlmError("provider_error", "LLM request failed")

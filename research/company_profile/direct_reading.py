@@ -225,9 +225,49 @@ def _latest_named_condition_check(checks, needle: str):
     return found
 
 
+def _is_operating_role_question(condition_id: str) -> bool:
+    """Which question this is. A matching id does not itself pass."""
+    tail = str(condition_id or "").split(":")[-1]
+    return tail in {"operating-role", "operating_roles"} or tail.endswith(
+        ("operating-role", "operating_roles")
+    )
+
+
 def _operating_role_established(claims, checks) -> bool:
-    latest = _latest_named_condition_check(checks, "core-question:operating-role")
-    return _condition_covers_verified_claim(latest, claims, checks)
+    """Latest covering pass on the role answer. The question id may be native."""
+    named = _latest_named_condition_check(checks, "core-question:operating-role")
+    if _condition_covers_verified_claim(named, claims, checks):
+        return True
+    verified = {item.claim_id: item for item in _verified_claims(claims, checks)}
+    latest_for: dict[str, object] = {}
+    for check in checks:
+        if check.target_type == "condition" and check.target_id:
+            latest_for[str(check.target_id)] = check
+    for claim in verified.values():
+        if _is_concentration_or_cost_substitute(str(claim.answer or "")):
+            continue
+        for condition_id in claim.condition_ids or ():
+            if not _is_operating_role_question(str(condition_id)):
+                continue
+            check = latest_for.get(str(condition_id))
+            if check is None:
+                tail = str(condition_id).split(":")[-1]
+                check = next(
+                    (
+                        item
+                        for target, item in latest_for.items()
+                        if target.endswith(":" + tail)
+                    ),
+                    None,
+                )
+            if (
+                check is not None
+                and check.status == "pass"
+                and check.covers_target_type == "claim"
+                and check.covers_target_id == claim.claim_id
+            ):
+                return True
+    return False
 
 
 def _amount_in_yuan(amount: str, unit: str) -> float | None:
@@ -521,6 +561,17 @@ def _current_gaps(accumulated, claims, conditions, checks, records=()) -> list[s
             if gap.startswith("verify_unit_not_admitted:"):
                 target = gap.split(":", 1)[1]
                 if any(item.claim_id == target for item in _verified_claims(claims, checks)):
+                    continue
+            if gap.startswith("claim_pending:"):
+                target = gap.split(":", 1)[1]
+                claim = next((item for item in claims if item.claim_id == target), None)
+                latest = _latest_check(checks, "claim", target)
+                if (
+                    claim is not None
+                    and claim.limitation not in _UNTRUSTED_LIMITATIONS
+                    and latest is not None
+                    and latest.status == "pass"
+                ):
                     continue
             live.append(gap)
     for gap in dynamic:
@@ -1075,11 +1126,22 @@ def disclosed_core_revenue_facts(sources: Sequence[Mapping[str, Any]]) -> list[d
                 }
             )
         for match in re.finditer(r"营业收入\s+(\d{1,3}(?:,\d{3})+(?:\.\d+)?)", text):
-            window = text[max(0, match.start() - 24) : match.end() + 16]
-            if any(mark in window for mark in ("分产品", "分行业", "分地区", "%", "占")):
+            window = text[max(0, match.start() - 40) : match.end() + 16]
+            if any(mark in window for mark in ("分产品", "分行业", "分地区", "占")):
+                continue
+            # A column header such as 变动比例（%） is not this line's rate.
+            if "%" in re.sub(r"[（(]\s*%\s*[）)]", "", window):
                 continue
             amount = match.group(1)
-            key = (amount.replace(",", ""), "")
+            unit = ""
+            header = text[max(0, match.start() - 240) : match.start()]
+            unit_marks = list(re.finditer(r"单位\s*[:：]\s*(?:人民币)?(亿元|万元|元)", header))
+            if unit_marks:
+                unit = unit_marks[-1].group(1)
+            quote = match.group(0)[:180]
+            if unit and unit not in quote:
+                quote = f"单位：{unit} {quote}"[:180]
+            key = (amount.replace(",", ""), unit)
             if key in seen:
                 continue
             seen.add(key)
@@ -1088,8 +1150,8 @@ def disclosed_core_revenue_facts(sources: Sequence[Mapping[str, Any]]) -> list[d
                     "kind": "operating_revenue_total",
                     "page": page,
                     "amount": amount,
-                    "unit": "",
-                    "quote": match.group(0)[:180],
+                    "unit": unit,
+                    "quote": quote,
                 }
             )
         for label, kind in _NET_INCOME_LINES:
@@ -2247,7 +2309,11 @@ def interpret_direct_core(
                     )
                     gaps.append(f"claim_not_verified:{claim.claim_id}")
                 continue
-            upsert(claim)
+            upsert(
+                claim.model_copy(
+                    update={"status": "observed", "limitation": None}
+                )
+            )
         checks.extend(verified.checks)
 
     def retract_rejected(sent_claims, verified) -> None:
@@ -2420,6 +2486,15 @@ def interpret_direct_core(
                 gaps.append(f"direct_core_verify_stopped:{exc}")
                 if support:
                     for claim in group:
+                        latest = None
+                        for check in checks:
+                            if (
+                                check.target_type == "claim"
+                                and check.target_id == claim.claim_id
+                            ):
+                                latest = check
+                        if latest is not None and latest.status == "pass":
+                            continue
                         keep_pending(claim, "claim_pending")
                 publish()
                 return False
@@ -3543,22 +3618,6 @@ def interpret_direct_core(
                     continue
                 by_page[page_no]["status"] = "read"
                 by_page[page_no]["reused_source"] = True
-        if identity.get("saved_source_draft"):
-            kept_conditions = []
-            for condition in conditions:
-                tail = condition.condition_id.split(":")[-1]
-                detail = tail in {
-                    "customer_supplier_concentration_negated",
-                    "revenue_composition_by_region",
-                } or "concentration" in tail or tail.endswith("by_region")
-                if not detail:
-                    kept_conditions.append(condition)
-                    continue
-                kept_conditions.append(condition.model_copy(update={"major": False}))
-                gap = f"deferred_detail:{condition.condition_id}"
-                if gap not in gaps:
-                    gaps.append(gap)
-            conditions[:] = kept_conditions
         conditions_to_draft = []
         pending_core: list[ReportViewClaim] = []
         prior = identity.get("accepted_prior_draft") or {}
@@ -3818,6 +3877,14 @@ def interpret_direct_core(
                 and condition.statement_status == "current"
                 and condition.dimension in _CORE_CLOSEOUT_DIMENSIONS
             ]
+        if identity.get("saved_source_draft"):
+            for index, claim in enumerate(list(claims)):
+                if claim.limitation == "pending_verification" and not (
+                    claim.condition_ids or ()
+                ):
+                    claims[index] = claim.model_copy(
+                        update={"status": "unclear", "limitation": None}
+                    )
         unread = [
             int(page["page"])
             for page in sources

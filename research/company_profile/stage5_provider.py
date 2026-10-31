@@ -4746,7 +4746,7 @@ class CommonGatewaySemanticProvider:
                 partition_count=partition_count,
             )
             raise SemanticProviderError(
-                code, "gateway response violates the schema"
+                code, f"gateway response violates the schema: {exc}"[:500]
             ) from exc
         self._traces.append(
             Stage5ProviderCallTrace(

@@ -152,6 +152,22 @@ def expand_response(data: dict, request: ReportSemanticRequestV3) -> dict:
         ).model_dump(mode="json")
 
     result = dict(data)
+    checks = result.get("checks")
+    if isinstance(checks, list):
+        rank = {"block": 3, "unclear": 2, "supplementary": 1, "pass": 0}
+        deduped: dict[tuple[str, str], dict] = {}
+        for check in checks:
+            if not isinstance(check, dict):
+                continue
+            key = (str(check.get("target_type") or ""), str(check.get("target_id") or ""))
+            if not key[0] or not key[1]:
+                continue
+            previous = deduped.get(key)
+            if previous is None or rank.get(str(check.get("status")), 0) >= rank.get(
+                str(previous.get("status")), 0
+            ):
+                deduped[key] = check
+        result["checks"] = list(deduped.values())
     if request.source_scope == "page_map" and data.get("source_conditions"):
         raise ValueError("page map cannot establish semantic conditions")
     for key in ("source_conditions", "claims"):
@@ -312,6 +328,14 @@ def instructions(request: ReportSemanticRequestV3) -> str:
                 "conditions support. Do not drop a later chapter because an earlier "
                 "passage already has an answer. "
             )
+            supplied = tuple(getattr(request, "source_conditions", ()) or ())
+            supplied_dims = {getattr(item, "dimension", "") for item in supplied}
+            if supplied_dims and supplied_dims <= {"input_exposure"}:
+                lead += (
+                    "This package asks only about the supplied input conditions. "
+                    "Return claims only for those conditions. Do not repeat principal "
+                    "business, products, rankings, or a truncated product name. "
+                )
         else:
             lead = (
                 "Return a claim only for a supplied source condition. "
@@ -367,6 +391,8 @@ def instructions(request: ReportSemanticRequestV3) -> str:
         else ""
     )
     return common + whole_claim + (
+        "The JSON object must include schema_version, request_id, purpose and checks. "
+        "Do not omit those root fields. "
         "Return exactly one check for EVERY condition, claim and original record. "
         "A heading or preceding section that limits the subject to the parent company, "
         "the company alone, a named subsidiary, or one segment must remain in the "

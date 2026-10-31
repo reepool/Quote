@@ -24,6 +24,7 @@ S16_AUTHORIZATION = "company_profile_s16_core.2026-10-30"
 S17_AUTHORIZATION = "company_profile_s17_continue.2026-10-31"
 S19_AUTHORIZATION = "company_profile_s19_core.2026-10-31"
 S20_AUTHORIZATION = "company_profile_s20_draft.2026-10-31"
+S21_AUTHORIZATION = "company_profile_s21_closeout.2026-10-31"
 
 
 def company_window_limits(binding: dict, state: dict | None) -> tuple[int, int]:
@@ -711,6 +712,13 @@ def validate_binding(
             and int(binding.get("max_physical_requests") or 0) <= 16
             and int(binding.get("max_recoveries") or 0) <= 2
         )
+    elif auth == S21_AUTHORIZATION:
+        allowed = (
+            0 < elapsed <= 900
+            and int(binding.get("max_tokens") or 0) <= 80_000
+            and int(binding.get("max_physical_requests") or 0) <= 8
+            and int(binding.get("max_recoveries") or 0) <= 2
+        )
     else:
         allowed = 0 < elapsed <= 900
     if not allowed:
@@ -826,6 +834,7 @@ def validate_binding(
                 "s1-600000-s17w2",
                 "s1-600103-s19",
                 "s1-600103-s20",
+                "s1-600103-s21",
             }
             or not authorization.get("approval_reference")
         ):
@@ -1159,6 +1168,10 @@ def _worker(
 
             result = gap_loop_reply(request)
         elif protocol == "core_package_v1":
+            from .resource_probe import core_package_reply
+
+            result = core_package_reply(request)
+        elif protocol == "closeout_v1":
             from .resource_probe import core_package_reply
 
             result = core_package_reply(request)
