@@ -16,14 +16,15 @@
       重复构建幂等（同版本内容 hash 不变）。
 - [ ] 1.6 暴露 `GET /api/v1/research/financials/pit/cross-section`（服务端装配，
       YYYYMMDD 统一格式）与 `GET /api/v1/research/financials/pit/panel`。
-- [ ] 1.7 暴露 coverage 最小版：实际/应有（生命周期推导）/缺口 + quality 分布 +
-      attribution_quality 分布。
+- [ ] 1.7 暴露 coverage 最小版：实际/应有（生命周期推导，仅 2023-12-31 起成规模
+      期，稀疏期标 sparse 不算缺口）/缺口 + quality 分布 + attribution_quality 分布。
 - [ ] 1.8 as-of 语义单元测试：available_at ≤ as_of、报告期不越界、未公告自动
       回退上一期（小型 fixture，不依赖实时网络）。
 
 ## 2. M2 推导链完整化与行业端点
 
-- [ ] 2.1 实质变更约束：join `data_change_log`（old_hash ≠ new_hash），
+- [ ] 2.1 实质变更约束：join `data_change_log`（domain='financial'，datasets
+      financial_facts / financial_numeric_facts，old_hash ≠ new_hash），
       `available_at = max(推导值, 实质变更日)`，落 `last_value_change_at` 与
       `revised_after_publish`。
 - [ ] 2.2 `effective_at` 推导（trading_calendar 次一交易日）并暴露于 cross-section

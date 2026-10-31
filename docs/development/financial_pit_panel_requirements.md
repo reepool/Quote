@@ -329,6 +329,9 @@ GET /api/v1/research/financials/pit/coverage
 - 派生字段非空率、`source_table_updated_at` 近 N 天变化行数（追溯调整监控）。
 
 应有数推导口径在响应中显式声明；数字须与面板实查一致（验收 #16）。
+**应有/缺口仅对成规模报告期（2023-12-31 起）计算**；更早的稀疏期（实际 1~3 行）
+只报实际数并标记 sparse，不计算应有/缺口——对稀疏期按生命周期推导会得到
+4,000+ 的荒谬缺口，误导存活偏差声明。
 
 ### 5.4 增量变更流
 
@@ -498,6 +501,7 @@ equity 有值时 100% 命中 `parent_attributable_equity`；net_income 95.5% 命
 | 口径不一致风险 | 与 AKShare 双源口径若不一致，拼接点因子突变 | §3.5 重叠校验 + 验收 #12；两侧同为最新口径 |
 | financials.db 活跃写入 | 76GB 库有日常同步 | coordinated writes + 增量刷新 bounded ≤30s |
 | 当期披露未完 | 2026Q3 至 10-31 4,938 条（预期 ~5,550） | is_complete 时间判据 + 增量刷新，coverage 反映实际 |
+| 交易日历视界有限 | trading_calendar 当前 SSE/SZSE 至 2026-12-30、BSE 仅至 2026-11-06，需随日常维护刷新 | 超出视界时 effective_at 返回 null（不近似）；日历刷新属现有调度职责 |
 
 ## 13. quantwin 字段映射（联调对齐，v1.2 新增）
 

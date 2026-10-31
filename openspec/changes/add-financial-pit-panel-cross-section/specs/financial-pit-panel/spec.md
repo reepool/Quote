@@ -157,9 +157,14 @@ The system SHALL provide an append-only changes feed endpoint based on `data_cha
 The system SHALL provide a coverage endpoint reporting, per report period, actual instrument counts, lifecycle-derived expected counts with the derivation stated, gap counts, reverse discrepancies where rows exist outside the lifecycle universe, the `available_at_quality` distribution, `attribution_quality` distribution, `revised_after_publish` row counts, derived-field non-null rates, completeness markers, and recent source-change row counts.
 
 #### Scenario: Expected counts are lifecycle-derived and disclosed
-- **WHEN** the coverage endpoint reports a report period
+- **WHEN** the coverage endpoint reports a bulk report period (2023-12-31 onward)
 - **THEN** expected counts SHALL be derived from instrument lifecycle fields (stock instruments on SSE/SZSE/BSE listed on or before the period end and not delisted as of the period end)
 - **AND** the response SHALL state this derivation explicitly
+
+#### Scenario: Sparse early periods report actual counts only
+- **WHEN** the coverage endpoint reports a report period before the first bulk period (2023-12-31) that has only sparse panel rows
+- **THEN** it SHALL report the actual row count with a sparse marker
+- **AND** it SHALL NOT compute lifecycle expected or gap counts for that period, because they would be meaningless against single-digit actuals
 
 #### Scenario: Reverse discrepancies are exposed
 - **WHEN** panel rows exist for instruments whose lifecycle fields exclude them from the expected universe
