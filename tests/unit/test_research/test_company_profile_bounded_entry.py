@@ -956,3 +956,102 @@ def test_s17w2_disk_entry_sends_unread_role_body_and_keeps_eight_claims():
     ) or "生产线" in str(role.get("answer") or "")
     if profile.get("draft_complete"):
         assert "core_dimension_missing:operating_role" not in gaps
+
+
+def test_fresh_chapter_core_package_drafts_and_verifies_under_conservative_usage():
+    """New chapter run, transport replaced. Unknown usage keeps each reservation.
+
+    This is the success proof: a pending core draft is saved and a nonempty
+    covering verify is sent. An admission refusal is not a pass.
+    """
+    import hashlib
+    import shutil
+    from pathlib import Path
+
+    from research.company_profile.bounded_entry import S19_AUTHORIZATION, main
+    from research.company_profile.reads import CompanyProfileReadService
+
+    root = Path("/home/python/Quote")
+    change = root / "openspec/changes/restore-company-profile-llm-led-generalization"
+    source = json.loads((change / "s1-pool-s1-600103-s16-binding.json").read_text())
+    for retired in (
+        "accepted_navigation_query",
+        "accepted_source_query",
+        "accepted_draft_query",
+        "accepted_candidate_query",
+        "navigation_query",
+        "continuation_checkpoint",
+        "company_task_state",
+        "continuation_budget",
+        "compatible_continue",
+        "prior_charged_tokens",
+        "verification_history_queries",
+    ):
+        source.pop(retired, None)
+    source["offline_protocol"] = "core_package_v1"
+    source["chapter_select"] = True
+    source["run_authorization"] = S19_AUTHORIZATION
+    source["max_elapsed_seconds"] = 900
+    source["max_tokens"] = 120_000
+    source["max_physical_requests"] = 16
+    source["max_recoveries"] = 2
+    source["max_cost_cny"] = "20"
+    source["file_hashes"] = {
+        name: hashlib.sha256((root / name).read_bytes()).hexdigest()
+        for name in source["file_hashes"]
+    }
+    run_root = root / "data/QuoteBak/s19-paper-core-offline"
+    if run_root.exists():
+        shutil.rmtree(run_root)
+    path = root / "data/QuoteBak/s19-paper-core-offline-binding.json"
+    path.write_text(json.dumps(source, ensure_ascii=False))
+    argv = sys.argv
+    sys.argv = ["bounded_entry", "--binding", str(path), "--run-root", str(run_root)]
+    try:
+        code = main()
+    finally:
+        sys.argv = argv
+    transport = json.loads((run_root / "offline-transport.json").read_text())
+    purposes = [item.get("purpose") for item in transport.get("requests") or []]
+    stages = json.loads((run_root / "entry-stages.json").read_text())
+    if code != 0:
+        result = json.loads((run_root / "entry-result.json").read_text())
+        raise AssertionError(
+            f"entry failed code={code} error={result.get('error')} purposes={purposes}"
+        )
+    query = json.loads((run_root / "query.json").read_text())
+    exported = json.loads((run_root / "export.json").read_text())
+    reloaded = CompanyProfileReadService(run_root / "output").query(
+        (source["asset"]["instrument_id"],)
+    )
+    assert query["profiles"] == exported["profiles"] == reloaded["profiles"]
+    profile = query["profiles"][0]["three_views"]
+    gaps = profile.get("gaps") or []
+    assert "synthesize_views" in purposes, gaps
+    assert "verify_views" in purposes, gaps
+    verify_pages = [
+        item.get("pages")
+        for item in transport["requests"]
+        if item.get("purpose") == "verify_views"
+    ]
+    assert verify_pages
+    claims = []
+    seen = set()
+    for view in profile["views"].values():
+        for claim in view.get("claims") or []:
+            if claim.get("claim_id") in seen:
+                continue
+            seen.add(claim.get("claim_id"))
+            claims.append(claim)
+    dimensions = {claim.get("dimension") for claim in claims if claim.get("status") == "observed"}
+    assert {"principal_business", "products_services", "revenue_model"} <= dimensions, (
+        dimensions,
+        gaps,
+    )
+    assert "supply_chain_role" in dimensions, (dimensions, gaps)
+    assert not any(gap.startswith("direct_core_ledger_hold") for gap in gaps), gaps
+    assert not any("direct_core_admission_stopped" in gap for gap in gaps), gaps
+    assert profile.get("draft_complete") is True, gaps
+    charged = int(stages.get("ledger_charged_tokens") or 0)
+    assert charged > 120 * len(purposes)
+    assert transport.get("real_calls") == 0

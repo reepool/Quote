@@ -227,13 +227,7 @@ def _latest_named_condition_check(checks, needle: str):
 
 def _operating_role_established(claims, checks) -> bool:
     latest = _latest_named_condition_check(checks, "core-question:operating-role")
-    if latest is None or latest.status != "pass":
-        return False
-    verified = {item.claim_id for item in _verified_claims(claims, checks)}
-    return (
-        latest.covers_target_type == "claim"
-        and latest.covers_target_id in verified
-    )
+    return _condition_covers_verified_claim(latest, claims, checks)
 
 
 def _amount_in_yuan(amount: str, unit: str) -> float | None:
@@ -260,11 +254,22 @@ def _amounts_equivalent(left: str, left_unit: str, right: str, right_unit: str) 
     return abs(first - second) <= max(1.0, 0.01 * coarse)
 
 
+def _condition_covers_verified_claim(latest, claims, checks) -> bool:
+    """A bare pass, a missing object, or a later deny does not answer the question."""
+    if latest is None or latest.status != "pass":
+        return False
+    verified = {item.claim_id for item in _verified_claims(claims, checks)}
+    return (
+        latest.covers_target_type == "claim"
+        and latest.covers_target_id in verified
+    )
+
+
 def _period_revenue_verified(claims, checks) -> bool:
     latest = _latest_named_condition_check(
         checks, "core-question:period-operating-revenue"
     )
-    return latest is not None and latest.status == "pass"
+    return _condition_covers_verified_claim(latest, claims, checks)
 
 
 def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
@@ -598,8 +603,15 @@ def _core_closeout_ready(claims, conditions, checks, records=()) -> bool:
 def _structure_preview(text: str) -> str:
     """Headings a reader can recognize, plus a short body sample. Not an 8-character stub."""
     headings = _heading_lines(text, limit=2)
-    sample = " ".join(text.split())[:48]
-    return " / ".join([*headings, sample])[:180]
+    compact = " ".join(text.split())
+    sample = compact[:48]
+    parts = [*headings, sample]
+    joined = " ".join(parts)
+    marker = next((mark for mark in _BUSINESS_MARKERS if mark in compact and mark not in joined), "")
+    if marker:
+        index = compact.find(marker)
+        parts.append(compact[max(0, index - 8) : index + len(marker) + 12])
+    return " / ".join(part for part in parts if part)[:180]
 
 
 _DOTTED_TOC = re.compile(r"^(?P<title>.+?)\s*[\.·．…\s]{2,}(?P<page>\d{1,3})$")
@@ -1852,8 +1864,22 @@ def interpret_direct_core(
                 counts[logical] = counts.get(logical, 0) + 1
         return any(count >= 2 for count in counts.values())
 
+    def gateway_budget():
+        """Public gateway ledger. A reservation simulator must not override it."""
+        budget = getattr(provider, "run_budget", None)
+        if budget is not None and hasattr(budget, "snapshot"):
+            return budget
+        client = getattr(provider, "client", None)
+        budget = getattr(client, "physical_budget", None)
+        if budget is not None and hasattr(budget, "snapshot"):
+            return budget
+        return None
+
     def charged() -> int:
         prior = int(identity.get("prior_charged_tokens") or 0)
+        gateway = gateway_budget()
+        if gateway is not None:
+            return prior + int(gateway.snapshot().get("charged_tokens") or 0)
         live = int(snapshot().get("charged_tokens") or 0)
         simulated = int(identity.get("offline_charged_tokens") or 0)
         return prior + max(live, simulated)
@@ -1966,10 +1992,7 @@ def interpret_direct_core(
             response = ReportSemanticResponseV3.model_validate_json(
                 json.dumps(response, ensure_ascii=False)
             )
-        gateway_budget = getattr(
-            getattr(provider, "client", None), "physical_budget", None
-        )
-        if getattr(provider, "offline_only", False) and gateway_budget is None:
+        if getattr(provider, "offline_only", False) and gateway_budget() is None:
             identity["offline_charged_tokens"] = int(
                 identity.get("offline_charged_tokens") or 0
             ) + int(units)
@@ -2840,7 +2863,7 @@ def interpret_direct_core(
             previews.append(
                 {
                     "page": int(page_no),
-                    "text": _structure_preview(str(source.get("text") or "")),
+                    "text": str(source.get("text") or ""),
                     "readable": True,
                 }
             )
@@ -2860,7 +2883,16 @@ def interpret_direct_core(
                 if int(source["page"]) in {int(item["page"]) for item in batch}
             ]
             try:
-                reserve_pages = full_pages if identity.get("chapter_select") else full_pages
+                reserve_pages = full_pages
+                if identity.get("chapter_select"):
+                    reserve_pages = [
+                        {
+                            "page": int(source["page"]),
+                            "text": " ".join(str(source.get("text") or "").split())[:700],
+                            "readable": True,
+                        }
+                        for source in full_pages[:2]
+                    ]
                 response = invoke(
                     "source_inventory",
                     batch,
@@ -3244,28 +3276,6 @@ def interpret_direct_core(
                 evidence for item in pending for evidence in item.evidence
             )
         ]
-        if any(
-            condition.condition_id.startswith("core-question:")
-            or str(condition.condition_id).split(":")[-1]
-            in {"operating-role", "period-operating-revenue"}
-            for condition in pending
-        ):
-            full_pages = []
-            for page in pages:
-                source = next(
-                    (
-                        item
-                        for item in sources
-                        if int(item["page"]) == int(page["page"]) and str(item.get("text") or "").strip()
-                    ),
-                    None,
-                )
-                if source is not None:
-                    full_pages.append(
-                        {"page": int(page["page"]), "text": str(source["text"]), "readable": True}
-                    )
-            if full_pages:
-                pages = full_pages
         if identity.get("core_gap_closeout"):
             full_pages = []
             for page in pages:
@@ -3298,29 +3308,56 @@ def interpret_direct_core(
                     page.get("text") or ""
                 ):
                     page["text"] = f"{heading}\n{page.get('text') or ''}"
-        if len(pending) > 1:
-            sized = ReportSemanticRequestV3(
-                request_id=f"{work_id}:report:{len(receipts) + 1}",
-                purpose="synthesize_views",
-                report=report,
-                processing_identity=identity,
-                source_pages=tuple(pages),
-                source_scope="full_context",
-                source_conditions=tuple(pending),
-                max_output_tokens=_body_output(identity),
-                timeout_seconds=float(
-                    identity.get("logical_request_timeout_seconds") or 120
-                ),
-            )
-            cap = int(identity.get("max_payload_utf8_bytes") or 60_000)
-            room = pack_room()
+        sized = ReportSemanticRequestV3(
+            request_id=f"{work_id}:report:{len(receipts) + 1}",
+            purpose="synthesize_views",
+            report=report,
+            processing_identity=identity,
+            source_pages=tuple(pages),
+            source_scope="full_context",
+            source_conditions=tuple(pending),
+            max_output_tokens=_body_output(identity),
+            timeout_seconds=float(
+                identity.get("logical_request_timeout_seconds") or 120
+            ),
+        )
+        cap = int(identity.get("max_payload_utf8_bytes") or 60_000)
+        room = pack_room()
+        too_big = (
+            request_payload_bytes(sized) > cap or request_reservation(sized) > room
+        )
+        if too_big and len(pending) > 1:
+            middle = max(1, len(pending) // 2)
+            deliver_group(pending[:middle])
+            deliver_group(pending[middle:])
+            return
+        if too_big:
+            quotes = [
+                str(getattr(getattr(evidence, "anchor", None), "bounded_quote", "") or "")
+                for condition in pending
+                for evidence in condition.evidence
+            ]
+            shrunk = []
+            for page in pages:
+                text = str(page.get("text") or "")
+                kept = next((quote for quote in quotes if quote and quote in text), "")
+                shrunk.append(
+                    {
+                        "page": int(page["page"]),
+                        "text": (kept or text[:180]),
+                        "readable": True,
+                    }
+                )
+            sized = sized.model_copy(update={"source_pages": tuple(shrunk)})
             if (
-                request_payload_bytes(sized) > cap
-                or request_reservation(sized) > room
+                request_payload_bytes(sized) <= cap
+                and request_reservation(sized) <= room
             ):
-                middle = max(1, len(pending) // 2)
-                deliver_group(pending[:middle])
-                deliver_group(pending[middle:])
+                pages = shrunk
+            else:
+                gap = f"necessary_fragment:{pending[0].condition_id}"
+                if gap not in gaps:
+                    gaps.append(gap)
                 return
         try:
             drafted = invoke(
@@ -4353,8 +4390,17 @@ def interpret_direct_core(
                     )
                 except ValueError:
                     hold_slices = [hold_pages[:1]]
+                first = hold_slices[0] if hold_slices else hold_pages[:1]
+                windowed = [
+                    {
+                        "page": int(page["page"]),
+                        "text": " ".join(str(page.get("text") or "").split())[:700],
+                        "readable": True,
+                    }
+                    for page in first[:2]
+                ]
                 source_later = _compose_tail(
-                    hold_slices[0] if hold_slices else hold_pages[:1],
+                    windowed,
                     report=report,
                     identity=identity,
                 )

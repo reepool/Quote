@@ -569,3 +569,215 @@ def gap_loop_reply(request: dict) -> dict:
                     check["covers_target_id"] = match
             result["checks"].append(check)
     return result
+
+
+def _unique_quote(text: str, marks: tuple[str, ...]) -> str | None:
+    compact = " ".join(str(text or "").split())
+    for mark in marks:
+        index = compact.find(mark)
+        if index < 0:
+            continue
+        quote = compact[max(0, index - 6) : index + 42]
+        if quote and compact.count(quote) == 1:
+            return quote
+    return None
+
+
+def core_package_reply(request: dict) -> dict:
+    """Answers only from text this request sent. Protocol proof, not a score."""
+    result = {
+        "schema_version": "company_profile_report_response.v3",
+        "request_id": request["request_id"],
+        "purpose": request["purpose"],
+    }
+    pages = [
+        page
+        for page in request.get("source_pages") or []
+        if page.get("readable", True) and str(page.get("text") or "").strip()
+    ]
+    if request["purpose"] == "source_inventory" and request.get("source_scope") == "page_map":
+        def catalog(text: str) -> bool:
+            return "目录" in text and ("第一节" in text or text.count(".") >= 4)
+
+        chosen = []
+        for page in pages:
+            text = str(page.get("text") or "")
+            if catalog(text):
+                continue
+            if any(
+                mark in text
+                for mark in ("管理层讨论", "经营情况", "经营模式", "财务报告", "主营业务")
+            ):
+                chosen.append(int(page["page"]))
+        if not chosen:
+            chosen = [int(page["page"]) for page in pages if not catalog(str(page.get("text") or ""))]
+        result["requested_pages"] = chosen[:3]
+        return result
+    if request["purpose"] == "source_inventory":
+        if request.get("claims"):
+            raise ValueError("gap_request_contains_candidates")
+        catalog = (
+            ("principal_business", "core-business", ("主营业务", "纸行业", "浆行业")),
+            ("products_services", "core-products", ("主要产品", "浆粕", "纸制品")),
+            ("revenue_model", "core-revenue", ("营业收入",)),
+            ("input_exposure", "core-input", ("原辅材料", "成本构成", "营业成本")),
+            (
+                "supply_chain_role",
+                "core-question:operating-role",
+                ("自主生产", "生产线", "经营模式", "制浆"),
+            ),
+            ("output_exposure", "core-output", ("销售模式", "直销", "经销")),
+        )
+        conditions = []
+        for dimension, condition_id, marks in catalog:
+            for page in pages:
+                quote = _unique_quote(str(page.get("text") or ""), marks)
+                if quote is None:
+                    continue
+                conditions.append(
+                    {
+                        "condition_id": condition_id,
+                        "dimension": dimension,
+                        "description": "根据本请求原文说明该项，不补原文没有的事实。",
+                        "major": True,
+                        "statement_status": "current",
+                        "evidence": [{"page": int(page["page"]), "quote": quote}],
+                    }
+                )
+                break
+        follow = []
+        for page in pages:
+            text = str(page.get("text") or "")
+            if "管理层讨论" in text and _unique_quote(
+                text, ("自主生产", "生产线", "经营模式", "制浆")
+            ) is None:
+                follow.append(int(page["page"]) + 1)
+        result["requested_pages"] = follow[:1]
+        result["source_conditions"] = conditions
+        return result
+    if request["purpose"] == "synthesize_views":
+        result["claims"] = []
+        catalog = request.get("evidence_catalog") or {}
+        seen_quotes: set[str] = set()
+        for item in request.get("source_conditions") or []:
+            evidence = []
+            raw_evidence = list(item.get("evidence") or [])
+            raw_evidence.extend(item.get("evidence_refs") or [])
+            for raw in raw_evidence:
+                if isinstance(raw, str):
+                    raw = catalog.get(raw) or {}
+                if not isinstance(raw, dict):
+                    continue
+                anchor = raw.get("anchor") or {}
+                page_no = raw.get("page")
+                quote = str(
+                    raw.get("quote")
+                    or anchor.get("bounded_quote")
+                    or anchor.get("model_quote")
+                    or ""
+                )
+                sent = next(
+                    (
+                        page
+                        for page in pages
+                        if page_no is not None and int(page["page"]) == int(page_no)
+                    ),
+                    None,
+                )
+                if sent is None or not quote:
+                    continue
+                compact_page = " ".join(str(sent.get("text") or "").split())
+                probe = "".join(quote.split())[:16]
+                folded = "".join(compact_page.split())
+                if probe and probe in folded:
+                    index = folded.find(probe)
+                    seen = 0
+                    start_at = 0
+                    for offset, char in enumerate(compact_page):
+                        if char.isspace():
+                            continue
+                        if seen == index:
+                            start_at = offset
+                            break
+                        seen += 1
+                    used = compact_page[start_at : start_at + 48]
+                else:
+                    marks = {
+                        "principal_business": ("主营", "制浆", "造纸"),
+                        "products_services": ("主要产品", "产品"),
+                        "revenue_model": ("营业收入",),
+                        "input_exposure": ("营业成本", "原辅材料", "成本"),
+                        "supply_chain_role": ("制浆", "造纸", "生产"),
+                        "output_exposure": ("销售模式", "直销", "销售"),
+                    }.get(str(item.get("dimension") or ""), ())
+                    mark = next((item_mark for item_mark in marks if item_mark in compact_page), "")
+                    if not mark:
+                        continue
+                    index = compact_page.find(mark)
+                    used = compact_page[max(0, index - 6) : index + 36]
+                if not used:
+                    continue
+                if used in seen_quotes and item.get("dimension") == "revenue_model":
+                    continue
+                seen_quotes.add(used)
+                evidence.append({"page": int(page_no), "quote": used})
+            if not evidence:
+                continue
+            result["claims"].append(
+                {
+                    "claim_id": f"core-{item.get('condition_id')}",
+                    "dimension": item.get("dimension"),
+                    "status": "observed",
+                    "answer": evidence[0]["quote"],
+                    "condition_ids": [item["condition_id"]] if item.get("condition_id") else [],
+                    "supporting_record_ids": [],
+                    "evidence": evidence[:1],
+                }
+            )
+        return result
+    result["checks"] = []
+    for kind, values, key in (
+        ("condition", request.get("source_conditions") or [], "condition_id"),
+        ("claim", request.get("claims") or [], "claim_id"),
+    ):
+        for item in values:
+            check = {
+                "target_type": kind,
+                "target_id": item[key],
+                "status": "pass",
+                "explanation": "离线按本请求已送原文核验，不是年报成绩。",
+            }
+            if kind == "condition":
+                condition_id = str(item.get("condition_id") or "")
+                claims = request.get("claims") or []
+                match = next(
+                    (
+                        claim.get("claim_id")
+                        for claim in claims
+                        if condition_id and condition_id in (claim.get("condition_ids") or [])
+                    ),
+                    None,
+                )
+                if match is None and condition_id.endswith("period-operating-revenue"):
+                    match = next(
+                        (
+                            claim.get("claim_id")
+                            for claim in claims
+                            if claim.get("dimension") == "revenue_model"
+                        ),
+                        None,
+                    )
+                if match is None and condition_id.endswith("operating-role"):
+                    match = next(
+                        (
+                            claim.get("claim_id")
+                            for claim in claims
+                            if claim.get("dimension") == "supply_chain_role"
+                        ),
+                        None,
+                    )
+                if match:
+                    check["covers_target_type"] = "claim"
+                    check["covers_target_id"] = match
+            result["checks"].append(check)
+    return result

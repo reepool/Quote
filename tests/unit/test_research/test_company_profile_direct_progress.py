@@ -7552,6 +7552,8 @@ def test_resolved_revenue_miss_is_not_kept_after_equivalent_pass():
             target_id="core-question:period-operating-revenue",
             status="pass",
             explanation="总额已核。",
+            covers_target_type="claim",
+            covers_target_id="claim_operating_revenue_2025",
         ),
     ]
     live = _current_gaps(
@@ -7562,6 +7564,34 @@ def test_resolved_revenue_miss_is_not_kept_after_equivalent_pass():
     )
     assert "read_but_missed:period-operating-revenue" not in live
     assert "chapter_gap_expansion" in live
+
+
+def test_period_revenue_pass_without_object_does_not_count():
+    from research.company_profile.direct_reading import _period_revenue_verified
+
+    report = _report()
+    claim = ReportViewClaim(
+        claim_id="claim_operating_revenue_2025",
+        dimension="revenue_model",
+        status="observed",
+        answer="青山纸业公司2025年度营业收入为241,899.02万元。",
+        evidence=(_evidence(report, text="营业收入为241,899.02万元", page=85),),
+    )
+    checks = [
+        ReportViewCheck(
+            target_type="claim",
+            target_id="claim_operating_revenue_2025",
+            status="pass",
+            explanation="主张已核。",
+        ),
+        ReportViewCheck(
+            target_type="condition",
+            target_id="core-question:period-operating-revenue",
+            status="pass",
+            explanation="没有指向交付对象。",
+        ),
+    ]
+    assert _period_revenue_verified([claim], checks) is False
 
 
 def test_unrelated_growth_rates_do_not_bloat_wealth_verify():
