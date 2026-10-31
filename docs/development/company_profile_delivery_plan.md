@@ -2,7 +2,7 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-10-31。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[§17章节核心业务验收](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#17-章节核心业务验收保已有答案修共同阻塞后一次交两家)，依据验收§7.68/A审核§149。S16两家已交真实非空三视图，原入口结束；造纸缺实质角色，银行核验被无关冲突上下文撑大，均未可靠收束。接受已有有据总额，不为指定利润表返工。A显式在原累计未用资源中重分配115000账本/1300秒/20物理/3恢复，两家各从本家S16兼容接续，先造纸成立再银行，不重读全年报、不加原总额；修正/实载证明/真实交付合在一窗，不逐项准备送审。质量及停止不变，原S1仍0/12，其余十家/S1重测/S2/生产未授权。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[§18章节缺口闭环重整](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#18-章节缺口闭环重整停止17真实接续)，依据验收§7.69/A审核§151。§17两窗无新可靠答案，付费兼容接续结束，关闭银行未用入口及旧余额授权。保章节方向和有效答案，在原owner一次贯通缺口→正文→答案→有效覆盖→持久三读，删除关键词/标签代语义捷径；两家公司工程验证不再串行等待。新增真实调用/预算0，不逐函数送审、不建平台。质量不降，原S1仍0/12，其余十家/S1重测/S2/生产未授权。
 
 ## 1. 开发者必须先理解的纠偏
 
@@ -92,7 +92,9 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 
 ### B3 / S1：12家新链回归（A2通过后）
 
-- **2026-10-31审核§149（当前）：** §16两家真实入口结束，三视图均非空但可靠核心未过。当前只执行[§17](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#17-章节核心业务验收保已有答案修共同阻塞后一次交两家)/验收§7.68：保S16正确正文/真实检查，纠正集中度代角色与跨指标冲突误扩；已读收入缺项补答核验、必要定向补读，一次交两家公司。明确允许本家S16兼容重验及原总额内子额重分配，不是新公司首发、旧卡自动后继或常规效率通过。清理前置/收尾、v3自主P0—P3/至多两次共性修正/冻结运行及停止写在卡内，不逐函数返A；失败作路线取舍，不自动加尾项窗。以下历史安排不再授权外呼。
+- **2026-10-31审核§151（当前）：** §17新增可靠答案0，付费兼容接续结束，不开第三窗/银行旧绑定。当前仅[§18](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#18-章节缺口闭环重整停止17真实接续)/验收§7.69的一次直接链工程整合，真实调用/预算0，旧余额不用。B按v3连续完成直接P0—P3/至多两次共性修正、真实磁盘失败入口到三读的受控传输证明；删除语义捷径，正常/失败均保已有正文与真实缺口。A末端一次裁决新方案，不逐函数审批；仍不通则结束该兼容实现继续修补。清理前置/收尾及原质量/分数/生产边界不变。以下历史安排不再授权外呼。
+
+- **2026-10-31审核§149（已结束）：** §16两家真实入口结束，三视图均非空但可靠核心未过。曾执行§17/验收§7.68，结果及停止见§150—151，不据此续用余额。
 
 - **2026-10-30审核§141：** 当前唯一§15/验收§7.64。§13—§14真实入口已结束，银行新增12条pending但checks=0，核心交付仍0/2。下一窗口沿原owner一次修通实际目标/余额下的章节核心链，真实请求/预算0，不恢复银行/造纸或借余额；完整工程交付后再裁决是否有新真实方案。以下均为历史活动安排，不再授权外呼。
 
