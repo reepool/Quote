@@ -94,6 +94,9 @@ CREATE TABLE IF NOT EXISTS financial_pit_panel (
     source_table_updated_at TEXT,
     last_value_change_at TEXT,
     revised_after_publish INTEGER NOT NULL DEFAULT 0,
+    share_validation TEXT,
+    share_basis TEXT,
+    share_candidates_json TEXT,
     panel_version TEXT NOT NULL,
     built_at TEXT NOT NULL,
     PRIMARY KEY (instrument_id, report_period)
@@ -291,9 +294,26 @@ class FinancialPitPanelStore:
         connection.execute("PRAGMA busy_timeout=60000")
         return connection
 
+    _ANNOTATION_COLUMNS: Tuple[Tuple[str, str], ...] = (
+        ("share_validation", "TEXT"),
+        ("share_basis", "TEXT"),
+        ("share_candidates_json", "TEXT"),
+    )
+
     def initialize(self) -> None:
         with self.connect() as connection:
             connection.executescript(FINANCIAL_PIT_PANEL_SCHEMA_SQL)
+            existing = {
+                row[1]
+                for row in connection.execute(
+                    "PRAGMA table_info(financial_pit_panel)"
+                ).fetchall()
+            }
+            for column, ctype in self._ANNOTATION_COLUMNS:
+                if column not in existing:
+                    connection.execute(
+                        f"ALTER TABLE financial_pit_panel ADD COLUMN {column} {ctype}"
+                    )
 
     # ------------------------------------------------------- source reading
 
@@ -367,11 +387,21 @@ class FinancialPitPanelStore:
                 result[(row["instrument_id"], str(row["period"])[:10])] = changed_at
         return result
 
-    def _load_share_facts(
+    def _load_share_anchor_facts(
         self, connection: sqlite3.Connection
     ) -> Dict[Tuple[str, str], Dict[str, Any]]:
-        """Reported per-share facts from the long table, keyed by (instrument, period)."""
-        enrichment: Dict[Tuple[str, str], Dict[str, Any]] = {}
+        """Share-related anchors from the long table, keyed by (instrument, period).
+
+        ths  : THS share-count fact (canonical share_capital_amount, fact_name
+               'equity'); rows quarantined to share_capital_suspect are
+               naturally excluded.
+        pic  : paid-in-capital fact (same canonical, fact_name starting
+               实收资本) - a CNY amount usable only as a validator.
+        reported_eps: cumulative reported basic EPS for the EPS-implied anchor.
+        Rows are read newest-first so the first value per (period, family) is
+        the deterministic latest.
+        """
+        anchors: Dict[Tuple[str, str], Dict[str, Any]] = {}
         instrument_ids = [
             row[0]
             for row in connection.execute(
@@ -381,26 +411,38 @@ class FinancialPitPanelStore:
         for instrument_id in instrument_ids:
             rows = connection.execute(
                 """
-                SELECT report_period,
-                       COALESCE(canonical_fact_name, fact_name) AS fact_name,
-                       fact_value
+                SELECT report_period, fact_name, canonical_fact_name, fact_value
                 FROM financial_numeric_facts_hot
                 WHERE instrument_id = ?
-                  AND COALESCE(canonical_fact_name, fact_name) IN (?, ?)
+                  AND (
+                        COALESCE(canonical_fact_name, fact_name) = 'share_capital_amount'
+                     OR COALESCE(canonical_fact_name, fact_name) = 'shares_outstanding'
+                     OR COALESCE(canonical_fact_name, fact_name) = ?
+                  )
                   AND fact_value IS NOT NULL
                 ORDER BY updated_at DESC, rowid DESC
                 """,
-                (instrument_id, _LONG_TABLE_EPS_FACT, _LONG_TABLE_SHARE_FACT),
+                (instrument_id, _LONG_TABLE_EPS_FACT),
             ).fetchall()
             for row in rows:
                 key = (instrument_id, str(row["report_period"])[:10])
-                entry = enrichment.setdefault(key, {})
+                entry = anchors.setdefault(key, {})
+                canonical = row["canonical_fact_name"] or row["fact_name"]
                 value = float(row["fact_value"])
-                if row["fact_name"] == _LONG_TABLE_EPS_FACT:
-                    entry.setdefault("reported_eps", value)
-                elif value > 0:
-                    entry.setdefault("share_capital", value)
-        return enrichment
+                fact_name = row["fact_name"]
+                if canonical == "shares_outstanding" and value > 0:
+                    entry.setdefault("sos", value)
+                elif canonical == _LONG_TABLE_EPS_FACT:
+                    if "reported_eps" not in entry:
+                        entry["reported_eps"] = value
+                elif canonical == "share_capital_amount":
+                    if fact_name == "equity":
+                        if value > 0:
+                            entry.setdefault("ths", value)
+                    elif fact_name.startswith("实收资本"):
+                        if value != 0:
+                            entry.setdefault("pic", value)
+        return anchors
 
     def _load_valuation_shares(
         self, instrument_ids: Sequence[str]
@@ -664,6 +706,141 @@ class FinancialPitPanelStore:
         """Kept for refresh-path symmetry; derivation lives in derive_availability."""
         return None
 
+    # Cross-validation bands (design D1): period-end share-count anchors agree
+    # within +/-5%; the EPS-implied weighted anchor gets +/-15% (measured
+    # cluster 0.98-1.02 supports the wider band).
+    _SC_BAND = 0.05
+    _EPS_BAND = 0.15
+    # A paid-in-capital (CNY) fact beyond this band from an adopted value is a
+    # unit mismatch (par != 1); beyond it while being the de facto validator
+    # (<2 share-count anchors) escalates to discrepancy.
+    _PIC_BAND = 0.05
+    _EPS_SKIP_ABS_NI = 1.0
+    _EPS_SKIP_ABS_EPS = 0.005
+
+    @staticmethod
+    def _assemble_share_denominator(
+        *,
+        instrument_id: str,
+        period: str,
+        anchor_entry: Optional[Dict[str, Any]],
+        net_income: Optional[float],
+        revenue: Optional[float],
+        valuation_series: Optional[Sequence[Tuple[str, float]]],
+    ) -> Tuple[Optional[float], str, str, Optional[Dict[str, Any]]]:
+        """Four-anchor cross-validated denominator (design D1, layered).
+
+        Returns (shares, validation, basis, candidates) where validation is
+        consensus / discrepancy / single_source / null.
+        """
+        entry = anchor_entry or {}
+        candidates: Dict[str, Any] = {}
+
+        def _add(name: str, value: Any, note: Optional[str] = None) -> None:
+            item: Dict[str, Any] = {"value": value}
+            if note:
+                item["note"] = note
+            candidates[name] = item
+
+        # 1) assemble available share-count anchors (positive values only)
+        sc: List[Tuple[int, str, float]] = []
+        sos = entry.get("sos")
+        if sos:
+            sc.append((0, "shares_outstanding", sos))
+            _add("shares_outstanding", sos)
+        else:
+            _add("shares_outstanding", None, note="absent")
+        ths = entry.get("ths")
+        if ths:
+            sc.append((1, "ths_share_capital", ths))
+            _add("ths_share_capital", ths)
+        else:
+            _add("ths_share_capital", None, note="absent")
+        val = None
+        if valuation_series:
+            window_end = _shift_iso_date(period, 45)
+            in_window = [
+                v for d, v in valuation_series if period < d <= window_end
+            ]
+            val = in_window[0] if in_window else None
+        if val:
+            sc.append((2, "valuation_implied", val))
+            _add("valuation_implied", round(val, 4))
+        else:
+            _add("valuation_implied", None, note="absent")
+        eps_implied = None
+        reported_eps = entry.get("reported_eps")
+        if (
+            reported_eps
+            and net_income is not None
+            and abs(net_income) >= FinancialPitPanelStore._EPS_SKIP_ABS_NI
+            and abs(reported_eps) >= FinancialPitPanelStore._EPS_SKIP_ABS_EPS
+        ):
+            eps_implied = net_income / reported_eps
+        if eps_implied:
+            sc.append((3, "eps_implied", eps_implied))
+            _add("eps_implied", round(eps_implied, 4))
+        else:
+            skip_note = "skipped_near_zero_net_income_or_eps"
+            _add("eps_implied", None, note=skip_note)
+        pic = entry.get("pic")
+        if pic:
+            _add("paid_in_capital_cny", pic)
+
+        if not sc:
+            if pic:
+                return (
+                    pic,
+                    "single_source",
+                    "paid_in_capital_cny_par_assumption",
+                    {"anchors": candidates},
+                )
+            return None, "null", None, {"anchors": candidates}
+
+        # 2) adopt by preference; validate remaining share-count anchors vs V
+        sc.sort(key=lambda item: item[0])
+        _, basis, shares = sc[0]
+        dissenting = []
+        for _, name, value in sc[1:]:
+            band = (
+                FinancialPitPanelStore._EPS_BAND
+                if name == "eps_implied"
+                else FinancialPitPanelStore._SC_BAND
+            )
+            if abs(value / shares - 1.0) > band:
+                dissenting.append(name)
+
+        # 3) paid-in-capital validator (layered; never adopted when any
+        #    share-count anchor exists)
+        pic_note = None
+        if pic:
+            if abs(pic / shares - 1.0) <= FinancialPitPanelStore._PIC_BAND:
+                pic_note = "corroborated_by_paid_in_capital"
+            else:
+                if len(sc) >= 2 and not dissenting:
+                    pic_note = "unit_mismatch_likely_non_unit_par"
+                elif len(dissenting) == 1 and abs(
+                    pic / candidates[dissenting[0]]["value"] - 1.0
+                ) <= FinancialPitPanelStore._PIC_BAND:
+                    pic_note = "corroborates_dissenting_anchor"
+                    dissenting.append("paid_in_capital_cny_unit_consistent_with_dissent")
+                elif len(sc) < 2:
+                    dissenting.append("paid_in_capital_cny")
+                    pic_note = "de_facto_validator_disagreement"
+                else:
+                    pic_note = "unit_mismatch_likely_non_unit_par"
+
+        if dissenting:
+            validation = "discrepancy"
+        elif len(sc) == 1:
+            validation = "single_source"
+        else:
+            validation = "consensus"
+        if pic_note:
+            candidates["paid_in_capital_note"] = pic_note
+        candidates["adopted"] = {"basis": basis, "value": shares}
+        return shares, validation, basis, {"anchors": candidates}
+
     @staticmethod
     def _apply_derivations(
         panel_row: Dict[str, Any],
@@ -674,11 +851,22 @@ class FinancialPitPanelStore:
     ) -> None:
         """Compute eps/bps/ocfps and YoY/TTM in place (null outside boundaries)."""
         period = panel_row["report_period"]
-        fact_shares = source_row.get("shares_outstanding")
-        if not fact_shares and share_entry:
-            fact_shares = share_entry.get("share_capital")
-        shares = FinancialPitPanelStore._resolve_denominator_shares(
-            panel_row["instrument_id"], period, fact_shares, valuation_series
+        shares, share_validation, share_basis, share_candidates = (
+            FinancialPitPanelStore._assemble_share_denominator(
+                instrument_id=panel_row["instrument_id"],
+                period=period,
+                anchor_entry=share_entry,
+                net_income=source_row.get("net_income"),
+                revenue=source_row.get("revenue"),
+                valuation_series=valuation_series,
+            )
+        )
+        panel_row["share_validation"] = share_validation
+        panel_row["share_basis"] = share_basis
+        panel_row["share_candidates_json"] = (
+            json.dumps(share_candidates, ensure_ascii=False)
+            if share_candidates
+            else None
         )
         net_income = source_row.get("net_income")
         equity = source_row.get("equity")
@@ -731,7 +919,7 @@ class FinancialPitPanelStore:
         indicator_rows: Dict[Tuple[str, str], Dict[str, Any]],
         disclosure_events: Dict[Tuple[str, str], Dict[str, Any]],
         substantive_changes: Dict[Tuple[str, str], str],
-        share_facts: Dict[Tuple[str, str], Dict[str, Any]],
+        share_anchor_facts: Dict[Tuple[str, str], Dict[str, Any]],
         trading_days: Dict[str, List[str]],
         panel_version: str,
         built_at: str,
@@ -766,7 +954,7 @@ class FinancialPitPanelStore:
                     base,
                     row,
                     periods,
-                    share_facts.get((instrument_id, period)),
+                    share_anchor_facts.get((instrument_id, period)),
                     (valuation_shares or {}).get(instrument_id),
                 )
                 panel_rows.append(base)
@@ -789,7 +977,7 @@ class FinancialPitPanelStore:
                 "financial_pit_panel: change index loaded (%d keys)",
                 len(substantive_changes),
             )
-            share_facts = self._load_share_facts(connection)
+            share_anchor_facts = self._load_share_anchor_facts(connection)
             fact_rows = connection.execute(
                 f"SELECT {_SELECT_FACT_COLUMNS} FROM financial_facts"
             ).fetchall()
@@ -805,7 +993,7 @@ class FinancialPitPanelStore:
             indicator_rows,
             disclosure_events,
             substantive_changes,
-            share_facts,
+            share_anchor_facts,
             trading_days,
             panel_version,
             built_at,
@@ -991,27 +1179,40 @@ class FinancialPitPanelStore:
     def _load_single_share_facts(
         connection: sqlite3.Connection, instrument_id: str, period: str
     ) -> Optional[Dict[str, Any]]:
+        """Anchor entry for one (instrument, period); newest fact wins."""
         rows = connection.execute(
             """
-            SELECT COALESCE(canonical_fact_name, fact_name) AS fact_name, fact_value
+            SELECT fact_name, canonical_fact_name, fact_value
             FROM financial_numeric_facts_hot
             WHERE instrument_id = ? AND report_period = ?
-              AND COALESCE(canonical_fact_name, fact_name) IN (?, ?)
+              AND (
+                    COALESCE(canonical_fact_name, fact_name) = 'share_capital_amount'
+                 OR COALESCE(canonical_fact_name, fact_name) = 'shares_outstanding'
+                 OR COALESCE(canonical_fact_name, fact_name) = ?
+              )
               AND fact_value IS NOT NULL
             ORDER BY updated_at DESC, rowid DESC
             """,
-            (instrument_id, period, _LONG_TABLE_EPS_FACT, _LONG_TABLE_SHARE_FACT),
+            (instrument_id, period, _LONG_TABLE_EPS_FACT),
         ).fetchall()
         if not rows:
             return None
         entry: Dict[str, Any] = {}
         for row in rows:
+            canonical = row["canonical_fact_name"] or row["fact_name"]
             value = float(row["fact_value"])
-            if row["fact_name"] == _LONG_TABLE_EPS_FACT:
+            fact_name = row["fact_name"]
+            if canonical == "shares_outstanding" and value > 0:
+                entry.setdefault("sos", value)
+            elif canonical == _LONG_TABLE_EPS_FACT:
                 entry.setdefault("reported_eps", value)
-            elif value > 0:
-                entry.setdefault("share_capital", value)
-        return entry
+            elif canonical == "share_capital_amount":
+                if fact_name == "equity":
+                    if value > 0:
+                        entry.setdefault("ths", value)
+                elif fact_name.startswith("实收资本") and value != 0:
+                    entry.setdefault("pic", value)
+        return entry or None
 
     @staticmethod
     def _insert_rows(
@@ -1046,6 +1247,13 @@ class FinancialPitPanelStore:
             item[column] = _to_yyyymmdd(item.get(column))
         item["is_delisted"] = bool(item.get("is_delisted"))
         item["revised_after_publish"] = bool(item.get("revised_after_publish"))
+        if item.get("share_candidates_json"):
+            try:
+                item["share_candidates"] = json.loads(item["share_candidates_json"])
+            except (TypeError, json.JSONDecodeError):
+                item["share_candidates"] = None
+        else:
+            item["share_candidates"] = None
         if fields:
             allowed = set(fields) | {"instrument_id", "report_period"}
             item = {key: value for key, value in item.items() if key in allowed}
@@ -1431,6 +1639,14 @@ class FinancialPitPanelStore:
             """,
             (period,),
         ).fetchone()[0]
+        share_validation_rows = connection.execute(
+            """
+            SELECT share_validation, COUNT(*) AS n
+            FROM financial_pit_panel WHERE report_period = ?
+            GROUP BY share_validation
+            """,
+            (period,),
+        ).fetchall()
         derived_non_null = {
             column: connection.execute(
                 f"""
@@ -1464,6 +1680,10 @@ class FinancialPitPanelStore:
                 row["attribution_quality"]: row["n"] for row in attribution_rows
             },
             "revised_after_publish_count": revised,
+            "share_validation": {
+                (row["share_validation"] or "pending_rebuild"): row["n"]
+                for row in share_validation_rows
+            },
             "recent_source_change_count": recent_source_change,
             "derived_non_null": derived_non_null,
             "is_bulk_period": is_bulk,

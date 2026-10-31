@@ -16,7 +16,9 @@ MAPPING_VERSION_V1 = "sina_ths_core_financial_facts.v1"
 MAPPING_VERSION_V2 = "sina_ths_core_financial_facts.v2"
 MAPPING_VERSION_V3 = "sina_ths_core_financial_facts.v3"
 MAPPING_VERSION_V4 = "sina_ths_core_financial_facts.v4"
-MAPPING_VERSION = "sina_ths_core_financial_facts.v5"
+MAPPING_VERSION_V5 = "sina_ths_core_financial_facts.v5"
+MAPPING_VERSION_V6 = "sina_ths_core_financial_facts.v6"
+MAPPING_VERSION = MAPPING_VERSION_V6
 
 FINANCIAL_STATEMENT_PROFILES = ("nonbank", "bank", "securities", "insurance")
 PROFILE_BASE_MAPPINGS = {
@@ -534,6 +536,52 @@ _CATALOG_V5_BANK_CORRECTIONS: tuple[FinancialSourceFieldMapping, ...] = (
     ),
 )
 
+# v6 (change: cross-validate-share-capital-denominators): split the mixed
+# share-capital mapping. The THS "equity" metric carries period-end share
+# counts (unit=shares; 2026-10-31 D0 verification). The Sina paid-in-capital
+# field is a CNY amount that only equals the share count at 1-yuan par, so it
+# loses core approval and must go through denominator cross-validation.
+_CATALOG_V6_SHARE_CAPITAL_CORRECTIONS: tuple[FinancialSourceFieldMapping, ...] = (
+    FinancialSourceFieldMapping(
+        canonical_fact="share_capital_amount",
+        statement_family="balance_sheet",
+        profile="nonbank",
+        sina_field="实收资本(或股本)",
+        ths_metric="equity",
+        relationship=RELATIONSHIP_EXACT_EQUIVALENT,
+        source_unit="shares",
+        canonical_unit="shares",
+        value_type="point_in_time",
+        approved_for_core=True,
+        semantic="ths_equity_share_count",
+        evidence=(
+            "D0 2026-10-31: THS share fact tracks per-period valuation-implied "
+            "shares (n=416 median ratio 1.000) - period-end share counts",
+        ),
+    ),
+    FinancialSourceFieldMapping(
+        canonical_fact="share_capital_amount",
+        statement_family="balance_sheet",
+        profile="nonbank",
+        sina_field="实收资本(或股本)",
+        ths_metric="",
+        relationship=RELATIONSHIP_RELATED_ONLY,
+        source_unit="CNY",
+        canonical_unit="CNY",
+        value_type="point_in_time",
+        approved_for_core=False,
+        rejection_reason=(
+            "cny_paid_in_capital_requires_par_value_cross_validation"
+        ),
+        semantic="sina_paid_in_capital_cny_amount",
+        evidence=(
+            "Only equals the share count at 1-yuan par; kept unapproved so "
+            "denominators come from share-count anchors or cross-validation",
+        ),
+    ),
+)
+
+
 
 _CATALOG_BY_VERSION: dict[str, tuple[FinancialSourceFieldMapping, ...]] = {
     MAPPING_VERSION_V1: _CATALOG_V1,
@@ -543,10 +591,17 @@ _CATALOG_BY_VERSION: dict[str, tuple[FinancialSourceFieldMapping, ...]] = {
     ),
     MAPPING_VERSION_V3: _CATALOG_V3,
     MAPPING_VERSION_V4: _CATALOG_V4,
+    MAPPING_VERSION_V5: _dedupe_mappings(
+        (
+            *(replace(mapping, mapping_version=MAPPING_VERSION_V5) for mapping in _CATALOG_V4),
+            *_CATALOG_V5_BANK_CORRECTIONS,
+        )
+    ),
     MAPPING_VERSION: _dedupe_mappings(
         (
             *(replace(mapping, mapping_version=MAPPING_VERSION) for mapping in _CATALOG_V4),
             *_CATALOG_V5_BANK_CORRECTIONS,
+            *_CATALOG_V6_SHARE_CAPITAL_CORRECTIONS,
         )
     ),
 }

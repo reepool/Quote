@@ -327,16 +327,20 @@ _STANDARD_FINANCIAL_FACT_CATALOG_V1: Dict[str, Dict[str, Any]] = {
         "aliases": ["IntangibleAssets", "INTANGIBLE_ASSETS", "intangible_assets", "无形资产"],
     },
     "share_capital_amount": {
+        # CNY-amount flow (sina/cninfo paid-in capital) resolves here; the
+        # THS share-count flow resolves through source-field mappings v6
+        # (source_unit=shares). This catalog entry stays CNY because every
+        # alias below is a paid-in-capital amount, never a share count.
         "statement_family": "balance_sheet",
         "semantic": "paid_in_capital_amount",
         "unit": "CNY",
-        "aliases": ["ShareCapital", "TOTAL_SHARE", "SHARE_CAPITAL", "S2010_0700", "总股本", "实收资本（或股本）"],
+        "aliases": ["ShareCapital", "SHARE_CAPITAL", "S2010_0700", "实收资本（或股本）"],
     },
     "shares_outstanding": {
         "statement_family": "capital_structure",
         "semantic": "shares_outstanding",
         "unit": "shares",
-        "aliases": ["SharesOutstanding", "TotalSharesOutstanding"],
+        "aliases": ["SharesOutstanding", "TotalSharesOutstanding", "总股本"],
     },
     "undistributed_profit": {
         "statement_family": "balance_sheet",
@@ -681,3 +685,29 @@ def describe_core_financial_fact_alias(
         "canonical_compatible": alias_semantic == canonical_semantic,
         "warnings": [] if warning_code is None else [warning_code],
     }
+
+
+# Unit-class consistency assertion (change: cross-validate-share-capital-denominators)
+# Share-count canonicals must declare unit="shares"; any other canonical must
+# not. A violation means a CNY amount or share count was attached to the wrong
+# semantic class — exactly the defect that produced wrong bps/ocfps denominators.
+_SHARE_COUNT_CANONICALS = frozenset({"shares_outstanding"})
+
+
+def _validate_canonical_units(aliases: Dict[str, Dict[str, Any]]) -> None:
+    for canonical, entry in aliases.items():
+        unit = str(entry.get("unit") or "")
+        if canonical in _SHARE_COUNT_CANONICALS:
+            if unit != "shares":
+                raise ValueError(
+                    f"canonical '{canonical}' is a share-count fact and must "
+                    f"declare unit='shares' (got '{unit}')"
+                )
+        elif unit == "shares":
+            raise ValueError(
+                f"canonical '{canonical}' declares unit='shares' but is not in "
+                f"the reviewed share-count set {_SHARE_COUNT_CANONICALS}"
+            )
+
+
+_validate_canonical_units(_STANDARD_FINANCIAL_FACT_CATALOG_V1)

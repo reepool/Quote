@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import sqlite3
 from pathlib import Path
 
@@ -260,9 +261,9 @@ def store(tmp_path: Path) -> FinancialPitPanelStore:
             ) VALUES (?, ?, ?, ?, ?)
             """,
             [
-                ("600001.SH", "2024-12-31", "profit_sheet.basic_eps", "x", 1.25),
-                ("600001.SH", "2024-12-31", "share_capital_amount", "x", 80.0),
-                ("600001.SH", "2023-12-31", "profit_sheet.basic_eps", "x", 1.10),
+                ("600001.SH", "2024-12-31", "profit_sheet.basic_eps", "profit_sheet.basic_eps", 1.25),
+                ("600001.SH", "2024-12-31", "share_capital_amount", "equity", 80.0),
+                ("600001.SH", "2023-12-31", "profit_sheet.basic_eps", "profit_sheet.basic_eps", 1.10),
             ],
         )
         # indicator rows store fractions; panel contract is percent
@@ -320,8 +321,10 @@ def store(tmp_path: Path) -> FinancialPitPanelStore:
             ],
         )
         conn.commit()
-    # 600007.SH: mis-mapped share fact (an equity item, 3.2x off) that the
-    # valuation-implied share count must correct
+    # 600007.SH: mis-mapped THS share fact (3.2x off from the valuation and
+    # EPS anchors). Unquarantined -> denominator stays on the THS anchor but
+    # the row is flagged discrepancy (annotations, not silent substitution).
+    # A quarantined copy (share_capital_suspect) is ignored by anchor assembly.
     with sqlite3.connect(financials) as conn:
         _insert_fact(
             conn,
@@ -340,6 +343,76 @@ def store(tmp_path: Path) -> FinancialPitPanelStore:
                       1000.0, '2025-04-01T20:00:00')
             """
         )
+        conn.execute(
+            """
+            INSERT INTO financial_numeric_facts_hot (
+                instrument_id, report_period, canonical_fact_name, fact_name,
+                fact_value, updated_at
+            ) VALUES ('600007.SH', '2024-12-31', 'share_capital_suspect', 'equity',
+                      1000.0, '2025-04-01T20:00:00')
+            """
+        )
+        # reported EPS from the original disclosure implies 700/0.21875 = 3200
+        conn.execute(
+            """
+            INSERT INTO financial_numeric_facts_hot (
+                instrument_id, report_period, canonical_fact_name, fact_name,
+                fact_value, updated_at
+            ) VALUES ('600007.SH', '2024-12-31', 'profit_sheet.basic_eps',
+                      'profit_sheet.basic_eps', 0.21875, '2025-04-01T20:00:00')
+            """
+        )
+        # 600008.SH: par-value mismatch case - THS and valuation agree, the
+        # paid-in-capital CNY amount (par != 1) disagrees -> unit_mismatch
+        # note without flipping consensus
+        _insert_fact(
+            conn,
+            "600008.SH",
+            "2024-12-31",
+            net_income=800.0,
+            equity=5000.0,
+            publish_date="2025-04-05",
+        )
+        conn.executemany(
+            """
+            INSERT INTO financial_numeric_facts_hot (
+                instrument_id, report_period, canonical_fact_name, fact_name,
+                fact_value, updated_at
+            ) VALUES (?, ?, 'share_capital_amount', ?, ?, '2025-04-05T20:00:00')
+            """,
+            [
+                ("600008.SH", "2024-12-31", "equity", 2000.0),
+                ("600008.SH", "2024-12-31", "实收资本(或股本)", 200.0),
+            ],
+        )
+        # 600009.SH: quarantined THS + paid-in-capital agreement only
+        # -> single_source on paid-in-capital with par assumption label
+        _insert_fact(
+            conn,
+            "600009.SH",
+            "2024-12-31",
+            net_income=900.0,
+            equity=3600.0,
+            publish_date="2025-04-06",
+        )
+        conn.execute(
+            """
+            INSERT INTO financial_numeric_facts_hot (
+                instrument_id, report_period, canonical_fact_name, fact_name,
+                fact_value, updated_at
+            ) VALUES ('600009.SH', '2024-12-31', 'share_capital_suspect', 'equity',
+                      1.0, '2025-04-06T20:00:00')
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO financial_numeric_facts_hot (
+                instrument_id, report_period, canonical_fact_name, fact_name,
+                fact_value, updated_at
+            ) VALUES ('600009.SH', '2024-12-31', 'share_capital_amount',
+                      '实收资本(或股本)', 900.0, '2025-04-06T20:00:00')
+            """
+        )
         conn.commit()
     with sqlite3.connect(valuation) as vconn:
         vconn.executemany(
@@ -353,6 +426,11 @@ def store(tmp_path: Path) -> FinancialPitPanelStore:
                 ("600001.SH", "2025-01-10", 10.0, 800.0),
                 # 600007: true shares 3200.0, fact says 1000.0 (3.2x off)
                 ("600007.SH", "2025-01-10", 5.0, 16000.0),
+                # 600008: 2000.0 shares agrees with its THS fact; paid-in
+                # capital 200.0 CNY is the non-unit-par mismatch case
+                ("600008.SH", "2025-01-10", 10.0, 20000.0),
+                # 600009: no valuation row -> paid-in capital is the only
+                # live validator/value (par assumption label expected)
             ],
         )
         vconn.commit()
@@ -374,7 +452,7 @@ def test_statutory_deadline_mapping() -> None:
 
 def test_full_build_and_idempotency(store: FinancialPitPanelStore) -> None:
     stats = store.build_full("test-v1")
-    assert stats["rows"] == 13
+    assert stats["rows"] == 15
     with store.connect() as conn:
         first = conn.execute(
             "SELECT COUNT(*), SUM(revenue) FROM financial_pit_panel"
@@ -462,12 +540,12 @@ def test_cross_section_stats_and_universe_note(
     store.build_full("test-v1")
     result = store.query_cross_section("20260101")
     # 600006 delayed_estimate (2026-08-08) is correctly invisible at 2026-01-01
-    assert result["total"] == 6
+    assert result["total"] == 8
     assert "period_lag_distribution" in result["stats"]
     assert result["stats"]["available_at_quality"].get("exact", 0) >= 1
     assert "delisted not covered" in result["universe_note"]
     later = store.query_cross_section("20260901")
-    assert later["total"] == 7  # delayed filer becomes visible after estimate
+    assert later["total"] == 9  # delayed filer becomes visible after estimate
 
 
 def test_attribution_quality_marking(store: FinancialPitPanelStore) -> None:
@@ -510,22 +588,83 @@ def test_per_share_derivations_use_reported_facts(
     assert row["shares_outstanding"] == pytest.approx(80.0)
 
 
-def test_mismatched_share_fact_corrected_by_valuation(
+def test_unquarantined_mismatch_is_flagged_not_corrected(
     store: FinancialPitPanelStore,
 ) -> None:
-    """A mis-mapped share fact (equity item) must be rejected by the
-    valuation-implied denominator (real case: 600398.SH, 3.2x error)."""
+    """Annotations, not silent substitution (user direction).
+
+    600007.SH carries a mis-mapped THS fact (3.2x off). While unquarantined,
+    the THS anchor still wins by preference, but the row is flagged
+    discrepancy with the dissenting anchors visible in share_candidates.
+    """
     store.build_full("test-v1")
     with store.connect() as conn:
         row = conn.execute(
             """
-            SELECT bps, shares_outstanding FROM financial_pit_panel
+            SELECT shares_outstanding, bps, share_validation, share_basis,
+                   share_candidates_json FROM financial_pit_panel
             WHERE instrument_id = '600007.SH' AND report_period = '2024-12-31'
             """
         ).fetchone()
-    # fact=1000 (3.2x off) rejected -> valuation-implied 3200.0 used
-    assert row["shares_outstanding"] == pytest.approx(3200.0)
-    assert row["bps"] == pytest.approx(4800.0 / 3200.0)
+    assert row["share_validation"] == "discrepancy"
+    assert row["share_basis"] == "ths_share_capital"
+    assert row["shares_outstanding"] == pytest.approx(1000.0)
+    assert row["bps"] == pytest.approx(4800.0 / 1000.0)
+    candidates = json.loads(row["share_candidates_json"])
+    assert candidates["anchors"]["valuation_implied"]["value"] == 3200.0
+    assert candidates["anchors"]["eps_implied"]["value"] == pytest.approx(3200.0)
+
+
+def test_quarantined_ths_degrades_to_single_source(
+    store: FinancialPitPanelStore,
+) -> None:
+    """Quarantined THS rows drop out of anchor assembly (design D3).
+
+    600009.SH: THS quarantined, no valuation row -> paid-in-capital CNY is
+    the only live value with the par-assumption basis label.
+    """
+    store.build_full("test-v1")
+    with store.connect() as conn:
+        row = conn.execute(
+            """
+            SELECT shares_outstanding, bps, share_validation, share_basis
+            FROM financial_pit_panel
+            WHERE instrument_id = '600009.SH' AND report_period = '2024-12-31'
+            """
+        ).fetchone()
+    assert row["share_validation"] == "single_source"
+    assert row["share_basis"] == "paid_in_capital_cny_par_assumption"
+    assert row["shares_outstanding"] == pytest.approx(900.0)
+    assert row["bps"] == pytest.approx(4.0)
+
+
+def test_unit_mismatch_does_not_flip_consensus(
+    store: FinancialPitPanelStore,
+) -> None:
+    """Non-unit par company: share-count anchors agree; the CNY
+    paid-in-capital validator's disagreement records a unit_mismatch note
+    without flipping the status (design D1 layered rule)."""
+    store.build_full("test-v1")
+    with store.connect() as conn:
+        row = conn.execute(
+            """
+            SELECT shares_outstanding, share_validation, share_candidates_json
+            FROM financial_pit_panel
+            WHERE instrument_id = '600008.SH' AND report_period = '2024-12-31'
+            """
+        ).fetchone()
+    assert row["share_validation"] == "consensus"
+    assert row["shares_outstanding"] == pytest.approx(2000.0)
+    candidates = json.loads(row["share_candidates_json"])
+    assert (
+        candidates["anchors"]["paid_in_capital_cny"]["value"] == 200.0
+    )
+    assert candidates["anchors"]["paid_in_capital_cny"]["value"] != row[
+        "shares_outstanding"
+    ]
+    # the note sits beside the adopted anchor inside the candidates block
+    assert "paid_in_capital_note" in candidates["anchors"]
+    assert "unit_mismatch" in candidates["anchors"]["paid_in_capital_note"]
     # missing share facts -> null per-share, never zero placeholders
     with store.connect() as conn:
         row = conn.execute(
@@ -584,12 +723,13 @@ def test_coverage_expected_gap_and_sparse(store: FinancialPitPanelStore) -> None
     bulk = by_period["20241231"]
     assert bulk["is_bulk_period"] is True
     assert bulk["expected_count"] == 6  # lifecycle universe at 2024-12-31
-    # 600007.SH is a pre-IPO-style row outside the lifecycle universe: actual
-    # 6 = 5 in-universe + 600007; gap stays set-based (600002 missing), and
-    # the extra row surfaces as a reverse discrepancy instead of masking it
-    assert bulk["actual_count"] == 6
+    # 600007/600008/600009 are outside the lifecycle universe: actual
+    # 8 = 5 in-universe + 3 extra; the set-based gap still counts the true
+    # missing name (600002) instead of being masked by the extra rows, and
+    # the extras surface as a reverse discrepancy
+    assert bulk["actual_count"] == 8
     assert bulk["gap_count"] == 1
-    assert bulk["reverse_discrepancy_count"] == 1
+    assert bulk["reverse_discrepancy_count"] == 3
     assert bulk["is_complete"] is True  # deadline 2025-04-30 already passed
     sparse = by_period["20221231"]
     assert sparse.get("sparse") is True
@@ -629,7 +769,7 @@ def test_measure_revision_impact_thresholds(
     store.build_full("test-v1")
     impact = store.measure_revision_impact()
     assert impact["revised_rows"] == 1
-    assert impact["total_rows"] == 13
+    assert impact["total_rows"] == 15
     # 1/12 = 8.3% > 5% ratio threshold -> guard required even without quarter crossing
     assert impact["guard_required"] is True
 

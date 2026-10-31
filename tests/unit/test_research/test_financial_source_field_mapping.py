@@ -24,7 +24,8 @@ def test_financial_source_field_mapping_returns_only_approved_core_entries():
     assert {mapping.profile for mapping in mappings} == {"nonbank"}
     assert all(mapping.relationship in APPROVED_RELATIONSHIPS for mapping in mappings)
     assert all(mapping.source_unit == mapping.canonical_unit for mapping in mappings)
-    assert {mapping.canonical_unit for mapping in mappings} <= {"CNY", "CNY_per_share"}
+    # v6 adds the share-count unit class (change: cross-validate-share-capital-denominators)
+    assert {mapping.canonical_unit for mapping in mappings} <= {"CNY", "CNY_per_share", "shares"}
     assert all(mapping.mapping_version == MAPPING_VERSION for mapping in mappings)
 
 
