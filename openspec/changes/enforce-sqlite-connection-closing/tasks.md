@@ -35,3 +35,29 @@
 - [ ] 4.3 `openspec validate enforce-sqlite-connection-closing` 通过；
       修复点数与 1.2 基线表逐一对账（15/15）。
 - [ ] 4.4 提交推送；change 待验收归档。
+
+
+## 存量业务影响终审（2026-11-01，基线 d82fc744 全量 diff）
+
+按影响半径分四层，结论：**无破坏性影响；1 处低危元数据失真；2 处性能注记。**
+
+- **纯增量（零既有影响）**：routes +129 行零删除（5 新端点）；data_manager
+  +22 零删除（1 新方法）；storage +113 仅 import 行改动（1 新查询）；
+  面板模块/测试/文档均为新文件。
+- **机械转换（语义零变化）**：backup API 自含事务无 commit 变化；
+  test_database_backup **10/10**（关键路径闭环）；business_profile 系
+  50 测试零失败（余部环境锁阻塞，命令在档）。
+- **既有热路径插入（钩子）**：财报/披露同步为 best-effort（同步不可能
+  因面板失败）；事故后日志 0 次 refresh 失败；隔夜同步实证 Q3 面板
+  4,938→5,561 行增量正常落库。性能注记：批量同步下每 fact 一次
+  refresh（数查询），隔夜完成无异常，增速未量化——若批量窗口变慢，
+  后续可加"批量末聚合刷新"优化（可选，不立项）。
+- **全局配置 v6**：THS 流 canonical 不变；别名变更存量零命中；cninfo
+  实收资本照旧解析（测试过）。**已知低危失真**：sina_report fallback
+  流的实收资本 fact lineage 元数据 unit 会盖成 shares（值实为 CNY）——
+  该 fallback 非主要生产流（实测主要来源为 akshare direct 与 cninfo
+  structured，走 catalog 解析不受影响），canonical 名不变、面板按
+  fact_name 分类不受影响、存量不回写；随"ingestion 盖章"后续卡一并
+  消除。
+- import 期断言 ×2：当前合法；再发风险 = 编辑中间态被懒加载（09:30
+  事件模式），整改为原子编辑纪律已记。
