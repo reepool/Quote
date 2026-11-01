@@ -778,11 +778,11 @@ def _located_conditions(
     gaps: list[str] = []
     for condition in response_conditions:
         bound: list[Evidence] = []
-        missed = 0
+        missed_quotes: list[str] = []
         for evidence in condition.evidence:
             located = _bind_source_evidence(evidence, report, pages)
             if located is None:
-                missed += 1
+                missed_quotes.append(str(evidence.anchor.bounded_quote or ""))
                 continue
             bound.append(located)
         scoped_id = f"{request_id}:{condition.condition_id}"
@@ -791,8 +791,26 @@ def _located_conditions(
             if condition.major:
                 gaps.append(f"major_evidence_not_located:{scoped_id}")
             continue
-        if missed:
-            gaps.append(f"evidence_not_located:{scoped_id}:partial")
+
+        def redundant(quote: str) -> bool:
+            compact = "".join(quote.split())
+            if not compact:
+                return True
+            for item in bound:
+                if compact in "".join(str(item.anchor.bounded_quote or "").split()):
+                    return True
+            return len(compact) < 12 and any(
+                len("".join(str(item.anchor.bounded_quote or "").split())) >= 12
+                for item in bound
+            )
+
+        if missed_quotes and all(redundant(quote) for quote in missed_quotes):
+            gaps.append(f"evidence_not_located:{scoped_id}:redundant")
+        elif missed_quotes:
+            gaps.append(f"evidence_not_located:{scoped_id}")
+            if condition.major:
+                gaps.append(f"major_evidence_not_located:{scoped_id}")
+            continue
         if scoped_id in seen:
             raise ValueError("duplicate_source_condition")
         seen.add(scoped_id)

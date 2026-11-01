@@ -8664,4 +8664,56 @@ def test_bank_period_revenue_on_p71_is_kept_in_packed_pages():
     assert "30,756" in text
 
 
+def test_redundant_short_quote_can_close_but_a_missing_business_cannot():
+    from research.company_profile.contracts import ReportSourceCondition
+    from research.company_profile.report_interpretation import _located_conditions
+
+    report = _report()
+    page = {
+        "page": 1,
+        "text": "公司从事制浆造纸并销售纸袋纸。纸箱出现两次。纸箱出现两次。",
+        "readable": True,
+    }
+    good = _evidence(report, text="公司从事制浆造纸并销售纸袋纸。", page=1)
+    short = _evidence(report, text="纸箱", page=1)
+    accepted, gaps = _located_conditions(
+        [
+            ReportSourceCondition(
+                condition_id="products",
+                dimension="products_services",
+                description="产品范围。",
+                evidence=(good, short),
+                major=True,
+                statement_status="current",
+            )
+        ],
+        report,
+        [page],
+        request_id="t",
+        seen=set(),
+    )
+    assert accepted
+    assert any(gap.endswith(":redundant") for gap in gaps)
+    assert not any(gap.startswith("major_evidence_not_located:") for gap in gaps)
+    missing = _evidence(report, text="另一主业是从未出现的海洋工程服务。", page=1)
+    rejected, blocked = _located_conditions(
+        [
+            ReportSourceCondition(
+                condition_id="other",
+                dimension="principal_business",
+                description="另一主业。",
+                evidence=(good, missing),
+                major=True,
+                statement_status="current",
+            )
+        ],
+        report,
+        [page],
+        request_id="t2",
+        seen=set(),
+    )
+    assert not rejected
+    assert any(gap.startswith("major_evidence_not_located:") for gap in blocked)
+
+
 
