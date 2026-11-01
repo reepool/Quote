@@ -167,6 +167,11 @@ _CHANGE_LOG_DATASETS = ("financial_facts", "financial_numeric_facts")
 _HIDDEN_ROW_SENTINEL = "9999-12-31"
 
 _LONG_TABLE_EPS_FACT = "profit_sheet.basic_eps"
+
+# Names seen under share_capital_amount that no anchor slot recognizes;
+# tracked so unrecognized-source drift logs once instead of silently
+# dropping anchors (see _classify_share_anchor_row).
+_UNCLASSIFIED_SHARE_FACT_NAMES: set = set()
 _LONG_TABLE_SHARE_FACT = "share_capital_amount"
 
 _SELECT_FACT_COLUMNS = """
@@ -410,6 +415,18 @@ class FinancialPitPanelStore:
             return ("ths", value) if value > 0 else None
         if fact_name.startswith("实收资本"):
             return ("pic", value) if value > 0 else None
+        if canonical == "share_capital_amount" and fact_name not in _UNCLASSIFIED_SHARE_FACT_NAMES:
+            # The failure mode of the fact-name-based classification is
+            # silent anchor absence when a new source uses an unseen field
+            # name; make that drift observable instead of silent.
+            _UNCLASSIFIED_SHARE_FACT_NAMES.add(fact_name)
+            logger.warning(
+                "financial_pit_panel: share_capital_amount fact with "
+                "unrecognized fact_name %r excluded from anchor assembly; "
+                "extend _classify_share_anchor_row or stamp canonical_unit "
+                "via mapping v6+ (logged once per name)",
+                fact_name,
+            )
         return None
 
     def _load_share_anchor_facts(

@@ -688,6 +688,46 @@ def test_eps_lone_drift_stays_consensus(store: FinancialPitPanelStore) -> None:
     )
 
 
+def test_unrecognized_share_fact_name_is_observable(
+    store: FinancialPitPanelStore, caplog: pytest.LogCaptureFixture
+) -> None:
+    """A new source field name under share_capital_amount must not vanish
+    silently: the anchor is excluded but the name is logged once so source
+    drift is detectable."""
+    import logging
+
+    with sqlite3.connect(store.db_path) as conn:
+        conn.execute(
+            """
+            INSERT INTO financial_numeric_facts_hot (
+                instrument_id, report_period, canonical_fact_name, fact_name,
+                fact_value, updated_at
+            ) VALUES ('600001.SH', '2024-12-31', 'share_capital_amount',
+                      'zzz_unrecognized_probe_field', 123.0,
+                      '2025-01-03T09:00:00')
+            """
+        )
+        conn.commit()
+    with store.connect() as sconn:
+        entry = FinancialPitPanelStore._load_single_share_facts(
+            sconn, "600001.SH", "2024-12-31"
+        )
+    # the unrecognized name contributes no slot of its own; existing valid
+    # anchors (ths from the fixture) are unaffected
+    assert set((entry or {}).keys()) <= {"sos", "ths", "pic", "reported_eps"}
+    assert "pic" not in (entry or {})
+    with caplog.at_level(logging.WARNING, logger="research.financial_pit_panel"):
+        # re-classify directly: the once-per-name log already fired above in
+        # this process, so run the classifier through a fresh name
+        FinancialPitPanelStore._classify_share_anchor_row(
+            "share_capital_amount", "zzz_unrecognized_probe_field_2", 5.0
+        )
+    assert any(
+        "zzz_unrecognized_probe_field_2" in record.message
+        for record in caplog.records
+    )
+
+
 def test_quarantined_ths_degrades_to_single_source(
     store: FinancialPitPanelStore,
 ) -> None:

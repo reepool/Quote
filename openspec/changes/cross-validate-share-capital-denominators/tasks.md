@@ -178,3 +178,16 @@ industries 走 data_manager 应用服务链）✓；data_manager/storage 未新�
 语义；§8 验收 1–11/13–17 完成，#12 部分（ocfps PASS、bps 口径差已标注，
 逐股归因待 quantwin 联调）；§9 非目标零越界。需求文档与两个 change 的
 文档族三处一致。
+
+## 8. 硬编码判定复查（2026-11-01，用户质询后对抗性复查）
+
+原判"fact_name 分类合理保留"**淡化了一个真实弱点**：其失败模式是**静默的**——
+新来源用未见过的字段名时锚悄然缺席（体现为 single_source/null 上升，但无
+任何信号指向原因）。已修正：`_classify_share_anchor_row` 对 share_capital_
+amount 下未识别的 fact_name 记 once-per-name WARNING（来源漂移可观测），
+配单测（52/52）。分类逻辑本身维持 fact_name 驱动（存量行 canonical_unit
+均为 v6 前旧章 CNY，单位驱动对历史不可用），v6 盖章+存量重盖的后续卡不变。
+其余三项判定经复查维持：9999-12-31 哨兵（实际不可达的防御分支，仅 API
+展示层面的 cosmetic）、SSE 日历兜底（A 股域内未知交易所的合理缺省）、
+2023-12-31 边界常量（需求文档规定的历史边界，永不移动，具名常量比数据
+推导更诚实）。
