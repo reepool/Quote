@@ -22,7 +22,7 @@ The system SHALL enforce /stop and max_runtime_seconds against the worker execut
 
 #### Scenario: Operator stops a running long task
 - **WHEN** /stop is issued for a task running in the worker
-- **THEN** the worker task SHALL be cancelled at its next checkpoint within the configured bound (≤ 30s)
+- **THEN** the worker task SHALL be cancelled at its next checkpoint within the configured bound (default 30s)
 - **AND** the task SHALL be reported as stopped
 
 #### Scenario: max_runtime_seconds elapses
@@ -32,14 +32,14 @@ The system SHALL enforce /stop and max_runtime_seconds against the worker execut
 
 #### Scenario: Long synchronous phase delays cancellation
 - **WHEN** cancellation arrives while the task is inside a long synchronous stretch
-- **THEN** the task SHALL reach an await checkpoint within the configured checkpoint bound (≤ 30s) so cancellation can land
+- **THEN** the task SHALL reach an await checkpoint within the configured checkpoint bound (default 30s) so cancellation can land
 - **AND** services with long phases SHALL provide such checkpoints (e.g. per candidate batch)
 
 ### Requirement: Long tasks must expose progress
 The system SHALL log progress heartbeats for long task phases and expose the current run status through the bot and the API.
 
 #### Scenario: Heartbeat during a long phase
-- **WHEN** a long task phase runs longer than the configured heartbeat interval (≤ 5 minutes)
+- **WHEN** a long task phase runs longer than the configured heartbeat interval (default 5 minutes)
 - **THEN** a progress log entry SHALL be emitted with task, run_id, phase, progress counters and elapsed time
 
 #### Scenario: Operator queries current run
@@ -58,6 +58,16 @@ The system SHALL keep max_instances, run_id tracking, dependency groups and job_
 - **THEN** the target database SHALL contain no partial writes from that run
 - **AND** a later re-run SHALL produce the same idempotent reconciliation semantics
 
+#### Scenario: Different jobs run concurrently in workers
+- **WHEN** two different jobs run in separate workers and write to the same database
+- **THEN** their writes SHALL be coordinated by the existing single-writer ownership (serialized per database)
+- **AND** neither job SHALL fail due to cross-job write contention newly introduced by the isolation
+
+#### Scenario: Service restarts while a task is running
+- **WHEN** the service shuts down or restarts while a task runs in the worker
+- **THEN** the shutdown SHALL cancel running workers and wait within a bounded time
+- **AND** the target database SHALL contain no partial writes from the interrupted run
+
 ### Requirement: Loop-bound shared resources must stay on their owning loop
 The system SHALL ensure resources bound to the main event loop (Telethon client, async DB engines and pools, shared HTTP sessions) are not used from the worker loop, either via per-run instances created inside the worker or via thread-safe marshalling back to the main loop.
 
@@ -68,7 +78,7 @@ The system SHALL ensure resources bound to the main event loop (Telethon client,
 
 #### Scenario: Task needs async DB sessions in worker
 - **WHEN** a task requires async DB sessions that belong to the main-loop engine pool
-- **THEN** it SHALL either use per-run sessions created inside the worker loop or be configured to stay on the main loop with the reason recorded
+- **THEN** it SHALL either use per-run sessions created inside the worker loop under the task async DB workload configuration (preserving the api-db-resource-isolation workload separation) or be configured to stay on the main loop with the reason recorded
 
 ### Requirement: Worker failure must be contained and reported
 The system SHALL contain worker failures so the API and the bot stay available, and SHALL report the task as failed with a diagnosable reason.
@@ -77,3 +87,8 @@ The system SHALL contain worker failures so the API and the bot stay available, 
 - **WHEN** the task raises inside the worker loop
 - **THEN** the run SHALL be marked failed and the existing error report path SHALL be used
 - **AND** the API and the bot SHALL remain responsive
+
+#### Scenario: Worker thread becomes stuck
+- **WHEN** a worker thread is stuck such that cancellation cannot land
+- **THEN** the main loop timeout SHALL still mark the run failed at max_runtime_seconds
+- **AND** the orphaned worker SHALL be logged for diagnosis without blocking the API or the bot

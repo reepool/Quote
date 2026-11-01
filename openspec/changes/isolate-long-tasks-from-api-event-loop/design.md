@@ -24,6 +24,7 @@
 
 - `api-db-resource-isolation`：保护任务不受 API 负载挤占 DB 容量（反方向）。本 change 不修改其任何需求。
 - 治理总纲 §2.1 多入口单实现：本 change 只改"执行位置"，不改业务实现；任务仍由唯一调度器链路触发。
+- 覆盖范围：本 change 收口调度包装器执行路径（cron、bot `/run`、依赖组触发共用）。`api/routes.py` 存在直接调用 `data_manager.run_*` 的长任务入口（special commodity 系列同步、futures calendar backfill 等 5 处），不经过该包装器；M1 盘点后要么收敛到同一执行路径（优先，符合治理总纲 §2.1），要么显式记录为后续 change，不在本 change 静默留白。
 
 ## 2. 目标与非目标
 
@@ -54,10 +55,11 @@
 
 ### 3.1 执行模型（方案 A）
 
-- 包装器内：`asyncio.run_coroutine_threadsafe(task_func(**all_parameters), worker_loop)`，worker 线程来自常驻 `ThreadPoolExecutor`（每线程一个 `asyncio.new_event_loop()`，循环随线程生命周期管理）。
-- 主循环侧沿用 `asyncio.wait_for(future, timeout=max_runtime_seconds)` 外层超时；超时/`/stop` 取消经 Future 传导（call_soon_threadsafe → worker 内任务取消），在任务下一个 await 检查点落地。
+- 包装器内：每个 run 使用独立线程 + 独立事件循环（`asyncio.new_event_loop()` + `run_forever`，随 run 创建销毁），经 `asyncio.run_coroutine_threadsafe(task_func(**all_parameters), worker_loop)` 提交；主循环侧以 `asyncio.wrap_future` 转为 asyncio Future 后沿用 `asyncio.wait_for(timeout=max_runtime_seconds)` 外层超时。不设共享线程池容量上限，避免无关任务因池满互相排队；任务间真实并发度由调度器现有并发语义与 §3.6 写协调约束。
+- 超时/`/stop` 取消经 Future 传导（主循环 cancel → call_soon_threadsafe → worker 内任务取消），在任务下一个 await 检查点落地。若 worker 线程卡死到取消无法落地，主循环超时仍按期判定该 run 失败并记录孤儿 worker 告警日志（可观测、不阻塞主循环；线程随进程重启回收）。
 - `max_instances`、`run_id`、依赖组（dependency_results）、`job_config` 跟踪全部保持在主循环包装器内，语义不变。
 - per-job escape hatch：确有主 loop 资源依赖、暂无法改造的任务可在 `config/05_scheduler.json` 中配置保留主 loop 执行，理由记录在配置注释与资源盘点文档；默认全部走 worker。
+- 优雅停机：SIGTERM/systemctl 重启时 `shutdown()`（现有信号处理 `main.py _setup_signal_handlers` 之后）对在跑 worker 执行取消并有界等待；等待超时后随进程退出，由 SQLite 事务/WAL 保证中断安全（扫描期零写，apply 期未提交事务回滚）。
 
 ### 3.2 loop-bound 资源盘点（M1 spike 必产）
 
@@ -89,6 +91,18 @@ worker loop 上禁止使用主 loop 资源。M1 必须产出清单并逐任务�
 - 状态查询：bot `/status` 与 API 运行状态端点暴露当前 run（含 max_runtime 剩余）。
 - worker 内异常 → 包装器捕获 → 复用 `_format_job_exception`（`scheduler/scheduler.py:451`）与现有错误报告路径；API/bot 不受影响。worker 进程级崩溃（OOM 等）由 systemd 拉起整体进程，现状行为保留。
 
+### 3.6 并行引入的写协调
+
+现状单事件循环下各任务事实串行；worker 线程模型引入真实并行，必须防止新问题：
+
+- M1 盘点"任务 × 数据库写入"矩阵；同一数据库的写动作按现有单一写入 owner 语义串行（同库排队或互斥），并复核 sqlite `busy_timeout`；
+- 读路径依赖 WAL 并发读；跨数据库写入天然并行，不受限；
+- 该矩阵同时是 §6 并发测试的输入。
+
+### 3.7 与 enforce-sqlite-connection-closing 的协调
+
+worker/loop 随 run 创建销毁，退出路径必须复用该 change 固化的 finally-close 连接工厂释放全部 sqlite 连接与 HTTP 会话，禁止引入新的裸连接；两 change 的测试互为补充——"连接数不随 run 泄露"列为本 change 的回归断言之一（同一故障根因：资源生命周期治理）。
+
 ## 4. 生产不变量（review 时逐条核对）
 
 1. 单一业务实现：隔离只在包装器层；任务函数、业务服务不复制、不改语义。
@@ -105,6 +119,8 @@ worker loop 上禁止使用主 loop 资源。M1 必须产出清单并逐任务�
 | 个别任务隐藏的主 loop 资源依赖 | M1 盘点清单 + per-job escape hatch 兜底 |
 | 报告/通知跨 loop 使用 telethon | 统一 marshalling 网关 + 并发测试覆盖 |
 | 检查点遗漏导致取消延迟 | 检查点契约进测试（合成卡死任务断言 ≤30s） |
+| 真实并行引入同库写竞争（现状单循环为事实串行） | §3.6 任务×数据库写入矩阵 + 同库写串行/busy_timeout；并发测试覆盖 |
+| worker 线程卡死形成孤儿线程 | 主循环超时仍判定失败 + 孤儿 worker 告警日志（§3.1）；线程随进程重启回收 |
 
 ## 6. 验证与度量
 
@@ -113,6 +129,7 @@ worker loop 上禁止使用主 loop 资源。M1 必须产出清单并逐任务�
 3. 真实回放：`financial_disclosure_reconciliation_sync` 以有界 `target_symbols` 范围运行，期间实测 API p95、bot 响应、心跳日志与扫描期零写。
 4. 数据安全：worker 中断后核对 `financials.db` 无部分写入、重跑幂等。
 5. 全量现有单测回归通过。
+6. 并发与停机：两个不同任务并行运行互不阻塞；任务运行中 `systemctl restart quote-system`，核对有界取消、无部分写入、重跑幂等。
 
 ## 7. M4 升级路径（仅当 §6 不达标）
 

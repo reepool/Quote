@@ -1,22 +1,25 @@
 ## 1. M1 执行隔离落地
 
 - [ ] 1.1 完成 loop-bound 资源盘点：telethon 客户端、aiosqlite/SQLAlchemy task 池、共享 HTTP 会话、同步 sqlite3 连接生命周期；产出每个任务的归属标注（worker-safe / 需代理 / 主 loop 保留）并记录到 design 附录。
-- [ ] 1.2 在 `scheduler/scheduler.py` 任务包装器内实现 worker loop 执行（独立线程 + 独立事件循环），主循环仅 await 结果；`max_instances`/`run_id`/依赖组跟踪保持在主循环。
+- [ ] 1.2 在 `scheduler/scheduler.py` 任务包装器内实现 worker loop 执行（每 run 独立线程 + 独立事件循环，不设共享池上限），主循环仅 await 结果；`max_instances`/`run_id`/依赖组跟踪保持在主循环。
 - [ ] 1.3 报告与通知通道实现线程安全 marshalling 回主循环；任务内不得跨 loop 使用 telethon 客户端；`_send_task_report` 对任务代码保持原签名。
-- [ ] 1.4 `/stop` 与 `max_runtime_seconds` 经线程安全 cancel 注入 worker loop；检查点契约落地（默认 ≤30s 或每 200 候选一次 await，参数可配置）。
+- [ ] 1.4 `/stop` 与 `max_runtime_seconds` 经线程安全 cancel 注入 worker loop；检查点契约落地（默认 ≤30s，首个调用方按扫描节奏配置批次粒度，参数可配置）。
 - [ ] 1.5 提供 per-job escape hatch 配置（`config/05_scheduler.json`）：确有主 loop 资源依赖的任务保留主 loop 执行，理由记录在配置注释与盘点文档。
+- [ ] 1.6 盘点"任务 × 数据库写入"矩阵，落实同库写串行（现有单一写入 owner 语义）与 `busy_timeout` 复核，防止真实并行引入 SQLITE_BUSY。
+- [ ] 1.7 优雅停机：`shutdown()` 对在跑 worker 取消并有界等待；退出路径复用 enforce-sqlite-connection-closing 固化的 finally-close 工厂释放连接与会话。
+- [ ] 1.8 盘点 `api/routes.py` 直接调用 `data_manager.run_*` 的长任务入口（5 处），收敛到调度执行路径或显式另立 change，不静默留白。
 
 ## 2. M2 可观测性
 
 - [ ] 2.1 worker 侧 run 进度状态对象 + 主循环侧心跳日志（≤5 分钟）：task、run_id、phase、进度计数、elapsed。
 - [ ] 2.2 bot `/status` 与 API 运行状态端点暴露当前 run（run_id、task、phase、elapsed、最近进度、max_runtime 剩余）。
-- [ ] 2.3 worker 异常的失败上报路径：任务标记 failed、复用 `_format_job_exception` 与现有错误报告格式，API/bot 不受影响。
+- [ ] 2.3 worker 异常的失败上报路径：任务标记 failed、复用 `_format_job_exception` 与现有错误报告格式，API/bot 不受影响；worker 卡死形成孤儿线程时输出告警日志。
 
 ## 3. M3 测试与回归
 
-- [ ] 3.1 合成阻塞任务并发测试（CPU 密集 + 同步 sqlite 两类）：长任务运行期间 API health/read 与 bot 命令满足 SLO 断言。
+- [ ] 3.1 合成阻塞任务并发测试（CPU 密集 + 同步 sqlite 两类，含两个不同任务并行运行用例）：长任务运行期间 API health/read 与 bot 命令满足 SLO 断言。
 - [ ] 3.2 取消/超时测试：注入卡死任务，断言 `/stop` 与 `max_runtime_seconds` 在 ≤30s 内生效并产生对应报告。
-- [ ] 3.3 数据安全回归：worker 中断后核对对账扫描期零部分写入与幂等重跑。
+- [ ] 3.3 数据安全回归：worker 中断后核对对账扫描期零部分写入与幂等重跑，含任务运行中 `systemctl restart` 的中断安全验证。
 - [ ] 3.4 真实回放验证：`financial_disclosure_reconciliation_sync`（有界 `target_symbols`）运行期间实测 API p95、bot 响应、心跳日志。
 - [ ] 3.5 全量现有单测回归通过。
 

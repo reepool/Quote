@@ -19,7 +19,9 @@
 - 报告与通知通道回收主循环：任务内 `_send_task_report` 及 bot 通知经线程安全 marshalling 回主循环，telethon 客户端、aiosqlite 引擎等 loop-bound 资源不跨 loop 使用。
 - 停止与超时改造：`/stop` 与 `max_runtime_seconds` 通过线程安全 cancel 注入 worker loop；长同步段保证有 await 检查点，取消在配置上限（≤30s）内生效。
 - 长任务可观测性：长阶段心跳日志（≤5 分钟）；当前运行状态（run_id、阶段、耗时、最近进度）可经 bot 与 API 查询。
-- 失败隔离：worker 异常时任务标记 failed 并复用现有错误报告路径，API 与 bot 不受影响。
+- 失败隔离：worker 异常时任务标记 failed 并复用现有错误报告路径，API 与 bot 不受影响；worker 卡死成孤儿线程时告警可观测。
+- 并行与停机正确性：同库写按现有单一写入 owner 串行（防止 worker 真实并行引入写竞争）；优雅停机对在跑 worker 取消并有界等待。
+- 覆盖盘点：`api/routes.py` 绕过调度包装器直接调用 `data_manager.run_*` 的长任务入口（5 处）纳入 M1 盘点，收敛到同一执行路径或显式另立 change，不静默留白。
 
 ## Capabilities
 
@@ -35,4 +37,5 @@
 
 - 代码影响集中在 `scheduler/scheduler.py` 任务包装器与报告通道、`utils/task_manager/handlers.py` 停止/状态路径；长任务服务仅需提供检查点与心跳，首批真实调用方为 `financial_disclosure_reconciliation_sync` 与 `shareholder_reconciliation_sync`。
 - 生产不变量保持：max_instances、run_id、依赖组与 job_config 语义不变；业务实现单一路径不变（治理总纲 §2.1）；对账扫描期零写与幂等语义不变；DB 写入 owner 不变。
+- 与 `enforce-sqlite-connection-closing`（同日 fd 耗尽事故 change）协调：worker/loop 生命周期退出必须复用其固化的 finally-close 连接工厂，连接数不随 run 泄露列为本 change 回归断言。
 - 非目标：不拆分 `scheduler/tasks.py`（FR-08 另行处理）；不引入 Celery 等通用任务平台；不处理 `financials.db` 体积与扫描索引问题（另记改进建议）；不改变任何任务的业务语义与验收口径。
