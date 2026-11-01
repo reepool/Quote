@@ -140,8 +140,8 @@ def _add_change(
     substantive: bool = True,
     dataset: str = "financial_facts",
 ) -> None:
-    old_hash = "aaa" if substantive else "aaa"
     new_hash = "bbb" if substantive else "aaa"
+    old_hash = "aaa"
     conn.execute(
         """
         INSERT INTO data_change_log (
