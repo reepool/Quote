@@ -247,3 +247,21 @@ DatabaseOperations 初始化报错。整改：对运行中应用的工作区，�
    句柄已随旧进程释放。
 
 验证：面板 23/23、provider 14/14、同步三件套 61/61。
+
+## 11. 遗漏终审（2026-11-01 下午，生产安全余量专项）
+
+1. **生产关键项（需运维动作）**：现运行应用进程 13:17:25 启动，先于
+   泄漏修复写入工作区（13:19:22）2 分钟——懒加载时机不可判（重启后
+   panel 模块零活动、无触发痕迹）。**建议今晚披露同步高峰前再重启一次
+   应用**以消除内存版本不确定性。实测：重启后窗口零 Errno 24、
+   quotes 句柄采样稳定（122→125 总抖动、quotes 恒 5）。
+2. **全库同型模式清查（report-only，非本 change 引入）**：8 处裸
+   `with sqlite3.connect(` 存在于 business_profile_production_
+   operations / business_profile_structured_sync / scheduler/
+   database_backup / migrations 等既有模块——同款潜在泄漏模式，
+   按审查范围规则记录不代改，建议后续独立卡排查。
+3. **lint 分诊**：ruff 204 项中 199 项为 pyupgrade 现代化（与项目
+   自身 legacy typing 风格及 3.8+ 兼容声明相悖，不采纳）；真问题
+   2 处已修（测试辅助冗余、import 排序）。项目无 ruff 配置，默认
+   规则不构成项目标准。
+4. 我方改动 git 干净；test_storage 仍为环境阻塞项（记录不变）。
