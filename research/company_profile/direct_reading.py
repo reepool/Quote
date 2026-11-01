@@ -187,22 +187,45 @@ def _latest_check(checks, target_type: str, target_id: str):
     return found
 
 
-def _view_is_covered(name: str, claims, checks) -> bool:
-    """A view is covered by trusted objects, not by an empty dimension label.
+def _chain_sides(claim) -> set[str]:
+    """Which supply-chain side this trusted object actually is.
 
-    The supply-chain view needs an established role plus both an upstream and
-    a downstream object. Input and output claims already are those objects;
-    a missing ``upstream_downstream`` label does not by itself fail the view,
-    and adding that label without a trusted claim does not pass it.
+    ``upstream_downstream`` only names the bucket. A downstream use does not
+    also count as an upstream input, and a volume or concentration figure
+    does not fill either side.
     """
+    if _is_concentration_or_cost_substitute(str(getattr(claim, "answer", "") or "")):
+        return set()
+    tails = [
+        str(item).split(":")[-1] for item in (getattr(claim, "condition_ids", ()) or ())
+    ]
+    if any("volume" in tail or "balance" in tail for tail in tails):
+        return set()
+    sides: set[str] = set()
+    dimension = str(getattr(claim, "dimension", "") or "")
+    if dimension == "input_exposure":
+        sides.add("upstream")
+    elif dimension == "output_exposure":
+        sides.add("downstream")
+    for tail in tails:
+        if tail.startswith("upstream"):
+            sides.add("upstream")
+        elif tail.startswith("downstream"):
+            sides.add("downstream")
+    return sides
+
+
+def _view_is_covered(name: str, claims, checks) -> bool:
+    """A view is covered by trusted objects, not by an empty dimension label."""
     verified = _verified_claims(claims, checks)
-    dims = {item.dimension for item in verified}
     if name == "supply_chain_position":
         if not _operating_role_established(claims, checks):
             return False
-        upstream = bool(dims & {"input_exposure", "upstream_downstream"})
-        downstream = bool(dims & {"output_exposure", "upstream_downstream"})
-        return upstream and downstream
+        sides = set()
+        for claim in verified:
+            sides.update(_chain_sides(claim))
+        return "upstream" in sides and "downstream" in sides
+    dims = {item.dimension for item in verified}
     return all(dimension in dims for dimension in VIEWS[name])
 
 
@@ -2070,6 +2093,7 @@ def interpret_direct_core(
                     "claim_pending:",
                     "company_synthesis_context_truncated",
                     "core_question_unanswered:",
+                    "major_evidence_not_located:",
                 )
             )
             for gap in blocking_gaps
@@ -3128,7 +3152,7 @@ def interpret_direct_core(
     inventoried: set[int] = set()
     source_later = 0
 
-    def inventory_pages(page_ids, prepared=None) -> list[int]:
+    def inventory_pages(page_ids, prepared=None, *, keep_tail: bool = True) -> list[int]:
         """Read source text without candidate answers. Navigation is not body reading."""
         follow: list[int] = []
         ordered: list[int] = []
@@ -3155,7 +3179,7 @@ def interpret_direct_core(
             if prepared and prepared_pages == {int(page["page"]) for page in chosen}:
                 packages = list(prepared)
             else:
-                room = ledger - charged() - source_later
+                room = ledger - charged() - (source_later if keep_tail else 0)
                 slice_limit = max(1024, min(limit, room))
                 packages = list(
                     source_discovery_slices(chosen, report, identity, slice_limit)
@@ -3175,7 +3199,7 @@ def interpret_direct_core(
                     package,
                     source_scope="full_context",
                     output=_source_output(identity),
-                    later=source_later,
+                    later=source_later if keep_tail else 0,
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
                 text = str(exc)
@@ -3201,10 +3225,16 @@ def interpret_direct_core(
                 if len(package) > 1:
                     middle = len(package) // 2
                     follow.extend(
-                        inventory_pages(int(page["page"]) for page in package[:middle])
+                        inventory_pages(
+                            (int(page["page"]) for page in package[:middle]),
+                            keep_tail=keep_tail,
+                        )
                     )
                     follow.extend(
-                        inventory_pages(int(page["page"]) for page in package[middle:])
+                        inventory_pages(
+                            (int(page["page"]) for page in package[middle:]),
+                            keep_tail=keep_tail,
+                        )
                     )
                     continue
                 for page in package:
@@ -3235,6 +3265,55 @@ def interpret_direct_core(
                     follow.append(page_no)
             publish()
         return follow
+
+    def read_requested_follow(pages) -> None:
+        """Keep reading pages a source response just requested.
+
+        One continuation may ask for another. Already-read pages are not sent
+        again. A page that cannot be sent stays necessary and unread.
+        """
+        nonlocal chapter_required_pages
+        if chapter_required_pages is None:
+            chapter_required_pages = set()
+        pending = []
+        for page in pages:
+            page_no = int(page)
+            if page_no not in by_page or page_no in inventoried:
+                continue
+            pending.append(page_no)
+        attempted: set[int] = set()
+        while pending:
+            blocked = any(
+                gap.startswith(
+                    (
+                        "direct_core_ledger_hold",
+                        "direct_core_deadline",
+                        "direct_core_request_cap",
+                        "direct_core_recovery_refused",
+                    )
+                )
+                for gap in gaps
+            )
+            if blocked:
+                for page_no in pending:
+                    chapter_required_pages.add(page_no)
+                    gap = f"necessary_unread:{page_no}"
+                    if gap not in gaps:
+                        gaps.append(gap)
+                return
+            fresh = [page for page in pending if page not in attempted]
+            if not fresh:
+                return
+            attempted.update(fresh)
+            if "chapter_gap_expansion" not in gaps:
+                gaps.append("chapter_gap_expansion")
+            chapter_required_pages.update(fresh)
+            pending = []
+            for page_no in inventory_pages(fresh, keep_tail=False):
+                page_no = int(page_no)
+                if page_no in inventoried or page_no not in by_page:
+                    continue
+                pending.append(page_no)
 
     def note_missed_core_revenue():
         """Turn already-read totals into a core question, not a page whitelist."""
@@ -4063,13 +4142,8 @@ def interpret_direct_core(
                 for page in [*saved_follow, *follow]
                 if int(page) in by_page and int(page) not in repair_pages
             ]
-            if expand and not any(
-                gap.startswith("direct_core_ledger_hold") for gap in gaps
-            ):
-                gaps.append("chapter_gap_expansion")
-                chapter_required_pages.update(expand)
-                inventory_pages(expand)
-            touched = repair_pages | set(saved_follow) | set(expand)
+            read_requested_follow(expand)
+            touched = repair_pages | set(saved_follow) | set(chapter_required_pages)
             fresh = [
                 condition
                 for condition in conditions
@@ -4664,20 +4738,16 @@ def interpret_direct_core(
                     candidate_pages, report=report, identity=identity, limit=limit
                 )
             follow = inventory_pages(selected)
-            expand = [
-                int(page)
-                for page in follow
-                if int(page) not in chapter_required_pages and int(page) in set(readable_order)
-            ]
-            if expand and not any(
-                gap.startswith("direct_core_ledger_hold") for gap in gaps
-            ):
-                gaps.append("chapter_gap_expansion")
-                chapter_required_pages.update(expand)
-                inventory_pages(expand)
+            read_requested_follow(follow)
             tail_hold = 0
             note_missed_core_revenue()
-            compose([*selected, *expand])
+            compose(
+                [
+                    page
+                    for page in chapter_required_pages
+                    if by_page.get(int(page), {}).get("status") == "read"
+                ]
+            )
         else:
             follow = inventory_pages(readable_order, prepared=planned)
             tail_hold = 0

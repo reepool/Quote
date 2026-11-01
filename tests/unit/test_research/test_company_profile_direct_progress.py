@@ -8287,6 +8287,26 @@ def test_supply_chain_view_follows_covered_objects_not_a_missing_label():
         )
     )
     assert _view_is_covered("supply_chain_position", claims, checks) is True
+    role_and_input = [claims[3], claims[4]]
+    assert _view_is_covered("supply_chain_position", role_and_input, checks) is False
+    uses = ReportViewClaim(
+        claim_id="uses",
+        dimension="upstream_downstream",
+        status="observed",
+        answer="纸袋纸广泛用于水泥、化工、建材包装。",
+        condition_ids=("s23:downstream_product_uses",),
+        evidence=(_evidence(report, text="纸袋纸广泛用于水泥、化工、建材包装", page=10),),
+    )
+    use_checks = [
+        *checks,
+        ReportViewCheck(
+            target_type="claim",
+            target_id="uses",
+            status="pass",
+            explanation="用途通过。",
+        ),
+    ]
+    assert _view_is_covered("supply_chain_position", [claims[3], uses], use_checks) is False
     gaps = _completeness_gaps(claims, (), checks)
     assert "view_not_substantive:supply_chain_position" not in gaps
     bare = claims[:4]

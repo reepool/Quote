@@ -1190,6 +1190,85 @@ def _worker(
             from .resource_probe import core_package_reply
 
             result = core_package_reply(request)
+        elif protocol == "s23_follow_v1":
+            from .resource_probe import core_package_reply
+
+            stored = None
+            replay = binding.get("offline_replay_query")
+            if replay:
+                saved = json.loads(Path(replay).read_text())
+                sent = [int(page["page"]) for page in request.get("source_pages") or []]
+                for profile in saved.get("profiles") or []:
+                    for item in (profile.get("three_views") or {}).get(
+                        "call_receipts"
+                    ) or []:
+                        if (
+                            request["purpose"] == "source_inventory"
+                            and item.get("purpose") == request["purpose"]
+                            and [int(page) for page in item.get("source_pages") or []]
+                            == sent
+                        ):
+                            stored = dict(item.get("response_payload") or {})
+                            break
+                    if stored:
+                        break
+            if stored and replay:
+                budget_path = Path(replay).with_name("budget-final.json")
+                if budget_path.is_file():
+                    attempts = json.loads(budget_path.read_text()).get("attempts") or []
+                    physical = [
+                        item
+                        for profile in saved.get("profiles") or []
+                        for item in (profile.get("three_views") or {}).get(
+                            "call_receipts"
+                        )
+                        or []
+                        if item.get("physical_request")
+                    ]
+                    for index, item in enumerate(physical):
+                        if (
+                            [int(page) for page in item.get("source_pages") or []] == sent
+                            and index < len(attempts)
+                        ):
+                            chain_state["replay_usage"] = int(
+                                attempts[index].get("charged_tokens") or 0
+                            )
+                            break
+            if stored and request.get("source_scope") == "page_map":
+                stored = {
+                    "schema_version": stored.get(
+                        "schema_version", "company_profile_report_response.v3"
+                    ),
+                    "request_id": request["request_id"],
+                    "purpose": request["purpose"],
+                    "requested_pages": stored.get("requested_pages") or [],
+                }
+            elif stored:
+                stored["request_id"] = request["request_id"]
+            result = stored or core_package_reply(request)
+            if (
+                stored is None
+                and request["purpose"] == "source_inventory"
+                and request.get("source_scope") != "page_map"
+                and replay
+            ):
+                sent_set = set(sent)
+                for profile in saved.get("profiles") or []:
+                    for item in (profile.get("three_views") or {}).get(
+                        "call_receipts"
+                    ) or []:
+                        pages = [int(page) for page in item.get("source_pages") or []]
+                        if (
+                            item.get("purpose") == "source_inventory"
+                            and item.get("source_scope") != "page_map"
+                            and sent_set
+                            and sent_set <= set(pages)
+                            and sent[-1] == pages[-1]
+                        ):
+                            result["requested_pages"] = (
+                                item.get("response_payload") or {}
+                            ).get("requested_pages") or []
+                            break
         elif protocol == "closeout_v1":
             from .resource_probe import core_package_reply
 
@@ -1251,8 +1330,19 @@ def _worker(
                 chain_state["delayed"] = True
         encoded = json.dumps(result, ensure_ascii=False)
         transport_requests[-1]["response_utf8_bytes"] = len(encoded.encode())
+        replay_usage = (
+            chain_state.pop("replay_usage")
+            if protocol == "s23_follow_v1" and "replay_usage" in chain_state
+            else None
+        )
         usage = (
-            {"prompt_tokens": 80, "completion_tokens": 40, "total_tokens": 120}
+            {
+                "prompt_tokens": int(replay_usage),
+                "completion_tokens": 0,
+                "total_tokens": int(replay_usage),
+            }
+            if replay_usage is not None
+            else {"prompt_tokens": 80, "completion_tokens": 40, "total_tokens": 120}
             if protocol
             in {
                 "entry_proof_v3",

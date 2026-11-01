@@ -1488,3 +1488,88 @@ def test_fresh_s23_chapter_package_keeps_view_status_with_completion():
     assert "source_inventory" in purposes
     assert "synthesize_views" in purposes
     assert transport.get("real_calls") == 0
+
+
+def test_s23_follow_page_is_read_and_one_side_does_not_finish():
+    """Replay the real S23 responses. A later continuation page must be read."""
+    import hashlib
+    import shutil
+    from pathlib import Path
+
+    from research.company_profile.bounded_entry import S23_AUTHORIZATION, main
+    from research.company_profile.reads import CompanyProfileReadService
+
+    root = Path("/home/python/Quote")
+    frozen = (root / "data/QuoteBak/s22-paper-core-20261031/query.json").read_bytes()
+    change = root / "openspec/changes/restore-company-profile-llm-led-generalization"
+    source = json.loads((change / "s1-pool-s1-600103-s16-binding.json").read_text())
+    for retired in (
+        "accepted_navigation_query",
+        "accepted_source_query",
+        "accepted_draft_query",
+        "accepted_candidate_query",
+        "navigation_query",
+        "continuation_checkpoint",
+        "company_task_state",
+        "continuation_budget",
+        "compatible_continue",
+        "saved_source_draft",
+        "prior_charged_tokens",
+        "verification_history_queries",
+        "offline_protocol",
+    ):
+        source.pop(retired, None)
+    source["offline_protocol"] = "s23_follow_v1"
+    source["offline_replay_query"] = str(
+        root / "data/QuoteBak/s23-paper-chapter-20261101/query.json"
+    )
+    source["chapter_select"] = True
+    source["task_route_labels"] = ["deepseek:deepseek-flash", "scorpio:grok-4.7"]
+    source["task_route_first_only"] = True
+    source["same_source_max_retries"] = 0
+    source["run_authorization"] = S23_AUTHORIZATION
+    source["max_elapsed_seconds"] = 900
+    source["max_tokens"] = 120_000
+    source["max_physical_requests"] = 16
+    source["max_recoveries"] = 2
+    source["max_cost_cny"] = "10"
+    source["file_hashes"] = {
+        name: hashlib.sha256((root / name).read_bytes()).hexdigest()
+        for name in source["file_hashes"]
+    }
+    run_root = root / "data/QuoteBak/s24-paper-follow-offline"
+    if run_root.exists():
+        shutil.rmtree(run_root)
+    path = root / "data/QuoteBak/s24-paper-follow-offline-binding.json"
+    path.write_text(json.dumps(source, ensure_ascii=False))
+    argv = sys.argv
+    sys.argv = ["bounded_entry", "--binding", str(path), "--run-root", str(run_root)]
+    try:
+        code = main()
+    finally:
+        sys.argv = argv
+    if code != 0 or not (run_root / "query.json").is_file():
+        result = json.loads((run_root / "entry-result.json").read_text())
+        raise AssertionError(f"entry failed code={code} error={result.get('error')}")
+    query = json.loads((run_root / "query.json").read_text())
+    exported = json.loads((run_root / "export.json").read_text())
+    reloaded = CompanyProfileReadService(run_root / "output").query(
+        (source["asset"]["instrument_id"],)
+    )
+    assert query["profiles"] == exported["profiles"] == reloaded["profiles"]
+    profile = query["profiles"][0]["three_views"]
+    inventories = [
+        item.get("source_pages")
+        for item in profile.get("call_receipts") or []
+        if item.get("purpose") == "source_inventory" and item.get("source_scope") != "page_map"
+    ]
+    assert any(11 in (pages or []) for pages in inventories), inventories
+    gaps = profile.get("gaps") or []
+    assert not any(gap == "necessary_unread:11" for gap in gaps), gaps
+    assert not any(gap == "necessary_unread:17" for gap in gaps), gaps
+    views = profile["views"]
+    if profile.get("draft_complete") is True:
+        assert all(view["assessment_status"] == "assessed" for view in views.values())
+    else:
+        assert views["supply_chain_position"]["assessment_status"] == "extraction_failed"
+    assert (root / "data/QuoteBak/s22-paper-core-20261031/query.json").read_bytes() == frozen
