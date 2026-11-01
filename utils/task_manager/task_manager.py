@@ -68,6 +68,7 @@ class TaskManagerBot:
             self.telegram_bot.register_command_handler('/help', self.handlers.handle_help_command)
             self.telegram_bot.register_command_handler('/detail', self.handlers.handle_detail_command)
             self.telegram_bot.register_command_handler('/run', self.handlers.handle_run_command)
+            self.telegram_bot.register_command_handler('/stop', self.handlers.handle_stop_command)
             self.telegram_bot.register_command_handler('/backfill', self.handlers.handle_backfill_command)
             self.telegram_bot.register_command_handler('/backfill_factors', self.handlers.handle_backfill_factors_command)
             self.telegram_bot.register_command_handler('/industry_standard_sync', self.handlers.handle_industry_standard_sync_command)

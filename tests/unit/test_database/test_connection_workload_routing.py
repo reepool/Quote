@@ -3,7 +3,9 @@ Tests for async DB workload routing between API and task pools.
 """
 
 import pytest
-from sqlalchemy.pool import AsyncAdaptedQueuePool
+from sqlalchemy.pool import AsyncAdaptedQueuePool, NullPool
+
+from utils import config_manager
 
 from database.connection import (
     DatabaseManager,
@@ -21,15 +23,24 @@ async def test_database_manager_routes_api_and_task_sessions(tmp_path):
 
     try:
         assert manager.TaskAsyncSessionLocal is not manager.ApiAsyncSessionLocal
-        assert isinstance(
-            manager.task_async_engine.sync_engine.pool,
-            AsyncAdaptedQueuePool,
-        )
+        # Pool class is configuration-driven (nullpool keeps worker-loop task
+        # executions on connections bound to their own loop).
+        task_pool_cfg = config_manager.get_nested('database_config.task_async_pool', {}) or {}
+        if str(task_pool_cfg.get('pool_class', '')).lower() == 'nullpool':
+            assert isinstance(
+                manager.task_async_engine.sync_engine.pool,
+                NullPool,
+            )
+        else:
+            assert isinstance(
+                manager.task_async_engine.sync_engine.pool,
+                AsyncAdaptedQueuePool,
+            )
+            assert manager.task_async_engine.sync_engine.pool.size() == 8
         assert isinstance(
             manager.api_async_engine.sync_engine.pool,
             AsyncAdaptedQueuePool,
         )
-        assert manager.task_async_engine.sync_engine.pool.size() == 8
         assert manager.api_async_engine.sync_engine.pool.size() == 2
 
         assert get_current_db_workload() == "task"

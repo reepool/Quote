@@ -137,6 +137,9 @@ python3 main.py api --host 0.0.0.0 --port 8000
 
 #### 任务控制命令
 - `/run <task_id>` - 立即执行指定任务
+- `/stop` - 列出当前在 worker 事件循环上运行中的任务（含 run_id、阶段、耗时）
+- `/stop <task_id>` - 请求停止运行中的任务实例；取消在任务下一个 await 检查点生效（默认 ≤30s，取决于当前阶段批次粒度），并推送停止通知
+- 注意：`/run <task_id> key=value` 携带运行参数时不继承任务配置 `parameters` 默认值（含 `max_runtime_seconds` 与 `run_on_main_loop`），需要时须显式传入
 - `/run daily_data_update <日期>` - 以补数据模式执行每日更新（跳过交易日检查）
 - `/run shareholder_shadow_sync` - 手工执行股东摘要全量刷新，刷新本地 `shareholder_snapshots`
 - `/run shareholder_reconciliation_sync` - 立即执行股东摘要周期复核与补足，全量读取后只写变化或本地缺失/覆盖不完整标的

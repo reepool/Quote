@@ -143,3 +143,41 @@ scheduler 与 API 拆分为两个进程（`main.py` 拆分或双 systemd 单元�
 - 任务在调度进程内执行，bot 与调度器同进程（/run、/stop 需要的共享状态最小化），API 进程只做查询/提交（跨进程提交经调度进程暴露的内部触发接口，不复制业务循环，符合治理总纲 §2.1）；
 - 子进程执行任务时：子进程内经同一工厂重建 DataManager/服务实例，结果 dict 经 pickle 返回；超时/停止经 kill 收口，WAL 机制保证中断安全；
 - 注意：这是同一实现的执行位置隔离，不构成总纲 §2.1 禁止的"通过 subprocess 启动另一套生产实现"。
+
+## 8. 实施附录（M1 盘点与部署结论）
+
+### 附录 A：loop-bound 资源盘点（任务 1.1 产出）
+
+| 资源 | 归属 | 处理与结论 |
+|---|---|---|
+| Telethon 客户端（`scheduler/tasks.py` `self.bot`） | 主 loop | `_send_task_report` 顶部 marshalling：worker 内调用整体回主 loop 执行（非阻塞 await），报告契约与签名不变 |
+| task async 引擎（`database/connection.py` `task_async_engine`，245 处 `db_ops` await） | 连接随 checkout 绑定 loop | `task_async_pool.pool_class="nullpool"`：每次 checkout 新建 aiosqlite 连接、绑定使用方 loop、会话关闭即释放——worker-safe by construction；容量键在该模式下行内无效（启动日志已注明）；api 引擎保持 AsyncAdaptedQueuePool 不变，`api-db-resource-isolation` 的双池隔离语义保持 |
+| 同步 sqlite3（`research/storage.py` per-call 连接，含 financials.db） | 无 loop 绑定 | 线程安全，worker-safe；驱动默认 5 秒 busy 等待兜底（见附录 B） |
+| CNInfo/官方源 HTTP（`research/providers/cninfo_http.py`，同步 requests/curl_cffi） | 无 loop 绑定 | worker-safe |
+| backtest 阶段（`scheduler/tasks.py` `_run_backtest_stage`） | 无 | 已用 `asyncio.to_thread`，worker-safe |
+| instrument master governance（`data_manager.run_master_governance_for_job`） | db_ops | 经 NullPool worker-safe |
+
+已验证进入 worker 的首批任务（`parameters.run_on_main_loop=false`）：
+
+1. `financial_disclosure_reconciliation_sync`——全链路审计：任务包装器（报告经 marshalling）→ `data_manager.run_financial_disclosure_reconciliation_sync`（governance→db_ops）→ 增量同步服务（storage 同步 sqlite3 + 1 处 db_ops await）→ backtest 阶段（to_thread）。
+2. `shareholder_reconciliation_sync`——任务包装器 → `run_shareholder_shadow_sync`/readiness（db_ops + 同步 storage）。
+
+其余 27 个任务部署默认 `worker_isolation.default_run_on_main_loop=true` 维持主循环；放量协议：逐任务链路审计后，在该任务 `parameters` 显式 `"run_on_main_loop": false` 并记录审计结论，无需代码改动。
+
+已实现机制与代码位置：`utils/worker_context.py`（主 loop 注册、WorkerRunState、进度上下文、`run_on_main_loop` 网关）；`scheduler/scheduler.py` `_await_task_in_worker`（每 run 独立线程+loop、启动器协程、取消注入、心跳、孤儿看护、`_shutdown_worker_runs`、`request_stop_job`、`get_worker_run_snapshots`）；取消用"启动器协程 + Task 句柄 + `call_soon_threadsafe(handle.cancel)`"，不使用 `concurrent.futures.Future.cancel()`（任务开跑后恒 False）；后台任务经 `_spawn_background` 持强引用（规避 loop 弱引用 GC 丢失）。
+
+已知限制：shareholder 服务的取消检查点为交易所/源批次粒度，provider 内部同步长段（单批次拉取）取消延迟可能超过 30 秒——待该任务放量前细化到 provider 批内粒度（不阻塞本 change 首批交付，financial 为完整粒度）。
+
+### 附录 B：任务 × 数据库写入矩阵与同库串行（任务 1.6 产出）
+
+| 数据库 | 写 owner（现状不变） | 并发防护 |
+|---|---|---|
+| financials.db | financial 三任务（l1_full_import / incremental / reconciliation），各自 `max_instances=1` | sqlite3 驱动默认 5s busy 等待兜底；worker/main-loop 跨执行位置并发写退避而非报错 |
+| quotes.db（instruments 等） | 主数据同步任务（经 db_ops task 引擎） | 读多写少；两对账链路对 db_ops 只读（`get_instruments_by_exchange`） |
+| research.db / shareholder 快照 | shareholder 任务 | `max_instances=1`；research storage 已有 `coordinated_writes` 跨 worker 写门（business_profile_async_production 在用），后续放量任务按需接入 |
+
+放量规则（写入附录 A 协议）：同一数据库存在多个写 owner 的任务族，全部成员进入 worker 前必须同批审计；任一成员保留主循环时，跨执行位置并发写由 5s busy 等待兜底，超时错误按现有失败语义上报。
+
+### 附录 C：API 直连长任务入口（任务 1.8 决策）
+
+`api/routes.py` 直接调用 `data_manager.run_*` 的 5 处（special commodity series catalog / policy discovery / price sync / calendar governance、futures official calendar backfill）运行于 FastAPI 请求与 BackgroundTasks 上下文，与调度器执行模型不同；本 change 不将其收敛进调度包装器（避免为覆盖清单而扩大爆炸半径），显式另立 change `converge-api-triggered-long-tasks` 承接，验收口径复用本 capability 的 SLO 与停止语义。

@@ -4,6 +4,7 @@ Financial statement maintenance driven by CNInfo disclosure announcements.
 
 from __future__ import annotations
 
+import asyncio
 import time
 from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime, timedelta
@@ -54,6 +55,7 @@ from scripts.dev_validation.audit_financial_numeric_fact_coverage import (
     DEFAULT_REQUIRED_CANONICAL_FACTS,
 )
 from utils import dm_logger
+from utils import worker_context
 from utils.config_manager import ResearchConfig, config_manager
 from utils.date_utils import get_shanghai_time
 
@@ -349,7 +351,7 @@ class FinancialDisclosureIncrementalSyncService:
                     dry_run=dry_run,
                 )
             )
-            candidates = self._build_candidates(
+            candidates = await self._build_candidates(
                 instruments=instruments,
                 events=scan_result["events"],
                 report_periods=target_periods if reconciliation else None,
@@ -358,6 +360,12 @@ class FinancialDisclosureIncrementalSyncService:
                 max_candidates=candidate_limit,
                 run_id=run_id,
                 dry_run=dry_run,
+                checkpoint_every_candidates=int(
+                    maintenance_cfg.get("scan_checkpoint_every_candidates", 200) or 200
+                ),
+                checkpoint_interval_seconds=float(
+                    maintenance_cfg.get("scan_checkpoint_interval_seconds", 30) or 30
+                ),
             )
             write_result = await self._apply_candidates(
                 candidates=list(candidates.values()),
@@ -734,7 +742,7 @@ class FinancialDisclosureIncrementalSyncService:
             "errors": errors,
         }
 
-    def _build_candidates(
+    async def _build_candidates(
         self,
         *,
         instruments: Sequence[Mapping[str, Any]],
@@ -745,6 +753,8 @@ class FinancialDisclosureIncrementalSyncService:
         max_candidates: int,
         run_id: Optional[int],
         dry_run: bool,
+        checkpoint_every_candidates: int = 200,
+        checkpoint_interval_seconds: float = 30.0,
     ) -> Dict[Tuple[str, str], FinancialDisclosureMaintenanceCandidate]:
         instruments_by_id = {
             str(instrument.get("instrument_id") or ""): instrument
@@ -840,10 +850,29 @@ class FinancialDisclosureIncrementalSyncService:
             if existing is not candidate:
                 self._merge_candidate_event(existing, event)
         if report_periods:
+            scanned_total = 0
+            scanned_since_checkpoint = 0
+            last_checkpoint_at = time.monotonic()
             for instrument in instruments:
                 for report_period in report_periods:
                     if max_candidates > 0 and len(candidates) >= max_candidates:
                         break
+                    scanned_total += 1
+                    scanned_since_checkpoint += 1
+                    # Checkpoint contract: yield control at batch boundaries so
+                    # worker-loop cancellation lands within the configured bound.
+                    if (
+                        scanned_since_checkpoint >= checkpoint_every_candidates
+                        or time.monotonic() - last_checkpoint_at >= checkpoint_interval_seconds
+                    ):
+                        await asyncio.sleep(0)
+                        scanned_since_checkpoint = 0
+                        last_checkpoint_at = time.monotonic()
+                        worker_context.report_progress(
+                            phase="reconciliation_scan",
+                            scanned=scanned_total,
+                            candidates=len(candidates),
+                        )
                     candidate = self._candidate_for_period(instrument, report_period)
                     if candidate.key in candidates:
                         continue
@@ -1545,8 +1574,9 @@ class FinancialDisclosureIncrementalSyncService:
         run_id: Optional[int],
         dry_run: bool,
     ) -> Dict[str, Any]:
-        before_ready = {
-            candidate.key: self._readiness_for_candidate(
+        before_ready: Dict[Tuple[str, str], Dict[str, Any]] = {}
+        for candidate in candidates:
+            before_ready[candidate.key] = self._readiness_for_candidate(
                 candidate,
                 required_core_facts=self._required_core_facts_for_profile(
                     candidate.profile,
@@ -1554,8 +1584,14 @@ class FinancialDisclosureIncrementalSyncService:
                 ),
                 mapping_version=mapping_version,
             )
-            for candidate in candidates
-        }
+            # Pre-import readiness sweep reads the financial database per
+            # candidate; yield at batch boundaries for cancellation.
+            if len(before_ready) % 200 == 0:
+                await asyncio.sleep(0)
+                worker_context.report_progress(
+                    phase="apply_precheck",
+                    processed=len(before_ready),
+                )
         to_fetch = [
             candidate
             for candidate in candidates
@@ -1608,7 +1644,19 @@ class FinancialDisclosureIncrementalSyncService:
                 failed = len(to_fetch)
                 self._last_repair_source_summary = self.repair_router.default_summary()
                 self._last_repair_source_summary["errors"] = [str(exc)]
+        applied_total = 0
         for candidate in candidates:
+            applied_total += 1
+            # Apply-phase checkpoint: post-import readiness reads the financial
+            # database per candidate; yield at batch boundaries for cancellation.
+            if applied_total % 200 == 0:
+                await asyncio.sleep(0)
+                worker_context.report_progress(
+                    phase="apply_candidates",
+                    applied=applied_total,
+                    changed=changed,
+                    written=written,
+                )
             before = before_ready[candidate.key]
             after = self._readiness_for_candidate(
                 candidate,

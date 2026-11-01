@@ -14,7 +14,7 @@ from contextvars import ContextVar
 from sqlalchemy import create_engine, text, event
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.pool import AsyncAdaptedQueuePool, StaticPool
+from sqlalchemy.pool import AsyncAdaptedQueuePool, NullPool, StaticPool
 
 
 _db_workload: ContextVar[str] = ContextVar("quote_db_workload", default="task")
@@ -360,6 +360,26 @@ class DatabaseManager:
             pool_config.get('pool_timeout_seconds', default_pool_timeout)
             or default_pool_timeout
         )
+        pool_class_name = str(pool_config.get('pool_class', 'queuepool') or 'queuepool').lower()
+
+        if pool_class_name == 'nullpool':
+            # NullPool creates a fresh aiosqlite connection per checkout, bound to
+            # the loop that uses it, so worker-loop executions (scheduler task
+            # isolation) never touch connections owned by another loop. Capacity
+            # keys are inert in this mode and recorded as such.
+            poolclass = NullPool
+            db_logger.info(
+                "[Database] %s async pool configured: pool_class=nullpool "
+                "(pool_size/max_overflow/pool_timeout ignored)",
+                role,
+            )
+            engine = create_async_engine(
+                f"sqlite+aiosqlite:///{self.db_path}",
+                poolclass=poolclass,
+                connect_args={"check_same_thread": False}
+            )
+            event.listen(engine.sync_engine, 'connect', pragma_listener)
+            return engine
 
         engine = create_async_engine(
             f"sqlite+aiosqlite:///{self.db_path}",

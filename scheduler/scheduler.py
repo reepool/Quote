@@ -4,8 +4,9 @@ Uses APScheduler to manage and execute scheduled tasks.
 """
 
 import asyncio
+import threading
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Dict, Any, List, Optional
 from builtins import TimeoutError as BuiltinTimeoutError
 
 # Scheduler can be imported by operational scripts without going through
@@ -42,6 +43,12 @@ class TaskScheduler:
         self.scheduler = AsyncIOScheduler()
         self.jobs: Dict[str, Any] = {}
         self.running_tasks: Dict[str, Dict[str, datetime]] = {}
+        # Active worker-loop runs: job_id -> run_id -> WorkerRunState
+        self._worker_runs: Dict[str, Dict[str, Any]] = {}
+        # Strong references to fire-and-forget background tasks (the loop only
+        # keeps weak references; unreferenced tasks can be garbage-collected
+        # mid-execution).
+        self._background_tasks: set = set()
         self.enabled = self.config.get_nested('scheduler_config.enabled', True)
         # 创建 JobConfigManager 实例，由 TaskScheduler 统一管理
         self.job_config_manager = JobConfigManager(self.config)
@@ -57,6 +64,9 @@ class TaskScheduler:
             return
 
         try:
+            # Register the main loop so worker runs can marshal reports/DB access back
+            from utils import worker_context
+            worker_context.set_main_loop(asyncio.get_running_loop())
             scheduler_logger.info("[Scheduler] Initializing task scheduler...")
 
             # 初始化任务配置管理器
@@ -299,17 +309,302 @@ class TaskScheduler:
             self.running_tasks[job_id][run_id] = datetime.now()
             tracked_here = True
         try:
-            if max_runtime_seconds:
-                return await asyncio.wait_for(
-                    task_func(**all_parameters),
-                    timeout=max_runtime_seconds,
-                )
-            return await task_func(**all_parameters)
+            run_on_main_loop = self._resolve_run_on_main_loop(all_parameters, job_config)
+            if run_on_main_loop:
+                # Documented escape hatch: job keeps main-loop execution because of
+                # a known main-loop resource dependency (recorded in job config).
+                if max_runtime_seconds:
+                    return await asyncio.wait_for(
+                        task_func(**all_parameters),
+                        timeout=max_runtime_seconds,
+                    )
+                return await task_func(**all_parameters)
+            return await self._await_task_in_worker(
+                job_id=job_id,
+                run_id=run_id,
+                task_func=task_func,
+                all_parameters=all_parameters,
+                max_runtime_seconds=max_runtime_seconds,
+            )
         finally:
             if tracked_here and job_id in self.running_tasks:
                 self.running_tasks[job_id].pop(run_id, None)
                 if not self.running_tasks[job_id]:
                     self.running_tasks.pop(job_id, None)
+
+    def _resolve_run_on_main_loop(
+        self,
+        all_parameters: Dict[str, Any],
+        job_config: Any,
+    ) -> bool:
+        """Escape-hatch resolution: explicit per-run override > job config > global default.
+
+        Defaults to worker-loop execution. Deployment keeps
+        ``worker_isolation.default_run_on_main_loop`` config so unverified jobs
+        can stay on the main loop until their chains are audited (staged
+        rollout, see openspec isolate-long-tasks-from-api-event-loop).
+        """
+        explicit = all_parameters.pop("run_on_main_loop", None)
+        if explicit is not None:
+            return bool(explicit)
+        if getattr(job_config, "parameters", None):
+            job_level = job_config.parameters.get("run_on_main_loop")
+            if job_level is not None:
+                return bool(job_level)
+        return bool(
+            self.config.get_nested(
+                "scheduler_config.worker_isolation.default_run_on_main_loop",
+                False,
+            )
+        )
+
+    def _worker_heartbeat_interval_seconds(self) -> int:
+        return int(
+            self.config.get_nested(
+                "scheduler_config.worker_isolation.heartbeat_seconds",
+                300,
+            )
+            or 300
+        )
+
+    def _worker_shutdown_grace_seconds(self) -> float:
+        return float(
+            self.config.get_nested(
+                "scheduler_config.worker_isolation.shutdown_grace_seconds",
+                30,
+            )
+            or 30
+        )
+
+    async def _await_task_in_worker(
+        self,
+        *,
+        job_id: str,
+        run_id: str,
+        task_func: Any,
+        all_parameters: Dict[str, Any],
+        max_runtime_seconds: Optional[float],
+    ) -> Any:
+        """Run the task coroutine on a dedicated worker thread + event loop.
+
+        The main loop only awaits completion, so long synchronous phases in the
+        task cannot starve the API or the Telegram bot. Cancellation
+        (max_runtime_seconds expiry or operator stop) is injected through the
+        worker task handle at the task's next await checkpoint;
+        ``concurrent.futures.Future.cancel`` is deliberately not used because it
+        is a no-op once the task has started running.
+        """
+        from utils import worker_context
+
+        main_loop = asyncio.get_running_loop()
+        state = worker_context.WorkerRunState(
+            job_id=job_id,
+            run_id=run_id,
+            max_runtime_seconds=max_runtime_seconds,
+        )
+        self._register_worker_run(state)
+        done = asyncio.Event()
+        outcome: Dict[str, Any] = {}
+
+        def _set_done() -> None:
+            if not done.is_set():
+                done.set()
+
+        def _thread_main() -> None:
+            worker_loop = asyncio.new_event_loop()
+            try:
+                asyncio.set_event_loop(worker_loop)
+
+                async def _starter() -> None:
+                    worker_context.bind_current_run(state)
+                    handle = worker_loop.create_task(task_func(**all_parameters))
+                    state.attach_handle(handle, worker_loop)
+                    if state.consume_pending_cancel():
+                        handle.cancel()
+                    try:
+                        outcome["result"] = await handle
+                    except BaseException as exc:  # noqa: BLE001 - forwarded to main loop
+                        outcome["error"] = exc
+                    finally:
+                        state.mark_finished()
+                        main_loop.call_soon_threadsafe(_set_done)
+
+                worker_loop.run_until_complete(_starter())
+                worker_loop.run_until_complete(worker_loop.shutdown_asyncgens())
+            except BaseException as exc:  # noqa: BLE001 - loop-level failure
+                outcome.setdefault("error", exc)
+                main_loop.call_soon_threadsafe(_set_done)
+            finally:
+                asyncio.set_event_loop(None)
+                worker_loop.close()
+
+        thread = threading.Thread(
+            target=_thread_main,
+            name=f"quote-worker-{job_id}-{run_id}",
+            daemon=True,
+        )
+        thread.start()
+
+        async def _wait_outcome() -> Any:
+            await done.wait()
+            if "error" in outcome:
+                raise outcome["error"]
+            return outcome.get("result")
+
+        heartbeat_task = asyncio.create_task(self._worker_heartbeat_loop(state))
+        try:
+            if max_runtime_seconds:
+                return await asyncio.wait_for(_wait_outcome(), timeout=max_runtime_seconds)
+            return await _wait_outcome()
+        except asyncio.TimeoutError:
+            state.request_cancel(reason="max_runtime_seconds")
+            scheduler_logger.warning(
+                "[Scheduler] Task %s timed out after %ss (run_id=%s); cancellation injected "
+                "at next checkpoint",
+                job_id,
+                max_runtime_seconds,
+                run_id,
+            )
+            self._spawn_background(self._watch_orphan_worker(thread, state))
+            raise
+        except asyncio.CancelledError:
+            if state.stop_requested:
+                scheduler_logger.warning(
+                    "[Scheduler] Task %s stopped by operator (run_id=%s)",
+                    job_id,
+                    run_id,
+                )
+                self._notify_run_stopped(job_id, run_id)
+            raise
+        finally:
+            heartbeat_task.cancel()
+            self._unregister_worker_run(state)
+
+    async def _worker_heartbeat_loop(self, state: Any) -> None:
+        """Log a progress heartbeat for the run every configured interval."""
+        interval = self._worker_heartbeat_interval_seconds()
+        try:
+            while True:
+                await asyncio.sleep(interval)
+                snapshot = state.snapshot()
+                if not snapshot.get("finished"):
+                    scheduler_logger.info(
+                        "[Scheduler][Heartbeat] job=%s run_id=%s phase=%s elapsed=%ss "
+                        "since_progress=%ss progress=%s",
+                        snapshot.get("job_id"),
+                        snapshot.get("run_id"),
+                        snapshot.get("phase"),
+                        snapshot.get("elapsed_seconds"),
+                        snapshot.get("seconds_since_progress"),
+                        snapshot.get("progress") or {},
+                    )
+        except asyncio.CancelledError:
+            raise
+
+    async def _watch_orphan_worker(self, thread: threading.Thread, state: Any) -> None:
+        """Warn when a timed-out worker thread cannot land its cancellation."""
+        try:
+            grace = self._worker_shutdown_grace_seconds()
+            deadline = asyncio.get_running_loop().time() + grace
+            while thread.is_alive() and not state.finished:
+                if asyncio.get_running_loop().time() >= deadline:
+                    scheduler_logger.error(
+                        "[Scheduler] Orphaned worker thread for job=%s run_id=%s: cancellation "
+                        "could not land within %ss; the thread remains until process restart",
+                        state.job_id,
+                        state.run_id,
+                        grace,
+                    )
+                    return
+                await asyncio.sleep(2)
+        except asyncio.CancelledError:
+            raise
+
+    def _register_worker_run(self, state: Any) -> None:
+        self._worker_runs.setdefault(state.job_id, {})[state.run_id] = state
+
+    def _unregister_worker_run(self, state: Any) -> None:
+        runs = self._worker_runs.get(state.job_id)
+        if runs and state.run_id in runs:
+            runs.pop(state.run_id, None)
+            if not runs:
+                self._worker_runs.pop(state.job_id, None)
+
+    def _spawn_background(self, coro) -> asyncio.Task:
+        """Create a fire-and-forget task holding a strong reference."""
+        task = asyncio.create_task(coro)
+        self._background_tasks.add(task)
+        task.add_done_callback(self._background_tasks.discard)
+        return task
+
+    def _notify_run_stopped(self, job_id: str, run_id: str) -> None:
+        try:
+            bot = TelegramBot()
+            self._spawn_background(
+                bot.send_scheduler_notification(
+                    f"任务已停止: {job_id} (run_id={run_id})",
+                    level='warning',
+                )
+            )
+        except Exception:
+            scheduler_logger.error("[Scheduler] Failed to send stop notification")
+
+    def request_stop_job(self, job_id: str) -> Dict[str, Any]:
+        """Operator stop: inject cancellation into all active worker runs of a job."""
+        states = list(self._worker_runs.get(job_id, {}).values())
+        if not states:
+            return {"job_id": job_id, "requested": 0, "runs": []}
+        snapshots = []
+        for state in states:
+            injected = state.request_cancel(reason="operator_stop")
+            snapshot = state.snapshot()
+            snapshot["cancel_injected"] = injected
+            snapshots.append(snapshot)
+        scheduler_logger.warning(
+            "[Scheduler] Operator stop requested for job=%s runs=%s",
+            job_id,
+            [s["run_id"] for s in snapshots],
+        )
+        return {"job_id": job_id, "requested": len(snapshots), "runs": snapshots}
+
+    def get_worker_run_snapshots(self) -> list:
+        """Current active worker runs for /status and API exposure."""
+        snapshots = []
+        for runs in self._worker_runs.values():
+            for state in runs.values():
+                snapshots.append(state.snapshot())
+        return snapshots
+
+    async def _shutdown_worker_runs(self) -> None:
+        """Cancel all active worker runs and wait within the configured grace."""
+        states = [
+            state
+            for runs in self._worker_runs.values()
+            for state in runs.values()
+            if not state.finished
+        ]
+        if not states:
+            return
+        scheduler_logger.warning(
+            "[Scheduler] Shutdown: cancelling %s active worker run(s): %s",
+            len(states),
+            [(s.job_id, s.run_id) for s in states],
+        )
+        for state in states:
+            state.request_cancel(reason="shutdown")
+        grace = self._worker_shutdown_grace_seconds()
+        deadline = asyncio.get_running_loop().time() + grace
+        while any(not state.finished for state in states):
+            if asyncio.get_running_loop().time() >= deadline:
+                surviving = [s for s in states if not s.finished]
+                scheduler_logger.error(
+                    "[Scheduler] Shutdown grace %ss exceeded; orphaned worker run(s): %s",
+                    grace,
+                    [(s.job_id, s.run_id) for s in surviving],
+                )
+                return
+            await asyncio.sleep(0.2)
+        scheduler_logger.info("[Scheduler] All worker runs finished within grace")
 
     def _log_dependency_results(
         self,
@@ -710,6 +1005,9 @@ class TaskScheduler:
     async def shutdown(self):
         """关闭调度器"""
         try:
+            # Cancel active worker runs with a bounded wait before APScheduler
+            # shutdown(wait=True), which would otherwise block on them.
+            await self._shutdown_worker_runs()
             if self.scheduler.running:
                 scheduler_logger.info("[Scheduler] Shutting down task scheduler (will wait for jobs to complete)...")
                 loop = asyncio.get_running_loop()

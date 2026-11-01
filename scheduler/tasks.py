@@ -5230,6 +5230,20 @@ class ScheduledTasks:
         Returns:
             bool: 是否发送成功
         """
+        # Loop-bound resource guard: the Telethon client lives on the main loop.
+        # When a task runs in a worker loop (isolate-long-tasks-from-api-event-loop),
+        # marshal the whole delivery back to the main loop with a non-blocking
+        # await; report contracts and signatures are unchanged.
+        from utils import worker_context
+        if worker_context.is_worker_loop():
+            return await worker_context.run_on_main_loop(
+                lambda: self._send_task_report(
+                    report_data=report_data,
+                    report_type=report_type,
+                    task_name=task_name,
+                    job_config=job_config,
+                )
+            )
         try:
             if (
                 isinstance(report_data.get('instrument_master_governance'), dict)

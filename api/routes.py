@@ -383,6 +383,20 @@ async def get_system_status():
         raise HTTPException(status_code=500, detail=f"Failed to get system status: {str(e)}")
 
 
+@router.get("/system/worker-runs", tags=["System"])
+async def get_worker_runs():
+    """获取当前在 worker 事件循环上运行的调度任务详情（run_id、阶段、进度、耗时）。"""
+    try:
+        from scheduler.scheduler import task_scheduler
+
+        return {
+            "runs": task_scheduler.get_worker_run_snapshots(),
+            "generated_at": datetime.now().isoformat(),
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get worker runs: {str(e)}")
+
+
 # Instrument Management
 @router.get("/instruments", response_model=List[InstrumentResponse], tags=["Instruments"])
 async def get_instruments(

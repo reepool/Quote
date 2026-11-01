@@ -7,6 +7,11 @@
     "coalesce": true,
     "monitor_startup_delay": 3,
     "market_close_delay_minutes": 15,
+    "worker_isolation": {
+      "default_run_on_main_loop": true,
+      "heartbeat_seconds": 300,
+      "shutdown_grace_seconds": 30
+    },
     "jobs": {
       "risk_free_rate_sync": {
         "enabled": true,
@@ -2128,6 +2133,7 @@
         "misfire_grace_time": 1800,
         "coalesce": true,
         "parameters": {
+          "run_on_main_loop": false,
           "exchanges": [
             "SSE",
             "SZSE",
@@ -2320,6 +2326,7 @@
         "misfire_grace_time": 1800,
         "coalesce": true,
         "parameters": {
+          "run_on_main_loop": false,
           "exchanges": [
             "SSE",
             "SZSE",

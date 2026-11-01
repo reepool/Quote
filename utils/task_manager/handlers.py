@@ -101,6 +101,110 @@ class TaskManagerHandlers:
         self.task_manager.logger.debug(f"[TaskManagerHandlers] 处理/status命令，chat_id: {chat_id}")
 
         await self._show_task_status_simple(chat_id)
+        await self._send_worker_run_details(chat_id)
+
+    async def _send_worker_run_details(self, chat_id) -> None:
+        """Show active worker-loop run details (phase, progress, elapsed)."""
+        try:
+            scheduler = self.task_manager.task_scheduler
+            snapshots = scheduler.get_worker_run_snapshots()
+            if not snapshots:
+                return
+            lines = ["🛠 *运行中的工作线程任务:*\n"]
+            for snap in snapshots:
+                remaining = ""
+                max_runtime = snap.get("max_runtime_seconds")
+                if max_runtime:
+                    remaining_seconds = max(0, float(max_runtime) - float(snap.get("elapsed_seconds") or 0))
+                    remaining = f" | 剩余上限 {remaining_seconds:.0f}s"
+                progress = snap.get("progress") or {}
+                progress_text = (
+                    ", ".join(f"{key}={value}" for key, value in progress.items())
+                    if progress
+                    else "-"
+                )
+                lines.append(
+                    f"• `{snap.get('job_id')}` run={snap.get('run_id')} "
+                    f"phase={snap.get('phase')} elapsed={snap.get('elapsed_seconds')}s "
+                    f"| 进度: {progress_text}{remaining}"
+                )
+            lines.append("\n💡 使用 `/stop <任务ID>` 请求停止运行中的任务")
+            await self.task_manager.send_message(
+                chat_id,
+                "\n".join(lines),
+                parse_mode='markdown',
+            )
+        except Exception as e:
+            self.task_manager.logger.warning(
+                f"[TaskManagerHandlers] 显示工作线程任务详情失败: {e}"
+            )
+
+    async def handle_stop_command(self, event) -> None:
+        """处理 /stop 命令：请求停止运行中的调度任务（worker 取消在下一检查点生效）。"""
+        chat_id = event.chat_id
+        user_id = event.sender_id if hasattr(event, 'sender_id') else 'Unknown'
+        message_text = event.text if hasattr(event, 'text') else '/stop'
+
+        self.task_manager.logger.info(
+            f"[TaskManagerHandlers] 收到命令: '{message_text}' | 用户ID: {user_id} | 聊天ID: {chat_id}"
+        )
+
+        try:
+            scheduler = self.task_manager.task_scheduler
+            tokens = message_text.split()
+            args = [token for token in tokens[1:] if token.strip()]
+
+            if not args:
+                snapshots = scheduler.get_worker_run_snapshots()
+                if not snapshots:
+                    await self.task_manager.send_message(
+                        chat_id,
+                        "ℹ️ 当前没有运行中的任务。",
+                        parse_mode='markdown',
+                    )
+                    return
+                lines = ["🛠 *运行中的任务:*\n"]
+                for snap in snapshots:
+                    lines.append(
+                        f"• `{snap.get('job_id')}` run={snap.get('run_id')} "
+                        f"phase={snap.get('phase')} elapsed={snap.get('elapsed_seconds')}s"
+                    )
+                lines.append("\n💡 使用 `/stop <任务ID>` 请求停止")
+                await self.task_manager.send_message(
+                    chat_id,
+                    "\n".join(lines),
+                    parse_mode='markdown',
+                )
+                return
+
+            job_id = args[0]
+            result = scheduler.request_stop_job(job_id)
+            if not result["requested"]:
+                await self.task_manager.send_message(
+                    chat_id,
+                    f"⚠️ 任务 `{job_id}` 当前没有运行中的实例。",
+                    parse_mode='markdown',
+                )
+                return
+            run_ids = [run.get("run_id") for run in result["runs"]]
+            await self.task_manager.send_message(
+                chat_id,
+                (
+                    f"🛑 *已请求停止* `{job_id}`\n\n"
+                    f"运行实例: {', '.join(str(run_id) for run_id in run_ids)}\n"
+                    f"取消将在任务下一个检查点生效（默认 ≤30s，取决于当前阶段批次粒度）。"
+                ),
+                parse_mode='markdown',
+            )
+        except Exception as e:
+            self.task_manager.logger.error(
+                f"[TaskManagerHandlers] 处理停止命令失败: {e}"
+            )
+            await self.task_manager.send_message(
+                chat_id,
+                f"❌ *停止命令异常*\n\n`{str(e)}`",
+                parse_mode='markdown',
+            )
 
     async def handle_help_command(self, event) -> None:
         """处理 /help 命令"""
@@ -118,6 +222,7 @@ class TaskManagerHandlers:
             "• `/status` - 查看所有任务状态\n"
             "• `/detail <任务ID>` - 查看任务详情\n"
             "• `/run <任务ID>` - 立即执行任务\n"
+            "• `/stop [任务ID]` - 查看运行中任务或请求停止（在检查点生效）\n"
             "• `/run shareholder_shadow_sync` - 手工触发股东摘要全量刷新\n"
             "• `/run shareholder_reconciliation_sync` - 手工触发股东摘要周期复核与补足\n"
             "• `/run shareholder_incremental_sync` - 手工触发股东摘要每日增量检查\n"

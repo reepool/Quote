@@ -15,6 +15,7 @@ from research.providers import ShareholderProviderRegistry
 from research.providers.base import ShareholderSnapshot
 from research.empty_support import allows_optional_empty_exchange
 from research.shareholder_control_sync import persist_shareholder_control_changes
+from utils import worker_context
 from research.shareholder_snapshot_policy import (
     actual_shareholder_coverage_scope,
     compute_shareholder_content_hashes,
@@ -98,6 +99,14 @@ class ShareholderShadowSyncService:
         results: List[ShareholderExchangeSyncResult] = []
 
         for exchange in target_exchanges:
+            worker_context.report_progress(
+                phase="exchange_sync",
+                exchange=exchange,
+                exchanges_done=len(results),
+            )
+            # Checkpoint: yield between exchanges so worker-loop cancellation
+            # can land at a batch boundary.
+            await asyncio.sleep(0)
             results.append(
                 await self._sync_exchange(
                     exchange=exchange,
@@ -384,6 +393,15 @@ class ShareholderShadowSyncService:
                     primary_mode = candidate.mode
                 successful_sources.append(candidate_key)
                 successful_source_names.add(candidate.source)
+                # Checkpoint: yield after each source candidate batch so
+                # worker-loop cancellation can land between batches.
+                await asyncio.sleep(0)
+                worker_context.report_progress(
+                    phase="source_batch",
+                    exchange=exchange,
+                    sources_done=len(successful_sources),
+                    remaining_instruments=len(remaining_ids),
+                )
                 remaining_ids = {
                     instrument_id
                     for instrument_id in remaining_ids
