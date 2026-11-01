@@ -1,9 +1,9 @@
 ## 1. M1 执行隔离落地
 
 - [ ] 1.1 完成 loop-bound 资源盘点：telethon 客户端、aiosqlite/SQLAlchemy task 池、共享 HTTP 会话、同步 sqlite3 连接生命周期；产出每个任务的归属标注（worker-safe / 需代理 / 主 loop 保留）并记录到 design 附录。
-- [ ] 1.2 在 `scheduler/scheduler.py` 任务包装器内实现 worker loop 执行（每 run 独立线程 + 独立事件循环，不设共享池上限），主循环仅 await 结果；`max_instances`/`run_id`/依赖组跟踪保持在主循环。
-- [ ] 1.3 报告与通知通道实现线程安全 marshalling 回主循环；任务内不得跨 loop 使用 telethon 客户端；`_send_task_report` 对任务代码保持原签名。
-- [ ] 1.4 `/stop` 与 `max_runtime_seconds` 经线程安全 cancel 注入 worker loop；检查点契约落地（默认 ≤30s，首个调用方按扫描节奏配置批次粒度，参数可配置）。
+- [ ] 1.2 在 `_run_configured_task_raw`（已核实的三入口唯一收口点：cron `parameterized_task`、`/run` 立即执行、依赖组执行）内实现 worker loop 执行：每 run 独立线程 + 独立事件循环（启动器协程模式，Task 句柄线程安全回传主循环），主循环仅 await 结果；`max_instances`/`run_id`/依赖组跟踪保持在主循环。
+- [ ] 1.3 报告与通知通道实现线程安全 marshalling 回主循环：worker 侧以 `await asyncio.wrap_future(run_coroutine_threadsafe(...))` 非阻塞等待（禁止 `.result()` 阻塞 worker loop）；任务内不得跨 loop 使用 telethon 客户端；`_send_task_report` 对任务代码保持原签名。
+- [ ] 1.4 取消通道：新增 bot 停止命令（现状无停止命令，运行中任务只能进程重启）作用于 `running_tasks` 在跑 run；与 `max_runtime_seconds` 统一经 Task 句柄 `call_soon_threadsafe(handle.cancel)` 注入（不得依赖 `concurrent.futures.Future.cancel()`）；检查点契约落地（默认 ≤30s，首个调用方按扫描节奏配置批次粒度，参数可配置）。
 - [ ] 1.5 提供 per-job escape hatch 配置（`config/05_scheduler.json`）：确有主 loop 资源依赖的任务保留主 loop 执行，理由记录在配置注释与盘点文档。
 - [ ] 1.6 盘点"任务 × 数据库写入"矩阵，落实同库写串行（现有单一写入 owner 语义）与 `busy_timeout` 复核，防止真实并行引入 SQLITE_BUSY。
 - [ ] 1.7 优雅停机：`shutdown()` 对在跑 worker 取消并有界等待；退出路径复用 enforce-sqlite-connection-closing 固化的 finally-close 工厂释放连接与会话。

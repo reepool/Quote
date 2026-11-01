@@ -17,7 +17,7 @@
 
 - 调度器任务包装器层统一改造：任务协程在独立 worker 事件循环（独立线程）中执行，主循环只等待结果；业务任务代码不复制、不改语义、执行位置单一收口。
 - 报告与通知通道回收主循环：任务内 `_send_task_report` 及 bot 通知经线程安全 marshalling 回主循环，telethon 客户端、aiosqlite 引擎等 loop-bound 资源不跨 loop 使用。
-- 停止与超时改造：`/stop` 与 `max_runtime_seconds` 通过线程安全 cancel 注入 worker loop；长同步段保证有 await 检查点，取消在配置上限（≤30s）内生效。
+- 停止与超时改造：新增 bot 停止命令（现状无停止命令，运行中任务只能进程重启终止），与 `max_runtime_seconds` 通过线程安全 cancel 注入 worker loop；长同步段保证有 await 检查点，取消在配置上限（默认 30s）内生效。
 - 长任务可观测性：长阶段心跳日志（≤5 分钟）；当前运行状态（run_id、阶段、耗时、最近进度）可经 bot 与 API 查询。
 - 失败隔离：worker 异常时任务标记 failed 并复用现有错误报告路径，API 与 bot 不受影响；worker 卡死成孤儿线程时告警可观测。
 - 并行与停机正确性：同库写按现有单一写入 owner 串行（防止 worker 真实并行引入写竞争）；优雅停机对在跑 worker 取消并有界等待。

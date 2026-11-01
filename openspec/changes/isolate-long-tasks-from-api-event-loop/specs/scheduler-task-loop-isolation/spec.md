@@ -10,7 +10,7 @@ The system SHALL execute scheduler task coroutines off the API/Telegram shared e
 - **AND** a job configured via the escape hatch to stay on the main loop SHALL be exempt from this SLO with its known impact recorded
 
 #### Scenario: Long task runs while bot serves commands
-- **WHEN** a long task is running and an operator issues /run, /stop or /status
+- **WHEN** a long task is running and an operator issues /run, the stop command or /status
 - **THEN** the bot SHALL acknowledge the command within the configured SLO (default 10s)
 
 #### Scenario: Isolation stays at the wrapper layer
@@ -20,10 +20,10 @@ The system SHALL execute scheduler task coroutines off the API/Telegram shared e
 - **AND** business services SHALL only add await checkpoints and progress reporting as defined by this capability
 
 ### Requirement: Stop and timeout must be enforced under isolation
-The system SHALL enforce /stop and max_runtime_seconds against the worker execution such that cancellation takes effect at the task's next await checkpoint within a configured bound, even while the task is inside a long synchronous phase.
+The system SHALL provide an operator stop command for running tasks (a new entry; the bot currently exposes no stop command, so running tasks can today only be stopped by process restart) and SHALL enforce it together with max_runtime_seconds against the worker execution such that cancellation takes effect at the task's next await checkpoint within a configured bound, even while the task is inside a long synchronous phase.
 
 #### Scenario: Operator stops a running long task
-- **WHEN** /stop is issued for a task running in the worker
+- **WHEN** the bot stop command is issued for a task running in the worker
 - **THEN** the worker task SHALL be cancelled at its next checkpoint within the configured bound (default 30s)
 - **AND** the task SHALL be reported as stopped
 
