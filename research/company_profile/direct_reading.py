@@ -190,29 +190,16 @@ def _latest_check(checks, target_type: str, target_id: str):
 def _chain_sides(claim) -> set[str]:
     """Which supply-chain side this trusted object actually is.
 
-    ``upstream_downstream`` only names the bucket. A downstream use does not
-    also count as an upstream input, and a volume or concentration figure
-    does not fill either side.
+    Input and output are existing classifications. The combined
+    ``upstream_downstream`` bucket does not say which side, and the condition
+    id spelling is not a side.
     """
-    if _is_concentration_or_cost_substitute(str(getattr(claim, "answer", "") or "")):
-        return set()
-    tails = [
-        str(item).split(":")[-1] for item in (getattr(claim, "condition_ids", ()) or ())
-    ]
-    if any("volume" in tail or "balance" in tail for tail in tails):
-        return set()
-    sides: set[str] = set()
     dimension = str(getattr(claim, "dimension", "") or "")
     if dimension == "input_exposure":
-        sides.add("upstream")
-    elif dimension == "output_exposure":
-        sides.add("downstream")
-    for tail in tails:
-        if tail.startswith("upstream"):
-            sides.add("upstream")
-        elif tail.startswith("downstream"):
-            sides.add("downstream")
-    return sides
+        return {"upstream"}
+    if dimension == "output_exposure":
+        return {"downstream"}
+    return set()
 
 
 def _view_is_covered(name: str, claims, checks) -> bool:
@@ -1276,6 +1263,19 @@ def disclosed_core_revenue_facts(sources: Sequence[Mapping[str, Any]]) -> list[d
                         "quote": window[:180],
                     }
                 )
+    stated = [
+        item
+        for item in found
+        if item["kind"] == "operating_revenue_total"
+        and "本期" in str(item.get("quote") or "")
+        and "单位" in str(item.get("quote") or "")
+    ]
+    if stated:
+        found = [
+            item
+            for item in found
+            if item["kind"] != "operating_revenue_total" or item in stated
+        ]
     return found
 
 
@@ -3309,7 +3309,7 @@ def interpret_direct_core(
                 gaps.append("chapter_gap_expansion")
             chapter_required_pages.update(fresh)
             pending = []
-            for page_no in inventory_pages(fresh, keep_tail=False):
+            for page_no in inventory_pages(fresh):
                 page_no = int(page_no)
                 if page_no in inventoried or page_no not in by_page:
                     continue
@@ -3608,8 +3608,14 @@ def interpret_direct_core(
             deliver_group(pending[middle:], recovered=recovered)
             return
         if too_big:
-            gap = f"necessary_fragment:{pending[0].condition_id}"
-            if gap not in gaps:
+            shortfall = max(0, draft_units + verify_units - room)
+            gap = (
+                f"necessary_fragment:{pending[0].condition_id}"
+                f":payload={request_payload_bytes(sized)}"
+                f":reserved={draft_units}:verify={verify_units}"
+                f":remaining={room}:shortfall={shortfall}"
+            )
+            if not any(item.startswith(f"necessary_fragment:{pending[0].condition_id}:") or item == f"necessary_fragment:{pending[0].condition_id}" for item in gaps):
                 gaps.append(gap)
             return
         try:
@@ -4739,6 +4745,44 @@ def interpret_direct_core(
                 )
             follow = inventory_pages(selected)
             read_requested_follow(follow)
+            if not _operating_role_established(claims, checks):
+                role_evidence = []
+                for page_no in sorted(chapter_required_pages - set(selected)):
+                    source = by_page.get(int(page_no))
+                    if source is None or source.get("status") != "read":
+                        continue
+                    quote = ""
+                    for line in str(source.get("text") or "").splitlines():
+                        stripped = line.strip()
+                        if (
+                            not stripped
+                            or "年年度报告" in stripped
+                            or re.fullmatch(r"\d+\s*/\s*\d+", stripped)
+                        ):
+                            continue
+                        quote = stripped[:160]
+                        break
+                    if not quote or quote not in str(source.get("text") or ""):
+                        continue
+                    role_evidence.append(
+                        Evidence(
+                            evidence_id=f"operating-role-{page_no}",
+                            report=report,
+                            page=int(page_no),
+                            section_title="经营角色",
+                            anchor=TextAnchor(bounded_quote=quote),
+                        )
+                    )
+                    break
+                if role_evidence and not any(
+                    str(item.condition_id).endswith("operating-role")
+                    or str(item.condition_id).endswith("operating_roles")
+                    for item in conditions
+                ):
+                    question = make_operating_role_question(report, role_evidence)
+                    conditions.append(question)
+                    if question not in conditions_to_draft:
+                        conditions_to_draft.append(question)
             tail_hold = 0
             note_missed_core_revenue()
             compose(

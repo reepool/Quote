@@ -8211,6 +8211,7 @@ def test_historical_role_pass_does_not_cover_later_deny():
 
 def test_supply_chain_view_follows_covered_objects_not_a_missing_label():
     from research.company_profile.direct_reading import (
+        _chain_sides,
         _completeness_gaps,
         _view_is_covered,
     )
@@ -8307,6 +8308,13 @@ def test_supply_chain_view_follows_covered_objects_not_a_missing_label():
         ),
     ]
     assert _view_is_covered("supply_chain_position", [claims[3], uses], use_checks) is False
+    renamed = uses.model_copy(
+        update={"condition_ids": ("run:upstream_product_uses",)}
+    )
+    plain = uses.model_copy(update={"condition_ids": ("run:packaging_uses",)})
+    assert _chain_sides(uses) == _chain_sides(renamed) == _chain_sides(plain) == set()
+    raw = claims[4].model_copy(update={"condition_ids": ("run:downstream_raw",)})
+    assert _chain_sides(claims[4]) == _chain_sides(raw) == {"upstream"}
     gaps = _completeness_gaps(claims, (), checks)
     assert "view_not_substantive:supply_chain_position" not in gaps
     bare = claims[:4]

@@ -1537,10 +1537,10 @@ def test_s23_follow_page_is_read_and_one_side_does_not_finish():
         name: hashlib.sha256((root / name).read_bytes()).hexdigest()
         for name in source["file_hashes"]
     }
-    run_root = root / "data/QuoteBak/s24-paper-follow-offline"
+    run_root = root / "data/QuoteBak/s25-paper-core-offline"
     if run_root.exists():
         shutil.rmtree(run_root)
-    path = root / "data/QuoteBak/s24-paper-follow-offline-binding.json"
+    path = root / "data/QuoteBak/s25-paper-core-offline-binding.json"
     path.write_text(json.dumps(source, ensure_ascii=False))
     argv = sys.argv
     sys.argv = ["bounded_entry", "--binding", str(path), "--run-root", str(run_root)]
@@ -1565,8 +1565,26 @@ def test_s23_follow_page_is_read_and_one_side_does_not_finish():
     ]
     assert any(11 in (pages or []) for pages in inventories), inventories
     gaps = profile.get("gaps") or []
+    assert not any("schema validation failed" in gap for gap in gaps), gaps
     assert not any(gap == "necessary_unread:11" for gap in gaps), gaps
-    assert not any(gap == "necessary_unread:17" for gap in gaps), gaps
+    purposes = [
+        item.get("purpose")
+        for item in profile.get("call_receipts") or []
+        if item.get("physical_request")
+    ]
+    assert "synthesize_views" in purposes, purposes
+    assert "verify_views" in purposes, purposes
+    claims = [
+        claim
+        for view in profile["views"].values()
+        for claim in view.get("claims") or []
+    ]
+    assert claims, gaps
+    verified = [claim for claim in claims if claim.get("review_state") == "verified"]
+    assert verified, gaps
+    text = "\n".join(str(claim.get("answer") or "") for claim in verified)
+    assert "2,418,990,221.17" in text
+    assert "14,186.7" not in text
     views = profile["views"]
     if profile.get("draft_complete") is True:
         assert all(view["assessment_status"] == "assessed" for view in views.values())

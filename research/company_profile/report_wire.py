@@ -59,6 +59,88 @@ def compact_request(request: ReportSemanticRequestV3) -> dict:
     return payload
 
 
+def project_stored_inventory(payload: dict, request: dict) -> dict | None:
+    """Turn a saved domain object back into the compact inventory wire.
+
+    The stored payload is not the original model bytes. This keeps the
+    condition ids, quotes and requested pages, then checks the purpose schema.
+    """
+    import jsonschema
+
+    from research.company_profile.contracts import ReportSemanticRequestV3
+
+    purpose = str(request.get("purpose") or "")
+    if purpose != "source_inventory":
+        return None
+    wire: dict = {
+        "schema_version": "company_profile_report_response.v3",
+        "request_id": request["request_id"],
+        "purpose": purpose,
+        "requested_pages": [int(page) for page in payload.get("requested_pages") or []],
+    }
+    if request.get("source_scope") != "page_map":
+        conditions = []
+        for item in payload.get("source_conditions") or []:
+            evidence = []
+            for raw in item.get("evidence") or []:
+                if isinstance(raw, str):
+                    evidence.append(raw)
+                    continue
+                if not isinstance(raw, dict):
+                    continue
+                anchor = raw.get("anchor") or {}
+                quote = (
+                    anchor.get("bounded_quote")
+                    or anchor.get("model_quote")
+                    or raw.get("quote")
+                )
+                page = raw.get("page")
+                if page is None or not str(quote or "").strip():
+                    continue
+                one = {"page": int(page), "quote": str(quote)}
+                if raw.get("continuation_pages"):
+                    one["continuation_pages"] = [
+                        int(page_no) for page_no in raw["continuation_pages"]
+                    ]
+                if raw.get("subject_evidence_pages"):
+                    one["subject_evidence_pages"] = [
+                        int(page_no) for page_no in raw["subject_evidence_pages"]
+                    ]
+                evidence.append(one)
+            description = str(item.get("description") or "").strip()
+            if not evidence or not description or not item.get("condition_id"):
+                continue
+            conditions.append(
+                {
+                    "condition_id": item["condition_id"],
+                    "dimension": item["dimension"],
+                    "description": description,
+                    "evidence": evidence,
+                    "major": bool(item.get("major")),
+                    "statement_status": item.get("statement_status") or "current",
+                }
+            )
+        wire["source_conditions"] = conditions
+    try:
+        parsed = ReportSemanticRequestV3(
+            request_id=str(request.get("request_id") or "replay"),
+            purpose="source_inventory",
+            report=request["report"],
+            source_scope=request.get("source_scope") or "full_context",
+            source_pages=({"page": 1, "text": "x", "readable": True},),
+            processing_identity=dict(request.get("processing_identity") or {}),
+            max_output_tokens=int(request.get("max_output_tokens") or 200),
+            timeout_seconds=float(request.get("timeout_seconds") or 60),
+        )
+    except (TypeError, ValueError):
+        return None
+    try:
+        jsonschema.validate(wire, response_schema(parsed))
+    except jsonschema.ValidationError:
+        return None
+    return wire
+
+
 def response_schema(request: ReportSemanticRequestV3) -> dict:
     """Send only purpose-reachable fields; v3 cannot generate numeric records."""
     schema = ReportSemanticResponseV3.model_json_schema()
