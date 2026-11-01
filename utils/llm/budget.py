@@ -141,7 +141,10 @@ class LlmRunBudget:
         authorized_s20 = run_authorization == "company_profile_s20_draft.2026-10-31"
         authorized_s21 = run_authorization == "company_profile_s21_closeout.2026-10-31"
         authorized_s22 = run_authorization == "company_profile_s22_core.2026-10-31"
-        if authorized_s22:
+        authorized_s23 = run_authorization == "company_profile_s23_chapter.2026-11-01"
+        if authorized_s23:
+            token_cap, request_cap, cost_cap = 120_000, 16, Decimal(10)
+        elif authorized_s22:
             token_cap, request_cap, cost_cap = 40_000, 4, Decimal(10)
         elif authorized_s21:
             token_cap, request_cap, cost_cap = 80_000, 8, Decimal(20)

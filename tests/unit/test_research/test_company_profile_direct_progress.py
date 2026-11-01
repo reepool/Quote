@@ -8209,6 +8209,119 @@ def test_historical_role_pass_does_not_cover_later_deny():
     assert _operating_role_established(claims, checks) is False
 
 
+def test_supply_chain_view_follows_covered_objects_not_a_missing_label():
+    from research.company_profile.direct_reading import (
+        _completeness_gaps,
+        _view_is_covered,
+    )
+    from research.company_profile.report_interpretation import (
+        ReportInterpretation,
+        research_views,
+    )
+
+    report = _report()
+    role = "公司向客户提供定制加工并收取加工费。"
+    claims = [
+        ReportViewClaim(
+            claim_id="business",
+            dimension="principal_business",
+            status="observed",
+            answer="公司提供定制加工。",
+            evidence=(_evidence(report, text="公司提供定制加工", page=9),),
+        ),
+        ReportViewClaim(
+            claim_id="products",
+            dimension="products_services",
+            status="observed",
+            answer="主要产品为伸性纸袋纸。",
+            evidence=(_evidence(report, text="主要产品为伸性纸袋纸", page=9),),
+        ),
+        ReportViewClaim(
+            claim_id="revenue",
+            dimension="revenue_model",
+            status="observed",
+            answer="本期营业收入 2,418,990,221.17元。",
+            evidence=(_evidence(report, text="本期营业收入 2,418,990,221.17元", page=16),),
+        ),
+        ReportViewClaim(
+            claim_id="role",
+            dimension="supply_chain_role",
+            status="observed",
+            answer=role,
+            condition_ids=("s19-source:product_application_and_operating_roles",),
+            evidence=(_evidence(report, text=role, page=10),),
+        ),
+        ReportViewClaim(
+            claim_id="input",
+            dimension="input_exposure",
+            status="observed",
+            answer="主要原料为竹浆。",
+            evidence=(_evidence(report, text="主要原料为竹浆", page=18),),
+        ),
+        ReportViewClaim(
+            claim_id="output",
+            dimension="output_exposure",
+            status="observed",
+            answer="产品用于包装。",
+            evidence=(_evidence(report, text="产品用于包装", page=10),),
+        ),
+    ]
+    checks = []
+    for claim in claims:
+        checks.append(
+            ReportViewCheck(
+                target_type="claim",
+                target_id=claim.claim_id,
+                status="pass",
+                explanation="主张通过。",
+            )
+        )
+    checks.append(
+        ReportViewCheck(
+            target_type="condition",
+            target_id="s19-source:product_application_and_operating_roles",
+            status="pass",
+            explanation="角色覆盖该主张。",
+            covers_target_type="claim",
+            covers_target_id="role",
+        )
+    )
+    assert _view_is_covered("supply_chain_position", claims, checks) is True
+    gaps = _completeness_gaps(claims, (), checks)
+    assert "view_not_substantive:supply_chain_position" not in gaps
+    bare = claims[:4]
+    assert _view_is_covered("supply_chain_position", bare, checks) is False
+    assert "view_not_substantive:supply_chain_position" in _completeness_gaps(
+        bare, (), checks
+    )
+    labeled = [
+        *bare,
+        ReportViewClaim(
+            claim_id="label-only",
+            dimension="upstream_downstream",
+            status="observed",
+            answer="上下游。",
+            limitation="pending_verification",
+            evidence=(_evidence(report, text="上下游", page=10),),
+        ),
+    ]
+    assert _view_is_covered("supply_chain_position", labeled, checks) is False
+    result = ReportInterpretation(
+        report=report,
+        processing_identity={},
+        execution_mode="provider",
+        claims=tuple(claims),
+        checks=tuple(checks),
+        verified_dimensions=("input_exposure", "output_exposure", "supply_chain_role"),
+        draft_complete=True,
+        semantic_complete=True,
+        real_semantic_complete=True,
+    )
+    views = research_views(result)
+    assert views["views"]["supply_chain_position"]["assessment_status"] == "assessed"
+    assert views["draft_complete"] is True
+
+
 def test_same_tail_and_later_block_do_not_borrow_role_coverage():
     from research.company_profile.direct_reading import _operating_role_established
 

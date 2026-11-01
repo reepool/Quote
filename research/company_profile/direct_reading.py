@@ -187,6 +187,25 @@ def _latest_check(checks, target_type: str, target_id: str):
     return found
 
 
+def _view_is_covered(name: str, claims, checks) -> bool:
+    """A view is covered by trusted objects, not by an empty dimension label.
+
+    The supply-chain view needs an established role plus both an upstream and
+    a downstream object. Input and output claims already are those objects;
+    a missing ``upstream_downstream`` label does not by itself fail the view,
+    and adding that label without a trusted claim does not pass it.
+    """
+    verified = _verified_claims(claims, checks)
+    dims = {item.dimension for item in verified}
+    if name == "supply_chain_position":
+        if not _operating_role_established(claims, checks):
+            return False
+        upstream = bool(dims & {"input_exposure", "upstream_downstream"})
+        downstream = bool(dims & {"output_exposure", "upstream_downstream"})
+        return upstream and downstream
+    return all(dimension in dims for dimension in VIEWS[name])
+
+
 def _verified_claims(claims, checks):
     """Claims a later pass still stands on. A label alone is not enough."""
     trusted = []
@@ -353,8 +372,8 @@ def _completeness_gaps(claims, conditions, checks, records=()) -> list[str]:
         item.dimension for item in claims if item.claim_id in verified_claims
     }
     found = []
-    for view, dimensions in VIEWS.items():
-        if not observed & set(dimensions):
+    for view in VIEWS:
+        if not _view_is_covered(view, claims, checks):
             found.append(f"view_not_substantive:{view}")
     for dimension in ("principal_business", "products_services", "revenue_model"):
         if dimension not in observed:
@@ -2032,7 +2051,7 @@ def interpret_direct_core(
         on_progress(_result())
 
     def _result() -> ReportInterpretation:
-        observed = {item.dimension for item in claims if item.status == "observed"}
+        observed = {item.dimension for item in _verified_claims(claims, checks)}
         published = _current_gaps(gaps, claims, conditions, checks, records)
         blocking_gaps = [
             gap for gap in published if not gap.startswith("supplementary_gap:")

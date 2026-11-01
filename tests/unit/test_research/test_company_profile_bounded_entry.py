@@ -1389,3 +1389,102 @@ def test_s21_disk_retracts_the_split_product_and_sends_total_context():
     assert any(gap.startswith("retracted_cross_page_fragment:claim-002") for gap in gaps)
     assert not any(gap.startswith("claim_pending:claim-006") for gap in gaps)
     assert profile.get("draft_complete") is True, gaps
+
+
+def test_s22_reread_aligns_supply_chain_with_completion_without_rewriting():
+    """Stored S22 receipts. No model call and no write back to that root."""
+    from pathlib import Path
+
+    from research.company_profile.reads import CompanyProfileReadService
+
+    root = Path("/home/python/Quote/data/QuoteBak/s22-paper-core-20261031")
+    before = (root / "query.json").read_bytes()
+    reloaded = CompanyProfileReadService(root / "output").query(("600103.SH",))
+    profile = reloaded["profiles"][0]
+    views = profile["three_views"]["views"]
+    assert profile["core_complete"] is True
+    assert profile["three_views"]["draft_complete"] is True
+    assert views["supply_chain_position"]["assessment_status"] == "assessed"
+    assert all(
+        view["assessment_status"] == "assessed" for view in views.values()
+    )
+    gaps = profile["three_views"].get("gaps") or []
+    assert any(gap.startswith("retracted_cross_page_fragment:claim-002") for gap in gaps)
+    assert (root / "query.json").read_bytes() == before
+
+
+def test_fresh_s23_chapter_package_keeps_view_status_with_completion():
+    """A new chapter run loads no saved answers. Transport only is replaced."""
+    import hashlib
+    import shutil
+    from pathlib import Path
+
+    from research.company_profile.bounded_entry import S23_AUTHORIZATION, main
+    from research.company_profile.reads import CompanyProfileReadService
+
+    root = Path("/home/python/Quote")
+    change = root / "openspec/changes/restore-company-profile-llm-led-generalization"
+    source = json.loads((change / "s1-pool-s1-600103-s16-binding.json").read_text())
+    for retired in (
+        "accepted_navigation_query",
+        "accepted_source_query",
+        "accepted_draft_query",
+        "accepted_candidate_query",
+        "navigation_query",
+        "continuation_checkpoint",
+        "company_task_state",
+        "continuation_budget",
+        "compatible_continue",
+        "saved_source_draft",
+        "prior_charged_tokens",
+        "verification_history_queries",
+        "offline_protocol",
+    ):
+        source.pop(retired, None)
+    source["offline_protocol"] = "core_package_v1"
+    source["chapter_select"] = True
+    source["task_route_labels"] = ["deepseek:deepseek-flash", "scorpio:grok-4.7"]
+    source["task_route_first_only"] = True
+    source["same_source_max_retries"] = 0
+    source["run_authorization"] = S23_AUTHORIZATION
+    source["max_elapsed_seconds"] = 900
+    source["max_tokens"] = 120_000
+    source["max_physical_requests"] = 16
+    source["max_recoveries"] = 2
+    source["max_cost_cny"] = "10"
+    source["file_hashes"] = {
+        name: hashlib.sha256((root / name).read_bytes()).hexdigest()
+        for name in source["file_hashes"]
+    }
+    run_root = root / "data/QuoteBak/s23-paper-fresh-offline"
+    if run_root.exists():
+        shutil.rmtree(run_root)
+    path = root / "data/QuoteBak/s23-paper-fresh-offline-binding.json"
+    path.write_text(json.dumps(source, ensure_ascii=False))
+    argv = sys.argv
+    sys.argv = ["bounded_entry", "--binding", str(path), "--run-root", str(run_root)]
+    try:
+        code = main()
+    finally:
+        sys.argv = argv
+    if code != 0 or not (run_root / "query.json").is_file():
+        result = json.loads((run_root / "entry-result.json").read_text())
+        raise AssertionError(f"entry failed code={code} error={result.get('error')}")
+    query = json.loads((run_root / "query.json").read_text())
+    exported = json.loads((run_root / "export.json").read_text())
+    reloaded = CompanyProfileReadService(run_root / "output").query(
+        (source["asset"]["instrument_id"],)
+    )
+    assert query["profiles"] == exported["profiles"] == reloaded["profiles"]
+    profile = query["profiles"][0]
+    views = profile["three_views"]["views"]
+    gaps = profile["three_views"].get("gaps") or []
+    assert profile["three_views"].get("draft_complete") is True, gaps
+    assert {
+        name: view["assessment_status"] for name, view in views.items()
+    } == {name: "assessed" for name in views}, gaps
+    transport = json.loads((run_root / "offline-transport.json").read_text())
+    purposes = [item.get("purpose") for item in transport.get("requests") or []]
+    assert "source_inventory" in purposes
+    assert "synthesize_views" in purposes
+    assert transport.get("real_calls") == 0

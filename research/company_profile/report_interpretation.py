@@ -2551,6 +2551,12 @@ def _claim_is_trusted(claim: Any, checks: tuple[Any, ...]) -> bool:
     return latest is not None and latest.status == "pass"
 
 
+def _stored_view_is_covered(name: str, result: ReportInterpretation) -> bool:
+    from .direct_reading import _view_is_covered
+
+    return _view_is_covered(name, result.claims, result.checks)
+
+
 def research_views(result: ReportInterpretation) -> dict[str, Any]:
     """Render the same persisted projection for query and export."""
     answers_with_untrusted_copy = {
@@ -2588,7 +2594,7 @@ def research_views(result: ReportInterpretation) -> dict[str, Any]:
         views[name] = {
             "assessment_status": (
                 "assessed"
-                if all(d in result.verified_dimensions for d in dimensions)
+                if _stored_view_is_covered(name, result)
                 else "extraction_failed"
             ),
             "claims": [

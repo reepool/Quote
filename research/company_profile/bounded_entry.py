@@ -26,6 +26,7 @@ S19_AUTHORIZATION = "company_profile_s19_core.2026-10-31"
 S20_AUTHORIZATION = "company_profile_s20_draft.2026-10-31"
 S21_AUTHORIZATION = "company_profile_s21_closeout.2026-10-31"
 S22_AUTHORIZATION = "company_profile_s22_core.2026-10-31"
+S23_AUTHORIZATION = "company_profile_s23_chapter.2026-11-01"
 
 
 def company_window_limits(binding: dict, state: dict | None) -> tuple[int, int]:
@@ -727,6 +728,13 @@ def validate_binding(
             and int(binding.get("max_physical_requests") or 0) <= 4
             and int(binding.get("max_recoveries") or 0) <= 1
         )
+    elif auth == S23_AUTHORIZATION:
+        allowed = (
+            0 < elapsed <= 900
+            and int(binding.get("max_tokens") or 0) <= 120_000
+            and int(binding.get("max_physical_requests") or 0) <= 16
+            and int(binding.get("max_recoveries") or 0) <= 2
+        )
     else:
         allowed = 0 < elapsed <= 900
     if not allowed:
@@ -844,6 +852,8 @@ def validate_binding(
                 "s1-600103-s20",
                 "s1-600103-s21",
                 "s1-600103-s22",
+                "s1-600103-s23",
+                "s1-600000-s23",
             }
             or not authorization.get("approval_reference")
         ):
