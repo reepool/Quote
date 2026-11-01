@@ -1492,7 +1492,7 @@ def test_fresh_s23_chapter_package_keeps_view_status_with_completion():
 
 def test_empty_role_response_keeps_the_question_unanswered():
     """Read text still raises the role question. An empty answer does not finish it."""
-    profile, gaps = _replay_chapter("withheld", "s26-role-withheld-offline")
+    profile, gaps = _replay_chapter("withheld", "s27-role-withheld-offline")
     assert any(
         item.get("purpose") == "synthesize_views"
         and any(
@@ -1511,7 +1511,7 @@ def test_empty_role_response_keeps_the_question_unanswered():
 
 def test_sourced_operating_passage_enters_the_draft_and_records_the_shortfall():
     """The operating passage is drafted. The next core package does not fit."""
-    profile, gaps = _replay_chapter("present", "s26-role-present-offline")
+    profile, gaps = _replay_chapter("present", "s27-role-present-boundary-offline")
     assert any(
         11 in (item.get("source_pages") or [])
         for item in profile.get("call_receipts") or []
@@ -1543,7 +1543,14 @@ def test_sourced_operating_passage_enters_the_draft_and_records_the_shortfall():
     assert any("operating-role" in gap for gap in gaps)
 
 
-def _replay_chapter(role_sample: str, directory: str):
+def _replay_chapter(
+    role_sample: str,
+    directory: str,
+    *,
+    tokens: int = 120_000,
+    requests: int = 16,
+    authorization: str | None = None,
+):
     """Isolated replay. Does not remove S23 or S25 evidence."""
     import hashlib
     import shutil
@@ -1583,10 +1590,10 @@ def _replay_chapter(role_sample: str, directory: str):
     source["task_route_labels"] = ["deepseek:deepseek-flash", "scorpio:grok-4.7"]
     source["task_route_first_only"] = True
     source["same_source_max_retries"] = 0
-    source["run_authorization"] = S23_AUTHORIZATION
+    source["run_authorization"] = authorization or S23_AUTHORIZATION
     source["max_elapsed_seconds"] = 900
-    source["max_tokens"] = 120_000
-    source["max_physical_requests"] = 16
+    source["max_tokens"] = tokens
+    source["max_physical_requests"] = requests
     source["max_recoveries"] = 2
     source["max_cost_cny"] = "10"
     source["file_hashes"] = {
@@ -1594,7 +1601,7 @@ def _replay_chapter(role_sample: str, directory: str):
         for name in source["file_hashes"]
     }
     run_root = root / "data/QuoteBak" / directory
-    if directory.startswith("s26-") and run_root.exists():
+    if directory.startswith("s27-") and run_root.exists():
         shutil.rmtree(run_root)
     path = root / "data/QuoteBak" / f"{directory}-binding.json"
     path.write_text(json.dumps(source, ensure_ascii=False))
@@ -1631,5 +1638,63 @@ def _replay_chapter(role_sample: str, directory: str):
         if item.get("physical_request")
     ]
     return profile, gaps
+
+
+def test_diagnostic_budget_delivers_the_whole_core_offline():
+    """Normal sample, offline only, with room to finish coverage."""
+    from research.company_profile.bounded_entry import S27_OFFLINE_DIAGNOSTIC
+
+    profile, gaps = _replay_chapter(
+        "present",
+        "s27-core-diagnostic-offline",
+        tokens=480_000,
+        requests=32,
+        authorization=S27_OFFLINE_DIAGNOSTIC,
+    )
+    assert profile.get("draft_complete") is True, gaps
+    assert all(
+        view["assessment_status"] == "assessed" for view in profile["views"].values()
+    ), gaps
+    blob = "\n".join(
+        str(claim.get("answer") or "")
+        + "\n"
+        + "\n".join(
+            str((item.get("anchor") or {}).get("bounded_quote") or "")
+            for item in claim.get("evidence") or []
+        )
+        for view in profile["views"].values()
+        for claim in view.get("claims") or []
+        if claim.get("review_state") == "verified"
+    )
+    assert "自主生产的经营模式" in blob
+    assert "产品直销，以销定产" in blob
+    assert "木竹片采购" in blob
+    assert "2,418,990,221.17" in blob
+    covered = []
+    for item in profile.get("call_receipts") or []:
+        if item.get("purpose") != "verify_views":
+            continue
+        for check in (item.get("response_payload") or {}).get("checks") or []:
+            if check.get("target_type") == "condition" and check.get("covers_target_id"):
+                covered.append(str(check.get("target_id")))
+    assert any("operating-role" in item for item in covered), covered
+    assert not any(gap.startswith("major_condition_not_verified:") for gap in gaps), gaps
+
+
+def test_regular_budget_keeps_a_partial_core():
+    """Same sample inside 120000. A shortfall stays visible."""
+    profile, gaps = _replay_chapter("present", "s27-core-budget-offline")
+    verified = [
+        claim
+        for view in profile["views"].values()
+        for claim in view.get("claims") or []
+        if claim.get("review_state") == "verified"
+    ]
+    assert verified
+    if profile.get("draft_complete") is not True:
+        assert any(
+            gap.startswith(("necessary_fragment:", "major_condition_not_verified:"))
+            for gap in gaps
+        ), gaps
 
 

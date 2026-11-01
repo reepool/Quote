@@ -778,19 +778,21 @@ def _located_conditions(
     gaps: list[str] = []
     for condition in response_conditions:
         bound: list[Evidence] = []
-        failed = False
+        missed = 0
         for evidence in condition.evidence:
             located = _bind_source_evidence(evidence, report, pages)
             if located is None:
-                failed = True
-                break
+                missed += 1
+                continue
             bound.append(located)
         scoped_id = f"{request_id}:{condition.condition_id}"
-        if failed:
+        if not bound:
             gaps.append(f"evidence_not_located:{scoped_id}")
             if condition.major:
                 gaps.append(f"major_evidence_not_located:{scoped_id}")
             continue
+        if missed:
+            gaps.append(f"evidence_not_located:{scoped_id}:partial")
         if scoped_id in seen:
             raise ValueError("duplicate_source_condition")
         seen.add(scoped_id)

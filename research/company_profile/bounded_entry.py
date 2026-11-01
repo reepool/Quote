@@ -27,6 +27,7 @@ S20_AUTHORIZATION = "company_profile_s20_draft.2026-10-31"
 S21_AUTHORIZATION = "company_profile_s21_closeout.2026-10-31"
 S22_AUTHORIZATION = "company_profile_s22_core.2026-10-31"
 S23_AUTHORIZATION = "company_profile_s23_chapter.2026-11-01"
+S27_OFFLINE_DIAGNOSTIC = "company_profile_s27_offline_diagnostic.2026-11-01"
 
 
 def company_window_limits(binding: dict, state: dict | None) -> tuple[int, int]:
@@ -733,6 +734,17 @@ def validate_binding(
             0 < elapsed <= 900
             and int(binding.get("max_tokens") or 0) <= 120_000
             and int(binding.get("max_physical_requests") or 0) <= 16
+            and int(binding.get("max_recoveries") or 0) <= 2
+        )
+    elif auth == S27_OFFLINE_DIAGNOSTIC:
+        if real:
+            raise ValueError("offline diagnostic cannot place a real call")
+        allowed = (
+            not real
+            and binding.get("offline_protocol")
+            and 0 < elapsed <= 900
+            and int(binding.get("max_tokens") or 0) <= 480_000
+            and int(binding.get("max_physical_requests") or 0) <= 32
             and int(binding.get("max_recoveries") or 0) <= 2
         )
     else:
