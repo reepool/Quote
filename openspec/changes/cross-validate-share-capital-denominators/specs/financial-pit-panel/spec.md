@@ -34,6 +34,11 @@ The system SHALL precompute per-share, year-over-year, and TTM derived indicator
 - **WHEN** net income or the reported basic EPS is near zero
 - **THEN** the EPS-implied anchor SHALL be excluded and the exclusion reason recorded in `share_candidates`
 
+#### Scenario: Weighted-anchor drift is advisory, not a status flip
+- **WHEN** the EPS-implied (weighted-average) anchor alone disagrees with the adopted period-end value while the period-end anchors agree with each other
+- **THEN** the row SHALL remain `share_validation=consensus` with an `eps_weighted_drift_advisory` note and the EPS value recorded in `share_candidates`
+- **AND** the EPS dissent SHALL escalate to a status flip only when it corroborates a dissenting period-end anchor or serves as the de facto validator (fewer than two period-end anchors)
+
 #### Scenario: Unit-mismatch of the paid-in-capital validator does not flip consensus
 - **WHEN** all available share-count anchors agree with each other but the paid-in-capital fact (a CNY amount) disagrees with them
 - **THEN** the row SHALL remain `share_validation=consensus` with a `unit_mismatch` note (likely non-unit par value) recorded in `share_candidates`

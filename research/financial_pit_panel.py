@@ -770,11 +770,18 @@ class FinancialPitPanelStore:
             _add("valuation_implied", None, note="absent")
         eps_implied = None
         reported_eps = entry.get("reported_eps")
+        # Weighted-anchor stability guard (design risk table): skip when
+        # either operand is near zero, or when profit is a negligible
+        # fraction of revenue (micro margins amplify the net/eps division).
+        revenue_floor_ok = True
+        if revenue:
+            revenue_floor_ok = abs(net_income or 0.0) >= 0.005 * abs(revenue)
         if (
             reported_eps
             and net_income is not None
             and abs(net_income) >= FinancialPitPanelStore._EPS_SKIP_ABS_NI
             and abs(reported_eps) >= FinancialPitPanelStore._EPS_SKIP_ABS_EPS
+            and revenue_floor_ok
         ):
             eps_implied = net_income / reported_eps
         if eps_implied:
@@ -797,18 +804,38 @@ class FinancialPitPanelStore:
                 )
             return None, "null", None, {"anchors": candidates}
 
-        # 2) adopt by preference; validate remaining share-count anchors vs V
+        # 2) adopt by preference; validate remaining anchors vs V.
+        # Period-end anchors (sos/ths/valuation) are status voters. The EPS
+        # anchor is weighted-average and drifts from period-end counts by
+        # construction (measured median 21%), so its lone dissent is an
+        # advisory note, mirroring the paid-in-capital layered rule; it
+        # escalates only when corroborating a dissenting period-end anchor
+        # or serving as de facto validator (<2 period-end anchors).
         sc.sort(key=lambda item: item[0])
         _, basis, shares = sc[0]
-        dissenting = []
+        dissenting: List[str] = []
+        eps_note: Optional[str] = None
+        period_end_count = sum(
+            1 for _, name, _ in sc if name != "eps_implied"
+        )
         for _, name, value in sc[1:]:
             band = (
                 FinancialPitPanelStore._EPS_BAND
                 if name == "eps_implied"
                 else FinancialPitPanelStore._SC_BAND
             )
-            if abs(value / shares - 1.0) > band:
+            if abs(value / shares - 1.0) <= band:
+                continue
+            if name == "eps_implied":
+                if dissenting or period_end_count < 2:
+                    dissenting.append(name)
+                    eps_note = "eps_dissent_escalated"
+                else:
+                    eps_note = "eps_weighted_drift_advisory"
+            else:
                 dissenting.append(name)
+        if eps_note:
+            candidates["eps_anchor_note"] = eps_note
 
         # 3) paid-in-capital validator (layered; never adopted when any
         #    share-count anchor exists)
@@ -832,10 +859,12 @@ class FinancialPitPanelStore:
 
         if dissenting:
             validation = "discrepancy"
-        elif len(sc) == 1:
-            validation = "single_source"
-        else:
+        elif len(sc) >= 2:
+            # any two anchors agreeing (including the weighted EPS anchor
+            # corroborating a period-end one) is a consensus
             validation = "consensus"
+        else:
+            validation = "single_source"
         if pic_note:
             candidates["paid_in_capital_note"] = pic_note
         candidates["adopted"] = {"basis": basis, "value": shares}

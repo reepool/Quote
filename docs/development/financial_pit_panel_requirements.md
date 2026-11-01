@@ -393,7 +393,7 @@ equity 有值时 100% 命中 `parent_attributable_equity`；net_income 95.5% 命
   分母由**四锚交叉验证**装配——`shares_outstanding` canonical（股数）>
   THS `share_capital_amount`（期末股数，D0 证实）> valuation 隐含股本
   （总市值/收盘价，2024-04-30 起）> EPS 隐含（净利/披露 EPS，加权口径，
-  微利按营收比例护栏跳过）；`实收资本(或股本)`（元金额）仅作校验锚——
+  微利按营收比例护栏跳过；单独漂移记 advisory 不翻状态）；`实收资本(或股本)`（元金额）仅作校验锚——
   分歧记 `unit_mismatch` 注记不翻状态，股数锚 <2 时才实质计入，永不因
   分歧被采纳。**共识即 consensus、分歧即 discrepancy 备注（不静默替换）**，
   行级输出 `share_validation / share_basis / share_candidates`；坏行经四锚

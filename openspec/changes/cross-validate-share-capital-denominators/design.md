@@ -72,11 +72,14 @@ par-validated" 的实现）。仅当全库再无任何股数锚时才可作为�
   多源文件）时取 `updated_at` 最新一条（确定性）；
 - 取值优先序（全部为真股数口径）：`shares_outstanding` > THS >
   valuation（D0-2 通过的来源）> EPS 隐含 > 实收资本（末位兜底，如上）；
-- 一致性判定以**被采纳值 V** 为基准：其余每个**股数锚**在其带宽内
-  （期末股数锚 ±5%；EPS 加权锚 ±15%，实测集群 0.98–1.02 支持宽容差）
-  即为一致——股数锚全部一致且实收资本未触发分层②③ → `consensus`；
-  任一股数锚出带（或实收资本触发②③）→ `discrepancy`，仍取 V，
-  `share_candidates` 记录各锚数值+口径+absent/unit_mismatch 原因；
+- 一致性判定以**被采纳值 V** 为基准：**期末股数锚**（shares_outstanding/
+  THS/valuation）为状态投票者，带宽 ±5%；**EPS 加权锚 ±15% 但为建议制**
+  （2026-11-01 实测调优：加权漂移中位 21%，88.5% 的 discrepancy 为 EPS
+  单锚分歧——属可解释差异）：单独出带记 `eps_weighted_drift_advisory`
+  不翻状态；仅当其与某出带期末锚互证、或期末锚 <2（实质校验者）时升级
+  计入。股数锚全部一致且实收资本未触发分层②③ → `consensus`；任一期末
+  股数锚出带（或 EPS/实收资本触发升级）→ `discrepancy`，仍取 V，
+  `share_candidates` 记录各锚数值+口径+absent/unit_mismatch/advisory 原因；
 - EPS 锚跳过条件（双条件）：|净利| 过小 **或** |basic_eps| 过小（任一
   除数失稳即跳过，记 absent 原因）；
 - 仅一锚可用 → `single_source`（如实标注）；零锚 → 分母 null

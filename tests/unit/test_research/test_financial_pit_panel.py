@@ -623,10 +623,12 @@ def test_micro_margin_revenue_skips_eps_anchor(
     skipped (600007 keeps THS + valuation agreement -> consensus)."""
     store.build_full("test-v1")
     with sqlite3.connect(store.db_path) as conn:
-        # shrink net income to 0.1% of revenue for 600001's 2024 annual row
+        # net income above the absolute floor (30 >= 1.0 yuan) but only 0.3%
+        # of revenue (10,000): the absolute guard alone would NOT skip the
+        # eps anchor here - only the revenue-ratio guard does
         conn.execute(
             """
-            UPDATE financial_facts SET net_income = 0.5
+            UPDATE financial_facts SET net_income = 30.0, revenue = 10000.0
             WHERE instrument_id = '600001.SH' AND report_period = '2024-12-31'
             """
         )
@@ -643,6 +645,46 @@ def test_micro_margin_revenue_skips_eps_anchor(
     assert (
         candidates["anchors"]["eps_implied"]["note"]
         == "skipped_near_zero_net_income_or_eps"
+    )
+
+
+def test_eps_lone_drift_stays_consensus(store: FinancialPitPanelStore) -> None:
+    """Measured tuning (tasks section 5): weighted-vs-period-end drift has
+    median 21% - a lone EPS dissent must not flip consensus (mirrors the
+    paid-in-capital layered rule); it records an advisory note instead."""
+    store.build_full("test-v1")
+    with sqlite3.connect(store.db_path) as conn:
+        # 600001: ths=80, val=80 agree; inject reported eps implying 104
+        # (30% weighted drift) - above the absolute and revenue floors
+        conn.execute(
+            """
+            INSERT INTO financial_numeric_facts_hot (
+                instrument_id, report_period, canonical_fact_name, fact_name,
+                fact_value, updated_at
+            ) VALUES ('600001.SH', '2024-12-31', 'profit_sheet.basic_eps',
+                      'profit_sheet.basic_eps', 0.9615, '2025-01-02T09:00:00')
+            """
+        )
+        conn.commit()
+    store.refresh_pairs([("600001.SH", "2024-12-31")])
+    with store.connect() as conn:
+        row = conn.execute(
+            """
+            SELECT share_validation, share_candidates_json
+            FROM financial_pit_panel
+            WHERE instrument_id = '600001.SH' AND report_period = '2024-12-31'
+            """
+        ).fetchone()
+    assert row["share_validation"] == "consensus"
+    candidates = json.loads(row["share_candidates_json"])
+    # anchor-level notes sit inside the candidates block (as with
+    # paid_in_capital_note), beside the adopted anchor
+    assert (
+        candidates["anchors"]["eps_anchor_note"]
+        == "eps_weighted_drift_advisory"
+    )
+    assert candidates["anchors"]["eps_implied"]["value"] == pytest.approx(
+        104.0, rel=1e-3
     )
 
 
