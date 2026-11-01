@@ -30,6 +30,7 @@ import bisect
 import json
 import logging
 import sqlite3
+from contextlib import closing
 from datetime import date, timedelta
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
@@ -306,7 +307,7 @@ class FinancialPitPanelStore:
     )
 
     def initialize(self) -> None:
-        with self.connect() as connection:
+        with closing(self.connect()) as connection:
             connection.executescript(FINANCIAL_PIT_PANEL_SCHEMA_SQL)
             existing = {
                 row[1]
@@ -498,8 +499,10 @@ class FinancialPitPanelStore:
             return shares
         ids = list(instrument_ids)
         try:
-            with sqlite3.connect(
-                f"file:{self.valuation_db_path}?mode=ro", uri=True, timeout=30
+            with closing(
+                sqlite3.connect(
+                    f"file:{self.valuation_db_path}?mode=ro", uri=True, timeout=30
+                )
             ) as connection:
                 for start in range(0, len(ids), 500):
                     chunk = ids[start : start + 500]
@@ -533,8 +536,10 @@ class FinancialPitPanelStore:
         if not self.quotes_db_path:
             return trading
         try:
-            with sqlite3.connect(
-                f"file:{self.quotes_db_path}?mode=ro", uri=True, timeout=30
+            with closing(
+                sqlite3.connect(
+                    f"file:{self.quotes_db_path}?mode=ro", uri=True, timeout=30
+                )
             ) as connection:
                 rows = connection.execute(
                     """
@@ -984,7 +989,7 @@ class FinancialPitPanelStore:
         """Rebuild the whole panel from source tables (idempotent per version)."""
         built_at = get_shanghai_time().isoformat()
         logger.info("financial_pit_panel: full build started (version=%s)", panel_version)
-        with self.connect() as connection:
+        with closing(self.connect()) as connection:
             indicator_rows = self._load_indicator_rows(connection)
             disclosure_events = self._load_disclosure_events(connection)
             logger.info(
@@ -1017,7 +1022,7 @@ class FinancialPitPanelStore:
             built_at,
             valuation_shares,
         )
-        with self.connect() as connection:
+        with closing(self.connect()) as connection:
             connection.execute("BEGIN")
             connection.execute("DELETE FROM financial_pit_panel")
             self._insert_rows(connection, panel_rows)
@@ -1053,7 +1058,7 @@ class FinancialPitPanelStore:
             sorted({instrument_id for instrument_id, _ in normalized})
         )
         refreshed = 0
-        with self.connect() as connection:
+        with closing(self.connect()) as connection:
             for instrument_id, period in normalized:
                 row = connection.execute(
                     f"""
@@ -1125,6 +1130,9 @@ class FinancialPitPanelStore:
                     tuple(base.values()),
                 )
                 refreshed += 1
+            # closing() no longer auto-commits (the previous bare `with conn:`
+            # did); commit explicitly so upserts and deletes persist
+            connection.commit()
         return {"refreshed": refreshed, "built_at": built_at}
 
     def _load_sibling_periods(
@@ -1276,7 +1284,7 @@ class FinancialPitPanelStore:
     def latest_complete_period(self) -> Optional[str]:
         """Newest bulk report period whose statutory deadline has passed."""
         today = _today_iso()
-        with self.connect() as connection:
+        with closing(self.connect()) as connection:
             periods = [
                 row["report_period"]
                 for row in connection.execute(
@@ -1305,7 +1313,7 @@ class FinancialPitPanelStore:
             "universe=listed-only; delisted not covered; "
             f"latest_complete_period={_to_yyyymmdd(latest_complete) or 'none'}"
         )
-        with self.connect() as connection:
+        with closing(self.connect()) as connection:
             newest = connection.execute(
                 "SELECT MAX(report_period) AS newest FROM financial_pit_panel"
             ).fetchone()["newest"]
@@ -1358,7 +1366,7 @@ class FinancialPitPanelStore:
                 filter_params.extend(exchange_list)
         where = " AND ".join(clauses)
         where_prefixed = " AND ".join(clauses_prefixed)
-        with self.connect() as connection:
+        with closing(self.connect()) as connection:
             total = connection.execute(
                 f"""
                 SELECT COUNT(*) FROM (
@@ -1463,7 +1471,7 @@ class FinancialPitPanelStore:
             clauses.append("available_at <= ?")
             params.append(_from_yyyymmdd(available_at_lte, field="available_at_lte"))
         where = " AND ".join(clauses)
-        with self.connect() as connection:
+        with closing(self.connect()) as connection:
             total = connection.execute(
                 f"SELECT COUNT(*) FROM financial_pit_panel WHERE {where}", params
             ).fetchone()[0]
@@ -1485,7 +1493,7 @@ class FinancialPitPanelStore:
 
     def coverage(self, report_period: Optional[str] = None) -> Dict[str, Any]:
         """Per-period actual/expected/gap with quality and completeness markers."""
-        with self.connect() as connection:
+        with closing(self.connect()) as connection:
             if report_period is None:
                 periods = [
                     row["report_period"]
@@ -1566,8 +1574,10 @@ class FinancialPitPanelStore:
         if not self.quotes_db_path or not periods:
             return sets
         try:
-            with sqlite3.connect(
-                f"file:{self.quotes_db_path}?mode=ro", uri=True, timeout=30
+            with closing(
+                sqlite3.connect(
+                    f"file:{self.quotes_db_path}?mode=ro", uri=True, timeout=30
+                )
             ) as connection:
                 for period in periods:
                     if not statutory_deadline(period):
@@ -1683,7 +1693,7 @@ class FinancialPitPanelStore:
         """Append-only changes feed keyed by the monotonic sequence_id cursor."""
         limit = max(1, min(int(limit), 5000))
         after = int(cursor) if cursor is not None else -1
-        with self.connect() as connection:
+        with closing(self.connect()) as connection:
             rows = connection.execute(
                 f"""
                 SELECT sequence_id, dataset, change_type, instrument_id, period,
@@ -1729,7 +1739,7 @@ class FinancialPitPanelStore:
         falls back across k period boundaries. Drives the revision_guard
         threshold decision (acceptance #17 / task 2.5).
         """
-        with self.connect() as connection:
+        with closing(self.connect()) as connection:
             total = connection.execute(
                 "SELECT COUNT(*) FROM financial_pit_panel"
             ).fetchone()[0]

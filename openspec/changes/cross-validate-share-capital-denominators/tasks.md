@@ -191,3 +191,39 @@ amount 下未识别的 fact_name 记 once-per-name WARNING（来源漂移可观�
 展示层面的 cosmetic）、SSE 日历兜底（A 股域内未知交易所的合理缺省）、
 2023-12-31 边界常量（需求文档规定的历史边界，永不移动，具名常量比数据
 推导更诚实）。
+
+## 9. 生产事故记录与修复（2026-11-01 12:50，句柄泄漏）
+
+**事故**：主应用（PID 334306）12:50:54 文件句柄达 1024 上限（sys.log:555246
+Errno 24），API 拒连、SQLite 无法打开库文件，3 个日常任务同刻失败；事故时
+进程挂 579 fd（454 指向 quotes.db）；quotes.db-wal 膨胀至 12.04GB（常驻读
+连接阻断 WAL 回收）。外部诊断报告逐条核实**属实**。
+
+**根因（本 change 引入）**：`financial_pit_panel.py` 全部 14 处连接使用
+`with sqlite3.connect(...)` / `with self.connect()` 裸写法——`with` 作用于
+连接对象只管事务提交**从不关闭连接**（项目 storage.get_connection 为
+try/finally close 的生成器，本模块偏离了项目惯例）。每次披露事件刷新/
+查询各自新开连接且在应用常驻上下文中滞留，累积耗尽句柄。
+
+**为什么三轮审核都没抓到**：三轮维度分别是 spec 合同、修复核实+量化、
+架构治理——都不含**进程生命周期/资源管理**维度；冒烟验证全部短进程
+（TestClient/脚本），未在常驻进程中反复调用。教训已记：长驻服务的模块，
+连接生命周期必须有回归测试。
+
+**修复（23/23 全绿）**：
+1. 全部 14 处改为 `contextlib.closing(...)` 包裹（3 处 ro 连接 + 11 处
+   self.connect）；refresh_pairs 因失去 with 自动提交补显式 commit；
+2. 新增 fd 回归测试：25 轮 cross-section/panel/coverage/changes + 锚
+   装载，断言 /proc/self/fd 计数稳定（±2）；
+3. storage.get_connection 复核为 finally-close（我加的 industries 查询
+   走该路径，无同类问题）。
+
+**恢复步骤（需运维执行，代码修复不释放已泄漏句柄）**：
+1. 重启主应用进程（释放 579 fd）；
+2. 重启后无读者时回收 WAL：`sqlite3 data/quotes.db "PRAGMA
+   wal_checkpoint(TRUNCATE);"`（预计收回 ~12GB）。
+
+**半成品代码风险（同日 09:30:36 事件，属实）**：运行中应用懒加载读到了
+脚本化多步编辑的中间态文件（映射断言已入、克隆修复未入），导致
+DatabaseOperations 初始化报错。整改：对运行中应用的工作区，文件级编辑
+必须保持原子（一次成文），跨文件依赖的变更先写消费者再写校验方。

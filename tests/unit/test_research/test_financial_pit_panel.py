@@ -728,6 +728,40 @@ def test_unrecognized_share_fact_name_is_observable(
     )
 
 
+def test_repeated_queries_do_not_leak_file_handles(
+    store: FinancialPitPanelStore,
+) -> None:
+    """Incident 2026-11-01: bare `with sqlite3.connect(...)` never closed
+    connections and exhausted the production app's fd limit (579 handles,
+    454 on quotes.db). Regression test: repeated query/coverage/anchor-load
+    cycles must keep the process fd count stable."""
+    import os
+    import sys
+
+    if sys.platform != "linux" or not os.path.isdir("/proc/self/fd"):
+        pytest.skip("fd accounting requires Linux /proc")
+
+    store.build_full("test-v1")
+
+    def _fd_count() -> int:
+        return len(os.listdir("/proc/self/fd"))
+
+    _fd_count()  # warm up lazily-created resources
+    baseline = _fd_count()
+    for _ in range(25):
+        store.query_cross_section("20260101", limit=5)
+        store.query_panel(limit=5)
+        store.coverage()
+        store.changes(limit=2)
+    store._load_trading_days()
+    store._load_valuation_shares(["600001.SH"])
+    after = _fd_count()
+    assert after <= baseline + 2, (
+        f"file handles leaked across repeated panel queries: "
+        f"{baseline} -> {after}"
+    )
+
+
 def test_quarantined_ths_degrades_to_single_source(
     store: FinancialPitPanelStore,
 ) -> None:
