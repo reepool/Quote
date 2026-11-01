@@ -1,0 +1,123 @@
+# Design: 隔离长任务与 API 共享事件循环
+
+## 1. 问题分析
+
+### 1.1 现状架构
+
+```text
+进程: python main.py full (systemd: quote-system.service)
+  └── 单一 asyncio 事件循环
+        ├── uvicorn API server (main.py: asyncio.create_task(server.serve()))
+        ├── AsyncIOScheduler (scheduler/scheduler.py:42)
+        │     └── job 协程直接 await 在主循环 (scheduler/scheduler.py:305)
+        │           └── 任务内部: 同步 sqlite3 (research/storage.py:14) + pandas + httpx await
+        └── Telethon Telegram bot (utils/task_manager/handlers.py)
+```
+
+### 1.2 故障机理
+
+任务协程内的同步重活（77GB 库候选扫描，实测 CPU ~84%、持续读盘 9–12.5MB/s）占住解释器与循环：API 的 accept/路由协程、bot 的 update 处理、以及 `asyncio.wait_for` 的超时回调都只能挤任务 await 的间隙运行。2026-11-01 实测：API LISTEN 积压 172、curl 8s 超时；bot 仅在 15:41/15:42/15:44/16:16 零星醒来；`/stop` 不可达，只能重启进程。
+
+超时依赖被饿住的循环（`scheduler/scheduler.py:302-305`），意味着"5 小时强制超时"在饿住期间是尽力而为而非保证——这与"任务可能永不结束"叠加，构成当前最危险组合。
+
+### 1.3 与既有能力的关系
+
+- `api-db-resource-isolation`：保护任务不受 API 负载挤占 DB 容量（反方向）。本 change 不修改其任何需求。
+- 治理总纲 §2.1 多入口单实现：本 change 只改"执行位置"，不改业务实现；任务仍由唯一调度器链路触发。
+
+## 2. 目标与非目标
+
+**目标**
+
+1. 长任务运行期间：API health ≤500ms、读接口 p95 ≤1s（10 分钟窗口）、bot 命令 ack ≤10s（阈值可配置）。
+2. `/stop` 与 `max_runtime_seconds` 在 ≤30s 内于下一个检查点生效，并产生对应报告。
+3. 长阶段心跳日志 ≤5 分钟一次；bot/API 可查询当前 run 状态。
+4. worker 失败可上报、可诊断，API/bot 不受影响。
+5. 全部为包装器层与少量服务检查点改动，业务语义零变化。
+
+**非目标**
+
+- 不拆分 `scheduler/tasks.py`（FR-08 独立推进）；
+- 不引入 Celery/消息队列等通用任务平台（防过度工程）；
+- 不处理 `financials.db` 77GB 体积与扫描查询索引（另记改进建议）；
+- 不改变任何任务的业务验收口径与数据写入 owner。
+
+## 3. 方案比较与决策
+
+| 方案 | 说明 | 结论 |
+|---|---|---|
+| A. worker loop（选定） | 包装器把任务协程提交到独立线程 + 独立事件循环；主循环仅 await Future | 改动集中在 `scheduler/scheduler.py` 一处收口；业务代码零改动；GIL 下主循环仍按切换间隔（~5ms）获得时间片，响应性有界 |
+| B. 进程隔离（条件升级） | 每个长任务在子进程运行，结果 pickle 返回，超时/停止经 kill 收口 | 隔离最强（防 OOM/失控 CPU），但需子进程内重建 DataManager/服务实例、`job_config` 传递改造；保留为 M4 升级路径 |
+| C. 仅协作式让出 | 各服务内插 `await asyncio.sleep(0)` 检查点 | 需逐服务改造、无强制边界、CPU 段不可控；**否决为独立方案**，其检查点要求并入方案 A |
+
+**决策：方案 A 为主**，落在 `parameterized_task` 包装器；方案 B 的设计要点保留于 §7，仅当 §6 度量不达标时按 M4 另立 change 实施。
+
+### 3.1 执行模型（方案 A）
+
+- 包装器内：`asyncio.run_coroutine_threadsafe(task_func(**all_parameters), worker_loop)`，worker 线程来自常驻 `ThreadPoolExecutor`（每线程一个 `asyncio.new_event_loop()`，循环随线程生命周期管理）。
+- 主循环侧沿用 `asyncio.wait_for(future, timeout=max_runtime_seconds)` 外层超时；超时/`/stop` 取消经 Future 传导（call_soon_threadsafe → worker 内任务取消），在任务下一个 await 检查点落地。
+- `max_instances`、`run_id`、依赖组（dependency_results）、`job_config` 跟踪全部保持在主循环包装器内，语义不变。
+- per-job escape hatch：确有主 loop 资源依赖、暂无法改造的任务可在 `config/05_scheduler.json` 中配置保留主 loop 执行，理由记录在配置注释与资源盘点文档；默认全部走 worker。
+
+### 3.2 loop-bound 资源盘点（M1 spike 必产）
+
+worker loop 上禁止使用主 loop 资源。M1 必须产出清单并逐任务标注（worker-safe / 需代理 / 主 loop 保留）：
+
+| 资源 | 归属 | 处理 |
+|---|---|---|
+| Telethon 客户端 | 主 loop | 报告/通知一律经 `run_coroutine_threadsafe` 送回主 loop 执行（`_send_task_report`、`_send_task_report` 失败分支、scheduler 通知） |
+| aiosqlite/SQLAlchemy task 池（api-db-resource-isolation 的 task workload） | 主 loop | worker 内需要 async DB 会话的任务：在 worker loop 内经现有连接管理自建 per-run 会话，或配置为主 loop 保留 |
+| 共享 HTTP 会话（全局 aiohttp/httpx 客户端，若有） | 主 loop | per-run 实例化优先；确属全局单例的走代理或主 loop 保留 |
+| 同步 sqlite3（`research/storage.py` contextmanager，per-call 连接） | 无 loop 绑定 | 线程安全，无需迁移；spike 中逐调用方确认连接生命周期 |
+
+### 3.3 检查点契约
+
+- 长阶段（候选扫描、批量循环）必须提供检查点：默认每 ≤30 秒或每 200 个候选至少一次 `await`（`asyncio.sleep(0)` 即可），同时更新进度状态；参数进配置。
+- 首批真实调用方：`financial_disclosure_incremental_sync`（对账扫描）、`shareholder_reconciliation_sync`。两处接入后再抽最小共享 helper（满足治理总纲"两个真实调用方"门槛），不预先平台化。
+- 取消语义：取消在下一检查点落地；最坏延迟 = 最长同步段 ≤ 检查点上限。此契约写进任务服务文档与测试。
+
+### 3.4 报告与通知通道
+
+`_send_task_report`（`scheduler/tasks.py:5219`）与 scheduler 错误/错过通知（`scheduler/scheduler.py:440-455` 的 `asyncio.create_task(bot.send_...)`）当前隐式假设主 loop。改造后：
+
+- 任务侧 `_send_task_report` 调用经线程安全网关送回主 loop 执行，对任务代码保持原签名；
+- 主 loop 侧通知路径不变。
+
+### 3.5 可观测性与失败隔离
+
+- worker 侧维护 run 进度状态对象（task、run_id、phase、counters、elapsed、last_progress_at）；主 loop 侧定时器（≤5min）读取并打心跳日志。
+- 状态查询：bot `/status` 与 API 运行状态端点暴露当前 run（含 max_runtime 剩余）。
+- worker 内异常 → 包装器捕获 → 复用 `_format_job_exception`（`scheduler/scheduler.py:451`）与现有错误报告路径；API/bot 不受影响。worker 进程级崩溃（OOM 等）由 systemd 拉起整体进程，现状行为保留。
+
+## 4. 生产不变量（review 时逐条核对）
+
+1. 单一业务实现：隔离只在包装器层；任务函数、业务服务不复制、不改语义。
+2. `max_instances=1`、`run_id`、依赖组、`job_config` 语义不变。
+3. 对账任务扫描期零写、只写变化或缺失的幂等语义不变；kill worker 不产生部分写入。
+4. 配置驱动：SLO 阈值、心跳间隔、检查点参数、escape hatch 全部进 `config/05_scheduler.json`，不改代码可调。
+5. 日志沿用现有 logging 体系，不引入新 observability 框架。
+
+## 5. 风险
+
+| 风险 | 缓解 |
+|---|---|
+| GIL 争用导致纯 CPU 段 API p95 仍超标 | §6 度量把关；不达标走 M4 进程隔离（方案 B 要点已保留） |
+| 个别任务隐藏的主 loop 资源依赖 | M1 盘点清单 + per-job escape hatch 兜底 |
+| 报告/通知跨 loop 使用 telethon | 统一 marshalling 网关 + 并发测试覆盖 |
+| 检查点遗漏导致取消延迟 | 检查点契约进测试（合成卡死任务断言 ≤30s） |
+
+## 6. 验证与度量
+
+1. 合成阻塞任务（CPU 密集 + 同步 sqlite 两类）并发测试：长任务运行期间断言 health/read/bot SLO（pytest-asyncio）。
+2. 取消/超时测试：注入卡死任务，断言 `/stop` 与 `max_runtime_seconds` ≤30s 生效并产生对应报告。
+3. 真实回放：`financial_disclosure_reconciliation_sync` 以有界 `target_symbols` 范围运行，期间实测 API p95、bot 响应、心跳日志与扫描期零写。
+4. 数据安全：worker 中断后核对 `financials.db` 无部分写入、重跑幂等。
+5. 全量现有单测回归通过。
+
+## 7. M4 升级路径（仅当 §6 不达标）
+
+scheduler 与 API 拆分为两个进程（`main.py` 拆分或双 systemd 单元）：
+
+- 任务在调度进程内执行，bot 与调度器同进程（/run、/stop 需要的共享状态最小化），API 进程只做查询/提交（提交经既有调度接口，不复制业务循环，符合治理总纲 §2.1）；
+- 子进程执行任务时：子进程内经同一工厂重建 DataManager/服务实例，结果 dict 经 pickle 返回；超时/停止经 kill 收口，WAL 机制保证中断安全；
+- 注意：这是同一实现的执行位置隔离，不构成总纲 §2.1 禁止的"通过 subprocess 启动另一套生产实现"。
