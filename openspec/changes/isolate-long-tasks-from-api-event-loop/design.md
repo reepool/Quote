@@ -23,6 +23,8 @@
 ### 1.3 与既有能力的关系
 
 - `api-db-resource-isolation`：保护任务不受 API 负载挤占 DB 容量（反方向）。本 change 不修改其任何需求。
+- `scheduler`（任务配置与依赖组编排契约）：`pre_success`/`post_success`/`post_always`、parallel/serial、`manual_only` 语义不变，编排仍留在主循环包装器；注意 parallel 依赖组在 worker 化后从"单循环交错"变为真实并行，其写协调由 §3.6 约束。
+- `financial-operations-scheduler`（财务任务报告契约）：Telegram 报告的内容与渠道契约不变，本 change 只改变执行位置与投递路径（见 §3.4）。
 - 治理总纲 §2.1 多入口单实现：本 change 只改"执行位置"，不改业务实现；任务仍由唯一调度器链路触发。
 - 覆盖范围：本 change 收口调度包装器执行路径（cron、bot `/run`、依赖组触发共用）。`api/routes.py` 存在直接调用 `data_manager.run_*` 的长任务入口（special commodity 系列同步、futures calendar backfill 等 5 处），不经过该包装器；M1 盘点后要么收敛到同一执行路径（优先，符合治理总纲 §2.1），要么显式记录为后续 change，不在本 change 静默留白。
 
@@ -83,7 +85,8 @@ worker loop 上禁止使用主 loop 资源。M1 必须产出清单并逐任务�
 `_send_task_report`（`scheduler/tasks.py:5219`）与 scheduler 错误/错过通知（`scheduler/scheduler.py:440-455` 的 `asyncio.create_task(bot.send_...)`）当前隐式假设主 loop。改造后：
 
 - 任务侧 `_send_task_report` 调用经线程安全网关送回主 loop 执行，对任务代码保持原签名；
-- 主 loop 侧通知路径不变。
+- 主 loop 侧通知路径不变；
+- 网关禁止跨 loop 等待成环：worker 侧网关以 `run_coroutine_threadsafe(...).result()` 阻塞等待，此时主循环仅 await worker Future、可独立服务该提交，不构成死锁；worker 内禁止 await 主 loop 的 asyncio Future（跨 loop await 本身不合法）。
 
 ### 3.5 可观测性与失败隔离
 
@@ -135,6 +138,6 @@ worker/loop 随 run 创建销毁，退出路径必须复用该 change 固化的 
 
 scheduler 与 API 拆分为两个进程（`main.py` 拆分或双 systemd 单元）：
 
-- 任务在调度进程内执行，bot 与调度器同进程（/run、/stop 需要的共享状态最小化），API 进程只做查询/提交（提交经既有调度接口，不复制业务循环，符合治理总纲 §2.1）；
+- 任务在调度进程内执行，bot 与调度器同进程（/run、/stop 需要的共享状态最小化），API 进程只做查询/提交（跨进程提交经调度进程暴露的内部触发接口，不复制业务循环，符合治理总纲 §2.1）；
 - 子进程执行任务时：子进程内经同一工厂重建 DataManager/服务实例，结果 dict 经 pickle 返回；超时/停止经 kill 收口，WAL 机制保证中断安全；
 - 注意：这是同一实现的执行位置隔离，不构成总纲 §2.1 禁止的"通过 subprocess 启动另一套生产实现"。

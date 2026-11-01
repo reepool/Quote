@@ -1,21 +1,23 @@
 ## ADDED Requirements
 
 ### Requirement: Long task execution must not starve the shared event loop
-The system SHALL execute scheduler task coroutines off the API/Telegram shared event loop on a dedicated worker event loop per run, so that any registered long task can run to completion while the API and the Telegram bot remain responsive. The isolation SHALL stay at the scheduler wrapper layer; business task implementations SHALL NOT be duplicated or relocated.
+The system SHALL execute scheduler task coroutines off the API/Telegram shared event loop on a dedicated worker event loop per run, so that any registered long task can run to completion while the API and the bot remain responsive; jobs explicitly configured to stay on the main loop (documented escape hatch) are exempt and their known impact SHALL be recorded. The isolation SHALL stay at the scheduler wrapper layer; business task implementations SHALL NOT be duplicated or relocated.
 
 #### Scenario: Long task runs while API serves reads
-- **WHEN** any registered long task is running (e.g. financial_disclosure_reconciliation_sync scanning the financial database)
-- **THEN** API health and read endpoints SHALL respond within the configured latency SLO (health ≤ 500ms, reads p95 ≤ 1s over any 10-minute window)
+- **WHEN** any registered long task is running on the isolated worker execution path (e.g. financial_disclosure_reconciliation_sync scanning the financial database)
+- **THEN** API health and read endpoints SHALL respond within the configured latency SLO (defaults: health 500ms, reads p95 1s over any 10-minute window)
 - **AND** the API accept backlog SHALL NOT grow unboundedly
+- **AND** a job configured via the escape hatch to stay on the main loop SHALL be exempt from this SLO with its known impact recorded
 
 #### Scenario: Long task runs while bot serves commands
 - **WHEN** a long task is running and an operator issues /run, /stop or /status
-- **THEN** the bot SHALL acknowledge the command within the configured SLO (≤ 10s)
+- **THEN** the bot SHALL acknowledge the command within the configured SLO (default 10s)
 
 #### Scenario: Isolation stays at the wrapper layer
 - **WHEN** the execution isolation is applied
 - **THEN** task functions and business services SHALL keep a single implementation and unchanged semantics
-- **AND** the scheduler wrapper SHALL remain the only execution-path change
+- **AND** the scheduler wrapper SHALL remain the only execution-location change
+- **AND** business services SHALL only add await checkpoints and progress reporting as defined by this capability
 
 ### Requirement: Stop and timeout must be enforced under isolation
 The system SHALL enforce /stop and max_runtime_seconds against the worker execution such that cancellation takes effect at the task's next await checkpoint within a configured bound, even while the task is inside a long synchronous phase.
@@ -45,6 +47,7 @@ The system SHALL log progress heartbeats for long task phases and expose the cur
 #### Scenario: Operator queries current run
 - **WHEN** /status or the corresponding API endpoint is called while a task runs
 - **THEN** the response SHALL include run_id, task name, phase, elapsed time and the latest progress
+- **AND** existing /status entries and task report contracts (e.g. the financial-operations-scheduler reports) SHALL remain unchanged
 
 ### Requirement: Isolation must preserve scheduling and data semantics
 The system SHALL keep max_instances, run_id tracking, dependency groups and job_config semantics unchanged, and SHALL keep the zero-write scan-phase and idempotent-write semantics of reconciliation tasks under isolated execution.
@@ -60,13 +63,14 @@ The system SHALL keep max_instances, run_id tracking, dependency groups and job_
 
 #### Scenario: Different jobs run concurrently in workers
 - **WHEN** two different jobs run in separate workers and write to the same database
-- **THEN** their writes SHALL be coordinated by the existing single-writer ownership (serialized per database)
+- **THEN** their writes SHALL be serialized per database through the coordination defined in the design (per-database queueing or mutex, with busy_timeout rechecked)
 - **AND** neither job SHALL fail due to cross-job write contention newly introduced by the isolation
 
 #### Scenario: Service restarts while a task is running
 - **WHEN** the service shuts down or restarts while a task runs in the worker
 - **THEN** the shutdown SHALL cancel running workers and wait within a bounded time
-- **AND** the target database SHALL contain no partial writes from the interrupted run
+- **AND** the interrupted run SHALL leave no inconsistent state (scan phase: no writes; apply phase: only complete per-candidate transactions)
+- **AND** a later re-run SHALL complete the remaining candidates idempotently
 
 ### Requirement: Loop-bound shared resources must stay on their owning loop
 The system SHALL ensure resources bound to the main event loop (Telethon client, async DB engines and pools, shared HTTP sessions) are not used from the worker loop, either via per-run instances created inside the worker or via thread-safe marshalling back to the main loop.
@@ -75,6 +79,7 @@ The system SHALL ensure resources bound to the main event loop (Telethon client,
 - **WHEN** a task running in the worker sends its completion or error report
 - **THEN** the report delivery SHALL be marshalled to the main loop
 - **AND** the Telethon client SHALL NOT be touched from the worker loop
+- **AND** the report content and channel contracts of existing capabilities SHALL remain unchanged
 
 #### Scenario: Task needs async DB sessions in worker
 - **WHEN** a task requires async DB sessions that belong to the main-loop engine pool

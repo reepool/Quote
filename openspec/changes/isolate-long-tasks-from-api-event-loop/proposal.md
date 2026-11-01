@@ -31,7 +31,7 @@
 
 ### Modified Capabilities
 
-无。`api-db-resource-isolation`（API 准入控制与 DB 池隔离）语义保持不变，本 change 与其互补。
+无。既有 capability 语义全部保持，本 change 只改变执行位置：`api-db-resource-isolation`（API 准入与 DB 池隔离，互补方向）、`scheduler`（任务配置与依赖组编排契约，编排仍留在主循环包装器）、`financial-operations-scheduler`（财务任务报告内容与渠道契约）。
 
 ## Impact
 
