@@ -185,6 +185,9 @@ eps, bps, ocfps, rev_yoy, np_yoy, ttm_revenue, ttm_net_income
 source_table_updated_at TEXT         -- 源行 updated_at，追溯调整探测
 last_value_change_at TEXT            -- 最后一次实质数值变更日（data_change_log，old_hash≠new_hash）
 revised_after_publish INTEGER        -- 1 = 变更日晚于公告推导值（available_at 被推后）
+share_validation TEXT                -- consensus / discrepancy / single_source / null（四锚交叉验证）
+share_basis TEXT                     -- 被采纳分母的锚名（末位兜底标注 paid_in_capital_cny_par_assumption）
+share_candidates_json TEXT           -- 各锚数值/口径/absent/unit_mismatch 备注（分歧审计明细）
 panel_version TEXT NOT NULL
 built_at TEXT NOT NULL
 PRIMARY KEY (instrument_id, report_period)
@@ -322,7 +325,8 @@ GET /api/v1/research/financials/pit/coverage
   M1 校准任务消除或解释（§6.3-5）；
 - `available_at_quality` 分布（exact / exact_event / statutory_deadline /
   delayed_estimate 各多少行）、`revised_after_publish` 行数、
-  `attribution_quality` 分布（parent/mixed/unverified 占比）；
+  `attribution_quality` 分布（parent/mixed/unverified 占比）、
+  **`share_validation` 分布（consensus/discrepancy/single_source/null）**；
 - **完整期标记**：`is_complete = 评估时点 > 该期法定披露截止日`（时间判据，
   非计数判据），另附 `latest_complete_period`。2026Q3（截止 2026-10-31）自
   2026-11-01 起标记完整；当期不完整时 cross-section 的 `universe_note` 同步携带
@@ -384,15 +388,19 @@ equity 有值时 100% 命中 `parent_attributable_equity`；net_income 95.5% 命
 
 - `eps = net_income / shares_outstanding`；`bps = equity / shares_outstanding`；
   `ocfps = operating_cf / shares_outstanding`（分母为 0 或缺失时整体 null）；
-- **分母解析策略（v1.2 过渡机制，将被交叉验证机制取代——见 change
-  `cross-validate-share-capital-denominators`）**：宽表股本 0% 填充，分母回退
-  长表 `share_capital_amount`。该 canonical 混有两种来源语义：THS `equity`
-  （股本指标，67,037 行，99.35% 数值即真股数，~405 行为源侧坏值，如
-  600398.SH/600097.SH）与 `实收资本(或股本)`（元金额，面值=1 元时数值恰等
-  股数，面值≠1 的 ~98 行不可直接当股数）。过渡机制：仅当窗口内 valuation
-  隐含股本（market_cap/close，2024-04-30 起）与 fact 偏差 ≥50% 时替换，
-  其余保留 fact。注：此前"valuation 系统性偏低 18%"的说法系测量锚口径
-  伪影（AK 每股净资产扣除永续债等），不作为事实引用；
+- **分母解析策略（交叉验证机制，change
+  `cross-validate-share-capital-denominators` 已交付）**：宽表股本 0% 填充；
+  分母由**四锚交叉验证**装配——`shares_outstanding` canonical（股数）>
+  THS `share_capital_amount`（期末股数，D0 证实）> valuation 隐含股本
+  （总市值/收盘价，2024-04-30 起）> EPS 隐含（净利/披露 EPS，加权口径，
+  微利按营收比例护栏跳过）；`实收资本(或股本)`（元金额）仅作校验锚——
+  分歧记 `unit_mismatch` 注记不翻状态，股数锚 <2 时才实质计入，永不因
+  分歧被采纳。**共识即 consensus、分歧即 discrepancy 备注（不静默替换）**，
+  行级输出 `share_validation / share_basis / share_candidates`；坏行经四锚
+  扫描隔离至 `share_capital_suspect`（400 行，可逆留痕，复扫归零）。
+  真库分布：consensus 92.4% / discrepancy 6.8%（其中 EPS 加权漂移为主，
+  中位偏离 21%）/ single_source 0.8%；注：此前"valuation 系统性偏低 18%"
+  的说法系测量锚口径伪影（AK 每股净资产扣除永续债等），不作为事实引用；
 - `rev_yoy / np_yoy`（%）：本期累计 vs 上年同期累计，边界见 §3.4；
 - `ttm_revenue / ttm_net_income`：本期累计 + 上年年报 − 上年同期累计；
 - **单位契约（v1.2 审计补注）**：`roe / gross_margin / operating_margin /

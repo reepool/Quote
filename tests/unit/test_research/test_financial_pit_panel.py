@@ -615,6 +615,37 @@ def test_unquarantined_mismatch_is_flagged_not_corrected(
     assert candidates["anchors"]["eps_implied"]["value"] == pytest.approx(3200.0)
 
 
+def test_micro_margin_revenue_skips_eps_anchor(
+    store: FinancialPitPanelStore,
+) -> None:
+    """Design risk-table guard: when profit is a negligible fraction of
+    revenue the net/eps division amplifies noise, so the EPS anchor is
+    skipped (600007 keeps THS + valuation agreement -> consensus)."""
+    store.build_full("test-v1")
+    with sqlite3.connect(store.db_path) as conn:
+        # shrink net income to 0.1% of revenue for 600001's 2024 annual row
+        conn.execute(
+            """
+            UPDATE financial_facts SET net_income = 0.5
+            WHERE instrument_id = '600001.SH' AND report_period = '2024-12-31'
+            """
+        )
+        conn.commit()
+    store.refresh_pairs([("600001.SH", "2024-12-31")])
+    with store.connect() as conn:
+        row = conn.execute(
+            """
+            SELECT share_candidates_json FROM financial_pit_panel
+            WHERE instrument_id = '600001.SH' AND report_period = '2024-12-31'
+            """
+        ).fetchone()
+    candidates = json.loads(row["share_candidates_json"])
+    assert (
+        candidates["anchors"]["eps_implied"]["note"]
+        == "skipped_near_zero_net_income_or_eps"
+    )
+
+
 def test_quarantined_ths_degrades_to_single_source(
     store: FinancialPitPanelStore,
 ) -> None:
@@ -787,13 +818,19 @@ def test_refresh_pairs_updates_single_row(store: FinancialPitPanelStore) -> None
     result = store.refresh_pairs([("600002.SZ", "2024-06-30")])
     assert result["refreshed"] == 1
     with store.connect() as conn:
-        value = conn.execute(
+        row = conn.execute(
             """
-            SELECT net_income FROM financial_pit_panel
+            SELECT net_income, share_validation, share_basis
+            FROM financial_pit_panel
             WHERE instrument_id = '600002.SZ' AND report_period = '2024-06-30'
             """
-        ).fetchone()[0]
-    assert value == 999.0
+        ).fetchone()
+    assert row["net_income"] == 999.0
+    # incremental refresh applies the same anchor assembly as a full rebuild
+    # (spec scenario): 600002 carries no share facts in the fixture, so the
+    # denominator resolves to null through the same rules
+    assert row["share_validation"] == "null"
+    assert row["share_basis"] is None
 
 
 def test_refresh_pairs_deletes_rows_missing_from_source(

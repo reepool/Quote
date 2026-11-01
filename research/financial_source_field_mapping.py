@@ -541,7 +541,7 @@ _CATALOG_V5_BANK_CORRECTIONS: tuple[FinancialSourceFieldMapping, ...] = (
 # counts (unit=shares; 2026-10-31 D0 verification). The Sina paid-in-capital
 # field is a CNY amount that only equals the share count at 1-yuan par, so it
 # loses core approval and must go through denominator cross-validation.
-_CATALOG_V6_SHARE_CAPITAL_CORRECTIONS: tuple[FinancialSourceFieldMapping, ...] = (
+_V6_SHARE_CAPITAL_BASE_CORRECTIONS: tuple[FinancialSourceFieldMapping, ...] = (
     FinancialSourceFieldMapping(
         canonical_fact="share_capital_amount",
         statement_family="balance_sheet",
@@ -582,6 +582,20 @@ _CATALOG_V6_SHARE_CAPITAL_CORRECTIONS: tuple[FinancialSourceFieldMapping, ...] =
 )
 
 
+# The v6 corrections must replace the approved CNY share-capital rows in every
+# statement profile (the catalog clones nonbank rows into bank/securities/
+# insurance at build time; fixing only nonbank leaves approved CNY rows live
+# in the cloned profiles - caught by _validate_mapping_unit_classes).
+_CATALOG_V6_SHARE_CAPITAL_CORRECTIONS: tuple[FinancialSourceFieldMapping, ...] = (
+    *_V6_SHARE_CAPITAL_BASE_CORRECTIONS,
+    *(
+        replace(mapping, profile=profile)
+        for profile in ("bank", "securities", "insurance")
+        for mapping in _V6_SHARE_CAPITAL_BASE_CORRECTIONS
+    ),
+)
+
+
 
 _CATALOG_BY_VERSION: dict[str, tuple[FinancialSourceFieldMapping, ...]] = {
     MAPPING_VERSION_V1: _CATALOG_V1,
@@ -605,6 +619,32 @@ _CATALOG_BY_VERSION: dict[str, tuple[FinancialSourceFieldMapping, ...]] = {
         )
     ),
 }
+
+
+# Unit-class consistency (change: cross-validate-share-capital-denominators).
+# In the live mapping version, approved mappings into share-count canonicals
+# must declare unit "shares"; every other approved canonical must not. Older
+# frozen versions are historical records and are not re-validated.
+_MAPPING_SHARE_COUNT_CANONICALS = frozenset(
+    {"shares_outstanding", "share_capital_amount"}
+)
+
+
+def _validate_mapping_unit_classes() -> None:
+    for mapping in _CATALOG_BY_VERSION[MAPPING_VERSION]:
+        if not mapping.approved_for_core:
+            continue
+        is_share_count = mapping.canonical_fact in _MAPPING_SHARE_COUNT_CANONICALS
+        declares_shares = mapping.canonical_unit == "shares"
+        if is_share_count != declares_shares:
+            raise ValueError(
+                f"mapping {mapping.canonical_fact}/{mapping.sina_field!r}/"
+                f"{mapping.ths_metric!r} unit class contradicts its canonical "
+                f"(approved share-count canonicals must declare 'shares')"
+            )
+
+
+_validate_mapping_unit_classes()
 
 
 def get_financial_source_field_mappings(

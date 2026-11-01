@@ -440,7 +440,7 @@ class FinancialPitPanelStore:
                         if value > 0:
                             entry.setdefault("ths", value)
                     elif fact_name.startswith("实收资本"):
-                        if value != 0:
+                        if value > 0:
                             entry.setdefault("pic", value)
         return anchors
 
@@ -1210,7 +1210,7 @@ class FinancialPitPanelStore:
                 if fact_name == "equity":
                     if value > 0:
                         entry.setdefault("ths", value)
-                elif fact_name.startswith("实收资本") and value != 0:
+                elif fact_name.startswith("实收资本") and value > 0:
                     entry.setdefault("pic", value)
         return entry or None
 

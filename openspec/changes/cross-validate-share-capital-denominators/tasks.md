@@ -76,7 +76,40 @@
       持锁窗口下 flock 等待挂起（零 I/O 50 分钟，两次），与本次改动无关
       （storage 仅新增只读查询方法），需安静窗口重跑：
       `pytest tests/unit/test_research/test_storage.py -q`。
-- [x] 4.4 `openspec validate` 通过；需求文档 §6.2 已更新为交叉验证机制
-      （过渡机制标注移除于本 change 文档族）。
+- [x] 4.4 `openspec validate` 通过；需求文档已同步（交付后审计补齐）：
+      §6.2 改为交叉验证机制全文、§4.1 补 share_validation/share_basis/
+      share_candidates_json 三列、§5.3 补 share_validation 分布字段。
 - [x] 4.5 可选增强决策：暂不新增外部股本采集——四锚已自洽且 ocfps 达标；
       待 quantwin 联调若 bps 口径差仍阻碍拼接再议。
+
+
+## 5. 交付后对照审计（2026-11-01，spec/需求逐场景核对）
+
+发现 6 项，全部修复（测试 50/50）：
+
+1. **v6 修正未覆盖克隆 profile（断言抓到的真缺陷）**：profile 克隆机制把
+   旧 approved CNY 股本行复制进 bank/securities/insurance——此前只验证了
+   nonbank。新增 `_validate_mapping_unit_classes` 导入期断言（hygiene spec
+   "mapping 侧拒绝违规单位"场景的落地实现）当场拦截；v6 修正行现克隆至
+   全部四个 profile，逐一验证通过。
+2. **refresh 一致性断言缺失**：tasks 3.4 声称已测但旧测试只断言值传播；
+   已补 share_validation/share_basis 断言（spec 场景 "Incremental refresh
+   applies the same anchor assembly"）。
+3. **微利护栏未实现**：design 风险表的"净利<营收 0.5% 跳过 EPS 锚"落空，
+   `revenue` 参数为死参；已实现营收比例护栏 + 单测（微利时 eps_implied
+   记 skipped）。
+4. **pic 非正值未排除**：spec 场景要求零/负值锚视同 absent，实收资本
+   校验锚此前仅排除 0；已改 >0（两处 loader）。
+5. **需求文档漂移**：§6.2/§4.1/§5.3 三处未随实现更新（tasks 4.4 曾因此
+   表述失实）；已同步，本条目即修正后的真实状态。
+6. **审计脚本只存于 QuoteBak（gitignore）**：违反证据留存要求；扫描与
+   隔离脚本已固化至 `scripts/share_capital_audit/`（带 change 引用头）。
+
+**EPS 分歧幅度实测（带宽调优决策项，未擅自改设计）**：4,463 个 ths 基
+discrepancy 中 88.5% 为 eps_implied 单锚分歧，幅度中位 1.21（p10 0.73 /
+p90 1.47），85% 落在 0.7–1.5 加权漂移带——15% 带宽会把典型加权/期末漂移
+标为分歧。属"诚实标注过宽"而非错误；是否放宽 EPS 带宽（如 25–30%）或
+将 EPS 锚降为 advisory（不参与状态判定）留给 quantwin 联调决策。
+
+审计后验证：单测 50/50（面板 20 + 映射 9 + xbrl 21）；四 profile 映射
+逐一验证；护栏重建（v7）后台执行中，分布数字如有变化以重建后为准。
