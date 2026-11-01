@@ -2,7 +2,7 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-11-01。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[整公司最小交付§25](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#25-整公司最小交付校正回放与末端可执行性)，依据验收§7.76/A审核§165。§24必要续页局部成立，整份核心未交；回放协议错误触发重复拆读，112016离线量不代表真实需求，方向仍受ID影响。当前一次整合可信回放、核心末端与语义方向，交完整可执行方案或支持边界，新增真实调用/预算0，不续旧窗或迁银行额度。S23限用正文/S1 0/12及原质量/首次失败/unknown/生产边界不变。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[问题导向核心交付§26](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#26-问题导向的整公司核心交付替代25实现方案零外呼)，依据验收§7.77/A审核§167。§25协议及ID修复局部接受，离线已有成稿核验但核心未齐；角色分支误从coverage取正文，空条件样例又遗漏p11，不能归因于最后余额。结束§25实现方案，按公司核心问题组织已读证据，源条件继续独立查漏，不独占成稿准入；沿原owner交整份核心/实际请求方案或证实边界，新增真实调用/预算0，不续旧窗或迁银行额度。S23限用正文/S1 0/12及原质量/首次失败/unknown/生产边界不变。
 
 ## 1. 开发者必须先理解的纠偏
 
@@ -92,7 +92,7 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 
 ### B3 / S1：12家新链回归（A2通过后）
 
-- **2026-11-01审核§165（当前）：** §24续页局部成立，整公司核心仍未成稿；回放将领域对象直接当wire导致两次schema失败及模拟拆读，112016/8不能证明真实资源需求；方向按ID猜测仍阻塞。当前仅[§25](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#25-整公司最小交付校正回放与末端可执行性)/验收§7.76：B按v3连续P0—P3/至多两次共性修正/必要Review清理，校正回放后交首个非空成稿/实际核验及整份核心正常终态、方向ID不变性和一份实载资源方案。正常与故障/unknown分列，不强逼单包或只读不写，不增平台。仍不成立交最小结果/差额/支持边界，结束实现方案，A策略取舍，不滚动同根因纯准备卡。新增真实调用/预算0，不续旧造纸、挪银行额度或自动跨版启动。S23限用稿、S1 0/12/质量/失败/unknown及扩批/生产边界不变。以下历史安排不再授权外呼。
+- **2026-11-01审核§167（当前）：** §25协议重建及ID不变性局部接受，离线已有11条样例已核/非空核验，整份核心仍未齐；角色补答误从无text的coverage取正文，且p11空条件样例没有证明发现角色。结束§25实现方案，当前仅[§26](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#26-问题导向的整公司核心交付替代25实现方案零外呼)/验收§7.77：核心问题组织本次已读证据，源条件独立查漏、不独占成稿准入；沿原入口以少数跨章组交整份核心/正常终态/三读与完整请求资源方案。B按v3连续P0—P3/至多两次共性修正/直接正反验证/Review清理，不建平台、不逐句返A；失败交证实边界，不能再滚动同根因准备卡。新增真实调用/预算0，119950是历史usage和模拟unknown混合，不作真实成本或涨额依据；不续旧窗/借银行入口。S23限用稿、S1 0/12/原质量/首次失败/unknown及扩批/生产边界不变。固定证据根只读，先持久最小必要证据再清重复副本。以下历史安排不再授权外呼。
 
 - **2026-10-31审核§151（已结束）：** §17新增可靠答案0，付费兼容接续结束，不开第三窗/银行旧绑定。曾执行[§18](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#18-章节缺口闭环重整停止17真实接续)/验收§7.69的直接链工程整合，真实调用/预算0，旧余额不用；结果见§152—153。清理前置/收尾及原质量/分数/生产边界不变。
 
