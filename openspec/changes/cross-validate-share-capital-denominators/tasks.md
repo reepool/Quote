@@ -227,3 +227,23 @@ try/finally close 的生成器，本模块偏离了项目惯例）。每次披�
 脚本化多步编辑的中间态文件（映射断言已入、克隆修复未入），导致
 DatabaseOperations 初始化报错。整改：对运行中应用的工作区，文件级编辑
 必须保持原子（一次成文），跨文件依赖的变更先写消费者再写校验方。
+
+## 10. 泄漏修复后的复审（2026-11-01，新出现问题专项）
+
+1. **closing 转换自身核查（无新问题）**：全模块无裸 with-connect 残留；
+   refresh_pairs 显式 commit 位置正确（块内、循环后、return 前）；早退在
+   块外；hook 的 initialize 仅首建 store 时执行（每事件仅 DDL 一次的担心
+   不成立）。
+2. **模块级无界集合**（`_UNCLASSIFIED_SHARE_FACT_NAMES`，违反"避免全局
+   可变状态"且无上界）→ 加 128 名上限。
+3. **同步回归抓到一个真新缺陷**：此前别名目录编辑把 `TOTAL_SHARE`（总股本
+   语义）从 share_capital_amount 别名中**删除而非迁移**（"总股本"移了、
+   TOTAL_SHARE 漏移），用该字段的载荷解析 canonical 变 None——同步套件
+   的既有断言当场暴露。修复：TOTAL_SHARE 移入 `shares_outstanding`（股数
+   canonical，与语义一致），测试期望更新至 v6 契约
+   （canonical=shares_outstanding / unit=shares）。
+4. **恢复闭环确认**：quotes.db-wal 现为 0 字节（用户执行 TRUNCATE 返回
+   0|0|0 正常——重启时干净关闭已先行清空 WAL）；主应用新进程在跑、泄漏
+   句柄已随旧进程释放。
+
+验证：面板 23/23、provider 14/14、同步三件套 61/61。

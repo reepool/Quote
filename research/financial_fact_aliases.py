@@ -340,7 +340,12 @@ _STANDARD_FINANCIAL_FACT_CATALOG_V1: Dict[str, Dict[str, Any]] = {
         "statement_family": "capital_structure",
         "semantic": "shares_outstanding",
         "unit": "shares",
-        "aliases": ["SharesOutstanding", "TotalSharesOutstanding", "总股本"],
+        "aliases": [
+            "SharesOutstanding",
+            "TotalSharesOutstanding",
+            "TOTAL_SHARE",
+            "总股本",
+        ],
     },
     "undistributed_profit": {
         "statement_family": "balance_sheet",

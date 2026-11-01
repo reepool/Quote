@@ -169,10 +169,12 @@ _HIDDEN_ROW_SENTINEL = "9999-12-31"
 
 _LONG_TABLE_EPS_FACT = "profit_sheet.basic_eps"
 
-# Names seen under share_capital_amount that no anchor slot recognizes;
-# tracked so unrecognized-source drift logs once instead of silently
-# dropping anchors (see _classify_share_anchor_row).
+# Bounded registry of names seen under share_capital_amount that no anchor
+# slot recognizes; tracked so unrecognized-source drift logs once instead of
+# silently dropping anchors (see _classify_share_anchor_row). Capped to keep
+# the module-level state finite (project rule: avoid unbounded globals).
 _UNCLASSIFIED_SHARE_FACT_NAMES: set = set()
+_UNCLASSIFIED_SHARE_FACT_NAMES_CAP = 128
 _LONG_TABLE_SHARE_FACT = "share_capital_amount"
 
 _SELECT_FACT_COLUMNS = """
@@ -416,7 +418,12 @@ class FinancialPitPanelStore:
             return ("ths", value) if value > 0 else None
         if fact_name.startswith("实收资本"):
             return ("pic", value) if value > 0 else None
-        if canonical == "share_capital_amount" and fact_name not in _UNCLASSIFIED_SHARE_FACT_NAMES:
+        if (
+            canonical == "share_capital_amount"
+            and fact_name not in _UNCLASSIFIED_SHARE_FACT_NAMES
+            and len(_UNCLASSIFIED_SHARE_FACT_NAMES)
+            < _UNCLASSIFIED_SHARE_FACT_NAMES_CAP
+        ):
             # The failure mode of the fact-name-based classification is
             # silent anchor absence when a new source uses an unseen field
             # name; make that drift observable instead of silent.

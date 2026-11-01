@@ -416,10 +416,13 @@ async def test_financial_statements_sync_writes_bundle_rows(tmp_path):
     assert facts_by_name["TOTAL_OPERATE_INCOME"]["canonical_fact_name"] == "revenue"
     assert facts_by_name["TOTAL_ASSETS"]["canonical_fact_name"] == "total_assets"
     assert facts_by_name["NETCASH_OPERATE"]["canonical_fact_name"] == "operating_cf"
+    # v6 unit split (change: cross-validate-share-capital-denominators):
+    # TOTAL_SHARE is a share count and resolves to the shares_outstanding
+    # canonical (unit=shares), not the paid-in-capital amount canonical
     assert facts_by_name["TOTAL_SHARE"]["canonical_fact_name"] == (
-        "share_capital_amount"
+        "shares_outstanding"
     )
-    assert facts_by_name["TOTAL_SHARE"]["canonical_unit"] == "CNY"
+    assert facts_by_name["TOTAL_SHARE"]["canonical_unit"] == "shares"
     assert facts_by_name["CUSTOM_RATIO"]["canonical_fact_name"] is None
 
     with sqlite3.connect(research_config.storage.db_path) as conn:
