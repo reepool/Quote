@@ -16,6 +16,7 @@ from research.business_profile_corpus import (
 )
 from research.business_profile_documents import business_profile_document_family
 from research.business_profile_product_catalog import normalize_product_alias
+from contextlib import closing
 
 DEFAULT_WILSON_Z = 1.959963984540054
 REVIEW_OUTCOMES = {"correct", "incorrect", "excluded"}
@@ -787,9 +788,11 @@ def _load_official_documents(
 ]:
     output: Dict[tuple[str, str], List[Dict[str, Any]]] = {}
     validation_errors: List[Dict[str, Any]] = []
-    with sqlite3.connect(
-        f"file:{financials_db.resolve()}?mode=ro",
-        uri=True,
+    with closing(
+        sqlite3.connect(
+            f"file:{financials_db.resolve()}?mode=ro",
+            uri=True,
+        )
     ) as conn:
         manifests = load_business_profile_source_manifests(conn, instrument_ids)
     superseded_ids = {
@@ -903,9 +906,11 @@ def _load_candidate_instrument_ids(
     if report_period:
         clauses.append("report_period = ?")
         params.append(report_period)
-    with sqlite3.connect(
-        f"file:{research_db.resolve()}?mode=ro",
-        uri=True,
+    with closing(
+        sqlite3.connect(
+            f"file:{research_db.resolve()}?mode=ro",
+            uri=True,
+        )
     ) as conn:
         rows = conn.execute(
             f"""
@@ -960,7 +965,9 @@ def _load_exact_product_rows(
           AND COALESCE(revenue_share, 0) >= ?
         ORDER BY instrument_id, report_period, segment_name_raw, record_id
     """
-    with sqlite3.connect(f"file:{research_db.resolve()}?mode=ro", uri=True) as conn:
+    with closing(
+        sqlite3.connect(f"file:{research_db.resolve()}?mode=ro", uri=True)
+    ) as conn:
         conn.row_factory = sqlite3.Row
         rows = conn.execute(query, params).fetchall()
     output: List[Dict[str, Any]] = []
@@ -1008,7 +1015,9 @@ def _load_catalog_issue_product_rows(
           AND COALESCE(revenue_share, 0) >= ?
         ORDER BY instrument_id, report_period, segment_name_raw, record_id
     """
-    with sqlite3.connect(f"file:{research_db.resolve()}?mode=ro", uri=True) as conn:
+    with closing(
+        sqlite3.connect(f"file:{research_db.resolve()}?mode=ro", uri=True)
+    ) as conn:
         conn.row_factory = sqlite3.Row
         rows = conn.execute(query, params).fetchall()
     output: List[Dict[str, Any]] = []

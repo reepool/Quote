@@ -33,5 +33,5 @@
 - [ ] 4.2 全量复跑守卫 → 零残留；business_profile / scheduler 相关
       套件全绿。
 - [ ] 4.3 `openspec validate enforce-sqlite-connection-closing` 通过；
-      修复点数与 1.2 基线表逐一对账（16/16）。
+      修复点数与 1.2 基线表逐一对账（15/15）。
 - [ ] 4.4 提交推送；change 待验收归档。

@@ -36,6 +36,7 @@ from research.storage import ResearchStorageManager
 from utils import dm_logger
 from utils.config_manager import ResearchConfig, config_manager
 from utils.date_utils import get_shanghai_time
+from contextlib import closing
 
 
 WRITE_OPERATOR_SWITCH = "BUSINESS_PROFILE_CANDIDATE_WRITE"
@@ -661,17 +662,21 @@ def load_structured_business_profile_universe(
         raise FileNotFoundError(research_db)
     if not quotes_db.exists():
         raise FileNotFoundError(quotes_db)
-    with sqlite3.connect(
-        f"file:{research_db.resolve()}?mode=ro",
-        uri=True,
+    with closing(
+        sqlite3.connect(
+            f"file:{research_db.resolve()}?mode=ro",
+            uri=True,
+        )
     ) as research_conn:
         universe = list_first_wave_universe(
             research_conn,
             as_of_date=as_of_date,
         )
-    with sqlite3.connect(
-        f"file:{quotes_db.resolve()}?mode=ro",
-        uri=True,
+    with closing(
+        sqlite3.connect(
+            f"file:{quotes_db.resolve()}?mode=ro",
+            uri=True,
+        )
     ) as quotes_conn:
         lifecycle = load_instrument_lifecycle(
             quotes_conn,

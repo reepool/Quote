@@ -120,6 +120,7 @@ from research.business_profile_unit_registry import (
     propose_unknown_unit,
 )
 from utils.date_utils import get_shanghai_time
+from contextlib import closing
 
 logger = logging.getLogger(__name__)
 
@@ -608,7 +609,9 @@ def build_business_profile_counterparty_resolver(
         raise ValueError(
             "named relationship production requires a readable quotes database"
         )
-    with sqlite3.connect(f"file:{quotes_db_path.resolve()}?mode=ro", uri=True) as conn:
+    with closing(
+        sqlite3.connect(f"file:{quotes_db_path.resolve()}?mode=ro", uri=True)
+    ) as conn:
         conn.row_factory = sqlite3.Row
         table = conn.execute(
             "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'instruments'"

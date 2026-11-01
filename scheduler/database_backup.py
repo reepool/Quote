@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Awaitable, Callable, Dict, Iterable, List, Optional
+from contextlib import closing
 
 
 BACKUP_STATUS_SUCCESS = "success"
@@ -498,11 +499,22 @@ class DatabaseBackupService:
             "last_remaining": None,
             "last_progress": started,
         }
-        with sqlite3.connect(source_uri, uri=True, timeout=self.config.performance.busy_timeout_seconds) as src:
+        with closing(
+            sqlite3.connect(
+                source_uri,
+                uri=True,
+                timeout=self.config.performance.busy_timeout_seconds,
+            )
+        ) as src:
             src.execute(
                 f"PRAGMA busy_timeout={int(self.config.performance.busy_timeout_seconds * 1000)}"
             )
-            with sqlite3.connect(str(backup_path), timeout=self.config.performance.busy_timeout_seconds) as dst:
+            with closing(
+                sqlite3.connect(
+                    str(backup_path),
+                    timeout=self.config.performance.busy_timeout_seconds,
+                )
+            ) as dst:
                 dst.execute(
                     f"PRAGMA busy_timeout={int(self.config.performance.busy_timeout_seconds * 1000)}"
                 )
@@ -546,7 +558,12 @@ class DatabaseBackupService:
         backup_size = backup_path.stat().st_size
         if backup_size <= 0:
             raise RuntimeError(f"backup file is empty: {backup_path}")
-        with sqlite3.connect(str(backup_path), timeout=self.config.performance.busy_timeout_seconds) as conn:
+        with closing(
+            sqlite3.connect(
+                str(backup_path),
+                timeout=self.config.performance.busy_timeout_seconds,
+            )
+        ) as conn:
             conn.execute("PRAGMA schema_version").fetchone()
 
         mode = self.config.performance.validation_mode
@@ -581,7 +598,12 @@ class DatabaseBackupService:
                 detail = completed.stderr.strip() or status or f"exit={completed.returncode}"
                 raise RuntimeError(f"backup quick_check failed: {detail}")
         else:
-            with sqlite3.connect(str(backup_path), timeout=self.config.performance.busy_timeout_seconds) as conn:
+            with closing(
+            sqlite3.connect(
+                str(backup_path),
+                timeout=self.config.performance.busy_timeout_seconds,
+            )
+        ) as conn:
                 row = conn.execute("PRAGMA quick_check").fetchone()
             status = str(row[0]) if row else ""
         if status.lower() != "ok":

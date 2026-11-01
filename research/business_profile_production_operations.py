@@ -25,6 +25,7 @@ from research.business_profile_documents import (
     infer_business_profile_report_period,
 )
 from utils.date_utils import get_shanghai_time
+from contextlib import closing
 
 
 BUSINESS_PROFILE_INDEX_PURPOSE = "business_profile_evidence:index"
@@ -1136,7 +1137,9 @@ def load_active_a_share_universe(
             "business-profile discovery requires a readable quotes database"
         )
     cutoff = str(knowledge_cutoff or get_shanghai_time().date().isoformat())[:10]
-    with sqlite3.connect(f"file:{path.resolve()}?mode=ro", uri=True) as conn:
+    with closing(
+        sqlite3.connect(f"file:{path.resolve()}?mode=ro", uri=True)
+    ) as conn:
         conn.row_factory = sqlite3.Row
         columns = {
             str(row["name"])

@@ -8,6 +8,7 @@ import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Mapping, Optional
+from contextlib import closing
 
 
 LEGACY_STATE_TABLE = "cninfo_announcement_scan_state"
@@ -29,7 +30,9 @@ def create_verified_backup_if_needed(db_path: str | Path) -> Optional[Dict[str, 
             f"{path.name}.pre_announcement_legacy_cleanup.{stamp}.{suffix}.bak"
         )
         suffix += 1
-    with sqlite3.connect(path) as source, sqlite3.connect(backup_path) as target:
+    with closing(sqlite3.connect(path)) as source, closing(
+        sqlite3.connect(backup_path)
+    ) as target:
         source_counts = _legacy_row_counts(source)
         source.backup(target)
         integrity = str(target.execute("PRAGMA integrity_check").fetchone()[0])
@@ -328,7 +331,7 @@ def _legacy_scope(item: Mapping[str, Any]) -> tuple[Dict[str, Any], str]:
 
 
 def _legacy_tables_in_database(path: Path) -> bool:
-    with sqlite3.connect(path) as conn:
+    with closing(sqlite3.connect(path)) as conn:
         names = {
             str(row[0])
             for row in conn.execute(

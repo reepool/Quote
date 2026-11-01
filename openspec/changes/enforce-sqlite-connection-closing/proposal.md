@@ -6,7 +6,7 @@ quotes.db-wal 膨胀 12GB）的根因是 `with sqlite3.connect(...)` 裸写法�
 （详见 `cross-validate-share-capital-denominators` tasks §9 事故记录）。
 面板模块 14 处已修（`contextlib.closing` + fd 回归测试）。
 
-事故后全库清查：**同款裸写法在 8 个生产文件中仍有 16 处**，另有约 10 处
+事故后全库清查：**同款裸写法在 8 个生产文件中仍有 15 处**，另有约 10 处
 赋值型连接经核实为项目标准 `@contextmanager` + finally-close 工厂
 （financial_store / quote_store / corporate_action_projection / storage /
 fx / special_commodity 等，安全，不动）。
@@ -20,7 +20,7 @@ fx / special_commodity 等，安全，不动）。
     （每日调度任务，每次泄漏至多 4 个句柄）；
   - **B 层（操作员/评审长流程，5 处）**：`business_profile_precision_review`
     ×4、`financial_available_date_backfill`；
-  - **C 层（一次性迁移脚本，3 处）**：`migrations/announcement_legacy_cleanup`
+  - **C 层（一次性迁移脚本，2 处）**：`migrations/announcement_legacy_cleanup`
     ×2（进程退出即释放，风险最低，为一致性一并修）。
 - 修复模式统一对齐事故修复先例：`contextlib.closing(...)` 包裹；**依赖
   with 自动提交的写入点补显式 `commit()`**（事故修复中 refresh_pairs 的

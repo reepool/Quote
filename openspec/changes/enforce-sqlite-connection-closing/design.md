@@ -2,7 +2,7 @@
 
 事故根因与首例修复见 `cross-validate-share-capital-denominators` tasks §9：
 面板模块 14 处裸 with-connect 已改 `closing()` 并配 fd 回归测试。全库清查
-（2026-11-01 下午）确认同款模式在 8 个生产文件尚有 16 处；赋值型连接中
+（2026-11-01 下午）确认同款模式在 8 个生产文件尚有 15 处；赋值型连接中
 约 10 处经核实为标准 finally-close 工厂（安全）。
 
 ## Goals / Non-Goals

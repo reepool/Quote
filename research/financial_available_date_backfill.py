@@ -11,6 +11,7 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Dict, Iterable, Optional
 from zoneinfo import ZoneInfo
+from contextlib import closing
 
 
 CORE_FACT_TABLES = (
@@ -64,7 +65,7 @@ def backfill_financial_available_dates(
     report = AvailableDateBackfillReport(status="success", dry_run=not write_enabled)
     now = datetime.now(ZoneInfo("Asia/Shanghai")).isoformat()
 
-    with sqlite3.connect(path) as conn:
+    with closing(sqlite3.connect(path)) as conn:
         conn.row_factory = sqlite3.Row
         table_names = _table_names(conn)
         tables = [table for table in CORE_FACT_TABLES if table in table_names]
