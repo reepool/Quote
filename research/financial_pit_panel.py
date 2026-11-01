@@ -387,6 +387,31 @@ class FinancialPitPanelStore:
                 result[(row["instrument_id"], str(row["period"])[:10])] = changed_at
         return result
 
+    @staticmethod
+    def _classify_share_anchor_row(
+        canonical: str, fact_name: str, value: float
+    ) -> Optional[Tuple[str, float]]:
+        """Map one numeric fact onto a share-anchor slot, or None.
+
+        Single classification authority for both the full-build and the
+        single-pair loaders so the two paths cannot drift:
+          sos  - shares_outstanding canonical (share count)
+          ths  - THS share-capital fact (share count; quarantined rows sit
+                 under share_capital_suspect and never reach here)
+          pic  - sina/cninfo paid-in-capital fact (CNY amount, validator only)
+        """
+        if value is None:
+            return None
+        if canonical == "shares_outstanding":
+            return ("sos", value) if value > 0 else None
+        if canonical != "share_capital_amount":
+            return None
+        if fact_name == "equity":
+            return ("ths", value) if value > 0 else None
+        if fact_name.startswith("实收资本"):
+            return ("pic", value) if value > 0 else None
+        return None
+
     def _load_share_anchor_facts(
         self, connection: sqlite3.Connection
     ) -> Dict[Tuple[str, str], Dict[str, Any]]:
@@ -429,19 +454,14 @@ class FinancialPitPanelStore:
                 entry = anchors.setdefault(key, {})
                 canonical = row["canonical_fact_name"] or row["fact_name"]
                 value = float(row["fact_value"])
-                fact_name = row["fact_name"]
-                if canonical == "shares_outstanding" and value > 0:
-                    entry.setdefault("sos", value)
-                elif canonical == _LONG_TABLE_EPS_FACT:
-                    if "reported_eps" not in entry:
-                        entry["reported_eps"] = value
-                elif canonical == "share_capital_amount":
-                    if fact_name == "equity":
-                        if value > 0:
-                            entry.setdefault("ths", value)
-                    elif fact_name.startswith("实收资本"):
-                        if value > 0:
-                            entry.setdefault("pic", value)
+                if canonical == _LONG_TABLE_EPS_FACT:
+                    entry.setdefault("reported_eps", value)
+                    continue
+                classified = FinancialPitPanelStore._classify_share_anchor_row(
+                    canonical, row["fact_name"], value
+                )
+                if classified:
+                    entry.setdefault(classified[0], classified[1])
         return anchors
 
     def _load_valuation_shares(
@@ -489,43 +509,6 @@ class FinancialPitPanelStore:
                 exc,
             )
         return shares
-
-    @staticmethod
-    def _resolve_denominator_shares(
-        instrument_id: str,
-        period: str,
-        fact_shares: Optional[float],
-        valuation_series: Optional[Sequence[Tuple[str, float]]],
-    ) -> Optional[float]:
-        """Resolve the period-end share-count denominator.
-
-        Policy (measured on 2026-10-31 against the AKShare dual source):
-        the share_capital fact is correct for ~90% of rows, but a minority
-        of sources map an equity item into the canonical name (catastrophic,
-        e.g. 3.2x). The valuation-implied series itself is ~18% low for a
-        cluster of instruments and has no rows for migrated BSE 920xxx
-        codes, so it must NOT be preferred on ordinary disagreement.
-
-        Intervene only on catastrophic disagreement: when an in-window
-        (period_end, +45 days] valuation reference exists and the fact is
-        >= 50% off it (either direction), the fact is almost surely the
-        mis-mapped equity item (real case 600398.SH: fact = 0.31x true
-        shares) and the valuation count is the far smaller error. Observed
-        valuation-reference bias stays within ~33% (p5 0.749 / p95 1.333),
-        so 50% separates the two clusters; everything else keeps the fact.
-        """
-        fact_value = float(fact_shares) if fact_shares and float(fact_shares) > 0 else None
-        if fact_value is None or not valuation_series:
-            return fact_value
-        period_end = str(period)[:10]
-        window_end = _shift_iso_date(period_end, 45)
-        in_window = [v for d, v in valuation_series if period_end < d <= window_end]
-        if not in_window:
-            return fact_value
-        reference = in_window[0]
-        if abs(fact_value / reference - 1.0) >= 0.5:
-            return reference
-        return fact_value
 
     def _load_trading_days(self) -> Dict[str, List[str]]:
         """Trading-day lists per exchange for effective-date derivation."""
@@ -695,16 +678,6 @@ class FinancialPitPanelStore:
                 value = float(value) * 100.0
             panel_row[column] = value
         return panel_row
-
-    @staticmethod
-    def _apply_delay_estimate(
-        panel_row: Dict[str, Any],
-        event: Optional[Dict[str, Any]],
-        report_period: str,
-        grace_days: int,
-    ) -> None:
-        """Kept for refresh-path symmetry; derivation lives in derive_availability."""
-        return None
 
     # Cross-validation bands (design D1): period-end share-count anchors agree
     # within +/-5%; the EPS-implied weighted anchor gets +/-15% (measured
@@ -973,7 +946,6 @@ class FinancialPitPanelStore:
                     panel_version=panel_version,
                     built_at=built_at,
                 )
-                self._apply_delay_estimate(base, event, period, self.delay_grace_days)
                 exchange = str(base.get("exchange") or "SSE")
                 base["effective_at"] = self._next_trading_day(
                     trading_days.get(exchange, trading_days.get("SSE", [])),
@@ -1103,7 +1075,6 @@ class FinancialPitPanelStore:
                     panel_version=panel_version,
                     built_at=built_at,
                 )
-                self._apply_delay_estimate(base, event, period, self.delay_grace_days)
                 exchange = str(base.get("exchange") or "SSE")
                 base["effective_at"] = self._next_trading_day(
                     trading_days.get(exchange, trading_days.get("SSE", [])),
@@ -1230,17 +1201,14 @@ class FinancialPitPanelStore:
         for row in rows:
             canonical = row["canonical_fact_name"] or row["fact_name"]
             value = float(row["fact_value"])
-            fact_name = row["fact_name"]
-            if canonical == "shares_outstanding" and value > 0:
-                entry.setdefault("sos", value)
-            elif canonical == _LONG_TABLE_EPS_FACT:
+            if canonical == _LONG_TABLE_EPS_FACT:
                 entry.setdefault("reported_eps", value)
-            elif canonical == "share_capital_amount":
-                if fact_name == "equity":
-                    if value > 0:
-                        entry.setdefault("ths", value)
-                elif fact_name.startswith("实收资本") and value > 0:
-                    entry.setdefault("pic", value)
+                continue
+            classified = FinancialPitPanelStore._classify_share_anchor_row(
+                canonical, row["fact_name"], value
+            )
+            if classified:
+                entry.setdefault(classified[0], classified[1])
         return entry or None
 
     @staticmethod
@@ -1607,36 +1575,6 @@ class FinancialPitPanelStore:
                 "financial_pit_panel: lifecycle universe unavailable (%s)", exc
             )
         return sets
-
-    def _load_lifecycle_universe(self, periods: Sequence[str]) -> Dict[str, int]:
-        """Expected listed-stock count per report period end (instruments master)."""
-        counts: Dict[str, int] = {}
-        if not self.quotes_db_path or not periods:
-            return counts
-        try:
-            with sqlite3.connect(
-                f"file:{self.quotes_db_path}?mode=ro", uri=True, timeout=30
-            ) as connection:
-                for period in periods:
-                    if not statutory_deadline(period):
-                        continue
-                    counts[period] = connection.execute(
-                        """
-                        SELECT COUNT(*) FROM instruments
-                        WHERE type = 'stock'
-                          AND exchange IN ('SSE', 'SZSE', 'BSE')
-                          AND listed_date IS NOT NULL AND listed_date != ''
-                          AND substr(listed_date, 1, 10) <= ?
-                          AND (delisted_date IS NULL OR delisted_date = ''
-                               OR substr(delisted_date, 1, 10) > ?)
-                        """,
-                        (period, period),
-                    ).fetchone()[0]
-        except sqlite3.Error as exc:
-            logger.warning(
-                "financial_pit_panel: lifecycle universe unavailable (%s)", exc
-            )
-        return counts
 
     def _coverage_for_period(
         self, connection: sqlite3.Connection, period: str

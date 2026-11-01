@@ -145,3 +145,36 @@ advisory 注记 3,024 条。对照 v7（discrepancy 4,497/6.8%）：标注信噪
 **test_storage.py**：两次安静窗口重试均冻结于 flock（隔夜与日间调度都持
 coordinated 锁；rchar 停滞 400KB 级）。与本 change 无关（storage 仅新增
 只读方法），重试命令不变，留待调度空闲窗口。
+
+## 7. 第三轮审计（2026-11-01，需求覆盖 + 架构/治理维度）
+
+**架构修复（纯重构，51/51 全绿，行为不变无需重建）**：
+1. **分类逻辑重复 ×2**：build 与 refresh 两个装载器各自内联同一套
+   fact_name→锚分类规则（pic 正值修复曾被迫改两处即其症状）——统一为
+   `_classify_share_anchor_row` 单一权威，双路径委托；
+2. **no-op stub 被调用**：`_apply_delay_estimate` 早已被 derive_availability
+   取代却留作空壳，且两处调用点仍在调用（比死代码更误导）——删除；
+3. **死方法 ×2**：`_resolve_denominator_shares`（被交叉验证装配取代的旧
+   灾难替换器）、`_load_lifecycle_universe`（被 sets 版取代）——删除；
+   模块 1,810 → 1,774 行。
+
+**硬编码/特殊处理清单（逐项判定，记录不修）**：
+- `fact_name` 字符串分类（'equity'/'实收资本'）：理想方案是按 v6 映射在
+  ingestion 给 fact 盖 `canonical_unit`、面板按单位分类；实测存量行
+  canonical_unit 全部为 'CNY'（v6 语义之前入库），单位驱动对存量不可行——
+  fact_name 是当前唯一可靠判别，且已收敛到单一函数。后续卡：新入库按
+  v6 盖单位 + 存量重盖后切换单位驱动；
+- `9999-12-31` 哨兵（malformed 期间隐藏，实际无此类行）、交易日历 SSE
+  兜底（A 股域内合理）、`_BULK_FIRST_PERIOD=2023-12-31`（需求文档规定
+  的数据边界，具名常量）——均判定合理保留。
+
+**治理合规（§10.2 对照）**：单写入 owner（panel 模块 own 表/构建/查询）✓；
+API 入口只转发（`_pit_panel_store` 对齐 `_backtest_financial_store` 先例，
+industries 走 data_manager 应用服务链）✓；data_manager/storage 未新增
+大段领域逻辑（storage 仅一个读查询，符合 repository 角色）✓；增量挂钩
+经既有同步链路而非平行循环 ✓；无兼容门面 ✓。
+
+**需求覆盖（v1.2 全文对照）**：§3–§7 功能项全部实现且为三轮修复后终态
+语义；§8 验收 1–11/13–17 完成，#12 部分（ocfps PASS、bps 口径差已标注，
+逐股归因待 quantwin 联调）；§9 非目标零越界。需求文档与两个 change 的
+文档族三处一致。
