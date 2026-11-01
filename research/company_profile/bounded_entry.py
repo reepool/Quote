@@ -1252,10 +1252,53 @@ def _worker(
                     "requested_pages": [],
                 }
                 if request.get("source_scope") != "page_map":
+                    evidence = []
+                    if binding.get("offline_role_sample") == "present":
+                        for page in request.get("source_pages") or []:
+                            text = str(page.get("text") or "")
+                            for needle in (
+                                "国内木竹片采购",
+                                "自主生产的经营模式",
+                                "产品直销，以销定产",
+                            ):
+                                if needle not in text:
+                                    continue
+                                evidence.append(
+                                    {"page": int(page["page"]), "quote": needle}
+                                )
                     result["source_conditions"] = []
+                    if evidence:
+                        result["source_conditions"] = [
+                            {
+                                "condition_id": "company-operating-mode",
+                                "dimension": "supply_chain_role",
+                                "description": "所供原文写出的采购、生产和销售方式。",
+                                "evidence": evidence,
+                                "major": True,
+                                "statement_status": "current",
+                            }
+                        ]
                 transport_requests[-1]["replay_kind"] = "controlled_sample"
             else:
                 result = core_package_reply(request)
+                if binding.get("offline_role_sample") == "withheld":
+                    if request["purpose"] == "synthesize_views":
+                        result["claims"] = [
+                            claim
+                            for claim in result.get("claims") or []
+                            if not any(
+                                "operating-role" in str(item)
+                                for item in claim.get("condition_ids") or []
+                            )
+                        ]
+                    if request["purpose"] == "verify_views":
+                        result["checks"] = [
+                            check
+                            for check in result.get("checks") or []
+                            if "operating-role" not in str(check.get("target_id") or "")
+                            and "operating-role"
+                            not in str(check.get("covers_target_id") or "")
+                        ]
                 transport_requests[-1]["replay_kind"] = "controlled_sample"
         elif protocol == "closeout_v1":
             from .resource_probe import core_package_reply

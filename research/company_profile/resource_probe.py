@@ -689,7 +689,7 @@ def core_package_reply(request: dict) -> dict:
                 page_text = str(sent.get("text") or "")
                 exact = quote.strip()
                 if exact and exact in page_text:
-                    used = exact[:180]
+                    used = exact if len(exact) <= 1200 else exact[:180]
                     if used in seen_quotes and item.get("dimension") == "revenue_model":
                         continue
                     seen_quotes.add(used)

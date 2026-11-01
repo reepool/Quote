@@ -187,6 +187,35 @@ def _latest_check(checks, target_type: str, target_id: str):
     return found
 
 
+def _operating_passage(text: str) -> str:
+    """The company's own operating section, without the later industry chapter.
+
+    This only locates a contiguous passage. It does not decide the role.
+    """
+    start = text.find("主要经营模式")
+    if start < 0:
+        start = text.find("采购模式")
+    if start < 0:
+        return ""
+    end = len(text)
+    for mark in ("所处行业情况", "行业情况"):
+        found = text.find(mark, start + 4)
+        if found > start:
+            end = min(end, found)
+    passage = text[start:end].strip()
+    if len(passage) < 40 or passage not in text:
+        return ""
+    return passage
+
+
+def _read_page_text(sources, page_no: int) -> str:
+    """Body text lives on the parsed page. Coverage status has no text."""
+    for item in sources:
+        if int(item.get("page") or 0) == int(page_no):
+            return str(item.get("text") or "")
+    return ""
+
+
 def _chain_sides(claim) -> set[str]:
     """Which supply-chain side this trusted object actually is.
 
@@ -3424,8 +3453,14 @@ def interpret_direct_core(
             and item.statement_status == "current"
             and item.dimension in _CORE_CLOSEOUT_DIMENSIONS
         ]
-        if pending:
-            deliver_group(pending)
+        themes = (
+            ("principal_business", "revenue_model", "input_exposure", "supply_chain_role"),
+            ("products_services", "output_exposure", "upstream_downstream"),
+        )
+        for dims in themes:
+            group = [item for item in pending if item.dimension in dims]
+            if group:
+                deliver_group(group)
         for page in package:
             page_no = int(page["page"])
             composed.add(page_no)
@@ -4747,30 +4782,23 @@ def interpret_direct_core(
             read_requested_follow(follow)
             if not _operating_role_established(claims, checks):
                 role_evidence = []
-                for page_no in sorted(chapter_required_pages - set(selected)):
-                    source = by_page.get(int(page_no))
-                    if source is None or source.get("status") != "read":
-                        continue
-                    quote = ""
-                    for line in str(source.get("text") or "").splitlines():
-                        stripped = line.strip()
-                        if (
-                            not stripped
-                            or "年年度报告" in stripped
-                            or re.fullmatch(r"\d+\s*/\s*\d+", stripped)
-                        ):
-                            continue
-                        quote = stripped[:160]
-                        break
-                    if not quote or quote not in str(source.get("text") or ""):
+                read_ids = {
+                    int(item["page"])
+                    for item in coverage
+                    if item.get("status") == "read"
+                }
+                for page_no in sorted(read_ids):
+                    text = _read_page_text(sources, page_no)
+                    passage = _operating_passage(text)
+                    if not passage:
                         continue
                     role_evidence.append(
                         Evidence(
                             evidence_id=f"operating-role-{page_no}",
                             report=report,
-                            page=int(page_no),
-                            section_title="经营角色",
-                            anchor=TextAnchor(bounded_quote=quote),
+                            page=page_no,
+                            section_title="经营方式",
+                            anchor=TextAnchor(bounded_quote=passage),
                         )
                     )
                     break
@@ -4783,6 +4811,13 @@ def interpret_direct_core(
                     conditions.append(question)
                     if question not in conditions_to_draft:
                         conditions_to_draft.append(question)
+                elif not role_evidence:
+                    for page_no in sorted(read_ids):
+                        gap = f"read_not_drafted:operating-role:{page_no}"
+                        if gap not in gaps and _operating_passage(
+                            _read_page_text(sources, page_no)
+                        ):
+                            gaps.append(gap)
             tail_hold = 0
             note_missed_core_revenue()
             compose(

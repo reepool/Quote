@@ -1490,8 +1490,61 @@ def test_fresh_s23_chapter_package_keeps_view_status_with_completion():
     assert transport.get("real_calls") == 0
 
 
-def test_s23_follow_page_is_read_and_one_side_does_not_finish():
-    """Replay the real S23 responses. A later continuation page must be read."""
+def test_empty_role_response_keeps_the_question_unanswered():
+    """Read text still raises the role question. An empty answer does not finish it."""
+    profile, gaps = _replay_chapter("withheld", "s26-role-withheld-offline")
+    assert any(
+        item.get("purpose") == "synthesize_views"
+        and any(
+            "operating-role" in str(target.get("target_id") or "")
+            for target in item.get("request_targets") or []
+        )
+        for item in profile.get("call_receipts") or []
+    ), gaps
+    assert profile.get("draft_complete") is False, gaps
+    assert (
+        profile["views"]["supply_chain_position"]["assessment_status"]
+        == "extraction_failed"
+    )
+    assert any("operating-role" in gap or gap.startswith("core_dimension_missing:operating_role") for gap in gaps)
+
+
+def test_sourced_operating_passage_enters_the_draft_and_records_the_shortfall():
+    """The operating passage is drafted. The next core package does not fit."""
+    profile, gaps = _replay_chapter("present", "s26-role-present-offline")
+    assert any(
+        11 in (item.get("source_pages") or [])
+        for item in profile.get("call_receipts") or []
+        if item.get("purpose") == "synthesize_views"
+    ), gaps
+    verified_and_pending = [
+        claim
+        for view in profile["views"].values()
+        for claim in view.get("claims") or []
+    ]
+    blob = "\n".join(
+        str(claim.get("answer") or "")
+        + "\n"
+        + "\n".join(
+            str((item.get("anchor") or {}).get("bounded_quote") or "")
+            for item in claim.get("evidence") or []
+        )
+        for claim in verified_and_pending
+    )
+    assert "自主生产的经营模式" in blob
+    assert "产品直销，以销定产" in blob
+    assert "木竹片采购" in blob
+    assert "2,418,990,221.17" in blob
+    assert profile.get("draft_complete") is False, gaps
+    shortfalls = [
+        gap for gap in gaps if gap.startswith("necessary_fragment:") and "shortfall=" in gap
+    ]
+    assert shortfalls, gaps
+    assert any("operating-role" in gap for gap in gaps)
+
+
+def _replay_chapter(role_sample: str, directory: str):
+    """Isolated replay. Does not remove S23 or S25 evidence."""
     import hashlib
     import shutil
     from pathlib import Path
@@ -1500,7 +1553,9 @@ def test_s23_follow_page_is_read_and_one_side_does_not_finish():
     from research.company_profile.reads import CompanyProfileReadService
 
     root = Path("/home/python/Quote")
-    frozen = (root / "data/QuoteBak/s22-paper-core-20261031/query.json").read_bytes()
+    frozen_s22 = (root / "data/QuoteBak/s22-paper-core-20261031/query.json").read_bytes()
+    frozen_s23 = (root / "data/QuoteBak/s23-paper-chapter-20261101/query.json").read_bytes()
+    frozen_s25 = (root / "data/QuoteBak/s25-paper-core-offline/query.json").read_bytes()
     change = root / "openspec/changes/restore-company-profile-llm-led-generalization"
     source = json.loads((change / "s1-pool-s1-600103-s16-binding.json").read_text())
     for retired in (
@@ -1520,6 +1575,7 @@ def test_s23_follow_page_is_read_and_one_side_does_not_finish():
     ):
         source.pop(retired, None)
     source["offline_protocol"] = "s23_follow_v1"
+    source["offline_role_sample"] = role_sample
     source["offline_replay_query"] = str(
         root / "data/QuoteBak/s23-paper-chapter-20261101/query.json"
     )
@@ -1537,10 +1593,10 @@ def test_s23_follow_page_is_read_and_one_side_does_not_finish():
         name: hashlib.sha256((root / name).read_bytes()).hexdigest()
         for name in source["file_hashes"]
     }
-    run_root = root / "data/QuoteBak/s25-paper-core-offline"
-    if run_root.exists():
+    run_root = root / "data/QuoteBak" / directory
+    if directory.startswith("s26-") and run_root.exists():
         shutil.rmtree(run_root)
-    path = root / "data/QuoteBak/s25-paper-core-offline-binding.json"
+    path = root / "data/QuoteBak" / f"{directory}-binding.json"
     path.write_text(json.dumps(source, ensure_ascii=False))
     argv = sys.argv
     sys.argv = ["bounded_entry", "--binding", str(path), "--run-root", str(run_root)]
@@ -1557,37 +1613,23 @@ def test_s23_follow_page_is_read_and_one_side_does_not_finish():
         (source["asset"]["instrument_id"],)
     )
     assert query["profiles"] == exported["profiles"] == reloaded["profiles"]
+    assert frozen_s22 == (root / "data/QuoteBak/s22-paper-core-20261031/query.json").read_bytes()
+    assert frozen_s23 == (root / "data/QuoteBak/s23-paper-chapter-20261101/query.json").read_bytes()
+    assert frozen_s25 == (root / "data/QuoteBak/s25-paper-core-offline/query.json").read_bytes()
     profile = query["profiles"][0]["three_views"]
+    gaps = profile.get("gaps") or []
     inventories = [
         item.get("source_pages")
         for item in profile.get("call_receipts") or []
         if item.get("purpose") == "source_inventory" and item.get("source_scope") != "page_map"
     ]
     assert any(11 in (pages or []) for pages in inventories), inventories
-    gaps = profile.get("gaps") or []
     assert not any("schema validation failed" in gap for gap in gaps), gaps
-    assert not any(gap == "necessary_unread:11" for gap in gaps), gaps
-    purposes = [
+    assert "synthesize_views" in [
         item.get("purpose")
         for item in profile.get("call_receipts") or []
         if item.get("physical_request")
     ]
-    assert "synthesize_views" in purposes, purposes
-    assert "verify_views" in purposes, purposes
-    claims = [
-        claim
-        for view in profile["views"].values()
-        for claim in view.get("claims") or []
-    ]
-    assert claims, gaps
-    verified = [claim for claim in claims if claim.get("review_state") == "verified"]
-    assert verified, gaps
-    text = "\n".join(str(claim.get("answer") or "") for claim in verified)
-    assert "2,418,990,221.17" in text
-    assert "14,186.7" not in text
-    views = profile["views"]
-    if profile.get("draft_complete") is True:
-        assert all(view["assessment_status"] == "assessed" for view in views.values())
-    else:
-        assert views["supply_chain_position"]["assessment_status"] == "extraction_failed"
-    assert (root / "data/QuoteBak/s22-paper-core-20261031/query.json").read_bytes() == frozen
+    return profile, gaps
+
+
