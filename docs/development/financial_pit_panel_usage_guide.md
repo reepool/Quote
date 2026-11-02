@@ -1,6 +1,10 @@
 # 全市场财务 PIT 面板使用说明（quantwin 对接指南）
 
-> 版本：v1.0（2026-11-01）
+> 版本：v1.1（2026-11-03）
+>
+> - v1.0（2026-11-01）：首版；
+> - v1.1（2026-11-03）：§8 增补映射目录装载缺失告警监控项；股票 universe
+>   数改为以 coverage 端点实时为准（去硬编码）；稀疏行数更新。
 >
 > 面板需求与设计：`docs/development/financial_pit_panel_requirements.md`（v1.3）；
 > 交付与验收记录：`openspec/changes/archive/2026-11-01-add-financial-pit-panel-cross-section`
@@ -98,7 +102,7 @@ curl "http://<host>:8000/api/v1/research/financials/pit/changes?cursor=<next_cur
 
 ## 5. 覆盖与已知限制（如实声明）
 
-- 报告期 **2023-12-31 起 12 期**（更早仅 6 行稀疏数据）；回测起点最早 2024 年初；
+- 报告期 **2023-12-31 起 12 期**（更早仅约 10 行稀疏数据）；回测起点最早 2024 年初；
 - universe 为**当前在市全市场**（SSE/SZSE/BSE，约 5,600 只，实时值以 coverage 端点为准），无退市股财务数据——存在存活偏差，缺口经 coverage 逐期可监控，回测结论应表述为"在市集合内的因子排序证据"；
 - 当期披露窗口内的最新一期可能不完整：以 `universe_note` 的 incomplete 标记与 coverage `is_complete` 为准；
 - BSE 覆盖较薄（354 只）；`effective_at` 受交易日历视界限制（超界返回 null 而非近似）。
