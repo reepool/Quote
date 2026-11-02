@@ -1,12 +1,20 @@
 # 全市场财务横截面物化 PIT 面板需求（financial_pit_panel）
 
-> 版本：v1.2（2026-10-31）
+> 版本：v1.3（2026-11-01）
 >
 > - v1.1：增补 §3.3 实质变更约束（更正防前视）与延期覆盖率验证；
 > - v1.2：并入 quantwin 评审反馈（2026-10-31）的 4 项 P0 与 7 项 P1 答复：
 >   双源拼接契约、覆盖缺口生命周期推导、归母口径普查结论、行业时点端点（方案 B）、
 >   `effective_at`、`attribution_quality`、`is_complete`、changes 游标语义、
->   `revision_guard` 条件开关、report_period 格式统一；里程碑按 quantwin 建议重排。
+>   `revision_guard` 条件开关、report_period 格式统一；里程碑按 quantwin 建议重排；
+> - v1.3（交付定稿）：分母改为四锚交叉验证（consensus/discrepancy/
+>   single_source 备注，EPS 加权漂移 advisory）；revision_guard 经实测
+>   （2.47% / 0.39 期）定案不实现；§6.3 核验结论固化；交付状态见文末。
+>
+> **交付状态**：已交付并归档于
+> `openspec/changes/archive/2026-11-01-{add-financial-pit-panel-cross-section,
+> cross-validate-share-capital-denominators, enforce-sqlite-connection-closing}`；
+> 面向需求方的使用说明见 `docs/development/financial_pit_panel_usage_guide.md`。
 >
 > 数据基线：本库现有数据（2026-10-31 实测），**不做历史回补**。缺失即缺失，如实暴露。
 
@@ -124,11 +132,10 @@ quantwin 是全 A 股月度调仓多因子选股程序，每期调仓需要对�
   `last_value_change_at`；
 - 效果：更正发生前该期数据**整体不可见**（截面回退上一期），方向保守。
 
-**revision_guard 条件开关（v1.2）**：M2 前实测两个数字——实质变更影响的
-(instrument, period) 行数占比、更正导致的截面平均回退期数。若影响行数 >5% 或
-平均回退 >1 期，cross-section 提供 `revision_guard` 参数：默认 `strict`（上述
-约束生效）；`lenient` 时按原公告推导值返回可用性（**重新引入数值前视**，响应
-标记 `guard=lenient`，openapi 与本文档明示风险）。未超阈值则不实现该参数。
+**revision_guard 定案（v1.3）**：实测（2026-10-31，65,501 行）实质变更影响
+占比 **2.47%**（<5%）、平均回退 **0.39 期**（<1）——阈值未触发，**该参数
+不实现**，strict 为唯一行为（响应恒带 `guard: strict`）。若未来数据使阈值
+超限，按本节原条件设计重新评估（`lenient` 将重新引入数值前视，须明示）。
 
 ### 3.4 派生指标的可计算边界（数据边界，非错误）
 
@@ -389,7 +396,8 @@ equity 有值时 100% 命中 `parent_attributable_equity`；net_income 95.5% 命
 - `eps = net_income / shares_outstanding`；`bps = equity / shares_outstanding`；
   `ocfps = operating_cf / shares_outstanding`（分母为 0 或缺失时整体 null）；
 - **分母解析策略（交叉验证机制，change
-  `cross-validate-share-capital-denominators` 已交付）**：宽表股本 0% 填充；
+  `cross-validate-share-capital-denominators` 已交付，见归档
+  `archive/2026-11-01-cross-validate-share-capital-denominators`）**：宽表股本 0% 填充；
   分母由**四锚交叉验证**装配——`shares_outstanding` canonical（股数）>
   THS `share_capital_amount`（期末股数，D0 证实）> valuation 隐含股本
   （总市值/收盘价，2024-04-30 起）> EPS 隐含（净利/披露 EPS，加权口径，
@@ -431,8 +439,8 @@ equity 有值时 100% 命中 `parent_attributable_equity`；net_income 95.5% 命
 5. **生命周期应有数校准（v1.2 新增）**：对 161/274 只 `listed_date` 晚于报告期
    却有财报行的股票逐类归因（北交所重编码 / 吸收合并重新上市 / 字段错误），
    修正 instruments 推导口径或在校验报告中解释；消除后 §5.3 反向差异应趋零；
-6. **更正约束影响面（M2 前置）**：data_change_log 实测实质变更影响行数占比与
-   平均回退期数，决定 §3.3 revision_guard 是否实现。
+6. **更正约束影响面（已完成）**：实测 2.47% / 0.39 期，低于双阈值——
+   §3.3 revision_guard 定案不实现（结论已固化于归档 change 任务记录）。
 
 ### 6.4 缺失值规则（强制）
 
