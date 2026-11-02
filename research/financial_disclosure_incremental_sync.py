@@ -384,7 +384,7 @@ class FinancialDisclosureIncrementalSyncService:
                 run_id=run_id,
                 dry_run=dry_run,
             )
-            stale_local_gap_cleared = self._clear_stale_ready_local_gap_states(
+            stale_local_gap_cleared = await self._clear_stale_ready_local_gap_states(
                 instruments=instruments,
                 required_core_facts=required_facts,
                 mapping_version=MAPPING_VERSION,
@@ -933,7 +933,7 @@ class FinancialDisclosureIncrementalSyncService:
         )
         return limited
 
-    def _clear_stale_ready_local_gap_states(
+    async def _clear_stale_ready_local_gap_states(
         self,
         *,
         instruments: Sequence[Mapping[str, Any]],
@@ -941,7 +941,13 @@ class FinancialDisclosureIncrementalSyncService:
         mapping_version: str,
         dry_run: bool,
     ) -> int:
-        """Delete leftover local-gap bookmarks once current readiness is already complete."""
+        """Delete leftover local-gap bookmarks once current readiness is already complete.
+
+        Each state runs a full readiness query against the financial database
+        (the 2026-11-02 nightly stall: Q3-season state backlog held the main
+        loop for hours in this loop), so it yields at batch boundaries under
+        the worker checkpoint contract.
+        """
         instruments_by_id = {
             str(instrument.get("instrument_id") or ""): instrument
             for instrument in instruments
@@ -954,7 +960,18 @@ class FinancialDisclosureIncrementalSyncService:
                 statuses=list(STALE_LOCAL_GAP_STATE_STATUSES),
             )
         cleared = 0
+        scanned_states = 0
+        last_checkpoint_at = time.monotonic()
         for state in states:
+            scanned_states += 1
+            if scanned_states % 20 == 0 or time.monotonic() - last_checkpoint_at >= 30:
+                last_checkpoint_at = time.monotonic()
+                await worker_context.yield_checkpoint(
+                    phase="clear_stale_local_gap_states",
+                    scanned=scanned_states,
+                    total=len(states),
+                    cleared=cleared,
+                )
             instrument_id = str(state.get("instrument_id") or "")
             report_period = str(state.get("report_period") or "")
             announcement_id = str(state.get("announcement_id") or "")

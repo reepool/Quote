@@ -2161,6 +2161,7 @@
         "misfire_grace_time": 1800,
         "coalesce": true,
         "parameters": {
+          "run_on_main_loop": false,
           "exchanges": [
             "SSE",
             "SZSE",
@@ -2231,6 +2232,7 @@
         "misfire_grace_time": 1800,
         "coalesce": true,
         "parameters": {
+          "run_on_main_loop": false,
           "exchanges": [
             "SSE",
             "SZSE",
