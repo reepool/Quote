@@ -9,7 +9,9 @@ sys.path.insert(0, '/home/python/Quote')
 from utils.date_utils import get_shanghai_time
 
 DB = '/home/python/Quote/data/financials.db'
-suspects = json.load(open('/home/python/Quote/data/QuoteBak/pit-panel-dev/suspect_candidates.json'))
+import os
+_input = os.environ.get('SUSPECT_INPUT', os.path.join(os.path.dirname(__file__), 'suspect_candidates.json'))
+suspects = json.load(open(_input))
 print('suspects:', len(suspects))
 
 conn = sqlite3.connect(DB, timeout=60)

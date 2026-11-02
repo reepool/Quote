@@ -22,6 +22,12 @@ from typing import Any, Dict, Generator, List, Optional, Sequence, Tuple
 
 logger = logging.getLogger(__name__)
 
+# Registry-missing warnings fire once per (version, profile) so a full-market
+# readiness sweep with an empty registry cannot flood the log (incident
+# 2026-11-03 follow-up; capped like the panel's unclassified-name registry).
+_REGISTRY_WARNING_KEYS: set = set()
+_REGISTRY_WARNING_KEYS_CAP = 64
+
 from research.change_watermarks import append_change_record, ensure_change_log_schema
 from research.announcements.models import (
     AnnouncementRecord,
@@ -2514,15 +2520,22 @@ class ResearchStorageManager:
             # outside_approved_local_core for the whole market, so surface
             # the deployment gap loudly instead of letting it hide inside
             # per-field diagnostics (incident 2026-11-03, v6 never loaded).
-            logger.warning(
-                "financial mapping registry has no rows for mapping_version=%r "
-                "(profile=%r): readiness will report mapping_catalog_empty for "
-                "the entire market; load the catalog via "
-                "scripts/financial_pit_panel/load_mapping_catalog.py and then "
-                "re-run",
-                mapping_version,
-                profile,
-            )
+            # Warn once per (version, profile): a full-market sweep calls
+            # this per instrument and must not flood the log.
+            warning_key = (str(mapping_version), str(profile))
+            if warning_key not in _REGISTRY_WARNING_KEYS and (
+                len(_REGISTRY_WARNING_KEYS) < _REGISTRY_WARNING_KEYS_CAP
+            ):
+                _REGISTRY_WARNING_KEYS.add(warning_key)
+                logger.warning(
+                    "financial mapping registry has no rows for mapping_version=%r "
+                    "(profile=%r): readiness will report mapping_catalog_empty for "
+                    "the entire market; load the catalog via "
+                    "scripts/financial_pit_panel/load_mapping_catalog.py and then "
+                    "re-run",
+                    mapping_version,
+                    profile,
+                )
         approved_core_facts = sorted(
             {
                 str(mapping.get("canonical_fact") or "")

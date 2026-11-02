@@ -100,6 +100,8 @@ for s in suspects[:0]: pass
 print('\nsuspect samples (first 15):')
 for s in suspects[:15]:
     print(' ', json.dumps(s, ensure_ascii=False))
-with open('/home/python/Quote/data/QuoteBak/pit-panel-dev/suspect_candidates.json', 'w') as f:
+import os
+_out = os.environ.get('SUSPECT_OUTPUT', os.path.join(os.path.dirname(__file__), 'suspect_candidates.json'))
+with open(_out, 'w') as f:
     json.dump(suspects, f, ensure_ascii=False, indent=1)
 print('candidates written to suspect_candidates.json')

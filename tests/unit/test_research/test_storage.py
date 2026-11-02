@@ -2977,10 +2977,25 @@ def test_local_core_facts_warns_loudly_when_mapping_version_missing(
     assert result["missing_fields"], result
     reasons = {item["reason"] for item in result["missing_fields"]}
     assert reasons <= {"mapping_catalog_empty", "outside_approved_local_core"}
-    assert any(
-        "load_mapping_catalog.py" in record.getMessage()
+    matching = [
+        record
         for record in caplog.records
-    ), "expected the loud registry-missing warning naming the load tool"
+        if "load_mapping_catalog.py" in record.getMessage()
+    ]
+    assert matching, "expected the loud registry-missing warning naming the load tool"
+    # once-per-(version, profile): a second call for the same missing version
+    # stays silent so a full-market sweep cannot flood the log
+    caplog.clear()
+    storage.get_financial_local_core_facts(
+        "600036.SH",
+        requested_canonical_facts=["revenue"],
+        mapping_version="sina_ths_core_financial_facts.v_never_loaded",
+    )
+    assert not [
+        record
+        for record in caplog.records
+        if "no rows for mapping_version" in record.getMessage()
+    ], "registry-missing warning must fire once per (version, profile)"
     # sanity: a version present in the registry produces no such warning
     caplog.clear()
     with caplog.at_level(logging.WARNING, logger="research.storage"):
