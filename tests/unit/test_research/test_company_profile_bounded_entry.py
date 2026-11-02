@@ -1550,6 +1550,8 @@ def _replay_chapter(
     tokens: int = 120_000,
     requests: int = 16,
     authorization: str | None = None,
+    replay_name: str = "s23-paper-chapter-20261101",
+    unmatched_inventory: str | None = None,
 ):
     """Isolated replay. Does not remove S23 or S25 evidence."""
     import hashlib
@@ -1563,6 +1565,9 @@ def _replay_chapter(
     frozen_s22 = (root / "data/QuoteBak/s22-paper-core-20261031/query.json").read_bytes()
     frozen_s23 = (root / "data/QuoteBak/s23-paper-chapter-20261101/query.json").read_bytes()
     frozen_s25 = (root / "data/QuoteBak/s25-paper-core-offline/query.json").read_bytes()
+    frozen_s28 = (
+        root / "data/QuoteBak/s28-paper-observation-20261101/query.json"
+    ).read_bytes()
     change = root / "openspec/changes/restore-company-profile-llm-led-generalization"
     source = json.loads((change / "s1-pool-s1-600103-s16-binding.json").read_text())
     for retired in (
@@ -1583,9 +1588,9 @@ def _replay_chapter(
         source.pop(retired, None)
     source["offline_protocol"] = "s23_follow_v1"
     source["offline_role_sample"] = role_sample
-    source["offline_replay_query"] = str(
-        root / "data/QuoteBak/s23-paper-chapter-20261101/query.json"
-    )
+    source["offline_replay_query"] = str(root / "data/QuoteBak" / replay_name / "query.json")
+    if unmatched_inventory:
+        source["offline_unmatched_inventory"] = unmatched_inventory
     source["chapter_select"] = True
     source["task_route_labels"] = ["deepseek:deepseek-flash", "scorpio:grok-4.7"]
     source["task_route_first_only"] = True
@@ -1601,7 +1606,7 @@ def _replay_chapter(
         for name in source["file_hashes"]
     }
     run_root = root / "data/QuoteBak" / directory
-    if directory.startswith("s27-") and run_root.exists():
+    if directory.startswith(("s27-", "s29-")) and run_root.exists():
         shutil.rmtree(run_root)
     path = root / "data/QuoteBak" / f"{directory}-binding.json"
     path.write_text(json.dumps(source, ensure_ascii=False))
@@ -1623,6 +1628,9 @@ def _replay_chapter(
     assert frozen_s22 == (root / "data/QuoteBak/s22-paper-core-20261031/query.json").read_bytes()
     assert frozen_s23 == (root / "data/QuoteBak/s23-paper-chapter-20261101/query.json").read_bytes()
     assert frozen_s25 == (root / "data/QuoteBak/s25-paper-core-offline/query.json").read_bytes()
+    assert frozen_s28 == (
+        root / "data/QuoteBak/s28-paper-observation-20261101/query.json"
+    ).read_bytes()
     profile = query["profiles"][0]["three_views"]
     gaps = profile.get("gaps") or []
     inventories = [
@@ -1696,5 +1704,58 @@ def test_regular_budget_keeps_a_partial_core():
             gap.startswith(("necessary_fragment:", "major_condition_not_verified:"))
             for gap in gaps
         ), gaps
+
+
+def test_selected_real_navigation_finishes_the_core_offline():
+    """S28 asked for pages 9-22. The offline replay must read that range."""
+    from research.company_profile.bounded_entry import S27_OFFLINE_DIAGNOSTIC
+
+    profile, gaps = _replay_chapter(
+        "present",
+        "s29-selected-core-offline",
+        tokens=480_000,
+        requests=32,
+        authorization=S27_OFFLINE_DIAGNOSTIC,
+        replay_name="s28-paper-observation-20261101",
+        unmatched_inventory="sent_text",
+    )
+    inventories = [
+        item.get("source_pages") or []
+        for item in profile.get("call_receipts") or []
+        if item.get("purpose") == "source_inventory" and item.get("source_scope") != "page_map"
+    ]
+    sent = {page for pages in inventories for page in pages}
+    assert {9, 10, 11, 16, 18, 22} <= sent, inventories
+    assert profile.get("draft_complete") is True, gaps
+    assert profile.get("real_semantic_complete") is False
+    assert all(
+        view["assessment_status"] == "assessed" for view in profile["views"].values()
+    ), gaps
+    blob = "\n".join(
+        str(claim.get("answer") or "")
+        + "\n"
+        + "\n".join(
+            str((item.get("anchor") or {}).get("bounded_quote") or "")
+            for item in claim.get("evidence") or []
+        )
+        for view in profile["views"].values()
+        for claim in view.get("claims") or []
+        if claim.get("review_state") == "verified"
+    )
+    assert "自主生产的经营模式" in blob
+    assert "产品直销，以销定产" in blob
+    assert "木竹片采购" in blob
+    assert "2,418,990,221.17" in blob
+    covered = []
+    for item in profile.get("call_receipts") or []:
+        if item.get("purpose") != "verify_views":
+            continue
+        for check in (item.get("response_payload") or {}).get("checks") or []:
+            if check.get("target_type") == "condition" and check.get("covers_target_id"):
+                covered.append(str(check.get("target_id")))
+    assert any("operating-role" in item or "operating-mode" in item for item in covered), covered
+    assert not any(gap.startswith("major_condition_not_verified:") for gap in gaps), gaps
+    assert not any(gap.startswith("necessary_unread:") for gap in gaps), gaps
+
 
 

@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-11-02，[审核§174](#174-a审核真实部分交付接受修复所选章节范围丢失)）：§28真实观察1/1已结束，三读10/10/2、12不同主张，核心仍不完整，S1仍0/12。7次DeepSeek/108723账本/509.355432秒，无恢复，费用unknown，不是预算停止或吞吐达标。当前仅执行卡§29零外呼修复：模型所选正文范围不得被本地候选页截断，同时移除短引文长度冒充冗余的判断；不续余额、不启动银行或新真实入口。
+当前状态（2026-11-02，[交接§175](#175-b交接29所选章节进入完整核心)）：§29离线回放已读入模型所选第9–22页，三视图assessed，完成标志true，真实语义完成false。模拟账本130810，其中3655是旧预览usage。S1仍0/12。真实调用0。银行未启动。
 
 ## 1. 唯一实施指引
 
@@ -7313,3 +7313,47 @@ bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m r
 B的§173足以判断运行失败，不要求重写长报告；只补决策必要的候选→模型所选→实际发送→必要未读四集合及两项反例前后结果，沿流程v3的单一交接。首份pending/已核时间若未留记未知，不反跑取数。原S1正式首发/唯一后继12/12均已用、可用0/12；尚需正常章节链校准和原固定12家同版回归，再按20→100→全市场推进；不放S2/S3/生产或规模声明。
 
 §173明确释放0，S23—S27相关根约23.3MB仍在；保留不等于均无依赖，但不能再无限累积。下卡先按确切引用/活跃归属保一套必要持久证据，清可确认无依赖重复库/本人测试物，S28待审原根和正式PDF/在用解析不覆盖。A本轮只改现有7份规划文档，新增真实调用0、无公司重跑或删除材料；复用已有回执，仅跑上述一项定向测试和两个只读反例。A活跃审核时间未单独计时，新识别阻塞2项，不计为业务进展。开始14份tracked修改/9未跟踪保护，验收旧历史表不纳本轮提交。
+
+## 175. B交接：§29所选章节进入完整核心
+
+日期：2026-11-02。执行[§29](b3-s1-execution-card.md#29-所选章节到完整核心零外呼整合修复)。真实调用0。银行未启动。B不自评S1，S1仍0/12。这是受控离线回放，`real_semantic_complete=false`，不计年报质量。
+
+### 175.1 四个集合
+
+| 集合 | 页 |
+| --- | --- |
+| 候选 | 4、9、85、16、18、22、92 |
+| 模型所选 | 9、10、11、12、13、14、15、16、17、18、19、20、21、22 |
+| 实发正文 | 同上9–22，一次全文库存 |
+| 必要未读 | 无 |
+
+修前交集只剩9、16、18、22，第11页未读且没有必要未读记录。修后第11页进入库存、成稿和已核引用。未选普通附注不进待办。无效页99和空白页23留下缺口，不标已读。所选页有一页发不出去时，完成标志仍为false。
+
+### 175.2 正文和覆盖
+
+根`data/QuoteBak/s29-selected-core-offline`。三个视图都是assessed。完成标志true。query `9bdf0cbaf58a30f419610200915d4d4436967a62267f3876d9ac8c8500d4be21`，export `0a9ec87835668b852332433559f1a81783b49118ae7e709fcd48aa4563ae28c4`，新实例`bp-work-5e2914a927f17fbafe2b2efa`。三份profiles相等。监督151.449646秒，是离线入口。
+
+已核正文含制浆造纸主业、期间营业收入2,418,990,221.17元，以及第11页的木竹片采购、自主生产和产品直销、以销定产。有对象覆盖的条件包括主营、收入、期间总额、投入、经营方式、经营角色、产品和产出。
+
+短引文：长引用已经包含“纸箱”时可以闭合。独立的“医药业务”即使只有4个字，也留下主要缺口，不再按不足12字当成冗余。
+
+### 175.3 账本
+
+6次模拟请求，合计130810。第1次预览是协议重建，沿用真实usage 3655。后5次是受控样例，缺usage后按预留入账。0.143810是离线合成价，不是费用。常规120000/900秒标准不变；这次用的是既有480000离线诊断上限，超过12万不能称吞吐达标。
+
+| 次序 | 页面 | 性质 | 入账 |
+| --- | --- | --- | --- |
+| 1 | 4、9、85、16、18、22、92 | 协议重建 | 3655 |
+| 2 | 9–22 | 受控样例 | 60224 |
+| 3 | 9、11、16 | 受控成稿 | 19477 |
+| 4 | 9 | 受控核验 | 21741 |
+| 5 | 9、11 | 受控成稿 | 12851 |
+| 6 | 9 | 受控核验 | 12862 |
+
+### 175.4 命令和清理
+
+```text
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_direct_progress.py::test_redundant_short_quote_can_close_but_a_missing_business_cannot tests/unit/test_research/test_company_profile_direct_progress.py::test_model_selected_pages_outside_the_preview_are_read tests/unit/test_research/test_company_profile_direct_progress.py::test_one_selected_page_left_unread_keeps_the_core_incomplete tests/unit/test_research/test_company_profile_direct_progress.py::test_invalid_selected_page_is_recorded_and_not_marked_read tests/unit/test_research/test_company_profile_bounded_entry.py::test_selected_real_navigation_finishes_the_core_offline
+```
+
+5 passed，166.39秒。S28原根未改，query仍为`544eeeff60fc93e4c7548393563b8cc05007163270f61586404b40b99613d641`。S23–S28原根保留。本轮新根约3.2MB作为这次证明留下。没有确认可删的重复库，释放0。既有工作区改动未纳入提交。

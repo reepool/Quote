@@ -796,11 +796,8 @@ def _located_conditions(
             compact = "".join(quote.split())
             if not compact:
                 return True
-            for item in bound:
-                if compact in "".join(str(item.anchor.bounded_quote or "").split()):
-                    return True
-            return len(compact) < 12 and any(
-                len("".join(str(item.anchor.bounded_quote or "").split())) >= 12
+            return any(
+                compact in "".join(str(item.anchor.bounded_quote or "").split())
                 for item in bound
             )
 
@@ -810,6 +807,10 @@ def _located_conditions(
             gaps.append(f"evidence_not_located:{scoped_id}")
             if condition.major:
                 gaps.append(f"major_evidence_not_located:{scoped_id}")
+            for quote in missed_quotes:
+                snippet = "".join(quote.split())[:40]
+                if snippet:
+                    gaps.append(f"evidence_not_located:{scoped_id}:unmatched:{snippet}")
             continue
         if scoped_id in seen:
             raise ValueError("duplicate_source_condition")

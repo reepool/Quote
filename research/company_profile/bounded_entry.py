@@ -1266,30 +1266,38 @@ def _worker(
                 result = projected
                 transport_requests[-1]["replay_kind"] = "protocol_reconstruction"
             elif request["purpose"] == "source_inventory":
-                result = {
-                    "schema_version": "company_profile_report_response.v3",
-                    "request_id": request["request_id"],
-                    "purpose": request["purpose"],
-                    "requested_pages": [],
-                }
-                if request.get("source_scope") != "page_map":
+                if binding.get("offline_unmatched_inventory") == "sent_text":
+                    result = core_package_reply(request)
+                    result["requested_pages"] = []
+                else:
+                    result = {
+                        "schema_version": "company_profile_report_response.v3",
+                        "request_id": request["request_id"],
+                        "purpose": request["purpose"],
+                        "requested_pages": [],
+                    }
+                    if request.get("source_scope") != "page_map":
+                        result["source_conditions"] = []
+                if (
+                    request.get("source_scope") != "page_map"
+                    and binding.get("offline_role_sample") == "present"
+                ):
                     evidence = []
-                    if binding.get("offline_role_sample") == "present":
-                        for page in request.get("source_pages") or []:
-                            text = str(page.get("text") or "")
-                            for needle in (
-                                "国内木竹片采购",
-                                "自主生产的经营模式",
-                                "产品直销，以销定产",
-                            ):
-                                if needle not in text:
-                                    continue
-                                evidence.append(
-                                    {"page": int(page["page"]), "quote": needle}
-                                )
-                    result["source_conditions"] = []
+                    for page in request.get("source_pages") or []:
+                        text = str(page.get("text") or "")
+                        for needle in (
+                            "国内木竹片采购",
+                            "自主生产的经营模式",
+                            "产品直销，以销定产",
+                        ):
+                            if needle not in text:
+                                continue
+                            evidence.append(
+                                {"page": int(page["page"]), "quote": needle}
+                            )
                     if evidence:
-                        result["source_conditions"] = [
+                        result.setdefault("source_conditions", [])
+                        result["source_conditions"].append(
                             {
                                 "condition_id": "company-operating-mode",
                                 "dimension": "supply_chain_role",
@@ -1298,7 +1306,7 @@ def _worker(
                                 "major": True,
                                 "statement_status": "current",
                             }
-                        ]
+                        )
                 transport_requests[-1]["replay_kind"] = "controlled_sample"
             else:
                 result = core_package_reply(request)

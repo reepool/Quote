@@ -8671,18 +8671,20 @@ def test_redundant_short_quote_can_close_but_a_missing_business_cannot():
     report = _report()
     page = {
         "page": 1,
-        "text": "公司从事制浆造纸并销售纸袋纸。纸箱出现两次。纸箱出现两次。",
+        "text": "公司从事制浆造纸并销售纸袋纸。纸箱用于包装。纸箱用于包装。",
         "readable": True,
     }
-    good = _evidence(report, text="公司从事制浆造纸并销售纸袋纸。", page=1)
-    short = _evidence(report, text="纸箱", page=1)
+    good = _evidence(
+        report, text="公司从事制浆造纸并销售纸袋纸。纸箱用于包装。", page=1
+    )
+    contained = _evidence(report, text="纸箱", page=1)
     accepted, gaps = _located_conditions(
         [
             ReportSourceCondition(
                 condition_id="products",
                 dimension="products_services",
                 description="产品范围。",
-                evidence=(good, short),
+                evidence=(good, contained),
                 major=True,
                 statement_status="current",
             )
@@ -8695,25 +8697,294 @@ def test_redundant_short_quote_can_close_but_a_missing_business_cannot():
     assert accepted
     assert any(gap.endswith(":redundant") for gap in gaps)
     assert not any(gap.startswith("major_evidence_not_located:") for gap in gaps)
-    missing = _evidence(report, text="另一主业是从未出现的海洋工程服务。", page=1)
+    paper = {
+        "page": 1,
+        "text": "公司从事制浆造纸并销售纸袋纸。",
+        "readable": True,
+    }
+    paper_quote = _evidence(report, text="公司从事制浆造纸并销售纸袋纸。", page=1)
+    pharma = _evidence(report, text="医药业务", page=1)
     rejected, blocked = _located_conditions(
         [
             ReportSourceCondition(
                 condition_id="other",
                 dimension="principal_business",
-                description="另一主业。",
-                evidence=(good, missing),
+                description="造纸之外还有医药业务。",
+                evidence=(paper_quote, pharma),
                 major=True,
                 statement_status="current",
             )
         ],
         report,
-        [page],
+        [paper],
         request_id="t2",
         seen=set(),
     )
     assert not rejected
     assert any(gap.startswith("major_evidence_not_located:") for gap in blocked)
+    assert any("医药业务" in gap for gap in blocked)
+
+
+def test_model_selected_pages_outside_the_preview_are_read():
+    from research.company_profile import direct_reading
+    from research.company_profile.contracts import ReportSourceCondition
+    from research.company_profile.direct_reading import chapter_candidate_pages
+
+    report = _report()
+    role = "国内木竹片采购。公司采用自主生产的经营模式。产品直销，以销定产。"
+    pages = [
+        {
+            "page": 3,
+            "text": (
+                "目录\n"
+                "第三节 管理层讨论与分析 ............................................. 20\n"
+                "第八节 财务报告 .................................................... 30\n"
+            ),
+            "readable": True,
+        },
+        {
+            "page": 20,
+            "text": (
+                "第三节 管理层讨论与分析\n"
+                "公司主营造纸并销售纸袋纸。公司营业收入为100万元。"
+                "公司采购木片。公司向下游客户销售纸制品。"
+            ),
+            "readable": True,
+        },
+        {"page": 21, "text": "上一页表格在这里续完，本页没有新的章节标题。", "readable": True},
+        {
+            "page": 22,
+            "text": role + "本页没有章节标题。",
+            "readable": True,
+        },
+        {"page": 30, "text": "第八节 财务报告\n合并利润表\n营业收入 100万元。", "readable": True},
+        {"page": 40, "text": "附注列示子公司注册地址。", "readable": True},
+    ]
+    candidates = chapter_candidate_pages(pages)
+    assert 22 not in candidates and 40 not in candidates
+    assert [page for page in (20, 21, 22, 30) if page in candidates] != [20, 21, 22, 30]
+    facts = (
+        ("principal_business", "principal", 20, "公司主营造纸并销售纸袋纸。"),
+        ("products_services", "products", 20, "公司主营造纸并销售纸袋纸。"),
+        ("revenue_model", "revenue", 20, "公司营业收入为100万元。"),
+        ("input_exposure", "input", 20, "公司采购木片。"),
+        ("output_exposure", "output", 20, "公司向下游客户销售纸制品。"),
+        ("supply_chain_role", "core-question:operating-role", 22, role),
+    )
+    seen = []
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            current = tuple(int(page["page"]) for page in request.source_pages)
+            seen.append((request.source_scope, request.purpose, current))
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(20, 21, 22, 30),
+                )
+            if request.purpose == "source_inventory":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    source_conditions=tuple(
+                        ReportSourceCondition(
+                            condition_id=condition_id,
+                            dimension=dimension,
+                            description=quote,
+                            evidence=(
+                                _evidence(report, text=quote, page=page).model_copy(
+                                    update={"evidence_id": f"sel-{condition_id}"}
+                                ),
+                            ),
+                            major=True,
+                            statement_status="current",
+                        )
+                        for dimension, condition_id, page, quote in facts
+                        if page in current
+                    ),
+                )
+            if request.purpose == "synthesize_views":
+                claims = []
+                for condition in request.source_conditions:
+                    evidence = condition.evidence[0]
+                    quote = str(evidence.anchor.bounded_quote)
+                    claims.append(
+                        ReportViewClaim(
+                            claim_id=condition.condition_id,
+                            dimension=condition.dimension,
+                            status="observed",
+                            answer=quote,
+                            condition_ids=(condition.condition_id,),
+                            evidence=(
+                                _evidence(
+                                    report, text=quote, page=int(evidence.page)
+                                ).model_copy(
+                                    update={"evidence_id": f"sel-claim-{condition.condition_id}"}
+                                ),
+                            ),
+                        )
+                    )
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    claims=tuple(claims),
+                )
+            claim_by_dimension = {claim.dimension: claim.claim_id for claim in request.claims}
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+                checks=tuple(
+                    {
+                        "target_type": "claim",
+                        "target_id": claim.claim_id,
+                        "status": "pass",
+                        "explanation": "选自正文。",
+                    }
+                    for claim in request.claims
+                )
+                + tuple(
+                    {
+                        "target_type": "condition",
+                        "target_id": condition.condition_id,
+                        "status": "pass",
+                        "covers_target_type": "claim",
+                        "covers_target_id": claim_by_dimension[condition.dimension],
+                        "explanation": "核心条件已覆盖。",
+                    }
+                    for condition in request.source_conditions
+                    if condition.dimension in claim_by_dimension
+                ),
+            )
+
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    original = direct_reading.source_discovery_slices
+    direct_reading.source_discovery_slices = _one_page_slices
+    try:
+        result = _run(
+            _Provider(),
+            pages=tuple(pages),
+            processing_identity=identity,
+            report=report,
+        )
+    finally:
+        direct_reading.source_discovery_slices = original
+    inventories = [
+        pages
+        for scope, purpose, pages in seen
+        if purpose == "source_inventory" and scope != "page_map"
+    ]
+    assert any(22 in item for item in inventories), inventories
+    assert any(
+        22 in item
+        for scope, purpose, item in seen
+        if purpose == "synthesize_views"
+    ), seen
+    assert any("木竹片采购" in claim.answer for claim in result.claims)
+    assert result.draft_complete is True, result.gaps
+    assert any(item["page"] == 40 and item["status"] == "not_read" for item in result.page_coverage)
+    assert not any(gap == "necessary_unread:40" for gap in result.gaps)
+
+
+def test_one_selected_page_left_unread_keeps_the_core_incomplete():
+    from research.company_profile import direct_reading
+
+    report = _report()
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            current = {int(page["page"]) for page in request.source_pages}
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(20, 22),
+                )
+            if 22 in current:
+                raise ValueError("selected-page-not-sent")
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+            )
+
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    original = direct_reading.source_discovery_slices
+    direct_reading.source_discovery_slices = _one_page_slices
+    try:
+        result = _run(
+            _Provider(),
+            pages=(
+                {
+                    "page": 3,
+                    "text": "目录\n第三节 管理层讨论与分析 ............................................. 20\n",
+                    "readable": True,
+                },
+                {"page": 20, "text": "第三节 管理层讨论与分析\n公司主营造纸。", "readable": True},
+                {"page": 22, "text": "本页没有章节标题。国内木竹片采购。", "readable": True},
+            ),
+            processing_identity=identity,
+            report=report,
+        )
+    finally:
+        direct_reading.source_discovery_slices = original
+    assert result.draft_complete is False
+    assert any(gap == "necessary_unread:22" for gap in result.gaps)
+
+
+def test_invalid_selected_page_is_recorded_and_not_marked_read():
+    from research.company_profile import direct_reading
+
+    report = _report()
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            if request.source_scope == "page_map":
+                return ReportSemanticResponseV3(
+                    request_id=request.request_id,
+                    purpose=request.purpose,
+                    requested_pages=(20, 23, 99),
+                )
+            return ReportSemanticResponseV3(
+                request_id=request.request_id,
+                purpose=request.purpose,
+            )
+
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    original = direct_reading.source_discovery_slices
+    direct_reading.source_discovery_slices = _one_page_slices
+    try:
+        result = _run(
+            _Provider(),
+            pages=(
+                {
+                    "page": 3,
+                    "text": "目录\n第三节 管理层讨论与分析 ............................................. 20\n",
+                    "readable": True,
+                },
+                {"page": 20, "text": "第三节 管理层讨论与分析\n公司主营造纸。", "readable": True},
+                {"page": 23, "text": "", "readable": False},
+            ),
+            processing_identity=identity,
+            report=report,
+        )
+    finally:
+        direct_reading.source_discovery_slices = original
+    assert any(gap == "selected_page_invalid:99" for gap in result.gaps)
+    assert any(gap == "selected_page_unreadable:23" for gap in result.gaps)
+    assert not any(item["page"] == 99 for item in result.page_coverage)
+    assert not any(
+        item["page"] == 23 and item["status"] == "read" for item in result.page_coverage
+    )
+    assert result.draft_complete is False
 
 
 

@@ -618,6 +618,8 @@ def _current_gaps(accumulated, claims, conditions, checks, records=()) -> list[s
         if gap.startswith(
             (
                 "necessary_unread:",
+                "selected_page_invalid:",
+                "selected_page_unreadable:",
                 "necessary_fragment",
                 "navigation_incomplete:",
                 "direct_core_",
@@ -886,6 +888,39 @@ def _page_has_title(source, title: str) -> bool:
         return True
     short = needle[:16]
     return any(short in line or needle in line for line in _heading_lines(str(source.get("text") or "")))
+
+
+def accept_selected_pages(requested, sources) -> tuple[list[int], list[str]]:
+    """Keep the pages a model selected when they exist in the official source.
+
+    Preview candidates are not a whitelist. Invalid numbers stay visible and
+    are not marked read. Unreadable selected pages stay visible too.
+    """
+    by_page = {int(item["page"]): item for item in sources}
+    accepted: list[int] = []
+    gaps: list[str] = []
+    for raw in requested or ():
+        try:
+            page_no = int(raw)
+        except (TypeError, ValueError):
+            gap = f"selected_page_invalid:{raw}"
+            if gap not in gaps:
+                gaps.append(gap)
+            continue
+        source = by_page.get(page_no)
+        if source is None:
+            gap = f"selected_page_invalid:{page_no}"
+            if gap not in gaps:
+                gaps.append(gap)
+            continue
+        if not source.get("readable", True) or not str(source.get("text") or "").strip():
+            gap = f"selected_page_unreadable:{page_no}"
+            if gap not in gaps:
+                gaps.append(gap)
+            continue
+        if page_no not in accepted:
+            accepted.append(page_no)
+    return accepted, gaps
 
 
 def chapter_candidate_pages(pages, limit: int = 16) -> list[int]:
@@ -2112,6 +2147,8 @@ def interpret_direct_core(
             gap.startswith(
                 (
                     "necessary_unread:",
+                    "selected_page_invalid:",
+                    "selected_page_unreadable:",
                     "necessary_fragment",
                     "major_condition_not_verified:",
                     "major_condition_not_in_synthesis:",
@@ -3133,9 +3170,14 @@ def interpret_direct_core(
                 gaps.append(f"direct_core_navigation_incomplete:{exc}")
                 gaps.append("chapter_selection_limited")
                 return core, [page_no for page_no in page_ids if page_no not in core]
-            for page_no in response.requested_pages:
-                page_no = int(page_no)
-                if page_no in page_ids and page_no not in core:
+            accepted, selection_gaps = accept_selected_pages(
+                response.requested_pages, sources
+            )
+            for gap in selection_gaps:
+                if gap not in gaps:
+                    gaps.append(gap)
+            for page_no in accepted:
+                if page_no not in core:
                     core.append(page_no)
         return core, [page_no for page_no in page_ids if page_no not in core]
 
