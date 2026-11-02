@@ -11,7 +11,6 @@ import threading
 import time
 import types
 from dataclasses import dataclass, field
-from typing import Any
 
 import pytest
 
@@ -198,7 +197,7 @@ async def test_stuck_worker_times_out_and_orphan_is_logged(scheduler, monkeypatc
     async def fake_task(job_config=None):
         # Deliberately blocks the worker loop with a sync stretch and no
         # checkpoints: cancellation cannot land until the stretch ends.
-        time.sleep(3.0)
+        time.sleep(3.0)  # noqa: ASYNC251 - the blocking itself is under test
 
     class _LogCapture:
         def __init__(self):
@@ -400,7 +399,7 @@ def test_build_candidates_scan_yields_checkpoints(monkeypatch):
         storage=_CheckpointStorage(),
         research_config=types.SimpleNamespace(modules={}, markets=[], sources={}, routing={}),
         announcement_service=types.SimpleNamespace(),
-        repair_router=types.SimpleNamespace(default_summary=lambda: {}),
+        repair_router=types.SimpleNamespace(default_summary=dict),
     )
     monkeypatch.setattr(service, "_readiness_for_candidate", lambda *a, **k: {"ready": False})
     monkeypatch.setattr(
