@@ -452,15 +452,14 @@ def test_build_candidates_scan_yields_checkpoints(monkeypatch):
     )
 
     yield_calls = []
-    real_sleep = asyncio.sleep
 
-    async def counting_sleep(delay=0):
-        yield_calls.append(delay)
-        await real_sleep(0)
+    async def counting_checkpoint(phase=None, **counters):
+        yield_calls.append((phase, counters))
 
-    module = types.SimpleNamespace(asyncio=types.SimpleNamespace(sleep=counting_sleep))
     import research.financial_disclosure_incremental_sync as fd_module
-    monkeypatch.setattr(fd_module, "asyncio", module.asyncio)
+    monkeypatch.setattr(
+        fd_module.worker_context, "yield_checkpoint", counting_checkpoint
+    )
 
     instruments = [{"instrument_id": f"INST{i:04d}", "symbol": f"60000{i % 10}"} for i in range(6)]
     events = []
@@ -480,8 +479,10 @@ def test_build_candidates_scan_yields_checkpoints(monkeypatch):
         )
 
     candidates = asyncio.run(run_scan())
-    # 6 instruments x 3 periods = 18 readiness evaluations; every 2 must yield.
+    # 6 instruments x 3 periods = 18 readiness evaluations; every 2 must
+    # checkpoint (9 gates max), each carrying scan progress counters.
     assert len(yield_calls) >= 8
+    assert all(phase == "reconciliation_scan" for phase, _ in yield_calls)
     assert isinstance(candidates, dict)
 
 

@@ -172,14 +172,30 @@ def bind_current_run(state: WorkerRunState) -> None:
 
 
 def report_progress(phase: Optional[str] = None, **counters: Any) -> None:
-    """Checkpoint helper: record progress of the run bound to this context.
+    """Record progress of the run bound to this context without yielding.
 
     No-op outside a worker run (main-loop escape-hatch jobs, tests, CLI), so
-    business services can call it unconditionally at checkpoint sites.
+    business services can call it unconditionally.
     """
     state = _current_run.get()
     if state is not None:
         state.update_progress(phase=phase, **counters)
+
+
+async def yield_checkpoint(phase: Optional[str] = None, **counters: Any) -> None:
+    """Shared checkpoint for long business loops: record progress, then yield.
+
+    Combines progress reporting with a single await point so worker-loop
+    cancellation can land at batch boundaries (the checkpoint contract of
+    isolate-long-tasks-from-api-event-loop). The yield happens on any loop;
+    progress recording is a no-op outside a worker run. Shared by every
+    service that opts into worker isolation - new callers use this instead of
+    hand-rolled ``await asyncio.sleep(0)`` + report pairs.
+    """
+    state = _current_run.get()
+    if state is not None:
+        state.update_progress(phase=phase, **counters)
+    await asyncio.sleep(0)
 
 
 def get_current_run_state() -> Optional[WorkerRunState]:

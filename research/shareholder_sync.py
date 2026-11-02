@@ -99,14 +99,13 @@ class ShareholderShadowSyncService:
         results: List[ShareholderExchangeSyncResult] = []
 
         for exchange in target_exchanges:
-            worker_context.report_progress(
+            # Checkpoint: yield between exchanges so worker-loop cancellation
+            # can land at a batch boundary.
+            await worker_context.yield_checkpoint(
                 phase="exchange_sync",
                 exchange=exchange,
                 exchanges_done=len(results),
             )
-            # Checkpoint: yield between exchanges so worker-loop cancellation
-            # can land at a batch boundary.
-            await asyncio.sleep(0)
             results.append(
                 await self._sync_exchange(
                     exchange=exchange,
@@ -395,8 +394,7 @@ class ShareholderShadowSyncService:
                 successful_source_names.add(candidate.source)
                 # Checkpoint: yield after each source candidate batch so
                 # worker-loop cancellation can land between batches.
-                await asyncio.sleep(0)
-                worker_context.report_progress(
+                await worker_context.yield_checkpoint(
                     phase="source_batch",
                     exchange=exchange,
                     sources_done=len(successful_sources),

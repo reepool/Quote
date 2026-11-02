@@ -6,7 +6,7 @@ Uses APScheduler to manage and execute scheduled tasks.
 import asyncio
 import threading
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, Optional
 from builtins import TimeoutError as BuiltinTimeoutError
 
 # Scheduler can be imported by operational scripts without going through
@@ -488,23 +488,20 @@ class TaskScheduler:
     async def _worker_heartbeat_loop(self, state: Any) -> None:
         """Log a progress heartbeat for the run every configured interval."""
         interval = self._worker_heartbeat_interval_seconds()
-        try:
-            while True:
-                await asyncio.sleep(interval)
-                snapshot = state.snapshot()
-                if not snapshot.get("finished"):
-                    scheduler_logger.info(
-                        "[Scheduler][Heartbeat] job=%s run_id=%s phase=%s elapsed=%ss "
-                        "since_progress=%ss progress=%s",
-                        snapshot.get("job_id"),
-                        snapshot.get("run_id"),
-                        snapshot.get("phase"),
-                        snapshot.get("elapsed_seconds"),
-                        snapshot.get("seconds_since_progress"),
-                        snapshot.get("progress") or {},
-                    )
-        except asyncio.CancelledError:
-            raise
+        while True:
+            await asyncio.sleep(interval)
+            snapshot = state.snapshot()
+            if not snapshot.get("finished"):
+                scheduler_logger.info(
+                    "[Scheduler][Heartbeat] job=%s run_id=%s phase=%s elapsed=%ss "
+                    "since_progress=%ss progress=%s",
+                    snapshot.get("job_id"),
+                    snapshot.get("run_id"),
+                    snapshot.get("phase"),
+                    snapshot.get("elapsed_seconds"),
+                    snapshot.get("seconds_since_progress"),
+                    snapshot.get("progress") or {},
+                )
 
     async def _watch_orphan_worker(self, thread: threading.Thread, state: Any) -> None:
         """Warn when a timed-out worker thread cannot land its cancellation."""

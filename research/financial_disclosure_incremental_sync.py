@@ -4,7 +4,6 @@ Financial statement maintenance driven by CNInfo disclosure announcements.
 
 from __future__ import annotations
 
-import asyncio
 import time
 from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime, timedelta
@@ -872,10 +871,9 @@ class FinancialDisclosureIncrementalSyncService:
                         scanned_since_checkpoint >= checkpoint_every_candidates
                         or time.monotonic() - last_checkpoint_at >= checkpoint_interval_seconds
                     ):
-                        await asyncio.sleep(0)
                         scanned_since_checkpoint = 0
                         last_checkpoint_at = time.monotonic()
-                        worker_context.report_progress(
+                        await worker_context.yield_checkpoint(
                             phase="reconciliation_scan",
                             scanned=scanned_total,
                             candidates=len(candidates),
@@ -1594,8 +1592,7 @@ class FinancialDisclosureIncrementalSyncService:
             # Pre-import readiness sweep reads the financial database per
             # candidate; yield at batch boundaries for cancellation.
             if len(before_ready) % DEFAULT_CHECKPOINT_EVERY_CANDIDATES == 0:
-                await asyncio.sleep(0)
-                worker_context.report_progress(
+                await worker_context.yield_checkpoint(
                     phase="apply_precheck",
                     processed=len(before_ready),
                 )
@@ -1657,8 +1654,7 @@ class FinancialDisclosureIncrementalSyncService:
             # Apply-phase checkpoint: post-import readiness reads the financial
             # database per candidate; yield at batch boundaries for cancellation.
             if applied_total % DEFAULT_CHECKPOINT_EVERY_CANDIDATES == 0:
-                await asyncio.sleep(0)
-                worker_context.report_progress(
+                await worker_context.yield_checkpoint(
                     phase="apply_candidates",
                     applied=applied_total,
                     changed=changed,

@@ -159,7 +159,7 @@ class TaskManagerHandlers:
                 if not snapshots:
                     await self.task_manager.send_message(
                         chat_id,
-                        "ℹ️ 当前没有运行中的任务。",
+                        "ℹ️ 当前没有 worker 隔离任务在运行（主循环任务不在此列，亦不可经 `/stop` 停止）。",
                         parse_mode='markdown',
                     )
                     return

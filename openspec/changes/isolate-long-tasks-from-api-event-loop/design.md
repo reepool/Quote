@@ -162,7 +162,7 @@ scheduler 与 API 拆分为两个进程（`main.py` 拆分或双 systemd 单元�
 1. `financial_disclosure_reconciliation_sync`——全链路审计：任务包装器（报告经 marshalling）→ `data_manager.run_financial_disclosure_reconciliation_sync`（governance→db_ops）→ 增量同步服务（storage 同步 sqlite3 + 1 处 db_ops await）→ backtest 阶段（to_thread）。
 2. `shareholder_reconciliation_sync`——任务包装器 → `run_shareholder_shadow_sync`/readiness（db_ops + 同步 storage）。
 
-其余 27 个任务部署默认 `worker_isolation.default_run_on_main_loop=true` 维持主循环；放量协议：逐任务链路审计后，在该任务 `parameters` 显式 `"run_on_main_loop": false` 并记录审计结论，无需代码改动。
+其余 27 个任务部署默认 `worker_isolation.default_run_on_main_loop=true` 维持主循环；放量协议：逐任务链路审计后，在该任务 `parameters` 显式 `"run_on_main_loop": false` 并记录审计结论，无需代码改动。审计清单：① 任务体及其调用链不得直接调用 `self.bot.send_*`（`scheduler/tasks.py` 现存 17 处分散于 health_check、hkex 同步等任务体内，均须改走 `_send_task_report`/主循环通知后再放量）；② db_ops 调用经 NullPool 天然安全；③ 长同步段接入 `worker_context.yield_checkpoint`（共享检查点 helper，两个真实调用方已满足总纲抽象门槛，新调用方一律复用，不得手写 `await asyncio.sleep(0)` + 上报对）。
 
 已实现机制与代码位置：`utils/worker_context.py`（主 loop 注册、WorkerRunState、进度上下文、`run_on_main_loop` 网关）；`scheduler/scheduler.py` `_await_task_in_worker`（每 run 独立线程+loop、启动器协程、取消注入、心跳、孤儿看护、`_shutdown_worker_runs`、`request_stop_job`、`get_worker_run_snapshots`）；取消用"启动器协程 + Task 句柄 + `call_soon_threadsafe(handle.cancel)`"，不使用 `concurrent.futures.Future.cancel()`（任务开跑后恒 False）；后台任务经 `_spawn_background` 持强引用（规避 loop 弱引用 GC 丢失）。
 
