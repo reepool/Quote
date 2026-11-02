@@ -265,3 +265,26 @@ DatabaseOperations 初始化报错。整改：对运行中应用的工作区，�
    2 处已修（测试辅助冗余、import 排序）。项目无 ruff 配置，默认
    规则不构成项目标准。
 4. 我方改动 git 干净；test_storage 仍为环境阻塞项（记录不变）。
+
+## 部署事故与修复（2026-11-03，v6 映射目录未装载）
+
+**现象**：/run financial_disclosure_reconciliation_sync（任意标的）全量
+candidates 标 mapping_policy_gap（就绪检查报 mapping_catalog_empty +
+outside_approved_local_core），补数源 0（该场景的设计防护，行为正确）。
+
+**根因（本 change 部署不完整，属实）**：c402cd08 将代码端 MAPPING_VERSION
+切至 v6 并通过全部测试（测试读代码目录），但**未执行目录装载**——生产库
+financial_source_field_mappings 仅有 v5 523 行、v6 0 行。就绪检查读生产库
+目录（storage.get_financial_source_field_mappings 按 mapping_version 过滤）
+→ v6 空目录 → 全市场 policy gap。
+
+**修复**：新增 operator 工具 scripts/financial_pit_panel/
+load_mapping_catalog.py（精确镜像 _ensure_local_core_mapping_catalog 的装
+载语义，带审计 run）；执行后 v6 入库 **527 行（521 approved + 8 条股本
+修正行，四 profile 齐全）**；600036/600519 就绪复查 **policy_gap=0 /
+catalog_empty=0 / outside_core=0**。
+
+**预防（教训固化）**：映射版本升级 = 代码目录 + 生产库装载两步缺一不可；
+本次装载器已工具化，后续版本升级卡必须包含"执行 load_mapping_catalog.py
+并验证分布"为验收项。10-25 v5 时代无此现象、本次隔离改造无关的归属判断
+亦属实（本事故纯数据侧）。
