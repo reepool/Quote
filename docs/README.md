@@ -18,6 +18,7 @@
 - `docs/database_guide.md`：SQLite 存储布局与调优
 - `docs/financial_data_system.md`：财务数据系统
 - `docs/features/scheduler_system.md`：调度任务和生产时间表
+- `docs/worker_task_isolation_usage.md`：长任务执行隔离使用说明（worker 运行、`/stop`、心跳与放量协议）
 - `docs/telegram_task_manager.md`：Telegram 运维入口
 
 ## 行情与主数据

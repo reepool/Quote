@@ -889,6 +889,15 @@ graph TD
     H --> I[记录日志]
 ```
 
+## 🧩 长任务执行隔离（worker 事件循环）
+
+自 2026-11 起，调度任务默认在独立 worker 线程 + 独立事件循环上执行（openspec change `isolate-long-tasks-from-api-event-loop`，对应改造纲要 FR-18），长同步任务不再饿死 API 与 Telegram bot：
+
+- **执行位置**由任务配置 `parameters.run_on_main_loop` 决定：`false` 进入 worker；全局默认 `scheduler_config.worker_isolation.default_run_on_main_loop=true`（未审计任务维持主循环，逐链路审计后逐个 opt-in，当前为财务/股东周度对账两个任务）。
+- **停止与超时**：`/stop` 命令与 `max_runtime_seconds` 在任务下一个 await 检查点生效（默认 30s 上限）；取消无法落地的卡死任务在 grace 后记录孤儿告警，主循环不受影响。
+- **可观测**：心跳日志（默认 300s）、bot `/status` 运行详情、API `GET /api/v1/system/worker-runs`。
+- 操作手册见 `docs/worker_task_isolation_usage.md`。
+
 ## 🔍 监控和日志
 
 ### 任务状态监控

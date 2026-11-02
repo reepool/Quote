@@ -32,7 +32,7 @@
 
 **目标**
 
-1. 长任务运行期间：API health ≤500ms、读接口 p95 ≤1s（10 分钟窗口）、bot 命令 ack ≤10s（阈值可配置）。
+1. 长任务运行期间：API health 默认 500ms、读接口 p95 默认 1s（10 分钟窗口）、bot 命令 ack 默认 10s（SLO 数值为验收与观测口径，写入测试断言与监控文档，不属于调度器配置）。
 2. 新增停止命令与 `max_runtime_seconds` 在配置上限（默认 30s）内于下一个检查点生效，并产生对应报告。
 3. 长阶段心跳日志 ≤5 分钟一次；bot/API 可查询当前 run 状态。
 4. worker 失败可上报、可诊断，API/bot 不受影响。
@@ -58,7 +58,7 @@
 ### 3.1 执行模型（方案 A）
 
 - 收口点（已代码核实）：cron 注册路径的 `parameterized_task`（`scheduler/scheduler.py:147` 起，内部经 `dependency_executor.run_job` 并以 `_SCHEDULER_ALREADY_TRACKED_PARAM` 防重复跟踪）、`/run` 立即执行（`run_job_now` → `scheduler.modify_job(next_run_time=now)`，仍由 APScheduler 触发同一 `parameterized_task`）、依赖组执行（`raw_job_runner=_run_configured_task_raw`）三条入口全部汇聚到 `_run_configured_task_raw`（`scheduler/scheduler.py:255` 起）。隔离只替换该函数内对 `task_func(**all_parameters)` 的调用与既有 `wait_for`（`scheduler/scheduler.py:302-305`）两处；`pre_run_notify`、依赖编排与依赖报告留在主循环 `parameterized_task`，不进 worker。
-- worker 执行模型：每个 run 使用独立线程 + 独立事件循环（`asyncio.new_event_loop()` + `run_forever`，随 run 创建销毁）；提交采用"启动器协程"模式——worker loop 内 `create_task` 创建 asyncio.Task 并把句柄线程安全回传主循环，再 `await` 该 Task；主循环以 `asyncio.wrap_future` 转为 asyncio Future 后沿用 `asyncio.wait_for(timeout=max_runtime_seconds)` 外层超时。不设共享线程池容量上限，避免无关任务因池满互相排队；任务间真实并发度由调度器现有并发语义与 §3.6 写协调约束。
+- worker 执行模型（与实现一致）：每个 run 使用独立线程 + 独立事件循环（`asyncio.new_event_loop()` + `run_until_complete`，随 run 创建销毁）；采用"启动器协程"模式——worker loop 内 `create_task` 创建任务 asyncio.Task，句柄存入共享 `WorkerRunState`（主循环与 worker 同一对象引用，取消经 `call_soon_threadsafe(handle.cancel)` 注入）；启动器 `await` 该 Task 并把结果/异常写入 `outcome` 容器，完成后 `call_soon_threadsafe` 置主循环侧 `asyncio.Event`；主循环 `await wait_for(_wait_outcome(), timeout=max_runtime_seconds)`。不设共享线程池容量上限，避免无关任务因池满互相排队；任务间真实并发度由调度器现有并发语义与 §3.6 写协调约束。
 - 取消传导：不得依赖 `concurrent.futures.Future.cancel()`（任务开跑后恒返回 False）；超时与停止命令统一经已回传的 worker 侧 asyncio.Task 句柄执行 `worker_loop.call_soon_threadsafe(handle.cancel)`，在任务下一个 await 检查点落地。若 worker 线程卡死到取消无法落地，主循环超时仍按期判定该 run 失败并记录孤儿 worker 告警日志（可观测、不阻塞主循环；线程随进程重启回收）。
 - 停止命令为**新增**操作入口（现状盘点：bot 仅有 /start /status /help /detail /run /backfill，无停止命令，运行中任务今天只能靠进程重启终止）：新增 bot 停止命令作用于 `running_tasks` 中的在跑 run，经上述同一取消通道注入；权限沿用现有 chat 白名单。
 - `max_instances`、`run_id`、依赖组（dependency_results）、`job_config` 跟踪全部保持在主循环包装器内，语义不变。
@@ -79,7 +79,7 @@ worker loop 上禁止使用主 loop 资源。M1 必须产出清单并逐任务�
 ### 3.3 检查点契约
 
 - 长阶段（候选扫描、批量循环）必须提供检查点：默认每 ≤30 秒或每 200 个候选至少一次 `await`（`asyncio.sleep(0)` 即可），同时更新进度状态；参数进配置。
-- 首批真实调用方：`financial_disclosure_incremental_sync`（对账扫描）、`shareholder_reconciliation_sync`。两处接入后再抽最小共享 helper（满足治理总纲"两个真实调用方"门槛），不预先平台化。
+- 首批真实调用方：`financial_disclosure_incremental_sync`（对账扫描）、`shareholder_reconciliation_sync`。两处接入后已抽共享原语 `worker_context.yield_checkpoint`（进度上报 + 单次让出合一），后续新调用方一律复用，不得手写 `await asyncio.sleep(0)` + 上报对。
 - 取消语义：取消在下一检查点落地；最坏延迟 = 最长同步段 ≤ 检查点上限。此契约写进任务服务文档与测试。
 
 ### 3.4 报告与通知通道
@@ -123,14 +123,14 @@ worker/loop 随 run 创建销毁，退出路径必须复用该 change 固化的 
 | GIL 争用导致纯 CPU 段 API p95 仍超标 | §6 度量把关；不达标走 M4 进程隔离（方案 B 要点已保留） |
 | 个别任务隐藏的主 loop 资源依赖 | M1 盘点清单 + per-job escape hatch 兜底 |
 | 报告/通知跨 loop 使用 telethon | 统一 marshalling 网关 + 并发测试覆盖 |
-| 检查点遗漏导致取消延迟 | 检查点契约进测试（合成卡死任务断言 ≤30s） |
+| 检查点遗漏导致取消延迟 | 检查点契约进测试（合成卡死任务断言默认 30s 上限内） |
 | 真实并行引入同库写竞争（现状单循环为事实串行） | §3.6 任务×数据库写入矩阵 + 同库写串行/busy_timeout；并发测试覆盖 |
 | worker 线程卡死形成孤儿线程 | 主循环超时仍判定失败 + 孤儿 worker 告警日志（§3.1）；线程随进程重启回收 |
 
 ## 6. 验证与度量
 
 1. 合成阻塞任务（CPU 密集 + 同步 sqlite 两类）并发测试：长任务运行期间断言 health/read/bot SLO（pytest-asyncio）。
-2. 取消/超时测试：注入卡死任务，断言 `/stop` 与 `max_runtime_seconds` ≤30s 生效并产生对应报告。
+2. 取消/超时测试：注入卡死任务，断言 `/stop` 与 `max_runtime_seconds` 在默认 30s 上限内生效并产生对应报告。
 3. 真实回放：`financial_disclosure_reconciliation_sync` 以有界 `target_symbols` 范围运行，期间实测 API p95、bot 响应、心跳日志与扫描期零写。
 4. 数据安全：worker 中断后核对 `financials.db` 无部分写入、重跑幂等。
 5. 全量现有单测回归通过。

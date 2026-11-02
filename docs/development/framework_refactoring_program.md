@@ -77,6 +77,7 @@
 | FR-15 | 共享能力可能因新需求再次被各域自行实现 | 在 AGENTS 和总纲中强制 owner/复用/单路径检查 |
 | FR-16 | `database/operations.py` 约 9.8 千行、单类承担主数据、行情、日历和写入协调，未纳入框架拆分 | W3 必须先登记其 quote-storage owner 和拆分边界；迁移期不得继续堆业务逻辑，若暂不拆分须记录理由、风险和后续 change |
 | FR-17 | 长周期改造期间业务代码会继续演进，静态冻结规则缺少例外和切换门禁 | 建立移动目标协议、例外登记、切换前运行状态检查、单 writer 切换和首个自然调度观察/回滚条件 |
+| FR-18 | uvicorn API、AsyncIOScheduler 与 Telethon bot 共享同一事件循环，长同步任务可饿死 API/bot 且 `wait_for` 超时同循环不可靠（2026-11-01 对账任务事故） | 调度包装器层 worker 事件循环隔离：报告 marshalling 回主循环、检查点取消契约（`yield_checkpoint` 共享原语）、`/stop` 与心跳可观测、优雅停机；change `isolate-long-tasks-from-api-event-loop`，分阶段放量（默认主循环，逐链路审计 opt-in） |
 
 ## 5. 工作流与 OpenSpec change
 

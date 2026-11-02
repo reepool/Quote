@@ -30,5 +30,6 @@
 
 ## 5. 清理与交接
 
-- [x] 5.1 删除本次替代的旧执行路径与临时代码；更新运维文档（`docs/telegram_task_manager.md` 补 `/stop` 命令口径）。注：主循环直await路径保留为 escape hatch 分支（任务 1.5 明确要求），非遗留垃圾。
+- [x] 5.1 删除本次替代的旧执行路径与临时代码；更新运维文档（`docs/telegram_task_manager.md` 补 `/stop` 命令口径；`docs/features/scheduler_system.md` 补执行隔离章节；`docs/worker_task_isolation_usage.md` 为需求方使用说明）。注：主循环直await路径保留为 escape hatch 分支（任务 1.5 明确要求），非遗留垃圾。
 - [x] 5.2 openspec validate 通过；对照治理总纲自查（单一实现、无平台化扩建、检查点 helper 满足两调用方门槛）后交 A 审核。
+- [x] 5.3 开发产物清理（2026-11-02，按治理总纲 §2.4）：清除本 change 开发期间产生的 `data/QuoteBak/quote_pytest_logs_*`（含历史可再生 pytest 日志临时目录）与 `data/QuoteBak/pytest-of-python`（pytest 临时根，约 394MB，可再生）；仓库根 `sqlite:/` 误生成目录已删；验证代码无临时脚本/中间库残留（测试全部使用 tmp_path 与内存库）。保留 `data/QuoteBak/adjudicate_002717`（68GB，归属他项任务待所有者确认）、`/tmp` 下 ZCode 框架自身文件及 `py-yfinance`/`quote_ca_bundle_*.pem`（应用既有临时物，非本次产物，另行登记为全局卫生项）。
