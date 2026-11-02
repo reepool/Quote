@@ -87,6 +87,9 @@ _BSE_PERIODIC_ANNOUNCEMENT_ENDPOINT = (
 DEFAULT_STALE_RUNNING_TIMEOUT_SECONDS = 6 * 60 * 60
 DEFAULT_MAX_CANDIDATES = 0  # 0 = unlimited; finish every selected candidate in the same run
 DEFAULT_MAX_PAGES_PER_MARKET = 0  # 0 = no page cap; stop at watermark/last page/reported total
+# Checkpoint cadence for long candidate loops (worker-loop cancellation bound):
+# yield control every N candidates so cancellation lands within the configured interval.
+DEFAULT_CHECKPOINT_EVERY_CANDIDATES = 200
 STALE_FINANCIAL_JOB_NAMES = (
     "financial_disclosure_incremental_sync",
     "financial_disclosure_reconciliation_sync",
@@ -361,7 +364,11 @@ class FinancialDisclosureIncrementalSyncService:
                 run_id=run_id,
                 dry_run=dry_run,
                 checkpoint_every_candidates=int(
-                    maintenance_cfg.get("scan_checkpoint_every_candidates", 200) or 200
+                    maintenance_cfg.get(
+                        "scan_checkpoint_every_candidates",
+                        DEFAULT_CHECKPOINT_EVERY_CANDIDATES,
+                    )
+                    or DEFAULT_CHECKPOINT_EVERY_CANDIDATES
                 ),
                 checkpoint_interval_seconds=float(
                     maintenance_cfg.get("scan_checkpoint_interval_seconds", 30) or 30
@@ -753,7 +760,7 @@ class FinancialDisclosureIncrementalSyncService:
         max_candidates: int,
         run_id: Optional[int],
         dry_run: bool,
-        checkpoint_every_candidates: int = 200,
+        checkpoint_every_candidates: int = DEFAULT_CHECKPOINT_EVERY_CANDIDATES,
         checkpoint_interval_seconds: float = 30.0,
     ) -> Dict[Tuple[str, str], FinancialDisclosureMaintenanceCandidate]:
         instruments_by_id = {
@@ -1586,7 +1593,7 @@ class FinancialDisclosureIncrementalSyncService:
             )
             # Pre-import readiness sweep reads the financial database per
             # candidate; yield at batch boundaries for cancellation.
-            if len(before_ready) % 200 == 0:
+            if len(before_ready) % DEFAULT_CHECKPOINT_EVERY_CANDIDATES == 0:
                 await asyncio.sleep(0)
                 worker_context.report_progress(
                     phase="apply_precheck",
@@ -1649,7 +1656,7 @@ class FinancialDisclosureIncrementalSyncService:
             applied_total += 1
             # Apply-phase checkpoint: post-import readiness reads the financial
             # database per candidate; yield at batch boundaries for cancellation.
-            if applied_total % 200 == 0:
+            if applied_total % DEFAULT_CHECKPOINT_EVERY_CANDIDATES == 0:
                 await asyncio.sleep(0)
                 worker_context.report_progress(
                     phase="apply_candidates",

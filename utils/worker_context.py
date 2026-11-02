@@ -109,8 +109,12 @@ class WorkerRunState:
             self._pending_cancel = False
             return pending
 
-    def request_cancel(self, reason: str = "") -> bool:
-        """Thread-safe cancellation injection at the task's next await checkpoint."""
+    def request_cancel(self) -> bool:
+        """Thread-safe cancellation injection at the task's next await checkpoint.
+
+        Returns True when cancellation was injected into a live worker task.
+        Callers log the reason (operator stop / timeout / shutdown).
+        """
         with self._lock:
             self._stop_requested = True
             self._pending_cancel = True
@@ -125,7 +129,6 @@ class WorkerRunState:
         except RuntimeError:
             # Worker loop already closed; the thread is on its way out.
             return False
-        del reason  # logged by callers
         return True
 
     @property

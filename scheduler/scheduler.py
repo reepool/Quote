@@ -457,7 +457,7 @@ class TaskScheduler:
                 return await asyncio.wait_for(_wait_outcome(), timeout=max_runtime_seconds)
             return await _wait_outcome()
         except asyncio.TimeoutError:
-            state.request_cancel(reason="max_runtime_seconds")
+            state.request_cancel()
             scheduler_logger.warning(
                 "[Scheduler] Task %s timed out after %ss (run_id=%s); cancellation injected "
                 "at next checkpoint",
@@ -468,6 +468,11 @@ class TaskScheduler:
             self._spawn_background(self._watch_orphan_worker(thread, state))
             raise
         except asyncio.CancelledError:
+            # Parent-side cancellation must always propagate to the worker;
+            # otherwise the run keeps going as an unwatched orphan. Operator
+            # stop additionally notifies; scheduler shutdown relies on the
+            # grace-bounded _shutdown_worker_runs path instead.
+            state.request_cancel()
             if state.stop_requested:
                 scheduler_logger.warning(
                     "[Scheduler] Task %s stopped by operator (run_id=%s)",
@@ -556,7 +561,7 @@ class TaskScheduler:
             return {"job_id": job_id, "requested": 0, "runs": []}
         snapshots = []
         for state in states:
-            injected = state.request_cancel(reason="operator_stop")
+            injected = state.request_cancel()
             snapshot = state.snapshot()
             snapshot["cancel_injected"] = injected
             snapshots.append(snapshot)
@@ -591,7 +596,7 @@ class TaskScheduler:
             [(s.job_id, s.run_id) for s in states],
         )
         for state in states:
-            state.request_cancel(reason="shutdown")
+            state.request_cancel()
         grace = self._worker_shutdown_grace_seconds()
         deadline = asyncio.get_running_loop().time() + grace
         while any(not state.finished for state in states):

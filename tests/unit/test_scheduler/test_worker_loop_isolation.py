@@ -485,6 +485,66 @@ def test_build_candidates_scan_yields_checkpoints(monkeypatch):
     assert isinstance(candidates, dict)
 
 
+@pytest.mark.asyncio
+async def test_worker_exception_propagates_to_caller(scheduler, monkeypatch):
+    """Worker exceptions surface on the main loop through the existing error path."""
+    job_id = "worker_exception_probe"
+
+    async def fake_task(job_config=None):
+        raise ValueError("boom from worker")
+
+    _install_task(monkeypatch, job_id, fake_task)
+    try:
+        scheduler.job_configs = {job_id: FakeJobConfig(job_id=job_id)}
+        with pytest.raises(ValueError, match="boom from worker"):
+            await scheduler._run_configured_task_raw(
+                job_id,
+                {"run_on_main_loop": False},
+                include_dependencies=False,
+            )
+        # Failed runs are unregistered; the scheduler stays usable.
+        assert not scheduler.get_worker_run_snapshots()
+    finally:
+        _cleanup_task(monkeypatch, job_id)
+
+
+@pytest.mark.asyncio
+async def test_runtime_params_inherit_job_level_worker_isolation(scheduler, monkeypatch):
+    """/run-style runtime params inherit job-config run_on_main_loop (merge base).
+
+    execute_job_direct builds params as job_config.parameters updated with
+    runtime params; a param'd run of a worker-opted job must still execute on
+    the worker loop (this is the bounded /run target_symbols replay path).
+    """
+    job_id = "worker_params_inherit_probe"
+    seen = {}
+
+    async def fake_task(job_config=None, target_symbols=None):
+        seen["thread"] = threading.get_ident()
+        seen["target_symbols"] = target_symbols
+        return True
+
+    _install_task(monkeypatch, job_id, fake_task)
+    try:
+        scheduler.job_configs = {
+            job_id: FakeJobConfig(
+                job_id=job_id,
+                parameters={"run_on_main_loop": False, "max_runtime_seconds": 18000},
+            )
+        }
+        # Simulate the merged-params shape produced by execute_job_direct.
+        params = dict(scheduler.job_configs[job_id].parameters)
+        params.update({"target_symbols": ["600036"]})
+        result = await scheduler._run_configured_task_raw(
+            job_id, params, include_dependencies=False
+        )
+        assert result is True
+        assert seen["thread"] != threading.get_ident()
+        assert seen["target_symbols"] == ["600036"]
+    finally:
+        _cleanup_task(monkeypatch, job_id)
+
+
 def test_worker_context_report_progress_is_noop_outside_worker():
     """report_progress is a safe no-op without a bound run (main loop/CLI)."""
     worker_context.report_progress(phase="any", processed=1)

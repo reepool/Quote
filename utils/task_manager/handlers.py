@@ -180,9 +180,19 @@ class TaskManagerHandlers:
             job_id = args[0]
             result = scheduler.request_stop_job(job_id)
             if not result["requested"]:
+                # Distinguish "not running" from "running on the main loop"
+                # (escape hatch / not yet opted in), which /stop cannot stop.
+                main_loop_runs = scheduler.running_tasks.get(job_id)
+                if main_loop_runs:
+                    message = (
+                        f"⚠️ 任务 `{job_id}` 正在主循环上运行（worker 隔离未启用或已显式豁免），"
+                        f"`/stop` 无法停止主循环任务；需要时请使用 `/restart_system` 或等待其自然结束。"
+                    )
+                else:
+                    message = f"⚠️ 任务 `{job_id}` 当前没有运行中的实例。"
                 await self.task_manager.send_message(
                     chat_id,
-                    f"⚠️ 任务 `{job_id}` 当前没有运行中的实例。",
+                    message,
                     parse_mode='markdown',
                 )
                 return

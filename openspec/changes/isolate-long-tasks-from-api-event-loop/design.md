@@ -150,7 +150,7 @@ scheduler 与 API 拆分为两个进程（`main.py` 拆分或双 systemd 单元�
 
 | 资源 | 归属 | 处理与结论 |
 |---|---|---|
-| Telethon 客户端（`scheduler/tasks.py` `self.bot`） | 主 loop | `_send_task_report` 顶部 marshalling：worker 内调用整体回主 loop 执行（非阻塞 await），报告契约与签名不变 |
+| Telethon 客户端（`scheduler/tasks.py` `self.bot`） | 主 loop | `_send_task_report` 顶部 marshalling：以"当前 run 绑定存在"（worker 启动器设置的 contextvar）为判据——比主 loop 注册更精确且不依赖注册顺序；worker 内调用整体回主 loop 执行（非阻塞 await），报告契约与签名不变 |
 | task async 引擎（`database/connection.py` `task_async_engine`，245 处 `db_ops` await） | 连接随 checkout 绑定 loop | `task_async_pool.pool_class="nullpool"`：每次 checkout 新建 aiosqlite 连接、绑定使用方 loop、会话关闭即释放——worker-safe by construction；容量键在该模式下行内无效（启动日志已注明）；api 引擎保持 AsyncAdaptedQueuePool 不变，`api-db-resource-isolation` 的双池隔离语义保持 |
 | 同步 sqlite3（`research/storage.py` per-call 连接，含 financials.db） | 无 loop 绑定 | 线程安全，worker-safe；驱动默认 5 秒 busy 等待兜底（见附录 B） |
 | CNInfo/官方源 HTTP（`research/providers/cninfo_http.py`，同步 requests/curl_cffi） | 无 loop 绑定 | worker-safe |
