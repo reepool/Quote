@@ -5232,20 +5232,33 @@ class ScheduledTasks:
         """
         # Loop-bound resource guard: the Telethon client lives on the main loop.
         # A scheduler worker run binds its state to the task context, so the
-        # current-run binding is the precise "inside a worker loop" signal
-        # (independent of main-loop registration). Marshal the whole delivery
-        # back to the main loop with a non-blocking await; report contracts and
-        # signatures are unchanged.
+        # current-run binding is the precise "inside a worker loop" signal.
+        # The guard is evaluated exactly ONCE here; the delivery body below
+        # carries no guard. (call_soon_threadsafe copies the submitting
+        # thread's contextvars, so a marshalled delivery on the main loop
+        # still observes the worker-run binding - an unguarded re-check there
+        # would recurse forever.)
         from utils import worker_context
         if worker_context.get_current_run_state() is not None:
             return await worker_context.run_on_main_loop(
-                lambda: self._send_task_report(
+                lambda: self._deliver_task_report(
                     report_data=report_data,
                     report_type=report_type,
                     task_name=task_name,
                     job_config=job_config,
                 )
             )
+        return await self._deliver_task_report(
+            report_data=report_data,
+            report_type=report_type,
+            task_name=task_name,
+            job_config=job_config,
+        )
+
+    async def _deliver_task_report(self, report_data: dict, report_type: str,
+                                   task_name: str, job_config: Optional[JobConfig] = None) -> bool:
+        """Deliver a task report on the current loop. No worker-run guard:
+        safe to execute on either loop exactly once."""
         try:
             if (
                 isinstance(report_data.get('instrument_master_governance'), dict)

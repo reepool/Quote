@@ -545,6 +545,64 @@ async def test_runtime_params_inherit_job_level_worker_isolation(scheduler, monk
         _cleanup_task(monkeypatch, job_id)
 
 
+@pytest.mark.asyncio
+async def test_report_delivery_marshals_exactly_once(scheduler, monkeypatch):
+    """Worker-run report must be delivered on the main loop exactly once.
+
+    Regression for the production RecursionError: call_soon_threadsafe copies
+    the submitting (worker) thread's contextvars, so the marshalled delivery
+    on the main loop still observes the worker-run binding - an unguarded
+    re-check there recursed forever.
+    """
+    job_id = "worker_report_probe"
+    from utils import worker_context as wc
+
+    wc.set_main_loop(asyncio.get_running_loop())
+    try:
+        deliver_calls = []
+        marshal_calls = []
+
+        async def fake_deliver(self, report_data, report_type, task_name, job_config=None):
+            deliver_calls.append(asyncio.get_running_loop())
+            return True
+
+        real_run_on_main_loop = wc.run_on_main_loop
+
+        async def counting_run_on_main_loop(factory):
+            marshal_calls.append(asyncio.get_running_loop())
+            return await real_run_on_main_loop(factory)
+
+        monkeypatch.setattr(
+            task_module.ScheduledTasks,
+            "_deliver_task_report",
+            fake_deliver,
+        )
+        monkeypatch.setattr(wc, "run_on_main_loop", counting_run_on_main_loop)
+
+        async def fake_task(job_config=None):
+            return await task_module.scheduled_tasks._send_task_report(
+                report_data={"status": "success"},
+                report_type="maintenance_report",
+                task_name=job_id,
+            )
+
+        _install_task(monkeypatch, job_id, fake_task)
+        try:
+            scheduler.job_configs = {job_id: FakeJobConfig(job_id=job_id)}
+            result = await scheduler._run_configured_task_raw(
+                job_id,
+                {"run_on_main_loop": False},
+                include_dependencies=False,
+            )
+            assert result is True
+            assert len(deliver_calls) == 1, f"delivery ran {len(deliver_calls)} times"
+            assert len(marshal_calls) == 1
+        finally:
+            _cleanup_task(monkeypatch, job_id)
+    finally:
+        wc.set_main_loop(None)
+
+
 def test_worker_context_report_progress_is_noop_outside_worker():
     """report_progress is a safe no-op without a bound run (main loop/CLI)."""
     worker_context.report_progress(phase="any", processed=1)
