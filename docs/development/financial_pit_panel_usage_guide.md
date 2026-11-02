@@ -122,8 +122,11 @@ curl "http://<host>:8000/api/v1/research/financials/pit/changes?cursor=<next_cur
 2. **日常**：定时轮询 `/pit/changes?cursor=...`，对命中键重拉对应 panel 行；
 3. **调仓日**：直接调用 cross-section（服务端装配，热查询 P95 <1s），或用本地缓存离线装配（同语义：每票 `available_at ≤ T` 的最新报告期）。
 
-## 8. 监控建议（coverage 端点）
+## 8. 监控建议（coverage 端点 + 服务日志）
 
+- **服务日志关注** `financial mapping registry has no rows for mapping_version=...`
+  警告（出现即映射目录装载缺失，全市场就绪将报 policy gap；运行
+  `scripts/financial_pit_panel/load_mapping_catalog.py` 修复）；
 - `share_validation` 分布漂移（consensus 占比骤降 = 某锚数据源异常）；
 - `available_at_quality` 分布（exact 占比下降 = 披露日采集退化）；
 - `discrepancy` 基准 ~1.7%、`revised_after_publish` 行数突增（更正季）；
