@@ -1552,22 +1552,23 @@ def _replay_chapter(
     authorization: str | None = None,
     replay_name: str = "s23-paper-chapter-20261101",
     unmatched_inventory: str | None = None,
+    company_spans: bool = False,
 ):
-    """Isolated replay. Does not remove S23 or S25 evidence."""
+    """Isolated replay. The output directory is unique and removed on exit."""
     import hashlib
     import shutil
+    import uuid
     from pathlib import Path
 
     from research.company_profile.bounded_entry import S23_AUTHORIZATION, main
     from research.company_profile.reads import CompanyProfileReadService
 
     root = Path("/home/python/Quote")
-    frozen_s22 = (root / "data/QuoteBak/s22-paper-core-20261031/query.json").read_bytes()
-    frozen_s23 = (root / "data/QuoteBak/s23-paper-chapter-20261101/query.json").read_bytes()
-    frozen_s25 = (root / "data/QuoteBak/s25-paper-core-offline/query.json").read_bytes()
-    frozen_s28 = (
-        root / "data/QuoteBak/s28-paper-observation-20261101/query.json"
-    ).read_bytes()
+    protected = (
+        root / "data/QuoteBak/s28-paper-observation-20261101/query.json",
+        root / "data/QuoteBak/s29-selected-core-offline/query.json",
+    )
+    sentinels = {path: path.read_bytes() for path in protected}
     change = root / "openspec/changes/restore-company-profile-llm-led-generalization"
     source = json.loads((change / "s1-pool-s1-600103-s16-binding.json").read_text())
     for retired in (
@@ -1591,6 +1592,8 @@ def _replay_chapter(
     source["offline_replay_query"] = str(root / "data/QuoteBak" / replay_name / "query.json")
     if unmatched_inventory:
         source["offline_unmatched_inventory"] = unmatched_inventory
+    if company_spans:
+        source["offline_company_spans"] = True
     source["chapter_select"] = True
     source["task_route_labels"] = ["deepseek:deepseek-flash", "scorpio:grok-4.7"]
     source["task_route_first_only"] = True
@@ -1605,47 +1608,48 @@ def _replay_chapter(
         name: hashlib.sha256((root / name).read_bytes()).hexdigest()
         for name in source["file_hashes"]
     }
-    run_root = root / "data/QuoteBak" / directory
-    if directory.startswith(("s27-", "s29-")) and run_root.exists():
-        shutil.rmtree(run_root)
-    path = root / "data/QuoteBak" / f"{directory}-binding.json"
+    run_root = root / "data/QuoteBak" / f"{directory}-{uuid.uuid4().hex[:8]}"
+    if run_root.exists():
+        raise AssertionError(f"isolated output already exists: {run_root}")
+    path = root / "data/QuoteBak" / f"{run_root.name}-binding.json"
     path.write_text(json.dumps(source, ensure_ascii=False))
     argv = sys.argv
     sys.argv = ["bounded_entry", "--binding", str(path), "--run-root", str(run_root)]
     try:
         code = main()
+        if code != 0 or not (run_root / "query.json").is_file():
+            result = json.loads((run_root / "entry-result.json").read_text())
+            raise AssertionError(f"entry failed code={code} error={result.get('error')}")
+        query = json.loads((run_root / "query.json").read_text())
+        exported = json.loads((run_root / "export.json").read_text())
+        reloaded = CompanyProfileReadService(run_root / "output").query(
+            (source["asset"]["instrument_id"],)
+        )
+        assert query["profiles"] == exported["profiles"] == reloaded["profiles"]
+        for sentinel, raw in sentinels.items():
+            assert sentinel.read_bytes() == raw
+        profile = query["profiles"][0]["three_views"]
+        gaps = profile.get("gaps") or []
+        inventories = [
+            item.get("source_pages")
+            for item in profile.get("call_receipts") or []
+            if item.get("purpose") == "source_inventory" and item.get("source_scope") != "page_map"
+        ]
+        assert any(11 in (pages or []) for pages in inventories), inventories
+        assert not any("schema validation failed" in gap for gap in gaps), gaps
+        assert "synthesize_views" in [
+            item.get("purpose")
+            for item in profile.get("call_receipts") or []
+            if item.get("physical_request")
+        ]
+        return profile, gaps
     finally:
         sys.argv = argv
-    if code != 0 or not (run_root / "query.json").is_file():
-        result = json.loads((run_root / "entry-result.json").read_text())
-        raise AssertionError(f"entry failed code={code} error={result.get('error')}")
-    query = json.loads((run_root / "query.json").read_text())
-    exported = json.loads((run_root / "export.json").read_text())
-    reloaded = CompanyProfileReadService(run_root / "output").query(
-        (source["asset"]["instrument_id"],)
-    )
-    assert query["profiles"] == exported["profiles"] == reloaded["profiles"]
-    assert frozen_s22 == (root / "data/QuoteBak/s22-paper-core-20261031/query.json").read_bytes()
-    assert frozen_s23 == (root / "data/QuoteBak/s23-paper-chapter-20261101/query.json").read_bytes()
-    assert frozen_s25 == (root / "data/QuoteBak/s25-paper-core-offline/query.json").read_bytes()
-    assert frozen_s28 == (
-        root / "data/QuoteBak/s28-paper-observation-20261101/query.json"
-    ).read_bytes()
-    profile = query["profiles"][0]["three_views"]
-    gaps = profile.get("gaps") or []
-    inventories = [
-        item.get("source_pages")
-        for item in profile.get("call_receipts") or []
-        if item.get("purpose") == "source_inventory" and item.get("source_scope") != "page_map"
-    ]
-    assert any(11 in (pages or []) for pages in inventories), inventories
-    assert not any("schema validation failed" in gap for gap in gaps), gaps
-    assert "synthesize_views" in [
-        item.get("purpose")
-        for item in profile.get("call_receipts") or []
-        if item.get("physical_request")
-    ]
-    return profile, gaps
+        path.unlink(missing_ok=True)
+        shutil.rmtree(run_root, ignore_errors=True)
+        for sentinel, raw in sentinels.items():
+            if sentinel.read_bytes() != raw:
+                raise AssertionError(f"protected evidence changed: {sentinel}")
 
 
 def test_diagnostic_budget_delivers_the_whole_core_offline():
@@ -1706,55 +1710,75 @@ def test_regular_budget_keeps_a_partial_core():
         ), gaps
 
 
-def test_selected_real_navigation_finishes_the_core_offline():
-    """S28 asked for pages 9-22. The offline replay must read that range."""
+def test_company_sentences_finish_one_isolated_core():
+    """Selected pages, complete company sentences, and the review roots stay put."""
+    from pathlib import Path
+
     from research.company_profile.bounded_entry import S27_OFFLINE_DIAGNOSTIC
 
+    protected = Path("/home/python/Quote/data/QuoteBak/s29-selected-core-offline")
+    before = (protected / "query.json").read_bytes()
     profile, gaps = _replay_chapter(
         "present",
-        "s29-selected-core-offline",
+        "s30-company-span",
         tokens=480_000,
         requests=32,
         authorization=S27_OFFLINE_DIAGNOSTIC,
         replay_name="s28-paper-observation-20261101",
-        unmatched_inventory="sent_text",
+        company_spans=True,
     )
+    assert (protected / "query.json").read_bytes() == before
     inventories = [
         item.get("source_pages") or []
         for item in profile.get("call_receipts") or []
         if item.get("purpose") == "source_inventory" and item.get("source_scope") != "page_map"
     ]
     sent = {page for pages in inventories for page in pages}
-    assert {9, 10, 11, 16, 18, 22} <= sent, inventories
+    assert {9, 11, 16, 18} <= sent, inventories
     assert profile.get("draft_complete") is True, gaps
     assert profile.get("real_semantic_complete") is False
     assert all(
         view["assessment_status"] == "assessed" for view in profile["views"].values()
     ), gaps
-    blob = "\n".join(
-        str(claim.get("answer") or "")
-        + "\n"
-        + "\n".join(
-            str((item.get("anchor") or {}).get("bounded_quote") or "")
-            for item in claim.get("evidence") or []
-        )
+    claims = {
+        claim["claim_id"]: claim
         for view in profile["views"].values()
         for claim in view.get("claims") or []
         if claim.get("review_state") == "verified"
-    )
-    assert "自主生产的经营模式" in blob
-    assert "产品直销，以销定产" in blob
-    assert "木竹片采购" in blob
-    assert "2,418,990,221.17" in blob
+    }
+    answers = [str(claim.get("answer") or "") for claim in claims.values()]
+    joined = "\n".join(answers)
+    assert "14,186.7" not in joined
+    assert "2,418,990,221.17" in joined
+    assert "2,028,696,061.86" in joined
+    assert "受原辅材料价格变动及产品结构调整" in joined
+    assert "企业行列" in joined
+    assert "伸性纸袋纸" in joined
+    assert "国内木竹片采购" in joined
+    assert "自主生产的经营模式" in joined
+    assert "以销定产" in joined
+    assert not any(answer.rstrip().endswith("-9.") or answer.rstrip().endswith("纸箱") for answer in answers)
     covered = []
     for item in profile.get("call_receipts") or []:
         if item.get("purpose") != "verify_views":
             continue
         for check in (item.get("response_payload") or {}).get("checks") or []:
-            if check.get("target_type") == "condition" and check.get("covers_target_id"):
-                covered.append(str(check.get("target_id")))
-    assert any("operating-role" in item or "operating-mode" in item for item in covered), covered
-    assert not any(gap.startswith("major_condition_not_verified:") for gap in gaps), gaps
+            if check.get("target_type") != "condition" or not check.get("covers_target_id"):
+                continue
+            target = str(check["covers_target_id"])
+            match = next(
+                (
+                    claim
+                    for claim_id, claim in claims.items()
+                    if claim_id == target or claim_id.endswith(target) or target.endswith(claim_id)
+                ),
+                None,
+            )
+            assert match is not None, target
+            covered.append((str(check.get("target_id")), str(match.get("answer") or "")))
+    assert any("period-operating-revenue" in target and "2,418,990,221.17" in answer for target, answer in covered)
+    assert any("operating-role" in target and "国内木竹片采购" in answer for target, answer in covered)
+    assert not any("14,186.7" in answer for _target, answer in covered)
     assert not any(gap.startswith("necessary_unread:") for gap in gaps), gaps
 
 

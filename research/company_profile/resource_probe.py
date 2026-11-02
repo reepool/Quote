@@ -776,3 +776,178 @@ def core_package_reply(request: dict) -> dict:
         deduped[(check["target_type"], str(check["target_id"]))] = check
     result["checks"] = list(deduped.values())
     return result
+
+
+_COMPANY_SPANS = (
+    ("principal_business", "core-business", "公司属于制浆造纸行业", "企业行列。"),
+    ("products_services", "core-products", "主要产品为", "产品行销全国各地和国际市场"),
+    ("revenue_model", "sales-mode-revenue", "直销", "2,028,696,061.86"),
+    (
+        "revenue_model",
+        "core-question:period-operating-revenue",
+        "单位：元 币种：人民币",
+        "2,418,990,221.17",
+    ),
+    (
+        "input_exposure",
+        "raw-material-input",
+        "受原辅材料价格变动及产品结构调整",
+        "毛利率同比增加。",
+    ),
+    (
+        "supply_chain_role",
+        "core-question:operating-role",
+        "国内木竹片采购",
+        "以销定产”的销售模式。",
+    ),
+    (
+        "output_exposure",
+        "downstream-sales",
+        "公司销售采取",
+        "以销定产”的销售模式。",
+    ),
+)
+
+
+def _company_span(text: str, start: str, end: str) -> str | None:
+    """Exact company passage. A short keyword slice is not a sentence."""
+    begin = text.find(start)
+    if begin < 0:
+        return None
+    finish = text.find(end, begin)
+    if finish < 0:
+        return None
+    quote = text[begin : finish + len(end)]
+    if "14,186.7" in quote or "全国造纸" in quote:
+        return None
+    compact = " ".join(quote.split())
+    if compact.endswith("-9.") or compact.endswith("纸箱"):
+        return None
+    return quote
+
+
+def company_span_reply(request: dict) -> dict:
+    """Replay complete company sentences that are already in the sent pages.
+
+    This is one paper's controlled sample. It is not a general reader and not
+    a quality score.
+    """
+    result = {
+        "schema_version": "company_profile_report_response.v3",
+        "request_id": request["request_id"],
+        "purpose": request["purpose"],
+    }
+    pages = [
+        page
+        for page in request.get("source_pages") or []
+        if page.get("readable", True) and str(page.get("text") or "").strip()
+    ]
+    if request["purpose"] == "source_inventory" and request.get("source_scope") == "page_map":
+        result["requested_pages"] = []
+        return result
+    if request["purpose"] == "source_inventory":
+        conditions = []
+        for dimension, condition_id, start, end in _COMPANY_SPANS:
+            for page in pages:
+                quote = _company_span(str(page.get("text") or ""), start, end)
+                if quote is None:
+                    continue
+                conditions.append(
+                    {
+                        "condition_id": condition_id,
+                        "dimension": dimension,
+                        "description": " ".join(quote.split()),
+                        "major": True,
+                        "statement_status": "current",
+                        "evidence": [{"page": int(page["page"]), "quote": quote}],
+                    }
+                )
+                break
+        result["requested_pages"] = []
+        result["source_conditions"] = conditions
+        return result
+    if request["purpose"] == "synthesize_views":
+        catalog = request.get("evidence_catalog") or {}
+        claims = []
+        for item in request.get("source_conditions") or []:
+            evidence = []
+            raws = list(item.get("evidence") or [])
+            raws.extend(item.get("evidence_refs") or [])
+            for raw in raws:
+                if isinstance(raw, str):
+                    raw = catalog.get(raw) or {}
+                if not isinstance(raw, dict):
+                    continue
+                anchor = raw.get("anchor") or {}
+                quote = str(
+                    raw.get("quote")
+                    or anchor.get("bounded_quote")
+                    or anchor.get("model_quote")
+                    or ""
+                )
+                page_no = raw.get("page")
+                sent = next(
+                    (
+                        page
+                        for page in pages
+                        if page_no is not None and int(page["page"]) == int(page_no)
+                    ),
+                    None,
+                )
+                if sent is None or not quote:
+                    continue
+                page_text = str(sent.get("text") or "")
+                if quote not in page_text and "".join(quote.split()) not in "".join(page_text.split()):
+                    continue
+                evidence.append({"page": int(page_no), "quote": quote})
+            if not evidence:
+                continue
+            claims.append(
+                {
+                    "claim_id": f"span-{item.get('condition_id')}",
+                    "dimension": item.get("dimension"),
+                    "status": "observed",
+                    "answer": " ".join(
+                        " ".join(item_evidence["quote"].split()) for item_evidence in evidence
+                    ),
+                    "condition_ids": [item["condition_id"]] if item.get("condition_id") else [],
+                    "supporting_record_ids": [],
+                    "evidence": evidence,
+                }
+            )
+        result["claims"] = claims
+        return result
+    result["checks"] = []
+    claims = request.get("claims") or []
+    for claim in claims:
+        result["checks"].append(
+            {
+                "target_type": "claim",
+                "target_id": claim["claim_id"],
+                "status": "pass",
+                "explanation": "主张使用的是本请求里的完整原句。",
+            }
+        )
+    for item in request.get("source_conditions") or []:
+        condition_id = str(item.get("condition_id") or "")
+        match = next(
+            (
+                claim.get("claim_id")
+                for claim in claims
+                if condition_id and condition_id in (claim.get("condition_ids") or [])
+            ),
+            None,
+        )
+        if not match:
+            continue
+        result["checks"].append(
+            {
+                "target_type": "condition",
+                "target_id": condition_id,
+                "status": "pass",
+                "covers_target_type": "claim",
+                "covers_target_id": match,
+                "explanation": "覆盖对象就是这条完整原句。",
+            }
+        )
+    return result

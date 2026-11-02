@@ -29,6 +29,7 @@ S22_AUTHORIZATION = "company_profile_s22_core.2026-10-31"
 S23_AUTHORIZATION = "company_profile_s23_chapter.2026-11-01"
 S27_OFFLINE_DIAGNOSTIC = "company_profile_s27_offline_diagnostic.2026-11-01"
 S28_OBSERVATION = "company_profile_s28_observation.2026-11-01"
+S30_OBSERVATION = "company_profile_s30_observation.2026-11-02"
 
 
 def company_window_limits(binding: dict, state: dict | None) -> tuple[int, int]:
@@ -748,6 +749,13 @@ def validate_binding(
             and int(binding.get("max_physical_requests") or 0) <= 32
             and int(binding.get("max_recoveries") or 0) <= 2
         )
+    elif auth == S30_OBSERVATION:
+        allowed = (
+            0 < elapsed <= 1200
+            and int(binding.get("max_tokens") or 0) <= 240_000
+            and int(binding.get("max_physical_requests") or 0) <= 16
+            and int(binding.get("max_recoveries") or 0) <= 2
+        )
     elif auth == S28_OBSERVATION:
         allowed = (
             0 < elapsed <= 1200
@@ -874,6 +882,7 @@ def validate_binding(
                 "s1-600103-s22",
                 "s1-600103-s23",
                 "s1-600103-s28",
+                "s1-600103-s30",
                 "s1-600000-s23",
             }
             or not authorization.get("approval_reference")
@@ -1265,6 +1274,11 @@ def _worker(
             if projected is not None:
                 result = projected
                 transport_requests[-1]["replay_kind"] = "protocol_reconstruction"
+            elif binding.get("offline_company_spans"):
+                from .resource_probe import company_span_reply
+
+                result = company_span_reply(request)
+                transport_requests[-1]["replay_kind"] = "controlled_sample"
             elif request["purpose"] == "source_inventory":
                 if binding.get("offline_unmatched_inventory") == "sent_text":
                     result = core_package_reply(request)
