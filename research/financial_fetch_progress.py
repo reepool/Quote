@@ -51,6 +51,17 @@ def log_financial_fetch_progress(
     """Log fetch progress when the current index crosses the reporting cadence."""
     if not should_emit_financial_fetch_progress(processed, total):
         return
+    # Surface fetch progress through the worker-run state so /status, the API
+    # endpoint and heartbeats show live counters during long fetch phases
+    # (no-op outside a scheduler worker run).
+    from utils import worker_context
+
+    worker_context.report_progress(
+        phase=f"fetch_{channel}",
+        processed=processed,
+        total=total,
+        **details,
+    )
     logger.info(
         format_financial_fetch_progress(
             channel=channel,
