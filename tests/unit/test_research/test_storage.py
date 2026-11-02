@@ -2941,6 +2941,60 @@ def test_financial_source_field_mappings_and_audit_results_round_trip(tmp_path):
     assert audits[0]["audit"]["mapping_audit"][0]["canonical_fact"] == "revenue"
 
 
+def test_local_core_facts_warns_loudly_when_mapping_version_missing(
+    tmp_path, caplog, monkeypatch
+):
+    """Deployment-gap observability (incident 2026-11-03): a mapping
+    version absent from the registry must produce a loud warning naming
+    the load tool, not silently return an empty approval set."""
+    import logging
+
+    from research.storage import ResearchStorageManager
+
+    storage, _ = _build_storage_manager(tmp_path)
+    storage.initialize()
+    # seed the registry with an older version so the "known-good version
+    # produces no warning" leg has something present to compare against
+    run_id = storage.start_ingestion_run(
+        domain="financial_statements",
+        job_name="mapping_registry_seed_test",
+        market="SSE",
+    )
+    storage.upsert_financial_source_field_mappings(
+        get_financial_source_field_mappings(
+            mapping_version="sina_ths_core_financial_facts.v1"
+        ),
+        ingestion_run_id=run_id,
+    )
+
+    with caplog.at_level(logging.WARNING, logger="research.storage"):
+        result = storage.get_financial_local_core_facts(
+            "600519.SH",
+            requested_canonical_facts=["revenue"],
+            mapping_version="sina_ths_core_financial_facts.v_never_loaded",
+        )
+
+    assert result["missing_fields"], result
+    reasons = {item["reason"] for item in result["missing_fields"]}
+    assert reasons <= {"mapping_catalog_empty", "outside_approved_local_core"}
+    assert any(
+        "load_mapping_catalog.py" in record.getMessage()
+        for record in caplog.records
+    ), "expected the loud registry-missing warning naming the load tool"
+    # sanity: a version present in the registry produces no such warning
+    caplog.clear()
+    with caplog.at_level(logging.WARNING, logger="research.storage"):
+        storage.get_financial_local_core_facts(
+            "600519.SH",
+            requested_canonical_facts=["revenue"],
+            mapping_version="sina_ths_core_financial_facts.v1",
+        )
+    assert not any(
+        "no rows for mapping_version" in record.getMessage()
+        for record in caplog.records
+    )
+
+
 def test_financial_local_core_facts_returns_missing_field_diagnostics(tmp_path):
     storage, _ = _build_storage_manager(tmp_path)
     storage.initialize()

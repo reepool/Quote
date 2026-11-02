@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import os
+import logging
 import sqlite3
 import hashlib
 import threading
@@ -18,6 +19,8 @@ from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 from datetime import timedelta
 from typing import Any, Dict, Generator, List, Optional, Sequence, Tuple
+
+logger = logging.getLogger(__name__)
 
 from research.change_watermarks import append_change_record, ensure_change_log_schema
 from research.announcements.models import (
@@ -2505,6 +2508,21 @@ class ResearchStorageManager:
             approved_for_core=True,
             mapping_version=mapping_version,
         )
+        if not approved_mappings:
+            # The requested mapping version has no rows in the registry:
+            # every readiness answer below would be mapping_catalog_empty /
+            # outside_approved_local_core for the whole market, so surface
+            # the deployment gap loudly instead of letting it hide inside
+            # per-field diagnostics (incident 2026-11-03, v6 never loaded).
+            logger.warning(
+                "financial mapping registry has no rows for mapping_version=%r "
+                "(profile=%r): readiness will report mapping_catalog_empty for "
+                "the entire market; load the catalog via "
+                "scripts/financial_pit_panel/load_mapping_catalog.py and then "
+                "re-run",
+                mapping_version,
+                profile,
+            )
         approved_core_facts = sorted(
             {
                 str(mapping.get("canonical_fact") or "")
