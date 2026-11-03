@@ -30,6 +30,7 @@ S23_AUTHORIZATION = "company_profile_s23_chapter.2026-11-01"
 S27_OFFLINE_DIAGNOSTIC = "company_profile_s27_offline_diagnostic.2026-11-01"
 S28_OBSERVATION = "company_profile_s28_observation.2026-11-01"
 S30_OBSERVATION = "company_profile_s30_observation.2026-11-02"
+S31_COVERAGE = "company_profile_s31_coverage.2026-11-03"
 
 
 def company_window_limits(binding: dict, state: dict | None) -> tuple[int, int]:
@@ -749,6 +750,13 @@ def validate_binding(
             and int(binding.get("max_physical_requests") or 0) <= 32
             and int(binding.get("max_recoveries") or 0) <= 2
         )
+    elif auth == S31_COVERAGE:
+        allowed = (
+            0 < elapsed <= 600
+            and int(binding.get("max_tokens") or 0) <= 40_000
+            and int(binding.get("max_physical_requests") or 0) <= 4
+            and int(binding.get("max_recoveries") or 0) <= 1
+        )
     elif auth == S30_OBSERVATION:
         allowed = (
             0 < elapsed <= 1200
@@ -883,6 +891,7 @@ def validate_binding(
                 "s1-600103-s23",
                 "s1-600103-s28",
                 "s1-600103-s30",
+                "s1-600103-s31",
                 "s1-600000-s23",
             }
             or not authorization.get("approval_reference")
@@ -1172,7 +1181,96 @@ def _worker(
         )
         result = {"request_id": request["request_id"], "purpose": request["purpose"]}
         protocol = binding.get("offline_protocol")
-        if protocol == "nonempty_v3":
+        if protocol == "coverage_repair_v1":
+            if request["purpose"] != "verify_views":
+                raise ValueError("coverage repair does not reread or redraft")
+            claims = request.get("claims") or []
+
+            def compact(value: object) -> str:
+                return "".join(str(value or "").split())
+
+            checks = []
+            for claim in claims:
+                checks.append(
+                    {
+                        "target_type": "claim",
+                        "target_id": claim["claim_id"],
+                        "status": "pass",
+                        "explanation": "离线只保留已有主张，不重新成稿。",
+                    }
+                )
+            catalog = request.get("evidence_catalog") or {}
+            for condition in request.get("source_conditions") or []:
+                pieces = [compact(condition.get("description"))]
+                raws = list(condition.get("evidence") or [])
+                raws.extend(condition.get("evidence_refs") or [])
+                for raw in raws:
+                    if isinstance(raw, str):
+                        raw = catalog.get(raw) or {}
+                    if not isinstance(raw, dict):
+                        continue
+                    anchor = raw.get("anchor") or {}
+                    pieces.append(
+                        compact(
+                            raw.get("quote")
+                            or anchor.get("bounded_quote")
+                            or anchor.get("model_quote")
+                        )
+                    )
+                needles = [piece for piece in pieces[1:] if len(piece) >= 8] or [
+                    piece for piece in pieces if len(piece) >= 8
+                ]
+                needle = max(needles, key=len) if needles else ""
+                matches = []
+                for claim in claims:
+                    answer = compact(claim.get("answer"))
+                    quotes = []
+                    for raw in list(claim.get("evidence") or []) + list(
+                        claim.get("evidence_refs") or []
+                    ):
+                        if isinstance(raw, str):
+                            raw = catalog.get(raw) or {}
+                        if isinstance(raw, dict):
+                            anchor = raw.get("anchor") or {}
+                            quotes.append(
+                                compact(
+                                    raw.get("quote")
+                                    or anchor.get("bounded_quote")
+                                    or ""
+                                )
+                            )
+                    blob = answer + "".join(quotes)
+                    if needle and needle in blob:
+                        matches.append(claim["claim_id"])
+                matches = list(dict.fromkeys(matches))
+                if len(matches) == 1:
+                    checks.append(
+                        {
+                            "target_type": "condition",
+                            "target_id": condition["condition_id"],
+                            "status": "pass",
+                            "covers_target_type": "claim",
+                            "covers_target_id": matches[0],
+                            "explanation": "离线覆盖指向当前已交付主张。",
+                        }
+                    )
+                else:
+                    checks.append(
+                        {
+                            "target_type": "condition",
+                            "target_id": condition["condition_id"],
+                            "status": "unclear",
+                            "explanation": "没有唯一的已交付主张。",
+                        }
+                    )
+            result = {
+                "schema_version": "company_profile_report_response.v3",
+                "request_id": request["request_id"],
+                "purpose": request["purpose"],
+                "checks": checks,
+            }
+            transport_requests[-1]["replay_kind"] = "controlled_sample"
+        elif protocol == "nonempty_v3":
             from .resource_probe import protocol_reply
 
             result = protocol_reply(request)

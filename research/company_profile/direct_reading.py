@@ -31,6 +31,7 @@ from research.company_profile.report_interpretation import (
     ReportInterpretation,
     _bind_source_evidence,
     _located_conditions,
+    claim_evidence_containers,
     _pages,
     fits_card_reservation,
     cited_quote_pages,
@@ -626,6 +627,7 @@ def _current_gaps(accumulated, claims, conditions, checks, records=()) -> list[s
                 "isolated_unreliable_claim:",
                 "chapter_",
                 "evidence_not_located:",
+                "evidence_span_recovered:",
                 "major_evidence_not_located:",
                 "claim_pending:",
                 "verify_unit_not_admitted:",
@@ -2628,6 +2630,8 @@ def interpret_direct_core(
             return units, pages, related, conditions
 
         sent_conditions: set[str] = set()
+        coverage_retried: set[str] = set()
+        coverage_reopen: list[ReportSourceCondition] = []
 
         def attach(group, pool):
             chosen = []
@@ -2712,8 +2716,80 @@ def interpret_direct_core(
             ]
             for page in pages:
                 by_page[int(page["page"])]["status"] = "read"
+            open_conditions = []
             for condition in sent:
-                sent_conditions.add(condition.condition_id)
+                latest = None
+                for check in checks:
+                    if (
+                        check.target_type == "condition"
+                        and check.target_id == condition.condition_id
+                    ):
+                        latest = check
+                covered = False
+                if latest is not None and latest.status == "pass":
+                    if latest.covers_target_type == "claim" and any(
+                        item.claim_id == latest.covers_target_id
+                        and item.status == "observed"
+                        and item.limitation
+                        not in {
+                            "pending_verification",
+                            "claim_or_dependency_not_verified",
+                            "evidence_not_located",
+                            "retracted_pending_correction",
+                            "subject_scope_omitted",
+                        }
+                        for item in claims
+                    ):
+                        covered = True
+                    elif latest.covers_target_type == "record" and any(
+                        item.record_id == latest.covers_target_id for item in related
+                    ):
+                        covered = True
+                if covered:
+                    sent_conditions.add(condition.condition_id)
+                else:
+                    open_conditions.append((condition, latest))
+            if open_conditions:
+                retry_note = []
+                valid_ids = [
+                    item.claim_id
+                    for item in group
+                    if item.status == "observed"
+                    and item.limitation
+                    not in {
+                        "pending_verification",
+                        "claim_or_dependency_not_verified",
+                        "evidence_not_located",
+                        "retracted_pending_correction",
+                        "subject_scope_omitted",
+                    }
+                ]
+                for condition, latest in open_conditions:
+                    if condition.condition_id in coverage_retried:
+                        gaps.append(
+                            f"major_condition_not_verified:{condition.condition_id}"
+                        )
+                        sent_conditions.add(condition.condition_id)
+                        continue
+                    coverage_retried.add(condition.condition_id)
+                    invalid = ""
+                    if latest is not None and latest.covers_target_id:
+                        invalid = (
+                            f"{latest.covers_target_type}:{latest.covers_target_id}"
+                        )
+                    description = condition.description
+                    if "先前覆盖对象" not in description:
+                        description = (
+                            description
+                            + f"\n先前覆盖对象{invalid or '空'}不是本次交付主张或记录。"
+                            + "只能覆盖这些主张："
+                            + "、".join(valid_ids)
+                        )
+                    retry_note.append(
+                        condition.model_copy(update={"description": description})
+                    )
+                if retry_note:
+                    coverage_reopen.extend(retry_note)
             publish()
             return True
 
@@ -2750,11 +2826,17 @@ def interpret_direct_core(
             for claim in overflow:
                 keep_pending(claim, "verify_unit_not_admitted")
                 publish()
+        reopen_ids = {condition.condition_id for condition in coverage_reopen}
         pending_conditions = [
-            condition
-            for condition in package_conditions
-            if condition.condition_id not in sent_conditions
+            *coverage_reopen,
+            *[
+                condition
+                for condition in package_conditions
+                if condition.condition_id not in sent_conditions
+                and condition.condition_id not in reopen_ids
+            ],
         ]
+        coverage_reopen.clear()
 
         def usable_claims(item):
             return [
@@ -2816,6 +2898,9 @@ def interpret_direct_core(
                         sent_conditions.add(item.condition_id)
             else:
                 pack_limit[0] = 10**9
+            if coverage_reopen:
+                pending_conditions = [*coverage_reopen, *pending_conditions]
+                coverage_reopen.clear()
 
     def report_gap(page_ids) -> None:
         by_id = {int(page["page"]): page for page in sources}
@@ -4420,6 +4505,61 @@ def interpret_direct_core(
             return condition.model_copy(update={"description": "\n".join(lines)})
 
         recheck_pairs: list[tuple[ReportSourceCondition, list]] = []
+        containers = claim_evidence_containers(claims, sources)
+        if containers:
+            known = {condition.condition_id for condition in conditions}
+            recovered = []
+            for item in reused_receipts:
+                payload = item.get("response_payload") or {}
+                if not payload.get("source_conditions"):
+                    continue
+                response = ReportSemanticResponseV3.model_validate_json(
+                    json.dumps(payload, ensure_ascii=False)
+                )
+                request_id = str(item.get("request_id") or work_id)
+                pending = [
+                    condition
+                    for condition in response.source_conditions
+                    if f"{request_id}:{condition.condition_id}" not in known
+                ]
+                if not pending:
+                    continue
+                accepted, location_gaps = _located_conditions(
+                    pending,
+                    report,
+                    sources,
+                    request_id=request_id,
+                    seen=set(),
+                    containers=containers,
+                )
+                for condition in accepted:
+                    if condition.condition_id in known:
+                        continue
+                    known.add(condition.condition_id)
+                    conditions.append(condition)
+                    recovered.append(condition)
+                gaps.extend(
+                    gap for gap in location_gaps if gap.startswith("evidence_span_recovered:")
+                )
+            if recovered:
+                recovered_ids = {condition.condition_id for condition in recovered}
+                gaps[:] = [
+                    gap
+                    for gap in gaps
+                    if not any(
+                        condition_id in gap
+                        and gap.startswith(
+                            ("evidence_not_located:", "major_evidence_not_located:")
+                        )
+                        for condition_id in recovered_ids
+                    )
+                ]
+                drafted_ids = {condition.condition_id for condition in conditions_to_draft}
+                conditions_to_draft.extend(
+                    condition
+                    for condition in recovered
+                    if condition.condition_id not in drafted_ids
+                )
         core_answers = []
         for condition in list(conditions_to_draft):
             latest = None

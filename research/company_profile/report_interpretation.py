@@ -683,14 +683,19 @@ def governing_subject_heading(
 
 
 def locate_source_quote(
-    quote: str, pages: Sequence[Mapping[str, Any]], *, page_number: int
+    quote: str,
+    pages: Sequence[Mapping[str, Any]],
+    *,
+    page_number: int,
+    containers: Sequence[tuple[int, int, int, str]] = (),
 ) -> tuple[str, int, str, str] | None:
     """Locate one quote inside the text that was actually sent.
 
-    Returns the continuous source text, its page offset, a nearby heading and
-    the containing paragraph. Multiple matches stay unlocated.
+    One match is that span. Several matches can use a single already located
+    passage only when that passage contains every match. Otherwise the quote
+    stays unlocated.
     """
-    hits: list[tuple[str, int, str, str]] = []
+    hits: list[tuple[str, int, str, str, int, int]] = []
     for fragment in pages:
         if int(fragment["page"]) != int(page_number):
             continue
@@ -703,14 +708,40 @@ def locate_source_quote(
         base = int(fragment.get("offset") or 0)
         for start, end in spans:
             heading, paragraph = _heading_and_paragraph(text, start, end)
-            hits.append((text[start:end], base + start, heading, paragraph))
-    if len(hits) != 1:
+            hits.append((text[start:end], base + start, heading, paragraph, start, end))
+    if len(hits) == 1:
+        source, offset, heading, paragraph, _start, _end = hits[0]
+        return source, offset, heading, paragraph
+    if len(hits) < 2:
         return None
-    return hits[0]
+    holders = []
+    for page_no, start, end, contained in containers:
+        if int(page_no) != int(page_number):
+            continue
+        if all(start <= hit[4] and hit[5] <= end for hit in hits):
+            holders.append((end - start, start, end, contained))
+    if not holders:
+        return None
+    holders.sort()
+    tight = [item for item in holders if item[0] == holders[0][0]]
+    if len({(item[1], item[2]) for item in tight}) != 1:
+        return None
+    _size, start, end, contained = tight[0]
+    base = hits[0][1] - hits[0][4]
+    text = next(
+        str(fragment.get("text") or "")
+        for fragment in pages
+        if int(fragment["page"]) == int(page_number)
+    )
+    heading, paragraph = _heading_and_paragraph(text, start, end)
+    return contained, base + start, heading, paragraph
 
 
 def _bind_source_evidence(
-    evidence: Evidence, report: ReportIdentity, pages: Sequence[Mapping[str, Any]]
+    evidence: Evidence,
+    report: ReportIdentity,
+    pages: Sequence[Mapping[str, Any]],
+    containers: Sequence[tuple[int, int, int, str]] = (),
 ) -> Evidence | None:
     """Backfill one sent-page location. Meaning is not decided here."""
     if evidence.report != report or not isinstance(evidence.anchor, TextAnchor):
@@ -722,7 +753,9 @@ def _bind_source_evidence(
     ):
         return None
     model_quote = evidence.anchor.model_quote or evidence.anchor.bounded_quote
-    located = locate_source_quote(model_quote, pages, page_number=evidence.page)
+    located = locate_source_quote(
+        model_quote, pages, page_number=evidence.page, containers=containers
+    )
     page_no = int(evidence.page)
     if located is None:
         relocated: list[tuple[int, str, int, str, str]] = []
@@ -765,6 +798,51 @@ def _bind_source_evidence(
     )
 
 
+def _bound_containers(bound, pages) -> list[tuple[int, int, int, str]]:
+    """Spans already fixed on this condition. They can hold a repeated short quote."""
+    by_page = {int(page["page"]): str(page.get("text") or "") for page in pages}
+    found = []
+    for evidence in bound:
+        text = by_page.get(int(evidence.page))
+        quote = str(evidence.anchor.bounded_quote or "")
+        if text is None or not quote:
+            continue
+        spans = _spans_in_text(quote, text)
+        if len(spans or []) != 1:
+            continue
+        start, end = spans[0]
+        found.append((int(evidence.page), start, end, text[start:end]))
+    return found
+
+
+def claim_evidence_containers(claims, pages) -> list[tuple[int, int, int, str]]:
+    """Unique passages already delivered. A repeated short quote may sit inside one."""
+    by_page = {int(page["page"]): str(page.get("text") or "") for page in pages}
+    found = []
+    for claim in claims:
+        if getattr(claim, "status", None) != "observed":
+            continue
+        if getattr(claim, "limitation", None) in {
+            "pending_verification",
+            "claim_or_dependency_not_verified",
+            "evidence_not_located",
+            "retracted_pending_correction",
+            "subject_scope_omitted",
+        }:
+            continue
+        for evidence in getattr(claim, "evidence", ()) or ():
+            text = by_page.get(int(evidence.page))
+            quote = str(getattr(getattr(evidence, "anchor", None), "bounded_quote", "") or "")
+            if text is None or not quote:
+                continue
+            spans = _spans_in_text(quote, text)
+            if len(spans or []) != 1:
+                continue
+            start, end = spans[0]
+            found.append((int(evidence.page), start, end, text[start:end]))
+    return found
+
+
 def _located_conditions(
     response_conditions: Sequence[ReportSourceCondition],
     report: ReportIdentity,
@@ -772,6 +850,7 @@ def _located_conditions(
     *,
     request_id: str,
     seen: set[str],
+    containers: Sequence[tuple[int, int, int, str]] = (),
 ) -> tuple[list[ReportSourceCondition], list[str]]:
     """Keep conditions whose quotes locate. One bad quote does not drop the rest."""
     accepted: list[ReportSourceCondition] = []
@@ -780,11 +859,17 @@ def _located_conditions(
         bound: list[Evidence] = []
         missed_quotes: list[str] = []
         for evidence in condition.evidence:
-            located = _bind_source_evidence(evidence, report, pages)
+            located = _bind_source_evidence(
+                evidence, report, pages, (*containers, *_bound_containers(bound, pages))
+            )
             if located is None:
                 missed_quotes.append(str(evidence.anchor.bounded_quote or ""))
                 continue
             bound.append(located)
+            short = "".join(str(evidence.anchor.bounded_quote or "").split())
+            full = "".join(str(located.anchor.bounded_quote or "").split())
+            if short and short != full and short in full:
+                gaps.append(f"evidence_span_recovered:{request_id}:{condition.condition_id}")
         scoped_id = f"{request_id}:{condition.condition_id}"
         if not bound:
             gaps.append(f"evidence_not_located:{scoped_id}")

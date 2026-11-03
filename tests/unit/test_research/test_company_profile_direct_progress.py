@@ -8725,6 +8725,68 @@ def test_redundant_short_quote_can_close_but_a_missing_business_cannot():
     assert any("医药业务" in gap for gap in blocked)
 
 
+def test_repeated_short_quote_uses_one_passage_and_stays_open_when_split():
+    from research.company_profile.contracts import ReportSourceCondition
+    from research.company_profile.report_interpretation import (
+        _located_conditions,
+        claim_evidence_containers,
+    )
+
+    report = _report()
+    text = "纸袋纸\n广泛用于水泥包装。\n复合原纸\n广泛用于水泥包装。\n木材用于建筑。"
+    page = {"page": 10, "text": text, "readable": True}
+    long = "纸袋纸\n广泛用于水泥包装。\n复合原纸\n广泛用于水泥包装。"
+    claim = ReportViewClaim(
+        claim_id="claim-002",
+        dimension="products_services",
+        status="observed",
+        answer="纸袋纸和复合原纸广泛用于水泥包装。",
+        evidence=(_evidence(report, text=long, page=10),),
+    )
+    containers = claim_evidence_containers([claim], [page])
+    short = _evidence(report, text="广泛用于水泥包装。", page=10)
+    accepted, gaps = _located_conditions(
+        [
+            ReportSourceCondition(
+                condition_id="uses",
+                dimension="output_exposure",
+                description="包装用途。",
+                evidence=(short,),
+                major=True,
+                statement_status="current",
+            )
+        ],
+        report,
+        [page],
+        request_id="t",
+        seen=set(),
+        containers=containers,
+    )
+    assert accepted
+    assert "纸袋纸" in accepted[0].evidence[0].anchor.bounded_quote
+    assert "复合原纸" in accepted[0].evidence[0].anchor.bounded_quote
+    assert any(gap.startswith("evidence_span_recovered:") for gap in gaps)
+    rejected, blocked = _located_conditions(
+        [
+            ReportSourceCondition(
+                condition_id="uses",
+                dimension="output_exposure",
+                description="包装用途。",
+                evidence=(short,),
+                major=True,
+                statement_status="current",
+            )
+        ],
+        report,
+        [page],
+        request_id="t2",
+        seen=set(),
+    )
+    assert not rejected
+    assert any(gap.startswith("major_evidence_not_located:") for gap in blocked)
+
+
+
 def test_model_selected_pages_outside_the_preview_are_read():
     from research.company_profile import direct_reading
     from research.company_profile.contracts import ReportSourceCondition

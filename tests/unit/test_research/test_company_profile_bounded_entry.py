@@ -1782,4 +1782,98 @@ def test_company_sentences_finish_one_isolated_core():
     assert not any(gap.startswith("necessary_unread:") for gap in gaps), gaps
 
 
+def test_s30_coverage_continuation_closes_answered_conditions_offline():
+    """Reuse the real S30 disk result. Do not reread, redraft, or rewrite it."""
+    import hashlib
+    import shutil
+    import uuid
+    from pathlib import Path
+
+    from research.company_profile.bounded_entry import S27_OFFLINE_DIAGNOSTIC, main
+    from research.company_profile.reads import CompanyProfileReadService
+
+    root = Path("/home/python/Quote")
+    source_query = root / "data/QuoteBak/s30-paper-observation-20261102/query.json"
+    before = source_query.read_bytes()
+    binding = json.loads(
+        (root / "data/QuoteBak/s30-paper-observation-binding.json").read_text()
+    )
+    for key in (
+        "offline_protocol",
+        "offline_role_sample",
+        "offline_replay_query",
+        "offline_unmatched_inventory",
+        "offline_company_spans",
+    ):
+        binding.pop(key, None)
+    binding["offline_protocol"] = "coverage_repair_v1"
+    binding["accepted_source_query"] = str(source_query)
+    binding["accepted_draft_query"] = str(source_query)
+    binding["saved_source_draft"] = True
+    binding["compatible_continue"] = True
+    binding["chapter_select"] = True
+    binding["run_authorization"] = S27_OFFLINE_DIAGNOSTIC
+    binding["max_elapsed_seconds"] = 900
+    binding["max_tokens"] = 480_000
+    binding["max_physical_requests"] = 32
+    binding["max_recoveries"] = 2
+    binding["file_hashes"] = {
+        name: hashlib.sha256((root / name).read_bytes()).hexdigest()
+        for name in binding["file_hashes"]
+    }
+    run_root = root / "data/QuoteBak" / f"s31-coverage-offline-{uuid.uuid4().hex[:8]}"
+    path = root / "data/QuoteBak" / f"{run_root.name}-binding.json"
+    path.write_text(json.dumps(binding, ensure_ascii=False))
+    argv = sys.argv
+    sys.argv = ["bounded_entry", "--binding", str(path), "--run-root", str(run_root)]
+    try:
+        code = main()
+        assert code == 0, run_root
+        query = json.loads((run_root / "query.json").read_text())
+        exported = json.loads((run_root / "export.json").read_text())
+        reloaded = CompanyProfileReadService(run_root / "output").query(("600103.SH",))
+        assert query["profiles"] == exported["profiles"] == reloaded["profiles"]
+        profile = query["profiles"][0]["three_views"]
+        assert source_query.read_bytes() == before
+        physical = [
+            item
+            for item in profile.get("call_receipts") or []
+            if item.get("physical_request")
+        ]
+        assert physical
+        assert {item.get("purpose") for item in physical} == {"verify_views"}
+        assert profile.get("draft_complete") is True, profile.get("gaps")
+        assert profile.get("real_semantic_complete") is False
+        claims = {
+            claim["claim_id"]: claim
+            for view in profile["views"].values()
+            for claim in view.get("claims") or []
+        }
+        assert claims["products-services"].get("review_state") != "verified"
+        covered = []
+        for item in physical:
+            for check in (item.get("response_payload") or {}).get("checks") or []:
+                if check.get("target_type") == "condition" and check.get("status") == "pass":
+                    covered.append(
+                        (
+                            str(check.get("target_id")),
+                            str(check.get("covers_target_id")),
+                        )
+                    )
+        assert any(
+            "downstream_applications" in target and cover == "claim-002"
+            for target, cover in covered
+        ), covered
+        assert any(
+            "revenue_by_industry_composition" in target and cover == "revenue-by-industry"
+            for target, cover in covered
+        ), covered
+        assert not any(str(cover).startswith("reading:") for _target, cover in covered)
+    finally:
+        sys.argv = argv
+        path.unlink(missing_ok=True)
+        shutil.rmtree(run_root, ignore_errors=True)
+        assert source_query.read_bytes() == before
+
+
 
