@@ -41,6 +41,22 @@ CORE_FINANCIAL_FACT_ALIASES_V1: Dict[str, List[str]] = {
         "所有者权益",
         "净资产",
     ],
+    "equity_total": [
+        "TotalEquity",
+        "TOTAL_EQUITY",
+        "股东权益合计",
+        "所有者权益合计",
+        "所有者权益",
+        "净资产",
+    ],
+    "minority_equity": [
+        "MinorityInterest",
+        "MINORITY_EQUITY",
+        "MINORITY_INTEREST",
+        "minority_equity",
+        "少数股东权益",
+        "少数股东权益合计",
+    ],
     "total_assets": [
         "Assets",
         "TotalAssets",

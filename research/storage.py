@@ -2621,6 +2621,34 @@ class ResearchStorageManager:
             "ready": not missing_fields,
         }
 
+    @staticmethod
+    def _warn_balance_identity_mismatch(snapshot: FinancialFactsSnapshot) -> None:
+        """Warn when assets != liabilities + equity_total beyond tolerance.
+
+        The identity must use equity_total (所有者权益合计), not the parent
+        column `equity`, which excludes minority equity by design.
+        """
+        assets = snapshot.total_assets
+        liabilities = snapshot.total_liabilities
+        equity_total = snapshot.equity_total
+        if assets is None or liabilities is None or equity_total is None:
+            return
+        if assets <= 0:
+            return
+        gap = abs(assets - (liabilities + equity_total))
+        if gap > 0.01 * abs(assets):
+            logger.warning(
+                "[FinancialFacts] balance identity mismatch: "
+                "instrument_id=%s report_period=%s assets=%.2f "
+                "liabilities=%.2f equity_total=%.2f gap_ratio=%.4f",
+                snapshot.instrument_id,
+                snapshot.report_period,
+                assets,
+                liabilities,
+                equity_total,
+                gap / abs(assets),
+            )
+
     def upsert_financial_facts(
         self,
         snapshot: FinancialFactsSnapshot,
@@ -2629,6 +2657,7 @@ class ResearchStorageManager:
         return_stats: bool = False,
     ) -> Optional[Dict[str, int]]:
         """Upsert one normalized financial facts row."""
+        self._warn_balance_identity_mismatch(snapshot)
         now = get_shanghai_time().isoformat()
         facts_json = json.dumps(snapshot.facts_json, ensure_ascii=False, sort_keys=True)
         semantic_payload = asdict(snapshot)
@@ -6699,6 +6728,8 @@ class ResearchStorageManager:
                     total_assets,
                     total_liabilities,
                     equity,
+                    equity_total,
+                    minority_equity,
                     current_assets,
                     current_liabilities,
                     inventory,
@@ -7407,6 +7438,8 @@ class ResearchStorageManager:
             "fixed_assets",
             "intangible_assets",
             "shares_outstanding",
+            "equity_total",
+            "minority_equity",
         }
         alias_matches: Dict[str, Dict[str, Any]] = {}
         alias_warnings: List[Dict[str, Any]] = []
@@ -11562,6 +11595,8 @@ class ResearchStorageManager:
                 total_assets,
                 total_liabilities,
                 equity,
+                equity_total,
+                minority_equity,
                 current_assets,
                 current_liabilities,
                 inventory,
@@ -11579,7 +11614,7 @@ class ResearchStorageManager:
                 ingestion_run_id,
                 created_at,
                 updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(instrument_id, report_period)
             DO UPDATE SET
                 symbol = excluded.symbol,
@@ -11604,6 +11639,8 @@ class ResearchStorageManager:
                 total_assets = excluded.total_assets,
                 total_liabilities = excluded.total_liabilities,
                 equity = excluded.equity,
+                equity_total = excluded.equity_total,
+                minority_equity = excluded.minority_equity,
                 current_assets = excluded.current_assets,
                 current_liabilities = excluded.current_liabilities,
                 inventory = excluded.inventory,
@@ -11646,6 +11683,8 @@ class ResearchStorageManager:
                 snapshot.total_assets,
                 snapshot.total_liabilities,
                 snapshot.equity,
+                snapshot.equity_total,
+                snapshot.minority_equity,
                 snapshot.current_assets,
                 snapshot.current_liabilities,
                 snapshot.inventory,
@@ -11802,6 +11841,8 @@ class ResearchStorageManager:
             "total_assets",
             "total_liabilities",
             "equity",
+            "equity_total",
+            "minority_equity",
             "current_assets",
             "current_liabilities",
             "inventory",
@@ -12267,6 +12308,18 @@ class ResearchStorageManager:
                 table_name,
                 "row_version",
                 "row_version INTEGER NOT NULL DEFAULT 1",
+            )
+        for table_name in (
+            "financial_facts",
+            "financial_core_facts_hot",
+            "financial_core_facts_history",
+        ):
+            cls._ensure_column(conn, table_name, "equity_total", "equity_total REAL")
+            cls._ensure_column(
+                conn,
+                table_name,
+                "minority_equity",
+                "minority_equity REAL",
             )
         cls._ensure_column(
             conn,
@@ -13951,6 +14004,8 @@ class ResearchStorageManager:
                 total_assets REAL,
                 total_liabilities REAL,
                 equity REAL,
+                equity_total REAL,
+                minority_equity REAL,
                 current_assets REAL,
                 current_liabilities REAL,
                 inventory REAL,
@@ -13998,6 +14053,8 @@ class ResearchStorageManager:
                 total_assets REAL,
                 total_liabilities REAL,
                 equity REAL,
+                equity_total REAL,
+                minority_equity REAL,
                 current_assets REAL,
                 current_liabilities REAL,
                 inventory REAL,
@@ -14045,6 +14102,8 @@ class ResearchStorageManager:
                 total_assets REAL,
                 total_liabilities REAL,
                 equity REAL,
+                equity_total REAL,
+                minority_equity REAL,
                 current_assets REAL,
                 current_liabilities REAL,
                 inventory REAL,

@@ -1513,7 +1513,7 @@
               "primary_source": "ths_report",
               "validation_source": "sina_report",
               "strict_intersection_only": true,
-              "mapping_version": "sina_ths_core_financial_facts.v5",
+              "mapping_version": "sina_ths_core_financial_facts.v6",
               "promotion_required_canonical_facts": [
                 "revenue",
                 "net_income_parent",

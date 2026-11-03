@@ -267,6 +267,8 @@ class FinancialFactsSnapshot:
     total_assets: Optional[float] = None
     total_liabilities: Optional[float] = None
     equity: Optional[float] = None
+    equity_total: Optional[float] = None
+    minority_equity: Optional[float] = None
     current_assets: Optional[float] = None
     current_liabilities: Optional[float] = None
     inventory: Optional[float] = None
