@@ -239,6 +239,11 @@ class TaskScheduler:
                     f"(run_id={run_id})"
                 )
                 scheduler_logger.error(timeout_msg)
+                # The dependency executor converts job failures into recorded
+                # success=False results (so post_always groups still run) and
+                # the APScheduler error listener never sees this exception -
+                # notify the operator explicitly or the timeout stays silent.
+                self._notify_task_timeout(job_id, run_id, duration)
                 raise
             except (asyncio.CancelledError, KeyboardInterrupt):
                 # 对于取消或手动中断，直接重新抛出，不记录为错误
@@ -550,6 +555,24 @@ class TaskScheduler:
             )
         except Exception:
             scheduler_logger.error("[Scheduler] Failed to send stop notification")
+
+    def _notify_task_timeout(self, job_id: str, run_id: str, duration_seconds: float) -> None:
+        """Operator-visible timeout notice (the periodic report never runs when
+        a run is killed at max_runtime_seconds)."""
+        try:
+            bot = TelegramBot()
+            self._spawn_background(
+                bot.send_scheduler_notification(
+                    (
+                        f"⏱ 任务超时被终止: {job_id}\n"
+                        f"run_id={run_id} 已运行 {duration_seconds / 3600:.2f} 小时达到 max_runtime_seconds 上限。\n"
+                        f"已完成部分按候选事务落库；剩余范围请重新 /run（幂等续跑）。"
+                    ),
+                    level='warning',
+                )
+            )
+        except Exception:
+            scheduler_logger.error("[Scheduler] Failed to send timeout notification")
 
     def request_stop_job(self, job_id: str) -> Dict[str, Any]:
         """Operator stop: inject cancellation into all active worker runs of a job."""
