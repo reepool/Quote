@@ -74,5 +74,7 @@
         "supervisor.json"
       ]
     }
-  }
+  },
+  "durable_receipts": "s30-s32-receipts",
+  "durable_note": "query, budget-final, entry-result and source-receipt bytes. The hash list above does not replace these files."
 }

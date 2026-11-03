@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-11-03，[A审核§185](#185-a审核33局部接受不批准真实验证退回原卡完整交付)）：§33提示分支及局部排序接受，完整核心编排/准入和实际入口未交；原卡一次合并返修，不新开§34、不批准真实验证。§32仍2/12执行、0家核心/独立待审/常规核心交付，余十未启动；原成绩/S2/生产不变。
+当前状态（2026-11-03，[B交接§186](#186-b交接33一次合并返修)）：§33.4一次合并已交。执行2/12，程序核心0，独立待审0，常规核心交付0。没有新的真实业务。离线入口能交正常核心，也能把必要未读和另一主业缺答留成false。供应商输出上限仍未知。S2/生产未开放。
 
 ## 1. 唯一实施指引
 
@@ -7672,3 +7672,30 @@ A核剩余常规文件618043/777582字节及query hash与manifest一致，work�
 这是一次合并返修窗口，不逐函数送审；仍不能交正常核心协议路径及诚实准入边界则结束此实现方案，A作整体路线/服务能力裁决，不自动再续同根因纯准备卡。工程就绪以后才另裁是否提出新有界真实方案，当前不预批；原S1/S32成绩、常规门槛/S2/生产不变。
 
 A新增真实调用0、应用代码修改0；独立核验为上述3测试、七维反例、正式解析打包及hash检查。初次诊断脚本漏Evidence.section_title，补齐后才得重建结果，不归因产品。OpenSpec本change严格校验、5份本轮文档新增13个本地链接/锚点及`git diff --check`通过。保护开始14份tracked脏改/9未跟踪及并行，验收旧历史表不纳提交；审核活跃时间未精确计量，不把供应商token作人工成本。
+
+## 186. B交接：§33一次合并返修
+
+日期：2026-11-03。执行[§33.4](b3-s1-execution-card.md#334-a返修裁决补完原卡不新开付费或准备卡)。新组仍是已执行2/12，未执行10家。程序核心成立0家。独立待审0家。常规核心交付0家。本卡没有新的真实业务。真实调用、探针、可发送绑定均为0。
+
+### 186.1 请求链
+
+首份核心不再按六条截断。当前的主营、期间总额、产品、投入、经营角色和产出暴露留在第一包；同维度的另一项主营也留在这一包。其余收入行和合并的上下游桶后置。合并桶仍不算双侧。必要页未读时只发这一包，完成标志保持false。
+
+章节切包改用本请求的预留上限。源读输出按6倍已占24000时，不再把切包上限也卡在24000，因而不会退回第一张物理页。装不下的正文记`chapter_core_slice_unbounded`，不用单页冒充整份核心。章节核验按该页前400字计量，不再用40字。6倍仍只是准入缓冲。公共网关在用量未知时按payload里的声明输出结算，不按这6倍。导航已有声明1000、实际10122，所以6倍不是供应商上限，本卡没有改倍数，也没有改共享池。
+
+### 186.2 实际入口
+
+造纸正常交付、造纸缺另一主业、银行必要页未读，都走正式PDF、原入口、公共网关替换外传输、原writer和新实例三读。正常交付的完成标志为true，且有指向真实claim的非空通过检查。缺另一主业和必要未读的完成标志都是false。受控响应的用量是预留，不拿它证明120000达标。每样本上界仍是900秒、32次替换、480000模拟账本。
+
+```text
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_direct_progress.py::test_first_core_group_includes_products_and_role tests/unit/test_research/test_company_profile_direct_progress.py::test_chapter_source_slice_uses_the_request_limit_not_one_page tests/unit/test_research/test_company_profile_direct_progress.py::test_chapter_admission_does_not_trust_the_declared_output
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_bounded_entry.py::test_chapter_goal_entry_delivers_and_keeps_two_failures
+```
+
+前一组3 passed，5.78秒。入口一组1 passed，350.99秒。
+
+### 186.3 回执与清理
+
+S30、S31、S32造纸和银行的query、budget-final、entry-result、source-receipt已写入`s30-s32-receipts/`，hash见同目录`index.json`。query hash与原manifest一致。没有恢复已删整库，没有复制PDF。上次报告释放的8514484字节不重算。本轮调试副本已删。
+
+供应商是否遵守输出上限，离线仍然不能证明。本地可确定的首包缺口和单页尾额已经修通。没有新开§34，也没有重启余下十家。

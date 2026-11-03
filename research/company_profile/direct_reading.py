@@ -78,31 +78,40 @@ def _fit(pages, *, purpose, source_scope, report, identity, output, limit):
 
 
 def _business_groups(conditions: Sequence[ReportSourceCondition]) -> list[list[ReportSourceCondition]]:
-    """Interleave current core dimensions, and do not draft the non-current tail."""
-    order = (
-        "principal_business",
-        "revenue_model",
-        "products_services",
-        "input_exposure",
-        "supply_chain_role",
-        "upstream_downstream",
-        "output_exposure",
-    )
-    buckets: dict[str, list[ReportSourceCondition]] = {name: [] for name in order}
+    """Core package by business target, then leftover detail.
+
+    Every current principal business, the period total, products, inputs,
+    the operating role and the output side stay in the first package. A
+    dimension count does not postpone one of them. Further revenue rows and
+    the combined upstream_downstream bucket are later detail; that bucket
+    is not both chain sides.
+    """
+    core: list[ReportSourceCondition] = []
+    later: list[ReportSourceCondition] = []
+    revenue_kept = False
     for condition in conditions:
-        if condition.statement_status == "current" and condition.dimension in buckets:
-            buckets[condition.dimension].append(condition)
+        if condition.statement_status != "current":
+            continue
+        dimension = condition.dimension
+        period = "period-operating-revenue" in str(condition.condition_id)
+        if dimension in {
+            "principal_business",
+            "products_services",
+            "input_exposure",
+            "supply_chain_role",
+            "output_exposure",
+        } or period:
+            core.append(condition)
+        elif dimension == "revenue_model" and not revenue_kept:
+            core.append(condition)
+            revenue_kept = True
+        else:
+            later.append(condition)
     groups: list[list[ReportSourceCondition]] = []
-    while any(buckets.values()):
-        group: list[ReportSourceCondition] = []
-        for name in order:
-            if not buckets[name]:
-                continue
-            group.append(buckets[name].pop(0))
-            if len(group) == 6:
-                break
-        if group:
-            groups.append(group)
+    if core:
+        groups.append(core)
+    if later:
+        groups.append(later)
     return groups
 
 
@@ -1865,12 +1874,20 @@ def _first_delivery_tail(pages, *, report, identity, limit: int) -> int:
     """Reserve the first real source+draft+verify object, not a two-page stub."""
     if not pages:
         return 0
-    pack_limit = min(int(limit), RESERVATION_LIMIT)
+    pack_limit = (
+        int(limit)
+        if identity.get("chapter_select")
+        else min(int(limit), RESERVATION_LIMIT)
+    )
     try:
         slices = list(source_discovery_slices(pages, report, identity, pack_limit))
     except ValueError:
+        if identity.get("chapter_select"):
+            return 0
         slices = [list(pages[:1])]
-    first = slices[0] if slices else list(pages[:1])
+    if not slices:
+        return 0
+    first = slices[0]
     return (
         _units(
             first,
@@ -1912,7 +1929,8 @@ def _nonempty_verify_units(piece, *, report, identity) -> int:
     """Size verification with a real claim and condition, not an empty target list."""
     from research.company_profile.models import Evidence, TextAnchor
 
-    quote = str(piece[0].get("text") or "")[:40] or "正文"
+    width = 400 if identity.get("chapter_select") else 40
+    quote = str(piece[0].get("text") or "")[:width] or "正文"
     evidence = Evidence(
         evidence_id="direct-core-size",
         report=report,
@@ -4946,17 +4964,21 @@ def interpret_direct_core(
                             hold_pages,
                             report,
                             identity,
-                            min(int(limit), RESERVATION_LIMIT),
+                            int(limit)
+                            if identity.get("chapter_select")
+                            else min(int(limit), RESERVATION_LIMIT),
                         )
                     )
-                except ValueError:
-                    hold_slices = [hold_pages[:1]]
-                first = hold_slices[0] if hold_slices else hold_pages[:1]
-                source_later = _compose_tail(
-                    first,
-                    report=report,
-                    identity=identity,
-                )
+                except ValueError as exc:
+                    hold_slices = []
+                    source_later = 0
+                    gaps.append(f"chapter_core_slice_unbounded:{exc}")
+                if hold_slices:
+                    source_later = _compose_tail(
+                        hold_slices[0],
+                        report=report,
+                        identity=identity,
+                    )
             elif candidate_pages:
                 source_later = _first_delivery_tail(
                     candidate_pages, report=report, identity=identity, limit=limit

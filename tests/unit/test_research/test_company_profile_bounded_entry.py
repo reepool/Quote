@@ -1876,4 +1876,110 @@ def test_s30_coverage_continuation_closes_answered_conditions_offline():
         assert source_query.read_bytes() == before
 
 
+def _chapter_goal_entry(binding_name: str, mode: str, tokens: int):
+    """Official PDF through the real entry. Only the transport is replaced."""
+    import hashlib
+    import shutil
+    import uuid
+    from pathlib import Path
+
+    from research.company_profile.bounded_entry import S27_OFFLINE_DIAGNOSTIC, main
+    from research.company_profile.reads import CompanyProfileReadService
+
+    root = Path("/home/python/Quote")
+    change = root / "openspec/changes/restore-company-profile-llm-led-generalization"
+    source = json.loads((change / binding_name).read_text())
+    for retired in (
+        "accepted_navigation_query",
+        "accepted_source_query",
+        "accepted_draft_query",
+        "accepted_candidate_query",
+        "navigation_query",
+        "continuation_checkpoint",
+        "company_task_state",
+        "continuation_budget",
+        "compatible_continue",
+        "saved_source_draft",
+        "prior_charged_tokens",
+        "verification_history_queries",
+        "offline_protocol",
+    ):
+        source.pop(retired, None)
+    source["offline_protocol"] = "chapter_goal_v1"
+    source["chapter_goal_mode"] = mode
+    source["chapter_select"] = True
+    source["task_route_labels"] = ["deepseek:deepseek-flash", "scorpio:grok-4.7"]
+    source["task_route_first_only"] = True
+    source["same_source_max_retries"] = 0
+    source["run_authorization"] = S27_OFFLINE_DIAGNOSTIC
+    source["max_elapsed_seconds"] = 900
+    source["max_tokens"] = tokens
+    source["max_physical_requests"] = 32
+    source["max_recoveries"] = 2
+    source["max_cost_cny"] = "10"
+    source["file_hashes"] = {
+        name: hashlib.sha256((root / name).read_bytes()).hexdigest()
+        for name in source["file_hashes"]
+    }
+    run_root = root / "data/QuoteBak" / f"s33-goal-{mode}-{uuid.uuid4().hex[:8]}"
+    path = root / "data/QuoteBak" / f"{run_root.name}-binding.json"
+    path.write_text(json.dumps(source, ensure_ascii=False))
+    argv = sys.argv
+    sys.argv = ["bounded_entry", "--binding", str(path), "--run-root", str(run_root)]
+    try:
+        code = main()
+        result_path = run_root / "entry-result.json"
+        result = json.loads(result_path.read_text()) if result_path.is_file() else {}
+        if code != 0 or not (run_root / "query.json").is_file():
+            raise AssertionError(f"entry failed code={code} error={result.get('error')}")
+        query = json.loads((run_root / "query.json").read_text())
+        exported = json.loads((run_root / "export.json").read_text())
+        reloaded = CompanyProfileReadService(run_root / "output").query(
+            (source["asset"]["instrument_id"],)
+        )
+        assert query["profiles"] == exported["profiles"] == reloaded["profiles"]
+        profile = query["profiles"][0]["three_views"]
+        stages = json.loads((run_root / "entry-stages.json").read_text())
+        return profile, stages
+    finally:
+        sys.argv = argv
+        path.unlink(missing_ok=True)
+        shutil.rmtree(run_root, ignore_errors=True)
+
+
+def test_chapter_goal_entry_delivers_and_keeps_two_failures():
+    """Normal core, an unread chapter, and a missing other business."""
+    paper = "s1-pool-s1-600103-s16-binding.json"
+    bank = "s1-pool-s1-600000-s16-binding.json"
+    delivered, _stages = _chapter_goal_entry(paper, "deliver", 480_000)
+    assert delivered.get("draft_complete") is True, delivered.get("gaps")
+    claims = {}
+    for view in (delivered.get("views") or {}).values():
+        for claim in view.get("claims") or []:
+            claims[claim.get("claim_id")] = claim
+    checks = [
+        check
+        for receipt in delivered.get("call_receipts") or []
+        for check in (receipt.get("response_payload") or {}).get("checks") or []
+    ]
+    covered = [
+        check
+        for check in checks
+        if check.get("status") == "pass"
+        and check.get("covers_target_type") == "claim"
+        and check.get("covers_target_id") in claims
+        and claims[check["covers_target_id"]].get("answer")
+    ]
+    assert covered, "normal delivery has no nonempty claim check"
+    omitted, _stages = _chapter_goal_entry(paper, "omit_business", 480_000)
+    assert omitted.get("draft_complete") is False, omitted.get("gaps")
+    omitted_gaps = " ".join(str(gap) for gap in omitted.get("gaps") or [])
+    assert "core-business-other" in omitted_gaps or "principal_business" in omitted_gaps, omitted.get("gaps")
+    unread, _stages = _chapter_goal_entry(bank, "unread", 180_000)
+    assert unread.get("draft_complete") is False, unread.get("gaps")
+    assert any(
+        str(gap).startswith("necessary_unread:") for gap in unread.get("gaps") or []
+    ), unread.get("gaps")
+
+
 

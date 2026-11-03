@@ -82,7 +82,9 @@ def request_bounds(request: ReportSemanticRequestV3) -> tuple[int, int]:
         # S32 DeepSeek replies exceeded max_completion_tokens. The largest
         # source read was 23560 against a declared 4000. Chapter admission
         # reserves six times the declaration. The field sent to the provider
-        # stays unchanged, and this factor is not proof the provider will obey it.
+        # stays unchanged. Gateway unknown settlement still charges the
+        # declared reservation on the payload, not this cushion. Navigation
+        # already returned 10122 against 1000, so six times is not a ceiling.
         if isinstance(identity, dict) and identity.get("chapter_select") and declared:
             declared *= 6
         reservations.append(reservation_units(payload, declared))

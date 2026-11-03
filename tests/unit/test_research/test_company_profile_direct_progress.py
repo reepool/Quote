@@ -8775,16 +8775,29 @@ def test_first_core_group_includes_products_and_role():
         [
             condition("revenue-a", "revenue_model"),
             condition("revenue-b", "revenue_model"),
-            condition("revenue-c", "revenue_model"),
+            condition("core-question:period-operating-revenue", "revenue_model"),
             condition("products", "products_services"),
             condition("role", "supply_chain_role"),
+            condition("input", "input_exposure"),
+            condition("combined", "upstream_downstream"),
             condition("output", "output_exposure"),
             condition("business", "principal_business"),
+            condition("business-other", "principal_business"),
         ]
     )
-    first = {item.dimension for item in groups[0]}
-    assert {"principal_business", "products_services", "supply_chain_role", "output_exposure"} <= first
-    assert sum(item.dimension == "revenue_model" for item in groups[0]) == 1
+    first_ids = {item.condition_id for item in groups[0]}
+    assert {
+        "business",
+        "business-other",
+        "products",
+        "input",
+        "role",
+        "output",
+        "core-question:period-operating-revenue",
+    } <= first_ids
+    assert "combined" not in first_ids
+    assert "revenue-b" not in first_ids
+    assert groups[1] and {item.condition_id for item in groups[1]} >= {"combined", "revenue-b"}
 
 
 def test_chapter_admission_does_not_trust_the_declared_output():
@@ -8811,6 +8824,27 @@ def test_chapter_admission_does_not_trust_the_declared_output():
     chapter_identity["chapter_select"] = True
     chapter = plain.model_copy(update={"processing_identity": chapter_identity})
     assert request_reservation(chapter) >= request_reservation(plain) + 5 * 4000
+
+
+def test_chapter_source_slice_uses_the_request_limit_not_one_page():
+    from research.company_profile.direct_reading import source_discovery_slices
+    from research.company_profile.report_interpretation import (
+        direct_core_processing_identity,
+    )
+
+    report = _report()
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    page = {"page": 9, "text": "营业收入 " * 900, "readable": True}
+    try:
+        list(source_discovery_slices([page], report, identity, 24_000))
+    except ValueError as exc:
+        assert str(exc).startswith("fragment_has_no_safe_boundary")
+    else:
+        raise AssertionError("24000 still packed a chapter source page")
+    packed = list(source_discovery_slices([page], report, identity, 65_536))
+    assert packed and int(packed[0][0]["page"]) == 9
+    assert "营业收入" in packed[0][0]["text"]
 
 
 

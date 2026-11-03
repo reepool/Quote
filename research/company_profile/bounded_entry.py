@@ -408,6 +408,233 @@ def load_twelfth_navigation(binding: dict) -> list:
     return receipts
 
 
+def _chapter_goal_sentences(pages) -> list[tuple[int, str]]:
+    """Exact unique lines from the sent page. No text is invented."""
+    found: list[tuple[int, str]] = []
+    for page in pages:
+        raw = str(page.get("text") or "")
+        for line in raw.splitlines():
+            text = line.strip()
+            probe = text if len(text) <= 180 else text[:180]
+            if len(probe) >= 8 and probe in raw and raw.count(probe) == 1:
+                found.append((int(page["page"]), probe))
+    return found
+
+
+def _chapter_goal_pick(sentences, marks: tuple[str, ...], limit: int):
+    chosen = []
+    seen: set[str] = set()
+    for page_no, sentence in sentences:
+        if sentence in seen or not any(mark in sentence for mark in marks):
+            continue
+        seen.add(sentence)
+        chosen.append((page_no, sentence))
+        if len(chosen) == limit:
+            break
+    return chosen
+
+
+def _chapter_goal_conditions(pages) -> list[dict]:
+    sentences = _chapter_goal_sentences(pages)
+    catalog = (
+        ("principal_business", "core-business", ("主营", "主要业务"), 1),
+        ("principal_business", "core-business-other", ("主营", "主要业务", "主要从事"), 1),
+        ("products_services", "core-products", ("产品",), 1),
+        (
+            "revenue_model",
+            "core-question:period-operating-revenue",
+            ("本期", "营业收入"),
+            1,
+        ),
+        ("revenue_model", "core-revenue", ("营业收入",), 1),
+        ("input_exposure", "core-input", ("采购", "原材料", "营业成本"), 1),
+        (
+            "supply_chain_role",
+            "core-question:operating-role",
+            ("经营模式", "直销", "自主生产"),
+            1,
+        ),
+        ("output_exposure", "core-output", ("下游", "用于", "销售"), 1),
+    )
+    used: set[str] = set()
+    conditions = []
+    for dimension, condition_id, marks, _limit in catalog:
+        for page_no, sentence in _chapter_goal_pick(sentences, marks, 4):
+            if sentence in used:
+                continue
+            if condition_id == "core-question:period-operating-revenue" and (
+                "本期" not in sentence or "营业收入" not in sentence
+            ):
+                continue
+            used.add(sentence)
+            conditions.append(
+                {
+                    "condition_id": condition_id,
+                    "dimension": dimension,
+                    "description": sentence[:40],
+                    "major": True,
+                    "statement_status": "current",
+                    "evidence": [{"page": page_no, "quote": sentence}],
+                }
+            )
+            break
+    if not any(
+        item["condition_id"] == "core-question:period-operating-revenue"
+        for item in conditions
+    ):
+        for page in pages:
+            raw = str(page.get("text") or "")
+            index = raw.find("营业收入")
+            if index < 0:
+                continue
+            window = raw[max(0, index - 24) : index + 24]
+            if "本期" in window and raw.count(window) == 1:
+                conditions.append(
+                    {
+                        "condition_id": "core-question:period-operating-revenue",
+                        "dimension": "revenue_model",
+                        "description": window[:40],
+                        "major": True,
+                        "statement_status": "current",
+                        "evidence": [{"page": int(page["page"]), "quote": window}],
+                    }
+                )
+                break
+    return conditions
+
+
+def _request_quote(item: dict, request: dict) -> tuple[str, int | None]:
+    """Read a quote from either the compact catalog or a full evidence object."""
+    catalog = request.get("evidence_catalog") or {}
+    refs = item.get("evidence") or item.get("evidence_refs") or []
+    if not refs:
+        return "", None
+    first = refs[0]
+    if isinstance(first, str):
+        body = catalog.get(first) or {}
+        anchor = body.get("anchor") or {}
+        quote = str(anchor.get("bounded_quote") or body.get("quote") or "")
+        page = body.get("page")
+        return quote, int(page) if isinstance(page, int) else None
+    if isinstance(first, dict):
+        anchor = first.get("anchor") or {}
+        quote = str(first.get("quote") or anchor.get("bounded_quote") or "")
+        page = first.get("page")
+        return quote, int(page) if isinstance(page, int) else None
+    return "", None
+
+
+def _chapter_goal_reply(request: dict, mode: str) -> dict:
+    """Controlled chapter reply. A missing business is left unanswered."""
+    result = {
+        "schema_version": "company_profile_report_response.v3",
+        "request_id": request["request_id"],
+        "purpose": request["purpose"],
+    }
+    pages = [
+        page
+        for page in request.get("source_pages") or []
+        if page.get("readable", True) and str(page.get("text") or "").strip()
+    ]
+    if request["purpose"] == "source_inventory" and request.get("source_scope") == "page_map":
+
+        def catalog(text: str) -> bool:
+            return "目录" in text and ("第一节" in text or text.count(".") >= 4)
+
+        chosen = []
+        for page in pages:
+            text = str(page.get("text") or "")
+            if catalog(text):
+                continue
+            if any(mark in text for mark in ("管理层讨论", "经营情况", "经营模式", "主营业务")):
+                chosen.append(int(page["page"]))
+        if not chosen:
+            chosen = [
+                int(page["page"])
+                for page in pages
+                if not catalog(str(page.get("text") or ""))
+            ]
+        if mode == "unread":
+            result["requested_pages"] = [
+                int(page["page"])
+                for page in pages
+                if not catalog(str(page.get("text") or ""))
+            ][:24]
+        else:
+            result["requested_pages"] = chosen[:4]
+        return result
+    if request["purpose"] == "source_inventory":
+        result["requested_pages"] = []
+        result["source_conditions"] = _chapter_goal_conditions(pages)
+        return result
+    if request["purpose"] == "synthesize_views":
+        claims = []
+        for item in request.get("source_conditions") or []:
+            condition_id = str(item.get("condition_id") or "")
+            if mode == "omit_business" and condition_id.endswith("core-business-other"):
+                continue
+            quote, page_no = _request_quote(item, request)
+            if not quote:
+                continue
+            claims.append(
+                {
+                    "claim_id": "goal-" + condition_id.replace(":", "-"),
+                    "dimension": item.get("dimension"),
+                    "status": "observed",
+                    "answer": quote,
+                    "condition_ids": [condition_id],
+                    "supporting_record_ids": [],
+                    "evidence": [
+                        {
+                            "page": int(page_no or 1),
+                            "quote": quote,
+                        }
+                    ],
+                }
+            )
+        result["claims"] = claims
+        return result
+    claims = request.get("claims") or []
+    by_condition = {}
+    for claim in claims:
+        for condition_id in claim.get("condition_ids") or []:
+            by_condition[str(condition_id)] = claim
+    checks = []
+    for item in request.get("source_conditions") or []:
+        condition_id = str(item.get("condition_id") or "")
+        claim = by_condition.get(condition_id)
+        quote = ""
+        if claim:
+            quote, _page = _request_quote(claim, request)
+        omitted = mode == "omit_business" and condition_id.endswith(
+            "core-business-other"
+        )
+        check = {
+            "target_type": "condition",
+            "target_id": condition_id,
+            "status": "pass" if claim and quote and not omitted else "unclear",
+            "explanation": "离线只核对本请求里的非空对象。",
+        }
+        if check["status"] == "pass":
+            check["covers_target_type"] = "claim"
+            check["covers_target_id"] = claim["claim_id"]
+        checks.append(check)
+    for claim in claims:
+        quote, _page = _request_quote(claim, request)
+        checks.append(
+            {
+                "target_type": "claim",
+                "target_id": claim.get("claim_id"),
+                "status": "pass" if quote else "unclear",
+                "explanation": "离线只核对本请求里的非空对象。",
+                "covers_target_type": "claim",
+                "covers_target_id": claim.get("claim_id"),
+            }
+        )
+    result["checks"] = checks
+    return result
+
+
 def preflight_direct_core(binding: dict) -> dict:
     """Admit the first chapter package with the same reservation the send uses."""
     import gzip
@@ -1461,6 +1688,11 @@ def _worker(
                             not in str(check.get("covers_target_id") or "")
                         ]
                 transport_requests[-1]["replay_kind"] = "controlled_sample"
+        elif protocol == "chapter_goal_v1":
+            result = _chapter_goal_reply(
+                request, str(binding.get("chapter_goal_mode") or "deliver")
+            )
+            transport_requests[-1]["replay_kind"] = "controlled_sample"
         elif protocol == "closeout_v1":
             from .resource_probe import core_package_reply
 
