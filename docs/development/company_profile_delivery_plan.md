@@ -2,7 +2,7 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-11-03。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前唯一活动卡为[章节公司核心优先交付重整§33](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#33-章节公司核心优先交付重整零外呼)，依据验收§7.84/A审核§183。§32执行2/12、核心0/2，余十家按止损未启动、旧授权结束。§33仅原owner工程修正/禁网验证，真实调用0，不再付费补旧纸/银行、不借余额；原成绩/质量/S2及生产边界不改。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前继续[原卡§33.4合并返修](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#334-a返修裁决补完原卡不新开付费或准备卡)，依据验收§7.84/A审核§185。提示/身份及瘦身局部接受，核心准入/实际入口未交，不新开§34或批准真跑。S32仍2/12执行、核心0/2、余十未运行；新增真实调用/探针/binding0，原成绩/质量/S2/生产不变。
 
 ## 1. 开发者必须先理解的纠偏
 
@@ -93,6 +93,8 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 2026-10-25审核§113已完成四类核心与实际答案审查。浦发补充源冲突须离线撤句，安全稿query/export/新实例一致且独立正确正文/真实检查不丢后，4/4及A2进入S1的条件放行生效；B按下一卡核确定差异、登记证据后自主继续，不另等A返审。常规资源、首次自动表现及未见泛化未通过。
 
 ### B3 / S1：12家新链回归（A2通过后）
+
+- **2026-11-03审核§185（当前）：** §33只局部接受提示/身份和清理，3短测非实际入口；七维被六条break挤下游，6倍源输出与24k切源冲突回退单页，完整核心准入仍未成。按原§33.4一次合并补核心分组/必要源与真实核验准入、最小禁网TaskService/网关/原writer三读及必要持久证据；不重做已过部分，不按症状换§34，不批准真实验证/旧两家微窗/余十家。输出实控未知可如实保风险，不要求零外呼证明供应商；返修仍不成则交支持边界结束当前实现方案，不滚动准备卡。流程v3/原owner/常规门槛/原成绩不变。下列为此前裁决。
 
 - **2026-11-03审核§183（当前）：** §32如约2家止损，核心0/2，223671/13/1114.939秒/0恢复/费用unknown；未超常规但不算效率通过。唯一§33/验收§7.84只沿原owner修章节提示/当前身份、主要性与跨业务核心优先分组、必要读源/成稿/核验共同准入和输出usage不确定性，禁网回归真实失败路径。先持久S30/S31/S32最小必要证据再清整库/重复副本，保正式源/首次/并行；真实调用/探针/binding0，不借余十家余额。B同窗自主P0—P3/至多两次必要共性修正、直接回归及一次交接，不新建平台/全pass大mock、不计S1分数；之后真实方案另裁。以下均为已结束安排。
 
