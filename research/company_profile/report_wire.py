@@ -314,6 +314,7 @@ def instructions(request: ReportSemanticRequestV3) -> str:
         "records; otherwise leave supporting_record_ids empty. No production approval, "
         "inferred numeric facts, invented names or price/profit sensitivity. "
     )
+    chapter = direct and bool(identity.get("chapter_select"))
     if request.source_scope == "page_map":
         if direct and identity.get("chapter_select"):
             selection = (
@@ -356,7 +357,22 @@ def instructions(request: ReportSemanticRequestV3) -> str:
             "Do not assume an unselected page has no relevant disclosure."
         )
     if request.purpose == "source_inventory":
-        if fulltext:
+        if chapter:
+            scope = (
+                "These pages are the selected chapter body, not a dump of the whole "
+                "report. No candidate answer is included. From the supplied text, "
+                "state each distinct current principal business, its main products "
+                "or services, how revenue is earned, the period total when the text "
+                "prints it, the important inputs, and the operating role with the "
+                "upstream and downstream the text supports. "
+                "An ordinary regional table, a routine production or sales volume "
+                "row, or a concentration percentage is supplementary: set major "
+                "false. Keep major true when that same passage states a distinct "
+                "new business, a change in the principal product mix, or a material "
+                "related-party risk. Do not drop a major business because the list "
+                "is long. Copy quotes. Keep the subject, period, unit and negation. "
+            )
+        elif fulltext:
             scope = (
                 "This slice is source text from the annual report. No candidate and no "
                 "gold answer is included. Read every supplied character, including notes, "
@@ -410,7 +426,23 @@ def instructions(request: ReportSemanticRequestV3) -> str:
             )
         )
     if request.purpose == "synthesize_views":
-        if fulltext:
+        if chapter:
+            lead = (
+                "The supplied text is the selected chapter evidence. Write the "
+                "first summary across the principal businesses, main products or "
+                "services, how revenue is earned, the period total, the important "
+                "inputs, and the operating role with evidenced upstream and "
+                "downstream. Do not expand every revenue, cost or margin row "
+                "before those sentences exist. A later passage is not dropped "
+                "because an earlier one already has an answer. "
+                "An ordinary regional ranking, routine volume row, or concentration "
+                "percentage stays out of that first summary unless the quote states "
+                "a new business, a principal product-mix change, or a material "
+                "related-party risk. "
+                "Return a claim only when the supplied text supports the whole "
+                "answer, with a {page,quote} copied from that text. "
+            )
+        elif fulltext:
             lead = (
                 "The supplied quotes and source conditions are the cross-chapter evidence. "
                 "Use every supplied condition. Do not drop a later chapter because an "

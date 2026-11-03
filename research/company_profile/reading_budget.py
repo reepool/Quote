@@ -77,7 +77,15 @@ def request_bounds(request: ReportSemanticRequestV3) -> tuple[int, int]:
     sizes = []
     for payload in _profile_payloads(request):
         output = payload.get("max_completion_tokens", payload.get("max_tokens"))
-        reservations.append(reservation_units(payload, int(output)))
+        declared = int(output or 0)
+        identity = getattr(request, "processing_identity", None) or {}
+        # S32 DeepSeek replies exceeded max_completion_tokens. The largest
+        # source read was 23560 against a declared 4000. Chapter admission
+        # reserves six times the declaration. The field sent to the provider
+        # stays unchanged, and this factor is not proof the provider will obey it.
+        if isinstance(identity, dict) and identity.get("chapter_select") and declared:
+            declared *= 6
+        reservations.append(reservation_units(payload, declared))
         sizes.append(len(json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode()))
     return (max(reservations) if reservations else 0, max(sizes) if sizes else 0)
 

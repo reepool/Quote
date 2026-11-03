@@ -1,0 +1,78 @@
+{
+  "kept_purpose": "query, budget, entry result, source receipt, supervisor and logs",
+  "roots": {
+    "600103": {
+      "query_sha256": "b2574fb7c366f9735b6cbb1b47a6ee61a0b1b8d9ecfb791f3bfbf7a4d2c943b9",
+      "export_sha256": "c514de817886bcb7641c1d535fe6e05c5dae55cf83957f86dcf7dcd794ab392e",
+      "work_id": "bp-work-4e89a8ad81d4ae6cf95e217a",
+      "draft_complete": false,
+      "charged_tokens": 109773,
+      "physical_requests": 6,
+      "bytes_before": 4501598,
+      "bytes_after": 618043,
+      "bytes_freed": 3883555,
+      "kept": [
+        "budget-final.json",
+        "entry-result.json",
+        "entry-stages.json",
+        "entry.log",
+        "offline-transport.json",
+        "query.json",
+        "source-receipt.json",
+        "supervisor.json"
+      ]
+    },
+    "600000": {
+      "query_sha256": "4e5af8fec38fed9d7628db6d5322d52c15969ff7974b0977477e3c7222bc25b7",
+      "export_sha256": "758bf6bfe52427d112aa4d1ff3da01820071eefe993f7908e5da8cdad1740128",
+      "work_id": "bp-work-ecf0f9c155d5fe053a2ae870",
+      "draft_complete": false,
+      "charged_tokens": 113898,
+      "physical_requests": 7,
+      "bytes_before": 5408511,
+      "bytes_after": 777582,
+      "bytes_freed": 4630929,
+      "kept": [
+        "budget-final.json",
+        "entry-result.json",
+        "entry-stages.json",
+        "entry.log",
+        "offline-transport.json",
+        "query.json",
+        "source-receipt.json",
+        "supervisor.json"
+      ]
+    },
+    "s30": {
+      "query_sha256": "744c0c6778c279bd1129f55239e7a0d3d9b45a0fb6051934e7f43ae9bec89f61",
+      "bytes": 5056485,
+      "kept": [
+        "budget-final.json",
+        "entry-result.json",
+        "entry-stages.json",
+        "entry.log",
+        "export.json",
+        "offline-transport.json",
+        "physical-budget.json",
+        "query.json",
+        "research.db",
+        "source-receipt.json",
+        "supervisor.json"
+      ]
+    },
+    "s31": {
+      "query_sha256": "61621cf5595e560bfe7e788d02920a2f7be2078fc9c880735258ea074f268980",
+      "bytes": 599497,
+      "kept": [
+        "budget-final.json",
+        "entry-result.json",
+        "entry-stages.json",
+        "entry.log",
+        "offline-transport.json",
+        "query.json",
+        "source-receipt.json",
+        "supervisor.json"
+      ]
+    }
+  }
+}

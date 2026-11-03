@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-11-03，[A审核§183](#183-a审核32止损正确核心优先与资源准入仍未实现)）：§32以2/12执行、0/2核心成立、0家独立待审止损，余十家不再授权启动。下一卡§33只做章节核心优先/实际资源准入的工程重整、禁网验证及必要清理，新增真实调用0；原S1/质量/S2和生产边界不改。
+当前状态（2026-11-03，[交接§184](#184-b交接33章节核心优先零外呼)）：新组仍是执行2/12，程序核心成立0，独立待审0，常规核心交付0。§33只改了章节提示、首包顺序和准入预留，没有新的真实调用。余下十家仍不启动。
 
 ## 1. 唯一实施指引
 
@@ -7615,3 +7615,37 @@ A只读核业务/日志/源，并以read service复核三读；直接diff检查`
 唯一下一卡为[§33章节公司核心优先交付重整](b3-s1-execution-card.md#33-章节公司核心优先交付重整零外呼)/[验收§7.84](../../../docs/development/company_profile_acceptance_program.md#784-结束s32转章节核心优先交付重整2026-11-03)，依据产品v8及[A/B流程v3](../../../docs/development/ab_role_development_workflow.md)。B同窗修`chapter_select/full_text`策略覆盖、核心/补充主要性顺序、必要源读与实际成稿/核验预算准入及输出上限可证性，直接回归造纸和银行失败轨迹，禁止网络并新增真实调用0。复用既有成功真实响应只作范围匹配的输入证据，不把旧answers当新答案或全pass；不造十二家通过模拟、不回归余十家、不续两家付费微窗。先持久S30/S31/S32最小必要证据，再清无依赖垃圾，最终给原请求轨迹/真实缺口/可验证边界。§33成功只证明直接链工程策略已按v8重整，S1新组仍2/12执行、0核心成立、0独立可用，历史不改。真实重验须后续另行裁决，不在本卡授权。
 
 本轮之后，交接摘要必须先报固定组业务数/核心成立/独立待审/常规核心交付，再列主要根因和证据；测试、提交、守限止损不能代替业务结果。
+
+## 184. B交接：§33章节核心优先，零外呼
+
+日期：2026-11-03。执行[§33](b3-s1-execution-card.md#33-章节公司核心优先交付重整零外呼)。新组仍是已执行2/12，未执行10家。程序核心成立0家。独立待审0家。常规核心交付0家。本卡没有新的真实业务。真实调用0。
+
+### 184.1 请求链相对S32的变化
+
+S32两家的身份是`chapter_select=true`且`discovery_scope=full_text`，源审提示走了“Read every supplied character”。章节选读现在改走章节正文提示：先写主营、主要产品、收入和期间总额、重要投入、经营角色和有据上下游。地区表、普通产销行和集中度比例由模型标为非主要，除非同一段写出新业务、主要产品构成变化或重要关联风险。程序不按条件编号、关键词或余额把主要条件改成补充。
+
+成稿不再先写完收入、成本和角色再写产品。第一组按主营、收入、产品、投入、角色、下游各取一条交错发出。所选必要页还没读完时，只留这一组，不把余额花在后面的明细上。未读页仍使完成标志为false。
+
+章节准入按声明输出的6倍预留。依据是S32日志：造纸源阅读声明4000、实际23560，字段是`max_completion_tokens`。发给模型的声明值没有改。6倍只是准入缓冲，不能证明供应商会遵守该字段。导航有一次声明1000、实际10122，所以6倍仍可能偏小。后续真实验证仍有输出超限风险。
+
+尾部预留改为所选正文的第一片全文，不再用两页各700字代替整份核心。
+
+### 184.2 验证
+
+```text
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_direct_progress.py::test_chapter_prompt_is_not_the_full_text_branch tests/unit/test_research/test_company_profile_direct_progress.py::test_first_core_group_includes_products_and_role tests/unit/test_research/test_company_profile_direct_progress.py::test_chapter_admission_does_not_trust_the_declared_output
+```
+
+3 passed，7.64秒。没有新的真实调用，也没有整公司自动通过的模拟。
+
+### 184.3 清理
+
+S30/S31/S32的query hash和账本写在`s30-s32-result-manifest.json`。S31瘦身不重复计释放。S32两根：
+
+| 根 | 清前 | 清后 | 释放 |
+| --- | --- | --- | --- |
+| s32-600103-20261103 | 4501598 | 618043 | 3883555 |
+| s32-600000-20261103 | 5408511 | 777582 | 4630929 |
+
+删除两根的research.db、output、checkpoints、export、解析副本。留下query、budget-final、entry-result、source-receipt和日志。正式PDF未删。既有工作区改动未纳入提交。
+

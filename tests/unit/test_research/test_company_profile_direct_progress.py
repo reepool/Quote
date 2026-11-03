@@ -8725,6 +8725,95 @@ def test_redundant_short_quote_can_close_but_a_missing_business_cannot():
     assert any("医药业务" in gap for gap in blocked)
 
 
+def test_chapter_prompt_is_not_the_full_text_branch():
+    from research.company_profile.contracts import ReportSemanticRequestV3
+    from research.company_profile.report_interpretation import (
+        direct_core_processing_identity,
+    )
+    from research.company_profile.report_wire import instructions
+
+    report = _report()
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    request = ReportSemanticRequestV3(
+        request_id="chapter-prompt",
+        purpose="source_inventory",
+        report=report,
+        processing_identity=identity,
+        source_pages=({"page": 1, "text": "公司主营造纸。", "readable": True},),
+        source_scope="full_context",
+        max_output_tokens=4000,
+        timeout_seconds=30,
+    )
+    text = instructions(request)
+    assert "Read every supplied character" not in text
+    assert "selected chapter body" in text
+    assert "set major false" in text
+    assert "related-party risk" in text
+    plain = direct_core_processing_identity()
+    historical = request.model_copy(update={"processing_identity": plain})
+    assert "Read every supplied character" in instructions(historical)
+
+
+def test_first_core_group_includes_products_and_role():
+    from research.company_profile.contracts import ReportSourceCondition
+    from research.company_profile.direct_reading import _business_groups
+
+    report = _report()
+
+    def condition(condition_id, dimension):
+        return ReportSourceCondition(
+            condition_id=condition_id,
+            dimension=dimension,
+            description=condition_id,
+            evidence=(_evidence(report, text="公司主营造纸。", page=1),),
+            major=True,
+            statement_status="current",
+        )
+
+    groups = _business_groups(
+        [
+            condition("revenue-a", "revenue_model"),
+            condition("revenue-b", "revenue_model"),
+            condition("revenue-c", "revenue_model"),
+            condition("products", "products_services"),
+            condition("role", "supply_chain_role"),
+            condition("output", "output_exposure"),
+            condition("business", "principal_business"),
+        ]
+    )
+    first = {item.dimension for item in groups[0]}
+    assert {"principal_business", "products_services", "supply_chain_role", "output_exposure"} <= first
+    assert sum(item.dimension == "revenue_model" for item in groups[0]) == 1
+
+
+def test_chapter_admission_does_not_trust_the_declared_output():
+    from research.company_profile.reading_budget import request_reservation
+    from research.company_profile.report_interpretation import (
+        direct_core_processing_identity,
+    )
+    from research.company_profile.contracts import ReportSemanticRequestV3
+
+    report = _report()
+    identity = direct_core_processing_identity()
+    pages = ({"page": 1, "text": "公司主营造纸并销售纸袋纸。", "readable": True},)
+    plain = ReportSemanticRequestV3(
+        request_id="reserve",
+        purpose="source_inventory",
+        report=report,
+        processing_identity=identity,
+        source_pages=pages,
+        source_scope="full_context",
+        max_output_tokens=4000,
+        timeout_seconds=30,
+    )
+    chapter_identity = dict(identity)
+    chapter_identity["chapter_select"] = True
+    chapter = plain.model_copy(update={"processing_identity": chapter_identity})
+    assert request_reservation(chapter) >= request_reservation(plain) + 5 * 4000
+
+
+
 def test_repeated_short_quote_uses_one_passage_and_stays_open_when_split():
     from research.company_profile.contracts import ReportSourceCondition
     from research.company_profile.report_interpretation import (
@@ -9047,6 +9136,3 @@ def test_invalid_selected_page_is_recorded_and_not_marked_read():
         item["page"] == 23 and item["status"] == "read" for item in result.page_coverage
     )
     assert result.draft_complete is False
-
-
-

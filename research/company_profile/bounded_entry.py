@@ -1740,6 +1740,12 @@ def _worker(
             identity["read_remaining_sources"] = True
         if binding.get("chapter_select"):
             identity["chapter_select"] = True
+            identity["prompt_version"] = (
+                "company_profile_report_reading.2026-11-03.chapter-core.v1"
+            )
+            identity["product_contract"] = (
+                "company_profile_product_contract.2026-10-27.llm-led.v8"
+            )
         if binding.get("compatible_continue"):
             identity["compatible_continue"] = True
         if binding.get("saved_source_draft"):

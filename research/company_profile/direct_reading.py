@@ -3580,12 +3580,21 @@ def interpret_direct_core(
             and item.statement_status == "current"
             and item.dimension in _CORE_CLOSEOUT_DIMENSIONS
         ]
-        themes = (
-            ("principal_business", "revenue_model", "input_exposure", "supply_chain_role"),
-            ("products_services", "output_exposure", "upstream_downstream"),
-        )
-        for dims in themes:
-            group = [item for item in pending if item.dimension in dims]
+        groups = _business_groups(pending)
+        if chapter_required_pages is not None:
+            unread_required = [
+                page
+                for page in sorted(chapter_required_pages)
+                if by_page.get(int(page), {}).get("status") != "read"
+            ]
+            if unread_required:
+                groups = groups[:1]
+                gap = "core_held_for_unread_source:" + ",".join(
+                    str(page) for page in unread_required[:12]
+                )
+                if gap not in gaps:
+                    gaps.append(gap)
+        for group in groups:
             if group:
                 deliver_group(group)
         for page in package:
@@ -4943,16 +4952,8 @@ def interpret_direct_core(
                 except ValueError:
                     hold_slices = [hold_pages[:1]]
                 first = hold_slices[0] if hold_slices else hold_pages[:1]
-                windowed = [
-                    {
-                        "page": int(page["page"]),
-                        "text": " ".join(str(page.get("text") or "").split())[:700],
-                        "readable": True,
-                    }
-                    for page in first[:2]
-                ]
                 source_later = _compose_tail(
-                    windowed,
+                    first,
                     report=report,
                     identity=identity,
                 )
