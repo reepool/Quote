@@ -2,9 +2,11 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-11-04。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[§35一次常规额度新处理](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#35-一次常规额度造纸全新真实交付观察)已获用户§190授权，仅造纸一次120000/900秒/16含2恢复、现有DeepSeek，禁旧语义/银行/十家/后继/充值。B必要冻结后直接执行，登记0/1、A未启动；旧S1/S32/质量/S2/生产边界不变。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[§36零外呼执行链归因与路线裁决](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#36-零外呼执行链归因与路线裁决)，依据验收§7.87/A审核§192。§35一次1/1失败已停止；先分清程序/模型/接口责任，不直接淘汰模型或续旧方案。新增模型请求/探针/binding0，逐轮清垃圾，旧S1/S32及S2/生产不变。
 
 ## 1. 开发者必须先理解的纠偏
+
+**2026-11-04审核§192（当前）：** §35一次已结束失败，不再有本卡真实授权；§36只在原owner归因并必要修正本地错误提问/补源阻断，再分清模型与接口证据。新模型请求/探针/binding0，不自行换模型/加额或启动银行/十家。B按流程v3同窗P0—P3、匹配的局部验证/Review和一次因果/下一方案交接，不按总额/续页分小卡，不大模拟造true。每轮先核归属/持久证据清本人无用物、交接再收尾；A已实际清S35重复根478250字节，保冻结合同/权威回执/正式源。以下为历史安排。
 
 **2026-11-04最新授权（替代下述待批准状态）：** 用户已在[§190](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#190-用户授权35一次常规额度造纸新处理)批准§35“这一次常规额度新处理”，原120000/900秒/16含2恢复和一次/DeepSeek/禁旧语义/无银行十家后继充值边界不变。B必要清理/检查及冻结后直接执行一次，无需再逐项请批；登记0/1，A未外呼，不改旧成绩/S2/生产权限。
 
@@ -95,6 +97,8 @@ B可以在卡内自主处理真实触发的P0/P1和P2/P3验证问题，不因每
 2026-10-25审核§113已完成四类核心与实际答案审查。浦发补充源冲突须离线撤句，安全稿query/export/新实例一致且独立正确正文/真实检查不丢后，4/4及A2进入S1的条件放行生效；B按下一卡核确定差异、登记证据后自主继续，不另等A返审。常规资源、首次自动表现及未见泛化未通过。
 
 ### B3 / S1：12家新链回归（A2通过后）
+
+- **2026-11-04审核§192（当前）：** §35真实观察1/1、核心0，63232/5/393.144秒/0恢复/unknown；当前组合失败，不再DeepSeek微窗。应用正则错误定向行业收入、必要页未发送与真实模型生成/核验行为分开，不预设换模型即可解决。唯一§36/验收§7.87一次归因/必要本地修正/接口核查、清理并交唯一下一方案，模型外呼0，不自切路由/加额。B每轮清本人垃圾，现有权威/正式源/并行保护，原S1/S32/S2/生产边界不变。以下为历史裁决。
 
 - **2026-11-04审核§189（当前）：** §34工程有限通过，4短测及固定S31八对象的原入口/三读证明接受，非新语义/效率。导航计入余额后可重包首源，不保证完整公司；关闭继续模拟方向。唯一§35/验收§7.86拟仅造纸一次120000/900秒/16含2恢复、现有DeepSeek、禁旧语义/银行/十家/后继/充值，待用户新授权、当前0/1；批准前不发请求/binding，批准后同卡冻结执行。B按流程v3只做必要窄接入/清理/Review，不造平台或纯准备交接；真实再失败按路线/模型/边界裁决，不付费补句，S1原成绩/S2/生产不改。以下为历史安排。
 
