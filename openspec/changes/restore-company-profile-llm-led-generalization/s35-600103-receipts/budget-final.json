@@ -1,0 +1,122 @@
+{
+  "physical_requests": 5,
+  "charged_tokens": 63232,
+  "charged_cost_cny": "unknown",
+  "cost_status": "unknown",
+  "billing_mode": "development_unpriced",
+  "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+  "stopped_reason": null,
+  "denied_request": null,
+  "attempts": [
+    {
+      "sequence": 1,
+      "request_id": "7eb322bd218b4a0487364c3175089c5f",
+      "logical_request_id": "88c62a0d85e3b030d6b7b45939dfc7c6d4be2325234e84c03b97fd02eaa2d34b",
+      "source_label": "deepseek:deepseek-flash",
+      "attempt": 1,
+      "profile": "semantic_extraction__deepseek",
+      "provider_resource": "deepseek",
+      "model": "deepseek-flash",
+      "reserved_input_tokens": 4876,
+      "reserved_output_tokens": 1000,
+      "charged_tokens": 3253,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 1097,
+        "output_tokens": 2156,
+        "total_tokens": 3253
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown"
+    },
+    {
+      "sequence": 2,
+      "request_id": "12d462977f6647dd8f34ac7c7732d538",
+      "logical_request_id": "25d75f3233783b7e0f8e82a68c0e4e1bf52be03a43179cd25bcae61247c8f46f",
+      "source_label": "deepseek:deepseek-flash",
+      "attempt": 1,
+      "profile": "semantic_extraction__deepseek",
+      "provider_resource": "deepseek",
+      "model": "deepseek-flash",
+      "reserved_input_tokens": 21336,
+      "reserved_output_tokens": 4000,
+      "charged_tokens": 21181,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 4818,
+        "output_tokens": 16363,
+        "total_tokens": 21181
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown"
+    },
+    {
+      "sequence": 3,
+      "request_id": "2603db2ea3834ee683866fc6ceab510c",
+      "logical_request_id": "68d24847ecb1aa7bdb2d9777cd7b4ab89552823e7fb5a79c336fd809dd2937a1",
+      "source_label": "deepseek:deepseek-flash",
+      "attempt": 1,
+      "profile": "semantic_extraction__deepseek",
+      "provider_resource": "deepseek",
+      "model": "deepseek-flash",
+      "reserved_input_tokens": 42147,
+      "reserved_output_tokens": 2500,
+      "charged_tokens": 18567,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 9282,
+        "output_tokens": 9285,
+        "total_tokens": 18567
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown"
+    },
+    {
+      "sequence": 4,
+      "request_id": "c93fcc8eb13449ff8947480d307f7013",
+      "logical_request_id": "7c8395fdfdce40e3ba15677551d7a1256da1fceff0ef1e29a51110dda5eed83d",
+      "source_label": "deepseek:deepseek-flash",
+      "attempt": 1,
+      "profile": "semantic_extraction__deepseek",
+      "provider_resource": "deepseek",
+      "model": "deepseek-flash",
+      "reserved_input_tokens": 30971,
+      "reserved_output_tokens": 2000,
+      "charged_tokens": 15965,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 7352,
+        "output_tokens": 8613,
+        "total_tokens": 15965
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown"
+    },
+    {
+      "sequence": 5,
+      "request_id": "2e41a225b75d484a88b734484adbec00",
+      "logical_request_id": "fb5f82bc8478f328b116daa28b02b678bb5e1bd258e40e177d8f1639f633ce1f",
+      "source_label": "deepseek:deepseek-flash",
+      "attempt": 1,
+      "profile": "semantic_extraction__deepseek",
+      "provider_resource": "deepseek",
+      "model": "deepseek-flash",
+      "reserved_input_tokens": 9165,
+      "reserved_output_tokens": 2000,
+      "charged_tokens": 4266,
+      "charged_cost_cny": "unknown",
+      "usage": {
+        "input_tokens": 2097,
+        "output_tokens": 2169,
+        "total_tokens": 4266
+      },
+      "status": "success",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown"
+    }
+  ]
+}

@@ -145,11 +145,12 @@ class LlmRunBudget:
         authorized_s27 = (
             run_authorization == "company_profile_s27_offline_diagnostic.2026-11-01"
         )
+        authorized_s35 = run_authorization == "company_profile_s35_observation.2026-11-04"
         authorized_s32 = run_authorization == "company_profile_s32_regression.2026-11-03"
         authorized_s31 = run_authorization == "company_profile_s31_coverage.2026-11-03"
         authorized_s30 = run_authorization == "company_profile_s30_observation.2026-11-02"
         authorized_s28 = run_authorization == "company_profile_s28_observation.2026-11-01"
-        if authorized_s32:
+        if authorized_s35 or authorized_s32:
             token_cap, request_cap, cost_cap = 120_000, 16, Decimal(10)
         elif authorized_s31:
             token_cap, request_cap, cost_cap = 40_000, 4, Decimal(10)
