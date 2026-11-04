@@ -2,9 +2,11 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-11-04。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[一次常规额度真实观察§35](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#35-一次常规额度造纸全新真实交付观察待授权)，依据验收§7.86/A审核§189，待用户新授权。§34工程有限通过、结束模拟；新卡只拟造纸一次120000/900秒/16含2恢复全新真实处理，禁旧语义/银行/十家/后继/充值。当前新观察0/1、真实调用/binding0，S32仍2/12执行、核心0/2，原成绩/S2/生产不变。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[§35一次常规额度新处理](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#35-一次常规额度造纸全新真实交付观察)已获用户§190授权，仅造纸一次120000/900秒/16含2恢复、现有DeepSeek，禁旧语义/银行/十家/后继/充值。B必要冻结后直接执行，登记0/1、A未启动；旧S1/S32/质量/S2/生产边界不变。
 
 ## 1. 开发者必须先理解的纠偏
+
+**2026-11-04最新授权（替代下述待批准状态）：** 用户已在[§190](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#190-用户授权35一次常规额度造纸新处理)批准§35“这一次常规额度新处理”，原120000/900秒/16含2恢复和一次/DeepSeek/禁旧语义/无银行十家后继充值边界不变。B必要清理/检查及冻结后直接执行一次，无需再逐项请批；登记0/1，A未外呼，不改旧成绩/S2/生产权限。
 
 **当前授权状态（2026-11-04）：** §34工程有限通过后不再模拟准备。§35拟造纸一次常规额度全新真实观察，已询问用户、待明确批准；批准前真实调用/探针/可发送binding0，仅必要收尾/清理。批准后B沿原owner冻结并直接执行一次，不逐项等A；失败保结果即停，不自动局部付费续窗或启动银行/十家。输出实控与无价费用风险如实记，不能将阶段预留当整公司保证。原S1/S32/S2及生产边界不变。
 
