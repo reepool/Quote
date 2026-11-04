@@ -2,12 +2,17 @@
 
 ### Requirement: 可得性日期回填按本地证据优先执行且幂等
 
-可得性日期回填 SHALL 优先使用本地证据源（`financial_source_files.published_at`、披露事件 `announcement_time`、以及本 change 新增的 `financial_statements_raw` / `financial_filing_versions` 本地披露时间与 `announcement_audit` 勘察结果），按 `(instrument_id, report_period)` 取最早观测日填充 `publish_date` 与 `data_available_date`；回填 SHALL 仅更新空值字段并在 lineage 记录证据来源与质量，重复执行 SHALL 不改变已填值。
+可得性日期回填 SHALL 优先使用本地证据源（`financial_source_files.published_at`、披露事件 `announcement_time`、以及本 change 新增的 `financial_statements_raw` / `financial_filing_versions` 本地披露时间与 `announcement_audit` 勘察结果），按 `(instrument_id, report_period)` 取最早观测日填充 `data_available_date`；`publish_date` 仅在证据质量为实测（observed，含勘察结果）时填充，SHALL NOT 以法定截止日兜底值填充 `publish_date`；证据 SHALL 仅接受定期报告类公告，非定期公告（业绩说明会预告、更正等）SHALL NOT 作为可得日依据（防止把早于报告发布的事件当成可得日造成未来函数）。回填 SHALL 仅更新空值字段并在 lineage 记录证据来源与质量，重复执行 SHALL 不改变已填值。
 
 #### Scenario: 本地证据命中
 
-- **WHEN** 某 `(instrument_id, report_period)` 在任一本地证据源存在披露时间
-- **THEN** 回填 SHALL 以最早观测日填充 `data_available_date` 与空缺的 `publish_date`，lineage SHALL 记录证据表名与质量标记
+- **WHEN** 某 `(instrument_id, report_period)` 在任一本地证据源存在定期报告披露时间
+- **THEN** 回填 SHALL 以最早观测日填充 `data_available_date`，且空缺的 `publish_date` 在证据质量为实测时一并填充，lineage SHALL 记录证据表名与质量标记
+
+#### Scenario: 非定期公告不得作为证据
+
+- **WHEN** 某 instrument 在报告期附近存在业绩说明会预告等非定期报告公告
+- **THEN** 该公告时间 SHALL NOT 被用作 `data_available_date` 证据
 
 #### Scenario: 重复执行
 
@@ -17,7 +22,7 @@
 #### Scenario: 回填不触发变更水位
 
 - **WHEN** 回填更新目标行
-- **THEN** SHALL 仅更新日期与 lineage 目标列，不更新 `row_hash` / `updated_at`，不产生 `data_change_log` 变更记录
+- **THEN** SHALL NOT 更新 `row_hash`、SHALL NOT 产生 `data_change_log` 变更记录（`updated_at` 按回填模块既有行为维护）
 
 ### Requirement: 历史披露日批量勘察写入审计表且不触碰事件状态
 
@@ -54,17 +59,22 @@
 
 ### Requirement: 缺失可得性行以法定披露截止日保守兜底
 
-经本地证据与勘察后仍缺失可得日的历史行，SHALL 以对应报告期的法定披露截止日（Q1→当年 4/30、H1→当年 8/31、Q3→当年 10/31、年报→次年 4/30）作为 `data_available_date` 兜底，lineage SHALL 标注 `quality='statutory_deadline'`；兜底值 SHALL 满足 `data_available_date ≥ 报告期期末`。
+经本地证据与勘察后仍缺失可得日的历史行，SHALL 以对应报告期的法定披露截止日（Q1→当年 4/30、H1→当年 8/31、Q3→当年 10/31、年报→次年 4/30）作为 `data_available_date` 兜底，lineage SHALL 标注 `quality='statutory_deadline'`；`publish_date` SHALL 保持 NULL（法定截止日是保守上界而非披露事实，不得写入事实字段）；兜底值 SHALL 满足 `data_available_date ≥ 报告期期末`。
 
 #### Scenario: 兜底填充
 
 - **WHEN** 某行在全部证据源均无披露日
-- **THEN** 该行 SHALL 按报告期类型取法定截止日填充，且 lineage 质量标记为 `statutory_deadline`
+- **THEN** 该行 SHALL 按报告期类型取法定截止日填充 `data_available_date` 且 lineage 质量标记为 `statutory_deadline`，`publish_date` SHALL 保持 NULL
+
+#### Scenario: 实测日可以晚于法定截止日（延期披露）
+
+- **WHEN** 某行实测/勘察披露日晚于法定截止日（公司延期披露属实）
+- **THEN** 该行 `data_available_date` SHALL 取实测日（晚于截止日是真实情况，不是校验违例），仅当实测日超过截止日 60 天以上时 SHALL 列入验收报告的异常清单供人工复核
 
 #### Scenario: 兜底不得早于真实可得
 
-- **WHEN** 任一行（实测、勘察或兜底）完成可得日填充
-- **THEN** 校验 SHALL 断言 `data_available_date ≥ 报告期期末` 且 `≤ 对应法定截止日 + 容差`，违例行 SHALL 列入验收报告而非静默通过
+- **WHEN** 任一行完成可得日填充
+- **THEN** 硬性校验 SHALL 断言 `data_available_date ≥ 报告期期末`；兜底行 SHALL 等于对应法定截止日；违例 SHALL 阻断验收而非静默通过
 
 ### Requirement: 历史批次口径差具备全量量化报告与决策门
 
@@ -96,12 +106,12 @@
 
 ### Requirement: 修复结果通过验收验证
 
-本 change 完成时 SHALL 产出验收报告：可得性覆盖率三类占比（observed / surveyed / statutory / 仍缺）、全行 PIT 边界校验结果、20 家抽样与 cninfo 公告日人工核对一致率、周日全量 reconciliation 后 `mapping_catalog_empty` 事件归零确认。
+本 change 完成时 SHALL 产出验收报告：全部缺失行（2023Q4–2026Q1 十个季度约 5.4 万行，另含 2026-06-30 残余 388 行与 2026-09-30 残余 2 行）的 `data_available_date` 处置覆盖率按 observed / surveyed / statutory / 仍缺 四类给占比、PIT 边界校验结果、20 家抽样与 cninfo 公告日人工核对一致率、周日全量 reconciliation 后 `mapping_catalog_empty` 事件归零确认。
 
 #### Scenario: 覆盖率报告
 
 - **WHEN** 全部回填完成
-- **THEN** 目标十个季度的可得性覆盖率 SHALL ≥ 99.9%（仍缺行仅允许为数值层与公告均无记录的退市/特殊行）
+- **THEN** 全部历史缺失行的 `data_available_date` 处置覆盖率 SHALL ≥ 99.9%（仍缺行仅允许为数值层与公告均无记录的退市/特殊行，逐行说明）；覆盖率指标以 `data_available_date` 为准，`publish_date` 允许在 statutory 行保持 NULL
 
 #### Scenario: 抽样核对
 

@@ -8,7 +8,7 @@
 
 ## 2. M2 历史披露日勘察（网络，安静窗口，调度侧执行）
 
-- [ ] 2.1 勘察入口实现：复用公告采集服务按市场×季度窗口扫描（类别限定定期报告，标题推期），写 `announcement_audit`（purpose_key=`historical_disclosure_date_survey`）；实现访问栈完整性自检（headed Chrome 不可用即拒绝启动）与窗口断点。
+- [ ] 2.1 勘察入口实现：复用公告采集服务按市场×季度窗口扫描（窗口日期边界 = 披露季起点至法定截止日 + 延期尾窗 60 天，见 design D1；类别限定定期报告，标题推期），写 `announcement_audit`（purpose_key=`historical_disclosure_date_survey`）；实现访问栈完整性自检（headed Chrome 不可用即拒绝启动）与窗口断点；提供调度侧运行入口（manual_only 调度任务或 worker 入口，必要时新增 `config/05_scheduler.json` 条目）。
 - [ ] 2.2 执行约束落地：默认请求间隔 ≥ 1s（可配置）、连续 403/限流停窗、单窗口请求量上限；入口帮助文本注明独立裸进程禁用（2026-11-03 403 事故记录）。
 - [ ] 2.3 单测：事件状态零触碰（勘察前后 `financial_disclosure_event_state` 快照一致）；断点续跑不重复请求；标题推期仅接受定期报告类别。
 - [ ] 2.4 生产执行：十个季度 × 三市场分窗跑完（安静窗口，避开 21:45/周日 09:30），产出 `(instrument, period, announcement_time)` 覆盖率统计写入 M3 验收报告输入。
@@ -16,9 +16,9 @@
 ## 3. M3 回填与验收（本地为主）
 
 - [ ] 3.1 证据加载器接入 `announcement_audit` 勘察源；回填模块全量运行（本地证据 + 勘察证据），dry-run 先行核对将填行数与样本日期。
-- [ ] 3.2 法定截止日兜底：仍缺行按报告期类型填法定截止日，lineage `quality='statutory_deadline'`；兜底实现复用回填模块写入路径，不另写平行 UPDATE。
-- [ ] 3.3 验收验证一：目标十季度可得性覆盖率 ≥ 99.9%，按 observed / surveyed / statutory / 仍缺 四类给占比；仍缺行逐行说明（预期仅退市/特殊行）。
-- [ ] 3.4 验收验证二：全行 PIT 边界校验（报告期期末 ≤ avail ≤ 法定截止日 + 1 天容差），违例行零静默通过。
+- [ ] 3.2 法定截止日兜底：仍缺行按报告期类型填法定截止日到 `data_available_date`（`publish_date` 保持 NULL），lineage `quality='statutory_deadline'`；兜底实现复用回填模块写入路径，不另写平行 UPDATE。
+- [ ] 3.3 验收验证一：全部历史缺失行（2023Q4–2026Q1 十季度约 5.4 万行 + 2026H1 残余 388 行 + Q3 残余 2 行）的 `data_available_date` 处置覆盖率 ≥ 99.9%，按 observed / surveyed / statutory / 仍缺 四类给占比；仍缺行逐行说明（预期仅退市/特殊行）。
+- [ ] 3.4 验收验证二：PIT 硬性边界校验（`data_available_date ≥ 报告期期末`；兜底行 == 法定截止日），违例阻断验收；实测日晚于法定截止日超 60 天的行进异常清单人工复核（延期披露属真实情况，不计违例）。
 - [ ] 3.5 验收验证三：随机 20 家 observed/surveyed 类抽样与 cninfo 公告日人工核对，一致率 ≥ 90%，不一致样本逐家说明。
 - [ ] 3.6 验收验证四：首个周日全量 reconciliation 后 `mapping_catalog_empty` 事件归零确认（SQL 验证，结果记入验收报告）。
 - [ ] 3.7 249 行无源 total_assets：检查 `financial_statements_raw` 可重解析性，结论（重解析清单或接受记录）写入验收报告。

@@ -78,6 +78,8 @@ reconciliation 自动刷新，本 change 只承担验证，不新增修复动作
     勘察源（约数十行）；
   - `scripts/maintenance/`：新增口径对账量化脚本与勘察触发脚本（一次性工具，
     遵守 §2.3 TMPDIR）；
+  - 勘察的调度侧运行入口：优先复用现有 worker/manual 触发路径；确需新增
+    manual_only 调度任务时改 `config/05_scheduler.json`（一条 job 条目）；
   - 不改 `research/storage.py` 表结构与既有方法签名；不新增共享抽象。
 - 程序映射：FR-07（W5 存储边界）只读切片不动 repository 划分；FR-18
   （`isolate-long-tasks-from-api-event-loop`）为网络勘察的执行约束来源。
