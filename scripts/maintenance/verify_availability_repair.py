@@ -201,7 +201,7 @@ def main() -> int:
     parser.add_argument("--sample", type=int, default=20,
                         help="0 disables the cninfo sampling check")
     parser.add_argument("--out", default=str(
-        REPO / "scripts" / "maintenance" / "availability_verify_summary.json"))
+        REPO / "data" / "QuoteBak" / "financial_survey" / "availability_verify_summary.json"))
     args = parser.parse_args()
 
     conn = sqlite3.connect(f"file:{Path(args.db).resolve()}?mode=ro", uri=True)
@@ -227,7 +227,9 @@ def main() -> int:
         if args.sample > 0:
             summary["sample"] = sample_check_cninfo(rows, args.sample)
 
-        Path(args.out).write_text(
+        out_path = Path(args.out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(
             json.dumps(summary, ensure_ascii=False, indent=1), encoding="utf-8"
         )
         print(json.dumps(summary, ensure_ascii=False, indent=1, default=str))

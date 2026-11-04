@@ -107,9 +107,11 @@ def build_survey_windows(
     only covers already-elapsed seasons.
     """
     today = today or date.today()
+    periods = [str(period) for period in report_periods]
+    exchanges = list(exchanges)
     windows: List[SurveyWindow] = []
     for exchange in exchanges:
-        for period_text in report_periods:
+        for period_text in periods:
             period_end = _parse_period_end(period_text)
             if period_end is None:
                 continue
@@ -215,11 +217,11 @@ async def survey_historical_disclosure_dates(
     drive the loop without network or storage; the production runner wires
     the announcement acquisition service and ``store_announcement_audit``.
     """
-    windows = build_survey_windows(exchanges, report_periods, today=today)
-    target_periods = {
-        period
-        for period in map(str, report_periods)
-    }
+    # materialize once: build_survey_windows and the harvest filter both
+    # iterate the periods, and a generator input would silently exhaust
+    periods = [str(period) for period in report_periods]
+    windows = build_survey_windows(exchanges, periods, today=today)
+    target_periods = set(periods)
     checkpoint = load_checkpoint(checkpoint_path)
     completed: List[str] = list(checkpoint.get("completed_windows", []))
     failed: List[str] = list(checkpoint.get("failed_windows", []))
