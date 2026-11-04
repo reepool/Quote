@@ -52,10 +52,11 @@ reconciliation（`report_periods=['2023-12-31']`）完成刷新并验证清零�
   披露截止日做保守可得日**（Q1→4/30、H1→8/31、Q3→10/31、年报→次年
   4/30），lineage 标注 `quality='statutory_deadline'`，研究侧可区分实测日
   与保守上界。
-- **验证**：覆盖率三类占比报告（observed / surveyed / statutory）、全行
-  PIT 边界校验（`data_available_date` ≥ 报告期期末且 ≤ 法定截止日）、抽
-  20 家对 cninfo 人工核对、`mapping_catalog_empty` 陈旧 reason 清零验证
-  （窗口内周日全量 + 窗口外 2023Q4 定向刷新）。
+- **验证**：覆盖率四类占比报告（observed / surveyed / statutory / 仍缺）、
+  PIT 硬性边界校验（`data_available_date` ≥ 报告期期末；兜底行 = 法定截止
+  日；实测晚于截止日属延期披露真实情况，超 60 天进异常清单）、抽 20 家对
+  cninfo 人工核对、`mapping_catalog_empty` 陈旧 reason 清零验证（窗口内
+  周日全量 + 窗口外 2023Q4 定向刷新）。
 - **决策门**：口径差经量化后是否对历史行按 v6 管道重派生，由 owner 拍板
   （营业总收入 vs 营业收入对控股公司各有合理性）；未获决策不执行重派生。
 
@@ -94,5 +95,6 @@ reconciliation（`report_periods=['2023-12-31']`）完成刷新并验证清零�
 - 非目标：不做 2023Q4 之前宽表历史扩产（滚动窗口 10 季，2023Q4 已为基线；
   更早历史数值层仍可用）；不做通用披露时间数据平台；不修改当季管道；
   249 行 total_assets 中数值层无值的行以"源文件可重解析则重解析、否则接受
-  并记录"处理，不强制补齐；历史事件陈旧 reason 的刷新由周日全量任务自然
-  完成，本 change 不写并行刷新逻辑。
+  并记录"处理，不强制补齐；历史事件陈旧 reason 窗口内（2024Q1 起）由周日
+  全量任务自然刷新，窗口外 2023Q4 44 条以一次定向 reconciliation 刷新，
+  不写并行刷新逻辑。

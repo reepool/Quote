@@ -98,7 +98,7 @@ M2 网络勘察卡（安静窗口，调度侧执行）
    勘察脚本/入口（D2/D3 约束）→ 分窗执行 → announcement_audit 落库
 M3 回填与验收卡（本地为主）
    回填模块全量跑 → 法定兜底 → 覆盖率/PIT/抽样三类验证
-   → 周日 reconciliation 后 mapping_catalog_empty 归零确认
+   → mapping_catalog_empty 清零确认（窗口内周日全量 + 2023Q4 定向刷新）
    → 口径量化报告提交 owner 决策（重派生留待决策后另行排期）
 ```
 
