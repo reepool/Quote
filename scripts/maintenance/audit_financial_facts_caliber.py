@@ -307,7 +307,8 @@ def main() -> int:
         summary["totals"] = dict(totals)
         summary["report_path"] = str(report_path)
 
-        dump_dir = Path(__file__).resolve().parent
+        dump_dir = REPO / "data" / "QuoteBak" / "financial_survey"
+        dump_dir.mkdir(parents=True, exist_ok=True)
         (dump_dir / "caliber_summary.json").write_text(
             json.dumps(summary, ensure_ascii=False, indent=1), encoding="utf-8"
         )

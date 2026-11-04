@@ -52,13 +52,16 @@ class _RouteShim:
 
 
 def _build_instrument_map(exchanges) -> dict:
+    """All stocks regardless of status: delisted companies also have
+    historical periodic reports whose observed dates beat the statutory
+    fallback (e.g. 600599 delisted-panda rows in the wide table)."""
     quotes_db = REPO / "data" / "quotes.db"
     conn = sqlite3.connect(f"file:{quotes_db}?mode=ro", uri=True)
     try:
         rows = conn.execute(
             """
             SELECT exchange, symbol, instrument_id FROM instruments
-            WHERE type='stock' AND status='active'
+            WHERE type='stock'
             """
         ).fetchall()
     finally:
@@ -126,7 +129,6 @@ async def run(args) -> dict:
             audit_writer=audit_writer,
             instrument_map=instrument_map,
             checkpoint_path=checkpoint_path,
-            request_interval_seconds=args.interval,
             page_size=args.page_size,
             max_pages=args.max_pages,
             probe_enabled=not args.skip_probe,

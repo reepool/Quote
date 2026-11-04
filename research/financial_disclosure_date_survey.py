@@ -15,16 +15,53 @@ Hard constraints (from the change spec):
 """
 from __future__ import annotations
 
-import calendar
 import json
 from dataclasses import dataclass, field, replace
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any, Awaitable, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
 
+from research.financial_available_date_backfill import (
+    statutory_deadline_for_period_end,
+)
 from research.financial_disclosure_events import infer_report_periods_from_title
 
 SURVEY_PURPOSE_KEY = "historical_disclosure_date_survey"
+
+# selection-reason token carrying the title-inferred report period on each
+# audit row; the availability backfill parses the same token (single
+# contract between the two modules).
+INFERRED_PERIOD_PREFIX = "inferred_report_period="
+
+
+def inferred_period_reason(report_period: str) -> str:
+    """Build the selection-reason token for a survey audit row."""
+    return f"{INFERRED_PERIOD_PREFIX}{report_period}"
+
+
+def parse_inferred_report_period(text: Any) -> str:
+    """Extract the report period from survey selection reasons.
+
+    Accepts the serialized shapes seen in ``selection_reasons_json``
+    (JSON list of token strings), a bare token string, or a legacy dict
+    carrying ``inferred_report_period``; empty string when absent.
+    """
+    prefix = INFERRED_PERIOD_PREFIX
+    if not text:
+        return ""
+    try:
+        parsed = json.loads(str(text))
+    except (TypeError, ValueError):
+        parsed = None
+    if isinstance(parsed, dict):
+        return str(parsed.get("inferred_report_period") or "").strip()
+    candidates: list[Any] = parsed if isinstance(parsed, list) else [text]
+    for item in candidates:
+        token = str(item).strip()
+        if token.startswith(prefix):
+            return token[len(prefix):].strip().strip("'\"")
+    return ""
+
 
 # late-disclosure tail appended to each statutory deadline (design D1)
 LATE_TAIL_DAYS = 60
@@ -68,14 +105,12 @@ def build_survey_windows(
     windows: List[SurveyWindow] = []
     for exchange in exchanges:
         for period_text in report_periods:
-            parsed = _parse_period_end(period_text)
-            if parsed is None:
+            period_end = _parse_period_end(period_text)
+            if period_end is None:
                 continue
-            period_end = parsed
-            year, month, _ = (int(part) for part in period_text.split("-"))
-            deadline_month = {3: 4, 6: 8, 9: 10, 12: 4}[month]
-            deadline_year = year + 1 if month == 12 else year
-            deadline = date(deadline_year, deadline_month, calendar.monthrange(deadline_year, deadline_month)[1])
+            deadline = statutory_deadline_for_period_end(period_end)
+            if deadline is None:
+                continue
             end = deadline + timedelta(days=LATE_TAIL_DAYS)
             if end > today:
                 continue
@@ -182,7 +217,6 @@ async def survey_historical_disclosure_dates(
     audit_writer: AuditWriterFn,
     instrument_map: Mapping[Tuple[str, str], str],
     checkpoint_path: Path,
-    request_interval_seconds: float = 1.0,
     page_size: int = _DEFAULT_PAGE_SIZE,
     max_pages: int = _DEFAULT_MAX_PAGES,
     probe_enabled: bool = True,
@@ -277,7 +311,7 @@ async def survey_historical_disclosure_dates(
                 tagged = record.with_selection_reasons(
                     [
                         *(record.selection_reasons or ()),
-                        f"inferred_report_period={window.report_period}",
+                        inferred_period_reason(window.report_period),
                     ]
                 )
                 audit_writer(SURVEY_PURPOSE_KEY, tagged, instrument_id)

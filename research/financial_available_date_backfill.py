@@ -20,6 +20,19 @@ CORE_FACT_TABLES = (
     "financial_core_facts_history",
 )
 
+# evidence sources that carry an actually observed disclosure date; the
+# statutory estimate is deliberately excluded (it is a bound, not a fact).
+# Shared by the backfill, the acceptance verifier and the tz repair pass.
+OBSERVED_EVIDENCE_SOURCES = frozenset(
+    {
+        "core_publish_date",
+        "source_file",
+        "statements_raw",
+        "survey_audit",
+        "disclosure_event",
+    }
+)
+
 
 @dataclass
 class AvailableDateBackfillReport:
@@ -203,16 +216,23 @@ def _load_available_date_evidence(
         # Historical disclosure-date survey rows (M2 of
         # backfill-financial-historical-availability-and-caliber): the survey
         # records periodic-report announcements with the inferred report
-        # period inside selection_reasons_json.
+        # period inside selection_reasons_json. The purpose key and the
+        # token contract live in the survey module (single definition).
+        from research.financial_disclosure_date_survey import (
+            SURVEY_PURPOSE_KEY,
+            parse_inferred_report_period,
+        )
+
         for row in conn.execute(
             """
             SELECT instrument_id, published_at, selection_reasons_json
             FROM announcement_audit
-            WHERE purpose_key = 'historical_disclosure_date_survey'
+            WHERE purpose_key = ?
               AND published_at IS NOT NULL AND published_at <> ''
-            """
+            """,
+            (SURVEY_PURPOSE_KEY,),
         ).fetchall():
-            report_period = _extract_survey_report_period(
+            report_period = parse_inferred_report_period(
                 row["selection_reasons_json"]
             )
             if not report_period:
@@ -283,6 +303,26 @@ def _resolve_available_date(
     return None
 
 
+def statutory_deadline_for_period_end(period_end: date) -> Optional[date]:
+    """Single source of the A-share statutory disclosure deadline map.
+
+    Q1 -> Apr 30, H1 -> Aug 31, Q3 -> Oct 31, FY -> next Apr 30.
+    Shared by the availability fallback and the disclosure-date survey
+    window builder; keep every caller on this one implementation.
+    """
+    deadline_month = {3: 4, 6: 8, 9: 10, 12: 4}.get(period_end.month)
+    if deadline_month is None:
+        return None
+    deadline_year = period_end.year + 1 if period_end.month == 12 else period_end.year
+    import calendar as _calendar
+
+    return date(
+        deadline_year,
+        deadline_month,
+        _calendar.monthrange(deadline_year, deadline_month)[1],
+    )
+
+
 def _estimated_statutory_deadline(
     report_period: Any,
     fiscal_year: Any,
@@ -304,15 +344,12 @@ def _estimated_statutory_deadline(
             return None
         year, quarter = parsed
 
-    if quarter == 1:
-        deadline = date(year, 4, 30)
-    elif quarter == 2:
-        deadline = date(year, 8, 31)
-    elif quarter == 3:
-        deadline = date(year, 10, 31)
-    elif quarter == 4:
-        deadline = date(year + 1, 4, 30)
-    else:
+    quarter_end_month = {1: 3, 2: 6, 3: 9, 4: 12}.get(quarter)
+    if quarter_end_month is None:
+        return None
+    # the deadline helper only reads year/month; day is irrelevant here
+    deadline = statutory_deadline_for_period_end(date(year, quarter_end_month, 1))
+    if deadline is None:
         return None
     return deadline.isoformat()
 
@@ -370,35 +407,6 @@ def _json_object(value: Any) -> Dict[str, Any]:
     except (TypeError, ValueError, json.JSONDecodeError):
         return {}
     return parsed if isinstance(parsed, dict) else {}
-
-
-def _extract_survey_report_period(value: Any) -> str:
-    """Read the inferred report period from a survey audit row.
-
-    ``selection_reasons_json`` serializes ``record.selection_reasons``
-    (Tuple[str, ...]): the survey tags each row with a
-    ``inferred_report_period=<ISO period>`` token.
-    """
-    prefix = "inferred_report_period="
-    if not value:
-        return ""
-    try:
-        parsed = json.loads(str(value))
-    except (TypeError, ValueError, json.JSONDecodeError):
-        return ""
-    if isinstance(parsed, str):
-        candidates = [parsed]
-    elif isinstance(parsed, list):
-        candidates = parsed
-    elif isinstance(parsed, dict):
-        return str(parsed.get("inferred_report_period") or "").strip()
-    else:
-        return ""
-    for item in candidates:
-        text = str(item).strip()
-        if text.startswith(prefix):
-            return text[len(prefix):].strip().strip("'\"")
-    return ""
 
 
 def build_parser() -> argparse.ArgumentParser:

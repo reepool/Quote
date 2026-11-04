@@ -20,23 +20,19 @@ import sqlite3
 import sys
 from collections import defaultdict
 from datetime import date, datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO))
 
 from research.financial_available_date_backfill import (  # noqa: E402
+    OBSERVED_EVIDENCE_SOURCES,
     _estimated_statutory_deadline,
     _json_object,
 )
 
-OBSERVED_SOURCES = {
-    "core_publish_date",
-    "source_file",
-    "statements_raw",
-    "survey_audit",
-    "disclosure_event",
-}
+OBSERVED_SOURCES = OBSERVED_EVIDENCE_SOURCES
 
 
 def _period_end(report_period: str) -> date:
@@ -170,7 +166,9 @@ def sample_check_cninfo(rows, sample_size: int) -> dict:
             ts = ann.get("announcementTime")
             if ts is None:
                 continue
-            ann_date = datetime.fromtimestamp(ts / 1000).date()
+            ann_date = datetime.fromtimestamp(
+                ts / 1000, tz=ZoneInfo('Asia/Shanghai')
+            ).date()
             if row["avail"] and ann_date == date.fromisoformat(row["avail"][:10]):
                 confirmed = True
                 break

@@ -25,27 +25,14 @@ REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO))
 
 from research.financial_available_date_backfill import (  # noqa: E402
+    OBSERVED_EVIDENCE_SOURCES,
     _load_available_date_evidence,
     _json_object,
 )
 
-OBSERVED_SOURCES = ("source_file", "statements_raw", "survey_audit", "disclosure_event")
+# this repair only touches rows whose evidence came from the joined tables
+OBSERVED_SOURCES = OBSERVED_EVIDENCE_SOURCES - {"core_publish_date"}
 CST = ZoneInfo("Asia/Shanghai")
-
-
-def _cst_date(value) -> str:
-    text = str(value or "").strip()
-    if not text:
-        return ""
-    if text.endswith("Z"):
-        text = text[:-1] + "+00:00"
-    try:
-        parsed = datetime.fromisoformat(text)
-    except ValueError:
-        return text[:10]
-    if parsed.tzinfo is not None:
-        parsed = parsed.astimezone(CST)
-    return parsed.date().isoformat()
 
 
 def main() -> int:
@@ -107,9 +94,7 @@ def main() -> int:
             lineage_full["data_available_date_backfill"] = entry
 
             new_publish = row["publish_date"]
-            if new_publish and _cst_date(new_publish) == new_publish[:10]:
-                pass  # plain date or already CST - keep
-            elif new_publish:
+            if new_publish:
                 # publish_date filled from the same evidence string; shift by
                 # the same correction delta
                 try:
