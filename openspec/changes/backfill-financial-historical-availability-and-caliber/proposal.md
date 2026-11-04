@@ -50,7 +50,7 @@ reconciliation（`report_periods=['2023-12-31']`）完成刷新并验证清零�
   全量网络任务。
 - **可得性日期回填**：证据到位后运行既有回填模块（幂等）；仍缺行以**法定
   披露截止日做保守可得日**（Q1→4/30、H1→8/31、Q3→10/31、年报→次年
-  4/30），lineage 标注 `quality='statutory_deadline'`，研究侧可区分实测日
+  4/30），lineage 标注模块既有兜底标记（`estimated_statutory_deadline`），研究侧可区分实测日
   与保守上界。
 - **验证**：覆盖率四类占比报告（observed / surveyed / statutory / 仍缺）、
   PIT 硬性边界校验（`data_available_date` ≥ 报告期期末；兜底行 = 法定截止

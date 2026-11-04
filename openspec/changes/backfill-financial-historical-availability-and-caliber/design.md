@@ -61,7 +61,7 @@ reconciliation（`target_symbols`）。本 change 不新建任何平台。
 
 A股法定披露截止：Q1→4/30、H1→8/31、Q3→10/31、年报→次年 4/30。兜底值
 满足"不早于真实可得"（最晚合法披露日），PIT 安全方向正确；lineage 记
-`quality='statutory_deadline'` 供研究侧区分。两个关键语义：
+供研究侧区分（实现核实：模块既有标记为 `source='estimated_statutory_deadline'`/`quality='estimated'`，spec 对齐该既有标记，不新造标记）。两个关键语义：
 
 - **兜底只填 `data_available_date`，`publish_date` 保持 NULL**——法定截止
   日是保守上界而非披露事实，写入事实字段等于伪造披露日；既有模块对

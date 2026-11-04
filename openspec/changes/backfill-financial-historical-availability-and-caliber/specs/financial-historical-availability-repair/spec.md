@@ -59,12 +59,12 @@
 
 ### Requirement: 缺失可得性行以法定披露截止日保守兜底
 
-经本地证据与勘察后仍缺失可得日的历史行，SHALL 以对应报告期的法定披露截止日（Q1→当年 4/30、H1→当年 8/31、Q3→当年 10/31、年报→次年 4/30）作为 `data_available_date` 兜底，lineage SHALL 标注 `quality='statutory_deadline'`；`publish_date` SHALL 保持 NULL（法定截止日是保守上界而非披露事实，不得写入事实字段）；兜底值 SHALL 满足 `data_available_date ≥ 报告期期末`。
+经本地证据与勘察后仍缺失可得日的历史行，SHALL 以对应报告期的法定披露截止日（Q1→当年 4/30、H1→当年 8/31、Q3→当年 10/31、年报→次年 4/30）作为 `data_available_date` 兜底，lineage SHALL 记录兜底来源标记 `source='estimated_statutory_deadline'`（`quality='estimated'`，回填模块既有标记，研究侧据此区分实测日与保守上界）；`publish_date` SHALL 保持 NULL（法定截止日是保守上界而非披露事实，不得写入事实字段）；兜底值 SHALL 满足 `data_available_date ≥ 报告期期末`。
 
 #### Scenario: 兜底填充
 
 - **WHEN** 某行在全部证据源均无披露日
-- **THEN** 该行 SHALL 按报告期类型取法定截止日填充 `data_available_date` 且 lineage 质量标记为 `statutory_deadline`，`publish_date` SHALL 保持 NULL
+- **THEN** 该行 SHALL 按报告期类型取法定截止日填充 `data_available_date` 且 lineage 兜底来源标记为 `source='estimated_statutory_deadline'`，`publish_date` SHALL 保持 NULL
 
 #### Scenario: 实测日可以晚于法定截止日（延期披露）
 

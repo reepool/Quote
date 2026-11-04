@@ -16,7 +16,7 @@
 ## 3. M3 回填与验收（本地为主）
 
 - [ ] 3.1 证据加载器接入 `announcement_audit` 勘察源；回填模块全量运行（本地证据 + 勘察证据），dry-run 先行核对将填行数与样本日期。
-- [ ] 3.2 法定截止日兜底：仍缺行按报告期类型填法定截止日到 `data_available_date`（`publish_date` 保持 NULL），lineage `quality='statutory_deadline'`；兜底实现复用回填模块写入路径，不另写平行 UPDATE。
+- [ ] 3.2 法定截止日兜底：仍缺行按报告期类型填法定截止日到 `data_available_date`（`publish_date` 保持 NULL），lineage 记录模块既有兜底标记 `source='estimated_statutory_deadline'`/`quality='estimated'`；兜底实现复用回填模块写入路径（该路径已内置法定截止日推算，M3 仅执行），不另写平行 UPDATE。
 - [ ] 3.3 验收验证一：全部历史缺失行（2023Q4–2026Q1 十季度约 5.4 万行 + 2026H1 残余 388 行 + Q3 残余 2 行）的 `data_available_date` 处置覆盖率 ≥ 99.9%，按 observed / surveyed / statutory / 仍缺 四类给占比；仍缺行逐行说明（预期仅退市/特殊行）。
 - [ ] 3.4 验收验证二：PIT 硬性边界校验（`data_available_date ≥ 报告期期末`；兜底行 == 法定截止日），违例阻断验收；实测日晚于法定截止日超 60 天的行进异常清单人工复核（延期披露属真实情况，不计违例）。
 - [ ] 3.5 验收验证三：随机 20 家 observed/surveyed 类抽样与 cninfo 公告日人工核对，一致率 ≥ 90%，不一致样本逐家说明。
