@@ -1062,13 +1062,15 @@ class LlmClient:
                         )
                         llm_logger.warning(
                             "event=llm.response.output_budget_exceeded profile=%s "
-                            "request_id=%s request_hash=%s field=%s requested=%s observed=%s",
+                            "request_id=%s request_hash=%s field=%s requested=%s observed=%s "
+                            "finish_reason=%s",
                             profile.name,
                             request_id,
                             request_hash,
                             profile.max_output_tokens_field,
                             request.max_output_tokens,
                             usage.output_tokens,
+                            finish_reason,
                         )
                     provider_request_id = response.provider_request_id or _optional_text(
                         (response.data or {}).get("id")

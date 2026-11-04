@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-11-04，[A审核§192](#192-a审核35失败终结先分清程序与模型责任并逐轮清理)）：§35一次真实观察失败并结束，不续旧窗口/银行/十家。S32仍2/12执行、核心0。§36零模型外呼，先归因并修本地确定性错误，再裁路由/模型，不把应用未发送页归罪模型。S35重复运行根已由A核证据后清理，新增删除478250字节，权威回执/正式源不动。
+当前状态（2026-11-04，[B交接§193](#193-b交接36分清程序与接口责任)）：§35失败已结束。S32仍是执行2/12、核心0。本卡没有新的真实调用。行业句不再被提成公司总额，必要续页不再被固定尾额挡住。S2/生产未开放。
 
 ## 1. 唯一实施指引
 
@@ -7841,3 +7841,27 @@ A此前以首笔不再必拒作为放行观察依据，没有识别本地错误�
 下一卡为[§36零外呼执行链归因与路线裁决](b3-s1-execution-card.md#36-零外呼执行链归因与路线裁决)，不新增模型调用/探针/binding，不改共享配置。B一次合并核定并最小修正已证的主体误提问、必要补源/写核互相阻断，复用真实失败数据作局部正反验证，不造整公司模拟true、不为p16另开卡。再对接口字段/模式/usage说明分列已证本地问题、模型生成问题和接口未知；只推荐一个最短可行的下一业务方案，真实预算/模型/路由如需变化交A/用户选择，不预定必须换模型，也不预批同一组合再跑。
 
 A新增真实调用0、应用代码修改0、整链测试重跑0；独立验证为正式p11、本地提取反例、动态补源余额、七文件hash/范围及实际垃圾清理。当前change的OpenSpec严格校验、7份本轮文档新增17个本地链接/锚点及`git diff --check`通过。活跃审核耗时未独立计量记unknown，供应商393秒不作A/B工时。保护起始14份tracked脏改/9项未跟踪及并行，验收旧历史表不纳提交；S2/S3/全市场/生产不变。
+
+## 193. B交接：§36分清程序与接口责任
+
+日期：2026-11-04。执行[§36](b3-s1-execution-card.md#36-零外呼执行链归因与路线裁决)。新观察仍是1/1失败。S32仍是已执行2/12、核心成立0家。本卡真实调用、探针、可发送绑定均为0。没有新的临时根；A已删的478,250字节和此前3,316,848字节都不重报。
+
+### 193.1 因果
+
+| 现象 | 责任 | 证据 | 本卡处理 |
+| --- | --- | --- | --- |
+| 14,186.7亿元被提成公司总额 | 应用 | S35源审的11个条件里没有这条行业收入。正式p11句子是“全国造纸和纸制品业营业收入 14,186.7 亿元”。程序正则把它收成公司总额问题，模型照此写错，核验再挡住 | 同一句没有报告主体和本期/报告期，就不再成为公司总额，也不再标read_but_missed。母公司句子同样不冒充集团总额。正式p16“本期数/单位：元/2,418,990,221.17”和银行“报告期内，本集团实现营业收入 1,739.64 亿元”仍保留 |
+| 第13–23页未读 | 应用 | 首源后已用24,434。固定八槽尾额约67,248，补源只剩28,318，装不下一页。模型已请求这些页，程序没有发出 | 源审返回后，尾额改按已返回证据计算，不再一直占着八槽。短证据下，120,000减24,434后仍能再装一页源读 |
+| 五次输出都超过声明值 | 接口未证，不是模型能力结论 | 日志字段是max_completion_tokens，五次HTTP 200且usage高于该数。DeepSeek公开的创建补全说明写的上限字段是max_tokens，并写明finish_reason=length表示生成超过max_tokens。本次回执没有保存finish_reason | 只在以后的超限日志里记下finish_reason。本卡不改共享配置，也不再发请求 |
+
+### 193.2 验证
+
+```text
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_direct_progress.py::test_industry_and_parent_revenue_are_not_the_company_total tests/unit/test_research/test_company_profile_direct_progress.py::test_returned_evidence_tail_leaves_room_for_the_next_source_page tests/unit/test_research/test_company_profile_direct_progress.py::test_header_percent_does_not_hide_the_period_revenue_total tests/unit/test_research/test_company_profile_direct_progress.py::test_read_pages_surface_missed_operating_revenue_totals
+```
+
+4 passed，6.50秒。没有整公司模拟通过，也没有为第16页另开模型调用。
+
+### 193.3 下一方案
+
+只保留一条：先把现有DeepSeek配置里的输出上限字段改成公开文档中的max_tokens，再对造纸做一次与§35相同的120,000/900秒/16次观察。这一步要改共享配置，本卡没有做，也没有批准新的真实绑定。依据是接口字段和文档不一致，不是DeepSeek读不懂未发送的页。若改字段后输出仍不守上限，就停止这条路由，不在同一字段上再跑。

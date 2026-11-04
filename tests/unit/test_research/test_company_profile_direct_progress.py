@@ -7004,6 +7004,75 @@ def test_header_percent_does_not_hide_the_period_revenue_total():
     )
 
 
+def test_industry_and_parent_revenue_are_not_the_company_total():
+    from research.company_profile.direct_reading import (
+        disclosed_core_revenue_facts,
+        missed_core_revenue_facts,
+    )
+
+    industry = (
+        "国家统计局数据显示，2025 年全国机制纸及纸板产量为 16,405.4 万吨；"
+        "全国造纸和纸制品业营业收入 14,186.7 亿元，同比下降 2.6%。"
+    )
+    parent = "报告期内，母公司实现营业收入 100.00 亿元，不包括子公司。"
+    company = "报告期内，本集团实现营业收入 1,739.64 亿元，同比增加 32.16 亿元。"
+    statement = (
+        "单位：元 币种：人民币\n"
+        "科目 本期数 上年同期数 变动比例（%）\n"
+        "营业收入 2,418,990,221.17 2,600,396,782.74 -6.98\n"
+    )
+    industry_facts = disclosed_core_revenue_facts(
+        [{"page": 11, "text": industry, "readable": True}]
+    )
+    assert not any(item["amount"] == "14,186.7" for item in industry_facts)
+    assert not missed_core_revenue_facts(
+        [{"page": 11, "text": industry, "readable": True}], (), ()
+    )
+    parent_facts = disclosed_core_revenue_facts(
+        [{"page": 20, "text": parent, "readable": True}]
+    )
+    assert not any(item["kind"] == "operating_revenue_total" for item in parent_facts)
+    company_facts = disclosed_core_revenue_facts(
+        [{"page": 32, "text": company, "readable": True}]
+    )
+    assert any(item["amount"] == "1,739.64" for item in company_facts)
+    statement_facts = disclosed_core_revenue_facts(
+        [{"page": 16, "text": statement, "readable": True}]
+    )
+    assert any(item["amount"] == "2,418,990,221.17" for item in statement_facts)
+
+
+def test_returned_evidence_tail_leaves_room_for_the_next_source_page():
+    from research.company_profile.contracts import ReportSourceCondition
+    from research.company_profile.direct_reading import (
+        _conditions_package_tail,
+        _core_package_tail,
+    )
+    from research.company_profile.report_interpretation import direct_core_processing_identity
+
+    report = _report()
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    page = {"page": 9, "text": "公司主营造纸并销售纸袋纸。" * 40, "readable": True}
+    static_tail = _core_package_tail([page], report=report, identity=identity)
+    condition = ReportSourceCondition(
+        condition_id="sales-model",
+        dimension="revenue_model",
+        description="公司销售采取产品直销。",
+        evidence=(_evidence(report, text="公司销售采取产品直销，以销定产。", page=11),),
+        major=True,
+        statement_status="current",
+    )
+    evidence_tail = _conditions_package_tail(
+        [condition], report=report, identity=identity
+    )
+    charged = 24_434
+    ledger = 120_000
+    assert evidence_tail < static_tail
+    assert ledger - charged - static_tail < 32_000
+    assert ledger - charged - evidence_tail > 32_000
+
+
 def test_native_role_coverage_does_not_need_the_fixed_question_id():
     from research.company_profile.direct_reading import _operating_role_established
 

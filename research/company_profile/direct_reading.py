@@ -1234,6 +1234,32 @@ _NET_INCOME_LINES = (
 _LINE_AMOUNT = re.compile(r"(\d{1,3}(?:,\d{3})+(?:\.\d+)?)")
 
 
+def _revenue_sentence(text: str, start: int, end: int) -> str:
+    """The sentence that contains this amount, not the next paragraph."""
+    left = max(text.rfind(mark, 0, start) for mark in "。；\n")
+    rights = [text.find(mark, end) for mark in "。；\n"]
+    rights = [index for index in rights if index >= 0]
+    right = min(rights) if rights else len(text)
+    return text[left + 1 : right]
+
+
+def _revenue_subject(sentence: str) -> str:
+    """Who the sentence says earned the revenue. A bare amount has no subject."""
+    if "报告期" not in sentence and "本期" not in sentence:
+        return ""
+    if "本集团" in sentence or "本公司" in sentence:
+        return "company"
+    if re.search(r"母公司(?:实现)?营业收入", sentence):
+        return "parent"
+    if re.search(r"(?<![\u4e00-\u9fff])公司(?:实现)?营业收入", sentence):
+        return "company"
+    if re.search(r"[\u4e00-\u9fff]{2,}公司(?:实现)?营业收入", sentence):
+        return "other"
+    if "业营业收入" in sentence:
+        return "other"
+    return ""
+
+
 def disclosed_core_revenue_facts(sources: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
     """Group operating-revenue totals and the three net-income lines on read pages."""
     found: list[dict[str, Any]] = []
@@ -1242,6 +1268,8 @@ def disclosed_core_revenue_facts(sources: Sequence[Mapping[str, Any]]) -> list[d
         text = str(source.get("text") or "")
         page = int(source["page"])
         for match in _REVENUE_TOTAL.finditer(text):
+            if _revenue_subject(_revenue_sentence(text, match.start(), match.end())) != "company":
+                continue
             window = text[max(0, match.start() - 24) : match.end() + 16]
             if any(mark in window for mark in ("分产品", "分行业", "分地区")):
                 continue
@@ -1290,7 +1318,11 @@ def disclosed_core_revenue_facts(sources: Sequence[Mapping[str, Any]]) -> list[d
                 header_quotes.append(piece)
                 if hits[-1].lastindex:
                     unit = hits[-1].group(hits[-1].lastindex) or unit
+                elif re.search(r"单位\s*[:：]\s*元", piece):
+                    unit = unit or "元"
             quote = match.group(0)[:180]
+            sentence = _revenue_sentence(text, match.start(), match.end())
+            subject = _revenue_subject(sentence)
             mark = "单位：元 币种：人民币"
             pos = text.rfind(mark, max(0, match.start() - 180), match.start())
             between = text[pos:match.start()] if pos >= 0 else ""
@@ -1302,6 +1334,11 @@ def disclosed_core_revenue_facts(sources: Sequence[Mapping[str, Any]]) -> list[d
             ):
                 quote = text[pos:match.end()]
                 header_quotes = []
+            statement = "本期" in quote and ("单位" in quote or bool(unit))
+            if subject in {"parent", "other"}:
+                continue
+            if subject != "company" and not statement:
+                continue
             key = (amount.replace(",", ""), unit)
             if key in seen:
                 continue
@@ -1999,6 +2036,33 @@ def _core_package_tail(pages, *, report, identity) -> int:
             max_output_tokens=_verify_output(identity),
             timeout_seconds=float(identity.get("logical_request_timeout_seconds") or 120),
         )
+    )
+    return draft + verify
+
+
+def _conditions_package_tail(conditions, *, report, identity) -> int:
+    """Reserve draft and verification for evidence already returned."""
+    evidence = [
+        item
+        for condition in conditions
+        for item in getattr(condition, "evidence", ()) or ()
+    ]
+    pages = list(cited_quote_pages(evidence))
+    if not pages:
+        return 0
+    draft = _units(
+        pages,
+        purpose="synthesize_views",
+        source_scope="full_context",
+        report=report,
+        identity=identity,
+        output=_body_output(identity),
+    )
+    verify = joint_verify_reservation(
+        report,
+        identity,
+        pages,
+        conditions=tuple(conditions),
     )
     return draft + verify
 
@@ -3455,6 +3519,13 @@ def interpret_direct_core(
 
     def inventory_pages(page_ids, prepared=None, *, keep_tail: bool = True) -> list[int]:
         """Read source text without candidate answers. Navigation is not body reading."""
+        nonlocal source_later
+        if identity.get("chapter_select") and conditions and keep_tail:
+            refreshed = _conditions_package_tail(
+                conditions, report=report, identity=identity
+            )
+            if refreshed:
+                source_later = refreshed
         follow: list[int] = []
         ordered: list[int] = []
         for page in page_ids:
