@@ -15,6 +15,7 @@ from contextlib import closing
 
 
 CORE_FACT_TABLES = (
+    "financial_facts",
     "financial_core_facts_hot",
     "financial_core_facts_history",
 )
@@ -164,6 +165,8 @@ def _load_available_date_evidence(
 ) -> Dict[str, Dict[tuple[str, str], str]]:
     evidence: Dict[str, Dict[tuple[str, str], str]] = {
         "source_file": {},
+        "statements_raw": {},
+        "survey_audit": {},
         "disclosure_event": {},
     }
     if "financial_source_files" in table_names:
@@ -178,6 +181,46 @@ def _load_available_date_evidence(
                 evidence["source_file"],
                 row["instrument_id"],
                 row["report_period"],
+                row["published_at"],
+            )
+    if "financial_statements_raw" in table_names:
+        # Structured statement rows carry their own publish_date; sparse for
+        # historical import batches but additive when present.
+        for row in conn.execute(
+            """
+            SELECT instrument_id, report_period, publish_date
+            FROM financial_statements_raw
+            WHERE publish_date IS NOT NULL AND publish_date <> ''
+            """
+        ).fetchall():
+            _put_min_date(
+                evidence["statements_raw"],
+                row["instrument_id"],
+                row["report_period"],
+                row["publish_date"],
+            )
+    if "announcement_audit" in table_names:
+        # Historical disclosure-date survey rows (M2 of
+        # backfill-financial-historical-availability-and-caliber): the survey
+        # records periodic-report announcements with the inferred report
+        # period inside selection_reasons_json.
+        for row in conn.execute(
+            """
+            SELECT instrument_id, published_at, selection_reasons_json
+            FROM announcement_audit
+            WHERE purpose_key = 'historical_disclosure_date_survey'
+              AND published_at IS NOT NULL AND published_at <> ''
+            """
+        ).fetchall():
+            report_period = _extract_survey_report_period(
+                row["selection_reasons_json"]
+            )
+            if not report_period:
+                continue
+            _put_min_date(
+                evidence["survey_audit"],
+                row["instrument_id"],
+                report_period,
                 row["published_at"],
             )
     if "financial_disclosure_event_state" in table_names:
@@ -222,7 +265,7 @@ def _resolve_available_date(
     publish_date = _normalize_date(row["publish_date"])
     if publish_date:
         return {"date": publish_date, "source": "core_publish_date", "quality": "observed"}
-    for source_name in ("source_file", "disclosure_event"):
+    for source_name in ("source_file", "statements_raw", "survey_audit", "disclosure_event"):
         value = evidence[source_name].get(key)
         if value:
             return {"date": value, "source": source_name, "quality": "observed"}
@@ -318,6 +361,35 @@ def _json_object(value: Any) -> Dict[str, Any]:
     except (TypeError, ValueError, json.JSONDecodeError):
         return {}
     return parsed if isinstance(parsed, dict) else {}
+
+
+def _extract_survey_report_period(value: Any) -> str:
+    """Read the inferred report period from a survey audit row.
+
+    ``selection_reasons_json`` serializes ``record.selection_reasons``
+    (Tuple[str, ...]): the survey tags each row with a
+    ``inferred_report_period=<ISO period>`` token.
+    """
+    prefix = "inferred_report_period="
+    if not value:
+        return ""
+    try:
+        parsed = json.loads(str(value))
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return ""
+    if isinstance(parsed, str):
+        candidates = [parsed]
+    elif isinstance(parsed, list):
+        candidates = parsed
+    elif isinstance(parsed, dict):
+        return str(parsed.get("inferred_report_period") or "").strip()
+    else:
+        return ""
+    for item in candidates:
+        text = str(item).strip()
+        if text.startswith(prefix):
+            return text[len(prefix):].strip().strip("'\"")
+    return ""
 
 
 def build_parser() -> argparse.ArgumentParser:
