@@ -87,9 +87,14 @@ def test_build_survey_windows_drops_future_windows():
 @pytest.mark.asyncio
 async def test_survey_writes_audit_only_with_inferred_period(tmp_path):
     record = _Record(title="中芯国际2024年第三季度报告")          # -> 2024-09-30
+    # cross-season harvest: an annual report seen inside the Q3 window's
+    # date range is tagged with its own period, not discarded
+    cross = _Record(
+        title="某公司2023年年度报告", announcement_key="k9", symbols=("600000",)
+    )
     noise = _Record(title="中芯国际2024年半年度报告", announcement_key="k2")  # mismatch
     acquire, calls = _fake_acquire(
-        {"2024-09-30": _Result(records=[record, noise])},
+        {"2024-09-30": _Result(records=[record, cross, noise])},
         probe_result=_Result(status="success_empty"),
     )
     write, written = _writer()
@@ -97,26 +102,37 @@ async def test_survey_writes_audit_only_with_inferred_period(tmp_path):
 
     report = await survey_historical_disclosure_dates(
         exchanges=["SSE"],
-        report_periods=["2024-09-30"],
+        report_periods=["2024-09-30", "2023-12-31"],
         acquire=acquire,
         audit_writer=write,
-        instrument_map={("SSE", "688981"): "688981.SH"},
+        instrument_map={
+            ("SSE", "688981"): "688981.SH",
+            ("SSE", "600000"): "600000.SH",
+        },
         checkpoint_path=cp,
         probe_enabled=True,
     )
 
     assert report["aborted"] is False
-    assert report["audit_written"] == 1
-    assert len(written) == 1
+    assert report["audit_written"] == 2
+    assert len(written) == 2
     purpose, tagged, instrument_id = written[0]
     assert purpose == SURVEY_PURPOSE_KEY
     assert instrument_id == "688981.SH"
     reasons = tagged.selection_reasons
     assert "inferred_report_period=2024-09-30" in reasons
-    # checkpoint marks the window completed
-    assert load_checkpoint(cp)["completed_windows"] == ["SSE:2024-09-30"]
-    # two acquires total: probe + one window (noise record not written)
-    assert len(calls) == 2
+    # cross-season row keeps its own inferred period
+    _, cross_tagged, cross_id = written[1]
+    assert cross_id == "600000.SH"
+    assert "inferred_report_period=2023-12-31" in cross_tagged.selection_reasons
+    # checkpoint marks both windows completed (2023-12-31 was added to
+    # periods so its cross-season announcements are harvest targets)
+    assert set(load_checkpoint(cp)["completed_windows"]) == {
+        "SSE:2024-09-30",
+        "SSE:2023-12-31",
+    }
+    # three acquires total: probe + two windows
+    assert len(calls) == 3
 
 
 @pytest.mark.asyncio

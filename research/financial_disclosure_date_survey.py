@@ -216,6 +216,10 @@ async def survey_historical_disclosure_dates(
     the announcement acquisition service and ``store_announcement_audit``.
     """
     windows = build_survey_windows(exchanges, report_periods, today=today)
+    target_periods = {
+        period
+        for period in map(str, report_periods)
+    }
     checkpoint = load_checkpoint(checkpoint_path)
     completed: List[str] = list(checkpoint.get("completed_windows", []))
     failed: List[str] = list(checkpoint.get("failed_windows", []))
@@ -297,23 +301,33 @@ async def survey_historical_disclosure_dates(
 
         if write_enabled:
             for record in records:
-                inferred = [
-                    period
-                    for period in infer_report_periods_from_title(record.title or "")
-                    if period == window.report_period
-                ]
-                if not inferred:
+                # Windows overlap the neighbouring disclosure season
+                # (deadline + late tail): harvest every periodic report the
+                # scan sees, tagged with the period inferred from ITS OWN
+                # title, not just the window's period. Filtering to the
+                # window period alone discarded ~half of each overlapping
+                # window's announcements (found in implementation review).
+                inferred_periods = sorted(
+                    {
+                        period
+                        for period in infer_report_periods_from_title(
+                            record.title or ""
+                        )
+                        if period in target_periods
+                    }
+                )
+                if not inferred_periods:
                     continue
                 symbol = record.symbols[0] if record.symbols else None
                 instrument_id = instrument_map.get((window.exchange, symbol or ""))
                 if not instrument_id:
                     continue
                 # selection_reasons is Tuple[str, ...] on the record model:
-                # carry the inferred period as a plain string token.
+                # carry the inferred period as plain string tokens.
                 tagged = record.with_selection_reasons(
                     [
                         *(record.selection_reasons or ()),
-                        inferred_period_reason(window.report_period),
+                        *(inferred_period_reason(p) for p in inferred_periods),
                     ]
                 )
                 audit_writer(SURVEY_PURPOSE_KEY, tagged, instrument_id)
