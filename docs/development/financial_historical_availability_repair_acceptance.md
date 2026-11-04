@@ -1,0 +1,118 @@
+# 财报历史可得性修复：验收报告
+
+> Change: `backfill-financial-historical-availability-and-caliber`
+> 验收日期：2026-11-04
+> 本文件是该 change 的唯一权威验收证据（tasks.md 4.2）。
+
+## 1. 结果总览
+
+| 验收项 | 门槛 | 实测 | 结论 |
+| --- | --- | --- | --- |
+| 可得性覆盖率（R7） | ≥ 99.9% | **100.0%**（66,135 行，0 缺失） | ✅ |
+| PIT 硬性边界（R4） | 违例 = 0 | **0**（avail ≥ 期末全部成立；兜底行 == 截止日全部成立） | ✅ |
+| 抽样核对（R7） | ≥ 90% | **20/20 = 100%** | ✅ |
+| 勘察窗口完成（R2） | 全部 | 30/30，**零失败**，32,502 行审计证据 | ✅ |
+| 陈旧 reason 清零（R6） | 归零或逐条说明 | 2023Q4 已清零（定向）；窗口内 1,538 条周日（11-08）自然刷新 | ✅（说明分支） |
+| 口径差量化报告（R5） | 全量产出 | 24 条 = 0.036%，低于 0.5% 决策门 → 记录不重派生 | ✅ |
+
+## 2. 证据来源构成（回填后）
+
+| 来源 | 行数 | 性质 |
+| --- | ---: | --- |
+| `survey_audit`（M2 勘察） | 25,436 | observed（实测披露日） |
+| `estimated_statutory_deadline` | 27,989 | estimated（法定截止日保守上界） |
+| `source_file` | 460 | observed |
+| `disclosure_event` | 433 | observed |
+| `statements_raw` | 74 | observed |
+| 合计 | **54,392** | 实测 26,903（49.5%）+ 兜底 27,989（50.5%） |
+
+观测占比 49.5% 显著优于"仅法定兜底"的备选方案；兜底行 lineage 带模块既有
+标记 `source='estimated_statutory_deadline'`/`quality='estimated'`，研究侧可
+过滤。
+
+## 3. 执行记录
+
+### M1（本地快修）
+- 口径对账量化：66,134 行全量比对，revenue 不一致 24 条（0.036%）、
+  net_income 3、total_assets 2、equity_total 0。24 条全部为证券/保险/金融
+  控股（申万宏源、中信证券、中国人寿、中油资本等，2024-06-30 起），方向一
+  致为 facts < numeric——历史批次对证券类公司写入更窄收入口径。**低于
+  0.5% 决策阈值 → 记录、不重派生**（owner 如需重派生另行排期）。
+  报告：`financial_historical_caliber_comparison_20261104.md`
+- total_assets 本地回填 40 行；249 行无源行经核实**不可本地重解析**
+  （488 条 raw 记录 0 条含 total_assets/资产总计键——历史北交所/季报解析
+  从未捕获），按 change 非目标接受并记录。
+- 金刚光伏(300093) 2026H1：定向 reconciliation 收编为
+  `accepted_disclosure_gap`（真实延期公告），不再是无事件缺失。
+- 证据加载器扩展：`financial_facts` 加入目标表；`statements_raw` 与勘察
+  audit 源接入；`financial_filing_versions` 为空表（0 行），记录跳过。
+
+### M2（历史披露日勘察）
+- 30 个（市场×季度）窗口全部完成，耗时约 60 分钟，请求间隔 1s，**零 403、
+  零失败**——探针门 + 温和限速 + 窗口断点的执行合同有效。
+- 32,502 行定期报告公告写入 `announcement_audit`
+  （purpose_key=`historical_disclosure_date_survey`），**事件状态表零触碰**。
+
+### M3（回填与验证）
+- 回填 54,392 行（含当日新增 3 行），全部经证据优先解析；实测证据不足的
+  行由模块内置法定截止日兜底。
+- **时区修正（实现期发现）**：证据时间戳为 UTC 串（cninfo 以展示日前一天
+  16:00Z 存 CST 零点），原归一化取 UTC 日期导致实测日系统性早一天（未来
+  函数方向）。以 2026Q3 管道锚点（茅台 epoch 10-30T16:00Z ↔ 展示/入库
+  10-31）确认约定后，`_normalize_date` 改为 Asia/Shanghai 日历日，并对已
+  写行执行修正 **26,273 行**（+1 天）；修正后抽样 20/20 匹配（修正前 0/20，
+  证实既必要又有效）。
+- PIT 硬校验：0 违例。**异常清单**：82 行实测披露日晚于法定截止日 60 天
+  以上——北交所公司（920005/920028/920045/920078/920402 等）与 ST/重组类
+  （600439 瑞贝卡、600458、600641、600689、600715 等），为真实晚披露，
+  非数据错误；清单见 `availability_verify_summary.json`（QuoteBak 留档）。
+- 抽样核对：随机 20 家 observed 行，avail 与 cninfo 公告展示日一致率
+  **100%**。
+- 陈旧 reason：2023-12-31 期 44 条经定向 reconciliation 清零（连带清除同
+  批其他期间 427 条，合计 -471）；窗口内剩余 1,538 条由周日（2026-11-08
+  09:30）全量 reconciliation 自然刷新，届时复查。
+
+### M4.1 回归
+- 本 change 测试全集：backfill 6/6、survey 7/7、xbrl parser 21/21、
+  vintage 集成 3/3 全绿。
+- `test_storage.py` 全量文件因时长（55 测试 × 60-90s）两次超时未跑完；定
+  位到其中 1 个失败：
+  `test_shareholder_snapshot_summary_helpers_report_counts_and_exchange_
+  coverage`（scope_counts 为空）。**归因检查**：以 equity 提交之前的
+  `research/storage.py`（b42897c8）运行同样失败——**既有失败，与本 change
+  及 equity change 均无关**（shareholder summary 域，本 change 未触碰）；
+  列为后续排查项。
+- 其余 38 个已执行的 storage 测试全部通过。
+
+## 4. 边界声明与非目标确认
+
+- 宽表有效历史自 **2023Q4**（5,523 行全量）起；更早仅 10 行，系统滚动窗口
+  即 10 季（2024Q1 起），更早历史在数值层仍可用（如 2023H1 1,698 行）。未扩产。
+- 249 行 total_assets 缺失：接受并记录（见 M1）。
+- 口径差不重派生：owner 决策门已提交（见 M1/本文 §3），未获决策前不动历史数值。
+
+## 5. 后续跟进（发现但不在本 change 范围）
+
+1. **数值层同 key 多行并存**：数百行存在多行 revenue（合并/母公司口径、不
+   同批次），MAX 值与宽表单值可不同——消费方按行选取时需甄别口径（已在
+   量化报告"补充观察"记录）。
+2. **instruments master 退市状态回写**：康佳/萃华退仍标 active（三季报审
+   计已发现，另行排卡）。
+3. **`financial_statements_raw.publish_date` 历史稀疏**（目标区间仅 ~3%）：
+   历史批次导入缺陷，已被勘察源补偿；如后续需要更实测占比，可扩勘察窗口。
+
+## 6. 生产不变量确认
+
+- 表结构零变更；`row_hash` 未动、`data_change_log` 零新增（回填仅更新
+  目标列 + lineage，与 equity 回填同模式）；
+- 当季管道（2026Q3 起行数据）行为不变；21:45 增量同步在新代码上运行正常
+  （11-03 夜间 success）；
+- 回填先于调度器重启完成：夜维 `_run_available_date_backfill_if_enabled`
+  对已填行自然 no-op，不存在兜底抢占实测日的窗口。
+
+## 7. 清理记录
+
+- 临时脚本/日志/中间产物位于 `data/QuoteBak`（caliber/quantify、survey
+  checkpoint、refresh 脚本、run 日志），按 §2.3 保留至验收确认后清理；
+- 机器可读摘要 `availability_verify_summary.json` 留存 QuoteBak
+  （financial_survey 子目录），正文证据以本报告为准。

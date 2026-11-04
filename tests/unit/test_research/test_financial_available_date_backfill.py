@@ -63,8 +63,10 @@ def test_backfill_financial_available_dates_uses_observed_source_file_date(tmp_p
             FROM financial_core_facts_hot
             """
         ).fetchone()
-    assert row[0] == "2025-04-28"
-    assert row[1] == "2025-04-28"
+    # 2025-04-28T16:00:00Z == 2025-04-29 00:00 CST: the Shanghai calendar
+    # date is the disclosure date shown by cninfo.
+    assert row[0] == "2025-04-29"
+    assert row[1] == "2025-04-29"
     lineage = json.loads(row[2])
     assert lineage["data_available_date_backfill"]["quality"] == "observed"
 

@@ -333,6 +333,13 @@ def _parse_report_period(value: Any) -> Optional[tuple[int, int]]:
 
 
 def _normalize_date(value: Any) -> Optional[str]:
+    """Normalize a date/timestamp to its Asia/Shanghai calendar date.
+
+    Evidence timestamps arrive as UTC ISO strings (cninfo stores the CST
+    midnight of the disclosure date as the prior day 16:00Z); taking the
+    UTC date part would report availability one day early - the dangerous
+    direction for PIT research.
+    """
     if value in (None, ""):
         return None
     text = str(value).strip()
@@ -342,6 +349,8 @@ def _normalize_date(value: Any) -> Optional[str]:
         text = f"{text[:-1]}+00:00"
     try:
         parsed = datetime.fromisoformat(text)
+        if parsed.tzinfo is not None:
+            parsed = parsed.astimezone(ZoneInfo("Asia/Shanghai"))
         return parsed.date().isoformat()
     except ValueError:
         pass
