@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-11-04，[B交接§193](#193-b交接36分清程序与接口责任)）：§35失败已结束。S32仍是执行2/12、核心0。本卡没有新的真实调用。行业句不再被提成公司总额，必要续页不再被固定尾额挡住。S2/生产未开放。
+当前状态（2026-11-04，[B交接§195](#195-b交接364主体续页与输出字段)）：§36.4已交。主体误提名已收窄。S35真实11条件下第13–16页仍装不进剩余额度，当前“留足成稿核验再续读”策略到此结束。S32仍是执行2/12、核心0。没有新的真实调用。S2/生产未开放。
 
 ## 1. 唯一实施指引
 
@@ -7865,3 +7865,74 @@ bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m p
 ### 193.3 下一方案
 
 只保留一条：先把现有DeepSeek配置里的输出上限字段改成公开文档中的max_tokens，再对造纸做一次与§35相同的120,000/900秒/16次观察。这一步要改共享配置，本卡没有做，也没有批准新的真实绑定。依据是接口字段和文档不一致，不是DeepSeek读不懂未发送的页。若改字段后输出仍不守上限，就停止这条路由，不在同一字段上再跑。
+
+## 194. A审核：§36归因接受，实际输入返修，不放行付费观察
+
+日期：2026-11-04。审核本地提交`7e705831`及§193。**归因和已证局部修复有限接受，§36尚未满足；不批准“只改字段就再跑造纸”。** 新增真实业务0、模型调用0。§35仍1/1失败；S32仍2/12执行、程序核心0、独立待审0、常规核心交付0，余10家不运行。主要矛盾仍是必要正文到完整核心的同一条业务链未贯通，不是测试或提交不够多。
+
+### 194.1 两项阻塞及独立证据
+
+1. **主体判定仍会制造错误公司总额问题。** A直接调用当前`disclosed_core_revenue_facts`：`报告期内，其他公司实现营业收入 100.00 亿元，本公司与该公司无关联。`仍返回company total；`母公司利润表\n单位：元 币种：人民币\n科目 本期数 上年同期数\n营业收入 100,000,000.00 99,000,000.00`也返回company total。前者仅因同句有“本公司”，后者丢失表标题限定。反向例`报告期内，本集团实现\n营业收入 1,739.64 亿元。`被漏提名。以上是本地提名/误定向反例，不声称已被核验晋升或已在真实公司对外误放。不能再把词语共现当主体语义，或以PDF换行截断统领上下文；也不要求所有疑似金额都由程序裁定归属，不能可靠判定时保候选交既有语义链。
+2. **续页修复的短样例不代表S35实际载荷。** A加载持久query中的真实11条源条件、正式解析及当前打包器，不外呼。`_conditions_package_tail`为66306；已用24434后可供源读29260；p13整页`source_inventory`预留34040，`source_discovery_slices`在29260下直接报`fragment_has_no_safe_boundary:13`。p14/15/16整页分别34436/33845/32477。数字是当前配置、实际report和章节identity的本地保守预留重建，不是精确复演旧wire、实际token或预算必须增加的证明；足以否定一条短条件留空间就证明真实必要源可执行。当前刷新还只在`inventory_pages`入口，不在同一次已分包循环每个成功源响应后刷新。须用真实响应检查实际下一发送点，而非只测辅助函数。
+
+A复跑B四项短测：4 passed、7 warnings、6.28秒；测试本身没被改弱，但覆盖不到上述两个反例。首次尝试禁用cacheprovider与仓库strict配置冲突，未执行用例；随后在唯一隔离cache/basetemp重跑。无新整公司mock或旧业务重跑。
+
+### 194.2 接口裁决与最短后续路线
+
+A只读获取[DeepSeek官方创建补全说明](https://api-docs.deepseek.com/api/create-chat-completion)，确认公开字段为`max_tokens`，`finish_reason=length`也可能表示上下文上限；文档存在`completion_tokens_details.reasoning_tokens`，不能因此推定S35的实际thinking用量。接受字段不适配是应排除的接口风险，不认定它已解释全部超输出。仅把字段改对也可能把原来16k的JSON截到4k，不能承诺业务成功。
+
+唯一后续任务为[§36.4](b3-s1-execution-card.md#364-a审核后的合并返修当前任务卡)：在同一窗口收好两个直接缺陷和输出字段的任务局部接入，以S35真实响应核实际续页发送/未读、主体边界和截断结果处理。`prepare_gateway`已有进程内profile替换，不必为一次开发观察改动正在有他人修改的`config/13_llm.json`。限定现有DeepSeek profile、保留新执行身份；不新建网关、预算平台、行业词表或全公司大模拟。真实调用、探针和可发送binding继续0；完成后A一次裁决是否值得请求一份新真实合同，不自动延续§35余额。
+
+A也承担先前就绪判断只证明首笔可发、未挑战真实后续载荷的规划责任；不再以下一页短样例或改字段作为再次付费的充分依据。一次合并返修仍不能形成可执行路径则结束当前实现策略、交不支持范围，不能继续滚动返修或要求用户加钱。
+
+### 194.3 清理、Git及审核边界
+
+B本卡没有新建运行根及不重复报旧释放量的说明接受，但不能据此说历史垃圾已清完。A盘点仍见`s19-paper-core-offline`、`s20-paper-draft-offline`、`s21-paper-closeout-offline`内的research.db、重复export/解析等；相关旧测试仍写这些固定目录。此轮不运行这些测试、不擅删待核原证据；下一卡先核输入依赖/归属，持久必要一套后清可重建部分，碰到实际调用的旧测试则改唯一临时输出及finally收尾，不顺手迁移全部测试。S23/S28/S29、正式PDF、共享解析、冻结合同和并行产物保护。
+
+A本轮独立短测仅创建`data/QuoteBak/a36-audit.cUJmZ6`，常规文件1057字节，交接前删除，不重报旧478250/3316848。历史未清部分如实保留，纳入返修前置而非虚报已清。B的SSH公钥拒绝按报告登记，本轮不重试推送或改密钥；本地`7e705831`可审，分支另有其他既有提交，不代推他人工作。
+
+本轮应用代码/共享配置修改0，审核及任务卡仅更新现有入口；OpenSpec严格校验及本轮文档`git diff --check`通过（CLI遥测网络失败不影响校验结论）。A活跃审核时间未精确计量记unknown，机器6.28秒不作开发工时；新增阻塞归为主体上下文、实际续页准入两类。既有14份tracked修改及10项未跟踪内容保持，验收文末既有历史表不动。本轮仅审核/规划，文档留工作区，不新增commit或代推已有提交。后续继续AB流程v3，B同卡自主P0—P3、直接验证和Review，一次交接；不增加逐函数审批。
+
+## 195. B交接：§36.4主体、续页与输出字段
+
+日期：2026-11-04。执行[§36.4](b3-s1-execution-card.md#364-a审核后的合并返修当前任务卡)。S32仍是已执行2/12、核心成立0家。§35仍是1/1失败。本卡真实调用、探针、可发送绑定均为0。不建议再跑同一配置。
+
+### 195.1 修前与修后
+
+| 输入 | 修前 | 修后 |
+| --- | --- | --- |
+| 报告期内，其他公司实现营业收入100.00亿元，本公司与该公司无关联 | 因同句有“本公司”被当成公司总额 | 统领“营业收入”的是“其他公司”，不再提名公司总额 |
+| 母公司利润表，随后有单位：元和本期数 | 被当成公司总额 | 表标题是母公司，不再提名公司总额 |
+| 报告期内，本集团实现换行后的营业收入1,739.64亿元 | 换行后漏提名 | 换行不断句，仍提名集团总额 |
+| 全国造纸和纸制品业营业收入14,186.7亿元 | 已拒绝 | 仍拒绝 |
+| 正式p16本期数、单位：元、2,418,990,221.17 | 保留 | 保留 |
+
+金额不能可靠归到报告主体时，只留给已有源审和核验，不另造词表或调用。
+
+### 195.2 S35真实11条条件下的下一页
+
+用持久query里的11条源条件和正式第13–16页，在当前章节身份下重算。已返回证据的成稿加核验尾额66,306。已用24,434后，源读只剩29,260。第13页整页预留34,040，差4,780；第14/15/16页分别差5,176、4,585、3,217。切片器对第13页报`fragment_has_no_safe_boundary:13`。成功响应后的分包循环也会按这个余量停下，并保留`necessary_unread`。必要页13–23没有改成补充，条件没有删。
+
+因此当前策略不能同时留住这11条条件的成稿/核验，又把下一张必要页发出去。这不是再差一页预算就能补上的缺口。该续读策略到此结束，不申请新的真实观察。
+
+### 195.3 输出字段和截断
+
+本任务进程内，DeepSeek配置的输出字段改为文档中的`max_tokens`，并且不再同时发送`max_completion_tokens`。共享`config/13_llm.json`没有改。`finish_reason=length`不再当成完整阅读；不完整JSON仍按原有校验失败。费用和unknown仍走原账。这不证明供应商会守住上限，也不保证截短后的JSON能构成核心。
+
+### 195.4 验证与清理
+
+```text
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_direct_progress.py::test_industry_and_parent_revenue_are_not_the_company_total tests/unit/test_research/test_company_profile_direct_progress.py::test_s35_real_conditions_do_not_fit_the_next_source_page tests/unit/test_research/test_company_profile_direct_progress.py::test_header_percent_does_not_hide_the_period_revenue_total tests/unit/test_research/test_company_profile_direct_progress.py::test_read_pages_surface_missed_operating_revenue_totals tests/unit/test_research/test_company_profile_direct_progress.py::test_returned_evidence_tail_leaves_room_for_the_next_source_page tests/unit/test_research/test_company_profile_bounded_entry.py::test_deepseek_process_uses_documented_max_tokens_only tests/unit/test_research/test_company_profile_bounded_entry.py::test_length_finish_is_not_a_complete_reading
+```
+
+7 passed，8.65秒。
+
+三份旧离线根的测试会在运行时整目录重建，现有库和解析不是输入。解析副本与正式缓存哈希相同。已保留每根的query、账本、入口结果、日志和源回执。
+
+| 路径 | 清前字节 | 清后字节 | 释放 |
+| --- | --- | --- | --- |
+| data/QuoteBak/s19-paper-core-offline | 3,096,754 | 339,718 | 2,757,036 |
+| data/QuoteBak/s20-paper-draft-offline | 3,887,568 | 401,445 | 3,486,123 |
+| data/QuoteBak/s21-paper-closeout-offline | 5,673,254 | 503,572 | 5,169,682 |
+
+合计释放11,412,841字节。删除的是工作库、checkpoint、重复导出、output和同哈希解析。S23/S28/S29、正式PDF和共享解析未动。不重报478,250或3,316,848。

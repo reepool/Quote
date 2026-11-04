@@ -7016,6 +7016,14 @@ def test_industry_and_parent_revenue_are_not_the_company_total():
     )
     parent = "报告期内，母公司实现营业收入 100.00 亿元，不包括子公司。"
     company = "报告期内，本集团实现营业收入 1,739.64 亿元，同比增加 32.16 亿元。"
+    wrapped = "报告期内，本集团实现\n营业收入 1,739.64 亿元。"
+    other = "报告期内，其他公司实现营业收入 100.00 亿元，本公司与该公司无关联。"
+    parent_table = (
+        "母公司利润表\n"
+        "单位：元 币种：人民币\n"
+        "科目 本期数 上年同期数\n"
+        "营业收入 100,000,000.00 99,000,000.00\n"
+    )
     statement = (
         "单位：元 币种：人民币\n"
         "科目 本期数 上年同期数 变动比例（%）\n"
@@ -7036,6 +7044,20 @@ def test_industry_and_parent_revenue_are_not_the_company_total():
         [{"page": 32, "text": company, "readable": True}]
     )
     assert any(item["amount"] == "1,739.64" for item in company_facts)
+    wrapped_facts = disclosed_core_revenue_facts(
+        [{"page": 32, "text": wrapped, "readable": True}]
+    )
+    assert any(item["amount"] == "1,739.64" for item in wrapped_facts)
+    other_facts = disclosed_core_revenue_facts(
+        [{"page": 11, "text": other, "readable": True}]
+    )
+    assert not any(item["kind"] == "operating_revenue_total" for item in other_facts)
+    parent_table_facts = disclosed_core_revenue_facts(
+        [{"page": 40, "text": parent_table, "readable": True}]
+    )
+    assert not any(
+        item["kind"] == "operating_revenue_total" for item in parent_table_facts
+    )
     statement_facts = disclosed_core_revenue_facts(
         [{"page": 16, "text": statement, "readable": True}]
     )
@@ -7071,6 +7093,72 @@ def test_returned_evidence_tail_leaves_room_for_the_next_source_page():
     assert evidence_tail < static_tail
     assert ledger - charged - static_tail < 32_000
     assert ledger - charged - evidence_tail > 32_000
+
+
+def test_s35_real_conditions_do_not_fit_the_next_source_page():
+    import gzip
+    import json
+    from pathlib import Path
+
+    from research.company_profile.contracts import ReportSemanticResponseV3
+    from research.company_profile.direct_reading import (
+        _conditions_package_tail,
+        _units,
+        source_discovery_slices,
+    )
+    from research.company_profile.report_interpretation import direct_core_processing_identity
+
+    query = json.loads(
+        Path(
+            "openspec/changes/restore-company-profile-llm-led-generalization/"
+            "s35-600103-receipts/query.json"
+        ).read_text()
+    )
+    payload = next(
+        item["response_payload"]
+        for item in query["profiles"][0]["three_views"]["call_receipts"]
+        if item.get("purpose") == "source_inventory"
+        and item.get("source_scope") == "full_context"
+    )
+    response = ReportSemanticResponseV3.model_validate_json(
+        json.dumps(payload, ensure_ascii=False)
+    )
+    assert len(response.source_conditions) == 11
+    report = response.source_conditions[0].evidence[0].report
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    tail = _conditions_package_tail(
+        response.source_conditions, report=report, identity=identity
+    )
+    charged = 24_434
+    room = 120_000 - charged - tail
+    cache = Path(
+        "/home/python/Quote/data/filings/announcements/blobs/68/derived/"
+        "business_profile_pdfium_recovery.v4/"
+        "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c_"
+        "57e1dd4f16ef40ff.json.gz"
+    )
+    page = next(
+        item
+        for item in json.loads(gzip.open(cache, "rt", encoding="utf-8").read())["pages"]
+        if int(item["page_number"]) == 13
+    )
+    fragment = {"page": 13, "text": page["text"], "readable": True}
+    needed = _units(
+        [fragment],
+        purpose="source_inventory",
+        source_scope="full_context",
+        report=report,
+        identity=identity,
+        output=4000,
+    )
+    assert room < needed, (tail, room, needed)
+    try:
+        source_discovery_slices([fragment], report, identity, max(room, 1))
+    except ValueError as exc:
+        assert str(exc).startswith("fragment_has_no_safe_boundary:13")
+    else:
+        raise AssertionError("page 13 was packed inside the remaining ledger")
 
 
 def test_native_role_coverage_does_not_need_the_fixed_question_id():

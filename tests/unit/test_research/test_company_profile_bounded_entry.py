@@ -173,6 +173,125 @@ def test_pool_binding_rejects_route_or_source_drift_before_client(pool_binding, 
         prepare_gateway(binding, raw, real=False)
 
 
+def test_deepseek_process_uses_documented_max_tokens_only(pool_binding):
+    import asyncio
+
+    from tests.unit.test_utils.test_llm_physical_budget import _client
+    from tests.unit.test_utils.test_llm_routed_client import _request
+    from utils.llm.budget import LlmRunBudget
+    from utils.llm.testing import ScriptedTransport
+
+    binding, raw = pool_binding
+    raw["profiles"]["semantic__deepseek"] = {
+        **raw["profiles"]["semantic__grok"],
+        "name": "semantic__deepseek",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "provider_resource": "grok-resource",
+        "max_output_tokens_field": "max_completion_tokens",
+    }
+    raw["profiles"]["semantic__grok"]["max_output_tokens_field"] = "max_completion_tokens"
+    binding["sources"] = [
+        source
+        for source in binding["sources"]
+        if source["profile"] == "semantic__grok"
+    ]
+    binding["sources"][0]["profile"] = "semantic__deepseek"
+    binding["sources"][0]["model"] = "deepseek-flash"
+    binding["sources"][0]["provider_resource"] = "grok-resource"
+    raw["pools"]["semantic-pool"]["members"] = [
+        {
+            "source_label": "deepseek:deepseek-flash",
+            "weight": 1,
+            "profiles": {"semantic": "semantic__deepseek"},
+        }
+    ]
+    from utils.llm import LlmConfig
+
+    binding["route_fingerprint"] = LlmConfig.from_mapping(raw).route_fingerprint("semantic")
+    config, prices = prepare_gateway(binding, raw, real=False)
+    profile = config.profiles["semantic__deepseek"]
+    assert profile.max_output_tokens_field == "max_tokens"
+    assert config.profiles["semantic__luna"].max_output_tokens_field == "max_tokens"
+    budget = LlmRunBudget(deadline=time.monotonic() + 10, prices=prices)
+    transport = ScriptedTransport(
+        [{"data": {"choices": [{"message": {"content": '{"label":"ok"}'}, "finish_reason": "stop"}]}}]
+    )
+    asyncio.run(
+        _client(transport, budget, config).complete(_request(max_output_tokens=100))
+    )
+    sent = transport.calls[0]["payload"]
+    assert "max_tokens" in sent
+    assert "max_completion_tokens" not in sent
+
+
+def test_length_finish_is_not_a_complete_reading():
+    from research.company_profile.contracts import (
+        ReportSemanticRequestV3,
+        SemanticProviderError,
+    )
+    from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
+    from tests.unit.test_research.test_company_profile_llm_led import _report
+    from utils.llm.models import LlmResponse
+
+    report = _report()
+    request = ReportSemanticRequestV3(
+        request_id="length-1",
+        purpose="source_inventory",
+        report=report,
+        processing_identity={"execution_mode": "offline_fake", "chapter_select": True},
+        source_pages=({"page": 9, "text": "公司主营造纸。", "readable": True},),
+        source_scope="full_context",
+        max_output_tokens=4000,
+        timeout_seconds=30,
+    )
+
+    class _Client:
+        def __init__(self):
+            self.requests = []
+
+        async def complete(self, gateway_request):
+            self.requests.append(gateway_request)
+            return LlmResponse(
+                status="ok",
+                raw_content="{}",
+                data={
+                    "schema_version": "company_profile_report_response.v3",
+                    "request_id": request.request_id,
+                    "purpose": "source_inventory",
+                    "requested_pages": [],
+                    "source_conditions": [],
+                },
+                finish_reason="length",
+                usage=None,
+                request_id="gateway-1",
+                provider_request_id=None,
+                request_hash="a" * 64,
+                response_hash="b" * 64,
+                schema_name=gateway_request.schema_name,
+                schema_version=gateway_request.schema_version,
+                structured_output_mode="json_object",
+                latency_ms=1,
+                attempt_count=1,
+                provider="deepseek",
+                model="deepseek-flash",
+                selected_profile="semantic_extraction__deepseek",
+                source_label="deepseek:deepseek-flash",
+                failover_count=0,
+                attempts=(),
+                warnings=(),
+            )
+
+    provider = CommonGatewaySemanticProvider(
+        client=_Client(),
+        profile="semantic_extraction",
+        max_output_tokens=4000,
+        timeout_seconds=30,
+    )
+    with pytest.raises(SemanticProviderError, match="finish_reason=length"):
+        provider.interpret(request)
+
+
 def test_task_route_first_only_binds_the_preferred_source_alone(pool_binding):
     binding, raw = pool_binding
     labels = [member["source_label"] for member in raw["pools"]["semantic-pool"]["members"]]

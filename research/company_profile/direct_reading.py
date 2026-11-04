@@ -1235,27 +1235,31 @@ _LINE_AMOUNT = re.compile(r"(\d{1,3}(?:,\d{3})+(?:\.\d+)?)")
 
 
 def _revenue_sentence(text: str, start: int, end: int) -> str:
-    """The sentence that contains this amount, not the next paragraph."""
-    left = max(text.rfind(mark, 0, start) for mark in "。；\n")
-    rights = [text.find(mark, end) for mark in "。；\n"]
+    """The clause that contains this amount. A PDF line break is not a new sentence."""
+    left = max(text.rfind(mark, 0, start) for mark in "。；")
+    rights = [text.find(mark, end) for mark in "。；"]
     rights = [index for index in rights if index >= 0]
     right = min(rights) if rights else len(text)
     return text[left + 1 : right]
 
 
 def _revenue_subject(sentence: str) -> str:
-    """Who the sentence says earned the revenue. A bare amount has no subject."""
+    """Who governs this 营业收入. A later 本公司 does not rewrite an earlier subject."""
+    index = sentence.find("营业收入")
+    before = sentence[:index] if index >= 0 else sentence
     if "报告期" not in sentence and "本期" not in sentence:
         return ""
-    if "本集团" in sentence or "本公司" in sentence:
+    matches = list(re.finditer(r"本集团|本公司|母公司|其他公司", before))
+    if matches:
+        token = matches[-1].group(0)
+        if token == "母公司":
+            return "parent"
+        if token == "其他公司":
+            return "other"
         return "company"
-    if re.search(r"母公司(?:实现)?营业收入", sentence):
-        return "parent"
-    if re.search(r"(?<![\u4e00-\u9fff])公司(?:实现)?营业收入", sentence):
+    if re.search(r"(?<![\u4e00-\u9fff])公司(?:实现)?\s*$", before.replace("\n", "")):
         return "company"
-    if re.search(r"[\u4e00-\u9fff]{2,}公司(?:实现)?营业收入", sentence):
-        return "other"
-    if "业营业收入" in sentence:
+    if before.replace("\n", "").rstrip().endswith("业"):
         return "other"
     return ""
 
@@ -3565,6 +3569,33 @@ def interpret_direct_core(
             return follow
         already = set(inventoried)
         for package in packages:
+            if identity.get("chapter_select") and conditions and keep_tail:
+                refreshed = _conditions_package_tail(
+                    conditions, report=report, identity=identity
+                )
+                if refreshed:
+                    source_later = refreshed
+            if identity.get("chapter_select") and keep_tail:
+                package_units = _units(
+                    package,
+                    purpose="source_inventory",
+                    source_scope="full_context",
+                    report=report,
+                    identity=identity,
+                    output=_source_output(identity),
+                )
+                remaining = ledger - charged() - source_later
+                if package_units > max(0, remaining):
+                    gaps.append(
+                        f"chapter_follow_blocked:{package_units}:{max(0, remaining)}"
+                    )
+                    for page in package:
+                        if page.get("scope") == "boundary_context":
+                            continue
+                        gap = f"necessary_unread:{int(page['page'])}"
+                        if gap not in gaps:
+                            gaps.append(gap)
+                    break
             try:
                 reviewed = invoke(
                     "source_inventory",

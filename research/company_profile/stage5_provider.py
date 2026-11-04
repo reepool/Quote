@@ -4696,6 +4696,11 @@ class CommonGatewaySemanticProvider:
             parsed = response_model.model_validate_json(
                 json.dumps(normalized_response, ensure_ascii=False, allow_nan=False)
             )
+            if report_reading and response.finish_reason == "length":
+                raise SemanticProviderError(
+                    ContractErrorCode.CANDIDATE_SCHEMA_INVALID,
+                    "provider finish_reason=length; truncated output is not a complete reading",
+                )
             if parsed.request_id != semantic_request_id:
                 raise SemanticProviderError(
                     ContractErrorCode.REQUEST_IDENTITY_MISMATCH,

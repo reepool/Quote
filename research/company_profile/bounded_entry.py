@@ -1145,6 +1145,28 @@ def validate_binding(
                 )
 
 
+def _documented_deepseek_output_field(config):
+    """Use DeepSeek's documented max_tokens for this process only.
+
+    The shared config file is left unchanged. A profile that is not DeepSeek
+    keeps its own field.
+    """
+    from dataclasses import replace
+
+    profiles = {}
+    changed = False
+    for name, profile in config.profiles.items():
+        resource = config.resource_for_profile(profile).name
+        if "deepseek" in name or "deepseek" in profile.model or "deepseek" in resource:
+            profiles[name] = replace(profile, max_output_tokens_field="max_tokens")
+            changed = True
+        else:
+            profiles[name] = profile
+    if not changed:
+        return config
+    return replace(config, profiles=profiles)
+
+
 def prepare_gateway(binding: dict, raw_config: dict, *, real: bool):
     """Bind the existing direct profile or pool without replacing gateway routing."""
     from dataclasses import replace
@@ -1241,7 +1263,7 @@ def prepare_gateway(binding: dict, raw_config: dict, *, real: bool):
             price["basis"],
             price["context_tokens"],
         )
-    return config, prices
+    return _documented_deepseek_output_field(config), prices
 
 
 def _worker(
