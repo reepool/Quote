@@ -1876,8 +1876,110 @@ def test_s30_coverage_continuation_closes_answered_conditions_offline():
         assert source_query.read_bytes() == before
 
 
-def _chapter_goal_entry(binding_name: str, mode: str, tokens: int):
-    """Official PDF through the real entry. Only the transport is replaced."""
+def test_fixed_core_does_not_pass_an_unsupported_or_omitted_answer():
+    from research.company_profile.bounded_entry import _fixed_core_reply
+
+    objects = [
+        {
+            "condition_id": "claim-001",
+            "dimension": "principal_business",
+            "page": 9,
+            "quote": "公司主要从事竹木浆、纸袋纸和医药产品。",
+            "answer": "公司主要从事竹木浆、纸袋纸和医药产品。",
+        },
+        {
+            "condition_id": "core-question:period-operating-revenue",
+            "dimension": "revenue_model",
+            "page": 16,
+            "quote": "营业收入 2,418,990,221.17",
+            "answer": "本期营业收入 2,418,990,221.17元。",
+        },
+    ]
+    sent = {
+        "request_id": "t",
+        "purpose": "verify_views",
+        "source_pages": [
+            {"page": 9, "text": objects[0]["quote"], "readable": True},
+            {"page": 16, "text": "单位：元 " + objects[1]["quote"], "readable": True},
+        ],
+        "claims": [
+            {
+                "claim_id": "bad",
+                "answer": "全国造纸行业收入14,186.7亿元。",
+                "evidence": [{"page": 999, "quote": "全国造纸行业收入14,186.7亿元。"}],
+            }
+        ],
+        "source_conditions": [],
+    }
+    refused = _fixed_core_reply(sent, {"fixed_core_objects": objects})
+    assert all(check["status"] != "pass" for check in refused["checks"])
+    omitted = _fixed_core_reply(
+        {
+            "request_id": "t2",
+            "purpose": "source_inventory",
+            "source_scope": "full_context",
+            "source_pages": sent["source_pages"],
+        },
+        {"fixed_core_objects": objects, "fixed_core_omit": "claim-001"},
+    )
+    assert any(item["condition_id"] == "claim-001" for item in omitted["source_conditions"])
+    drafted = _fixed_core_reply(
+        {
+            "request_id": "t3",
+            "purpose": "synthesize_views",
+            "source_pages": sent["source_pages"],
+            "source_conditions": omitted["source_conditions"],
+        },
+        {"fixed_core_objects": objects, "fixed_core_omit": "claim-001"},
+    )
+    assert all("claim-001" not in claim["claim_id"] for claim in drafted["claims"])
+    assert any(claim["answer"].startswith("本期营业收入") for claim in drafted["claims"])
+
+
+def _fixed_core_objects():
+    import json
+    from pathlib import Path
+
+    query = json.loads(
+        Path(
+            "/home/python/Quote/openspec/changes/restore-company-profile-llm-led-generalization/s30-s32-receipts/s31/query.json"
+        ).read_text()
+    )
+    wanted = {
+        "principal-business-integrated",
+        "claim-001",
+        "claim-002",
+        "claim-005",
+        "revenue-total",
+        "procurement",
+        "self-production",
+        "sales-model-customer-relationships",
+    }
+    found = {}
+    for view in query["profiles"][0]["three_views"]["views"].values():
+        for claim in view.get("claims") or []:
+            cid = claim.get("claim_id")
+            if cid not in wanted or cid in found:
+                continue
+            evidence = (claim.get("evidence") or [{}])[0]
+            quote = (evidence.get("anchor") or {}).get("bounded_quote") or ""
+            if not quote:
+                continue
+            found[cid] = {
+                "condition_id": cid,
+                "dimension": claim["dimension"],
+                "page": int(evidence["page"]),
+                "quote": quote,
+                "answer": claim["answer"],
+            }
+    assert wanted <= set(found)
+    found["self-production"]["condition_id"] = "core-question:operating-role"
+    found["revenue-total"]["condition_id"] = "core-question:period-operating-revenue"
+    return [found[cid] for cid in wanted]
+
+
+def test_fixed_core_entry_checks_each_reviewed_object():
+    """Official paper entry. Answers must match the reviewed text, not a nonempty quote."""
     import hashlib
     import shutil
     import uuid
@@ -1886,9 +1988,10 @@ def _chapter_goal_entry(binding_name: str, mode: str, tokens: int):
     from research.company_profile.bounded_entry import S27_OFFLINE_DIAGNOSTIC, main
     from research.company_profile.reads import CompanyProfileReadService
 
+    objects = _fixed_core_objects()
     root = Path("/home/python/Quote")
     change = root / "openspec/changes/restore-company-profile-llm-led-generalization"
-    source = json.loads((change / binding_name).read_text())
+    source = json.loads((change / "s1-pool-s1-600103-s16-binding.json").read_text())
     for retired in (
         "accepted_navigation_query",
         "accepted_source_query",
@@ -1905,23 +2008,27 @@ def _chapter_goal_entry(binding_name: str, mode: str, tokens: int):
         "offline_protocol",
     ):
         source.pop(retired, None)
-    source["offline_protocol"] = "chapter_goal_v1"
-    source["chapter_goal_mode"] = mode
-    source["chapter_select"] = True
-    source["task_route_labels"] = ["deepseek:deepseek-flash", "scorpio:grok-4.7"]
-    source["task_route_first_only"] = True
-    source["same_source_max_retries"] = 0
-    source["run_authorization"] = S27_OFFLINE_DIAGNOSTIC
-    source["max_elapsed_seconds"] = 900
-    source["max_tokens"] = tokens
-    source["max_physical_requests"] = 32
-    source["max_recoveries"] = 2
-    source["max_cost_cny"] = "10"
-    source["file_hashes"] = {
-        name: hashlib.sha256((root / name).read_bytes()).hexdigest()
-        for name in source["file_hashes"]
-    }
-    run_root = root / "data/QuoteBak" / f"s33-goal-{mode}-{uuid.uuid4().hex[:8]}"
+    source.update(
+        {
+            "offline_protocol": "fixed_core_v1",
+            "fixed_core_objects": objects,
+            "chapter_select": True,
+            "task_route_labels": ["deepseek:deepseek-flash", "scorpio:grok-4.7"],
+            "task_route_first_only": True,
+            "same_source_max_retries": 0,
+            "run_authorization": S27_OFFLINE_DIAGNOSTIC,
+            "max_elapsed_seconds": 900,
+            "max_tokens": 480_000,
+            "max_physical_requests": 32,
+            "max_recoveries": 2,
+            "max_cost_cny": "10",
+            "file_hashes": {
+                name: hashlib.sha256((root / name).read_bytes()).hexdigest()
+                for name in source["file_hashes"]
+            },
+        }
+    )
+    run_root = root / "data/QuoteBak" / f"s34-fixed-core-{uuid.uuid4().hex[:8]}"
     path = root / "data/QuoteBak" / f"{run_root.name}-binding.json"
     path.write_text(json.dumps(source, ensure_ascii=False))
     argv = sys.argv
@@ -1939,47 +2046,76 @@ def _chapter_goal_entry(binding_name: str, mode: str, tokens: int):
         )
         assert query["profiles"] == exported["profiles"] == reloaded["profiles"]
         profile = query["profiles"][0]["three_views"]
-        stages = json.loads((run_root / "entry-stages.json").read_text())
-        return profile, stages
+        claims = {
+            claim.get("answer"): claim
+            for view in profile["views"].values()
+            for claim in view.get("claims") or []
+        }
+        checks = [
+            check
+            for receipt in profile.get("call_receipts") or []
+            for check in (receipt.get("response_payload") or {}).get("checks") or []
+            if check.get("status") == "pass" and check.get("covers_target_type") == "claim"
+        ]
+        covered = {check.get("covers_target_id") for check in checks}
+        for item in objects:
+            claim = claims.get(item["answer"])
+            assert claim is not None, item["condition_id"]
+            quote = (claim.get("evidence") or [{}])[0].get("anchor", {}).get("bounded_quote")
+            if quote is None:
+                quote = (claim.get("evidence") or [{}])[0].get("quote")
+            assert quote == item["quote"]
+            assert claim.get("claim_id") in covered
+        assert any("2,418,990,221.17" in item["answer"] for item in objects)
+        assert any("医药" in item["answer"] for item in objects)
+        assert profile.get("draft_complete") is True, profile.get("gaps")
     finally:
         sys.argv = argv
         path.unlink(missing_ok=True)
         shutil.rmtree(run_root, ignore_errors=True)
 
 
-def test_chapter_goal_entry_delivers_and_keeps_two_failures():
-    """Normal core, an unread chapter, and a missing other business."""
-    paper = "s1-pool-s1-600103-s16-binding.json"
-    bank = "s1-pool-s1-600000-s16-binding.json"
-    delivered, _stages = _chapter_goal_entry(paper, "deliver", 480_000)
-    assert delivered.get("draft_complete") is True, delivered.get("gaps")
-    claims = {}
-    for view in (delivered.get("views") or {}).values():
-        for claim in view.get("claims") or []:
-            claims[claim.get("claim_id")] = claim
-    checks = [
-        check
-        for receipt in delivered.get("call_receipts") or []
-        for check in (receipt.get("response_payload") or {}).get("checks") or []
-    ]
-    covered = [
-        check
-        for check in checks
-        if check.get("status") == "pass"
-        and check.get("covers_target_type") == "claim"
-        and check.get("covers_target_id") in claims
-        and claims[check["covers_target_id"]].get("answer")
-    ]
-    assert covered, "normal delivery has no nonempty claim check"
-    omitted, _stages = _chapter_goal_entry(paper, "omit_business", 480_000)
-    assert omitted.get("draft_complete") is False, omitted.get("gaps")
-    omitted_gaps = " ".join(str(gap) for gap in omitted.get("gaps") or [])
-    assert "core-business-other" in omitted_gaps or "principal_business" in omitted_gaps, omitted.get("gaps")
-    unread, _stages = _chapter_goal_entry(bank, "unread", 180_000)
-    assert unread.get("draft_complete") is False, unread.get("gaps")
-    assert any(
-        str(gap).startswith("necessary_unread:") for gap in unread.get("gaps") or []
-    ), unread.get("gaps")
+def test_chapter_core_package_fits_the_routine_ledger():
+    import gzip
+    from pathlib import Path
 
+    from research.company_profile.direct_reading import chapter_core_admission
+    from research.company_profile.models import ReportIdentity
+    from research.company_profile.report_interpretation import direct_core_processing_identity
 
+    def pages(path):
+        data = json.loads(gzip.decompress(Path(path).read_bytes()))
+        return [
+            {"page": page["page_number"], "text": page["text"], "readable": True}
+            for page in data["pages"]
+        ]
 
+    root = Path("/home/python/Quote/data/filings/announcements/blobs")
+    paper = pages(
+        root
+        / "68/derived/business_profile_pdfium_recovery.v4/6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c_57e1dd4f16ef40ff.json.gz"
+    )
+    bank = pages(
+        root
+        / "e4/derived/business_profile_pdfium_recovery.v4/e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22_57e1dd4f16ef40ff.json.gz"
+    )
+    identity = direct_core_processing_identity()
+    identity["chapter_select"] = True
+    report = ReportIdentity(
+        instrument_id="600103.SH",
+        report_id="size",
+        document_version="v",
+        report_period="2025-12-31",
+        published_at="2026-04-13T16:00:00+00:00",
+        document_type="annual_report",
+    )
+    for name, chosen in (
+        ("paper", [page for page in paper if page["page"] in range(9, 23)]),
+        ("bank", [page for page in bank if page["page"] in range(32, 77)]),
+    ):
+        admitted = chapter_core_admission(
+            chosen, report, identity, ledger=120_000, limit=65_536
+        )
+        assert admitted["fits_ledger"], (name, admitted)
+        assert admitted["total_units"] <= 120_000
+        assert admitted["first_pages"]

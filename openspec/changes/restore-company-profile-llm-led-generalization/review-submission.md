@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-11-04，[A审核§187](#187-a审核关闭局部缺陷结束旧准入方案不放行真实运行)）：局部缺陷与16份必要回执持久化接受；截句/非空pass不作完整核心证明，常规首包准入仍必拒。§33当前实现方案按约结束，§34只替换整片尾额策略，不再追加原卡返修/付费微窗。S32仍2/12执行、0核心/独立待审/常规核心交付，余十未运行；新增真实调用0，S2/生产不放行。
+当前状态（2026-11-04，[B交接§188](#188-b交接34核心证据包替换整片尾额)）：§34已替换整片尾额。执行2/12，程序核心0，独立待审0，常规核心交付0。首个核心包在常规12万准入内可装下，尚未做真实调用。S2/生产未开放。
 
 ## 1. 唯一实施指引
 
@@ -7729,3 +7729,31 @@ A用当前本地配置、正式解析、当前v8章节身份、每请求65536及
 §34无真实调用/探针/可发送binding，不借余十家或旧两家额度；交付完整可审核心协议路径与准入边界或明确本模型/策略不支持的结论，一次整体方案替换与匹配复验后止，不自动再给尾句/模型探针开卡。通过以后A才提出有界真实观察方案，当前不预批付费。原S1/S32分数及S2/S3/全市场/生产不变。
 
 A本轮只读检查代码、16文件hash、本地无传输准入与反例，新增真实调用0/应用代码修改0；未重新执行350.99秒测试，复用其协议回执。当前change的OpenSpec严格校验、7份本轮文档新增18个本地链接/锚点及`git diff --check`通过。起始14份tracked脏改/9未跟踪及后续并行保护，验收旧历史表不入提交；审核活跃时间未精确计量，供应商业务token不充人工成本。
+
+## 188. B交接：§34核心证据包替换整片尾额
+
+日期：2026-11-04。执行[§34](b3-s1-execution-card.md#34-替换整片尾额准入交付可执行公司核心包零外呼)。新组仍是已执行2/12，未执行10家。程序核心成立0家。独立待审0家。常规核心交付0家。本卡没有新的真实业务。真实调用、费用、探针、可发送绑定均为0。
+
+### 188.1 请求与准入
+
+章节尾额不再按第一片全文预留成稿和核验。尾额改为八个核心对象的引用包：两项主营、产品、收入构成、期间总额、投入、经营角色、产出暴露。引用按原文位置去重，不同引文即使说明相同也保留。普通明细仍后置。这些字符只用于计量长度，不是答案。
+
+按审核同一口径、正式解析、当前章节身份、请求上限65536、账本120000，导航之前：
+
+| 样本 | 源读页 | 源读预留 | 核心包尾额 | 合计 |
+| --- | --- | --- | --- | --- |
+| 造纸 9–22 | 9–13 | 50055 | 67052 | 117107 |
+| 银行 32–76 | 32–38 | 53113 | 66396 | 119509 |
+
+两家都不再是导航前必拒。候选页上的导航请求另计：造纸10906加尾额61926，银行12441加尾额63491，导航之后账本里仍留有源读。6倍仍只是准入缓冲。公共网关用量未知时按声明输出结算，不按6倍。供应商是否守住输出上限仍然未知。
+
+### 188.2 固定正文验证
+
+正向证明改为S31已核正文。造纸正式入口、公共网关只替换外传输、原writer和三读之后，逐条核对主营、医药产品句、期间总额2,418,990,221.17、采购、自主生产和销售方式的答案、原引文和覆盖对象。完成标志为true。全国行业收入句和缺另一主业不会因为引文非空而通过。480000只是这条诊断的模拟上界，不用它证明120000已经跑完。
+
+```text
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_bounded_entry.py::test_fixed_core_does_not_pass_an_unsupported_or_omitted_answer tests/unit/test_research/test_company_profile_bounded_entry.py::test_chapter_core_package_fits_the_routine_ledger tests/unit/test_research/test_company_profile_direct_progress.py::test_compact_source_conditions_keep_distinct_majors tests/unit/test_research/test_company_profile_direct_progress.py::test_first_core_group_includes_products_and_role
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_bounded_entry.py::test_fixed_core_entry_checks_each_reviewed_object
+```
+
+前一组4 passed，10.81秒。入口1 passed，88.42秒。没有新的真实调用，也没有重启余下十家。

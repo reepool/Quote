@@ -1053,7 +1053,7 @@ def _directed_operating_role_pages(sources, by_page, limit: int = 8) -> list[int
 def compact_source_conditions(
     conditions: Sequence[ReportSourceCondition],
 ) -> list[ReportSourceCondition]:
-    """Drop exact-quote+name repeats. Keep distinct majors on the same quote."""
+    """Drop an identical quote. A different quote stays even when the description matches."""
     kept: list[ReportSourceCondition] = []
     quotes: set[tuple[Any, ...]] = set()
     names: set[tuple[Any, ...]] = set()
@@ -1072,7 +1072,7 @@ def compact_source_conditions(
             item.statement_status,
             item.major,
         )
-        if item.major and name_key in names:
+        if item.major and name_key in names and quote_key is None:
             continue
         if quote_key is not None:
             quotes.add(quote_key)
@@ -1874,6 +1874,8 @@ def _first_delivery_tail(pages, *, report, identity, limit: int) -> int:
     """Reserve the first real source+draft+verify object, not a two-page stub."""
     if not pages:
         return 0
+    if identity.get("chapter_select"):
+        return _core_package_tail(pages, report=report, identity=identity)
     pack_limit = (
         int(limit)
         if identity.get("chapter_select")
@@ -1882,8 +1884,6 @@ def _first_delivery_tail(pages, *, report, identity, limit: int) -> int:
     try:
         slices = list(source_discovery_slices(pages, report, identity, pack_limit))
     except ValueError:
-        if identity.get("chapter_select"):
-            return 0
         slices = [list(pages[:1])]
     if not slices:
         return 0
@@ -1907,6 +1907,133 @@ def _first_delivery_tail(pages, *, report, identity, limit: int) -> int:
         )
         + _nonempty_verify_units(first, report=report, identity=identity)
     )
+
+
+# Spans size the core package. They are not answers and are not chosen by keyword.
+_CORE_EVIDENCE_SLOTS = (
+    ("principal_business", "core-business", 160),
+    ("principal_business", "core-business-other", 160),
+    ("products_services", "core-products", 180),
+    ("revenue_model", "core-revenue", 480),
+    ("revenue_model", "core-question:period-operating-revenue", 96),
+    ("input_exposure", "core-input", 96),
+    ("supply_chain_role", "core-question:operating-role", 96),
+    ("output_exposure", "core-output", 160),
+)
+
+
+def _core_evidence_request(pages, report):
+    """Shape of the draft that cites evidence, not the whole source slice.
+
+    The characters are a length sample from the pages about to be read. They
+    are not a company answer.
+    """
+    usable = [page for page in pages if str(page.get("text") or "").strip()]
+    if not usable:
+        return (), (), ()
+    conditions = []
+    claims = []
+    evidence = []
+    for index, (dimension, condition_id, span) in enumerate(_CORE_EVIDENCE_SLOTS):
+        page = usable[index % len(usable)]
+        quote = str(page.get("text") or "")[:span].strip() or "正文"
+        item = Evidence(
+            evidence_id=f"core-size-{index}",
+            report=report,
+            page=int(page["page"]),
+            section_title="size",
+            anchor=TextAnchor(bounded_quote=quote),
+        )
+        evidence.append(item)
+        conditions.append(
+            ReportSourceCondition(
+                condition_id=condition_id,
+                dimension=dimension,
+                description=condition_id,
+                evidence=(item,),
+                major=True,
+                statement_status="current",
+            )
+        )
+        claims.append(
+            ReportViewClaim(
+                claim_id=f"core-size-claim-{index}",
+                dimension=dimension,
+                status="observed",
+                answer=quote,
+                condition_ids=(condition_id,),
+                evidence=(item,),
+            )
+        )
+    return tuple(conditions), tuple(claims), cited_quote_pages(evidence)
+
+
+def _core_package_tail(pages, *, report, identity) -> int:
+    """Reserve the core draft and its verification, not another copy of the slice."""
+    conditions, claims, source_pages = _core_evidence_request(pages, report)
+    if not source_pages:
+        return 0
+    draft = request_reservation(
+        ReportSemanticRequestV3(
+            request_id="direct-core-package-draft",
+            purpose="synthesize_views",
+            report=report,
+            processing_identity=dict(identity),
+            source_pages=tuple(source_pages),
+            source_scope="full_context",
+            source_conditions=conditions,
+            max_output_tokens=_body_output(identity),
+            timeout_seconds=float(identity.get("logical_request_timeout_seconds") or 120),
+        )
+    )
+    verify = request_reservation(
+        ReportSemanticRequestV3(
+            request_id="direct-core-package-verify",
+            purpose="verify_views",
+            report=report,
+            processing_identity=dict(identity),
+            source_pages=tuple(source_pages),
+            source_scope="full_context",
+            source_conditions=conditions,
+            claims=claims,
+            max_output_tokens=_verify_output(identity),
+            timeout_seconds=float(identity.get("logical_request_timeout_seconds") or 120),
+        )
+    )
+    return draft + verify
+
+
+def chapter_core_admission(pages, report, identity, *, ledger: int, limit: int) -> dict[str, Any]:
+    """First source slice plus the core evidence package, on one ledger."""
+    tail = _core_package_tail(pages, report=report, identity=identity)
+    room = min(int(limit), max(0, int(ledger) - tail))
+    slices: list = []
+    error = ""
+    if room >= 1024:
+        try:
+            slices = list(source_discovery_slices(pages, report, identity, room))
+        except ValueError as exc:
+            error = str(exc)
+    source = 0
+    first_pages: list[int] = []
+    if slices:
+        source = _units(
+            slices[0],
+            purpose="source_inventory",
+            source_scope="full_context",
+            report=report,
+            identity=identity,
+            output=_source_output(identity),
+        )
+        first_pages = sorted({int(page["page"]) for page in slices[0] if page.get("scope") != "boundary_context"})
+    return {
+        "tail_units": tail,
+        "source_units": source,
+        "total_units": source + tail,
+        "first_pages": first_pages,
+        "fits_ledger": bool(slices) and source + tail <= int(ledger) and not error,
+        "error": error,
+    }
 
 
 def _compose_tail(pages, *, report, identity) -> int:
@@ -4958,27 +5085,18 @@ def interpret_direct_core(
                 if int(page["page"]) in (chapter_required_pages or set(candidates))
             ]
             if hold_pages:
-                try:
-                    hold_slices = list(
-                        source_discovery_slices(
-                            hold_pages,
-                            report,
-                            identity,
-                            int(limit)
-                            if identity.get("chapter_select")
-                            else min(int(limit), RESERVATION_LIMIT),
-                        )
-                    )
-                except ValueError as exc:
-                    hold_slices = []
-                    source_later = 0
-                    gaps.append(f"chapter_core_slice_unbounded:{exc}")
-                if hold_slices:
-                    source_later = _compose_tail(
-                        hold_slices[0],
-                        report=report,
-                        identity=identity,
-                    )
+                admitted = chapter_core_admission(
+                    hold_pages,
+                    report,
+                    identity,
+                    ledger=ledger,
+                    limit=int(limit),
+                )
+                source_later = int(admitted["tail_units"])
+                if admitted["error"]:
+                    gaps.append(f"chapter_core_slice_unbounded:{admitted['error']}")
+                elif not admitted["fits_ledger"]:
+                    gaps.append("chapter_core_package_exceeds_ledger")
             elif candidate_pages:
                 source_later = _first_delivery_tail(
                     candidate_pages, report=report, identity=identity, limit=limit
