@@ -1,6 +1,6 @@
 ## 1. M1 本地快修（无网络，可随时执行）
 
-- [ ] 1.1 口径对账量化脚本：全期 `financial_facts` vs 数值层（hot+history）按 revenue / net_income / total_assets / equity_total 四字段 0.5% 容差全量比对（临时聚合表模式，产物按 §2.3 入 QuoteBak），报告（分期×分字段差异率、典型样本、科目口径归类）落盘 `docs/development/financial_historical_caliber_comparison_20261103.md`。
+- [ ] 1.1 口径对账量化脚本：全期 `financial_facts` vs 数值层（hot+history）按 revenue / net_income / total_assets / equity_total 四字段 0.5% 容差全量比对（临时聚合表模式，产物按 §2.3 入 QuoteBak），报告（分期×分字段差异率、典型样本、科目口径归类）落盘 `docs/development/financial_historical_caliber_comparison_<yyyymmdd>.md`（日期以实际运行日命名）。
 - [ ] 1.2 40 行 `total_assets` 本地回填：仅数值层有值的 NULL 行（equity 回填同模式，只填 NULL、不动 hash/updated_at），回填后更新 1.1 报告附录记录剩余 249 行清单。
 - [ ] 1.3 金刚光伏(300093) 定向 reconciliation（`target_symbols=['300093']`，安静窗口），确认其 2026-06-30 获得事件化处置。
 - [ ] 1.4 `financial_available_date_backfill` 证据加载器扩展：新增 `financial_statements_raw` / `financial_filing_versions` 本地披露时间源（先核实两表是否携带可用日期字段，无则记录跳过理由）；dry-run 试跑产出本地证据可覆盖行数。
@@ -20,7 +20,7 @@
 - [ ] 3.3 验收验证一：全部历史缺失行（2023Q4–2026Q1 十季度约 5.4 万行 + 2026H1 残余 388 行 + Q3 残余 2 行）的 `data_available_date` 处置覆盖率 ≥ 99.9%，按 observed / surveyed / statutory / 仍缺 四类给占比；仍缺行逐行说明（预期仅退市/特殊行）。
 - [ ] 3.4 验收验证二：PIT 硬性边界校验（`data_available_date ≥ 报告期期末`；兜底行 == 法定截止日），违例阻断验收；实测日晚于法定截止日超 60 天的行进异常清单人工复核（延期披露属真实情况，不计违例）。
 - [ ] 3.5 验收验证三：随机 20 家 observed/surveyed 类抽样与 cninfo 公告日人工核对，一致率 ≥ 90%，不一致样本逐家说明。
-- [ ] 3.6 验收验证四：首个周日全量 reconciliation 后 `mapping_catalog_empty` 事件归零确认（SQL 验证，结果记入验收报告）。
+- [ ] 3.6 验收验证四：`mapping_catalog_empty` 陈旧 reason 清零——首个周日全量 reconciliation 覆盖滚动窗口内（2024Q1 起）各期；窗口外 2023-12-31 期 44 条另跑一次定向 reconciliation（`report_periods=['2023-12-31']`，安静窗口）刷新；SQL 验证全部期间归零或逐条说明，结果记入验收报告。
 - [ ] 3.7 249 行无源 total_assets：检查 `financial_statements_raw` 可重解析性，结论（重解析清单或接受记录）写入验收报告。
 - [ ] 3.8 口径量化报告（1.1 产物）提交 owner 决策：是否按现行映射重派生历史行；重派生未经决策不执行，如获批准另行排期（不在本 change 内完成重派生）。
 - [ ] 3.9 宽表 2023Q4 前边界声明：在需求文档（`financial_equity_semantics_and_balance_identity_requirements.md` 或验收报告）记录"宽表历史自 2023Q4 起，更早历史见数值层"。

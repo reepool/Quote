@@ -15,7 +15,8 @@ point-in-time 回测时，宽表自身无法回答"该行数据当时何时可�
 - 项目既有专项模块 `research/financial_available_date_backfill.py` 的两条本地
   证据源在该区间几乎为空：`financial_source_files` 62,235 行中仅 604 行带
   `published_at`（472 个 instrument×period 对）；事件表经 11-03 修复裁剪后
-  仅存近期，归档 59,232 行中目标区间带 `announcement_time` 的仅 2 条。
+  仅存近期与少量历史残留，归档 59,232 行中目标区间带 `announcement_time`
+  的仅 2 条。
   **模块是对的，但证据原料未进货**。
 - 历史批次存在小比例口径差：2025-09-30 抽 300 只，4 只（1.3%）revenue 在
   facts 与数值层不一致，模式统一为"营业总收入 vs 营业收入"（000617.SZ
@@ -23,11 +24,14 @@ point-in-time 回测时，宽表自身无法回答"该行数据当时何时可�
   0/5,571 已对齐。真实规模未定量。
 - 零星缺口：金刚光伏(300093) 2026H1 缺事实且无事件；2024–2025 各 Q1/Q3 共
   289 行 `total_assets` 为 NULL，其中 40 行数值层有值可本地回填；宽表有效
-  历史自 2023Q4 起（更早仅 10 行，数值层另有约 1,700 行/期）。
+  历史自 2023Q4 起（更早仅 10 行；数值层更早期次仍有数据，如 2023H1 为
+  1,698 行）。
 
 另有 2,010 条历史事件带 11-01 v6 目录空窗期的陈旧 `mapping_catalog_empty`
-reason（状态本身正确，均为 `accepted_disclosure_gap`）：周日全量
-reconciliation 自动刷新，本 change 只承担验证，不新增修复动作。
+reason（状态本身正确，均为 `accepted_disclosure_gap`）：滚动窗口内
+（2024Q1 起，1,966 条）由周日全量 reconciliation 自然刷新；窗口外的
+2023-12-31 期 44 条不会被周日任务覆盖，本 change 以一次定向
+reconciliation（`report_periods=['2023-12-31']`）完成刷新并验证清零。
 
 ## What Changes
 
@@ -50,8 +54,8 @@ reconciliation 自动刷新，本 change 只承担验证，不新增修复动作
   与保守上界。
 - **验证**：覆盖率三类占比报告（observed / surveyed / statutory）、全行
   PIT 边界校验（`data_available_date` ≥ 报告期期末且 ≤ 法定截止日）、抽
-  20 家对 cninfo 人工核对、周日 reconciliation 后 `mapping_catalog_empty`
-  归零验证。
+  20 家对 cninfo 人工核对、`mapping_catalog_empty` 陈旧 reason 清零验证
+  （窗口内周日全量 + 窗口外 2023Q4 定向刷新）。
 - **决策门**：口径差经量化后是否对历史行按 v6 管道重派生，由 owner 拍板
   （营业总收入 vs 营业收入对控股公司各有合理性）；未获决策不执行重派生。
 
@@ -85,9 +89,8 @@ reconciliation 自动刷新，本 change 只承担验证，不新增修复动作
   （`isolate-long-tasks-from-api-event-loop`）为网络勘察的执行约束来源。
 - 生产不变量：表结构、canonical key、写入 owner、job 配置与调度时间全部
   不变；`financial_facts` 仅 UPDATE 空值列（publish_date / data_available_date
-  / total_assets 局部），不动 row_hash 覆盖语义之外的字段；回填产生的行不
-  触发 change watermark（仅 UPDATE 目标列，不动 updated_at/hash，与
-  equity 回填同一模式）。
+  / total_assets 局部）；回填不更新 `row_hash`、不产生 `data_change_log`
+  变更记录（`updated_at` 按回填模块既有行为维护，已核实不触发水位级联）。
 - 非目标：不做 2023Q4 之前宽表历史扩产（滚动窗口 10 季，2023Q4 已为基线；
   更早历史数值层仍可用）；不做通用披露时间数据平台；不修改当季管道；
   249 行 total_assets 中数值层无值的行以"源文件可重解析则重解析、否则接受

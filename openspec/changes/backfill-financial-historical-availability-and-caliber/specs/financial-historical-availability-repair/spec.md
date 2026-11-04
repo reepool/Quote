@@ -31,7 +31,7 @@
 #### Scenario: 勘察结果落库
 
 - **WHEN** 勘察在某市场×季度窗口识别到定期报告公告
-- **THEN** 对应 `(instrument_id, report_period, announcement_time, title)` SHALL 记录在 `announcement_audit`，供可得性回填作为证据读取
+- **THEN** 对应公告 SHALL 以既有 `announcement_audit` 列记录（`instrument_id`、`published_at`、`title` 等），标题推断的报告期 SHALL 记录于该行的 JSON 列（如 `selection_reasons_json`），供可得性回填按 `(instrument_id, 推断报告期, published_at)` 读取
 
 #### Scenario: 事件状态隔离
 
@@ -106,12 +106,17 @@
 
 ### Requirement: 修复结果通过验收验证
 
-本 change 完成时 SHALL 产出验收报告：全部缺失行（2023Q4–2026Q1 十个季度约 5.4 万行，另含 2026-06-30 残余 388 行与 2026-09-30 残余 2 行）的 `data_available_date` 处置覆盖率按 observed / surveyed / statutory / 仍缺 四类给占比、PIT 边界校验结果、20 家抽样与 cninfo 公告日人工核对一致率、周日全量 reconciliation 后 `mapping_catalog_empty` 事件归零确认。
+本 change 完成时 SHALL 产出验收报告：全部缺失行（2023Q4–2026Q1 十个季度约 5.4 万行，另含 2026-06-30 残余 388 行与 2026-09-30 残余 2 行）的 `data_available_date` 处置覆盖率按 observed / surveyed / statutory / 仍缺 四类给占比、PIT 边界校验结果、20 家抽样与 cninfo 公告日人工核对一致率、`mapping_catalog_empty` 陈旧 reason 清零确认（滚动窗口内由周日全量 reconciliation 自然刷新；窗口外的 2023-12-31 期 44 条须经一次定向 reconciliation 刷新）。
 
 #### Scenario: 覆盖率报告
 
 - **WHEN** 全部回填完成
 - **THEN** 全部历史缺失行的 `data_available_date` 处置覆盖率 SHALL ≥ 99.9%（仍缺行仅允许为数值层与公告均无记录的退市/特殊行，逐行说明）；覆盖率指标以 `data_available_date` 为准，`publish_date` 允许在 statutory 行保持 NULL
+
+#### Scenario: 陈旧 reason 清零含窗口外期间
+
+- **WHEN** 首个周日全量 reconciliation（滚动窗口 2024Q1 起）完成并对其余期间完成定向刷新后
+- **THEN** 全部期间（含 2023-12-31）的 `mapping_catalog_empty` 陈旧 reason 事件 SHALL 归零或逐条给出不可刷新的原因说明
 
 #### Scenario: 抽样核对
 
