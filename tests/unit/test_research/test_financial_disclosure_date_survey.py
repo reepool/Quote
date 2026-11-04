@@ -219,3 +219,36 @@ async def test_survey_records_without_matching_symbol_skipped(tmp_path):
 
     assert report["audit_written"] == 0
     assert written == []
+
+
+@pytest.mark.asyncio
+async def test_survey_degraded_window_is_incomplete_not_completed(tmp_path):
+    """max_pages_exhausted (degraded) windows keep captured audit rows but
+    are checkpointed as incomplete so a rerun with a higher page cap
+    rescans them (truncation guard, found in implementation review)."""
+    acquire, calls = _fake_acquire(
+        {
+            "2024-03-31": _Result(status="degraded", records=[_Record(title="某公司2024年第一季度报告")]),
+            "2024-06-30": _Result(records=[]),
+        }
+    )
+    write, written = _writer()
+    cp = tmp_path / "checkpoint.json"
+
+    report = await survey_historical_disclosure_dates(
+        exchanges=["SSE"],
+        report_periods=["2024-03-31", "2024-06-30"],
+        acquire=acquire,
+        audit_writer=write,
+        instrument_map={("SSE", "688981"): "688981.SH"},
+        checkpoint_path=cp,
+        probe_enabled=False,
+    )
+
+    # degraded window: not aborted, audit rows kept, but marked incomplete
+    assert report["aborted"] is False
+    assert report["audit_written"] == 1
+    assert report["incomplete_windows"] == ["SSE:2024-03-31"]
+    state = load_checkpoint(cp)
+    assert state["completed_windows"] == ["SSE:2024-06-30"]
+    assert state["incomplete_windows"] == ["SSE:2024-03-31"]

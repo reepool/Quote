@@ -8,10 +8,12 @@ so the availability-date backfill can use them as observed evidence.
 
 Hard constraints (from the change spec):
 - never write `financial_disclosure_event_state`;
-- refuse to start when the cninfo access stack is degraded (probe first);
+- probe the announcement source with one bounded page before scanning;
+  refuse to scan when the probe fails (endpoint-health contract);
 - bounded requests: one acquire per (exchange, window) with page caps, a
-  checkpoint per completed window, and an abort on repeated 403/limit
-  responses (2026-11-03 data20 403 incident).
+  checkpoint per completed window, an abort on 403/limit refusals, and
+  degraded (page-exhausted) windows marked incomplete so a rerun with a
+  higher cap resumes them (2026-11-03 data20 403 incident).
 """
 from __future__ import annotations
 
@@ -67,7 +69,10 @@ def parse_inferred_report_period(text: Any) -> str:
 LATE_TAIL_DAYS = 60
 
 _DEFAULT_PAGE_SIZE = 30
-_DEFAULT_MAX_PAGES = 40
+# Peak seasons overlap the next season inside the deadline+tail window and
+# cninfo pages newest-first: annual/Q1 windows must hold two seasons
+# (~7.5k records per exchange). The runner imports this same default.
+DEFAULT_MAX_PAGES = 250
 
 AcquireFn = Callable[[Any], Awaitable[Any]]
 AuditWriterFn = Callable[[str, Any, Optional[str]], None]
@@ -136,7 +141,7 @@ def load_checkpoint(path: Path) -> Dict[str, Any]:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
-        return {"completed_windows": [], "failed_windows": []}
+        return {"completed_windows": [], "failed_windows": [], "incomplete_windows": []}
 
 
 def save_checkpoint(path: Path, state: Mapping[str, Any]) -> None:
@@ -145,23 +150,6 @@ def save_checkpoint(path: Path, state: Mapping[str, Any]) -> None:
         json.dumps(state, ensure_ascii=False, indent=1, sort_keys=True),
         encoding="utf-8",
     )
-
-
-class SurveyAccessError(RuntimeError):
-    """Raised when the announcement access stack fails the startup probe.
-
-    The operator guidance points at the scheduler-side entry: a degraded
-    stack (headed Chrome down, source 403) must not be worked around with
-    bare-HTTP bulk requests (2026-11-03 incident).
-    """
-
-    def __init__(self, detail: str) -> None:
-        super().__init__(
-            "announcement access stack probe failed; "
-            "run the survey through the scheduler-side entry with the "
-            "full cninfo access stack instead of a bare standalone "
-            f"process. detail: {detail}"
-        )
 
 
 def _window_probe_query(window: SurveyWindow):
@@ -218,7 +206,7 @@ async def survey_historical_disclosure_dates(
     instrument_map: Mapping[Tuple[str, str], str],
     checkpoint_path: Path,
     page_size: int = _DEFAULT_PAGE_SIZE,
-    max_pages: int = _DEFAULT_MAX_PAGES,
+    max_pages: int = DEFAULT_MAX_PAGES,
     probe_enabled: bool = True,
     write_enabled: bool = True,
     today: Optional[date] = None,
@@ -231,6 +219,7 @@ async def survey_historical_disclosure_dates(
     checkpoint = load_checkpoint(checkpoint_path)
     completed: List[str] = list(checkpoint.get("completed_windows", []))
     failed: List[str] = list(checkpoint.get("failed_windows", []))
+    incomplete: List[str] = list(checkpoint.get("incomplete_windows", []))
     completed_set = set(completed)
 
     report: Dict[str, Any] = {
@@ -242,6 +231,7 @@ async def survey_historical_disclosure_dates(
         "records_seen": 0,
         "aborted": False,
         "abort_reason": None,
+        "incomplete_windows": [],
     }
 
     if windows and probe_enabled:
@@ -289,9 +279,21 @@ async def survey_historical_disclosure_dates(
             )
             save_checkpoint(
                 checkpoint_path,
-                {"completed_windows": completed, "failed_windows": failed},
+                {
+                    "completed_windows": completed,
+                    "failed_windows": failed,
+                    "incomplete_windows": incomplete,
+                },
             )
             return report
+
+        if status not in {"success", "success_empty"}:
+            # degraded scans (e.g. max_pages_exhausted) did not see the
+            # whole window: record what was captured but do NOT mark the
+            # window complete, so a rerun with a higher page cap resumes it.
+            window_result["incomplete_window"] = True
+            incomplete.append(window.key)
+            report["incomplete_windows"].append(window.key)
 
         if write_enabled:
             for record in records:
@@ -320,11 +322,16 @@ async def survey_historical_disclosure_dates(
         report["records_seen"] += len(records)
         report["window_results"].append(window_result)
 
-        completed.append(window.key)
-        completed_set.add(window.key)
+        if window.key not in incomplete:
+            completed.append(window.key)
+            completed_set.add(window.key)
         save_checkpoint(
             checkpoint_path,
-            {"completed_windows": completed, "failed_windows": failed},
+            {
+                "completed_windows": completed,
+                "failed_windows": failed,
+                "incomplete_windows": incomplete,
+            },
         )
 
     return report

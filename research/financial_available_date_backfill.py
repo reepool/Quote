@@ -314,12 +314,10 @@ def statutory_deadline_for_period_end(period_end: date) -> Optional[date]:
     if deadline_month is None:
         return None
     deadline_year = period_end.year + 1 if period_end.month == 12 else period_end.year
-    import calendar as _calendar
-
     return date(
         deadline_year,
         deadline_month,
-        _calendar.monthrange(deadline_year, deadline_month)[1],
+        calendar.monthrange(deadline_year, deadline_month)[1],
     )
 
 

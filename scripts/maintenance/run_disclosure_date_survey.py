@@ -22,6 +22,7 @@ REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO))
 
 from research.financial_disclosure_date_survey import (  # noqa: E402
+    DEFAULT_MAX_PAGES,
     SURVEY_PURPOSE_KEY,
     survey_historical_disclosure_dates,
 )
@@ -143,7 +144,12 @@ def main() -> int:
     parser.add_argument("--periods", nargs="*", default=list(DEFAULT_PERIODS))
     parser.add_argument("--interval", type=float, default=1.0)
     parser.add_argument("--page-size", type=int, default=30)
-    parser.add_argument("--max-pages", type=int, default=40)
+    parser.add_argument(
+        "--max-pages",
+        type=int,
+        default=DEFAULT_MAX_PAGES,
+        help="Page cap per window (default shared with the survey module).",
+    )
     parser.add_argument(
         "--checkpoint",
         default=str(REPO / "data" / "QuoteBak" / "financial_survey" / "checkpoint.json"),

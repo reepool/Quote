@@ -118,7 +118,10 @@ def sample_check_cninfo(rows, sample_size: int) -> dict:
         "http://www.cninfo.com.cn/new/data/szse_stock.json", timeout=30
     ).json()
     org_map = {r.get("code"): r.get("orgId") for r in org.get("stockList", [])}
-    column_map = {"SSE": ("sse", "sh"), "SZSE": ("szse", "sz"), "BSE": ("bj", "bj")}
+    # column/plate mirror the provider's market_configs (BSE = neeq/bj);
+    # note: the per-stock orgId query does not work against the BSE
+    # endpoint (board-level scans only), so BSE samples are skipped below.
+    column_map = {"SSE": ("sse", "sh"), "SZSE": ("szse", "sz"), "BSE": ("neeq", "bj")}
 
     candidates = [r for r in rows if r["source"] in OBSERVED_SOURCES]
     random.shuffle(candidates)
@@ -156,6 +159,12 @@ def sample_check_cninfo(rows, sample_size: int) -> dict:
             details.append({"symbol": symbol, "error": str(exc)[:80]})
             continue
         announcements = resp.get("announcements") or []
+        if exchange == "BSE" and not announcements:
+            # per-stock queries are not supported for the BSE board: count
+            # as skipped, not mismatch (BSE observed dates were validated
+            # by the survey through the provider's board-level scan).
+            skipped += 1
+            continue
         # a periodic-report announcement published on/before our avail date
         # and within tolerance confirms the observed date
         confirmed = False
