@@ -1032,9 +1032,14 @@ class LlmClient:
                         raise provider_error
                     raw_content, finish_reason = extract_message_content(response)
                     usage = LlmUsage.from_mapping((response.data or {}).get("usage"))
+                    stream_summary = _stream_summary_of(response)
                     try:
                         data = self._parse_and_validate(raw_content, schema)
                     except (LlmResponseParseError, LlmSchemaValidationError) as exc:
+                        if exc.finish_reason is None:
+                            exc.finish_reason = finish_reason
+                        if exc.stream_summary is None:
+                            exc.stream_summary = stream_summary
                         if _is_output_limit_finish_reason(finish_reason):
                             raise LlmResponseTruncatedError(
                                 finish_reason=finish_reason,
@@ -1042,6 +1047,7 @@ class LlmClient:
                                 observed_output_tokens=(
                                     usage.output_tokens if usage is not None else None
                                 ),
+                                stream_summary=stream_summary,
                             ) from exc
                         raise
                     warnings = response_warnings(
@@ -1203,6 +1209,12 @@ class LlmClient:
                     if time.monotonic() >= execution_deadline:
                         raise LlmDeadlineExceededError() from exc
                     last_error = exc
+                    if self.physical_budget is not None:
+                        self.physical_budget.note_response_diagnosis(
+                            error_code=exc.code,
+                            finish_reason=exc.finish_reason,
+                            stream_summary=exc.stream_summary,
+                        )
                     self._record_attempt_failure(
                         attempt_failures,
                         attempt_sequence=attempt_count,
@@ -1210,13 +1222,18 @@ class LlmClient:
                     )
                     llm_logger.warning(
                         "event=llm.response.validation_failed profile=%s request_id=%s "
-                        "attempt=%s/%s code=%s repair_used=%s",
+                        "attempt=%s/%s code=%s repair_used=%s finish_reason=%s "
+                        "stream_events=%s content_chars=%s reasoning_present=%s",
                         profile.name,
                         request_id,
                         attempt_count,
                         max_attempts,
                         exc.code,
                         repair_used,
+                        exc.finish_reason,
+                        (exc.stream_summary or {}).get("event_count"),
+                        (exc.stream_summary or {}).get("content_chars"),
+                        (exc.stream_summary or {}).get("reasoning_present"),
                     )
                     if (
                         repair_used < profile.max_schema_repair_attempts
@@ -1391,10 +1408,11 @@ class LlmClient:
             "finish_reason",
             "requested_output_tokens",
             "observed_output_tokens",
+            "stream_summary",
         ):
             value = getattr(error, key, None)
             if value is not None:
-                failure[key] = value
+                failure[key] = dict(value) if key == "stream_summary" else value
         if target and target[-1] == failure:
             return
         target.append(failure)
@@ -1454,9 +1472,12 @@ class LlmClient:
                 self.physical_budget.settle(ticket, None, status="failed_or_cancelled")
             raise
         if ticket is not None:
+            finish_reason, stream_summary = _diagnostics_from_payload(response.data)
             self.physical_budget.settle(
                 ticket, LlmUsage.from_mapping((response.data or {}).get("usage")),
                 status="success" if 200 <= response.status_code < 300 else "http_failure",
+                finish_reason=finish_reason,
+                stream_summary=stream_summary,
             )
         return response
 
@@ -1779,24 +1800,62 @@ def normalize_openai_url(base_url: str, endpoint: str) -> str:
     return urlunsplit((parsed.scheme, parsed.netloc, path, "", ""))
 
 
+def _diagnostics_from_payload(data: Any) -> tuple[Optional[str], Optional[dict[str, Any]]]:
+    """Read finish and the stream summary before deciding the body is empty."""
+    if not isinstance(data, Mapping):
+        return None, None
+    raw_summary = data.get("stream_summary")
+    summary = dict(raw_summary) if isinstance(raw_summary, Mapping) else None
+    finish_reason = None
+    choices = data.get("choices")
+    if isinstance(choices, list) and choices and isinstance(choices[0], Mapping):
+        finish_reason = _optional_text(choices[0].get("finish_reason"))
+    if finish_reason is None and summary is not None:
+        finish_reason = _optional_text(summary.get("finish_reason"))
+    return finish_reason, summary
+
+
+def _stream_summary_of(response: TransportResponse) -> Optional[dict[str, Any]]:
+    return _diagnostics_from_payload(response.data)[1]
+
+
 def extract_message_content(response: TransportResponse) -> tuple[str, Optional[str]]:
     data = response.data
+    finish_reason, summary = _diagnostics_from_payload(data)
     try:
         choice = data["choices"][0]  # type: ignore[index]
         message = choice["message"]
         content = message["content"]
     except (KeyError, IndexError, TypeError) as exc:
-        raise LlmResponseParseError("LLM response is missing message content") from exc
+        raise LlmResponseParseError(
+            "LLM response is missing message content",
+            finish_reason=finish_reason,
+            stream_summary=summary,
+        ) from exc
     if isinstance(content, list):
         content = "".join(
             str(item.get("text") or "") for item in content if isinstance(item, Mapping)
         )
     text = str(content or "").strip()
+    if isinstance(choice, Mapping):
+        finish_reason = _optional_text(choice.get("finish_reason")) or finish_reason
     if not text:
-        raise LlmResponseParseError("LLM response message content is empty")
-    finish_reason = (
-        _optional_text(choice.get("finish_reason")) if isinstance(choice, Mapping) else None
-    )
+        if _is_output_limit_finish_reason(finish_reason):
+            raise LlmResponseTruncatedError(
+                finish_reason=finish_reason,
+                stream_summary=summary,
+            )
+        if finish_reason is None:
+            message = "LLM response message content is empty; finish_reason is missing"
+        elif summary and summary.get("reasoning_present") and not summary.get("content_chars"):
+            message = "LLM response message content is empty; reasoning is not the answer"
+        else:
+            message = "LLM response message content is empty"
+        raise LlmResponseParseError(
+            message,
+            finish_reason=finish_reason,
+            stream_summary=summary,
+        )
     return text, finish_reason
 
 

@@ -60,6 +60,7 @@ class LlmError(RuntimeError):
     finish_reason: Optional[str] = None
     requested_output_tokens: Optional[int] = None
     observed_output_tokens: Optional[int] = None
+    stream_summary: Optional[Mapping[str, Any]] = None
 
     def __post_init__(self) -> None:
         if self.code not in ERROR_CODES:
@@ -98,6 +99,7 @@ class LlmError(RuntimeError):
             "finish_reason": self.finish_reason,
             "requested_output_tokens": self.requested_output_tokens,
             "observed_output_tokens": self.observed_output_tokens,
+            "stream_summary": dict(self.stream_summary or {}),
         }
 
 

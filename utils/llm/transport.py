@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import inspect
 import json
 import logging
@@ -320,6 +321,30 @@ class HttpxOpenAICompatibleTransport:
         await self.release_client()
 
 
+def _stream_summary(
+    *,
+    event_count: int,
+    content_parts: list[str],
+    reasoning_chars: int,
+    finish_reason: str | None,
+    done: bool,
+    usage_present: bool,
+) -> dict[str, Any]:
+    """Counts and hashes only. The raw stream is not retained."""
+    content = "".join(content_parts)
+    return {
+        "event_count": event_count,
+        "content_fragments": len(content_parts),
+        "content_chars": len(content),
+        "content_sha256": hashlib.sha256(content.encode("utf-8")).hexdigest(),
+        "reasoning_present": reasoning_chars > 0,
+        "reasoning_chars": reasoning_chars,
+        "finish_reason": finish_reason,
+        "done": done,
+        "usage_present": usage_present,
+    }
+
+
 async def _collect_openai_stream(
     lines: AsyncIterator[str],
     *,
@@ -332,16 +357,35 @@ async def _collect_openai_stream(
     model: str | None = None
     usage: Mapping[str, Any] | None = None
     event_count = 0
+    reasoning_chars = 0
+    done = False
+
+    def summary() -> dict[str, Any]:
+        return _stream_summary(
+            event_count=event_count,
+            content_parts=content_parts,
+            reasoning_chars=reasoning_chars,
+            finish_reason=finish_reason,
+            done=done,
+            usage_present=usage is not None,
+        )
 
     async for event_data in _iter_sse_data(lines):
         if event_data == "[DONE]":
+            done = True
             break
         try:
             chunk = json.loads(event_data)
         except json.JSONDecodeError as exc:
-            raise LlmResponseParseError("LLM provider returned invalid streaming JSON") from exc
+            raise LlmResponseParseError(
+                "LLM provider returned invalid streaming JSON",
+                stream_summary=summary(),
+            ) from exc
         if not isinstance(chunk, Mapping):
-            raise LlmResponseParseError("LLM provider streaming chunk is not an object")
+            raise LlmResponseParseError(
+                "LLM provider streaming chunk is not an object",
+                stream_summary=summary(),
+            )
         event_count += 1
         if event_count == 1:
             llm_logger.info(
@@ -377,9 +421,16 @@ async def _collect_openai_stream(
                 fragment = _stream_content_text(message.get("content"))
                 if fragment:
                     content_parts.append(fragment)
+                for key in ("reasoning_content", "reasoning"):
+                    reasoning = _stream_content_text(message.get(key))
+                    if reasoning:
+                        reasoning_chars += len(reasoning)
 
-    if event_count == 0:
-        raise LlmResponseParseError("LLM provider returned an empty streaming response")
+    if event_count == 0 and not done:
+        raise LlmResponseParseError(
+            "LLM provider returned an empty streaming response",
+            stream_summary=summary(),
+        )
     return {
         "id": response_id,
         "model": model,
@@ -390,6 +441,7 @@ async def _collect_openai_stream(
             }
         ],
         "usage": dict(usage) if usage is not None else None,
+        "stream_summary": summary(),
     }
 
 

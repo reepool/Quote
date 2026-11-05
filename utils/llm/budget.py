@@ -395,10 +395,22 @@ class LlmRunBudget:
             self._persist()
             return ticket
 
-    def settle(self, ticket: int, usage: LlmUsage | None, *, status: str) -> None:
+    def settle(
+        self,
+        ticket: int,
+        usage: LlmUsage | None,
+        *,
+        status: str,
+        finish_reason: str | None = None,
+        stream_summary: Mapping[str, Any] | None = None,
+    ) -> None:
         with self._lock:
             item = self.attempts[ticket]
             item["status"] = status
+            if finish_reason:
+                item["finish_reason"] = finish_reason
+            if stream_summary:
+                item["stream_summary"] = dict(stream_summary)
             if usage is not None:
                 item["usage"] = {
                     "input_tokens": usage.input_tokens,
@@ -461,6 +473,25 @@ class LlmRunBudget:
                 self._stopped = "provider_usage_exceeded_reserved_run_budget"
                 self._persist()
                 raise LlmDeadlineExceededError(self._stopped)
+            self._persist()
+
+    def note_response_diagnosis(
+        self,
+        *,
+        error_code: str,
+        finish_reason: str | None = None,
+        stream_summary: Mapping[str, Any] | None = None,
+    ) -> None:
+        """Attach the response diagnosis without clearing charged usage."""
+        with self._lock:
+            if not self.attempts:
+                return
+            item = self.attempts[-1]
+            item["error_code"] = error_code
+            if finish_reason:
+                item["finish_reason"] = finish_reason
+            if stream_summary:
+                item["stream_summary"] = dict(stream_summary)
             self._persist()
 
     def note_source_error(self, *, source_label: str, error_code: str) -> None:
