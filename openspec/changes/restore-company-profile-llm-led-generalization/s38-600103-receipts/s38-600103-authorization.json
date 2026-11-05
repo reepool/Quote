@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600103-s38",
+  "binding_sha256": "379f55e910ab4f1ff93d4d43ef6ee1d5503563b828588397299361d88154cb59",
+  "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+  "approval_reference": "acceptance section 7.91 and b3 card section 38; user approved one routine paper run 2026-11-05, review section 201",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "section 38 one fresh paper chapter run"
+}
