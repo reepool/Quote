@@ -7095,48 +7095,86 @@ def test_returned_evidence_tail_leaves_room_for_the_next_source_page():
     assert ledger - charged - evidence_tail > 32_000
 
 
-def _send_page_13(fragment, report, identity, returned):
-    """Walk the owner from the real source response to the next page request."""
+def _continue_after_real_pages(pages, report, identity, returned):
+    """Bind the real source response on official pages, then continue."""
     import time
 
+    from research.company_profile.contracts import ReportViewCheck, ReportViewClaim
     from research.company_profile.direct_reading import interpret_direct_core
 
     empty = returned.model_copy(
         update={"source_conditions": (), "requested_pages": (), "target_condition_ids": ()}
     )
     seen: list = []
+    state = {"charged_before_page_13": None, "costs": []}
 
     class _Provider:
         offline_only = True
 
         def interpret(self, request):
-            seen.append(request)
-            pages = [int(page["page"]) for page in request.source_pages]
-            if request.source_scope == "page_map":
-                return empty.model_copy(update={"requested_pages": (9,)})
-            if 13 in pages:
-                return empty
-            return returned.model_copy(update={"requested_pages": (int(fragment["page"]),)})
+            from research.company_profile.reading_budget import request_reservation
 
-    interpret_direct_core(
+            seen.append(request)
+            numbers = [int(page["page"]) for page in request.source_pages]
+            state["costs"].append(
+                (request.purpose, request.source_scope, numbers, request_reservation(request))
+            )
+            if request.source_scope == "page_map":
+                return empty.model_copy(update={"requested_pages": ()})
+            if request.purpose == "synthesize_views":
+                claims = tuple(
+                    ReportViewClaim(
+                        claim_id=f"claim-{condition.condition_id.split(':')[-1]}",
+                        dimension=condition.dimension,
+                        status="observed",
+                        answer=condition.description,
+                        condition_ids=(condition.condition_id,),
+                        evidence=condition.evidence,
+                    )
+                    for condition in request.source_conditions
+                    if condition.statement_status == "current" and condition.major
+                )
+                return empty.model_copy(update={"claims": claims, "source_conditions": ()})
+            if request.purpose == "verify_views":
+                checks = tuple(
+                    ReportViewCheck(
+                        target_type="claim",
+                        target_id=claim.claim_id,
+                        status="pass",
+                        explanation="答案和引文都在已读正文里。",
+                        covers_target_type="claim",
+                        covers_target_id=claim.claim_id,
+                    )
+                    for claim in request.claims
+                )
+                return empty.model_copy(update={"checks": checks, "source_conditions": ()})
+            present = set(numbers)
+            if 13 in present and not (present & {9, 10, 11, 12}):
+                state["charged_before_page_13"] = int(
+                    identity.get("prior_charged_tokens") or 0
+                ) + int(identity.get("offline_charged_tokens") or 0)
+                return empty.model_copy(update={"requested_pages": (30,)})
+            if 30 in present and not (present & {9, 10, 11, 12, 13}):
+                return empty
+            kept = tuple(
+                condition
+                for condition in returned.source_conditions
+                if {int(evidence.page) for evidence in condition.evidence} <= present
+            )
+            return returned.model_copy(
+                update={"source_conditions": kept, "requested_pages": (13,)}
+            )
+
+    started = interpret_direct_core(
         report=report,
-        pages=[
-            {"page": 9, "text": "第三节 管理层讨论与分析\n公司主营业务说明。", "readable": True},
-            fragment,
-        ],
+        pages=pages,
         processing_identity=identity,
         provider=_Provider(),
         work_id="s37-next-page",
         token_budget=120_000,
         started_at=time.monotonic(),
     )
-    return (
-        request
-        for request in seen
-        if request.purpose == "source_inventory"
-        and request.source_scope == "full_context"
-        and any(int(page["page"]) == 13 for page in request.source_pages)
-    )
+    return started, seen, state
 
 
 def test_s35_next_source_page_is_sent_without_the_future_tail():
@@ -7145,11 +7183,7 @@ def test_s35_next_source_page_is_sent_without_the_future_tail():
     from pathlib import Path
 
     from research.company_profile.contracts import ReportSemanticResponseV3
-    from research.company_profile.direct_reading import (
-        _conditions_package_tail,
-        _units,
-        source_discovery_slices,
-    )
+    from research.company_profile.direct_reading import _conditions_package_tail
     from research.company_profile.report_interpretation import direct_core_processing_identity
 
     query = json.loads(
@@ -7177,108 +7211,76 @@ def test_s35_next_source_page_is_sent_without_the_future_tail():
         "stream": False,
         "stream_include_usage": True,
     }
-    tail = _conditions_package_tail(
-        response.source_conditions, report=report, identity=identity
-    )
-    charged = 24_434
-    room = 120_000 - charged - tail
+    identity["ledger_tokens"] = 120_000
+    identity["prior_charged_tokens"] = 24_434
+    identity["request_reservation_limit"] = 65_536
+    identity["compatible_continue"] = True
+    continued = response.model_copy(update={"requested_pages": (13,)})
+    identity["accepted_source_receipts"] = [
+        {
+            "request_id": "s35-source",
+            "purpose": "source_inventory",
+            "status": "success",
+            "source_scope": "full_context",
+            "source_pages": [9, 10, 11, 12],
+            "physical_request": False,
+            "response_payload": json.loads(continued.model_dump_json()),
+        }
+    ]
     cache = Path(
         "/home/python/Quote/data/filings/announcements/blobs/68/derived/"
         "business_profile_pdfium_recovery.v4/"
         "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c_"
         "57e1dd4f16ef40ff.json.gz"
     )
-    page = next(
-        item
+    official = {
+        int(item["page_number"]): item["text"]
         for item in json.loads(gzip.open(cache, "rt", encoding="utf-8").read())["pages"]
-        if int(item["page_number"]) == 13
+        if int(item["page_number"]) in range(9, 14)
+    }
+    pages = [
+        {"page": number, "text": official[number], "readable": True}
+        for number in range(9, 14)
+    ]
+    pages.append(
+        {"page": 30, "text": "未发送的必要续页。" + ("甲" * 80000), "readable": True}
     )
-    fragment = {"page": 13, "text": page["text"], "readable": True}
-    needed = _units(
-        [fragment],
-        purpose="source_inventory",
-        source_scope="full_context",
-        report=report,
-        identity=identity,
-        output=4000,
+    started, seen, state = _continue_after_real_pages(pages, report, identity, response)
+    original_ids = {item.condition_id for item in response.source_conditions}
+    kept_ids = {item.condition_id.split(":")[-1] for item in started.source_conditions}
+    assert original_ids <= kept_ids
+    assert sum(item.condition_id.split(":")[-1] in original_ids for item in started.source_conditions) == 11
+    assert started.tokens_charged >= 24_434
+    assert started.processing_identity["prior_charged_tokens"] == 24_434
+    assert any(claim.evidence for claim in started.claims)
+    assert "necessary_unread:13" not in started.gaps
+    assert "necessary_unread:30" in started.gaps
+    assert all(int(receipt.get("future_reserve_units") or 0) == 0 for receipt in started.call_receipts)
+    sent = next(
+        request
+        for request in seen
+        if request.purpose == "source_inventory"
+        and request.source_scope == "full_context"
+        and [int(page["page"]) for page in request.source_pages] == [13]
     )
-    assert needed <= room, (tail, room, needed)
-    packed = list(source_discovery_slices([fragment], report, identity, room))
-    assert packed and int(packed[0][0]["page"]) == 13
-    sent = next(request for request in _send_page_13(fragment, report, identity, response))
-    from research.company_profile.reading_budget import _meter_payload, request_reservation
-
-    payload = _meter_payload(sent, identity["meter_profile"])
-    assert payload["model"] == "deepseek-flash"
-    assert payload["max_tokens"] == sent.max_output_tokens
-    assert "max_completion_tokens" not in payload
-    assert request_reservation(sent) == len(
-        json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode()
-    ) + 256 + int(payload["max_tokens"])
-    from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
-    from utils.llm import LlmClient
-    from utils.llm.models import LlmResponse
-
-    class _Gateway:
-        def __init__(self):
-            self.requests = []
-
-        async def complete(self, gateway_request):
-            self.requests.append(gateway_request)
-            return LlmResponse(
-                status="ok",
-                raw_content="{}",
-                data={
-                    "schema_version": "company_profile_report_response.v3",
-                    "request_id": sent.request_id,
-                    "purpose": "source_inventory",
-                    "requested_pages": [],
-                    "source_conditions": [],
-                },
-                finish_reason="stop",
-                usage=None,
-                request_id="gateway-s37",
-                provider_request_id=None,
-                request_hash="a" * 64,
-                response_hash="b" * 64,
-                schema_name=gateway_request.schema_name,
-                schema_version=gateway_request.schema_version,
-                structured_output_mode="json_object",
-                latency_ms=1,
-                attempt_count=1,
-                provider="deepseek",
-                model="deepseek-flash",
-                selected_profile="semantic_extraction__deepseek",
-                source_label="deepseek:deepseek-flash",
-                failover_count=0,
-                attempts=(),
-                warnings=(),
-            )
-
-    gateway = _Gateway()
-    CommonGatewaySemanticProvider(
-        client=gateway,
-        profile="semantic_extraction",
-        max_output_tokens=4000,
-        timeout_seconds=30,
-    ).interpret(sent)
-    captured = gateway.requests[0]
-    wire = LlmClient._build_payload(
-        model=identity["meter_profile"]["model"],
-        messages=[
-            {"role": message.role, "content": message.content}
-            for message in captured.messages
-        ],
-        schema=captured.response_schema,
-        schema_name=captured.schema_name,
-        mode="json_object",
-        temperature=0,
-        max_output_tokens=captured.max_output_tokens,
-        max_output_tokens_field=identity["meter_profile"]["max_output_tokens_field"],
-        stream=bool(identity["meter_profile"]["stream"]),
-        stream_include_usage=bool(identity["meter_profile"]["stream_include_usage"]),
+    assert seen.index(next(request for request in seen if request.purpose == "synthesize_views")) < seen.index(sent)
+    old_identity = dict(identity)
+    old_identity.pop("meter_profile")
+    old_tail = _conditions_package_tail(
+        response.source_conditions, report=report, identity=old_identity
     )
-    assert wire == payload
+    from research.company_profile.reading_budget import request_reservation
+
+    page13_at = next(
+        index
+        for index, item in enumerate(state["costs"])
+        if item[0] == "source_inventory" and item[1] == "full_context" and item[2] == [13]
+    )
+    charged_before = 24_434 + sum(item[3] for item in state["costs"][:page13_at])
+    units = request_reservation(sent)
+    assert charged_before >= 24_434
+    assert charged_before + units <= 120_000
+    assert charged_before + units + old_tail > 120_000
 
 
 def test_native_role_coverage_does_not_need_the_fixed_question_id():

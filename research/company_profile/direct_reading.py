@@ -2487,6 +2487,7 @@ def interpret_direct_core(
                 "status": "success",
                 "source_scope": source_scope,
                 "source_pages": [int(page["page"]) for page in request.source_pages],
+                "future_reserve_units": int(later),
                 "request_targets": request_targets,
                 "response_payload": response.model_dump(mode="json"),
                 "physical_request": True,
@@ -3454,7 +3455,9 @@ def interpret_direct_core(
                     source_scope="page_map",
                     output=_nav_output(identity),
                     later=(
-                        _first_delivery_tail(
+                        0
+                        if measure_current_request
+                        else _first_delivery_tail(
                             reserve_pages,
                             report=report,
                             identity=identity,
@@ -3563,7 +3566,8 @@ def interpret_direct_core(
             if prepared and prepared_pages == {int(page["page"]) for page in chosen}:
                 packages = list(prepared)
             else:
-                room = ledger - charged() - (source_later if keep_tail else 0)
+                held = 0 if measure_current_request or not keep_tail else source_later
+                room = ledger - charged() - held
                 slice_limit = max(1024, min(limit, room))
                 packages = list(
                     source_discovery_slices(chosen, report, identity, slice_limit)
@@ -3615,7 +3619,7 @@ def interpret_direct_core(
                     package,
                     source_scope="full_context",
                     output=_source_output(identity),
-                    later=source_later if keep_tail else 0,
+                    later=0 if measure_current_request or not keep_tail else source_later,
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
                 text = str(exc)
@@ -3675,6 +3679,8 @@ def interpret_direct_core(
             accepted = compact_source_conditions(accepted)
             gaps.extend(location_gaps)
             conditions.extend(accepted)
+            if measure_current_request and accepted:
+                draft_ready_core()
             for page_no in reviewed.requested_pages:
                 page_no = int(page_no)
                 if page_no in by_page and page_no not in inventoried and page_no not in follow:
@@ -3959,7 +3965,12 @@ def interpret_direct_core(
         settle_claims([*drafted, *extra_claims], [*draft_conditions, *extra_conds])
         publish()
 
-    def deliver_group(group: list[ReportSourceCondition], *, recovered: bool = False) -> None:
+    def deliver_group(
+        group: list[ReportSourceCondition],
+        *,
+        recovered: bool = False,
+        defer_verify: bool = False,
+    ) -> None:
         """Save one business group, verify it, and publish before the next group."""
         pending = [
             condition
@@ -4111,6 +4122,9 @@ def interpret_direct_core(
             publish()
         for condition in pending:
             drafted_condition_ids.add(condition.condition_id)
+        if defer_verify:
+            publish()
+            return
         located_conditions = []
         for condition in pending:
             bound_evidence = []
@@ -4171,7 +4185,7 @@ def interpret_direct_core(
                 settle_claims(related, quiet)
                 publish()
 
-    def draft_ready_core() -> None:
+    def draft_ready_core(*, defer_verify: bool = False) -> None:
         """Draft the next core group once principal and revenue evidence both exist."""
         pending = [
             condition
@@ -4194,7 +4208,7 @@ def interpret_direct_core(
             {"revenue_model", "products_services"} & dims
         ):
             return
-        deliver_group(_business_groups(pending)[0])
+        deliver_group(_business_groups(pending)[0], defer_verify=defer_verify)
 
     chapter_required_pages: set[int] | None = None
     isolated_condition_ids: set[str] = set()
@@ -4235,6 +4249,8 @@ def interpret_direct_core(
                     continue
                 by_page[page_no]["status"] = "read"
                 by_page[page_no]["reused_source"] = True
+                if measure_current_request:
+                    inventoried.add(page_no)
         conditions_to_draft = []
         pending_core: list[ReportViewClaim] = []
         prior = identity.get("accepted_prior_draft") or {}
@@ -4569,6 +4585,8 @@ def interpret_direct_core(
                 ):
                     saved_follow.append(page_no)
         if (repair_pages or saved_follow) and not identity.get("saved_source_draft"):
+            if measure_current_request and conditions:
+                draft_ready_core(defer_verify=True)
             known_ids = {condition.condition_id for condition in conditions}
             chapter_required_pages = {
                 int(item["page"]) for item in coverage if item["status"] == "read"
@@ -4580,6 +4598,14 @@ def interpret_direct_core(
                 if int(page) in by_page and int(page) not in repair_pages
             ]
             read_requested_follow(expand)
+            if measure_current_request:
+                pending_claims = [
+                    claim
+                    for claim in claims
+                    if claim.limitation == "pending_verification"
+                ]
+                if pending_claims:
+                    settle_claims(pending_claims, conditions)
             touched = repair_pages | set(saved_follow) | set(chapter_required_pages)
             fresh = [
                 condition
@@ -5212,7 +5238,7 @@ def interpret_direct_core(
                     gaps.append(f"chapter_core_slice_unbounded:{admitted['error']}")
                 elif not admitted["fits_ledger"]:
                     gaps.append("chapter_core_package_exceeds_ledger")
-            elif candidate_pages:
+            elif candidate_pages and not measure_current_request:
                 source_later = _first_delivery_tail(
                     candidate_pages, report=report, identity=identity, limit=limit
                 )
