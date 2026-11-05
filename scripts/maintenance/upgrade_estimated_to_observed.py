@@ -68,6 +68,7 @@ def main() -> int:
             key = (row["instrument_id"], row["report_period"])
             observed = None
             observed_source = None
+            period_end = row["report_period"][:10]
             for source in (
                 "source_file",
                 "statements_raw",
@@ -75,7 +76,9 @@ def main() -> int:
                 "disclosure_event",
             ):
                 value = evidence.get(source, {}).get(key)
-                if value:
+                # impossible evidence (before the period end, issuer title
+                # typos) never upgrades a statutory fallback row
+                if value and value >= period_end:
                     observed, observed_source = value, source
                     break
             if not observed:

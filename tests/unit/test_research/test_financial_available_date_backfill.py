@@ -260,3 +260,52 @@ def test_statutory_fallback_keeps_publish_date_null_on_wide_table(tmp_path):
         ).fetchone()
     assert row[0] == "2024-10-31"
     assert row[1] is None
+
+
+def test_backfill_rejects_evidence_before_period_end(tmp_path):
+    """Issuer title-year typos (a "2024年年度报告" filed in March 2024)
+    produce evidence dated before the period end; such evidence must be
+    rejected so the statutory fallback applies instead (PIT guard moved
+    from acceptance-time to write-time)."""
+    db_path = tmp_path / "financials.db"
+    with sqlite3.connect(db_path) as conn:
+        _create_core_table(conn, "financial_facts")
+        conn.execute(
+            """
+            CREATE TABLE announcement_audit (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                purpose_key TEXT,
+                instrument_id TEXT,
+                published_at TEXT,
+                selection_reasons_json TEXT
+            )
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO financial_facts (
+                instrument_id, report_period, exchange, fiscal_year, fiscal_quarter,
+                lineage_json
+            ) VALUES ('600582.SH', '2024-12-31', 'SSE', 2024, 4, '{}')
+            """
+        )
+        # impossible evidence: 2024 annual "report" announced in March
+        conn.execute(
+            """
+            INSERT INTO announcement_audit
+                (purpose_key, instrument_id, published_at, selection_reasons_json)
+            VALUES ('historical_disclosure_date_survey', '600582.SH',
+                    '2024-03-20T16:00:00+00:00',
+                    '["inferred_report_period=2024-12-31"]')
+            """
+        )
+
+    report = backfill_financial_available_dates(db_path, write_enabled=True)
+
+    assert report.source_counts == {"estimated_statutory_deadline": 1}
+    with sqlite3.connect(db_path) as conn:
+        row = conn.execute(
+            "SELECT data_available_date, publish_date FROM financial_facts"
+        ).fetchone()
+    assert row[0] == "2025-04-30"          # statutory fallback, not 2024-03-21
+    assert row[1] is None

@@ -282,11 +282,21 @@ def _resolve_available_date(
     evidence: Dict[str, Dict[tuple[str, str], str]],
 ) -> Optional[Dict[str, str]]:
     key = (str(row["instrument_id"]), str(row["report_period"]))
-    publish_date = _normalize_date(row["publish_date"])
+    period_end = str(row["report_period"])[:10]
+
+    def _usable(value: Optional[str]) -> Optional[str]:
+        # evidence dated before the period end is impossible (issuer
+        # title-year typos, e.g. "2024年年度报告" filed in March 2024):
+        # reject it and let the statutory fallback apply instead
+        if value and value >= period_end:
+            return value
+        return None
+
+    publish_date = _usable(_normalize_date(row["publish_date"]))
     if publish_date:
         return {"date": publish_date, "source": "core_publish_date", "quality": "observed"}
     for source_name in ("source_file", "statements_raw", "survey_audit", "disclosure_event"):
-        value = evidence[source_name].get(key)
+        value = _usable(evidence[source_name].get(key))
         if value:
             return {"date": value, "source": source_name, "quality": "observed"}
     estimated = _estimated_statutory_deadline(
