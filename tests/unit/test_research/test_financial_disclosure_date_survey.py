@@ -355,3 +355,34 @@ async def test_survey_bisects_page_exhausted_segments(tmp_path):
     assert "SSE:2024-06-30:2024-08-16~2024-08-31" not in completed
     # the bisection record was harvested from a half
     assert report["audit_written"] == 1
+
+
+def test_period_category_mapping_is_exact():
+    """The report-period -> single-category map is the correctness core:
+    a wrong pairing (e.g. Q3 window querying the semiannual category)
+    would silently harvest the wrong announcements. Lock every entry."""
+    from research.announcements.categories import (
+        ANNUAL_REPORT_CATEGORY,
+        FIRST_QUARTER_REPORT_CATEGORY,
+        SEMIANNUAL_REPORT_CATEGORY,
+        THIRD_QUARTER_REPORT_CATEGORY,
+        cninfo_category_value,
+    )
+    from research.financial_disclosure_date_survey import (
+        PERIOD_CATEGORY,
+        _window_category,
+    )
+
+    assert PERIOD_CATEGORY == {
+        "03-31": FIRST_QUARTER_REPORT_CATEGORY,
+        "06-30": SEMIANNUAL_REPORT_CATEGORY,
+        "09-30": THIRD_QUARTER_REPORT_CATEGORY,
+        "12-31": ANNUAL_REPORT_CATEGORY,
+    }
+    # each maps to the correct live cninfo category token
+    assert cninfo_category_value(_window_category("2024-03-31")) == "category_yjdbg_szsh"
+    assert cninfo_category_value(_window_category("2024-06-30")) == "category_bndbg_szsh"
+    assert cninfo_category_value(_window_category("2024-09-30")) == "category_sjdbg_szsh"
+    assert cninfo_category_value(_window_category("2023-12-31")) == "category_ndbg_szsh"
+    # unknown period falls back to the joint periodic filter
+    assert _window_category("2024-05-15") == "periodic_report"
