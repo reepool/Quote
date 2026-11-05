@@ -22,7 +22,7 @@ REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO))
 
 from research.financial_disclosure_date_survey import (  # noqa: E402
-    DEFAULT_MAX_PAGES,
+    SAFE_MAX_PAGES,
     SURVEY_PURPOSE_KEY,
     survey_historical_disclosure_dates,
 )
@@ -147,8 +147,12 @@ def main() -> int:
     parser.add_argument(
         "--max-pages",
         type=int,
-        default=DEFAULT_MAX_PAGES,
-        help="Page cap per window (default shared with the survey module).",
+        default=SAFE_MAX_PAGES,
+        help=(
+            "Page cap per segment query. Segments exhausting this cap are "
+            "auto-bisected by the survey core; the cap must stay under "
+            "the cninfo pagination rewind ceiling (~110 pages)."
+        ),
     )
     parser.add_argument(
         "--checkpoint",

@@ -76,8 +76,8 @@ def test_build_survey_windows_half_month_segments():
         ("2024-06-16", "2024-06-29"),
     ]
     # keys are per-segment so checkpoints resume at half-month grain
-    assert windows[0].key == "SSE:2024-03-31:2024-03-31"
-    assert windows[1].key == "SSE:2024-03-31:2024-04-01"
+    assert windows[0].key == "SSE:2024-03-31:2024-03-31~2024-03-31"
+    assert windows[1].key == "SSE:2024-03-31:2024-04-01~2024-04-15"
 
 
 def test_build_survey_windows_segment_never_crosses_season_tail():
@@ -173,8 +173,8 @@ async def test_survey_aborts_on_403_and_leaves_remaining_windows(tmp_path):
     assert report["aborted"] is True
     assert "403" in (report["abort_reason"] or "")
     state = load_checkpoint(cp)
-    assert state["completed_windows"] == ["SSE:2024-09-30:2024-09-30"]
-    assert state["failed_windows"] == ["SSE:2024-09-30:2024-10-01"]
+    assert state["completed_windows"] == ["SSE:2024-09-30:2024-09-30~2024-09-30"]
+    assert state["failed_windows"] == ["SSE:2024-09-30:2024-10-01~2024-10-15"]
     # later segments never requested: first segment + refusing segment only
     assert len(calls) == 2
 
@@ -205,7 +205,7 @@ async def test_survey_resumes_from_checkpoint(tmp_path):
     # every completed segment was skipped: no acquire inside its range
     acquired_starts = [q.scope.start_date for q in calls]
     for w in done_season_keys:
-        seg_start = w.rsplit(":", 1)[1]
+        seg_start = w.rsplit(":", 1)[1].split("~")[0]
         assert seg_start not in acquired_starts
     assert all(
         r["skipped"] == "checkpoint_completed"
@@ -286,9 +286,72 @@ async def test_survey_degraded_window_is_incomplete_not_completed(tmp_path):
     # degraded window: not aborted, audit rows kept, but marked incomplete
     assert report["aborted"] is False
     assert report["audit_written"] == 1
-    assert report["incomplete_windows"] == ["SSE:2024-03-31:2024-03-31"]
+    assert report["incomplete_windows"] == ["SSE:2024-03-31:2024-03-31~2024-03-31"]
     state = load_checkpoint(cp)
     # every later segment of the season completed normally
-    assert "SSE:2024-03-31:2024-04-01" in state["completed_windows"]
-    assert "SSE:2024-03-31:2024-06-16" in state["completed_windows"]
-    assert state["incomplete_windows"] == ["SSE:2024-03-31:2024-03-31"]
+    assert "SSE:2024-03-31:2024-04-01~2024-04-15" in state["completed_windows"]
+    assert "SSE:2024-03-31:2024-06-16~2024-06-29" in state["completed_windows"]
+    assert state["incomplete_windows"] == ["SSE:2024-03-31:2024-03-31~2024-03-31"]
+
+
+@pytest.mark.asyncio
+async def test_survey_bisects_page_exhausted_segments(tmp_path):
+    """A half-month segment that exhausts the safe page cap is bisected
+    into two halves which are scanned and checkpointed individually
+    (deadline pile-ups exceed the cninfo rewind ceiling per query)."""
+    acquire, calls = _fake_acquire(
+        {
+            # the first half-month segment is oversized -> bisect
+            "2024-08-16": _Result(status="degraded", records=[]),
+            # bisected halves succeed
+            "2024-08-16x": None,  # placeholder replaced below by date math
+        }
+    )
+
+    from datetime import date as _date, timedelta as _td
+
+    start = _date(2024, 8, 16)
+    end = _date(2024, 8, 31)
+    mid = start + _td(days=(end - start).days // 2)          # 2024-08-23
+    left_key = mid.isoformat()
+    right_key = (mid + _td(days=1)).isoformat()
+
+    async def acquire_dynamic(query):
+        calls.append(query)
+        sd, ed = query.scope.start_date, query.scope.end_date
+        # only the full half-month segment is oversized; halves succeed
+        if sd == "2024-08-16" and ed == "2024-08-31":
+            return _Result(status="degraded", records=[])
+        if sd in (left_key, right_key):
+            return _Result(
+                records=[_Record(title="某公司2024年半年度报告", symbols=("000001",))]
+            )
+        return _Result()
+
+    write, written = _writer()
+
+    report = await survey_historical_disclosure_dates(
+        exchanges=["SSE"],
+        report_periods=["2024-06-30"],
+        acquire=acquire_dynamic,
+        audit_writer=write,
+        instrument_map={("SSE", "000001"): "000001.SZ"},
+        checkpoint_path=tmp_path / "checkpoint.json",
+        probe_enabled=False,
+        today=_date(2024, 12, 31),
+    )
+
+    assert report["aborted"] is False
+    assert report["incomplete_windows"] == []
+    bisect_events = [
+        r for r in report["window_results"] if "bisected_into" in r
+    ]
+    assert len(bisect_events) == 1
+    state = load_checkpoint(tmp_path / "checkpoint.json")
+    completed = set(state["completed_windows"])
+    assert f"SSE:2024-06-30:2024-08-16~{mid.isoformat()}" in completed
+    assert f"SSE:2024-06-30:{right_key}~2024-08-31" in completed
+    # the oversized parent itself is NOT marked completed
+    assert "SSE:2024-06-30:2024-08-16~2024-08-31" not in completed
+    # the bisection record was harvested from a half
+    assert report["audit_written"] == 1

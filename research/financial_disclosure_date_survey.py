@@ -27,7 +27,23 @@ from typing import Any, Awaitable, Callable, Dict, Iterable, List, Mapping, Opti
 from research.financial_available_date_backfill import (
     statutory_deadline_for_period_end,
 )
+from research.announcements.categories import (
+    ANNUAL_REPORT_CATEGORY,
+    FIRST_QUARTER_REPORT_CATEGORY,
+    SEMIANNUAL_REPORT_CATEGORY,
+    THIRD_QUARTER_REPORT_CATEGORY,
+)
 from research.financial_disclosure_events import infer_report_periods_from_title
+
+# exact single-category per report period: quarter-sized queries keep the
+# cninfo pagination far below the ~110-page rewind ceiling (April worst
+# case ~49 pages per half-month segment on the Q1 category)
+PERIOD_CATEGORY = {
+    "03-31": FIRST_QUARTER_REPORT_CATEGORY,
+    "06-30": SEMIANNUAL_REPORT_CATEGORY,
+    "09-30": THIRD_QUARTER_REPORT_CATEGORY,
+    "12-31": ANNUAL_REPORT_CATEGORY,
+}
 
 SURVEY_PURPOSE_KEY = "historical_disclosure_date_survey"
 
@@ -69,11 +85,12 @@ def parse_inferred_report_period(text: Any) -> str:
 # late-disclosure tail appended to each statutory deadline (design D1)
 LATE_TAIL_DAYS = 60
 
+# cninfo rewinds to page-one content beyond ~110 pages per query; keep
+# segments under this ceiling and bisect any segment that exhausts it
+# (deadline-week pile-ups reach 130+ pages even on a single category).
+SAFE_MAX_PAGES = 90
+
 _DEFAULT_PAGE_SIZE = 30
-# Peak seasons overlap the next season inside the deadline+tail window and
-# cninfo pages newest-first: annual/Q1 windows must hold two seasons
-# (~7.5k records per exchange). The runner imports this same default.
-DEFAULT_MAX_PAGES = 250
 
 AcquireFn = Callable[[Any], Awaitable[Any]]
 AuditWriterFn = Callable[[str, Any, Optional[str]], None]
@@ -98,7 +115,7 @@ class SurveyWindow:
 
     @property
     def key(self) -> str:
-        return f"{self.exchange}:{self.report_period}:{self.start_date}"
+        return f"{self.exchange}:{self.report_period}:{self.start_date}~{self.end_date}"
 
 
 def build_survey_windows(
@@ -201,11 +218,15 @@ def _window_probe_query(window: SurveyWindow):
         market=window.exchange,
         start_date=window.start_date,
         end_date=one_day_end.isoformat(),
-        category="periodic_report",
+        category=_window_category(window.report_period),
         page_size=5,
         max_pages=1,
     )
     return AnnouncementQuery(purpose_key=SURVEY_PURPOSE_KEY, scope=scope)
+
+
+def _window_category(report_period: str) -> str:
+    return PERIOD_CATEGORY.get(report_period[-5:], "periodic_report")
 
 
 def _window_query(window: SurveyWindow, *, page_size: int, max_pages: int):
@@ -216,7 +237,7 @@ def _window_query(window: SurveyWindow, *, page_size: int, max_pages: int):
         market=window.exchange,
         start_date=window.start_date,
         end_date=window.end_date,
-        category="periodic_report",
+        category=_window_category(window.report_period),
         page_size=page_size,
         max_pages=max_pages,
     )
@@ -243,7 +264,7 @@ async def survey_historical_disclosure_dates(
     instrument_map: Mapping[Tuple[str, str], str],
     checkpoint_path: Path,
     page_size: int = _DEFAULT_PAGE_SIZE,
-    max_pages: int = DEFAULT_MAX_PAGES,
+    max_pages: int = SAFE_MAX_PAGES,
     probe_enabled: bool = True,
     write_enabled: bool = True,
     today: Optional[date] = None,
@@ -294,88 +315,119 @@ async def survey_historical_disclosure_dates(
             )
             continue
 
-        result = await acquire(
-            _window_query(window, page_size=page_size, max_pages=max_pages)
-        )
-        status, errors = _result_errors(result)
-        records = list(getattr(result, "records", None) or [])
-        window_result: Dict[str, Any] = {
-            "window": window.key,
-            "status": status,
-            "records": len(records),
-            "audit_written": 0,
-        }
-
-        if _is_access_refusal(errors) or status == "failed":
-            window_result["aborted_window"] = True
-            if errors:
-                window_result["errors"] = errors[:3]
-            failed.append(window.key)
-            report["window_results"].append(window_result)
-            report["aborted"] = True
-            report["abort_reason"] = (
-                f"access refused on {window.key} (status={status!r}, "
-                f"errors={errors[:3]}); remaining windows left for the "
-                "next scheduled run"
+        bisect_queue: List[SurveyWindow] = [window]
+        window_keys_completed: List[str] = []
+        while bisect_queue:
+            active = bisect_queue.pop(0)
+            result = await acquire(
+                _window_query(active, page_size=page_size, max_pages=max_pages)
             )
-            save_checkpoint(
-                checkpoint_path,
-                {
-                    "completed_windows": completed,
-                    "failed_windows": failed,
-                    "incomplete_windows": incomplete,
-                },
-            )
-            return report
+            status, errors = _result_errors(result)
+            records = list(getattr(result, "records", None) or [])
 
-        if status not in {"success", "success_empty"}:
-            # degraded scans (e.g. max_pages_exhausted) did not see the
-            # whole window: record what was captured but do NOT mark the
-            # window complete, so a rerun with a higher page cap resumes it.
-            window_result["incomplete_window"] = True
-            incomplete.append(window.key)
-            report["incomplete_windows"].append(window.key)
-
-        if write_enabled:
-            for record in records:
-                # Windows overlap the neighbouring disclosure season
-                # (deadline + late tail): harvest every periodic report the
-                # scan sees, tagged with the period inferred from ITS OWN
-                # title, not just the window's period. Filtering to the
-                # window period alone discarded ~half of each overlapping
-                # window's announcements (found in implementation review).
-                inferred_periods = sorted(
+            if _is_access_refusal(errors) or status == "failed":
+                report["window_results"].append(
                     {
-                        period
-                        for period in infer_report_periods_from_title(
-                            record.title or ""
-                        )
-                        if period in target_periods
+                        "window": active.key,
+                        "status": status,
+                        "records": len(records),
+                        "aborted_window": True,
+                        "errors": errors[:3],
                     }
                 )
-                if not inferred_periods:
-                    continue
-                symbol = record.symbols[0] if record.symbols else None
-                instrument_id = instrument_map.get((window.exchange, symbol or ""))
-                if not instrument_id:
-                    continue
-                # selection_reasons is Tuple[str, ...] on the record model:
-                # carry the inferred period as plain string tokens.
-                tagged = record.with_selection_reasons(
-                    [
-                        *(record.selection_reasons or ()),
-                        *(inferred_period_reason(p) for p in inferred_periods),
-                    ]
+                failed.append(active.key)
+                report["aborted"] = True
+                report["abort_reason"] = (
+                    f"access refused on {active.key} (status={status!r}, "
+                    f"errors={errors[:3]}); remaining windows left for the "
+                    "next scheduled run"
                 )
-                audit_writer(SURVEY_PURPOSE_KEY, tagged, instrument_id)
-                window_result["audit_written"] += 1
-                report["audit_written"] += 1
-        report["records_seen"] += len(records)
-        report["window_results"].append(window_result)
+                save_checkpoint(
+                    checkpoint_path,
+                    {
+                        "completed_windows": completed,
+                        "failed_windows": failed,
+                        "incomplete_windows": incomplete,
+                    },
+                )
+                return report
 
-        if window.key not in incomplete:
-            completed.append(window.key)
-            completed_set.add(window.key)
+            if (
+                status not in {"success", "success_empty"}
+                and _bisectable(active)
+            ):
+                # page exhaustion inside the safe ceiling means the segment
+                # is bigger than one query can page: bisect and retry both
+                # halves (deadline pile-ups can exceed 130 pages/category)
+                left, right = _bisect_window(active)
+                report["window_results"].append(
+                    {
+                        "window": active.key,
+                        "status": status,
+                        "records": len(records),
+                        "bisected_into": [left.key, right.key],
+                    }
+                )
+                bisect_queue.insert(0, right)
+                bisect_queue.insert(0, left)
+                continue
+
+            window_result: Dict[str, Any] = {
+                "window": active.key,
+                "status": status,
+                "records": len(records),
+                "audit_written": 0,
+            }
+            if status not in {"success", "success_empty"}:
+                # not exhaustible further (single day) - record as is
+                window_result["incomplete_window"] = True
+                incomplete.append(active.key)
+                report["incomplete_windows"].append(active.key)
+
+            if write_enabled:
+                for record in records:
+                    # Windows overlap the neighbouring disclosure season
+                    # (deadline + late tail) and now carry a single report
+                    # category: harvest every periodic report the scan
+                    # sees, tagged with the period inferred from ITS OWN
+                    # title. Filtering to the window period alone
+                    # discarded ~half of each overlapping window's
+                    # announcements (found in implementation review).
+                    inferred_periods = sorted(
+                        {
+                            period
+                            for period in infer_report_periods_from_title(
+                                record.title or ""
+                            )
+                            if period in target_periods
+                        }
+                    )
+                    if not inferred_periods:
+                        continue
+                    symbol = record.symbols[0] if record.symbols else None
+                    instrument_id = instrument_map.get(
+                        (active.exchange, symbol or "")
+                    )
+                    if not instrument_id:
+                        continue
+                    # selection_reasons is Tuple[str, ...] on the record
+                    # model: carry the inferred period as plain tokens.
+                    tagged = record.with_selection_reasons(
+                        [
+                            *(record.selection_reasons or ()),
+                            *(inferred_period_reason(p) for p in inferred_periods),
+                        ]
+                    )
+                    audit_writer(SURVEY_PURPOSE_KEY, tagged, instrument_id)
+                    window_result["audit_written"] += 1
+                    report["audit_written"] += 1
+            report["records_seen"] += len(records)
+            report["window_results"].append(window_result)
+
+            if active.key not in incomplete:
+                completed.append(active.key)
+                completed_set.add(active.key)
+
         save_checkpoint(
             checkpoint_path,
             {
@@ -386,3 +438,29 @@ async def survey_historical_disclosure_dates(
         )
 
     return report
+
+
+def _bisectable(window: SurveyWindow) -> bool:
+    start = date.fromisoformat(window.start_date)
+    end = date.fromisoformat(window.end_date)
+    return (end - start).days >= 1
+
+
+def _bisect_window(window: SurveyWindow) -> tuple[SurveyWindow, SurveyWindow]:
+    start = date.fromisoformat(window.start_date)
+    end = date.fromisoformat(window.end_date)
+    span = (end - start).days
+    mid = start + timedelta(days=span // 2)
+    left = SurveyWindow(
+        exchange=window.exchange,
+        report_period=window.report_period,
+        start_date=start.isoformat(),
+        end_date=mid.isoformat(),
+    )
+    right = SurveyWindow(
+        exchange=window.exchange,
+        report_period=window.report_period,
+        start_date=(mid + timedelta(days=1)).isoformat(),
+        end_date=end.isoformat(),
+    )
+    return left, right
