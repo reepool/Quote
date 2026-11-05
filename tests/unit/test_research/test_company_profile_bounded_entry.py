@@ -195,6 +195,14 @@ def test_deepseek_process_uses_documented_max_tokens_only(pool_binding):
         "provider_resource": "deepseek",
         "max_output_tokens_field": "max_completion_tokens",
     }
+    raw["profiles"]["semantic__deepseek_other"] = {
+        **raw["profiles"]["semantic__grok"],
+        "name": "semantic__deepseek_other",
+        "source_label": "deepseek:other",
+        "model": "deepseek-flash",
+        "provider_resource": "deepseek",
+        "max_output_tokens_field": "max_completion_tokens",
+    }
     raw["profiles"]["semantic__alias"] = {
         **raw["profiles"]["semantic__grok"],
         "name": "semantic__alias",
@@ -223,7 +231,10 @@ def test_deepseek_process_uses_documented_max_tokens_only(pool_binding):
     binding["route_fingerprint"] = LlmConfig.from_mapping(raw).route_fingerprint("semantic")
     config, prices = prepare_gateway(binding, raw, real=False)
     assert config.profiles["semantic__deepseek"].max_output_tokens_field == "max_tokens"
+    assert config.profiles["semantic__deepseek"].disable_thinking is True
     assert config.profiles["semantic__alias"].max_output_tokens_field == "max_completion_tokens"
+    assert config.profiles["semantic__alias"].disable_thinking is False
+    assert config.profiles["semantic__deepseek_other"].disable_thinking is False
     budget = LlmRunBudget(deadline=time.monotonic() + 10, prices=prices)
     transport = ScriptedTransport(
         [{"data": {"choices": [{"message": {"content": '{"label":"ok"}'}, "finish_reason": "stop"}]}}]
@@ -233,7 +244,52 @@ def test_deepseek_process_uses_documented_max_tokens_only(pool_binding):
     )
     sent = transport.calls[0]["payload"]
     assert sent["max_tokens"] == 100
+    assert sent["thinking"] == {"type": "disabled"}
     assert "max_completion_tokens" not in sent
+    from research.company_profile.bounded_entry import _meter_profile
+
+    meter = _meter_profile(config, binding)
+    assert meter["disable_thinking"] is True
+    from research.company_profile.contracts import ReportSemanticRequestV3
+    from research.company_profile.reading_budget import _meter_payload
+    from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
+    from tests.unit.test_research.test_company_profile_llm_led import _report
+
+    report = _report()
+    staged = ScriptedTransport(
+        [
+            {"data": {"choices": [{"message": {"content": "{}"}, "finish_reason": "stop"}]}}
+        ] * 3
+    )
+    provider = CommonGatewaySemanticProvider(
+        client=_client(staged, budget, config),
+        profile="semantic",
+        max_output_tokens=4000,
+        timeout_seconds=30,
+    )
+    for purpose, scope, output in (
+        ("source_inventory", "page_map", 1000),
+        ("source_inventory", "full_context", 4000),
+        ("synthesize_views", "full_context", 2500),
+    ):
+        reading = ReportSemanticRequestV3(
+            request_id=f"mode-{purpose}-{scope}",
+            purpose=purpose,
+            report=report,
+            processing_identity={"chapter_select": True, "meter_profile": meter},
+            source_pages=({"page": 9, "text": "公司主营业务。", "readable": True},),
+            source_scope=scope,
+            max_output_tokens=output,
+            timeout_seconds=30,
+        )
+        try:
+            provider.interpret(reading)
+        except Exception:
+            pass
+        wire = staged.calls[-1]["payload"]
+        assert wire["thinking"] == {"type": "disabled"}
+        assert wire["max_tokens"] == output
+        assert wire == _meter_payload(reading, meter)
 
 
 def test_length_finish_is_not_a_complete_reading():

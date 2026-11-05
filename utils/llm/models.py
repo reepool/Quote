@@ -199,6 +199,7 @@ class LlmProfile:
     max_output_tokens_field: str = "max_tokens"
     stream: bool = False
     stream_include_usage: bool = True
+    disable_thinking: bool = False
     max_retry_after_seconds: float = 30.0
     retry_backoff_seconds: float = 0.5
     retry_jitter_ratio: float = 0.2

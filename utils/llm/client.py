@@ -740,6 +740,7 @@ class LlmClient:
                 max_output_tokens_field=profile.max_output_tokens_field,
                 stream=profile.stream,
                 stream_include_usage=profile.stream_include_usage,
+                disable_thinking=profile.disable_thinking,
             )
             request_identity = {
                 "profile": profile.name,
@@ -1620,6 +1621,7 @@ class LlmClient:
         max_output_tokens_field: str,
         stream: bool,
         stream_include_usage: bool,
+        disable_thinking: bool = False,
     ) -> dict[str, Any]:
         provider_messages = list(messages)
         payload: dict[str, Any] = {
@@ -1627,6 +1629,8 @@ class LlmClient:
             "messages": provider_messages,
             "temperature": float(temperature),
         }
+        if disable_thinking:
+            payload["thinking"] = {"type": "disabled"}
         if max_output_tokens is not None:
             payload[max_output_tokens_field] = int(max_output_tokens)
         if stream:

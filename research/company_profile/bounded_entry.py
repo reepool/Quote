@@ -1173,12 +1173,14 @@ def _meter_profile(config, binding: dict) -> dict:
         "max_output_tokens_field": selected.max_output_tokens_field,
         "stream": bool(selected.stream),
         "stream_include_usage": bool(selected.stream_include_usage),
+        "disable_thinking": bool(getattr(selected, "disable_thinking", False)),
     }
 
 
 def _documented_deepseek_output_field(config, selected_names: set[str]):
-    """Use documented max_tokens only for the official DeepSeek profile this task sends.
+    """Adapt only the official DeepSeek profile this task sends.
 
+    That profile uses documented max_tokens and explicitly disables thinking.
     A third-party route is unchanged when its model name merely contains
     deepseek. The shared config file is left unchanged.
     """
@@ -1189,7 +1191,11 @@ def _documented_deepseek_output_field(config, selected_names: set[str]):
     for name, profile in config.profiles.items():
         resource = config.resource_for_profile(profile).name
         if name in selected_names and resource == "deepseek":
-            profiles[name] = replace(profile, max_output_tokens_field="max_tokens")
+            profiles[name] = replace(
+                profile,
+                max_output_tokens_field="max_tokens",
+                disable_thinking=True,
+            )
             changed = True
         else:
             profiles[name] = profile

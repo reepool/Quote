@@ -96,6 +96,7 @@ def _meter_payload(request: ReportSemanticRequestV3, meter: Mapping[str, Any]):
         max_output_tokens_field=str(meter.get("max_output_tokens_field") or "max_tokens"),
         stream=bool(meter.get("stream")),
         stream_include_usage=bool(meter.get("stream_include_usage", True)),
+        disable_thinking=bool(meter.get("disable_thinking")),
     )
 
 
