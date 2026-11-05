@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-11-04，[B交接§195](#195-b交接364主体续页与输出字段)）：§36.4已交。主体误提名已收窄。S35真实11条件下第13–16页仍装不进剩余额度，当前“留足成稿核验再续读”策略到此结束。S32仍是执行2/12、核心0。没有新的真实调用。S2/生产未开放。
+当前状态（2026-11-05，[B交接§197](#197-b交接37按实际请求的核心协议)）：S32仍执行2/12、核心0。§35仍1/1失败。§37只交工程协议，不是新公司；真实调用、探针、可发送绑定均为0。S2/生产未开放。
 
 ## 1. 唯一实施指引
 
@@ -7936,3 +7936,86 @@ bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m p
 | data/QuoteBak/s21-paper-closeout-offline | 5,673,254 | 503,572 | 5,169,682 |
 
 合计释放11,412,841字节。删除的是工作库、checkpoint、重复导出、output和同哈希解析。S23/S28/S29、正式PDF和共享解析未动。不重报478,250或3,316,848。
+
+## 196. A审核：§36.4局部成果接受，旧尾额策略结束
+
+日期：2026-11-04。审核`c4924cbf`/§195。**接受主体反例修复、任务进程内输出字段、截断拒绝与三根清理；接受当前续读策略不可执行的如实结论，§36结束，不再返修它。** 不将七项测试或结束失败策略算成新业务交付。S32仍执行2/12、程序核心0、独立待审0、常规核心交付0，余10未运行；§35仍1/1失败，新真实调用0。主要矛盾是公司核心尚无常规资源下可复现的交付路径；主体细节不再主导后续排期，排名/区域/普通产销等继续后置。
+
+### 196.1 独立核实与限制
+
+A复跑§195七项测试：7 passed、7 warnings、9.50秒。已挑战的别家公司、母公司表、换行集团、行业拒绝及正式p16正例成立；仅接受这些提名行为，不称通用主体语义已由正则解决。公共网关替换传输证明wire只有`max_tokens`，`finish_reason=length`不算完整阅读；不是供应商守限或新公司语义质量证据。
+
+66306/29260/34040及无安全边界接受为当前旧估算器的复现。**不接受由此推导DeepSeek真实处理必需涨额。** `reading_budget._profiles()`仍从共享文件取整个semantic池，而发送侧`prepare_gateway()`使用任务筛选、字段替换后的进程内配置；`request_bounds()`还对章节输出无条件乘6。新适配后的真实发送并不等于这条旧估算链。该差异是下一业务路径必须局部收口的P2，不再为旧尾额重测一遍p13或调新倍率。
+
+A也纠正自己的方案：反复要求“当前必要源＋全量未来成稿核验估算”共同准入，使未知未来载荷成为当前业务的门槛。保守预算是约束，不应发展成另一套公司业务控制器。原失败不改、硬预算和质量不降；以下是显式替代策略，不是旧代码改名后继续付费。
+
+### 196.2 唯一后续交付
+
+[§37](b3-s1-execution-card.md#37-按实际请求交付公司核心替代全量尾额策略)在原owner实施**按实际请求的阶段执行**：选定必要正文无候选读源→少数跨章核心草稿立即保存→对实际生成对象合并支持/覆盖核验，必要新增来源仍先独立源审。不能靠全量未生成尾额拦必要正文，也不能只删尾额把所有钱花在读源；用紧凑核心条件、少数实际包和相关引用降低往返，完整主要板块不删、必要未读不降级。
+
+任务生效路由/输出字段/实际payload在准入和网关一致，第三方兼容路由不因model名含deepseek就套官方契约。单笔按完整payload/声明输出、当前已用及unknown做硬准入；风险缓冲与未知供应商行为单列，不把经验6倍当供应商上限或第二套结算。所有真实阶段同账同deadline，超输出如实入账，超过总限立即停止；不清unknown、不放大预算。现卡新增真实调用/探针/可发送binding仍0，银行/十家不动；只有新方案工程交付后A才一次裁决是否值得请求新的真实授权，不承诺成功。
+
+B可同窗连续P0—P3、必要直接回归和Review，不按函数/页/字段再次请批。只交一个实际入口的公司核心协议结果及必要失败反例，固定内容复用既有已核正文/真实条件且逐对象核支持和覆盖，不能echo/非空pass。旧11条件轨迹是故障输入，不作新语义答案或新usage；缺少未读页响应时明示受控段。一次整体替代、至多两次必要共性修正后仍不能交协议闭环，就停止当前实现方向，提交支持边界供范围/模型/资源裁决，不再滚动纯准备卡。
+
+### 196.3 清理、效率与Git
+
+A核三根各只剩8个回执文件，文件字节合计339718/401445/503572，与B清后值一致；research.db、checkpoint、output、重复export和解析副本已不存在。旧测试整根重建而非读取库的实现可见，清理有依据。释放11412841字节为B清前后报告值，A未独立记录清前，不冒称A实测或再计一次释放。正式共享解析仍在，受保护S23/S28/S29不变。
+
+旧S19/S20/S21测试仍使用固定输出目录；本轮没有执行它们，不能谎称已修退出清理。下一卡若实际使用它们，先改唯一临时输出/finally收尾再运行，不要求迁移无关全部历史测试。每轮继续先核归属/依赖清本人无用物，交接持久必要一套后清库/副本；瘦回执有当前复现用途可暂留，无用途后在既有入口说明再清，不新建清理台账。
+
+A本轮测试仅使用`data/QuoteBak/a37-review.vMifrz`，常规文件1422字节，交接前删除；无新增公司根/整库或模型调用。`c4924cbf`已位于本地`origin/master`历史中，接受已推送；不再沿用上轮SSH失败作为本轮状态。A只改现有规划/审核文档，不修改应用/共享配置、不提交/推送；保护任务开始17份tracked脏改及10项未跟踪，文末既有历史表不动。A活跃审核时间未精确计量记unknown，9.50秒是测试时间；新发现路线约束1类（生效配置与旧计量不一致），没有再增加主体修补清单。
+
+## 197. B交接：§37按实际请求的核心协议
+
+日期：2026-11-05。执行[§37](b3-s1-execution-card.md#37-按实际请求交付公司核心替代全量尾额策略)。S32仍是已执行2/12、核心成立0家。§35仍是1/1失败。本卡真实调用、探针、可发送绑定均为0。不启动银行，也不启动其余十家。这不是新的公司交付，也不改首次成绩。
+
+### 197.1 生效配置与实际发送
+
+章节任务在执行身份上写下本任务将要发送的那一个 profile：模型、输出字段、是否流式。准入只按这一份构造 payload，不再读取共享全池，也不再把声明输出乘6。没有这份身份时，旧的全池乘6仍只作为未绑定路径的风险注记，不进入本任务的硬门槛。
+
+官方资源名是 `deepseek` 且被本任务选中的 profile，进程内改为文档字段 `max_tokens`。资源不是官方 DeepSeek、只是模型名里带有 deepseek 的第三方路由，保持原字段。共享 `config/13_llm.json` 没有改。
+
+网关用户正文与准入使用同一份 `gateway_runtime`：系统提示按任务身份生成，用户 JSON 去掉处理身份和输出上限等控制字段。测试把第13页的实际请求交给 `CommonGatewaySemanticProvider`，再用同一输出字段调用 `LlmClient._build_payload`。捕获的 wire 与准入 payload 相等，字段是 `max_tokens`，没有 `max_completion_tokens`。
+
+### 197.2 读源、草稿与核验
+
+任务带有这份计量身份时，未生成的成稿/核验尾额不再从必要正文的剩余额度里扣掉。第一段源响应已经形成条件后，先对已读页保存并核验跨章核心包，再继续读后续页。已保存的分组不会被后一次分组失败抹掉。装不下的页保持 `necessary_unread`，不改成补充，也不删主要条件。
+
+用持久 query 的11条源条件、已用24,434和正式第13页重算。这11条条件若仍按未乘6的成稿包估算，包大小是43,788，剩余51,778；第13页实际请求是14,031，小于该剩余。替代路径并不把这43,788当作硬门槛。入口从这11条真实响应走到下一请求，发出的是第13页全文源读。未发送的页仍是未读。
+
+同一窗口用既有S31已核对象走原入口：`bounded_entry` → 替换传输 → 原写入 → query、export、新实例读回一致。逐对象核对答案、引文和覆盖。`draft_complete` 为真。这是离线诊断额度480,000 / 32次 / 900秒上的受控协议，不是120,000常规额度下的公司通过，也不是新的模型分数。缺另一项业务、必要未读、截断或核验失败仍保持不完整；`finish_reason=length` 仍拒绝。
+
+### 197.3 预留分开列
+
+| 类别 | 本卡 |
+| --- | --- |
+| 真实供应商预留 | 0。没有新的模型调用 |
+| 受控预留 | 离线入口使用既有S27诊断上限。唯一运行根在测试 `finally` 删除，不另存一套账本 |
+| unknown | 没有新的供应商用量。超输出和unknown仍按原账，不把声明上限当成供应商必守的天花板 |
+| 风险注记 | 经验6倍和未生成全量尾额不再锁必要正文。11条条件的未乘6成稿包43,788只说明包有多大，不证明必须加预算 |
+
+### 197.4 验证、清理与Git
+
+```text
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_direct_progress.py::test_s35_next_source_page_is_sent_without_the_future_tail tests/unit/test_research/test_company_profile_direct_progress.py::test_industry_and_parent_revenue_are_not_the_company_total tests/unit/test_research/test_company_profile_bounded_entry.py::test_chapter_core_package_fits_the_routine_ledger tests/unit/test_research/test_company_profile_bounded_entry.py::test_length_finish_is_not_a_complete_reading
+```
+
+4 passed，11.50秒。
+
+```text
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_bounded_entry.py::test_fixed_core_entry_checks_each_reviewed_object
+```
+
+1 passed，调用91.69秒，整次94.93秒。
+
+```text
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_direct_progress.py::test_returned_evidence_tail_leaves_room_for_the_next_source_page tests/unit/test_research/test_company_profile_direct_progress.py::test_header_percent_does_not_hide_the_period_revenue_total tests/unit/test_research/test_company_profile_direct_progress.py::test_read_pages_surface_missed_operating_revenue_totals tests/unit/test_research/test_company_profile_bounded_entry.py::test_deepseek_process_uses_documented_max_tokens_only tests/unit/test_research/test_company_profile_direct_progress.py::test_s35_next_source_page_is_sent_without_the_future_tail
+```
+
+5 passed，9.37秒。`openspec validate restore-company-profile-llm-led-generalization --strict` 通过。
+
+没有新建持久运行根。S19/S20/S21瘦回执未动，也不把此前释放的11,412,841字节再计一次。正式PDF和共享解析未动。S23/S28/S29未动。
+
+首次失败和§35原失败不改。本卡不申请新的真实观察。工程协议成立，不等于可以付费再跑；是否另开有界真实合同由A裁决。
+
+本交接写在本文件。任务开始前已有的审核和任务卡改动仍在工作区；提交时只纳入本卡代码、测试和本交接，并会说明本文件里已有的未提交审核文字无法从同一次提交中拆开。共享配置和并行文件不纳入。

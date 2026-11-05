@@ -1145,11 +1145,33 @@ def validate_binding(
                 )
 
 
-def _documented_deepseek_output_field(config):
-    """Use DeepSeek's documented max_tokens for this process only.
+def _meter_profile(config, binding: dict) -> dict:
+    """The profile this task will send, copied into admission."""
+    logical = binding["profile"]
+    selected = None
+    labels = binding.get("task_route_labels") or []
+    if binding.get("pool") and labels:
+        pool = config.pool_for_profile(logical)
+        label = str(labels[0])
+        for member in pool.members:
+            if member.source_label == label:
+                selected = config.profiles[member.profiles[logical]]
+                break
+    if selected is None:
+        selected = config.concrete_profiles_for(logical)[0]
+    return {
+        "model": selected.model,
+        "max_output_tokens_field": selected.max_output_tokens_field,
+        "stream": bool(selected.stream),
+        "stream_include_usage": bool(selected.stream_include_usage),
+    }
 
-    The shared config file is left unchanged. A profile that is not DeepSeek
-    keeps its own field.
+
+def _documented_deepseek_output_field(config, selected_names: set[str]):
+    """Use documented max_tokens only for the official DeepSeek profile this task sends.
+
+    A third-party route is unchanged when its model name merely contains
+    deepseek. The shared config file is left unchanged.
     """
     from dataclasses import replace
 
@@ -1157,7 +1179,7 @@ def _documented_deepseek_output_field(config):
     changed = False
     for name, profile in config.profiles.items():
         resource = config.resource_for_profile(profile).name
-        if "deepseek" in name or "deepseek" in profile.model or "deepseek" in resource:
+        if name in selected_names and resource == "deepseek":
             profiles[name] = replace(profile, max_output_tokens_field="max_tokens")
             changed = True
         else:
@@ -1263,7 +1285,8 @@ def prepare_gateway(binding: dict, raw_config: dict, *, real: bool):
             price["basis"],
             price["context_tokens"],
         )
-    return _documented_deepseek_output_field(config), prices
+    selected_names = {str(source["profile"]) for source in sources}
+    return _documented_deepseek_output_field(config, selected_names), prices
 
 
 def _worker(
@@ -1972,6 +1995,7 @@ def _worker(
             identity["product_contract"] = (
                 "company_profile_product_contract.2026-10-27.llm-led.v8"
             )
+            identity["meter_profile"] = _meter_profile(gateway_config, binding)
         if binding.get("compatible_continue"):
             identity["compatible_continue"] = True
         if binding.get("saved_source_draft"):

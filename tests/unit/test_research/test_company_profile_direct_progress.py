@@ -7095,7 +7095,51 @@ def test_returned_evidence_tail_leaves_room_for_the_next_source_page():
     assert ledger - charged - evidence_tail > 32_000
 
 
-def test_s35_real_conditions_do_not_fit_the_next_source_page():
+def _send_page_13(fragment, report, identity, returned):
+    """Walk the owner from the real source response to the next page request."""
+    import time
+
+    from research.company_profile.direct_reading import interpret_direct_core
+
+    empty = returned.model_copy(
+        update={"source_conditions": (), "requested_pages": (), "target_condition_ids": ()}
+    )
+    seen: list = []
+
+    class _Provider:
+        offline_only = True
+
+        def interpret(self, request):
+            seen.append(request)
+            pages = [int(page["page"]) for page in request.source_pages]
+            if request.source_scope == "page_map":
+                return empty.model_copy(update={"requested_pages": (9,)})
+            if 13 in pages:
+                return empty
+            return returned.model_copy(update={"requested_pages": (int(fragment["page"]),)})
+
+    interpret_direct_core(
+        report=report,
+        pages=[
+            {"page": 9, "text": "第三节 管理层讨论与分析\n公司主营业务说明。", "readable": True},
+            fragment,
+        ],
+        processing_identity=identity,
+        provider=_Provider(),
+        work_id="s37-next-page",
+        token_budget=120_000,
+        started_at=time.monotonic(),
+    )
+    return (
+        request
+        for request in seen
+        if request.purpose == "source_inventory"
+        and request.source_scope == "full_context"
+        and any(int(page["page"]) == 13 for page in request.source_pages)
+    )
+
+
+def test_s35_next_source_page_is_sent_without_the_future_tail():
     import gzip
     import json
     from pathlib import Path
@@ -7127,6 +7171,12 @@ def test_s35_real_conditions_do_not_fit_the_next_source_page():
     report = response.source_conditions[0].evidence[0].report
     identity = direct_core_processing_identity()
     identity["chapter_select"] = True
+    identity["meter_profile"] = {
+        "model": "deepseek-flash",
+        "max_output_tokens_field": "max_tokens",
+        "stream": False,
+        "stream_include_usage": True,
+    }
     tail = _conditions_package_tail(
         response.source_conditions, report=report, identity=identity
     )
@@ -7152,13 +7202,83 @@ def test_s35_real_conditions_do_not_fit_the_next_source_page():
         identity=identity,
         output=4000,
     )
-    assert room < needed, (tail, room, needed)
-    try:
-        source_discovery_slices([fragment], report, identity, max(room, 1))
-    except ValueError as exc:
-        assert str(exc).startswith("fragment_has_no_safe_boundary:13")
-    else:
-        raise AssertionError("page 13 was packed inside the remaining ledger")
+    assert needed <= room, (tail, room, needed)
+    packed = list(source_discovery_slices([fragment], report, identity, room))
+    assert packed and int(packed[0][0]["page"]) == 13
+    sent = next(request for request in _send_page_13(fragment, report, identity, response))
+    from research.company_profile.reading_budget import _meter_payload, request_reservation
+
+    payload = _meter_payload(sent, identity["meter_profile"])
+    assert payload["model"] == "deepseek-flash"
+    assert payload["max_tokens"] == sent.max_output_tokens
+    assert "max_completion_tokens" not in payload
+    assert request_reservation(sent) == len(
+        json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode()
+    ) + 256 + int(payload["max_tokens"])
+    from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
+    from utils.llm import LlmClient
+    from utils.llm.models import LlmResponse
+
+    class _Gateway:
+        def __init__(self):
+            self.requests = []
+
+        async def complete(self, gateway_request):
+            self.requests.append(gateway_request)
+            return LlmResponse(
+                status="ok",
+                raw_content="{}",
+                data={
+                    "schema_version": "company_profile_report_response.v3",
+                    "request_id": sent.request_id,
+                    "purpose": "source_inventory",
+                    "requested_pages": [],
+                    "source_conditions": [],
+                },
+                finish_reason="stop",
+                usage=None,
+                request_id="gateway-s37",
+                provider_request_id=None,
+                request_hash="a" * 64,
+                response_hash="b" * 64,
+                schema_name=gateway_request.schema_name,
+                schema_version=gateway_request.schema_version,
+                structured_output_mode="json_object",
+                latency_ms=1,
+                attempt_count=1,
+                provider="deepseek",
+                model="deepseek-flash",
+                selected_profile="semantic_extraction__deepseek",
+                source_label="deepseek:deepseek-flash",
+                failover_count=0,
+                attempts=(),
+                warnings=(),
+            )
+
+    gateway = _Gateway()
+    CommonGatewaySemanticProvider(
+        client=gateway,
+        profile="semantic_extraction",
+        max_output_tokens=4000,
+        timeout_seconds=30,
+    ).interpret(sent)
+    captured = gateway.requests[0]
+    wire = LlmClient._build_payload(
+        model=identity["meter_profile"]["model"],
+        messages=[
+            {"role": message.role, "content": message.content}
+            for message in captured.messages
+        ],
+        schema=captured.response_schema,
+        schema_name=captured.schema_name,
+        mode="json_object",
+        temperature=0,
+        max_output_tokens=captured.max_output_tokens,
+        max_output_tokens_field=identity["meter_profile"]["max_output_tokens_field"],
+        stream=bool(identity["meter_profile"]["stream"]),
+        stream_include_usage=bool(identity["meter_profile"]["stream_include_usage"]),
+    )
+    assert wire == payload
 
 
 def test_native_role_coverage_does_not_need_the_fixed_question_id():

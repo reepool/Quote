@@ -3520,11 +3520,19 @@ def interpret_direct_core(
 
     inventoried: set[int] = set()
     source_later = 0
+    measure_current_request = isinstance(identity.get("meter_profile"), dict) and bool(
+        (identity.get("meter_profile") or {}).get("model")
+    )
 
     def inventory_pages(page_ids, prepared=None, *, keep_tail: bool = True) -> list[int]:
         """Read source text without candidate answers. Navigation is not body reading."""
         nonlocal source_later
-        if identity.get("chapter_select") and conditions and keep_tail:
+        if (
+            not measure_current_request
+            and identity.get("chapter_select")
+            and conditions
+            and keep_tail
+        ):
             refreshed = _conditions_package_tail(
                 conditions, report=report, identity=identity
             )
@@ -3569,13 +3577,18 @@ def interpret_direct_core(
             return follow
         already = set(inventoried)
         for package in packages:
-            if identity.get("chapter_select") and conditions and keep_tail:
+            if (
+                not measure_current_request
+                and identity.get("chapter_select")
+                and conditions
+                and keep_tail
+            ):
                 refreshed = _conditions_package_tail(
                     conditions, report=report, identity=identity
                 )
                 if refreshed:
                     source_later = refreshed
-            if identity.get("chapter_select") and keep_tail:
+            if not measure_current_request and identity.get("chapter_select") and keep_tail:
                 package_units = _units(
                     package,
                     purpose="source_inventory",
@@ -5186,7 +5199,7 @@ def interpret_direct_core(
                 for page in sources
                 if int(page["page"]) in (chapter_required_pages or set(candidates))
             ]
-            if hold_pages:
+            if hold_pages and not measure_current_request:
                 admitted = chapter_core_admission(
                     hold_pages,
                     report,
@@ -5204,6 +5217,14 @@ def interpret_direct_core(
                     candidate_pages, report=report, identity=identity, limit=limit
                 )
             follow = inventory_pages(selected)
+            if measure_current_request and conditions:
+                compose(
+                    [
+                        page
+                        for page in chapter_required_pages
+                        if by_page.get(int(page), {}).get("status") == "read"
+                    ]
+                )
             read_requested_follow(follow)
             if not _operating_role_established(claims, checks):
                 role_evidence = []

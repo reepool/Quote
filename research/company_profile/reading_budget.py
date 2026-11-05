@@ -14,7 +14,6 @@ from typing import Any
 
 from research.company_profile.contracts import ReportSemanticRequestV3
 from research.company_profile.report_wire import (
-    compact_request,
     instructions,
     response_schema,
 )
@@ -41,51 +40,88 @@ def reservation_units(payload: Mapping[str, Any], max_output: int) -> int:
     return len(encoded) + 256 + max_output
 
 
-def _profile_payloads(request: ReportSemanticRequestV3):
-    """Build each pool payload once. Fit checks must not serialize the same request twice."""
+def _request_messages(request: ReportSemanticRequestV3):
+    from types import SimpleNamespace
+
+    from research.company_profile.report_wire import gateway_runtime, gateway_user_object
+
+    runtime = gateway_runtime(request)
     user = json.dumps(
-        compact_request(request),
+        gateway_user_object(request),
         ensure_ascii=False,
         separators=(",", ":"),
     )
-    system = instructions(request)
-    schema = response_schema(request)
+    return (
+        [
+            {"role": "system", "content": instructions(SimpleNamespace(**runtime))},
+            {"role": "user", "content": user},
+        ],
+        response_schema(request),
+    )
+
+
+def _profile_payloads(request: ReportSemanticRequestV3):
+    """Build each pool payload once. Fit checks must not serialize the same request twice."""
+    messages, schema = _request_messages(request)
     built = []
     for profile in _profiles():
-        payload = LlmClient._build_payload(
-            model=profile.model,
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": user},
-            ],
-            schema=schema,
-            schema_name="company_profile_report_response",
-            mode="json_object",
-            temperature=0,
-            max_output_tokens=request.max_output_tokens,
-            max_output_tokens_field=profile.max_output_tokens_field,
-            stream=profile.stream,
-            stream_include_usage=profile.stream_include_usage,
+        built.append(
+            LlmClient._build_payload(
+                model=profile.model,
+                messages=messages,
+                schema=schema,
+                schema_name="company_profile_report_response",
+                mode="json_object",
+                temperature=0,
+                max_output_tokens=request.max_output_tokens,
+                max_output_tokens_field=profile.max_output_tokens_field,
+                stream=profile.stream,
+                stream_include_usage=profile.stream_include_usage,
+            )
         )
-        built.append(payload)
     return built
+
+
+def _meter_payload(request: ReportSemanticRequestV3, meter: Mapping[str, Any]):
+    """The one payload this task will send. Not a second estimate from the pool."""
+    messages, schema = _request_messages(request)
+    return LlmClient._build_payload(
+        model=str(meter["model"]),
+        messages=messages,
+        schema=schema,
+        schema_name="company_profile_report_response",
+        mode="json_object",
+        temperature=0,
+        max_output_tokens=request.max_output_tokens,
+        max_output_tokens_field=str(meter.get("max_output_tokens_field") or "max_tokens"),
+        stream=bool(meter.get("stream")),
+        stream_include_usage=bool(meter.get("stream_include_usage", True)),
+    )
 
 
 def request_bounds(request: ReportSemanticRequestV3) -> tuple[int, int]:
     """Reservation tokens and UTF-8 bytes from one payload build."""
+    identity = getattr(request, "processing_identity", None) or {}
+    meter = identity.get("meter_profile") if isinstance(identity, dict) else None
+    if isinstance(meter, dict) and meter.get("model"):
+        payloads = [_meter_payload(request, meter)]
+        # Six times the declaration is a historical risk note. It is not the
+        # hard gate once admission uses the payload this task actually sends.
+        cushion = False
+    else:
+        payloads = _profile_payloads(request)
+        cushion = True
     reservations = []
     sizes = []
-    for payload in _profile_payloads(request):
+    for payload in payloads:
         output = payload.get("max_completion_tokens", payload.get("max_tokens"))
         declared = int(output or 0)
-        identity = getattr(request, "processing_identity", None) or {}
-        # S32 DeepSeek replies exceeded max_completion_tokens. The largest
-        # source read was 23560 against a declared 4000. Chapter admission
-        # reserves six times the declaration. The field sent to the provider
-        # stays unchanged. Gateway unknown settlement still charges the
-        # declared reservation on the payload, not this cushion. Navigation
-        # already returned 10122 against 1000, so six times is not a ceiling.
-        if isinstance(identity, dict) and identity.get("chapter_select") and declared:
+        if (
+            cushion
+            and isinstance(identity, dict)
+            and identity.get("chapter_select")
+            and declared
+        ):
             declared *= 6
         reservations.append(reservation_units(payload, declared))
         sizes.append(len(json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode()))

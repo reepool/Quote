@@ -178,27 +178,41 @@ def test_deepseek_process_uses_documented_max_tokens_only(pool_binding):
 
     from tests.unit.test_utils.test_llm_physical_budget import _client
     from tests.unit.test_utils.test_llm_routed_client import _request
+    from utils.llm import LlmConfig
     from utils.llm.budget import LlmRunBudget
     from utils.llm.testing import ScriptedTransport
 
     binding, raw = pool_binding
+    raw["provider_resources"]["deepseek"] = {
+        **raw["provider_resources"]["grok-resource"],
+        "quota_bucket": "deepseek",
+    }
     raw["profiles"]["semantic__deepseek"] = {
         **raw["profiles"]["semantic__grok"],
         "name": "semantic__deepseek",
         "source_label": "deepseek:deepseek-flash",
         "model": "deepseek-flash",
+        "provider_resource": "deepseek",
+        "max_output_tokens_field": "max_completion_tokens",
+    }
+    raw["profiles"]["semantic__alias"] = {
+        **raw["profiles"]["semantic__grok"],
+        "name": "semantic__alias",
+        "source_label": "pipio:deepseek-flash",
+        "model": "deepseek-flash",
         "provider_resource": "grok-resource",
         "max_output_tokens_field": "max_completion_tokens",
     }
-    raw["profiles"]["semantic__grok"]["max_output_tokens_field"] = "max_completion_tokens"
+    binding["task_route_labels"] = ["deepseek:deepseek-flash"]
+    binding["task_route_first_only"] = True
     binding["sources"] = [
-        source
-        for source in binding["sources"]
-        if source["profile"] == "semantic__grok"
+        {
+            "profile": "semantic__deepseek",
+            "model": "deepseek-flash",
+            "provider_resource": "deepseek",
+            "price": binding["sources"][0]["price"],
+        }
     ]
-    binding["sources"][0]["profile"] = "semantic__deepseek"
-    binding["sources"][0]["model"] = "deepseek-flash"
-    binding["sources"][0]["provider_resource"] = "grok-resource"
     raw["pools"]["semantic-pool"]["members"] = [
         {
             "source_label": "deepseek:deepseek-flash",
@@ -206,13 +220,10 @@ def test_deepseek_process_uses_documented_max_tokens_only(pool_binding):
             "profiles": {"semantic": "semantic__deepseek"},
         }
     ]
-    from utils.llm import LlmConfig
-
     binding["route_fingerprint"] = LlmConfig.from_mapping(raw).route_fingerprint("semantic")
     config, prices = prepare_gateway(binding, raw, real=False)
-    profile = config.profiles["semantic__deepseek"]
-    assert profile.max_output_tokens_field == "max_tokens"
-    assert config.profiles["semantic__luna"].max_output_tokens_field == "max_tokens"
+    assert config.profiles["semantic__deepseek"].max_output_tokens_field == "max_tokens"
+    assert config.profiles["semantic__alias"].max_output_tokens_field == "max_completion_tokens"
     budget = LlmRunBudget(deadline=time.monotonic() + 10, prices=prices)
     transport = ScriptedTransport(
         [{"data": {"choices": [{"message": {"content": '{"label":"ok"}'}, "finish_reason": "stop"}]}}]
@@ -221,7 +232,7 @@ def test_deepseek_process_uses_documented_max_tokens_only(pool_binding):
         _client(transport, budget, config).complete(_request(max_output_tokens=100))
     )
     sent = transport.calls[0]["payload"]
-    assert "max_tokens" in sent
+    assert sent["max_tokens"] == 100
     assert "max_completion_tokens" not in sent
 
 

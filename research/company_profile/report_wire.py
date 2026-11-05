@@ -59,6 +59,51 @@ def compact_request(request: ReportSemanticRequestV3) -> dict:
     return payload
 
 
+_GATEWAY_USER_OMIT = {
+    "max_output_tokens",
+    "timeout_seconds",
+    "partial_slice",
+    "reading_strategy",
+    "discovery_scope",
+    "logical_entry_id",
+    "logical_targets",
+    "processing_identity",
+}
+
+
+def gateway_runtime(request: ReportSemanticRequestV3) -> dict:
+    """The runtime object the direct gateway sends and admission measures."""
+    identity = getattr(request, "processing_identity", None) or {}
+    if not isinstance(identity, dict):
+        identity = {}
+    targets: list[str] = []
+    if request.purpose == "verify_views":
+        targets = sorted(
+            [claim.claim_id for claim in request.claims]
+            + [item.condition_id for item in request.source_conditions]
+        )
+    return {
+        **compact_request(request),
+        "processing_identity": dict(identity),
+        "max_output_tokens": request.max_output_tokens,
+        "timeout_seconds": request.timeout_seconds,
+        "partial_slice": bool(identity.get("partial_slice")),
+        "reading_strategy": identity.get("reading_strategy"),
+        "discovery_scope": identity.get("discovery_scope"),
+        "max_route_attempts": identity.get("max_route_attempts"),
+        "max_physical_attempt_seconds": identity.get(
+            "max_physical_attempt_seconds"
+        ),
+        "logical_entry_id": str(identity.get("logical_entry_id") or ""),
+        "logical_targets": targets,
+    }
+
+
+def gateway_user_object(request: ReportSemanticRequestV3) -> dict:
+    runtime = gateway_runtime(request)
+    return {key: value for key, value in runtime.items() if key not in _GATEWAY_USER_OMIT}
+
+
 def project_stored_inventory(payload: dict, request: dict) -> dict | None:
     """Turn a saved domain object back into the compact inventory wire.
 
