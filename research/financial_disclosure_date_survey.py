@@ -17,6 +17,7 @@ Hard constraints (from the change spec):
 """
 from __future__ import annotations
 
+import calendar
 import json
 from dataclasses import dataclass, field, replace
 from datetime import date, timedelta
@@ -80,7 +81,15 @@ AuditWriterFn = Callable[[str, Any, Optional[str]], None]
 
 @dataclass(frozen=True)
 class SurveyWindow:
-    """One (exchange, report_period) season window to scan."""
+    """One half-month segment of an (exchange, report_period) season.
+
+    Segments stay under the cninfo effective-pagination ceiling (~110
+    pages, ~3,300 records): beyond it the endpoint rewinds to page one,
+    silently hiding the older half of the date range (found while
+    diagnosing missing annual-report evidence). Peak half-months (April,
+    with annual tail + full Q1 season) stay at ~90 pages on the joint
+    periodic category.
+    """
 
     exchange: str
     report_period: str  # ISO 'YYYY-MM-DD' period end
@@ -89,7 +98,7 @@ class SurveyWindow:
 
     @property
     def key(self) -> str:
-        return f"{self.exchange}:{self.report_period}"
+        return f"{self.exchange}:{self.report_period}:{self.start_date}"
 
 
 def build_survey_windows(
@@ -118,18 +127,44 @@ def build_survey_windows(
             deadline = statutory_deadline_for_period_end(period_end)
             if deadline is None:
                 continue
-            end = deadline + timedelta(days=LATE_TAIL_DAYS)
-            if end > today:
+            season_end = deadline + timedelta(days=LATE_TAIL_DAYS)
+            if season_end > today:
                 continue
-            windows.append(
+            windows.extend(
                 SurveyWindow(
                     exchange=exchange,
                     report_period=period_text,
-                    start_date=period_end.isoformat(),
-                    end_date=end.isoformat(),
+                    start_date=seg_start.isoformat(),
+                    end_date=seg_end.isoformat(),
+                )
+                for seg_start, seg_end in _half_month_segments(
+                    period_end, season_end, today
                 )
             )
     return windows
+
+
+def _half_month_segments(
+    season_start: date, season_end: date, today: date
+) -> List[Tuple[date, date]]:
+    """Split [season_start, season_end] into half-month segments.
+
+    Boundaries: the 1st..15th and 16th..month-end of each calendar month
+    clipped to the season and to ``today`` (never scan into the future).
+    """
+    segments: List[Tuple[date, date]] = []
+    cursor = season_start
+    while cursor <= min(season_end, today):
+        if cursor.day <= 15:
+            seg_end = min(
+                date(cursor.year, cursor.month, 15), season_end, today
+            )
+        else:
+            month_last = calendar.monthrange(cursor.year, cursor.month)[1]
+            seg_end = min(date(cursor.year, cursor.month, month_last), season_end, today)
+        segments.append((cursor, seg_end))
+        cursor = seg_end + timedelta(days=1)
+    return segments
 
 
 def _parse_period_end(text: str) -> Optional[date]:

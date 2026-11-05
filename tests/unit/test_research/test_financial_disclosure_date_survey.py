@@ -59,21 +59,36 @@ def _writer():
     return write, written
 
 
-def test_build_survey_windows_boundaries_and_tail():
+def test_build_survey_windows_half_month_segments():
     windows = build_survey_windows(
-        ["SSE"],
-        ["2024-03-31", "2024-06-30", "2024-09-30", "2024-12-31"],
-        today=date(2026, 11, 4),
+        ["SSE"], ["2024-03-31"], today=date(2026, 11, 4)
     )
-    by_period = {w.report_period: w for w in windows}
-    assert by_period["2024-03-31"].start_date == "2024-03-31"
-    assert by_period["2024-03-31"].end_date == "2024-06-29"      # 04-30 + 60d
-    assert by_period["2024-06-30"].start_date == "2024-06-30"
-    assert by_period["2024-06-30"].end_date == "2024-10-30"      # 08-31 + 60d
-    assert by_period["2024-09-30"].start_date == "2024-09-30"
-    assert by_period["2024-09-30"].end_date == "2024-12-30"      # 10-31 + 60d
-    assert by_period["2024-12-31"].start_date == "2024-12-31"
-    assert by_period["2024-12-31"].end_date == "2025-06-29"      # next 04-30 + 60d
+    # season 2024-03-31 .. 2024-06-29 splits into half-month segments,
+    # each small enough for the cninfo effective-pagination ceiling
+    spans = [(w.start_date, w.end_date) for w in windows]
+    assert spans == [
+        ("2024-03-31", "2024-03-31"),
+        ("2024-04-01", "2024-04-15"),
+        ("2024-04-16", "2024-04-30"),
+        ("2024-05-01", "2024-05-15"),
+        ("2024-05-16", "2024-05-31"),
+        ("2024-06-01", "2024-06-15"),
+        ("2024-06-16", "2024-06-29"),
+    ]
+    # keys are per-segment so checkpoints resume at half-month grain
+    assert windows[0].key == "SSE:2024-03-31:2024-03-31"
+    assert windows[1].key == "SSE:2024-03-31:2024-04-01"
+
+
+def test_build_survey_windows_segment_never_crosses_season_tail():
+    # FY season ends next-year 06-29; the last segment is clipped to it
+    windows = build_survey_windows(
+        ["SSE"], ["2023-12-31"], today=date(2026, 11, 4)
+    )
+    assert windows[-1].end_date == "2024-06-29"
+    assert windows[0].start_date == "2023-12-31"
+    # segment count sanity: Dec half + 6 months x 2 halves + clipped tail
+    assert len(windows) == 13
 
 
 def test_build_survey_windows_drops_future_windows():
@@ -125,22 +140,21 @@ async def test_survey_writes_audit_only_with_inferred_period(tmp_path):
     _, cross_tagged, cross_id = written[1]
     assert cross_id == "600000.SH"
     assert "inferred_report_period=2023-12-31" in cross_tagged.selection_reasons
-    # checkpoint marks both windows completed (2023-12-31 was added to
-    # periods so its cross-season announcements are harvest targets)
-    assert set(load_checkpoint(cp)["completed_windows"]) == {
-        "SSE:2024-09-30",
-        "SSE:2023-12-31",
-    }
-    # three acquires total: probe + two windows
-    assert len(calls) == 3
+    # checkpoint marks every half-month segment of the season completed
+    completed = load_checkpoint(cp)["completed_windows"]
+    assert completed
+    assert any(k.startswith("SSE:2024-09-30:") for k in completed)
+    assert any(k.startswith("SSE:2023-12-31:") for k in completed)
+    # probe + one acquire per segment
+    assert len(calls) == 1 + len(completed)
 
 
 @pytest.mark.asyncio
 async def test_survey_aborts_on_403_and_leaves_remaining_windows(tmp_path):
     acquire, calls = _fake_acquire(
         {
-            "2024-03-31": _Result(records=[]),
-            "2024-06-30": _Result(status="degraded", errors=["HTTP Error 403: Forbidden"]),
+            "2024-09-30": _Result(records=[]),
+            "2024-10-01": _Result(status="degraded", errors=["HTTP Error 403: Forbidden"]),
         }
     )
     write, written = _writer()
@@ -148,7 +162,7 @@ async def test_survey_aborts_on_403_and_leaves_remaining_windows(tmp_path):
 
     report = await survey_historical_disclosure_dates(
         exchanges=["SSE"],
-        report_periods=["2024-03-31", "2024-06-30", "2024-09-30"],
+        report_periods=["2024-09-30", "2023-12-31"],
         acquire=acquire,
         audit_writer=write,
         instrument_map={},
@@ -159,24 +173,28 @@ async def test_survey_aborts_on_403_and_leaves_remaining_windows(tmp_path):
     assert report["aborted"] is True
     assert "403" in (report["abort_reason"] or "")
     state = load_checkpoint(cp)
-    assert state["completed_windows"] == ["SSE:2024-03-31"]
-    assert state["failed_windows"] == ["SSE:2024-06-30"]
-    # w3 never requested: w1 + w2 only
+    assert state["completed_windows"] == ["SSE:2024-09-30:2024-09-30"]
+    assert state["failed_windows"] == ["SSE:2024-09-30:2024-10-01"]
+    # later segments never requested: first segment + refusing segment only
     assert len(calls) == 2
 
 
 @pytest.mark.asyncio
 async def test_survey_resumes_from_checkpoint(tmp_path):
+    from research.financial_disclosure_date_survey import build_survey_windows
+    done_season_keys = [
+        w.key for w in build_survey_windows(["SSE"], ["2024-03-31"])
+    ]
     save_checkpoint(
         tmp_path / "checkpoint.json",
-        {"completed_windows": ["SSE:2024-03-31"], "failed_windows": []},
+        {"completed_windows": done_season_keys, "failed_windows": []},
     )
     acquire, calls = _fake_acquire({})
     write, written = _writer()
 
     report = await survey_historical_disclosure_dates(
         exchanges=["SSE"],
-        report_periods=["2024-03-31", "2024-06-30"],
+        report_periods=["2024-03-31"],
         acquire=acquire,
         audit_writer=write,
         instrument_map={},
@@ -184,11 +202,15 @@ async def test_survey_resumes_from_checkpoint(tmp_path):
         probe_enabled=False,
     )
 
-    # the completed window was skipped: no acquire for it
+    # every completed segment was skipped: no acquire inside its range
     acquired_starts = [q.scope.start_date for q in calls]
-    assert "2024-03-31" not in acquired_starts
-    assert report["window_results"][0]["skipped"] == "checkpoint_completed"
-    assert report["window_results"][1]["status"] == "success"
+    for w in done_season_keys:
+        seg_start = w.rsplit(":", 1)[1]
+        assert seg_start not in acquired_starts
+    assert all(
+        r["skipped"] == "checkpoint_completed"
+        for r in report["window_results"][: len(done_season_keys)]
+    )
 
 
 @pytest.mark.asyncio
@@ -200,7 +222,7 @@ async def test_survey_probe_failure_refuses_startup(tmp_path):
 
     report = await survey_historical_disclosure_dates(
         exchanges=["SSE"],
-        report_periods=["2024-09-30"],
+        report_periods=["2024-09-30", "2023-12-31"],
         acquire=acquire,
         audit_writer=write,
         instrument_map={},
@@ -225,7 +247,7 @@ async def test_survey_records_without_matching_symbol_skipped(tmp_path):
 
     report = await survey_historical_disclosure_dates(
         exchanges=["SSE"],
-        report_periods=["2024-09-30"],
+        report_periods=["2024-09-30", "2023-12-31"],
         acquire=acquire,
         audit_writer=write,
         instrument_map={},                                    # empty map
@@ -245,7 +267,7 @@ async def test_survey_degraded_window_is_incomplete_not_completed(tmp_path):
     acquire, calls = _fake_acquire(
         {
             "2024-03-31": _Result(status="degraded", records=[_Record(title="某公司2024年第一季度报告")]),
-            "2024-06-30": _Result(records=[]),
+            "2024-04-01": _Result(records=[]),
         }
     )
     write, written = _writer()
@@ -253,7 +275,7 @@ async def test_survey_degraded_window_is_incomplete_not_completed(tmp_path):
 
     report = await survey_historical_disclosure_dates(
         exchanges=["SSE"],
-        report_periods=["2024-03-31", "2024-06-30"],
+        report_periods=["2024-03-31"],
         acquire=acquire,
         audit_writer=write,
         instrument_map={("SSE", "688981"): "688981.SH"},
@@ -264,7 +286,9 @@ async def test_survey_degraded_window_is_incomplete_not_completed(tmp_path):
     # degraded window: not aborted, audit rows kept, but marked incomplete
     assert report["aborted"] is False
     assert report["audit_written"] == 1
-    assert report["incomplete_windows"] == ["SSE:2024-03-31"]
+    assert report["incomplete_windows"] == ["SSE:2024-03-31:2024-03-31"]
     state = load_checkpoint(cp)
-    assert state["completed_windows"] == ["SSE:2024-06-30"]
-    assert state["incomplete_windows"] == ["SSE:2024-03-31"]
+    # every later segment of the season completed normally
+    assert "SSE:2024-03-31:2024-04-01" in state["completed_windows"]
+    assert "SSE:2024-03-31:2024-06-16" in state["completed_windows"]
+    assert state["incomplete_windows"] == ["SSE:2024-03-31:2024-03-31"]
