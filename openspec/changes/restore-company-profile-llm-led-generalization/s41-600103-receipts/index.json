@@ -1,0 +1,30 @@
+{
+  "query.json": {
+    "sha256": "e580f6db9c437350c8b49c2525cc9f32bfd5ec26357e6732ff1258e3fdebd98d",
+    "bytes": 246936
+  },
+  "budget-final.json": {
+    "sha256": "f344ceb0d89651cf19d41c46717ce778a6dd3959c261a1eb76ae4e29efed7b73",
+    "bytes": 4921
+  },
+  "entry-result.json": {
+    "sha256": "7686a9a9c7000833290f7bd94db47809fdfdae8779f75b4720a066cad81b7b4f",
+    "bytes": 50930
+  },
+  "source-receipt.json": {
+    "sha256": "82fa51dfb9155ca81bf8c5f2869abbde4643ecbc569bb8930a61c36d49d944e6",
+    "bytes": 18087
+  },
+  "entry.log": {
+    "sha256": "55145faba2c9436d251d4e25eb2a4298b2e75c43048a14bef606dc24b563f340",
+    "bytes": 23060
+  },
+  "supervisor.json": {
+    "sha256": "827a95b633bc859aba5cd5ec6bddf83cd5c54e405b8fa5d517c5544db2352443",
+    "bytes": 60
+  },
+  "entry-stages.json": {
+    "sha256": "ca7172cc0706f78bca95fc0895fc830f6ca6cf531e3f378f3447d0e9b843a71e",
+    "bytes": 524
+  }
+}

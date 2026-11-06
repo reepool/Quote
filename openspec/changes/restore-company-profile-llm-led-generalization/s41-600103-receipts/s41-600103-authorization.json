@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600103-s41",
+  "binding_sha256": "03b87800486a98e56747df966ee6aa5728ea079dbe3823711c8dd131732d8782",
+  "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+  "approval_reference": "b3 card section 41; user approved one non-thinking paper run 2026-11-06",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "card_execution_not_code_reviewed",
+  "window": "section 41 one fresh non-thinking paper chapter run"
+}

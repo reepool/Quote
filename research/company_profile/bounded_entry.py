@@ -34,6 +34,7 @@ S31_COVERAGE = "company_profile_s31_coverage.2026-11-03"
 S32_REGRESSION = "company_profile_s32_regression.2026-11-03"
 S35_OBSERVATION = "company_profile_s35_observation.2026-11-04"
 S38_OBSERVATION = "company_profile_s38_observation.2026-11-05"
+S41_OBSERVATION = "company_profile_s41_observation.2026-11-06"
 
 
 def company_window_limits(binding: dict, state: dict | None) -> tuple[int, int]:
@@ -927,6 +928,13 @@ def validate_binding(
             and int(binding.get("max_physical_requests") or 0) <= 4
             and int(binding.get("max_recoveries") or 0) <= 1
         )
+    elif auth == S41_OBSERVATION:
+        allowed = (
+            0 < elapsed <= 900
+            and int(binding.get("max_tokens") or 0) <= 120_000
+            and int(binding.get("max_physical_requests") or 0) <= 16
+            and int(binding.get("max_recoveries") or 0) <= 2
+        )
     elif auth == S38_OBSERVATION:
         allowed = (
             0 < elapsed <= 900
@@ -1111,6 +1119,7 @@ def validate_binding(
                 "s1-600103-s32",
                 "s1-600103-s35",
                 "s1-600103-s38",
+                "s1-600103-s41",
                 "s1-600000-s32",
                 "s1-600094-s32",
                 "s1-600100-s32",
