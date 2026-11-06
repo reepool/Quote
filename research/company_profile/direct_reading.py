@@ -3778,11 +3778,19 @@ def interpret_direct_core(
         by_id = {int(page["page"]): page for page in sources}
         chosen = []
         seen_pages: set[int] = set()
+        open_pages = {
+            int(evidence.page)
+            for item in conditions
+            if item.condition_id not in drafted_condition_ids
+            and item.major
+            and item.statement_status == "current"
+            for evidence in getattr(item, "evidence", ()) or ()
+        }
         for page in page_ids:
             page_no = int(page)
             if (
                 page_no in seen_pages
-                or page_no in composed
+                or (page_no in composed and page_no not in open_pages)
                 or page_no not in by_id
                 or not by_id[page_no].get("readable", True)
                 or by_page.get(page_no, {}).get("status") != "read"
@@ -5253,6 +5261,18 @@ def interpret_direct_core(
                 )
             read_requested_follow(follow)
             if not _operating_role_established(claims, checks):
+                unread = _directed_operating_role_pages(sources, by_page)
+                if unread:
+                    inventory_pages(unread)
+                    chapter_required_pages.update(
+                        page for page in unread if page in inventoried
+                    )
+                    for page_no in unread:
+                        if page_no in inventoried:
+                            continue
+                        gap = f"necessary_unread:{page_no}"
+                        if gap not in gaps:
+                            gaps.append(gap)
                 role_evidence = []
                 read_ids = {
                     int(item["page"])
@@ -5270,7 +5290,7 @@ def interpret_direct_core(
                             report=report,
                             page=page_no,
                             section_title="经营方式",
-                            anchor=TextAnchor(bounded_quote=passage),
+                            anchor=TextAnchor(bounded_quote=passage[:180]),
                         )
                     )
                     break
@@ -5283,13 +5303,6 @@ def interpret_direct_core(
                     conditions.append(question)
                     if question not in conditions_to_draft:
                         conditions_to_draft.append(question)
-                elif not role_evidence:
-                    for page_no in sorted(read_ids):
-                        gap = f"read_not_drafted:operating-role:{page_no}"
-                        if gap not in gaps and _operating_passage(
-                            _read_page_text(sources, page_no)
-                        ):
-                            gaps.append(gap)
             tail_hold = 0
             note_missed_core_revenue()
             compose(
