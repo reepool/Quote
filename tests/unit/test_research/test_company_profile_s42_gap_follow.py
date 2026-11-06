@@ -67,6 +67,73 @@ def test_s41_follow_up_sends_the_period_question_and_unread_role_page():
             seen.append(request)
             if queue:
                 return queue.pop(0)
+            if request.purpose == "synthesize_views":
+                claims = []
+                for condition in request.source_conditions:
+                    blob = "".join(
+                        str(evidence.anchor.bounded_quote or "")
+                        for evidence in condition.evidence
+                    )
+                    if "2,418,990,221.17" in blob and "2,332,376,693.65" not in condition.description:
+                        claims.append(
+                            {
+                                "claim_id": "period-total",
+                                "dimension": "revenue_model",
+                                "status": "observed",
+                                "answer": "本期营业收入 2,418,990,221.17元。",
+                                "condition_ids": [condition.condition_id],
+                                "evidence": [
+                                    {
+                                        "evidence_id": "period-total",
+                                        "report": request.report.model_dump(mode="json"),
+                                        "page": int(condition.evidence[0].page),
+                                        "section_title": "利润表",
+                                        "anchor": {
+                                            "anchor_type": "text",
+                                            "bounded_quote": condition.evidence[0].anchor.bounded_quote,
+                                        },
+                                    }
+                                ],
+                            }
+                        )
+                if claims:
+                    return ReportSemanticResponseV3.model_validate_json(
+                        json.dumps(
+                            {
+                                "schema_version": "company_profile_report_response.v3",
+                                "request_id": request.request_id,
+                                "purpose": request.purpose,
+                                "claims": claims,
+                            },
+                            ensure_ascii=False,
+                        )
+                    )
+            if request.purpose == "verify_views":
+                checks = []
+                for claim in request.claims:
+                    ok = claim.answer == "本期营业收入 2,418,990,221.17元。"
+                    checks.append(
+                        {
+                            "target_type": "claim",
+                            "target_id": claim.claim_id,
+                            "status": "pass" if ok else "unclear",
+                            "explanation": "只接受期间总额这一已核答案。",
+                            "covers_target_type": "claim",
+                            "covers_target_id": claim.claim_id,
+                        }
+                    )
+                if checks:
+                    return ReportSemanticResponseV3.model_validate_json(
+                        json.dumps(
+                            {
+                                "schema_version": "company_profile_report_response.v3",
+                                "request_id": request.request_id,
+                                "purpose": request.purpose,
+                                "checks": checks,
+                            },
+                            ensure_ascii=False,
+                        )
+                    )
             return empty
 
     started = interpret_direct_core(
@@ -108,4 +175,5 @@ def test_s41_follow_up_sends_the_period_question_and_unread_role_page():
     assert any("伸性纸袋纸" in answer for answer in answers)
     assert any("漳州水仙" in answer for answer in answers)
     assert any(gap.split(":")[-1] == "c3" and gap.startswith("major_evidence_not_located") for gap in started.gaps)
-    assert started.draft_complete is False
+    assert any("2,418,990,221.17" in answer for answer in answers)
+    assert not any("2,332,376,693.65" in answer for answer in answers)
