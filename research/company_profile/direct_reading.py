@@ -27,6 +27,7 @@ from research.company_profile.reading_budget import (
     request_reservation,
 )
 from research.company_profile.report_interpretation import (
+    DIMENSIONS,
     VIEWS,
     ReportInterpretation,
     _bind_source_evidence,
@@ -651,6 +652,15 @@ def _current_gaps(accumulated, claims, conditions, checks, records=()) -> list[s
                 claims, checks
             ):
                 continue
+            if gap.startswith(("evidence_not_located:", "major_evidence_not_located:")):
+                tail = gap.rsplit(":", 1)[-1]
+                if any(
+                    getattr(check, "status", None) == "pass"
+                    and getattr(check, "target_type", None) == "condition"
+                    and str(getattr(check, "target_id", "")).endswith(f"restate-{tail}")
+                    for check in checks
+                ):
+                    continue
             if gap.startswith("evidence_not_located:"):
                 target = gap.split(":", 1)[1]
                 if any(
@@ -2353,10 +2363,48 @@ def interpret_direct_core(
         on_progress(_result())
 
     def _result() -> ReportInterpretation:
-        observed = {item.dimension for item in _verified_claims(claims, checks)}
+        verified_now = _verified_claims(claims, checks)
+
+        def claim_text(claim) -> str:
+            parts = [str(claim.answer or "")]
+            for evidence in claim.evidence:
+                parts.append(str(evidence.anchor.bounded_quote or ""))
+            return "".join("".join(parts).split())
+
+        def failed_dimension(gap: str) -> str:
+            if gap.startswith("major_evidence_not_located:"):
+                tail = gap.rsplit(":", 1)[-1]
+                return tail if tail in DIMENSIONS else ""
+            if not gap.startswith("evidence_not_located:"):
+                return ""
+            scoped = gap.split(":", 1)[1].split(":unmatched:", 1)[0]
+            scoped = scoped.split(":redundant", 1)[0]
+            for item in gaps:
+                if item.startswith(f"major_evidence_not_located:{scoped}:"):
+                    tail = item.rsplit(":", 1)[-1]
+                    if tail in DIMENSIONS:
+                        return tail
+            return ""
+
+        replaced_gaps = set()
+        for gap in gaps:
+            dimension = failed_dimension(gap)
+            snippet = gap.split(":unmatched:", 1)[1] if ":unmatched:" in gap else ""
+            replaced = dimension and any(
+                item.dimension == dimension
+                and (not snippet or snippet not in claim_text(item))
+                for item in verified_now
+            )
+            if replaced and gap.startswith(
+                ("evidence_not_located:", "major_evidence_not_located:")
+            ):
+                replaced_gaps.add(gap)
+        observed = {item.dimension for item in verified_now}
         published = _current_gaps(gaps, claims, conditions, checks, records)
         blocking_gaps = [
-            gap for gap in published if not gap.startswith("supplementary_gap:")
+            gap
+            for gap in published
+            if not gap.startswith("supplementary_gap:") and gap not in replaced_gaps
         ]
         blocking = any(
             gap.startswith(
@@ -5260,6 +5308,11 @@ def interpret_direct_core(
                     ]
                 )
             read_requested_follow(follow)
+            read_before_role = {
+                int(page["page"])
+                for page in sources
+                if by_page.get(int(page["page"]), {}).get("status") == "read"
+            }
             if not _operating_role_established(claims, checks):
                 unread = _directed_operating_role_pages(sources, by_page)
                 if unread:
@@ -5305,6 +5358,48 @@ def interpret_direct_core(
                         conditions_to_draft.append(question)
             tail_hold = 0
             note_missed_core_revenue()
+            if "output_exposure" not in {
+                item.dimension for item in _verified_claims(claims, checks)
+            }:
+                read_now = [
+                    page
+                    for page in sources
+                    if int(page["page"]) in read_before_role
+                    and str(page.get("text") or "").strip()
+                ]
+                if read_now and not identity.get("supplemented_missing_output"):
+                    identity["supplemented_missing_output"] = True
+                    try:
+                        packages = list(
+                            source_discovery_slices(read_now, report, identity, limit)
+                        )
+                    except (ValueError, LlmError, SemanticProviderError):
+                        packages = []
+                    for package in packages:
+                        if any(
+                            item.dimension == "output_exposure" and item.major
+                            for item in conditions
+                        ):
+                            break
+                        try:
+                            reviewed = invoke(
+                                "source_inventory",
+                                package,
+                                source_scope="full_context",
+                                output=_source_output(identity),
+                                later=0,
+                            )
+                        except (ValueError, LlmError, SemanticProviderError):
+                            continue
+                        accepted, location_gaps = _located_conditions(
+                            reviewed.source_conditions,
+                            report,
+                            package,
+                            request_id=receipts[-1]["request_id"],
+                            seen=seen,
+                        )
+                        gaps.extend(location_gaps)
+                        conditions.extend(accepted)
             compose(
                 [
                     page

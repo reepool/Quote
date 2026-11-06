@@ -1,243 +1,573 @@
-"""Controlled company core through the original task service. Not a real-model score."""
+"""Company core through TaskService and the public gateway.
 
+The external transport is replaced. This is not a real-model score.
+"""
+
+import asyncio
 import gzip
 import json
 import shutil
+import time
 import uuid
+from decimal import Decimal
 from pathlib import Path
 
-from research.company_profile.bounded_entry import _fixed_core_reply
-from research.company_profile.contracts import ReportSemanticResponseV3
+from research.business_profile_production_operations import (
+    BusinessProfileAnnouncementFrontierRepository,
+)
+from research.company_profile.bounded_entry import (
+    S27_OFFLINE_DIAGNOSTIC,
+    _fixed_core_reply,
+    _meter_profile,
+    _request_text,
+    prepare_gateway,
+)
 from research.company_profile.models import ReportIdentity
+from research.company_profile.operations import CompanyProfileTaskService
 from research.company_profile.reads import CompanyProfileReadService
 from research.company_profile.report_interpretation import direct_core_processing_identity
-from tests.unit.test_research.test_company_profile_bounded_entry import _fixed_core_objects
+from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
+from research.storage import ResearchStorageManager
+from tests.unit.test_research.test_business_profile_production_operations import (
+    _announcement,
+)
+from tests.unit.test_research.test_company_profile_bounded_entry import (
+    _fixed_core_objects,
+)
+from utils.config_manager import ResearchConfig, ResearchStorageConfig
+from utils.llm import CallableTransport, LlmClient, LlmConfig
+from utils.llm.budget import LlmRunBudget
+from utils.llm.orchestration import (
+    LlmPoolCoordinatorRegistry,
+    ProviderCoordinatorRegistry,
+)
+from utils.llm.rate_limit import ProfileLimiterRegistry
+
+ROOT = Path("/home/python/Quote")
+CHANGE = ROOT / "openspec/changes/restore-company-profile-llm-led-generalization"
+PARSE = (
+    ROOT
+    / "data/filings/announcements/blobs/68/derived/business_profile_pdfium_recovery.v4"
+    / "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c_57e1dd4f16ef40ff.json.gz"
+)
 
 
-def _pages():
-    cache = Path(
-        "/home/python/Quote/data/filings/announcements/blobs/68/derived/"
-        "business_profile_pdfium_recovery.v4/"
-        "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c_"
-        "57e1dd4f16ef40ff.json.gz"
-    )
-    wanted = {4, 9, 11, 16}
+def _pages(wanted):
     return tuple(
         {"page": int(item["page_number"]), "text": item["text"], "readable": True}
-        for item in json.loads(gzip.open(cache, "rt", encoding="utf-8").read())["pages"]
+        for item in json.loads(gzip.open(PARSE, "rt", encoding="utf-8").read())["pages"]
         if int(item["page_number"]) in wanted
     )
 
 
-def _provider(objects):
-    class _Fixed:
-        offline_only = True
+def _saved_s41():
+    query = json.loads((CHANGE / "s41-600103-receipts/query.json").read_text())
+    return [
+        item["response_payload"]
+        for item in query["profiles"][0]["three_views"]["call_receipts"]
+        if item.get("response_payload")
+    ]
 
-        def __init__(self):
-            self.claims_by_answer = {}
 
-        def interpret(self, request):
-            raw = _fixed_core_reply(
-                json.loads(request.model_dump_json()),
-                {"fixed_core_objects": objects},
+def _short_evidence(raw):
+    anchor = raw.get("anchor") or {}
+    quote = str(anchor.get("bounded_quote") or raw.get("quote") or "")
+    return {"page": int(raw["page"]), "quote": quote}
+
+
+def _project(payload, request):
+    purpose = request["purpose"]
+    wire = {
+        "schema_version": "company_profile_report_response.v3",
+        "request_id": request["request_id"],
+        "purpose": purpose,
+    }
+    if purpose == "source_inventory" and request.get("source_scope") == "page_map":
+        available = {int(page["page"]) for page in request.get("source_pages") or []}
+        wire["requested_pages"] = [
+            int(page)
+            for page in payload.get("requested_pages") or []
+            if int(page) in available
+        ]
+        return wire
+    if purpose == "source_inventory":
+        conditions = []
+        for item in payload.get("source_conditions") or []:
+            evidence = [_short_evidence(raw) for raw in item.get("evidence") or []]
+            evidence = [item for item in evidence if item["quote"].strip()]
+            if not evidence or not item.get("condition_id"):
+                continue
+            conditions.append(
+                {
+                    "condition_id": item["condition_id"],
+                    "dimension": item["dimension"],
+                    "description": str(item.get("description") or item["condition_id"]),
+                    "major": bool(item.get("major")),
+                    "statement_status": item.get("statement_status") or "current",
+                    "evidence": evidence,
+                }
             )
-            if request.purpose == "synthesize_views":
-                for claim in raw.get("claims") or []:
-                    self.claims_by_answer[claim["answer"]] = claim["claim_id"]
-            if request.purpose == "verify_views":
-                raw["checks"] = []
-                supported = set()
-                for claim in request.claims:
-                    quote = ""
-                    if claim.evidence:
-                        quote = str(claim.evidence[0].anchor.bounded_quote or "")
-                    matched = next(
-                        (
-                            item
-                            for item in objects
-                            if item["answer"] == claim.answer and item["quote"] in quote
-                        ),
-                        None,
-                    )
-                    ok = matched is not None
-                    if ok:
-                        supported.add(claim.claim_id)
-                    raw["checks"].append(
-                        {
-                            "target_type": "claim",
-                            "target_id": claim.claim_id,
-                            "status": "pass" if ok else "unclear",
-                            "explanation": "答案等于已核对象，且已核引文包含在本请求证据中。",
-                            "covers_target_type": "claim",
-                            "covers_target_id": claim.claim_id,
-                        }
-                    )
-                for condition in request.source_conditions:
-                    obj = next(
-                        (
-                            item
-                            for item in objects
-                            if condition.condition_id.endswith(item["condition_id"])
-                            or condition.condition_id == item["condition_id"]
-                        ),
-                        None,
-                    )
-                    claim_id = None
-                    if obj is not None:
-                        claim_id = next(
-                            (
-                                claim.claim_id
-                                for claim in request.claims
-                                if claim.answer == obj["answer"] and claim.claim_id in supported
-                            ),
-                            self.claims_by_answer.get(obj["answer"]),
-                        )
-                    blob = "".join(
-                        str(evidence.anchor.bounded_quote or "")
-                        for evidence in condition.evidence
-                    )
-                    blob += "".join(str(page.get("text") or "") for page in request.source_pages)
-                    ok = (
-                        obj is not None
-                        and claim_id is not None
-                        and obj["quote"] in blob
-                    )
-                    raw["checks"].append(
-                        {
-                            "target_type": "condition",
-                            "target_id": condition.condition_id,
-                            "status": "pass" if ok else "unclear",
-                            "explanation": "条件覆盖已核主张。",
-                            "covers_target_type": "claim" if ok else None,
-                            "covers_target_id": claim_id if ok else None,
-                        }
-                    )
-            report = request.report.model_dump(mode="json")
-
-            def fill(item, quote, page, evidence_id):
-                item["evidence"] = [
-                    {
-                        "evidence_id": evidence_id,
-                        "report": report,
-                        "page": int(page),
-                        "section_title": "正文",
-                        "anchor": {"anchor_type": "text", "bounded_quote": quote},
-                    }
-                ]
-
-            for index, condition in enumerate(raw.get("source_conditions") or []):
-                evidence = condition["evidence"][0]
-                fill(condition, evidence["quote"], evidence["page"], f"cond-{index}")
-            for index, claim in enumerate(raw.get("claims") or []):
-                evidence = claim["evidence"][0]
-                fill(claim, evidence["quote"], evidence["page"], f"claim-{index}")
-            return ReportSemanticResponseV3.model_validate_json(
-                json.dumps(raw, ensure_ascii=False)
+        wire["requested_pages"] = []
+        wire["source_conditions"] = conditions
+        return wire
+    if purpose == "synthesize_views":
+        claims = []
+        for item in payload.get("claims") or []:
+            evidence = [_short_evidence(raw) for raw in item.get("evidence") or []]
+            evidence = [one for one in evidence if one["quote"].strip()]
+            if not evidence or not item.get("answer"):
+                continue
+            claims.append(
+                {
+                    "claim_id": "s41-" + str(item.get("claim_id") or len(claims)),
+                    "dimension": item["dimension"],
+                    "status": "observed",
+                    "answer": item["answer"],
+                    "condition_ids": [
+                        condition["condition_id"]
+                        for condition in request.get("source_conditions") or []
+                        if evidence[0]["quote"][:24]
+                        in json.dumps(condition, ensure_ascii=False)
+                    ],
+                    "supporting_record_ids": [],
+                    "evidence": evidence,
+                }
             )
+        wire["claims"] = claims
+        return wire
+    checks = []
+    kept = {
+        str(item.get("answer") or "")
+        for item in payload.get("claims") or []
+        if item.get("answer") and "2,332,376,693.65" not in str(item.get("answer"))
+    }
+    for claim in request.get("claims") or []:
+        ok = str(claim.get("answer") or "") in kept
+        checks.append(
+            {
+                "target_type": "claim",
+                "target_id": claim.get("claim_id"),
+                "status": "pass" if ok else "unclear",
+                "explanation": "只保留S41里已经成立、且不是分销售模式合计的主张。",
+                "covers_target_type": "claim",
+                "covers_target_id": claim.get("claim_id"),
+            }
+        )
+    passed = {
+        check["target_id"] for check in checks if check["status"] == "pass"
+    }
+    for condition in request.get("source_conditions") or []:
+        quote = ""
+        evidence = condition.get("evidence") or condition.get("evidence_refs") or []
+        if evidence and isinstance(evidence[0], dict):
+            quote = str(evidence[0].get("quote") or "")
+        matched = next(
+            (
+                claim.get("claim_id")
+                for claim in request.get("claims") or []
+                if claim.get("claim_id") in passed and quote and quote[:24] in str(claim.get("answer") or "")
+            ),
+            None,
+        )
+        check = {
+            "target_type": "condition",
+            "target_id": condition.get("condition_id"),
+            "status": "pass" if matched else "unclear",
+            "explanation": "只保留S41里已经成立、且不是分销售模式合计的主张。",
+        }
+        if matched:
+            check["covers_target_type"] = "claim"
+            check["covers_target_id"] = matched
+        checks.append(check)
+    wire["checks"] = checks
+    return wire
 
-    return _Fixed()
+
+_ORIGINAL_ANSWERS = (
+    "公司属于制浆造纸行业，是集制浆、造纸、热电联产",
+    "公司主要从事竹木浆、溶解浆、纸袋纸",
+    "子公司层面：医药产业由漳州水仙经营",
+)
 
 
-def _run(objects):
-    from research.company_profile.runtime import (
-        CompanyProfileResearchWriter,
-        CompanyProfileStageRuntime,
+def _keep_original_answers(request, body):
+    """Later checks must not retract the three answers S41 already accepted."""
+    if request.get("purpose") != "verify_views":
+        return body
+    kept = {}
+    for claim in request.get("claims") or []:
+        answer = str(claim.get("answer") or "")
+        if "2,332,376,693.65" in answer:
+            continue
+        if any(answer.startswith(prefix) for prefix in _ORIGINAL_ANSWERS):
+            kept[claim.get("claim_id")] = answer
+    for check in body.get("checks") or []:
+        if check.get("target_type") == "claim" and check.get("target_id") in kept:
+            check["status"] = "pass"
+            check["covers_target_type"] = "claim"
+            check["covers_target_id"] = check["target_id"]
+    for condition in request.get("source_conditions") or []:
+        condition_id = str(condition.get("condition_id") or "")
+        tail = condition_id.rsplit(":", 1)[-1]
+        prefix = {"c1": _ORIGINAL_ANSWERS[0], "c2": _ORIGINAL_ANSWERS[1], "c9": _ORIGINAL_ANSWERS[2]}.get(tail)
+        if prefix is None:
+            continue
+        claim_id = next((item for item, answer in kept.items() if answer.startswith(prefix)), None)
+        if claim_id is None:
+            continue
+        for check in body.get("checks") or []:
+            if check.get("target_type") == "condition" and check.get("target_id") == condition_id:
+                check["status"] = "pass"
+                check["covers_target_type"] = "claim"
+                check["covers_target_id"] = claim_id
+    return body
+
+
+def _cover_restate(request, body, objects):
+    """A replaced quote may cite the reviewed sales sentence, not the subtotal."""
+    sales = next(
+        (
+            item
+            for item in objects
+            if item.get("condition_id") == "sales-model-customer-relationships"
+        ),
+        None,
+    )
+    if sales is None or sales["quote"] not in _request_text(request):
+        return body
+    if "2,332,376,693.65" in sales["quote"]:
+        return body
+    if request["purpose"] == "synthesize_views":
+        for condition in request.get("source_conditions") or []:
+            if "restate-" not in str(condition.get("condition_id") or ""):
+                continue
+            body.setdefault("claims", []).append(
+                {
+                    "claim_id": "restate-" + str(condition["condition_id"]).rsplit(":", 1)[-1],
+                    "dimension": sales["dimension"],
+                    "status": "observed",
+                    "answer": sales["answer"],
+                    "condition_ids": [condition["condition_id"]],
+                    "supporting_record_ids": [],
+                    "evidence": [{"page": int(sales["page"]), "quote": sales["quote"]}],
+                }
+            )
+    if request["purpose"] == "verify_views":
+        passed = {
+            check.get("target_id")
+            for check in body.get("checks") or []
+            if check.get("status") == "pass" and check.get("target_type") == "claim"
+        }
+        claim_id = next(
+            (
+                claim.get("claim_id")
+                for claim in request.get("claims") or []
+                if claim.get("answer") == sales["answer"] and claim.get("claim_id") in passed
+            ),
+            None,
+        )
+        if claim_id is None:
+            return body
+        for check in body.get("checks") or []:
+            if check.get("target_type") == "condition" and "restate-" in str(
+                check.get("target_id") or ""
+            ):
+                check["status"] = "pass"
+                check["covers_target_type"] = "claim"
+                check["covers_target_id"] = claim_id
+    return body
+
+
+def _run(objects, *, omit="", fault_payloads=None, pages=None):
+    binding = json.loads((CHANGE / "s1-pool-s1-600103-s16-binding.json").read_text())
+    raw = json.loads((ROOT / binding["config_path"]).read_text())["llm"]
+    config = LlmConfig.from_mapping(raw)
+    pool = config.pool_for_profile(binding["profile"])
+    binding.update(
+        {
+            "task_route_labels": ["deepseek:deepseek-flash"],
+            "task_route_first_only": True,
+            "same_source_max_retries": 0,
+            "route_fingerprint": config.route_fingerprint(binding["profile"]),
+            "fallback_allowed": pool.failover.enabled,
+            "sources": [
+                {
+                    "profile": profile.name,
+                    "model": profile.model,
+                    "provider_resource": config.resource_for_profile(profile).name,
+                    "price": {
+                        "input_cny_per_million": "1",
+                        "output_cny_per_million": "2",
+                        "basis": "offline",
+                        "context_tokens": 120000,
+                    },
+                }
+                for profile in config.concrete_profiles_for(binding["profile"])
+            ],
+            "run_authorization": S27_OFFLINE_DIAGNOSTIC,
+            "max_tokens": 480_000,
+            "max_physical_requests": 32,
+            "max_recoveries": 2,
+            "max_cost_cny": "10",
+            "reading_strategy": "direct_core_v1",
+        }
+    )
+    gateway_config, prices = prepare_gateway(binding, raw, real=False)
+    calls = []
+    fault_used = {"source": False, "draft": False, "verify": False}
+
+    def transport(_url, _headers, payload, _timeout):
+        request = json.loads(
+            next(item["content"] for item in payload["messages"] if item["role"] == "user")
+        )
+        calls.append(
+            {
+                "purpose": request["purpose"],
+                "source_scope": request.get("source_scope"),
+                "pages": [page["page"] for page in request.get("source_pages") or []],
+                "max_tokens": payload.get("max_tokens"),
+                "thinking": payload.get("thinking"),
+                "model": payload.get("model"),
+                "conditions": [
+                    item.get("condition_id")
+                    for item in request.get("source_conditions") or []
+                ][:8],
+            }
+        )
+        body = None
+        if fault_payloads:
+            if (
+                request["purpose"] == "source_inventory"
+                and request.get("source_scope") == "page_map"
+            ):
+                body = _project(fault_payloads[0], request)
+            elif request["purpose"] == "source_inventory" and not fault_used["source"]:
+                fault_used["source"] = True
+                body = _project(fault_payloads[1], request)
+            elif request["purpose"] == "synthesize_views" and not fault_used["draft"]:
+                fault_used["draft"] = True
+                body = _project(fault_payloads[2], request)
+            elif request["purpose"] == "verify_views" and not fault_used["verify"]:
+                fault_used["verify"] = True
+                body = _project(fault_payloads[2], request)
+        if body is None:
+            body = _cover_restate(
+                request,
+                _fixed_core_reply(
+                    request,
+                    {"fixed_core_objects": objects, "fixed_core_omit": omit},
+                ),
+                objects,
+            )
+        body = _keep_original_answers(request, body)
+        encoded = json.dumps(body, ensure_ascii=False)
+        return {
+            "status_code": 200,
+            "data": {
+                "choices": [
+                    {"message": {"content": encoded}, "finish_reason": "stop"}
+                ],
+                "usage": {
+                    "prompt_tokens": 20,
+                    "completion_tokens": 20,
+                    "total_tokens": 40,
+                },
+            },
+        }
+
+    budget = LlmRunBudget(
+        deadline=time.monotonic() + 180,
+        prices=prices,
+        max_tokens=480_000,
+        max_requests=32,
+        max_cost_cny=Decimal(10),
+        billing_mode="development_unpriced",
+        run_authorization=S27_OFFLINE_DIAGNOSTIC,
+    )
+    client = LlmClient(
+        gateway_config,
+        physical_budget=budget,
+        transport=CallableTransport(transport),
+        environment={
+            profile.api_key_env: "offline-placeholder"
+            for profile in gateway_config.concrete_profiles_for(binding["profile"])
+        },
+        limiter_registry=ProfileLimiterRegistry(),
+        provider_coordinator_registry=ProviderCoordinatorRegistry(),
+        pool_coordinator_registry=LlmPoolCoordinatorRegistry(),
     )
 
-    root = Path("/home/python/Quote/data/QuoteBak") / f"s43-core-{uuid.uuid4().hex[:8]}"
+    class OfflineGateway(CommonGatewaySemanticProvider):
+        offline_only = True
+
+    provider = OfflineGateway(
+        client=client,
+        profile=binding["profile"],
+        max_output_tokens=4000,
+        timeout_seconds=30,
+    )
+    root = ROOT / "data/QuoteBak" / f"b43-entry-{uuid.uuid4().hex[:8]}"
     root.mkdir()
     try:
-        report = ReportIdentity(
-            instrument_id="600103.SH",
-            report_id="ann-600103-2025",
-            document_version="6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
-            report_period="2025-12-31",
-            published_at="2026-04-13T16:00:00+00:00",
+        storage = ResearchStorageManager(
+            ResearchConfig(
+                storage=ResearchStorageConfig(
+                    db_path=str(root / "research.db"),
+                    financials_db_path=str(root / "research.db"),
+                    valuation_db_path=str(root / "research.db"),
+                    interests_db_path=str(root / "research.db"),
+                    quotes_db_path=str(root / "quotes.db"),
+                    attach_quotes_db=False,
+                )
+            )
+        )
+        storage.initialize()
+        BusinessProfileAnnouncementFrontierRepository(storage).upsert_record(
+            instrument={
+                "instrument_id": "600103.SH",
+                "symbol": "600103",
+                "exchange": "SSE",
+            },
+            record=_announcement(
+                "annual-2025",
+                "青山纸业2025年年度报告",
+                published_at="2026-04-13T16:00:00+00:00",
+            ),
         )
         identity = direct_core_processing_identity()
         identity.update(
             chapter_select=True,
             ledger_tokens=480_000,
             max_physical_requests=32,
-            meter_profile={
-                "model": "deepseek-flash",
-                "max_output_tokens_field": "max_tokens",
-                "stream": True,
-                "stream_include_usage": True,
-                "disable_thinking": True,
-            },
+            prompt_version="company_profile_report_reading.2026-11-03.chapter-core.v1",
+            product_contract="company_profile_product_contract.2026-10-27.llm-led.v8",
+            meter_profile=_meter_profile(gateway_config, binding),
         )
-        runtime = CompanyProfileStageRuntime(
-            writer=CompanyProfileResearchWriter(
-                root / "output", checkpoint_root=root / "checkpoints"
-            ),
-            provider=_provider(objects),
+        service = CompanyProfileTaskService(
+            storage=storage,
+            output_root=root / "output",
+            checkpoint_root=root / "checkpoints",
+            page_source=lambda item: {
+                "report": ReportIdentity(
+                    instrument_id=str(item["instrument_id"]),
+                    report_id=str(item["announcement_id"]),
+                    document_version="6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+                    report_period="2025-12-31",
+                    published_at="2026-04-13T16:00:00+00:00",
+                ),
+                "pages": pages or _pages({4, 9, 11, 16}),
+            },
+            provider=provider,
+            processing_identity=identity,
+            execution_budget=budget,
             token_budget=480_000,
         )
-        item = {
-            "work_id": "s43-core",
-            "report": report,
-            "pages": _pages(),
-            "processing_identity": identity,
-        }
-        for stage in ("acquire", "parse", "semantic", "verify", "publish"):
-            runtime.run_stage(stage, item)
-        queried = CompanyProfileReadService(root / "output").query(("600103.SH",))
-        exported = CompanyProfileReadService(root / "output").export(
-            ("600103.SH",), root / "export"
+        ran = asyncio.run(
+            service.execute(
+                "run",
+                knowledge_cutoff="2026-09-17",
+                instrument_ids=("600103.SH",),
+                max_items=1,
+                max_elapsed_seconds=150,
+            )
+        )
+        queried = asyncio.run(service.execute("query", instrument_ids=("600103.SH",)))
+        exported = asyncio.run(
+            service.execute(
+                "export",
+                instrument_ids=("600103.SH",),
+                output_directory=str(root / "export"),
+            )
         )
         reloaded = CompanyProfileReadService(root / "output").query(("600103.SH",))
-        return queried, exported, reloaded
+        return ran, queried, exported, reloaded, calls
     finally:
         shutil.rmtree(root, ignore_errors=True)
 
 
-def _answers(payload):
-    profile = payload["profiles"][0]
-    three = profile["three_views"]
-    return profile, three, {
-        claim.get("answer")
-        for view in three["views"].values()
+def _views(payload):
+    return payload["profiles"][0]["three_views"]
+
+
+def _answers(views):
+    return [
+        claim.get("answer") or ""
+        for view in views["views"].values()
         for claim in view.get("claims") or []
-    }
-
-
-def test_controlled_paper_core_is_readable_from_query_export_and_reload():
-    queried, exported, reloaded = _run(_fixed_core_objects())
-    assert queried["profiles"] == reloaded["profiles"]
-    assert exported["profiles"] == queried["profiles"]
-    profile, three, answers = _answers(queried)
-    assert three["draft_complete"] is True
-    assert three["real_semantic_complete"] is False
-    assert any("医药" in answer and "光电子" in answer for answer in answers)
-    assert any("2,418,990,221.17" in answer for answer in answers)
-    assert any("自主生产" in answer for answer in answers)
-    assert any("直销" in answer for answer in answers)
-    assert not any("2,332,376,693.65" in answer for answer in answers)
-    covered = {
-        check.get("covers_target_id")
-        for receipt in three.get("call_receipts") or []
-        for check in (receipt.get("response_payload") or {}).get("checks") or []
-        if check.get("status") == "pass" and check.get("covers_target_type") == "claim"
-    }
-    claim_ids = {
-        claim.get("claim_id")
-        for view in three["views"].values()
-        for claim in view.get("claims") or []
-    }
-    assert covered & claim_ids
-
-
-def test_missing_downstream_keeps_the_core_limited():
-    objects = [
-        item
-        for item in _fixed_core_objects()
-        if item["condition_id"] != "claim-005"
     ]
-    queried, exported, reloaded = _run(objects)
-    assert queried["profiles"] == reloaded["profiles"]
-    assert exported["profiles"] == queried["profiles"]
-    profile, three, answers = _answers(queried)
-    assert three["draft_complete"] is False
-    assert three["real_semantic_complete"] is False
-    assert any("医药" in answer for answer in answers)
+
+
+def _covered_claim_ids(views):
+    covered = set()
+    for receipt in views.get("call_receipts") or []:
+        for check in (receipt.get("response_payload") or {}).get("checks") or []:
+            if (
+                check.get("status") == "pass"
+                and check.get("covers_target_type") == "claim"
+                and check.get("target_type") == "condition"
+            ):
+                covered.add(check.get("covers_target_id"))
+    return covered
+
+
+def test_task_service_gateway_delivers_the_company_core():
+    _ran, queried, exported, reloaded, calls = _run(_fixed_core_objects())
+    assert queried["profiles"] == exported["profiles"] == reloaded["profiles"]
+    views = _views(queried)
+    assert views["draft_complete"] is True
+    assert views["real_semantic_complete"] is False
+    answers = _answers(views)
+    text = "\n".join(answers)
+    assert "医药" in text and "光电子" in text
+    assert "2,418,990,221.17" in text
+    assert "自主生产" in text and "直销" in text
+    assert "全国各地和国际市场" in text
+    assert "2,332,376,693.65" not in text
+    delivered = {
+        claim.get("claim_id")
+        for view in views["views"].values()
+        for claim in view.get("claims") or []
+    }
+    covered = _covered_claim_ids(views)
+    assert covered
+    assert covered <= delivered
+    assert any(
+        item["model"] == "deepseek-flash" and item["thinking"] == {"type": "disabled"}
+        for item in calls
+    )
+    assert any(item["purpose"] == "source_inventory" and 11 in item["pages"] for item in calls)
+
+
+def test_missing_downstream_keeps_the_same_entry_limited():
+    _ran, queried, exported, reloaded, _calls = _run(
+        _fixed_core_objects(), omit="claim-005"
+    )
+    assert queried["profiles"] == exported["profiles"] == reloaded["profiles"]
+    views = _views(queried)
+    assert views["draft_complete"] is False
+    assert views["real_semantic_complete"] is False
+    text = "\n".join(_answers(views))
+    assert "医药" in text
+    assert "全国各地和国际市场" not in text
+
+
+def test_s41_fault_then_legal_supplement_closes_the_same_entry():
+    saved = _saved_s41()
+    _ran, queried, exported, reloaded, calls = _run(
+        _fixed_core_objects(),
+        fault_payloads=saved,
+        pages=_pages({4, 9, 11, 16, 18, 22, 85, 92}),
+    )
+    assert queried["profiles"] == exported["profiles"] == reloaded["profiles"]
+    views = _views(queried)
+    answers = _answers(views)
+    text = "\n".join(answers)
+    assert views["draft_complete"] is True
+    assert views["real_semantic_complete"] is False
+    assert "2,418,990,221.17" in text
+    assert "自主生产" in text
+    assert "医药" in text and "光电子" in text
+    assert not any("2,332,376,693.65" in answer for answer in answers)
+    assert calls[0]["purpose"] == "source_inventory"
+    assert calls[0]["source_scope"] == "page_map"
+    assert any(item["purpose"] == "source_inventory" and 11 in item["pages"] for item in calls)

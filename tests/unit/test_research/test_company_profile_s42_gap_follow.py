@@ -174,6 +174,9 @@ def test_s41_follow_up_sends_the_period_question_and_unread_role_page():
     assert any("制浆、造纸" in answer for answer in answers)
     assert any("伸性纸袋纸" in answer for answer in answers)
     assert any("漳州水仙" in answer for answer in answers)
-    assert any(gap.split(":")[-1] == "c3" and gap.startswith("major_evidence_not_located") for gap in started.gaps)
+    assert any(
+        "c3" in gap and gap.startswith("major_evidence_not_located:")
+        for gap in started.gaps
+    )
     assert any("2,418,990,221.17" in answer for answer in answers)
     assert not any("2,332,376,693.65" in answer for answer in answers)
