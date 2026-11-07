@@ -27,7 +27,6 @@ from research.company_profile.reading_budget import (
     request_reservation,
 )
 from research.company_profile.report_interpretation import (
-    DIMENSIONS,
     VIEWS,
     ReportInterpretation,
     _bind_source_evidence,
@@ -652,15 +651,6 @@ def _current_gaps(accumulated, claims, conditions, checks, records=()) -> list[s
                 claims, checks
             ):
                 continue
-            if gap.startswith(("evidence_not_located:", "major_evidence_not_located:")):
-                tail = gap.rsplit(":", 1)[-1]
-                if any(
-                    getattr(check, "status", None) == "pass"
-                    and getattr(check, "target_type", None) == "condition"
-                    and str(getattr(check, "target_id", "")).endswith(f"restate-{tail}")
-                    for check in checks
-                ):
-                    continue
             if gap.startswith("evidence_not_located:"):
                 target = gap.split(":", 1)[1]
                 if any(
@@ -2363,48 +2353,10 @@ def interpret_direct_core(
         on_progress(_result())
 
     def _result() -> ReportInterpretation:
-        verified_now = _verified_claims(claims, checks)
-
-        def claim_text(claim) -> str:
-            parts = [str(claim.answer or "")]
-            for evidence in claim.evidence:
-                parts.append(str(evidence.anchor.bounded_quote or ""))
-            return "".join("".join(parts).split())
-
-        def failed_dimension(gap: str) -> str:
-            if gap.startswith("major_evidence_not_located:"):
-                tail = gap.rsplit(":", 1)[-1]
-                return tail if tail in DIMENSIONS else ""
-            if not gap.startswith("evidence_not_located:"):
-                return ""
-            scoped = gap.split(":", 1)[1].split(":unmatched:", 1)[0]
-            scoped = scoped.split(":redundant", 1)[0]
-            for item in gaps:
-                if item.startswith(f"major_evidence_not_located:{scoped}:"):
-                    tail = item.rsplit(":", 1)[-1]
-                    if tail in DIMENSIONS:
-                        return tail
-            return ""
-
-        replaced_gaps = set()
-        for gap in gaps:
-            dimension = failed_dimension(gap)
-            snippet = gap.split(":unmatched:", 1)[1] if ":unmatched:" in gap else ""
-            replaced = dimension and any(
-                item.dimension == dimension
-                and (not snippet or snippet not in claim_text(item))
-                for item in verified_now
-            )
-            if replaced and gap.startswith(
-                ("evidence_not_located:", "major_evidence_not_located:")
-            ):
-                replaced_gaps.add(gap)
-        observed = {item.dimension for item in verified_now}
+        observed = {item.dimension for item in _verified_claims(claims, checks)}
         published = _current_gaps(gaps, claims, conditions, checks, records)
         blocking_gaps = [
-            gap
-            for gap in published
-            if not gap.startswith("supplementary_gap:") and gap not in replaced_gaps
+            gap for gap in published if not gap.startswith("supplementary_gap:")
         ]
         blocking = any(
             gap.startswith(

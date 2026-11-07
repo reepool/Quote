@@ -278,7 +278,7 @@ def _cover_restate(request, body, objects):
     return body
 
 
-def _run(objects, *, omit="", fault_payloads=None, pages=None):
+def _run(objects, *, omit="", fault_payloads=None, pages=None, plant_unresolved=False):
     binding = json.loads((CHANGE / "s1-pool-s1-600103-s16-binding.json").read_text())
     raw = json.loads((ROOT / binding["config_path"]).read_text())["llm"]
     config = LlmConfig.from_mapping(raw)
@@ -315,6 +315,7 @@ def _run(objects, *, omit="", fault_payloads=None, pages=None):
     gateway_config, prices = prepare_gateway(binding, raw, real=False)
     calls = []
     fault_used = {"source": False, "draft": False, "verify": False}
+    planted = {"done": False}
 
     def transport(_url, _headers, payload, _timeout):
         request = json.loads(
@@ -360,6 +361,32 @@ def _run(objects, *, omit="", fault_payloads=None, pages=None):
                 objects,
             )
         body = _keep_original_answers(request, body)
+        if (
+            plant_unresolved
+            and not planted["done"]
+            and request["purpose"] == "source_inventory"
+            and request.get("source_scope") != "page_map"
+            and request.get("source_pages")
+        ):
+            planted["done"] = True
+            page = int(request["source_pages"][0]["page"])
+            body = dict(body)
+            body["source_conditions"] = [
+                *(body.get("source_conditions") or []),
+                {
+                    "condition_id": "audit-unresolved-other-business",
+                    "dimension": "principal_business",
+                    "description": "另一个独立主要业务的证据尚未定位，未核验也未被撤销。",
+                    "major": True,
+                    "statement_status": "current",
+                    "evidence": [
+                        {
+                            "page": page,
+                            "quote": "审核受控反例：另一个独立主要业务未定位的引文",
+                        }
+                    ],
+                },
+            ]
         encoded = json.dumps(body, ensure_ascii=False)
         return {
             "status_code": 200,
@@ -538,6 +565,28 @@ def test_task_service_gateway_delivers_the_company_core():
     assert any(item["purpose"] == "source_inventory" and 11 in item["pages"] for item in calls)
 
 
+def test_unresolved_major_business_keeps_the_core_incomplete():
+    _ran, queried, exported, reloaded, _calls = _run(
+        _fixed_core_objects(), plant_unresolved=True
+    )
+    assert queried["profiles"] == exported["profiles"] == reloaded["profiles"]
+    views = _views(queried)
+    gaps = views.get("gaps") or []
+    assert any(
+        gap.startswith("major_evidence_not_located:")
+        and gap.endswith("audit-unresolved-other-business")
+        for gap in gaps
+    )
+    assert not any(
+        check.get("target_id", "").endswith("audit-unresolved-other-business")
+        for receipt in views.get("call_receipts") or []
+        for check in (receipt.get("response_payload") or {}).get("checks") or []
+    )
+    assert views["draft_complete"] is False
+    assert views["real_semantic_complete"] is False
+    assert "医药" in "\n".join(_answers(views))
+
+
 def test_missing_downstream_keeps_the_same_entry_limited():
     _ran, queried, exported, reloaded, _calls = _run(
         _fixed_core_objects(), omit="claim-005"
@@ -551,7 +600,7 @@ def test_missing_downstream_keeps_the_same_entry_limited():
     assert "全国各地和国际市场" not in text
 
 
-def test_s41_fault_then_legal_supplement_closes_the_same_entry():
+def test_s41_unresolved_major_quote_keeps_the_supplement_limited():
     saved = _saved_s41()
     _ran, queried, exported, reloaded, calls = _run(
         _fixed_core_objects(),
@@ -562,7 +611,11 @@ def test_s41_fault_then_legal_supplement_closes_the_same_entry():
     views = _views(queried)
     answers = _answers(views)
     text = "\n".join(answers)
-    assert views["draft_complete"] is True
+    assert views["draft_complete"] is False
+    assert any(
+        "c3" in gap and gap.startswith("major_evidence_not_located:")
+        for gap in views.get("gaps") or []
+    )
     assert views["real_semantic_complete"] is False
     assert "2,418,990,221.17" in text
     assert "自主生产" in text

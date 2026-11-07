@@ -874,9 +874,7 @@ def _located_conditions(
         if not bound:
             gaps.append(f"evidence_not_located:{scoped_id}")
             if condition.major:
-                gaps.append(
-                    f"major_evidence_not_located:{scoped_id}:{condition.dimension}"
-                )
+                gaps.append(f"major_evidence_not_located:{scoped_id}")
             continue
 
         def redundant(quote: str) -> bool:
@@ -893,9 +891,7 @@ def _located_conditions(
         elif missed_quotes:
             gaps.append(f"evidence_not_located:{scoped_id}")
             if condition.major:
-                gaps.append(
-                    f"major_evidence_not_located:{scoped_id}:{condition.dimension}"
-                )
+                gaps.append(f"major_evidence_not_located:{scoped_id}")
             for quote in missed_quotes:
                 snippet = "".join(quote.split())[:40]
                 if snippet:
