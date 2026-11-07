@@ -1,6 +1,6 @@
 # B43：公司整稿有限阶段交付
 
-> 日期：2026-11-07；状态：**B43两次共性修正已用，主验收未通过、业务方案停止；仅§9零调用安全收尾生效**。原工程合同保留如下，不能据§1—8再开第三轮或真实调用。
+> 日期：2026-11-07；状态：**B43主验收未通过、业务方案停止；§9安全收尾经审核§217接受，整卡结束**。原工程合同保留如下，不恢复旧次数或真实调用；A按本次用户请求显式重整的后续能力见[新工程合同](company-core-source-recovery-card.md)，不是本卡第三轮。
 > 用户要求“落实总结，新生成交付给B的开发任务卡”。A据此采用已讨论的有限阶段路线，不再要求用户重复选择普通实现方案。本卡替代旧§43候选说明，不恢复已结束的§42。
 > 唯一change：`restore-company-profile-llm-led-generalization`；流程：[A/B v3](../../../docs/development/ab_role_development_workflow.md)。产品：[总需求v8](../../../docs/development/company_profile_product_and_industry_semantic_requirements.md)；质量/资源/原成绩：[验收计划](../../../docs/development/company_profile_acceptance_program.md)。本卡只授权零外呼工程，不能代替任何付费、生产或扩样批准。
 

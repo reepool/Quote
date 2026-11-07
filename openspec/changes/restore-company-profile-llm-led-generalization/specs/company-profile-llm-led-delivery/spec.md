@@ -278,6 +278,12 @@ After candidate-free source discovery, the owner MUST compare major conditions w
 - **WHEN** a condition pass has no coverage object, cites an unknown or unverified object, or cites a different business merely sharing the same dimension
 - **THEN** it cannot clear the major gap; reference checks enforce identity and state, and semantic comparison determines substantive coverage
 
+#### Scenario: A major source condition has a repairable evidence error
+- **WHEN** an explicitly authorized company task receives a major source candidate whose quotation cannot be located but relevant official text can substantiate the same business obligation
+- **THEN** the original candidate, failed evidence, request identity and source scope remain traceable while one bounded company-level evidence repair produces an explicitly linked correction
+- **AND** the correction must locate in actually read source context and flow through synthesis or reuse of a valid delivered object and effective support and coverage checks before that original obligation can stop blocking completion
+- **AND** sharing a dimension, omitting the failed quote, silently dropping a clause or returning no correction cannot resolve the original major gap; independent source inventory remains candidate-free and is distinct from repair
+
 #### Scenario: The first-company experiment has ended
 - **WHEN** the current card permits only offline correction and closeout of saved real receipts
 - **THEN** the existing entry may prove engineering corrections in isolated storage, but the original real results and charges remain unchanged
