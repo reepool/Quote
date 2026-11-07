@@ -179,4 +179,7 @@ def test_s41_follow_up_sends_the_period_question_and_unread_role_page():
         for gap in started.gaps
     )
     assert any("2,418,990,221.17" in answer for answer in answers)
-    assert not any("2,332,376,693.65" in answer for answer in answers)
+    assert any(
+        "2,418,990,221.17" in answer and "2,332,376,693.65" not in answer
+        for answer in answers
+    )

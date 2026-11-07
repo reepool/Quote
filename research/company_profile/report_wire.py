@@ -191,7 +191,8 @@ def response_schema(request: ReportSemanticRequestV3) -> dict:
     schema = ReportSemanticResponseV3.model_json_schema()
     fields = {"schema_version", "request_id", "purpose"}
     if request.purpose == "source_inventory":
-        fields.add("requested_pages")
+        if request.source_scope != "evidence_repair":
+            fields.add("requested_pages")
         if request.source_scope != "page_map":
             fields.add("source_conditions")
     elif request.purpose == "synthesize_views":
@@ -400,6 +401,17 @@ def instructions(request: ReportSemanticRequestV3) -> str:
             + selection
             + "No source_conditions or answers yet. "
             "Do not assume an unselected page has no relevant disclosure."
+        )
+    if request.purpose == "source_inventory" and request.source_scope == "evidence_repair":
+        return common + (
+            "This is one evidence repair, not a new source discovery and not a draft. "
+            "Each supplied source condition failed because its quote was not in the "
+            "supplied pages. Return the same condition_id, dimension and major flag, "
+            "with a quote copied from these pages that states that same obligation, "
+            "including the printed table header, period and unit. A sales-channel or "
+            "industry subtotal does not replace the company operating-revenue total. "
+            "Do not replace the condition with a different business. If these pages "
+            "do not contain a correction, omit that condition. Do not request more pages."
         )
     if request.purpose == "source_inventory":
         if chapter:

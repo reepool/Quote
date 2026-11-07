@@ -662,6 +662,13 @@ def _current_gaps(accumulated, claims, conditions, checks, records=()) -> list[s
                     continue
                 if _period_revenue_verified(claims, checks) and "period-operating-revenue" in target:
                     continue
+            if gap.startswith("major_evidence_not_located:"):
+                scoped = gap.split(":", 1)[1]
+                if any(
+                    scoped in claim.condition_ids
+                    for claim in _verified_claims(claims, checks)
+                ):
+                    continue
             if gap.startswith("verify_unit_not_admitted:"):
                 target = gap.split(":", 1)[1]
                 if any(item.claim_id == target for item in _verified_claims(claims, checks)):
@@ -2281,6 +2288,7 @@ def interpret_direct_core(
     request_cap = int(identity.get("max_physical_requests") or 16)
     gaps: list[str] = []
     conditions: list[ReportSourceCondition] = []
+    pending_repairs: list[ReportSourceCondition] = []
     conditions_to_draft: list[ReportSourceCondition] = conditions
     claims: list[ReportViewClaim] = []
     checks: list[ReportViewCheck] = []
@@ -3679,6 +3687,32 @@ def interpret_direct_core(
             accepted = compact_source_conditions(accepted)
             gaps.extend(location_gaps)
             conditions.extend(accepted)
+            request_id = receipts[-1]["request_id"]
+            accepted_ids = {item.condition_id for item in accepted}
+            for condition in reviewed.source_conditions:
+                scoped = f"{request_id}:{condition.condition_id}"
+                if (
+                    not condition.major
+                    or scoped in accepted_ids
+                    or any(item.condition_id == scoped for item in pending_repairs)
+                ):
+                    continue
+                if not any(
+                    gap.startswith("major_evidence_not_located:") and scoped in gap
+                    for gap in location_gaps
+                ):
+                    continue
+                pending_repairs.append(
+                    condition.model_copy(
+                        update={
+                            "condition_id": scoped,
+                            "description": (
+                                condition.description
+                                + "\n定位失败：所给引文不在已发送正文中。"
+                            ),
+                        }
+                    )
+                )
             if measure_current_request and accepted:
                 draft_ready_core()
             for page_no in reviewed.requested_pages:
@@ -3770,6 +3804,78 @@ def interpret_direct_core(
         question = make_operating_revenue_question(report, missed)
         conditions.append(question)
         return question
+
+    def repair_unlocated_sources() -> None:
+        """One company-level repair of source quotes that did not locate.
+
+        The failed condition keeps its id. A returned quote joins the draft only
+        when it locates on the cited pages. Coverage, not the repair itself,
+        clears the major gap.
+        """
+        if identity.get("source_evidence_repaired") or not pending_repairs:
+            return
+        identity["source_evidence_repaired"] = True
+        page_ids: list[int] = []
+        for condition in pending_repairs:
+            for evidence in condition.evidence:
+                page_no = int(evidence.page)
+                if page_no not in page_ids:
+                    page_ids.append(page_no)
+        missing = [
+            page_no
+            for page_no in page_ids
+            if page_no in by_page and by_page[page_no].get("status") != "read"
+        ]
+        if missing:
+            inventory_pages(missing)
+        pages = []
+        for page_no in page_ids:
+            source = next(
+                (
+                    item
+                    for item in sources
+                    if int(item["page"]) == page_no and str(item.get("text") or "").strip()
+                ),
+                None,
+            )
+            if source is None or by_page.get(page_no, {}).get("status") != "read":
+                continue
+            pages.append(
+                {"page": page_no, "text": str(source["text"]), "readable": True}
+            )
+        if not pages:
+            return
+        try:
+            reviewed = invoke(
+                "source_inventory",
+                pages,
+                source_scope="evidence_repair",
+                output=_source_output(identity),
+                later=0,
+                extra={"source_conditions": tuple(pending_repairs)},
+            )
+        except (ValueError, LlmError, SemanticProviderError):
+            return
+        by_id = {item.condition_id: item for item in pending_repairs}
+        for condition in reviewed.source_conditions:
+            original = by_id.get(condition.condition_id)
+            if original is None or condition.dimension != original.dimension:
+                continue
+            located = []
+            failed = False
+            for evidence in condition.evidence:
+                bound = _bind_source_evidence(evidence, report, pages)
+                if bound is None:
+                    failed = True
+                    break
+                located.append(bound)
+            if failed or not located:
+                continue
+            corrected = original.model_copy(update={"evidence": tuple(located)})
+            conditions.append(corrected)
+            if chapter_required_pages is not None:
+                for evidence in corrected.evidence:
+                    chapter_required_pages.add(int(evidence.page))
 
     composed: set[int] = set()
 
@@ -5352,6 +5458,7 @@ def interpret_direct_core(
                         )
                         gaps.extend(location_gaps)
                         conditions.extend(accepted)
+            repair_unlocated_sources()
             compose(
                 [
                     page
@@ -5363,6 +5470,7 @@ def interpret_direct_core(
             follow = inventory_pages(readable_order, prepared=planned)
             tail_hold = 0
             note_missed_core_revenue()
+            repair_unlocated_sources()
             compose(readable_order)
             if (
                 follow

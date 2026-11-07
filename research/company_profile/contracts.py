@@ -437,8 +437,10 @@ class ReportSemanticRequest(_StrictModel):
 
     @model_validator(mode="after")
     def _purpose_scope(self) -> ReportSemanticRequest:
-        if self.purpose == "source_inventory" and (
-            self.source_conditions or self.claims or self.records
+        if (
+            self.purpose == "source_inventory"
+            and getattr(self, "source_scope", "full_context") != "evidence_repair"
+            and (self.source_conditions or self.claims or self.records)
         ):
             raise ValueError("source-first inventory must not receive candidates")
         if self.purpose == "synthesize_views" and self.claims:
@@ -510,7 +512,19 @@ class ReportSemanticRequestV3(ReportSemanticRequest):
     schema_version: Literal["company_profile_report_request.v3"] = (
         "company_profile_report_request.v3"
     )
-    source_scope: Literal["page_map", "full_context"] = "full_context"
+    source_scope: Literal["page_map", "full_context", "evidence_repair"] = "full_context"
+
+    @model_validator(mode="after")
+    def _repair_scope(self) -> ReportSemanticRequestV3:
+        if self.source_scope != "evidence_repair":
+            return self
+        if self.purpose != "source_inventory":
+            raise ValueError("evidence repair is not a draft or a verification")
+        if not self.source_conditions:
+            raise ValueError("evidence repair requires the failed source conditions")
+        if self.claims or self.records:
+            raise ValueError("evidence repair must not receive answers")
+        return self
 
 
 class ReportSemanticResponseV3(ReportSemanticResponse):
