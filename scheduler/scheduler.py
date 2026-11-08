@@ -470,6 +470,12 @@ class TaskScheduler:
                 max_runtime_seconds,
                 run_id,
             )
+            # Notify here, at the earliest layer that observes the timeout:
+            # the dependency executor converts the re-raised TimeoutError into
+            # a recorded success=False, so downstream except-branches and the
+            # APScheduler error listener never fire (2026-11-08: Sunday
+            # reconciliation scan killed at the cap, operator unserved).
+            self._notify_task_timeout(job_id, run_id, float(max_runtime_seconds or 0))
             self._spawn_background(self._watch_orphan_worker(thread, state))
             raise
         except asyncio.CancelledError:
