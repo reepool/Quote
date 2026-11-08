@@ -1,12 +1,12 @@
 ## 1. M1 基线与等价性工具
 
-- [ ] 1.1 建立单候选计时与调用分解工具：每候选端到端耗时、存储调用次数（连接/查询/取回行数），在 ~200 标的样本上产出基线报告（存 docs/development），确认 0.64s 的构成比例，校准 L4/L5 取舍。
+- [ ] 1.1 建立单候选计时与调用分解工具：每候选端到端耗时、存储调用次数（连接/查询/取回行数），在 ~200 标的样本上、**以真实查询形态（include_history=True 的 UNION ALL 路径）**产出基线报告（存 docs/development），确认 0.64s 的构成比例，校准 L4/L5 取舍；同时从评估器代码钉死窄查询必须投影的精确列集（含 updated_at 最新语义与取值/单位列）。
 - [ ] 1.2 冻结等价性样本集：≥200 标的 × 全对账报告期，必含银行/非银 profile、BSE、零数据标的（600036 类）、生命周期豁免分类；入库为 tests fixture。
 - [ ] 1.3 实现双跑等价工具：同一样本集上新旧实现输出逐候选 diff（ready/missing_fields/facts），当前实现结果作为黄金基线存档。
 
 ## 2. M2 窄方法与调用点切换
 
-- [ ] 2.1 storage 新增窄方法 `get_financial_core_fact_readiness_rows`：显式列投影 + canonical IN 过滤下推 + updated_at 最新语义保持；单测钉住排序与选择语义。
+- [ ] 2.1 storage 新增窄方法 `get_financial_core_fact_readiness_rows`：显式列投影 + canonical IN 过滤下推 + updated_at 最新语义保持 + **历史表分支合并（include_history 语义等价，历史表无索引直查）**；单测钉住排序、选择与历史合并语义（含"仅存在于历史表的标的"用例）。
 - [ ] 2.2 就绪调用点（readiness_for_target → storage 链）切换到窄方法；宽方法及全部其他调用方零改动。
 - [ ] 2.3 就绪评估作用域内连接复用（每候选一次连接），消除 5ms×N 叠加；不建常驻池。
 - [ ] 2.4 双跑等价 100% 一致后合入；全部既有 storage/对账/增量单测回归通过。

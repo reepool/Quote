@@ -13,11 +13,15 @@ The financial readiness path SHALL issue narrow queries that project only the co
 - **THEN** the existing wide read method SHALL keep its current signature and behavior
 
 ### Requirement: The readiness path must be backed by a covering index
-The system SHALL maintain a composite covering index over (instrument_id, report_period, canonical_fact_name, fact_value) on the hot facts table so readiness queries execute as index-only scans.
+The system SHALL maintain a composite covering index on the hot facts table whose column set covers every column referenced by the narrow readiness query (at minimum instrument_id, report_period, canonical_fact_name, updated_at and the selected value/unit columns), so the hot-table branch of readiness queries executes as an index-only scan. The history branch SHALL preserve include_history semantics without requiring a history index (its size is negligible).
 
 #### Scenario: Readiness query plan is verified
-- **WHEN** EXPLAIN QUERY PLAN is run for the narrow readiness query
+- **WHEN** EXPLAIN QUERY PLAN is run for the narrow readiness query's hot-table branch
 - **THEN** the plan SHALL show a covering-index scan without table row lookups
+
+#### Scenario: History rows still contribute to readiness
+- **WHEN** a candidate's facts exist only in the history table (or differ from hot)
+- **THEN** the narrow path SHALL merge history rows with the same recency semantics as the wide implementation
 
 #### Scenario: Index is created in a maintenance window
 - **WHEN** the covering index is created on the production financial database

@@ -16,11 +16,13 @@
 
 ### 1.2 现状查询形态（`research/storage.py` get_financial_numeric_facts）
 
-- `SELECT *`（35 列全部解码为 Python 对象，含大文本列）；
-- canonical 过滤在 Python 侧逐行判断（573 行取回后丢弃 566 行）；
+- 真实调用为 `include_history=True`（`readiness_for_target` 固定传）：内层 `SELECT *, '<table>' AS physical_table FROM hot UNION ALL SELECT *, ... FROM history`，外层再按 instrument+period 过滤——**A/B 基准测的是热表单表直查形态**，浪费结论（573 vs 7 行）不变，但绝对耗时以 M1 在真实形态上重测为准；
+- 历史表全表仅 **10,978 行**（实测），union 体积可忽略；成本主体是热表肥行解码；
+- `SELECT *`（35 列全部解码为 Python 对象，含大文本列），并附加合成列 `physical_table`；
+- canonical 过滤在评估器侧逐行判断（573 行取回后丢弃绝大多数），SQL 未下推；
 - `ORDER BY report_period DESC, fact_name ASC, updated_at DESC` 触发 TEMP B-TREE；
 - 已有 `idx_financial_numeric_facts_hot_instrument(instrument_id, ...)` 支撑定位——**不缺查找索引，缺的是"少取数据"**；
-- EXPLAIN（现行）：`SEARCH ... USING INDEX idx_..._instrument (instrument_id=? AND report_period=?)` + `USE TEMP B-TREE FOR LAST TERM OF ORDER BY`。
+- 附：就绪链上的 `wrapped` 装饰器（storage.py:14796）只是 financial 库路由（进入 `financial_database_scope`），**无缓存层**——L4 连接复用的收益前提成立。
 
 ### 1.3 为什么现在立项
 
@@ -48,7 +50,7 @@
 |---|---|---|---|
 | L1 投影收窄 | 新方法只 SELECT 就绪所需列（period、canonical_fact_name、fact_value、unit 等少量列） | 肥列（JSON/长文本）不再解码，IO 与解码同降 | **做**（A/B 已证 10→<1ms 量级） |
 | L2 过滤下推 | canonical 事实 IN (...) 进 SQL WHERE | 573 行→~7 行 | **做**（与 L1 同一方法体内） |
-| L3 覆盖索引 | `(instrument_id, report_period, canonical_fact_name, fact_value)` 复合索引 → index-only scan | 冷缓存下消除随机回表（扫描态主要物理成本） | **做**（DDL 走维护窗口，见 §5） |
+| L3 覆盖索引 | 热表 `(instrument_id, report_period, canonical_fact_name, updated_at, fact_value[, unit])`——**列集以窄查询实际引用为准**（M1 从评估器代码钉死，updated_at 为最新版本语义必需）；历史分支不做索引（全表仅 11k 行，窄方法直查后 Python 合并，保持 include_history 语义） | 冷缓存下消除随机回表（扫描态主要物理成本） | **做**（DDL 走维护窗口，见 §5） |
 | L4 连接复用 | 就绪路径在同一库作用域内复用连接（现每调用 5ms×N） | 每候选省 15~30ms | **做**（最小：readiness 循环级连接；不建常驻池） |
 | L5 按标的批量化 | 一次查询取回该标的全部 11 期就绪行（11 次查询→1 次） | 查询次数降 11 倍 | **条件项**：M1 实测 L1-L4 后仍不达标才做 |
 | 物化就绪表 | 写路径维护每标就绪摘要 | 读端 O(1) 但写端失效逻辑复杂 | **否决**（违反最小充分实现） |
@@ -64,7 +66,7 @@
 ## 5. 索引 DDL 运维（L3）
 
 - `CREATE INDEX` 在 77GB 库上为写事务：WAL 下**读者不受影响**，**写者阻塞建索引全程**；
-- 窗口选择：夜间增量（21:45 任务）结束后、且无其他 financials.db 写任务时段（建议周三 00:30-06:00 空档，M3 出具精确窗口核查清单）；
+- 窗口选择：夜间增量（21:45 起、上限 4h，最坏 01:45 结束——2026-11-02 实际发生过）之后、且无其他 financials.db 写任务时段（建议 **≥02:00** 的凌晨空档，M3 出具精确窗口核查清单排除当日在跑任务）；
 - 时长预估：77GB 顺序构建估 20~60 分钟（M3 在备份副本上实测后写死进 runbook）；
 - 空间：估 1~2GB（29.7M 行 × 窄键），建前查剩余空间；
 - 回滚：`DROP INDEX` 即可，无数据影响；
