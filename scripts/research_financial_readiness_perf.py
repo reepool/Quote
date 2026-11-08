@@ -20,8 +20,11 @@ import json
 import sys
 import threading
 import time
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
+
+MAPPING_VERSION = "sina_ths_core_financial_facts.v6"
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -97,18 +100,42 @@ def _pick_sample(manager: ResearchStorageManager, count: int, periods: list[str]
     ]
 
 
-def _run_readiness(manager: ResearchStorageManager, sample: list[dict[str, Any]], narrow: bool) -> list[dict[str, Any]]:
+def _resolve_profiles(manager: ResearchStorageManager, sample: list[dict[str, Any]]) -> dict[str, str]:
+    """Resolve each instrument's statement profile exactly like the service."""
+    from research.financial_statement_profile import resolve_financial_statement_profile
+
+    profiles: dict[str, str] = {}
+    with (
+        manager.pinned_financial_read_connection(),
+        manager.financial_database_scope(),
+        manager.get_connection(),
+    ):
+        for entry in sample:
+            resolution = resolve_financial_statement_profile(instrument={"instrument_id": entry["instrument_id"]})
+            profiles[entry["instrument_id"]] = resolution.profile if hasattr(resolution, "profile") else str(resolution)
+    return profiles
+
+
+def _run_readiness(
+    manager: ResearchStorageManager,
+    sample: list[dict[str, Any]],
+    narrow: bool,
+    profiles: dict[str, str] | None = None,
+    mapping_version: str | None = None,
+) -> list[dict[str, Any]]:
     manager.financial_readiness_narrow_rows = narrow
     out: list[dict[str, Any]] = []
     for entry in sample:
         instrument_id = entry["instrument_id"]
+        profile = (profiles or {}).get(instrument_id)
         for period in entry["report_periods"]:
             result = manager.get_financial_local_core_facts(
                 instrument_id,
                 report_period=period,
                 requested_canonical_facts=["revenue", "net_income_parent", "equity_parent",
                                            "total_assets", "total_liabilities"],
-                mapping_version=None,
+                profile=profile,
+                mapping_version=mapping_version,
                 include_history=True,
             )
             out.append(
@@ -135,11 +162,46 @@ def _run_readiness(manager: ResearchStorageManager, sample: list[dict[str, Any]]
 def cmd_baseline(args: argparse.Namespace) -> int:
     manager = _build_manager()
     sample = _pick_sample(manager, args.count, RECONCILIATION_PERIODS)
+    profiles = _resolve_profiles(manager, sample)
     print(f"sample: {len(sample)} instruments x {len(RECONCILIATION_PERIODS)} periods")
+    if args.decompose:
+        counts = {"connections": 0, "queries": 0}
+        real_get_conn = manager.get_connection
+
+        class _CountingConn:
+            def __init__(self, inner):
+                self._inner = inner
+
+            def execute(self, sql, *a, **k):
+                counts["queries"] += 1
+                return self._inner.execute(sql, *a, **k)
+
+            def __getattr__(self, name):
+                return getattr(self._inner, name)
+
+        @contextmanager
+        def counting_conn():
+            counts["connections"] += 1
+            with real_get_conn() as c:
+                yield _CountingConn(c)
+
+        manager.get_connection = counting_conn
+        try:
+            n_evals = len(sample) * len(RECONCILIATION_PERIODS)
+            started = time.monotonic()
+            _run_readiness(manager, sample, narrow=False, profiles=profiles, mapping_version=MAPPING_VERSION)
+            wide_elapsed = time.monotonic() - started
+            print(
+                f"decompose(wide): {counts['connections']} connections, {counts['queries']} queries "
+                f"for {n_evals} evaluations -> {counts['connections'] / n_evals:.2f} conn, "
+                f"{counts['queries'] / n_evals:.2f} queries per candidate, {wide_elapsed / n_evals * 1000:.1f} ms/candidate"
+            )
+        finally:
+            del manager.get_connection
     timings: dict[str, float] = {}
     for label, narrow in (("wide", False), ("narrow", True)):
         started = time.monotonic()
-        results = _run_readiness(manager, sample, narrow)
+        results = _run_readiness(manager, sample, narrow, profiles=profiles, mapping_version=MAPPING_VERSION)
         elapsed = time.monotonic() - started
         per_candidate = elapsed / max(1, len(results))
         timings[label] = per_candidate
@@ -170,9 +232,13 @@ def cmd_dump_sample(args: argparse.Namespace) -> int:
 def cmd_equivalence(args: argparse.Namespace) -> int:
     manager = _build_manager()
     sample = json.loads(Path(args.sample_file).read_text())
-    print(f"equivalence gate: {len(sample)} instruments (dual run, wide vs narrow)")
-    wide = _run_readiness(manager, sample, narrow=False)
-    narrow = _run_readiness(manager, sample, narrow=True)
+    profiles = _resolve_profiles(manager, sample)
+    print(
+        f"equivalence gate: {len(sample)} instruments (dual run, wide vs narrow, "
+        f"production shape: profile resolution + mapping_version={MAPPING_VERSION})"
+    )
+    wide = _run_readiness(manager, sample, narrow=False, profiles=profiles, mapping_version=MAPPING_VERSION)
+    narrow = _run_readiness(manager, sample, narrow=True, profiles=profiles, mapping_version=MAPPING_VERSION)
     mismatches = 0
     for w, n in zip(wide, narrow):
         if w != n:
@@ -190,6 +256,7 @@ def main() -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     p_base = sub.add_parser("baseline", help="time wide vs narrow readiness")
     p_base.add_argument("--count", type=int, default=30)
+    p_base.add_argument("--decompose", action="store_true", help="count connections/queries per candidate (wide)")
     p_dump = sub.add_parser("dump-sample", help="freeze an equivalence sample set")
     p_dump.add_argument("--count", type=int, default=220)
     p_dump.add_argument("--out", default=DEFAULT_SAMPLE_OUT)

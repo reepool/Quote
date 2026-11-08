@@ -2152,7 +2152,9 @@ class ResearchStorageManager:
         with _FINANCIAL_MAPPING_REGISTRY_LOCK:
             cached = _FINANCIAL_MAPPING_REGISTRY_CACHE.get(cache_key)
             if cached is not None and cached[0] > now:
-                return cached[1]
+                # Shallow copies per hit: callers must never mutate the cached
+                # rows (the registry is tiny, copy cost is negligible).
+                return [dict(row) for row in cached[1]]
         rows = self._read_financial_source_field_mappings(
             profile=profile,
             approved_for_core=approved_for_core,

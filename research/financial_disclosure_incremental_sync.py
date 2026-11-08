@@ -447,6 +447,7 @@ class FinancialDisclosureIncrementalSyncService:
                 "stale_run_count": len(stale_runs),
                 "stale_run_samples": stale_runs[:10],
                 "stale_local_gap_cleared": stale_local_gap_cleared,
+                "scan_rate_per_sec": getattr(self, "_last_scan_rate_per_sec", None),
                 "elapsed_seconds": elapsed,
                 **write_result,
                 "cninfo_access": cninfo_access,
@@ -855,11 +856,14 @@ class FinancialDisclosureIncrementalSyncService:
             existing = candidates.setdefault(candidate.key, candidate)
             if existing is not candidate:
                 self._merge_candidate_event(existing, event)
+        # Scan counters initialized before the optional reconciliation block so
+        # the tail scan-rate bookkeeping below stays defined in incremental
+        # mode (no report_periods) as well.
+        scanned_total = 0
+        scan_started_at = time.monotonic()
         if report_periods:
-            scanned_total = 0
             scanned_since_checkpoint = 0
-            last_checkpoint_at = time.monotonic()
-            scan_started_at = last_checkpoint_at
+            last_checkpoint_at = scan_started_at
             for instrument in instruments:
                 for report_period in report_periods:
                     if max_candidates > 0 and len(candidates) >= max_candidates:
@@ -928,6 +932,9 @@ class FinancialDisclosureIncrementalSyncService:
         self._last_candidate_unlimited_count = len(candidates)
         self._last_candidate_limit = int(max_candidates)
         self._last_expired_pending_count = expired_pending
+        if scanned_total:
+            scan_elapsed_total = max(1e-6, time.monotonic() - scan_started_at)
+            self._last_scan_rate_per_sec = round(scanned_total / scan_elapsed_total, 2)
         limited = self._limit_candidates_balanced(candidates, max_candidates)
         self._last_candidate_source_summary = self._summarize_candidate_sources(
             limited.values(),

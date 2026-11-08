@@ -2906,6 +2906,11 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
         f"报告期: `{', '.join(result.get('report_periods') or [])}`",
         f"公告扫描: {result.get('announcements_scanned', 0)}，命中 {result.get('selected_announcements', 0)}，页数 {result.get('pages_scanned', 0)}",
         (
+            "扫描速率: "
+            f"{result.get('scan_rate_per_sec') or '-'} 候选/秒"
+            + (f"（耗时 {result.get('elapsed_seconds', 0)}s）" if result.get('scan_rate_per_sec') else "")
+        ),
+        (
             "公告过滤: "
             f"财报相关 {result.get('financial_like_announcements', 0)}，"
             f"过滤噪声 {result.get('filtered_financial_like_announcements', 0)}，"
