@@ -284,6 +284,11 @@ After candidate-free source discovery, the owner MUST compare major conditions w
 - **AND** the correction must locate in actually read source context and flow through synthesis or reuse of a valid delivered object and effective support and coverage checks before that original obligation can stop blocking completion
 - **AND** sharing a dimension, omitting the failed quote, silently dropping a clause or returning no correction cannot resolve the original major gap; independent source inventory remains candidate-free and is distinct from repair
 
+#### Scenario: A supported claim names an unrepaired source condition
+- **WHEN** a major source candidate remains unlocated and no valid correction or condition coverage has resolved it, but an otherwise supported claim lists its ID
+- **THEN** the ID declaration alone cannot remove the major gap or complete the company
+- **AND** a repaired condition must retain its original business obligations and governing source context before effective coverage against a currently valid delivered object can resolve it
+
 #### Scenario: The first-company experiment has ended
 - **WHEN** the current card permits only offline correction and closeout of saved real receipts
 - **THEN** the existing entry may prove engineering corrections in isolated storage, but the original real results and charges remain unchanged
