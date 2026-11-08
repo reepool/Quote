@@ -24,23 +24,43 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
-MAPPING_VERSION = "sina_ths_core_financial_facts.v6"
-
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from research.financial_source_field_mapping import MAPPING_VERSION
+from research.financial_statements_sync import (
+    build_financial_report_periods,
+)
 from research.storage import ResearchStorageManager
 from utils.config_manager import config_manager
 
 DEFAULT_SAMPLE_OUT = "tests/unit/test_research/fixtures/financial_readiness_equivalence_sample.json"
-RECONCILIATION_PERIODS = [
-    "2024-12-31",
-    "2025-03-31",
-    "2025-06-30",
-    "2025-09-30",
-    "2025-12-31",
-    "2026-03-31",
-    "2026-06-30",
-]
+
+
+def _reconciliation_periods() -> list[str]:
+    """Derive the reconciliation period window from the scheduler job config
+    (same source of truth as the production task; no hand-maintained list)."""
+    job_params = (
+        config_manager.get_nested("scheduler_config.jobs.financial_disclosure_reconciliation_sync.parameters", {})
+        or {}
+    )
+    periods = build_financial_report_periods(
+        baseline_report_period=job_params.get("baseline_report_period", "2024Q1"),
+        rolling_min_quarters=int(job_params.get("rolling_quarters", 10)),
+    )
+    return [str(period) for period in periods]
+
+
+def _required_core_facts() -> list[str]:
+    """Read required core facts from the research config (production source)."""
+    module = config_manager.get_research_config().modules.get("financial_statements", {}) or {}
+    facts = module.get("readiness", {}).get("required_core_facts") or []
+    return [str(fact) for fact in facts]
+
+
+REQUIRED_CORE_FACTS = _required_core_facts()
+
+
+RECONCILIATION_PERIODS = _reconciliation_periods()
 
 
 def _build_manager() -> ResearchStorageManager:
@@ -132,8 +152,7 @@ def _run_readiness(
             result = manager.get_financial_local_core_facts(
                 instrument_id,
                 report_period=period,
-                requested_canonical_facts=["revenue", "net_income_parent", "equity_parent",
-                                           "total_assets", "total_liabilities"],
+                requested_canonical_facts=REQUIRED_CORE_FACTS,
                 profile=profile,
                 mapping_version=mapping_version,
                 include_history=True,

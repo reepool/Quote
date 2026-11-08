@@ -32,9 +32,13 @@ _REGISTRY_WARNING_KEYS_CAP = 64
 # Per-process memoization of the financial source-field mapping registry
 # (openspec: accelerate-financial-readiness-queries). The registry is a tiny
 # table queried once per readiness candidate; caching removes a per-candidate
-# connection round trip. Rules: TTL bounded; EMPTY RESULTS ARE NEVER CACHED -
-# the 2026-11 V6 incident was a catalog turning from empty to loaded while the
-# process ran, and caching empty results would pin that recovery to restart.
+# connection round trip. Deliberately NOT utils.cache.SimpleCache: that cache
+# is async-lock based while this lookup runs in sync code on worker threads
+# without a running loop. Kept inline (single caller) per the governance rule
+# that shared abstractions need two real callers. Rules: TTL bounded; EMPTY
+# RESULTS ARE NEVER CACHED - the 2026-11 V6 incident was a catalog turning
+# from empty to loaded while the process ran, and caching empty results would
+# pin that recovery to restart.
 _FINANCIAL_MAPPING_REGISTRY_TTL_SECONDS = 60.0
 _FINANCIAL_MAPPING_REGISTRY_CACHE: Dict[Any, Any] = {}
 _FINANCIAL_MAPPING_REGISTRY_LOCK = threading.Lock()

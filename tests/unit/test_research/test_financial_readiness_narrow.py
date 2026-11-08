@@ -199,6 +199,29 @@ def test_narrow_without_history_excludes_history_rows(env):
     assert rows == []
 
 
+def test_narrow_equals_wide_with_empty_catalog(env):
+    """V6-incident shape: empty mapping catalog must yield identical wide and
+    narrow results (mapping_catalog_empty reasons, no facts selected)."""
+    _FINANCIAL_MAPPING_REGISTRY_CACHE.clear()  # module-level cache leaks across tests
+    with env.get_connection() as conn:
+        conn.execute("DELETE FROM financial_source_field_mappings")
+        conn.commit()
+    for narrow in (False, True):
+        env.financial_readiness_narrow_rows = narrow
+        result = env.get_financial_local_core_facts(
+            "3001.SZ",
+            report_period="2026-06-30",
+            requested_canonical_facts=REQUIRED_FACTS,
+            mapping_version=MAPPING_VERSION,
+            include_history=True,
+        )
+        reasons = {item["reason"] for item in result["missing_fields"]}
+        assert "mapping_catalog_empty" in reasons
+        assert result["facts"] == {}
+        assert result["ready"] is False
+    _FINANCIAL_MAPPING_REGISTRY_CACHE.clear()
+
+
 def test_registry_memoization_empty_never_cached(env, monkeypatch):
     _FINANCIAL_MAPPING_REGISTRY_CACHE.clear()
     calls = {"n": 0}
