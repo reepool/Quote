@@ -1,0 +1,42 @@
+{
+  "attempt-marker.json": {
+    "sha256": "8e85f0dcadc4bba49400acd37dbcba4e49f5e3f7b6990c8414e668b3f552f592",
+    "bytes": 745
+  },
+  "authorization.json": {
+    "sha256": "5907b0cecb318df3f2b2c4a1d068f30545a42ea1524f8aa7e6af28c77b76f182",
+    "bytes": 572
+  },
+  "binding.json": {
+    "sha256": "9f7574558f11bce5743c77037cf648f419df7226038ca37e438be6652b940218",
+    "bytes": 10525
+  },
+  "budget-final.json": {
+    "sha256": "8003f288f8bc677ab85efc5303b9247532c48d51540881e0efb690b7ee8ffb82",
+    "bytes": 15816
+  },
+  "entry-result.json": {
+    "sha256": "81e3a001f172920e2569f583db054d7c16998de3ec02e70719cc7b9e295a29ae",
+    "bytes": 50946
+  },
+  "entry-stages.json": {
+    "sha256": "52ed7407209647c7e03d54179c7a23b6ecf8025a2dc77b8d8f8dc7f1d85989d8",
+    "bytes": 528
+  },
+  "entry.log": {
+    "sha256": "9c5a41dc743ff53629501644b97d3910929914da7a8aaddfc017e994a72145cd",
+    "bytes": 55763
+  },
+  "query.json": {
+    "sha256": "0cd2025dc1f7e00dd60759ab64fdcc1973755bc3249051105c65fd6af7ebbfc2",
+    "bytes": 382574
+  },
+  "source-receipt.json": {
+    "sha256": "82fa51dfb9155ca81bf8c5f2869abbde4643ecbc569bb8930a61c36d49d944e6",
+    "bytes": 18087
+  },
+  "supervisor.json": {
+    "sha256": "12b2ed62375f91b8205c9d95b0a09f592fbc5bc9dad21905110a40b235a18873",
+    "bytes": 60
+  }
+}
