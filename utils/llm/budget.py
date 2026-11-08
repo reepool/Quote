@@ -225,6 +225,7 @@ class LlmRunBudget:
         self._lock = threading.RLock()
         self._stopped: str | None = None
         self._denied_request: dict[str, Any] | None = None
+        self._recovery_closed = False
 
     def cancel(self, reason: str = "run_cancelled") -> None:
         with self._lock:
@@ -312,14 +313,19 @@ class LlmRunBudget:
                 or output > DEVELOPMENT_MAX_OUTPUT_TOKENS
             )
             logical_id = str(logical_request_id or request_id)
-            blocked = _recovery_block(
-                [*self.prior_logical_attempts, *self.attempts],
-                logical_id,
-                self.recovery_policy,
-                source_label,
-            )
+            if self._recovery_closed:
+                blocked = "card_recovery_exhausted"
+            else:
+                blocked = _recovery_block(
+                    [*self.prior_logical_attempts, *self.attempts],
+                    logical_id,
+                    self.recovery_policy,
+                    source_label,
+                )
             if blocked is not None:
-                # Refuse only this send. Other logical requests can still run.
+                # A card-level recovery refusal ends every later send in this entry.
+                if blocked == "card_recovery_exhausted":
+                    self._recovery_closed = True
                 self._denied_request = {
                     "request_id": request_id,
                     "logical_request_id": logical_id,

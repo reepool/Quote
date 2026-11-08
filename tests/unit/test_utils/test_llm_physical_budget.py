@@ -261,6 +261,17 @@ def test_cross_source_reset_still_consumes_the_logical_recovery():
             logical_request_id="logic-next",
             source_label="source-b",
         )
+    with pytest.raises(LlmDeadlineExceededError, match="card_recovery_exhausted"):
+        same_source.reserve(
+            resource="resource",
+            model="model",
+            profile="profile",
+            payload=payload,
+            request_id="after-stop",
+            attempt=1,
+            logical_request_id="logic-after-stop",
+            source_label="source-c",
+        )
     assert len(same_source.attempts) == 1
     assert same_source.attempts[0]["charged_tokens"] > 0
 

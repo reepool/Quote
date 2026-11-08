@@ -493,6 +493,7 @@ def _run(
     plant_s41_c3=False,
     repair_mode=None,
     attach_failed_id=False,
+    drop_first_claims=False,
 ):
     binding = json.loads((CHANGE / "s1-pool-s1-600103-s16-binding.json").read_text())
     raw = json.loads((ROOT / binding["config_path"]).read_text())["llm"]
@@ -532,6 +533,7 @@ def _run(
     fault_used = {"source": False, "draft": False, "verify": False}
     planted = {"done": False}
     seen_failed = {"id": None}
+    dropped_claims = {"done": False}
 
     def transport(_url, _headers, payload, _timeout):
         request = json.loads(
@@ -650,6 +652,14 @@ def _run(
                 ]
         if repair_mode == "full":
             body = _bind_industry_repair(request, body)
+        if (
+            drop_first_claims
+            and not dropped_claims["done"]
+            and request.get("purpose") == "synthesize_views"
+        ):
+            dropped_claims["done"] = True
+            body = dict(body)
+            body.pop("claims", None)
         encoded = json.dumps(body, ensure_ascii=False)
         return {
             "status_code": 200,
@@ -798,6 +808,45 @@ def _covered_claim_ids(views):
             ):
                 covered.add(check.get("covers_target_id"))
     return covered
+
+
+def test_minor_company_total_is_a_core_draft_target():
+    from types import SimpleNamespace
+
+    from research.company_profile.direct_reading import _carries_company_period_total
+
+    page = {
+        "page": 9,
+        "text": "单位：元 币种：人民币\n本期\n营业收入 2,418,990,221.17\n",
+        "readable": True,
+    }
+    condition = SimpleNamespace(
+        condition_id="c4",
+        description="报告期公司营业收入2,418,990,221.17元，营业成本1,965,747,663.71元。",
+        evidence=(),
+    )
+    assert _carries_company_period_total(condition, (page,))
+    subtotal = SimpleNamespace(
+        condition_id="c3",
+        description="主营业务分行业合计2,332,376,693.65元。",
+        evidence=(),
+    )
+    assert _carries_company_period_total(subtotal, (page,)) is False
+
+
+def test_missing_claims_splits_once_and_still_delivers_the_core():
+    _ran, queried, exported, reloaded, calls = _run(
+        _fixed_core_objects(), drop_first_claims=True
+    )
+    assert queried["profiles"] == exported["profiles"] == reloaded["profiles"]
+    views = _views(queried)
+    assert views["draft_complete"] is True
+    assert views["real_semantic_complete"] is False
+    drafts = [item for item in calls if item["purpose"] == "synthesize_views"]
+    assert len(drafts) >= 2
+    assert drafts[0]["conditions"] != drafts[1]["conditions"]
+    text = "\n".join(_answers(views))
+    assert "医药" in text and "2,418,990,221.17" in text
 
 
 def test_task_service_gateway_delivers_the_company_core():

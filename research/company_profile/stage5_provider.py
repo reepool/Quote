@@ -4628,9 +4628,17 @@ class CommonGatewaySemanticProvider:
                 "run_id": semantic_request_id.split(":", 1)[0],
                 "stage": call_type,
                 "logical_request_id": (
-                    _logical_report_request_id(runtime_payload)
-                    if report_reading
-                    else semantic_request_id
+                    str(
+                        (runtime_payload.get("processing_identity") or {}).get(
+                            "format_recovery_parent"
+                        )
+                        or ""
+                    )
+                    or (
+                        _logical_report_request_id(runtime_payload)
+                        if report_reading
+                        else semantic_request_id
+                    )
                 ),
                 "business_item_key": (
                     f"{runtime_payload['report']['instrument_id']}:{runtime_payload['purpose']}"

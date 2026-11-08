@@ -1448,6 +1448,24 @@ def _answer_covers_revenue_fact(answers: str, fact: Mapping[str, Any]) -> bool:
     return False
 
 
+def _carries_company_period_total(condition, sources) -> bool:
+    """A source condition states the company period total, even if marked minor."""
+    if "period-operating-revenue" in str(getattr(condition, "condition_id", "") or ""):
+        return True
+    blob = str(getattr(condition, "description", "") or "")
+    for evidence in getattr(condition, "evidence", ()) or ():
+        blob += "\n" + str(
+            getattr(getattr(evidence, "anchor", None), "bounded_quote", "") or ""
+        )
+    for fact in disclosed_core_revenue_facts(sources):
+        if fact.get("kind") != "operating_revenue_total":
+            continue
+        amount = str(fact.get("amount") or "")
+        if amount and amount in blob:
+            return True
+    return False
+
+
 def missed_core_revenue_facts(
     sources: Sequence[Mapping[str, Any]],
     conditions=(),
@@ -2445,8 +2463,21 @@ def interpret_direct_core(
             return False
         return True
 
-    def invoke(purpose: str, source_pages, *, source_scope: str, output: int, later: int, extra: dict | None = None):
+    failed_logical = {"id": None}
+
+    def invoke(
+        purpose: str,
+        source_pages,
+        *,
+        source_scope: str,
+        output: int,
+        later: int,
+        extra: dict | None = None,
+        recovery_parent: str | None = None,
+    ):
         extra = dict(extra or {})
+        if recovery_parent:
+            identity["format_recovery_parent"] = recovery_parent
         if purpose == "verify_views":
             claims = list(extra.get("claims") or ())
             conditions = list(extra.get("source_conditions") or ())
@@ -2476,7 +2507,18 @@ def interpret_direct_core(
             raise ValueError("card_request_reservation_exceeded")
         if not admit(units, later):
             raise ValueError("direct_core_admission_stopped")
-        response = provider.interpret(request)
+        from research.company_profile.report_wire import gateway_runtime
+        from research.company_profile.stage5_provider import _logical_report_request_id
+
+        logical_id = recovery_parent or _logical_report_request_id(gateway_runtime(request))
+        try:
+            response = provider.interpret(request)
+        except (ValueError, LlmError, SemanticProviderError):
+            failed_logical["id"] = logical_id
+            raise
+        finally:
+            identity.pop("format_recovery_parent", None)
+        failed_logical["id"] = None
         if not isinstance(response, ReportSemanticResponseV3):
             response = ReportSemanticResponseV3.model_validate_json(
                 json.dumps(response, ensure_ascii=False)
@@ -2888,7 +2930,20 @@ def interpret_direct_core(
                     chosen.append(condition)
             return chosen
 
-        def send(group, sent, *, support: bool) -> bool:
+        def verify_output_estimate(group) -> int:
+            chars = 0
+            for claim in group:
+                chars += len(str(getattr(claim, "answer", "") or ""))
+                for evidence in getattr(claim, "evidence", ()) or ():
+                    chars += len(
+                        str(
+                            getattr(getattr(evidence, "anchor", None), "bounded_quote", "")
+                            or ""
+                        )
+                    )
+            return max(len(group) * 160, chars)
+
+        def send(group, sent, *, support: bool, recovery_parent: str | None = None) -> bool:
             units, pages, related, sent = measure(group, sent)
             if units > pack_room() or not pages:
                 if support:
@@ -2911,8 +2966,25 @@ def interpret_direct_core(
                         "records": related,
                         "source_conditions": tuple(sent),
                     },
+                    recovery_parent=recovery_parent,
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
+                text = str(exc)
+                if "truncat" in text.lower() and len(group) > 1 and not recovery_parent:
+                    middle = max(1, len(group) // 2)
+                    parent = failed_logical["id"]
+                    if not send(
+                        group[:middle],
+                        attach(group[:middle], sent),
+                        support=support,
+                        recovery_parent=parent,
+                    ):
+                        return False
+                    return send(
+                        group[middle:],
+                        attach(group[middle:], sent),
+                        support=support,
+                    )
                 gaps.append(f"direct_core_verify_stopped:{exc}")
                 if support:
                     for claim in group:
@@ -3048,7 +3120,10 @@ def interpret_direct_core(
                     overflow.append(claim)
                     continue
                 trial = group + [claim]
-                if group and measure(trial, [])[0] > room:
+                if group and (
+                    measure(trial, [])[0] > room
+                    or verify_output_estimate(trial) > _verify_output(identity)
+                ):
                     next_round.append(claim)
                 else:
                     group = trial
@@ -3985,9 +4060,11 @@ def interpret_direct_core(
             item
             for item in related
             if item.condition_id not in drafted_condition_ids
-            and item.major
             and item.statement_status == "current"
-            and item.dimension in _CORE_CLOSEOUT_DIMENSIONS
+            and (
+                (item.major and item.dimension in _CORE_CLOSEOUT_DIMENSIONS)
+                or _carries_company_period_total(item, sources)
+            )
         ]
         groups = _business_groups(pending)
         if chapter_required_pages is not None:
@@ -4113,6 +4190,7 @@ def interpret_direct_core(
         *,
         recovered: bool = False,
         defer_verify: bool = False,
+        recovery_parent: str | None = None,
     ) -> None:
         """Save one business group, verify it, and publish before the next group."""
         pending = [
@@ -4211,9 +4289,21 @@ def interpret_direct_core(
                 output=_body_output(identity),
                 later=0,
                 extra={"source_conditions": tuple(pending)},
+                recovery_parent=recovery_parent,
             )
         except (ValueError, LlmError, SemanticProviderError) as exc:
             text = str(exc)
+            if "schema validation failed" in text and len(pending) > 1 and not recovered:
+                middle = max(1, len(pending) // 2)
+                parent = failed_logical["id"]
+                deliver_group(
+                    pending[:middle], recovered=True, recovery_parent=parent
+                )
+                deliver_group(pending[middle:], recovered=True)
+                return
+            if "schema validation failed" in text or "card_recovery_exhausted" in text:
+                gaps.append(f"direct_core_package_stopped:{exc}")
+                return
             retryable = (
                 "deadline" in text.lower()
                 or "timed out" in text.lower()
@@ -5468,6 +5558,15 @@ def interpret_direct_core(
                             for item in conditions
                         ):
                             break
+                        package_pages = [
+                            int(page["page"])
+                            for page in package
+                            if page.get("scope") != "boundary_context"
+                        ]
+                        if package_pages and all(
+                            page_no in inventoried for page_no in package_pages
+                        ):
+                            continue
                         try:
                             reviewed = invoke(
                                 "source_inventory",

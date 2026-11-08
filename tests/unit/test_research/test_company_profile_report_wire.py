@@ -85,6 +85,31 @@ def test_purpose_schema_excludes_unreachable_facts_and_validates_nonempty_replie
         assert len(json.dumps(schema)) < 6500
 
 
+def test_omitted_response_identity_is_bound_and_missing_claims_stay_invalid():
+    synthesis = request("synthesize_views")
+    reply = {
+        "claims": [
+            {
+                "claim_id": "c1",
+                "dimension": "principal_business",
+                "status": "observed",
+                "answer": "公司从事造纸。",
+                "condition_ids": [],
+                "supporting_record_ids": [],
+                "evidence": [{"page": 1, "quote": TEXT[:80]}],
+            }
+        ]
+    }
+    schema = response_schema(synthesis)
+    jsonschema.validate(reply, schema)
+    expanded = expand_response(reply, synthesis)
+    assert expanded["request_id"] == synthesis.request_id
+    assert expanded["purpose"] == "synthesize_views"
+    assert expanded["schema_version"] == "company_profile_report_response.v3"
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate({}, schema)
+
+
 def test_shared_evidence_is_sent_once_and_unknown_reference_rejected():
     r = request()
     first = expand_response(protocol_reply(compact_request(r)), r)
