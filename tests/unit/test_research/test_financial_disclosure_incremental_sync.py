@@ -106,6 +106,12 @@ class _FakeFinancialStatements:
 
 
 class _FakeStorage:
+    @contextmanager
+    def pinned_financial_read_connection(self):
+        # Contract method of the real storage (accelerate-financial-readiness-
+        # queries); the fake has no connection to pin.
+        yield
+
     def __init__(
         self,
         *,

@@ -52,7 +52,7 @@
 |---|---|---|---|
 | L1 投影收窄 | 新方法只 SELECT 就绪所需列（period、canonical_fact_name、fact_value、unit 等少量列） | 肥列（JSON/长文本）不再解码，IO 与解码同降 | **做**（A/B 已证 10→<1ms 量级） |
 | L2 过滤下推 | canonical 事实 IN (...) 进 SQL WHERE | 573 行→~7 行 | **做**（与 L1 同一方法体内） |
-| L3 覆盖索引 | 热表 `(instrument_id, report_period, canonical_fact_name, updated_at, fact_value[, unit])`——**列集以窄查询实际引用为准**（M1 从评估器代码钉死，updated_at 为最新版本语义必需）；历史分支不做索引（全表仅 11k 行，窄方法直查后 Python 合并，保持 include_history 语义） | 冷缓存下消除随机回表（扫描态主要物理成本） | **做**（DDL 走维护窗口，见 §5） |
+| L3 覆盖索引 | **降级为条件项**（2026-11-08 EXPLAIN 实证：既有 `idx_financial_numeric_facts_hot_canonical` 已支撑 (instrument_id, report_period, canonical_fact_name) 三列 SEARCH，历史表分支同样有 canonical 索引；且 `raw_fact_json` 必须回表，index-only 目标对该查询形态不可达） | L1+L2 后每候选仅 ~7 行回表，边际收益小 | **条件项**：M4.1 实测不达标才执行（脚本已备 `scripts/financial_readiness_covering_index.py`，窗口要求见 runbook） |
 | L4 连接复用 + 注册记忆化 | 就绪路径在同一库作用域内复用连接（现每调用 5ms×N）；映射注册查询按 (mapping_version, profile) 进程内记忆化——**空结果一律不缓存**（V6 事故即"进程运行中目录从空被装载"，空结果缓存会把恢复窗口钉死到下次重启，此规则使其自愈） | 每候选省 15~30ms 连接开销 + 每候选一次注册查询 | **做**（最小：readiness 循环级连接；不建常驻池；键含 mapping_version，版本变化自动失效） |
 | L5 按标的批量化 | 一次查询取回该标的全部 11 期就绪行（11 次查询→1 次） | 查询次数降 11 倍 | **条件项**：M1 实测 L1-L4 后仍不达标才做 |
 | 物化就绪表 | 写路径维护每标就绪摘要 | 读端 O(1) 但写端失效逻辑复杂 | **否决**（违反最小充分实现） |
@@ -65,7 +65,9 @@
 - 样本集冻结入仓库（tests fixture），回归永久保留；
 - 单元测试覆盖：过滤下推后"多版本同名事实取最新"语义不变（updated_at 排序语义在窄方法中保持）。
 
-## 5. 索引 DDL 运维（L3）
+## 5. 索引 DDL 运维（L3——条件项，仅当 M4.1 实测不达标）
+
+（2026-11-08 EXPLAIN 更新：既有 `idx_financial_numeric_facts_hot_canonical` 已支撑窄查询三列过滤，历史表亦有同类索引；覆盖升级仅在窄化后实测仍超标时执行，脚本与窗口 runbook 已备。）
 
 - `CREATE INDEX` 在 77GB 库上为写事务：WAL 下**读者不受影响**，**写者阻塞建索引全程**；
 - 窗口选择：夜间增量（21:45 起、上限 4h，最坏 01:45 结束——2026-11-02 实际发生过）之后、且无其他 financials.db 写任务时段（建议 **≥02:00** 的凌晨空档，M3 出具精确窗口核查清单排除当日在跑任务）；

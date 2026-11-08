@@ -859,6 +859,7 @@ class FinancialDisclosureIncrementalSyncService:
             scanned_total = 0
             scanned_since_checkpoint = 0
             last_checkpoint_at = time.monotonic()
+            scan_started_at = last_checkpoint_at
             for instrument in instruments:
                 for report_period in report_periods:
                     if max_candidates > 0 and len(candidates) >= max_candidates:
@@ -873,10 +874,12 @@ class FinancialDisclosureIncrementalSyncService:
                     ):
                         scanned_since_checkpoint = 0
                         last_checkpoint_at = time.monotonic()
+                        scan_elapsed = max(1e-6, last_checkpoint_at - scan_started_at)
                         await worker_context.yield_checkpoint(
                             phase="reconciliation_scan",
                             scanned=scanned_total,
                             candidates=len(candidates),
+                            scan_rate_per_sec=round(scanned_total / scan_elapsed, 2),
                         )
                     candidate = self._candidate_for_period(instrument, report_period)
                     if candidate.key in candidates:

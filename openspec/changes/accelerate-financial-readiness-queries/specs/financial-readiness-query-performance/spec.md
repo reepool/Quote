@@ -12,12 +12,16 @@ The financial readiness path SHALL issue narrow queries that project only the co
 - **WHEN** any non-readiness caller requests financial numeric facts
 - **THEN** the existing wide read method SHALL keep its current signature and behavior
 
-### Requirement: The readiness path must be backed by a covering index
-The system SHALL maintain a composite covering index on the hot facts table whose column set covers every column referenced by the narrow readiness query (at minimum instrument_id, report_period, canonical_fact_name, updated_at and the selected value/unit columns), so the hot-table branch of readiness queries executes as an index-only scan. The history branch SHALL preserve include_history semantics without requiring a history index (its size is negligible).
+### Requirement: The readiness query must be index-served
+The narrow readiness query SHALL be served by an existing index filtering on (instrument_id, report_period, canonical_fact_name) for both the hot and history branches; the plan SHALL NOT degrade to a full table scan. An upgrade to a covering index is a CONDITIONAL lever: it is applied only if measured per-candidate cost still exceeds targets after the narrow path ships (raw_fact_json requires a table lookup regardless, so a fully covering index-only scan is not achievable for this query shape).
 
 #### Scenario: Readiness query plan is verified
-- **WHEN** EXPLAIN QUERY PLAN is run for the narrow readiness query's hot-table branch
-- **THEN** the plan SHALL show a covering-index scan without table row lookups
+- **WHEN** EXPLAIN QUERY PLAN is run for the narrow readiness query on production data
+- **THEN** both branch plans SHALL show an index SEARCH on (instrument_id, report_period, canonical_fact_name) with no full table scan
+
+#### Scenario: Covering upgrade is conditional
+- **WHEN** post-narrow measurements still exceed the performance targets
+- **THEN** the covering index SHALL be created via the operator script in a verified maintenance window, and dropped without impact if it does not move the numbers
 
 #### Scenario: History rows still contribute to readiness
 - **WHEN** a candidate's facts exist only in the history table (or differ from hot)

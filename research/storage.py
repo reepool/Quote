@@ -15,6 +15,7 @@ import logging
 import sqlite3
 import hashlib
 import threading
+import time
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 from datetime import timedelta
@@ -27,6 +28,16 @@ logger = logging.getLogger(__name__)
 # 2026-11-03 follow-up; capped like the panel's unclassified-name registry).
 _REGISTRY_WARNING_KEYS: set = set()
 _REGISTRY_WARNING_KEYS_CAP = 64
+
+# Per-process memoization of the financial source-field mapping registry
+# (openspec: accelerate-financial-readiness-queries). The registry is a tiny
+# table queried once per readiness candidate; caching removes a per-candidate
+# connection round trip. Rules: TTL bounded; EMPTY RESULTS ARE NEVER CACHED -
+# the 2026-11 V6 incident was a catalog turning from empty to loaded while the
+# process ran, and caching empty results would pin that recovery to restart.
+_FINANCIAL_MAPPING_REGISTRY_TTL_SECONDS = 60.0
+_FINANCIAL_MAPPING_REGISTRY_CACHE: Dict[Any, Any] = {}
+_FINANCIAL_MAPPING_REGISTRY_LOCK = threading.Lock()
 
 from research.change_watermarks import append_change_record, ensure_change_log_schema
 from research.announcements.models import (
@@ -509,6 +520,13 @@ class ResearchStorageManager:
         self.change_watermark_config = self.research_config.modules.get(
             "change_watermark", {}
         )
+        # Narrow readiness row fetch (accelerate-financial-readiness-queries);
+        # enabled only after the frozen-sample dual-run equivalence gate.
+        self.financial_readiness_narrow_rows = bool(
+            config_manager.get_nested(
+                "database_config.financial_readiness_narrow_rows", False
+            )
+        )
         self.financial_statements = FinancialStatementStorageRepository(self)
 
     @property
@@ -626,12 +644,62 @@ class ResearchStorageManager:
             )
 
     @contextmanager
+    def pinned_financial_read_connection(self) -> Generator[None, None, None]:
+        """Reuse one financial-db read connection within this block (per thread).
+
+        get_connection() inside the block yields the pinned connection instead
+        of opening a new one (opens on first use, closes on block exit). Nested
+        scopes on a different active db path fall back to their own connection,
+        so routing semantics are preserved.
+        """
+        state = self._db_route_state
+        prev = getattr(state, "pinned_read", None)
+        state.pinned_read = {"conn": None, "path": None}
+        try:
+            yield
+        finally:
+            entry = getattr(state, "pinned_read", None)
+            state.pinned_read = prev
+            if entry and entry["conn"] is not None:
+                try:
+                    entry["conn"].close()
+                except sqlite3.Error:
+                    pass
+
+    @contextmanager
     def get_connection(self) -> Generator[sqlite3.Connection, None, None]:
         """Yield a sqlite3 connection for the research database."""
+        pinned = getattr(self._db_route_state, "pinned_read", None)
+        active = self._active_db_path or self.db_path
+        if pinned is not None:
+            if pinned["conn"] is not None and pinned["path"] == active:
+                raw_conn = pinned["conn"]
+                raw_conn.row_factory = sqlite3.Row
+                coordinator = getattr(self._db_route_state, "write_coordinator", None)
+                conn: Any = (
+                    _CoordinatedSQLiteConnection(raw_conn, coordinator)
+                    if coordinator is not None
+                    else raw_conn
+                )
+                yield conn
+                return
+            if pinned["conn"] is None:
+                raw_conn = sqlite3.connect(active)
+                raw_conn.row_factory = sqlite3.Row
+                pinned["conn"] = raw_conn
+                pinned["path"] = active
+                coordinator = getattr(self._db_route_state, "write_coordinator", None)
+                conn = (
+                    _CoordinatedSQLiteConnection(raw_conn, coordinator)
+                    if coordinator is not None
+                    else raw_conn
+                )
+                yield conn
+                return
         raw_conn = sqlite3.connect(self._active_db_path or self.db_path)
         raw_conn.row_factory = sqlite3.Row
         coordinator = getattr(self._db_route_state, "write_coordinator", None)
-        conn: Any = (
+        conn = (
             _CoordinatedSQLiteConnection(raw_conn, coordinator)
             if coordinator is not None
             else raw_conn
@@ -2069,7 +2137,42 @@ class ResearchStorageManager:
         approved_for_core: Optional[bool] = None,
         mapping_version: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
-        """Read persisted source-field mapping decisions."""
+        """Read persisted source-field mapping decisions.
+
+        Results are memoized per (profile, approved_for_core, mapping_version)
+        with a short TTL; empty results are never cached so a catalog loaded
+        while the process runs is picked up on the next call (V6 incident).
+        """
+        cache_key = (
+            profile if profile is not None else None,
+            approved_for_core if approved_for_core is not None else None,
+            mapping_version if mapping_version is not None else None,
+        )
+        now = time.monotonic()
+        with _FINANCIAL_MAPPING_REGISTRY_LOCK:
+            cached = _FINANCIAL_MAPPING_REGISTRY_CACHE.get(cache_key)
+            if cached is not None and cached[0] > now:
+                return cached[1]
+        rows = self._read_financial_source_field_mappings(
+            profile=profile,
+            approved_for_core=approved_for_core,
+            mapping_version=mapping_version,
+        )
+        if rows:
+            with _FINANCIAL_MAPPING_REGISTRY_LOCK:
+                _FINANCIAL_MAPPING_REGISTRY_CACHE[cache_key] = (
+                    time.monotonic() + _FINANCIAL_MAPPING_REGISTRY_TTL_SECONDS,
+                    rows,
+                )
+        return rows
+
+    def _read_financial_source_field_mappings(
+        self,
+        *,
+        profile: Optional[str] = None,
+        approved_for_core: Optional[bool] = None,
+        mapping_version: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
         clauses: List[str] = []
         params: List[Any] = []
         if profile is not None:
@@ -2498,6 +2601,66 @@ class ResearchStorageManager:
 
         return [self._decode_financial_numeric_fact_row(row) for row in rows]
 
+    def get_financial_core_fact_readiness_rows(
+        self,
+        instrument_id: str,
+        *,
+        report_period: Optional[str] = None,
+        canonical_facts: Sequence[str],
+        include_history: bool = True,
+    ) -> List[Dict[str, Any]]:
+        """Narrow readiness row fetch (openspec: accelerate-financial-readiness-
+        queries).
+
+        Projects only the columns the readiness evaluation consumes and pushes
+        the canonical-fact filter into SQL, so a candidate fetches ~7 rows
+        instead of the full instrument-period payload (~573 fat rows). Row
+        order, recency semantics and the include_history union match
+        get_financial_numeric_facts exactly; consumers filter lineage in
+        Python as before. Empty canonical_facts returns [] (no facts can be
+        selected).
+        """
+        canonical = sorted({str(item) for item in (canonical_facts or []) if str(item)})
+        if not canonical:
+            return []
+        tables = ["financial_numeric_facts_hot"]
+        if include_history:
+            tables.append("financial_numeric_facts_history")
+        select_sql = " UNION ALL ".join(
+            f"""
+            SELECT instrument_id, report_period, fact_name, canonical_fact_name,
+                   fact_value, unit, updated_at, raw_fact_json
+            FROM {table_name}
+            """
+            for table_name in tables
+        )
+        filters = ["instrument_id = ?"]
+        params: List[Any] = [instrument_id]
+        if report_period:
+            filters.append("report_period = ?")
+            params.append(report_period)
+        placeholders = ", ".join("?" for _ in canonical)
+        filters.append(f"canonical_fact_name IN ({placeholders})")
+        params.extend(canonical)
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                f"""
+                SELECT instrument_id, report_period, fact_name, canonical_fact_name,
+                       fact_value, unit, updated_at, raw_fact_json
+                FROM ({select_sql})
+                WHERE {' AND '.join(filters)}
+                ORDER BY report_period DESC, fact_name ASC, updated_at DESC
+                """,
+                params,
+            ).fetchall()
+        decoded: List[Dict[str, Any]] = []
+        for row in rows:
+            item = dict(row)
+            item["raw_fact"] = self._deserialize_json(item.pop("raw_fact_json", None)) or {}
+            decoded.append(item)
+        return decoded
+
     def get_financial_local_core_facts(
         self,
         instrument_id: str,
@@ -2548,11 +2711,24 @@ class ResearchStorageManager:
             if requested_canonical_facts is not None
             else list(approved_core_facts)
         )
-        rows = self.get_financial_numeric_facts(
-            instrument_id,
-            include_history=include_history,
-            report_period=report_period,
-        )
+        rows: List[Dict[str, Any]]
+        if getattr(self, "financial_readiness_narrow_rows", False):
+            # Narrow readiness path (openspec: accelerate-financial-readiness-
+            # queries): project only the columns this evaluation consumes and
+            # push the canonical-fact filter into SQL. Equivalence with the
+            # wide path is gated by the frozen-sample dual run.
+            rows = self.get_financial_core_fact_readiness_rows(
+                instrument_id,
+                report_period=report_period,
+                canonical_facts=requested,
+                include_history=include_history,
+            )
+        else:
+            rows = self.get_financial_numeric_facts(
+                instrument_id,
+                include_history=include_history,
+                report_period=report_period,
+            )
         local_rows = [
             row
             for row in rows

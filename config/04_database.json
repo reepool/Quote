@@ -1,5 +1,6 @@
 {
     "database_config": {
+        "financial_readiness_narrow_rows": true,
         "db_path": "data/quotes.db",
         "backup_enabled": false,
         "backup_interval_days": 7,

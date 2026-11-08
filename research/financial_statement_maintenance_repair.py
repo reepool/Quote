@@ -556,7 +556,8 @@ class FinancialMaintenanceRepairRouter:
         required_core_facts: Sequence[str],
         mapping_version: str,
     ) -> Dict[str, Any]:
-        with self.storage.financial_database_scope():
+        with self.storage.financial_database_scope(), \
+                self.storage.pinned_financial_read_connection():
             result = self.storage.financial_statements.get_local_core_facts(
                 target.instrument_id,
                 report_period=target.report_period,
