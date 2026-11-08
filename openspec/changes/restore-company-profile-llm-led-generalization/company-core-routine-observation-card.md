@@ -3,6 +3,8 @@
 > 日期：2026-11-08；依据[A审核§221／用户授权§222](review-submission.md#222-用户授权一次常规额度造纸真实观察)及用户明确答复“批准这一次常规额度真实观察”，**本卡生效，初始已用0/1**。B清理/冻结后直接执行，无需再次请批。A本轮不代发模型请求、不抢占B的唯一入口。
 > 唯一change：`restore-company-profile-llm-led-generalization`。遵循[产品v8](../../../docs/development/company_profile_product_and_industry_semantic_requirements.md)、[验收§7.98](../../../docs/development/company_profile_acceptance_program.md)、[交付路径](../../../docs/development/company_profile_delivery_plan.md)、[A/B v3](../../../docs/development/ab_role_development_workflow.md)。源审纠错工程已有限审结，不再另交模拟准备卡；旧S1/S32及失败不改，不启S2/生产。
 
+> 2026-11-08审结更新：本次已用1/1，核心0/1，13物理/67272账本/199.205秒监督/费用unknown，原回执不改。首次卡级恢复拒发之后仍有2次发送，完整停止时序见[A审核§224](review-submission.md#224-a审核真实核心仍失败合并收口成稿核验与恢复)，不能称拒发后立即停。原授权结束，余额不转后继；当前仅[零外呼工程收口](company-core-protocol-closeout-card.md)，下文初始状态/启动步骤为原冻结合同，不再据其发送。
+
 ## 1. 唯一结果
 
 仅对**600103.SH的现有正式2025年报**做一次全新真实章节处理，观察真实LLM能否在常规资源内交出公司画像、产品暴露和供应链定位的可审核心。只复用正式PDF/解析缓存；不载旧导航、源条件、答案、草稿、核验、语义checkpoint、S31/S41对象或受控响应。不是旧答案补核，不称未见公司或S1正式整组重跑；失败也保本次首份独立合法结果与首个断点。

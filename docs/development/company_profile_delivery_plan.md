@@ -1,10 +1,12 @@
 # 公司画像交付路径与开发任务卡
 
-> 类型：requirements / execution plan；版本：3；更新：2026-11-04。
+> 类型：requirements / execution plan；版本：3；更新：2026-11-08。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[§36零外呼执行链归因与路线裁决](../../openspec/changes/restore-company-profile-llm-led-generalization/b3-s1-execution-card.md#36-零外呼执行链归因与路线裁决)，依据验收§7.87/A审核§192。§35一次1/1失败已停止；先分清程序/模型/接口责任，不直接淘汰模型或续旧方案。新增模型请求/探针/binding0，逐轮清垃圾，旧S1/S32及S2/生产不变。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[A审核§224](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#224-a审核真实核心仍失败合并收口成稿核验与恢复)：一次常规观察已用1/1、核心0；只执行[整公司成稿/核验/有限恢复收口卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-protocol-closeout-card.md)，新增真实调用/探针/binding0，无银行/十家/后继；每轮先清后做、交接收尾，旧成绩/质量/生产不变。
 
 ## 1. 开发者必须先理解的纠偏
+
+**2026-11-08审核§224（当前）：** §223读源及待核正文保留，但三视图均未成立、覆盖0，常规观察结束。4次schema失败和1次2000输出截断、成功源审重复消耗恢复及拒发后继续发送，显示主要矛盾是核心成稿/核验协议与执行控制，不能归为额度不足或模型不会读。A此前就绪证据偏重合法受控响应，未充分挑战真实响应形态及整链恢复，也承担规划责任。唯一新卡将请求协议/核验输出容量、成功读源复用、主要核心共同入稿及有限恢复停止合并为同窗交付；不再逐句c3/预留/建表细分卡。工程正常与故障后均须原入口完整三视图，未决/耗尽正确限用；常规资源不靠大模拟放宽，至多两次必要修正后仍失败停止，不自动新付费。先核归属清无用物/唯一QuoteBak/finally收尾，保护正式源、首次回执及并行改动。以下为历史依据。
 
 **2026-11-04审核§192（当前）：** §35一次已结束失败，不再有本卡真实授权；§36只在原owner归因并必要修正本地错误提问/补源阻断，再分清模型与接口证据。新模型请求/探针/binding0，不自行换模型/加额或启动银行/十家。B按流程v3同窗P0—P3、匹配的局部验证/Review和一次因果/下一方案交接，不按总额/续页分小卡，不大模拟造true。每轮先核归属/持久证据清本人无用物、交接再收尾；A已实际清S35重复根478250字节，保冻结合同/权威回执/正式源。以下为历史安排。
 
