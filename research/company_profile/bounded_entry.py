@@ -35,6 +35,7 @@ S32_REGRESSION = "company_profile_s32_regression.2026-11-03"
 S35_OBSERVATION = "company_profile_s35_observation.2026-11-04"
 S38_OBSERVATION = "company_profile_s38_observation.2026-11-05"
 S41_OBSERVATION = "company_profile_s41_observation.2026-11-06"
+CORE_OBSERVATION = "company_profile_core_observation.2026-11-08"
 
 
 def company_window_limits(binding: dict, state: dict | None) -> tuple[int, int]:
@@ -935,6 +936,38 @@ def validate_binding(
             and int(binding.get("max_physical_requests") or 0) <= 16
             and int(binding.get("max_recoveries") or 0) <= 2
         )
+    elif auth == CORE_OBSERVATION:
+        if any(
+            binding.get(key)
+            for key in (
+                "navigation_query",
+                "continuation_checkpoint",
+                "accepted_navigation_query",
+                "accepted_source_query",
+                "accepted_draft_query",
+                "reused_page_map_query",
+                "verification_history_queries",
+                "saved_source_draft",
+                "company_task_state",
+                "continuation_budget",
+            )
+        ):
+            raise ValueError("core observation refuses saved semantics")
+        if str((binding.get("asset") or {}).get("instrument_id") or "") != "600103.SH":
+            raise ValueError("core observation is only 600103.SH")
+        if (
+            binding.get("reading_strategy") != "direct_core_v1"
+            or not binding.get("chapter_select")
+            or binding.get("task_route_labels") != ["deepseek:deepseek-flash"]
+            or not binding.get("task_route_first_only")
+        ):
+            raise ValueError("core observation sends only the reviewed deepseek chapter entry")
+        allowed = (
+            0 < elapsed <= 900
+            and int(binding.get("max_tokens") or 0) <= 120_000
+            and int(binding.get("max_physical_requests") or 0) <= 16
+            and int(binding.get("max_recoveries") or 0) <= 2
+        )
     elif auth == S38_OBSERVATION:
         allowed = (
             0 < elapsed <= 900
@@ -1120,6 +1153,7 @@ def validate_binding(
                 "s1-600103-s35",
                 "s1-600103-s38",
                 "s1-600103-s41",
+                "s1-600103-core-observation-20261108",
                 "s1-600000-s32",
                 "s1-600094-s32",
                 "s1-600100-s32",
