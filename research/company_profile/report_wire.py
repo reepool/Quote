@@ -406,12 +406,15 @@ def instructions(request: ReportSemanticRequestV3) -> str:
         return common + (
             "This is one evidence repair, not a new source discovery and not a draft. "
             "Each supplied source condition failed because its quote was not in the "
-            "supplied pages. Return the same condition_id, dimension and major flag, "
-            "with a quote copied from these pages that states that same obligation, "
-            "including the printed table header, period and unit. A sales-channel or "
-            "industry subtotal does not replace the company operating-revenue total. "
-            "Do not replace the condition with a different business. If these pages "
-            "do not contain a correction, omit that condition. Do not request more pages."
+            "supplied pages. Return the same condition_id, dimension and major flag. "
+            "Copy quotes from these pages that together state that same obligation: "
+            "the printed table header, period and unit, and each business the failed "
+            "condition already named. Return at least as many located quotes as that "
+            "condition supplied. A later table title does not replace the header that "
+            "governs the earlier rows. A subtotal does not replace the company "
+            "operating-revenue total. Do not replace the condition with a different "
+            "business or keep only one part of it. If these pages do not contain a "
+            "correction, omit that condition. Do not request more pages."
         )
     if request.purpose == "source_inventory":
         if chapter:

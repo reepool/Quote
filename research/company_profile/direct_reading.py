@@ -664,9 +664,31 @@ def _current_gaps(accumulated, claims, conditions, checks, records=()) -> list[s
                     continue
             if gap.startswith("major_evidence_not_located:"):
                 scoped = gap.split(":", 1)[1]
-                if any(
-                    scoped in claim.condition_ids
-                    for claim in _verified_claims(claims, checks)
+                latest = _latest_check(checks, "condition", scoped)
+                verified_ids = {
+                    claim.claim_id for claim in _verified_claims(claims, checks)
+                }
+                accepted_records = {item.record_id for item in records}
+                record_verdicts = {
+                    check.target_id: check.status
+                    for check in checks
+                    if check.target_type == "record"
+                }
+                if (
+                    latest is not None
+                    and latest.status == "pass"
+                    and (
+                        (
+                            latest.covers_target_type == "claim"
+                            and latest.covers_target_id in verified_ids
+                        )
+                        or (
+                            latest.covers_target_type == "record"
+                            and latest.covers_target_id in accepted_records
+                            and record_verdicts.get(latest.covers_target_id)
+                            in {None, "pass"}
+                        )
+                    )
                 ):
                     continue
             if gap.startswith("verify_unit_not_admitted:"):
@@ -3817,8 +3839,13 @@ def interpret_direct_core(
         identity["source_evidence_repaired"] = True
         page_ids: list[int] = []
         for condition in pending_repairs:
+            cited = [int(evidence.page) for evidence in condition.evidence]
             for evidence in condition.evidence:
-                page_no = int(evidence.page)
+                cited.extend(int(page) for page in evidence.continuation_pages)
+                cited.extend(int(page) for page in evidence.subject_evidence_pages)
+            if not cited:
+                continue
+            for page_no in range(min(cited), max(cited) + 1):
                 if page_no not in page_ids:
                     page_ids.append(page_no)
         missing = [
@@ -3860,6 +3887,8 @@ def interpret_direct_core(
         for condition in reviewed.source_conditions:
             original = by_id.get(condition.condition_id)
             if original is None or condition.dimension != original.dimension:
+                continue
+            if len(condition.evidence) < len(original.evidence):
                 continue
             located = []
             failed = False

@@ -278,39 +278,136 @@ def _cover_restate(request, body, objects):
     return body
 
 
-SUBTOTAL_QUOTE = (
-    "合计 2,332,376,693.65 1,954,239,255.89 16.21 -8.35 -9.35 增加 0.92"
-    "\r\n个百分点\r\n主营业务分产品情况"
+INDUSTRY_QUOTES = (
+    ("16", "单位：元 币种：人民币\r\n主营业务分行业情况"),
+    ("16", "纸行业 1,197,089,976.81 1,068,486,208.58 10.74 -9.40 -7.88 减少 1.48"),
+    ("16", "浆行业 358,768,319.71 331,734,674.66 7.54 -17.85 -18.90 增加 1.19"),
+    (
+        "16",
+        "纸制品加工行\r\n业\r\n284,450,942.34 285,672,734.79 -0.43 -15.03 -16.39 增加 1.63\r\n",
+    ),
+    ("16", "医药行业 303,680,631.79 159,829,111.78 47.37 -2.06 -0.81 减少 0.66"),
+    ("16", "光电子行业 206,025,784.54 152,773,265.40 25.85 53.54 45.93 增加 3.87"),
+    (
+        "17",
+        "营林业 30,598,132.37 23,466,931.09 23.31 64.21 72.09 减少 3.51\r\n"
+        "个百分点\r\n商贸业 2,034,990.83 1,999,114.27 1.76 -93.46 -93.35 减少 1.66\r\n"
+        "个百分点\r\n环保业 63,795,075.10 62,228,582.85 2.46 19.00 22.94 减少 3.12\r\n"
+        "个百分点\r\n机电维修安装 53,693,710.43 46,499,806.32 13.40 9.04 13.30 减少 3.25\r\n"
+        "个百分点\r\n内部抵销 -167,760,870.27 -178,451,173.85\r\n"
+        "合计 2,332,376,693.65 1,954,239,255.89 16.21 -8.35 -9.35 增加 0.92\r\n"
+        "个百分点\r\n",
+    ),
 )
-WRONG_HEADER = "主营业务分产品情况"
+
+
+def _s41_c3_wire():
+    saved = _saved_s41()
+    source = next(
+        item
+        for payload in saved
+        if payload.get("purpose") == "source_inventory"
+        for item in payload.get("source_conditions") or []
+        if item.get("condition_id") == "c3"
+    )
+    return {
+        "condition_id": "c3",
+        "dimension": source["dimension"],
+        "description": source["description"],
+        "major": bool(source.get("major")),
+        "statement_status": source.get("statement_status") or "current",
+        "evidence": [
+            {
+                "page": int(evidence["page"]),
+                "quote": (evidence.get("anchor") or {})["bounded_quote"],
+            }
+            for evidence in source["evidence"]
+        ],
+    }
+
+
+def _evidence_items(item, request=None):
+    catalog = (request or {}).get("evidence_catalog") or {}
+    found = []
+    raws = list(item.get("evidence") or [])
+    raws.extend(item.get("evidence_refs") or [])
+    for evidence in raws:
+        if isinstance(evidence, str):
+            evidence = catalog.get(evidence) or {}
+        if not isinstance(evidence, dict):
+            continue
+        quote = str(
+            evidence.get("quote")
+            or (evidence.get("anchor") or {}).get("bounded_quote")
+            or ""
+        )
+        if not quote:
+            continue
+        page = evidence.get("page") or (evidence.get("anchor") or {}).get("page") or 16
+        found.append({"page": int(page), "quote": quote})
+    return found
+
+
+def _quote_list(item, request=None):
+    return [item["quote"] for item in _evidence_items(item, request)]
+
+
+def _industry_supported(quotes):
+    blob = "\n".join(quotes)
+    return (
+        "主营业务分行业情况" in blob
+        and "纸行业" in blob
+        and "浆行业" in blob
+        and "纸制品加工" in blob
+        and "医药行业" in blob
+        and "光电子行业" in blob
+        and "2,332,376,693.65" in blob
+        and "主营业务分产品情况" not in blob
+    )
 
 
 def _repair_response(request, mode):
+    failed = [
+        condition
+        for condition in request.get("source_conditions") or []
+        if str(condition.get("condition_id") or "").endswith(":c3")
+        or str(condition.get("condition_id") or "") == "c3"
+    ]
     conditions = []
-    if mode == "other_business":
-        conditions.append(
-            {
-                "condition_id": "other-business",
-                "dimension": "principal_business",
-                "description": "另一项已核主业，不是待修条件。",
-                "major": True,
-                "statement_status": "current",
-                "evidence": [{"page": 9, "quote": "公司属于制浆造纸行业"}],
-            }
-        )
-    else:
-        quote = SUBTOTAL_QUOTE if mode == "subtotal" else WRONG_HEADER
-        for condition in request.get("source_conditions") or []:
-            if not str(condition.get("condition_id") or "").endswith("c3"):
-                continue
+    if mode == "located_wrong":
+        for condition in failed:
             conditions.append(
                 {
                     "condition_id": condition["condition_id"],
                     "dimension": condition.get("dimension") or "revenue_model",
-                    "description": condition.get("description") or "主营业务合计",
+                    "description": condition.get("description") or "待修条件",
                     "major": True,
                     "statement_status": "current",
-                    "evidence": [{"page": 17, "quote": quote}],
+                    "evidence": [
+                        {"page": 17, "quote": "主营业务分产品情况"},
+                        {"page": 16, "quote": INDUSTRY_QUOTES[1][1]},
+                        {"page": 16, "quote": INDUSTRY_QUOTES[2][1]},
+                        {"page": 16, "quote": INDUSTRY_QUOTES[5][1]},
+                        {
+                            "page": 17,
+                            "quote": "营林业 30,598,132.37 23,466,931.09 23.31 64.21 72.09 减少 3.51",
+                        },
+                    ],
+                }
+            )
+    elif mode == "full":
+        for condition in failed:
+            conditions.append(
+                {
+                    "condition_id": condition["condition_id"],
+                    "dimension": condition.get("dimension") or "revenue_model",
+                    "description": condition.get("description") or "待修条件",
+                    "major": True,
+                    "statement_status": "current",
+                    "evidence": [
+                        {"page": int(page), "quote": quote}
+                        for page, quote in INDUSTRY_QUOTES
+                    ],
                 }
             )
     return {
@@ -321,23 +418,28 @@ def _repair_response(request, mode):
     }
 
 
-def _bind_repaired_subtotal(request, body):
+def _bind_industry_repair(request, body):
+    """Pass the repaired industry condition only when its quotes support it."""
     if request.get("purpose") == "synthesize_views":
         for condition in request.get("source_conditions") or []:
             condition_id = str(condition.get("condition_id") or "")
-            if not condition_id.endswith("c3"):
+            quotes = _quote_list(condition, request)
+            if not condition_id.endswith(":c3") and condition_id != "c3":
                 continue
-            if SUBTOTAL_QUOTE not in _request_text(request):
+            if not _industry_supported(quotes):
                 continue
             body.setdefault("claims", []).append(
                 {
                     "claim_id": "repaired-c3",
                     "dimension": "revenue_model",
                     "status": "observed",
-                    "answer": "主营业务分行业合计为2,332,376,693.65元，不是公司营业收入总额。",
+                    "answer": (
+                        "主营业务分行业情况按人民币元列示纸行业、浆行业、纸制品加工行业、"
+                        "医药行业和光电子行业。该表合计2,332,376,693.65元，不是公司营业收入总额。"
+                    ),
                     "condition_ids": [condition_id],
                     "supporting_record_ids": [],
-                    "evidence": [{"page": 17, "quote": SUBTOTAL_QUOTE}],
+                    "evidence": _evidence_items(condition, request),
                 }
             )
     if request.get("purpose") != "verify_views":
@@ -346,26 +448,38 @@ def _bind_repaired_subtotal(request, body):
         (
             claim.get("claim_id")
             for claim in request.get("claims") or []
-            if "主营业务分行业合计" in str(claim.get("answer") or "")
-            and "2,332,376,693.65" in str(claim.get("answer") or "")
-            and "2,418,990,221.17" not in str(claim.get("answer") or "")
+            if _industry_supported(_quote_list(claim, request))
         ),
         None,
     )
-    if claim_id is None:
-        return body
-    for check in body.get("checks") or []:
-        if check.get("target_type") == "claim" and check.get("target_id") == claim_id:
-            check["status"] = "pass"
-            check["covers_target_type"] = "claim"
-            check["covers_target_id"] = claim_id
-        if (
-            check.get("target_type") == "condition"
-            and str(check.get("target_id") or "").endswith("c3")
-        ):
-            check["status"] = "pass"
-            check["covers_target_type"] = "claim"
-            check["covers_target_id"] = claim_id
+    if claim_id is not None:
+        for check in body.setdefault("checks", []):
+            if check.get("target_type") == "claim" and check.get("target_id") == claim_id:
+                check["status"] = "pass"
+                check["covers_target_type"] = "claim"
+                check["covers_target_id"] = claim_id
+    for condition in request.get("source_conditions") or []:
+        condition_id = str(condition.get("condition_id") or "")
+        if not _industry_supported(_quote_list(condition, request)):
+            continue
+        replaced = False
+        for check in body.setdefault("checks", []):
+            if check.get("target_type") == "condition" and check.get("target_id") == condition_id:
+                check["status"] = "pass"
+                check["covers_target_type"] = "claim"
+                check["covers_target_id"] = claim_id or "repaired-c3"
+                replaced = True
+        if not replaced:
+            body["checks"].append(
+                {
+                    "target_type": "condition",
+                    "target_id": condition_id,
+                    "status": "pass",
+                    "explanation": "引文包含分行业表头和纸、浆、医药、光电子各行，不是下一张表的标题。",
+                    "covers_target_type": "claim",
+                    "covers_target_id": claim_id or "repaired-c3",
+                }
+            )
     return body
 
 
@@ -376,7 +490,9 @@ def _run(
     fault_payloads=None,
     pages=None,
     plant_unresolved=False,
+    plant_s41_c3=False,
     repair_mode=None,
+    attach_failed_id=False,
 ):
     binding = json.loads((CHANGE / "s1-pool-s1-600103-s16-binding.json").read_text())
     raw = json.loads((ROOT / binding["config_path"]).read_text())["llm"]
@@ -415,6 +531,7 @@ def _run(
     calls = []
     fault_used = {"source": False, "draft": False, "verify": False}
     planted = {"done": False}
+    seen_failed = {"id": None}
 
     def transport(_url, _headers, payload, _timeout):
         request = json.loads(
@@ -432,10 +549,20 @@ def _run(
                     item.get("condition_id")
                     for item in request.get("source_conditions") or []
                 ][:8],
+                "page_text": "".join(
+                    str(page.get("text") or "") for page in request.get("source_pages") or []
+                ),
             }
         )
         body = None
         if request.get("source_scope") == "evidence_repair":
+            seen_failed["id"] = next(
+                (
+                    str(item.get("condition_id") or "")
+                    for item in request.get("source_conditions") or []
+                ),
+                None,
+            )
             body = (
                 _repair_response(request, repair_mode)
                 if repair_mode
@@ -446,6 +573,11 @@ def _run(
                     "source_conditions": [],
                 }
             )
+            calls[-1]["returned_quotes"] = [
+                str(evidence.get("quote") or "")
+                for condition in body.get("source_conditions") or []
+                for evidence in condition.get("evidence") or []
+            ]
         elif fault_payloads:
             if (
                 request["purpose"] == "source_inventory"
@@ -497,7 +629,7 @@ def _run(
                     ],
                 },
             ]
-        if repair_mode in {"subtotal", "wrong_header"} and (
+        if plant_s41_c3 and (
             request["purpose"] == "source_inventory"
             and request.get("source_scope") not in {"page_map", "evidence_repair"}
             and not planted["done"]
@@ -507,22 +639,17 @@ def _run(
             body = dict(body)
             body["source_conditions"] = [
                 *(body.get("source_conditions") or []),
-                {
-                    "condition_id": "c3",
-                    "dimension": "revenue_model",
-                    "description": "主营业务分行业合计。这不是公司营业收入总额。",
-                    "major": True,
-                    "statement_status": "current",
-                    "evidence": [
-                        {
-                            "page": 17,
-                            "quote": "合计2,332,376,693.65未定位的错误列",
-                        }
-                    ],
-                },
+                _s41_c3_wire(),
             ]
-        if repair_mode == "subtotal":
-            body = _bind_repaired_subtotal(request, body)
+        if attach_failed_id and seen_failed["id"] and request.get("purpose") == "synthesize_views":
+            claims = body.setdefault("claims", [])
+            if claims:
+                claims[0]["condition_ids"] = [
+                    *(claims[0].get("condition_ids") or []),
+                    seen_failed["id"],
+                ]
+        if repair_mode == "full":
+            body = _bind_industry_repair(request, body)
         encoded = json.dumps(body, ensure_ascii=False)
         return {
             "status_code": 200,
@@ -727,19 +854,58 @@ def test_unresolved_major_business_keeps_the_core_incomplete():
     assert any(item["source_scope"] == "evidence_repair" for item in _calls)
 
 
-def test_repaired_subtotal_completes_the_company_without_replacing_the_total():
+def test_condition_id_on_another_claim_does_not_clear_the_gap():
+    _ran, queried, exported, reloaded, _calls = _run(
+        _fixed_core_objects(),
+        plant_unresolved=True,
+        attach_failed_id=True,
+    )
+    assert queried["profiles"] == exported["profiles"] == reloaded["profiles"]
+    views = _views(queried)
+    gaps = views.get("gaps") or []
+    gap = next(
+        item
+        for item in gaps
+        if item.startswith("major_evidence_not_located:")
+        and item.endswith("audit-unresolved-other-business")
+    )
+    scoped = gap.split(":", 1)[1]
+    assert any(
+        scoped in (claim.get("condition_ids") or [])
+        for view in views["views"].values()
+        for claim in view.get("claims") or []
+    )
+    assert not any(
+        check.get("status") == "pass"
+        and check.get("target_type") == "condition"
+        and str(check.get("target_id") or "").endswith("audit-unresolved-other-business")
+        for receipt in views.get("call_receipts") or []
+        for check in (receipt.get("response_payload") or {}).get("checks") or []
+    )
+    assert views["draft_complete"] is False
+    assert views["real_semantic_complete"] is False
+    assert "医药" in "\n".join(_answers(views))
+
+
+def test_s41_industry_condition_repairs_with_its_header_and_rows():
     _ran, queried, exported, reloaded, calls = _run(
         _fixed_core_objects(),
-        repair_mode="subtotal",
-        pages=_pages({4, 9, 11, 16, 17}),
+        plant_s41_c3=True,
+        repair_mode="full",
+        pages=_pages({4, 9, 11, 15, 16, 17, 18}),
     )
     assert queried["profiles"] == exported["profiles"] == reloaded["profiles"]
     views = _views(queried)
     answers = _answers(views)
     text = "\n".join(answers)
+    repair = next(item for item in calls if item["source_scope"] == "evidence_repair")
+    assert {16, 17, 18} <= set(repair["pages"])
+    assert "主营业务分行业情况" in repair["page_text"]
+    assert "单位：元" in repair["page_text"]
     assert views["draft_complete"] is True
     assert views["real_semantic_complete"] is False
     assert "医药" in text and "光电子" in text and "伸性纸袋纸" in text
+    assert "纸行业" in text and "浆行业" in text
     assert "自主生产" in text and "直销" in text
     assert "全国各地和国际市场" in text
     assert any("招标" in answer or "木竹片" in answer for answer in answers)
@@ -747,10 +913,19 @@ def test_repaired_subtotal_completes_the_company_without_replacing_the_total():
         "2,418,990,221.17" in answer and "2,332,376,693.65" not in answer
         for answer in answers
     )
-    assert any(
-        "2,332,376,693.65" in answer and "主营业务" in answer
-        for answer in answers
-    )
+    repaired = [
+        claim
+        for view in views["views"].values()
+        for claim in view.get("claims") or []
+        if claim.get("claim_id") == "repaired-c3"
+        or "主营业务分行业情况" in str(claim.get("answer") or "")
+    ]
+    assert repaired
+    quotes = []
+    for claim in repaired:
+        for evidence in claim.get("evidence") or []:
+            quotes.append(str((evidence.get("anchor") or {}).get("bounded_quote") or evidence.get("quote") or ""))
+    assert _industry_supported(quotes)
     assert not any(
         gap.startswith("major_evidence_not_located:") and gap.endswith("c3")
         for gap in views.get("gaps") or []
@@ -758,30 +933,49 @@ def test_repaired_subtotal_completes_the_company_without_replacing_the_total():
     assert any(
         check.get("status") == "pass"
         and check.get("target_type") == "condition"
-        and str(check.get("target_id") or "").endswith("c3")
-        and check.get("covers_target_id")
+        and str(check.get("target_id") or "").endswith(":c3")
+        and check.get("covers_target_type") == "claim"
+        and check.get("covers_target_id") == "repaired-c3"
         for receipt in views.get("call_receipts") or []
         for check in (receipt.get("response_payload") or {}).get("checks") or []
     )
-    assert any(item["source_scope"] == "evidence_repair" for item in calls)
 
 
-def test_wrong_header_does_not_repair_the_failed_condition():
+def test_located_wrong_header_does_not_repair_the_multi_part_condition():
     _ran, queried, exported, reloaded, calls = _run(
         _fixed_core_objects(),
-        repair_mode="wrong_header",
-        pages=_pages({4, 9, 11, 16, 17}),
+        plant_s41_c3=True,
+        repair_mode="located_wrong",
+        pages=_pages({4, 9, 11, 15, 16, 17, 18}),
     )
     assert queried["profiles"] == exported["profiles"] == reloaded["profiles"]
     views = _views(queried)
+    repair = next(item for item in calls if item["source_scope"] == "evidence_repair")
+    assert {16, 17} <= set(repair["pages"])
+    assert "主营业务分行业情况" in repair["page_text"]
+    returned = "\n".join(repair["returned_quotes"])
+    assert "主营业务分产品情况" in returned
+    assert "医药行业" not in returned
+    assert len(repair["returned_quotes"]) == 5
+    assert any(
+        item["purpose"] == "synthesize_views"
+        and any(str(condition).endswith(":c3") for condition in item["conditions"])
+        for item in calls[calls.index(repair) + 1 :]
+    )
     assert views["draft_complete"] is False
     assert views["real_semantic_complete"] is False
     assert any(
         gap.startswith("major_evidence_not_located:") and gap.endswith("c3")
         for gap in views.get("gaps") or []
     )
+    assert not any(
+        check.get("status") == "pass"
+        and check.get("target_type") == "condition"
+        and str(check.get("target_id") or "").endswith(":c3")
+        for receipt in views.get("call_receipts") or []
+        for check in (receipt.get("response_payload") or {}).get("checks") or []
+    )
     assert "医药" in "\n".join(_answers(views))
-    assert any(item["source_scope"] == "evidence_repair" for item in calls)
 
 
 def test_missing_downstream_keeps_the_same_entry_limited():
