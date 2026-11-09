@@ -498,7 +498,25 @@ def _observation_source_receipts():
     ]
 
 
+def _folded(text) -> str:
+    return "".join(str(text or "").split())
+
+
+def _quotes_support_answer(answer, quotes) -> bool:
+    """A controlled answer is supported only when it is drawn from its quotes."""
+    folded = _folded(answer)
+    blob = _folded("\n".join(str(quote) for quote in quotes))
+    return bool(folded) and folded in blob
+
+
 def _condition_wire(condition, request=None):
+    """Project one saved condition onto this request without dropping evidence.
+
+    A unique span may be stored as the page's own text. A quote that does not
+    locate, or locates more than once, stays in the original wording.
+    """
+    if not condition.get("condition_id"):
+        return None
     evidence = []
     pages = {
         int(page["page"]): str(page.get("text") or "")
@@ -512,13 +530,12 @@ def _condition_wire(condition, request=None):
         if not quote or page is None:
             continue
         text = pages.get(int(page), "")
-        spans = _spans_in_text(str(quote), text) or []
-        if len(spans) != 1:
-            continue
-        start, end = spans[0]
-        evidence.append({"page": int(page), "quote": text[start:end]})
-    if not evidence or not condition.get("condition_id"):
-        return None
+        spans = _spans_in_text(str(quote), text) or [] if text else []
+        if len(spans) == 1:
+            start, end = spans[0]
+            evidence.append({"page": int(page), "quote": text[start:end]})
+        else:
+            evidence.append({"page": int(page), "quote": str(quote)})
     return {
         "condition_id": condition["condition_id"],
         "dimension": condition.get("dimension") or "principal_business",
@@ -592,30 +609,32 @@ def _quote_evidence(condition, request):
 
 
 def _controlled_observation_draft(request):
-    """Labeled controlled draft. Answers and quotes come from the request conditions."""
+    """Labeled controlled draft. The answer is the supporting quote, not the description."""
     claims = []
     for condition in request.get("source_conditions") or []:
         evidence = _quote_evidence(condition, request)
         if not evidence:
             continue
-        description = str(condition.get("description") or "")
         condition_id = str(condition.get("condition_id") or "")
-        quoted = "\n".join(item["quote"] for item in evidence)
+        quoted = [item["quote"] for item in evidence]
         if not (
             condition.get("major")
             or condition.get("dimension") == "output_exposure"
             or "period-operating-revenue" in condition_id
             or "output-exposure" in condition_id
-            or "2,418,990,221.17" in description
-            or "2,418,990,221.17" in quoted
+            or any("2,418,990,221.17" in quote for quote in quoted)
         ):
             continue
-        if "period-operating-revenue" in condition_id or (
-            "2,418,990,221.17" in quoted and "2,418,990,221.17" not in description
+        if "period-operating-revenue" in condition_id or any(
+            "2,418,990,221.17" in quote for quote in quoted
         ):
-            answer = next(item["quote"] for item in evidence if "2,418,990,221.17" in item["quote"])
+            answer = next(quote for quote in quoted if "2,418,990,221.17" in quote)
+            kept = [item for item in evidence if "2,418,990,221.17" in item["quote"]]
         else:
-            answer = description or evidence[0]["quote"]
+            answer = "\n".join(quoted)
+            kept = evidence
+        if not _quotes_support_answer(answer, [item["quote"] for item in kept]):
+            continue
         claims.append(
             {
                 "claim_id": "draft-" + condition_id.replace(":", "-"),
@@ -624,7 +643,7 @@ def _controlled_observation_draft(request):
                 "answer": answer,
                 "condition_ids": [condition_id],
                 "supporting_record_ids": [],
-                "evidence": evidence[:4],
+                "evidence": kept[:4],
             }
         )
     return {
@@ -636,17 +655,32 @@ def _controlled_observation_draft(request):
 
 
 def _controlled_observation_verify(request):
-    """Labeled controlled verification. A pass covers a claim in this request."""
+    """Labeled controlled verification. A pass requires the answer to be inside its quotes."""
     checks = []
     covered = {}
+    claims_by_id = {}
     for claim in request.get("claims") or []:
         claim_id = claim.get("claim_id")
+        quotes = [item["quote"] for item in _quote_evidence(claim, request)]
+        if not _quotes_support_answer(claim.get("answer"), quotes):
+            checks.append(
+                {
+                    "target_type": "claim",
+                    "target_id": claim_id,
+                    "status": "unclear",
+                    "explanation": "受控核验：答案不是本主张引文中的原文。",
+                    "covers_target_type": "claim",
+                    "covers_target_id": claim_id,
+                }
+            )
+            continue
+        claims_by_id[claim_id] = claim
         checks.append(
             {
                 "target_type": "claim",
                 "target_id": claim_id,
                 "status": "pass",
-                "explanation": "受控核验：主张引文来自本次请求中的源条件。",
+                "explanation": "受控核验：答案来自本主张引文。",
                 "covers_target_type": "claim",
                 "covers_target_id": claim_id,
             }
@@ -656,14 +690,18 @@ def _controlled_observation_verify(request):
     for condition in request.get("source_conditions") or []:
         condition_id = condition.get("condition_id")
         claim_id = covered.get(condition_id)
-        if not claim_id:
+        claim = claims_by_id.get(claim_id)
+        if claim is None:
+            continue
+        condition_quotes = [item["quote"] for item in _quote_evidence(condition, request)]
+        if not _quotes_support_answer(claim.get("answer"), condition_quotes):
             continue
         checks.append(
             {
                 "target_type": "condition",
                 "target_id": condition_id,
                 "status": "pass",
-                "explanation": "受控核验：条件覆盖当前主张。",
+                "explanation": "受控核验：条件引文包含该主张。",
                 "covers_target_type": "claim",
                 "covers_target_id": claim_id,
             }
@@ -874,6 +912,21 @@ def _run(
         ):
             truncated_verify["done"] = True
             finish_reason = "length"
+        if (
+            body
+            and request.get("purpose") == "source_inventory"
+            and request.get("source_scope") not in {"page_map", "evidence_repair"}
+        ):
+            calls[-1]["returned_evidence"] = [
+                {
+                    "id": item.get("condition_id"),
+                    "page": evidence.get("page"),
+                    "quote": evidence.get("quote"),
+                }
+                for item in body.get("source_conditions") or []
+                for evidence in item.get("evidence") or []
+                if isinstance(evidence, dict)
+            ]
         encoded = json.dumps(body, ensure_ascii=False)
         if routine_contract:
             usage = {
@@ -1073,63 +1126,116 @@ def test_minor_company_total_is_a_core_draft_target():
 _OBSERVATION_PAGES = {4, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 22, 85, 92}
 
 
-def _assert_routine_core(queried, exported, reloaded, calls):
+def _stored_quotes(claim):
+    found = []
+    for evidence in claim.get("evidence") or []:
+        if not isinstance(evidence, dict):
+            continue
+        quote = (evidence.get("anchor") or {}).get("bounded_quote") or evidence.get("quote") or ""
+        if quote:
+            found.append(str(quote))
+    return found
+
+
+def _first_observation_c3():
+    for item in _observation_source_receipts():
+        if item.get("source_scope") != "full_context":
+            continue
+        for condition in (item.get("response_payload") or {}).get("source_conditions") or []:
+            if condition.get("condition_id") == "c3" and condition.get("major"):
+                return condition
+    raise AssertionError("saved c3 is missing")
+
+
+def test_replay_keeps_unlocated_c3_evidence_and_refuses_an_unsupported_pass():
+    saved = _first_observation_c3()
+    request = {
+        "source_pages": [
+            {"page": page["page"], "text": page["text"]}
+            for page in _pages({9, 16, 18, 22, 92})
+        ]
+    }
+    wire = _condition_wire(saved, request)
+    assert wire["condition_id"] == "c3"
+    assert wire["major"] is True
+    assert "2,332,376,693.65" in wire["description"]
+    assert any(
+        item["page"] == 18 and "2,332,376,693.65" in item["quote"]
+        for item in wire["evidence"]
+    )
+    page16 = [item for item in wire["evidence"] if item["page"] == 16]
+    assert page16
+    assert all("2,332,376,693.65" not in item["quote"] for item in page16)
+    unsupported = {
+        "request_id": "probe",
+        "purpose": "verify_views",
+        "claims": [
+            {
+                "claim_id": "copied-description",
+                "answer": wire["description"],
+                "condition_ids": ["c3"],
+                "evidence": page16,
+            }
+        ],
+        "source_conditions": [{**wire, "evidence": page16}],
+    }
+    checks = _controlled_observation_verify(unsupported)["checks"]
+    assert checks
+    assert all(check["status"] != "pass" for check in checks)
+    draft = _controlled_observation_draft(
+        {
+            "request_id": "probe",
+            "purpose": "synthesize_views",
+            "source_conditions": [{**wire, "evidence": page16}],
+        }
+    )
+    for claim in draft["claims"]:
+        assert "2,332,376,693.65" not in claim["answer"]
+        assert _quotes_support_answer(
+            claim["answer"], [item["quote"] for item in claim["evidence"]]
+        )
+
+
+def test_preserved_observation_evidence_keeps_c3_blocking():
+    """One entry replay. The original unlocated total stays a blocking gap."""
+    _ran, queried, exported, reloaded, calls = _run(
+        _fixed_core_objects(),
+        pages=_pages(_OBSERVATION_PAGES),
+        replay_observation=True,
+        routine_contract=True,
+    )
     assert queried["profiles"] == exported["profiles"] == reloaded["profiles"]
     views = _views(queried)
-    assert views["draft_complete"] is True, views.get("gaps")
     assert views["real_semantic_complete"] is False
-    text = "\n".join(_answers(views))
-    assert "医药" in text and "光电子" in text and "伸性纸袋纸" in text
-    assert "自主生产" in text and "直销" in text
-    assert "全国各地和国际市场" in text or "下游" in text
+    assert views["draft_complete"] is False
     assert any(
-        "2,418,990,221.17" in answer and "2,332,376,693.65" not in answer
-        for answer in _answers(views)
+        gap.startswith("major_evidence_not_located:") and gap.endswith("c3")
+        or (gap.startswith("major_evidence_not_located:") and ":c3" in gap)
+        for gap in views.get("gaps") or []
     )
-    snapshot = calls.budget_snapshot
-    assert snapshot["physical_requests"] <= 16, snapshot["physical_requests"]
-    assert snapshot["charged_tokens"] <= 120_000, snapshot["charged_tokens"]
-    counts = {}
-    for item in snapshot["attempts"]:
-        key = item["logical_request_id"]
-        counts[key] = counts.get(key, 0) + 1
-    assert sum(1 for count in counts.values() if count > 1) <= 2
-    covered = _covered_claim_ids(views)
-    assert covered
     assert any(
+        item.get("id") == "c3"
+        and item.get("page") == 18
+        and "2,332,376,693.65" in str(item.get("quote") or "")
+        for call in calls
+        for item in call.get("returned_evidence") or []
+    )
+    assert any(call.get("source_scope") == "evidence_repair" for call in calls)
+    for view in views["views"].values():
+        for claim in view.get("claims") or []:
+            if "2,332,376,693.65" not in str(claim.get("answer") or ""):
+                continue
+            assert "2,332,376,693.65" in "\n".join(_stored_quotes(claim))
+    assert not any(
         check.get("status") == "pass"
         and check.get("target_type") == "condition"
-        and check.get("covers_target_id") in covered
+        and str(check.get("target_id") or "").endswith("c3")
         for receipt in views.get("call_receipts") or []
         for check in (receipt.get("response_payload") or {}).get("checks") or []
     )
-
-
-def test_routine_contract_delivers_the_observation_core():
-    _ran, queried, exported, reloaded, calls = _run(
-        _fixed_core_objects(),
-        pages=_pages(_OBSERVATION_PAGES),
-        replay_observation=True,
-        repair_mode="full",
-        routine_contract=True,
-    )
-    _assert_routine_core(queried, exported, reloaded, calls)
-
-
-def test_routine_contract_survives_missing_claims_and_truncated_verify():
-    _ran, queried, exported, reloaded, calls = _run(
-        _fixed_core_objects(),
-        pages=_pages(_OBSERVATION_PAGES),
-        replay_observation=True,
-        repair_mode="full",
-        routine_contract=True,
-        drop_first_claims=True,
-        truncate_first_verify=True,
-    )
-    _assert_routine_core(queried, exported, reloaded, calls)
-    drafts = [item for item in calls if item["purpose"] == "synthesize_views"]
-    assert len(drafts) >= 2
-    assert drafts[0]["conditions"] != drafts[1]["conditions"]
+    snapshot = calls.budget_snapshot
+    assert snapshot["physical_requests"] <= 16, snapshot
+    assert snapshot["charged_tokens"] <= 120_000, snapshot
 
 
 def test_missing_claims_splits_once_and_still_delivers_the_core():
