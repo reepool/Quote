@@ -728,7 +728,10 @@ def _run(
     truncate_first_verify=False,
     replay_observation=False,
     routine_contract=False,
+    anchor_contract=False,
 ):
+    if anchor_contract:
+        routine_contract = True
     binding = json.loads((CHANGE / "s1-pool-s1-600103-s16-binding.json").read_text())
     raw = json.loads((ROOT / binding["config_path"]).read_text())["llm"]
     config = LlmConfig.from_mapping(raw)
@@ -792,10 +795,19 @@ def _run(
                 "page_text": "".join(
                     str(page.get("text") or "") for page in request.get("source_pages") or []
                 ),
+                "anchor_ids": [item.get("id") for item in request.get("source_anchors") or []],
             }
         )
         body = None
-        if replay_observation and request.get("purpose") == "source_inventory" and request.get("source_scope") != "evidence_repair":
+        if anchor_contract and request.get("purpose") == "source_inventory" and request.get("source_scope") == "page_map":
+            body = _anchor_page_map(request)
+        elif anchor_contract and request.get("purpose") == "source_inventory" and request.get("source_scope") != "evidence_repair":
+            body = _anchor_source_body(request, plant_other=plant_unresolved)
+        elif anchor_contract and request.get("purpose") == "synthesize_views":
+            body = _anchor_draft(request)
+        elif anchor_contract and request.get("purpose") == "verify_views":
+            body = _anchor_verify(request)
+        elif replay_observation and request.get("purpose") == "source_inventory" and request.get("source_scope") != "evidence_repair":
             body = _observation_source_body(request, observation_receipts)
         elif replay_observation and request.get("purpose") == "synthesize_views":
             body = _controlled_observation_draft(request)
@@ -851,6 +863,7 @@ def _run(
         body = _keep_original_answers(request, body)
         if (
             plant_unresolved
+            and not anchor_contract
             and not planted["done"]
             and request["purpose"] == "source_inventory"
             and request.get("source_scope") != "page_map"
@@ -1023,7 +1036,10 @@ def _run(
             product_contract="company_profile_product_contract.2026-10-27.llm-led.v8",
             meter_profile=_meter_profile(gateway_config, binding),
         )
-        if routine_contract:
+        if anchor_contract:
+            routine_contract = True
+            identity["source_reference"] = "anchor_v1"
+        if routine_contract or anchor_contract:
             identity["request_reservation_limit"] = int(
                 binding.get("request_reservation_limit") or 65_536
             )
@@ -1471,3 +1487,338 @@ def test_s41_unresolved_major_quote_keeps_the_supplement_limited():
     assert calls[0]["purpose"] == "source_inventory"
     assert calls[0]["source_scope"] == "page_map"
     assert any(item["purpose"] == "source_inventory" and 11 in item["pages"] for item in calls)
+
+
+_DOCUMENT = "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c"
+_KIND_DIMENSION = {
+    "principal": "principal_business",
+    "products": "products_services",
+    "period": "revenue_model",
+    "industry": "revenue_model",
+    "input": "input_exposure",
+    "role": "supply_chain_role",
+    "output": "output_exposure",
+    "chain": "upstream_downstream",
+}
+
+
+def _page_text(request, page_no) -> str:
+    for page in request.get("source_pages") or []:
+        if int(page.get("page") or 0) == int(page_no):
+            return str(page.get("text") or "")
+    return ""
+
+
+def _anchor_slice(anchor, request) -> str:
+    text = _page_text(request, anchor["page"])
+    return text[int(anchor["start"]) : int(anchor["end"])]
+
+
+def _anchor_kind(text: str) -> str | None:
+    if "主营业务分产品情况" in text:
+        return None
+    if "2,418,990,221.17" in text and "营业收入" in text:
+        return "period"
+    if "主营业务分行业情况" in text or ("纸行业" in text and "医药行业" in text):
+        return "industry"
+    if "伸性纸袋纸" in text or "主要产品为" in text:
+        return "products"
+    if "自主生产" in text or "自行生产" in text:
+        return "role"
+    if "产品行销" in text:
+        return "output"
+    if "采购" in text and ("浆" in text or "原料" in text):
+        return "input"
+    if "上下游" in text or "林-浆-纸" in text or "林浆纸" in text:
+        return "chain"
+    if ("主要从事" in text or "主营业务" in text) and "纸" in text and "合计" not in text:
+        return "principal"
+    return None
+
+
+def _supporting_anchor_ids(kind, anchors, request) -> list[str]:
+    """The shortest spans that actually support this kind. No extra pages."""
+    dimension = _KIND_DIMENSION[kind]
+    matched = []
+    for anchor in anchors:
+        text = _anchor_slice(anchor, request)
+        if _anchor_kind(text) != kind:
+            continue
+        matched.append((anchor, text))
+    singles = [
+        (len(text), [str(anchor["id"])])
+        for anchor, text in matched
+        if _anchor_fact_supported(dimension, [text])
+    ]
+    if singles:
+        return min(singles)[1]
+    chosen_ids: list[str] = []
+    chosen_text: list[str] = []
+    for anchor, text in matched:
+        if "主营业务分产品情况" in text:
+            break
+        chosen_ids.append(str(anchor["id"]))
+        chosen_text.append(text)
+        if _anchor_fact_supported(dimension, chosen_text):
+            return chosen_ids
+        if len(chosen_ids) == 3:
+            break
+    return []
+
+
+def _wire_evidence_items(item):
+    return list(item.get("evidence") or []) + list(item.get("evidence_refs") or [])
+
+
+def _evidence_text(item, request) -> str:
+    catalog = request.get("evidence_catalog") or {}
+    if isinstance(item, str):
+        body = catalog.get(item) if isinstance(catalog, dict) else None
+        if isinstance(body, dict):
+            quote = (body.get("anchor") or {}).get("bounded_quote")
+            if quote:
+                return str(quote)
+        parts = item.rsplit(":", 3)
+        if len(parts) == 4 and parts[1].isdigit():
+            return _page_text(request, int(parts[1]))[int(parts[2]) : int(parts[3])]
+        return ""
+    if isinstance(item, dict):
+        if item.get("quote"):
+            return str(item["quote"])
+        quote = (item.get("anchor") or {}).get("bounded_quote")
+        if quote:
+            return str(quote)
+        if item.get("evidence_id"):
+            return _evidence_text(item["evidence_id"], request)
+    return ""
+
+
+def _anchor_fact_supported(dimension, quotes) -> bool:
+    blob = "\n".join(quote for quote in quotes if quote)
+    if not blob.strip():
+        return False
+    if dimension == "principal_business":
+        return ("主要从事" in blob or "主营业务" in blob) and "纸" in blob and "分产品情况" not in blob
+    if dimension == "products_services":
+        return "伸性纸袋纸" in blob or "主要产品" in blob
+    if dimension == "revenue_model":
+        if "2,418,990,221.17" in blob:
+            return "营业收入" in blob and "2,332,376,693.65" not in blob
+        if "2,332,376,693.65" in blob:
+            return (
+                "主营业务分行业情况" in blob
+                and "医药" in blob
+                and "光电子" in blob
+                and "主营业务分产品情况" not in blob
+            )
+        return False
+    if dimension == "input_exposure":
+        return "采购" in blob or "原料" in blob
+    if dimension == "supply_chain_role":
+        return "自主生产" in blob or "自行生产" in blob or "制浆" in blob
+    if dimension == "output_exposure":
+        return "行销" in blob and "下游需求" not in blob
+    if dimension == "upstream_downstream":
+        return "上下游" in blob or "上游" in blob or "林" in blob
+    return False
+
+
+def _anchor_page_map(request):
+    pages = [int(page["page"]) for page in request.get("source_pages") or []]
+    chosen = [page for page in pages if page in _OBSERVATION_PAGES]
+    return {
+        "schema_version": "company_profile_report_response.v3",
+        "request_id": request["request_id"],
+        "purpose": request["purpose"],
+        "requested_pages": chosen or pages,
+    }
+
+
+def _anchor_source_body(request, plant_other=False):
+    groups: dict[str, list[str]] = {}
+    for kind in _KIND_DIMENSION:
+        ids = _supporting_anchor_ids(kind, request.get("source_anchors") or [], request)
+        if ids:
+            groups[kind] = ids
+    conditions = []
+    for kind, ids in groups.items():
+        conditions.append(
+            {
+                "condition_id": f"anchor-{kind}-{ids[0].rsplit(':', 1)[-1]}",
+                "dimension": _KIND_DIMENSION[kind],
+                "description": "受控选择：引用本次请求已经给出的原文锚点。",
+                "major": True,
+                "statement_status": "current",
+                "evidence": ids[:8],
+            }
+        )
+    if plant_other:
+        product = next(
+            (
+                anchor
+                for anchor in request.get("source_anchors") or []
+                if "主营业务分产品情况" in _anchor_slice(anchor, request)
+            ),
+            None,
+        )
+        if product is not None:
+            conditions.append(
+                {
+                    "condition_id": "anchor-wrong-table",
+                    "dimension": "revenue_model",
+                    "description": "把产品表锚点当作分行业合计。",
+                    "major": True,
+                    "statement_status": "current",
+                    "evidence": [product["id"]],
+                }
+            )
+    return {
+        "schema_version": "company_profile_report_response.v3",
+        "request_id": request["request_id"],
+        "purpose": request["purpose"],
+        "requested_pages": [],
+        "source_conditions": conditions,
+    }
+
+
+def _anchor_draft(request):
+    claims = []
+    for condition in request.get("source_conditions") or []:
+        evidence = _wire_evidence_items(condition)
+        quotes = [text for text in (_evidence_text(item, request) for item in evidence) if text]
+        refs = []
+        for item in evidence:
+            if isinstance(item, str):
+                refs.append(item)
+            elif isinstance(item, dict) and item.get("evidence_id"):
+                refs.append(item["evidence_id"])
+        if not quotes or not refs:
+            continue
+        claims.append(
+            {
+                "claim_id": "draft-" + str(condition.get("condition_id")).replace(":", "-"),
+                "dimension": condition.get("dimension") or "principal_business",
+                "status": "observed",
+                "answer": "\n".join(quotes),
+                "condition_ids": [condition.get("condition_id")],
+                "supporting_record_ids": [],
+                "evidence": refs,
+            }
+        )
+    return {
+        "schema_version": "company_profile_report_response.v3",
+        "request_id": request["request_id"],
+        "purpose": request["purpose"],
+        "claims": claims,
+    }
+
+
+def _anchor_verify(request):
+    checks = []
+    for claim in request.get("claims") or []:
+        quotes = [
+            text
+            for text in (_evidence_text(item, request) for item in _wire_evidence_items(claim))
+            if text
+        ]
+        supported = _anchor_fact_supported(claim.get("dimension"), quotes)
+        checks.append(
+            {
+                "target_type": "claim",
+                "target_id": claim.get("claim_id"),
+                "status": "pass" if supported else "unclear",
+                "explanation": "受控核验：按原文锚点核对主体、表头和数字。",
+                "covers_target_type": "claim",
+                "covers_target_id": claim.get("claim_id"),
+            }
+        )
+        if not supported:
+            continue
+        for condition in request.get("source_conditions") or []:
+            if condition.get("condition_id") not in (claim.get("condition_ids") or []):
+                continue
+            condition_quotes = [
+                text
+                for text in (
+                    _evidence_text(item, request) for item in _wire_evidence_items(condition)
+                )
+                if text
+            ]
+            if not _anchor_fact_supported(condition.get("dimension"), condition_quotes):
+                continue
+            checks.append(
+                {
+                    "target_type": "condition",
+                    "target_id": condition.get("condition_id"),
+                    "status": "pass",
+                    "explanation": "受控核验：条件锚点与主张指向同一段原文。",
+                    "covers_target_type": "claim",
+                    "covers_target_id": claim.get("claim_id"),
+                }
+            )
+    return {
+        "schema_version": "company_profile_report_response.v3",
+        "request_id": request["request_id"],
+        "purpose": request["purpose"],
+        "checks": checks,
+    }
+
+
+def test_same_text_tables_keep_separate_anchors_and_reject_bad_ids():
+    from research.company_profile.report_interpretation import (
+        restore_source_anchor,
+        source_anchor_catalog,
+    )
+
+    pages = list(_pages({16, 17}))
+    catalog = source_anchor_catalog(pages, _DOCUMENT)
+    assert catalog
+    assert set(catalog[0]) == {"id", "page", "start", "end"}
+
+    def text_of(item):
+        page = next(page for page in pages if page["page"] == item["page"])
+        return page["text"][item["start"] : item["end"]]
+
+    industry = [item for item in catalog if "主营业务分行业情况" in text_of(item)]
+    product = [item for item in catalog if "主营业务分产品情况" in text_of(item)]
+    assert industry and product
+    assert industry[0]["id"] != product[0]["id"]
+    report = ReportIdentity(
+        instrument_id="600103.SH",
+        report_id="annual-2025",
+        document_version=_DOCUMENT,
+        report_period="2025-12-31",
+        published_at="2026-04-13T16:00:00+00:00",
+    )
+    restored = restore_source_anchor(industry[0]["id"], report, pages)
+    assert restored["anchor"]["bounded_quote"] == text_of(industry[0])
+    assert restored["anchor"]["source_offset"] == industry[0]["start"]
+    wrong_version = "0" * 64 + industry[0]["id"][len(_DOCUMENT) :]
+    assert restore_source_anchor(wrong_version, report, pages) is None
+    start = industry[0]["id"].rsplit(":", 2)[0]
+    assert restore_source_anchor(f"{start}:0:999999", report, pages) is None
+    assert _anchor_fact_supported("revenue_model", [text_of(product[0])]) is False
+
+
+def test_anchor_contract_stops_before_principal_and_role():
+    """Second normal-chain run. Principal and operating role stay unresolved."""
+    _ran, queried, exported, reloaded, calls = _run(
+        _fixed_core_objects(),
+        pages=_pages(_OBSERVATION_PAGES),
+        anchor_contract=True,
+    )
+    assert queried["profiles"] == exported["profiles"] == reloaded["profiles"]
+    views = _views(queried)
+    assert views["real_semantic_complete"] is False
+    assert views["draft_complete"] is False
+    gaps = set(views.get("gaps") or [])
+    assert "core_dimension_missing:principal_business" in gaps
+    assert "core_dimension_missing:operating_role" in gaps
+    assert any(gap.startswith("major_condition_not_verified:core-question:operating-role") or gap == "major_condition_not_verified:core-question:operating-role" for gap in gaps)
+    assert "view_not_substantive:company_profile" in gaps
+    assert "view_not_substantive:supply_chain_position" in gaps
+    assert any(call.get("anchor_ids") for call in calls)
+    snapshot = calls.budget_snapshot
+    assert snapshot["physical_requests"] <= 16, snapshot["physical_requests"]
+    assert snapshot["charged_tokens"] <= 120_000, snapshot["charged_tokens"]
+

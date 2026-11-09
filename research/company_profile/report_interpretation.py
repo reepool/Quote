@@ -508,6 +508,113 @@ def _spans_in_text(quote: str, text: str) -> list[tuple[int, int]] | None:
     return spans
 
 
+def parse_source_anchor_id(anchor_id: str) -> tuple[str, int, int, int] | None:
+    """Split version:page:start:end. The version itself may contain colons."""
+    parts = str(anchor_id or "").rsplit(":", 3)
+    if len(parts) != 4:
+        return None
+    version, page, start, end = parts
+    if not version or not page.isdigit() or not start.isdigit() or not end.isdigit():
+        return None
+    return version, int(page), int(start), int(end)
+
+
+def source_anchor_id(document_version: str, page: int, start: int, end: int) -> str:
+    return f"{document_version}:{int(page)}:{int(start)}:{int(end)}"
+
+
+def _anchor_spans(text: str) -> list[tuple[int, int]]:
+    """Deterministic ranges in one sent page. No business is chosen here."""
+    if not str(text or "").strip():
+        return []
+    spans: list[tuple[int, int]] = []
+    start: int | None = None
+
+    def close(end: int) -> None:
+        nonlocal start
+        if start is None:
+            return
+        if text[start:end].strip():
+            spans.append((start, end))
+        start = None
+
+    for line_start, line_end in _line_spans(text):
+        line = _line_text(text, (line_start, line_end))
+        if not line:
+            close(line_start)
+            continue
+        opens = _is_heading_line(line) or "单位：" in line or "单位:" in line
+        if opens and start is not None and line_start > start:
+            close(line_start)
+        if start is None:
+            start = line_start
+        if line_end - start > 480 and _ends_sentence(line):
+            close(line_end)
+    close(len(text))
+    return spans
+
+
+def source_anchor_catalog(pages, document_version: str) -> list[dict[str, int | str]]:
+    """Locations in the pages actually sent. The catalog has no answers."""
+    version = str(document_version or "")
+    catalog = []
+    for page in pages or ():
+        if page.get("readable", True) is False:
+            continue
+        text = str(page.get("text") or "")
+        page_no = int(page.get("page") or 0)
+        if page_no < 1 or not version:
+            continue
+        for start, end in _anchor_spans(text):
+            catalog.append(
+                {
+                    "id": source_anchor_id(version, page_no, start, end),
+                    "page": page_no,
+                    "start": start,
+                    "end": end,
+                }
+            )
+    return catalog
+
+
+def restore_source_anchor(anchor_id: str, report, pages) -> dict | None:
+    """Exact text for one id. A wrong version or range is not a quote to search for."""
+    parsed = parse_source_anchor_id(anchor_id)
+    if parsed is None:
+        return None
+    version, page_no, start, end = parsed
+    if version != str(getattr(report, "document_version", "") or ""):
+        return None
+    if end <= start:
+        return None
+    fragment = next(
+        (
+            page
+            for page in pages or ()
+            if int(page.get("page") or 0) == page_no and page.get("readable", True) is not False
+        ),
+        None,
+    )
+    if fragment is None:
+        return None
+    text = str(fragment.get("text") or "")
+    if start < 0 or end > len(text):
+        return None
+    quote = text[start:end]
+    if not quote.strip():
+        return None
+    heading, _paragraph = _heading_and_paragraph(text, start, end)
+    from .models import Evidence, TextAnchor
+
+    return Evidence(
+        evidence_id=str(anchor_id),
+        report=report,
+        page=page_no,
+        section_title=heading or "原文",
+        anchor=TextAnchor(bounded_quote=quote, source_offset=start),
+    ).model_dump(mode="json")
+
+
 def _line_spans(text: str) -> list[tuple[int, int]]:
     spans: list[tuple[int, int]] = []
     start = 0
@@ -752,6 +859,40 @@ def _bind_source_evidence(
         for page in (*evidence.continuation_pages, *evidence.subject_evidence_pages)
     ):
         return None
+    if evidence.anchor.source_offset is not None:
+        page_no = int(evidence.page)
+        fragment = next(
+            (
+                page
+                for page in pages
+                if int(page.get("page") or 0) == page_no and page.get("readable", True) is not False
+            ),
+            None,
+        )
+        quote = str(evidence.anchor.bounded_quote or "")
+        text = str((fragment or {}).get("text") or "")
+        offset = int(evidence.anchor.source_offset)
+        if (
+            fragment is None
+            or offset < 0
+            or offset + len(quote) > len(text)
+            or text[offset : offset + len(quote)] != quote
+        ):
+            return None
+        heading, paragraph = _heading_and_paragraph(text, offset, offset + len(quote))
+        if not heading or _is_page_header(heading, pages):
+            earlier = governing_subject_heading(pages, page_no, before_offset=offset)
+            if earlier:
+                heading = earlier
+        return evidence.model_copy(
+            update={
+                "page": page_no,
+                "section_title": heading or evidence.section_title,
+                "anchor": evidence.anchor.model_copy(
+                    update={"context_before": paragraph or evidence.anchor.context_before}
+                ),
+            }
+        )
     model_quote = evidence.anchor.model_quote or evidence.anchor.bounded_quote
     located = locate_source_quote(
         model_quote, pages, page_number=evidence.page, containers=containers

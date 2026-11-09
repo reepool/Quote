@@ -84,21 +84,37 @@ def gateway_runtime(request: ReportSemanticRequestV3) -> dict:
             [claim.claim_id for claim in request.claims]
             + [item.condition_id for item in request.source_conditions]
         )
-    return {
-        **compact_request(request),
-        "processing_identity": dict(identity),
-        "max_output_tokens": request.max_output_tokens,
-        "timeout_seconds": request.timeout_seconds,
-        "partial_slice": bool(identity.get("partial_slice")),
-        "reading_strategy": identity.get("reading_strategy"),
-        "discovery_scope": identity.get("discovery_scope"),
-        "max_route_attempts": identity.get("max_route_attempts"),
-        "max_physical_attempt_seconds": identity.get(
-            "max_physical_attempt_seconds"
-        ),
-        "logical_entry_id": str(identity.get("logical_entry_id") or ""),
-        "logical_targets": targets,
-    }
+    return _with_source_anchors(
+        {
+            **compact_request(request),
+            "processing_identity": dict(identity),
+            "max_output_tokens": request.max_output_tokens,
+            "timeout_seconds": request.timeout_seconds,
+            "partial_slice": bool(identity.get("partial_slice")),
+            "reading_strategy": identity.get("reading_strategy"),
+            "discovery_scope": identity.get("discovery_scope"),
+            "max_route_attempts": identity.get("max_route_attempts"),
+            "max_physical_attempt_seconds": identity.get(
+                "max_physical_attempt_seconds"
+            ),
+            "logical_entry_id": str(identity.get("logical_entry_id") or ""),
+            "logical_targets": targets,
+        },
+        request,
+    )
+
+
+def _with_source_anchors(payload: dict, request: ReportSemanticRequestV3) -> dict:
+    identity = getattr(request, "processing_identity", None) or {}
+    if not isinstance(identity, dict) or identity.get("source_reference") != "anchor_v1":
+        return payload
+    from .report_interpretation import source_anchor_catalog
+
+    payload["source_anchors"] = source_anchor_catalog(
+        request.source_pages,
+        request.report.document_version,
+    )
+    return payload
 
 
 def gateway_user_object(request: ReportSemanticRequestV3) -> dict:
@@ -265,9 +281,22 @@ def expand_response(data: dict, request: ReportSemanticRequestV3) -> dict:
 
     def evidence(value):
         if isinstance(value, str):
-            if value not in catalog:
-                raise ValueError("unknown compact Evidence reference")
-            return catalog[value]
+            if value in catalog:
+                return catalog[value]
+            identity = getattr(request, "processing_identity", None) or {}
+            if isinstance(identity, dict) and identity.get("source_reference") == "anchor_v1":
+                from .report_interpretation import restore_source_anchor
+
+                restored = restore_source_anchor(
+                    value, request.report, request.source_pages
+                )
+                if restored is None:
+                    raise ValueError("unknown source anchor")
+                return restored
+            raise ValueError("unknown compact Evidence reference")
+        identity = getattr(request, "processing_identity", None) or {}
+        if isinstance(identity, dict) and identity.get("source_reference") == "anchor_v1":
+            raise ValueError("source anchor id required")
         from .models import Evidence, TextAnchor
 
         key = hashlib.sha256(
@@ -370,6 +399,15 @@ def instructions(request: ReportSemanticRequestV3) -> str:
         "records; otherwise leave supporting_record_ids empty. No production approval, "
         "inferred numeric facts, invented names or price/profit sensitivity. "
     )
+    if identity.get("source_reference") == "anchor_v1":
+        common += (
+            "source_anchors lists only locations in the pages sent with this request. "
+            "Each id is this document version, one physical page, and a character "
+            "range. Read the original page text at that range. Select evidence by "
+            "those ids only. Do not copy a quote or invent a page. An id from "
+            "another version, another request, or outside the sent text is invalid. "
+            "A valid id still has to support the statement; location is not a pass. "
+        )
     chapter = direct and bool(identity.get("chapter_select"))
     if request.source_scope == "page_map":
         if direct and identity.get("chapter_select"):
