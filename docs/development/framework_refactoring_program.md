@@ -228,6 +228,8 @@ owner 内增加公告-only 案例聚合、可切换 LLM 分流、inactive watch 
 
 验收：每个现有端点有唯一路由 owner；新路由不直接访问全局门面或拼接业务 SQL；旧入口只保留装配/兼容职责。
 
+关联业务修复提案：[`fix-market-data-api-consumption-semantics`](../../openspec/changes/fix-market-data-api-consumption-semantics/proposal.md)（2026-11-09，规划完成、尚未实施）登记到 FR-09/W9，关联 FR-06/W4、FR-07/W5 的现行读 owner。范围为已核实的行情字段/过滤、财务摘要、利率分页及研究质量过滤合同；明确列出的 API 默认变化由该提案定义，不据此扩大整体路由/存储拆分或声明 W9 已完成。触及核心文件前与现有财务性能和框架 change 核对单写者窗口；不重复接管同步就绪度优化。
+
 ### W8 遗留入口和工具退出
 
 **Change**：`retire-obsolete-entry-points-and-tools`
