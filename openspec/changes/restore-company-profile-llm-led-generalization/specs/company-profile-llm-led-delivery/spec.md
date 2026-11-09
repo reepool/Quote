@@ -251,6 +251,15 @@ The new-policy requirements MUST supersede legacy no-provider completion, fixed 
 ### Requirement: Evidence support and report coverage are separate decisions
 Under the explicitly enabled current semantic policy, the authoritative owner MUST verify actual candidate evidence units independently of candidate-free source discovery. Only genuinely verified claims and valid dependencies may enter reliable query/export; core completeness MUST still require independent reading of necessary sources, major-condition checks and context recovery, but not reading every supplementary page. The v8 orchestration MUST combine selected cross-chapter core evidence before company synthesis and MAY share bounded verification groups for separate support and coverage decisions without reproducing a per-page business loop.
 
+#### Scenario: The current request supplies exact source references
+- **WHEN** an explicitly versioned task supplies candidate-free source text with deterministic references bound to its report version, physical pages and exact source ranges
+- **THEN** the model may select supplied references rather than rewriting page numbers and exact quotes, and the existing owner restores continuous source wording and necessary headings, units and continuation context
+- **AND** unknown, out-of-request or wrong-version references are rejected, historical protocols and failures remain unchanged, and a valid reference alone never establishes semantic support or major-condition coverage
+
+#### Scenario: Identical totals appear under different tables
+- **WHEN** two supplied source ranges contain identical total text under different governing table headings
+- **THEN** their source references retain distinct physical ranges, and verification still checks the selected heading, subject, period and delivered answer rather than accepting an amount match
+
 #### Scenario: Source inventory is unavailable after real candidates were saved
 - **WHEN** a source-led inventory call fails but located candidates and their full semantic context remain available
 - **THEN** bounded independent support verification can execute without waiting for an entire source-condition list, and successful units are published before the next unit

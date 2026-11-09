@@ -2,9 +2,11 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-11-09。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[A审核§228](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#228-a审核身份和计数修复接受完整核心证明失真按约结束业务方案)：§227身份/计数局部接受，完整核心证明失真；原业务卡2/2结束未过，仅[测试证据纠正与结案](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-evidence-correction-closeout-card.md)，不第三轮业务修补或新付费。每轮先清后做/收尾，旧成绩/质量/生产不变。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[A审核§230](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#230-a审核纠证结案接受规划责任与原文锚点交付重整)：§229纠证结案接受，旧业务结束；唯一[原文锚点三视图新切片](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-source-reference-delivery-card.md)零外呼工程生效，复用Evidence/offset/引用目录直接交公司核心，不再逐页/引文修补。每轮先清后做/收尾，旧成绩/失败/生产不变。
 
 ## 1. 开发者必须先理解的纠偏
+
+**2026-11-09审核§230（当前）：** §229保原失败证据、空修复后false符合安全收尾，接受结束，不再当新业务失败。A承担长期碎片发卡/就绪误判的主要责任，B承担具体实现/失真自检责任；最近零外呼卡本不增加S1，不以活动替交付。新卡显式改变当前证据选择协议：本次发送原文给确定锚点、模型选择、程序还原，语义/覆盖仍须核；复用Evidence/offset/compact目录及原TaskService/网关/单writer，不建平台或修c3特例。同窗交完整三视图及正确限用，正常入口最多2次/一次合并返修，不另交准备卡。真实/探针/binding/银行十家/生产0，旧2/2不恢复，工程不作模型/吞吐分数；每轮先清后做/finally/收尾、正式/首次/并行保护。以下为历史依据。
 
 **2026-11-09审核§228（当前）：** `68e55ce9`同页目标身份/父恢复与常规限制接通局部接受。A复现11次/88398模拟账本及三读true，但c3的原未定位合计引文被测试预先删，合计句只引p16行业行而无该数，受控核验仍pass，证据修复0次。编号保全不等于原语义/失败状态保全；不以此批付费或宣称整公司核心。原业务2/2到限结束，不滚动第三轮。仅测试/文档安全收尾，纠正源回放和受控期望，按原入口一次必要重验照实结案，不改生产、不追true、不建框架；真实/探针/binding0，旧失败/S1/生产不改。每轮先清后做/唯一QuoteBak/finally收尾、必要证据一套，保护正式/首次/并行。以下为历史依据。
 
