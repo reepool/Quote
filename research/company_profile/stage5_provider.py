@@ -82,6 +82,20 @@ def _logical_report_request_id(payload: Mapping[str, Any]) -> str:
     return hashlib.sha256(encoded.encode()).hexdigest()
 
 
+def report_logical_id(payload: Mapping[str, Any]) -> str:
+    """Identity of one report send.
+
+    A draft or verification is the page plus its business targets. A format
+    repair keeps the failed group's id, so a later normal group is not that repair.
+    """
+    parent = str(
+        (payload.get("processing_identity") or {}).get("format_recovery_parent") or ""
+    )
+    if parent:
+        return parent
+    return _logical_report_request_id(payload)
+
+
 _ResponseT = TypeVar("_ResponseT", bound=BaseModel)
 
 
@@ -4628,17 +4642,9 @@ class CommonGatewaySemanticProvider:
                 "run_id": semantic_request_id.split(":", 1)[0],
                 "stage": call_type,
                 "logical_request_id": (
-                    str(
-                        (runtime_payload.get("processing_identity") or {}).get(
-                            "format_recovery_parent"
-                        )
-                        or ""
-                    )
-                    or (
-                        _logical_report_request_id(runtime_payload)
-                        if report_reading
-                        else semantic_request_id
-                    )
+                    report_logical_id(runtime_payload)
+                    if report_reading
+                    else semantic_request_id
                 ),
                 "business_item_key": (
                     f"{runtime_payload['report']['instrument_id']}:{runtime_payload['purpose']}"

@@ -22,6 +22,7 @@ from research.company_profile.report_interpretation import (
 from research.company_profile.report_wire import (
     compact_request,
     expand_response,
+    gateway_runtime,
     response_schema,
 )
 from research.company_profile.resource_probe import protocol_reply
@@ -83,6 +84,36 @@ def test_purpose_schema_excludes_unreachable_facts_and_validates_nonempty_replie
         assert "ReportIdentity" not in schema.get("$defs", {})
         assert "Measurement" not in schema.get("$defs", {})
         assert len(json.dumps(schema)) < 6500
+
+
+def test_same_page_draft_groups_do_not_share_a_logical_id():
+    from research.company_profile.stage5_provider import report_logical_id
+
+    inventory = request()
+    expanded = ReportSemanticResponseV3.model_validate_json(
+        json.dumps(expand_response(protocol_reply(compact_request(inventory)), inventory))
+    )
+    template = expanded.source_conditions[0]
+
+    def logical_id(ids):
+        conditions = tuple(
+            template.model_copy(update={"condition_id": cid}) for cid in ids
+        )
+        runtime = gateway_runtime(
+            request("synthesize_views", source_conditions=conditions)
+        )
+        return report_logical_id(runtime), runtime
+
+    first, first_runtime = logical_id(["protocol-0", "protocol-1"])
+    second, _runtime = logical_id(["protocol-2", "protocol-3"])
+    assert first != second
+    repaired = dict(first_runtime)
+    repaired["processing_identity"] = {
+        **first_runtime["processing_identity"],
+        "format_recovery_parent": first,
+    }
+    repaired["logical_targets"] = ["protocol-2", "protocol-3"]
+    assert report_logical_id(repaired) == first
 
 
 def test_omitted_response_identity_is_bound_and_missing_claims_stay_invalid():

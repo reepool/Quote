@@ -77,7 +77,9 @@ def gateway_runtime(request: ReportSemanticRequestV3) -> dict:
     if not isinstance(identity, dict):
         identity = {}
     targets: list[str] = []
-    if request.purpose == "verify_views":
+    if request.purpose == "synthesize_views":
+        targets = sorted(item.condition_id for item in request.source_conditions)
+    elif request.purpose == "verify_views":
         targets = sorted(
             [claim.claim_id for claim in request.claims]
             + [item.condition_id for item in request.source_conditions]

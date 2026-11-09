@@ -1466,6 +1466,18 @@ def _carries_company_period_total(condition, sources) -> bool:
     return False
 
 
+def _carries_company_sales_destination(condition) -> bool:
+    """A source condition states where the company's own products are sold."""
+    if getattr(condition, "dimension", None) != "output_exposure":
+        return False
+    blob = str(getattr(condition, "description", "") or "")
+    for evidence in getattr(condition, "evidence", ()) or ():
+        blob += "\n" + str(
+            getattr(getattr(evidence, "anchor", None), "bounded_quote", "") or ""
+        )
+    return any(mark in blob for mark in ("行销", "销往"))
+
+
 def missed_core_revenue_facts(
     sources: Sequence[Mapping[str, Any]],
     conditions=(),
@@ -1611,6 +1623,44 @@ def make_operating_revenue_question(report, facts: Sequence[Mapping[str, Any]]):
         major=True,
         statement_status="current",
     )
+
+
+def output_question_from_pages(report, sources):
+    """A downstream sentence already on a read page. This does not call a model."""
+    marks = ("行销", "销往", "下游")
+    for source in sources:
+        text = str(source.get("text") or "")
+        page_no = int(source.get("page") or 0)
+        if page_no < 1 or not text:
+            continue
+        for mark in marks:
+            start = text.find(mark)
+            if start < 0:
+                continue
+            left = max(text.rfind(bound, 0, start) for bound in "。；\n")
+            ends = [text.find(bound, start + len(mark)) for bound in "。；"]
+            ends = [index for index in ends if index >= 0]
+            right = min(ends) if ends else len(text)
+            quote = text[left + 1 : right].strip()
+            if not quote or text.count(quote) != 1:
+                continue
+            return ReportSourceCondition(
+                condition_id="core-question:output-exposure",
+                dimension="output_exposure",
+                description="根据所供原文说明本公司当前的下游或销售去向。",
+                evidence=(
+                    Evidence(
+                        evidence_id=f"read-output-{page_no}",
+                        report=report,
+                        page=page_no,
+                        section_title="下游",
+                        anchor=TextAnchor(bounded_quote=quote[:180]),
+                    ),
+                ),
+                major=True,
+                statement_status="current",
+            )
+    return None
 
 
 def make_operating_role_question(report, evidence) -> ReportSourceCondition:
@@ -2970,21 +3020,23 @@ def interpret_direct_core(
                 )
             except (ValueError, LlmError, SemanticProviderError) as exc:
                 text = str(exc)
-                if "truncat" in text.lower() and len(group) > 1 and not recovery_parent:
-                    middle = max(1, len(group) // 2)
+                if "truncat" in text.lower() and not recovery_parent:
                     parent = failed_logical["id"]
-                    if not send(
-                        group[:middle],
-                        attach(group[:middle], sent),
-                        support=support,
-                        recovery_parent=parent,
-                    ):
-                        return False
-                    return send(
-                        group[middle:],
-                        attach(group[middle:], sent),
-                        support=support,
-                    )
+                    if len(group) > 1:
+                        middle = max(1, len(group) // 2)
+                        if not send(
+                            group[:middle],
+                            attach(group[:middle], sent),
+                            support=support,
+                            recovery_parent=parent,
+                        ):
+                            return False
+                        return send(
+                            group[middle:],
+                            attach(group[middle:], sent),
+                            support=support,
+                        )
+                    return send(group, sent, support=support, recovery_parent=parent)
                 gaps.append(f"direct_core_verify_stopped:{exc}")
                 if support:
                     for claim in group:
@@ -4064,6 +4116,7 @@ def interpret_direct_core(
             and (
                 (item.major and item.dimension in _CORE_CLOSEOUT_DIMENSIONS)
                 or _carries_company_period_total(item, sources)
+                or _carries_company_sales_destination(item)
             )
         ]
         groups = _business_groups(pending)
@@ -5535,6 +5588,24 @@ def interpret_direct_core(
                         conditions_to_draft.append(question)
             tail_hold = 0
             note_missed_core_revenue()
+            if "output_exposure" not in {
+                item.dimension for item in _verified_claims(claims, checks)
+            } and not any(
+                (item.dimension == "output_exposure" and item.major)
+                or _carries_company_sales_destination(item)
+                for item in conditions
+            ):
+                question = output_question_from_pages(
+                    report,
+                    [
+                        page
+                        for page in sources
+                        if by_page.get(int(page["page"]), {}).get("status") == "read"
+                        and str(page.get("text") or "").strip()
+                    ],
+                )
+                if question is not None:
+                    conditions.append(question)
             if "output_exposure" not in {
                 item.dimension for item in _verified_claims(claims, checks)
             }:
