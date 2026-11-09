@@ -3,6 +3,8 @@
 > 日期：2026-11-08；依据[A审核§224](review-submission.md#224-a审核真实核心仍失败合并收口成稿核验与恢复)，本卡零外呼工程生效。不是§222授权接续，不重启已用1/1的真实观察。
 > 唯一change：`restore-company-profile-llm-led-generalization`。按[产品总需求](../../../docs/development/company_profile_product_and_industry_semantic_requirements.md)→[验收计划v2](../../../docs/development/company_profile_acceptance_program.md)→[交付路径v3](../../../docs/development/company_profile_delivery_plan.md)→[A/B流程v3](../../../docs/development/ab_role_development_workflow.md)执行。
 
+> 2026-11-09[A审核§228](review-submission.md#228-a审核身份和计数修复接受完整核心证明失真按约结束业务方案)：业务修正2/2已用，身份/父请求/计数局部接受，整卡未通过并结束。§227回放过滤了c3必要的未定位引文，受控核验又给缺乏该数引用的合计句pass，不能据其true认定完整核心或付费就绪。不自动第3次；当前仅[验收证据纠正与结案](company-core-evidence-correction-closeout-card.md)，限测试/文档安全收尾，不改生产语义、不新增真实调用。下文实施步骤和§7为冻结历史，不再据其恢复开发/发送。
+
 ## 1. 唯一交付与主线取舍
 
 在原`bounded_entry → CompanyProfileTaskService.execute("run") → 公共网关 → 原writer/read service`内，使一个覆盖全部主要业务问题的公司核心包能够成稿、完成有效支持/条件覆盖并持久读回；同一实现遇到不可修复响应或耗尽恢复时正确停止、保留合法部分。只交一项字段修复、一次请求发出或更多诊断日志不算完成。

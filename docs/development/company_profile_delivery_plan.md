@@ -2,9 +2,11 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-11-09。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[A审核§226](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#226-a审核局部修复接受恢复身份与真实合同尚未闭合)：§225局部接受、整卡未过；仅[原收口卡§7末次合并收尾](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-protocol-closeout-card.md#7-226审核后的同卡末次收尾2026-11-09当前)，修正已用1/2不重置，关闭成稿分组/恢复身份与常规合同验证。新增真实/探针/binding0，不扩样；每轮先清后做/收尾，原成绩/质量/生产不变。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[A审核§228](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#228-a审核身份和计数修复接受完整核心证明失真按约结束业务方案)：§227身份/计数局部接受，完整核心证明失真；原业务卡2/2结束未过，仅[测试证据纠正与结案](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-evidence-correction-closeout-card.md)，不第三轮业务修补或新付费。每轮先清后做/收尾，旧成绩/质量/生产不变。
 
 ## 1. 开发者必须先理解的纠偏
+
+**2026-11-09审核§228（当前）：** `68e55ce9`同页目标身份/父恢复与常规限制接通局部接受。A复现11次/88398模拟账本及三读true，但c3的原未定位合计引文被测试预先删，合计句只引p16行业行而无该数，受控核验仍pass，证据修复0次。编号保全不等于原语义/失败状态保全；不以此批付费或宣称整公司核心。原业务2/2到限结束，不滚动第三轮。仅测试/文档安全收尾，纠正源回放和受控期望，按原入口一次必要重验照实结案，不改生产、不追true、不建框架；真实/探针/binding0，旧失败/S1/生产不改。每轮先清后做/唯一QuoteBak/finally收尾、必要证据一套，保护正式/首次/并行。以下为历史依据。
 
 **2026-11-09审核§226（当前）：** `cb58fc58`的本地身份绑定/正文必填、总额入稿、成功源复用与卡级封口局部接受。整链测试仍480000/32、每次40合成usage且未接recovery_policy，不满足原卡；A在120000/16/两次恢复下叠加缺claims和核验length，8次替换/320合成账本即核心false。直接检查同页不同成稿条件集合仍同逻辑ID，业务拆组与恢复身份未闭合。只用原卡剩第2次合并修身份/父请求及实际合同下完整§223源规模验证，正常和叠加故障一起交完整三视图/有效覆盖/三读，不另起方向/准备轮/付费。仍失败到此结束，不重置次数；B卡内自主P0—P3/直接Review/清理。每轮先清后做/finally/交接收尾、必要证据一套，正式源/历史失败/标记及并行保护。以下为历史依据。
 
