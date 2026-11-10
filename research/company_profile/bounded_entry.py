@@ -36,6 +36,45 @@ S35_OBSERVATION = "company_profile_s35_observation.2026-11-04"
 S38_OBSERVATION = "company_profile_s38_observation.2026-11-05"
 S41_OBSERVATION = "company_profile_s41_observation.2026-11-06"
 CORE_OBSERVATION = "company_profile_core_observation.2026-11-08"
+POST_CLOSURE_OBSERVATION = "company_profile_post_closure_observation.2026-11-10"
+
+
+def assert_post_closure_observation(binding: dict, elapsed: int) -> bool:
+    """One fresh 600103 anchor run. Saved semantics and other companies stay closed."""
+    if any(
+        binding.get(key)
+        for key in (
+            "navigation_query",
+            "continuation_checkpoint",
+            "accepted_navigation_query",
+            "accepted_source_query",
+            "accepted_draft_query",
+            "reused_page_map_query",
+            "verification_history_queries",
+            "saved_source_draft",
+            "company_task_state",
+            "continuation_budget",
+        )
+    ):
+        raise ValueError("post-closure observation refuses saved semantics")
+    if str((binding.get("asset") or {}).get("instrument_id") or "") != "600103.SH":
+        raise ValueError("post-closure observation is only 600103.SH")
+    if (
+        binding.get("reading_strategy") != "direct_core_v1"
+        or not binding.get("chapter_select")
+        or binding.get("source_reference") != "anchor_v1"
+        or binding.get("task_route_labels") != ["deepseek:deepseek-flash"]
+        or not binding.get("task_route_first_only")
+    ):
+        raise ValueError(
+            "post-closure observation sends only the reviewed deepseek anchor entry"
+        )
+    return (
+        0 < elapsed <= 900
+        and int(binding.get("max_tokens") or 0) <= 120_000
+        and int(binding.get("max_physical_requests") or 0) <= 16
+        and int(binding.get("max_recoveries") or 0) <= 2
+    )
 
 
 def company_window_limits(binding: dict, state: dict | None) -> tuple[int, int]:
@@ -968,6 +1007,8 @@ def validate_binding(
             and int(binding.get("max_physical_requests") or 0) <= 16
             and int(binding.get("max_recoveries") or 0) <= 2
         )
+    elif auth == POST_CLOSURE_OBSERVATION:
+        allowed = assert_post_closure_observation(binding, elapsed)
     elif auth == S38_OBSERVATION:
         allowed = (
             0 < elapsed <= 900
@@ -1154,6 +1195,7 @@ def validate_binding(
                 "s1-600103-s38",
                 "s1-600103-s41",
                 "s1-600103-core-observation-20261108",
+                "s1-600103-post-closure-20261110",
                 "s1-600000-s32",
                 "s1-600094-s32",
                 "s1-600100-s32",
@@ -2054,6 +2096,8 @@ def _worker(
                 "company_profile_product_contract.2026-10-27.llm-led.v8"
             )
             identity["meter_profile"] = _meter_profile(gateway_config, binding)
+        if binding.get("source_reference") == "anchor_v1":
+            identity["source_reference"] = "anchor_v1"
         if binding.get("compatible_continue"):
             identity["compatible_continue"] = True
         if binding.get("saved_source_draft"):
