@@ -1,6 +1,6 @@
-# 工程收束后的一次常规真实交付观察（待用户授权）
+# 工程收束后的一次常规真实交付观察（用户已批准）
 
-> 日期：2026-11-10；依据[A审核§238](review-submission.md#238-a审核受控核心闭环通过结束工程收口转真实交付裁决)。§237受控工程范围有限通过并结束；本卡不是恢复§223或其他已用授权。**当前真实入口0/1，未批准，不得创建可发送binding、探针或模型请求。**
+> 日期：2026-11-10；依据[A审核§238](review-submission.md#238-a审核受控核心闭环通过结束工程收口转真实交付裁决)及[用户授权§239](review-submission.md#239-用户授权工程收束后的一次常规真实交付观察)，用户明确答复“批准”，**本卡生效，初始已用0/1**。B按本卡先清理、必要窄接入、冻结后直接执行一次，无需再次请批。A本轮仅登记授权，未创建可发送binding/尝试标记或发模型请求；本卡不是恢复§223或其他已用授权。
 > 唯一change：`restore-company-profile-llm-led-generalization`。遵循[产品v8](../../../docs/development/company_profile_product_and_industry_semantic_requirements.md)、[验收v2 §7.102](../../../docs/development/company_profile_acceptance_program.md#7102-受控核心收束后的一次常规真实交付观察2026-11-10)、[交付路径v3](../../../docs/development/company_profile_delivery_plan.md)及[A/B流程v3](../../../docs/development/ab_role_development_workflow.md)。S1仍0/12，S32仍执行2/12、核心0；S2、扩批及生产未授权。
 
 ## 1. 唯一业务交付与非目标
@@ -11,7 +11,7 @@
 
 只复用正式PDF及匹配版本的解析缓存；不加载旧导航、源条件、主张、草稿、检查、语义checkpoint、S31/S41对象或任何受控响应。不是未见样本，不直接计S1或声称泛化/全市场能力。
 
-## 2. 拟批准的唯一运行合同
+## 2. 已批准的唯一运行合同
 
 - **次数：** 最多一次原`bounded_entry → CompanyProfileTaskService.execute("run") → 公共网关 → 原writer/read service`真实入口；启动即占1/1，本地失败或0外呼也不退。无第二入口、后继、追加窗口或余额转用。
 - **资源：** 入口累计≤120000账本、绝对期限≤900秒、≤16次物理请求，含最多2次恢复。导航、补读、证据修复、成稿、核验及传输重试全计；本地准备/排队/读写导出纳入入口时间。单次预留65536及载荷60000字节沿实际绑定，不放大离线480000取代常规限制。账本/时间/物理请求任一硬限到达，或出现`card_recovery_exhausted`拒发，即停止本入口后续发送；两次恢复不是额外入口，真实超额返回如实入账。
