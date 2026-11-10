@@ -1879,8 +1879,11 @@ _REVIEWED = (
     {
         "condition_id": "reviewed-input",
         "dimension": "input_exposure",
-        "quotes": ("物资采购是公司生产经营的重要环节，公司坚持“充分竞争、质优价宜”原则",),
-        "answer": "物资采购是公司生产经营的重要环节。",
+        "quotes": (
+            "大宗原材料、\r\n"
+            "燃料、设备等主要采用公开招标、竞争性谈判等方式，国内木竹片采购定价主要采取挂牌采购",
+        ),
+        "answer": "大宗原材料、燃料和设备主要采用公开招标或竞争性谈判，国内木竹片采购定价主要采取挂牌采购。",
     },
     {
         "condition_id": "reviewed-sales",
@@ -1907,8 +1910,16 @@ _REVIEWED = (
     {
         "condition_id": "reviewed-chain",
         "dimension": "upstream_downstream",
+        "quotes": ("公司目前已形成“林-浆-纸”产业链协同效应",),
+        "answer": "公司目前已形成“林-浆-纸”产业链协同效应。",
+    },
+    {
+        "condition_id": "reviewed-chain-plan",
+        "dimension": "upstream_downstream",
         "quotes": ("推动上下游协同创新",),
-        "answer": "公司推动上下游协同创新。",
+        "answer": "展望提出推动上下游协同创新，这不是已经实现的关系。",
+        "statement_status": "planned",
+        "major": False,
     },
 )
 _REVIEWED_BY_ID = {item["condition_id"]: item for item in _REVIEWED}
@@ -1976,8 +1987,8 @@ def _reviewed_source_body(request):
                 "condition_id": item["condition_id"],
                 "dimension": item["dimension"],
                 "description": item["answer"],
-                "major": True,
-                "statement_status": "current",
+                "major": item.get("major", True),
+                "statement_status": item.get("statement_status", "current"),
                 "evidence": ids,
             }
         )
@@ -2023,50 +2034,68 @@ def _reviewed_draft(request):
     }
 
 
+def _match_reviewed_claim(claim, request):
+    """Support comes from this claim's answer and its own quotes."""
+    blob = _condition_blob(claim, request)
+    matches = [
+        item
+        for item in _REVIEWED
+        if claim.get("answer") == item["answer"]
+        and all(quote in blob for quote in item["quotes"])
+    ]
+    if len(matches) == 1:
+        return matches[0]
+    return None
+
+
+def _covers_supported_claim(condition, supported, request):
+    """A condition is covered only when its own text supports one trusted claim."""
+    blob = _condition_blob(condition, request)
+    condition_id = str(condition.get("condition_id") or "")
+    for claim_id, item in supported.items():
+        if not all(quote in blob for quote in item["quotes"]):
+            continue
+        if condition_id == item["condition_id"] or item["dimension"] == condition.get(
+            "dimension"
+        ):
+            return claim_id, item
+    return None, None
+
+
 def _reviewed_verify(request):
     checks = []
+    supported = {}
     for claim in request.get("claims") or []:
-        condition = next(
-            (
-                item
-                for item in request.get("source_conditions") or []
-                if item.get("condition_id") in (claim.get("condition_ids") or [])
-            ),
-            None,
-        )
-        item = _reviewed_for_condition(condition, request) if condition else None
-        blob = _condition_blob(claim, request)
-        accepted = (
-            item is not None
-            and claim.get("answer") == item["answer"]
-            and all(quote in blob for quote in item["quotes"])
-        )
+        item = _match_reviewed_claim(claim, request)
+        accepted = item is not None
         checks.append(
             {
                 "target_type": "claim",
                 "target_id": claim.get("claim_id"),
                 "status": "pass" if accepted else "unclear",
-                "explanation": "受控核验：该主张和引用已对照正式年报逐项核对。",
+                "explanation": "受控核验：主张是否由本主张自己的原文支持。",
                 "covers_target_type": "claim",
                 "covers_target_id": claim.get("claim_id"),
             }
         )
-        if not accepted or condition is None:
-            continue
+        if accepted:
+            supported[claim.get("claim_id")] = item
+    for condition in request.get("source_conditions") or []:
+        claim_id, _item = _covers_supported_claim(condition, supported, request)
         checks.append(
             {
                 "target_type": "condition",
                 "target_id": condition.get("condition_id"),
-                "status": "pass",
-                "explanation": "受控核验：条件引用的是已核对的同一段原文。",
-                "covers_target_type": "claim",
-                "covers_target_id": claim.get("claim_id"),
+                "status": "pass" if claim_id else "unclear",
+                "explanation": "受控核验：条件是否覆盖本请求里已经支持的主张。",
+                "covers_target_type": "claim" if claim_id else None,
+                "covers_target_id": claim_id,
             }
         )
     return {
         "schema_version": "company_profile_report_response.v3",
-        "request_id": request["request_id"],
-        "purpose": request["purpose"],
+        "request_id": request.get("request_id") or "reviewed-verify",
+        "purpose": request.get("purpose") or "verify_views",
         "checks": checks,
     }
 
@@ -2154,8 +2183,145 @@ def test_unlisted_anchor_id_is_rejected_and_fragment_offset_rebinds():
         )
 
 
-def test_reviewed_input_entry_stops_with_role_and_input_unverified():
-    """The one allowed entry. Persisted text is not a completed three-view core."""
+def test_claim_support_does_not_wait_for_a_source_condition():
+    from research.company_profile.contracts import (
+        ReportSemanticRequestV3,
+        ReportViewCheck,
+        ReportViewClaim,
+    )
+    from research.company_profile.direct_reading import _operating_role_established, _verified_claims
+    from research.company_profile.models import Evidence, TextAnchor
+    from research.company_profile.report_interpretation import source_anchor_catalog
+    from research.company_profile.report_wire import expand_response
+
+    _reviewed_quotes_are_on_the_formal_pages()
+    role = _REVIEWED_BY_ID["reviewed-role"]
+    pages = list(_pages({11, 13}))
+    anchors = source_anchor_catalog(pages, _DOCUMENT)
+    role_ids = []
+    for quote in role["quotes"]:
+        found = _ids_for_quote({"source_pages": pages, "source_anchors": anchors}, quote)
+        assert found, quote
+        role_ids.extend(found)
+    claim = {
+        "claim_id": "draft-reviewed-role",
+        "dimension": role["dimension"],
+        "answer": role["answer"],
+        "condition_ids": ["reviewed-role"],
+        "evidence": role_ids,
+    }
+    alone = {
+        "request_id": "support-only",
+        "purpose": "verify_views",
+        "source_pages": pages,
+        "source_anchors": anchors,
+        "claims": [claim],
+        "source_conditions": [],
+    }
+    alone_checks = _reviewed_verify(alone)["checks"]
+    assert [(item["target_type"], item["status"]) for item in alone_checks] == [
+        ("claim", "pass")
+    ]
+    report = ReportIdentity(
+        instrument_id="600103.SH",
+        report_id="annual-2025",
+        document_version=_DOCUMENT,
+        report_period="2025-12-31",
+        published_at="2026-04-13T16:00:00+00:00",
+    )
+    request = ReportSemanticRequestV3(
+        request_id="support-only",
+        purpose="verify_views",
+        report=report,
+        processing_identity={"source_reference": "anchor_v1"},
+        source_pages=tuple(pages),
+        claims=(
+            ReportViewClaim(
+                claim_id="draft-reviewed-role",
+                dimension="supply_chain_role",
+                status="observed",
+                answer=role["answer"],
+                condition_ids=("reviewed-role",),
+                evidence=(
+                    Evidence(
+                        evidence_id=role_ids[0],
+                        report=report,
+                        page=11,
+                        section_title="原文",
+                        anchor=TextAnchor(
+                            bounded_quote=role["quotes"][0],
+                            source_offset=0,
+                        ),
+                    ),
+                ),
+            ),
+        ),
+        max_output_tokens=200,
+        timeout_seconds=30,
+    )
+    expanded = expand_response(_reviewed_verify(alone), request)
+    assert expanded["checks"][0]["status"] == "pass"
+    assert expanded["checks"][0]["target_type"] == "claim"
+    stored_claim = ReportViewClaim(
+        claim_id="draft-reviewed-role",
+        dimension="supply_chain_role",
+        status="observed",
+        answer=role["answer"],
+        evidence=(),
+    )
+    stored_check = ReportViewCheck.model_validate(expanded["checks"][0])
+    assert _verified_claims((stored_claim,), (stored_check,))
+    joined = _reviewed_verify(
+        {
+            **alone,
+            "source_conditions": [
+                {
+                    "condition_id": "core-question:operating-role",
+                    "dimension": "supply_chain_role",
+                    "evidence": role_ids,
+                }
+            ],
+        }
+    )["checks"]
+    assert ("claim", "pass") in [(item["target_type"], item["status"]) for item in joined]
+    coverage = next(item for item in joined if item["target_type"] == "condition")
+    assert coverage["status"] == "pass"
+    assert coverage["covers_target_id"] == "draft-reviewed-role"
+    role_check = ReportViewCheck(
+        target_type="condition",
+        target_id="core-question:operating-role",
+        status="pass",
+        explanation="受控核验：条件是否覆盖本请求里已经支持的主张。",
+        covers_target_type="claim",
+        covers_target_id="draft-reviewed-role",
+    )
+    assert _operating_role_established((stored_claim,), (stored_check, role_check))
+    wrong = _reviewed_verify(
+        {
+            **alone,
+            "source_conditions": [
+                {
+                    "condition_id": "reviewed-role",
+                    "dimension": "supply_chain_role",
+                    "evidence": ["not-the-role-quote"],
+                }
+            ],
+        }
+    )["checks"]
+    assert next(item for item in wrong if item["target_type"] == "condition")["status"] == "unclear"
+    chain = _REVIEWED_BY_ID["reviewed-chain"]
+    plan = _REVIEWED_BY_ID["reviewed-chain-plan"]
+    assert "林-浆-纸" in chain["quotes"][0]
+    assert chain.get("statement_status", "current") == "current"
+    assert plan["statement_status"] == "planned"
+    assert plan["major"] is False
+    assert "木竹片" in _REVIEWED_BY_ID["reviewed-input"]["answer"]
+    assert "挂牌采购" in _REVIEWED_BY_ID["reviewed-input"]["quotes"][0]
+    assert "推动上下游协同创新" not in chain["quotes"][0]
+
+
+def test_reviewed_input_delivers_the_company_core():
+    """The one section-5 entry. A correct reviewed response must come back complete."""
     result_path = Path("/home/python/Quote/data/QuoteBak/explicit-input-result.json")
     _ran, queried, exported, reloaded, calls = _run(
         _fixed_core_objects(),
@@ -2179,17 +2345,21 @@ def test_reviewed_input_entry_stops_with_role_and_input_unverified():
         encoding="utf-8",
     )
     assert queried["profiles"] == exported["profiles"] == reloaded["profiles"]
+    assert views["draft_complete"] is True, views.get("gaps")
     assert views["real_semantic_complete"] is False
-    assert views["draft_complete"] is False
-    gaps = list(views.get("gaps") or [])
-    assert "view_not_substantive:product_exposure" in gaps
-    assert "view_not_substantive:supply_chain_position" in gaps
-    assert "core_dimension_missing:operating_role" in gaps
-    assert any(gap.endswith("reviewed-input") and gap.startswith("major_condition_not_verified:") for gap in gaps)
-    assert "major_condition_not_verified:core-question:operating-role" in gaps
-    text = "\n".join(_answers(views))
-    assert "主要从事" in text and "伸性纸袋纸" in text and "2,418,990,221.17" in text
-    assert snapshot["physical_requests"] <= 16
-    assert snapshot["charged_tokens"] <= 120_000
+    answers = _answers(views)
+    text = "\n".join(answers)
+    assert "主要从事" in text and "伸性纸袋纸" in text and "医药" in text and "光电子" in text
+    assert "自主生产" in text and "直销" in text and "木竹片" in text and "挂牌采购" in text
+    assert "林-浆-纸" in text and "行销" in text
+    assert any(
+        "2,418,990,221.17" in answer and "2,332,376,693.65" not in answer
+        for answer in answers
+    )
+    assert "推动上下游协同创新" not in text or "不是已经实现" in text
+    covered = _covered_claim_ids(views)
+    assert covered
+    assert snapshot["physical_requests"] <= 16, snapshot.get("physical_requests")
+    assert snapshot["charged_tokens"] <= 120_000, snapshot.get("charged_tokens")
     result_path.unlink(missing_ok=True)
 
