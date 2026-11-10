@@ -2,9 +2,11 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-11-10。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[A审核§232](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#232-a审核停止错误模型替身试跑合并交正确输入的完整业务验收)：§231两次未过结束，不归因模型；仅[正确业务输入的一次独立接入验收](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-explicit-input-acceptance-card.md)，合并修ID集合/原页坐标，用人工核源响应替代关键词语义替身，直接交完整三视图。真实/探针/binding0，每轮先清后做/收尾，旧成绩/失败/生产不变。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[A审核§234](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#234-a审核本轮不是llm失败纠正支持与覆盖合同后完整复验)：§233原入口1/1未过、硬引用局部接受，受控核验合法模式/人工业务语境仍错，不归因LLM。仅[现卡§5合同纠正后一次完整复验](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-explicit-input-acceptance-card.md#5-234审核后的验收合同纠正与完整复验当前)，不换架构/模型；真实/探针/binding0，每轮先清后做/保必要证据后收尾。
 
 ## 1. 开发者必须先理解的纠偏
+
+**2026-11-10审核§234（当前）：** §233的13次全为受控替换，无真实LLM，不能据此淘汰模型。目录/坐标硬错局部接受，但核验替身无source_conditions即把正确角色/采购claim判unclear，加入条件才pass；原链允许支持和覆盖分步，测试合同不符。采购摘要无投入对象、产业链短句源于展望，人工输入语义也未齐。A/B分别承担就绪审核和实现/自检责任，不再新开路线。只同卡§5纠正支持/覆盖及有据业务语境，先组件实际请求→消费，再显式新增1次最终原入口完整三视图/有效覆盖/三读；旧1/1不改，仍不成保首断点停止，不自动续卡。真实/探针/binding0，原成绩/生产不变；每轮先清后做、失败保最小证据后finally清本人库/重复物，正式/首次/并行保护。
 
 **2026-11-10审核§232（当前）：** §231两次受控整链未交核心，旧正常2/2结束；自动关键词替身将含主营和产品的p9段互斥归产品，不能当模型两次失败。A直接复现未列目录的任意同页范围仍被接受、带offset片段从0造锚点致原页回绑失败。下一合同不扩锚点/分类器/平台，合并修来源硬错，用人工核过原文的完整有限响应检验程序能否接住正确答案；组件直测后仅1次正常原入口，交三视图/有效对象覆盖/三读或具体首断点，不把负例false或目录当完成。B同窗自主P0—P3/Review/清理，不逐函数等A；真实/探针/binding0，旧失败/次数/分数不改。每轮先清后做/失败保最小证据再finally收尾，正式/首次/并行保护。以下为历史依据。
 
