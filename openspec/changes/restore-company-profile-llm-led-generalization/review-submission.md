@@ -2,7 +2,7 @@
 
 日期：2026-10-16。结论：规划材料具备实施条件；不是LLM业务验收通过，不启动S2或生产。
 
-当前状态（2026-11-10，[A审核§241](#241-a审核真实观察失败先消除锚点请求与解析契约矛盾)）：§240真实观察已用1/1、核心0，5物理/32881账本/99.600秒/unknown；旧授权结束。A已复现正式提示/Schema允许page/quote却被anchor消费者拒绝，不能归咎模型语义能力。唯一[零外呼契约收口卡](company-core-wire-contract-closeout-card.md)合并交自洽请求及源到正文核验消费；S1 0/12、S32执行2/12核心0，旧结果/生产不改，每轮清理。
+当前状态（2026-11-10，[A审核§243](#243-a审核正式锚点契约关闭结束工程收口转真实交付)）：§242锚点合同/直接链工程有限通过，§237完整公司证明复用，工程收口结束。A7短测8.61秒，补真实LlmClient外传输替换4阶段/wire计量一致，未跑整公司/真实模型。下一[常规真实交付候选卡](company-core-anchor-aligned-observation-card.md)待用户新授权，0/1、模型/探针/binding0。S1 0/12、S32执行2/12核心0及旧真实失败/生产不改，每轮清理。
 
 ## 1. 唯一实施指引
 
@@ -8344,3 +8344,45 @@ query仅保存了成功页图响应。首个锚点展开失败的原JSON未在�
 index的11项大小/hash逐项吻合；query仍为`2e0c4b1fba79b2ceb6cd92e9cfc8691cc0775ff65ed6160c5dc592aaae210c75`，entry-result记录query/export一致。当前回执含index合计330536常规字节；B的329118为不含1418字节index的口径差，不作阻塞。运行根确已删除，无b43-*；746字节尝试标记保留，旧PDF/共享解析/首次原件不动。本轮无新增独立临时根、释放0；导入诊断写入的共享开发日志不整删，不触碰未知归属的历史.orig或并行内容。
 
 A仅执行最小形态挑战、manifest/hash/入口结果核验及OpenSpec校验，不重跑公司、不生成新模型/语义结果。新增阻塞合并1条：正式请求与解析的引用契约不自洽；失败正文缺失是已明确的归因限制，补诊断仅限直接链。A活跃审核时间未精确计时。提交只含本轮审核/当前卡/活动入口的隔离hunk，不混入§240或其他既有未提交段；后续仍每轮先清后做、必要证据一套后finally收尾。
+
+## 243. A审核：正式锚点契约关闭，结束工程收口转真实交付
+
+日期：2026-11-10，基线HEAD/origin/master `4d823d6e`；既有配置/规划/骨架/并行及未跟踪内容保护。按产品v8→验收v2→交付路径→A/B v3和§7.103审核，不改生产/测试代码、不发真实模型/探针、不建可发送binding。S1仍0/12、S32执行2/12核心0，§239/§240一次真实失败不改。
+
+### 243.1 裁决和实际进展
+
+4d823d6e有限通过，正式请求允许page/quote而anchor消费者拒绝的直接阻塞关闭，§7.103工程卡结束。B没有重跑公司、换模型/扩预算或放宽完成门槛，符合本卡复用约定。新增的是可核的正式引用合同，不是新增真实公司可用数；真实语义、整家公司资源和跨公司泛化仍未评估。不再以更多模拟、计数、风格或空目录边界另发工程修补卡。
+
+已核diff：anchor_v1的Evidence Schema为本请求source_anchors及已携Evidence ID的枚举；提示按身份分支不再许可page/quote，展开对合法ID的行为未变，对象/未知ID继续拒绝。无opt-in旧身份保原page/quote引用。核验提示的身份字段与本地绑定一致；required诊断补缺字段名/顶层keys/首项证据形态及解析对象hash，不保存引用正文，也不能恢复旧3次失败原文。空目录哨兵不等于真实证据，不用于补业务内容；未出现当前需发卡的现实新增阻塞。
+
+### 243.2 独立验证补齐到实际传输接点
+
+B新增测试的_Gateway.complete直接返回LlmResponse，准确范围是CommonGatewaySemanticProvider的LlmRequest消息/Schema及展开消费，**不是**外传输替换的真实LlmClient验证。其修复测试的kept-input引文不在该测试的PAGE正文中，证明的是已提供Evidence ID的引用复用，不证明该采购事实被独立核源；本卡不把此合成例当业务语义分数。
+
+A按业务优先只补短直接挑战，不因此返B准备一轮：真实LlmClient/json_object/非思考/max_tokens/流式参数经CallableTransport替代唯一外传输，源审→有据修复→成稿→核验4阶段合法响应均经实际Schema解析/展开消费，通过的condition check指向实际claim；每阶段捕获payload与reading_budget._meter_payload完全相等（4/4）。另2笔以对象/未知ID替换证据，均在真实LlmClient Schema层拒绝，没有跌到未声明的更严解析要求。共6笔替换传输、外网0、公司入口0；合成usage非供应商成本。第一次A诊断用严格Python model_validate转换JSON列表时失败，改用原链同等JSON反序列化后上述4阶段通过，不涉及B缺陷。
+
+A复跑B的直接及共享Schema回归：
+
+```bash
+bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit -o cache_dir=/home/python/Quote/data/QuoteBak/a243-review-ptonqm1g/cache --basetemp=/home/python/Quote/data/QuoteBak/a243-review-ptonqm1g/base tests/unit/test_research/test_company_profile_anchor_wire.py tests/unit/test_research/test_company_profile_report_wire.py::test_purpose_schema_excludes_unreachable_facts_and_validates_nonempty_replies tests/unit/test_utils/test_llm_gateway.py::test_json_object_schema_failure_repairs_once
+```
+
+7 passed/7 warnings，8.61秒。未运行整公司，复用§237 3577831b原TaskService/单writer三读与完整正文61.31/65.04秒证明；本次只改发送说明/Schema/失败诊断，合法响应的核心消费与完成门槛未变，不重演其真实语义或资源成绩。
+
+### 243.3 枚举载荷已纳入实际计量，不扩成资源工程
+
+reading_budget._request_messages读取当前response_schema及instructions，_meter_payload与实际LlmClient使用同一build_payload；编号枚举也进入json_object系统消息及UTF8预留，未漏计。A仅用§240冻结配置/正式解析和原选9/16/18/22/92页，在当前source_discovery_slices原打包器本地干运行：一包49264字节/53520预留，低于60000字节/65536单次限制。没有联网、绑定或新语义，未加载旧答案作新结果。
+
+该数只说明这一源读包可装入，不含真实后续条件、成稿/核验/恢复，不证明120000公司额度或真实token。§237原模拟账本也不能套到新Schema上称资源已通过。此次无需再派预算算法/整公司计量卡；下一真实合同仍按实际payload动态准入和整卡原硬限观察，不能保证成功。
+
+### 243.4 下一业务交付及权限
+
+唯一[下一候选卡](company-core-anchor-aligned-observation-card.md)拟仅600103正式2025年报一次全新真实章节处理：120000账本/900秒/16物理含2恢复，现有官方deepseek:deepseek-flash/非思考/max_tokens/anchor_v1，不载旧导航/条件/答案/核验/受控样例，只复用正式PDF/解析，无其他公司/后继/追加窗/充值/共享配置变更。价格未知记unknown不能承诺人民币总额，有价部分原10元限制。当前用户只要求审核发卡，**未批准该新付费观察**；0/1、模型/探针/binding0，不借§239余额。
+
+批准后B按A/B v3同卡先清理/必要窄授权接入/冻结直接执行和交接，不再每一步等A或交准备卡。核心成或终止断点/硬限即停，保实际部分和首断点；失败不自动局部窗/同类卡，成功不自计S1或启下一家。A独立核原文三视图及资源后再裁固定12家同版回归，S2/生产和规模声明不授权。
+
+### 243.5 清理、Review和效率
+
+开工/结束核无b43-*、§240运行根仍不存在。B本轮短测无新运行根，释放0的说明接受。A短测唯一根a243-review-ptonqm1g含1386常规文件字节，测试进程退出后已删除；内联诊断无脚本/库副本，导入写入的共享开发日志不整删，旧释放不重计。§240 query sha256仍2e0c4b1fba79b2ceb6cd92e9cfc8691cc0775ff65ed6160c5dc592aaae210c75，尝试标记/正式PDF/共享解析/旧回执及并行内容保护。
+
+A新增阻塞0，活跃审核未精确计时，8.61秒短测与受控传输/干计量分列，不冒充业务开发耗时。Review未发现直接A类阻塞；测试层级及资源限制已明确，非阻塞风格/哨兵建议不入下一卡。只隔离提交本轮审核/当前卡/活动入口，§242及既有历史段/配置/骨架/并行改动不纳入。后续每轮先清后做、一套必要证据及精确真实计数/hash先持久再清本人产物，OpenSpec严格校验及Git闭环随本次最终回复。

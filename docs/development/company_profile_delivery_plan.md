@@ -2,9 +2,11 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-11-10。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[A审核§241](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#241-a审核真实观察失败先消除锚点请求与解析契约矛盾)：§240一次真实观察已失败结束，提示/Schema仍许page/quote、anchor_v1解析却只收ID。唯一下一[正式锚点请求契约收口卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-wire-contract-closeout-card.md)合并对齐发送/Schema/消费及直接业务验证，零真实/探针/可发送binding，不自动再付费。S1仍0/12、S32执行2/12核心0，每轮先清后做/必要证据一套后收尾。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[A审核§243](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#243-a审核正式锚点契约关闭结束工程收口转真实交付)正式锚点合同工程有限通过，收口结束，不再整公司模拟。下一[一次常规真实核心交付候选卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-anchor-aligned-observation-card.md)待用户新授权，0/1、真实/探针/可发送binding0；批准后同卡清理/冻结/直接执行，无后继/其他公司/充值。S1仍0/12、S32执行2/12核心0，旧失败不改，每轮先清后做/必要证据后收尾。
 
 ## 1. 开发者必须先理解的纠偏
+
+**2026-11-10审核§243（当前）：** 4d823d6e对齐正式指令/Schema与目录消费，不改完成门槛。B的_Gateway.complete替身只能证明provider边界，A本轮已用真实LlmClient/仅替外传输补齐4阶段消费、meter/wire同份及坏形态拒绝；7项直接测试通过，原选正文干计量未越单次上限。工程范围有限通过结束，复用§237三读，不再为模拟计数/更多边界返修。下一唯一业务交付是待新授权的一次真实公司核心及实测资源；尚不能加S1或判模型能力。B本轮范围和复用节奏合规；枚举整公司资源未知要由真实结果回答，不新增性能/预算算法卡。每轮清理、旧失败/正式源/并行保护；下文历史“当前”不授新权。
 
 **2026-11-10审核§241（当前）：** §240没有公司核心进展，1/1授权结束、5物理/32881/99.600秒/unknown；页图成功不等于正文语义已接受。A直接复现同一个page/quote响应过正式Schema却被anchor解析拒绝，说明先前理想ID替身未证明真实请求自洽；A承担就绪判断漏检，B承担生产者/消费者及自检漏检，不能仅判模型不遵守。仅同卡合并修正式指令/可达Schema/合法ID与解析一致，沿公共网关证明源审→成稿→有效核验消费，复用§237整链；未改消费者不机械重跑公司，确改则至多1次原入口。无新模型/路由/公司/预算/付费、无新增平台；恢复/质量硬限不动，失败交首断点停止，不自动逐阶段续卡。每轮先清后做/一套必要证据/finally收尾；以下历史“当前”不授新权。
 

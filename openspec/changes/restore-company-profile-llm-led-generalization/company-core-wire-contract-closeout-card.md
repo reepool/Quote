@@ -2,6 +2,8 @@
 
 > 2026-11-10；依据[A审核§241](review-submission.md#241-a审核真实观察失败先消除锚点请求与解析契约矛盾)。唯一实施change为restore-company-profile-llm-led-generalization，按[产品v8](../../../docs/development/company_profile_product_and_industry_semantic_requirements.md)、[验收v2 §7.103](../../../docs/development/company_profile_acceptance_program.md)、[交付路径v3](../../../docs/development/company_profile_delivery_plan.md)、[A/B v3](../../../docs/development/ab_role_development_workflow.md)执行。§239一次授权已用1/1失败结束，不恢复次数/余额；本卡新增真实/探针/可发送binding/新公司/生产均0。
 
+> 2026-11-10[A审核§243](review-submission.md#243-a审核正式锚点契约关闭结束工程收口转真实交付)：4d823d6e及实际外传输替换的4阶段/wire计量直接挑战有限通过，本工程卡结束；§237整公司证明按原约定复用，不追加模拟/修补。真实语义/全公司资源未评估。下一[一次真实核心交付候选卡](company-core-anchor-aligned-observation-card.md)待用户新授权，当前无模型/探针/可发送binding。
+
 ## 1. 唯一结果与根因
 
 消除“模型按请求允许的证据形态回答，却被本地消费者拒绝”的正式协议矛盾，让原网关的源审→成稿→有效支持/条件覆盖路径能接住**已明确要求的正确引用响应**，不再仅证明人工替身能主动猜中隐藏限制。最终产品仍是可核的公司画像、产品暴露、供应链定位，不是锚点目录。
