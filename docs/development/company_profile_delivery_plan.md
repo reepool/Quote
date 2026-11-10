@@ -2,7 +2,7 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-11-10。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[A审核§243](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#243-a审核正式锚点契约关闭结束工程收口转真实交付)正式锚点合同工程有限通过，收口结束，不再整公司模拟。下一[一次常规真实核心交付候选卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-anchor-aligned-observation-card.md)待用户新授权，0/1、真实/探针/可发送binding0；批准后同卡清理/冻结/直接执行，无后继/其他公司/充值。S1仍0/12、S32执行2/12核心0，旧失败不改，每轮先清后做/必要证据后收尾。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。[常规真实核心交付观察卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-anchor-aligned-observation-card.md)已获[用户授权§244](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#244-用户授权契约一致后的一次常规真实核心交付观察)，初始0/1；B同卡先清理、必要窄接入、冻结后直接执行，不再交准备轮或重复请批。A本轮仅登记，未外呼/建binding。S1仍0/12、S32执行2/12核心0，原模型/预算/无后继/生产边界不改，每轮先清后做/必要证据后收尾。
 
 ## 1. 开发者必须先理解的纠偏
 
