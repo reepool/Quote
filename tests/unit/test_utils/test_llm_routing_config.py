@@ -413,7 +413,7 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
         "scorpio:gemini-3.8-flash-high",
         "zai:glm-5.3-flash",
         "scorpio:grok-4.7",
-        "scorpio:gpt-5.6-luna",
+        "scorpio:gpt-terra-luna",
         "scorpio:deepseek-flash",
         "deepseek:deepseek-flash",
     ]
@@ -451,11 +451,21 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     assert profiles["semantic_extraction__scorpio_luna"].api_key_env == (
         "QUOTE_LLM_SCORPIO_LUNA_API_KEY"
     )
+    assert profiles["semantic_extraction__scorpio_luna"].source_label == (
+        "scorpio:gpt-terra-luna"
+    )
+    assert profiles["semantic_extraction__scorpio_luna"].model == "gpt-6.1-terra"
+    assert profiles[
+        "corporate_action_title_classification__scorpio_luna"
+    ].source_label == "scorpio:gpt-terra-luna"
+    assert profiles[
+        "corporate_action_title_classification__scorpio_luna"
+    ].model == "gpt-6.1-terra"
     assert profiles["semantic_extraction__scorpio_deepseek"].api_key_env == (
         "QUOTE_LLM_SCORPIO_DEEPSEEK_API_KEY"
     )
     assert profiles["semantic_extraction__scorpio_deepseek"].model == (
-        "DeepSeek-V4.1-Flash"
+        "deepseek-v4-flash"
     )
     assert profiles["semantic_extraction__scorpio_deepseek"].source_label == (
         "scorpio:deepseek-flash"

@@ -26,7 +26,7 @@
 
 - 运行目录：`var/company_profile_stage5/20260904/run-stage5-semantic-20260904-a`
 - 运行类型：四份批准年报的真实公共 LLM provider 竖切
-- 公共路由：`semantic_extraction` → `scorpio:gpt-5.6-luna`
+- 公共路由：`semantic_extraction` → `scorpio:gpt-terra-luna`
 - 结果：四份报告均为 `hold`
 - 原因：provider 在请求已建立并收到 HTTP 200/stream first event 后，未在有界预算内完成 JSON，统一记录为 `deadline_exceeded` / `provider_unavailable`
 - 说明：这不是语义通过，也不是数据缺失结论；在网关恢复后必须使用新 run ID 重跑受影响 scope。

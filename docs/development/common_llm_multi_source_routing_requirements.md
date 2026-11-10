@@ -46,7 +46,7 @@ docs/development/cninfo_corporate_action_llm_resolution_requirements.md
 | 来源标签 | 模型 | API Key 环境变量 | Base URL |
 | --- | --- | --- | --- |
 | `scorpio:grok-4.5` | `grok-4.5` | `QUOTE_LLM_SCORPIO_GROK_API_KEY` | `https://scorpio.reepool.com` |
-| `scorpio:gpt-5.6-luna` | `gpt-5.6-luna` | `QUOTE_LLM_SCORPIO_LUNA_API_KEY` | `https://scorpio.reepool.com` |
+| `scorpio:gpt-terra-luna` | `gpt-6.1-terra` | `QUOTE_LLM_SCORPIO_LUNA_API_KEY` | `https://scorpio.reepool.com` |
 
 要求：
 
@@ -224,7 +224,7 @@ config/13_llm.json
             }
           },
           {
-            "source_label": "scorpio:gpt-5.6-luna",
+            "source_label": "scorpio:gpt-terra-luna",
             "weight": 1,
             "profiles": {
               "semantic_extraction": "semantic_extraction__scorpio_luna",
@@ -267,11 +267,11 @@ config/13_llm.json
         "enabled": true,
         "provider": "openai_compatible",
         "provider_resource": "scorpio:luna",
-        "source_label": "scorpio:gpt-5.6-luna",
+        "source_label": "scorpio:gpt-terra-luna",
         "base_url": "https://scorpio.reepool.com",
         "endpoint": "/v1/chat/completions",
         "api_key_env": "QUOTE_LLM_SCORPIO_LUNA_API_KEY",
-        "model": "gpt-5.6-luna"
+        "model": "gpt-6.1-terra"
       }
     }
   }
@@ -446,7 +446,7 @@ selected_profile: str
   "pool": "shared_semantic",
   "logical_profile": "semantic_extraction",
   "selected_profile": "semantic_extraction__scorpio_luna",
-  "llm_source": "scorpio:gpt-5.6-luna",
+  "llm_source": "scorpio:gpt-terra-luna",
   "route_fingerprint": "...",
   "failover_count": 1,
   "attempts": [
@@ -458,7 +458,7 @@ selected_profile: str
       "attempt_count": 2
     },
     {
-      "source_label": "scorpio:gpt-5.6-luna",
+      "source_label": "scorpio:gpt-terra-luna",
       "selected_profile": "semantic_extraction__scorpio_luna",
       "request_id": "...",
       "status": "success",
