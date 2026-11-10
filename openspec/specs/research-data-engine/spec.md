@@ -349,15 +349,29 @@ The Research Data Engine SHALL allow configuration or explicit runtime overrides
 - **THEN** dynamic or forward PE/PS SHALL return an explicit unavailable status instead of reusing static or TTM denominators
 
 ### Requirement: Relative Valuation Must Use Authoritative Peer Groups And Clean Multiples
-Relative valuation SHALL use authoritative Shenwan peer groups by default and SHALL exclude invalid or unsupported multiples from benchmark statistics.
+Relative valuation SHALL use authoritative Shenwan peer groups by default and SHALL exclude invalid or unsupported multiples from all benchmark statistics. Every metric's mean, median, extrema, quartiles, percentile rank and premium to median SHALL use the same filtered peer population. Raw peer values SHALL remain inspectable.
 
 #### Scenario: Peer benchmark is computed
 - **WHEN** relative valuation computes industry PE/PB/PS benchmarks
 - **THEN** it SHALL use the configured authoritative Shenwan peer level and return peer count, mean, median, quartiles, percentile rank, and premium or discount to median
+- **AND** it SHALL disclose that the primary comparison statistics are valid-peer median and quartiles
 
 #### Scenario: Invalid peer multiples exist
-- **WHEN** peer valuation rows contain negative denominators, zero denominators, missing values, or unsupported metric variants
-- **THEN** the benchmark calculation SHALL exclude those values and report the valid peer count used for each metric
+- **WHEN** peer valuation rows contain negative denominators, zero denominators, non-positive multiples, missing or non-finite values, or unsupported metric variants
+- **THEN** the benchmark calculation SHALL exclude those values and report the valid and excluded peer counts and per-metric reasons
+- **AND** subject rank and premium SHALL be null with diagnostics when the subject multiple is invalid
+- **AND** when denominator metadata is unavailable, the check SHALL use observable multiple validity without falsely claiming that the underlying denominator was independently inspected
+
+#### Scenario: Explicit high-multiple limits are supplied
+- **WHEN** a caller supplies a finite positive max_pe or max_pb
+- **THEN** the corresponding metric family SHALL exclude values above that limit with an above_maximum reason and SHALL echo the policy
+- **AND** omission of those parameters SHALL NOT silently activate an arbitrary high-value cutoff
+- **AND** the effective threshold policy SHALL participate in parameter_hash, with calc_version updated for the changed statistical algorithm
+
+#### Scenario: Raw and filtered populations are compared
+- **WHEN** finite raw peers include negative or excluded extreme values
+- **THEN** each metric SHALL return peer_raw_mean and raw_peer_count over finite raw numeric samples alongside its filtered statistics
+- **AND** no contract SHALL require the filtered mean to lie between its quartiles
 
 ### Requirement: Financial Updates Must Separate Daily Catchup From Weekly Reconciliation
 The scheduler SHALL support a daily incremental financial statement catch-up job and a separate weekly reconciliation or repair job so financial updates do not depend only on the Saturday maintenance window.
@@ -611,12 +625,12 @@ Financial full import, incremental sync, and reconciliation tasks SHALL write pr
 - **AND** it SHALL report the actual database path in structured results
 
 ### Requirement: Financial Statements History API
-The Research Data Engine SHALL expose a company-level financial statements history API that returns multiple report periods using the same canonical field semantics as the single-period financial statements API.
+The Research Data Engine SHALL expose a company-level financial statements history API that returns multiple report periods using the same canonical field semantics as the single-period financial statements API. History SHALL retain its default full view with raw statements disabled, independently of the single-period default summary, and SHALL support the same explicit summary and field-projection controls.
 
 #### Scenario: Latest rolling periods are returned
 - **WHEN** a caller requests `/api/v1/research/company/{instrument_id}/financial-statements/history` with `period_window=latest` and `rolling_quarters=N`
 - **THEN** the API SHALL return up to `N` locally available report periods for that company ordered by report period descending
-- **AND** each item SHALL include the same normalized facts and indicators shape as the single-period financial statements API
+- **AND** each item SHALL use the same normalized facts and indicators semantics as the single-period API for the same requested view and field projection
 
 #### Scenario: Explicit report periods are returned
 - **WHEN** a caller supplies `report_periods` as a comma-separated list
@@ -1751,6 +1765,59 @@ Production code SHALL NOT retain imports, modes, configuration switches, writers
 - **WHEN** the shared-only migration is complete
 - **THEN** production modules SHALL have no imports of the retired compatibility catalog or archive sync module
 - **AND** runtime configuration SHALL have no `dual_read`, `legacy_fallback_enabled`, or `legacy_writer_disabled` annual-report switches
+
+### Requirement: Financial Single-Period Reads Default To A Bounded Summary
+The single-period financial-statements API SHALL support `view=summary|full`, default to summary, and obtain summary values from the existing authoritative local financial rows without reading or decoding full facts, indicator-detail or statement JSON. Default summary serialization without explicitly requested diagnostics SHALL be less than 8192 UTF-8 bytes and SHALL retain identity, report period, availability, source, scalar core facts, scalar indicators and units. Actual response models and their OpenAPI branches SHALL represent summary, full and sparse projection rather than requiring or silently refilling the former complete model for every mode.
+
+#### Scenario: Default financial read is consumed inline
+- **WHEN** a caller requests one company's financial statements without an explicit full view or diagnostics
+- **THEN** the response SHALL contain the normalized summary and SHALL omit full facts payloads, indicator details and raw statements
+- **AND** both the response-size limit and absence of full-JSON reads or decoding SHALL be verified
+
+#### Scenario: Full financial payload is explicitly requested
+- **WHEN** view=full is requested without fields projection
+- **THEN** the existing complete facts and indicator-detail payload SHALL remain available
+- **AND** raw statements SHALL be included unless include_statements=false is explicitly supplied
+- **AND** view=summary with include_statements=true SHALL return a structured 422 with a hint to use view=full
+
+### Requirement: Financial Field Projection Selects Values Without Hiding Metadata
+Single-period and history financial APIs SHALL support fields containing canonical core keys, scalar `indicators.<key>` and `ratios.<key>`. Projection SHALL include only requested business values plus required identity, report-period, availability, source and unit metadata. Existing requested_canonical_facts SHALL retain its service-layer selection meaning rather than impersonating field projection.
+
+#### Scenario: Two core values are requested
+- **WHEN** fields=revenue,net_income is supplied
+- **THEN** only revenue and net_income SHALL appear as business values
+- **AND** the response SHALL retain required metadata but SHALL NOT append all unrequested indicators or raw facts
+- **AND** the actual HTTP serializer SHALL NOT reinsert unrequested business keys as default nulls or empty collections
+
+#### Scenario: Fields projection overrides full view expansion
+- **WHEN** view=full and fields=revenue,net_income are supplied without an explicit include_statements=true
+- **THEN** the response SHALL still contain only those two business values plus required metadata, with unrequested raw payloads omitted
+- **AND** explicitly combining fields with include_statements=true SHALL return structured 422 with a correction hint
+
+#### Scenario: A projection field is unknown
+- **WHEN** a field is absent from the supported normalized projection catalog
+- **THEN** the API SHALL return structured 422 and SHALL NOT silently return the full payload
+
+#### Scenario: Existing history and source-extension controls are used
+- **WHEN** history is called without a view override
+- **THEN** its existing report-period selection and default payload behavior SHALL remain unchanged
+- **AND** history SHALL accept explicit summary view and the same fields semantics
+- **AND** neither view nor fields SHALL enable remote extension without the existing explicit authorization parameter
+- **AND** explicitly requested service-layer diagnostics SHALL retain their separate diagnostic block and SHALL be documented outside the default summary-size promise
+
+### Requirement: Research Returns Expose Canonical Ratios And Units
+Financial responses SHALL expose a `ratios` object for percentage-semantic financial indicators in decimal-ratio units while retaining legacy values. Technical summary SHALL expose `pct_change_ratio` as an alias of its existing pct_change_1d and SHALL disclose adjusted-close-to-close return basis. Both surfaces SHALL include field-path units without changing per-share values or current/quick-ratio multiples.
+
+#### Scenario: Financial ratios are exposed alongside old fields
+- **WHEN** the stored gross_margin is 0.8976189601948095
+- **THEN** ratios.gross_margin SHALL retain that decimal value
+- **AND** units SHALL identify it as ratio rather than percent
+- **AND** current_ratio, quick_ratio and per-share values SHALL NOT be divided by 100
+
+#### Scenario: Technical return is compared with a quote return
+- **WHEN** technical summary has pct_change_1d=-0.005513
+- **THEN** pct_change_ratio SHALL equal -0.005513 and its unit SHALL be ratio
+- **AND** the return-basis declaration SHALL allow callers to distinguish it from source-reference returns on corporate-action days
 
 ## MODIFIED Requirements
 

@@ -5,6 +5,15 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [Unreleased] - 2026-11-10 — API 消费语义修复（info 1.2.0，未部署）
+
+- 行情 OHLC/前收/涨跌额复权口径一致，保留原始参考值；`volume` 改为 `volume_raw` 的弃用别名，复权股数使用 `volume_adj`；新增单位、小数收益率及 EOD 时间说明。
+- TDX/Tencent 未知换手率返回 null，未知评分保守为 0；停牌/质量过滤实际执行，限定只读接口拒绝未知参数并提供结构化错误。
+- 单期财务默认 `view=summary`，完整数据显式 `view=full`；新增稀疏 fields 投影，保留分层 fallback 值，多期默认行为不变。
+- HTTP 利率默认最新 100 条倒序，支持稳定分页与日期边界；区分观察日期和真实抓取时间，历史无证据时间保持未知，内部 DCF 读取不截断。
+- 相对估值使用一致有效样本集、可选 max_pe/max_pb 和 raw 对照，非有限响应值安全表达；PIT 新增最新可知期之后的质量过滤及分页前 filter_stats。
+- 实现 `504ede5d`、复审补修 `523e8c36`；[change 已归档](../openspec/changes/archive/2026-11-10-fix-market-data-api-consumption-semantics/proposal.md)，5 份主规范已同步。详见[迁移文档](api/restful_api.md)与[反馈回复](后端数据问题与改造需求_20261109_回复.md)。本次不代表线上已升级。
+
 ## [Unreleased] - 2026-07-12 ⭐ Quote System API 数据能力改进（面向量化平台）
 
 > 对照《Quote System API 数据能力改进需求》落地一批需求，API 版本 `1.0.0 → 1.1.0`；OpenSpec change：`add-quote-api-data-capability-improvements`。

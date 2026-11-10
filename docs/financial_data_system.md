@@ -654,11 +654,13 @@ sqlite3 data/financials.db "PRAGMA quick_check;"
 
 ## 8. API 读取
 
-单期财务报表读取：
+单期财务默认读取标量摘要（API info 1.2.0）：
 
 ```text
 GET /api/v1/research/company/{instrument_id}/financial-statements
 ```
+
+需要此前的完整事实、指标详情和原始报表时，显式使用 `?view=full`；可再用 `include_statements=false` 关闭原始报表。`?fields=revenue,net_income` 只投影请求科目及必要元数据，优先于 full 展开，不能与显式 `include_statements=true` 组合。默认摘要不读取/解码完整 JSON，未显式请求诊断的单期响应小于 8192 UTF-8 字节。
 
 多期财务报表历史读取：
 
@@ -672,7 +674,9 @@ GET /api/v1/research/company/{instrument_id}/financial-statements/history?period
 GET /api/v1/research/company/{instrument_id}/financial-statements/history?report_periods=2026-03-31,2025-12-31&include_statements=false
 ```
 
-历史接口的 `items` 每项复用单期接口结构，包含标准 `facts`、派生 `indicators` 和可选 `statements`。默认只读本地财务库，不隐式触发远程扩展；需要 L1 本地核心诊断时可追加 `include_local_core=true` 与 `requested_canonical_facts=...`。
+历史接口保留 `view=full`、`include_statements=false` 默认值，`items` 包含标准 `facts`、派生 `indicators` 和按参数选择的 `statements`；不会随单期默认摘要一起改变。历史也支持显式 `view=summary` 和相同的 `fields` 投影。财务百分比语义指标的 `ratios` 保持小数原值，流动/速动比率保持倍数，`units` 声明单位。
+
+默认只读本地财务库，不隐式触发远程扩展；需要 L1 本地核心诊断时可追加 `include_local_core=true` 与 `requested_canonical_facts=...`。标准 bundle 缺失但既有分层 fallback 有规范值时，摘要和字段投影保留其已选值；已有本地标量（含 null）不被原始 JSON 覆盖。显式诊断不在默认摘要大小承诺内。完整参数和迁移边界见 [REST API 参考](api/restful_api.md)。
 
 需要 L1.5 行业专项字段时追加：
 

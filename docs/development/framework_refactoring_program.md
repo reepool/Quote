@@ -228,7 +228,7 @@ owner 内增加公告-only 案例聚合、可切换 LLM 分流、inactive watch 
 
 验收：每个现有端点有唯一路由 owner；新路由不直接访问全局门面或拼接业务 SQL；旧入口只保留装配/兼容职责。
 
-关联业务修复提案：[`fix-market-data-api-consumption-semantics`](../../openspec/changes/fix-market-data-api-consumption-semantics/proposal.md)（2026-11-10，限定合同修复已实现并完成本地定向验收，未部署）登记到 FR-09/W9，关联 FR-06/W4、FR-07/W5 的现行读 owner。范围为已核实的行情字段/过滤、财务摘要、利率分页及研究质量过滤合同；明确列出的 API 默认变化由该提案定义，不据此扩大整体路由/存储拆分或声明 W9 已完成。触及核心文件前与现有财务性能和框架 change 核对单写者窗口；不重复接管同步就绪度优化。
+关联业务修复：[`fix-market-data-api-consumption-semantics`](../../openspec/changes/archive/2026-11-10-fix-market-data-api-consumption-semantics/proposal.md)（2026-11-10，30/30 完成并归档，主规范已同步；未部署）登记到 FR-09/W9，关联 FR-06/W4、FR-07/W5 的现行读 owner。范围为已核实的行情字段/过滤、财务摘要、利率分页及研究质量过滤合同；实现提交 `504ede5d`，复审补修 `523e8c36`。当前调用与迁移以 [API 文档](../api/restful_api.md) 为准，逐项处理见[消费方回复](../后端数据问题与改造需求_20261109_回复.md)。本项完成不表示整体路由/存储拆分或 W9 完成，不重复接管同步就绪度优化。
 
 ### W8 遗留入口和工具退出
 

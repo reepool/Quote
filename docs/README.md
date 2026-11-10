@@ -51,6 +51,7 @@
 - `docs/troubleshooting/faq.md`：故障排查
 - `docs/development/open_issues_backlog.md`：尚未解决的数据能力和源端问题
 - `docs/CHANGELOG.md`：版本变更记录
+- [2026-11-09 后端数据反馈回复](后端数据问题与改造需求_20261109_回复.md)：B-01～B-12 核实结论、修复结果、调用迁移和验收边界（代码完成，尚未部署）
 
 ## 文档生命周期
 
