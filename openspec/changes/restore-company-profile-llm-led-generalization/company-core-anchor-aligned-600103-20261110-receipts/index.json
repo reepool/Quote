@@ -1,0 +1,46 @@
+{
+  "attempt-marker.json": {
+    "bytes": 754,
+    "sha256": "2afd9075050ede91d3ca29c7d50990289fed5af2809a88bc8a172ccd42c5de6f"
+  },
+  "authorization.json": {
+    "bytes": 578,
+    "sha256": "32aaf0c5a81f40ef3a309051442544578d3a39254c959bad925f282cf643d356"
+  },
+  "binding.json": {
+    "bytes": 6127,
+    "sha256": "c672506e71170a2090cbacabc170d7f4a74579fbf6984884bd754a34088209ed"
+  },
+  "budget-final.json": {
+    "bytes": 13264,
+    "sha256": "4f0c8412bbf9a2467a0510cd001a766ab5f7c24584085290d5fa57858c4c1460"
+  },
+  "entry-result.json": {
+    "bytes": 50956,
+    "sha256": "a65a3267e719b46ad23038df9921b4225698a73ac20eb91e548d3ee022f4f46e"
+  },
+  "entry-stages.json": {
+    "bytes": 526,
+    "sha256": "2cbb85464a55498332ae3b4bf2788cda8a8ffeededb11e75ecba94c086eea3bb"
+  },
+  "entry.log": {
+    "bytes": 64553,
+    "sha256": "a3d941e5d28200844e20c162f066418da48414f62cec587dd5b2ce71e073f7d9"
+  },
+  "frozen-config.json": {
+    "bytes": 25785,
+    "sha256": "7abeaae4d6795ac8fdb2de019d98559b1a56a0d9585f58608eed727057745d75"
+  },
+  "query.json": {
+    "bytes": 306857,
+    "sha256": "2bd7023b4fb47b0ee66add1d5189fda569aaf0a5fc8e0c40688b12ace0574599"
+  },
+  "source-receipt.json": {
+    "bytes": 18087,
+    "sha256": "82fa51dfb9155ca81bf8c5f2869abbde4643ecbc569bb8930a61c36d49d944e6"
+  },
+  "supervisor.json": {
+    "bytes": 61,
+    "sha256": "a77c7500a7b5be9955c1eb31a1ed3e2d97d53a10ba2f22f795136afd9963aec2"
+  }
+}

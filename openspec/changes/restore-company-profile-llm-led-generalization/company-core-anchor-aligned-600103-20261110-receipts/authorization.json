@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600103-anchor-aligned-20261110",
+  "binding_sha256": "c672506e71170a2090cbacabc170d7f4a74579fbf6984884bd754a34088209ed",
+  "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+  "approval_reference": "company-core-anchor-aligned-observation-card; user approved one aligned observation 2026-11-10",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "user_approved_anchor_aligned_observation",
+  "window": "one fresh 600103 chapter run, 120000/900/16/2"
+}
