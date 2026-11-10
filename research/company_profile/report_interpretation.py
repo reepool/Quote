@@ -523,6 +523,48 @@ def source_anchor_id(document_version: str, page: int, start: int, end: int) -> 
     return f"{document_version}:{int(page)}:{int(start)}:{int(end)}"
 
 
+ANCHOR_MARK = "[[anchor]]"
+
+
+def render_anchor_pages(pages, document_version: str) -> list[dict]:
+    """Show each id immediately before its original wording.
+
+    The returned pages are a wire copy. Coordinates stay on the caller's
+    original pages; the inserted mark is not a source offset.
+    """
+    version = str(document_version or "")
+    rendered = []
+    for page in pages or ():
+        item = dict(page)
+        text = str(page.get("text") or "")
+        page_no = int(page.get("page") or 0)
+        if (
+            page.get("readable", True) is False
+            or page_no < 1
+            or not version
+            or not text.strip()
+        ):
+            rendered.append(item)
+            continue
+        base = int(page.get("offset") or 0)
+        pieces: list[str] = [f"document_version={version}\n"]
+        cursor = 0
+        for local_start, local_end in _anchor_spans(text):
+            if local_start < cursor:
+                continue
+            if local_start > cursor:
+                pieces.append(text[cursor:local_start])
+            label = f"{page_no}:{base + local_start}:{base + local_end}"
+            pieces.append(f"\n{ANCHOR_MARK}\n{label}\n")
+            pieces.append(text[local_start:local_end])
+            cursor = local_end
+        if cursor < len(text):
+            pieces.append(text[cursor:])
+        item["text"] = "".join(pieces)
+        rendered.append(item)
+    return rendered
+
+
 def _anchor_spans(text: str) -> list[tuple[int, int]]:
     """Deterministic ranges in one sent page. No business is chosen here."""
     if not str(text or "").strip():

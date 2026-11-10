@@ -1520,8 +1520,39 @@ def _page_text(request, page_no) -> str:
     return ""
 
 
+def _visible_blocks(text: str) -> list[tuple[str, str]]:
+    """Ids printed beside source text. This does not derive a character offset."""
+    version = ""
+    first, _, _rest = str(text or "").partition("\n")
+    if first.startswith("document_version="):
+        version = first.split("=", 1)[1]
+    blocks = []
+    for part in str(text or "").split("\n[[anchor]]\n"):
+        if "\n" not in part:
+            continue
+        label, body = part.split("\n", 1)
+        if version and label and label[0].isdigit():
+            blocks.append((f"{version}:{label}", body))
+    return blocks
+
+
+def _visible_quote(request, anchor_id: str) -> str | None:
+    for page in request.get("source_pages") or []:
+        for found, body in _visible_blocks(str(page.get("text") or "")):
+            if found == anchor_id:
+                return body
+    return None
+
+
 def _anchor_slice(anchor, request) -> str:
+    visible = _visible_quote(request, str(anchor.get("id") or ""))
+    if visible is not None:
+        return visible
+    if "start" not in anchor or "end" not in anchor:
+        return ""
     text = _page_text(request, anchor["page"])
+    if "[[anchor]]" in text:
+        return ""
     return text[int(anchor["start"]) : int(anchor["end"])]
 
 
@@ -1589,9 +1620,15 @@ def _evidence_text(item, request) -> str:
             quote = (body.get("anchor") or {}).get("bounded_quote")
             if quote:
                 return str(quote)
+        visible = _visible_quote(request, item)
+        if visible is not None:
+            return visible
         parts = item.rsplit(":", 3)
         if len(parts) == 4 and parts[1].isdigit():
-            return _page_text(request, int(parts[1]))[int(parts[2]) : int(parts[3])]
+            page_text = _page_text(request, int(parts[1]))
+            if "[[anchor]]" in page_text:
+                return ""
+            return page_text[int(parts[2]) : int(parts[3])]
         return ""
     if isinstance(item, dict):
         if item.get("quote"):
@@ -1648,7 +1685,7 @@ def _anchor_page_map(request):
 def _anchor_source_body(request, plant_other=False):
     groups: dict[str, list[str]] = {}
     for kind in _KIND_DIMENSION:
-        ids = _supporting_anchor_ids(kind, request.get("source_anchors") or [], request)
+        ids = _supporting_anchor_ids(kind, _request_anchors(request), request)
         if ids:
             groups[kind] = ids
     conditions = []
@@ -1667,7 +1704,7 @@ def _anchor_source_body(request, plant_other=False):
         product = next(
             (
                 anchor
-                for anchor in request.get("source_anchors") or []
+                for anchor in _request_anchors(request)
                 if "主营业务分产品情况" in _anchor_slice(anchor, request)
             ),
             None,
@@ -1933,12 +1970,25 @@ def _reviewed_quotes_are_on_the_formal_pages() -> None:
             assert quote in blob, quote
 
 
+def _request_anchors(request) -> list[dict]:
+    visible = []
+    for page in request.get("source_pages") or []:
+        for anchor_id, _body in _visible_blocks(str(page.get("text") or "")):
+            visible.append({"id": anchor_id, "page": int(page.get("page") or 0)})
+    return visible or list(request.get("source_anchors") or [])
+
+
 def _ids_for_quote(request, quote: str) -> list[str]:
     hits = []
-    for anchor in request.get("source_anchors") or []:
-        text = _anchor_slice(anchor, request)
-        if quote in text:
-            hits.append((len(text), str(anchor["id"])))
+    for page in request.get("source_pages") or []:
+        for anchor_id, body in _visible_blocks(str(page.get("text") or "")):
+            if quote in body:
+                hits.append((len(body), anchor_id))
+    if not hits:
+        for anchor in request.get("source_anchors") or []:
+            text = _anchor_slice(anchor, request)
+            if quote in text:
+                hits.append((len(text), str(anchor["id"])))
     if not hits:
         return []
     return [min(hits)[1]]

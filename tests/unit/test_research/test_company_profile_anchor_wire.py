@@ -17,12 +17,16 @@ from research.company_profile.contracts import (
     SemanticProviderError,
 )
 from research.company_profile.models import TextAnchor
+from research.company_profile.reading_budget import _request_messages
 from research.company_profile.report_interpretation import (
+    ANCHOR_MARK,
+    render_anchor_pages,
     restore_source_anchor,
     source_anchor_catalog,
 )
 from research.company_profile.report_wire import (
     expand_response,
+    gateway_user_object,
     instructions,
     response_schema,
 )
@@ -139,7 +143,7 @@ def test_gateway_anchor_contract_accepts_only_ids_it_sent():
         },
     )
     assert "{page,quote}" not in text
-    assert "source_anchors" in text
+    assert "immediately before" in text
     assert schema["$defs"]["Evidence"]["enum"]
     assert anchor_id in schema["$defs"]["Evidence"]["enum"]
     assert "anyOf" not in schema["$defs"]["Evidence"]
@@ -349,3 +353,143 @@ def test_required_field_diagnostic_names_the_field_without_the_body():
     assert "source_conditions.evidence=object" in message
     assert "sha256=" in message
     assert "原文" not in message
+
+
+def _without_anchor_marks(rendered: str) -> str:
+    if rendered.startswith("document_version="):
+        rendered = rendered.split("\n", 1)[1]
+    pieces = []
+    cursor = 0
+    mark = f"\n{ANCHOR_MARK}\n"
+    while True:
+        found = rendered.find(mark, cursor)
+        if found < 0:
+            pieces.append(rendered[cursor:])
+            break
+        pieces.append(rendered[cursor:found])
+        rest = rendered[found + len(mark) :]
+        newline = rest.find("\n")
+        if newline < 0:
+            break
+        cursor = found + len(mark) + newline + 1
+    return "".join(pieces)
+
+
+def _span_label(anchor_id: str) -> str:
+    version, page, start, end = anchor_id.rsplit(":", 3)
+    return version, f"{page}:{start}:{end}"
+
+
+def test_anchor_text_is_sent_once_beside_its_id_and_body_may_omit_pages():
+    inventory = _request()
+    original = inventory.source_pages[0]["text"]
+    user = json.loads(
+        json.dumps(gateway_user_object(inventory), ensure_ascii=False, separators=(",", ":"))
+    )
+    sent = user["source_pages"][0]["text"]
+    assert sent != original
+    assert _without_anchor_marks(sent) == original
+    assert "source_anchors" not in user
+    anchor_id = _anchor(inventory)
+    version, label = _span_label(anchor_id)
+    assert f"document_version={version}\n" in sent
+    assert f"\n{ANCHOR_MARK}\n{label}\n" in sent
+    assert anchor_id not in sent
+    quote = restore_source_anchor(anchor_id, inventory.report, inventory.source_pages)[
+        "anchor"
+    ]["bounded_quote"]
+    assert quote in sent.split(f"\n{ANCHOR_MARK}\n{label}\n", 1)[1]
+    start, end = (int(part) for part in anchor_id.rsplit(":", 2)[-2:])
+    assert sent[start:end] != quote
+    messages, schema = _request_messages(inventory)
+    assert messages[1]["content"] == json.dumps(
+        gateway_user_object(inventory), ensure_ascii=False, separators=(",", ":")
+    )
+    assert "requested_pages" not in schema["required"]
+    omitted = {
+        "source_conditions": [
+            {
+                "condition_id": "principal",
+                "dimension": "principal_business",
+                "description": "公司从事纸业生产",
+                "major": True,
+                "statement_status": "current",
+                "evidence": [anchor_id],
+            }
+        ]
+    }
+    jsonschema.validate(omitted, schema)
+    expanded = expand_response(omitted, inventory)
+    assert expanded["requested_pages"] == []
+    assert expanded["source_conditions"][0]["evidence"][0]["anchor"]["bounded_quote"] == quote
+    page_map = _request(source_scope="page_map")
+    map_schema = response_schema(page_map)
+    assert "requested_pages" in map_schema["required"]
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate({"source_conditions": []}, map_schema)
+    with pytest.raises(ValueError, match="page map must return requested_pages"):
+        expand_response({}, page_map)
+
+
+def test_a_legal_id_for_the_wrong_sentence_does_not_become_the_business_quote():
+    report = _report()
+    text = (
+        "响金额\n交易性金融资产 1,737,151,888.27\n"
+        "一、报告期内公司从事的业务情况\n"
+        "公司主要从事竹木浆纸业生产。\n"
+        "第三节 管理层讨论与分析\n"
+        "分行业 营业收入 营业成本\n"
+    )
+    request = ReportSemanticRequestV3(
+        request_id="mixed:v3",
+        purpose="source_inventory",
+        report=report,
+        processing_identity=_identity(),
+        source_pages=({"page": 9, "text": text, "readable": True, "offset": 0},),
+        max_output_tokens=4000,
+        timeout_seconds=10.0,
+    )
+    rendered = render_anchor_pages(request.source_pages, report.document_version)
+    assert rendered[0]["text"] != text
+    assert request.source_pages[0]["text"] == text
+    by_quote = {
+        restore_source_anchor(item["id"], report, request.source_pages)["anchor"][
+            "bounded_quote"
+        ]: item["id"]
+        for item in source_anchor_catalog(request.source_pages, report.document_version)
+    }
+    financial = next(quote for quote in by_quote if "交易性金融资产" in quote)
+    business = next(quote for quote in by_quote if "主要从事" in quote)
+    heading = next(quote for quote in by_quote if "管理层讨论与分析" in quote)
+    header = next(quote for quote in by_quote if quote.strip() == "分行业 营业收入 营业成本")
+    assert "主要从事" not in financial
+    assert "2,418,990,221.17" not in header
+    assert "主要从事" not in heading
+    sent = json.loads(
+        json.dumps(gateway_user_object(request), ensure_ascii=False, separators=(",", ":"))
+    )["source_pages"][0]["text"]
+    for quote, anchor_id in (
+        (financial, by_quote[financial]),
+        (business, by_quote[business]),
+    ):
+        _version, label = _span_label(anchor_id)
+        assert quote in sent.split(f"\n{ANCHOR_MARK}\n{label}\n", 1)[1][: len(quote) + 5]
+    result, _, _ = _send(
+        request,
+        {
+            "source_conditions": [
+                {
+                    "condition_id": "c1",
+                    "dimension": "principal_business",
+                    "description": "公司从事纸业生产",
+                    "major": True,
+                    "statement_status": "current",
+                    "evidence": [by_quote[financial]],
+                }
+            ]
+        },
+    )
+    restored = result["source_conditions"][0]["evidence"][0]["anchor"]["bounded_quote"]
+    assert restored == financial
+    assert "主要从事" not in restored
+

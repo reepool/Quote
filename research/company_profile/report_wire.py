@@ -108,10 +108,12 @@ def _with_source_anchors(payload: dict, request: ReportSemanticRequestV3) -> dic
     identity = getattr(request, "processing_identity", None) or {}
     if not isinstance(identity, dict) or identity.get("source_reference") != "anchor_v1":
         return payload
-    from .report_interpretation import source_anchor_catalog
+    from .report_interpretation import render_anchor_pages
 
-    payload["source_anchors"] = source_anchor_catalog(
-        request.source_pages,
+    # One copy of the source text. The document version is printed once per page
+    # and each span label sits immediately before that original wording.
+    payload["source_pages"] = render_anchor_pages(
+        payload.get("source_pages") or (),
         request.report.document_version,
     )
     return payload
@@ -208,10 +210,15 @@ def response_schema(request: ReportSemanticRequestV3) -> dict:
     """Send only purpose-reachable fields; v3 cannot generate numeric records."""
     schema = ReportSemanticResponseV3.model_json_schema()
     fields = {"schema_version", "request_id", "purpose"}
+    optional: set[str] = set()
     if request.purpose == "source_inventory":
-        if request.source_scope != "evidence_repair":
+        if request.source_scope == "page_map":
             fields.add("requested_pages")
-        if request.source_scope != "page_map":
+        elif request.source_scope != "evidence_repair":
+            fields.add("requested_pages")
+            optional.add("requested_pages")
+            fields.add("source_conditions")
+        else:
             fields.add("source_conditions")
     elif request.purpose == "synthesize_views":
         fields.add("claims")
@@ -222,7 +229,9 @@ def response_schema(request: ReportSemanticRequestV3) -> dict:
     }
     # Version, request id and purpose are the request's identity. The model
     # may omit them; they are bound locally and are not semantic answers.
-    schema["required"] = sorted(fields - {"schema_version", "request_id", "purpose"})
+    schema["required"] = sorted(
+        fields - {"schema_version", "request_id", "purpose"} - optional
+    )
     # A response Evidence is an exact quote on a supplied full page, or an
     # existing catalog ID. Full ReportIdentity is bound by the request locally.
     # anchor_v1 sends only ids this request actually listed.
@@ -349,6 +358,10 @@ def expand_response(data: dict, request: ReportSemanticRequestV3) -> dict:
         ).model_dump(mode="json")
 
     result = dict(data)
+    if request.purpose == "source_inventory" and "requested_pages" not in result:
+        if request.source_scope == "page_map":
+            raise ValueError("page map must return requested_pages")
+        result["requested_pages"] = []
     result["schema_version"] = "company_profile_report_response.v3"
     result["request_id"] = request.request_id
     result["purpose"] = request.purpose
@@ -424,9 +437,9 @@ def instructions(request: ReportSemanticRequestV3) -> str:
     anchor = identity.get("source_reference") == "anchor_v1"
     if anchor:
         evidence_rule = (
-            "Evidence must be one id listed in this request's source_anchors or "
-            "evidence_catalog. Do not return a page and quote object, do not copy "
-            "quote text, and do not invent a page. "
+            "Evidence must be one id printed immediately before its original wording, "
+            "or an id already listed in evidence_catalog. Do not return a page and "
+            "quote object, do not copy quote text, and do not invent a page. "
         )
     else:
         evidence_rule = (
@@ -448,12 +461,14 @@ def instructions(request: ReportSemanticRequestV3) -> str:
     )
     if anchor:
         common += (
-            "source_anchors lists only locations in the pages sent with this request. "
-            "Each id is this document version, one physical page, and a character "
-            "range. Read the original page text at that range. Select evidence by "
-            "those ids only. An id from another version, another request, or outside "
-            "the sent text is invalid. A valid id still has to support the statement; "
-            "location is not a pass. "
+            "Each source page states document_version once. Each block then begins "
+            "with [[anchor]] and a page:start:end label on the next line. The original "
+            "wording follows that label immediately. The evidence id is that "
+            "document_version, a colon, and the label. Read the wording beside the "
+            "label; do not count characters or treat the mark as part of the source. "
+            "Select evidence by those ids only. An id from another version, another "
+            "request, or outside the sent text is invalid. A valid id still has to "
+            "support the statement; location is not a pass. "
         )
 
     def finish(text: str) -> str:
@@ -520,7 +535,8 @@ def instructions(request: ReportSemanticRequestV3) -> str:
             "These are uniformly sampled page structure previews, NOT full reading. "
             + selection
             + "No source_conditions or answers yet. "
-            "Do not assume an unselected page has no relevant disclosure."
+            "Do not assume an unselected page has no relevant disclosure. "
+            "requested_pages is required for this selection."
         ))
     if request.purpose == "source_inventory" and request.source_scope == "evidence_repair":
         return finish(common + (
@@ -592,7 +608,9 @@ def instructions(request: ReportSemanticRequestV3) -> str:
             + "A span outside the preview can contain a "
             "major business even with no heading and no structured fact. Distinguish current, "
             "planned, negated, historical and third-party actors. Request additional physical "
-            "pages if context or continuation is insufficient; otherwise requested_pages=[]. "
+            "pages only when this response needs a continuation. Otherwise omit "
+            "requested_pages; an empty list means the same and does not finish unread "
+            "pages or remove a page already selected. "
             "No candidate answers are supplied. Preserve uncertainty, original names and units. "
             "A secondary footnote line need not each become a condition, but do not omit a "
             "major business, product, earning mechanism, input or role the supplied text supports."
