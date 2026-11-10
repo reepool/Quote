@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from copy import deepcopy
 from typing import Any, Mapping
@@ -50,7 +51,37 @@ def validate_data(data: Any, schema: Mapping[str, Any]) -> None:
         return
     path = ".".join(str(part) for part in error.path) or "$"
     validator_name = str(error.validator or "unknown")
-    raise LlmSchemaValidationError(f"schema validation failed at {path} ({validator_name})")
+    message = f"schema validation failed at {path} ({validator_name})"
+    if validator_name == "required" and isinstance(data, dict):
+        # Name the missing schema field and the response's top-level keys.
+        # Do not copy payload values into the diagnostic.
+        required = str(error.message)
+        if required.endswith(" is a required property") and "'" in required:
+            message += " missing=" + required.split("'", 2)[1]
+        message += " keys=" + ",".join(sorted(str(key) for key in data))
+        shapes: list[str] = []
+        for name in ("source_conditions", "claims", "checks"):
+            rows = data.get(name)
+            if not isinstance(rows, list) or not rows or not isinstance(rows[0], dict):
+                continue
+            evidence = rows[0].get("evidence")
+            if not isinstance(evidence, list) or not evidence:
+                continue
+            item = evidence[0]
+            kind = (
+                "object"
+                if isinstance(item, dict)
+                else "string"
+                if isinstance(item, str)
+                else type(item).__name__
+            )
+            shapes.append(f"{name}.evidence={kind}")
+        if shapes:
+            message += " " + " ".join(shapes)
+        message += " sha256=" + hashlib.sha256(
+            json.dumps(data, ensure_ascii=False, sort_keys=True, default=str).encode()
+        ).hexdigest()
+    raise LlmSchemaValidationError(message)
 
 
 def compact_schema_instruction(schema: Mapping[str, Any]) -> str:
