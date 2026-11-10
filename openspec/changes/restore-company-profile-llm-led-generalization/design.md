@@ -10,6 +10,8 @@
 
 ## Decisions
 
+**当前审核§246（2026-11-10）：** §245证明两类失败：full_context控制字段requested_pages遗漏导致5包Schema拒绝；合法裸字符坐标ID又绑到无关表/标题。停止该组合用于下一付费观察。唯一[零外呼业务协议重整](company-core-readable-source-delivery-card.md)在原owner把可选ID与原文邻接呈现，保原始Evidence坐标/hash/上下文并避免全文重复；普通正文requested_pages可省只表无新增建议，page_map仍须返回选页，已有必要未读与语义载荷/支持覆盖不放宽。源到三视图公司级验收同窗交，不做字段修补后自动付费，不造平台；旧冻结身份/原结果不迁移。
+
 **当前审核§232（2026-11-10）：** §231正常2/2未过结束，不加锚点功能。A直接复现目录外范围仍接受、片段offset归0；受控关键词替身互斥丢主营，不能当模型失败。新[一次独立业务接入验收](company-core-explicit-input-acceptance-card.md)合并修来源ID集合和原页坐标链，人工核过的完整有限语义响应替换自动分类/核验器，正常组件检查后仅1次原TaskService三视图/有效对象覆盖/三读，不扩平台/第二writer。旧尝试不重置，真实/探针/binding0，失败也保存最小资源/首断点再清库；每轮清理，原分数/失败/生产不变。以下为历史决策。
 
 **当前审核§230（2026-11-09）：** §229安全纠证结案接受，旧业务2/2未过结束。新[原文锚点三视图切片](company-core-source-reference-delivery-card.md)复用Evidence/原文偏移/compact evidence_catalog，让模型选择本次已发送源引用，程序还原原文，不以重抄quote/页码为正常前提。显式opt-in协议/身份、schema/producer/consumer/计量同版，旧v3按旧身份消费；源目录不带候选答案，定位和语义/主要条件覆盖分开。完整三视图正常与直接限用原入口同卡交，正常验证最多2次/一次合并返修；真实/探针/binding/生产0，不建来源平台/双writer、不恢复旧授权，每轮清理。以下为历史决策。

@@ -2,9 +2,11 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-11-10。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。[常规真实核心交付观察卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-anchor-aligned-observation-card.md)已获[用户授权§244](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#244-用户授权契约一致后的一次常规真实核心交付观察)，初始0/1；B同卡先清理、必要窄接入、冻结后直接执行，不再交准备轮或重复请批。A本轮仅登记，未外呼/建binding。S1仍0/12、S32执行2/12核心0，原模型/预算/无后继/生产边界不改，每轮先清后做/必要证据后收尾。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[A审核§246](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#246-a审核停止同配试跑把可读来源与业务载荷一起收束)：§245真实1/1失败结束，既有格式/来源协议不足，不能只补字段再跑。唯一[可读来源到公司核心卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-readable-source-delivery-card.md)零外呼合并交原文-ID直观对应、正文控制字段处理与原入口三视图；S1仍0/12、S32执行2/12核心0，不启新模型/付费/生产，每轮先清后做/必要证据后收尾。
 
 ## 1. 开发者必须先理解的纠偏
+
+**2026-11-10审核§246（当前）：** §245没有可信核心进展，11/91627/173.383秒/unknown及1/1结束不改；5次Schema失败60587账本均缺requested_pages，格式自洽仍未证明业务可消费。已接受c1主营引金融资产表、c2产品引标题、c4总额引分行业表头，核验拦截正确。A承担上轮就绪只看合法形态/未审引用呈现适用性的规划责任，B范围内执行及清理合规但报告需交代错绑，不只首Schema码。下一明确停止裸偏移目录+无编号正文组合用于付费，原owner合并ID紧邻真实原文/原坐标不变、full_context补页建议可省而page_map仍必填、原任务服务完整核心与错绑定/主要未读限用；不派单字段小卡，不加预算/换模型/建平台。本卡正常受控最多2次/仅一次合并返修，B同窗自主P0—P3/Review/清理；真实/探针/binding0，旧结果/正式源/标记/并行保护。
 
 **2026-11-10审核§243（当前）：** 4d823d6e对齐正式指令/Schema与目录消费，不改完成门槛。B的_Gateway.complete替身只能证明provider边界，A本轮已用真实LlmClient/仅替外传输补齐4阶段消费、meter/wire同份及坏形态拒绝；7项直接测试通过，原选正文干计量未越单次上限。工程范围有限通过结束，复用§237三读，不再为模拟计数/更多边界返修。下一唯一业务交付是待新授权的一次真实公司核心及实测资源；尚不能加S1或判模型能力。B本轮范围和复用节奏合规；枚举整公司资源未知要由真实结果回答，不新增性能/预算算法卡。每轮清理、旧失败/正式源/并行保护；下文历史“当前”不授新权。
 

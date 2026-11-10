@@ -128,6 +128,16 @@ The current v8 policy MUST use key-section reading with targeted expansion for o
 - **THEN** the requested scope becomes necessary and is read before core completion, or its unresolved unread status prevents completion
 - **AND** navigation failure does not silently select the entire report as a full-text fallback
 
+#### Scenario: Source references are presented for model selection
+- **WHEN** a current processing identity asks the model to select provided source IDs
+- **THEN** the request presents each selectable ID adjacent to its exact source wording and necessary local context, without candidate answers or Gold and without requiring the model to count character offsets in separate unlabelled text
+- **AND** source offsets remain relative to the immutable parsed page, the actual wire presentation is included in admission metering, and a legal ID alone does not establish semantic support or condition coverage
+
+#### Scenario: A full-context source response omits optional continuation suggestions
+- **WHEN** an ordinary full_context discovery response contains its required semantic payload but omits requested_pages
+- **THEN** the local contract treats that omission only as no additional page suggestion from this response and continues validating the source conditions, without erasing any already selected necessary page, prior continuation or major unresolved condition
+- **AND** page_map still requires its selection payload, synthesis and verification still require claims and checks, and missing continuation metadata never establishes source completeness or not_disclosed
+
 #### Scenario: Accumulated source conditions exceed a single synthesis request
 - **WHEN** the actual company-wide source conditions and necessary evidence exceed either the physical payload-byte limit or the reservation limit
 - **THEN** the authoritative owner adjusts the isolated development reservation or groups cross-chapter business evidence to fit actual service capabilities, preserving necessary context and major content
