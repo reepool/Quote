@@ -2,9 +2,11 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-11-10。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[A审核§234](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#234-a审核本轮不是llm失败纠正支持与覆盖合同后完整复验)：§233原入口1/1未过、硬引用局部接受，受控核验合法模式/人工业务语境仍错，不归因LLM。仅[现卡§5合同纠正后一次完整复验](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-explicit-input-acceptance-card.md#5-234审核后的验收合同纠正与完整复验当前)，不换架构/模型；真实/探针/binding0，每轮先清后做/保必要证据后收尾。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[A审核§236](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#236-a审核角色正文被180字前缀截断合并交已有答案的公司收束)：§235原1/1未过，已核角色未收束；生产补问前180字截掉第207字的自主生产，只拿采购重复核角色。仅[现卡§6已有答案收束](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-explicit-input-acceptance-card.md#6-236审核后的已有答案收束当前任务卡)，不改预算/完成门槛或新路线；真实/探针/binding0，每轮先清后做/保必要证据后收尾。
 
 ## 1. 开发者必须先理解的纠偏
+
+**2026-11-10审核§236（当前）：** 支持/覆盖与真实投入关系输入修正局部接受，§235单次未交核心按卡结束。A一次隔离诊断复现13/99485：第9笔自主生产claim及原角色条件已pass，第10/11笔却只用采购核角色补问，之后第三次相同逻辑被拦。根因补问生成`passage[:180]`，实际角色从207字起，问题证据只剩采购；预算拦截正确。下一卡不加恢复/换ID/删角色问题，沿现卡§6合并保必要原文→真实相关已核对象→覆盖与终态、复用有效检查及停止无新证据重复；先实际生成/消费直测，再显式新增1次完整原入口，旧失败不改。B同窗自主P0—P3/Review/清理一次交完整业务，真实/探针/binding0；每轮先清后做/必要证据一套后finally收尾，正式/首次/并行保护。
 
 **2026-11-10审核§234（当前）：** §233的13次全为受控替换，无真实LLM，不能据此淘汰模型。目录/坐标硬错局部接受，但核验替身无source_conditions即把正确角色/采购claim判unclear，加入条件才pass；原链允许支持和覆盖分步，测试合同不符。采购摘要无投入对象、产业链短句源于展望，人工输入语义也未齐。A/B分别承担就绪审核和实现/自检责任，不再新开路线。只同卡§5纠正支持/覆盖及有据业务语境，先组件实际请求→消费，再显式新增1次最终原入口完整三视图/有效覆盖/三读；旧1/1不改，仍不成保首断点停止，不自动续卡。真实/探针/binding0，原成绩/生产不变；每轮先清后做、失败保最小证据后finally清本人库/重复物，正式/首次/并行保护。
 
