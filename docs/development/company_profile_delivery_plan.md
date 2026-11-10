@@ -2,9 +2,11 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-11-10。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[A审核§236](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#236-a审核角色正文被180字前缀截断合并交已有答案的公司收束)：§235原1/1未过，已核角色未收束；生产补问前180字截掉第207字的自主生产，只拿采购重复核角色。仅[现卡§6已有答案收束](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-explicit-input-acceptance-card.md#6-236审核后的已有答案收束当前任务卡)，不改预算/完成门槛或新路线；真实/探针/binding0，每轮先清后做/保必要证据后收尾。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[A审核§238](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#238-a审核受控核心闭环通过结束工程收口转真实交付裁决)：§237受控原入口完整三视图有限通过，工程收口结束，不再模拟/局部返修。下一步只按[一次常规真实交付观察候选卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-post-closure-observation-card.md)等待用户新授权；未批准前真实/探针/可发送binding0。S1仍0/12、S32执行2/12核心0；每轮先清后做/保必要证据后收尾。
 
 ## 1. 开发者必须先理解的纠偏
+
+**2026-11-10审核§238（当前）：** `3577831b`保整段经营语境并阻止无新候选的第三次核验，未放宽完成门槛；复用B同快照正常原入口三读true/实质正文断言，A新增直接短测通过，受控工程范围有限通过并结束。精确模拟计数缺失列限制，不补跑或造账；真实模型仍未验证，不能改S1或据此归因模型。下一唯一交付是待新授权的一次600103全新真实观察，批准后同卡窄接入/冻结/执行/清理，不另交准备轮；不启银行/十家、无后继/充值，不继续工程微卡。B本轮已从局部函数推进到受控公司交付，节奏有实质改善，真实交付尚不能宣称。以下历史条目的“当前”不构成现行授权。
 
 **2026-11-10审核§236（当前）：** 支持/覆盖与真实投入关系输入修正局部接受，§235单次未交核心按卡结束。A一次隔离诊断复现13/99485：第9笔自主生产claim及原角色条件已pass，第10/11笔却只用采购核角色补问，之后第三次相同逻辑被拦。根因补问生成`passage[:180]`，实际角色从207字起，问题证据只剩采购；预算拦截正确。下一卡不加恢复/换ID/删角色问题，沿现卡§6合并保必要原文→真实相关已核对象→覆盖与终态、复用有效检查及停止无新证据重复；先实际生成/消费直测，再显式新增1次完整原入口，旧失败不改。B同窗自主P0—P3/Review/清理一次交完整业务，真实/探针/binding0；每轮先清后做/必要证据一套后finally收尾，正式/首次/并行保护。
 
