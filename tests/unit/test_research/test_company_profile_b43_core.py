@@ -2320,6 +2320,82 @@ def test_claim_support_does_not_wait_for_a_source_condition():
     assert "推动上下游协同创新" not in chain["quotes"][0]
 
 
+def test_role_question_keeps_the_production_sentence_and_stops_a_repeat():
+    from types import SimpleNamespace
+
+    from research.company_profile.direct_reading import (
+        _operating_passage,
+        coverage_retry_exhausted,
+        make_operating_role_question,
+        operating_role_quotes,
+        recheck_claims_for,
+    )
+
+    page = next(item for item in _pages({11}))
+    passage = _operating_passage(page["text"])
+    assert len(passage) > 180
+    assert passage.find("自主生产") > 180
+    quotes = operating_role_quotes(passage)
+    assert quotes
+    assert "自主生产" in quotes[0]
+    assert "采购模式" in quotes[0]
+    report = ReportIdentity(
+        instrument_id="600103.SH",
+        report_id="annual-2025",
+        document_version=_DOCUMENT,
+        report_period="2025-12-31",
+        published_at="2026-04-13T16:00:00+00:00",
+    )
+    from research.company_profile.models import Evidence, TextAnchor
+
+    question = make_operating_role_question(
+        report,
+        (
+            Evidence(
+                evidence_id="operating-role-11-0",
+                report=report,
+                page=11,
+                section_title="经营方式",
+                anchor=TextAnchor(bounded_quote=quotes[0]),
+            ),
+        ),
+    )
+    assert "自主生产" in question.evidence[0].anchor.bounded_quote
+    procurement = SimpleNamespace(
+        claim_id="procurement",
+        status="observed",
+        answer="大宗原材料、燃料和设备主要采用公开招标或竞争性谈判，国内木竹片采购定价主要采取挂牌采购。",
+        condition_ids=(),
+        limitation=None,
+    )
+    role = SimpleNamespace(
+        claim_id="role",
+        status="observed",
+        answer="公司浆纸主业秉承自主生产的经营模式，具备制浆造纸生产线。",
+        condition_ids=(),
+        limitation=None,
+    )
+    plan = SimpleNamespace(
+        claim_id="plan",
+        status="observed",
+        answer="展望提出推动上下游协同创新，这不是已经实现的关系。",
+        condition_ids=(),
+        limitation=None,
+    )
+    nominated = recheck_claims_for(question, [procurement, role, plan])
+    assert any(item.claim_id == "role" for item in nominated)
+    assert coverage_retry_exhausted(
+        "先前覆盖对象claim:procurement不是本次交付主张或记录。",
+        ["procurement"],
+        ["procurement"],
+    )
+    assert coverage_retry_exhausted(
+        "先前覆盖对象claim:procurement不是本次交付主张或记录。",
+        ["procurement", "role"],
+        ["procurement"],
+    ) is False
+
+
 def test_reviewed_input_delivers_the_company_core():
     """The one section-5 entry. A correct reviewed response must come back complete."""
     result_path = Path("/home/python/Quote/data/QuoteBak/explicit-input-result.json")

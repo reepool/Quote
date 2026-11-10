@@ -218,6 +218,19 @@ def _operating_passage(text: str) -> str:
     return passage
 
 
+def operating_role_quotes(passage: str) -> tuple[str, ...]:
+    """The operating section a role question may cite.
+
+    The locator already stops at the industry chapter. A fixed prefix of that
+    section keeps only the opening procurement lines and drops the production
+    and sales lines the question asks about.
+    """
+    text = str(passage or "").strip()
+    if len(text) < 40:
+        return ()
+    return (text,)
+
+
 def _read_page_text(sources, page_no: int) -> str:
     """Body text lives on the parsed page. Coverage status has no text."""
     for item in sources:
@@ -518,6 +531,15 @@ def claims_covering_condition(condition, candidates) -> list:
         if any(_condition_id_names(item, cid, tail_unique=tail_unique) for item in ids):
             matched.append(claim)
     return matched
+
+
+def coverage_retry_exhausted(description: str, referenced_ids, shown_ids) -> bool:
+    """The hinted retry already saw these candidates. Do not send them again."""
+    if "先前覆盖对象" not in str(description or ""):
+        return False
+    referenced = {str(item) for item in referenced_ids}
+    shown = {str(item) for item in shown_ids}
+    return bool(referenced) and referenced <= shown
 
 
 def recheck_claims_for(condition, candidates) -> list:
@@ -5419,9 +5441,17 @@ def interpret_direct_core(
             if latest is None or latest.status not in {"unclear", "block"}:
                 continue
             referenced = trusted_for(condition)
-            if any(
-                claim.claim_id not in shown_claim_ids(condition) for claim in referenced
+            shown = shown_claim_ids(condition)
+            if coverage_retry_exhausted(
+                condition.description,
+                [claim.claim_id for claim in referenced],
+                shown,
             ):
+                gap = f"major_condition_not_verified:{condition.condition_id}"
+                if gap not in gaps:
+                    gaps.append(gap)
+                continue
+            if any(claim.claim_id not in shown for claim in referenced):
                 continue
             more.append(gap_copy(condition, referenced))
         if more:
@@ -5567,14 +5597,18 @@ def interpret_direct_core(
                     passage = _operating_passage(text)
                     if not passage:
                         continue
-                    role_evidence.append(
+                    quotes = operating_role_quotes(passage)
+                    if not quotes:
+                        continue
+                    role_evidence.extend(
                         Evidence(
-                            evidence_id=f"operating-role-{page_no}",
+                            evidence_id=f"operating-role-{page_no}-{index}",
                             report=report,
                             page=page_no,
                             section_title="经营方式",
-                            anchor=TextAnchor(bounded_quote=passage[:180]),
+                            anchor=TextAnchor(bounded_quote=quote),
                         )
+                        for index, quote in enumerate(quotes)
                     )
                     break
                 if role_evidence and not any(
