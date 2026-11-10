@@ -565,7 +565,10 @@ def source_anchor_catalog(pages, document_version: str) -> list[dict[str, int | 
         page_no = int(page.get("page") or 0)
         if page_no < 1 or not version:
             continue
-        for start, end in _anchor_spans(text):
+        base = int(page.get("offset") or 0)
+        for local_start, local_end in _anchor_spans(text):
+            start = base + local_start
+            end = base + local_end
             catalog.append(
                 {
                     "id": source_anchor_id(version, page_no, start, end),
@@ -598,12 +601,15 @@ def restore_source_anchor(anchor_id: str, report, pages) -> dict | None:
     if fragment is None:
         return None
     text = str(fragment.get("text") or "")
-    if start < 0 or end > len(text):
+    base = int(fragment.get("offset") or 0)
+    local_start = start - base
+    local_end = end - base
+    if local_start < 0 or local_end > len(text) or local_end <= local_start:
         return None
-    quote = text[start:end]
+    quote = text[local_start:local_end]
     if not quote.strip():
         return None
-    heading, _paragraph = _heading_and_paragraph(text, start, end)
+    heading, _paragraph = _heading_and_paragraph(text, local_start, local_end)
     from .models import Evidence, TextAnchor
 
     return Evidence(
@@ -859,7 +865,10 @@ def _bind_source_evidence(
         for page in (*evidence.continuation_pages, *evidence.subject_evidence_pages)
     ):
         return None
-    if evidence.anchor.source_offset is not None:
+    if (
+        parse_source_anchor_id(evidence.evidence_id) is not None
+        and evidence.anchor.source_offset is not None
+    ):
         page_no = int(evidence.page)
         fragment = next(
             (
@@ -871,15 +880,17 @@ def _bind_source_evidence(
         )
         quote = str(evidence.anchor.bounded_quote or "")
         text = str((fragment or {}).get("text") or "")
+        base = int((fragment or {}).get("offset") or 0)
         offset = int(evidence.anchor.source_offset)
+        local = offset - base
         if (
             fragment is None
-            or offset < 0
-            or offset + len(quote) > len(text)
-            or text[offset : offset + len(quote)] != quote
+            or local < 0
+            or local + len(quote) > len(text)
+            or text[local : local + len(quote)] != quote
         ):
             return None
-        heading, paragraph = _heading_and_paragraph(text, offset, offset + len(quote))
+        heading, paragraph = _heading_and_paragraph(text, local, local + len(quote))
         if not heading or _is_page_header(heading, pages):
             earlier = governing_subject_heading(pages, page_no, before_offset=offset)
             if earlier:

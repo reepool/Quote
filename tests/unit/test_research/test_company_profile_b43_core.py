@@ -729,7 +729,10 @@ def _run(
     replay_observation=False,
     routine_contract=False,
     anchor_contract=False,
+    reviewed_input=False,
 ):
+    if reviewed_input:
+        anchor_contract = True
     if anchor_contract:
         routine_contract = True
     binding = json.loads((CHANGE / "s1-pool-s1-600103-s16-binding.json").read_text())
@@ -799,7 +802,15 @@ def _run(
             }
         )
         body = None
-        if anchor_contract and request.get("purpose") == "source_inventory" and request.get("source_scope") == "page_map":
+        if reviewed_input and request.get("purpose") == "source_inventory" and request.get("source_scope") == "page_map":
+            body = _anchor_page_map(request)
+        elif reviewed_input and request.get("purpose") == "source_inventory" and request.get("source_scope") != "evidence_repair":
+            body = _reviewed_source_body(request)
+        elif reviewed_input and request.get("purpose") == "synthesize_views":
+            body = _reviewed_draft(request)
+        elif reviewed_input and request.get("purpose") == "verify_views":
+            body = _reviewed_verify(request)
+        elif anchor_contract and request.get("purpose") == "source_inventory" and request.get("source_scope") == "page_map":
             body = _anchor_page_map(request)
         elif anchor_contract and request.get("purpose") == "source_inventory" and request.get("source_scope") != "evidence_repair":
             body = _anchor_source_body(request, plant_other=plant_unresolved)
@@ -1821,4 +1832,364 @@ def test_anchor_contract_stops_before_principal_and_role():
     snapshot = calls.budget_snapshot
     assert snapshot["physical_requests"] <= 16, snapshot["physical_requests"]
     assert snapshot["charged_tokens"] <= 120_000, snapshot["charged_tokens"]
+
+
+# Hand-checked against the formal 600103.SH 2025 annual report. One passage may
+# support more than one dimension. This table is test input, not a production rule.
+_REVIEWED = (
+    {
+        "condition_id": "reviewed-principal",
+        "dimension": "principal_business",
+        "quotes": (
+            "公司主要从事竹木浆、溶解浆、纸袋纸、纸制品、光电子产品、医药产品、林木产品等产品\r\n"
+            "产销及贸易经营。主要产品为“青山牌”系列伸性纸袋纸、环保纸袋纸、精制牛皮纸、溶解浆、\r\n"
+            "竹木浆、风油精、光器件、光模块等产品，产品行销全国各地和国际市场",
+        ),
+        "answer": "公司主要从事竹木浆、溶解浆、纸袋纸、纸制品、光电子产品、医药产品和林木产品的产销及贸易经营。",
+    },
+    {
+        "condition_id": "reviewed-products",
+        "dimension": "products_services",
+        "quotes": (
+            "公司主要从事竹木浆、溶解浆、纸袋纸、纸制品、光电子产品、医药产品、林木产品等产品\r\n"
+            "产销及贸易经营。主要产品为“青山牌”系列伸性纸袋纸、环保纸袋纸、精制牛皮纸、溶解浆、\r\n"
+            "竹木浆、风油精、光器件、光模块等产品，产品行销全国各地和国际市场",
+        ),
+        "answer": "主要产品包括“青山牌”系列伸性纸袋纸、环保纸袋纸、精制牛皮纸、溶解浆、竹木浆、风油精、光器件和光模块。",
+    },
+    {
+        "condition_id": "reviewed-output",
+        "dimension": "output_exposure",
+        "quotes": (
+            "公司主要从事竹木浆、溶解浆、纸袋纸、纸制品、光电子产品、医药产品、林木产品等产品\r\n"
+            "产销及贸易经营。主要产品为“青山牌”系列伸性纸袋纸、环保纸袋纸、精制牛皮纸、溶解浆、\r\n"
+            "竹木浆、风油精、光器件、光模块等产品，产品行销全国各地和国际市场",
+        ),
+        "answer": "产品行销全国各地和国际市场。",
+    },
+    {
+        "condition_id": "reviewed-role",
+        "dimension": "supply_chain_role",
+        "quotes": (
+            "公司浆纸主业一直秉承自主生产的经营模式，具备制浆造纸生产线及配套的碱回收、热电、\r\n"
+            "污水处理系统。",
+        ),
+        "answer": "公司浆纸主业秉承自主生产的经营模式，具备制浆造纸生产线。",
+    },
+    {
+        "condition_id": "reviewed-input",
+        "dimension": "input_exposure",
+        "quotes": ("物资采购是公司生产经营的重要环节，公司坚持“充分竞争、质优价宜”原则",),
+        "answer": "物资采购是公司生产经营的重要环节。",
+    },
+    {
+        "condition_id": "reviewed-sales",
+        "dimension": "revenue_model",
+        "quotes": ("公司销售采取“产品直销，以销定产”的销售模式。",),
+        "answer": "公司销售采取产品直销、以销定产的销售模式。",
+    },
+    {
+        "condition_id": "reviewed-period",
+        "dimension": "revenue_model",
+        "quotes": ("单位：元 币种：人民币", "营业收入 2,418,990,221.17"),
+        "answer": "营业收入2,418,990,221.17元，单位为人民币元。",
+    },
+    {
+        "condition_id": "reviewed-industry",
+        "dimension": "revenue_model",
+        "quotes": (
+            "主营业务分行业情况",
+            "医药行业 303,680,631.79",
+            "光电子行业 206,025,784.54",
+        ),
+        "answer": "主营业务分行业情况按人民币元列示，其中包括医药行业和光电子行业。",
+    },
+    {
+        "condition_id": "reviewed-chain",
+        "dimension": "upstream_downstream",
+        "quotes": ("推动上下游协同创新",),
+        "answer": "公司推动上下游协同创新。",
+    },
+)
+_REVIEWED_BY_ID = {item["condition_id"]: item for item in _REVIEWED}
+
+
+def _reviewed_quotes_are_on_the_formal_pages() -> None:
+    pages = {page["page"]: page["text"] for page in _pages({9, 11, 13, 16})}
+    blob = "\n".join(pages.values())
+    for item in _REVIEWED:
+        for quote in item["quotes"]:
+            assert quote in blob, quote
+
+
+def _ids_for_quote(request, quote: str) -> list[str]:
+    hits = []
+    for anchor in request.get("source_anchors") or []:
+        text = _anchor_slice(anchor, request)
+        if quote in text:
+            hits.append((len(text), str(anchor["id"])))
+    if not hits:
+        return []
+    return [min(hits)[1]]
+
+
+def _condition_blob(condition, request) -> str:
+    return "\n".join(
+        text
+        for text in (_evidence_text(item, request) for item in _wire_evidence_items(condition))
+        if text
+    )
+
+
+def _reviewed_for_condition(condition, request):
+    direct = _REVIEWED_BY_ID.get(str(condition.get("condition_id") or ""))
+    if direct is not None:
+        return direct
+    blob = _condition_blob(condition, request)
+    matches = [
+        item
+        for item in _REVIEWED
+        if item["dimension"] == condition.get("dimension")
+        and all(quote in blob for quote in item["quotes"])
+    ]
+    if len(matches) == 1:
+        return matches[0]
+    return None
+
+
+def _reviewed_source_body(request):
+    conditions = []
+    for item in _REVIEWED:
+        ids: list[str] = []
+        missing = False
+        for quote in item["quotes"]:
+            found = _ids_for_quote(request, quote)
+            if not found:
+                missing = True
+                break
+            if found[0] not in ids:
+                ids.append(found[0])
+        if missing:
+            continue
+        conditions.append(
+            {
+                "condition_id": item["condition_id"],
+                "dimension": item["dimension"],
+                "description": item["answer"],
+                "major": True,
+                "statement_status": "current",
+                "evidence": ids,
+            }
+        )
+    return {
+        "schema_version": "company_profile_report_response.v3",
+        "request_id": request["request_id"],
+        "purpose": request["purpose"],
+        "requested_pages": [],
+        "source_conditions": conditions,
+    }
+
+
+def _reviewed_draft(request):
+    claims = []
+    for condition in request.get("source_conditions") or []:
+        item = _reviewed_for_condition(condition, request)
+        if item is None:
+            continue
+        refs = []
+        for raw in _wire_evidence_items(condition):
+            if isinstance(raw, str):
+                refs.append(raw)
+            elif isinstance(raw, dict) and raw.get("evidence_id"):
+                refs.append(raw["evidence_id"])
+        if not refs:
+            continue
+        claims.append(
+            {
+                "claim_id": "draft-" + str(condition.get("condition_id")).replace(":", "-"),
+                "dimension": item["dimension"],
+                "status": "observed",
+                "answer": item["answer"],
+                "condition_ids": [condition.get("condition_id")],
+                "supporting_record_ids": [],
+                "evidence": refs,
+            }
+        )
+    return {
+        "schema_version": "company_profile_report_response.v3",
+        "request_id": request["request_id"],
+        "purpose": request["purpose"],
+        "claims": claims,
+    }
+
+
+def _reviewed_verify(request):
+    checks = []
+    for claim in request.get("claims") or []:
+        condition = next(
+            (
+                item
+                for item in request.get("source_conditions") or []
+                if item.get("condition_id") in (claim.get("condition_ids") or [])
+            ),
+            None,
+        )
+        item = _reviewed_for_condition(condition, request) if condition else None
+        blob = _condition_blob(claim, request)
+        accepted = (
+            item is not None
+            and claim.get("answer") == item["answer"]
+            and all(quote in blob for quote in item["quotes"])
+        )
+        checks.append(
+            {
+                "target_type": "claim",
+                "target_id": claim.get("claim_id"),
+                "status": "pass" if accepted else "unclear",
+                "explanation": "受控核验：该主张和引用已对照正式年报逐项核对。",
+                "covers_target_type": "claim",
+                "covers_target_id": claim.get("claim_id"),
+            }
+        )
+        if not accepted or condition is None:
+            continue
+        checks.append(
+            {
+                "target_type": "condition",
+                "target_id": condition.get("condition_id"),
+                "status": "pass",
+                "explanation": "受控核验：条件引用的是已核对的同一段原文。",
+                "covers_target_type": "claim",
+                "covers_target_id": claim.get("claim_id"),
+            }
+        )
+    return {
+        "schema_version": "company_profile_report_response.v3",
+        "request_id": request["request_id"],
+        "purpose": request["purpose"],
+        "checks": checks,
+    }
+
+
+def test_reviewed_passage_keeps_principal_and_products_together():
+    _reviewed_quotes_are_on_the_formal_pages()
+    pages = list(_pages({9}))
+    from research.company_profile.report_interpretation import source_anchor_catalog
+
+    anchors = source_anchor_catalog(pages, _DOCUMENT)
+    request = {
+        "request_id": "component",
+        "purpose": "source_inventory",
+        "source_pages": pages,
+        "source_anchors": anchors,
+    }
+    body = _reviewed_source_body(request)
+    by_id = {item["condition_id"]: item for item in body["source_conditions"]}
+    assert "reviewed-principal" in by_id
+    assert "reviewed-products" in by_id
+    assert by_id["reviewed-principal"]["evidence"] == by_id["reviewed-products"]["evidence"]
+    assert by_id["reviewed-principal"]["evidence"]
+
+
+def test_unlisted_anchor_id_is_rejected_and_fragment_offset_rebinds():
+    import pytest
+
+    from research.company_profile.contracts import ReportSemanticRequestV3
+    from research.company_profile.report_interpretation import (
+        restore_source_anchor,
+        source_anchor_catalog,
+        source_anchor_id,
+    )
+    from research.company_profile.report_wire import expand_response
+
+    full = next(page for page in _pages({16}))
+    fragment = {
+        "page": 16,
+        "offset": 13,
+        "text": full["text"][13:93],
+        "readable": True,
+    }
+    catalog = source_anchor_catalog([fragment], _DOCUMENT)
+    assert catalog
+    assert min(item["start"] for item in catalog) >= 13
+    report = ReportIdentity(
+        instrument_id="600103.SH",
+        report_id="annual-2025",
+        document_version=_DOCUMENT,
+        report_period="2025-12-31",
+        published_at="2026-04-13T16:00:00+00:00",
+    )
+    restored = restore_source_anchor(catalog[0]["id"], report, [fragment])
+    quote = restored["anchor"]["bounded_quote"]
+    offset = restored["anchor"]["source_offset"]
+    assert offset == catalog[0]["start"]
+    assert full["text"][offset : offset + len(quote)] == quote
+    request = ReportSemanticRequestV3(
+        request_id="anchor-component",
+        purpose="source_inventory",
+        report=report,
+        processing_identity={"source_reference": "anchor_v1"},
+        source_pages=({"page": 16, "offset": 0, "text": full["text"], "readable": True},),
+        max_output_tokens=200,
+        timeout_seconds=30,
+    )
+    listed = source_anchor_catalog(request.source_pages, _DOCUMENT)
+    forged = source_anchor_id(_DOCUMENT, 16, 1, 2)
+    assert forged not in {item["id"] for item in listed}
+    with pytest.raises(ValueError, match="unknown source anchor"):
+        expand_response(
+            {
+                "source_conditions": [
+                    {
+                        "condition_id": "forged",
+                        "dimension": "principal_business",
+                        "description": "目录外范围",
+                        "major": True,
+                        "statement_status": "current",
+                        "evidence": [forged],
+                    }
+                ]
+            },
+            request,
+        )
+
+
+def test_reviewed_input_entry_stops_with_role_and_input_unverified():
+    """The one allowed entry. Persisted text is not a completed three-view core."""
+    result_path = Path("/home/python/Quote/data/QuoteBak/explicit-input-result.json")
+    _ran, queried, exported, reloaded, calls = _run(
+        _fixed_core_objects(),
+        pages=_pages(_OBSERVATION_PAGES),
+        reviewed_input=True,
+    )
+    views = _views(queried)
+    snapshot = calls.budget_snapshot
+    result_path.write_text(
+        __import__("json").dumps(
+            {
+                "physical": snapshot.get("physical_requests"),
+                "charged": snapshot.get("charged_tokens"),
+                "stopped": snapshot.get("stopped_reason"),
+                "draft_complete": views.get("draft_complete"),
+                "gaps": views.get("gaps"),
+                "answers": _answers(views),
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    assert queried["profiles"] == exported["profiles"] == reloaded["profiles"]
+    assert views["real_semantic_complete"] is False
+    assert views["draft_complete"] is False
+    gaps = list(views.get("gaps") or [])
+    assert "view_not_substantive:product_exposure" in gaps
+    assert "view_not_substantive:supply_chain_position" in gaps
+    assert "core_dimension_missing:operating_role" in gaps
+    assert any(gap.endswith("reviewed-input") and gap.startswith("major_condition_not_verified:") for gap in gaps)
+    assert "major_condition_not_verified:core-question:operating-role" in gaps
+    text = "\n".join(_answers(views))
+    assert "主要从事" in text and "伸性纸袋纸" in text and "2,418,990,221.17" in text
+    assert snapshot["physical_requests"] <= 16
+    assert snapshot["charged_tokens"] <= 120_000
+    result_path.unlink(missing_ok=True)
 

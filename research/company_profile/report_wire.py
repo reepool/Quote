@@ -285,8 +285,20 @@ def expand_response(data: dict, request: ReportSemanticRequestV3) -> dict:
                 return catalog[value]
             identity = getattr(request, "processing_identity", None) or {}
             if isinstance(identity, dict) and identity.get("source_reference") == "anchor_v1":
-                from .report_interpretation import restore_source_anchor
+                from .report_interpretation import (
+                    restore_source_anchor,
+                    source_anchor_catalog,
+                )
 
+                allowed = {
+                    item["id"]
+                    for item in source_anchor_catalog(
+                        request.source_pages,
+                        request.report.document_version,
+                    )
+                }
+                if value not in allowed:
+                    raise ValueError("unknown source anchor")
                 restored = restore_source_anchor(
                     value, request.report, request.source_pages
                 )
