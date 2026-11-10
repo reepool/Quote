@@ -2,7 +2,10 @@
 
 import pytest
 
-from research.company_profile.bounded_entry import assert_post_closure_observation
+from research.company_profile.bounded_entry import (
+    assert_anchor_aligned_observation,
+    assert_post_closure_observation,
+)
 
 
 def _binding() -> dict:
@@ -34,3 +37,15 @@ def test_post_closure_observation_accepts_only_the_fresh_anchor_entry():
     other["asset"] = {"instrument_id": "600000.SH"}
     with pytest.raises(ValueError, match="only 600103"):
         assert_post_closure_observation(other, 900)
+
+
+def test_anchor_aligned_observation_is_a_separate_fresh_entry():
+    assert assert_anchor_aligned_observation(_binding(), 900) is True
+    saved = _binding()
+    saved["accepted_draft_query"] = "old-draft.json"
+    with pytest.raises(ValueError, match="refuses saved semantics"):
+        assert_anchor_aligned_observation(saved, 900)
+    bank = _binding()
+    bank["task_route_labels"] = ["deepseek:deepseek-flash", "scorpio:grok-4.7"]
+    with pytest.raises(ValueError, match="reviewed deepseek anchor entry"):
+        assert_anchor_aligned_observation(bank, 900)
