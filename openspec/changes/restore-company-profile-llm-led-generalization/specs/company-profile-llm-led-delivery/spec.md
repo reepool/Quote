@@ -260,6 +260,14 @@ Under the explicitly enabled current semantic policy, the authoritative owner MU
 - **WHEN** two supplied source ranges contain identical total text under different governing table headings
 - **THEN** their source references retain distinct physical ranges, and verification still checks the selected heading, subject, period and delivered answer rather than accepting an amount match
 
+#### Scenario: A generated reference was not actually supplied
+- **WHEN** a response returns a validly formatted same-version range that is absent from the current request's provided source-reference and input-evidence catalogs
+- **THEN** the owner rejects that reference rather than accepting any arbitrary substring of a sent page
+
+#### Scenario: A source page is sliced or compacted before another stage
+- **WHEN** later requests carry a fragment or compacted context from a previously sent page
+- **THEN** the source reference and restored Evidence preserve the original page coordinates through an explicit range mapping, and no fragment-relative zero or rewritten text is silently treated as an original page location
+
 #### Scenario: Source inventory is unavailable after real candidates were saved
 - **WHEN** a source-led inventory call fails but located candidates and their full semantic context remain available
 - **THEN** bounded independent support verification can execute without waiting for an entire source-condition list, and successful units are published before the next unit

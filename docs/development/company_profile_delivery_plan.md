@@ -1,10 +1,12 @@
 # 公司画像交付路径与开发任务卡
 
-> 类型：requirements / execution plan；版本：3；更新：2026-11-09。
+> 类型：requirements / execution plan；版本：3；更新：2026-11-10。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[A审核§230](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#230-a审核纠证结案接受规划责任与原文锚点交付重整)：§229纠证结案接受，旧业务结束；唯一[原文锚点三视图新切片](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-source-reference-delivery-card.md)零外呼工程生效，复用Evidence/offset/引用目录直接交公司核心，不再逐页/引文修补。每轮先清后做/收尾，旧成绩/失败/生产不变。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[A审核§232](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#232-a审核停止错误模型替身试跑合并交正确输入的完整业务验收)：§231两次未过结束，不归因模型；仅[正确业务输入的一次独立接入验收](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-explicit-input-acceptance-card.md)，合并修ID集合/原页坐标，用人工核源响应替代关键词语义替身，直接交完整三视图。真实/探针/binding0，每轮先清后做/收尾，旧成绩/失败/生产不变。
 
 ## 1. 开发者必须先理解的纠偏
+
+**2026-11-10审核§232（当前）：** §231两次受控整链未交核心，旧正常2/2结束；自动关键词替身将含主营和产品的p9段互斥归产品，不能当模型两次失败。A直接复现未列目录的任意同页范围仍被接受、带offset片段从0造锚点致原页回绑失败。下一合同不扩锚点/分类器/平台，合并修来源硬错，用人工核过原文的完整有限响应检验程序能否接住正确答案；组件直测后仅1次正常原入口，交三视图/有效对象覆盖/三读或具体首断点，不把负例false或目录当完成。B同窗自主P0—P3/Review/清理，不逐函数等A；真实/探针/binding0，旧失败/次数/分数不改。每轮先清后做/失败保最小证据再finally收尾，正式/首次/并行保护。以下为历史依据。
 
 **2026-11-09审核§230（当前）：** §229保原失败证据、空修复后false符合安全收尾，接受结束，不再当新业务失败。A承担长期碎片发卡/就绪误判的主要责任，B承担具体实现/失真自检责任；最近零外呼卡本不增加S1，不以活动替交付。新卡显式改变当前证据选择协议：本次发送原文给确定锚点、模型选择、程序还原，语义/覆盖仍须核；复用Evidence/offset/compact目录及原TaskService/网关/单writer，不建平台或修c3特例。同窗交完整三视图及正确限用，正常入口最多2次/一次合并返修，不另交准备卡。真实/探针/binding/银行十家/生产0，旧2/2不恢复，工程不作模型/吞吐分数；每轮先清后做/finally/收尾、正式/首次/并行保护。以下为历史依据。
 
