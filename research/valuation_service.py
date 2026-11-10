@@ -1380,7 +1380,7 @@ class ResearchValuationService:
             "status": status,
             "missing_reason": missing_reason,
             "calc_method": "relative_valuation_builtin",
-            "calc_version": "relative_valuation.v1",
+            "calc_version": "relative_valuation.v2",
             "parameter_hash": self._build_parameter_hash(relative_config),
             "benchmark_taxonomy_system": industry_membership.get("taxonomy_system"),
             "benchmark_taxonomy_version": industry_membership.get("taxonomy_version"),
@@ -1451,7 +1451,7 @@ class ResearchValuationService:
             "status": "benchmark_unavailable",
             "missing_reason": missing_reason,
             "calc_method": "relative_valuation_builtin",
-            "calc_version": "relative_valuation.v1",
+            "calc_version": "relative_valuation.v2",
             "parameter_hash": self._build_parameter_hash(self.parameters["relative"]),
             "benchmark_taxonomy_system": (
                 None
@@ -1547,61 +1547,108 @@ class ResearchValuationService:
         peer_rows: List[Dict[str, Any]],
         field_name: str,
     ) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
+        """Use one valid positive population for every comparable-multiple statistic."""
         values: List[float] = []
+        raw_values: List[float] = []
         exclusions: List[Dict[str, Any]] = []
+        family = (
+            "pe"
+            if field_name.startswith("pe_")
+            else "pb"
+            if field_name.startswith("pb_")
+            else "ps"
+        )
+        maximum = self.parameters["relative"].get(f"max_{family}")
+
+        def comparable_value(row: Dict[str, Any]) -> Tuple[Optional[float], str]:
+            if field_name not in VALUATION_PERCENTILE_FIELDS:
+                return None, "unsupported_metric"
+            value, reason = self._metric_value_from_row(row, field_name)
+            # Legacy compact rows have no denominator evidence. Only inspect
+            # the existing details when they are actually supplied by storage.
+            details = (row.get("details") or {}).get("metrics") or {}
+            metric_name = {
+                "pe_ratio": "pe_ttm",
+                "pb_ratio": "pb_mrq",
+                "ps_ratio": "ps_ttm",
+            }.get(field_name, field_name)
+            evidence = details.get(metric_name) or {}
+            if field_name in {"pe_ratio", "ps_ratio"} and row.get(metric_name) is None:
+                evidence = (
+                    details.get(metric_name.replace("_ttm", "_static")) or evidence
+                )
+            denominator = evidence.get("denominator")
+            if denominator is not None:
+                try:
+                    denominator = float(denominator)
+                except (TypeError, ValueError):
+                    return None, "invalid_denominator"
+                if not math.isfinite(denominator) or denominator <= 0:
+                    return None, "invalid_denominator"
+            if evidence.get("status") == "unavailable":
+                return None, evidence.get("missing_reason") or "unsupported_metric"
+            if value is not None and (not math.isfinite(value) or value <= 0):
+                return None, "non_positive_or_non_finite"
+            return value, reason
+
         for row in peer_rows:
-            value, missing_reason = self._metric_value_from_row(row, field_name)
+            value, reason = comparable_value(row)
+            raw = row.get(field_name)
+            if raw is None:
+                raw = row.get(
+                    {
+                        "pe_ttm": "pe_ratio",
+                        "pb_mrq": "pb_ratio",
+                        "ps_ttm": "ps_ratio",
+                    }.get(field_name, field_name)
+                )
+            try:
+                numeric = float(raw)
+                if math.isfinite(numeric):
+                    raw_values.append(numeric)
+            except (TypeError, ValueError):
+                pass
+            if value is not None and maximum is not None and value > maximum:
+                value, reason = None, "above_maximum"
             if value is None:
                 exclusions.append(
                     {
                         "instrument_id": row.get("instrument_id"),
                         "symbol": row.get("symbol"),
-                        "reason": missing_reason,
+                        "reason": reason,
                     }
                 )
-                continue
-            values.append(value)
-
-        subject_numeric, _ = self._metric_value_from_row(subject_row, field_name)
-        if not values:
-            return (
-                {
-                    "subject_value": subject_numeric,
-                    "peer_mean": None,
-                    "peer_median": None,
-                    "peer_min": None,
-                    "peer_max": None,
-                    "peer_p25": None,
-                    "peer_p75": None,
-                    "valid_peer_count": 0,
-                    "excluded_peer_count": len(exclusions),
-                    "percentile_rank": None,
-                    "premium_to_median": None,
-                },
-                exclusions,
-            )
-
-        benchmark_median = median(values)
-        premium_to_median = None
-        if subject_numeric is not None and benchmark_median not in (None, 0):
-            premium_to_median = subject_numeric / benchmark_median - 1
-
-        return (
-            {
-                "subject_value": subject_numeric,
-                "peer_mean": fmean(values),
-                "peer_median": benchmark_median,
-                "peer_min": min(values),
-                "peer_max": max(values),
-                "peer_p25": self._quantile(values, 0.25),
-                "peer_p75": self._quantile(values, 0.75),
-                "valid_peer_count": len(values),
-                "excluded_peer_count": len(exclusions),
-                "percentile_rank": self._percentile_rank(subject_numeric, values),
-                "premium_to_median": premium_to_median,
+            else:
+                values.append(value)
+        subject, reason = comparable_value(subject_row)
+        if subject is not None and maximum is not None and subject > maximum:
+            subject, reason = None, "above_maximum"
+        center = median(values) if values else None
+        result = {
+            "subject_value": subject,
+            "peer_mean": fmean(values) if values else None,
+            "peer_median": center,
+            "peer_min": min(values) if values else None,
+            "peer_max": max(values) if values else None,
+            "peer_p25": self._quantile(values, 0.25),
+            "peer_p75": self._quantile(values, 0.75),
+            "valid_peer_count": len(values),
+            "excluded_peer_count": len(exclusions),
+            "peer_raw_mean": fmean(raw_values) if raw_values else None,
+            "raw_peer_count": len(raw_values),
+            "percentile_rank": self._percentile_rank(subject, values),
+            "premium_to_median": subject / center - 1
+            if subject is not None and center
+            else None,
+            "subject_missing_reason": reason if subject is None else None,
+            "policy": {
+                "positive_finite_only": True,
+                "maximum": maximum,
+                "primary_statistic": "peer_median",
+                "denominator_check": "when_metadata_available",
             },
-            exclusions,
-        )
+        }
+        return result, exclusions
 
     @staticmethod
     def _relative_metric_fields(relative_config: Dict[str, Any]) -> List[str]:

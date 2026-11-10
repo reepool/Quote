@@ -6,7 +6,7 @@ Pydantic models for request/response validation with comprehensive features.
 from enum import Enum
 from typing import Optional, List, Dict, Any, Union, Literal
 from datetime import datetime, date
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from database.models import Instrument, DailyQuote, TradingCalendar
 
 
@@ -160,14 +160,36 @@ class DailyQuoteResponse(BaseModel):
     close: float = Field(..., description="收盘价", ge=0)
 
     # 成交量和金额
-    volume: int = Field(..., description="成交量", ge=0)
+    volume: int = Field(..., description="真实成交股数；兼容别名，请改用volume_raw", ge=0, deprecated=True)
+    volume_raw: Optional[int] = Field(None, description="真实成交股数，与复权无关")
+    volume_adj: Optional[int] = Field(None, description="按价格复权乘数反向调整的股数")
+    currency: Optional[str] = Field(None, description="实际交易币种")
     amount: float = Field(..., description="成交额", ge=0)
     turnover: Optional[float] = Field(None, description="换手率", ge=0)
 
     # 价格变动
     pre_close: Optional[float] = Field(None, description="前收盘价")
     change: Optional[float] = Field(None, description="涨跌额")
-    pct_change: Optional[float] = Field(None, description="涨跌幅")
+    pct_change: Optional[float] = Field(None, description="百分数；请用pct_change_pct或pct_change_ratio", deprecated=True)
+    pct_change_pct: Optional[float] = Field(None, description="涨跌幅，百分数")
+    pct_change_ratio: Optional[float] = Field(None, description="涨跌幅，小数比例")
+    raw_pre_close: Optional[float] = Field(None, description="原始参考前收价")
+    raw_change: Optional[float] = Field(None, description="原始涨跌额")
+    price_basis: Optional[str] = Field(None, description="实际价格基准：qfq/hfq/none")
+    volume_basis: Optional[str] = Field(None, description="volume的基准：raw")
+    return_basis: Optional[str] = Field(None, description="source_reference")
+    units: Dict[str, Optional[str]] = Field(default_factory=dict, description="字段路径到实际单位")
+    missing_fields: List[str] = Field(default_factory=list)
+    missing_reason: Dict[str, str] = Field(default_factory=dict)
+    quote_type: Optional[str] = Field(None, description="eod表示最新日线，非实时")
+    is_intraday: Optional[bool] = Field(None)
+    as_of: Optional[datetime] = Field(None, description="带时区的日线日期标签")
+    computed_at: Optional[datetime] = Field(None, description="响应装配时刻")
+    created_at: Optional[datetime] = Field(None, description="库内记录创建时刻，不是tick时间")
+    updated_at: Optional[datetime] = Field(None)
+    staleness_trading_days: Optional[int] = Field(None)
+    staleness_reason: Optional[str] = Field(None)
+    batch_id_kind: Optional[str] = Field(None, description="已知来源身份或unknown")
 
     # 交易状态
     tradestatus: int = Field(1, description="交易状态 1=正常 0=停牌")
@@ -210,6 +232,7 @@ class DailyQuotesEnvelopeResponse(BaseModel):
     name: Optional[str] = Field(None, description="品种名称")
     exchange: Optional[str] = Field(None, description="交易所")
     data: List[DailyQuoteResponse] = Field(default_factory=list, description="日线行情行")
+    units: Dict[str, Optional[str]] = Field(default_factory=dict, description="data行字段单位")
     total_records: int = Field(0, description="本次响应返回的记录数")
     start_date: Optional[str] = Field(None, description="查询开始日期 (含)")
     end_date: Optional[str] = Field(None, description="查询结束日期 (含)")
@@ -1114,6 +1137,8 @@ class ResearchFinancialStatementsResponse(BaseModel):
     fiscal_quarter: Optional[int] = Field(None, description="财季")
     currency: str = Field(..., description="货币")
     schema_version: str = Field(..., description="规范化事实schema版本")
+    ratios: Dict[str, Optional[float]] = Field(default_factory=dict, description="小数比例")
+    units: Dict[str, Optional[str]] = Field(default_factory=dict)
     revenue: Optional[float] = Field(None, description="营业收入")
     gross_profit: Optional[float] = Field(None, description="毛利润")
     operating_profit: Optional[float] = Field(None, description="营业利润")
@@ -1152,6 +1177,42 @@ class ResearchFinancialStatementsResponse(BaseModel):
     )
 
 
+class ResearchFinancialProjectionResponse(BaseModel):
+    """Sparse scalar summary/projection; extra keys are selected canonical facts."""
+
+    model_config = ConfigDict(extra="allow")
+    view: Literal["summary", "full"]
+    instrument_id: str
+    symbol: str
+    exchange: str
+    report_period: str
+    currency: str
+    source: str
+    data_available_date: Optional[str] = None
+    publish_date: Optional[str] = None
+    data_as_of: Optional[datetime] = None
+    revenue: Optional[float] = None
+    gross_profit: Optional[float] = None
+    operating_profit: Optional[float] = None
+    pre_tax_profit: Optional[float] = None
+    net_income: Optional[float] = None
+    operating_cf: Optional[float] = None
+    total_cf: Optional[float] = None
+    total_assets: Optional[float] = None
+    total_liabilities: Optional[float] = None
+    equity: Optional[float] = None
+    current_assets: Optional[float] = None
+    current_liabilities: Optional[float] = None
+    inventory: Optional[float] = None
+    receivables: Optional[float] = None
+    fixed_assets: Optional[float] = None
+    intangible_assets: Optional[float] = None
+    shares_outstanding: Optional[float] = None
+    indicators: Optional[Dict[str, Any]] = None
+    ratios: Optional[Dict[str, Optional[float]]] = None
+    units: Dict[str, Optional[str]] = Field(default_factory=dict)
+
+
 class ResearchFinancialStatementsHistoryResponse(BaseModel):
     """研究域多报告期财务报表读模型。"""
 
@@ -1169,7 +1230,7 @@ class ResearchFinancialStatementsHistoryResponse(BaseModel):
         description="实际返回的报告期",
     )
     period_count: int = Field(..., description="返回报告期数量")
-    items: List[ResearchFinancialStatementsResponse] = Field(
+    items: List[Union[ResearchFinancialProjectionResponse, ResearchFinancialStatementsResponse]] = Field(
         default_factory=list,
         description="逐报告期财务报表数据",
     )
@@ -1312,6 +1373,10 @@ class ResearchRelativeValuationMetricResponse(BaseModel):
 
     subject_value: Optional[float] = Field(None, description="标的当前值")
     peer_mean: Optional[float] = Field(None, description="同行均值")
+    peer_raw_mean: Optional[float] = Field(None, description="有限原始样本均值，包括负数")
+    raw_peer_count: Optional[int] = None
+    policy: Dict[str, Any] = Field(default_factory=dict)
+    subject_missing_reason: Optional[str] = None
     peer_median: Optional[float] = Field(None, description="同行中位数")
     peer_min: Optional[float] = Field(None, description="同行最小值")
     peer_max: Optional[float] = Field(None, description="同行最大值")
@@ -1888,6 +1953,8 @@ class RiskFreeRateSeriesMeta(BaseModel):
     source_profile: Optional[str] = Field(None, description="来源画像")
     source: Optional[str] = Field(None, description="数据来源")
     data_as_of: Optional[str] = Field(None, description="数据截止")
+    data_as_of_quality: Optional[str] = Field(None, description="observed_fetch_time或unknown_historical")
+    last_observation_date: Optional[str] = Field(None, description="不受查询区间影响的最新观测日")
 
 
 class RiskFreeRateObservation(BaseModel):
@@ -1897,6 +1964,9 @@ class RiskFreeRateObservation(BaseModel):
     source: Optional[str] = Field(None, description="数据来源")
     data_as_of: Optional[str] = Field(None, description="数据截止")
     revision_id: Optional[str] = Field("latest", description="修订标识")
+    source_profile: Optional[str] = Field(None, description="来源身份，与日期共同区分观测")
+    data_as_of_quality: Optional[str] = Field(None)
+    revision_kind: str = Field("overwrite_slot", description="latest是覆盖槽位，不承诺历史vintage")
 
 
 class RiskFreeRateResponse(BaseModel):
@@ -1904,8 +1974,17 @@ class RiskFreeRateResponse(BaseModel):
     series_id: str = Field(..., description="序列标识")
     series: Optional[RiskFreeRateSeriesMeta] = Field(None, description="序列定义 (可能为 null)")
     total: int = Field(0, description="观测值数量")
+    returned_records: int = Field(0)
+    total_available: int = Field(0, description="日期过滤后、分页前数量")
+    first_date: Optional[str] = None
+    last_date: Optional[str] = None
+    order: str = "desc"
+    limit: int = 100
+    offset: int = 0
+    truncated: bool = False
+    next_offset: Optional[int] = None
     observations: List[RiskFreeRateObservation] = Field(
-        default_factory=list, description="按日期升序的观测值"
+        default_factory=list, description="按order稳定排列的当前页观测值"
     )
 
 
@@ -2634,6 +2713,9 @@ class ResearchTechnicalSummaryResponse(BaseModel):
     trend_score: Optional[float] = Field(None, description="趋势评分")
     close: Optional[float] = Field(None, description="最新收盘价")
     pct_change_1d: Optional[float] = Field(None, description="1日收益率")
+    pct_change_ratio: Optional[float] = Field(None, description="1日收益率，小数比例")
+    return_basis: str = Field("adjusted_close_to_close")
+    units: Dict[str, Optional[str]] = Field(default_factory=dict)
     pct_change_20d: Optional[float] = Field(None, description="20日收益率")
     sma20: Optional[float] = Field(None, description="20日均线")
     sma60: Optional[float] = Field(None, description="60日均线")
@@ -2842,3 +2924,39 @@ class ResearchFxReadinessResponse(BaseModel):
 
     class Config:
         extra = "allow"
+
+
+class FinancialPitItemResponse(BaseModel):
+    """PIT item with explicit legacy percentage fields; sparse projections stay sparse."""
+
+    model_config = ConfigDict(extra="allow")
+    instrument_id: str
+    report_period: str
+    gross_margin: Optional[float] = Field(None, deprecated=True, description="百分数；请用gross_margin_pct或ratios.gross_margin")
+    operating_margin: Optional[float] = Field(None, deprecated=True)
+    net_margin: Optional[float] = Field(None, deprecated=True)
+    roe: Optional[float] = Field(None, deprecated=True)
+    roa: Optional[float] = Field(None, deprecated=True)
+    asset_liability_ratio: Optional[float] = Field(None, deprecated=True)
+    gross_margin_pct: Optional[float] = None
+    operating_margin_pct: Optional[float] = None
+    net_margin_pct: Optional[float] = None
+    roe_pct: Optional[float] = None
+    roa_pct: Optional[float] = None
+    asset_liability_ratio_pct: Optional[float] = None
+    ratios: Dict[str, Optional[float]] = Field(default_factory=dict)
+    units: Dict[str, Optional[str]] = Field(default_factory=dict)
+
+
+class FinancialPitCrossSectionResponse(BaseModel):
+    as_of: str
+    report_period: Optional[str] = None
+    guard: str
+    total: int
+    limit: int
+    offset: int
+    universe_note: str
+    stats: Dict[str, Any]
+    filter_stats: Dict[str, Any]
+    units: Dict[str, Optional[str]] = Field(default_factory=dict)
+    items: List[FinancialPitItemResponse]

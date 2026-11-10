@@ -983,3 +983,62 @@ def test_panel_raw_access_and_filters(store: FinancialPitPanelStore) -> None:
     )
     # 600001 (published 2024-08-30) + 600002 (statutory 2024-08-31) both visible
     assert filtered["total"] == 2
+
+
+def test_quality_filters_apply_after_latest_selection_and_before_paging(store):
+    store.build_full("repair-fixture")
+    before = store.query_cross_section("20250501", limit=2000)
+    assert before["filter_stats"]["before_count"] == before["total"]
+    with sqlite3.connect(store.db_path) as connection:
+        connection.execute("UPDATE financial_pit_panel SET attribution_quality='unverified' WHERE instrument_id='600001.SH' AND report_period='2025-03-31'")
+        connection.commit()
+    filtered = store.query_cross_section("20250501", exclude_unverified=True, limit=2000)
+    assert not any(row["instrument_id"] == "600001.SH" for row in filtered["items"])
+    assert filtered["filter_stats"]["excluded_count"] > 0
+    page = store.query_cross_section("20250501", exclude_unverified=True, limit=1)
+    assert page["filter_stats"] == filtered["filter_stats"]
+    assert page["total"] == filtered["total"]
+    exact = store.query_cross_section("20250501", available_at_quality=["exact"], fields=["revenue"], limit=2000)
+    assert all(set(row) == {"instrument_id", "report_period", "revenue", "units"} for row in exact["items"])
+    assert set(exact["filter_stats"]["after"]["available_at_quality"]) <= {"exact"}
+    with pytest.raises(ValueError, match="available_at_quality"):
+        store.query_cross_section("20250501", available_at_quality=["invented"])
+
+
+def test_pit_decimal_aliases_preserve_legacy_units_and_projection(store):
+    store.build_full("repair-fixture")
+    result = store.query_cross_section("20250415", limit=2000)
+    row = next(item for item in result["items"] if item["instrument_id"] == "600001.SH")
+    assert row["roe"] == row["roe_pct"] == pytest.approx(2.67)
+    assert row["ratios"]["roe"] == pytest.approx(.0267)
+    assert row["units"]["roe"] == row["units"]["roe_pct"] == "percent"
+    assert row["units"]["ratios.roe"] == "ratio"
+    assert row["units"]["current_ratio"] == "multiple"
+    sparse = store.query_cross_section("20250415", fields=["roe_pct", "ratios.roe"], limit=2000)
+    selected = next(item for item in sparse["items"] if item["instrument_id"] == "600001.SH")
+    assert "roe" not in selected and selected["roe_pct"] == pytest.approx(2.67)
+    assert selected["ratios"] == {"roe": pytest.approx(.0267)}
+
+
+@pytest.mark.asyncio
+async def test_pit_quality_and_aliases_over_http_preserve_sparse_shape(store, monkeypatch):
+    from fastapi import FastAPI
+    from api import routes
+    from tests.unit.test_api.test_data_consumption_contract import get
+
+    store.build_full("repair-http")
+    monkeypatch.setattr(routes, "_pit_panel_store", lambda: store)
+    app = FastAPI()
+    app.include_router(routes.router, prefix="/api/v1")
+    response = await get(app, "/research/financials/pit/cross-section", as_of="20250415",
+                         fields="roe_pct,ratios.roe", available_at_quality="exact", limit=2000)
+    assert response.status_code == 200, response.text
+    result = response.json()
+    row = next(item for item in result["items"] if item["instrument_id"] == "600001.SH")
+    assert row["roe_pct"] == pytest.approx(2.67) and row["ratios"]["roe"] == pytest.approx(.0267)
+    assert "roe" not in row and "gross_margin" not in row
+    assert result["filter_stats"]["after_count"] == result["total"]
+    invalid = await get(app, "/research/financials/pit/cross-section", as_of="20250415", available_at_quality="bad")
+    assert invalid.status_code == 422
+    assert invalid.json()["error_code"] == "invalid_query_parameter"
+    assert app.openapi()["components"]["schemas"]["FinancialPitItemResponse"]["properties"]["roe"]["deprecated"] is True

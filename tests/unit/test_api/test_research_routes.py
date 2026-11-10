@@ -2045,6 +2045,7 @@ class TestResearchRoutes:
         response = _run(
             get_research_financial_statements(
                 "600000.SH",
+                view="full",
                 include_statements=True,
             )
         )
@@ -2059,6 +2060,7 @@ class TestResearchRoutes:
         assert response.statements[0].statement["TOTAL_ASSETS"] == 1200.0
         mock_dm.get_research_financial_statements.assert_awaited_once_with(
             "600000.SH",
+            view="full",
             include_statements=True,
         )
 
@@ -2096,6 +2098,7 @@ class TestResearchRoutes:
         mock_dm.get_research_financial_statements.assert_awaited_once_with(
             "600000.SH",
             include_statements=False,
+            view="summary",
         )
 
     @patch("api.routes.data_manager")
@@ -2133,6 +2136,7 @@ class TestResearchRoutes:
         response = _run(
             get_research_financial_statements(
                 "600000.SH",
+                view="full",
                 include_statements=False,
                 report_period="2025-12-31",
                 requested_canonical_facts="revenue,equity_parent",
@@ -2146,6 +2150,7 @@ class TestResearchRoutes:
         assert response.service_layers["local_core"]["status"] == "passed"
         mock_dm.get_research_financial_statements.assert_awaited_once_with(
             "600000.SH",
+            view="full",
             include_statements=False,
             report_period="2025-12-31",
             requested_canonical_facts=["revenue", "equity_parent"],

@@ -641,11 +641,14 @@ def test_valuation_service_relative_valuation_reports_variant_exclusions():
     )
 
     assert result["metric_variants"] == ["pe_static", "pe_ttm", "pe_forward"]
-    assert result["benchmark_summary"]["pe_static"]["valid_peer_count"] == 2
-    assert result["benchmark_summary"]["pe_static"]["excluded_peer_count"] == 0
-    assert result["benchmark_summary"]["pe_static"]["peer_median"] == 9.5
+    assert result["benchmark_summary"]["pe_static"]["valid_peer_count"] == 1
+    assert result["benchmark_summary"]["pe_static"]["excluded_peer_count"] == 1
+    assert result["benchmark_summary"]["pe_static"]["peer_median"] == 20.0
     assert result["benchmark_summary"]["pe_forward"]["valid_peer_count"] == 0
     assert result["diagnostics"]["metric_exclusions"]["pe_ttm"][0]["reason"] == "missing_value"
+
+    assert result["benchmark_summary"]["pe_static"]["peer_raw_mean"] == 9.5
+    assert result["diagnostics"]["metric_exclusions"]["pe_static"][0]["instrument_id"] == "603369.SH"
 
 
 def test_valuation_service_rejects_non_authoritative_relative_membership():

@@ -6872,6 +6872,7 @@ class ResearchStorageManager:
         instrument_id: str,
         *,
         include_statements: bool = True,
+        include_details: bool = True,
         report_period: Optional[str] = None,
     ) -> Optional[Dict[str, Any]]:
         """Fetch one latest financial statement bundle for an instrument."""
@@ -6922,8 +6923,7 @@ class ResearchStorageManager:
                     source,
                     source_mode,
                     data_as_of,
-                    facts_json,
-                    lineage_json,
+                    {"facts_json, lineage_json," if include_details else ""}
                     ingestion_run_id,
                     created_at,
                     updated_at
@@ -6939,7 +6939,7 @@ class ResearchStorageManager:
 
             report_period = facts_row["report_period"]
             indicators_row = conn.execute(
-                """
+                f"""
                 SELECT
                     instrument_id,
                     report_period,
@@ -6955,7 +6955,7 @@ class ResearchStorageManager:
                     operating_cf_to_revenue,
                     operating_cf_to_net_income,
                     book_value_per_share,
-                    indicators_json,
+                    {"indicators_json," if include_details else ""}
                     source,
                     source_mode,
                     data_as_of,
@@ -6969,32 +6969,34 @@ class ResearchStorageManager:
                 """,
                 (instrument_id, report_period),
             ).fetchone()
-            statement_rows = conn.execute(
-                """
-                SELECT
-                    instrument_id,
-                    symbol,
-                    exchange,
-                    statement_type,
-                    report_period,
-                    publish_date,
-                    fiscal_year,
-                    fiscal_quarter,
-                    currency,
-                    schema_version,
-                    source,
-                    source_mode,
-                    data_as_of,
-                    statement_json,
-                    ingestion_run_id,
-                    created_at,
-                    updated_at
-                FROM financial_statements_raw
-                WHERE instrument_id = ? AND report_period = ?
-                ORDER BY statement_type ASC
-                """,
-                (instrument_id, report_period),
-            ).fetchall()
+            statement_rows = []
+            if include_details and include_statements:
+                statement_rows = conn.execute(
+                    """
+                    SELECT
+                        instrument_id,
+                        symbol,
+                        exchange,
+                        statement_type,
+                        report_period,
+                        publish_date,
+                        fiscal_year,
+                        fiscal_quarter,
+                        currency,
+                        schema_version,
+                        source,
+                        source_mode,
+                        data_as_of,
+                        statement_json,
+                        ingestion_run_id,
+                        created_at,
+                        updated_at
+                    FROM financial_statements_raw
+                    WHERE instrument_id = ? AND report_period = ?
+                    ORDER BY statement_type ASC
+                    """,
+                    (instrument_id, report_period),
+                ).fetchall()
 
         facts = dict(facts_row)
         facts_json = facts.pop("facts_json", None)
@@ -7002,7 +7004,8 @@ class ResearchStorageManager:
         indicators = dict(indicators_row) if indicators_row is not None else None
         if indicators is not None:
             indicators_json = indicators.pop("indicators_json", None)
-            indicators["details"] = self._deserialize_json(indicators_json)
+            if include_details:
+                indicators["details"] = self._deserialize_json(indicators_json)
 
         statements = []
         for row in statement_rows:
@@ -7011,8 +7014,9 @@ class ResearchStorageManager:
             item["statement"] = self._deserialize_json(statement_json)
             statements.append(item)
 
-        facts["facts"] = self._deserialize_json(facts_json)
-        facts["lineage"] = self._deserialize_json(lineage_json) or {}
+        if include_details:
+            facts["facts"] = self._deserialize_json(facts_json)
+            facts["lineage"] = self._deserialize_json(lineage_json) or {}
         facts["indicators"] = indicators
         if include_statements:
             facts["statements"] = statements
@@ -7023,6 +7027,7 @@ class ResearchStorageManager:
         instrument_id: str,
         *,
         include_statements: bool = True,
+        include_details: bool = True,
         report_periods: Optional[List[str]] = None,
         limit: int = 12,
     ) -> List[Dict[str, Any]]:
@@ -7066,6 +7071,7 @@ class ResearchStorageManager:
             bundle = self.get_financial_statement_bundle(
                 instrument_id,
                 include_statements=include_statements,
+                include_details=include_details,
                 report_period=period,
             )
             if bundle is not None:
@@ -9547,6 +9553,84 @@ class ResearchStorageManager:
                 params,
             ).fetchall()
         return [dict(row) for row in rows]
+
+    def get_risk_free_rate_page(
+        self,
+        series_id: str,
+        *,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        order: str = "desc",
+        limit: int = 100,
+        offset: int = 0,
+    ) -> Dict[str, Any]:
+        """Read an explicit HTTP page; internal historical rate reads stay unbounded."""
+        if order not in {"asc", "desc"} or not 1 <= limit <= 2000 or offset < 0:
+            raise ValueError("Invalid risk-free rate order/limit/offset")
+        if start_date and end_date and start_date > end_date:
+            raise ValueError("end_date must be >= start_date")
+        conditions = ["series_id = ?", "revision_id = 'latest'"]
+        params: List[Any] = [series_id]
+        for column, operator, value in (
+            ("observation_date", ">=", start_date),
+            ("observation_date", "<=", end_date),
+        ):
+            if value:
+                conditions.append(f"{column} {operator} ?")
+                params.append(str(value)[:10])
+        where = " AND ".join(conditions)
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            summary = conn.execute(
+                f"SELECT COUNT(*) AS n, MIN(observation_date) AS first_date, MAX(observation_date) AS last_date FROM risk_free_rate_observations WHERE {where}",
+                params,
+            ).fetchone()
+            series_row = conn.execute(
+                "SELECT * FROM risk_free_rate_series WHERE series_id = ?", (series_id,)
+            ).fetchone()
+            latest = conn.execute(
+                "SELECT MAX(observation_date) FROM risk_free_rate_observations WHERE series_id = ? AND revision_id = 'latest'",
+                (series_id,),
+            ).fetchone()[0]
+            rows = conn.execute(
+                f"SELECT observation_date, value, source, source_mode, source_profile, data_as_of, revision_id FROM risk_free_rate_observations WHERE {where} ORDER BY observation_date {order.upper()}, source_profile ASC, revision_id ASC LIMIT ? OFFSET ?",
+                [*params, limit, offset],
+            ).fetchall()
+        series = dict(series_row) if series_row is not None else None
+        if series is not None:
+            series["last_observation_date"] = latest
+            series["data_as_of_quality"] = (
+                "observed_fetch_time"
+                if series.get("data_as_of")
+                else "unknown_historical"
+            )
+        observations = []
+        for row in rows:
+            item = dict(row)
+            item["data_as_of_quality"] = (
+                "observed_fetch_time"
+                if item.get("data_as_of")
+                else "unknown_historical"
+            )
+            item["revision_kind"] = "overwrite_slot"
+            observations.append(item)
+        total = summary["n"]
+        more = offset + len(observations) < total
+        return {
+            "series_id": series_id,
+            "series": series,
+            "observations": observations,
+            "total": len(observations),
+            "returned_records": len(observations),
+            "total_available": total,
+            "first_date": summary["first_date"],
+            "last_date": summary["last_date"],
+            "order": order,
+            "limit": limit,
+            "offset": offset,
+            "truncated": more,
+            "next_offset": offset + len(observations) if more else None,
+        }
 
     def get_official_industry_classification(
         self,
@@ -15001,6 +15085,7 @@ def _route_interests_method_to_interests_db(method_name: str) -> None:
 
 
 for _interests_method_name in (
+    "get_risk_free_rate_page",
     "upsert_risk_free_rate_series",
     "upsert_risk_free_rate_observations",
     "list_risk_free_rate_series",

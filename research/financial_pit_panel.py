@@ -35,6 +35,7 @@ from datetime import date, timedelta
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
 from utils.date_utils import get_shanghai_time
+from research.financial_read_projection import pit_ratio_projection
 
 
 def _today_iso() -> str:
@@ -1342,6 +1343,9 @@ class FinancialPitPanelStore:
         fields: Optional[Sequence[str]] = None,
         limit: int = 1000,
         offset: int = 0,
+        available_at_quality: Optional[Sequence[str]] = None,
+        exclude_unverified: bool = False,
+        exclude_discrepancy: bool = False,
     ) -> Dict[str, Any]:
         """Latest visible report period per instrument at ``as_of`` (server-assembled).
 
@@ -1349,15 +1353,18 @@ class FinancialPitPanelStore:
         the original announcement stay invisible until the change date (see
         module docstring for why the lenient variant is not implemented).
         """
+        if isinstance(available_at_quality, str):
+            available_at_quality = [value.strip() for value in available_at_quality.split(",") if value.strip()]
+        accepted_quality = {"exact", "exact_event", "statutory_deadline", "delayed_estimate"}
+        if available_at_quality is not None and (not available_at_quality or set(available_at_quality) - accepted_quality):
+            raise ValueError("Invalid available_at_quality")
         as_of_iso = _from_yyyymmdd(as_of, field="as_of")
         visibility_column = "available_at"
         limit = max(1, min(int(limit), 2000))
         offset = max(0, int(offset))
         filter_params: List[Any] = [as_of_iso]
-        clauses = [f"{visibility_column} <= ?"]
         clauses_prefixed = [f"p.{visibility_column} <= ?"]
         if report_period:
-            clauses.append("report_period = ?")
             clauses_prefixed.append("p.report_period = ?")
             filter_params.append(_from_yyyymmdd(report_period, field="report_period"))
         if exchanges:
@@ -1368,40 +1375,42 @@ class FinancialPitPanelStore:
             ]
             if exchange_list:
                 placeholders = ",".join("?" for _ in exchange_list)
-                clauses.append(f"exchange IN ({placeholders})")
                 clauses_prefixed.append(f"p.exchange IN ({placeholders})")
                 filter_params.extend(exchange_list)
-        where = " AND ".join(clauses)
         where_prefixed = " AND ".join(clauses_prefixed)
+        selected = f"""WITH selected AS (
+            SELECT * FROM (
+                SELECT p.*, ROW_NUMBER() OVER (
+                    PARTITION BY p.instrument_id ORDER BY p.report_period DESC, p.available_at DESC
+                ) AS rn FROM financial_pit_panel p WHERE {where_prefixed}
+            ) WHERE rn = 1
+        )"""
+        quality_clauses = []
+        quality_params: List[Any] = []
+        if available_at_quality:
+            quality_clauses.append("available_at_quality IN (" + ",".join("?" for _ in available_at_quality) + ")")
+            quality_params.extend(available_at_quality)
+        if exclude_unverified:
+            quality_clauses.append("COALESCE(attribution_quality, 'unverified') != 'unverified'")
+        if exclude_discrepancy:
+            quality_clauses.append("COALESCE(share_validation, '') != 'discrepancy'")
+        quality_where = " AND ".join(quality_clauses) or "1=1"
+        def distributions(grouped):
+            counts = {"available_at_quality": {}, "attribution_quality": {}, "share_validation": {}}
+            for row in grouped:
+                for field in counts:
+                    key = row[field] or "unknown"
+                    counts[field][key] = counts[field].get(key, 0) + row["n"]
+            return {"count": sum(row["n"] for row in grouped), **counts}
+        group_sql = "SELECT available_at_quality, attribution_quality, share_validation, COUNT(*) AS n FROM selected"
+        group_by = " GROUP BY available_at_quality, attribution_quality, share_validation"
         with closing(self.connect()) as connection:
-            total = connection.execute(
-                f"""
-                SELECT COUNT(*) FROM (
-                    SELECT instrument_id,
-                           ROW_NUMBER() OVER (
-                               PARTITION BY instrument_id
-                               ORDER BY report_period DESC, available_at DESC
-                           ) AS rn
-                    FROM financial_pit_panel
-                    WHERE {where}
-                ) WHERE rn = 1
-                """,
-                filter_params,
-            ).fetchone()[0]
+            before = distributions(connection.execute(selected + group_sql + group_by, filter_params).fetchall())
+            after = distributions(connection.execute(selected + group_sql + " WHERE " + quality_where + group_by, [*filter_params, *quality_params]).fetchall())
+            total = after["count"]
             rows = connection.execute(
-                f"""
-                SELECT * FROM (
-                    SELECT p.*, ROW_NUMBER() OVER (
-                        PARTITION BY p.instrument_id
-                        ORDER BY p.report_period DESC, p.available_at DESC
-                    ) AS rn
-                    FROM financial_pit_panel p
-                    WHERE {where_prefixed}
-                ) WHERE rn = 1
-                ORDER BY instrument_id
-                LIMIT ? OFFSET ?
-                """,
-                [*filter_params, limit, offset],
+                selected + "SELECT * FROM selected WHERE " + quality_where + " ORDER BY instrument_id LIMIT ? OFFSET ?",
+                [*filter_params, *quality_params, limit, offset],
             ).fetchall()
             # Expected period per instrument: latest period publicly announced
             # by as_of (announcement semantics, independent of revision push).
@@ -1417,11 +1426,25 @@ class FinancialPitPanelStore:
         expected_by_instrument = {
             row["instrument_id"]: row["expected_period"] for row in expected_rows
         }
-        items = [self._row_to_item(row, fields) for row in rows]
+        complete_items = [self._row_to_item(row) for row in rows]
+        items = []
+        for row in rows:
+            complete = self._row_to_item(row)
+            projected = pit_ratio_projection(complete, fields)
+            if fields:
+                always = {"instrument_id", "report_period"}
+                requested = set(fields)
+                # Preserve the established sparse shape and add only requested aliases.
+                projected = {key: value for key, value in projected.items()
+                             if key in always or key in requested or key == "units" or
+                             (key == "ratios" and any(value == "ratios" or value.startswith("ratios.") for value in requested))}
+            projected["units"] = {path: unit for path, unit in projected.get("units", {}).items()
+                                  if path.split(".", 1)[0] in projected}
+            items.append(projected)
         lag_distribution: Dict[str, int] = {}
         quality_counts: Dict[str, int] = {}
         attribution_counts: Dict[str, int] = {}
-        for item in items:
+        for item in complete_items:
             expected = expected_by_instrument.get(item["instrument_id"])
             actual = _to_iso_date(
                 _from_yyyymmdd_safe(item.get("report_period")) or ""
@@ -1444,6 +1467,14 @@ class FinancialPitPanelStore:
             "limit": limit,
             "offset": offset,
             "universe_note": self._universe_note(latest_complete),
+            "filter_stats": {
+                "scope": "selected_cross_section_before_paging",
+                "before_count": before["count"], "after_count": after["count"],
+                "excluded_count": before["count"] - after["count"],
+                "before": {key: value for key, value in before.items() if key != "count"},
+                "after": {key: value for key, value in after.items() if key != "count"},
+            },
+            "units": items[0].get("units", {}) if items else {},
             "stats": {
                 "period_lag_distribution": dict(
                     sorted(lag_distribution.items(), key=lambda kv: kv[0])

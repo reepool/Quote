@@ -54,7 +54,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Quote System API",
     description="A comprehensive stock quote data management system API",
-    version="1.1.0",
+    version="1.2.0",
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",

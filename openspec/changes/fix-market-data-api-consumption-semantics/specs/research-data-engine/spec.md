@@ -12,11 +12,13 @@ Relative valuation SHALL use authoritative Shenwan peer groups by default and SH
 - **WHEN** peer valuation rows contain negative denominators, zero denominators, non-positive multiples, missing or non-finite values, or unsupported metric variants
 - **THEN** the benchmark calculation SHALL exclude those values and report the valid and excluded peer counts and per-metric reasons
 - **AND** subject rank and premium SHALL be null with diagnostics when the subject multiple is invalid
+- **AND** when denominator metadata is unavailable, the check SHALL use observable multiple validity without falsely claiming that the underlying denominator was independently inspected
 
 #### Scenario: Explicit high-multiple limits are supplied
 - **WHEN** a caller supplies a finite positive max_pe or max_pb
 - **THEN** the corresponding metric family SHALL exclude values above that limit with an above_maximum reason and SHALL echo the policy
 - **AND** omission of those parameters SHALL NOT silently activate an arbitrary high-value cutoff
+- **AND** the effective threshold policy SHALL participate in parameter_hash, with calc_version updated for the changed statistical algorithm
 
 #### Scenario: Raw and filtered populations are compared
 - **WHEN** finite raw peers include negative or excluded extreme values
@@ -26,7 +28,7 @@ Relative valuation SHALL use authoritative Shenwan peer groups by default and SH
 ## ADDED Requirements
 
 ### Requirement: Financial Single-Period Reads Default To A Bounded Summary
-The single-period financial-statements API SHALL support `view=summary|full`, default to summary, and obtain summary values from the existing authoritative local financial rows without reading or decoding full facts, indicator-detail or statement JSON. Default summary serialization without explicitly requested diagnostics SHALL be less than 8192 UTF-8 bytes and SHALL retain identity, report period, availability, source, scalar core facts, scalar indicators and units.
+The single-period financial-statements API SHALL support `view=summary|full`, default to summary, and obtain summary values from the existing authoritative local financial rows without reading or decoding full facts, indicator-detail or statement JSON. Default summary serialization without explicitly requested diagnostics SHALL be less than 8192 UTF-8 bytes and SHALL retain identity, report period, availability, source, scalar core facts, scalar indicators and units. Actual response models and their OpenAPI branches SHALL represent summary, full and sparse projection rather than requiring or silently refilling the former complete model for every mode.
 
 #### Scenario: Default financial read is consumed inline
 - **WHEN** a caller requests one company's financial statements without an explicit full view or diagnostics
@@ -34,7 +36,7 @@ The single-period financial-statements API SHALL support `view=summary|full`, de
 - **AND** both the response-size limit and absence of full-JSON reads or decoding SHALL be verified
 
 #### Scenario: Full financial payload is explicitly requested
-- **WHEN** view=full is requested
+- **WHEN** view=full is requested without fields projection
 - **THEN** the existing complete facts and indicator-detail payload SHALL remain available
 - **AND** raw statements SHALL be included unless include_statements=false is explicitly supplied
 - **AND** view=summary with include_statements=true SHALL return a structured 422 with a hint to use view=full
@@ -46,6 +48,12 @@ Single-period and history financial APIs SHALL support fields containing canonic
 - **WHEN** fields=revenue,net_income is supplied
 - **THEN** only revenue and net_income SHALL appear as business values
 - **AND** the response SHALL retain required metadata but SHALL NOT append all unrequested indicators or raw facts
+- **AND** the actual HTTP serializer SHALL NOT reinsert unrequested business keys as default nulls or empty collections
+
+#### Scenario: Fields projection overrides full view expansion
+- **WHEN** view=full and fields=revenue,net_income are supplied without an explicit include_statements=true
+- **THEN** the response SHALL still contain only those two business values plus required metadata, with unrequested raw payloads omitted
+- **AND** explicitly combining fields with include_statements=true SHALL return structured 422 with a correction hint
 
 #### Scenario: A projection field is unknown
 - **WHEN** a field is absent from the supported normalized projection catalog
@@ -56,6 +64,7 @@ Single-period and history financial APIs SHALL support fields containing canonic
 - **THEN** its existing report-period selection and default payload behavior SHALL remain unchanged
 - **AND** history SHALL accept explicit summary view and the same fields semantics
 - **AND** neither view nor fields SHALL enable remote extension without the existing explicit authorization parameter
+- **AND** explicitly requested service-layer diagnostics SHALL retain their separate diagnostic block and SHALL be documented outside the default summary-size promise
 
 ### Requirement: Research Returns Expose Canonical Ratios And Units
 Financial responses SHALL expose a `ratios` object for percentage-semantic financial indicators in decimal-ratio units while retaining legacy values. Technical summary SHALL expose `pct_change_ratio` as an alias of its existing pct_change_1d and SHALL disclose adjusted-close-to-close return basis. Both surfaces SHALL include field-path units without changing per-share values or current/quick-ratio multiples.

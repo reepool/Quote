@@ -18,13 +18,18 @@ from utils.code_utils import convert_to_database_format
 from utils.validation import QueryValidator, DataValidator
 from utils.date_utils import DateUtils, get_shanghai_time
 from .models import *
+from .data_query_contract import DataQueryRoute, invalid_query
 from research.backtest_data.catalog import load_default_catalog
 from research.backtest_data.quote_store import BacktestQuoteStore
 from research.backtest_data.financial_store import FinancialVintageStore
 from research.financial_pit_panel import FinancialPitPanelStore
+from research.quote_read_semantics import (
+    preserve_raw_quote_fields, project_quote_frame,
+    quote_units, eod_timing, batch_identity_kind,
+)
 from utils import config_manager
 
-router = APIRouter()
+router = APIRouter(route_class=DataQueryRoute)
 
 
 async def _run_data_task_workload(func: Callable, *args, **kwargs):
@@ -212,7 +217,7 @@ def _pit_panel_store() -> FinancialPitPanelStore:
     return store
 
 
-@router.get("/research/financials/pit/cross-section", tags=["Research Financials PIT"])
+@router.get("/research/financials/pit/cross-section", response_model=FinancialPitCrossSectionResponse, response_model_exclude_unset=True, tags=["Research Financials PIT"])
 async def get_financial_pit_cross_section(
     as_of: str = Query(..., description="时点，YYYYMMDD 或 YYYY-MM-DD"),
     report_period: Optional[str] = Query(None, description="报告期过滤，YYYYMMDD"),
@@ -220,6 +225,9 @@ async def get_financial_pit_cross_section(
     fields: Optional[str] = Query(None, description="字段投影，逗号分隔"),
     limit: int = Query(1000, ge=1, le=2000),
     offset: int = Query(0, ge=0),
+    available_at_quality: Optional[str] = Query(None, description="exact,exact_event,statutory_deadline,delayed_estimate白名单"),
+    exclude_unverified: bool = Query(False),
+    exclude_discrepancy: bool = Query(False),
 ):
     """时点横截面：每票截至 as_of 最新可知报告期（服务端装配，无未来函数）。
 
@@ -239,8 +247,13 @@ async def get_financial_pit_cross_section(
             fields=field_list,
             limit=limit,
             offset=offset,
+            available_at_quality=_query_default(available_at_quality),
+            exclude_unverified=_query_default(exclude_unverified, False),
+            exclude_discrepancy=_query_default(exclude_discrepancy, False),
         )
     except ValueError as exc:
+        if "available_at_quality" in str(exc):
+            raise invalid_query("available_at_quality", str(exc)) from exc
         raise HTTPException(status_code=400, detail=str(exc))
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Failed to read PIT cross-section: {exc}")
@@ -715,15 +728,21 @@ async def get_research_risk_free_rate(
     series_id: str = Query(..., description="序列标识, 如 china_treasury_10y"),
     start_date: Optional[date] = Query(None, description="起始日期 (含)"),
     end_date: Optional[date] = Query(None, description="结束日期 (含)"),
+    order: str = Query("desc", pattern="^(asc|desc)$"),
+    limit: int = Query(100, ge=1, le=2000),
+    offset: int = Query(0, ge=0),
 ):
-    """按日期查询无风险利率序列 (REQ-13)。无数据时返回空序列而非报错。"""
+    """按日期过滤后分页，默认返回最新100条。抓取时间未知的历史明确标记。"""
     try:
         payload = await data_manager.get_research_risk_free_rate(
             series_id,
-            start_date=start_date.isoformat() if start_date else None,
-            end_date=end_date.isoformat() if end_date else None,
+            start_date=start_date.isoformat() if isinstance(start_date, date) else None,
+            end_date=end_date.isoformat() if isinstance(end_date, date) else None,
+            order=_query_default(order, "desc"), limit=_query_default(limit, 100), offset=_query_default(offset, 0),
         )
         return RiskFreeRateResponse(**payload)
+    except ValueError as e:
+        raise invalid_query("start_date/end_date", str(e)) from e
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e))
     except HTTPException:
@@ -1448,12 +1467,15 @@ async def get_research_technical_cache_readiness():
 
 @router.get(
     "/research/company/{instrument_id}/financial-statements",
-    response_model=ResearchFinancialStatementsResponse,
+    response_model=Union[ResearchFinancialProjectionResponse, ResearchFinancialStatementsResponse],
+    response_model_exclude_unset=True,
     tags=["Research"],
 )
 async def get_research_financial_statements(
     instrument_id: str,
-    include_statements: bool = Query(True, description="是否包含原始报表详情"),
+    include_statements: Optional[bool] = Query(None, description="full视图默认包含原始报表；summary不可开启"),
+    view: str = Query("summary", pattern="^(summary|full)$", description="默认标量摘要；完整明细显式用full"),
+    fields: Optional[str] = Query(None, description="规范化科目、indicators.<key>或ratios.<key>投影"),
     report_period: Optional[str] = Query(None, description="可选报告期过滤"),
     requested_canonical_facts: Optional[str] = Query(
         None,
@@ -1468,8 +1490,21 @@ async def get_research_financial_statements(
         description="是否显式允许 L3 东财远程扩展",
     ),
 ):
-    """获取研究域完整财务报表组合快照。"""
+    """获取本地单期财务摘要，完整明细须显式选择full视图。"""
     try:
+        from research.financial_read_projection import parse_financial_fields
+        view = _query_default(view, "summary")
+        fields = _query_default(fields)
+        include_statements = _query_default(include_statements)
+        try:
+            selected = parse_financial_fields(fields)
+        except ValueError as exc:
+            raise invalid_query("fields", str(exc)) from exc
+        if view not in {"summary", "full"}:
+            raise invalid_query("view", "view must be summary or full")
+        if include_statements is True and (view == "summary" or selected is not None):
+            raise invalid_query("include_statements", "Raw statements conflict with summary or fields", "Use view=full without fields")
+        include_statements = bool(include_statements) if include_statements is not None else view == "full" and selected is None
         report_period = report_period if isinstance(report_period, str) else None
         requested_canonical_facts = (
             requested_canonical_facts
@@ -1498,7 +1533,9 @@ async def get_research_financial_statements(
             if requested_canonical_facts
             else None
         )
-        manager_kwargs = {"include_statements": include_statements}
+        manager_kwargs = {"include_statements": include_statements, "view": view}
+        if selected is not None:
+            manager_kwargs["fields"] = selected
         if report_period:
             manager_kwargs["report_period"] = report_period
         if requested is not None:
@@ -1520,7 +1557,7 @@ async def get_research_financial_statements(
         if not bundle:
             raise HTTPException(status_code=404, detail="Research financial statements not found")
 
-        return ResearchFinancialStatementsResponse(**bundle)
+        return ResearchFinancialProjectionResponse(**bundle) if view == "summary" or selected is not None else ResearchFinancialStatementsResponse(**bundle)
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e))
     except HTTPException:
@@ -1535,11 +1572,14 @@ async def get_research_financial_statements(
 @router.get(
     "/research/company/{instrument_id}/financial-statements/history",
     response_model=ResearchFinancialStatementsHistoryResponse,
+    response_model_exclude_unset=True,
     tags=["Research"],
 )
 async def get_research_financial_statements_history(
     instrument_id: str,
     include_statements: bool = Query(False, description="是否包含原始报表详情"),
+    view: str = Query("full", pattern="^(summary|full)$"),
+    fields: Optional[str] = Query(None, description="规范化标量字段投影"),
     period_window: str = Query("latest", description="报告期窗口模式，目前支持 latest"),
     rolling_quarters: int = Query(12, description="最近报告期数量", ge=1, le=40),
     report_periods: Optional[str] = Query(None, description="逗号分隔的显式报告期列表"),
@@ -1558,7 +1598,15 @@ async def get_research_financial_statements_history(
 ):
     """获取研究域公司多报告期财务报表历史。"""
     try:
+        from research.financial_read_projection import parse_financial_fields
+        view = _query_default(view, "full")
+        try:
+            selected = parse_financial_fields(_query_default(fields))
+        except ValueError as exc:
+            raise invalid_query("fields", str(exc)) from exc
         include_statements = include_statements if isinstance(include_statements, bool) else False
+        if include_statements and (view == "summary" or selected is not None):
+            raise invalid_query("include_statements", "Raw statements conflict with summary or fields")
         period_window = period_window if isinstance(period_window, str) else "latest"
         rolling_quarters = rolling_quarters if isinstance(rolling_quarters, int) else 12
         report_periods = report_periods if isinstance(report_periods, str) else None
@@ -1599,6 +1647,10 @@ async def get_research_financial_statements_history(
             "period_window": period_window,
             "rolling_quarters": rolling_quarters,
         }
+        if view != "full":
+            manager_kwargs["view"] = view
+        if selected is not None:
+            manager_kwargs["fields"] = selected
         if periods is not None:
             manager_kwargs["report_periods"] = periods
         if requested is not None:
@@ -1718,10 +1770,13 @@ async def get_research_valuation_readiness():
 )
 async def get_research_relative_valuation(
     instrument_id: str,
+    max_pe: Optional[float] = Query(None, gt=0, allow_inf_nan=False),
+    max_pb: Optional[float] = Query(None, gt=0, allow_inf_nan=False),
 ):
     """获取研究域相对估值。"""
     try:
-        valuation = await data_manager.get_research_relative_valuation(instrument_id)
+        policy = {key: value for key, value in (("max_pe", _query_default(max_pe)), ("max_pb", _query_default(max_pb))) if value is not None}
+        valuation = await data_manager.get_research_relative_valuation(instrument_id, **policy)
         if not valuation:
             raise HTTPException(status_code=404, detail="Research relative valuation not found")
 
@@ -4157,7 +4212,7 @@ async def get_daily_quotes(
     """获取日线行情数据
 
     复权语义 (REQ-04):
-    - adjust=qfq: 前复权（默认）, 以最新交易日为基准的静态前复权; 后复权价 = 原始价 × cumulative_factor(t),
+    - adjust=qfq: 前复权（默认）, 以查询区间最后一条行情为基准的前复权; 后复权价 = 原始价 × cumulative_factor(t),
       前复权价 = 原始价 × cumulative_factor(t) / cumulative_factor(latest)。
     - adjust=hfq: 后复权, 以上市日为基准。
     - adjust=none: 不复权, 返回原始价格 (factor=1.0, adjustment_type='none')。
@@ -4183,6 +4238,13 @@ async def get_daily_quotes(
             if not isinstance(include_delisted, bool):
                 include_delisted = False
 
+        adjust = _query_default(adjust, "qfq")
+        adjust_type = (adjust or "qfq").lower().strip()
+        if adjust_type not in {"qfq", "hfq", "none", "forward", "backward"}:
+            raise HTTPException(status_code=422, detail={
+                "error_code": "invalid_query_parameter", "message": "adjust must be qfq, hfq or none",
+                "field": "adjust", "hint": "Use qfq, hfq, none, forward or backward",
+            })
         # 参数验证
         if not (request.instrument_id or request.symbol):
             raise HTTPException(status_code=400, detail="Either instrument_id or symbol must be provided")
@@ -4214,17 +4276,23 @@ async def get_daily_quotes(
             symbol=query_symbol,
             start_date=request.start_date,
             end_date=request.end_date,
-            include_quality=request.include_quality,
+            include_quality=True,
             return_format=data_return_format
         )
 
         if data is None or (hasattr(data, 'empty') and data.empty):
             raise HTTPException(status_code=404, detail="No quote data found")
 
+        data = preserve_raw_quote_fields(data)
+
         # 应用过滤器
-        filtered_data = await data_manager._apply_quote_filters(
-            data, request.__dict__
-        )
+        try:
+            filtered_data = await data_manager._apply_quote_filters(data, request.__dict__)
+        except ValueError as exc:
+            raise HTTPException(status_code=503, detail={
+                "error_code": "quote_filter_data_unavailable", "message": str(exc),
+                "field": None, "hint": "Required quote filter inputs are unavailable",
+            }) from exc
 
         # ---- 动态复权计算 ----
         adjust_type = (adjust or "qfq").lower().strip()
@@ -4288,7 +4356,8 @@ async def get_daily_quotes(
                     records = list(filtered_data) if not isinstance(filtered_data, list) else filtered_data
 
                 adjusted_records = AdjustmentEngine.apply_adjustment(
-                    records, factors, adjust_type
+                    records, factors, adjust_type,
+                    price_fields=("open", "high", "low", "close", "pre_close", "change"),
                 )
 
                 if isinstance(filtered_data, pd.DataFrame):
@@ -4318,6 +4387,9 @@ async def get_daily_quotes(
                     if isinstance(record, dict):
                         record['adjustment_type'] = 'none'
                         record['factor'] = 1.0
+
+        filtered_data = project_quote_frame(filtered_data, instrument_info)
+        units = quote_units(filtered_data["currency"].iloc[0] if not filtered_data.empty else instrument_info.get("currency"))
 
         # 生成统计信息
         stats = await data_manager._generate_quote_statistics(filtered_data)
@@ -4405,6 +4477,11 @@ async def get_daily_quotes(
         )
         serialized_stats = _serialize_value(stats)
 
+        if not request.include_quality:
+            hidden = [key for key in ("quality_score", "missing_fields", "missing_reason", "is_complete") if key in filtered_data]
+            filtered_data = filtered_data.drop(columns=hidden)
+            units = {key: unit for key, unit in units.items() if key not in hidden}
+
         # 根据格式返回数据
         if request.return_format == 'pandas':
             data_records = _serialize_records(filtered_data.to_dict('records'))
@@ -4426,6 +4503,7 @@ async def get_daily_quotes(
                 "include_delisted": include_delisted,
                 "instrument_delisted": instrument_delisted,
                 "factor_metadata": factor_metadata,
+                "units": units,
             }
             return JSONResponse(content=_serialize_value(response_payload))
 
@@ -4452,6 +4530,7 @@ async def get_daily_quotes(
                 "include_delisted": include_delisted,
                 "instrument_delisted": instrument_delisted,
                 "factor_metadata": factor_metadata,
+                "units": units,
             }
             return JSONResponse(content=_serialize_value(response_payload))
 
@@ -4519,78 +4598,55 @@ async def get_quotes_coverage(
         raise HTTPException(status_code=500, detail=f"Failed to get quotes coverage: {str(e)}")
 
 
-@router.get("/quotes/latest", response_model=List[DailyQuoteResponse], tags=["Quotes"])
+@router.get("/quotes/latest", response_model=List[DailyQuoteResponse], response_model_exclude_unset=True, tags=["Quotes"])
 async def get_latest_quotes(
     instrument_ids: List[str] = Query(..., description="交易品种ID列表"),
     include_quality: bool = Query(True, description="是否包含质量信息")
 ):
-    """获取最新行情数据"""
-    try:
-        if not instrument_ids:
-            raise HTTPException(status_code=400, detail="At least one instrument_id must be provided")
-
-        latest_quotes = []
-        for instrument_id in instrument_ids:
-            db_instrument_id = convert_to_database_format(instrument_id)
-            # 获取最近5天的数据
-            end_date = datetime.now()
-            start_date = end_date - timedelta(days=5)
-
-            data = await data_manager.get_quotes(
-                instrument_id=db_instrument_id,
-                start_date=start_date,
-                end_date=end_date,
-                include_quality=include_quality,
-                return_format='pandas'
-            )
-
-            if not data.empty:
-                # 获取最新一条记录
-                if 'time' in data.columns:
-                    time_series = pd.to_datetime(data['time'], errors='coerce')
-                    if time_series.notna().any():
-                        latest_row = data.loc[time_series.idxmax()]
-                    else:
-                        latest_row = data.iloc[0]
-                else:
-                    latest_row = data.iloc[0]
-                time_value = latest_row.get('time')
-                if isinstance(time_value, pd.Timestamp):
-                    time_value = time_value.to_pydatetime()
-                elif isinstance(time_value, datetime):
-                    pass
-                else:
-                    time_value = datetime.now()
-                latest_quote = DailyQuoteResponse(
-                    time=time_value,
-                    instrument_id=latest_row.get('instrument_id', db_instrument_id),
-                    symbol=latest_row.get('symbol', ''),
-                    open=float(latest_row['open']),
-                    high=float(latest_row['high']),
-                    low=float(latest_row['low']),
-                    close=float(latest_row['close']),
-                    volume=int(latest_row['volume']) if pd.notna(latest_row['volume']) else 0,
-                    amount=float(latest_row['amount']) if pd.notna(latest_row['amount']) else 0.0,
-                    turnover=latest_row.get('turnover'),
-                    pre_close=latest_row.get('pre_close'),
-                    change=latest_row.get('change'),
-                    pct_change=latest_row.get('pct_change'),
-                    tradestatus=latest_row.get('tradestatus', 1),
-                    factor=latest_row.get('factor', 1.0),
-                    adjustment_type=latest_row.get('adjustment_type'),
-                    is_complete=latest_row.get('is_complete', True),
-                    quality_score=latest_row.get('quality_score', 1.0) if include_quality else 1.0,
-                    source=latest_row.get('source'),
-                    batch_id=latest_row.get('batch_id')
-                )
-                latest_quotes.append(latest_quote)
-
-        return latest_quotes
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get latest quotes: {str(e)}")
+    """非实时，最新已入库日线收盘价。as_of是日线日期，computed_at是响应装配时间。"""
+    include_quality = _query_default(include_quality, True)
+    if not instrument_ids:
+        raise HTTPException(status_code=400, detail="At least one instrument_id must be provided")
+    latest_quotes = []
+    for instrument_id in instrument_ids:
+        db_id = convert_to_database_format(instrument_id)
+        end_date = get_shanghai_time()
+        data = await data_manager.get_quotes(
+            instrument_id=db_id, start_date=end_date - timedelta(days=5),
+            end_date=end_date, include_quality=True, return_format="pandas",
+        )
+        db_ops = getattr(data_manager, "db_ops", None)
+        if (data is None or data.empty) and callable(getattr(db_ops, "get_daily_data", None)):
+            data = await db_ops.get_daily_data(instrument_id=db_id, end_date=end_date, limit=1)
+        if data is None or data.empty:
+            continue
+        times = pd.to_datetime(data["time"], errors="coerce")
+        if not times.notna().any():
+            raise HTTPException(status_code=503, detail="Stored quote date is unavailable")
+        row = data.loc[times.idxmax()].to_dict()
+        instrument = {}
+        if callable(getattr(db_ops, "get_instrument_by_id", None)):
+            instrument = await db_ops.get_instrument_by_id(db_id) or {}
+        instrument.setdefault("instrument_id", db_id)
+        instrument.setdefault("symbol", row.get("symbol") or db_id.split(".")[0])
+        instrument.setdefault("exchange", {"SH": "SSE", "SZ": "SZSE", "BJ": "BSE", "HK": "HKEX"}.get(db_id.rsplit(".", 1)[-1]))
+        normalized = preserve_raw_quote_fields([row])
+        normalized["adjustment_type"] = "none"
+        normalized["factor"] = 1.0
+        projected = project_quote_frame(normalized, instrument).to_dict("records")[0]
+        projected["symbol"] = row.get("symbol") or instrument["symbol"]
+        projected["batch_id_kind"] = batch_identity_kind(row)
+        projected["units"] = quote_units(projected["currency"])
+        projected.update(await eod_timing(row, instrument, db_ops))
+        for key in ("created_at", "updated_at", "turnover", "pre_close", "change", "raw_pre_close", "raw_change", "pct_change", "pct_change_pct", "pct_change_ratio"):
+            if key in projected and not isinstance(projected[key], (dict, list)) and pd.isna(projected[key]):
+                projected[key] = None
+        if not include_quality:
+            for key in ("quality_score", "missing_fields", "missing_reason", "is_complete"):
+                projected.pop(key, None)
+                projected["units"].pop(key, None)
+        latest_quotes.append(DailyQuoteResponse(**projected))
+    return latest_quotes
 
 
 # Data Management

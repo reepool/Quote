@@ -13,6 +13,9 @@ from __future__ import annotations
 import logging
 import time
 from typing import Any, Callable, Dict, List, Optional
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from utils.date_utils import get_shanghai_time
 
 # 注: 不用 utils.db_logger ("Database" 模块日志器) —— config/01_log.json 将其
 # 显式设为 WARNING(抑制高频 DB 层日志), info() 会被静默丢弃。本模块用独立的
@@ -117,16 +120,20 @@ class RiskFreeRateSyncService:
         logger.info("[RiskFreeRate] sync start series_id=%s", series_id)
 
         meta = dict(self._series_meta)
-        if data_as_of:
-            meta["data_as_of"] = data_as_of
-        self._storage.upsert_risk_free_rate_series(meta)
-
         observations = self._fetcher()
+        fetched_at = datetime.fromisoformat(data_as_of) if data_as_of else get_shanghai_time()
+        if fetched_at.tzinfo is None:
+            fetched_at = fetched_at.replace(tzinfo=ZoneInfo("Asia/Shanghai"))
+        fetched_at_iso = fetched_at.isoformat()
+        existing = next((row for row in self._storage.list_risk_free_rate_series() if row["series_id"] == series_id), None)
+        # The parent FK must exist, but its successful timestamp must not move
+        # before observation writes. A definition update must not clear it.
+        meta["data_as_of"] = existing.get("data_as_of") if existing else None
+        self._storage.upsert_risk_free_rate_series(meta)
         for obs in observations:
             obs.setdefault("source", meta.get("source"))
             obs.setdefault("source_mode", meta.get("source_mode"))
-            if data_as_of:
-                obs.setdefault("data_as_of", data_as_of)
+            obs["data_as_of"] = fetched_at_iso
 
         logger.info(
             "[RiskFreeRate] sync series_id=%s fetched=%s, writing ...",
@@ -142,6 +149,10 @@ class RiskFreeRateSyncService:
                 series_id, written, total,
             )
 
+        if observations:
+            if written != len(observations):
+                raise RuntimeError("Risk-free-rate observation writes did not complete")
+            self._storage.upsert_risk_free_rate_series({**meta, "data_as_of": fetched_at_iso})
         elapsed = time.monotonic() - started
         logger.info(
             "[RiskFreeRate] sync done series_id=%s fetched=%s written=%s elapsed=%.1fs",

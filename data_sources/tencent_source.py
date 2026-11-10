@@ -184,7 +184,7 @@ class TencentSource(BaseDataSource):
                 "close": close_price,
                 "volume": volume,
                 "amount": amount,
-                "turnover": 0.0,
+                "turnover": None,  # Not supplied by the parsed daily/snapshot fields.
                 "pre_close": pre_close,
                 "change": round(close_price - pre_close, 4) if pre_close is not None else None,
                 "pct_change": (
@@ -285,7 +285,7 @@ class TencentSource(BaseDataSource):
                 "close": float(fields[3]),
                 "volume": volume,
                 "amount": round(float(fields[37]) * 10000.0, 2),
-                "turnover": 0.0,
+                "turnover": None,  # Not supplied by the parsed daily/snapshot fields.
                 "pre_close": float(fields[4]),
                 "tradestatus": 1,
                 "factor": 1.0,

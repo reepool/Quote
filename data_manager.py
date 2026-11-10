@@ -4978,9 +4978,16 @@ class DataManager:
         *,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
+        limit: Optional[int] = None,
+        offset: int = 0,
+        order: str = "asc",
     ) -> Dict[str, Any]:
         """读取无风险利率序列观测值 (REQ-13)。无数据返回空序列而非报错。"""
         storage = self._require_research_storage()
+        if limit is not None:
+            return await asyncio.to_thread(storage.get_risk_free_rate_page, series_id,
+                                           start_date=start_date, end_date=end_date,
+                                           order=order, limit=limit, offset=offset)
         series_list = await asyncio.to_thread(storage.list_risk_free_rate_series)
         series_meta = next(
             (s for s in series_list if s.get("series_id") == series_id), None
@@ -9470,6 +9477,8 @@ class DataManager:
         instrument_id: str,
         *,
         include_statements: bool = True,
+        view: str = "full",
+        fields: Optional[List[str]] = None,
         report_period: Optional[str] = None,
         requested_canonical_facts: Optional[List[str]] = None,
         profile: Optional[str] = None,
@@ -9479,6 +9488,11 @@ class DataManager:
         allow_remote_extension: bool = False,
     ) -> Optional[Dict[str, Any]]:
         """读取研究域 financial statements bundle。"""
+        from research.financial_read_projection import financial_projection, parse_financial_fields
+        if view not in {"summary", "full"}:
+            raise ValueError("view must be summary or full")
+        fields = parse_financial_fields(fields)
+        projection_kwargs = {"include_details": False} if view == "summary" or fields is not None else {}
         storage = self._require_research_storage()
         module_cfg = self.research_config.modules.get("financial_statements", {})
         if not module_cfg.get("enabled", False):
@@ -9492,6 +9506,7 @@ class DataManager:
             normalized_id,
             include_statements=include_statements,
             report_period=report_period,
+            **projection_kwargs,
         )
         if bundle is not None:
             service_layers = await self._get_research_financial_statement_service_layers(
@@ -9508,7 +9523,7 @@ class DataManager:
             )
             if service_layers:
                 bundle["service_layers"] = service_layers
-            return bundle
+            return financial_projection(bundle, view=view, fields=fields)
 
         instrument = await self._get_research_instrument_info(normalized_id)
         service_layers = await self._get_research_financial_statement_service_layers(
@@ -9524,12 +9539,13 @@ class DataManager:
             allow_remote_extension=allow_remote_extension,
         )
         if service_layers and self._financial_statement_service_layers_have_data(service_layers):
-            return self._build_financial_statements_service_layer_response(
+            service_payload = self._build_financial_statements_service_layer_response(
                 normalized_id,
                 instrument,
                 service_layers,
                 report_period=report_period,
             )
+            return financial_projection(service_payload, view=view, fields=fields)
         if instrument and self._module_allows_optional_empty_exchange(
             "financial_statements",
             instrument.get("exchange"),
@@ -9540,7 +9556,7 @@ class DataManager:
             )
             if service_layers:
                 placeholder["service_layers"] = service_layers
-            return placeholder
+            return financial_projection(placeholder, view=view, fields=fields)
         return None
 
     async def get_research_financial_statements_history(
@@ -9548,6 +9564,8 @@ class DataManager:
         instrument_id: str,
         *,
         include_statements: bool = False,
+        view: str = "full",
+        fields: Optional[List[str]] = None,
         period_window: str = "latest",
         rolling_quarters: int = 12,
         report_periods: Optional[List[str]] = None,
@@ -9559,6 +9577,11 @@ class DataManager:
         allow_remote_extension: bool = False,
     ) -> Optional[Dict[str, Any]]:
         """读取研究域多报告期 financial statements history。"""
+        from research.financial_read_projection import financial_projection, parse_financial_fields
+        if view not in {"summary", "full"}:
+            raise ValueError("view must be summary or full")
+        fields = parse_financial_fields(fields)
+        projection_kwargs = {"include_details": False} if view == "summary" or fields is not None else {}
         storage = self._require_research_storage()
         module_cfg = self.research_config.modules.get("financial_statements", {})
         if not module_cfg.get("enabled", False):
@@ -9581,6 +9604,7 @@ class DataManager:
             include_statements=include_statements,
             report_periods=requested_periods or None,
             limit=limit,
+            **projection_kwargs,
         )
         instrument = await self._get_research_instrument_info(normalized_id)
         items: List[Dict[str, Any]] = []
@@ -9600,7 +9624,7 @@ class DataManager:
             )
             if service_layers:
                 bundle["service_layers"] = service_layers
-            items.append(bundle)
+            items.append(financial_projection(bundle, view=view, fields=fields))
 
         if not items and instrument is None:
             return None
@@ -10117,6 +10141,7 @@ class DataManager:
     async def get_research_relative_valuation(
         self,
         instrument_id: str,
+        *, max_pe: Optional[float] = None, max_pb: Optional[float] = None,
     ) -> Optional[Dict[str, Any]]:
         """读取研究域相对估值。"""
         storage = self._require_research_storage()
@@ -10133,6 +10158,12 @@ class DataManager:
         from research.valuation_service import ResearchValuationService
 
         query_service = ResearchQueryService(storage)
+        module_cfg = deepcopy(module_cfg)
+        for key, value in (("max_pe", max_pe), ("max_pb", max_pb)):
+            if value is not None:
+                if not math.isfinite(value) or value <= 0:
+                    raise ValueError(f"{key} must be finite and positive")
+                module_cfg.setdefault("relative", {})[key] = value
         valuation_service = ResearchValuationService(module_cfg)
         identity = valuation_service.history_identity()
         subject_row = await asyncio.to_thread(
@@ -10178,7 +10209,7 @@ class DataManager:
                 taxonomy_version=industry_membership.get("taxonomy_version"),
                 benchmark_field=benchmark_context["benchmark_field"],
                 limit=int(relative_cfg.get("max_peer_rows", 20)),
-                include_details=False,
+                include_details=True,
                 calc_method=identity["calc_method"],
                 calc_version=identity["calc_version"],
                 parameter_hash=identity["parameter_hash"],
@@ -19984,30 +20015,10 @@ class DataManager:
             return data
 
     async def _apply_quote_filters(self, data: Any, filters: Dict[str, Any]) -> Any:
-        """应用行情过滤器"""
-        try:
-            if data is None:
-                return data
+        """Filter quotes using the same missing-value quality exposed by the API."""
+        from research.quote_read_semantics import filter_quote_frame
 
-            # 转换为DataFrame如果需要
-            if not isinstance(data, pd.DataFrame):
-                data = pd.DataFrame(data)
-
-            # 应用过滤器
-            if filters.get('tradestatus') is not None:
-                data = data[data['tradestatus'] == filters['tradestatus']]
-
-            if filters.get('min_volume') is not None:
-                data = data[data['volume'] >= filters['min_volume']]
-
-            if filters.get('is_complete') is not None:
-                data = data[data['is_complete'] == filters['is_complete']]
-
-            return data
-
-        except Exception as e:
-            dm_logger.error(f"[DataManager] Failed to apply quote filters: {e}")
-            return data
+        return filter_quote_frame(data, filters)
 
     async def _generate_quote_statistics(self, data: Any) -> Dict[str, Any]:
         """生成行情统计信息"""

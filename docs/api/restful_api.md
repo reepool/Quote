@@ -2,6 +2,8 @@
 
 本文档以 `api/app.py` 与 `api/routes.py` 为准，描述当前可用接口、路径与参数要求。
 
+API info 版本为 `1.2.0`，URL 前缀仍为 `/api/v1`。本版调整了复权行情的 `volume` 兼容别名、单期财务默认视图和利率默认分页，迁移方式见各节。
+
 ## 基础信息
 
 ### 启动服务
@@ -23,6 +25,10 @@ http://localhost:8000/api/v1
 
 ### 返回格式说明
 当前实现未统一为单一 envelope（如 `success/data/message`）。部分接口直接返回列表/对象，部分返回 `{"success": true, ...}` 风格的 JSON。请参考各接口示例。
+
+以下只读接口会拒绝未声明的 query 字段：`quotes/daily`、`quotes/latest`、`quotes/coverage`、单期及历史 `financial-statements`、`technical/summary`、`valuation/relative`、`research/risk-free-rate`、`research/financials/pit/cross-section`。未知字段优先返回 `422 unknown_query_parameter`，列出全部字段；已声明字段的类型、范围或新增参数组合错误返回 `422 invalid_query_parameter`。错误包含 `error_code/message/field/hint/detail`，多项错误另有 `errors`，保留旧 `detail` 和原 HTTP 状态码。
+
+例如 coverage 的 `?limit=3` 即使没有日期，也先报未知字段 422；仅缺日期时仍为 `400 missing_date_range`。daily 的 `adjust=bad` 为 422，technical/summary 原有手工校验的非法 adjust 仍为 400。财务 `include_snapshot=false` 为未知字段，`include_local_core=false` 合法。其他接口及年报错误格式沿用各自合同。
 
 ---
 
@@ -96,6 +102,7 @@ http://localhost:8000/api/v1
 - `adjust`: `qfq`（前复权，默认）、`hfq`（后复权）、`none`（不复权）
 - `include_delisted`: 是否允许取回已退市证券的历史行情，默认 `false`。默认行为不变；按 `instrument_id` 精确查询本就不受 active 状态限制。
 - `tradestatus`、`is_complete`、`min_volume`、`min_quality_score`
+- `include_suspended`：是否包含停牌，默认 `false`；仅查停牌须同时传 `tradestatus=0&include_suspended=true`
 - `include_quality`、`include_metadata`
 - `limit`、`offset`
 
@@ -105,12 +112,16 @@ http://localhost:8000/api/v1
 - 前复权以查询范围内最新交易日为基准（价格=原始价格），历史价格向下调整使得价格序列连续
 - 后复权以上市首日为基准，价格按除权事件累乘放大，反映真实持股收益
 - 复权因子公式：后复权价 = 原始价 × `cumulative_factor(t)`；前复权价 = 原始价 × `cumulative_factor(t)/cumulative_factor(latest)`
+- `open/high/low/close/pre_close/change` 使用同一价格乘数，原始来源参考价及涨跌额保留为 `raw_pre_close/raw_change`。`pct_change_pct` 保留来源百分数，`pct_change_ratio=pct_change_pct/100`；旧 `pct_change` 为兼容百分数字段。
+- 单日 qfq 查询以该日为锚，复权价格可能等于原价；分页使用完整查询区间的同一锚点。技术摘要使用复权收盘价之间的收益率，与这里的来源参考价收益率在除权日可能不同。
 
 分页与语义：
 - 显式传入 `limit` 时，按稳定的 `time` 升序返回 `offset` 之后至多 `limit` 行；不传 `limit` 时返回全量（默认行为不变）。
 - `start_date`/`end_date` 双端包含。
-- `time` 字段为 Asia/Shanghai 时区；`volume` 单位为股，`amount` 为成交额（人民币元）。
+- `volume_raw` 为实际成交股数，旧 `volume` 现为其弃用兼容别名；需要原复权成交量的客户端改用 `volume_adj`。`amount` 为实际成交币种金额，复权不改变它和 `volume_raw`，`stats` 成交量也聚合原始股数。
+- `currency` 和顶层 `units` 声明价格、金额、股数、百分数及小数比例的单位（例如 A 股价格 `CNY/share`、港股金额 `HKD`）；`price_basis/volume_basis/return_basis` 声明口径。CSV 同样包含新投影列；单位表见 JSON/OpenAPI。
 - `tradestatus`：`1`=正常交易，`0`=停牌；`pre_close` 在除权日为除权调整后的参考价。
+- pytdx/Tencent 不提供的换手率以 `turnover=null` 返回；其历史占位 0 仅在读投影中归一，并记录缺失原因、将质量分上限设为 0.9。其他来源的真实 0 保留。质量归一及所有过滤先于统计、分页，`include_quality=false` 只隐藏质量字段，不绕过 `min_quality_score`。
 
 响应结构（200，`DailyQuotesEnvelopeResponse`）：
 - `data`：日线行情行数组，行字段见 `DailyQuoteResponse`（`time/open/high/low/close/volume/amount/turnover/pre_close/change/pct_change/tradestatus/factor/adjustment_type/source/batch_id`）。
@@ -188,11 +199,13 @@ curl "http://localhost:8000/api/v1/quotes/daily/changes?since_sequence=123&instr
 ```
 
 ### GET /api/v1/quotes/latest
-获取指定品种的最新一条行情（从最近 5 天数据中取最新）。
+获取指定品种的最新日线行情，保持列表返回。它是已落库 EOD 数据，不是实时行情。
 
 查询语义：
-- 返回每个请求品种在查询窗口内 `time` 最大的记录。
+- 优先从最近 5 天取 `time` 最大记录，窗口为空时回退至该品种库内最新记录。
 - `instrument_ids` 支持数据库后缀和标准交易所后缀；例如 `000001.SZSE` 会归一化查询为 `000001.SZ`，`600000.SSE` 会归一化查询为 `600000.SH`。
+- 每项返回 `quote_type=eod`、`is_intraday=false`、带市场时区的 `as_of`（bar 日期标签）、`computed_at`（计算时刻），并保留 `created_at/updated_at`。`staleness_trading_days` 按日历和已结束交易时段计算，日历证据不足时为 null 并给出 `staleness_reason`。
+- `symbol` 可回退到证券主数据；缺失换手率/质量及单位沿用 daily 语义。存在 `batch_id` 但无持久出处证据时 `batch_id_kind=unknown`，不会根据字符串外观猜测。
 
 必填参数：
 - `instrument_ids`（可重复参数）
@@ -341,35 +354,44 @@ curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-indicato
 
 ### GET /api/v1/research/company/{instrument_id}/financial-statements
 
-读取本地完整财务报表组合快照。当前接口仍保持兼容读模型，对应 `financial_statements_raw`、`financial_facts`、`financial_indicator_snapshots`；底层同步/存储已新增 source manifest、全数值事实长表、hot/cold tier 和多期 readiness，但该单公司接口默认仍返回当前 bundle 形态。
+读取本地单期财务。默认 `view=summary`，直接读取权威本地事实和指标的标量列，不读取或解码完整事实、指标详情及原始报表 JSON。未显式请求诊断的默认单期响应小于 8192 UTF-8 字节；这不是所有接口或 MCP 工具的通用大小上限。
 
 路径参数：
 - `instrument_id`：数据库格式代码，如 `600000.SH`、`000001.SZ`
 
 可选参数：
-- `include_statements`：是否返回原始报表分项，默认 `true`
+- `view`：`summary`（默认）或 `full`；迁移旧完整响应请显式传 `view=full`
+- `fields`：逗号分隔的规范核心字段、`indicators.<key>`、`ratios.<key>`，如 `revenue,net_income,ratios.gross_margin`；未知字段返回 422
+- `include_statements`：完整视图默认包含原始报表，显式 `false` 可关闭；summary 或 fields 投影与显式 `true` 冲突，返回 422 并提示修正
+- `requested_canonical_facts/profile/mapping_version/include_local_core/include_industry_facts/allow_remote_extension`：沿用现有服务分层选择及诊断语义，远程扩展默认不启用
 
 主要字段：
 - `report_period`、`publish_date`、`fiscal_year`、`fiscal_quarter`
 - `revenue`、`net_income`、`operating_cf`
 - `total_assets`、`total_liabilities`、`equity`
 - `source`、`source_mode`、`data_as_of`
-- `facts`、`indicators`、`statements`
+- `indicators`、`ratios`、`units`；仅 full 且没有 fields 时展开完整 `facts` 和指标详情，按 include_statements 返回 `statements`
 
 当前边界：
-- 单期接口保持兼容形态；多期读取使用 `/financial-statements/history`，避免在单期响应里混入不同报告期结构。
+- `fields` 优先于 full 展开，只保留请求的业务值和身份、报告期、可得日、来源及单位等必要元数据；HTTP 不补回未请求字段的 null 默认值。`requested_canonical_facts` 不是 fields 的别名。
+- `ratios` 为小数比例；原财务百分比语义指标已是小数比例，直接沿用，不再除以 100。流动/速动比率仍为倍数，每股值保持原单位。显式 `service_layers` 诊断不在默认摘要大小承诺内。
+- 多期读取使用 `/financial-statements/history`；底层 source manifest、hot/cold tier 和 readiness 仍由现有同步 owner 负责。
 - 官方结构化 `SSE/CNInfo/BSE` 源默认仍 disabled；在 live probe 和小样本 backfill 通过前，实际生产链路仍以 AkShare fallback 为主。
 - 仓库级财务 readiness 已提供 REST endpoint，也仍可通过 `scripts/research_financial_statements_rollout_validation.py` 做离线/调度前验证。
 
 示例：
 ```bash
 curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-statements"
-curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-statements?include_statements=false"
+curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-statements?view=full"
+curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-statements?view=full&include_statements=false"
+curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-statements?fields=revenue,net_income"
 ```
 
 ### GET /api/v1/research/company/{instrument_id}/financial-statements/history
 
 读取公司多报告期财务报表历史。默认只读本地 `financials.db`，不在请求时触发远程补数。
+
+历史接口保留 `view=full`、`include_statements=false` 的默认行为；可显式传 `view=summary` 或与单期相同的 `fields` 投影。fields 优先于 full，禁止同时显式要求原始报表；报告期选择和原有分层/远程授权不变。
 
 可选参数：
 - `period_window`：报告期窗口模式，当前支持 `latest`
@@ -426,7 +448,9 @@ curl "http://localhost:8000/api/v1/research/company/600000.SH/valuation/history?
 当前字段包括：
 - `metric_variants`：本次参与 benchmark 的估值口径，默认 `pe_ttm / pb_mrq / ps_ttm`，并保留兼容字段统计。
 - `benchmark_summary`：逐指标返回 valid peer count、mean、median、p25、p75、percentile rank、相对中位数溢价/折价。
-- `diagnostics.metric_exclusions`：逐指标列出因缺失、非数值、负值或零值被排除的同行样本。
+- `diagnostics.metric_exclusions`：逐指标列出因缺失、非有限/非正数、可用明细中的无效分母、不可用口径或显式阈值被排除的同行样本。没有分母明细时只核可见倍数。
+- 每个指标的全部比较统计使用同一有效同行集合，另有 `peer_raw_mean/raw_peer_count` 保留有限原始值（包括负值）的对照。主体倍数无效时，排名和相对溢价为 null，并说明原因。
+- 可选 `max_pe/max_pb` 必须为有限正数，只作用于对应指标族；省略时不额外启用固定高值阈值。响应回显 policy，阈值参与 `parameter_hash`，统计算法版本为 `relative_valuation.v2`。主要比较值为有效样本中位数和分位数，不承诺均值落在四分位区间。
 - `subject_valuation`、`peers`：保留静态、TTM、forward/MRQ 指标字段，便于调用方明确选择口径。
 
 当前边界：
@@ -436,7 +460,22 @@ curl "http://localhost:8000/api/v1/research/company/600000.SH/valuation/history?
 示例：
 ```bash
 curl "http://localhost:8000/api/v1/research/company/600000.SH/valuation/relative"
+curl "http://localhost:8000/api/v1/research/company/600000.SH/valuation/relative?max_pe=100&max_pb=20"
 ```
+
+### GET /api/v1/research/company/{instrument_id}/technical/summary
+
+读取技术摘要，`adjust=qfq|hfq|none` 默认 qfq。`pct_change_1d` 继续表示小数收益率，新增同值 `pct_change_ratio`，`units` 声明比例单位；`return_basis=adjusted_close_to_close` 表示相邻复权收盘价收益。复权因子来源、技术计算版本及 provenance 保持原合同。
+
+### GET /api/v1/research/financials/pit/cross-section
+
+必填 `as_of`，支持已有 `report_period/exchange/fields/limit/offset`。先按严格可得日选择每个品种最新可知报告期，再做质量过滤；最新期不合格即排除该票，不用更旧报表替代。
+
+新增 `available_at_quality` 逗号白名单（`exact/exact_event/statutory_deadline/delayed_estimate`，未知值 422）、`exclude_unverified`（排除 attribution_quality=unverified）、`exclude_discrepancy`（排除 share_validation=discrepancy），均默认不过滤，组合取交集。
+
+`total` 是过滤后总数。原 `stats` 继续描述返回页；新增 `filter_stats` 描述分页前整个选定横截面的过滤前后数量、排除数量及三类质量分布，跨页相同，也不受 fields 投影影响。原 listed-only 股票池和 strict 更正防护不变。
+
+PIT 六项旧百分数字段（毛利率、营业利润率、净利率、ROE、ROA、资产负债率）保留并标记弃用，新增 `<field>_pct` 百分数别名及 `ratios.<field>` 小数比例，后者只除以 100 一次。`units` 声明实际字段单位；财务接口的原比例字段不要按 PIT 百分数再转换。
 
 ### GET /api/v1/research/company/{instrument_id}/valuation/percentile
 
@@ -761,8 +800,14 @@ curl "http://localhost:8000/api/v1/research/company/600000.SH/industry/as-of?as_
 参数：
 - `series_id`（必填，如 `china_treasury_10y`）
 - `start_date`、`end_date`（可选，双端包含）
+- `order=desc|asc`，默认 `desc`
+- `limit` 默认 `100`，范围 `1–2000`；`offset` 默认 `0`
 
-返回：`{series_id, series:{rate_type, tenor, currency, unit, frequency, timezone, source, ...}, total, observations:[{observation_date, value, source, data_as_of, revision_id}]}`。无数据时返回空序列而非报错。
+先按序列、日期和原有最新修订槽选择，再排序分页；同日用 `source_profile`、`revision_id` 升序稳定排序。`total` 仍为本页条数，新增 `returned_records/total_available/first_date/last_date/truncated/next_offset`；日期边界描述过滤后整个区间，无数据返回空序列。遍历历史需固定筛选条件并按 `next_offset` 续取；迁移旧升序全历史读取请显式 `order=asc` 并循环翻页。
+
+每条 observation 包含 `source_profile`、`revision_kind`、`data_as_of_quality`。`series.last_observation_date` 为库内该序列最新观察日期，不受请求日期过滤影响；`data_as_of` 为真实成功抓取时间，缺历史证据时保持 null、标记 `unknown_historical`，不会用观察日期或当前请求时间补造。同步仅在全部非空观测写入成功后推进 series 时间，失败或空抓取保留前次成功时间。
+
+`revision_id=latest` 是覆盖槽，对应 `revision_kind=overwrite_slot`，不承诺历史 vintage。利率值的单位继续为 `percent_annual`。上述 HTTP 默认分页不影响 DCF 等内部调用原有无界、按估值时点截取的读取合同。
 
 ### GET /api/v1/research/risk-free-rate/series
 列出所有已定义的无风险利率序列。
@@ -771,6 +816,7 @@ curl "http://localhost:8000/api/v1/research/company/600000.SH/industry/as-of?as_
 ```bash
 curl "http://localhost:8000/api/v1/research/risk-free-rate/series"
 curl "http://localhost:8000/api/v1/research/risk-free-rate?series_id=china_treasury_10y&start_date=2026-01-01&end_date=2026-07-11"
+curl "http://localhost:8000/api/v1/research/risk-free-rate?series_id=china_treasury_10y&order=asc&limit=2000&offset=0"
 ```
 
 ---

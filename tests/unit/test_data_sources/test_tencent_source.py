@@ -104,7 +104,7 @@ async def test_lot_market_volume_converted_by_100():
     assert bars[0]["volume"] == 89817200
     # amount 万元 -> 元, 且消除二进制尘埃
     assert bars[0]["amount"] == 841972900.0
-    assert bars[0]["turnover"] == 0.0
+    assert bars[0]["turnover"] is None  # Source does not provide turnover; zero is not a measurement.
 
 
 @pytest.mark.asyncio

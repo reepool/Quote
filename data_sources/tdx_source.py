@@ -1475,7 +1475,7 @@ class TdxSource(BaseDataSource):
                 "close": close_price,
                 "volume": volume,
                 "amount": amount,
-                "turnover": 0.0,  # pytdx 不提供换手率
+                "turnover": None,  # pytdx does not provide turnover
                 "pre_close": prev_close if prev_close > 0 else None,
                 "change": change,
                 "pct_change": pct_change,

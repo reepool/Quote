@@ -28,10 +28,15 @@ Cross-section responses SHALL preserve existing page-level stats and SHALL add f
 - **AND** existing selection and listed-only universe limitations SHALL remain intact
 
 ### Requirement: PIT Ratios Provide A Decimal Projection Without Changing Stored Percentages
-PIT cross-section responses SHALL retain legacy percentage-valued indicators and SHALL expose decimal ratios for gross_margin, operating_margin, net_margin, roe, roa and asset_liability_ratio in a ratios object with machine-readable units. Multiple-valued and currency-per-share indicators SHALL retain their own units.
+PIT cross-section responses SHALL retain legacy percentage-valued indicators as deprecated compatibility keys, SHALL expose matching unit-bearing `<name>_pct` aliases, and SHALL expose decimal ratios for gross_margin, operating_margin, net_margin, roe, roa and asset_liability_ratio in a ratios object with machine-readable units. Multiple-valued and currency-per-share indicators SHALL retain their own units. Only requested business values and their requested aliases SHALL be serialized when fields projection is active; quality filtering and statistics SHALL use the complete selected rows internally.
 
 #### Scenario: A legacy percentage is normalized once
 - **WHEN** a selected PIT row has roe=4.687220683893516
 - **THEN** its projected ratios.roe SHALL equal 0.04687220683893516 within serialization precision
-- **AND** legacy roe SHALL remain 4.687220683893516
+- **AND** legacy roe and roe_pct SHALL remain 4.687220683893516, with legacy roe marked deprecated in the actual response schema
 - **AND** neither stored panel rows nor their availability metadata SHALL be rewritten
+
+#### Scenario: Projection omits fields needed internally for quality statistics
+- **WHEN** the caller requests only revenue and a quality exclusion filter
+- **THEN** all quality filtering and whole-cross-section counts SHALL still be correct
+- **AND** unrelated ratio values SHALL NOT be appended merely because the internal selected row contains them
