@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600103-post-closure-20261110",
+  "binding_sha256": "bb3d0f9db17df04c3687ec30c309bd00aa39ed9a1cf54696b2c8ebdf3c6821e5",
+  "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+  "approval_reference": "company-core-post-closure-observation-card; user approved one routine observation 2026-11-10",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "user_approved_post_closure_observation",
+  "window": "one fresh 600103 chapter run, 120000/900/16/2"
+}
