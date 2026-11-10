@@ -14,6 +14,7 @@ from research.financial_read_projection import (
     CORE_FACTS,
     INDICATORS,
     METADATA,
+    financial_projection,
 )
 from research.risk_free_rate_sync import RiskFreeRateSyncService
 from research.storage import ResearchStorageManager
@@ -224,6 +225,93 @@ async def test_financial_http_summary_fields_full_history_and_flags(monkeypatch)
     storage.conn.close()
 
 
+@pytest.mark.asyncio
+@pytest.mark.parametrize("layer", ["local_core", "remote_extension"])
+async def test_service_only_financial_values_survive_http_projection(
+    monkeypatch, layer
+):
+    from fastapi import FastAPI
+
+    from api import routes
+
+    manager = DataManager.__new__(DataManager)
+    manager._require_research_storage = lambda: SimpleNamespace(
+        get_financial_statement_bundle=lambda *args, **kwargs: None
+    )
+    manager.research_config = SimpleNamespace(
+        modules={"financial_statements": {"enabled": True}}
+    )
+    manager._get_research_instrument_info = AsyncMock(
+        return_value={
+            "instrument_id": "600519.SH",
+            "symbol": "600519",
+            "exchange": "SSE",
+        }
+    )
+    layers = (
+        {
+            "local_core": {
+                "report_period": "2025-12-31",
+                "facts": {"revenue": {"fact_value": 100}},
+            }
+        }
+        if layer == "local_core"
+        else {
+            "remote_extension": {
+                "facts": [
+                    {
+                        "canonical_fact_name": "revenue",
+                        "fact_value": 100,
+                        "report_period": "2025-12-31",
+                    }
+                ]
+            }
+        }
+    )
+    manager._get_research_financial_statement_service_layers = AsyncMock(
+        return_value=layers
+    )
+    monkeypatch.setattr(routes, "data_manager", manager)
+    app = FastAPI()
+    app.include_router(routes.router, prefix="/api/v1")
+    path = "/research/company/600519.SH/financial-statements"
+    control = (
+        {"include_local_core": True}
+        if layer == "local_core"
+        else {"allow_remote_extension": True, "requested_canonical_facts": "revenue"}
+    )
+    full = await get(app, path, view="full", **control)
+    assert full.status_code == 200, full.text
+    assert full.json()["facts"]["revenue"] == 100
+    for projection in (
+        {},
+        {"fields": "revenue"},
+        {"view": "full", "fields": "revenue"},
+    ):
+        response = await get(app, path, **control, **projection)
+        assert response.status_code == 200, response.text
+        result = response.json()
+        assert result["revenue"] == 100
+        assert result["source"] == "service_layers"
+        assert result["report_period"] == "2025-12-31"
+        assert result["units"]["revenue"] == "CNY"
+        assert "facts" not in result and "statements" not in result
+        if "fields" in projection:
+            assert "net_income" not in result and "indicators" not in result
+        call = (
+            manager._get_research_financial_statement_service_layers.await_args.kwargs
+        )
+        assert call["allow_remote_extension"] is (layer == "remote_extension")
+    # Stored canonical scalars remain authoritative, including an explicit null.
+    assert (
+        financial_projection(
+            {"source": "fixture", "revenue": None, "facts": {"revenue": 100}},
+            fields=["revenue"],
+        )["revenue"]
+        is None
+    )
+
+
 def make_rate_storage():
     conn = _make_conn()
     conn.execute("DROP TABLE risk_free_rate_observations")
@@ -428,6 +516,68 @@ def test_relative_checks_available_denominators_and_subject_validity():
     )
     assert capped["percentile_rank"] is capped["premium_to_median"] is None
     assert capped["subject_missing_reason"] == "above_maximum"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("nonfinite", [float("inf"), float("nan")])
+@pytest.mark.parametrize("location", ["subject", "peer"])
+async def test_relative_invalid_multiples_remain_readable_over_http(
+    monkeypatch, nonfinite, location
+):
+    import math
+
+    from fastapi import FastAPI
+
+    from api import routes
+
+    instrument = {"instrument_id": "600519.SH", "symbol": "600519", "exchange": "SSE"}
+    subject = {**instrument, "pe_ttm": 21.0}
+    peers = [
+        {**instrument, "instrument_id": str(i), "pe_ttm": value}
+        for i, value in enumerate((20.0, 22.0, -5.0))
+    ]
+    target = subject if location == "subject" else peers[0]
+    target["pe_ttm"] = nonfinite
+    result = ResearchValuationService(
+        {"relative": {"min_peer_count": 1}}
+    ).build_relative_valuation(
+        instrument=instrument,
+        subject_row=subject,
+        peer_rows=peers,
+        industry_membership={
+            "mapping_status": "authoritative",
+            "sw_l2_code": "fixture",
+        },
+    )
+    monkeypatch.setattr(
+        routes,
+        "data_manager",
+        SimpleNamespace(get_research_relative_valuation=AsyncMock(return_value=result)),
+    )
+    app = FastAPI()
+    app.include_router(routes.router, prefix="/api/v1")
+    response = await get(app, "/research/company/600519.SH/valuation/relative")
+    assert response.status_code == 200, response.text
+    payload = response.json()
+    assert (
+        payload["peers"][2]["pe_ttm"] == -5.0
+    )  # Finite raw negatives stay inspectable.
+    stats = payload["benchmark_summary"]["pe_ttm"]
+    if location == "subject":
+        assert payload["subject_valuation"]["pe_ttm"] is None
+        assert stats["percentile_rank"] is stats["premium_to_median"] is None
+        assert stats["subject_missing_reason"] == "non_positive_or_non_finite"
+    else:
+        assert payload["peers"][0]["pe_ttm"] is None
+        assert stats["valid_peer_count"] == 1 and stats["excluded_peer_count"] == 2
+        assert stats["peer_mean"] == stats["peer_median"] == 22
+        assert (
+            payload["diagnostics"]["metric_exclusions"]["pe_ttm"][0]["reason"]
+            == "non_positive_or_non_finite"
+        )
+    assert not math.isfinite(
+        target["pe_ttm"]
+    )  # Read projection does not mutate raw data.
 
 
 @pytest.mark.asyncio

@@ -133,6 +133,38 @@ async def test_known_missing_and_real_zero_turnover(
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("quality", [None, "absent", float("nan")])
+async def test_unknown_quality_is_conservative_independent_of_turnover(
+    quote_http, quality
+):
+    app, manager = quote_http
+    raw = bar(source="baostock", turnover=2, quality_score=quality)
+    if quality == "absent":
+        raw.pop("quality_score")
+    manager.get_quotes.return_value = pd.DataFrame([raw])
+    daily = await get(app, "/quotes/daily", **daily_args(adjust="none"))
+    assert daily.status_code == 200, daily.text
+    row = daily.json()["data"][0]
+    assert row["quality_score"] == 0
+    assert row["missing_reason"]["quality_score"] == "not_available"
+    assert "quality_score" in row["missing_fields"]
+    assert row["turnover"] == 2 and row["is_complete"] is True
+    latest = await get(app, "/quotes/latest", instrument_ids="600519.SH")
+    assert latest.status_code == 200, latest.text
+    assert latest.json()[0]["quality_score"] == 0
+    for visible in (True, False):
+        filtered = await get(
+            app,
+            "/quotes/daily",
+            **daily_args(adjust="none"),
+            min_quality_score=0.01,
+            include_quality=visible,
+        )
+        assert filtered.status_code == 200, filtered.text
+        assert filtered.json()["data"] == []
+
+
+@pytest.mark.asyncio
 async def test_filters_use_public_quality_even_when_hidden(quote_http):
     app, manager = quote_http
     manager.get_quotes.return_value = pd.DataFrame(

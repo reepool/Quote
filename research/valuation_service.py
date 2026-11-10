@@ -1891,7 +1891,7 @@ class ResearchValuationService:
 
     @staticmethod
     def _compact_valuation_row(row: Dict[str, Any]) -> Dict[str, Any]:
-        return {
+        result = {
             "instrument_id": row.get("instrument_id"),
             "symbol": row.get("symbol"),
             "exchange": row.get("exchange"),
@@ -1910,6 +1910,17 @@ class ResearchValuationService:
             "ps_forward": row.get("ps_forward"),
             "data_as_of": row.get("data_as_of"),
         }
+        # JSON cannot represent NaN/Infinity. Keep finite raw values (including
+        # excluded negative multiples) inspectable, without mutating storage.
+        for key in ("close_price", "market_cap", *VALUATION_PERCENTILE_FIELDS):
+            value = result.get(key)
+            if value is not None:
+                try:
+                    if not math.isfinite(float(value)):
+                        result[key] = None
+                except (TypeError, ValueError):
+                    result[key] = None
+        return result
 
     def _merge_parameters(self, overrides: Dict[str, Any]) -> Dict[str, Any]:
         merged = deepcopy(DEFAULT_VALUATION_PARAMETERS)

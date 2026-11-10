@@ -201,3 +201,37 @@ Tencent是现行A股备用来源，日线/快照也硬编码换手率0，与TDX�
 Review 分类：A 类已修复真实 HTTP 稀疏序列化、未知参数与旧 400 错误兼容、首次利率父记录/失败时间保护、估值分母读取与校验、latest 空窗口及可空参考值序列化等；B 类整体路由/存储拆分和未来治理不扩大；C 类既有 DCF 周期测试失败及已有 `data_manager.py` 无关路径的 `source_symbol` 未定义保持原样。DCF 失败在本次估值改动前已复现：`test_valuation_service_dcf_cyclical_uses_futures_cycle_for_margin_normalization` 预期 futures-cycle 调整标记，当前返回 clamped 标记；因此本轮定向回归明确排除此例，不声称全仓全绿。
 
 工作区保护：按任务起始基线核对并只提交本 change 可隔离改动。比对时发现公司画像验收/任务文档、restore-company-profile change 和 requirements.txt 等非本任务文件被并行更新；本任务没有写入或还原这些文件，也不将它们加入提交。原反馈未跟踪文件保持原样。核对测试目录名称、无 pytest 活跃锁且相关进程已结束后，删除本轮 pytest-78/79/80 的可重建 fixture 和本任务基线副本，共释放 27,726,162 字节；另移除本轮显式编译生成的字节码 3,220,370 字节。其他缓存、归属不明的历史日志和并行制品保留。必要证据仅保留本节及对应测试，没有保存生产库副本或完整响应正文。
+
+
+### 实现对照复审（2026-11-10，审核结论未通过）
+
+针对实现提交 `504ede5d` 重新核对五份 delta spec 和实际 HTTP 链路。上一节 30/30 完成结论偏早；本轮重新打开任务 2.3、3.2、5.1、6.4，当前为 26/30。仅修改审核记录与任务状态，未修改业务实现、暂存、提交、推送或操作生产。
+
+- **P1 / 3.2：分层财务值被摘要/fields 丢失。** 当标准 bundle 不存在、显式 local_core 或 remote_extension 有 canonical facts 时，既有 fallback 把数值置于 `facts`；新投影仅以 `bundle.get(key)` 取顶层标量。受控 HTTP 请求中，`view=full&include_local_core=true` 的 `facts.revenue=100`，同一数据的 `fields=revenue&include_local_core=true` 却返回 `revenue=null`（200）。需要在既有权威 fallback 上将可用规范值接入标量投影，并补实际 HTTP 回归，不能改造成新的事实源。
+- **P2 / 5.1：估值排除了非有限比较值，但整个响应仍可能 500。** 有一个 `pe_ttm=Infinity` 同行和一个正常同行时，内部统计有效数已正确为 1，但 `peers` 的 compact 行继续带 Infinity；Pydantic 接受它，JSON 序列化失败，实际 relative endpoint 返回 500。主体有同类值也有相同风险。需要在对外投影中将不可用非有限值表达为 null 并保留诊断，补端到端测试；不修改历史原始值。
+- **P2 / 2.3：未知质量分处理错误地依赖换手率缺失。** 对合法 `turnover=2`、`quality_score=null` 的可存储行，normalize 保留 null，latest 的非空 float 模型校验失败；评分键缺失时还会由模型默认值补成 1。应独立归一未知评分为 0 并标注缺失原因，保留“已知缺换手率才封顶 0.9”的规则，验证 daily/latest/隐藏质量时的筛选一致性。
+
+复验：`openspec validate fix-market-data-api-consumption-semantics --strict` 仍通过；`python -m pytest tests/unit/test_api/test_data_consumption_contract.py tests/unit/test_research/test_data_read_repairs.py -q` 为 18 passed。独立补充的 7 个本地复现为 5 failed / 2 passed（5 个失败对应上述 3 个缺陷；空筛选结果与既有数值范围 422 对照例通过）。所有复现均为内存 fixture 和本地 ASGI，没有生产数据写入。严格校验只证明规范格式有效，原有测试通过不能替代遗漏边界的业务验收。
+
+补修用的短复现脚本及本轮 Git 状态基线暂存于 `data/QuoteBak/review-market-data-consumption-20261110/`，仅供下一轮将失败例转为正式回归测试；补修复验完成后删除。该目录为本轮新建，无本 change 前序遗留物可清理；其他并行/历史制品不处理。本节为持久审核证据，不保存完整接口正文或数据库副本。
+
+
+### 缺陷有效性复核与修复闭环（2026-11-10）
+
+三项均属实，属于既有需求遗漏，不属于过度审核：分层 fallback 是现行可用路径，字段投影必须保留其规范数值；非有限倍数已被规范和原有测试明确纳入异常输入，SQLite REAL 也允许持久化 Infinity；quality_score 在实际模型中 nullable，规范明确要求未知评分保守为 0。这里的异常值 fixture 用于验证既定合同，不表示已经证明生产库存在这些异常行。仅修复直接影响当前结果/HTTP 返回的问题，不扩展治理框架、生产回填、路由拆分或阈值策略。
+
+修复内容：
+
+- `financial_read_projection.py` 只对 owner 标为 `source=service_layers` 的既有 fallback，从已选择的规范 `facts` 取缺失顶层科目；已有标量（包括显式 null）保持权威。full 明细、远程授权和正常 summary 的无完整 JSON 读取合同不变。
+- `valuation_service.py` 的 relative 专用 compact 读投影将 NaN/Infinity 等无效数值转为 null，继续由原有 metric diagnostics 报告排除原因。有限负值继续作为 raw 对照，原始行、统计集合、calc_version/parameter_hash、历史估值和 DCF 计算不变。
+- `quote_read_semantics.py` 独立处理未知评分，输出 0 及 missing_fields/missing_reason；换手率缺失才适用的 0.9 上限、正常来源有效零值、OHLCV 完整性和停牌状态保持原规则。daily/latest 共用同一投影，隐藏质量不绕过筛选。
+
+验证（所有命令先 `source scripts/quote_dev_env.sh`，Python 为 `/home/python/miniconda3/envs/Quote/bin/python`）：
+
+- 新增 9 个正式回归例在修复前均失败，覆盖 local_core/显式 remote_extension，summary/fields/full 优先级，主体/同行 NaN/Infinity，以及评分 null/缺键/NaN。修复后 `python -m pytest tests/unit/test_research/test_data_read_repairs.py tests/unit/test_api/test_data_consumption_contract.py -q` → **27 passed**；补齐真实远程路径必需的 requested_canonical_facts 后该两项 HTTP 用例再次通过。
+- `python -m pytest tests/unit/test_api/test_research_routes.py tests/unit/test_api/test_quote_query_semantics.py tests/unit/test_api/test_quote_capability_improvements.py tests/unit/test_data_sources/test_tdx_source.py tests/unit/test_data_sources/test_tencent_source.py -k 'not real and not integration' -q` → **189 passed / 3 deselected**。
+- `python -m pytest tests/unit/test_research/test_valuation_service.py tests/unit/test_research/test_technical_service.py tests/unit/test_research/test_financial_pit_panel.py tests/unit/test_research/test_query_service.py tests/unit/test_research/test_data_manager_bootstrap.py tests/unit/test_research/test_risk_free_rate.py -k 'not futures_cycle_for_margin_normalization and not database_route_state_is_isolated and not interest_reads_ignore_other_thread and not nested_and_failing_database_scopes and not missing_series_does_not_hide' -q` → **190 passed / 6 failed / 6 deselected**。排除项为已记录的既有 DCF 周期断言和上轮已通过、且本轮未修改路径的 5 个慢速数据库路由例。
+- 扩展回归的 6 个失败属于当前工作区既有测试失配：`test_data_manager_bootstraps_research_storage_when_enabled` 仍断言直接 initialize（当前 owner 为 ensure_business_profile_storage_ready）；3 个 `test_data_manager_get_research_shareholder_readiness_*` 的旧 mock 不匹配当前股票池查询。这 4 项在独立进程内加载 HEAD 修复前三模块后仍以相同原因失败，未回退或改写共享工作区。另外 `test_research_industry_standard_sync_forces_master_governance_refresh` 和 `test_data_manager_financial_summary_sync_attaches_master_governance` 仍 mock 旧 ensure_instrument_master_fresh，而实际路径已是 run_master_governance_for_job；入口代码未被本 change 修改。首次扩展回归发现这两个旧 fixture 可触及真实上游，因此未重复运行它们。未改变这 6 项测试的预期，不据此声称全仓全绿，也不把无关修复并入本 change。
+- 本轮修改的 helper/测试 ruff、语法与 diff 检查通过；OpenSpec strict 校验通过。修后再次审核全部新增差异及调用方，没有发现本轮引入的阻塞缺陷。没有修改数据库结构、调度、远程启用、复权因子、PIT 可得日或技术算法；未执行生产迁移和服务重启。
+
+任务 2.3、3.2、5.1、6.4 已恢复完成，当前 **30/30**；可在实施验收后归档。公司画像相关文档在本轮被并行更新，本人没有写入、还原或暂存这些路径。上一轮短复现已转入正式测试，相关进程结束且无活跃锁后，已清理 `review-market-data-consumption-20261110` 和 `fix-market-data-review-repairs-20261110` 两个本人临时目录；共释放 2,597,346 字节；必要证据保留在本节与正式测试中。

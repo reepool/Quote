@@ -89,6 +89,12 @@ def financial_projection(
     indicators = bundle.get("indicators") or {}
     ratios = {key: indicators.get(key) for key in PERCENT_RATIOS}
     currency = bundle.get("currency")
+    # The existing service-layer fallback has no canonical scalar row and
+    # exposes its selected canonical values in facts. Do not use arbitrary raw
+    # JSON to override stored scalar values, including an explicit null.
+    fallback_facts = (
+        (bundle.get("facts") or {}) if bundle.get("source") == "service_layers" else {}
+    )
     if view == "full" and fields is None:
         result = dict(bundle)
     else:
@@ -96,7 +102,7 @@ def financial_projection(
         selected = fields if fields is not None else list(CORE_FACTS)
         for key in selected:
             if key in CORE_FACTS:
-                result[key] = bundle.get(key)
+                result[key] = bundle[key] if key in bundle else fallback_facts.get(key)
             else:
                 group, field = key.split(".", 1)
                 result.setdefault(group, {})[field] = (

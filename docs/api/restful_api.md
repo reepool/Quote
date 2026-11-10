@@ -122,6 +122,7 @@ http://localhost:8000/api/v1
 - `currency` 和顶层 `units` 声明价格、金额、股数、百分数及小数比例的单位（例如 A 股价格 `CNY/share`、港股金额 `HKD`）；`price_basis/volume_basis/return_basis` 声明口径。CSV 同样包含新投影列；单位表见 JSON/OpenAPI。
 - `tradestatus`：`1`=正常交易，`0`=停牌；`pre_close` 在除权日为除权调整后的参考价。
 - pytdx/Tencent 不提供的换手率以 `turnover=null` 返回；其历史占位 0 仅在读投影中归一，并记录缺失原因、将质量分上限设为 0.9。其他来源的真实 0 保留。质量归一及所有过滤先于统计、分页，`include_quality=false` 只隐藏质量字段，不绕过 `min_quality_score`。
+- 无论换手率是否可用，未知或非有限质量分均保守返回 `quality_score=0` 并标注缺失原因，不由响应模型补成满分。
 
 响应结构（200，`DailyQuotesEnvelopeResponse`）：
 - `data`：日线行情行数组，行字段见 `DailyQuoteResponse`（`time/open/high/low/close/volume/amount/turnover/pre_close/change/pct_change/tradestatus/factor/adjustment_type/source/batch_id`）。
@@ -374,6 +375,7 @@ curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-indicato
 
 当前边界：
 - `fields` 优先于 full 展开，只保留请求的业务值和身份、报告期、可得日、来源及单位等必要元数据；HTTP 不补回未请求字段的 null 默认值。`requested_canonical_facts` 不是 fields 的别名。
+- 标准 bundle 缺失而既有分层来源有规范值时，摘要/fields 沿用该来源 owner 已选择的值；已有本地标量（包括明确的 null）不会被原始明细覆盖。远程授权条件不变。
 - `ratios` 为小数比例；原财务百分比语义指标已是小数比例，直接沿用，不再除以 100。流动/速动比率仍为倍数，每股值保持原单位。显式 `service_layers` 诊断不在默认摘要大小承诺内。
 - 多期读取使用 `/financial-statements/history`；底层 source manifest、hot/cold tier 和 readiness 仍由现有同步 owner 负责。
 - 官方结构化 `SSE/CNInfo/BSE` 源默认仍 disabled；在 live probe 和小样本 backfill 通过前，实际生产链路仍以 AkShare fallback 为主。
@@ -450,6 +452,7 @@ curl "http://localhost:8000/api/v1/research/company/600000.SH/valuation/history?
 - `benchmark_summary`：逐指标返回 valid peer count、mean、median、p25、p75、percentile rank、相对中位数溢价/折价。
 - `diagnostics.metric_exclusions`：逐指标列出因缺失、非有限/非正数、可用明细中的无效分母、不可用口径或显式阈值被排除的同行样本。没有分母明细时只核可见倍数。
 - 每个指标的全部比较统计使用同一有效同行集合，另有 `peer_raw_mean/raw_peer_count` 保留有限原始值（包括负值）的对照。主体倍数无效时，排名和相对溢价为 null，并说明原因。
+- 主体与 `peers` 中无法用 JSON 表达的非有限数值返回 null，指标诊断保留排除原因；有限负数仍作为原始对照保留，不改写历史数据。
 - 可选 `max_pe/max_pb` 必须为有限正数，只作用于对应指标族；省略时不额外启用固定高值阈值。响应回显 policy，阈值参与 `parameter_hash`，统计算法版本为 `relative_valuation.v2`。主要比较值为有效样本中位数和分位数，不承诺均值落在四分位区间。
 - `subject_valuation`、`peers`：保留静态、TTM、forward/MRQ 指标字段，便于调用方明确选择口径。
 

@@ -41,10 +41,14 @@ def normalize_quote_quality(record: Mapping[str, Any]) -> dict[str, Any]:
             if row.get("source") in MISSING_TURNOVER_SOURCES
             else "not_available"
         )
-        score = row.get("quality_score")
-        row["quality_score"] = min(float(score), 0.9) if finite_number(score) else 0.0
-        if not finite_number(score):
-            reasons["quality_score"] = "not_available"
+    score = row.get("quality_score")
+    if not finite_number(score):
+        row["quality_score"] = 0.0
+        if "quality_score" not in missing:
+            missing.append("quality_score")
+        reasons["quality_score"] = "not_available"
+    elif unavailable:
+        row["quality_score"] = min(float(score), 0.9)
     row["missing_fields"] = missing
     row["missing_reason"] = reasons
     return row
