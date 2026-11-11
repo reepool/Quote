@@ -2,7 +2,7 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-11-10。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。[审核§254](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#254-a审核第1轮样稿展示达标按原卡直接交第2轮)：第1轮青山纸业样稿已可读，展示达标、新处理1/3。下一仍[原三轮卡第2轮](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-three-round-preview-card.md)：浦发/上汽各一次直接出正文和三家对照，不补青山、不等先选栏目、不恢复工程收口；旧每家/整卡资源不变，第3轮反馈后结束。待核/缺项明示、S1不加分；每轮先清后做/保样稿再清过程物。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。[用户补充§255](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#255-用户确认八要素内容目标先交画像再查遗漏和有效章节)：当前不是继续工程收口，也不止两段简介；按[原三轮卡第2轮](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-three-round-preview-card.md)交浦发/上汽八要素画像，再离线对照三家缺项、遗漏、有效章节与实际查找难度。青山不重跑，后两家各一次和原预算不变；B同窗局部实现/短检/冻结/运行/查漏/清理一次交接，不另交准备卡。新处理仍1/3、待核不晋升/S1不加分，第3轮收敛；每轮先清后做/保正文与精确计数后收尾。
 
 ## 1. 开发者必须先理解的纠偏
 
