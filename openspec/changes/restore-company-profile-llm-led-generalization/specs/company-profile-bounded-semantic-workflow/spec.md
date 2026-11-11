@@ -1,7 +1,7 @@
 ## MODIFIED Requirements
 
 ### Requirement: Common core dimensions map to the existing task vocabulary
-The existing company_profile_common_core_mapping.v1 MUST remain readable; the new policy MUST version and register semantic discovery, source-first coverage and evidence-linked summary metadata before use. Principal business, products/services and revenue model MUST be projection/evaluation dimensions, not new ChapterTask values or request field IDs. Existing chapter tasks MUST be reused where adequate; bounded document discovery and coverage purposes MUST be explicitly registered in the extract/verify protocol, and unknown unregistered values MUST be rejected before provider invocation. extract_business_overview with business_overview_source and explicit_activity owns the common narrative. extract_segment_financials with segment_dimension and operating_revenue supplements disclosed business/revenue composition. Other existing tasks activate only for supported enhancements. A single accepted passage MAY support multiple dimensions only when each dimension has substantive source support; its existence alone MUST NOT mark all three answered.
+The existing company_profile_common_core_mapping.v1 MUST remain readable. New v9 company_profile_workpaper.v1 metadata, request schema and consumers MUST be explicitly versioned together before execution. The eight workpaper elements and principal business/products/revenue dimensions are output/evaluation projections, not new ChapterTask values. Existing tasks and fact/Evidence types MUST be reused where adequate. The registered workpaper purpose MAY interpret several related selected sections and several elements in one request through the existing provider; unsupported legacy fields/tasks remain rejected. Numeric extraction tasks and existing observed fields cannot substitute for open-language understanding or declare core completeness.
 
 #### Scenario: Three core dimensions share an overview passage
 - **WHEN** a passage explicitly names the main business, its services and its fee model
@@ -18,7 +18,7 @@ The existing company_profile_common_core_mapping.v1 MUST remain readable; the ne
 - **THEN** the vocabulary validator rejects it before LLM access.
 
 ### Requirement: Each semantic request is bounded to one chapter task
-The existing extract, repair and verify request/response models MUST have explicit versioned purposes, report identity, source scope, allowed fields, prohibited inferences and resource budgets. Fact extraction MUST retain one chapter task per request and complete necessary headers, units, footnotes and continuation context. Document discovery, source-first inventory and cross-chapter evidence-linked synthesis MUST use registered bounded purposes within the existing provider, not an unconstrained mixed extraction prompt. Unsupported fields and unregistered tasks MUST be rejected. Incomplete discovery scopes MUST be reported rather than pretending full-report coverage.
+The one-ChapterTask restriction MUST remain in force for legacy typed fact-extraction requests, but MUST NOT be applied as a one-section or one-element restriction to the explicitly versioned v9 company-workpaper purpose. That purpose MAY accept a bounded pack of related source sections and return the registered eight-element projection, with report/source identity, allowed fields, prohibited inferences and actual resource limits. Requests MUST preserve complete necessary headers, units, footnotes and continuation context. A separate source-condition inventory and another synthesis call MUST NOT be mandatory before a v9 draft can be saved. Protocol, gateway schema, parser and persistence/read consumers MUST agree before use; unknown unregistered values and claims of full-report coverage from partial sources remain invalid.
 
 #### Scenario: Table row has no unit context
 - **WHEN** a numeric extraction request lacks the owning unit context
@@ -61,7 +61,7 @@ A repair request MUST include the original request, original candidate or covera
 - **AND** the original candidate remains unresolved
 
 ### Requirement: Verification is independent and cannot mutate facts
-A bounded source-first inventory MUST be obtained without candidate answers and used to identify omitted major disclosures. Verify MUST evaluate each candidate and each active checklist item against the original Evidence, returning `pass`, `block`, or `unclear` checks and reason codes. Verify MUST return omission checks without editing facts. It MUST NOT add candidates, edit source values, choose package assignment, grant approval, perform canonical conversion, or waive a blocking check through an aggregate score.
+Verification MUST compare actual content against original source evidence and preserve the distinction between support and omission coverage. Under v9, A's independently read reference and selected-source review MAY establish the development comparison scope; a separate paid candidate-free inventory MUST NOT be required before producing every workpaper. For formally trusted results, applicable support/omission checks and valid dependency states remain required. The legacy stage-four verify protocol still returns pass/block/unclear for its candidates and active checklist without editing facts, adding candidates, granting approval, changing source values or waiving a blocking check by aggregate score. Manual references and controlled checks never establish real model success.
 
 #### Scenario: Third-party actor is not rewritten
 - **WHEN** a report describes a trader selling to the end customer while the issuer only supplies or contracts with that trader
@@ -89,7 +89,7 @@ A bounded source-first inventory MUST be obtained without candidate answers and 
 - **AND** average accuracy cannot override the blocker
 
 ### Requirement: Report usability requires complete core chapters and no frozen blocker
-For the new policy, core delivery MUST include substantive principal business, major products/services and revenue model together with source-supported product/input exposure and supply-chain positioning. The acceptance program MUST define usable, limited and isolated grades; all six manufacturing tasks are not universally mandatory. Full-report indexing, section selection, actual source reading and verified core completeness MUST remain distinct, versioned states. The v8 ordinary path MUST use selected sections and targeted recovery rather than require full-text real-LLM reading. Unselected pages MUST remain unread, but their unread status alone MUST NOT negate an otherwise evidenced core or establish not_disclosed. Known unresolved major-business, required-reading and necessary-context gaps MUST prevent core completeness; selection or existing fields MUST NOT erase them. Record validation errors MUST isolate affected records and dependent derivations. Missing supplementary operating, input, counterparty or event details MUST remain explicit but MUST NOT block unrelated core facts. Task execution failure MUST remain a failure for that task, while record delivery and core completeness are evaluated separately. Historical frozen six-chapter runs retain their versioned statuses.
+The v9 system MUST distinguish basic workpaper delivery, selected-section information coverage, formal core completeness and production authorization. A sourced pending workpaper MAY be rendered and queried with explicit partial elements and unread scopes without running a complete-report condition checklist. Formal usable company status still requires substantive principal business, major products/services, revenue model, relevant exposures/roles and the applicable acceptance checks; known material errors or major omissions cannot be hidden as minor gaps. Reading MUST use report-local section boundaries, not isolated candidate pages or fixed page counts. Missing secondary operating/input/counterparty/event detail does not block independent facts. Legacy six-chapter statuses, old first-run results and authorization limits remain unchanged.
 
 #### Scenario: Enhanced operating quantities fail
 - **WHEN** a quantity scope fails and the common business core is evidenced
@@ -102,3 +102,23 @@ For the new policy, core delivery MUST include substantive principal business, m
 #### Scenario: Supplementary scope repeats a field
 - **WHEN** the same field appears in several scopes
 - **THEN** chapter reconciliation checks object, period, metric and disclosure obligation before treating coverage as satisfied.
+
+## ADDED Requirements
+
+### Requirement: Selected section packets retain PDF table meaning
+The company-profile consumer MUST reuse the existing shared PDF/layout/recovery owners to assemble selected-section text, not build another parser or bypass shared OCR policy. A packet MUST contain the source version, report-local section IDs/title paths and source spans, and ordered paragraph/table blocks. Tables MUST preserve title, subject, period, unit/currency, column and row headers, blank/merged-cell relationships, signs, footnotes and original per-page provenance. Continuations may be linked or merged only when owning-table/header relationships are supported; unresolved layout MUST remain explicit. Native structure SHOULD be reused, bounded layout/image recovery MAY target a genuinely affected table, and full-report OCR or plain-text nonemptiness MUST NOT be treated as table correctness.
+
+#### Scenario: A table crosses a PDF page boundary
+- **WHEN** an income table continues onto the next physical page without repeating all headers
+- **THEN** the selected packet includes the governing header and continuation rows with their original source coordinates and correct relationships
+- **AND** slicing retains necessary table context without shifting blank cells, guessing labels or overwriting the immutable page text
+
+#### Scenario: A continuation cannot be safely reconstructed
+- **WHEN** column ownership or table identity remains ambiguous after available bounded source recovery
+- **THEN** the packet exposes the ambiguity and affected metrics remain unclear while independent narrative and other valid tables remain usable
+- **AND** no amount is borrowed from a neighboring row and no unrelated full-document OCR run is started by default
+
+#### Scenario: A new report has different physical pagination
+- **WHEN** equivalent business subsections occupy different page ranges or use different TOC labels
+- **THEN** the packet is rebuilt from that report's TOC/headings and true subsection boundaries, with physical pages used only for localization
+- **AND** a selected business introduction does not imply that a fixed number of adjacent pages covers the full operating-model section

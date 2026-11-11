@@ -1,5 +1,7 @@
 # B3 / S1：固定12家新链回归
 
+> 历史卡入口说明（2026-11-11，§257）：下方历次“当前/授权”只解释原冻结合同，不再指挥新运行。当前唯一计划为[章节底稿卡](company-profile-chapter-workpaper-card.md)：A人工有源底稿→精选章节文本/表格→同结构JSON；旧三家尝试已用，新增真实/探针/绑定/生产授权0。S1旧失败和预算不追改，不从本文件恢复任何未用余额。
+
 > **当前裁决（2026-11-03）：** [审核§179及新授权](review-submission.md#179-a审核真实核心已有实质进展合并解决末端有效覆盖)接受§30真实正文增量/清理，核心仍未完成，旧授权1/1已结束。当前仅[§31](#31-章节核心末端收敛与现有答案覆盖复验)/验收§7.82，合并修通已有答案的定位与有效覆盖；用户已批准一次40000账本/600秒/4物理含1恢复的复验，离线就绪后B冻结执行，当前0/1。不重读/成稿/银行/追加窗/借旧额；S1仍0/12。旧活动条款只留历史，不授权续跑。
 
 > A于2026-10-25依据[审核§113](review-submission.md#113-a审核浦发核心成立结束逐公司收口转入s1)发卡。采用[产品总需求](../../../docs/development/company_profile_product_and_industry_semantic_requirements.md)、[验收v2§7.50](../../../docs/development/company_profile_acceptance_program.md#750-浦发核心验收与s1连续开发授权2026-10-25)、[交付路径v3](../../../docs/development/company_profile_delivery_plan.md)及[A/B流程v3](../../../docs/development/ab_role_development_workflow.md)。本卡合并离线安全收尾、必要实现与12家真实回归；不再逐家公司派收口卡。

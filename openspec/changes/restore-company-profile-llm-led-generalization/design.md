@@ -4,11 +4,58 @@
 
 ## Goals / Non-Goals
 
-**Goals:** 同一owner交付三类相连产品；真实模型阅读、源先行漏项检查、可靠数值与硬约束分工；有限容错；4/12/20/100至全市场的有界计划；移除误导性有效指令并清理被替代代码。
+**Goals:** 先交有源人工公司画像底稿，以集中章节来源确定八要素和数字，再交章节文本/跨页表格材料及统一JSON抽取/原owner渲染；用异公司真实结果检验实用性与漏项后再推进远期阶段。复用既有PDF、Evidence、网关和writer；质量用于约束事实正确，不让完整性工程先于基础业务交付。
 
-**Non-Goals:** A审核规划，B沿原owner按当前卡连续交付；旧结果及失败保留。替换传输只证明协议，不是业务验收。B2三家真实收口结束，浦发只做已定离线安全撤句；后续S1仅限固定原12家回归。不建通用跨入口续跑、新网关/agent/数据库/writer/预算平台，不改用户池/生产，不擅自进入S2或增加回归第13家。
+**Non-Goals:** 不以每项100%齐全或全报告查漏作为底稿前置，不按公司/页码列生产规则，不建新parser/agent/writer/数据库/schema registry/预算平台；不改共享配置、日常生产或交易。旧运行与尝试保原结果，不复活旧预算或把人工参考/受控结果算作模型成功；新真实调用需另行明确授权。
 
 ## Decisions
+
+### 当前v9：人工参考、章节输入与JSON投影（§257）
+
+顺序固定为A参考底稿→确认信息/数字与章节贡献→B整理章节文本/表格→相同JSON结构的模型抽取和原owner呈现→原文遗漏对照。A先读上汽已有正式年报，产出一份human_reference JSON和由它渲染的人读版，逐事实链接章/节/页；此阶段不要求B先修执行链才能看到参考。下一异公司用浦发既有正式报告规划对照，旧尝试不重开，真实调用仍待新预算/版本合同。
+
+主源选择依据是信息密度、权威主体期间与语境完整，优先让一组章节同时回答多项业务问题。目录标题不一致时按业务功能识别并用正文标题定位实际边界；长章节按子节/段落/表格分块，页码只定位、不复制。只在核心缺口或冲突/损坏表格时定向补读；次要细节留空，不运行全文反复查漏或通用最小集合优化器。
+
+统一投影的规范定义在[workpaper requirement](specs/company-profile-llm-led-delivery/spec.md#requirement-structured-company-workpapers-have-one-evidence-linked-contract)，不另建生产事实体系。以下仅为协议形状示例，空结构不是本阶段可交付的人工底稿：
+```json
+{
+  "schema_version": "company_profile_workpaper.v1",
+  "origin": "human_reference",
+  "report": {
+    "instrument_id": "600104.SH",
+    "report_id": "bind-to-official-report-id",
+    "report_period": "2025-12-31",
+    "document_version": "bind-to-official-report",
+    "published_at": "2026-04-01T16:00:00+00:00"
+  },
+  "reading_scope": {
+    "sections": [],
+    "unread_or_deferred": [],
+    "selection_rationale": "",
+    "stop_reason": ""
+  },
+  "elements": {
+    "business_structure": {"status": "unclear", "facts": [], "limitations": []},
+    "products_services": {"status": "unclear", "facts": [], "limitations": []},
+    "revenue_model": {"status": "unclear", "facts": [], "limitations": []},
+    "scale_and_mix": {"status": "unclear", "facts": [], "limitations": []},
+    "operations_and_inputs": {"status": "unclear", "facts": [], "limitations": []},
+    "customers_channels_markets": {"status": "unclear", "facts": [], "limitations": []},
+    "operating_drivers": {"status": "unclear", "facts": [], "limitations": []},
+    "material_changes": {"status": "unclear", "facts": [], "limitations": []}
+  },
+  "evidence": [],
+  "limitations": []
+}
+```
+
+每条fact至少含fact_id/text/subject_scope/period/evidence_ids；metrics记录原名、原数、单位/币种、期间/主体/比较口径，规范化金额用十进制字符串并保留原数。Evidence记录document_version/section_path/physical_pages/原文片段及位置，表格用关联的表头/行列/金额/脚注span而非强迫一段大引文。原文与报告状态不改写；按既有对象映射到八项投影，JSON与Markdown不得各写一套互不一致的答案。
+
+LLM语义分析可直接产出结构化底稿，不强制另发source_inventory、再synthesis、再逐条coverage才允许待核交付。独立参考与范围审查保留，正式可信输出仍按适用质量合同核查。目标公司人工答案不进其真实抽取输入；异公司示例只教格式/要素，不将上汽产品和产业角色变成银行必填。source_scope字段合法不代表表头/续页真的完整。
+
+公司画像消费者复用共享PDF/布局及必要定向OCR，在选定章节包保留段落、表名、行列头、单位/期间、空格/合并关系与续表出处；不能恢复就明确unclear。实际计量使用真正发送的包，不能用假想全报告尾额阻挡首份有源JSON；也不能因还有余额就认为过大的单笔必能发送。只做与当前输入/消费直接相关的短测与Review，不增加通用框架。
+
+本次只有文档同步，没有代码实施/模型调用/可发送绑定/生产。原三家窗口均已用；旧“全文尾额”解释只保历史，尚未确定的运行原因不能写成新策略前提。以下所有日期化“当前”是旧版本背景，不授新执行权。
 
 **当前用户改向§252（2026-11-11）：** 原业务完整性开发退出当前主线，采用[三轮三家样稿卡](company-profile-three-round-preview-card.md)：公司级摘要早保存/早展示，query/export或Markdown直接给用户看，未核/缺项与真实处理身份明确，completion=false不清空正文。暂用少量通用栏目但不强制齐全，用户看过再定要求；固定3家各一次有界样稿，逐家公司完整性不阻塞其他家，禁止自动第四轮/补窗。历史真实预览与本轮新跑分开，正式S1/生产标准不改。
 

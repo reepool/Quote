@@ -2,9 +2,11 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-11-10。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。[用户补充§255](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#255-用户确认八要素内容目标先交画像再查遗漏和有效章节)：当前不是继续工程收口，也不止两段简介；按[原三轮卡第2轮](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-three-round-preview-card.md)交浦发/上汽八要素画像，再离线对照三家缺项、遗漏、有效章节与实际查找难度。青山不重跑，后两家各一次和原预算不变；B同窗局部实现/短检/冻结/运行/查漏/清理一次交接，不另交准备卡。新处理仍1/3、待核不晋升/S1不加分，第3轮收敛；每轮先清后做/保正文与精确计数后收尾。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[规范对齐§257](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#257-v9文档对齐人工底稿章节文本同结构抽取)/[章节底稿卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md)：A先交上汽人工有源JSON及人读版，再由B沿目录/真实章节边界整理集中来源文本与表格、接同结构抽取和原owner渲染；异公司真实调用待新授权。原三家尝试3/3已用，不再指挥重跑，实际模型样稿仅青山1份；S1仍0/12。以下历次“当前”均为历史上下文，不能恢复其授权；每轮先清后做、必要交付一套后清过程物。
 
 ## 1. 开发者必须先理解的纠偏
+
+**当前v9执行顺序（审核§257）：** 用户已重新明确“人工有源底稿→来源集中→结构化标准→精选章节文本→LLM读其他公司”。原三家窗口均已用，B第2轮材料不等于两份完整画像；现在不续派尾额/补页小卡，也不直接再次付费跑上汽或浦发。A先完成可读参考业务交付，B再按同一JSON投影接目录章节文本、表格和原query/export；章节策略按本报告目录/标题边界，不按样本页码。缺项和成本取舍写进规范，基础底稿与正式全报告质量验收分开。本文余下日期化裁决仅留历史，不是并行当前卡。
 
 **2026-11-11审核§251（当前）：** 可读源已让主营/产品/公司总额形成真实部分，§250仍未交完整核心且16次用尽。第7笔已读采购/自主生产/直销，major=false却被实际pending筛掉；产品细项/重复结构表述先展开，角色末尾才补，第8次length也未走已有可用恢复。A先前只核理想核心包而未核真实条件分布，承担就绪/路线判断不足。下一不是加2500上限或16次数，也不是再做一个分组工具；只按§7.107从实际源条件选择点替换末尾补问策略，以未答核心义务推进、保持LLM语义/对象覆盖，原入口真实规模的受控完整核心和length边界同窗交。零真实/探针/binding/扩样/生产，最多两次合并共性修正仍不成交边界止，不自动局部卡/付费；每轮清理并保原结果。
 

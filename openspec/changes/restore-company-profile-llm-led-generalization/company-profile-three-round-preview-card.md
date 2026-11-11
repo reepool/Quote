@@ -1,5 +1,7 @@
 # B任务卡：八要素公司画像、实际漏项与有效章节（原三轮卡第2轮）
 
+> 状态（2026-11-11，§257）：历史卡，三份入口已占用，未达三份模型画像。青山有成稿，上汽仅源审、浦发模型前失败；原费用/次数/结果不改，不再执行下方重跑指令、不借余额开启第4轮。当前仅[章节底稿卡](company-profile-chapter-workpaper-card.md)接续人工/离线计划，异公司真实调用待新授权。
+
 > 2026-11-11。依据[用户本次明确改向§252](review-submission.md#252-用户改向先展示三家公司样稿三轮内交效果)，本卡立即替代§7.107/6.AY工程收口任务；未完成的策略重整不再是前置。按[产品目标](../../../docs/development/company_profile_product_and_industry_semantic_requirements.md)、[验收§7.108](../../../docs/development/company_profile_acceptance_program.md)、[交付路径](../../../docs/development/company_profile_delivery_plan.md)及[A/B v3](../../../docs/development/ab_role_development_workflow.md)执行。用户“先跑几家”在本卡固定为青山纸业600103.SH、浦发银行600000.SH、上汽集团600104.SH的现有正式2025年报；这是效果展示，不是S1/S2/生产验收，也不是恢复旧失败窗口。
 
 ## 唯一目标与取舍
