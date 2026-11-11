@@ -1,0 +1,121 @@
+{
+  "schema_version": "b1_pool_observation_binding.v2",
+  "status": "frozen_for_readable_source_observation",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "cost_status": "unknown",
+  "profile": "semantic_extraction",
+  "config_path": "openspec/changes/restore-company-profile-llm-led-generalization/company-core-readable-source-600103-20261111-receipts/frozen-config.json",
+  "pool": "shared_semantic",
+  "route_fingerprint": "46b2196868aff034a6e8301c7573871fe0735ab75ff1c0a06e26e8500b5a4299",
+  "fallback_allowed": true,
+  "resource_feasibility_passed": true,
+  "max_elapsed_seconds": 900,
+  "max_tokens": 120000,
+  "max_physical_requests": 16,
+  "max_payload_utf8_bytes": 60000,
+  "max_output_tokens": 4000,
+  "max_cost_cny": "10",
+  "cost_note": "Priced cost stays within 10 CNY when a price exists. Unpriced usage stays unknown.",
+  "physical_pages": 220,
+  "knowledge_cutoff": "2026-09-17",
+  "discovery_scope": "full_text",
+  "prompt_version": "company_profile_report_reading.2026-11-03.chapter-core.v1",
+  "attempt_directory": "/home/python/Quote/data/QuoteBak/s1-attempts",
+  "file_hashes": {
+    "research/company_profile/bounded_entry.py": "982ac7d92e3ff617bffa7a1b65a7a1fe1630a27173c8f4285eca9ef585938734",
+    "research/company_profile/direct_reading.py": "c0da169327b4b2129bc11ca078382d3896f7071b6d89bba19891fc66064c843c",
+    "research/company_profile/report_wire.py": "1814f45d40c28f3a7988c061e88f344138274a646247e490be67b2fa89a76076",
+    "research/company_profile/report_interpretation.py": "775f138cb8e964aa554cbc6a1efb1d406beadd535c6f8a1a2b26f03e6e40a937",
+    "research/company_profile/stage5_provider.py": "32422715f49327ee3dd16578bcc3265fe981a0e298bc844efeed0a80459f172b",
+    "research/company_profile/operations.py": "6343c8111ab3a63de0c727600b2cc8852af21cdea4a4831ff34e3b007f9bb41f",
+    "research/company_profile/reads.py": "ed09d58fa66952fa39f01f7b2166cb4c198241896661c55908725a6e53c1bf29",
+    "research/company_profile/contracts.py": "bd6d1d8d01e7698affc3801f231a66dd72be849e6c7d59fbf49a4ca5768e789f",
+    "research/company_profile/models.py": "e85e4bd785ad698b814b84ecb69cba750f118a37140775d596fe01c3e12e2a2b",
+    "research/company_profile/runtime.py": "f7f22ecc34108d54d4869c1e768e6f9dce840b05d50bfc5797d86635a57b985f",
+    "utils/llm/client.py": "4e1cd4f851a1ae7062e4b8e19563cdb96f213562b43093d131297dd01fb6d7b1",
+    "utils/llm/budget.py": "d7fea220c54a9decaef3dd00141fe3d85de94e7bf85f71cba67b94e3dde92aef",
+    "utils/llm/config.py": "5327f3d23be58c40eae147bae41ca31761e49ae48a34844dacdab9411944289a",
+    "utils/llm/schema.py": "ec679ed8fec132b3e5e0f8598cca71b772628c73f341658f8c32f690268d6b35",
+    "utils/llm/transport.py": "a28c0c0e8aa3dffd04347f707f19e2ec5eacba32f21cb4b8f5d782e4f14b974d",
+    "utils/llm/models.py": "4c1037941013a4a084f88bc0659ab476b36ec8c0e4bb7cefb559bf40007577d7",
+    "utils/llm/errors.py": "3625a8325fa761194086e47b161672bb12d1f45b20ab1331b234caa37e7415a6",
+    "openspec/changes/restore-company-profile-llm-led-generalization/company-core-readable-source-600103-20261111-receipts/frozen-config.json": "7abeaae4d6795ac8fdb2de019d98559b1a56a0d9585f58608eed727057745d75"
+  },
+  "asset": {
+    "instrument_id": "600103.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "ann_e26654bf6cc4bf44f45f6c342da566e4",
+    "filing_id": "1225099218",
+    "source": "cninfo",
+    "published_at": "2026-04-13T16:00:00+00:00",
+    "content_hash": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/68/6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c.pdf",
+    "report_type": "annual_report"
+  },
+  "announcement": {
+    "exchange": "SSE",
+    "title": "2025年年度报告",
+    "source_url": "https://static.cninfo.com.cn/finalpage/2026-04-14/1225099218.PDF"
+  },
+  "production_authorization": "not_authorized",
+  "scale_claim": false,
+  "sources": [
+    {
+      "profile": "semantic_extraction__scorpio_gemini",
+      "provider_resource": "scorpio:gemini",
+      "model": "gemini-3.8-flash-high",
+      "source_label": "scorpio:gemini-3.8-flash-high"
+    },
+    {
+      "profile": "semantic_extraction__zai",
+      "provider_resource": "zai",
+      "model": "glm-5.3-flash",
+      "source_label": "zai:glm-5.3-flash"
+    },
+    {
+      "profile": "semantic_extraction__scorpio_grok",
+      "provider_resource": "scorpio:grok",
+      "model": "grok-4.7",
+      "source_label": "scorpio:grok-4.7"
+    },
+    {
+      "profile": "semantic_extraction__scorpio_luna",
+      "provider_resource": "scorpio:luna",
+      "model": "gpt-6.1-terra",
+      "source_label": "scorpio:gpt-terra-luna"
+    },
+    {
+      "profile": "semantic_extraction__scorpio_deepseek",
+      "provider_resource": "scorpio:deepseek",
+      "model": "deepseek-v4-flash",
+      "source_label": "scorpio:deepseek-flash"
+    },
+    {
+      "profile": "semantic_extraction__deepseek",
+      "provider_resource": "deepseek",
+      "model": "deepseek-flash",
+      "source_label": "deepseek:deepseek-flash"
+    }
+  ],
+  "approval_reference": "company-core-readable-source-real-delivery-card; user approved one readable-source observation 2026-11-11",
+  "same_source_max_retries": 0,
+  "retry_override_note": "At most 2 recoveries inside the 16 physical requests.",
+  "egress_policy": "run outside the sandbox proxy; do not change global proxy or TLS verification",
+  "resource_note": "One fresh 600103 chapter run with ids printed beside the source. Official deepseek only. No saved navigation, conditions, answers, or prior receipts.",
+  "partial_slice": false,
+  "reading_strategy": "direct_core_v1",
+  "max_recoveries": 2,
+  "request_reservation_limit": 65536,
+  "defer_tail_to_next_window": false,
+  "run_authorization": "company_profile_readable_source_observation.2026-11-11",
+  "logical_request_timeout_seconds": 300,
+  "max_physical_attempt_seconds": 150,
+  "chapter_select": true,
+  "source_reference": "anchor_v1",
+  "task_route_labels": [
+    "deepseek:deepseek-flash"
+  ],
+  "task_route_first_only": true,
+  "code_commit": "7f2c27003afb0bcbaddc2811b82dfc0ccf6f6ce2"
+}
