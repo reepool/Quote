@@ -741,6 +741,7 @@ class LlmClient:
                 stream=profile.stream,
                 stream_include_usage=profile.stream_include_usage,
                 disable_thinking=profile.disable_thinking,
+                reasoning_effort=profile.reasoning_effort,
             )
             request_identity = {
                 "profile": profile.name,
@@ -752,6 +753,7 @@ class LlmClient:
                 "schema_version": request.schema_version,
                 "mode": mode,
                 "temperature": payload.get("temperature"),
+                "reasoning_effort": payload.get("reasoning_effort"),
                 "max_output_tokens": request.max_output_tokens,
                 "max_output_tokens_field": profile.max_output_tokens_field,
             }
@@ -1622,6 +1624,7 @@ class LlmClient:
         stream: bool,
         stream_include_usage: bool,
         disable_thinking: bool = False,
+        reasoning_effort: str = "",
     ) -> dict[str, Any]:
         provider_messages = list(messages)
         payload: dict[str, Any] = {
@@ -1631,6 +1634,8 @@ class LlmClient:
         }
         if disable_thinking:
             payload["thinking"] = {"type": "disabled"}
+        if reasoning_effort:
+            payload["reasoning_effort"] = reasoning_effort
         if max_output_tokens is not None:
             payload[max_output_tokens_field] = int(max_output_tokens)
         if stream:

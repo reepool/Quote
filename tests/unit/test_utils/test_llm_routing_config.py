@@ -413,22 +413,33 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
         "scorpio:gemini-3.8-flash-high",
         "zai:glm-5.3-flash",
         "scorpio:grok-4.7",
-        "scorpio:gpt-terra-luna",
         "scorpio:deepseek-flash",
         "deepseek:deepseek-flash",
     ]
-    assert [member.weight for member in members] == [1, 1, 1, 1, 1, 1]
+    assert [member.weight for member in members] == [1, 1, 1, 1, 1]
     assert config.pools["shared_semantic"].failover.enabled is True
     profiles = config.profiles
+    assert {profile.reasoning_effort for profile in profiles.values()} == {"high"}
     assert profiles["semantic_extraction__scorpio_grok"].enabled is True
     assert (
         profiles["corporate_action_title_classification__scorpio_grok"].enabled
         is True
     )
-    assert profiles["semantic_extraction__scorpio_luna"].enabled is True
+    assert profiles["semantic_extraction__scorpio_luna"].enabled is False
     assert (
-        profiles["corporate_action_title_classification__scorpio_luna"].enabled is True
+        profiles["corporate_action_title_classification__scorpio_luna"].enabled
+        is False
     )
+    assert profiles["semantic_extraction__scorpio_luna"].source_label == (
+        "scorpio:gpt-terra-luna"
+    )
+    assert profiles["semantic_extraction__scorpio_luna"].model == "gpt-6.1-terra"
+    assert profiles[
+        "corporate_action_title_classification__scorpio_luna"
+    ].source_label == "scorpio:gpt-terra-luna"
+    assert profiles[
+        "corporate_action_title_classification__scorpio_luna"
+    ].model == "gpt-6.1-terra"
     assert profiles["semantic_extraction__scorpio_deepseek"].enabled is True
     assert profiles["semantic_extraction__scorpio_deepseek"].max_concurrency == 20
     assert config.provider_resources["scorpio:deepseek"].hard_max_concurrency == 20
@@ -451,22 +462,15 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     assert profiles["semantic_extraction__scorpio_luna"].api_key_env == (
         "QUOTE_LLM_SCORPIO_LUNA_API_KEY"
     )
-    assert profiles["semantic_extraction__scorpio_luna"].source_label == (
-        "scorpio:gpt-terra-luna"
-    )
-    assert profiles["semantic_extraction__scorpio_luna"].model == "gpt-6.1-terra"
-    assert profiles[
-        "corporate_action_title_classification__scorpio_luna"
-    ].source_label == "scorpio:gpt-terra-luna"
-    assert profiles[
-        "corporate_action_title_classification__scorpio_luna"
-    ].model == "gpt-6.1-terra"
     assert profiles["semantic_extraction__scorpio_deepseek"].api_key_env == (
         "QUOTE_LLM_SCORPIO_DEEPSEEK_API_KEY"
     )
     assert profiles["semantic_extraction__scorpio_deepseek"].model == (
         "deepseek-v4-flash"
     )
+    assert profiles[
+        "corporate_action_title_classification__scorpio_deepseek"
+    ].model == "deepseek-v4-flash"
     assert profiles["semantic_extraction__scorpio_deepseek"].source_label == (
         "scorpio:deepseek-flash"
     )
@@ -524,7 +528,7 @@ def test_repository_llm_config_is_enabled_non_secret_and_has_one_owner():
     assert "unit-test-key" not in serialized
 
 
-def test_repository_llm_config_routes_six_equal_weight_members():
+def test_repository_llm_config_routes_five_equal_weight_members():
     raw = json.loads(Path("config/13_llm.json").read_text(encoding="utf-8"))["llm"]
     pool = raw["pools"]["shared_semantic"]
 
@@ -538,12 +542,10 @@ def test_repository_llm_config_routes_six_equal_weight_members():
         "semantic_extraction__scorpio_gemini",
         "semantic_extraction__zai",
         "semantic_extraction__scorpio_grok",
-        "semantic_extraction__scorpio_luna",
         "semantic_extraction__scorpio_deepseek",
         "semantic_extraction__deepseek",
     ]
     assert [member.weight for member in config.pools["shared_semantic"].members] == [
-        1,
         1,
         1,
         1,

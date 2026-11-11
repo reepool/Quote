@@ -200,6 +200,7 @@ class LlmProfile:
     stream: bool = False
     stream_include_usage: bool = True
     disable_thinking: bool = False
+    reasoning_effort: str = ""
     max_retry_after_seconds: float = 30.0
     retry_backoff_seconds: float = 0.5
     retry_jitter_ratio: float = 0.2
@@ -252,6 +253,13 @@ class LlmProfile:
                 timeout_seconds,
             )),
         )
+        reasoning_effort = str(
+            _configured(value, "reasoning_effort", "")
+        ).strip().lower()
+        if reasoning_effort not in {"", "low", "medium", "high"}:
+            raise ValueError(
+                f"unsupported reasoning_effort for {name}: {reasoning_effort}"
+            )
         return cls(
             name=str(name).strip(),
             enabled=value.get("enabled") is True,
@@ -290,6 +298,7 @@ class LlmProfile:
             max_output_tokens_field=max_output_tokens_field,
             stream=value.get("stream") is True,
             stream_include_usage=value.get("stream_include_usage", True) is True,
+            reasoning_effort=reasoning_effort,
             max_retry_after_seconds=max(
                 0.0, float(_configured(value, "max_retry_after_seconds", 30.0))
             ),
@@ -333,6 +342,7 @@ class LlmProfile:
             "max_output_tokens_field": self.max_output_tokens_field,
             "stream": self.stream,
             "stream_include_usage": self.stream_include_usage,
+            "reasoning_effort": self.reasoning_effort,
             "retry_jitter_ratio": self.retry_jitter_ratio,
             "provider_resource": self.provider_resource,
             "default_workload": self.default_workload,

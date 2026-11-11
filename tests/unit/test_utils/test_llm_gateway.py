@@ -105,6 +105,25 @@ def _response(data, **kwargs):
     return value
 
 
+@pytest.mark.asyncio
+async def test_reasoning_effort_is_validated_and_forwarded_to_provider():
+    transport = ScriptedTransport([_response({"label": "ok", "score": 1})])
+    client = LlmClient(
+        _config(reasoning_effort="high"),
+        transport=transport,
+        environment={"TEST_LLM_KEY": "unit-secret"},
+    )
+
+    await client.complete(_request())
+
+    assert transport.calls[0]["payload"]["reasoning_effort"] == "high"
+    with pytest.raises(ValueError, match="reasoning_effort"):
+        LlmConfig.from_mapping({
+            "enabled": True,
+            "profiles": {"test": {"reasoning_effort": "maximum"}},
+        })
+
+
 def test_owned_http_client_is_closed_on_the_loop_that_created_it(monkeypatch):
     """Repeated asyncio.run calls must not close httpx on a dead loop."""
     import asyncio

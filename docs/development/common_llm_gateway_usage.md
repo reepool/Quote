@@ -7,16 +7,19 @@
 
 ## 配置与密钥
 
-项目配置 `config/13_llm.json` 只包含非敏感 route、pool 和实际 profile。当前 Scorpio
-配置以保守限额启用，路由池当前启用 Luna 和 DeepSeek，Grok profile 保留但停用；各业务
-仍必须使用自己的独立 enable/write gate，公共路由开启不代表画像等业务自动开启：
+项目配置 `config/13_llm.json` 只包含非敏感 route、pool 和实际 profile。`shared_semantic`
+当前五个等权成员是 `scorpio:gemini-3.8-flash-high`、`zai:glm-5.3-flash`、`scorpio:grok-4.7`、
+`scorpio:deepseek-flash`（模型名 `deepseek-v4-flash`）和 `deepseek:deepseek-flash`。
+`scorpio:gpt-terra-luna` 的两个实际 profile 保留但 `enabled=false`，且不在 pool members 中。
+各业务仍必须使用自己的独立 enable/write gate，公共路由开启不代表画像等业务自动开启：
 
-- 逻辑 profile：`semantic_extraction`
+- 逻辑 profile：`semantic_extraction`、`corporate_action_title_classification`
 - provider：`openai_compatible`
-- base URL：`https://scorpio.reepool.com`
-- profiles：`grok-4.7`（停用）、`gpt-6.1-terra`、`deepseek-v4-flash-0731`
-- key 环境变量：`QUOTE_LLM_SCORPIO_GROK_API_KEY`、`QUOTE_LLM_SCORPIO_LUNA_API_KEY`、`QUOTE_LLM_SCORPIO_DEEPSEEK_API_KEY`
-- 当前启用的 provider quota bucket：Luna 使用 `scorpio:luna`，DeepSeek 使用 `scorpio:deepseek`
+- Scorpio base URL：`https://scorpio.reepool.com`；Z.ai 与官方 DeepSeek 使用各自 base URL
+- 池内模型：`gemini-3.8-flash-high`、`glm-5.3-flash`、`grok-4.7`、`deepseek-v4-flash`、`deepseek-flash`
+- 暂不参与负载均衡：`gpt-6.1-terra`
+- key 环境变量：`QUOTE_LLM_SCORPIO_GROK_API_KEY`、`QUOTE_LLM_SCORPIO_LUNA_API_KEY`、`QUOTE_LLM_SCORPIO_DEEPSEEK_API_KEY`、`QUOTE_LLM_SCORPIO_GEMINI_API_KEY`、`QUOTE_LLM_ZAI_API_KEY`、`QUOTE_LLM_DEEPSEEK_API_KEY`
+- 所有实际 profile 均配置 `reasoning_effort: "high"`；网关将其作为 OpenAI-compatible 请求的顶层 `reasoning_effort` 字段发送。Terra Luna 当前保留该配置，但因上游不可用而保持禁用。
 
 本地开发时，将真实值放在项目根目录 `.env`，该文件已被 gitignore 忽略。应用入口显式调用 `load_project_environment()`，且 `override=False`，所以进程已经注入的变量优先。`.env` 不应被提交、写入日志或复制到报告中。
 
@@ -28,8 +31,8 @@
 
 业务只使用 `routes` 中的逻辑 profile；`routes` 指向 pool，pool 的 `members` 再映射到
 实际 profile。负载均衡权重配置在 `llm.pools.shared_semantic.members[*].weight`，运行时比例
-始终以该配置中的当前值为准。当前 Luna/DeepSeek 配置为 `1`、`1`，在两个成员都健康、
-有容量且不发生借用的持续流量下，长期正常调度比例约为 50% 和 50%。例如配置为 `3`、`1` 时，
+始终以该配置中的当前值为准。当前五个成员权重都是 `1`，在都健康、有容量且不发生借用的
+持续流量下，长期正常调度比例约为各 20%。例如配置为 `3`、`1` 时，
 长期正常调度比例约为 75% 和 25%。权重必须是正整数，不能用 `0` 禁用成员。
 
 `borrow_idle_capacity=true` 表示首选成员繁忙、熔断或不可用时，健康成员可以借用空闲容量，
@@ -77,7 +80,7 @@ response = await client.complete(
 
 同一 `rate_limit_scope` 的所有请求必须使用相同的正 RPM；配置冲突会 fail closed，防止一个业务被拆成多个限流桶。RPM 只接受整数或整数字符串，小数和布尔值均视为配置错误。任务报告中的 `effective` RPM 表示继承和业务 override 共同作用后的实际限制。
 
-provider resource 应按真实 quota bucket 建模，而不是机械地按 API key 建模。当前 Scorpio Grok 和 Luna Key 的 quota 相互独立，因此分别配置 `scorpio:grok` 和 `scorpio:luna` 两个 resource。当前限流器为单进程共享，多 worker/多主机部署需要额外的分布式协调。
+provider resource 应按真实 quota bucket 建模，而不是机械地按 API key 建模。当前 Scorpio Grok、Luna、DeepSeek 和 Gemini Key 的 quota 相互独立，因此分别配置 `scorpio:grok`、`scorpio:luna`、`scorpio:deepseek` 和 `scorpio:gemini` 四个 resource。当前限流器为单进程共享，多 worker/多主机部署需要额外的分布式协调。
 
 `response.data` 只表示通过 JSON Schema 的候选结构，不能绕过业务证据、可得日、字段目录或 candidate gate。`raw_content` 只用于受控审计，公共日志默认只记录 request/response hash、request ID、usage、耗时和错误分类。
 
