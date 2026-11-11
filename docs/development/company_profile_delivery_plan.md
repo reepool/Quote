@@ -2,7 +2,7 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-11-10。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[规范对齐§257](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#257-v9文档对齐人工底稿章节文本同结构抽取)/[章节底稿卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md)：A先交上汽人工有源JSON及人读版，再由B沿目录/真实章节边界整理集中来源文本与表格、接同结构抽取和原owner渲染；异公司真实调用待新授权。原三家尝试3/3已用，不再指挥重跑，实际模型样稿仅青山1份；S1仍0/12。以下历次“当前”均为历史上下文，不能恢复其授权；每轮先清后做、必要交付一套后清过程物。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[直接实施交接§258](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#258-直接实施v9章节底稿与两家公司真实交付)：本会话按用户新授权已完成人工参考、标题树选章、章节/表格包、同结构真实抽取与原owner读回。上汽、浦发各有可读pending底稿，6.BA结束；正式S1/生产仍未评估。下一步直接以这两份内容检查遗漏、推进更多报告消费，非阻塞细节后置，不恢复旧卡或逐字段等待B。以下历次“当前”均为历史上下文；每轮先清后做、必要交付一套后清本人过程物。
 
 ## 1. 开发者必须先理解的纠偏
 

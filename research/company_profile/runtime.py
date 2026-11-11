@@ -89,6 +89,9 @@ from .report_interpretation import (
     core_assessment as report_core_assessment,
 )
 from .workflow import CompanyProfileSemanticService
+from .workpaper import CompanyProfileWorkpaper
+from .workpaper_llm import WORKPAPER_READING_STRATEGY, run_workpaper
+from .workpaper_sections import SectionPacket
 
 _RECORD_ADAPTER = TypeAdapter(SemanticRecord)
 
@@ -185,6 +188,14 @@ class CompanyProfileRuntimeRecordV2(CompanyProfileRuntimeRecord):
     assessment: CompanyProfileCoreAssessmentV2
 
 
+class CompanyProfileRuntimeRecordV3(CompanyProfileRuntimeRecord):
+    schema_version: Literal["company_profile_common_core_runtime.v3"] = (
+        "company_profile_common_core_runtime.v3"
+    )
+    workpaper: CompanyProfileWorkpaper
+    workpaper_receipts: tuple[dict[str, Any], ...] = ()
+
+
 def _reading_policy(identity: Mapping[str, Any] | None) -> tuple:
     """Prompt and report policy. Budget plans and receipt blobs are not policy."""
     if not isinstance(identity, Mapping):
@@ -217,6 +228,10 @@ class _WorkState:
     provider_blocked: bool = False
     published: CompanyProfileRuntimeRecord | None = None
     report_interpretation: ReportInterpretation | None = None
+    workpaper: CompanyProfileWorkpaper | None = None
+    workpaper_packet: SectionPacket | None = None
+    workpaper_receipts: list[dict[str, Any]] = field(default_factory=list)
+    source_pdf_path: str | None = None
     completed_scopes: dict[str, CompanyProfileTaskResult] = field(default_factory=dict)
     scope_digests: dict[str, str] = field(default_factory=dict)
     reused_scope_ids: list[str] = field(default_factory=list)
@@ -423,6 +438,7 @@ class CompanyProfileStageRuntime:
         state = self._states.setdefault(work_id, _WorkState(work_id=work_id))
         if created:
             self._hydrate(state)
+        prior_policy = _reading_policy(state.processing_identity)
         if item.get("report") is not None:
             state.report = (
                 item["report"]
@@ -431,9 +447,19 @@ class CompanyProfileStageRuntime:
             )
         if item.get("pages") is not None:
             state.pages = tuple(item["pages"])
+        if item.get("source_pdf_path"):
+            state.source_pdf_path = str(item["source_pdf_path"])
         if item.get("accepted_records"):
             state.accepted_records = tuple(item["accepted_records"])
         state.processing_identity = processing_identity_from_item(item)
+        if state.workpaper is not None and (
+            state.workpaper.report != state.report
+            or prior_policy != _reading_policy(state.processing_identity)
+        ):
+            state.workpaper = None
+            state.workpaper_packet = None
+            state.workpaper_receipts.clear()
+            state.assessment = None
         if state.report_interpretation is not None and (
             state.report_interpretation.report != state.report
             or _reading_policy(state.report_interpretation.processing_identity)
@@ -483,6 +509,15 @@ class CompanyProfileStageRuntime:
     def _parse(self, state: _WorkState) -> dict[str, Any]:
         if state.report is None:
             raise ValueError("parse requires a bound report")
+        if state.processing_identity.get("reading_strategy") == WORKPAPER_READING_STRATEGY:
+            # V9 uses section material, not the old keyword fact-selection rules.
+            state.evidence = CoreEvidenceSelection(
+                report=state.report, spans=(), reused_facts=(),
+                unresolved_field_ids=(), gaps=(), prepared_evidence=(),
+            )
+            state.chapters = ()
+            self._persist_work(state)
+            return self._result(state, status="success", stage="parse")
         state.evidence = select_core_evidence(
             report=state.report,
             pages=state.pages,
@@ -516,6 +551,28 @@ class CompanyProfileStageRuntime:
             self._parse(state)
         assert state.evidence is not None
         assert state.report is not None
+        if state.processing_identity.get("reading_strategy") == WORKPAPER_READING_STRATEGY:
+            if state.workpaper is None:
+                result = run_workpaper(
+                    report=state.report, pages=state.pages,
+                    processing_identity=state.processing_identity,
+                    provider=self._report_provider, work_id=state.work_id,
+                    source_pdf_path=state.source_pdf_path,
+                )
+                state.workpaper = result.workpaper
+                state.workpaper_packet = result.packet
+                state.pages = result.pages
+                state.workpaper_receipts = [dict(item) for item in result.receipts]
+            state.provider_calls = [str(item["purpose"]) for item in state.workpaper_receipts]
+            gateway_budget = getattr(self._report_provider, "run_budget", None)
+            if gateway_budget is not None:
+                state.tokens_used = int(gateway_budget.snapshot().get("charged_tokens") or 0)
+            state.provider_blocked = False
+            self._persist_work(state)
+            # A pending workpaper is a deliverable, not a formally approved company.
+            self._verify(state)
+            self._publish(state)
+            return self._result(state, status="success", stage="semantic")
         if llm_led(state.processing_identity):
             structured = tuple(
                 record
@@ -744,6 +801,31 @@ class CompanyProfileStageRuntime:
     def _verify(self, state: _WorkState) -> dict[str, Any]:
         if state.report is None:
             raise ValueError("verify requires a bound report")
+        if state.processing_identity.get("reading_strategy") == WORKPAPER_READING_STRATEGY:
+            if state.workpaper is None:
+                self._semantic(state)
+            assert state.workpaper is not None
+            state.workpaper.validate_pages(state.pages)
+            from .core_assessment_projection import CoreDimensionAssessment
+
+            state.assessment = CompanyProfileCoreAssessment(
+                report=state.report,
+                principal_business=CoreDimensionAssessment(
+                    dimension_id="principal_business", answered=False,
+                    missing_reason="no_accepted_evidence",
+                ),
+                products_services=CoreDimensionAssessment(
+                    dimension_id="products_services", answered=False,
+                    missing_reason="no_accepted_evidence",
+                ),
+                revenue_model=CoreDimensionAssessment(
+                    dimension_id="revenue_model", answered=False,
+                    missing_reason="no_accepted_evidence",
+                ),
+                core_complete=False,
+            )
+            self._persist_work(state)
+            return self._result(state, status="success", stage="verify")
         if llm_led(state.processing_identity):
             if state.report_interpretation is None:
                 self._semantic(state)
@@ -776,11 +858,18 @@ class CompanyProfileStageRuntime:
         assert state.report is not None
         assert state.assessment is not None
         assert state.evidence is not None
-        record_type = (
-            CompanyProfileRuntimeRecordV2
-            if llm_led(state.processing_identity)
-            else CompanyProfileRuntimeRecord
-        )
+        if state.workpaper is not None:
+            record_type = CompanyProfileRuntimeRecordV3
+            extra = {
+                "workpaper": state.workpaper,
+                "workpaper_receipts": tuple(state.workpaper_receipts),
+            }
+        elif llm_led(state.processing_identity):
+            record_type = CompanyProfileRuntimeRecordV2
+            extra = {"report_interpretation": state.report_interpretation}
+        else:
+            record_type = CompanyProfileRuntimeRecord
+            extra = {}
         record = record_type(
             work_id=state.work_id,
             report=state.report,
@@ -791,11 +880,7 @@ class CompanyProfileStageRuntime:
             provider_blocked=state.provider_blocked,
             execution=self._execution_for(state),
             legacy_writers_invoked=(),
-            **(
-                {"report_interpretation": state.report_interpretation}
-                if llm_led(state.processing_identity)
-                else {}
-            ),
+            **extra,
         )
         try:
             self.writer.persist(record)
@@ -914,8 +999,19 @@ class CompanyProfileStageRuntime:
         if payload.get("schema_version") not in {
             SCOPE_CHECKPOINT_SCHEMA,
             "company_profile_scope_checkpoint.v2",
+            "company_profile_scope_checkpoint.v3",
         }:
             return
+        if payload.get("workpaper") is not None:
+            state.workpaper = CompanyProfileWorkpaper.model_validate_json(
+                json.dumps(payload["workpaper"], ensure_ascii=False)
+            )
+        if payload.get("workpaper_packet") is not None:
+            state.workpaper_packet = SectionPacket.model_validate_json(
+                json.dumps(payload["workpaper_packet"], ensure_ascii=False)
+            )
+        state.workpaper_receipts = list(payload.get("workpaper_receipts") or ())
+        state.source_pdf_path = payload.get("source_pdf_path")
         if payload.get("report_interpretation") is not None:
             state.report_interpretation = ReportInterpretation.model_validate_json(
                 json.dumps(payload["report_interpretation"], ensure_ascii=False)
@@ -1076,10 +1172,18 @@ class CompanyProfileStageRuntime:
             path,
             {
                 "schema_version": (
-                    "company_profile_scope_checkpoint.v2"
+                    "company_profile_scope_checkpoint.v3"
+                    if state.processing_identity.get("reading_strategy") == WORKPAPER_READING_STRATEGY
+                    else "company_profile_scope_checkpoint.v2"
                     if llm_led(state.processing_identity)
                     else SCOPE_CHECKPOINT_SCHEMA
                 ),
+                **({
+                    "workpaper": state.workpaper.model_dump(mode="json") if state.workpaper else None,
+                    "workpaper_packet": state.workpaper_packet.model_dump(mode="json") if state.workpaper_packet else None,
+                    "workpaper_receipts": state.workpaper_receipts,
+                    "source_pdf_path": state.source_pdf_path,
+                } if state.processing_identity.get("reading_strategy") == WORKPAPER_READING_STRATEGY else {}),
                 **(
                     {
                         "report_interpretation": (

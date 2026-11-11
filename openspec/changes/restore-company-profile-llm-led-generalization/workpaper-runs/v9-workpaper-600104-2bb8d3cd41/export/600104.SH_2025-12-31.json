@@ -1,0 +1,2446 @@
+{
+  "schema_version": "company_profile_common_core_profile.v3",
+  "production_authorization": "not_authorized",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "work_id": "bp-work-23d00570c7183558ae632745",
+  "instrument_id": "600104.SH",
+  "report": {
+    "instrument_id": "600104.SH",
+    "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+    "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-01T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "freshness": {
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-01T16:00:00+00:00",
+    "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+    "knowledge_time": "2026-04-01T16:00:00+00:00"
+  },
+  "core_complete": false,
+  "dimensions": [
+    {
+      "dimension_id": "principal_business",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    {
+      "dimension_id": "products_services",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    {
+      "dimension_id": "revenue_model",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    }
+  ],
+  "accepted_facts": [],
+  "gaps": [],
+  "evidence_gap_codes": [],
+  "commodity_exposure": {
+    "assessment": {
+      "schema_version": "company_profile_commodity_exposure.v1",
+      "production_authorization": "not_authorized",
+      "report": {
+        "instrument_id": "600104.SH",
+        "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-01T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "assessment_status": "not_assessed",
+      "checked_evidence_ids": [],
+      "exposures": []
+    },
+    "reported_period": "2025-12-31",
+    "knowledge_time": "2026-04-01T16:00:00+00:00",
+    "consumer_authorization": {
+      "dcf": false,
+      "trading": false,
+      "price_sensitivity": false
+    }
+  },
+  "workpaper": {
+    "schema_version": "company_profile_workpaper.v1",
+    "origin": "llm_generated",
+    "report": {
+      "instrument_id": "600104.SH",
+      "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "report_period": "2025-12-31",
+      "published_at": "2026-04-01T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reading_scope": {
+      "sections": [
+        {
+          "section_id": "section-0039",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 8,
+          "end_page": 9,
+          "rationale": "本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。"
+        },
+        {
+          "section_id": "section-0044",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "二、报告期内公司所处行业情况"
+          ],
+          "start_page": 9,
+          "end_page": 9,
+          "rationale": "本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。"
+        },
+        {
+          "section_id": "section-0045",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "start_page": 9,
+          "end_page": 10,
+          "rationale": "本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。"
+        },
+        {
+          "section_id": "section-0053",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(一) 主营业务分析"
+          ],
+          "start_page": 10,
+          "end_page": 15,
+          "rationale": "本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。"
+        },
+        {
+          "section_id": "section-0078",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(四) 行业经营性信息分析"
+          ],
+          "start_page": 16,
+          "end_page": 20,
+          "rationale": "本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。"
+        },
+        {
+          "section_id": "section-0105",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(七) 主要控股参股公司分析"
+          ],
+          "start_page": 26,
+          "end_page": 27,
+          "rationale": "本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。"
+        },
+        {
+          "section_id": "section-0107",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "六、公司关于公司未来发展的讨论与分析"
+          ],
+          "start_page": 27,
+          "end_page": 29,
+          "rationale": "本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。"
+        },
+        {
+          "section_id": "section-1078",
+          "section_path": [
+            "第八节 财务报告",
+            "十八、其他重要事项",
+            "6、 分部信息"
+          ],
+          "start_page": 192,
+          "end_page": 193,
+          "rationale": "本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。"
+        }
+      ],
+      "unread_or_deferred": [
+        "第二节 近三年主要会计数据和财务指标及分季度数据",
+        "第三节 资产及负债状况分析与投资状况分析（产业基金及证券投资）",
+        "第四节 公司治理、环境与社会责任（ESG）报告",
+        "第五节 重大关联交易及重大合同履行情况",
+        "第八节 财务报表全文及其他具体科目附注"
+      ],
+      "selection_rationale": "本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。",
+      "stop_reason": "选定章节已充分覆盖公司业务模式、产销规模、分部构成、财务驱动及战略规划的核心信息，无需引入冗长的财务报表附注与日常治理内容即可满足深度业务与经营分析需求。",
+      "transcription_version": "shared-pdf-pypdf-layout.v1"
+    },
+    "elements": {
+      "business_structure": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "bs-01",
+            "text": "公司报告分部为两个：整车及零部件分部负责生产并销售整车及零部件，金融服务分部负责提供金融服务；分部间转移价格参照向第三方销售所采用的价格确定。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0022"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "bs-02",
+            "text": "公司主营业务分行业为汽车制造业与金融业，分产品为整车业务、零部件业务、劳务及其他、金融业务。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "bs-03",
+            "text": "零部件业务主要由下属控股子公司华域汽车系统股份有限公司开展。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0013"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "bs-04",
+            "text": "报告期内公司撤销商用车事业部，将职能整合并入上汽大通，压缩管理层级和决策链条。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "bs-05",
+            "text": "公司主要整车企业包括上汽大众、上汽通用、上汽集团乘用车分公司、上汽通用五菱、上汽大通、智己汽车、上汽正大、上汽通用五菱印尼、捷仕达名爵汽车印度等。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": []
+          }
+        ],
+        "limitations": []
+      },
+      "products_services": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "ps-01",
+            "text": "整车业务按车型类别包括基本乘用车、运动型多用途车（SUV）、多功能乘用车（MPV）、交叉型乘用车、客车、载货汽车。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0013"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "ps-02",
+            "text": "自主品牌集中推出全新MG4、荣威M7、尚界H5、智己全新LS6/LS9、五菱缤果S、大通大拿等新能源产品；上汽大众、上汽通用分别推出AUDI E5、别克至境L7等中高端智电新品。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "ps-03",
+            "text": "公司与华为合作推出“尚界”品牌，2月签署战略合作协议，9月下旬投放首款产品尚界H5。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "ps-04",
+            "text": "公司已构建包含纯电、混动、氢能三大整车平台，以及电池、电驱、超混系统和智能车全栈解决方案的“七大技术底座”。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0010"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "ps-05",
+            "text": "公司业务板块包括整车、零部件、移动出行和服务、金融；安吉物流自营远洋滚装船已达21艘，“无驾驶人”Robotaxi启动专线商业化运营。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "ps-06",
+            "text": "汽车金融业务由上海汽车集团财务有限责任公司、上汽通用汽车金融有限责任公司、上海东正汽车金融股份有限公司开展，主要经营指标包括发放贷款金额、贷款笔数、贷款余额。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0014",
+              "source-0015"
+            ],
+            "metrics": []
+          }
+        ],
+        "limitations": []
+      },
+      "revenue_model": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "rm-01",
+            "text": "公司主营业务分产品收入构成为整车业务、零部件业务、劳务及其他、金融业务，合计主营业务收入656,243,812,081.18元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "主营业务收入合计",
+                "raw_value": "656,243,812,081.18",
+                "value": "656243812081.18",
+                "unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              },
+              {
+                "name": "整车业务营业收入",
+                "raw_value": "410,196,473,001.11",
+                "value": "410196473001.11",
+                "unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              },
+              {
+                "name": "零部件业务营业收入",
+                "raw_value": "203,019,866,775.26",
+                "value": "203019866775.26",
+                "unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              },
+              {
+                "name": "劳务及其他营业收入",
+                "raw_value": "32,935,762,112.94",
+                "value": "32935762112.94",
+                "unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              },
+              {
+                "name": "金融业务营业收入",
+                "raw_value": "10,091,710,191.88",
+                "value": "10091710191.88",
+                "unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              }
+            ]
+          },
+          {
+            "fact_id": "rm-02",
+            "text": "整车业务毛利率4.30%，零部件业务毛利率19.15%，劳务及其他毛利率26.38%，金融业务毛利率88.47%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "rm-03",
+            "text": "公司合并营业总收入6562.4亿元，同比增长4.6%；营业收入646,152,101,889.30元，同比增长5.22%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004",
+              "source-0006"
+            ],
+            "metrics": [
+              {
+                "name": "合并营业总收入",
+                "raw_value": "6562.4",
+                "value": "6562.4",
+                "unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              },
+              {
+                "name": "营业收入",
+                "raw_value": "646,152,101,889.30",
+                "value": "646152101889.30",
+                "unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              }
+            ]
+          },
+          {
+            "fact_id": "rm-04",
+            "text": "分部信息显示整车及零部件分部对外交易收入644,665,370,348.55元，金融业对外交易收入11,578,441,732.63元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0023"
+            ],
+            "metrics": [
+              {
+                "name": "整车及零部件分部对外交易收入",
+                "raw_value": "644,665,370,348.55",
+                "value": "644665370348.55",
+                "unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              },
+              {
+                "name": "金融业对外交易收入",
+                "raw_value": "11,578,441,732.63",
+                "value": "11578441732.63",
+                "unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              }
+            ]
+          },
+          {
+            "fact_id": "rm-05",
+            "text": "公司贸易业务本期营业收入206,508,725.66元，主要系汽车芯片及相关汽车零部件的出口贸易业务。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "metrics": [
+              {
+                "name": "贸易业务营业收入",
+                "raw_value": "206,508,725.66",
+                "value": "206508725.66",
+                "unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              }
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "scale_and_mix": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "sm-01",
+            "text": "全年实现整车销售450.7万辆，同比增长12.3%，市场占有率13.1%，同比上升0.3个百分点。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [
+              {
+                "name": "整车销量",
+                "raw_value": "450.7",
+                "value": "450.7",
+                "unit": "万辆",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              }
+            ]
+          },
+          {
+            "fact_id": "sm-02",
+            "text": "自主品牌销量292.8万辆，同比增长21.6%，占公司整体销量比重65%，同比提升约5个百分点。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "sm-03",
+            "text": "新能源车销售164.3万辆，同比增长33.1%；出口及海外市场销售107.1万辆，同比增长3.1%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "sm-04",
+            "text": "产销量表合计生产量4,601,962辆、销售量4,507,518辆、库存量188,996辆，生产量比上年增减14.82%、销售量比上年增减12.32%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "合计生产量",
+                "raw_value": "4,601,962",
+                "value": "4601962",
+                "unit": "辆",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              },
+              {
+                "name": "合计销售量",
+                "raw_value": "4,507,518",
+                "value": "4507518",
+                "unit": "辆",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              },
+              {
+                "name": "合计库存量",
+                "raw_value": "188,996",
+                "value": "188996",
+                "unit": "辆",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "期末数"
+              }
+            ]
+          },
+          {
+            "fact_id": "sm-05",
+            "text": "分地区主营业务收入：中国504,138,835,950.64元，其他152,104,976,130.54元；其他地区含上汽通用五菱出口销量。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "中国地区主营业务收入",
+                "raw_value": "504,138,835,950.64",
+                "value": "504138835950.64",
+                "unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              },
+              {
+                "name": "其他地区主营业务收入",
+                "raw_value": "152,104,976,130.54",
+                "value": "152104976130.54",
+                "unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              }
+            ]
+          },
+          {
+            "fact_id": "sm-06",
+            "text": "新能源汽车销量1,643,009辆（乘用车1,481,504辆、商用车161,505辆），产量1,683,460辆。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0014"
+            ],
+            "metrics": [
+              {
+                "name": "新能源汽车销量总计",
+                "raw_value": "1,643,009",
+                "value": "1643009",
+                "unit": "辆",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              },
+              {
+                "name": "新能源汽车产量总计",
+                "raw_value": "1,683,460",
+                "value": "1683460",
+                "unit": "辆",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              }
+            ]
+          },
+          {
+            "fact_id": "sm-07",
+            "text": "主要整车企业销量：上汽大众1,024,000辆、上汽通用535,000辆、上汽集团乘用车分公司886,742辆、上汽通用五菱1,615,066辆、上汽大通222,286辆、智己汽车81,017辆。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": []
+          }
+        ],
+        "limitations": []
+      },
+      "operations_and_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "oi-01",
+            "text": "现有产能（设计产能/报告期内产能/产能利用率）：上汽大众192.0万辆/105.8万辆/55%，上汽通用145.2/53.4/37%，上汽集团乘用车分公司116.0/88.5/76%，上汽通用五菱176.0/167.1/95%，上汽大通37.5/22.4/60%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0012"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "oi-02",
+            "text": "设计产能计算依据为年工作日250天、每天工作16小时即4000小时；报告期内产能为报告期内产量；产能利用率为报告期内产量/设计产能。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0013"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "oi-03",
+            "text": "除上汽大众MEB工厂外，公司其他新能源产品与传统车共线生产、共享产能，可结合市场情况对两类产品进行调配，实行柔性化生产。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0014"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "oi-04",
+            "text": "成本构成项目为原材料、人工工资、折旧、能源等；汽车制造业本期成本580,943,983,649.41元，占总成本99.80%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "汽车制造业营业成本",
+                "raw_value": "580,943,983,649.41",
+                "value": "580943983649.41",
+                "unit": "元",
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              }
+            ]
+          },
+          {
+            "fact_id": "oi-05",
+            "text": "研发投入合计21,706,037,747.07元，其中费用化18,104,061,919.77元、资本化3,601,975,827.30元，研发投入总额占营业收入比例3.36%；研发人员30,329人，占公司总人数17.6%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "研发投入合计",
+                "raw_value": "21,706,037,747.07",
+                "value": "21706037747.07",
+                "unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              },
+              {
+                "name": "本期费用化研发投入",
+                "raw_value": "18,104,061,919.77",
+                "value": "18104061919.77",
+                "unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              },
+              {
+                "name": "本期资本化研发投入",
+                "raw_value": "3,601,975,827.30",
+                "value": "3601975827.30",
+                "unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              }
+            ]
+          },
+          {
+            "fact_id": "oi-06",
+            "text": "公司推进固态电池与汽车芯片研发应用，在国内率先实现第二代半固态电池技术在全新MG4上搭载并批量交付，全固态电池“中试线”正式贯通；上汽国产芯片应用率已超过30%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "oi-07",
+            "text": "安吉物流自营远洋滚装船已达21艘，报告期内安吉物流有8艘滚装新船启航。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001",
+              "source-0004"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "oi-08",
+            "text": "上汽大众、上汽通用优化基地布局，释放出的产能用于生产“尚界”等自主品牌产品；上汽大通累计退出近百家直营店；上汽红岩司法重整方案获法院批准并已启动实施。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": []
+          }
+        ],
+        "limitations": []
+      },
+      "customers_channels_markets": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "cm-01",
+            "text": "前五名客户销售额7,545,821.15万元，占年度销售总额11.68%；其中关联方销售额0万元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "metrics": [
+              {
+                "name": "前五名客户销售额",
+                "raw_value": "7,545,821.15",
+                "value": "7545821.15",
+                "unit": "万元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              }
+            ]
+          },
+          {
+            "fact_id": "cm-02",
+            "text": "前五名供应商采购额21,496,663.81万元，占年度采购总额37%；其中关联方采购额459,389.23万元，占年度采购总额0.79%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "metrics": [
+              {
+                "name": "前五名供应商采购额",
+                "raw_value": "21,496,663.81",
+                "value": "21496663.81",
+                "unit": "万元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              }
+            ]
+          },
+          {
+            "fact_id": "cm-03",
+            "text": "MG品牌在欧洲市场销量超过30万辆，并在澳新、中东、拉美、东南亚等地区的18个国家乘用车市场排名跻身当地前十。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "cm-04",
+            "text": "上汽通用五菱深化“印马泰”一体化战略，印尼基地新能源汽车产销占比提升至80%；公司通过在海外设立代工厂、CKD等方式推进本地化生产。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "cm-05",
+            "text": "结合全新MG4上市，在86城布局120家快闪店，通过“轻量化引流”促进4S店高效率转化；联动抖音、小红书等平台实现内容共创。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "cm-06",
+            "text": "按地区销量：境内3,436,968辆（同比增15.55%），境外1,070,550辆（同比增3.09%）。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0013"
+            ],
+            "metrics": [
+              {
+                "name": "境内销量",
+                "raw_value": "3,436,968",
+                "value": "3436968",
+                "unit": "辆",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              },
+              {
+                "name": "境外销量",
+                "raw_value": "1,070,550",
+                "value": "1070550",
+                "unit": "辆",
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              }
+            ]
+          }
+        ],
+        "limitations": []
+      },
+      "operating_drivers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "od-01",
+            "text": "归属于上市公司股东的净利润101.1亿元，同比增长506.5%；扣除非经常性损益的净利润74.2亿元，同比增长237.2%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": [
+              {
+                "name": "归属于上市公司股东的净利润",
+                "raw_value": "101.1",
+                "value": "101.1",
+                "unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              },
+              {
+                "name": "归属于上市公司股东的扣除非经常性损益的净利润",
+                "raw_value": "74.2",
+                "value": "74.2",
+                "unit": "亿元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              }
+            ]
+          },
+          {
+            "fact_id": "od-02",
+            "text": "投资收益13,432,644,620.92元，同比增长87.15%，主要原因为对联营企业和合营企业的投资收益同比增加；公允价值变动收益6,605,490,436.41元，同比增长180.43%，主要原因为金融资产公允价值变动同比增加。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006",
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "投资收益",
+                "raw_value": "13,432,644,620.92",
+                "value": "13432644620.92",
+                "unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              },
+              {
+                "name": "公允价值变动收益",
+                "raw_value": "6,605,490,436.41",
+                "value": "6605490436.41",
+                "unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              }
+            ]
+          },
+          {
+            "fact_id": "od-03",
+            "text": "经营活动产生的现金流量净额34,306,601,905.98元，同比减少50.47%，主要由于子公司上汽财务公司汽车金融贷款等业务规模变动。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006",
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "经营活动产生的现金流量净额",
+                "raw_value": "34,306,601,905.98",
+                "value": "34306601905.98",
+                "unit": "元",
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "本期数"
+              }
+            ]
+          },
+          {
+            "fact_id": "od-04",
+            "text": "资产减值损失-5,682,389,059.31元，同比增长79.61%，主要原因为计提固定资产减值损失同比增加；营业外支出1,125,649,581.19元，同比增长99.46%，主要原因为本年对供应商补偿款同比增加。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006",
+              "source-0007"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "od-05",
+            "text": "财务费用-265,824,180.92元，同比变动-108.70%，主要原因为汇兑收益同比增加；所得税费用7,465,085,641.62元，同比增长59.59%，主要原因为子公司基于谨慎性原则冲回未来预期无法实现的可抵扣暂时性差异。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006",
+              "source-0010"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "od-06",
+            "text": "主要子公司业绩：华域汽车营业总收入18,399,890.05万元、净利润720,726.81万元；智己汽车营业总收入1,541,140.76万元、净利润-359,815.59万元；上汽大通营业总收入2,533,685.67万元、净利润-161,123.82万元；上汽财务公司营业总收入946,887.95万元、净利润316,901.15万元。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0017"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "od-07",
+            "text": "公司自主品牌新能源车销量增速近50%；“恒星”超级增程、“灵蜥”底盘2.0等新技术实现量产装车。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0004"
+            ],
+            "metrics": []
+          }
+        ],
+        "limitations": []
+      },
+      "material_changes": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "mc-01",
+            "text": "报告期内公司业务类型、利润构成或利润来源未发生重大变动；业务、产品或服务未发生重大变化或调整。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007",
+              "source-0009"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "mc-02",
+            "text": "合并范围变化：上汽红岩汽车有限公司破产重整；华翔圣德曼（上海）汽车系统有限公司以股权出资方式处置；上海大众联合汽车改装有限公司、上海机动车回收服务中心有限公司股权转让后不再纳入合并范围；上海德实汽车服务有限公司因一致行动条款终止丧失控制权；上汽通用新能源汽车销售服务（深圳）有限公司、飞凡汽车销售（深圳）有限公司注销；上海幸福坊创意产业管理有限公司清算。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0017"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "mc-03",
+            "text": "公司撤销商用车事业部，职能整合并入上汽大通；上汽大众、上汽通用优化基地布局，释放产能用于生产“尚界”等自主品牌产品。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "mc-04",
+            "text": "公司本年将上汽通用五菱的出口销量纳入其他地区计算，相关指标增减变动幅度按可比口径计算。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": []
+          },
+          {
+            "fact_id": "mc-05",
+            "text": "公司2026年经营计划为力争全年整车销量达到500万辆，营业总收入超过7000亿元，营业成本在6300亿元左右；该等目标为计划，非报告期已实现业绩。",
+            "subject_scope": "consolidated_group",
+            "period": "2026年度计划",
+            "evidence_ids": [
+              "source-0020"
+            ],
+            "metrics": []
+          }
+        ],
+        "limitations": []
+      }
+    },
+    "evidence": [
+      {
+        "evidence_id": "source-0001",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        "physical_pages": [
+          8
+        ],
+        "source_spans": [
+          {
+            "page": 8,
+            "start": 1330,
+            "end": 2968,
+            "quote": "一、报告期内公司从事的业务情况\n\n    2025  年，面对市场竞争内卷与技术变革加速的双重挑战，公司坚定不移深化改革，全力以赴\n开拓市场，全年实现整车销售                    450.7 万辆，同比增长           12.3%，市场占有率            13.1%，同比上升         0.3 个\n百分点。其中，自主品牌销量达到                      292.8 万辆，同比增长          21.6%，占公司整体销量的比重达到                      65%，\n同比提升约        5 个百分点；新能源车销售                  164.3 万辆，同比增长           33.1%，高于全国新能源车市场平\n均增速近      5 个百分点；出口及海外市场销售                      107.1 万辆，同比增长            3.1%，成为中国汽车品牌“出\n海”的中坚力量。\n     1. 加快自主品牌整车业务发展。一是深化自主乘用车业务一体化管理。以市场用户为导向，\n深入推进组织变革和流程优化，进一步打通产品定义、设计研发、市场营销等全链路，加快市场\n响应速度。二是实施商用车业务扁平化管理。撤销了商用车事业部，将职能整合并入上汽大通，\n压缩管理层级和决策链条，并聚焦轻型商用车核心产品，积极开拓新能源商用车和海外商用车市\n场。三是与华为合作推出“尚界”品牌。2                           月签署战略合作协议，9                月下旬投放首款产品尚界                 H5，\n并快速跻身国内           15-20 万元级市场主流产品阵营。\n    2. 聚焦经营提质推进瘦身健体。一是加快“调产能”。上汽大众、上汽通用优化基地布局，\n释放出的产能用于生产“尚界”等自主品牌产品，着力提高产能利用率，降低运营成本。二是加\n力“减亏损”。通过分析研判、分类施策并采取果断措施，持续缩减亏损企业数量。三是加速“去\n风险”。上汽大通累计退出近百家直营店，不断优化网络渠道提升效率；上汽红岩司法重整方案\n获法院批准，并已启动实施。\n     3. 巩固提升产业链综合优势。一是整合智电零部件业务资源，加快推进全固态电池、一体化\n智能底盘等技术的产业化落地。二是拓展海外物流，安吉物流自营远洋滚装船已达                                                      21 艘，不断加\n快提升全链国际物流能力。三是建设智慧出行，“无驾驶人”Robotaxi                                          启动专线商业化运营。四\n是深化产融结合，围绕主业搭建起产投联动平台，并通过推进司库建设、设立自保公司，增强产\n业链风险防范能力，进一步延链、补链、强链。\n     4. 深化干部人事制度改革。一是深入推进“能上能下”，在企业层面，大力实施管理岗位竞\n聘；在总部层面，对业绩考核不达标的中层干部实施变岗变薪。二是加快年轻干部选拔任用，新\n提任的中层干部中，年轻干部比例显著提升。三是优化考核激励，对                                              7 家重点整车企业实施季度\n考核，对      MG4   等项目团队实施项目奖励，并首批授予                           13 名技术领军人才“上汽首席专家”“上\n汽特级专家”称号，激励干部员工挑战更高目标、创造更大价值。\n\n报告期内公司新增重要非主营业务的说明\n                                                 8 /205"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0002",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        "physical_pages": [
+          9
+        ],
+        "source_spans": [
+          {
+            "page": 9,
+            "start": 0,
+            "end": 73,
+            "quote": "                          上海汽车集团股份有限公司2025          年年度报告\n\n\n□适用    √不适用\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0003",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "二、报告期内公司所处行业情况"
+        ],
+        "physical_pages": [
+          9
+        ],
+        "source_spans": [
+          {
+            "page": 9,
+            "start": 73,
+            "end": 681,
+            "quote": "二、报告期内公司所处行业情况\n    2025年，我国汽车行业在“两新”政策支持和车企加速“出海”带动下，继续展现出强大的\n发展韧性和活力。根据中国汽车工业协会数据，全年我国汽车行业产销累计完成                                       3453.1万辆和\n3440万辆，同比分别增长          10.4%和  9.4%，均高于年初预期，继续稳居全球第一，并再创历史新高。\n其中，乘用车市场整体稳健增长，销量同比增长                       9.2%，成为促消费的重要稳定力量；商用车市场\n明显回暖向好，销量同比增长              10.9%，规模重回       400 万辆以上；新能源汽车保持较快增长，销量\n同比增长    28.2%，全年占国内新车销量的比重已超                  50%，成为我国汽车市场的主导力量；汽车出\n口呈现出较强韧性，出口规模首次站上                  700 万辆台阶，新能源汽车出口成为我国外贸的强劲增量。\n但与此同时，受国内车市竞争内卷、国际贸易壁垒升级等不利因素影响，我国汽车行业利润率继\n续承压下行。为此，国家已出台多项政策举措综合整治“内卷式”竞争，车企在加强自律的同时，\n积极调整经营模式和盈利结构，努力向“新”求变、向“海”图强，推动行业高质量可持续发展。\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0004",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          9
+        ],
+        "source_spans": [
+          {
+            "page": 9,
+            "start": 681,
+            "end": 2526,
+            "quote": "三、经营情况讨论与分析\n    报告期内，公司扎实推进全面深化改革各项工作，聚焦整车业务，优化业务结构，抢抓结构\n性市场机会，推动自主品牌率先发展及合资业务焕新转型；推进核心技术攻关，做优产业生态，\n夯实国际经营，提升发展能级；强化零部件、移动出行和服务、金融等业务协同，稳定产品附加\n值，助力公司整体转型。全年公司实现合并营业总收入                           6562.4亿元，同比增长        4.6%，归属于上\n市公司股东的净利润          101.1亿元，同比增长        506.5%，归属于上市公司股东的扣除非经常性损益的\n净利润   74.2 亿元，同比增长        237.2%，经营筑底企稳基本实现、回升提速态势渐显。\n    1．抢抓机遇奋进新赛道。自主品牌集中推出了全新                      MG4、荣威M7、尚界        H5、智己全新     LS6/LS9、\n五菱缤果    S、大通大拿等新能源产品，持续放大“以旧换新”政策效应，全年公司自主品牌新能\n源车销量增速近        50%。上汽大众、上汽通用强化与自主品牌的资源协同，利用本土研发力量，分\n别推出   AUDI  E5、别克至境       L7等中高端智电新品，加快焕新转型步伐。\n    2. 合力拓展海外新市场。面对国际贸易壁垒升级等不利因素，公司通过推出多款                                     HEV 混动车\n型，MG  品牌在欧洲市场销量超过             30 万辆，成为欧洲最畅销的中国品牌，并在澳新、中东、拉美、\n东南亚等地区的        18个国家乘用车市场排名跻身当地前十；上汽通用五菱深化“印马泰”一体化战\n略，印尼基地新能源汽车产销占比提升至                    80%；智己    IM5 和 IM6 相继登陆泰国、英国、澳大利亚\n等市场；上汽商用车的轻客和皮卡产品在欧洲、澳洲、拉美三大市场也实现快速增长。同时，公\n司通过在海外设立代工厂、CKD             等方式，积极推进本地化生产。\n    3. 培育壮大新质生产力。“恒星”超级增程、“灵蜥”底盘                           2.0 等新技术实现量产装车，技\n术水平达到行业领先。公司积极参与上海“高级别自动驾驶引领区”建设，获颁上海市新一批智\n能网联汽车示范运营牌照，成为行业唯一获得乘用车和商用车领域“双牌照”企业；Robotaxi                                        3.0\n已正式进入商业化运营新阶段，全程可实现“零接管”。推进固态电池与汽车芯片研发应用，在\n国内率先实现第二代半固态电池技术在全新                     MG4 上搭载并批量交付，全固态电池“中试线”正式\n贯通，低温续航、电池安全等核心技术指标行业领先；同时，上汽国产芯片应用率已超过                                           30%，\n正加快推进全国产芯片车型的开发和验证工作。\n    4. 不断深化新营销变革。结合全新                MG4 上市，在     86城布局    120 家快闪店，通过“轻量化引\n流”促进    4S店高效率转化。搭建运营管理看板与新车流量追踪体系，实现流量到销量的闭环管理，\n并依托   AI 工具提升订单转化。联动抖音、小红书等平台，实现内容深度共创，各品牌的线上互动\n量和触达率显著提升。\n    5. 构建板块联动新优势。零部件、金融、移动出行和服务板块协同联动，持续为整车业务提\n供有力支撑。零部件板块完善智能电动化核心技术布局，整合优势资源，加快推进固态电池、智\n能底盘等技术的产业化落地。金融板块加强汽车金融服务的精细化发展，积极支持尚界等新业务，\n并加快拓展海外金融服务。移动出行和服务板块聚焦服务整车业务，报告期内安吉物流有                                           8 艘滚\n装新船启航，进一步提升至南美、欧洲等航线的运能。\n\n\n\n\n                                         9 /205"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0005",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          10
+        ],
+        "source_spans": [
+          {
+            "page": 10,
+            "start": 0,
+            "end": 72,
+            "quote": "                                上海汽车集团股份有限公司2025                年年度报告\n\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0006",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(一) 主营业务分析"
+        ],
+        "physical_pages": [
+          10
+        ],
+        "source_spans": [
+          {
+            "page": 10,
+            "start": 1116,
+            "end": 3250,
+            "quote": "(一)   主营业务分析\n\n1、   利润表及现金流量表相关科目变动分析表\n                                                                                单位：元         币种：人民币\n               科目                             本期数                   上年同期数                 变动比例（%）\n营业收入                                     646,152,101,889.30      614,074,061,818.13                     5.22\n营业成本                                     580,943,983,649.41      556,450,036,686.44                     4.40\n利息支出                                       1,124,352,721.48         1,981,767,545.96                  -43.27\n销售费用                                      20,898,005,550.00       20,080,258,315.83                     4.07\n管理费用                                      22,453,286,690.11       21,108,125,732.22                     6.37\n财务费用                                        -265,824,180.92         3,054,077,070.48                 -108.70\n研发费用                                      18,104,061,919.77       17,649,893,105.21                     2.57\n投资收益                                      13,432,644,620.92         7,177,645,440.57                   87.15\n公允价值变动收益                                   6,605,490,436.41         2,355,521,579.73                 180.43\n信用减值损失                                    -1,091,063,095.93        -3,965,874,339.93                  -72.49\n资产减值损失                                    -5,682,389,059.31        -3,163,758,019.61                   79.61\n营业外支出                                      1,125,649,581.19           564,350,666.53                   99.46\n所得税费用                                      7,465,085,641.62         4,677,794,462.18                   59.59\n经营活动产生的现金流量净额                             34,306,601,905.98       69,267,789,561.24                   -50.47\n投资活动产生的现金流量净额                            -27,561,161,950.79        -3,503,392,907.79                 不适用\n筹资活动产生的现金流量净额                            -53,218,400,555.93        -9,312,171,110.35                 不适用\n利息支出变动原因说明：主要原因为公司之子公司上汽财务公司利息支出同比减少。\n财务费用变动原因说明：主要原因为公司汇兑收益同比增加。\n投资收益变动原因说明：主要原因为公司对联营企业和合营企业的投资收益同比增加。\n\n                                                  10 /205"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0007",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(一) 主营业务分析"
+        ],
+        "physical_pages": [
+          11
+        ],
+        "source_spans": [
+          {
+            "page": 11,
+            "start": 0,
+            "end": 3406,
+            "quote": "                                   上海汽车集团股份有限公司2025                  年年度报告\n\n\n公允价值变动收益变动原因说明：主要原因为公司金融资产公允价值变动同比增加。\n信用减值损失变动原因说明：主要原因为公司之子公司计提应收款项的坏账损失同比减少。\n资产减值损失变动原因说明：主要原因为公司计提固定资产减值损失同比增加。\n营业外支出变动原因说明：主要原因为公司本年对供应商补偿款同比增加。\n所得税费用变动原因说明：主要原因为公司之子公司基于谨慎性原则，对于未来预期无法实现可\n抵扣暂时性差异予以冲回,计入当期所得税费用。\n经营活动产生的现金流量净额变动原因说明：公司通过狠抓零售，加强资金管理，制造业务经营\n活动净现金流得到显著改善，但由于公司之子公司上汽财务公司汽车金融贷款等业务规模变动，\n导致公司经营活动产生的现金流量净额比上年同期减少。\n投资活动产生的现金流量净额变动原因说明：主要原因为公司之子公司上汽财务公司根据本年业\n务需求调整了金融资产配置，投资所支付的现金同比增加。\n筹资活动产生的现金流量净额变动原因说明：主要公司本年偿还债务所支付的现金同比增加。\n\n本期公司业务类型、利润构成或利润来源发生重大变动的详细说明\n□适用      √不适用\n\n2、   收入和成本分析\n√适用      □不适用\n具体如下：\n\n(1).   主营业务分行业、分产品、分地区、分销售模式情况\n                                                                                      单位：元          币种：人民币\n                                             主营业务分行业情况\n                                                              毛利       营业收入         营业成本         毛利率比上年增减\n   分行业               营业收入                  营业成本                率       比上年增         比上年增               （%）\n                                                             （%）       减（%）         减（%）\n汽车制造业           646,152,101,889.30     580,943,983,649.41     10.09         5.22         4.40    增加   0.71 个百分点\n金融业               10,091,710,191.88      1,163,322,101.92     88.47       -25.33       -42.04    增加   3.32 个百分点\n合计              656,243,812,081.18     582,107,305,751.33     11.30         4.57         4.23    增加   0.28 个百分点\n                                               主营业务分产品情况\n                                                              毛利       营业收入         营业成本         毛利率比上年增减\n   分产品               营业收入                  营业成本                率       比上年增         比上年增               （%）\n                                                             （%）       减（%）         减（%）\n整车业务            410,196,473,001.11     392,545,642,811.16      4.30         7.59         7.10    增加   0.44 个百分点\n零部件业务           203,019,866,775.26     164,149,718,120.28     19.15         6.47         4.87    增加   1.24 个百分点\n劳务及其他             32,935,762,112.94     24,248,622,717.97     26.38       -21.83       -27.36    增加   5.61 个百分点\n金融业务              10,091,710,191.88      1,163,322,101.92     88.47       -25.33       -42.04    增加   3.32 个百分点\n合计              656,243,812,081.18     582,107,305,751.33     11.30         4.57         4.23    增加   0.28 个百分点\n                                               主营业务分地区情况\n                                                              毛利       营业收入         营业成本         毛利率比上年增减\n   分地区               营业收入                  营业成本                率       比上年增         比上年增               （%）\n                                                             （%）       减（%）         减（%）\n中国              504,138,835,950.64     449,593,517,326.14     10.82         1.64         1.79    减少   0.13 个百分点\n其他（注）           152,104,976,130.54     132,513,788,425.19     12.88        15.60        13.50    增加   1.61 个百分点\n合计              656,243,812,081.18     582,107,305,751.33     11.30         4.57         4.23    增加   0.28 个百分点\n\n注：本年公司将上汽通用五菱的出口销量纳入其他地区计算，相关指标的增减变动幅度按可比口径计算。\n\n(2).   产销量情况分析表\n\n√适用      □不适用\n            主要产品                       单       生产量          销售量          库存量         生产量        销售量         库存量\n                                       位                                             比上年        比上年         比上年\n                                                      11 /205"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0008",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(一) 主营业务分析"
+        ],
+        "physical_pages": [
+          12
+        ],
+        "source_spans": [
+          {
+            "page": 12,
+            "start": 0,
+            "end": 4585,
+            "quote": "                                           上海汽车集团股份有限公司2025                          年年度报告\n\n\n                                                                                                           增减            增减            增减\n                                                                                                          （%）           （%）          （%）\n上汽大众汽车有限公司                                       辆       1,057,605        1,024,000         47,321          -7.81        -10.81        233.32\n上汽通用汽车有限公司                                       辆        534,026          535,000          10,989         26.63         22.99          -8.33\n上汽集团乘用车分公司                                       辆        885,448          886,742          10,144         25.17         25.42         -13.74\n上汽通用五菱汽车股份有限公司                                   辆       1,671,013        1,615,066         90,269         23.58         20.52         163.01\n上汽大通汽车有限公司                                       辆        223,531          222,286          13,995         23.99         25.14          9.76\n智己汽车科技有限公司                                       辆         85,884          81,017           5,824          31.34         23.68       1,035.28\n上汽正大有限公司                                         辆         30,048          29,391           5,909          36.15         13.26         12.49\n上汽通用五菱印尼汽车有限公司                                   辆         21,121          21,016           1,723          -11.22        -13.31         6.49\n捷仕达名爵汽车印度有限公司                                    辆         70,351          69,997           1,559          19.30         17.76         21.99\n其他                                               辆         22,935          23,003           1,263          -20.55        -23.47         -5.18\n合计                                               辆       4,601,962        4,507,518        188,996         14.82         12.32         98.92\n产销量情况说明\n其他主要含上海申沃客车有限公司、上汽红岩汽车有限公司、南京依维柯汽车有限公司等。\n\n(3).     重大采购合同、重大销售合同的履行情况\n□适用         √不适用\n\n(4).     成本分析表\n                                                                                                          单位：元             币种：人民币\n                                                                分行业情况\n                                                                   本期占总                                        上年同期             本期金额较\n分行业            成本构成项目                        本期金额                  成本比例               上年同期金额                   占总成本             上年同期变\n                                                                      (%)                                      比例(%)            动比例(%)\n汽车制          原材料、人工工\n造业           资、折旧、能源                   580,943,983,649.41               99.80      556,450,036,686.44               99.64                  4.40\n             等\n金融业          人工工资、折旧、                     1,163,322,101.92                0.20        2,006,973,587.57                0.36              -42.04\n             能源等\n合计                                     582,107,305,751.33              100.00      558,457,010,274.01              100.00                  4.23\n                                                                分产品情况\n                                                                   本期占总                                        上年同期             本期金额较\n分产品            成本构成项目                        本期金额                  成本比例               上年同期金额                   占总成本             上年同期变\n                                                                      (%)                                      比例(%)            动比例(%)\n整车业          原材料、人工工\n务            资、折旧、能源                   392,545,642,811.16               67.43      366,534,174,722.96               65.63                  7.10\n             等\n零部件          原材料、人工工\n业务           资、折旧、能源                   164,149,718,120.28               28.20      156,532,375,412.29               28.03                  4.87\n             等\n劳务    及      原材料、人工工\n其他           资、折旧、能源                     24,248,622,717.97                4.17       33,383,486,551.19                5.98              -27.36\n             等\n金融业          人工工资、折旧、                     1,163,322,101.92                0.20        2,006,973,587.57                0.36              -42.04\n务            能源等\n合计                                     582,107,305,751.33              100.00      558,457,010,274.01              100.00                  4.23\n\n(5).     报告期主要子公司股权变动导致合并范围变化\n√适用         □不适用\n   具体情况详见本报告第八节第九项。\n\n\n\n                                                                   12 / 205"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0009",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(一) 主营业务分析"
+        ],
+        "physical_pages": [
+          13
+        ],
+        "source_spans": [
+          {
+            "page": 13,
+            "start": 0,
+            "end": 1702,
+            "quote": "                              上海汽车集团股份有限公司2025              年年度报告\n\n\n(6).  公司报告期内业务、产品或服务发生重大变化或调整有关情况\n\n□适用     √不适用\n\n(7).  主要销售客户及主要供应商情况\n\nA.公司主要销售客户及主要供应商情况\n√适用     □不适用\n前五名客户销售额7,545,821.15万元，占年度销售总额11.68%；其中前五名客户销售额中关联方销\n售额0万元，占年度销售总额0%。\n\n前五名供应商采购额21,496,663.81万元，占年度采购总额37%；其中前五名供应商采购额中关联\n方采购额459,389.23万元，占年度采购总额0.79%。\n\nB.报告期内向单个客户的销售比例超过总额的                           50%、前     5 名客户中存在新增客户的或严重依赖于\n少数客户的情形\n□适用     √不适用\n\n报告期内向单个供应商的采购比例超过总额的                             50%、前    5 名供应商中存在新增供应商的或严重依\n赖于少数供应商的情形\n□适用     √不适用\n\nC. 报告期内公司股票被实施退市风险警示或其他风险警示\n前五名销售客户\n□适用     √不适用\n\n前五名供应商\n□适用     √不适用\n\nD. 报告期内公司存在贸易业务收入\n√适用     □不适用\n                                                                        单位：元       币种：人民币\n  贸易业务开展情况                    本期营业收入                    上期营业收入                 本期营业收入比上年\n                                                                                 同期增减（%）\n本报告期主要系汽车\n芯片及相关汽车零部                         206,508,725.66            684,512,856.82                     -69.83\n件的出口贸易业务。\n\n贸易业务占营业收入比例超过                   10%前五名销售客户\n□适用     √不适用\n\n贸易业务收入占营业收入比例超过                     10%前五名供应商\n□适用     √不适用\n\n3、  费用\n√适用     □不适用\n                                                                         单位：元          币种：人民币\n         项目                      2025  年                   2024  年               变动比例（%）\n销售费用                           20,898,005,550.00         20,080,258,315.83                       4.07\n管理费用                           22,453,286,690.11         21,108,125,732.22                       6.37\n研发费用                           18,104,061,919.77         17,649,893,105.21                       2.57\n\n                                               13/ 205"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0010",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(一) 主营业务分析"
+        ],
+        "physical_pages": [
+          14
+        ],
+        "source_spans": [
+          {
+            "page": 14,
+            "start": 0,
+            "end": 2572,
+            "quote": "                             上海汽车集团股份有限公司2025             年年度报告\n\n\n财务费用                            -265,824,180.92         3,054,077,070.48                  -108.70\n所得税费用                          7,465,085,641.62         4,677,794,462.18                    59.59\n注：\n1）财务费用较上年同期变动主要原因为公司汇兑收益同比增加。\n2）所得税费用较上年同期变动主要原因为公司之子公司基于谨慎性原则，对于未来预期无法实现\n的可抵扣暂时性差异予以冲回,计入当期所得税费用。\n\n4、  研发投入\n\n(1).研发投入情况表\n√适用      □不适用\n                                                                        单位：元       币种：人民币\n本期费用化研发投入                                                                       18,104,061,919.77\n本期资本化研发投入                                                                        3,601,975,827.30\n研发投入合计                                                                          21,706,037,747.07\n研发投入总额占营业收入比例（%）                                                                             3.36\n研发投入资本化的比重（%）                                                                               16.59\n注：2025   年度本集团含所属主要合资整车企业的汇总研发投入为                                 3,358,018.53 万元。\n\n(2).研发人员情况表\n√适用     □不适用\n\n公司研发人员的数量                                                                                  30,329\n研发人员数量占公司总人数的比例（%）                                                                           17.6\n                                       研发人员学历结构\n学历结构类别                                                                   学历结构人数\n研究生及以上                                                                                     11,325\n本科及以下                                                                                      19,004\n                                       研发人员年龄结构\n年龄结构类别                                                                   年龄结构人数\n35岁以下（含        35 岁）                                                                       18,195\n35-45 岁（不含     35 岁，含     45 岁）                                                             9,301\n45岁以上                                                                                       2,833\n\n(3).情况说明\n√适用     □不适用\n    上汽集团聚焦于新能源汽车和智能汽车领域，着力推动自主品牌向上突破，扩大新能源产品\n和海外市场份额。通过大力度投入新能源汽车核心技术研发，加快推出智能化新能源车型，努力\n提升自主品牌在国内市场的竞争力，并在海外市场实现销量持续较快增长。\n    在此过程中，公司已构建包含纯电、混动、氢能三大整车平台，以及电池、电驱、超混系统\n和智能车全栈解决方案的“七大技术底座”，率先实现半固态电池、“银河”全栈智能车解决方\n案、整车中央协调运动控制平台（VMC）等行业领先技术的量产落地，并持续推进全固态电池、高\n阶智能驾驶、一体化轻量智能底盘、AI                      智能座舱等前沿技术升级和上车应用。通过融合“芯片、\n硬件平台、软件平台、数据和算法”跨领域工程，运用                               AI 技术赋能，致力为用户打造“能推理、\n会思考、懂情绪”驾舱融合的智慧出行终端。\n\n(4).研发人员构成发生重大变化的原因及对公司未来发展的影响\n□适用     √不适用\n\n                                             14 /205"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0011",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(一) 主营业务分析"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 0,
+            "end": 720,
+            "quote": "                                     上海汽车集团股份有限公司2025                    年年度报告\n\n\n\n5、   现金流\n\n√适用       □不适用\n                                                                                         单位：元            币种：人民币\n                   项目                                 2025   年                    2024  年             变动比例（%）\n经营活动产生的现金净流量净额                                   34,306,601,905.98           69,267,789,561.24                      -50.47\n投资活动产生的现金净流量净额                                  -27,561,161,950.79            -3,503,392,907.79                   不适用\n筹资活动产生的现金净流量净额                                  -53,218,400,555.93            -9,312,171,110.35                   不适用\n注：现金流变动分析参见利润表及现金流量表相关科目变动分析表。\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0012",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(四) 行业经营性信息分析"
+        ],
+        "physical_pages": [
+          16
+        ],
+        "source_spans": [
+          {
+            "page": 16,
+            "start": 408,
+            "end": 1641,
+            "quote": "(四)  行业经营性信息分析\n√适用      □不适用\n具体如下：\n汽车制造行业经营性信息分析\n\n 1、   产能状况\n√适用      □不适用\n\n现有产能\n√适用      □不适用\n                                                                                      单位：万辆\n           主要工厂名称                          设计产能              报告期内产能             产能利用率（%）\n上汽大众汽车有限公司                                   192.0                105.8                 55\n上汽通用汽车有限公司                                   145.2                53.4                  37\n上汽集团乘用车分公司                                   116.0                88.5                  76\n上汽通用五菱汽车股份有限公司                               176.0                167.1                 95\n上汽大通汽车有限公司                                    37.5                22.4                  60\n上汽正大有限公司                                      7.2                  3.0                  42\n上汽通用五菱汽车印尼有限公司                                6.0                  2.1                  35\n捷仕达名爵汽车印度有限公司                                 5.6                  7.0                 126\n其他(注)                                         13.7                 2.3                  17\n注：其他主要含上海申沃客车有限公司、上汽红岩汽车有限公司、南京依维柯汽车有限公司等。\n\n在建产能\n□适用      √不适用\n\n产能计算标准\n√适用      □不适用\n\n                                             16 /205"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0013",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(四) 行业经营性信息分析"
+        ],
+        "physical_pages": [
+          17
+        ],
+        "source_spans": [
+          {
+            "page": 17,
+            "start": 0,
+            "end": 3334,
+            "quote": "                                     上海汽车集团股份有限公司2025                     年年度报告\n\n\n设计产能计算依据为年工作日                          250  天，每天工作             16  小时，即        4000   小时。报告期内产能为报告期\n内产量；产能利用率为报告期内产量                                 / 设计产能。\n\n 2、    整车产销量\n√适用        □不适用\n\n按车型类别\n√适用        □不适用\n                                                 销量（辆）                                           产量（辆）\n                                                                        累计同                                         累计同\n         车型类别                       本年累计               去年累计             比增减         本年累计            去年累计            比增减\n                                                                        （%）                                         （%）\n基本乘用车                                 2,175,039          2,019,811         7.69      2,222,164       2,009,712        10.57\n运动型多用途车（SUV）                          1,303,095          1,155,054        12.82      1,328,384       1,146,178        15.90\n多功能乘用车（MPV）                              337,749           249,946        35.13        334,093         257,786        29.60\n交叉型乘用车                                   254,168           204,041        24.57        264,153         208,109        26.93\n客车                                       114,247            92,932        22.94        113,478           93,089       21.90\n载货汽车                                     323,220           291,216        10.99        339,690         292,978        15.94\n总计                                    4,507,518          4,013,000        12.32      4,601,962       4,007,852        14.82\n\n按地区\n√适用        □不适用\n                                              境内销量（辆）                                         境外销量（辆）\n                                                                        累计同                                         累计同\n         车型类别                       本年累计               去年累计             比增减         本年累计            去年累计            比增减\n                                                                        （%）                                         （%）\n基本乘用车                                 1,745,822          1,602,138         8.97        429,217         417,673          2.76\n运动型多用途车（SUV）                             789,912           645,747        22.33        513,183         509,307          0.76\n多功能乘用车（MPV）                              318,560           234,214        36.01         19,189           15,732       21.97\n交叉型乘用车                                   225,468           175,735        28.30         28,700           28,306         1.39\n客车                                        89,249            75,428        18.32         24,998           17,504       42.81\n载货汽车                                     267,957           241,249        11.07         55,263           49,967       10.60\n总计                                    3,436,968          2,974,511        15.55      1,070,550       1,038,489          3.09\n\n 3、    零部件产销量\n√适用        □不适用\n      公司的零部件业务主要由下属控股子公司华域汽车系统股份有限公司（股票代码：600741）\n开展，其       2025   年业务情况详见华域汽车（600741）在上海证券交易所                                           www.sse.com.cn       发布的       2025\n年年报。\n按零部件类别\n□适用        √不适用\n\n按市场类别\n□适用        √不适用\n\n 4、    新能源汽车业务\n√适用        □不适用\n\n\n                                                          17 / 205"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0014",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(四) 行业经营性信息分析"
+        ],
+        "physical_pages": [
+          18
+        ],
+        "source_spans": [
+          {
+            "page": 18,
+            "start": 0,
+            "end": 3379,
+            "quote": "                                上海汽车集团股份有限公司2025               年年度报告\n\n\n新能源汽车产能状况\n√适用     □不适用\n\n            主要工厂名称                        设计产能（辆）              报告期内产能（辆）                 产能利用率(%)\n上汽大众汽车有限公司                                         -                   68,002                    -\n  其中上汽大众          MEB   工厂                     240,000                 34,464                   14\n上汽通用汽车有限公司                                         -                   91,037                    -\n上汽集团乘用车分公司                                         -                   272,418                   -\n上汽通用五菱汽车股份有限公司                                     -                  1,000,551                  -\n上汽大通汽车有限公司                                         -                   65,618                    -\n智己汽车科技有限公司                                         -                   85,884                    -\n上汽正大有限公司                                           -                   20,703                    -\n捷仕达名爵汽车印度有限公司                                      -                   60,992                    -\n上汽通用五菱印尼汽车有限公司                                     -                   14,336                    -\n其他                                                 -                    3,919                    -\n注  1：除上汽大众          MEB   工厂外，公司其他新能源产品与传统车共线生产，共享产能，公司可结合\n市场情况对两类产品进行调配，实行柔性化生产。\n注  2：其他主要含上海申沃客车有限公司、上汽红岩汽车有限公司、南京依维柯汽车有限公司等。\n\n新能源汽车产销量\n√适用       □不适用\n                               销量（辆）                                         产量（辆）\n 车型类别           本年累计            去年累计          累计同比增            本年累计            去年累计          累计同比增\n                                               减（%）                                           减（%）\n乘用车              1,481,504       1,139,255           30.04      1,520,384       1,146,193           32.65\n商用车                161,505          94,821           70.33        163,076          98,968           64.78\n总计               1,643,009       1,234,076           33.14      1,683,460       1,245,161           35.20\n\n新能源汽车收入及补贴\n√适用       □不适用\n                                                                            单位：万元          币种：人民币\n     车型类别                       收入                新能源汽车补贴金额                        补贴占比（%）\n乘用车                                11,921,125                             0                            0%\n商用车                                 1,431,094                             0                            0%\n\n 5、   汽车金融业务\n√适用     □不适用\n汽车金融业务情况\n√适用     □不适用\n                                                                            单位：亿元          币种：人民币\n          子公司名称                      上海汽车集团财务有限责任公司\n                                                基本情况\n   注册资本                总资产              净资产              营业收入             营业利润                净利润\n         153.80          2,092.82            536.11             60.76            52.08               42.70\n                                             主要经营指标\n    发放贷款金额                      发放贷款笔数                        贷款余额                  信用减值损失金额\n                1,189.69                  1,052,187                     403.48                       15.91\n                                             主要监管指标\n 核心一级          一级资本充            资本充足率           不良贷款率            拨备覆         贷款拨备率            流动性比例\n                                                 18 /205"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0015",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(四) 行业经营性信息分析"
+        ],
+        "physical_pages": [
+          19
+        ],
+        "source_spans": [
+          {
+            "page": 19,
+            "start": 0,
+            "end": 3664,
+            "quote": "                                  上海汽车集团股份有限公司2025                 年年度报告\n\n\n 资本充足           足率（%）                （%）              （%）              盖率            （%）               （%）\n 率（%）                                                                （%）\n   29.67            29.67             30.53           1.0613          371.56           3.94            264.29\n\n\n           子公司名称                       上汽通用汽车金融有限责任公司\n                                                   基本情况\n   注册资本                 总资产                净资产               营业收入              营业利润                  净利润\n           92.00             490.15             198.41              30.70              16.85                12.04\n                                                主要经营指标\n     发放贷款金额                       发放贷款笔数                          贷款余额                    信用减值损失金额\n                   950.16                      622,042                       383.79                         15.42\n                                                主要监管指标\n 核心一级           一级资本充             资本充足率            不良贷款率             拨备覆           贷款拨备率            流动性比例\n 资本充足           足率（%）                （%）              （%）              盖率            （%）               （%）\n 率（%）                                                                （%）\n   27.62            27.62              28.7             1.04          384.91           4.02            151.58\n\n\n           子公司名称                       上海东正汽车金融股份有限公司\n                                                   基本情况\n   注册资本                 总资产                净资产               营业收入              营业利润                  净利润\n           21.40             195.61              37.86                4.56             -0.53                 1.05\n                                                主要经营指标\n     发放贷款金额                       发放贷款笔数                          贷款余额                    信用减值损失金额\n                   296.35                      353,626                       155.58                          2.31\n                                                主要监管指标\n 核心一级           一级资本充             资本充足率            不良贷款率             拨备覆           贷款拨备率            流动性比例\n 资本充足           足率（%）                （%）              （%）              盖率            （%）               （%）\n 率（%）                                                                （%）\n   17.16            17.16             19.04             0.49          648.52           3.16            424.00\n\n贷款五级分类分布情况\n√适用      □不适用\n                                                                                  单位：亿元          币种：人民币\n                  上海汽车集团财务有限责                        上汽通用汽车金融有限                      上海东正汽车金融股份\n                             任公司                             责任公司                            有限公司\n    项目                金额           占比（%）                金额          占比（%）               金额          占比（%）\n    正常                  394.48             97.77         371.92            96.91          153.13           98.42\n    关注                     4.71              1.17           7.87            2.05            1.69            1.09\n    次级                     2.43              0.60           1.34            0.35            0.17            0.11\n    可疑                     0.45              0.11           0.97            0.25            0.27            0.17\n    损失                     1.40              0.35           1.70            0.44            0.32            0.21\n    合计                  403.47            100.00         383.79          100.00           155.58          100.00\n\n 6、    其他说明\n□适用       √不适用\n\n\n\n                                                    19 / 205"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0016",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(四) 行业经营性信息分析"
+        ],
+        "physical_pages": [
+          20
+        ],
+        "source_spans": [
+          {
+            "page": 20,
+            "start": 0,
+            "end": 142,
+            "quote": "                                                                                         上海汽车集团股份有限公司2025                            年年度报告\n\n\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0017",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(七) 主要控股参股公司分析"
+        ],
+        "physical_pages": [
+          26
+        ],
+        "source_spans": [
+          {
+            "page": 26,
+            "start": 76,
+            "end": 3551,
+            "quote": "(七)   主要控股参股公司分析\n\n√适用      □不适用\n主要子公司及对公司净利润影响达                          10%以上的参股公司情况\n√适用      □不适用\n                                                                                  单位：万元            币种：人民币\n                                                                       归属于母公                              归属于母\n   公司名称        公司类型             主要业务             注册资本         总资产       司净资产       营业总收入        营业利润      公司净利\n                                                                                                             润\n华域汽车           子公司       汽车零部件生产、销售                 315,27219,918,645.096,714,457.3318,399,890.05943,418.20720,726.81\n动力新科           子公司       柴油机及配件的生产销售             138,782.18 1,075,095.65 638,118.32  573,954.10 293,719.80287,200.46\n智己汽车           子公司       新能源汽车生产、销售             1,400,997.602,297,331.28 211,367.081,541,140.76-359,798.69-359,815.59\n上汽大通           子公司       汽车生产、销售                1,032,911.002,606,631.03 225,613.892,533,685.67-160,815.73-161,123.82\n上汽财务公司         子公司       金融服务                   1,538,000.0025,421,723.325,848,599.88946,887.95 525,072.96316,901.15\n中联汽车电子有        子公司       汽车用电子产品的生产、              60,062.00 1,043,506.751,042,237.01   2,969.63 257,576.98257,045.24\n限公司                      经营和研发\n上海颀盟企业管\n理合伙企业（有        子公司       投资及咨询服务                 800,400.00  801,994.16  801,994.16       0.00  509,478.12509,478.12\n限合伙）\n\n报告期内取得和处置子公司的情况\n√适用      □不适用\n                             报告期内取\n        公司名称                 得和处置子                           对整体生产经营和业绩的影响\n                              公司方式\n上汽红岩汽车有限公司                  破产重整            上汽红岩重整相关情况，详见动力新科在上海证券交易所\n                                            www.sse.com.cn发布的2025年年报。\n                                            华域汽车系统（上海）有限公司（以下简称“华域上海”）\n                                            以其原持有的华翔圣德曼(山西)汽车系统有限公司(以下简称\n华翔圣德曼(上海)汽车                 股权出资            “华翔圣德曼山西”)100.00%的股权作价人民币18,390.75万元\n系统有限公司                                      ，山西华翔集团股份有限公司以现金人民币42,911.75万元作\n                                            价出资。上述交易完成后，华域上海持有华翔圣德曼上海\n                                            30.00%的股权，不再直接持有华翔圣德曼山西的股权。\n                                            本公司以人民币21,000,000.00元作为对价，将原持有的子公\n上海大众联合汽车改装                                  司上海大众联合汽车改装有限公司(以下简称“大众联合改装\n有限公司                        股权转让            ”)100%股权转让予上海大众联合发展有限公司。上述交易完\n                                            成后，本公司丧失对大众联合改装的控制权，不再将其纳入\n                                            合并范围。\n                                            本公司以人民币13,800,000.00元作为对价，将原持有的子公\n上海机动车回收服务中                                  司上海机动车回收服务中心有限公司(以下简称“服务中心\n心有限公司                       股权转让            ”)51%股权转让予上海龙群贸易(集团)有限公司。上述交易完\n                                            成后，本公司对服务中心的持股比例下降至5%，丧失对其的\n                                            控制权，不再将其纳入合并范围。\n上海德实汽车服务有限                  终止一致行           经相关股东协议约定，本公司原子公司上海德实汽车服务有\n公司                          动条款             限公司(以下简称“德实”)原公司章程中的一致行动条款终止\n                                            。相应地，本公司丧失对德实的控制权。\n上汽通用新能源汽车销                                  本公司注销下属子公司上汽通用新能源汽车销售服务(深圳)\n售服务(深圳)有限公司                 注销              有限公司、飞凡汽车销售(深圳)有限公司，并不再将其纳入\n、飞凡汽车销售(深圳)                                 合并财务报表范围。\n有限公司\n上海幸福坊创意产业管                  清算              本公司清算下属子公司上海幸福坊创意产业管理有限公司，\n理有限公司                                       并不再将其纳入合并财务报表范围。\n\n其他说明\n\n                                                     26 / 205"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0018",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(七) 主要控股参股公司分析"
+        ],
+        "physical_pages": [
+          27
+        ],
+        "source_spans": [
+          {
+            "page": 27,
+            "start": 0,
+            "end": 72,
+            "quote": "                          上海汽车集团股份有限公司2025         年年度报告\n\n\n□适用    √不适用\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0019",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "六、公司关于公司未来发展的讨论与分析"
+        ],
+        "physical_pages": [
+          27
+        ],
+        "source_spans": [
+          {
+            "page": 27,
+            "start": 232,
+            "end": 1953,
+            "quote": "六、公司关于公司未来发展的讨论与分析\n\n(一)行业格局和趋势\n\n√适用     □不适用\n    (一)行业格局和趋势\n    当前，我国汽车行业仍处于市场调整、产业转型、竞争加剧等“多期叠加”的复杂环境。从\n国内看，虽然车市竞争深度内卷，但市场容量依然很大；从海外看，尽管存在着各种风险挑战，\n但中国车企加速出海的趋势不会改变，未来必将深度参与、进而主导汽车产业的全球竞争。预计\n今后五年，我国汽车行业将呈现以下三大发展趋势：\n    一是总量攀升、增速放缓。截至              2025 年底，我国千人汽车保有量约              260 辆，与发达国家相比\n仍有较大提升空间。尽管国内汽车消费刺激政策的边际效应将逐步递减，但是一二线市场的增换\n购需求有望持续释放，并且随着乡村振兴和城镇化推进，各类基础设施的不断完善，低线市场的\n汽车保有量或将加快提升。预计到“十五五”期末，国内市场整车销量可达                                  3000 万辆，但年均复\n合增速将从“十四五”时期的              4%降至   2%左右。\n    二是智电普及、结构分化。一方面，在国家政策指引和消费者接受度持续提升的背景下，新\n能源汽车有望保持中高速增长；同时，随着芯片、算法等不断迭代，智能化或将迎来全面爆发，                                          L2\n级“组合驾驶辅助功能”将全面普及，L3                  级“自动驾驶”将在全国实现规模化落地，依托                       AI 大\n模型的深度赋能，智能座舱将从“基础交互”升级为“场景化智能服务”并与智能驾驶深度融合，\n带来全新的出行体验。预计到              2030年，新能源汽车的年销量将超过                2000万辆，进入全面市场化\n的成熟发展阶段。另一方面，随着智电产品供给不断丰富，以及“科技平权”理念普及，市场的\n增长结构将进一步分化，同等价位具备更新技术和更高配置的产品才能赢得消费者青睐，市场份\n额将更加向“头部”产品和企业集中。\n    三是出海加速、挑战升级。从增长机遇看，海外市场的经济发展和汽车普及化程度不一，初\n步预判中国车企可触达的海外市场容量约                   4000 万辆，尤其是海外新兴市场具有较大增长潜力；同\n时，由于海外市场的电动化进程落后于中国，并且中国车企的成本竞争力具有显著优势，预计到\n“十五五”期末，中国车企“出口+海外生产”的总规模将超过                            1000 万辆，年均复合增速在           10%\n以上。从风险挑战看，在全球贸易保护主义盛行，地缘政治关系紧张等背景下，美欧等国采取加\n征关税、最低价格、强化“碳足迹”核算等手段，对中国车企出口进行限制，跨国车企巨头也在\n加快完善新能源产品矩阵，争夺核心市场；同时，随着中国车企扎堆出海，国际竞争“国内化”\n进一步加剧，赢得海外市场的关键将从产品竞争转向体系竞争。\n\n(二)公司发展战略\n√适用     □不适用\n    “十五五”期间，公司将坚持用户为本的经营理念，持续推进创新转型，加快培育新质生产\n力；坚持提质增效的工作导向，持续提升经营质量，不断增强核心竞争力，持续构建世界一流企\n业，形成主业更强、布局更优、响应更快、动力更足的新局面，建设一个具有产品魅力、科技实\n力、机制活力，年轻人向往的“新上汽”。\n    经营目标：保持汽车行业头部领先地位，实现财务健康与可持续发展。\n    品牌建设：上汽高端品牌力争跻身智能电动第一梯队；做大自主品牌国内市场基本盘，保持\n国内市占率稳中有进，不断提升品牌溢价能力；加强海外品牌协同发展，使                                   MG 在全球范围内成\n\n\n                                        27/205"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0020",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "六、公司关于公司未来发展的讨论与分析"
+        ],
+        "physical_pages": [
+          28
+        ],
+        "source_spans": [
+          {
+            "page": 28,
+            "start": 0,
+            "end": 2156,
+            "quote": "                          上海汽车集团股份有限公司2025         年年度报告\n\n\n为具备一定影响力和竞争力的主流品牌；持续推进战略性品牌协同，形成“高端突破、主流稳固、\n全球联动”的强大品牌矩阵。\n    绿色低碳：持续提升纯电动、混合动力产品渗透率，加快燃料电池产品投放，初步探索                                        V2G\n应用；构建全链条绿色化协同降碳机制，推动从材料生产到报废回收利用的绿色循环经济体系；\n优化能源结构，提升绿电比重；加强能耗管理，降低单位能耗；利用储能、协议等手段，降低能\n源成本；加速绿色低碳转型，拥抱“碳中和”浪潮。\n    AI赋能：在“AI+产品”层面，研发               OneChip 技术架构，云端与车端快速应用               AI 技术，推\n动智能座舱从“功能载体”向“持续进化的智能体”跃迁；力争到                               2030年，L3   及以上智能驾驶\n乘用车占比超      30%，并实现      L4 级自动驾驶批量运营。在“AI+业务”层面，构建可组合的应用\nAgent，推动   AI 深度融入业务流程；探索具身智能在生产端的应用场景，研究样板应用。\n    全球经营：推动高水平全球化发展，深化                   ESG 体系建设，实现从“中国企业”到“全球企业”\n的身份重塑。在技术与产品全球化方面，构建以中国技术为核心的全球技术创新网络，以营利性\n为主要目标，不断完善海外产品矩阵。在供应链与制造本地化方面，通过在海外建立研发中心、\n生产基地和服务体系，实现关键供应链本土化布局，深度融入全球主要市场。在品牌与生态全球\n化方面，在海外重点市场，布局出行、金融、二手车等服务。\n    技术创新：构建起自主可控、具备全球竞争力的研发体系和技术标准。形成完善的技术底座\n管理体系。在全固态电池、混动技术、关键原材料体系、全栈软件生态、智能底盘以及氢燃料电\n池等领域，形成具备较强竞争力的技术标签。加强知识产权布局，提升专利数量；加强技术标准\n话语权，提升在国内外技术标准制定中的影响力。\n    产业体系：聚焦产业链关键战略资源，实现“自主可控+风险隔离”双保障；通过产业链布局\n优化与协同机制，降低外部冲击影响，提升体系韧性；推进芯片、工业软件的国产化应用，构建\n安全、韧性、高效的现代化产业链。\n    组织人才：在提升组织效率方面，深化“三能”机制建设，完善与公司发展战略相匹配的组\n织架构与人员规模，健全激励约束体系，强化业绩导向。在人才梯队建设方面，加大年轻干部培\n养和选任力度；聚焦关键领域，加大引进领军人才和海外高层次人才；深化产学研合作机制，定\n向培养紧缺专业人才和技术专家人才；大量招聘优秀应届人才，扩大基盘强化人才储备；探索高\n技能人才培养新范式。\n(三)经营计划\n√适用     □不适用\n    根据中国汽车工业协会预测，2026             年我国汽车行业销量预计在             3475 万辆左右，同比增长         1%。\n公司将坚持“稳中求进”工作总基调，纵深推进全面深化改革各项任务，持续做大国内“基本盘”，\n积极拓展海外“增长极”，抢抓结构性市场机会，全力巩固经营回升提速势头；进一步优化资源\n配置与业务协同，发展壮大新质生产力，持续提升核心竞争力，加快构建发展新优势。公司力争\n全年整车销量达到        500 万辆，营业总收入超过           7000 亿元，营业成本在         6300 亿元左右，奋力实现\n“十五五”良好开局。\n    1.整车板块发挥龙头牵引作用，加快提升“用户洞察、技术创新、品牌建设、产品入市、全\n球经营”等五大能力，聚焦目标用户和竞品对标，突出自身技术长板，加快迭代升级，努力实现\n“量质齐增”；持续完善海外经营布局，深化                     ESG 体系建设，不断优化海外产品结构，更好满足\n不同国家消费者多元化需求。\n    2.零部件板块强化业务协同，加快推进固态电池、智能底盘、智能座舱等新技术的量产应用，\n并探索从造型设计、工程开发到制造交付的“整包式”协同开发模式，进一步降低综合成本、提\n升开发效率。\n    3.移动出行和服务板块加强服务保障，物流业务围绕海外经营，进一步增强全链物流能力建\n设；销售服务业务积极探索营销新模式，加快从规模拓展向效能提升转型；出行服务业务加快推\n动 Robotaxi项目规模化落地。\n    4.金融板块深化“产融合”，积极探索业务模式创新与数智赋能，挖潜新的增长点，并深化\n战略直投，实现产投协同的生态闭环；有序推进司库和自保公司建设，提升风险预警和风险防控\n能力。\n    5.创新板块着力改善企业经营质量，持续推进关键技术攻关与产业化落地，以及前瞻技术布\n局；进一步加强风险管控，推动企业健康发展。\n                                        28/205"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0021",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "六、公司关于公司未来发展的讨论与分析"
+        ],
+        "physical_pages": [
+          29
+        ],
+        "source_spans": [
+          {
+            "page": 29,
+            "start": 0,
+            "end": 307,
+            "quote": "                          上海汽车集团股份有限公司2025         年年度报告\n\n\n\n(四)可能面对的风险\n\n√适用     □不适用\n    一是外部经贸环境和地缘局势的不稳定不确定性风险依然较大，可能对海外市场销售造成不\n利影响。二是“两新”政策边际效应递减，叠加新能源汽车购置税优惠政策退坡，国内车市需求\n可能在短期内承压；同时，非政策刺激的汽车消费需求受宏观经济、收入预期、技术迭代等因素\n影响较大，国内市场增速存在不及预期的风险。三是部分上游原材料以及存储芯片等的价格如果\n持续大幅上行，可能对生产保供及成本管控造成较大压力。\n\n(五)其他\n□适用     √不适用\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0022",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第八节 财务报告",
+          "十八、其他重要事项",
+          "6、 分部信息"
+        ],
+        "physical_pages": [
+          192
+        ],
+        "source_spans": [
+          {
+            "page": 192,
+            "start": 256,
+            "end": 758,
+            "quote": "6、  分部信息\n\n(1).报告分部的确定依据与会计政策\n√适用     □不适用\n本集团的报告分部是提供不同产品或服务的业务单元。由于各种业务需要不同的技术和市场战略，\n因此，本集团分别独立管理各个报告分部的生产经营活动，分别评价其经营成果，以决定向其配\n置资源并评价其业绩。本集团主要经营地在中国大陆，因此，本集团不进一步按照国家或地区情\n况确定报告分部。\n\n本集团有    2 个报告分部，分别为：\n\n—   整车及零部件分部，负责生产并销售整车及零部件\n—   金融服务分部，负责提供金融服务\n\n分部间转移价格参照向第三方销售所采用的价格确定。资产根据分部的经营以及资产的所在位置\n进行分配，负债根据分部的经营进行分配，间接归属于各分部的费用按照收入比例在分部之间进\n行分配。\n\n(2).报告分部的财务信息\n\n√适用     □不适用\n                                                                单位：元       币种：人民币\n\n                                        192/205"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0023",
+        "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "section_path": [
+          "第八节 财务报告",
+          "十八、其他重要事项",
+          "6、 分部信息"
+        ],
+        "physical_pages": [
+          193
+        ],
+        "source_spans": [
+          {
+            "page": 193,
+            "start": 0,
+            "end": 4180,
+            "quote": "                                                        上海汽车集团股份有限公司2025                                       年年度报告\n\n\n\n                        项目                                      整车及零部件                                金融业                           分部间抵销                                 合计\n对外交易收入                                                         644,665,370,348.55                11,578,441,732.63                                                656,243,812,081.18\n分部间交易收入                                                                                               36,066,953.66                    -36,066,953.66\n营业总成本                                                         -642,480,819,098.34                -6,487,261,701.98                      30,117,242.97            -648,937,963,557.35\n加：其他收益                                                            4,156,368,658.31                   222,013,891.09                                                  4,378,382,549.40\n投资收益                                                            11,882,157,267.63                 1,670,930,089.43                   -120,442,736.14                13,432,644,620.92\n汇兑收益                                                                                                  53,642,948.70                                                      53,642,948.70\n公允价值变动收益                                                          5,145,257,105.45                1,460,233,330.96                                                   6,605,490,436.41\n信用减值损失                                                             -314,210,632.52                  -772,573,060.85                     -4,279,402.56               -1,091,063,095.93\n资产减值(损失)/转回                                                      -5,691,384,491.27                      8,995,431.96                                                -5,682,389,059.31\n资产处置收益/(损失)                                                         455,263,294.10                   -25,533,792.05                                                     429,729,502.05\n营业利润                                                            17,818,002,451.91                 7,744,955,823.55                   -130,671,849.39                25,432,286,426.07\n加：营业外收入                                                             584,848,865.46                    17,523,773.74                                                     602,372,639.20\n减：营业外支出                                                          -1,121,006,861.61                     -4,642,719.58                                                -1,125,649,581.19\n利润总额                                                            17,281,844,455.76                 7,757,836,877.71                   -130,671,849.39                24,909,009,484.08\n减：所得税费用                                                          -5,865,047,346.58               -1,600,038,295.04                                                  -7,465,085,641.62\n净利润                                                             11,416,797,109.18                 6,157,798,582.67                   -130,671,849.39                17,443,923,842.46\n资产总额                                                           726,364,191,856.95              355,233,575,765.85               -121,390,306,172.11               960,207,461,450.69\n负债总额                                                           501,660,152,156.15              218,520,680,495.01               -121,278,932,356.28               598,901,900,294.88\n折旧和摊销支出                                                         21,574,812,303.92                     71,093,452.28                                                 21,645,905,756.20\n资本性支出                                                           22,161,653,803.64                         737,886.18                                                22,162,391,689.82\n经营活动产生/(使用)的现金流量净额                                              54,984,211,155.24               -20,677,609,249.26                                                  34,306,601,905.98\n\n(3).公司无报告分部的，或者不能披露各报告分部的资产总额和负债总额的，应说明原因\n□适用              √不适用\n\n(4).其他说明\n□适用              √不适用\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      }
+    ],
+    "limitations": [
+      "未阅读第二节近三年主要会计数据及分季度数据、第三节资产负债状况与投资状况分析、第四节ESG报告、第五节重大关联交易及重大合同履行情况、第八节财务报表全文及其他科目附注，相关分析受限。",
+      "分部信息中整车及零部件分部未进一步拆分整车与零部件，且分部间抵销金额较大，分部收入与主营业务分产品收入口径不完全一致。",
+      "产销量表按整车企业列示，未披露各企业分车型明细；新能源汽车产能除上汽大众MEB工厂外与传统车共线，无法单独核算各企业新能源产能利用率。",
+      "前五名客户与供应商仅披露合计金额及占比，未披露具体名称，无法识别客户与供应商身份。",
+      "公司未披露按销售模式划分的收入明细，仅披露分行业、分产品、分地区数据。",
+      "2026年销量与收入目标为经营计划，不构成报告期已实现业绩，亦不代表公司保证。"
+    ]
+  },
+  "workpaper_markdown": "# 600104.SH｜2025-12-31 公司画像底稿\n\n真实模型底稿（待核，不代表正式公司可用）\n\n来源版本：`aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874`。发布时点：2026-04-01T16:00:00+00:00。\n\n## 业务结构\n\n- 公司报告分部为两个：整车及零部件分部负责生产并销售整车及零部件，金融服务分部负责提供金融服务；分部间转移价格参照向第三方销售所采用的价格确定。（[source-0022](#source-0022)）\n- 公司主营业务分行业为汽车制造业与金融业，分产品为整车业务、零部件业务、劳务及其他、金融业务。（[source-0007](#source-0007)）\n- 零部件业务主要由下属控股子公司华域汽车系统股份有限公司开展。（[source-0013](#source-0013)）\n- 报告期内公司撤销商用车事业部，将职能整合并入上汽大通，压缩管理层级和决策链条。（[source-0001](#source-0001)）\n- 公司主要整车企业包括上汽大众、上汽通用、上汽集团乘用车分公司、上汽通用五菱、上汽大通、智己汽车、上汽正大、上汽通用五菱印尼、捷仕达名爵汽车印度等。（[source-0008](#source-0008)）\n\n## 产品、服务及用途\n\n- 整车业务按车型类别包括基本乘用车、运动型多用途车（SUV）、多功能乘用车（MPV）、交叉型乘用车、客车、载货汽车。（[source-0013](#source-0013)）\n- 自主品牌集中推出全新MG4、荣威M7、尚界H5、智己全新LS6/LS9、五菱缤果S、大通大拿等新能源产品；上汽大众、上汽通用分别推出AUDI E5、别克至境L7等中高端智电新品。（[source-0004](#source-0004)）\n- 公司与华为合作推出“尚界”品牌，2月签署战略合作协议，9月下旬投放首款产品尚界H5。（[source-0001](#source-0001)）\n- 公司已构建包含纯电、混动、氢能三大整车平台，以及电池、电驱、超混系统和智能车全栈解决方案的“七大技术底座”。（[source-0010](#source-0010)）\n- 公司业务板块包括整车、零部件、移动出行和服务、金融；安吉物流自营远洋滚装船已达21艘，“无驾驶人”Robotaxi启动专线商业化运营。（[source-0001](#source-0001)）\n- 汽车金融业务由上海汽车集团财务有限责任公司、上汽通用汽车金融有限责任公司、上海东正汽车金融股份有限公司开展，主要经营指标包括发放贷款金额、贷款笔数、贷款余额。（[source-0014](#source-0014)、[source-0015](#source-0015)）\n\n## 怎么赚钱\n\n- 公司主营业务分产品收入构成为整车业务、零部件业务、劳务及其他、金融业务，合计主营业务收入656,243,812,081.18元。（[source-0007](#source-0007)）\n  - 主营业务收入合计：656,243,812,081.18 元；2025年度，consolidated_group。\n  - 整车业务营业收入：410,196,473,001.11 元；2025年度，business_segment。\n  - 零部件业务营业收入：203,019,866,775.26 元；2025年度，business_segment。\n  - 劳务及其他营业收入：32,935,762,112.94 元；2025年度，business_segment。\n  - 金融业务营业收入：10,091,710,191.88 元；2025年度，business_segment。\n- 整车业务毛利率4.30%，零部件业务毛利率19.15%，劳务及其他毛利率26.38%，金融业务毛利率88.47%。（[source-0007](#source-0007)）\n- 公司合并营业总收入6562.4亿元，同比增长4.6%；营业收入646,152,101,889.30元，同比增长5.22%。（[source-0004](#source-0004)、[source-0006](#source-0006)）\n  - 合并营业总收入：6562.4 亿元；2025年度，consolidated_group。\n  - 营业收入：646,152,101,889.30 元；2025年度，consolidated_group。\n- 分部信息显示整车及零部件分部对外交易收入644,665,370,348.55元，金融业对外交易收入11,578,441,732.63元。（[source-0023](#source-0023)）\n  - 整车及零部件分部对外交易收入：644,665,370,348.55 元；2025年度，business_segment。\n  - 金融业对外交易收入：11,578,441,732.63 元；2025年度，business_segment。\n- 公司贸易业务本期营业收入206,508,725.66元，主要系汽车芯片及相关汽车零部件的出口贸易业务。（[source-0009](#source-0009)）\n  - 贸易业务营业收入：206,508,725.66 元；2025年度，consolidated_group。\n\n## 规模与业务权重\n\n- 全年实现整车销售450.7万辆，同比增长12.3%，市场占有率13.1%，同比上升0.3个百分点。（[source-0001](#source-0001)）\n  - 整车销量：450.7 万辆；2025年度，consolidated_group。\n- 自主品牌销量292.8万辆，同比增长21.6%，占公司整体销量比重65%，同比提升约5个百分点。（[source-0001](#source-0001)）\n- 新能源车销售164.3万辆，同比增长33.1%；出口及海外市场销售107.1万辆，同比增长3.1%。（[source-0001](#source-0001)）\n- 产销量表合计生产量4,601,962辆、销售量4,507,518辆、库存量188,996辆，生产量比上年增减14.82%、销售量比上年增减12.32%。（[source-0008](#source-0008)）\n  - 合计生产量：4,601,962 辆；2025年度，consolidated_group。\n  - 合计销售量：4,507,518 辆；2025年度，consolidated_group。\n  - 合计库存量：188,996 辆；2025年度，consolidated_group。\n- 分地区主营业务收入：中国504,138,835,950.64元，其他152,104,976,130.54元；其他地区含上汽通用五菱出口销量。（[source-0007](#source-0007)）\n  - 中国地区主营业务收入：504,138,835,950.64 元；2025年度，consolidated_group。\n  - 其他地区主营业务收入：152,104,976,130.54 元；2025年度，consolidated_group。\n- 新能源汽车销量1,643,009辆（乘用车1,481,504辆、商用车161,505辆），产量1,683,460辆。（[source-0014](#source-0014)）\n  - 新能源汽车销量总计：1,643,009 辆；2025年度，consolidated_group。\n  - 新能源汽车产量总计：1,683,460 辆；2025年度，consolidated_group。\n- 主要整车企业销量：上汽大众1,024,000辆、上汽通用535,000辆、上汽集团乘用车分公司886,742辆、上汽通用五菱1,615,066辆、上汽大通222,286辆、智己汽车81,017辆。（[source-0008](#source-0008)）\n\n## 经营方式与关键投入\n\n- 现有产能（设计产能/报告期内产能/产能利用率）：上汽大众192.0万辆/105.8万辆/55%，上汽通用145.2/53.4/37%，上汽集团乘用车分公司116.0/88.5/76%，上汽通用五菱176.0/167.1/95%，上汽大通37.5/22.4/60%。（[source-0012](#source-0012)）\n- 设计产能计算依据为年工作日250天、每天工作16小时即4000小时；报告期内产能为报告期内产量；产能利用率为报告期内产量/设计产能。（[source-0013](#source-0013)）\n- 除上汽大众MEB工厂外，公司其他新能源产品与传统车共线生产、共享产能，可结合市场情况对两类产品进行调配，实行柔性化生产。（[source-0014](#source-0014)）\n- 成本构成项目为原材料、人工工资、折旧、能源等；汽车制造业本期成本580,943,983,649.41元，占总成本99.80%。（[source-0008](#source-0008)）\n  - 汽车制造业营业成本：580,943,983,649.41 元；2025年度，business_segment。\n- 研发投入合计21,706,037,747.07元，其中费用化18,104,061,919.77元、资本化3,601,975,827.30元，研发投入总额占营业收入比例3.36%；研发人员30,329人，占公司总人数17.6%。（[source-0010](#source-0010)）\n  - 研发投入合计：21,706,037,747.07 元；2025年度，consolidated_group。\n  - 本期费用化研发投入：18,104,061,919.77 元；2025年度，consolidated_group。\n  - 本期资本化研发投入：3,601,975,827.30 元；2025年度，consolidated_group。\n- 公司推进固态电池与汽车芯片研发应用，在国内率先实现第二代半固态电池技术在全新MG4上搭载并批量交付，全固态电池“中试线”正式贯通；上汽国产芯片应用率已超过30%。（[source-0004](#source-0004)）\n- 安吉物流自营远洋滚装船已达21艘，报告期内安吉物流有8艘滚装新船启航。（[source-0001](#source-0001)、[source-0004](#source-0004)）\n- 上汽大众、上汽通用优化基地布局，释放出的产能用于生产“尚界”等自主品牌产品；上汽大通累计退出近百家直营店；上汽红岩司法重整方案获法院批准并已启动实施。（[source-0001](#source-0001)）\n\n## 客户、渠道与市场\n\n- 前五名客户销售额7,545,821.15万元，占年度销售总额11.68%；其中关联方销售额0万元。（[source-0009](#source-0009)）\n  - 前五名客户销售额：7,545,821.15 万元；2025年度，consolidated_group。\n- 前五名供应商采购额21,496,663.81万元，占年度采购总额37%；其中关联方采购额459,389.23万元，占年度采购总额0.79%。（[source-0009](#source-0009)）\n  - 前五名供应商采购额：21,496,663.81 万元；2025年度，consolidated_group。\n- MG品牌在欧洲市场销量超过30万辆，并在澳新、中东、拉美、东南亚等地区的18个国家乘用车市场排名跻身当地前十。（[source-0004](#source-0004)）\n- 上汽通用五菱深化“印马泰”一体化战略，印尼基地新能源汽车产销占比提升至80%；公司通过在海外设立代工厂、CKD等方式推进本地化生产。（[source-0004](#source-0004)）\n- 结合全新MG4上市，在86城布局120家快闪店，通过“轻量化引流”促进4S店高效率转化；联动抖音、小红书等平台实现内容共创。（[source-0004](#source-0004)）\n- 按地区销量：境内3,436,968辆（同比增15.55%），境外1,070,550辆（同比增3.09%）。（[source-0013](#source-0013)）\n  - 境内销量：3,436,968 辆；2025年度，consolidated_group。\n  - 境外销量：1,070,550 辆；2025年度，consolidated_group。\n\n## 关键经营影响因素\n\n- 归属于上市公司股东的净利润101.1亿元，同比增长506.5%；扣除非经常性损益的净利润74.2亿元，同比增长237.2%。（[source-0004](#source-0004)）\n  - 归属于上市公司股东的净利润：101.1 亿元；2025年度，consolidated_group。\n  - 归属于上市公司股东的扣除非经常性损益的净利润：74.2 亿元；2025年度，consolidated_group。\n- 投资收益13,432,644,620.92元，同比增长87.15%，主要原因为对联营企业和合营企业的投资收益同比增加；公允价值变动收益6,605,490,436.41元，同比增长180.43%，主要原因为金融资产公允价值变动同比增加。（[source-0006](#source-0006)、[source-0007](#source-0007)）\n  - 投资收益：13,432,644,620.92 元；2025年度，consolidated_group。\n  - 公允价值变动收益：6,605,490,436.41 元；2025年度，consolidated_group。\n- 经营活动产生的现金流量净额34,306,601,905.98元，同比减少50.47%，主要由于子公司上汽财务公司汽车金融贷款等业务规模变动。（[source-0006](#source-0006)、[source-0007](#source-0007)）\n  - 经营活动产生的现金流量净额：34,306,601,905.98 元；2025年度，consolidated_group。\n- 资产减值损失-5,682,389,059.31元，同比增长79.61%，主要原因为计提固定资产减值损失同比增加；营业外支出1,125,649,581.19元，同比增长99.46%，主要原因为本年对供应商补偿款同比增加。（[source-0006](#source-0006)、[source-0007](#source-0007)）\n- 财务费用-265,824,180.92元，同比变动-108.70%，主要原因为汇兑收益同比增加；所得税费用7,465,085,641.62元，同比增长59.59%，主要原因为子公司基于谨慎性原则冲回未来预期无法实现的可抵扣暂时性差异。（[source-0006](#source-0006)、[source-0010](#source-0010)）\n- 主要子公司业绩：华域汽车营业总收入18,399,890.05万元、净利润720,726.81万元；智己汽车营业总收入1,541,140.76万元、净利润-359,815.59万元；上汽大通营业总收入2,533,685.67万元、净利润-161,123.82万元；上汽财务公司营业总收入946,887.95万元、净利润316,901.15万元。（[source-0017](#source-0017)）\n- 公司自主品牌新能源车销量增速近50%；“恒星”超级增程、“灵蜥”底盘2.0等新技术实现量产装车。（[source-0004](#source-0004)）\n\n## 近期重要变化\n\n- 报告期内公司业务类型、利润构成或利润来源未发生重大变动；业务、产品或服务未发生重大变化或调整。（[source-0007](#source-0007)、[source-0009](#source-0009)）\n- 合并范围变化：上汽红岩汽车有限公司破产重整；华翔圣德曼（上海）汽车系统有限公司以股权出资方式处置；上海大众联合汽车改装有限公司、上海机动车回收服务中心有限公司股权转让后不再纳入合并范围；上海德实汽车服务有限公司因一致行动条款终止丧失控制权；上汽通用新能源汽车销售服务（深圳）有限公司、飞凡汽车销售（深圳）有限公司注销；上海幸福坊创意产业管理有限公司清算。（[source-0017](#source-0017)）\n- 公司撤销商用车事业部，职能整合并入上汽大通；上汽大众、上汽通用优化基地布局，释放产能用于生产“尚界”等自主品牌产品。（[source-0001](#source-0001)）\n- 公司本年将上汽通用五菱的出口销量纳入其他地区计算，相关指标增减变动幅度按可比口径计算。（[source-0007](#source-0007)）\n- 公司2026年经营计划为力争全年整车销量达到500万辆，营业总收入超过7000亿元，营业成本在6300亿元左右；该等目标为计划，非报告期已实现业绩。（[source-0020](#source-0020)）\n\n## 阅读范围与取舍\n\n本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。\n\n- 第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况，物理页8—9：本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。\n- 第三节 管理层讨论与分析 / 二、报告期内公司所处行业情况，物理页9—9：本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。\n- 第三节 管理层讨论与分析 / 三、经营情况讨论与分析，物理页9—10：本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。\n- 第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (一) 主营业务分析，物理页10—15：本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。\n- 第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (四) 行业经营性信息分析，物理页16—20：本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。\n- 第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (七) 主要控股参股公司分析，物理页26—27：本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。\n- 第三节 管理层讨论与分析 / 六、公司关于公司未来发展的讨论与分析，物理页27—29：本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。\n- 第八节 财务报告 / 十八、其他重要事项 / 6、 分部信息，物理页192—193：本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。\n\n停止理由：选定章节已充分覆盖公司业务模式、产销规模、分部构成、财务驱动及战略规划的核心信息，无需引入冗长的财务报表附注与日常治理内容即可满足深度业务与经营分析需求。\n\n- 未读/后置：第二节 近三年主要会计数据和财务指标及分季度数据\n- 未读/后置：第三节 资产及负债状况分析与投资状况分析（产业基金及证券投资）\n- 未读/后置：第四节 公司治理、环境与社会责任（ESG）报告\n- 未读/后置：第五节 重大关联交易及重大合同履行情况\n- 未读/后置：第八节 财务报表全文及其他具体科目附注\n- 限制：未阅读第二节近三年主要会计数据及分季度数据、第三节资产负债状况与投资状况分析、第四节ESG报告、第五节重大关联交易及重大合同履行情况、第八节财务报表全文及其他科目附注，相关分析受限。\n- 限制：分部信息中整车及零部件分部未进一步拆分整车与零部件，且分部间抵销金额较大，分部收入与主营业务分产品收入口径不完全一致。\n- 限制：产销量表按整车企业列示，未披露各企业分车型明细；新能源汽车产能除上汽大众MEB工厂外与传统车共线，无法单独核算各企业新能源产能利用率。\n- 限制：前五名客户与供应商仅披露合计金额及占比，未披露具体名称，无法识别客户与供应商身份。\n- 限制：公司未披露按销售模式划分的收入明细，仅披露分行业、分产品、分地区数据。\n- 限制：2026年销量与收入目标为经营计划，不构成报告期已实现业绩，亦不代表公司保证。\n\n## 来源\n\n### source-0001\n\n第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况\n\n物理页8，字符1330—2968：\n\n> 一、报告期内公司从事的业务情况 2025 年，面对市场竞争内卷与技术变革加速的双重挑战，公司坚定不移深化改革，全力以赴 开拓市场，全年实现整车销售 450.7 万辆，同比增长 12.3%，市场占有率 13.1%，同比上升 0.3 个 百分点。其中，自主品牌销量达到 292.8 万辆，同比增长 21.6%，占公司整体销量的比重达到 65%， 同比提升约 5 个百分点；新能源车销售 164.3 万辆，同比增长 33.1%，高于全国新能源车市场平 均增速近 5 个百分点；出口及海外市场销售 107.1 万辆，同比增长 3.1%，成为中国汽车品牌“出 海”的中坚力量。 1. 加快自主品牌整车业务发展。一是深化自主乘用车业务一体化管理。以市场用户为导向， 深入推进组织变革和流程优化，进一步打通产品定义、设计研发、市场营销等全链路，加快市场 响应速度。二是实施商用车业务扁平化管理。撤销了商用车事业部，将职能整合并入上汽大通， 压缩管理层级和决策链条，并聚焦轻型商用车核心产品，积极开拓新能源商用车和海外商用车市 场。三是与华为合作推出“尚界”品牌。2 月签署战略合作协议，9 月下旬投放首款产品尚界 H5， 并快速跻身国内 15-20 万元级市场主流产品阵营。 2. 聚焦经营提质推进瘦身健体。一是加快“调产能”。上汽大众、上汽通用优化基地布局， 释放出的产能用于生产“尚界”等自主品牌产品，着力提高产能利用率，降低运营成本。二是加 力“减亏损”。通过分析研判、分类施策并采取果断措施，持续缩减亏损企业数量。三是加速“去 风险”。上汽大通累计退出近百家直营店，不断优化网络渠道提升效率；上汽红岩司法重整方案 获法院批准，并已启动实施。 3. 巩固提升产业链综合优势。一是整合智电零部件业务资源，加快推进全固态电池、一体化 智能底盘等技术的产业化落地。二是拓展海外物流，安吉物流自营远洋滚装船已达 21 艘，不断加 快提升全链国际物流能力。三是建设智慧出行，“无驾驶人”Robotaxi 启动专线商业化运营。四 是深化产融结合，围绕主业搭建起产投联动平台，并通过推进司库建设、设立自保公司，增强产 业链风险防范能力，进一步延链、补链、强链。 4. 深化干部人事制度改革。一是深入推进“能上能下”，在企业层面，大力实施管理岗位竞 聘；在总部层面，对业绩考核不达标的中层干部实施变岗变薪。二是加快年轻干部选拔任用，新 提任的中层干部中，年轻干部比例显著提升。三是优化考核激励，对 7 家重点整车企业实施季度 考核，对 MG4 等项目团队实施项目奖励，并首批授予 13 名技术领军人才“上汽首席专家”“上 汽特级专家”称号，激励干部员工挑战更高目标、创造更大价值。 报告期内公司新增重要非主营业务的说明 8 /205\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0002\n\n第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况\n\n物理页9，字符0—73：\n\n> 上海汽车集团股份有限公司2025 年年度报告 □适用 √不适用\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0003\n\n第三节 管理层讨论与分析 / 二、报告期内公司所处行业情况\n\n物理页9，字符73—681：\n\n> 二、报告期内公司所处行业情况 2025年，我国汽车行业在“两新”政策支持和车企加速“出海”带动下，继续展现出强大的 发展韧性和活力。根据中国汽车工业协会数据，全年我国汽车行业产销累计完成 3453.1万辆和 3440万辆，同比分别增长 10.4%和 9.4%，均高于年初预期，继续稳居全球第一，并再创历史新高。 其中，乘用车市场整体稳健增长，销量同比增长 9.2%，成为促消费的重要稳定力量；商用车市场 明显回暖向好，销量同比增长 10.9%，规模重回 400 万辆以上；新能源汽车保持较快增长，销量 同比增长 28.2%，全年占国内新车销量的比重已超 50%，成为我国汽车市场的主导力量；汽车出 口呈现出较强韧性，出口规模首次站上 700 万辆台阶，新能源汽车出口成为我国外贸的强劲增量。 但与此同时，受国内车市竞争内卷、国际贸易壁垒升级等不利因素影响，我国汽车行业利润率继 续承压下行。为此，国家已出台多项政策举措综合整治“内卷式”竞争，车企在加强自律的同时， 积极调整经营模式和盈利结构，努力向“新”求变、向“海”图强，推动行业高质量可持续发展。\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0004\n\n第三节 管理层讨论与分析 / 三、经营情况讨论与分析\n\n物理页9，字符681—2526：\n\n> 三、经营情况讨论与分析 报告期内，公司扎实推进全面深化改革各项工作，聚焦整车业务，优化业务结构，抢抓结构 性市场机会，推动自主品牌率先发展及合资业务焕新转型；推进核心技术攻关，做优产业生态， 夯实国际经营，提升发展能级；强化零部件、移动出行和服务、金融等业务协同，稳定产品附加 值，助力公司整体转型。全年公司实现合并营业总收入 6562.4亿元，同比增长 4.6%，归属于上 市公司股东的净利润 101.1亿元，同比增长 506.5%，归属于上市公司股东的扣除非经常性损益的 净利润 74.2 亿元，同比增长 237.2%，经营筑底企稳基本实现、回升提速态势渐显。 1．抢抓机遇奋进新赛道。自主品牌集中推出了全新 MG4、荣威M7、尚界 H5、智己全新 LS6/LS9、 五菱缤果 S、大通大拿等新能源产品，持续放大“以旧换新”政策效应，全年公司自主品牌新能 源车销量增速近 50%。上汽大众、上汽通用强化与自主品牌的资源协同，利用本土研发力量，分 别推出 AUDI E5、别克至境 L7等中高端智电新品，加快焕新转型步伐。 2. 合力拓展海外新市场。面对国际贸易壁垒升级等不利因素，公司通过推出多款 HEV 混动车 型，MG 品牌在欧洲市场销量超过 30 万辆，成为欧洲最畅销的中国品牌，并在澳新、中东、拉美、 东南亚等地区的 18个国家乘用车市场排名跻身当地前十；上汽通用五菱深化“印马泰”一体化战 略，印尼基地新能源汽车产销占比提升至 80%；智己 IM5 和 IM6 相继登陆泰国、英国、澳大利亚 等市场；上汽商用车的轻客和皮卡产品在欧洲、澳洲、拉美三大市场也实现快速增长。同时，公 司通过在海外设立代工厂、CKD 等方式，积极推进本地化生产。 3. 培育壮大新质生产力。“恒星”超级增程、“灵蜥”底盘 2.0 等新技术实现量产装车，技 术水平达到行业领先。公司积极参与上海“高级别自动驾驶引领区”建设，获颁上海市新一批智 能网联汽车示范运营牌照，成为行业唯一获得乘用车和商用车领域“双牌照”企业；Robotaxi 3.0 已正式进入商业化运营新阶段，全程可实现“零接管”。推进固态电池与汽车芯片研发应用，在 国内率先实现第二代半固态电池技术在全新 MG4 上搭载并批量交付，全固态电池“中试线”正式 贯通，低温续航、电池安全等核心技术指标行业领先；同时，上汽国产芯片应用率已超过 30%， 正加快推进全国产芯片车型的开发和验证工作。 4. 不断深化新营销变革。结合全新 MG4 上市，在 86城布局 120 家快闪店，通过“轻量化引 流”促进 4S店高效率转化。搭建运营管理看板与新车流量追踪体系，实现流量到销量的闭环管理， 并依托 AI 工具提升订单转化。联动抖音、小红书等平台，实现内容深度共创，各品牌的线上互动 量和触达率显著提升。 5. 构建板块联动新优势。零部件、金融、移动出行和服务板块协同联动，持续为整车业务提 供有力支撑。零部件板块完善智能电动化核心技术布局，整合优势资源，加快推进固态电池、智 能底盘等技术的产业化落地。金融板块加强汽车金融服务的精细化发展，积极支持尚界等新业务， 并加快拓展海外金融服务。移动出行和服务板块聚焦服务整车业务，报告期内安吉物流有 8 艘滚 装新船启航，进一步提升至南美、欧洲等航线的运能。 9 /205\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0005\n\n第三节 管理层讨论与分析 / 三、经营情况讨论与分析\n\n物理页10，字符0—72：\n\n> 上海汽车集团股份有限公司2025 年年度报告\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0006\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (一) 主营业务分析\n\n物理页10，字符1116—3250：\n\n> (一) 主营业务分析 1、 利润表及现金流量表相关科目变动分析表 单位：元 币种：人民币 科目 本期数 上年同期数 变动比例（%） 营业收入 646,152,101,889.30 614,074,061,818.13 5.22 营业成本 580,943,983,649.41 556,450,036,686.44 4.40 利息支出 1,124,352,721.48 1,981,767,545.96 -43.27 销售费用 20,898,005,550.00 20,080,258,315.83 4.07 管理费用 22,453,286,690.11 21,108,125,732.22 6.37 财务费用 -265,824,180.92 3,054,077,070.48 -108.70 研发费用 18,104,061,919.77 17,649,893,105.21 2.57 投资收益 13,432,644,620.92 7,177,645,440.57 87.15 公允价值变动收益 6,605,490,436.41 2,355,521,579.73 180.43 信用减值损失 -1,091,063,095.93 -3,965,874,339.93 -72.49 资产减值损失 -5,682,389,059.31 -3,163,758,019.61 79.61 营业外支出 1,125,649,581.19 564,350,666.53 99.46 所得税费用 7,465,085,641.62 4,677,794,462.18 59.59 经营活动产生的现金流量净额 34,306,601,905.98 69,267,789,561.24 -50.47 投资活动产生的现金流量净额 -27,561,161,950.79 -3,503,392,907.79 不适用 筹资活动产生的现金流量净额 -53,218,400,555.93 -9,312,171,110.35 不适用 利息支出变动原因说明：主要原因为公司之子公司上汽财务公司利息支出同比减少。 财务费用变动原因说明：主要原因为公司汇兑收益同比增加。 投资收益变动原因说明：主要原因为公司对联营企业和合营企业的投资收益同比增加。 10 /205\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0007\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (一) 主营业务分析\n\n物理页11，字符0—3406：\n\n> 上海汽车集团股份有限公司2025 年年度报告 公允价值变动收益变动原因说明：主要原因为公司金融资产公允价值变动同比增加。 信用减值损失变动原因说明：主要原因为公司之子公司计提应收款项的坏账损失同比减少。 资产减值损失变动原因说明：主要原因为公司计提固定资产减值损失同比增加。 营业外支出变动原因说明：主要原因为公司本年对供应商补偿款同比增加。 所得税费用变动原因说明：主要原因为公司之子公司基于谨慎性原则，对于未来预期无法实现可 抵扣暂时性差异予以冲回,计入当期所得税费用。 经营活动产生的现金流量净额变动原因说明：公司通过狠抓零售，加强资金管理，制造业务经营 活动净现金流得到显著改善，但由于公司之子公司上汽财务公司汽车金融贷款等业务规模变动， 导致公司经营活动产生的现金流量净额比上年同期减少。 投资活动产生的现金流量净额变动原因说明：主要原因为公司之子公司上汽财务公司根据本年业 务需求调整了金融资产配置，投资所支付的现金同比增加。 筹资活动产生的现金流量净额变动原因说明：主要公司本年偿还债务所支付的现金同比增加。 本期公司业务类型、利润构成或利润来源发生重大变动的详细说明 □适用 √不适用 2、 收入和成本分析 √适用 □不适用 具体如下： (1). 主营业务分行业、分产品、分地区、分销售模式情况 单位：元 币种：人民币 主营业务分行业情况 毛利 营业收入 营业成本 毛利率比上年增减 分行业 营业收入 营业成本 率 比上年增 比上年增 （%） （%） 减（%） 减（%） 汽车制造业 646,152,101,889.30 580,943,983,649.41 10.09 5.22 4.40 增加 0.71 个百分点 金融业 10,091,710,191.88 1,163,322,101.92 88.47 -25.33 -42.04 增加 3.32 个百分点 合计 656,243,812,081.18 582,107,305,751.33 11.30 4.57 4.23 增加 0.28 个百分点 主营业务分产品情况 毛利 营业收入 营业成本 毛利率比上年增减 分产品 营业收入 营业成本 率 比上年增 比上年增 （%） （%） 减（%） 减（%） 整车业务 410,196,473,001.11 392,545,642,811.16 4.30 7.59 7.10 增加 0.44 个百分点 零部件业务 203,019,866,775.26 164,149,718,120.28 19.15 6.47 4.87 增加 1.24 个百分点 劳务及其他 32,935,762,112.94 24,248,622,717.97 26.38 -21.83 -27.36 增加 5.61 个百分点 金融业务 10,091,710,191.88 1,163,322,101.92 88.47 -25.33 -42.04 增加 3.32 个百分点 合计 656,243,812,081.18 582,107,305,751.33 11.30 4.57 4.23 增加 0.28 个百分点 主营业务分地区情况 毛利 营业收入 营业成本 毛利率比上年增减 分地区 营业收入 营业成本 率 比上年增 比上年增 （%） （%） 减（%） 减（%） 中国 504,138,835,950.64 449,593,517,326.14 10.82 1.64 1.79 减少 0.13 个百分点 其他（注） 152,104,976,130.54 132,513,788,425.19 12.88 15.60 13.50 增加 1.61 个百分点 合计 656,243,812,081.18 582,107,305,751.33 11.30 4.57 4.23 增加 0.28 个百分点 注：本年公司将上汽通用五菱的出口销量纳入其他地区计算，相关指标的增减变动幅度按可比口径计算。 (2). 产销量情况分析表 √适用 □不适用 主要产品 单 生产量 销售量 库存量 生产量 销售量 库存量 位 比上年 比上年 比上年 11 /205\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0008\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (一) 主营业务分析\n\n物理页12，字符0—4585：\n\n> 上海汽车集团股份有限公司2025 年年度报告 增减 增减 增减 （%） （%） （%） 上汽大众汽车有限公司 辆 1,057,605 1,024,000 47,321 -7.81 -10.81 233.32 上汽通用汽车有限公司 辆 534,026 535,000 10,989 26.63 22.99 -8.33 上汽集团乘用车分公司 辆 885,448 886,742 10,144 25.17 25.42 -13.74 上汽通用五菱汽车股份有限公司 辆 1,671,013 1,615,066 90,269 23.58 20.52 163.01 上汽大通汽车有限公司 辆 223,531 222,286 13,995 23.99 25.14 9.76 智己汽车科技有限公司 辆 85,884 81,017 5,824 31.34 23.68 1,035.28 上汽正大有限公司 辆 30,048 29,391 5,909 36.15 13.26 12.49 上汽通用五菱印尼汽车有限公司 辆 21,121 21,016 1,723 -11.22 -13.31 6.49 捷仕达名爵汽车印度有限公司 辆 70,351 69,997 1,559 19.30 17.76 21.99 其他 辆 22,935 23,003 1,263 -20.55 -23.47 -5.18 合计 辆 4,601,962 4,507,518 188,996 14.82 12.32 98.92 产销量情况说明 其他主要含上海申沃客车有限公司、上汽红岩汽车有限公司、南京依维柯汽车有限公司等。 (3). 重大采购合同、重大销售合同的履行情况 □适用 √不适用 (4). 成本分析表 单位：元 币种：人民币 分行业情况 本期占总 上年同期 本期金额较 分行业 成本构成项目 本期金额 成本比例 上年同期金额 占总成本 上年同期变 (%) 比例(%) 动比例(%) 汽车制 原材料、人工工 造业 资、折旧、能源 580,943,983,649.41 99.80 556,450,036,686.44 99.64 4.40 等 金融业 人工工资、折旧、 1,163,322,101.92 0.20 2,006,973,587.57 0.36 -42.04 能源等 合计 582,107,305,751.33 100.00 558,457,010,274.01 100.00 4.23 分产品情况 本期占总 上年同期 本期金额较 分产品 成本构成项目 本期金额 成本比例 上年同期金额 占总成本 上年同期变 (%) 比例(%) 动比例(%) 整车业 原材料、人工工 务 资、折旧、能源 392,545,642,811.16 67.43 366,534,174,722.96 65.63 7.10 等 零部件 原材料、人工工 业务 资、折旧、能源 164,149,718,120.28 28.20 156,532,375,412.29 28.03 4.87 等 劳务 及 原材料、人工工 其他 资、折旧、能源 24,248,622,717.97 4.17 33,383,486,551.19 5.98 -27.36 等 金融业 人工工资、折旧、 1,163,322,101.92 0.20 2,006,973,587.57 0.36 -42.04 务 能源等 合计 582,107,305,751.33 100.00 558,457,010,274.01 100.00 4.23 (5). 报告期主要子公司股权变动导致合并范围变化 √适用 □不适用 具体情况详见本报告第八节第九项。 12 / 205\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0009\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (一) 主营业务分析\n\n物理页13，字符0—1702：\n\n> 上海汽车集团股份有限公司2025 年年度报告 (6). 公司报告期内业务、产品或服务发生重大变化或调整有关情况 □适用 √不适用 (7). 主要销售客户及主要供应商情况 A.公司主要销售客户及主要供应商情况 √适用 □不适用 前五名客户销售额7,545,821.15万元，占年度销售总额11.68%；其中前五名客户销售额中关联方销 售额0万元，占年度销售总额0%。 前五名供应商采购额21,496,663.81万元，占年度采购总额37%；其中前五名供应商采购额中关联 方采购额459,389.23万元，占年度采购总额0.79%。 B.报告期内向单个客户的销售比例超过总额的 50%、前 5 名客户中存在新增客户的或严重依赖于 少数客户的情形 □适用 √不适用 报告期内向单个供应商的采购比例超过总额的 50%、前 5 名供应商中存在新增供应商的或严重依 赖于少数供应商的情形 □适用 √不适用 C. 报告期内公司股票被实施退市风险警示或其他风险警示 前五名销售客户 □适用 √不适用 前五名供应商 □适用 √不适用 D. 报告期内公司存在贸易业务收入 √适用 □不适用 单位：元 币种：人民币 贸易业务开展情况 本期营业收入 上期营业收入 本期营业收入比上年 同期增减（%） 本报告期主要系汽车 芯片及相关汽车零部 206,508,725.66 684,512,856.82 -69.83 件的出口贸易业务。 贸易业务占营业收入比例超过 10%前五名销售客户 □适用 √不适用 贸易业务收入占营业收入比例超过 10%前五名供应商 □适用 √不适用 3、 费用 √适用 □不适用 单位：元 币种：人民币 项目 2025 年 2024 年 变动比例（%） 销售费用 20,898,005,550.00 20,080,258,315.83 4.07 管理费用 22,453,286,690.11 21,108,125,732.22 6.37 研发费用 18,104,061,919.77 17,649,893,105.21 2.57 13/ 205\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0010\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (一) 主营业务分析\n\n物理页14，字符0—2572：\n\n> 上海汽车集团股份有限公司2025 年年度报告 财务费用 -265,824,180.92 3,054,077,070.48 -108.70 所得税费用 7,465,085,641.62 4,677,794,462.18 59.59 注： 1）财务费用较上年同期变动主要原因为公司汇兑收益同比增加。 2）所得税费用较上年同期变动主要原因为公司之子公司基于谨慎性原则，对于未来预期无法实现 的可抵扣暂时性差异予以冲回,计入当期所得税费用。 4、 研发投入 (1).研发投入情况表 √适用 □不适用 单位：元 币种：人民币 本期费用化研发投入 18,104,061,919.77 本期资本化研发投入 3,601,975,827.30 研发投入合计 21,706,037,747.07 研发投入总额占营业收入比例（%） 3.36 研发投入资本化的比重（%） 16.59 注：2025 年度本集团含所属主要合资整车企业的汇总研发投入为 3,358,018.53 万元。 (2).研发人员情况表 √适用 □不适用 公司研发人员的数量 30,329 研发人员数量占公司总人数的比例（%） 17.6 研发人员学历结构 学历结构类别 学历结构人数 研究生及以上 11,325 本科及以下 19,004 研发人员年龄结构 年龄结构类别 年龄结构人数 35岁以下（含 35 岁） 18,195 35-45 岁（不含 35 岁，含 45 岁） 9,301 45岁以上 2,833 (3).情况说明 √适用 □不适用 上汽集团聚焦于新能源汽车和智能汽车领域，着力推动自主品牌向上突破，扩大新能源产品 和海外市场份额。通过大力度投入新能源汽车核心技术研发，加快推出智能化新能源车型，努力 提升自主品牌在国内市场的竞争力，并在海外市场实现销量持续较快增长。 在此过程中，公司已构建包含纯电、混动、氢能三大整车平台，以及电池、电驱、超混系统 和智能车全栈解决方案的“七大技术底座”，率先实现半固态电池、“银河”全栈智能车解决方 案、整车中央协调运动控制平台（VMC）等行业领先技术的量产落地，并持续推进全固态电池、高 阶智能驾驶、一体化轻量智能底盘、AI 智能座舱等前沿技术升级和上车应用。通过融合“芯片、 硬件平台、软件平台、数据和算法”跨领域工程，运用 AI 技术赋能，致力为用户打造“能推理、 会思考、懂情绪”驾舱融合的智慧出行终端。 (4).研发人员构成发生重大变化的原因及对公司未来发展的影响 □适用 √不适用 14 /205\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0011\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (一) 主营业务分析\n\n物理页15，字符0—720：\n\n> 上海汽车集团股份有限公司2025 年年度报告 5、 现金流 √适用 □不适用 单位：元 币种：人民币 项目 2025 年 2024 年 变动比例（%） 经营活动产生的现金净流量净额 34,306,601,905.98 69,267,789,561.24 -50.47 投资活动产生的现金净流量净额 -27,561,161,950.79 -3,503,392,907.79 不适用 筹资活动产生的现金净流量净额 -53,218,400,555.93 -9,312,171,110.35 不适用 注：现金流变动分析参见利润表及现金流量表相关科目变动分析表。\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0012\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (四) 行业经营性信息分析\n\n物理页16，字符408—1641：\n\n> (四) 行业经营性信息分析 √适用 □不适用 具体如下： 汽车制造行业经营性信息分析 1、 产能状况 √适用 □不适用 现有产能 √适用 □不适用 单位：万辆 主要工厂名称 设计产能 报告期内产能 产能利用率（%） 上汽大众汽车有限公司 192.0 105.8 55 上汽通用汽车有限公司 145.2 53.4 37 上汽集团乘用车分公司 116.0 88.5 76 上汽通用五菱汽车股份有限公司 176.0 167.1 95 上汽大通汽车有限公司 37.5 22.4 60 上汽正大有限公司 7.2 3.0 42 上汽通用五菱汽车印尼有限公司 6.0 2.1 35 捷仕达名爵汽车印度有限公司 5.6 7.0 126 其他(注) 13.7 2.3 17 注：其他主要含上海申沃客车有限公司、上汽红岩汽车有限公司、南京依维柯汽车有限公司等。 在建产能 □适用 √不适用 产能计算标准 √适用 □不适用 16 /205\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0013\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (四) 行业经营性信息分析\n\n物理页17，字符0—3334：\n\n> 上海汽车集团股份有限公司2025 年年度报告 设计产能计算依据为年工作日 250 天，每天工作 16 小时，即 4000 小时。报告期内产能为报告期 内产量；产能利用率为报告期内产量 / 设计产能。 2、 整车产销量 √适用 □不适用 按车型类别 √适用 □不适用 销量（辆） 产量（辆） 累计同 累计同 车型类别 本年累计 去年累计 比增减 本年累计 去年累计 比增减 （%） （%） 基本乘用车 2,175,039 2,019,811 7.69 2,222,164 2,009,712 10.57 运动型多用途车（SUV） 1,303,095 1,155,054 12.82 1,328,384 1,146,178 15.90 多功能乘用车（MPV） 337,749 249,946 35.13 334,093 257,786 29.60 交叉型乘用车 254,168 204,041 24.57 264,153 208,109 26.93 客车 114,247 92,932 22.94 113,478 93,089 21.90 载货汽车 323,220 291,216 10.99 339,690 292,978 15.94 总计 4,507,518 4,013,000 12.32 4,601,962 4,007,852 14.82 按地区 √适用 □不适用 境内销量（辆） 境外销量（辆） 累计同 累计同 车型类别 本年累计 去年累计 比增减 本年累计 去年累计 比增减 （%） （%） 基本乘用车 1,745,822 1,602,138 8.97 429,217 417,673 2.76 运动型多用途车（SUV） 789,912 645,747 22.33 513,183 509,307 0.76 多功能乘用车（MPV） 318,560 234,214 36.01 19,189 15,732 21.97 交叉型乘用车 225,468 175,735 28.30 28,700 28,306 1.39 客车 89,249 75,428 18.32 24,998 17,504 42.81 载货汽车 267,957 241,249 11.07 55,263 49,967 10.60 总计 3,436,968 2,974,511 15.55 1,070,550 1,038,489 3.09 3、 零部件产销量 √适用 □不适用 公司的零部件业务主要由下属控股子公司华域汽车系统股份有限公司（股票代码：600741） 开展，其 2025 年业务情况详见华域汽车（600741）在上海证券交易所 www.sse.com.cn 发布的 2025 年年报。 按零部件类别 □适用 √不适用 按市场类别 □适用 √不适用 4、 新能源汽车业务 √适用 □不适用 17 / 205\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0014\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (四) 行业经营性信息分析\n\n物理页18，字符0—3379：\n\n> 上海汽车集团股份有限公司2025 年年度报告 新能源汽车产能状况 √适用 □不适用 主要工厂名称 设计产能（辆） 报告期内产能（辆） 产能利用率(%) 上汽大众汽车有限公司 - 68,002 - 其中上汽大众 MEB 工厂 240,000 34,464 14 上汽通用汽车有限公司 - 91,037 - 上汽集团乘用车分公司 - 272,418 - 上汽通用五菱汽车股份有限公司 - 1,000,551 - 上汽大通汽车有限公司 - 65,618 - 智己汽车科技有限公司 - 85,884 - 上汽正大有限公司 - 20,703 - 捷仕达名爵汽车印度有限公司 - 60,992 - 上汽通用五菱印尼汽车有限公司 - 14,336 - 其他 - 3,919 - 注 1：除上汽大众 MEB 工厂外，公司其他新能源产品与传统车共线生产，共享产能，公司可结合 市场情况对两类产品进行调配，实行柔性化生产。 注 2：其他主要含上海申沃客车有限公司、上汽红岩汽车有限公司、南京依维柯汽车有限公司等。 新能源汽车产销量 √适用 □不适用 销量（辆） 产量（辆） 车型类别 本年累计 去年累计 累计同比增 本年累计 去年累计 累计同比增 减（%） 减（%） 乘用车 1,481,504 1,139,255 30.04 1,520,384 1,146,193 32.65 商用车 161,505 94,821 70.33 163,076 98,968 64.78 总计 1,643,009 1,234,076 33.14 1,683,460 1,245,161 35.20 新能源汽车收入及补贴 √适用 □不适用 单位：万元 币种：人民币 车型类别 收入 新能源汽车补贴金额 补贴占比（%） 乘用车 11,921,125 0 0% 商用车 1,431,094 0 0% 5、 汽车金融业务 √适用 □不适用 汽车金融业务情况 √适用 □不适用 单位：亿元 币种：人民币 子公司名称 上海汽车集团财务有限责任公司 基本情况 注册资本 总资产 净资产 营业收入 营业利润 净利润 153.80 2,092.82 536.11 60.76 52.08 42.70 主要经营指标 发放贷款金额 发放贷款笔数 贷款余额 信用减值损失金额 1,189.69 1,052,187 403.48 15.91 主要监管指标 核心一级 一级资本充 资本充足率 不良贷款率 拨备覆 贷款拨备率 流动性比例 18 /205\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0015\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (四) 行业经营性信息分析\n\n物理页19，字符0—3664：\n\n> 上海汽车集团股份有限公司2025 年年度报告 资本充足 足率（%） （%） （%） 盖率 （%） （%） 率（%） （%） 29.67 29.67 30.53 1.0613 371.56 3.94 264.29 子公司名称 上汽通用汽车金融有限责任公司 基本情况 注册资本 总资产 净资产 营业收入 营业利润 净利润 92.00 490.15 198.41 30.70 16.85 12.04 主要经营指标 发放贷款金额 发放贷款笔数 贷款余额 信用减值损失金额 950.16 622,042 383.79 15.42 主要监管指标 核心一级 一级资本充 资本充足率 不良贷款率 拨备覆 贷款拨备率 流动性比例 资本充足 足率（%） （%） （%） 盖率 （%） （%） 率（%） （%） 27.62 27.62 28.7 1.04 384.91 4.02 151.58 子公司名称 上海东正汽车金融股份有限公司 基本情况 注册资本 总资产 净资产 营业收入 营业利润 净利润 21.40 195.61 37.86 4.56 -0.53 1.05 主要经营指标 发放贷款金额 发放贷款笔数 贷款余额 信用减值损失金额 296.35 353,626 155.58 2.31 主要监管指标 核心一级 一级资本充 资本充足率 不良贷款率 拨备覆 贷款拨备率 流动性比例 资本充足 足率（%） （%） （%） 盖率 （%） （%） 率（%） （%） 17.16 17.16 19.04 0.49 648.52 3.16 424.00 贷款五级分类分布情况 √适用 □不适用 单位：亿元 币种：人民币 上海汽车集团财务有限责 上汽通用汽车金融有限 上海东正汽车金融股份 任公司 责任公司 有限公司 项目 金额 占比（%） 金额 占比（%） 金额 占比（%） 正常 394.48 97.77 371.92 96.91 153.13 98.42 关注 4.71 1.17 7.87 2.05 1.69 1.09 次级 2.43 0.60 1.34 0.35 0.17 0.11 可疑 0.45 0.11 0.97 0.25 0.27 0.17 损失 1.40 0.35 1.70 0.44 0.32 0.21 合计 403.47 100.00 383.79 100.00 155.58 100.00 6、 其他说明 □适用 √不适用 19 / 205\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0016\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (四) 行业经营性信息分析\n\n物理页20，字符0—142：\n\n> 上海汽车集团股份有限公司2025 年年度报告\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0017\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (七) 主要控股参股公司分析\n\n物理页26，字符76—3551：\n\n> (七) 主要控股参股公司分析 √适用 □不适用 主要子公司及对公司净利润影响达 10%以上的参股公司情况 √适用 □不适用 单位：万元 币种：人民币 归属于母公 归属于母 公司名称 公司类型 主要业务 注册资本 总资产 司净资产 营业总收入 营业利润 公司净利 润 华域汽车 子公司 汽车零部件生产、销售 315,27219,918,645.096,714,457.3318,399,890.05943,418.20720,726.81 动力新科 子公司 柴油机及配件的生产销售 138,782.18 1,075,095.65 638,118.32 573,954.10 293,719.80287,200.46 智己汽车 子公司 新能源汽车生产、销售 1,400,997.602,297,331.28 211,367.081,541,140.76-359,798.69-359,815.59 上汽大通 子公司 汽车生产、销售 1,032,911.002,606,631.03 225,613.892,533,685.67-160,815.73-161,123.82 上汽财务公司 子公司 金融服务 1,538,000.0025,421,723.325,848,599.88946,887.95 525,072.96316,901.15 中联汽车电子有 子公司 汽车用电子产品的生产、 60,062.00 1,043,506.751,042,237.01 2,969.63 257,576.98257,045.24 限公司 经营和研发 上海颀盟企业管 理合伙企业（有 子公司 投资及咨询服务 800,400.00 801,994.16 801,994.16 0.00 509,478.12509,478.12 限合伙） 报告期内取得和处置子公司的情况 √适用 □不适用 报告期内取 公司名称 得和处置子 对整体生产经营和业绩的影响 公司方式 上汽红岩汽车有限公司 破产重整 上汽红岩重整相关情况，详见动力新科在上海证券交易所 www.sse.com.cn发布的2025年年报。 华域汽车系统（上海）有限公司（以下简称“华域上海”） 以其原持有的华翔圣德曼(山西)汽车系统有限公司(以下简称 华翔圣德曼(上海)汽车 股权出资 “华翔圣德曼山西”)100.00%的股权作价人民币18,390.75万元 系统有限公司 ，山西华翔集团股份有限公司以现金人民币42,911.75万元作 价出资。上述交易完成后，华域上海持有华翔圣德曼上海 30.00%的股权，不再直接持有华翔圣德曼山西的股权。 本公司以人民币21,000,000.00元作为对价，将原持有的子公 上海大众联合汽车改装 司上海大众联合汽车改装有限公司(以下简称“大众联合改装 有限公司 股权转让 ”)100%股权转让予上海大众联合发展有限公司。上述交易完 成后，本公司丧失对大众联合改装的控制权，不再将其纳入 合并范围。 本公司以人民币13,800,000.00元作为对价，将原持有的子公 上海机动车回收服务中 司上海机动车回收服务中心有限公司(以下简称“服务中心 心有限公司 股权转让 ”)51%股权转让予上海龙群贸易(集团)有限公司。上述交易完 成后，本公司对服务中心的持股比例下降至5%，丧失对其的 控制权，不再将其纳入合并范围。 上海德实汽车服务有限 终止一致行 经相关股东协议约定，本公司原子公司上海德实汽车服务有 公司 动条款 限公司(以下简称“德实”)原公司章程中的一致行动条款终止 。相应地，本公司丧失对德实的控制权。 上汽通用新能源汽车销 本公司注销下属子公司上汽通用新能源汽车销售服务(深圳) 售服务(深圳)有限公司 注销 有限公司、飞凡汽车销售(深圳)有限公司，并不再将其纳入 、飞凡汽车销售(深圳) 合并财务报表范围。 有限公司 上海幸福坊创意产业管 清算 本公司清算下属子公司上海幸福坊创意产业管理有限公司， 理有限公司 并不再将其纳入合并财务报表范围。 其他说明 26 / 205\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0018\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (七) 主要控股参股公司分析\n\n物理页27，字符0—72：\n\n> 上海汽车集团股份有限公司2025 年年度报告 □适用 √不适用\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0019\n\n第三节 管理层讨论与分析 / 六、公司关于公司未来发展的讨论与分析\n\n物理页27，字符232—1953：\n\n> 六、公司关于公司未来发展的讨论与分析 (一)行业格局和趋势 √适用 □不适用 (一)行业格局和趋势 当前，我国汽车行业仍处于市场调整、产业转型、竞争加剧等“多期叠加”的复杂环境。从 国内看，虽然车市竞争深度内卷，但市场容量依然很大；从海外看，尽管存在着各种风险挑战， 但中国车企加速出海的趋势不会改变，未来必将深度参与、进而主导汽车产业的全球竞争。预计 今后五年，我国汽车行业将呈现以下三大发展趋势： 一是总量攀升、增速放缓。截至 2025 年底，我国千人汽车保有量约 260 辆，与发达国家相比 仍有较大提升空间。尽管国内汽车消费刺激政策的边际效应将逐步递减，但是一二线市场的增换 购需求有望持续释放，并且随着乡村振兴和城镇化推进，各类基础设施的不断完善，低线市场的 汽车保有量或将加快提升。预计到“十五五”期末，国内市场整车销量可达 3000 万辆，但年均复 合增速将从“十四五”时期的 4%降至 2%左右。 二是智电普及、结构分化。一方面，在国家政策指引和消费者接受度持续提升的背景下，新 能源汽车有望保持中高速增长；同时，随着芯片、算法等不断迭代，智能化或将迎来全面爆发， L2 级“组合驾驶辅助功能”将全面普及，L3 级“自动驾驶”将在全国实现规模化落地，依托 AI 大 模型的深度赋能，智能座舱将从“基础交互”升级为“场景化智能服务”并与智能驾驶深度融合， 带来全新的出行体验。预计到 2030年，新能源汽车的年销量将超过 2000万辆，进入全面市场化 的成熟发展阶段。另一方面，随着智电产品供给不断丰富，以及“科技平权”理念普及，市场的 增长结构将进一步分化，同等价位具备更新技术和更高配置的产品才能赢得消费者青睐，市场份 额将更加向“头部”产品和企业集中。 三是出海加速、挑战升级。从增长机遇看，海外市场的经济发展和汽车普及化程度不一，初 步预判中国车企可触达的海外市场容量约 4000 万辆，尤其是海外新兴市场具有较大增长潜力；同 时，由于海外市场的电动化进程落后于中国，并且中国车企的成本竞争力具有显著优势，预计到 “十五五”期末，中国车企“出口+海外生产”的总规模将超过 1000 万辆，年均复合增速在 10% 以上。从风险挑战看，在全球贸易保护主义盛行，地缘政治关系紧张等背景下，美欧等国采取加 征关税、最低价格、强化“碳足迹”核算等手段，对中国车企出口进行限制，跨国车企巨头也在 加快完善新能源产品矩阵，争夺核心市场；同时，随着中国车企扎堆出海，国际竞争“国内化” 进一步加剧，赢得海外市场的关键将从产品竞争转向体系竞争。 (二)公司发展战略 √适用 □不适用 “十五五”期间，公司将坚持用户为本的经营理念，持续推进创新转型，加快培育新质生产 力；坚持提质增效的工作导向，持续提升经营质量，不断增强核心竞争力，持续构建世界一流企 业，形成主业更强、布局更优、响应更快、动力更足的新局面，建设一个具有产品魅力、科技实 力、机制活力，年轻人向往的“新上汽”。 经营目标：保持汽车行业头部领先地位，实现财务健康与可持续发展。 品牌建设：上汽高端品牌力争跻身智能电动第一梯队；做大自主品牌国内市场基本盘，保持 国内市占率稳中有进，不断提升品牌溢价能力；加强海外品牌协同发展，使 MG 在全球范围内成 27/205\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0020\n\n第三节 管理层讨论与分析 / 六、公司关于公司未来发展的讨论与分析\n\n物理页28，字符0—2156：\n\n> 上海汽车集团股份有限公司2025 年年度报告 为具备一定影响力和竞争力的主流品牌；持续推进战略性品牌协同，形成“高端突破、主流稳固、 全球联动”的强大品牌矩阵。 绿色低碳：持续提升纯电动、混合动力产品渗透率，加快燃料电池产品投放，初步探索 V2G 应用；构建全链条绿色化协同降碳机制，推动从材料生产到报废回收利用的绿色循环经济体系； 优化能源结构，提升绿电比重；加强能耗管理，降低单位能耗；利用储能、协议等手段，降低能 源成本；加速绿色低碳转型，拥抱“碳中和”浪潮。 AI赋能：在“AI+产品”层面，研发 OneChip 技术架构，云端与车端快速应用 AI 技术，推 动智能座舱从“功能载体”向“持续进化的智能体”跃迁；力争到 2030年，L3 及以上智能驾驶 乘用车占比超 30%，并实现 L4 级自动驾驶批量运营。在“AI+业务”层面，构建可组合的应用 Agent，推动 AI 深度融入业务流程；探索具身智能在生产端的应用场景，研究样板应用。 全球经营：推动高水平全球化发展，深化 ESG 体系建设，实现从“中国企业”到“全球企业” 的身份重塑。在技术与产品全球化方面，构建以中国技术为核心的全球技术创新网络，以营利性 为主要目标，不断完善海外产品矩阵。在供应链与制造本地化方面，通过在海外建立研发中心、 生产基地和服务体系，实现关键供应链本土化布局，深度融入全球主要市场。在品牌与生态全球 化方面，在海外重点市场，布局出行、金融、二手车等服务。 技术创新：构建起自主可控、具备全球竞争力的研发体系和技术标准。形成完善的技术底座 管理体系。在全固态电池、混动技术、关键原材料体系、全栈软件生态、智能底盘以及氢燃料电 池等领域，形成具备较强竞争力的技术标签。加强知识产权布局，提升专利数量；加强技术标准 话语权，提升在国内外技术标准制定中的影响力。 产业体系：聚焦产业链关键战略资源，实现“自主可控+风险隔离”双保障；通过产业链布局 优化与协同机制，降低外部冲击影响，提升体系韧性；推进芯片、工业软件的国产化应用，构建 安全、韧性、高效的现代化产业链。 组织人才：在提升组织效率方面，深化“三能”机制建设，完善与公司发展战略相匹配的组 织架构与人员规模，健全激励约束体系，强化业绩导向。在人才梯队建设方面，加大年轻干部培 养和选任力度；聚焦关键领域，加大引进领军人才和海外高层次人才；深化产学研合作机制，定 向培养紧缺专业人才和技术专家人才；大量招聘优秀应届人才，扩大基盘强化人才储备；探索高 技能人才培养新范式。 (三)经营计划 √适用 □不适用 根据中国汽车工业协会预测，2026 年我国汽车行业销量预计在 3475 万辆左右，同比增长 1%。 公司将坚持“稳中求进”工作总基调，纵深推进全面深化改革各项任务，持续做大国内“基本盘”， 积极拓展海外“增长极”，抢抓结构性市场机会，全力巩固经营回升提速势头；进一步优化资源 配置与业务协同，发展壮大新质生产力，持续提升核心竞争力，加快构建发展新优势。公司力争 全年整车销量达到 500 万辆，营业总收入超过 7000 亿元，营业成本在 6300 亿元左右，奋力实现 “十五五”良好开局。 1.整车板块发挥龙头牵引作用，加快提升“用户洞察、技术创新、品牌建设、产品入市、全 球经营”等五大能力，聚焦目标用户和竞品对标，突出自身技术长板，加快迭代升级，努力实现 “量质齐增”；持续完善海外经营布局，深化 ESG 体系建设，不断优化海外产品结构，更好满足 不同国家消费者多元化需求。 2.零部件板块强化业务协同，加快推进固态电池、智能底盘、智能座舱等新技术的量产应用， 并探索从造型设计、工程开发到制造交付的“整包式”协同开发模式，进一步降低综合成本、提 升开发效率。 3.移动出行和服务板块加强服务保障，物流业务围绕海外经营，进一步增强全链物流能力建 设；销售服务业务积极探索营销新模式，加快从规模拓展向效能提升转型；出行服务业务加快推 动 Robotaxi项目规模化落地。 4.金融板块深化“产融合”，积极探索业务模式创新与数智赋能，挖潜新的增长点，并深化 战略直投，实现产投协同的生态闭环；有序推进司库和自保公司建设，提升风险预警和风险防控 能力。 5.创新板块着力改善企业经营质量，持续推进关键技术攻关与产业化落地，以及前瞻技术布 局；进一步加强风险管控，推动企业健康发展。 28/205\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0021\n\n第三节 管理层讨论与分析 / 六、公司关于公司未来发展的讨论与分析\n\n物理页29，字符0—307：\n\n> 上海汽车集团股份有限公司2025 年年度报告 (四)可能面对的风险 √适用 □不适用 一是外部经贸环境和地缘局势的不稳定不确定性风险依然较大，可能对海外市场销售造成不 利影响。二是“两新”政策边际效应递减，叠加新能源汽车购置税优惠政策退坡，国内车市需求 可能在短期内承压；同时，非政策刺激的汽车消费需求受宏观经济、收入预期、技术迭代等因素 影响较大，国内市场增速存在不及预期的风险。三是部分上游原材料以及存储芯片等的价格如果 持续大幅上行，可能对生产保供及成本管控造成较大压力。 (五)其他 □适用 √不适用\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0022\n\n第八节 财务报告 / 十八、其他重要事项 / 6、 分部信息\n\n物理页192，字符256—758：\n\n> 6、 分部信息 (1).报告分部的确定依据与会计政策 √适用 □不适用 本集团的报告分部是提供不同产品或服务的业务单元。由于各种业务需要不同的技术和市场战略， 因此，本集团分别独立管理各个报告分部的生产经营活动，分别评价其经营成果，以决定向其配 置资源并评价其业绩。本集团主要经营地在中国大陆，因此，本集团不进一步按照国家或地区情 况确定报告分部。 本集团有 2 个报告分部，分别为： — 整车及零部件分部，负责生产并销售整车及零部件 — 金融服务分部，负责提供金融服务 分部间转移价格参照向第三方销售所采用的价格确定。资产根据分部的经营以及资产的所在位置 进行分配，负债根据分部的经营进行分配，间接归属于各分部的费用按照收入比例在分部之间进 行分配。 (2).报告分部的财务信息 √适用 □不适用 单位：元 币种：人民币 192/205\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0023\n\n第八节 财务报告 / 十八、其他重要事项 / 6、 分部信息\n\n物理页193，字符0—4180：\n\n> 上海汽车集团股份有限公司2025 年年度报告 项目 整车及零部件 金融业 分部间抵销 合计 对外交易收入 644,665,370,348.55 11,578,441,732.63 656,243,812,081.18 分部间交易收入 36,066,953.66 -36,066,953.66 营业总成本 -642,480,819,098.34 -6,487,261,701.98 30,117,242.97 -648,937,963,557.35 加：其他收益 4,156,368,658.31 222,013,891.09 4,378,382,549.40 投资收益 11,882,157,267.63 1,670,930,089.43 -120,442,736.14 13,432,644,620.92 汇兑收益 53,642,948.70 53,642,948.70 公允价值变动收益 5,145,257,105.45 1,460,233,330.96 6,605,490,436.41 信用减值损失 -314,210,632.52 -772,573,060.85 -4,279,402.56 -1,091,063,095.93 资产减值(损失)/转回 -5,691,384,491.27 8,995,431.96 -5,682,389,059.31 资产处置收益/(损失) 455,263,294.10 -25,533,792.05 429,729,502.05 营业利润 17,818,002,451.91 7,744,955,823.55 -130,671,849.39 25,432,286,426.07 加：营业外收入 584,848,865.46 17,523,773.74 602,372,639.20 减：营业外支出 -1,121,006,861.61 -4,642,719.58 -1,125,649,581.19 利润总额 17,281,844,455.76 7,757,836,877.71 -130,671,849.39 24,909,009,484.08 减：所得税费用 -5,865,047,346.58 -1,600,038,295.04 -7,465,085,641.62 净利润 11,416,797,109.18 6,157,798,582.67 -130,671,849.39 17,443,923,842.46 资产总额 726,364,191,856.95 355,233,575,765.85 -121,390,306,172.11 960,207,461,450.69 负债总额 501,660,152,156.15 218,520,680,495.01 -121,278,932,356.28 598,901,900,294.88 折旧和摊销支出 21,574,812,303.92 71,093,452.28 21,645,905,756.20 资本性支出 22,161,653,803.64 737,886.18 22,162,391,689.82 经营活动产生/(使用)的现金流量净额 54,984,211,155.24 -20,677,609,249.26 34,306,601,905.98 (3).公司无报告分部的，或者不能披露各报告分部的资产总额和负债总额的，应说明原因 □适用 √不适用 (4).其他说明 □适用 √不适用\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n",
+  "workpaper_status": "pending_verification",
+  "workpaper_receipts": [
+    {
+      "request_id": "bp-work-23d00570c7183558ae632745:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "91927d120223c0f36a929f59c15253ac956f6f3fcf8f230f744da5cb91d76f35",
+      "response_hash": "359ab397f2c31eed2a8c7ea94534e23c7957c466ae237ccff72d8aae8afcb987",
+      "finish_reason": "stop",
+      "source_label": "scorpio:gemini-3.8-flash-high",
+      "model": "gemini-3.8-flash-high",
+      "raw_content": "{\"deferred\":[\"第二节 近三年主要会计数据和财务指标及分季度数据\",\"第三节 资产及负债状况分析与投资状况分析（产业基金及证券投资）\",\"第四节 公司治理、环境与社会责任（ESG）报告\",\"第五节 重大关联交易及重大合同履行情况\",\"第八节 财务报表全文及其他具体科目附注\"],\"rationale\":\"本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。\",\"selected_section_ids\":[\"section-0039\",\"section-0044\",\"section-0045\",\"section-0053\",\"section-0078\",\"section-0105\",\"section-0107\",\"section-1078\"],\"stop_reason\":\"选定章节已充分覆盖公司业务模式、产销规模、分部构成、财务驱动及战略规划的核心信息，无需引入冗长的财务报表附注与日常治理内容即可满足深度业务与经营分析需求。\"}",
+      "response_payload": {
+        "deferred": [
+          "第二节 近三年主要会计数据和财务指标及分季度数据",
+          "第三节 资产及负债状况分析与投资状况分析（产业基金及证券投资）",
+          "第四节 公司治理、环境与社会责任（ESG）报告",
+          "第五节 重大关联交易及重大合同履行情况",
+          "第八节 财务报表全文及其他具体科目附注"
+        ],
+        "rationale": "本组选取的章节涵盖上汽集团核心业务架构、行业地位、经营成效、产销及财务指标、核心子公司表现与未来发展展望。通过“业务情况”与“行业情况”解析业务结构与宏观环境；“经营情况讨论与分析”、“主营业务分析”和“行业经营性信息分析”详尽提供了整车与零部件产能产销量、新能源汽车、汽车金融及收入成本费用变动等关键运营数据；“主要控股参股公司分析”揭示了各主力合资与自主品牌实体的经营成果；“未来发展的讨论与分析”阐明战略规划与业务驱动力；配合财务报告中的“分部信息”，完整构成了对公司商业模式、经营状况及财务表现的多维度分析闭环。",
+        "selected_section_ids": [
+          "section-0039",
+          "section-0044",
+          "section-0045",
+          "section-0053",
+          "section-0078",
+          "section-0105",
+          "section-0107",
+          "section-1078"
+        ],
+        "stop_reason": "选定章节已充分覆盖公司业务模式、产销规模、分部构成、财务驱动及战略规划的核心信息，无需引入冗长的财务报表附注与日常治理内容即可满足深度业务与经营分析需求。"
+      },
+      "usage": {
+        "input_tokens": 32414,
+        "output_tokens": 364,
+        "total_tokens": 32778
+      }
+    },
+    {
+      "request_id": "bp-work-23d00570c7183558ae632745:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "8ea917279cd07d1a5f451345426235e8965394ad0a9925b036ffd31504fed0b5",
+      "response_hash": "f84aee6291c107907b77e875ccaba45ca29afbc2993c71d2639a9a84fe2a52fa",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "raw_content": "{\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"bs-01\",\"text\":\"公司报告分部为两个：整车及零部件分部负责生产并销售整车及零部件，金融服务分部负责提供金融服务；分部间转移价格参照向第三方销售所采用的价格确定。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0022\"]},{\"fact_id\":\"bs-02\",\"text\":\"公司主营业务分行业为汽车制造业与金融业，分产品为整车业务、零部件业务、劳务及其他、金融业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"bs-03\",\"text\":\"零部件业务主要由下属控股子公司华域汽车系统股份有限公司开展。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"]},{\"fact_id\":\"bs-04\",\"text\":\"报告期内公司撤销商用车事业部，将职能整合并入上汽大通，压缩管理层级和决策链条。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"bs-05\",\"text\":\"公司主要整车企业包括上汽大众、上汽通用、上汽集团乘用车分公司、上汽通用五菱、上汽大通、智己汽车、上汽正大、上汽通用五菱印尼、捷仕达名爵汽车印度等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"ps-01\",\"text\":\"整车业务按车型类别包括基本乘用车、运动型多用途车（SUV）、多功能乘用车（MPV）、交叉型乘用车、客车、载货汽车。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"]},{\"fact_id\":\"ps-02\",\"text\":\"自主品牌集中推出全新MG4、荣威M7、尚界H5、智己全新LS6/LS9、五菱缤果S、大通大拿等新能源产品；上汽大众、上汽通用分别推出AUDI E5、别克至境L7等中高端智电新品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"ps-03\",\"text\":\"公司与华为合作推出“尚界”品牌，2月签署战略合作协议，9月下旬投放首款产品尚界H5。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"ps-04\",\"text\":\"公司已构建包含纯电、混动、氢能三大整车平台，以及电池、电驱、超混系统和智能车全栈解决方案的“七大技术底座”。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"]},{\"fact_id\":\"ps-05\",\"text\":\"公司业务板块包括整车、零部件、移动出行和服务、金融；安吉物流自营远洋滚装船已达21艘，“无驾驶人”Robotaxi启动专线商业化运营。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"ps-06\",\"text\":\"汽车金融业务由上海汽车集团财务有限责任公司、上汽通用汽车金融有限责任公司、上海东正汽车金融股份有限公司开展，主要经营指标包括发放贷款金额、贷款笔数、贷款余额。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\",\"source-0015\"]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"rm-01\",\"text\":\"公司主营业务分产品收入构成为整车业务、零部件业务、劳务及其他、金融业务，合计主营业务收入656,243,812,081.18元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"主营业务收入合计\",\"raw_value\":\"656,243,812,081.18\",\"value\":\"656243812081.18\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"},{\"name\":\"整车业务营业收入\",\"raw_value\":\"410,196,473,001.11\",\"value\":\"410196473001.11\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"comparison_basis\":\"本期数\"},{\"name\":\"零部件业务营业收入\",\"raw_value\":\"203,019,866,775.26\",\"value\":\"203019866775.26\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"comparison_basis\":\"本期数\"},{\"name\":\"劳务及其他营业收入\",\"raw_value\":\"32,935,762,112.94\",\"value\":\"32935762112.94\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"comparison_basis\":\"本期数\"},{\"name\":\"金融业务营业收入\",\"raw_value\":\"10,091,710,191.88\",\"value\":\"10091710191.88\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"comparison_basis\":\"本期数\"}]},{\"fact_id\":\"rm-02\",\"text\":\"整车业务毛利率4.30%，零部件业务毛利率19.15%，劳务及其他毛利率26.38%，金融业务毛利率88.47%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"rm-03\",\"text\":\"公司合并营业总收入6562.4亿元，同比增长4.6%；营业收入646,152,101,889.30元，同比增长5.22%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0006\"],\"metrics\":[{\"name\":\"合并营业总收入\",\"raw_value\":\"6562.4\",\"value\":\"6562.4\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"},{\"name\":\"营业收入\",\"raw_value\":\"646,152,101,889.30\",\"value\":\"646152101889.30\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"}]},{\"fact_id\":\"rm-04\",\"text\":\"分部信息显示整车及零部件分部对外交易收入644,665,370,348.55元，金融业对外交易收入11,578,441,732.63元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0023\"],\"metrics\":[{\"name\":\"整车及零部件分部对外交易收入\",\"raw_value\":\"644,665,370,348.55\",\"value\":\"644665370348.55\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"comparison_basis\":\"本期数\"},{\"name\":\"金融业对外交易收入\",\"raw_value\":\"11,578,441,732.63\",\"value\":\"11578441732.63\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"comparison_basis\":\"本期数\"}]},{\"fact_id\":\"rm-05\",\"text\":\"公司贸易业务本期营业收入206,508,725.66元，主要系汽车芯片及相关汽车零部件的出口贸易业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"贸易业务营业收入\",\"raw_value\":\"206,508,725.66\",\"value\":\"206508725.66\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"}]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sm-01\",\"text\":\"全年实现整车销售450.7万辆，同比增长12.3%，市场占有率13.1%，同比上升0.3个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"整车销量\",\"raw_value\":\"450.7\",\"value\":\"450.7\",\"unit\":\"万辆\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"}]},{\"fact_id\":\"sm-02\",\"text\":\"自主品牌销量292.8万辆，同比增长21.6%，占公司整体销量比重65%，同比提升约5个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"sm-03\",\"text\":\"新能源车销售164.3万辆，同比增长33.1%；出口及海外市场销售107.1万辆，同比增长3.1%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"sm-04\",\"text\":\"产销量表合计生产量4,601,962辆、销售量4,507,518辆、库存量188,996辆，生产量比上年增减14.82%、销售量比上年增减12.32%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"合计生产量\",\"raw_value\":\"4,601,962\",\"value\":\"4601962\",\"unit\":\"辆\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"},{\"name\":\"合计销售量\",\"raw_value\":\"4,507,518\",\"value\":\"4507518\",\"unit\":\"辆\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"},{\"name\":\"合计库存量\",\"raw_value\":\"188,996\",\"value\":\"188996\",\"unit\":\"辆\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"期末数\"}]},{\"fact_id\":\"sm-05\",\"text\":\"分地区主营业务收入：中国504,138,835,950.64元，其他152,104,976,130.54元；其他地区含上汽通用五菱出口销量。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"中国地区主营业务收入\",\"raw_value\":\"504,138,835,950.64\",\"value\":\"504138835950.64\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"},{\"name\":\"其他地区主营业务收入\",\"raw_value\":\"152,104,976,130.54\",\"value\":\"152104976130.54\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"}]},{\"fact_id\":\"sm-06\",\"text\":\"新能源汽车销量1,643,009辆（乘用车1,481,504辆、商用车161,505辆），产量1,683,460辆。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[{\"name\":\"新能源汽车销量总计\",\"raw_value\":\"1,643,009\",\"value\":\"1643009\",\"unit\":\"辆\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"},{\"name\":\"新能源汽车产量总计\",\"raw_value\":\"1,683,460\",\"value\":\"1683460\",\"unit\":\"辆\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"}]},{\"fact_id\":\"sm-07\",\"text\":\"主要整车企业销量：上汽大众1,024,000辆、上汽通用535,000辆、上汽集团乘用车分公司886,742辆、上汽通用五菱1,615,066辆、上汽大通222,286辆、智己汽车81,017辆。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"oi-01\",\"text\":\"现有产能（设计产能/报告期内产能/产能利用率）：上汽大众192.0万辆/105.8万辆/55%，上汽通用145.2/53.4/37%，上汽集团乘用车分公司116.0/88.5/76%，上汽通用五菱176.0/167.1/95%，上汽大通37.5/22.4/60%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]},{\"fact_id\":\"oi-02\",\"text\":\"设计产能计算依据为年工作日250天、每天工作16小时即4000小时；报告期内产能为报告期内产量；产能利用率为报告期内产量/设计产能。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"]},{\"fact_id\":\"oi-03\",\"text\":\"除上汽大众MEB工厂外，公司其他新能源产品与传统车共线生产、共享产能，可结合市场情况对两类产品进行调配，实行柔性化生产。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"]},{\"fact_id\":\"oi-04\",\"text\":\"成本构成项目为原材料、人工工资、折旧、能源等；汽车制造业本期成本580,943,983,649.41元，占总成本99.80%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"汽车制造业营业成本\",\"raw_value\":\"580,943,983,649.41\",\"value\":\"580943983649.41\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"comparison_basis\":\"本期数\"}]},{\"fact_id\":\"oi-05\",\"text\":\"研发投入合计21,706,037,747.07元，其中费用化18,104,061,919.77元、资本化3,601,975,827.30元，研发投入总额占营业收入比例3.36%；研发人员30,329人，占公司总人数17.6%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"研发投入合计\",\"raw_value\":\"21,706,037,747.07\",\"value\":\"21706037747.07\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"},{\"name\":\"本期费用化研发投入\",\"raw_value\":\"18,104,061,919.77\",\"value\":\"18104061919.77\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"},{\"name\":\"本期资本化研发投入\",\"raw_value\":\"3,601,975,827.30\",\"value\":\"3601975827.30\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"}]},{\"fact_id\":\"oi-06\",\"text\":\"公司推进固态电池与汽车芯片研发应用，在国内率先实现第二代半固态电池技术在全新MG4上搭载并批量交付，全固态电池“中试线”正式贯通；上汽国产芯片应用率已超过30%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"oi-07\",\"text\":\"安吉物流自营远洋滚装船已达21艘，报告期内安吉物流有8艘滚装新船启航。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0004\"]},{\"fact_id\":\"oi-08\",\"text\":\"上汽大众、上汽通用优化基地布局，释放出的产能用于生产“尚界”等自主品牌产品；上汽大通累计退出近百家直营店；上汽红岩司法重整方案获法院批准并已启动实施。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"cm-01\",\"text\":\"前五名客户销售额7,545,821.15万元，占年度销售总额11.68%；其中关联方销售额0万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"7,545,821.15\",\"value\":\"7545821.15\",\"unit\":\"万元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"}]},{\"fact_id\":\"cm-02\",\"text\":\"前五名供应商采购额21,496,663.81万元，占年度采购总额37%；其中关联方采购额459,389.23万元，占年度采购总额0.79%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"前五名供应商采购额\",\"raw_value\":\"21,496,663.81\",\"value\":\"21496663.81\",\"unit\":\"万元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"}]},{\"fact_id\":\"cm-03\",\"text\":\"MG品牌在欧洲市场销量超过30万辆，并在澳新、中东、拉美、东南亚等地区的18个国家乘用车市场排名跻身当地前十。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"cm-04\",\"text\":\"上汽通用五菱深化“印马泰”一体化战略，印尼基地新能源汽车产销占比提升至80%；公司通过在海外设立代工厂、CKD等方式推进本地化生产。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"cm-05\",\"text\":\"结合全新MG4上市，在86城布局120家快闪店，通过“轻量化引流”促进4S店高效率转化；联动抖音、小红书等平台实现内容共创。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"cm-06\",\"text\":\"按地区销量：境内3,436,968辆（同比增15.55%），境外1,070,550辆（同比增3.09%）。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"境内销量\",\"raw_value\":\"3,436,968\",\"value\":\"3436968\",\"unit\":\"辆\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"},{\"name\":\"境外销量\",\"raw_value\":\"1,070,550\",\"value\":\"1070550\",\"unit\":\"辆\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"}]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"od-01\",\"text\":\"归属于上市公司股东的净利润101.1亿元，同比增长506.5%；扣除非经常性损益的净利润74.2亿元，同比增长237.2%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"101.1\",\"value\":\"101.1\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"},{\"name\":\"归属于上市公司股东的扣除非经常性损益的净利润\",\"raw_value\":\"74.2\",\"value\":\"74.2\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"}]},{\"fact_id\":\"od-02\",\"text\":\"投资收益13,432,644,620.92元，同比增长87.15%，主要原因为对联营企业和合营企业的投资收益同比增加；公允价值变动收益6,605,490,436.41元，同比增长180.43%，主要原因为金融资产公允价值变动同比增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\"],\"metrics\":[{\"name\":\"投资收益\",\"raw_value\":\"13,432,644,620.92\",\"value\":\"13432644620.92\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"},{\"name\":\"公允价值变动收益\",\"raw_value\":\"6,605,490,436.41\",\"value\":\"6605490436.41\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"}]},{\"fact_id\":\"od-03\",\"text\":\"经营活动产生的现金流量净额34,306,601,905.98元，同比减少50.47%，主要由于子公司上汽财务公司汽车金融贷款等业务规模变动。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\"],\"metrics\":[{\"name\":\"经营活动产生的现金流量净额\",\"raw_value\":\"34,306,601,905.98\",\"value\":\"34306601905.98\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"comparison_basis\":\"本期数\"}]},{\"fact_id\":\"od-04\",\"text\":\"资产减值损失-5,682,389,059.31元，同比增长79.61%，主要原因为计提固定资产减值损失同比增加；营业外支出1,125,649,581.19元，同比增长99.46%，主要原因为本年对供应商补偿款同比增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\"]},{\"fact_id\":\"od-05\",\"text\":\"财务费用-265,824,180.92元，同比变动-108.70%，主要原因为汇兑收益同比增加；所得税费用7,465,085,641.62元，同比增长59.59%，主要原因为子公司基于谨慎性原则冲回未来预期无法实现的可抵扣暂时性差异。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0010\"]},{\"fact_id\":\"od-06\",\"text\":\"主要子公司业绩：华域汽车营业总收入18,399,890.05万元、净利润720,726.81万元；智己汽车营业总收入1,541,140.76万元、净利润-359,815.59万元；上汽大通营业总收入2,533,685.67万元、净利润-161,123.82万元；上汽财务公司营业总收入946,887.95万元、净利润316,901.15万元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"]},{\"fact_id\":\"od-07\",\"text\":\"公司自主品牌新能源车销量增速近50%；“恒星”超级增程、“灵蜥”底盘2.0等新技术实现量产装车。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"mc-01\",\"text\":\"报告期内公司业务类型、利润构成或利润来源未发生重大变动；业务、产品或服务未发生重大变化或调整。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0009\"]},{\"fact_id\":\"mc-02\",\"text\":\"合并范围变化：上汽红岩汽车有限公司破产重整；华翔圣德曼（上海）汽车系统有限公司以股权出资方式处置；上海大众联合汽车改装有限公司、上海机动车回收服务中心有限公司股权转让后不再纳入合并范围；上海德实汽车服务有限公司因一致行动条款终止丧失控制权；上汽通用新能源汽车销售服务（深圳）有限公司、飞凡汽车销售（深圳）有限公司注销；上海幸福坊创意产业管理有限公司清算。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"]},{\"fact_id\":\"mc-03\",\"text\":\"公司撤销商用车事业部，职能整合并入上汽大通；上汽大众、上汽通用优化基地布局，释放产能用于生产“尚界”等自主品牌产品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"mc-04\",\"text\":\"公司本年将上汽通用五菱的出口销量纳入其他地区计算，相关指标增减变动幅度按可比口径计算。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"mc-05\",\"text\":\"公司2026年经营计划为力争全年整车销量达到500万辆，营业总收入超过7000亿元，营业成本在6300亿元左右；该等目标为计划，非报告期已实现业绩。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2026年度计划\",\"evidence_ids\":[\"source-0020\"]}]}},\"limitations\":[\"未阅读第二节近三年主要会计数据及分季度数据、第三节资产负债状况与投资状况分析、第四节ESG报告、第五节重大关联交易及重大合同履行情况、第八节财务报表全文及其他科目附注，相关分析受限。\",\"分部信息中整车及零部件分部未进一步拆分整车与零部件，且分部间抵销金额较大，分部收入与主营业务分产品收入口径不完全一致。\",\"产销量表按整车企业列示，未披露各企业分车型明细；新能源汽车产能除上汽大众MEB工厂外与传统车共线，无法单独核算各企业新能源产能利用率。\",\"前五名客户与供应商仅披露合计金额及占比，未披露具体名称，无法识别客户与供应商身份。\",\"公司未披露按销售模式划分的收入明细，仅披露分行业、分产品、分地区数据。\",\"2026年销量与收入目标为经营计划，不构成报告期已实现业绩，亦不代表公司保证。\"]}",
+      "response_payload": {
+        "elements": {
+          "business_structure": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "bs-01",
+                "text": "公司报告分部为两个：整车及零部件分部负责生产并销售整车及零部件，金融服务分部负责提供金融服务；分部间转移价格参照向第三方销售所采用的价格确定。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0022"
+                ]
+              },
+              {
+                "fact_id": "bs-02",
+                "text": "公司主营业务分行业为汽车制造业与金融业，分产品为整车业务、零部件业务、劳务及其他、金融业务。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "bs-03",
+                "text": "零部件业务主要由下属控股子公司华域汽车系统股份有限公司开展。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0013"
+                ]
+              },
+              {
+                "fact_id": "bs-04",
+                "text": "报告期内公司撤销商用车事业部，将职能整合并入上汽大通，压缩管理层级和决策链条。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "bs-05",
+                "text": "公司主要整车企业包括上汽大众、上汽通用、上汽集团乘用车分公司、上汽通用五菱、上汽大通、智己汽车、上汽正大、上汽通用五菱印尼、捷仕达名爵汽车印度等。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ]
+              }
+            ]
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "ps-01",
+                "text": "整车业务按车型类别包括基本乘用车、运动型多用途车（SUV）、多功能乘用车（MPV）、交叉型乘用车、客车、载货汽车。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0013"
+                ]
+              },
+              {
+                "fact_id": "ps-02",
+                "text": "自主品牌集中推出全新MG4、荣威M7、尚界H5、智己全新LS6/LS9、五菱缤果S、大通大拿等新能源产品；上汽大众、上汽通用分别推出AUDI E5、别克至境L7等中高端智电新品。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ]
+              },
+              {
+                "fact_id": "ps-03",
+                "text": "公司与华为合作推出“尚界”品牌，2月签署战略合作协议，9月下旬投放首款产品尚界H5。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "ps-04",
+                "text": "公司已构建包含纯电、混动、氢能三大整车平台，以及电池、电驱、超混系统和智能车全栈解决方案的“七大技术底座”。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010"
+                ]
+              },
+              {
+                "fact_id": "ps-05",
+                "text": "公司业务板块包括整车、零部件、移动出行和服务、金融；安吉物流自营远洋滚装船已达21艘，“无驾驶人”Robotaxi启动专线商业化运营。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "ps-06",
+                "text": "汽车金融业务由上海汽车集团财务有限责任公司、上汽通用汽车金融有限责任公司、上海东正汽车金融股份有限公司开展，主要经营指标包括发放贷款金额、贷款笔数、贷款余额。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0014",
+                  "source-0015"
+                ]
+              }
+            ]
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "rm-01",
+                "text": "公司主营业务分产品收入构成为整车业务、零部件业务、劳务及其他、金融业务，合计主营业务收入656,243,812,081.18元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "主营业务收入合计",
+                    "raw_value": "656,243,812,081.18",
+                    "value": "656243812081.18",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  },
+                  {
+                    "name": "整车业务营业收入",
+                    "raw_value": "410,196,473,001.11",
+                    "value": "410196473001.11",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "comparison_basis": "本期数"
+                  },
+                  {
+                    "name": "零部件业务营业收入",
+                    "raw_value": "203,019,866,775.26",
+                    "value": "203019866775.26",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "comparison_basis": "本期数"
+                  },
+                  {
+                    "name": "劳务及其他营业收入",
+                    "raw_value": "32,935,762,112.94",
+                    "value": "32935762112.94",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "comparison_basis": "本期数"
+                  },
+                  {
+                    "name": "金融业务营业收入",
+                    "raw_value": "10,091,710,191.88",
+                    "value": "10091710191.88",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "comparison_basis": "本期数"
+                  }
+                ]
+              },
+              {
+                "fact_id": "rm-02",
+                "text": "整车业务毛利率4.30%，零部件业务毛利率19.15%，劳务及其他毛利率26.38%，金融业务毛利率88.47%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "rm-03",
+                "text": "公司合并营业总收入6562.4亿元，同比增长4.6%；营业收入646,152,101,889.30元，同比增长5.22%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004",
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "合并营业总收入",
+                    "raw_value": "6562.4",
+                    "value": "6562.4",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  },
+                  {
+                    "name": "营业收入",
+                    "raw_value": "646,152,101,889.30",
+                    "value": "646152101889.30",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  }
+                ]
+              },
+              {
+                "fact_id": "rm-04",
+                "text": "分部信息显示整车及零部件分部对外交易收入644,665,370,348.55元，金融业对外交易收入11,578,441,732.63元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0023"
+                ],
+                "metrics": [
+                  {
+                    "name": "整车及零部件分部对外交易收入",
+                    "raw_value": "644,665,370,348.55",
+                    "value": "644665370348.55",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "comparison_basis": "本期数"
+                  },
+                  {
+                    "name": "金融业对外交易收入",
+                    "raw_value": "11,578,441,732.63",
+                    "value": "11578441732.63",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "comparison_basis": "本期数"
+                  }
+                ]
+              },
+              {
+                "fact_id": "rm-05",
+                "text": "公司贸易业务本期营业收入206,508,725.66元，主要系汽车芯片及相关汽车零部件的出口贸易业务。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "贸易业务营业收入",
+                    "raw_value": "206,508,725.66",
+                    "value": "206508725.66",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "sm-01",
+                "text": "全年实现整车销售450.7万辆，同比增长12.3%，市场占有率13.1%，同比上升0.3个百分点。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ],
+                "metrics": [
+                  {
+                    "name": "整车销量",
+                    "raw_value": "450.7",
+                    "value": "450.7",
+                    "unit": "万辆",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-02",
+                "text": "自主品牌销量292.8万辆，同比增长21.6%，占公司整体销量比重65%，同比提升约5个百分点。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "sm-03",
+                "text": "新能源车销售164.3万辆，同比增长33.1%；出口及海外市场销售107.1万辆，同比增长3.1%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "sm-04",
+                "text": "产销量表合计生产量4,601,962辆、销售量4,507,518辆、库存量188,996辆，生产量比上年增减14.82%、销售量比上年增减12.32%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "合计生产量",
+                    "raw_value": "4,601,962",
+                    "value": "4601962",
+                    "unit": "辆",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  },
+                  {
+                    "name": "合计销售量",
+                    "raw_value": "4,507,518",
+                    "value": "4507518",
+                    "unit": "辆",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  },
+                  {
+                    "name": "合计库存量",
+                    "raw_value": "188,996",
+                    "value": "188996",
+                    "unit": "辆",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "期末数"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-05",
+                "text": "分地区主营业务收入：中国504,138,835,950.64元，其他152,104,976,130.54元；其他地区含上汽通用五菱出口销量。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "中国地区主营业务收入",
+                    "raw_value": "504,138,835,950.64",
+                    "value": "504138835950.64",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  },
+                  {
+                    "name": "其他地区主营业务收入",
+                    "raw_value": "152,104,976,130.54",
+                    "value": "152104976130.54",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-06",
+                "text": "新能源汽车销量1,643,009辆（乘用车1,481,504辆、商用车161,505辆），产量1,683,460辆。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0014"
+                ],
+                "metrics": [
+                  {
+                    "name": "新能源汽车销量总计",
+                    "raw_value": "1,643,009",
+                    "value": "1643009",
+                    "unit": "辆",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  },
+                  {
+                    "name": "新能源汽车产量总计",
+                    "raw_value": "1,683,460",
+                    "value": "1683460",
+                    "unit": "辆",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  }
+                ]
+              },
+              {
+                "fact_id": "sm-07",
+                "text": "主要整车企业销量：上汽大众1,024,000辆、上汽通用535,000辆、上汽集团乘用车分公司886,742辆、上汽通用五菱1,615,066辆、上汽大通222,286辆、智己汽车81,017辆。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ]
+              }
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "oi-01",
+                "text": "现有产能（设计产能/报告期内产能/产能利用率）：上汽大众192.0万辆/105.8万辆/55%，上汽通用145.2/53.4/37%，上汽集团乘用车分公司116.0/88.5/76%，上汽通用五菱176.0/167.1/95%，上汽大通37.5/22.4/60%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0012"
+                ]
+              },
+              {
+                "fact_id": "oi-02",
+                "text": "设计产能计算依据为年工作日250天、每天工作16小时即4000小时；报告期内产能为报告期内产量；产能利用率为报告期内产量/设计产能。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0013"
+                ]
+              },
+              {
+                "fact_id": "oi-03",
+                "text": "除上汽大众MEB工厂外，公司其他新能源产品与传统车共线生产、共享产能，可结合市场情况对两类产品进行调配，实行柔性化生产。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0014"
+                ]
+              },
+              {
+                "fact_id": "oi-04",
+                "text": "成本构成项目为原材料、人工工资、折旧、能源等；汽车制造业本期成本580,943,983,649.41元，占总成本99.80%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "汽车制造业营业成本",
+                    "raw_value": "580,943,983,649.41",
+                    "value": "580943983649.41",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "business_segment",
+                    "comparison_basis": "本期数"
+                  }
+                ]
+              },
+              {
+                "fact_id": "oi-05",
+                "text": "研发投入合计21,706,037,747.07元，其中费用化18,104,061,919.77元、资本化3,601,975,827.30元，研发投入总额占营业收入比例3.36%；研发人员30,329人，占公司总人数17.6%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "研发投入合计",
+                    "raw_value": "21,706,037,747.07",
+                    "value": "21706037747.07",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  },
+                  {
+                    "name": "本期费用化研发投入",
+                    "raw_value": "18,104,061,919.77",
+                    "value": "18104061919.77",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  },
+                  {
+                    "name": "本期资本化研发投入",
+                    "raw_value": "3,601,975,827.30",
+                    "value": "3601975827.30",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  }
+                ]
+              },
+              {
+                "fact_id": "oi-06",
+                "text": "公司推进固态电池与汽车芯片研发应用，在国内率先实现第二代半固态电池技术在全新MG4上搭载并批量交付，全固态电池“中试线”正式贯通；上汽国产芯片应用率已超过30%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ]
+              },
+              {
+                "fact_id": "oi-07",
+                "text": "安吉物流自营远洋滚装船已达21艘，报告期内安吉物流有8艘滚装新船启航。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0004"
+                ]
+              },
+              {
+                "fact_id": "oi-08",
+                "text": "上汽大众、上汽通用优化基地布局，释放出的产能用于生产“尚界”等自主品牌产品；上汽大通累计退出近百家直营店；上汽红岩司法重整方案获法院批准并已启动实施。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "cm-01",
+                "text": "前五名客户销售额7,545,821.15万元，占年度销售总额11.68%；其中关联方销售额0万元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五名客户销售额",
+                    "raw_value": "7,545,821.15",
+                    "value": "7545821.15",
+                    "unit": "万元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  }
+                ]
+              },
+              {
+                "fact_id": "cm-02",
+                "text": "前五名供应商采购额21,496,663.81万元，占年度采购总额37%；其中关联方采购额459,389.23万元，占年度采购总额0.79%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五名供应商采购额",
+                    "raw_value": "21,496,663.81",
+                    "value": "21496663.81",
+                    "unit": "万元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  }
+                ]
+              },
+              {
+                "fact_id": "cm-03",
+                "text": "MG品牌在欧洲市场销量超过30万辆，并在澳新、中东、拉美、东南亚等地区的18个国家乘用车市场排名跻身当地前十。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ]
+              },
+              {
+                "fact_id": "cm-04",
+                "text": "上汽通用五菱深化“印马泰”一体化战略，印尼基地新能源汽车产销占比提升至80%；公司通过在海外设立代工厂、CKD等方式推进本地化生产。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ]
+              },
+              {
+                "fact_id": "cm-05",
+                "text": "结合全新MG4上市，在86城布局120家快闪店，通过“轻量化引流”促进4S店高效率转化；联动抖音、小红书等平台实现内容共创。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ]
+              },
+              {
+                "fact_id": "cm-06",
+                "text": "按地区销量：境内3,436,968辆（同比增15.55%），境外1,070,550辆（同比增3.09%）。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0013"
+                ],
+                "metrics": [
+                  {
+                    "name": "境内销量",
+                    "raw_value": "3,436,968",
+                    "value": "3436968",
+                    "unit": "辆",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  },
+                  {
+                    "name": "境外销量",
+                    "raw_value": "1,070,550",
+                    "value": "1070550",
+                    "unit": "辆",
+                    "currency": null,
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  }
+                ]
+              }
+            ]
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "od-01",
+                "text": "归属于上市公司股东的净利润101.1亿元，同比增长506.5%；扣除非经常性损益的净利润74.2亿元，同比增长237.2%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "归属于上市公司股东的净利润",
+                    "raw_value": "101.1",
+                    "value": "101.1",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  },
+                  {
+                    "name": "归属于上市公司股东的扣除非经常性损益的净利润",
+                    "raw_value": "74.2",
+                    "value": "74.2",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  }
+                ]
+              },
+              {
+                "fact_id": "od-02",
+                "text": "投资收益13,432,644,620.92元，同比增长87.15%，主要原因为对联营企业和合营企业的投资收益同比增加；公允价值变动收益6,605,490,436.41元，同比增长180.43%，主要原因为金融资产公允价值变动同比增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006",
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "投资收益",
+                    "raw_value": "13,432,644,620.92",
+                    "value": "13432644620.92",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  },
+                  {
+                    "name": "公允价值变动收益",
+                    "raw_value": "6,605,490,436.41",
+                    "value": "6605490436.41",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  }
+                ]
+              },
+              {
+                "fact_id": "od-03",
+                "text": "经营活动产生的现金流量净额34,306,601,905.98元，同比减少50.47%，主要由于子公司上汽财务公司汽车金融贷款等业务规模变动。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006",
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "经营活动产生的现金流量净额",
+                    "raw_value": "34,306,601,905.98",
+                    "value": "34306601905.98",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "period": "2025年度",
+                    "subject_scope": "consolidated_group",
+                    "comparison_basis": "本期数"
+                  }
+                ]
+              },
+              {
+                "fact_id": "od-04",
+                "text": "资产减值损失-5,682,389,059.31元，同比增长79.61%，主要原因为计提固定资产减值损失同比增加；营业外支出1,125,649,581.19元，同比增长99.46%，主要原因为本年对供应商补偿款同比增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006",
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "od-05",
+                "text": "财务费用-265,824,180.92元，同比变动-108.70%，主要原因为汇兑收益同比增加；所得税费用7,465,085,641.62元，同比增长59.59%，主要原因为子公司基于谨慎性原则冲回未来预期无法实现的可抵扣暂时性差异。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006",
+                  "source-0010"
+                ]
+              },
+              {
+                "fact_id": "od-06",
+                "text": "主要子公司业绩：华域汽车营业总收入18,399,890.05万元、净利润720,726.81万元；智己汽车营业总收入1,541,140.76万元、净利润-359,815.59万元；上汽大通营业总收入2,533,685.67万元、净利润-161,123.82万元；上汽财务公司营业总收入946,887.95万元、净利润316,901.15万元。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0017"
+                ]
+              },
+              {
+                "fact_id": "od-07",
+                "text": "公司自主品牌新能源车销量增速近50%；“恒星”超级增程、“灵蜥”底盘2.0等新技术实现量产装车。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ]
+              }
+            ]
+          },
+          "material_changes": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "mc-01",
+                "text": "报告期内公司业务类型、利润构成或利润来源未发生重大变动；业务、产品或服务未发生重大变化或调整。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007",
+                  "source-0009"
+                ]
+              },
+              {
+                "fact_id": "mc-02",
+                "text": "合并范围变化：上汽红岩汽车有限公司破产重整；华翔圣德曼（上海）汽车系统有限公司以股权出资方式处置；上海大众联合汽车改装有限公司、上海机动车回收服务中心有限公司股权转让后不再纳入合并范围；上海德实汽车服务有限公司因一致行动条款终止丧失控制权；上汽通用新能源汽车销售服务（深圳）有限公司、飞凡汽车销售（深圳）有限公司注销；上海幸福坊创意产业管理有限公司清算。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0017"
+                ]
+              },
+              {
+                "fact_id": "mc-03",
+                "text": "公司撤销商用车事业部，职能整合并入上汽大通；上汽大众、上汽通用优化基地布局，释放产能用于生产“尚界”等自主品牌产品。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "mc-04",
+                "text": "公司本年将上汽通用五菱的出口销量纳入其他地区计算，相关指标增减变动幅度按可比口径计算。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "mc-05",
+                "text": "公司2026年经营计划为力争全年整车销量达到500万辆，营业总收入超过7000亿元，营业成本在6300亿元左右；该等目标为计划，非报告期已实现业绩。",
+                "subject_scope": "consolidated_group",
+                "period": "2026年度计划",
+                "evidence_ids": [
+                  "source-0020"
+                ]
+              }
+            ]
+          }
+        },
+        "limitations": [
+          "未阅读第二节近三年主要会计数据及分季度数据、第三节资产负债状况与投资状况分析、第四节ESG报告、第五节重大关联交易及重大合同履行情况、第八节财务报表全文及其他科目附注，相关分析受限。",
+          "分部信息中整车及零部件分部未进一步拆分整车与零部件，且分部间抵销金额较大，分部收入与主营业务分产品收入口径不完全一致。",
+          "产销量表按整车企业列示，未披露各企业分车型明细；新能源汽车产能除上汽大众MEB工厂外与传统车共线，无法单独核算各企业新能源产能利用率。",
+          "前五名客户与供应商仅披露合计金额及占比，未披露具体名称，无法识别客户与供应商身份。",
+          "公司未披露按销售模式划分的收入明细，仅披露分行业、分产品、分地区数据。",
+          "2026年销量与收入目标为经营计划，不构成报告期已实现业绩，亦不代表公司保证。"
+        ]
+      },
+      "usage": {
+        "input_tokens": 16760,
+        "output_tokens": 5971,
+        "total_tokens": 22731
+      }
+    }
+  ]
+}

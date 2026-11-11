@@ -1,0 +1,798 @@
+{
+  "schema_version": "company_profile_workpaper.v1",
+  "origin": "human_reference",
+  "report": {
+    "instrument_id": "600104.SH",
+    "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+    "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-01T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "reading_scope": {
+    "sections": [
+      {
+        "section_id": "saic-discussion",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "start_page": 9,
+        "end_page": 9,
+        "rationale": "同一子节集中提供主业、车型、海外、营销、技术及板块协同。"
+      },
+      {
+        "section_id": "saic-competitiveness",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "四、报告期内核心竞争力分析"
+        ],
+        "start_page": 10,
+        "end_page": 10,
+        "rationale": "补齐研发制造营销体系、客户市场及海外渠道。"
+      },
+      {
+        "section_id": "saic-main-operations",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(一) 主营业务分析",
+          "1、利润表及现金流量表相关科目变动分析表"
+        ],
+        "start_page": 10,
+        "end_page": 11,
+        "rationale": "公司规模及营业收入科目集中于此，不再分散取审计报告/财务附注。"
+      },
+      {
+        "section_id": "saic-revenue-cost",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(一) 主营业务分析",
+          "2、收入和成本分析"
+        ],
+        "start_page": 11,
+        "end_page": 13,
+        "rationale": "同一节含分行业/产品/地区收入、跨页产销表、成本构成、贸易与客户供应商信息。"
+      }
+    ],
+    "unread_or_deferred": [
+      "第三节其余研发、投资、未来展望等子节，仅在本次核心问题缺源时再查。",
+      "第八节财务报告内重复的收入确认表、分部表及关联购销附注未作为本次主源。",
+      "未进行全报告逐项漏项审计，未给具名采购材料/对手不能称全报告未披露。"
+    ],
+    "selection_rationale": "从目录第三节管理层讨论与分析入手，集中选择三、四及五(一)中的1、2，实际证据仅9—13页；这些是本报告子节坐标而非新公司的页码规则。分产品和成本表已能回答多数基础问题，不为重复财务附注增加来源。",
+    "stop_reason": "八项均已有源实质内容；具体材料明细、分品牌收入、完整客户/供应商及金融收费明细后置，不为了补齐次要细节扩读整本年报。"
+  },
+  "elements": {
+    "business_structure": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "business-main",
+          "text": "公司以整车业务为中心，推进自主品牌与合资业务发展，零部件、金融、移动出行和服务提供协同支持。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-business",
+            "saic-services"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "business-services",
+          "text": "金融板块提供汽车金融服务并拓展海外服务；移动出行和服务板块包括为整车服务的物流运力。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-services"
+          ],
+          "metrics": []
+        }
+      ],
+      "limitations": []
+    },
+    "products_services": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "products-new-energy",
+          "text": "自主品牌新品包括全新MG4、荣威M7、尚界H5、智己LS6/LS9、五菱缤果S和大通大拿；合资业务推出AUDI E5和别克至境L7。这里是报告列举的新品，不是完整在售车型目录。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-products"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "products-commercial",
+          "text": "商用车产品包括轻客、皮卡；智己IM5/IM6在报告列举的海外市场销售。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-overseas"
+          ],
+          "metrics": []
+        }
+      ],
+      "limitations": [
+        "未扩读车型目录确认每款终端客群、价格或销量；不以新品名单替代全部主要业务。"
+      ]
+    },
+    "revenue_model": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "revenue-mechanism",
+          "text": "收入由整车、零部件、劳务及其他、金融业务构成；自主研发制造和营销体系支撑整车与零部件经营，汽车金融和服务另列。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-product-revenue",
+            "saic-capabilities",
+            "saic-services"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "revenue-trade",
+          "text": "另有汽车芯片及相关零部件出口贸易业务，但该项金额不能代表集团主业规模。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-trade"
+          ],
+          "metrics": [
+            {
+              "name": "贸易业务本期营业收入",
+              "raw_value": "206,508,725.66",
+              "value": "206508725.66",
+              "unit": "元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025",
+              "comparison_basis": null
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "所选章节没有细分汽车金融的具体收费或利息机制，未把行业常识补成该公司已披露事实。"
+      ]
+    },
+    "scale_and_mix": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "scale-total",
+          "text": "报告期营业总收入和营业收入是不同科目；归母净利润是股东口径，不与分部净利润合计混同。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-scale",
+            "saic-operating-revenue"
+          ],
+          "metrics": [
+            {
+              "name": "营业总收入",
+              "raw_value": "6,562.44",
+              "value": "6562.44",
+              "unit": "亿元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025",
+              "comparison_basis": null
+            },
+            {
+              "name": "营业收入",
+              "raw_value": "646,152,101,889.30",
+              "value": "646152101889.30",
+              "unit": "元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025",
+              "comparison_basis": null
+            },
+            {
+              "name": "归属于上市公司股东的净利润",
+              "raw_value": "101.06",
+              "value": "101.06",
+              "unit": "亿元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025",
+              "comparison_basis": null
+            }
+          ]
+        },
+        {
+          "fact_id": "scale-products",
+          "text": "按管理层讨论的主营业务分产品表，整车与零部件是主要收入来源，另列劳务及其他和金融业务。不同分部/收入确认表口径不在本底稿混加。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-product-revenue"
+          ],
+          "metrics": [
+            {
+              "name": "整车业务营业收入",
+              "raw_value": "410,196,473,001.11",
+              "value": "410196473001.11",
+              "unit": "元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025",
+              "comparison_basis": null
+            },
+            {
+              "name": "零部件业务营业收入",
+              "raw_value": "203,019,866,775.26",
+              "value": "203019866775.26",
+              "unit": "元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025",
+              "comparison_basis": null
+            },
+            {
+              "name": "劳务及其他营业收入",
+              "raw_value": "32,935,762,112.94",
+              "value": "32935762112.94",
+              "unit": "元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025",
+              "comparison_basis": null
+            },
+            {
+              "name": "金融业务营业收入",
+              "raw_value": "10,091,710,191.88",
+              "value": "10091710191.88",
+              "unit": "元",
+              "currency": "CNY",
+              "subject_scope": "business_segment",
+              "period": "2025",
+              "comparison_basis": null
+            }
+          ]
+        },
+        {
+          "fact_id": "scale-sales",
+          "text": "产销统计表列全年销售合计；这包括表中经营主体的统计，不能直接套成合并财务范围。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-sales-volume"
+          ],
+          "metrics": [
+            {
+              "name": "汽车销售量合计",
+              "raw_value": "4,507,518",
+              "value": "4507518",
+              "unit": "辆",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025",
+              "comparison_basis": "报告产销统计口径，不等同合并收入口径"
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "公司营业总收入引用亿元披露值，未为追求额外精度再读全部财务附注。"
+      ]
+    },
+    "operations_and_inputs": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "operations-model",
+          "text": "公司具有研发、制造、营销体系；海外通过代工厂、CKD等方式推进本地化生产。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-capabilities",
+            "saic-overseas"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "operations-cost",
+          "text": "成本构成涉及原材料、人工工资、折旧、能源等；成本表合并列示这些类别，不支持将总成本全部归为某一种材料。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-cost-inputs"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "operations-supplier",
+          "text": "所选章节披露供应商集中度，但不据此虚构具名采购对象或材料关系。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-concentration"
+          ],
+          "metrics": [
+            {
+              "name": "前五名供应商采购占年度采购总额比例",
+              "raw_value": "37",
+              "value": "37",
+              "unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025",
+              "comparison_basis": null
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "具体原材料品种、各项采购成本占比、具名供应商及自制外购比例未在本次选定材料中整理，作为后置缺项。"
+      ]
+    },
+    "customers_channels_markets": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "markets-world",
+          "text": "产品服务消费者市场；海外经营涉及欧洲、澳新、中东、拉美、东南亚等地区，报告称已有3000余个海外营销服务网点并服务170多个国家和地区。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-capabilities",
+            "saic-overseas"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "markets-channel",
+          "text": "营销同时使用快闪店引流、4S店转化，以及抖音、小红书等线上平台协作，不能据此推断全部销售均为直销或经销。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-channels"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "markets-regions",
+          "text": "地区表分别列中国及其他地区；其他地区统计含上汽通用五菱出口，相关变化按可比口径计算。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-regions"
+          ],
+          "metrics": [
+            {
+              "name": "中国地区营业收入",
+              "raw_value": "504,138,835,950.64",
+              "value": "504138835950.64",
+              "unit": "元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025",
+              "comparison_basis": null
+            },
+            {
+              "name": "其他地区营业收入",
+              "raw_value": "152,104,976,130.54",
+              "value": "152104976130.54",
+              "unit": "元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025",
+              "comparison_basis": null
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "客户/渠道结构没有完整量化，品牌渠道归属和具名客户不在本次阅读范围强补。"
+      ]
+    },
+    "operating_drivers": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "driver-policy",
+          "text": "报告把以旧换新政策与自主品牌新能源产品销售相联系；此处不据此量化政策对集团净利润的贡献。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-products"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "driver-trade",
+          "text": "国际贸易壁垒是海外经营面临的因素，公司以混动车型、海外本地化生产等方式应对；不能由这句话推导具体价格或利润弹性。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-overseas"
+          ],
+          "metrics": []
+        }
+      ],
+      "limitations": []
+    },
+    "material_changes": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "change-products",
+          "text": "报告期推出自主品牌新能源和合资中高端智电新品，形成产品更新；这不是声称公司整体转成另一行业。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-products"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "change-technology",
+          "text": "第二代半固态电池已搭载全新MG4并批量交付，全固态电池处于中试线贯通阶段；不能把中试写成全面量产。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-technology"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "change-logistics",
+          "text": "报告期安吉物流有8艘滚装新船启航，提升南美、欧洲等航线运能。",
+          "subject_scope": "consolidated_group",
+          "period": "2025",
+          "evidence_ids": [
+            "saic-services"
+          ],
+          "metrics": []
+        }
+      ],
+      "limitations": []
+    }
+  },
+  "evidence": [
+    {
+      "evidence_id": "saic-business",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "三、经营情况讨论与分析"
+      ],
+      "physical_pages": [
+        9
+      ],
+      "source_spans": [
+        {
+          "page": 9,
+          "start": 569,
+          "end": 688,
+          "quote": "聚焦整车业务，优化业务结构，抢抓结构\r\n性市场机会，推动自主品牌率先发展及合资业务焕新转型；推进核心技术攻关，做优产业生态，\r\n夯实国际经营，提升发展能级；强化零部件、移动出行和服务、金融等业务协同，稳定产品附加\r\n值，助力公司整体转型。"
+        }
+      ],
+      "table_context": null
+    },
+    {
+      "evidence_id": "saic-products",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "三、经营情况讨论与分析",
+        "1．抢抓机遇奋进新赛道"
+      ],
+      "physical_pages": [
+        9
+      ],
+      "source_spans": [
+        {
+          "page": 9,
+          "start": 838,
+          "end": 1010,
+          "quote": "自主品牌集中推出了全新 MG4、荣威 M7、尚界 H5、智己全新 LS6/LS9、\r\n五菱缤果 S、大通大拿等新能源产品，持续放大“以旧换新”政策效应，全年公司自主品牌新能\r\n源车销量增速近 50%。上汽大众、上汽通用强化与自主品牌的资源协同，利用本土研发力量，分\r\n别推出 AUDI E5、别克至境 L7 等中高端智电新品，加快焕新转型步伐。"
+        }
+      ],
+      "table_context": null
+    },
+    {
+      "evidence_id": "saic-overseas",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "三、经营情况讨论与分析",
+        "2. 合力拓展海外新市场"
+      ],
+      "physical_pages": [
+        9
+      ],
+      "source_spans": [
+        {
+          "page": 9,
+          "start": 1025,
+          "end": 1281,
+          "quote": "面对国际贸易壁垒升级等不利因素，公司通过推出多款 HEV 混动车\r\n型，MG 品牌在欧洲市场销量超过 30 万辆，成为欧洲最畅销的中国品牌，并在澳新、中东、拉美、\r\n东南亚等地区的 18 个国家乘用车市场排名跻身当地前十；上汽通用五菱深化“印马泰”一体化战\r\n略，印尼基地新能源汽车产销占比提升至 80%；智己 IM5 和 IM6 相继登陆泰国、英国、澳大利亚\r\n等市场；上汽商用车的轻客和皮卡产品在欧洲、澳洲、拉美三大市场也实现快速增长。同时，公\r\n司通过在海外设立代工厂、CKD 等方式，积极推进本地化生产。"
+        }
+      ],
+      "table_context": null
+    },
+    {
+      "evidence_id": "saic-channels",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "三、经营情况讨论与分析",
+        "4. 不断深化新营销变革"
+      ],
+      "physical_pages": [
+        9
+      ],
+      "source_spans": [
+        {
+          "page": 9,
+          "start": 1598,
+          "end": 1742,
+          "quote": "结合全新 MG4 上市，在 86 城布局 120 家快闪店，通过“轻量化引\r\n流”促进 4S 店高效率转化。搭建运营管理看板与新车流量追踪体系，实现流量到销量的闭环管理，\r\n并依托 AI 工具提升订单转化。联动抖音、小红书等平台，实现内容深度共创，各品牌的线上互动\r\n量和触达率显著提升。"
+        }
+      ],
+      "table_context": null
+    },
+    {
+      "evidence_id": "saic-services",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "三、经营情况讨论与分析",
+        "5. 构建板块联动新优势"
+      ],
+      "physical_pages": [
+        9
+      ],
+      "source_spans": [
+        {
+          "page": 9,
+          "start": 1757,
+          "end": 1947,
+          "quote": "零部件、金融、移动出行和服务板块协同联动，持续为整车业务提\r\n供有力支撑。零部件板块完善智能电动化核心技术布局，整合优势资源，加快推进固态电池、智\r\n能底盘等技术的产业化落地。金融板块加强汽车金融服务的精细化发展，积极支持尚界等新业务，\r\n并加快拓展海外金融服务。移动出行和服务板块聚焦服务整车业务，报告期内安吉物流有 8 艘滚\r\n装新船启航，进一步提升至南美、欧洲等航线的运能。"
+        }
+      ],
+      "table_context": null
+    },
+    {
+      "evidence_id": "saic-capabilities",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "四、报告期内核心竞争力分析"
+      ],
+      "physical_pages": [
+        10
+      ],
+      "source_spans": [
+        {
+          "page": 10,
+          "start": 98,
+          "end": 260,
+          "quote": "形\r\n成了完备可靠的研发、制造、营销体系，不仅在国内拥有强大的供应链体系保障、用户基盘、经\r\n销网络和汽车金融服务支持能力，而且率先实现汽车产业链“成建制”出海，通过持续完善海外\r\n整车制造基地布局，建立起 3000 余个海外营销服务网点，已为全球 170 多个国家和地区的消费者\r\n提供高质量、多样化、可持续的产品和服务。"
+        }
+      ],
+      "table_context": null
+    },
+    {
+      "evidence_id": "saic-scale",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "五、报告期内主要经营情况"
+      ],
+      "physical_pages": [
+        10
+      ],
+      "source_spans": [
+        {
+          "page": 10,
+          "start": 752,
+          "end": 862,
+          "quote": "报告期内，公司实现营业总收入 6,562.44 亿元，同比增长 4.57%，归属于上市公司股东的净\r\n利润 101.06 亿元，同比增长 506.45%，加权平均净资产收益率 3.43%，较上年增加 2.85 个百分点。"
+        }
+      ],
+      "table_context": null
+    },
+    {
+      "evidence_id": "saic-operating-revenue",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "五、报告期内主要经营情况",
+        "(一) 主营业务分析",
+        "1、利润表及现金流量表相关科目变动分析表"
+      ],
+      "physical_pages": [
+        10
+      ],
+      "source_spans": [
+        {
+          "page": 10,
+          "start": 899,
+          "end": 1030,
+          "quote": "单位：元 币种：人民币\r\n科目 本期数 上年同期数 变动比例（%）\r\n营业收入 646,152,101,889.30 614,074,061,818.13 5.22\r\n营业成本 580,943,983,649.41 556,450,036,686.44 4.40"
+        }
+      ],
+      "table_context": "单位元，币种人民币；科目/本期数/上年同期数/变动比例列；营业收入与营业总收入不同。"
+    },
+    {
+      "evidence_id": "saic-product-revenue",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "五、报告期内主要经营情况",
+        "(一) 主营业务分析",
+        "2、收入和成本分析",
+        "(1). 主营业务分行业、分产品、分地区、分销售模式情况"
+      ],
+      "physical_pages": [
+        11
+      ],
+      "source_spans": [
+        {
+          "page": 11,
+          "start": 585,
+          "end": 1359,
+          "quote": "单位：元 币种：人民币\r\n主营业务分行业情况\r\n分行业 营业收入 营业成本\r\n毛利\r\n率\r\n（%）\r\n营业收入\r\n比上年增\r\n减（%）\r\n营业成本\r\n比上年增\r\n减（%）\r\n毛利率比上年增减\r\n（%）\r\n汽车制造业 646,152,101,889.30 580,943,983,649.41 10.09 5.22 4.40 增加 0.71 个百分点\r\n金融业 10,091,710,191.88 1,163,322,101.92 88.47 -25.33 -42.04 增加 3.32 个百分点\r\n合计 656,243,812,081.18 582,107,305,751.33 11.30 4.57 4.23 增加 0.28 个百分点\r\n主营业务分产品情况\r\n分产品 营业收入 营业成本\r\n毛利\r\n率\r\n（%）\r\n营业收入\r\n比上年增\r\n减（%）\r\n营业成本\r\n比上年增\r\n减（%）\r\n毛利率比上年增减\r\n（%）\r\n整车业务 410,196,473,001.11 392,545,642,811.16 4.30 7.59 7.10 增加 0.44 个百分点\r\n零部件业务 203,019,866,775.26 164,149,718,120.28 19.15 6.47 4.87 增加 1.24 个百分点\r\n劳务及其他 32,935,762,112.94 24,248,622,717.97 26.38 -21.83 -27.36 增加 5.61 个百分点\r\n金融业务 10,091,710,191.88 1,163,322,101.92 88.47 -25.33 -42.04 增加 3.32 个百分点\r\n合计 656,243,812,081.18 582,107,305,751.33 11.30 4.57 4.23 增加 0.28 个百分点"
+        }
+      ],
+      "table_context": "同一节明确单位元、币种人民币；主营分行业和分产品为两个口径，不能重复相加；分产品劳务及其他32,935,762,112.94元不能与收入确认附注的不同列混同。"
+    },
+    {
+      "evidence_id": "saic-regions",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "五、报告期内主要经营情况",
+        "(一) 主营业务分析",
+        "2、收入和成本分析",
+        "(1). 主营业务分行业、分产品、分地区、分销售模式情况"
+      ],
+      "physical_pages": [
+        11
+      ],
+      "source_spans": [
+        {
+          "page": 11,
+          "start": 1361,
+          "end": 1714,
+          "quote": "主营业务分地区情况\r\n分地区 营业收入 营业成本\r\n毛利\r\n率\r\n（%）\r\n营业收入\r\n比上年增\r\n减（%）\r\n营业成本\r\n比上年增\r\n减（%）\r\n毛利率比上年增减\r\n（%）\r\n中国 504,138,835,950.64 449,593,517,326.14 10.82 1.64 1.79 减少 0.13 个百分点\r\n其他（注） 152,104,976,130.54 132,513,788,425.19 12.88 15.60 13.50 增加 1.61 个百分点\r\n合计 656,243,812,081.18 582,107,305,751.33 11.30 4.57 4.23 增加 0.28 个百分点\r\n注：本年公司将上汽通用五菱的出口销量纳入其他地区计算，相关指标的增减变动幅度按可比口径计算。"
+        }
+      ],
+      "table_context": "本节统一单位元、币种人民币；其他地区含上汽通用五菱出口销量，相关同比按可比口径计算。"
+    },
+    {
+      "evidence_id": "saic-cost-inputs",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "五、报告期内主要经营情况",
+        "(一) 主营业务分析",
+        "2、收入和成本分析",
+        "(4). 成本分析表"
+      ],
+      "physical_pages": [
+        12
+      ],
+      "source_spans": [
+        {
+          "page": 12,
+          "start": 752,
+          "end": 1570,
+          "quote": "(4). 成本分析表\r\n单位：元 币种：人民币\r\n分行业情况\r\n分行业 成本构成项目 本期金额\r\n本期占总\r\n成本比例\r\n(%)\r\n上年同期金额\r\n上年同期\r\n占总成本\r\n比例(%)\r\n本期金额较\r\n上年同期变\r\n动比例(%)\r\n汽车 制\r\n造业\r\n原材料、人工工\r\n资、折旧、能源\r\n等\r\n580,943,983,649.41 99.80 556,450,036,686.44 99.64 4.40\r\n金融业\r\n人工工资、折旧、\r\n能源等\r\n1,163,322,101.92 0.20 2,006,973,587.57 0.36 -42.04\r\n合计 582,107,305,751.33 100.00 558,457,010,274.01 100.00 4.23\r\n分产品情况\r\n分产品 成本构成项目 本期金额\r\n本期占总\r\n成本比例\r\n(%)\r\n上年同期金额\r\n上年同期\r\n占总成本\r\n比例(%)\r\n本期金额较\r\n上年同期变\r\n动比例(%)\r\n整车 业\r\n务\r\n原材料、人工工\r\n资、折旧、能源\r\n等\r\n392,545,642,811.16 67.43 366,534,174,722.96 65.63 7.10\r\n零部 件\r\n业务\r\n原材料、人工工\r\n资、折旧、能源\r\n等\r\n164,149,718,120.28 28.20 156,532,375,412.29 28.03 4.87\r\n劳务 及\r\n其他\r\n原材料、人工工\r\n资、折旧、能源\r\n等\r\n24,248,622,717.97 4.17 33,383,486,551.19 5.98 -27.36\r\n金融 业\r\n务\r\n人工工资、折旧、\r\n能源等\r\n1,163,322,101.92 0.20 2,006,973,587.57 0.36 -42.04\r\n合计 582,107,305,751.33 100.00 558,457,010,274.01 100.00 4.23"
+        }
+      ],
+      "table_context": "单位元、币种人民币；表格列出原材料、人工工资、折旧、能源等成本类别，未将各类别金额拆开，不能把总额归到某种材料。"
+    },
+    {
+      "evidence_id": "saic-trade",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "五、报告期内主要经营情况",
+        "(一) 主营业务分析",
+        "2、收入和成本分析",
+        "(7). 主要销售客户及主要供应商情况"
+      ],
+      "physical_pages": [
+        13
+      ],
+      "source_spans": [
+        {
+          "page": 13,
+          "start": 489,
+          "end": 644,
+          "quote": "D. 报告期内公司存在贸易业务收入\r\n√适用 □不适用\r\n单位：元 币种：人民币\r\n贸易业务开展情况 本期营业收入 上期营业收入\r\n本期营业收入比上年\r\n同期增减（%）\r\n本报告期主要系汽车\r\n芯片及相关汽车零部\r\n件的出口贸易业务。\r\n206,508,725.66 684,512,856.82 -69.83"
+        }
+      ],
+      "table_context": "单位元、币种人民币；本期、上期和变动比例分别列示，出口贸易不是整个集团的主导商业模式。"
+    },
+    {
+      "evidence_id": "saic-concentration",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "五、报告期内主要经营情况",
+        "(一) 主营业务分析",
+        "2、收入和成本分析",
+        "(7). 主要销售客户及主要供应商情况"
+      ],
+      "physical_pages": [
+        13
+      ],
+      "source_spans": [
+        {
+          "page": 13,
+          "start": 129,
+          "end": 283,
+          "quote": "前五名客户销售额7,545,821.15万元，占年度销售总额11.68%；其中前五名客户销售额中关联方销\r\n售额0万元，占年度销售总额0%。\r\n前五名供应商采购额21,496,663.81万元，占年度采购总额37%；其中前五名供应商采购额中关联\r\n方采购额459,389.23万元，占年度采购总额0.79%。"
+        }
+      ],
+      "table_context": "金额单位万元；客户和供应商两类比例分母不同，未给具名对手。"
+    },
+    {
+      "evidence_id": "saic-technology",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "三、经营情况讨论与分析",
+        "3. 培育壮大新质生产力"
+      ],
+      "physical_pages": [
+        9
+      ],
+      "source_spans": [
+        {
+          "page": 9,
+          "start": 1450,
+          "end": 1583,
+          "quote": "推进固态电池与汽车芯片研发应用，在\r\n国内率先实现第二代半固态电池技术在全新 MG4 上搭载并批量交付，全固态电池“中试线”正式\r\n贯通，低温续航、电池安全等核心技术指标行业领先；同时，上汽国产芯片应用率已超过 30%，\r\n正加快推进全国产芯片车型的开发和验证工作。"
+        }
+      ],
+      "table_context": null
+    },
+    {
+      "evidence_id": "saic-sales-volume",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "五、报告期内主要经营情况",
+        "(一) 主营业务分析",
+        "2、收入和成本分析",
+        "(2). 产销量情况分析表"
+      ],
+      "physical_pages": [
+        11,
+        12
+      ],
+      "source_spans": [
+        {
+          "page": 11,
+          "start": 1716,
+          "end": 1794,
+          "quote": "(2). 产销量情况分析表\r\n√适用 □不适用\r\n主要产品\r\n单\r\n位\r\n生产量 销售量 库存量\r\n生产量\r\n比上年\r\n销售量\r\n比上年\r\n库存量\r\n比上年"
+        },
+        {
+          "page": 12,
+          "start": 34,
+          "end": 715,
+          "quote": "增减\r\n（%）\r\n增减\r\n（%）\r\n增减\r\n（%）\r\n上汽大众汽车有限公司 辆 1,057,605 1,024,000 47,321 -7.81 -10.81 233.32\r\n上汽通用汽车有限公司 辆 534,026 535,000 10,989 26.63 22.99 -8.33\r\n上汽集团乘用车分公司 辆 885,448 886,742 10,144 25.17 25.42 -13.74\r\n上汽通用五菱汽车股份有限公司 辆 1,671,013 1,615,066 90,269 23.58 20.52 163.01\r\n上汽大通汽车有限公司 辆 223,531 222,286 13,995 23.99 25.14 9.76\r\n智己汽车科技有限公司 辆 85,884 81,017 5,824 31.34 23.68 1,035.28\r\n上汽正大有限公司 辆 30,048 29,391 5,909 36.15 13.26 12.49\r\n上汽通用五菱印尼汽车有限公司 辆 21,121 21,016 1,723 -11.22 -13.31 6.49\r\n捷仕达名爵汽车印度有限公司 辆 70,351 69,997 1,559 19.30 17.76 21.99\r\n其他 辆 22,935 23,003 1,263 -20.55 -23.47 -5.18\r\n合计 辆 4,601,962 4,507,518 188,996 14.82 12.32 98.92\r\n产销量情况说明\r\n其他主要含上海申沃客车有限公司、上汽红岩汽车有限公司、南京依维柯汽车有限公司等。"
+        }
+      ],
+      "table_context": "跨页表：第11页为主要产品、单位、生产量/销售量/库存量及同比表头；第12页续列同比并列行与合计。产销统计不是合并报表收入口径，含表列经营主体。"
+    }
+  ],
+  "limitations": [
+    "这是人工原文参考与来源集中设计，非模型抽取成绩，未更新S1或历史结果。",
+    "只对声明子节形成基础画像；不能从所选范围推断其他章节不存在重要事项。",
+    "车型、市场和产销统计涉及报告披露的经营主体，不用于推断所有主体均按同一种合并会计方法处理。"
+  ]
+}

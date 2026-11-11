@@ -366,6 +366,11 @@ class PypdfNativeAdapter:
     name = "pypdf"
     version = PDF_PARSER_VERSION
 
+    def __init__(self, *, extraction_mode: str = "plain") -> None:
+        if extraction_mode not in {"plain", "layout"}:
+            raise ValueError("native text mode must be plain or layout")
+        self.extraction_mode = extraction_mode
+
     def extract(self, content: bytes, *, target_pages: Sequence[int] = (), progress_callback: Optional[Callable[[NativePage], None]] = None, page_count_callback: Optional[Callable[[int], None]] = None) -> NativeResult:
         started = time.perf_counter()
         raw = bytes(content)
@@ -397,7 +402,14 @@ class PypdfNativeAdapter:
                         continue
                     page_started = time.perf_counter()
                     try:
-                        text = reader.pages[number - 1].extract_text() or ""
+                        page = reader.pages[number - 1]
+                        text = (
+                            page.extract_text(
+                                extraction_mode="layout", layout_mode_scale_weight=2.0
+                            )
+                            if self.extraction_mode == "layout"
+                            else page.extract_text()
+                        ) or ""
                         try:
                             width = float(reader.pages[number - 1].mediabox.width)
                             height = float(reader.pages[number - 1].mediabox.height)

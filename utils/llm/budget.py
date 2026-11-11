@@ -126,6 +126,7 @@ class LlmRunBudget:
         run_authorization: str | None = None,
     ):
         authorized_evidence = run_authorization == "company_profile_company_evidence.2026-10-22"
+        authorized_workpaper = run_authorization == "company_profile_workpaper_development.2026-11-11"
         authorized_fulltext = run_authorization == "company_profile_fulltext_core.2026-10-22"
         authorized_b2 = run_authorization == "company_profile_b2_cross_industry.2026-10-23"
         authorized_s1 = run_authorization == "company_profile_s1_regression.2026-10-26"
@@ -152,7 +153,9 @@ class LlmRunBudget:
         authorized_s31 = run_authorization == "company_profile_s31_coverage.2026-11-03"
         authorized_s30 = run_authorization == "company_profile_s30_observation.2026-11-02"
         authorized_s28 = run_authorization == "company_profile_s28_observation.2026-11-01"
-        if authorized_s41 or authorized_s38 or authorized_s35 or authorized_s32:
+        if authorized_workpaper:
+            token_cap, request_cap, cost_cap = 3_000_000, 96, Decimal(1000)
+        elif authorized_s41 or authorized_s38 or authorized_s35 or authorized_s32:
             token_cap, request_cap, cost_cap = 120_000, 16, Decimal(10)
         elif authorized_s31:
             token_cap, request_cap, cost_cap = 40_000, 4, Decimal(10)
@@ -297,7 +300,9 @@ class LlmRunBudget:
             used_cost = sum(known_costs, Decimal(0)) if cost_known else None
             context_exceeded = priced and tokens > price.context_tokens
             payload_limit = (
-                60_000
+                1_000_000
+                if self.run_authorization == "company_profile_workpaper_development.2026-11-11"
+                else 60_000
                 if self.run_authorization
                 in {
                     "company_profile_company_evidence.2026-10-22",
@@ -310,7 +315,11 @@ class LlmRunBudget:
             )
             payload_exceeded = self.billing_mode == DEVELOPMENT_UNPRICED_BILLING and (
                 payload_bytes > payload_limit
-                or output > DEVELOPMENT_MAX_OUTPUT_TOKENS
+                or output > (
+                    16_384
+                    if self.run_authorization == "company_profile_workpaper_development.2026-11-11"
+                    else DEVELOPMENT_MAX_OUTPUT_TOKENS
+                )
             )
             logical_id = str(logical_request_id or request_id)
             if self._recovery_closed:

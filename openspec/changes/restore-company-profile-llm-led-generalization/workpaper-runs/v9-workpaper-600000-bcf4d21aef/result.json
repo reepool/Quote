@@ -1,0 +1,1851 @@
+{
+  "run_id": "v9-workpaper-600000-bcf4d21aef",
+  "run": {
+    "action": "run",
+    "state": "completed",
+    "task": {
+      "task_name": "company_profile_common_core",
+      "actions": [
+        "preview",
+        "run",
+        "status",
+        "pause",
+        "resume",
+        "query",
+        "export"
+      ],
+      "parameters": {
+        "action": [
+          "preview",
+          "run",
+          "status",
+          "pause",
+          "resume",
+          "query",
+          "export"
+        ],
+        "knowledge_cutoff": null,
+        "instrument_ids": [],
+        "max_items": 2,
+        "token_budget": 50000,
+        "max_elapsed_seconds": 300.0,
+        "reason": "operator_request",
+        "output_directory": null
+      },
+      "storage_namespace": "company_profile_common_core.v1",
+      "writer": "company_profile_research_writer.v1",
+      "production_authorization": "not_authorized",
+      "legacy_task_names_not_connected": [
+        "business_profile_daily_incremental",
+        "business_profile_backfill",
+        "business_profile_backfill_control",
+        "business_profile_semantic_repair",
+        "company_profile_shadow_sync"
+      ],
+      "stage5_connected": true
+    },
+    "control": {
+      "schema_version": "company_profile_task_control.v1",
+      "state": "completed",
+      "run_id": "company_profile_common_core-528eef67822a",
+      "action": "run",
+      "started_at": "2026-11-11T23:53:27.394131+08:00",
+      "updated_at": "2026-11-12T00:00:57.259558+08:00",
+      "finished_at": "2026-11-12T00:00:57.259558+08:00",
+      "stop_requested": false,
+      "reason": null,
+      "parameters": {
+        "knowledge_cutoff": "2026-11-11",
+        "instrument_ids": [
+          "600000.SH"
+        ],
+        "max_items": 1,
+        "token_budget": 3000000,
+        "max_elapsed_seconds": 1770.9472657535225
+      },
+      "latest_result": {
+        "action": "run",
+        "state": "completed",
+        "task": {
+          "task_name": "company_profile_common_core",
+          "actions": [
+            "preview",
+            "run",
+            "status",
+            "pause",
+            "resume",
+            "query",
+            "export"
+          ],
+          "parameters": {
+            "action": [
+              "preview",
+              "run",
+              "status",
+              "pause",
+              "resume",
+              "query",
+              "export"
+            ],
+            "knowledge_cutoff": null,
+            "instrument_ids": [],
+            "max_items": 2,
+            "token_budget": 50000,
+            "max_elapsed_seconds": 300.0,
+            "reason": "operator_request",
+            "output_directory": null
+          },
+          "storage_namespace": "company_profile_common_core.v1",
+          "writer": "company_profile_research_writer.v1",
+          "production_authorization": "not_authorized",
+          "legacy_task_names_not_connected": [
+            "business_profile_daily_incremental",
+            "business_profile_backfill",
+            "business_profile_backfill_control",
+            "business_profile_semantic_repair",
+            "company_profile_shadow_sync"
+          ],
+          "stage5_connected": true
+        },
+        "control": {
+          "schema_version": "company_profile_task_control.v1",
+          "state": "running",
+          "run_id": "company_profile_common_core-528eef67822a",
+          "action": "run",
+          "started_at": "2026-11-11T23:53:27.394131+08:00",
+          "updated_at": "2026-11-11T23:53:27.394131+08:00",
+          "finished_at": null,
+          "stop_requested": false,
+          "reason": null,
+          "parameters": {
+            "knowledge_cutoff": "2026-11-11",
+            "instrument_ids": [
+              "600000.SH"
+            ],
+            "max_items": 1,
+            "token_budget": 3000000,
+            "max_elapsed_seconds": 1770.9472657535225
+          },
+          "latest_result": null
+        },
+        "queue": {
+          "as_of": "2026-11-12T00:00:55.917931+08:00",
+          "total": 1,
+          "running": 0,
+          "claimable": 0,
+          "terminal": 0,
+          "completed": 1,
+          "machine_rework": 0,
+          "finalized": 1,
+          "groups": [
+            {
+              "stage": "publish",
+              "status": "completed",
+              "row_count": 1,
+              "oldest_created_at": "2026-11-11T23:53:27.906159+08:00",
+              "oldest_age_seconds": 448.438535
+            }
+          ]
+        },
+        "production_authorization": "not_authorized",
+        "storage_namespace": "company_profile_common_core.v1",
+        "writer": "company_profile_research_writer.v1",
+        "knowledge_cutoff": "2026-11-11",
+        "enqueue": {
+          "eligible": 1,
+          "inserted": 1,
+          "reused": 0,
+          "reset": 0,
+          "checkpoint_rotated": 0,
+          "checkpoint_deleted": 0,
+          "checkpoint_delete_failures": [],
+          "superseded": 0,
+          "identity_superseded": 0,
+          "work_ids": [
+            "bp-work-bc46bdbf5377ae586d14be56"
+          ]
+        },
+        "drain": {
+          "acquire": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.668,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 2.953,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 2,
+              "wait_seconds": 2.2e-05,
+              "write_seconds": 0.3244,
+              "observation_seconds": 4.031427,
+              "transaction_p50_seconds": 0.1622,
+              "transaction_p95_seconds": 0.189919,
+              "transaction_max_seconds": 0.192999,
+              "writer_lock_duty": 0.080468,
+              "inter_write_idle_seconds": 1.575407,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "parse": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.12,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 2.343,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 4,
+              "wait_seconds": 5e-05,
+              "write_seconds": 0.60061,
+              "observation_seconds": 6.430868,
+              "transaction_p50_seconds": 0.143477,
+              "transaction_p95_seconds": 0.187382,
+              "transaction_max_seconds": 0.192999,
+              "writer_lock_duty": 0.093395,
+              "inter_write_idle_seconds": 3.698051,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "semantic": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 434.81,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 436.038,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 46,
+              "wait_seconds": 0.000513,
+              "write_seconds": 7.309748,
+              "observation_seconds": 442.522987,
+              "transaction_p50_seconds": 0.148511,
+              "transaction_p95_seconds": 0.237498,
+              "transaction_max_seconds": 0.307336,
+              "writer_lock_duty": 0.016518,
+              "inter_write_idle_seconds": 432.835487,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "verify": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 2.003,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 3.48,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 48,
+              "wait_seconds": 0.000537,
+              "write_seconds": 7.643612,
+              "observation_seconds": 446.081901,
+              "transaction_p50_seconds": 0.151254,
+              "transaction_p95_seconds": 0.237384,
+              "transaction_max_seconds": 0.307336,
+              "writer_lock_duty": 0.017135,
+              "inter_write_idle_seconds": 436.194934,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "publish": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.296,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 2.337,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 50,
+              "wait_seconds": 0.000555,
+              "write_seconds": 7.919048,
+              "observation_seconds": 448.471891,
+              "transaction_p50_seconds": 0.151254,
+              "transaction_p95_seconds": 0.237269,
+              "transaction_max_seconds": 0.307336,
+              "writer_lock_duty": 0.017658,
+              "inter_write_idle_seconds": 438.378125,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          }
+        }
+      }
+    },
+    "queue": {
+      "as_of": "2026-11-12T00:00:55.917931+08:00",
+      "total": 1,
+      "running": 0,
+      "claimable": 0,
+      "terminal": 0,
+      "completed": 1,
+      "machine_rework": 0,
+      "finalized": 1,
+      "groups": [
+        {
+          "stage": "publish",
+          "status": "completed",
+          "row_count": 1,
+          "oldest_created_at": "2026-11-11T23:53:27.906159+08:00",
+          "oldest_age_seconds": 448.438535
+        }
+      ]
+    },
+    "production_authorization": "not_authorized",
+    "storage_namespace": "company_profile_common_core.v1",
+    "writer": "company_profile_research_writer.v1",
+    "knowledge_cutoff": "2026-11-11",
+    "enqueue": {
+      "eligible": 1,
+      "inserted": 1,
+      "reused": 0,
+      "reset": 0,
+      "checkpoint_rotated": 0,
+      "checkpoint_deleted": 0,
+      "checkpoint_delete_failures": [],
+      "superseded": 0,
+      "identity_superseded": 0,
+      "work_ids": [
+        "bp-work-bc46bdbf5377ae586d14be56"
+      ]
+    },
+    "drain": {
+      "acquire": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.668,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 2.953,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 2,
+          "wait_seconds": 2.2e-05,
+          "write_seconds": 0.3244,
+          "observation_seconds": 4.031427,
+          "transaction_p50_seconds": 0.1622,
+          "transaction_p95_seconds": 0.189919,
+          "transaction_max_seconds": 0.192999,
+          "writer_lock_duty": 0.080468,
+          "inter_write_idle_seconds": 1.575407,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "parse": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.12,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 2.343,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 4,
+          "wait_seconds": 5e-05,
+          "write_seconds": 0.60061,
+          "observation_seconds": 6.430868,
+          "transaction_p50_seconds": 0.143477,
+          "transaction_p95_seconds": 0.187382,
+          "transaction_max_seconds": 0.192999,
+          "writer_lock_duty": 0.093395,
+          "inter_write_idle_seconds": 3.698051,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "semantic": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 434.81,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 436.038,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 46,
+          "wait_seconds": 0.000513,
+          "write_seconds": 7.309748,
+          "observation_seconds": 442.522987,
+          "transaction_p50_seconds": 0.148511,
+          "transaction_p95_seconds": 0.237498,
+          "transaction_max_seconds": 0.307336,
+          "writer_lock_duty": 0.016518,
+          "inter_write_idle_seconds": 432.835487,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "verify": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 2.003,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 3.48,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 48,
+          "wait_seconds": 0.000537,
+          "write_seconds": 7.643612,
+          "observation_seconds": 446.081901,
+          "transaction_p50_seconds": 0.151254,
+          "transaction_p95_seconds": 0.237384,
+          "transaction_max_seconds": 0.307336,
+          "writer_lock_duty": 0.017135,
+          "inter_write_idle_seconds": 436.194934,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "publish": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.296,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 2.337,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 50,
+          "wait_seconds": 0.000555,
+          "write_seconds": 7.919048,
+          "observation_seconds": 448.471891,
+          "transaction_p50_seconds": 0.151254,
+          "transaction_p95_seconds": 0.237269,
+          "transaction_max_seconds": 0.307336,
+          "writer_lock_duty": 0.017658,
+          "inter_write_idle_seconds": 438.378125,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      }
+    }
+  },
+  "identity": {
+    "semantic_policy": "company_profile_llm_led.v2",
+    "reading_strategy": "chapter_workpaper_v1",
+    "prompt_version": "company_profile_workpaper.2026-11-11.v1",
+    "preprocessing_version": "toc_sections_native_layout.v1",
+    "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+    "execution_mode": "provider",
+    "semantic_reuse": false,
+    "max_section_characters": 160000,
+    "max_layout_characters": 500000,
+    "workpaper_max_output_tokens": 12000,
+    "logical_request_timeout_seconds": 620
+  },
+  "source": {
+    "instrument_id": "600000.SH",
+    "report_id": "ann_40e282b55b9f660348911fb6a3531126",
+    "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-30T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "physical_pages": 454,
+  "ledger": {
+    "physical_requests": 4,
+    "charged_tokens": 804552,
+    "charged_cost_cny": "unknown",
+    "cost_status": "unknown",
+    "billing_mode": "development_unpriced",
+    "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+    "stopped_reason": null,
+    "denied_request": null,
+    "attempts": [
+      {
+        "sequence": 1,
+        "request_id": "c205514f1e9a4d10ae119879d32078da",
+        "logical_request_id": "159c71d4992c3acff5843ecc556fbc231dd5fe7d4dcfb67865fcdf87d7be8ce6",
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "attempt": 1,
+        "profile": "semantic_extraction__scorpio_gemini",
+        "provider_resource": "scorpio:gemini",
+        "model": "gemini-3.8-flash-high",
+        "reserved_input_tokens": 15568,
+        "reserved_output_tokens": 2500,
+        "charged_tokens": 8572,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 6124,
+          "output_tokens": 2448,
+          "total_tokens": 8572
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 18,
+          "content_fragments": 10,
+          "content_chars": 391,
+          "content_sha256": "14b89bf5c24cbe2b48a44735a2b296d1ac11982f818d0bff519682270ffc0e0a",
+          "reasoning_present": true,
+          "reasoning_chars": 2518,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      },
+      {
+        "sequence": 2,
+        "request_id": "34c442cedadf477db9b760829d3dc952",
+        "logical_request_id": "a4720cce7ad4345a9ba2f076d834d5ba42324e430d536468ca3d22e717dfd1bc",
+        "source_label": "zai:glm-5.3-flash",
+        "attempt": 1,
+        "profile": "semantic_extraction__zai",
+        "provider_resource": "zai",
+        "model": "glm-5.3-flash",
+        "reserved_input_tokens": 347931,
+        "reserved_output_tokens": 12000,
+        "charged_tokens": 359931,
+        "charged_cost_cny": "unknown",
+        "usage": null,
+        "status": "failed_or_cancelled",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "usage_status": "unknown_reserved",
+        "error_code": "transient_transport_error"
+      },
+      {
+        "sequence": 3,
+        "request_id": "c6ce024e1008485398e940651a24dc7e",
+        "logical_request_id": "a4720cce7ad4345a9ba2f076d834d5ba42324e430d536468ca3d22e717dfd1bc",
+        "source_label": "scorpio:grok-4.7",
+        "attempt": 1,
+        "profile": "semantic_extraction__scorpio_grok",
+        "provider_resource": "scorpio:grok",
+        "model": "grok-4.7",
+        "reserved_input_tokens": 347926,
+        "reserved_output_tokens": 12000,
+        "charged_tokens": 359926,
+        "charged_cost_cny": "unknown",
+        "usage": null,
+        "status": "failed_or_cancelled",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "usage_status": "unknown_reserved",
+        "error_code": "transient_transport_error"
+      },
+      {
+        "sequence": 4,
+        "request_id": "52b3c11502184e42a583d1ef8765ff88",
+        "logical_request_id": "a4720cce7ad4345a9ba2f076d834d5ba42324e430d536468ca3d22e717dfd1bc",
+        "source_label": "scorpio:deepseek-flash",
+        "attempt": 1,
+        "profile": "semantic_extraction__scorpio_deepseek",
+        "provider_resource": "scorpio:deepseek",
+        "model": "deepseek-v4-flash",
+        "reserved_input_tokens": 347935,
+        "reserved_output_tokens": 12000,
+        "charged_tokens": 76123,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 59131,
+          "output_tokens": 16992,
+          "total_tokens": 76123
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 8821,
+          "content_fragments": 5649,
+          "content_chars": 14117,
+          "content_sha256": "35efdc919f0e2dc108eaa1721e15233fdfb255b384e7ae5aed89e947f6acdbf3",
+          "reasoning_present": true,
+          "reasoning_chars": 33335,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      }
+    ]
+  },
+  "three_reads_equal": true,
+  "provider_receipts": [
+    {
+      "request_id": "bp-work-bc46bdbf5377ae586d14be56:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "38e7feeb8669f2d43cf722edf4f6330132adec69cb7ee743e9708236454c1320",
+      "response_hash": "14b89bf5c24cbe2b48a44735a2b296d1ac11982f818d0bff519682270ffc0e0a",
+      "finish_reason": "stop",
+      "source_label": "scorpio:gemini-3.8-flash-high",
+      "model": "gemini-3.8-flash-high",
+      "raw_content": "{\"deferred\":[\"第四节 公司治理、环境和社会（section-0067）\",\"第六节 股份变动及股东情况（section-0085）\",\"第八节 财务报告及审计报告附注（section-0090及其子项）\"],\"rationale\":\"选取第二节（公司简介和主要财务指标）与第三节（管理层讨论与分析）可全面覆盖浦发银行的整体财务表现、主要业务结构（公司金融、零售金融、金融市场业务等）、客户与渠道建设、资产负债规模与变动动因、资产质量及风险管理状况，信息密度高且完整系统。\",\"selected_section_ids\":[\"section-0026\",\"section-0040\"],\"stop_reason\":\"已选章节已完整涵盖核心财务指标、业务板块经营分析与战略驱动因素，满足对银行商业模式和经营状况的全面分析需求，无需进一步引入庞大或碎片化的财务报表附注。\"}",
+      "response_payload": {
+        "deferred": [
+          "第四节 公司治理、环境和社会（section-0067）",
+          "第六节 股份变动及股东情况（section-0085）",
+          "第八节 财务报告及审计报告附注（section-0090及其子项）"
+        ],
+        "rationale": "选取第二节（公司简介和主要财务指标）与第三节（管理层讨论与分析）可全面覆盖浦发银行的整体财务表现、主要业务结构（公司金融、零售金融、金融市场业务等）、客户与渠道建设、资产负债规模与变动动因、资产质量及风险管理状况，信息密度高且完整系统。",
+        "selected_section_ids": [
+          "section-0026",
+          "section-0040"
+        ],
+        "stop_reason": "已选章节已完整涵盖核心财务指标、业务板块经营分析与战略驱动因素，满足对银行商业模式和经营状况的全面分析需求，无需进一步引入庞大或碎片化的财务报表附注。"
+      },
+      "usage": {
+        "input_tokens": 6124,
+        "output_tokens": 2448,
+        "total_tokens": 8572
+      }
+    },
+    {
+      "request_id": "bp-work-bc46bdbf5377ae586d14be56:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "28c26670da3ea21b3b9e1a8cd050f6c4154b9ca0de8a2857b7553b877c81d44e",
+      "response_hash": "35efdc919f0e2dc108eaa1721e15233fdfb255b384e7ae5aed89e947f6acdbf3",
+      "finish_reason": "stop",
+      "source_label": "scorpio:deepseek-flash",
+      "model": "deepseek-v4.1-flash",
+      "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"BS-01\",\"text\":\"浦发银行中文全称为上海浦东发展银行股份有限公司，注册地址为中国·上海市中山东一路12号，经营范围包括银行业务、证券投资基金托管、公募证券投资基金销售及经批准的其它业务。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"BS-02\",\"text\":\"本集团主要业务条线包括公司金融、零售金融、金融市场与金融机构业务、跨境及境外机构业务；集团子公司涵盖上海信托、浦银金租、浦银理财、浦银国际、浦银安盛、上海科创银行及浦发村镇银行等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0041\",\"source-0044\",\"source-0047\",\"source-0048\",\"source-0070\",\"source-0071\"]},{\"fact_id\":\"BS-03\",\"text\":\"公司金融业务涵盖商业信贷、交易银行、投资银行、电子银行、跨境业务、离岸业务等领域，并推进“四层四类”公司客户经营体系建设。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0041\"]},{\"fact_id\":\"BS-04\",\"text\":\"零售金融业务包括零售客户经营、零售贷款、财富管理、传承保障、借记卡、信用卡及养老金融等。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0044\",\"source-0046\",\"source-0047\"]},{\"fact_id\":\"BS-05\",\"text\":\"金融市场与金融机构业务以“自营投资交易+浦银避险代客”双核驱动，并开展资产托管业务；跨境及境外机构业务依托离岸银行、自贸金融、境外分行和海外投行等平台。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0047\",\"source-0048\"]}],\"limitations\":[\"仅按选段披露的业务条线和子公司归纳，未读取公司治理及附注明细。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"PS-01\",\"text\":\"科技金融方面，公司形成浦科“5+7+X”产品体系，五大拳头产品包括浦创贷、浦投贷、浦新贷、浦研贷、浦科并购贷，服务科技企业初创、成长、成熟期及中试验证、A轮融资、数字化转型、并购重组、跨境出海等场景。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"]},{\"fact_id\":\"PS-02\",\"text\":\"供应链金融方面，公司以“浦链通”“浦证通”“浦贴通”“浦订通”等在线产品服务产业链上下游，聚焦电力能源、石油石化、铁路运输、通信、物流等重点产业，并开展“一链一策”服务。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"]},{\"fact_id\":\"PS-03\",\"text\":\"普惠金融方面，“浦惠贷”产品体系以惠闪贷、惠抵贷、惠链贷等为核心，分别覆盖短期流动资金、大额抵押融资、产业链协同融资等小微企业融资需求。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\",\"source-0023\"]},{\"fact_id\":\"PS-04\",\"text\":\"跨境金融方面，公司提供“跨境极速汇”“跨境极速证”“极速押汇”“跨境商e汇”“北斗司库畅享版”及自贸FT账户等服务，用于企业跨境结算、融资、资金管理和汇率避险等场景。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"]},{\"fact_id\":\"PS-05\",\"text\":\"财资金融方面，公司提供个人AUM管理、财富管理产品、私人银行、家族传承及“财资α”资产配置服务，并依托浦银理财、上海信托、浦银安盛、浦银国际等子公司提供资管产品。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\",\"source-0019\"]},{\"fact_id\":\"PS-06\",\"text\":\"零售信贷方面，公司提供个人住房贷款、浦闪贷、浦发i车贷及信用卡分期等产品；浦闪贷为额度循环个人信用消费贷款，i车贷与新能源厂商系统对接并提供全在线汽车金融服务。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0045\",\"source-0046\"]},{\"fact_id\":\"PS-07\",\"text\":\"金融市场业务方面，公司开展自营投资交易、浦银避险代客交易和资产托管服务，覆盖本外币债券、外汇、贵金属及大宗商品等品种。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0047\",\"source-0048\"]}],\"limitations\":[\"产品名称和用途按原文归纳；未披露的具体产品规模或收益未作推断。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"RM-01\",\"text\":\"本集团营业收入主要来自利息净收入，同时包括手续费及佣金净收入和其他非利息收入；2025年实现营业收入1,739.64亿元，同比增加32.16亿元、增长1.88%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0050\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"1,739.64\",\"value\":\"1739.64\",\"unit\":\"亿元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"currency\":\"人民币\",\"comparison_basis\":\"同比增加32.16亿元，增长1.88%\"}]},{\"fact_id\":\"RM-02\",\"text\":\"2025年本集团利息净收入1,204.83亿元，同比增加57.66亿元、增长5.03%；净利息收益率1.42%，较上年同期持平。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0051\"],\"metrics\":[{\"name\":\"利息净收入\",\"raw_value\":\"1,204.83\",\"value\":\"1204.83\",\"unit\":\"亿元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"currency\":\"人民币\",\"comparison_basis\":\"同比增加57.66亿元，增长5.03%\"},{\"name\":\"净利息收益率\",\"raw_value\":\"1.42\",\"value\":\"1.42\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"currency\":null,\"comparison_basis\":\"较上年同期持平\"}]},{\"fact_id\":\"RM-03\",\"text\":\"2025年本集团非利息净收入534.81亿元，其中手续费及佣金净收入227.25亿元，其他非利息收益307.56亿元；手续费及佣金净收入同比下降0.40%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0053\"],\"metrics\":[{\"name\":\"非利息净收入\",\"raw_value\":\"534.81\",\"value\":\"534.81\",\"unit\":\"亿元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"currency\":\"人民币\",\"comparison_basis\":\"同比减少25.50亿元，下降4.55%\"},{\"name\":\"手续费及佣金净收入\",\"raw_value\":\"227.25\",\"value\":\"227.25\",\"unit\":\"亿元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"currency\":\"人民币\",\"comparison_basis\":\"同比减少0.91亿元，下降0.40%\"},{\"name\":\"其他非利息收益\",\"raw_value\":\"307.56\",\"value\":\"307.56\",\"unit\":\"亿元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"currency\":\"人民币\",\"comparison_basis\":\"同比减少24.59亿元，下降7.40%\"}]},{\"fact_id\":\"RM-04\",\"text\":\"盈利机制为以客户存款等计息负债吸收资金，运用于贷款、投资及同业业务，赚取净利息收入；同时通过银行卡、托管、投行、代理、结算清算和信用承诺等收取手续费及佣金，并通过投资损益、公允价值变动等形成其他非利息收入。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0052\",\"source-0054\"]}],\"limitations\":[\"收入结构按管理层讨论口径列示，未读取财务报表附注进行口径调节。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"SM-01\",\"text\":\"报告期末，本集团资产总额100,817.46亿元，较上年末增加6,198.66亿元、增长6.55%；贷款总额57,039.73亿元，较上年末增加3,124.43亿元、增长5.80%；负债总额92,573.16亿元，增长6.20%；存款总额55,824.35亿元，增长8.48%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"资产总额\",\"raw_value\":\"100,817.46\",\"value\":\"100817.46\",\"unit\":\"亿元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"currency\":\"人民币\",\"comparison_basis\":\"较上年末增加6,198.66亿元，增长6.55%\"},{\"name\":\"贷款总额\",\"raw_value\":\"57,039.73\",\"value\":\"57039.73\",\"unit\":\"亿元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"currency\":\"人民币\",\"comparison_basis\":\"较上年末增加3,124.43亿元，增长5.80%\"},{\"name\":\"负债总额\",\"raw_value\":\"92,573.16\",\"value\":\"92573.16\",\"unit\":\"亿元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"currency\":\"人民币\",\"comparison_basis\":\"较上年末增加5,402.17亿元，增长6.20%\"},{\"name\":\"存款总额\",\"raw_value\":\"55,824.35\",\"value\":\"55824.35\",\"unit\":\"亿元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"currency\":\"人民币\",\"comparison_basis\":\"较上年末增加4,364.76亿元，增长8.48%\"}]},{\"fact_id\":\"SM-02\",\"text\":\"2025年本集团实现利润总额533.74亿元，同比增加50.08亿元、增长10.35%；归属于母公司股东的净利润500.17亿元，同比增加47.60亿元、增长10.52%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"利润总额\",\"raw_value\":\"533.74\",\"value\":\"533.74\",\"unit\":\"亿元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"currency\":\"人民币\",\"comparison_basis\":\"同比增加50.08亿元，增长10.35%\"},{\"name\":\"归属于母公司股东的净利润\",\"raw_value\":\"500.17\",\"value\":\"500.17\",\"unit\":\"亿元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"currency\":\"人民币\",\"comparison_basis\":\"同比增加47.60亿元，增长10.52%\"}]},{\"fact_id\":\"SM-03\",\"text\":\"业务规模上，母公司对公存款余额38,103.74亿元、对公贷款（含票据贴现）总额36,654.74亿元；母公司零售贷款（不含个人经营贷款）余额15,137.37亿元；信用卡及透支余额3,893.27亿元。\",\"subject_scope\":\"issuer\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0041\",\"source-0042\",\"source-0045\",\"source-0047\"]},{\"fact_id\":\"SM-04\",\"text\":\"区域分布上，长三角区域贷款总额2.00万亿元、存款总额2.47万亿元；京津冀区域对公贷款余额突破3,500亿元；粤港澳大湾区对公贷款余额突破5,300亿元；上海地区本外币存款15,267亿元、贷款7,620亿元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0027\",\"source-0028\",\"source-0035\"]}],\"limitations\":[\"规模与结构数据按原文披露口径列示，未对表格与附注差异进行调节。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"OI-01\",\"text\":\"公司以“数智化”战略为统领，构建“1-5-5-5-4-3-N”战略实施路径，推进“五大赛道”和超级平台、超级产品、超级系统“三超”建设。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\",\"source-0019\"]},{\"fact_id\":\"OI-02\",\"text\":\"报告期内，公司加大科技资源投入，集团信息科技投入76.12亿元，较上年增加4.43亿元、增长6.18%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0055\"],\"metrics\":[{\"name\":\"信息科技投入\",\"raw_value\":\"76.12\",\"value\":\"76.12\",\"unit\":\"亿元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"currency\":\"人民币\",\"comparison_basis\":\"较上年增加4.43亿元，增长6.18%\"}]},{\"fact_id\":\"OI-03\",\"text\":\"公司建设“浦惠来了”和手机银行两大超级平台，并推进企业级架构、智能工厂、远程银行、企业微信等线上线下协同运营；手机银行业务笔数占全渠道93.67%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0020\",\"source-0029\"]},{\"fact_id\":\"OI-04\",\"text\":\"公司在全国建设510家科技（特色）支行、累计挂牌201家普惠金融特色支行及旗舰支行，并在37家分行落地小微及个贷中心，近50%普惠业务流程纳入中心标准化作业。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\",\"source-0016\",\"source-0045\"]},{\"fact_id\":\"OI-05\",\"text\":\"公司使用多云与多技术栈并行策略，沉淀66个企业级公共技术能力组件；报告期末累计递交专利申请1,218件、累计获得专利授权367件。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0030\"]},{\"fact_id\":\"OI-06\",\"text\":\"风险管理方面，公司建立“大卫星+小雷达”企业级风险监测体系及天眼风险监测预警系统，运用卫星、人工智能等技术对主要风险领域业务场景开展监测。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0026\",\"source-0038\"]},{\"fact_id\":\"OI-07\",\"text\":\"报告期内，本集团业务及管理费495.82亿元，同比减少2.13亿元、下降0.43%；成本收入比28.50%，较上年下降0.66个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0054\",\"source-0011\"]}],\"limitations\":[\"运营投入和渠道数据按选段披露列示，未覆盖未选章节的详细资源明细。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"CC-01\",\"text\":\"公司金融客户数252.29万户，较上年末增加15.44万户、增长6.52%；报告期内实现对公业务营业净收入685.79亿元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0041\"]},{\"fact_id\":\"CC-02\",\"text\":\"零售客户方面，个人客户（含信用卡）1.71亿户，较上年末增加1,396.59万户；月日均金融资产5万元以上客户469.26万户；月日均金融资产600万元以上私人银行客户5.55万户；管理个人AUM余额（含市值）46,645.33亿元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0044\",\"source-0045\"]},{\"fact_id\":\"CC-03\",\"text\":\"科技金融服务科技企业超25.6万户；供应链金融累计服务供应链上下游客户37,408户，较上年末增加18,492户、增长97.76%；普惠两增客户数50.98万户，较上年末增加9.94万户、增长24.22%；跨境客户数近4.9万户，增长24%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\",\"source-0014\",\"source-0015\",\"source-0016\"]},{\"fact_id\":\"CC-04\",\"text\":\"渠道方面，个人手机银行签约客户数突破9,300万，MAU突破3,400万、同比增长6.11%；“浦惠来了”平台注册用户突破260万户；企业微信服务长尾客群近60万人。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0020\",\"source-0021\",\"source-0030\"]},{\"fact_id\":\"CC-05\",\"text\":\"区域市场上，公司在长三角区域贷款总额2.00万亿元、存款总额2.47万亿元，存贷款规模保持股份制银行领先；京津冀区域对公贷款余额突破3,500亿元，粤港澳大湾区对公贷款余额突破5,300亿元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0027\",\"source-0028\"]},{\"fact_id\":\"CC-06\",\"text\":\"境外机构方面，香港、新加坡、伦敦三线联动，形成沪港、沪新、沪伦三大境外重点区域服务圈；报告期末境外分行总资产增长21.70%，营收同比增长23.98%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"]}],\"limitations\":[\"客户数、渠道和区域数据按原文披露口径列示；未披露的客户名称和单一客户细节未推断。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"OD-01\",\"text\":\"报告期内，公司营业收入同比增长1.88%，利润总额同比增长10.35%，归属于母公司股东的净利润同比增长10.52%；净息差1.42%较上年持平，ROA 0.52%、ROE 6.76%，成本收入比28.50%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"]},{\"fact_id\":\"OD-02\",\"text\":\"资产投放上，“五大赛道”业务成为公司贷款主要增长极；制造业中长期贷款总额3,599.26亿元，较上年末增加410.14亿元、增长12.86%，高于整体贷款增速7个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"制造业中长期贷款总额\",\"raw_value\":\"3,599.26\",\"value\":\"3599.26\",\"unit\":\"亿元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"currency\":\"人民币\",\"comparison_basis\":\"较上年末增加410.14亿元，增长12.86%\"}]},{\"fact_id\":\"OD-03\",\"text\":\"负债端，公司拓展高价值、低成本负债，负债付息率较上年下降46bps，本外币存款付息率较上年下降38bps；存款在计息负债日均占比较上年提升近3个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"]},{\"fact_id\":\"OD-04\",\"text\":\"资产质量方面，不良贷款余额719.90亿元，较上年末减少11.64亿元；不良贷款率1.26%，较上年末下降0.10个百分点；拨备覆盖率200.72%，较上年末上升13.76个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"不良贷款余额\",\"raw_value\":\"719.90\",\"value\":\"719.90\",\"unit\":\"亿元\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"currency\":\"人民币\",\"comparison_basis\":\"较上年末减少11.64亿元\"},{\"name\":\"不良贷款率\",\"raw_value\":\"1.26\",\"value\":\"1.26\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"currency\":null,\"comparison_basis\":\"较上年末下降0.10个百分点\"},{\"name\":\"拨备覆盖率\",\"raw_value\":\"200.72\",\"value\":\"200.72\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"currency\":null,\"comparison_basis\":\"较上年末上升13.76个百分点\"}]},{\"fact_id\":\"OD-05\",\"text\":\"资本方面，公司完成498.37亿元可转债转股，并发行500亿元无固定期限资本债券和200亿元二级资本债券；报告期末资本充足率12.47%、一级资本充足率9.99%、核心一级资本充足率8.99%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"资本充足率\",\"raw_value\":\"12.47\",\"value\":\"12.47\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"currency\":null},{\"name\":\"一级资本充足率\",\"raw_value\":\"9.99\",\"value\":\"9.99\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"currency\":null},{\"name\":\"核心一级资本充足率\",\"raw_value\":\"8.99\",\"value\":\"8.99\",\"unit\":\"%\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"currency\":null}]},{\"fact_id\":\"OD-06\",\"text\":\"公司净利息收入增长5.03%，非利息净收入下降4.55%；手续费及佣金净收入下降0.40%，其他非利息收益下降7.40%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0051\",\"source-0053\"]}],\"limitations\":[\"驱动因素按报告期披露归纳，不将2026年规划或行业统计视为2025年已实现结果。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"MC-01\",\"text\":\"报告期末，本集团资产总额突破10万亿元至100,817.46亿元，较上年末增加6,198.66亿元、增长6.55%；贷款总额57,039.73亿元，增长5.80%；存款总额55,824.35亿元，增长8.48%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0011\"]},{\"fact_id\":\"MC-02\",\"text\":\"报告期内，公司完成498.37亿元可转债转股，创A股历史单笔最大规模转股纪录；报告期末普通股总股本增至33,305,838,300股，资本公积因可转换公司债券转股增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\",\"source-0008\",\"source-0059\"]},{\"fact_id\":\"MC-03\",\"text\":\"报告期内，公司不良贷款余额和不良贷款率较上年实现“双降”，不良贷款额719.90亿元、不良率1.26%；拨备覆盖率200.72%，较上年末上升13.76个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0011\"]},{\"fact_id\":\"MC-04\",\"text\":\"业务结构变化方面，“五大赛道”业务成为公司贷款主要增长极；制造业中长期贷款总额3,599.26亿元，较上年末增长12.86%；负债付息率较上年下降46bps。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"]},{\"fact_id\":\"MC-05\",\"text\":\"报告期内，公司将12家浦发村镇银行收购改制为浦发银行分支机构，其余16家村镇银行改革继续推进；报告期末其余村镇银行资产总额248.19亿元、存款余额209.49亿元、贷款余额135.51亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0071\"]},{\"fact_id\":\"MC-06\",\"text\":\"公司发行500亿元无固定期限资本债券和200亿元二级资本债券，资本充足率12.47%、一级资本充足率9.99%、核心一级资本充足率8.99%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0012\"]}],\"limitations\":[\"变动原因按选段披露归纳，未读取财务报表附注进行进一步验证。\"]}},\"limitations\":[\"仅依据提供的第二节和第三节选段，未读取公司治理、股东、财务报表附注等章节；相关细节未在本工作底稿中展开。\",\"未对原文数据执行独立审计或勾稽核验，表格口径以原文披露为准。\",\"部分业务数据为管理层讨论口径，可能与财务报表附注口径存在差异；未读取附注，未作差异调节。\",\"未对未披露的客户名称、供应商名称、区域拆分或产品收益进行推断；原文未披露的即不列示。\",\"对2026年及以后的规划仅作为原文计划信息，不视为2025年已实现结果。\"]}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "BS-01",
+                "text": "浦发银行中文全称为上海浦东发展银行股份有限公司，注册地址为中国·上海市中山东一路12号，经营范围包括银行业务、证券投资基金托管、公募证券投资基金销售及经批准的其它业务。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "BS-02",
+                "text": "本集团主要业务条线包括公司金融、零售金融、金融市场与金融机构业务、跨境及境外机构业务；集团子公司涵盖上海信托、浦银金租、浦银理财、浦银国际、浦银安盛、上海科创银行及浦发村镇银行等。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0041",
+                  "source-0044",
+                  "source-0047",
+                  "source-0048",
+                  "source-0070",
+                  "source-0071"
+                ]
+              },
+              {
+                "fact_id": "BS-03",
+                "text": "公司金融业务涵盖商业信贷、交易银行、投资银行、电子银行、跨境业务、离岸业务等领域，并推进“四层四类”公司客户经营体系建设。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0041"
+                ]
+              },
+              {
+                "fact_id": "BS-04",
+                "text": "零售金融业务包括零售客户经营、零售贷款、财富管理、传承保障、借记卡、信用卡及养老金融等。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0044",
+                  "source-0046",
+                  "source-0047"
+                ]
+              },
+              {
+                "fact_id": "BS-05",
+                "text": "金融市场与金融机构业务以“自营投资交易+浦银避险代客”双核驱动，并开展资产托管业务；跨境及境外机构业务依托离岸银行、自贸金融、境外分行和海外投行等平台。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0047",
+                  "source-0048"
+                ]
+              }
+            ],
+            "limitations": [
+              "仅按选段披露的业务条线和子公司归纳，未读取公司治理及附注明细。"
+            ]
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "PS-01",
+                "text": "科技金融方面，公司形成浦科“5+7+X”产品体系，五大拳头产品包括浦创贷、浦投贷、浦新贷、浦研贷、浦科并购贷，服务科技企业初创、成长、成熟期及中试验证、A轮融资、数字化转型、并购重组、跨境出海等场景。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0013"
+                ]
+              },
+              {
+                "fact_id": "PS-02",
+                "text": "供应链金融方面，公司以“浦链通”“浦证通”“浦贴通”“浦订通”等在线产品服务产业链上下游，聚焦电力能源、石油石化、铁路运输、通信、物流等重点产业，并开展“一链一策”服务。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0014"
+                ]
+              },
+              {
+                "fact_id": "PS-03",
+                "text": "普惠金融方面，“浦惠贷”产品体系以惠闪贷、惠抵贷、惠链贷等为核心，分别覆盖短期流动资金、大额抵押融资、产业链协同融资等小微企业融资需求。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0015",
+                  "source-0023"
+                ]
+              },
+              {
+                "fact_id": "PS-04",
+                "text": "跨境金融方面，公司提供“跨境极速汇”“跨境极速证”“极速押汇”“跨境商e汇”“北斗司库畅享版”及自贸FT账户等服务，用于企业跨境结算、融资、资金管理和汇率避险等场景。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0017"
+                ]
+              },
+              {
+                "fact_id": "PS-05",
+                "text": "财资金融方面，公司提供个人AUM管理、财富管理产品、私人银行、家族传承及“财资α”资产配置服务，并依托浦银理财、上海信托、浦银安盛、浦银国际等子公司提供资管产品。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0018",
+                  "source-0019"
+                ]
+              },
+              {
+                "fact_id": "PS-06",
+                "text": "零售信贷方面，公司提供个人住房贷款、浦闪贷、浦发i车贷及信用卡分期等产品；浦闪贷为额度循环个人信用消费贷款，i车贷与新能源厂商系统对接并提供全在线汽车金融服务。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0045",
+                  "source-0046"
+                ]
+              },
+              {
+                "fact_id": "PS-07",
+                "text": "金融市场业务方面，公司开展自营投资交易、浦银避险代客交易和资产托管服务，覆盖本外币债券、外汇、贵金属及大宗商品等品种。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0047",
+                  "source-0048"
+                ]
+              }
+            ],
+            "limitations": [
+              "产品名称和用途按原文归纳；未披露的具体产品规模或收益未作推断。"
+            ]
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "RM-01",
+                "text": "本集团营业收入主要来自利息净收入，同时包括手续费及佣金净收入和其他非利息收入；2025年实现营业收入1,739.64亿元，同比增加32.16亿元、增长1.88%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0050"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入",
+                    "raw_value": "1,739.64",
+                    "value": "1739.64",
+                    "unit": "亿元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "currency": "人民币",
+                    "comparison_basis": "同比增加32.16亿元，增长1.88%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "RM-02",
+                "text": "2025年本集团利息净收入1,204.83亿元，同比增加57.66亿元、增长5.03%；净利息收益率1.42%，较上年同期持平。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0051"
+                ],
+                "metrics": [
+                  {
+                    "name": "利息净收入",
+                    "raw_value": "1,204.83",
+                    "value": "1204.83",
+                    "unit": "亿元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "currency": "人民币",
+                    "comparison_basis": "同比增加57.66亿元，增长5.03%"
+                  },
+                  {
+                    "name": "净利息收益率",
+                    "raw_value": "1.42",
+                    "value": "1.42",
+                    "unit": "%",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "currency": null,
+                    "comparison_basis": "较上年同期持平"
+                  }
+                ]
+              },
+              {
+                "fact_id": "RM-03",
+                "text": "2025年本集团非利息净收入534.81亿元，其中手续费及佣金净收入227.25亿元，其他非利息收益307.56亿元；手续费及佣金净收入同比下降0.40%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0053"
+                ],
+                "metrics": [
+                  {
+                    "name": "非利息净收入",
+                    "raw_value": "534.81",
+                    "value": "534.81",
+                    "unit": "亿元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "currency": "人民币",
+                    "comparison_basis": "同比减少25.50亿元，下降4.55%"
+                  },
+                  {
+                    "name": "手续费及佣金净收入",
+                    "raw_value": "227.25",
+                    "value": "227.25",
+                    "unit": "亿元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "currency": "人民币",
+                    "comparison_basis": "同比减少0.91亿元，下降0.40%"
+                  },
+                  {
+                    "name": "其他非利息收益",
+                    "raw_value": "307.56",
+                    "value": "307.56",
+                    "unit": "亿元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "currency": "人民币",
+                    "comparison_basis": "同比减少24.59亿元，下降7.40%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "RM-04",
+                "text": "盈利机制为以客户存款等计息负债吸收资金，运用于贷款、投资及同业业务，赚取净利息收入；同时通过银行卡、托管、投行、代理、结算清算和信用承诺等收取手续费及佣金，并通过投资损益、公允价值变动等形成其他非利息收入。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0052",
+                  "source-0054"
+                ]
+              }
+            ],
+            "limitations": [
+              "收入结构按管理层讨论口径列示，未读取财务报表附注进行口径调节。"
+            ]
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "SM-01",
+                "text": "报告期末，本集团资产总额100,817.46亿元，较上年末增加6,198.66亿元、增长6.55%；贷款总额57,039.73亿元，较上年末增加3,124.43亿元、增长5.80%；负债总额92,573.16亿元，增长6.20%；存款总额55,824.35亿元，增长8.48%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年末",
+                "evidence_ids": [
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "资产总额",
+                    "raw_value": "100,817.46",
+                    "value": "100817.46",
+                    "unit": "亿元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末",
+                    "currency": "人民币",
+                    "comparison_basis": "较上年末增加6,198.66亿元，增长6.55%"
+                  },
+                  {
+                    "name": "贷款总额",
+                    "raw_value": "57,039.73",
+                    "value": "57039.73",
+                    "unit": "亿元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末",
+                    "currency": "人民币",
+                    "comparison_basis": "较上年末增加3,124.43亿元，增长5.80%"
+                  },
+                  {
+                    "name": "负债总额",
+                    "raw_value": "92,573.16",
+                    "value": "92573.16",
+                    "unit": "亿元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末",
+                    "currency": "人民币",
+                    "comparison_basis": "较上年末增加5,402.17亿元，增长6.20%"
+                  },
+                  {
+                    "name": "存款总额",
+                    "raw_value": "55,824.35",
+                    "value": "55824.35",
+                    "unit": "亿元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末",
+                    "currency": "人民币",
+                    "comparison_basis": "较上年末增加4,364.76亿元，增长8.48%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "SM-02",
+                "text": "2025年本集团实现利润总额533.74亿元，同比增加50.08亿元、增长10.35%；归属于母公司股东的净利润500.17亿元，同比增加47.60亿元、增长10.52%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "利润总额",
+                    "raw_value": "533.74",
+                    "value": "533.74",
+                    "unit": "亿元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "currency": "人民币",
+                    "comparison_basis": "同比增加50.08亿元，增长10.35%"
+                  },
+                  {
+                    "name": "归属于母公司股东的净利润",
+                    "raw_value": "500.17",
+                    "value": "500.17",
+                    "unit": "亿元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "currency": "人民币",
+                    "comparison_basis": "同比增加47.60亿元，增长10.52%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "SM-03",
+                "text": "业务规模上，母公司对公存款余额38,103.74亿元、对公贷款（含票据贴现）总额36,654.74亿元；母公司零售贷款（不含个人经营贷款）余额15,137.37亿元；信用卡及透支余额3,893.27亿元。",
+                "subject_scope": "issuer",
+                "period": "2025年末",
+                "evidence_ids": [
+                  "source-0041",
+                  "source-0042",
+                  "source-0045",
+                  "source-0047"
+                ]
+              },
+              {
+                "fact_id": "SM-04",
+                "text": "区域分布上，长三角区域贷款总额2.00万亿元、存款总额2.47万亿元；京津冀区域对公贷款余额突破3,500亿元；粤港澳大湾区对公贷款余额突破5,300亿元；上海地区本外币存款15,267亿元、贷款7,620亿元。",
+                "subject_scope": "business_segment",
+                "period": "2025年末",
+                "evidence_ids": [
+                  "source-0027",
+                  "source-0028",
+                  "source-0035"
+                ]
+              }
+            ],
+            "limitations": [
+              "规模与结构数据按原文披露口径列示，未对表格与附注差异进行调节。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "OI-01",
+                "text": "公司以“数智化”战略为统领，构建“1-5-5-5-4-3-N”战略实施路径，推进“五大赛道”和超级平台、超级产品、超级系统“三超”建设。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0012",
+                  "source-0019"
+                ]
+              },
+              {
+                "fact_id": "OI-02",
+                "text": "报告期内，公司加大科技资源投入，集团信息科技投入76.12亿元，较上年增加4.43亿元、增长6.18%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0055"
+                ],
+                "metrics": [
+                  {
+                    "name": "信息科技投入",
+                    "raw_value": "76.12",
+                    "value": "76.12",
+                    "unit": "亿元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "currency": "人民币",
+                    "comparison_basis": "较上年增加4.43亿元，增长6.18%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "OI-03",
+                "text": "公司建设“浦惠来了”和手机银行两大超级平台，并推进企业级架构、智能工厂、远程银行、企业微信等线上线下协同运营；手机银行业务笔数占全渠道93.67%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0020",
+                  "source-0029"
+                ]
+              },
+              {
+                "fact_id": "OI-04",
+                "text": "公司在全国建设510家科技（特色）支行、累计挂牌201家普惠金融特色支行及旗舰支行，并在37家分行落地小微及个贷中心，近50%普惠业务流程纳入中心标准化作业。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0013",
+                  "source-0016",
+                  "source-0045"
+                ]
+              },
+              {
+                "fact_id": "OI-05",
+                "text": "公司使用多云与多技术栈并行策略，沉淀66个企业级公共技术能力组件；报告期末累计递交专利申请1,218件、累计获得专利授权367件。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0030"
+                ]
+              },
+              {
+                "fact_id": "OI-06",
+                "text": "风险管理方面，公司建立“大卫星+小雷达”企业级风险监测体系及天眼风险监测预警系统，运用卫星、人工智能等技术对主要风险领域业务场景开展监测。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0026",
+                  "source-0038"
+                ]
+              },
+              {
+                "fact_id": "OI-07",
+                "text": "报告期内，本集团业务及管理费495.82亿元，同比减少2.13亿元、下降0.43%；成本收入比28.50%，较上年下降0.66个百分点。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0054",
+                  "source-0011"
+                ]
+              }
+            ],
+            "limitations": [
+              "运营投入和渠道数据按选段披露列示，未覆盖未选章节的详细资源明细。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "CC-01",
+                "text": "公司金融客户数252.29万户，较上年末增加15.44万户、增长6.52%；报告期内实现对公业务营业净收入685.79亿元。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0041"
+                ]
+              },
+              {
+                "fact_id": "CC-02",
+                "text": "零售客户方面，个人客户（含信用卡）1.71亿户，较上年末增加1,396.59万户；月日均金融资产5万元以上客户469.26万户；月日均金融资产600万元以上私人银行客户5.55万户；管理个人AUM余额（含市值）46,645.33亿元。",
+                "subject_scope": "business_segment",
+                "period": "2025年末",
+                "evidence_ids": [
+                  "source-0044",
+                  "source-0045"
+                ]
+              },
+              {
+                "fact_id": "CC-03",
+                "text": "科技金融服务科技企业超25.6万户；供应链金融累计服务供应链上下游客户37,408户，较上年末增加18,492户、增长97.76%；普惠两增客户数50.98万户，较上年末增加9.94万户、增长24.22%；跨境客户数近4.9万户，增长24%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0013",
+                  "source-0014",
+                  "source-0015",
+                  "source-0016"
+                ]
+              },
+              {
+                "fact_id": "CC-04",
+                "text": "渠道方面，个人手机银行签约客户数突破9,300万，MAU突破3,400万、同比增长6.11%；“浦惠来了”平台注册用户突破260万户；企业微信服务长尾客群近60万人。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年末",
+                "evidence_ids": [
+                  "source-0020",
+                  "source-0021",
+                  "source-0030"
+                ]
+              },
+              {
+                "fact_id": "CC-05",
+                "text": "区域市场上，公司在长三角区域贷款总额2.00万亿元、存款总额2.47万亿元，存贷款规模保持股份制银行领先；京津冀区域对公贷款余额突破3,500亿元，粤港澳大湾区对公贷款余额突破5,300亿元。",
+                "subject_scope": "business_segment",
+                "period": "2025年末",
+                "evidence_ids": [
+                  "source-0027",
+                  "source-0028"
+                ]
+              },
+              {
+                "fact_id": "CC-06",
+                "text": "境外机构方面，香港、新加坡、伦敦三线联动，形成沪港、沪新、沪伦三大境外重点区域服务圈；报告期末境外分行总资产增长21.70%，营收同比增长23.98%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0017"
+                ]
+              }
+            ],
+            "limitations": [
+              "客户数、渠道和区域数据按原文披露口径列示；未披露的客户名称和单一客户细节未推断。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "OD-01",
+                "text": "报告期内，公司营业收入同比增长1.88%，利润总额同比增长10.35%，归属于母公司股东的净利润同比增长10.52%；净息差1.42%较上年持平，ROA 0.52%、ROE 6.76%，成本收入比28.50%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011"
+                ]
+              },
+              {
+                "fact_id": "OD-02",
+                "text": "资产投放上，“五大赛道”业务成为公司贷款主要增长极；制造业中长期贷款总额3,599.26亿元，较上年末增加410.14亿元、增长12.86%，高于整体贷款增速7个百分点。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年末",
+                "evidence_ids": [
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "制造业中长期贷款总额",
+                    "raw_value": "3,599.26",
+                    "value": "3599.26",
+                    "unit": "亿元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末",
+                    "currency": "人民币",
+                    "comparison_basis": "较上年末增加410.14亿元，增长12.86%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "OD-03",
+                "text": "负债端，公司拓展高价值、低成本负债，负债付息率较上年下降46bps，本外币存款付息率较上年下降38bps；存款在计息负债日均占比较上年提升近3个百分点。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011"
+                ]
+              },
+              {
+                "fact_id": "OD-04",
+                "text": "资产质量方面，不良贷款余额719.90亿元，较上年末减少11.64亿元；不良贷款率1.26%，较上年末下降0.10个百分点；拨备覆盖率200.72%，较上年末上升13.76个百分点。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年末",
+                "evidence_ids": [
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "不良贷款余额",
+                    "raw_value": "719.90",
+                    "value": "719.90",
+                    "unit": "亿元",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末",
+                    "currency": "人民币",
+                    "comparison_basis": "较上年末减少11.64亿元"
+                  },
+                  {
+                    "name": "不良贷款率",
+                    "raw_value": "1.26",
+                    "value": "1.26",
+                    "unit": "%",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末",
+                    "currency": null,
+                    "comparison_basis": "较上年末下降0.10个百分点"
+                  },
+                  {
+                    "name": "拨备覆盖率",
+                    "raw_value": "200.72",
+                    "value": "200.72",
+                    "unit": "%",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末",
+                    "currency": null,
+                    "comparison_basis": "较上年末上升13.76个百分点"
+                  }
+                ]
+              },
+              {
+                "fact_id": "OD-05",
+                "text": "资本方面，公司完成498.37亿元可转债转股，并发行500亿元无固定期限资本债券和200亿元二级资本债券；报告期末资本充足率12.47%、一级资本充足率9.99%、核心一级资本充足率8.99%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年末",
+                "evidence_ids": [
+                  "source-0012"
+                ],
+                "metrics": [
+                  {
+                    "name": "资本充足率",
+                    "raw_value": "12.47",
+                    "value": "12.47",
+                    "unit": "%",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末",
+                    "currency": null
+                  },
+                  {
+                    "name": "一级资本充足率",
+                    "raw_value": "9.99",
+                    "value": "9.99",
+                    "unit": "%",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末",
+                    "currency": null
+                  },
+                  {
+                    "name": "核心一级资本充足率",
+                    "raw_value": "8.99",
+                    "value": "8.99",
+                    "unit": "%",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末",
+                    "currency": null
+                  }
+                ]
+              },
+              {
+                "fact_id": "OD-06",
+                "text": "公司净利息收入增长5.03%，非利息净收入下降4.55%；手续费及佣金净收入下降0.40%，其他非利息收益下降7.40%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0051",
+                  "source-0053"
+                ]
+              }
+            ],
+            "limitations": [
+              "驱动因素按报告期披露归纳，不将2026年规划或行业统计视为2025年已实现结果。"
+            ]
+          },
+          "material_changes": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "MC-01",
+                "text": "报告期末，本集团资产总额突破10万亿元至100,817.46亿元，较上年末增加6,198.66亿元、增长6.55%；贷款总额57,039.73亿元，增长5.80%；存款总额55,824.35亿元，增长8.48%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年末",
+                "evidence_ids": [
+                  "source-0011"
+                ]
+              },
+              {
+                "fact_id": "MC-02",
+                "text": "报告期内，公司完成498.37亿元可转债转股，创A股历史单笔最大规模转股纪录；报告期末普通股总股本增至33,305,838,300股，资本公积因可转换公司债券转股增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0012",
+                  "source-0008",
+                  "source-0059"
+                ]
+              },
+              {
+                "fact_id": "MC-03",
+                "text": "报告期内，公司不良贷款余额和不良贷款率较上年实现“双降”，不良贷款额719.90亿元、不良率1.26%；拨备覆盖率200.72%，较上年末上升13.76个百分点。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年末",
+                "evidence_ids": [
+                  "source-0011"
+                ]
+              },
+              {
+                "fact_id": "MC-04",
+                "text": "业务结构变化方面，“五大赛道”业务成为公司贷款主要增长极；制造业中长期贷款总额3,599.26亿元，较上年末增长12.86%；负债付息率较上年下降46bps。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011"
+                ]
+              },
+              {
+                "fact_id": "MC-05",
+                "text": "报告期内，公司将12家浦发村镇银行收购改制为浦发银行分支机构，其余16家村镇银行改革继续推进；报告期末其余村镇银行资产总额248.19亿元、存款余额209.49亿元、贷款余额135.51亿元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0071"
+                ]
+              },
+              {
+                "fact_id": "MC-06",
+                "text": "公司发行500亿元无固定期限资本债券和200亿元二级资本债券，资本充足率12.47%、一级资本充足率9.99%、核心一级资本充足率8.99%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年末",
+                "evidence_ids": [
+                  "source-0012"
+                ]
+              }
+            ],
+            "limitations": [
+              "变动原因按选段披露归纳，未读取财务报表附注进行进一步验证。"
+            ]
+          }
+        },
+        "limitations": [
+          "仅依据提供的第二节和第三节选段，未读取公司治理、股东、财务报表附注等章节；相关细节未在本工作底稿中展开。",
+          "未对原文数据执行独立审计或勾稽核验，表格口径以原文披露为准。",
+          "部分业务数据为管理层讨论口径，可能与财务报表附注口径存在差异；未读取附注，未作差异调节。",
+          "未对未披露的客户名称、供应商名称、区域拆分或产品收益进行推断；原文未披露的即不列示。",
+          "对2026年及以后的规划仅作为原文计划信息，不视为2025年已实现结果。"
+        ]
+      },
+      "usage": {
+        "input_tokens": 59131,
+        "output_tokens": 16992,
+        "total_tokens": 76123
+      }
+    }
+  ],
+  "elapsed_seconds": 480.1304451469332
+}

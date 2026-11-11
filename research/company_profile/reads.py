@@ -37,6 +37,7 @@ from research.company_profile.runtime import (
     COMMON_CORE_WRITER_NAME,
     CompanyProfileRuntimeRecord,
     CompanyProfileRuntimeRecordV2,
+    CompanyProfileRuntimeRecordV3,
     json_compatible,
 )
 from research.company_profile.stage4_restricted_read import (
@@ -53,7 +54,7 @@ COMMODITY_CONSUMER_AUTHORIZATION = {
 }
 _RECORD_ADAPTER = TypeAdapter(SemanticRecord)
 _RUNTIME_ADAPTER = TypeAdapter(
-    CompanyProfileRuntimeRecordV2 | CompanyProfileRuntimeRecord
+    CompanyProfileRuntimeRecordV3 | CompanyProfileRuntimeRecordV2 | CompanyProfileRuntimeRecord
 )
 _SAFE_NAME = re.compile(r"[^A-Za-z0-9._-]+")
 
@@ -279,7 +280,15 @@ class CompanyProfileReadService:
                 knowledge_time=knowledge_time,
             ),
         }
-        if isinstance(record, CompanyProfileRuntimeRecordV2):
+        if isinstance(record, CompanyProfileRuntimeRecordV3):
+            from .workpaper import render_workpaper
+
+            profile["schema_version"] = "company_profile_common_core_profile.v3"
+            profile["workpaper"] = record.workpaper.model_dump(mode="json")
+            profile["workpaper_markdown"] = render_workpaper(record.workpaper)
+            profile["workpaper_status"] = "pending_verification"
+            profile["workpaper_receipts"] = list(record.workpaper_receipts)
+        elif isinstance(record, CompanyProfileRuntimeRecordV2):
             from .report_interpretation import research_views
 
             profile["schema_version"] = "company_profile_common_core_profile.v2"
@@ -644,6 +653,10 @@ def _write_profile_export(
             encoding="utf-8",
         )
         written.append(str(path))
+        if profile.get("workpaper_markdown"):
+            markdown_path = path.with_suffix(".md")
+            markdown_path.write_text(str(profile["workpaper_markdown"]), encoding="utf-8")
+            written.append(str(markdown_path))
     csv_path = target / "profiles.csv"
     _write_profile_csv(csv_path, profiles)
     written.append(str(csv_path))

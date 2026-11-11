@@ -1,0 +1,18 @@
+{
+  "physical_requests": 0,
+  "charged_tokens": 0,
+  "charged_cost_cny": "0",
+  "cost_status": "priced",
+  "billing_mode": "development_unpriced",
+  "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+  "stopped_reason": null,
+  "denied_request": {
+    "request_id": "de4f79b5a725456bb21a5b0760735ede",
+    "payload_utf8_bytes": 203345,
+    "reserved_input_tokens": 203601,
+    "reserved_output_tokens": 2500,
+    "required_tokens": 206101,
+    "reason": "payload_not_admitted"
+  },
+  "attempts": []
+}

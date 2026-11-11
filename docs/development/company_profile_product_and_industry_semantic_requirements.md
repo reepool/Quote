@@ -2,7 +2,7 @@
 
 > 文档类型：requirements（唯一权威产品总需求）
 > 版本：`company_profile_product_contract.2026-11-11.chapter-workpaper.v9`（人工有源底稿先行、目录章节集中阅读、统一JSON抽取与画像呈现；历史成绩与生产权限不变）
-> 状态：目标合同已修订，真实LLM通用链尚待实现与验收；不以本文批准宣称上线。
+> 状态：v9基础底稿路径已由上汽、浦发真实开发观察验证，可交有源JSON和人读版；正式质量、S1及规模验收仍未完成，不据此宣称上线。
 > 生产仍为 `not_authorized`；`scale_quality_claim_allowed=false`。旧成绩、源合同与原制品不追溯修改。
 
 ## 0. 文档权威关系

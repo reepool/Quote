@@ -34,6 +34,7 @@ from research.company_profile.contracts import SemanticProvider
 from research.company_profile.execution import (
     DEFAULT_TOTAL_TOKEN_BUDGET,
     default_processing_identity,
+    processing_identity_from_item,
 )
 from research.company_profile.first_expansion import (
     activate_first_expansion,
@@ -281,6 +282,8 @@ class OfficialAnnualReportPageSource:
             }
             for page in raw_pages
         ]
+        if processing_identity_from_item(item).get("reading_strategy") == "chapter_workpaper_v1":
+            return self._source_result(asset, item, pages)
         # Compact PDF text loses a blank current/prior amount cell. Read layout
         # for affected native project-income and lessor tables; keep cached page
         # artifacts and their original text unchanged.
@@ -448,6 +451,11 @@ class OfficialAnnualReportPageSource:
                     "company-profile project-income layout unavailable: %s", exc
                 )
                 return None
+        return self._source_result(asset, item, pages)
+
+    def _source_result(self, asset, item, pages):
+        from research.company_profile.models import ReportIdentity
+
         if not pages:
             return None
         published_at = str(asset.get("published_at") or item.get("published_at") or "")
@@ -485,6 +493,7 @@ class OfficialAnnualReportPageSource:
                 ),
             ),
             "pages": pages,
+            "source_pdf_path": str(asset.get("archive_path") or ""),
         }
 
 

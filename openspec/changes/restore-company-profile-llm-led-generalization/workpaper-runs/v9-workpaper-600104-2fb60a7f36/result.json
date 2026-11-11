@@ -1,0 +1,1495 @@
+{
+  "run_id": "v9-workpaper-600104-2fb60a7f36",
+  "run": {
+    "action": "run",
+    "state": "incomplete",
+    "task": {
+      "task_name": "company_profile_common_core",
+      "actions": [
+        "preview",
+        "run",
+        "status",
+        "pause",
+        "resume",
+        "query",
+        "export"
+      ],
+      "parameters": {
+        "action": [
+          "preview",
+          "run",
+          "status",
+          "pause",
+          "resume",
+          "query",
+          "export"
+        ],
+        "knowledge_cutoff": null,
+        "instrument_ids": [],
+        "max_items": 2,
+        "token_budget": 50000,
+        "max_elapsed_seconds": 300.0,
+        "reason": "operator_request",
+        "output_directory": null
+      },
+      "storage_namespace": "company_profile_common_core.v1",
+      "writer": "company_profile_research_writer.v1",
+      "production_authorization": "not_authorized",
+      "legacy_task_names_not_connected": [
+        "business_profile_daily_incremental",
+        "business_profile_backfill",
+        "business_profile_backfill_control",
+        "business_profile_semantic_repair",
+        "company_profile_shadow_sync"
+      ],
+      "stage5_connected": true
+    },
+    "control": {
+      "schema_version": "company_profile_task_control.v1",
+      "state": "incomplete",
+      "run_id": "company_profile_common_core-ceacb60acf6d",
+      "action": "run",
+      "started_at": "2026-11-11T23:59:32.862002+08:00",
+      "updated_at": "2026-11-12T00:01:05.107909+08:00",
+      "finished_at": "2026-11-12T00:01:05.107909+08:00",
+      "stop_requested": false,
+      "reason": null,
+      "parameters": {
+        "knowledge_cutoff": "2026-11-11",
+        "instrument_ids": [
+          "600104.SH"
+        ],
+        "max_items": 1,
+        "token_budget": 3000000,
+        "max_elapsed_seconds": 1768.1079972088337
+      },
+      "latest_result": {
+        "action": "run",
+        "state": "incomplete",
+        "task": {
+          "task_name": "company_profile_common_core",
+          "actions": [
+            "preview",
+            "run",
+            "status",
+            "pause",
+            "resume",
+            "query",
+            "export"
+          ],
+          "parameters": {
+            "action": [
+              "preview",
+              "run",
+              "status",
+              "pause",
+              "resume",
+              "query",
+              "export"
+            ],
+            "knowledge_cutoff": null,
+            "instrument_ids": [],
+            "max_items": 2,
+            "token_budget": 50000,
+            "max_elapsed_seconds": 300.0,
+            "reason": "operator_request",
+            "output_directory": null
+          },
+          "storage_namespace": "company_profile_common_core.v1",
+          "writer": "company_profile_research_writer.v1",
+          "production_authorization": "not_authorized",
+          "legacy_task_names_not_connected": [
+            "business_profile_daily_incremental",
+            "business_profile_backfill",
+            "business_profile_backfill_control",
+            "business_profile_semantic_repair",
+            "company_profile_shadow_sync"
+          ],
+          "stage5_connected": true
+        },
+        "control": {
+          "schema_version": "company_profile_task_control.v1",
+          "state": "running",
+          "run_id": "company_profile_common_core-ceacb60acf6d",
+          "action": "run",
+          "started_at": "2026-11-11T23:59:32.862002+08:00",
+          "updated_at": "2026-11-11T23:59:32.862002+08:00",
+          "finished_at": null,
+          "stop_requested": false,
+          "reason": null,
+          "parameters": {
+            "knowledge_cutoff": "2026-11-11",
+            "instrument_ids": [
+              "600104.SH"
+            ],
+            "max_items": 1,
+            "token_budget": 3000000,
+            "max_elapsed_seconds": 1768.1079972088337
+          },
+          "latest_result": null
+        },
+        "queue": {
+          "as_of": "2026-11-12T00:01:03.499254+08:00",
+          "total": 1,
+          "running": 0,
+          "claimable": 1,
+          "terminal": 0,
+          "completed": 0,
+          "machine_rework": 0,
+          "finalized": 0,
+          "groups": [
+            {
+              "stage": "semantic",
+              "status": "retry_due",
+              "row_count": 1,
+              "oldest_created_at": "2026-11-11T23:59:34.121815+08:00",
+              "oldest_age_seconds": 89.804729
+            }
+          ]
+        },
+        "production_authorization": "not_authorized",
+        "storage_namespace": "company_profile_common_core.v1",
+        "writer": "company_profile_research_writer.v1",
+        "knowledge_cutoff": "2026-11-11",
+        "enqueue": {
+          "eligible": 1,
+          "inserted": 1,
+          "reused": 0,
+          "reset": 0,
+          "checkpoint_rotated": 0,
+          "checkpoint_deleted": 0,
+          "checkpoint_delete_failures": [],
+          "superseded": 0,
+          "identity_superseded": 0,
+          "work_ids": [
+            "bp-work-c245213d1edcebbc8de15c39"
+          ]
+        },
+        "drain": {
+          "acquire": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 2.777,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 5.235,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 2,
+              "wait_seconds": 2.3e-05,
+              "write_seconds": 0.421467,
+              "observation_seconds": 7.785719,
+              "transaction_p50_seconds": 0.210734,
+              "transaction_p95_seconds": 0.237556,
+              "transaction_max_seconds": 0.240537,
+              "writer_lock_duty": 0.054133,
+              "inter_write_idle_seconds": 2.661386,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "parse": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 2.418,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 5.108,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 4,
+              "wait_seconds": 4.8e-05,
+              "write_seconds": 0.951854,
+              "observation_seconds": 12.989464,
+              "transaction_p50_seconds": 0.23966,
+              "transaction_p95_seconds": 0.283943,
+              "transaction_max_seconds": 0.291603,
+              "writer_lock_duty": 0.073279,
+              "inter_write_idle_seconds": 7.238022,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "semantic": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 0,
+            "finalized": 0,
+            "retried": 1,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 73.98,
+            "errors": [
+              {
+                "work_id": "bp-work-c245213d1edcebbc8de15c39",
+                "error": "SemanticProviderError: gateway response violates the schema: 21 validation errors for WorkpaperDraftResponse\nelements.revenue_model.facts.0.metrics.0\n  Value error, metric values must be decimal strings [type=value_error, input_value={'comparison_basis': None...lue': '646152101889.30'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error\nelements.revenue_model.facts.0.metrics.1\n  Value error, metric values must be decimal strings [type=value_error, input_value={'comparison"
+              }
+            ],
+            "quality": {},
+            "execution_mode": null,
+            "elapsed_seconds": 76.472,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 12,
+              "wait_seconds": 0.143137,
+              "write_seconds": 2.389297,
+              "observation_seconds": 89.539703,
+              "transaction_p50_seconds": 0.206357,
+              "transaction_p95_seconds": 0.263516,
+              "transaction_max_seconds": 0.291603,
+              "writer_lock_duty": 0.026684,
+              "inter_write_idle_seconds": 82.470958,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "verify": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 0,
+            "completed": 0,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 0,
+            "empty_polls": 1,
+            "queue_underfilled_slots": 1,
+            "peak_in_flight": 0,
+            "active_work_seconds": 0.0,
+            "errors": [],
+            "quality": {},
+            "execution_mode": null,
+            "elapsed_seconds": 0.512,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 12,
+              "wait_seconds": 0.143137,
+              "write_seconds": 2.389297,
+              "observation_seconds": 90.104893,
+              "transaction_p50_seconds": 0.206357,
+              "transaction_p95_seconds": 0.263516,
+              "transaction_max_seconds": 0.291603,
+              "writer_lock_duty": 0.026517,
+              "inter_write_idle_seconds": 82.470958,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 0,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 1,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 0
+            }
+          },
+          "publish": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 0,
+            "completed": 0,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 0,
+            "empty_polls": 1,
+            "queue_underfilled_slots": 1,
+            "peak_in_flight": 0,
+            "active_work_seconds": 0.0,
+            "errors": [],
+            "quality": {},
+            "execution_mode": null,
+            "elapsed_seconds": 0.528,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 12,
+              "wait_seconds": 0.143137,
+              "write_seconds": 2.389297,
+              "observation_seconds": 90.636099,
+              "transaction_p50_seconds": 0.206357,
+              "transaction_p95_seconds": 0.263516,
+              "transaction_max_seconds": 0.291603,
+              "writer_lock_duty": 0.026361,
+              "inter_write_idle_seconds": 82.470958,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 0,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 1,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 0
+            }
+          }
+        }
+      }
+    },
+    "queue": {
+      "as_of": "2026-11-12T00:01:03.499254+08:00",
+      "total": 1,
+      "running": 0,
+      "claimable": 1,
+      "terminal": 0,
+      "completed": 0,
+      "machine_rework": 0,
+      "finalized": 0,
+      "groups": [
+        {
+          "stage": "semantic",
+          "status": "retry_due",
+          "row_count": 1,
+          "oldest_created_at": "2026-11-11T23:59:34.121815+08:00",
+          "oldest_age_seconds": 89.804729
+        }
+      ]
+    },
+    "production_authorization": "not_authorized",
+    "storage_namespace": "company_profile_common_core.v1",
+    "writer": "company_profile_research_writer.v1",
+    "knowledge_cutoff": "2026-11-11",
+    "enqueue": {
+      "eligible": 1,
+      "inserted": 1,
+      "reused": 0,
+      "reset": 0,
+      "checkpoint_rotated": 0,
+      "checkpoint_deleted": 0,
+      "checkpoint_delete_failures": [],
+      "superseded": 0,
+      "identity_superseded": 0,
+      "work_ids": [
+        "bp-work-c245213d1edcebbc8de15c39"
+      ]
+    },
+    "drain": {
+      "acquire": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 2.777,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 5.235,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 2,
+          "wait_seconds": 2.3e-05,
+          "write_seconds": 0.421467,
+          "observation_seconds": 7.785719,
+          "transaction_p50_seconds": 0.210734,
+          "transaction_p95_seconds": 0.237556,
+          "transaction_max_seconds": 0.240537,
+          "writer_lock_duty": 0.054133,
+          "inter_write_idle_seconds": 2.661386,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "parse": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 2.418,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 5.108,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 4,
+          "wait_seconds": 4.8e-05,
+          "write_seconds": 0.951854,
+          "observation_seconds": 12.989464,
+          "transaction_p50_seconds": 0.23966,
+          "transaction_p95_seconds": 0.283943,
+          "transaction_max_seconds": 0.291603,
+          "writer_lock_duty": 0.073279,
+          "inter_write_idle_seconds": 7.238022,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "semantic": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 0,
+        "finalized": 0,
+        "retried": 1,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 73.98,
+        "errors": [
+          {
+            "work_id": "bp-work-c245213d1edcebbc8de15c39",
+            "error": "SemanticProviderError: gateway response violates the schema: 21 validation errors for WorkpaperDraftResponse\nelements.revenue_model.facts.0.metrics.0\n  Value error, metric values must be decimal strings [type=value_error, input_value={'comparison_basis': None...lue': '646152101889.30'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error\nelements.revenue_model.facts.0.metrics.1\n  Value error, metric values must be decimal strings [type=value_error, input_value={'comparison"
+          }
+        ],
+        "quality": {},
+        "execution_mode": null,
+        "elapsed_seconds": 76.472,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 12,
+          "wait_seconds": 0.143137,
+          "write_seconds": 2.389297,
+          "observation_seconds": 89.539703,
+          "transaction_p50_seconds": 0.206357,
+          "transaction_p95_seconds": 0.263516,
+          "transaction_max_seconds": 0.291603,
+          "writer_lock_duty": 0.026684,
+          "inter_write_idle_seconds": 82.470958,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "verify": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 0,
+        "completed": 0,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 0,
+        "empty_polls": 1,
+        "queue_underfilled_slots": 1,
+        "peak_in_flight": 0,
+        "active_work_seconds": 0.0,
+        "errors": [],
+        "quality": {},
+        "execution_mode": null,
+        "elapsed_seconds": 0.512,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 12,
+          "wait_seconds": 0.143137,
+          "write_seconds": 2.389297,
+          "observation_seconds": 90.104893,
+          "transaction_p50_seconds": 0.206357,
+          "transaction_p95_seconds": 0.263516,
+          "transaction_max_seconds": 0.291603,
+          "writer_lock_duty": 0.026517,
+          "inter_write_idle_seconds": 82.470958,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 0,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 1,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 0
+        }
+      },
+      "publish": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 0,
+        "completed": 0,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 0,
+        "empty_polls": 1,
+        "queue_underfilled_slots": 1,
+        "peak_in_flight": 0,
+        "active_work_seconds": 0.0,
+        "errors": [],
+        "quality": {},
+        "execution_mode": null,
+        "elapsed_seconds": 0.528,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 12,
+          "wait_seconds": 0.143137,
+          "write_seconds": 2.389297,
+          "observation_seconds": 90.636099,
+          "transaction_p50_seconds": 0.206357,
+          "transaction_p95_seconds": 0.263516,
+          "transaction_max_seconds": 0.291603,
+          "writer_lock_duty": 0.026361,
+          "inter_write_idle_seconds": 82.470958,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 0,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 1,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 0
+        }
+      }
+    }
+  },
+  "identity": {
+    "semantic_policy": "company_profile_llm_led.v2",
+    "reading_strategy": "chapter_workpaper_v1",
+    "prompt_version": "company_profile_workpaper.2026-11-11.v1",
+    "preprocessing_version": "toc_sections_native_layout.v1",
+    "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+    "execution_mode": "provider",
+    "semantic_reuse": false,
+    "max_section_characters": 160000,
+    "max_layout_characters": 500000,
+    "workpaper_max_output_tokens": 12000,
+    "logical_request_timeout_seconds": 620
+  },
+  "binding": {
+    "profile": "semantic_extraction",
+    "pool": "shared_semantic",
+    "route_fingerprint": "86ad1a2cdbbd8e0f7f4c2283e651ff98dd60ab20348e66330c7f82807697fcd8",
+    "fallback_allowed": true,
+    "sources": [
+      {
+        "profile": "semantic_extraction__scorpio_gemini",
+        "provider_resource": "scorpio:gemini",
+        "model": "gemini-3.8-flash-high",
+        "source_label": "scorpio:gemini-3.8-flash-high"
+      },
+      {
+        "profile": "semantic_extraction__zai",
+        "provider_resource": "zai",
+        "model": "glm-5.3-flash",
+        "source_label": "zai:glm-5.3-flash"
+      },
+      {
+        "profile": "semantic_extraction__scorpio_grok",
+        "provider_resource": "scorpio:grok",
+        "model": "grok-4.7",
+        "source_label": "scorpio:grok-4.7"
+      },
+      {
+        "profile": "semantic_extraction__scorpio_deepseek",
+        "provider_resource": "scorpio:deepseek",
+        "model": "deepseek-v4-flash",
+        "source_label": "scorpio:deepseek-flash"
+      },
+      {
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "source_label": "deepseek:deepseek-flash"
+      }
+    ],
+    "billing_mode": "development_unpriced",
+    "task_route_labels": [
+      "scorpio:gemini-3.8-flash-high",
+      "deepseek:deepseek-flash"
+    ],
+    "task_route_preferred_first": true
+  },
+  "source": {
+    "instrument_id": "600104.SH",
+    "report_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+    "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-01T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "physical_pages": 205,
+  "ledger": {
+    "physical_requests": 2,
+    "charged_tokens": 57141,
+    "charged_cost_cny": "unknown",
+    "cost_status": "unknown",
+    "billing_mode": "development_unpriced",
+    "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+    "stopped_reason": null,
+    "denied_request": null,
+    "attempts": [
+      {
+        "sequence": 1,
+        "request_id": "3692637d831a4136a5f8359b65d33e03",
+        "logical_request_id": "0218326fa7c97b50f38542c58d06e4e56348323cdcf7ac0a461c741e6cba6e3c",
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "attempt": 1,
+        "profile": "semantic_extraction__scorpio_gemini",
+        "provider_resource": "scorpio:gemini",
+        "model": "gemini-3.8-flash-high",
+        "reserved_input_tokens": 76064,
+        "reserved_output_tokens": 2500,
+        "charged_tokens": 34060,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 31918,
+          "output_tokens": 2142,
+          "total_tokens": 34060
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 22,
+          "content_fragments": 15,
+          "content_chars": 627,
+          "content_sha256": "07f994fb9311e7c10004b745fd84a66bba31c7a6226e0cdbca2dfc00868daa88",
+          "reasoning_present": true,
+          "reasoning_chars": 1746,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      },
+      {
+        "sequence": 2,
+        "request_id": "a376870f895b4ad7889ad208da15013d",
+        "logical_request_id": "7a3cb017d7afaa7083f1af715a926fdb13f15bb2f1bce36950baf5c597657792",
+        "source_label": "scorpio:gemini-3.8-flash-high",
+        "attempt": 1,
+        "profile": "semantic_extraction__scorpio_gemini",
+        "provider_resource": "scorpio:gemini",
+        "model": "gemini-3.8-flash-high",
+        "reserved_input_tokens": 75176,
+        "reserved_output_tokens": 12000,
+        "charged_tokens": 23081,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 18637,
+          "output_tokens": 4444,
+          "total_tokens": 23081
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 179,
+          "content_fragments": 176,
+          "content_chars": 9564,
+          "content_sha256": "bc4c1a8f90e5619caa8cfcce52e4b311ed7491b1f0071e73e40009c68b4e7caf",
+          "reasoning_present": false,
+          "reasoning_chars": 0,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      }
+    ]
+  },
+  "three_reads_equal": true,
+  "provider_receipts": [
+    {
+      "request_id": "bp-work-c245213d1edcebbc8de15c39:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "91927d120223c0f36a929f59c15253ac956f6f3fcf8f230f744da5cb91d76f35",
+      "response_hash": "07f994fb9311e7c10004b745fd84a66bba31c7a6226e0cdbca2dfc00868daa88",
+      "finish_reason": "stop",
+      "source_label": "scorpio:gemini-3.8-flash-high",
+      "model": "gemini-3.8-flash-high",
+      "raw_content": "{\"deferred\":[\"六、公司关于公司未来发展的讨论与分析（行业格局、发展战略与经营计划）\",\"(三) 资产、负债情况分析及 (五) 投资状况分析\",\"第四节 公司治理、环境和社会\",\"第八节 财务报告中除分部信息外的完整财务报表及具体项目附注\"],\"rationale\":\"所选章节涵盖了公司业务架构与产品定位（报告期内公司从事的业务情况）、行业背景（所处行业情况）、年度经营全貌与战略推进（经营情况讨论与分析）、主营收入与成本构成及研发/现金流表现（主营业务分析）、汽车整车制造与销售/零部件/新能源及汽车金融等核心行业指标（行业经营性信息分析）、关键子公司与合资合营企业经营业绩（主要控股参股公司分析），以及财务报表分部经营数据（分部信息）。各部分紧密衔接，全面呈现了上汽集团的业务结构、盈利模式、产销规模及驱动变化。\",\"selected_section_ids\":[\"section-0039\",\"section-0044\",\"section-0045\",\"section-0053\",\"section-0078\",\"section-0105\",\"section-1078\"],\"stop_reason\":\"已完整覆盖公司业务模式、产品线、产销规模与产能利用、主营业务收支与变动驱动因素、合资及控股主体经营效益以及分部财务信息，足以支撑对公司核心业务及经营表现的深入研判，无需进一步扩展至其他管理层前瞻性规划或庞大的完整财务附注细节。\"}",
+      "response_payload": {
+        "deferred": [
+          "六、公司关于公司未来发展的讨论与分析（行业格局、发展战略与经营计划）",
+          "(三) 资产、负债情况分析及 (五) 投资状况分析",
+          "第四节 公司治理、环境和社会",
+          "第八节 财务报告中除分部信息外的完整财务报表及具体项目附注"
+        ],
+        "rationale": "所选章节涵盖了公司业务架构与产品定位（报告期内公司从事的业务情况）、行业背景（所处行业情况）、年度经营全貌与战略推进（经营情况讨论与分析）、主营收入与成本构成及研发/现金流表现（主营业务分析）、汽车整车制造与销售/零部件/新能源及汽车金融等核心行业指标（行业经营性信息分析）、关键子公司与合资合营企业经营业绩（主要控股参股公司分析），以及财务报表分部经营数据（分部信息）。各部分紧密衔接，全面呈现了上汽集团的业务结构、盈利模式、产销规模及驱动变化。",
+        "selected_section_ids": [
+          "section-0039",
+          "section-0044",
+          "section-0045",
+          "section-0053",
+          "section-0078",
+          "section-0105",
+          "section-1078"
+        ],
+        "stop_reason": "已完整覆盖公司业务模式、产品线、产销规模与产能利用、主营业务收支与变动驱动因素、合资及控股主体经营效益以及分部财务信息，足以支撑对公司核心业务及经营表现的深入研判，无需进一步扩展至其他管理层前瞻性规划或庞大的完整财务附注细节。"
+      },
+      "usage": {
+        "input_tokens": 31918,
+        "output_tokens": 2142,
+        "total_tokens": 34060
+      }
+    },
+    {
+      "request_id": "bp-work-c245213d1edcebbc8de15c39:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "1efbddcddb6d0b1f84c9c16b4b26d5c8fbaae4b831204bfdea0e7697054a25bf",
+      "response_hash": "bc4c1a8f90e5619caa8cfcce52e4b311ed7491b1f0071e73e40009c68b4e7caf",
+      "finish_reason": "stop",
+      "source_label": "scorpio:gemini-3.8-flash-high",
+      "model": "gemini-3.8-flash-high",
+      "raw_content": "{\"elements\":{\"business_structure\":{\"facts\":[{\"evidence_ids\":[\"source-0019\",\"source-0020\"],\"fact_id\":\"fact-bs-01\",\"metrics\":[],\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"text\":\"公司确立了2个报告分部，分别为负责生产并销售整车及零部件的“整车及零部件分部”，以及负责提供金融服务的“金融服务分部”。分部间转移价格参照向第三方销售所采用的价格确定。\"},{\"evidence_ids\":[\"source-0001\",\"source-0004\",\"source-0017\"],\"fact_id\":\"fact-bs-02\",\"metrics\":[],\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"text\":\"在整车与零部件业务组织架构方面，公司深化自主乘用车业务一体化管理，打通产品定义、设计研发与市场营销全链路；商用车业务撤销商用车事业部，职能整合并入上汽大通。主要业务载体包括华域汽车（汽车零部件）、上汽大通（汽车）、智己汽车（新能源汽车）、动力新科（柴油机及配件）以及上汽财务公司（金融服务）等重要子公司。\"}],\"limitations\":[],\"status\":\"observed\"},\"customers_channels_markets\":{\"facts\":[{\"evidence_ids\":[\"source-0009\"],\"fact_id\":\"fact-ccm-01\",\"metrics\":[{\"comparison_basis\":null,\"currency\":\"人民币\",\"name\":\"前五名客户销售额\",\"period\":\"2025年\",\"raw_value\":\"7,545,821.15万元\",\"subject_scope\":\"consolidated_group\",\"unit\":\"万元\",\"value\":\"7545821.15\"},{\"comparison_basis\":null,\"currency\":null,\"name\":\"前五名客户销售额占年度销售总额比例\",\"period\":\"2025年\",\"raw_value\":\"11.68%\",\"subject_scope\":\"consolidated_group\",\"unit\":\"%\",\"value\":\"11.68\"}],\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"text\":\"2025年公司前五名客户销售额为7,545,821.15万元，占年度销售总额的11.68%，其中关联方销售额为0元。报告期内不存在向单个客户销售比例超过50%或严重依赖少数客户的情况。\"},{\"evidence_ids\":[\"source-0001\",\"source-0004\",\"source-0007\",\"source-0013\"],\"fact_id\":\"fact-ccm-02\",\"metrics\":[{\"comparison_basis\":null,\"currency\":null,\"name\":\"整车销售境内销量\",\"period\":\"2025年\",\"raw_value\":\"3,436,968辆\",\"subject_scope\":\"consolidated_group\",\"unit\":\"辆\",\"value\":\"3436968\"},{\"comparison_basis\":null,\"currency\":null,\"name\":\"整车销售境外销量\",\"period\":\"2025年\",\"raw_value\":\"1,070,550辆\",\"subject_scope\":\"consolidated_group\",\"unit\":\"辆\",\"value\":\"1070550\"}],\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"text\":\"在市场与渠道方面，公司推进新营销变革，结合全新MG4上市在86城布局120家快闪店，以“轻量化引流”促进4S店转化，上汽大通退出近百家直营店优化渠道。海外市场方面，整车境外销量达1,070,550辆，MG品牌在欧洲销量超过30万辆，并在澳新、中东、拉美、东南亚等18个国家乘用车市场排名前十；上汽通用五菱深化“印马泰”一体化，智己登陆泰国、英国、澳大利亚等市场。\"}],\"limitations\":[],\"status\":\"observed\"},\"material_changes\":{\"facts\":[{\"evidence_ids\":[\"source-0001\",\"source-0017\"],\"fact_id\":\"fact-mc-01\",\"metrics\":[],\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"text\":\"子公司股权变动及处置方面，上汽红岩汽车有限公司司法重整方案获法院批准并启动实施；公司转让大众联合改装100%股权、转让服务中心51%股权（持股降至5%）、终止德实一致行动条款，均丧失控制权并不再纳入合并范围；同时注销了上汽通用新能源汽车销售服务(深圳)有限公司和飞凡汽车销售(深圳)有限公司，清算了上海幸福坊创意产业管理有限公司。\"},{\"evidence_ids\":[\"source-0001\",\"source-0004\"],\"fact_id\":\"fact-mc-02\",\"metrics\":[],\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"text\":\"业务协同与合作方面，公司与华为合作推出“尚界”品牌，首款产品尚界H5于9月投放；同时上汽大众、上汽通用优化生产基地布局，释放出的产能用于生产“尚界”等自主品牌产品。\"}],\"limitations\":[],\"status\":\"observed\"},\"operating_drivers\":{\"facts\":[{\"evidence_ids\":[\"source-0001\",\"source-0004\"],\"fact_id\":\"fact-od-01\",\"metrics\":[],\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"text\":\"公司聚焦整车业务并抢抓结构性机会，自主品牌集中推出全新MG4、荣威M7、尚界H5、智己全新LS6/LS9、五菱缤果S、大通大拿等新能源产品，放大“以旧换新”政策效应，自主品牌新能源车销量增速近50%。\"},{\"evidence_ids\":[\"source-0006\",\"source-0007\",\"source-0010\"],\"fact_id\":\"fact-od-02\",\"metrics\":[],\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"text\":\"财务驱动方面，归属于母公司股东的净利润同比大幅增长506.5%，主要由于对联营企业和合营企业的投资收益增加（达13,432,644,620.92元）、金融资产公允价值变动收益同比增加（达6,605,490,436.41元），以及汇兑收益增加使财务费用同比由正转负（-265,824,180.92元）。\"}],\"limitations\":[],\"status\":\"observed\"},\"operations_and_inputs\":{\"facts\":[{\"evidence_ids\":[\"source-0008\",\"source-0012\",\"source-0013\",\"source-0014\"],\"fact_id\":\"fact-oi-01\",\"metrics\":[{\"comparison_basis\":null,\"currency\":null,\"name\":\"整车总生产量\",\"period\":\"2025年\",\"raw_value\":\"4,601,962辆\",\"subject_scope\":\"consolidated_group\",\"unit\":\"辆\",\"value\":\"4601962\"}],\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"text\":\"公司整车年总产量达4,601,962辆。主要整车制造工厂中，上汽大众设计产能192.0万辆，产能利用率55%；上汽通用设计产能145.2万辆，产能利用率37%；乘用车分公司设计产能116.0万辆，产能利用率76%；上汽通用五菱设计产能176.0万辆，产能利用率95%。除上汽大众MEB工厂（设计产能24万辆）外，其他新能源汽车与传统车共线生产、柔性调配。\"},{\"evidence_ids\":[\"source-0008\",\"source-0009\"],\"fact_id\":\"fact-oi-02\",\"metrics\":[{\"comparison_basis\":null,\"currency\":\"人民币\",\"name\":\"汽车制造业营业成本\",\"period\":\"2025年\",\"raw_value\":\"580,943,983,649.41元\",\"subject_scope\":\"consolidated_group\",\"unit\":\"元\",\"value\":\"580943983649.41\"},{\"comparison_basis\":null,\"currency\":\"人民币\",\"name\":\"前五名供应商采购额\",\"period\":\"2025年\",\"raw_value\":\"21,496,663.81万元\",\"subject_scope\":\"consolidated_group\",\"unit\":\"万元\",\"value\":\"21496663.81\"},{\"comparison_basis\":null,\"currency\":null,\"name\":\"前五名供应商采购额占年度采购总额比例\",\"period\":\"2025年\",\"raw_value\":\"37%\",\"subject_scope\":\"consolidated_group\",\"unit\":\"%\",\"value\":\"37\"}],\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"text\":\"主营业务成本构成中，汽车制造业成本构成项目主要为原材料、人工工资、折旧、能源等，占总成本的99.80%。公司前五名供应商采购额为21,496,663.81万元，占年度采购总额的37%，其中关联方采购额为459,389.23万元（占比0.79%）。\"},{\"evidence_ids\":[\"source-0010\"],\"fact_id\":\"fact-oi-03\",\"metrics\":[{\"comparison_basis\":null,\"currency\":\"人民币\",\"name\":\"研发投入合计\",\"period\":\"2025年\",\"raw_value\":\"21,706,037,747.07元\",\"subject_scope\":\"consolidated_group\",\"unit\":\"元\",\"value\":\"21706037747.07\"},{\"comparison_basis\":null,\"currency\":null,\"name\":\"研发投入总额占营业收入比例\",\"period\":\"2025年\",\"raw_value\":\"3.36%\",\"subject_scope\":\"consolidated_group\",\"unit\":\"%\",\"value\":\"3.36\"},{\"comparison_basis\":null,\"currency\":null,\"name\":\"研发人员数量\",\"period\":\"2025年\",\"raw_value\":\"30,329\",\"subject_scope\":\"consolidated_group\",\"unit\":\"人\",\"value\":\"30329\"}],\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"text\":\"研发投入总额为21,706,037,747.07元（费用化18,104,061,919.77元，资本化3,601,975,827.30元），研发人员达30,329人，占总人数比例为17.6%。公司构建包含纯电、混动、氢能三大整车平台及全栈解决方案的“七大技术底座”，推进全固态电池、智能驾驶及国产芯片研发应用。\"}],\"limitations\":[],\"status\":\"observed\"},\"products_services\":{\"facts\":[{\"evidence_ids\":[\"source-0001\",\"source-0004\",\"source-0007\",\"source-0013\",\"source-0014\"],\"fact_id\":\"fact-ps-01\",\"metrics\":[],\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"text\":\"公司整车产品覆盖基本乘用车、运动型多用途车（SUV）、多功能乘用车（MPV）、交叉型乘用车、客车和载货汽车；涵盖传统燃油车、HEV混动、纯电、增程等多种动力形式。主要品牌及车型包括自主品牌（全新MG4、荣威M7、智己全新LS6/LS9、五菱缤果S、大通大拿、与华为合作的尚界H5）以及合资品牌（上汽大众AUDI E5、上汽通用别克至境L7等）。\"},{\"evidence_ids\":[\"source-0001\",\"source-0004\",\"source-0007\",\"source-0013\",\"source-0014\",\"source-0015\"],\"fact_id\":\"fact-ps-02\",\"metrics\":[],\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"text\":\"除整车制造销售外，公司还提供汽车零部件生产与销售（主要通过控股子公司华域汽车开展）、汽车金融服务（主要通过上汽财务公司、上汽通用汽车金融、东正汽车金融提供汽车贷款及金融服务）、国际物流（安吉物流自营远洋滚装船运输）及智慧出行服务（Robotaxi商业化运营）等。\"}],\"limitations\":[],\"status\":\"observed\"},\"revenue_model\":{\"facts\":[{\"evidence_ids\":[\"source-0006\",\"source-0007\",\"source-0019\",\"source-0020\"],\"fact_id\":\"fact-rm-01\",\"metrics\":[{\"comparison_basis\":null,\"currency\":\"人民币\",\"name\":\"营业收入\",\"period\":\"2025年\",\"raw_value\":\"646,152,101,889.30元\",\"subject_scope\":\"consolidated_group\",\"unit\":\"元\",\"value\":\"646152101889.30\"},{\"comparison_basis\":null,\"currency\":\"人民币\",\"name\":\"主营业务合计营业收入\",\"period\":\"2025年\",\"raw_value\":\"656,243,812,081.18元\",\"subject_scope\":\"consolidated_group\",\"unit\":\"元\",\"value\":\"656243812081.18\"}],\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"text\":\"公司营业收入主要来源于汽车制造业（整车及零部件的生产与销售）以及金融业（汽车金融贷款、利息与金融服务）。分部信息显示整车及零部件对外交易收入为644,665,370,348.55元，金融业对外交易收入为11,578,441,732.63元。\"},{\"evidence_ids\":[\"source-0009\"],\"fact_id\":\"fact-rm-02\",\"metrics\":[{\"comparison_basis\":null,\"currency\":\"人民币\",\"name\":\"贸易业务本期营业收入\",\"period\":\"2025年\",\"raw_value\":\"206,508,725.66元\",\"subject_scope\":\"consolidated_group\",\"unit\":\"元\",\"value\":\"206508725.66\"}],\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"text\":\"公司还开展汽车芯片及相关汽车零部件的出口贸易业务，报告期内实现贸易业务收入206,508,725.66元。\"}],\"limitations\":[],\"status\":\"observed\"},\"scale_and_mix\":{\"facts\":[{\"evidence_ids\":[\"source-0004\",\"source-0006\",\"source-0007\"],\"fact_id\":\"fact-sm-01\",\"metrics\":[{\"comparison_basis\":null,\"currency\":\"人民币\",\"name\":\"合并营业总收入\",\"period\":\"2025年\",\"raw_value\":\"6562.4亿元\",\"subject_scope\":\"consolidated_group\",\"unit\":\"亿元\",\"value\":\"6562.4\"},{\"comparison_basis\":null,\"currency\":\"人民币\",\"name\":\"整车业务营业收入\",\"period\":\"2025年\",\"raw_value\":\"410,196,473,001.11元\",\"subject_scope\":\"consolidated_group\",\"unit\":\"元\",\"value\":\"410196473001.11\"},{\"comparison_basis\":null,\"currency\":\"人民币\",\"name\":\"零部件业务营业收入\",\"period\":\"2025年\",\"raw_value\":\"203,019,866,775.26元\",\"subject_scope\":\"consolidated_group\",\"unit\":\"元\",\"value\":\"203019866775.26\"},{\"comparison_basis\":null,\"currency\":\"人民币\",\"name\":\"劳务及其他营业收入\",\"period\":\"2025年\",\"raw_value\":\"32,935,762,112.94元\",\"subject_scope\":\"consolidated_group\",\"unit\":\"元\",\"value\":\"32935762112.94\"},{\"comparison_basis\":null,\"currency\":\"人民币\",\"name\":\"金融业务营业收入\",\"period\":\"2025年\",\"raw_value\":\"10,091,710,191.88元\",\"subject_scope\":\"consolidated_group\",\"unit\":\"元\",\"value\":\"10091710191.88\"}],\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"text\":\"主营业务收入分产品构成中，整车业务收入410,196,473,001.11元（毛利率4.30%），零部件业务收入203,019,866,775.26元（毛利率19.15%），劳务及其他收入32,935,762,112.94元（毛利率26.38%），金融业务收入10,091,710,191.88元（毛利率88.47%）。分地区看，中国境内收入504,138,835,950.64元，其他地区收入152,104,976,130.54元。\"},{\"evidence_ids\":[\"source-0001\",\"source-0007\",\"source-0008\",\"source-0013\",\"source-0014\"],\"fact_id\":\"fact-sm-02\",\"metrics\":[{\"comparison_basis\":null,\"currency\":null,\"name\":\"整车销售量合计\",\"period\":\"2025年\",\"raw_value\":\"4,507,518辆\",\"subject_scope\":\"consolidated_group\",\"unit\":\"辆\",\"value\":\"4507518\"},{\"comparison_basis\":null,\"currency\":null,\"name\":\"自主品牌整车销量\",\"period\":\"2025年\",\"raw_value\":\"292.8万辆\",\"subject_scope\":\"consolidated_group\",\"unit\":\"万辆\",\"value\":\"292.8\"},{\"comparison_basis\":null,\"currency\":null,\"name\":\"新能源车销售量合计\",\"period\":\"2025年\",\"raw_value\":\"1,643,009辆\",\"subject_scope\":\"consolidated_group\",\"unit\":\"辆\",\"value\":\"1643009\"}],\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"text\":\"销量规模方面，全年整车销量达4,507,518辆（同比增12.32%）。其中自主品牌销量292.8万辆，占整体销量的65%；新能源汽车销量达1,643,009辆（乘用车1,481,504辆，商用车161,505辆）。主要整车主体销售中，上汽通用五菱1,615,066辆、上汽大众1,024,000辆、乘用车分公司886,742辆、上汽通用535,000辆、上汽大通222,286辆、智己汽车81,017辆。\"}],\"limitations\":[],\"status\":\"observed\"}},\"limitations\":[],\"schema_version\":\"company_profile_workpaper_draft.v1\"}",
+      "response_payload": {
+        "elements": {
+          "business_structure": {
+            "facts": [
+              {
+                "evidence_ids": [
+                  "source-0019",
+                  "source-0020"
+                ],
+                "fact_id": "fact-bs-01",
+                "metrics": [],
+                "period": "2025年",
+                "subject_scope": "consolidated_group",
+                "text": "公司确立了2个报告分部，分别为负责生产并销售整车及零部件的“整车及零部件分部”，以及负责提供金融服务的“金融服务分部”。分部间转移价格参照向第三方销售所采用的价格确定。"
+              },
+              {
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0004",
+                  "source-0017"
+                ],
+                "fact_id": "fact-bs-02",
+                "metrics": [],
+                "period": "2025年",
+                "subject_scope": "consolidated_group",
+                "text": "在整车与零部件业务组织架构方面，公司深化自主乘用车业务一体化管理，打通产品定义、设计研发与市场营销全链路；商用车业务撤销商用车事业部，职能整合并入上汽大通。主要业务载体包括华域汽车（汽车零部件）、上汽大通（汽车）、智己汽车（新能源汽车）、动力新科（柴油机及配件）以及上汽财务公司（金融服务）等重要子公司。"
+              }
+            ],
+            "limitations": [],
+            "status": "observed"
+          },
+          "customers_channels_markets": {
+            "facts": [
+              {
+                "evidence_ids": [
+                  "source-0009"
+                ],
+                "fact_id": "fact-ccm-01",
+                "metrics": [
+                  {
+                    "comparison_basis": null,
+                    "currency": "人民币",
+                    "name": "前五名客户销售额",
+                    "period": "2025年",
+                    "raw_value": "7,545,821.15万元",
+                    "subject_scope": "consolidated_group",
+                    "unit": "万元",
+                    "value": "7545821.15"
+                  },
+                  {
+                    "comparison_basis": null,
+                    "currency": null,
+                    "name": "前五名客户销售额占年度销售总额比例",
+                    "period": "2025年",
+                    "raw_value": "11.68%",
+                    "subject_scope": "consolidated_group",
+                    "unit": "%",
+                    "value": "11.68"
+                  }
+                ],
+                "period": "2025年",
+                "subject_scope": "consolidated_group",
+                "text": "2025年公司前五名客户销售额为7,545,821.15万元，占年度销售总额的11.68%，其中关联方销售额为0元。报告期内不存在向单个客户销售比例超过50%或严重依赖少数客户的情况。"
+              },
+              {
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0004",
+                  "source-0007",
+                  "source-0013"
+                ],
+                "fact_id": "fact-ccm-02",
+                "metrics": [
+                  {
+                    "comparison_basis": null,
+                    "currency": null,
+                    "name": "整车销售境内销量",
+                    "period": "2025年",
+                    "raw_value": "3,436,968辆",
+                    "subject_scope": "consolidated_group",
+                    "unit": "辆",
+                    "value": "3436968"
+                  },
+                  {
+                    "comparison_basis": null,
+                    "currency": null,
+                    "name": "整车销售境外销量",
+                    "period": "2025年",
+                    "raw_value": "1,070,550辆",
+                    "subject_scope": "consolidated_group",
+                    "unit": "辆",
+                    "value": "1070550"
+                  }
+                ],
+                "period": "2025年",
+                "subject_scope": "consolidated_group",
+                "text": "在市场与渠道方面，公司推进新营销变革，结合全新MG4上市在86城布局120家快闪店，以“轻量化引流”促进4S店转化，上汽大通退出近百家直营店优化渠道。海外市场方面，整车境外销量达1,070,550辆，MG品牌在欧洲销量超过30万辆，并在澳新、中东、拉美、东南亚等18个国家乘用车市场排名前十；上汽通用五菱深化“印马泰”一体化，智己登陆泰国、英国、澳大利亚等市场。"
+              }
+            ],
+            "limitations": [],
+            "status": "observed"
+          },
+          "material_changes": {
+            "facts": [
+              {
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0017"
+                ],
+                "fact_id": "fact-mc-01",
+                "metrics": [],
+                "period": "2025年",
+                "subject_scope": "consolidated_group",
+                "text": "子公司股权变动及处置方面，上汽红岩汽车有限公司司法重整方案获法院批准并启动实施；公司转让大众联合改装100%股权、转让服务中心51%股权（持股降至5%）、终止德实一致行动条款，均丧失控制权并不再纳入合并范围；同时注销了上汽通用新能源汽车销售服务(深圳)有限公司和飞凡汽车销售(深圳)有限公司，清算了上海幸福坊创意产业管理有限公司。"
+              },
+              {
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0004"
+                ],
+                "fact_id": "fact-mc-02",
+                "metrics": [],
+                "period": "2025年",
+                "subject_scope": "consolidated_group",
+                "text": "业务协同与合作方面，公司与华为合作推出“尚界”品牌，首款产品尚界H5于9月投放；同时上汽大众、上汽通用优化生产基地布局，释放出的产能用于生产“尚界”等自主品牌产品。"
+              }
+            ],
+            "limitations": [],
+            "status": "observed"
+          },
+          "operating_drivers": {
+            "facts": [
+              {
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0004"
+                ],
+                "fact_id": "fact-od-01",
+                "metrics": [],
+                "period": "2025年",
+                "subject_scope": "consolidated_group",
+                "text": "公司聚焦整车业务并抢抓结构性机会，自主品牌集中推出全新MG4、荣威M7、尚界H5、智己全新LS6/LS9、五菱缤果S、大通大拿等新能源产品，放大“以旧换新”政策效应，自主品牌新能源车销量增速近50%。"
+              },
+              {
+                "evidence_ids": [
+                  "source-0006",
+                  "source-0007",
+                  "source-0010"
+                ],
+                "fact_id": "fact-od-02",
+                "metrics": [],
+                "period": "2025年",
+                "subject_scope": "consolidated_group",
+                "text": "财务驱动方面，归属于母公司股东的净利润同比大幅增长506.5%，主要由于对联营企业和合营企业的投资收益增加（达13,432,644,620.92元）、金融资产公允价值变动收益同比增加（达6,605,490,436.41元），以及汇兑收益增加使财务费用同比由正转负（-265,824,180.92元）。"
+              }
+            ],
+            "limitations": [],
+            "status": "observed"
+          },
+          "operations_and_inputs": {
+            "facts": [
+              {
+                "evidence_ids": [
+                  "source-0008",
+                  "source-0012",
+                  "source-0013",
+                  "source-0014"
+                ],
+                "fact_id": "fact-oi-01",
+                "metrics": [
+                  {
+                    "comparison_basis": null,
+                    "currency": null,
+                    "name": "整车总生产量",
+                    "period": "2025年",
+                    "raw_value": "4,601,962辆",
+                    "subject_scope": "consolidated_group",
+                    "unit": "辆",
+                    "value": "4601962"
+                  }
+                ],
+                "period": "2025年",
+                "subject_scope": "consolidated_group",
+                "text": "公司整车年总产量达4,601,962辆。主要整车制造工厂中，上汽大众设计产能192.0万辆，产能利用率55%；上汽通用设计产能145.2万辆，产能利用率37%；乘用车分公司设计产能116.0万辆，产能利用率76%；上汽通用五菱设计产能176.0万辆，产能利用率95%。除上汽大众MEB工厂（设计产能24万辆）外，其他新能源汽车与传统车共线生产、柔性调配。"
+              },
+              {
+                "evidence_ids": [
+                  "source-0008",
+                  "source-0009"
+                ],
+                "fact_id": "fact-oi-02",
+                "metrics": [
+                  {
+                    "comparison_basis": null,
+                    "currency": "人民币",
+                    "name": "汽车制造业营业成本",
+                    "period": "2025年",
+                    "raw_value": "580,943,983,649.41元",
+                    "subject_scope": "consolidated_group",
+                    "unit": "元",
+                    "value": "580943983649.41"
+                  },
+                  {
+                    "comparison_basis": null,
+                    "currency": "人民币",
+                    "name": "前五名供应商采购额",
+                    "period": "2025年",
+                    "raw_value": "21,496,663.81万元",
+                    "subject_scope": "consolidated_group",
+                    "unit": "万元",
+                    "value": "21496663.81"
+                  },
+                  {
+                    "comparison_basis": null,
+                    "currency": null,
+                    "name": "前五名供应商采购额占年度采购总额比例",
+                    "period": "2025年",
+                    "raw_value": "37%",
+                    "subject_scope": "consolidated_group",
+                    "unit": "%",
+                    "value": "37"
+                  }
+                ],
+                "period": "2025年",
+                "subject_scope": "consolidated_group",
+                "text": "主营业务成本构成中，汽车制造业成本构成项目主要为原材料、人工工资、折旧、能源等，占总成本的99.80%。公司前五名供应商采购额为21,496,663.81万元，占年度采购总额的37%，其中关联方采购额为459,389.23万元（占比0.79%）。"
+              },
+              {
+                "evidence_ids": [
+                  "source-0010"
+                ],
+                "fact_id": "fact-oi-03",
+                "metrics": [
+                  {
+                    "comparison_basis": null,
+                    "currency": "人民币",
+                    "name": "研发投入合计",
+                    "period": "2025年",
+                    "raw_value": "21,706,037,747.07元",
+                    "subject_scope": "consolidated_group",
+                    "unit": "元",
+                    "value": "21706037747.07"
+                  },
+                  {
+                    "comparison_basis": null,
+                    "currency": null,
+                    "name": "研发投入总额占营业收入比例",
+                    "period": "2025年",
+                    "raw_value": "3.36%",
+                    "subject_scope": "consolidated_group",
+                    "unit": "%",
+                    "value": "3.36"
+                  },
+                  {
+                    "comparison_basis": null,
+                    "currency": null,
+                    "name": "研发人员数量",
+                    "period": "2025年",
+                    "raw_value": "30,329",
+                    "subject_scope": "consolidated_group",
+                    "unit": "人",
+                    "value": "30329"
+                  }
+                ],
+                "period": "2025年",
+                "subject_scope": "consolidated_group",
+                "text": "研发投入总额为21,706,037,747.07元（费用化18,104,061,919.77元，资本化3,601,975,827.30元），研发人员达30,329人，占总人数比例为17.6%。公司构建包含纯电、混动、氢能三大整车平台及全栈解决方案的“七大技术底座”，推进全固态电池、智能驾驶及国产芯片研发应用。"
+              }
+            ],
+            "limitations": [],
+            "status": "observed"
+          },
+          "products_services": {
+            "facts": [
+              {
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0004",
+                  "source-0007",
+                  "source-0013",
+                  "source-0014"
+                ],
+                "fact_id": "fact-ps-01",
+                "metrics": [],
+                "period": "2025年",
+                "subject_scope": "consolidated_group",
+                "text": "公司整车产品覆盖基本乘用车、运动型多用途车（SUV）、多功能乘用车（MPV）、交叉型乘用车、客车和载货汽车；涵盖传统燃油车、HEV混动、纯电、增程等多种动力形式。主要品牌及车型包括自主品牌（全新MG4、荣威M7、智己全新LS6/LS9、五菱缤果S、大通大拿、与华为合作的尚界H5）以及合资品牌（上汽大众AUDI E5、上汽通用别克至境L7等）。"
+              },
+              {
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0004",
+                  "source-0007",
+                  "source-0013",
+                  "source-0014",
+                  "source-0015"
+                ],
+                "fact_id": "fact-ps-02",
+                "metrics": [],
+                "period": "2025年",
+                "subject_scope": "consolidated_group",
+                "text": "除整车制造销售外，公司还提供汽车零部件生产与销售（主要通过控股子公司华域汽车开展）、汽车金融服务（主要通过上汽财务公司、上汽通用汽车金融、东正汽车金融提供汽车贷款及金融服务）、国际物流（安吉物流自营远洋滚装船运输）及智慧出行服务（Robotaxi商业化运营）等。"
+              }
+            ],
+            "limitations": [],
+            "status": "observed"
+          },
+          "revenue_model": {
+            "facts": [
+              {
+                "evidence_ids": [
+                  "source-0006",
+                  "source-0007",
+                  "source-0019",
+                  "source-0020"
+                ],
+                "fact_id": "fact-rm-01",
+                "metrics": [
+                  {
+                    "comparison_basis": null,
+                    "currency": "人民币",
+                    "name": "营业收入",
+                    "period": "2025年",
+                    "raw_value": "646,152,101,889.30元",
+                    "subject_scope": "consolidated_group",
+                    "unit": "元",
+                    "value": "646152101889.30"
+                  },
+                  {
+                    "comparison_basis": null,
+                    "currency": "人民币",
+                    "name": "主营业务合计营业收入",
+                    "period": "2025年",
+                    "raw_value": "656,243,812,081.18元",
+                    "subject_scope": "consolidated_group",
+                    "unit": "元",
+                    "value": "656243812081.18"
+                  }
+                ],
+                "period": "2025年",
+                "subject_scope": "consolidated_group",
+                "text": "公司营业收入主要来源于汽车制造业（整车及零部件的生产与销售）以及金融业（汽车金融贷款、利息与金融服务）。分部信息显示整车及零部件对外交易收入为644,665,370,348.55元，金融业对外交易收入为11,578,441,732.63元。"
+              },
+              {
+                "evidence_ids": [
+                  "source-0009"
+                ],
+                "fact_id": "fact-rm-02",
+                "metrics": [
+                  {
+                    "comparison_basis": null,
+                    "currency": "人民币",
+                    "name": "贸易业务本期营业收入",
+                    "period": "2025年",
+                    "raw_value": "206,508,725.66元",
+                    "subject_scope": "consolidated_group",
+                    "unit": "元",
+                    "value": "206508725.66"
+                  }
+                ],
+                "period": "2025年",
+                "subject_scope": "consolidated_group",
+                "text": "公司还开展汽车芯片及相关汽车零部件的出口贸易业务，报告期内实现贸易业务收入206,508,725.66元。"
+              }
+            ],
+            "limitations": [],
+            "status": "observed"
+          },
+          "scale_and_mix": {
+            "facts": [
+              {
+                "evidence_ids": [
+                  "source-0004",
+                  "source-0006",
+                  "source-0007"
+                ],
+                "fact_id": "fact-sm-01",
+                "metrics": [
+                  {
+                    "comparison_basis": null,
+                    "currency": "人民币",
+                    "name": "合并营业总收入",
+                    "period": "2025年",
+                    "raw_value": "6562.4亿元",
+                    "subject_scope": "consolidated_group",
+                    "unit": "亿元",
+                    "value": "6562.4"
+                  },
+                  {
+                    "comparison_basis": null,
+                    "currency": "人民币",
+                    "name": "整车业务营业收入",
+                    "period": "2025年",
+                    "raw_value": "410,196,473,001.11元",
+                    "subject_scope": "consolidated_group",
+                    "unit": "元",
+                    "value": "410196473001.11"
+                  },
+                  {
+                    "comparison_basis": null,
+                    "currency": "人民币",
+                    "name": "零部件业务营业收入",
+                    "period": "2025年",
+                    "raw_value": "203,019,866,775.26元",
+                    "subject_scope": "consolidated_group",
+                    "unit": "元",
+                    "value": "203019866775.26"
+                  },
+                  {
+                    "comparison_basis": null,
+                    "currency": "人民币",
+                    "name": "劳务及其他营业收入",
+                    "period": "2025年",
+                    "raw_value": "32,935,762,112.94元",
+                    "subject_scope": "consolidated_group",
+                    "unit": "元",
+                    "value": "32935762112.94"
+                  },
+                  {
+                    "comparison_basis": null,
+                    "currency": "人民币",
+                    "name": "金融业务营业收入",
+                    "period": "2025年",
+                    "raw_value": "10,091,710,191.88元",
+                    "subject_scope": "consolidated_group",
+                    "unit": "元",
+                    "value": "10091710191.88"
+                  }
+                ],
+                "period": "2025年",
+                "subject_scope": "consolidated_group",
+                "text": "主营业务收入分产品构成中，整车业务收入410,196,473,001.11元（毛利率4.30%），零部件业务收入203,019,866,775.26元（毛利率19.15%），劳务及其他收入32,935,762,112.94元（毛利率26.38%），金融业务收入10,091,710,191.88元（毛利率88.47%）。分地区看，中国境内收入504,138,835,950.64元，其他地区收入152,104,976,130.54元。"
+              },
+              {
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0007",
+                  "source-0008",
+                  "source-0013",
+                  "source-0014"
+                ],
+                "fact_id": "fact-sm-02",
+                "metrics": [
+                  {
+                    "comparison_basis": null,
+                    "currency": null,
+                    "name": "整车销售量合计",
+                    "period": "2025年",
+                    "raw_value": "4,507,518辆",
+                    "subject_scope": "consolidated_group",
+                    "unit": "辆",
+                    "value": "4507518"
+                  },
+                  {
+                    "comparison_basis": null,
+                    "currency": null,
+                    "name": "自主品牌整车销量",
+                    "period": "2025年",
+                    "raw_value": "292.8万辆",
+                    "subject_scope": "consolidated_group",
+                    "unit": "万辆",
+                    "value": "292.8"
+                  },
+                  {
+                    "comparison_basis": null,
+                    "currency": null,
+                    "name": "新能源车销售量合计",
+                    "period": "2025年",
+                    "raw_value": "1,643,009辆",
+                    "subject_scope": "consolidated_group",
+                    "unit": "辆",
+                    "value": "1643009"
+                  }
+                ],
+                "period": "2025年",
+                "subject_scope": "consolidated_group",
+                "text": "销量规模方面，全年整车销量达4,507,518辆（同比增12.32%）。其中自主品牌销量292.8万辆，占整体销量的65%；新能源汽车销量达1,643,009辆（乘用车1,481,504辆，商用车161,505辆）。主要整车主体销售中，上汽通用五菱1,615,066辆、上汽大众1,024,000辆、乘用车分公司886,742辆、上汽通用535,000辆、上汽大通222,286辆、智己汽车81,017辆。"
+              }
+            ],
+            "limitations": [],
+            "status": "observed"
+          }
+        },
+        "limitations": [],
+        "schema_version": "company_profile_workpaper_draft.v1"
+      },
+      "usage": {
+        "input_tokens": 18637,
+        "output_tokens": 4444,
+        "total_tokens": 23081
+      }
+    }
+  ],
+  "elapsed_seconds": 125.00907154753804
+}
