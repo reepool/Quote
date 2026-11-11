@@ -19,5 +19,5 @@
 
 ## 4. 移交与归档
 
-- [ ] 4.1 移交登记：入库去重键不含 mapping_version 的结构性修复（映射版本生命周期，V6 owner 域）写入移交记录并附本次证据链。
+- [x] 4.1 移交登记：结构性修复（去重键纳入 mapping_version）移交 V6 owner 域；过渡期防护物化于 docs/development/mapping_version_bump_runbook.md（装载目录→验证量级→重跑本迁移→verify→观察首窗的强制顺序，附本次证据链）。
 - [ ] 4.2 openspec validate 通过；生产不变量自查（判定语义零变化、写路径零触碰、可回滚）后交 A 审核。
