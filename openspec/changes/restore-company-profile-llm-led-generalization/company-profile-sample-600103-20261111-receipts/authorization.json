@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600103-sample-preview-20261111",
+  "binding_sha256": "59596410fcfd23e0631cb06ffbcd5be90023b4f9f273ba64ce3d3664508954ec",
+  "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+  "approval_reference": "company-profile-three-round-preview-card; user asked to show company drafts 2026-11-11",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "user_requested_sample_preview",
+  "window": "one fresh 600103 sample draft, 60000/600/6/1"
+}

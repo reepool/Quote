@@ -3884,7 +3884,11 @@ def interpret_direct_core(
                         }
                     )
                 )
-            if measure_current_request and accepted:
+            if (
+                measure_current_request
+                and accepted
+                and identity.get("sample_preview") != "company_v1"
+            ):
                 draft_ready_core()
             for page_no in reviewed.requested_pages:
                 page_no = int(page_no)
