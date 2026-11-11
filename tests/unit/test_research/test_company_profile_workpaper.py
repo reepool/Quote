@@ -193,26 +193,31 @@ def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_repla
         asyncio.run(client.close())
 
 
-def test_original_runtime_writer_query_export_and_new_read_instance_agree(tmp_path):
-    provider = _Provider()
-    writer = CompanyProfileResearchWriter(tmp_path / "output")
-    runtime = CompanyProfileStageRuntime(writer=writer, provider=provider, page_source=None)
-    item = {
-        "work_id": "v9-controlled", "report": _report(), "pages": PAGES,
-        "processing_identity": workpaper_processing_identity(real=False),
-    }
-    for stage in ("acquire", "parse", "semantic", "verify", "publish"):
-        assert runtime.run_stage(stage, item)["status"] == "success"
-    reader = CompanyProfileReadService(tmp_path / "output")
-    queried = reader.query(("600000.SH",))
-    exported = reader.export(("600000.SH",), tmp_path / "export")
-    reloaded = CompanyProfileReadService(tmp_path / "output").query(("600000.SH",))
-    assert queried["profiles"] == exported["profiles"] == reloaded["profiles"]
-    profile = queried["profiles"][0]
-    assert profile["workpaper"]["origin"] == "controlled_fixture"
-    assert profile["core_complete"] is False
-    assert profile["workpaper_status"] == "pending_verification"
-    assert any(str(path).endswith(".md") for path in exported["files"])
+def test_original_runtime_writer_query_export_and_new_read_instance_agree():
+    from tempfile import TemporaryDirectory
+
+    with TemporaryDirectory(prefix="v9-workpaper-test-") as directory:
+        root = Path(directory)
+        provider = _Provider()
+        writer = CompanyProfileResearchWriter(root / "output")
+        runtime = CompanyProfileStageRuntime(writer=writer, provider=provider, page_source=None)
+        item = {
+            "work_id": "v9-controlled", "report": _report(), "pages": PAGES,
+            "processing_identity": workpaper_processing_identity(real=False),
+        }
+        for stage in ("acquire", "parse", "semantic", "verify", "publish"):
+            assert runtime.run_stage(stage, item)["status"] == "success"
+        reader = CompanyProfileReadService(root / "output")
+        queried = reader.query(("600000.SH",))
+        exported = reader.export(("600000.SH",), root / "export")
+        reloaded = CompanyProfileReadService(root / "output").query(("600000.SH",))
+        assert queried["profiles"] == exported["profiles"] == reloaded["profiles"]
+        profile = queried["profiles"][0]
+        assert profile["workpaper"]["origin"] == "controlled_fixture"
+        assert profile["core_complete"] is False
+        assert profile["workpaper_status"] == "pending_verification"
+        assert any(str(path).endswith(".md") for path in exported["files"])
+    assert not root.exists()
 
 
 def test_manual_reference_is_substantive_and_rendered_from_same_json():
@@ -220,6 +225,7 @@ def test_manual_reference_is_substantive_and_rendered_from_same_json():
     path = root / "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-reference-600104-2025.json"
     workpaper = CompanyProfileWorkpaper.model_validate_json(path.read_text())
     assert workpaper.origin == "human_reference"
+    assert render_workpaper(workpaper) == path.with_suffix(".md").read_text()
     assert len(workpaper.evidence) == 15
     assert sum(len(getattr(workpaper.elements, key).facts) for key in ELEMENT_LABELS) == 20
     assert "2,332,376,693.65" not in render_workpaper(workpaper)
