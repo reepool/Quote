@@ -2346,7 +2346,7 @@
           "request_interval_seconds": 0.2,
           "request_timeout_seconds": 20.0,
           "dry_run": false,
-          "max_runtime_seconds": 28800
+          "max_runtime_seconds": 18000
         }
       },
       "financial_statements_shadow_sync": {
