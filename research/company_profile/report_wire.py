@@ -435,6 +435,21 @@ def instructions(request: ReportSemanticRequestV3) -> str:
         or getattr(request, "discovery_scope", None) == "full_text"
     )
     anchor = identity.get("source_reference") == "anchor_v1"
+    preview = identity.get("sample_preview") == "company_v1"
+    portrait = (
+        "Build one readable portrait of this business. Look for the business "
+        "structure and which entity operates each part; the important products "
+        "or services and their use or the customer they serve; how money is "
+        "earned; the company or group revenue total and its main components; "
+        "how the business is operated and its key inputs or funding; customer "
+        "types, channels and markets; drivers the report itself names; and "
+        "important changes already realized. Keep plans separate. A segment or "
+        "business-line subtotal is not the company revenue total. Keep the "
+        "subject, period and unit with every amount. Do not invent a raw "
+        "material for a bank, and do not turn a disclosed finance line into "
+        "manufacturing. If these pages do not contain an item, omit it; that "
+        "is not proof the report never discloses it. "
+    )
     if anchor:
         evidence_rule = (
             "Evidence must be one id printed immediately before its original wording, "
@@ -500,6 +515,19 @@ def instructions(request: ReportSemanticRequestV3) -> str:
         if direct and identity.get("chapter_select"):
             selection = (
                 "These previews are already located subsection candidates, not "
+                "every page opening. Select the physical requested_pages that "
+                "together explain the business structure, what is sold or what "
+                "service is provided, how money is earned, and the company or "
+                "group revenue total. Include the revenue-table header, unit and "
+                "the continuation page when the preview shows the table is cut. "
+                "Also include a page that states the operating method, key inputs "
+                "or funding, customers or channels, a named operating driver, or "
+                "an important change already realized. "
+                "An unfamiliar heading is not automatically minor. Do not select "
+                "ordinary footnotes, rankings or slogans. "
+                if preview
+                else
+                "These previews are already located subsection candidates, not "
                 "every page opening. Select the physical requested_pages whose "
                 "headings belong to the current main businesses, operating model, "
                 "revenue total or composition, income-statement or segment notes, "
@@ -553,7 +581,14 @@ def instructions(request: ReportSemanticRequestV3) -> str:
             "correction, omit that condition. Do not request more pages."
         ))
     if request.purpose == "source_inventory":
-        if chapter:
+        if chapter and preview:
+            scope = portrait + (
+                "These pages are the selected chapter body. No candidate answer "
+                "is included. Record a separate source condition for each portrait "
+                "question the supplied text supports. Keep the printed table "
+                "header, period and unit with each amount. "
+            )
+        elif chapter:
             scope = (
                 "These pages are the selected chapter body, not a dump of the whole "
                 "report. No candidate answer is included. From the supplied text, "
@@ -624,7 +659,14 @@ def instructions(request: ReportSemanticRequestV3) -> str:
             )
         ))
     if request.purpose == "synthesize_views":
-        if chapter:
+        if chapter and preview:
+            lead = portrait + (
+                "Write a separate claim for each portrait question the supplied "
+                "text supports. Do not reuse one business sentence to answer the "
+                "other questions. A number in the answer must appear in the cited "
+                "span. "
+            )
+        elif chapter:
             lead = (
                 "The supplied text is the selected chapter evidence. Write the "
                 "first summary across the principal businesses, main products or "

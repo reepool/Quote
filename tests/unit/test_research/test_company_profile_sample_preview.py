@@ -120,3 +120,49 @@ def test_sample_preview_saves_one_draft_without_verification():
     assert "verify_views" not in provider.purposes
     assert any("纸业生产" in claim.answer for claim in result.claims)
     assert all(claim.limitation == "pending_verification" for claim in result.claims)
+
+
+def test_sample_preview_prompt_asks_for_the_business_portrait():
+    from research.company_profile.contracts import ReportSemanticRequestV3
+    from research.company_profile.report_wire import instructions
+
+    report = ReportIdentity(
+        instrument_id="600000.SH",
+        report_id="preview",
+        document_version="preview-doc",
+        report_period="2025-12-31",
+        published_at="2026-03-30T16:00:00+00:00",
+    )
+    identity = {
+        "reading_strategy": "direct_core_v1",
+        "chapter_select": True,
+        "sample_preview": "company_v1",
+        "source_reference": "anchor_v1",
+    }
+    pages = ({"page": 1, "text": "公司开展银行业务。", "readable": True},)
+    selection = ReportSemanticRequestV3(
+        request_id="preview-map",
+        purpose="source_inventory",
+        report=report,
+        processing_identity=identity,
+        source_pages=pages,
+        source_scope="page_map",
+        max_output_tokens=1000,
+        timeout_seconds=30,
+    )
+    draft = ReportSemanticRequestV3(
+        request_id="preview-draft",
+        purpose="synthesize_views",
+        report=report,
+        processing_identity=identity,
+        source_pages=pages,
+        source_conditions=selection.source_conditions,
+        max_output_tokens=2500,
+        timeout_seconds=30,
+    )
+    selected = instructions(selection)
+    written = instructions(draft)
+    assert "revenue total" in selected and "continuation page" in selected
+    assert "separate claim" in written and "subtotal is not the company revenue total" in written
+    assert "source_anchors" not in selected and "source_anchors" not in written
+
