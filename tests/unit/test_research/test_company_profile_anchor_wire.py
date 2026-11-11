@@ -226,6 +226,8 @@ def test_gateway_reuses_only_evidence_ids_on_this_request():
     )
     assert "kept-input" in schema["$defs"]["Evidence"]["enum"]
     assert "{page,quote}" not in text
+    assert "source_anchors" not in text
+    assert "[[anchor]]" in text
     assert result["source_conditions"][0]["evidence"][0]["evidence_id"] == "kept-input"
     assert (
         result["source_conditions"][0]["evidence"][0]["anchor"]["bounded_quote"]
@@ -492,4 +494,170 @@ def test_a_legal_id_for_the_wrong_sentence_does_not_become_the_business_quote():
     restored = result["source_conditions"][0]["evidence"][0]["anchor"]["bounded_quote"]
     assert restored == financial
     assert "主要从事" not in restored
+
+
+def test_first_formal_core_package_reaches_draft_and_verify_inside_the_card():
+    """One real chapter package, not a navigation preview and not the whole company."""
+    from research.company_profile.direct_reading import body_packages
+    from research.company_profile.models import ReportIdentity
+    from research.company_profile.reading_budget import (
+        request_payload_bytes,
+        request_reservation,
+    )
+    from tests.unit.test_research.test_company_profile_b43_core import _DOCUMENT, _pages
+
+    report = ReportIdentity(
+        instrument_id="600103.SH",
+        report_id="annual-2025",
+        document_version=_DOCUMENT,
+        report_period="2025-12-31",
+        published_at="2026-04-13T16:00:00+00:00",
+    )
+    identity = {
+        **_identity(),
+        "max_payload_utf8_bytes": 60_000,
+        "meter_profile": {
+            "model": "deepseek-flash",
+            "max_output_tokens_field": "max_tokens",
+            "stream": True,
+            "stream_include_usage": True,
+            "disable_thinking": True,
+        },
+    }
+    pages = _pages({9, 11, 13, 16})
+    packages = body_packages(pages, report, identity, 65_536)
+    assert packages
+    package = packages[0]
+    blob = "\n".join(str(page.get("text") or "") for page in package)
+    assert "主要从事" in blob and "伸性纸袋纸" in blob
+    catalog = source_anchor_catalog(package, report.document_version)
+    principal = next(
+        item
+        for item in catalog
+        if "主要从事" in str(
+            restore_source_anchor(item["id"], report, package)["anchor"]["bounded_quote"]
+        )
+    )
+    evidence = Evidence(
+        evidence_id=principal["id"],
+        report=report,
+        page=int(principal["page"]),
+        section_title="经营",
+        anchor=TextAnchor(
+            bounded_quote=restore_source_anchor(principal["id"], report, package)["anchor"][
+                "bounded_quote"
+            ],
+            source_offset=int(principal["start"]),
+        ),
+    )
+    condition = ReportSourceCondition(
+        condition_id="reviewed-principal",
+        dimension="principal_business",
+        description="公司从事竹木浆纸业产销及贸易经营。",
+        major=True,
+        statement_status="current",
+        evidence=(evidence,),
+    )
+    claim = ReportViewClaim(
+        claim_id="draft-reviewed-principal",
+        dimension="principal_business",
+        status="observed",
+        answer="公司从事竹木浆纸业产销及贸易经营。",
+        condition_ids=("reviewed-principal",),
+        evidence=(evidence,),
+    )
+    outputs = {
+        "source_inventory": 4000,
+        "synthesize_views": 2500,
+        "verify_views": 2000,
+    }
+    requests = {}
+    for purpose, output in outputs.items():
+        kwargs = {}
+        if purpose != "source_inventory":
+            kwargs["source_conditions"] = (condition,)
+        if purpose == "verify_views":
+            kwargs["claims"] = (claim,)
+        one = ReportSemanticRequestV3(
+            request_id=f"core-package:{purpose}",
+            purpose=purpose,
+            report=report,
+            processing_identity=identity,
+            source_pages=tuple(package),
+            max_output_tokens=output,
+            timeout_seconds=30.0,
+            **kwargs,
+        )
+        payload_bytes = request_payload_bytes(one)
+        reserved = request_reservation(one)
+        assert payload_bytes <= 60_000, (purpose, payload_bytes)
+        assert reserved <= 65_536, (purpose, reserved)
+        requests[purpose] = one
+    user = json.loads(
+        json.dumps(
+            gateway_user_object(requests["source_inventory"]),
+            ensure_ascii=False,
+            separators=(",", ":"),
+        )
+    )
+    assert "source_anchors" not in user
+    assert "document_version=" in user["source_pages"][0]["text"]
+    source, schema, text = _send(
+        requests["source_inventory"],
+        {
+            "source_conditions": [
+                {
+                    "condition_id": "reviewed-principal",
+                    "dimension": "principal_business",
+                    "description": "公司从事竹木浆纸业产销及贸易经营。",
+                    "major": True,
+                    "statement_status": "current",
+                    "evidence": [principal["id"]],
+                }
+            ]
+        },
+    )
+    assert "requested_pages" not in schema["required"]
+    assert "source_anchors" not in text
+    assert source["requested_pages"] == []
+    assert "主要从事" in source["source_conditions"][0]["evidence"][0]["anchor"]["bounded_quote"]
+    drafted, _, _ = _send(
+        requests["synthesize_views"],
+        {
+            "claims": [
+                {
+                    "claim_id": "draft-reviewed-principal",
+                    "dimension": "principal_business",
+                    "status": "observed",
+                    "answer": "公司从事竹木浆纸业产销及贸易经营。",
+                    "condition_ids": ["reviewed-principal"],
+                    "evidence": [principal["id"]],
+                }
+            ]
+        },
+    )
+    assert drafted["claims"][0]["evidence"][0]["evidence_id"] == principal["id"]
+    checked, _, _ = _send(
+        requests["verify_views"],
+        {
+            "checks": [
+                {
+                    "target_type": "claim",
+                    "target_id": "draft-reviewed-principal",
+                    "status": "pass",
+                    "explanation": "原文支持该主营表述",
+                },
+                {
+                    "target_type": "condition",
+                    "target_id": "reviewed-principal",
+                    "status": "pass",
+                    "explanation": "该条件由同一主张覆盖",
+                    "covers_target_type": "claim",
+                    "covers_target_id": "draft-reviewed-principal",
+                },
+            ]
+        },
+    )
+    assert checked["checks"][1]["covers_target_id"] == "draft-reviewed-principal"
+
 

@@ -38,6 +38,7 @@ S41_OBSERVATION = "company_profile_s41_observation.2026-11-06"
 CORE_OBSERVATION = "company_profile_core_observation.2026-11-08"
 POST_CLOSURE_OBSERVATION = "company_profile_post_closure_observation.2026-11-10"
 ANCHOR_ALIGNED_OBSERVATION = "company_profile_anchor_aligned_observation.2026-11-10"
+READABLE_SOURCE_OBSERVATION = "company_profile_readable_source_observation.2026-11-11"
 
 
 def assert_post_closure_observation(binding: dict, elapsed: int) -> bool:
@@ -114,6 +115,14 @@ def assert_anchor_aligned_observation(binding: dict, elapsed: int) -> bool:
         and int(binding.get("max_physical_requests") or 0) <= 16
         and int(binding.get("max_recoveries") or 0) <= 2
     )
+
+
+def assert_readable_source_observation(binding: dict, elapsed: int) -> bool:
+    """The same fresh 600103 limits, after the readable-source presentation."""
+    try:
+        return assert_anchor_aligned_observation(binding, elapsed)
+    except ValueError as exc:
+        raise ValueError(str(exc).replace("anchor-aligned", "readable-source")) from None
 
 
 def company_window_limits(binding: dict, state: dict | None) -> tuple[int, int]:
@@ -1050,6 +1059,8 @@ def validate_binding(
         allowed = assert_post_closure_observation(binding, elapsed)
     elif auth == ANCHOR_ALIGNED_OBSERVATION:
         allowed = assert_anchor_aligned_observation(binding, elapsed)
+    elif auth == READABLE_SOURCE_OBSERVATION:
+        allowed = assert_readable_source_observation(binding, elapsed)
     elif auth == S38_OBSERVATION:
         allowed = (
             0 < elapsed <= 900
@@ -1238,6 +1249,7 @@ def validate_binding(
                 "s1-600103-core-observation-20261108",
                 "s1-600103-post-closure-20261110",
                 "s1-600103-anchor-aligned-20261110",
+                "s1-600103-readable-source-20261111",
                 "s1-600000-s32",
                 "s1-600094-s32",
                 "s1-600100-s32",

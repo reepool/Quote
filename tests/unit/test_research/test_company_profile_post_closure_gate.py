@@ -5,6 +5,7 @@ import pytest
 from research.company_profile.bounded_entry import (
     assert_anchor_aligned_observation,
     assert_post_closure_observation,
+    assert_readable_source_observation,
 )
 
 
@@ -49,3 +50,11 @@ def test_anchor_aligned_observation_is_a_separate_fresh_entry():
     bank["task_route_labels"] = ["deepseek:deepseek-flash", "scorpio:grok-4.7"]
     with pytest.raises(ValueError, match="reviewed deepseek anchor entry"):
         assert_anchor_aligned_observation(bank, 900)
+
+
+def test_readable_source_observation_keeps_the_same_fresh_limits():
+    assert assert_readable_source_observation(_binding(), 900) is True
+    saved = _binding()
+    saved["navigation_query"] = "old-navigation.json"
+    with pytest.raises(ValueError, match="readable-source observation refuses saved semantics"):
+        assert_readable_source_observation(saved, 900)

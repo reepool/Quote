@@ -485,7 +485,7 @@ def instructions(request: ReportSemanticRequestV3) -> str:
             )
             .replace(
                 "Copy quotes from these pages that together state that same obligation:",
-                "Select ids from this request's source_anchors that together locate that same obligation:",
+                "Select the evidence ids printed beside the original wording that together locate that same obligation:",
             )
             .replace(
                 "Copy quotes from the supplied text.",
