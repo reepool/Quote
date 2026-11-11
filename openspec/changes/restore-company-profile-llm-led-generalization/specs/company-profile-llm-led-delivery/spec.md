@@ -2,6 +2,14 @@ Current policy: the user's 2026-10-27 correction, product v8, acceptance section
 
 ## ADDED Requirements
 
+### Requirement: Effect previews show sourced content before completeness acceptance
+An explicitly authorized preview task MUST publish readable company draft content with report identity, source references and current trust or missing-field labels without requiring completed three-view coverage or a passing S1 score. Known errors MUST NOT be displayed as trusted facts, and preview display MUST NOT promote claims, change historical completion results or authorize production. User feedback MUST determine the next content priorities instead of making all possible fields mandatory in advance.
+
+#### Scenario: The user requests a three-company demonstration within three rounds
+- **WHEN** the current user authorizes bounded previews of three specified companies before selecting mandatory and optional content
+- **THEN** the first handoff includes readable draft content, the second includes all three current-run sample results or explicit per-company execution failures, and the third closes presentation feedback without automatically starting a fourth engineering round
+- **AND** one company's incomplete profile does not block displaying other independent company drafts, historical reused examples are labelled separately from new runs, and all real calls remain inside the current card's fixed cumulative resource bounds
+
 ### Requirement: New-report interpretation has a real semantic execution path
 The new processing policy MUST route every new report's open-language interpretation through the existing real LLM gateway and company-profile owner. Existing field IDs, deterministic candidates, fake providers and missing providers MUST NOT satisfy semantic completion. Reuse MUST bind a prior successful semantic result to identical report hash, input coverage, processing code/policy, model and prompt versions. An explicitly authorized development continuation MAY revalidate compatible raw receipts under a repaired snapshot with retained version lineage; it MUST NOT present this as unchanged-result reuse or a first-run evaluation. First-run evaluation MUST prohibit semantic-result reuse while declaring PDF-cache conditions.
 

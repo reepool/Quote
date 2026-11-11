@@ -2,6 +2,8 @@
 
 > 2026-11-11，依据[A审核§251](review-submission.md#251-a审核停止末尾补角色策略以完整核心义务重整交付)。唯一实施change `restore-company-profile-llm-led-generalization`，执行[产品v8](../../../docs/development/company_profile_product_and_industry_semantic_requirements.md)、[验收v2 §7.107](../../../docs/development/company_profile_acceptance_program.md)、[交付路径v3](../../../docs/development/company_profile_delivery_plan.md)、[A/B流程v3](../../../docs/development/ab_role_development_workflow.md)。§250真实入口1/1结束，不借余额，不改原结果。**新增真实调用/探针/可发送binding/新公司/生产全部0。**
 
+> 2026-11-11用户明确改向§252：本卡不再是当前任务或展示前置，未完成6.AY工程工作停止；不要求做完两条受控链才看正文。唯一当前[三轮样稿卡](company-profile-three-round-preview-card.md)先交内容，不追改旧失败/分数，也不删除本卡历史。
+
 ## 唯一交付及替换边界
 
 原TaskService在原常规资源内优先交出完整公司画像、产品暴露和供应链定位，已读核心证据不因模型标为次要而留到最后；已有可信部分可立即交付，但细项不得耗尽仍缺投入/角色/产出去向的核心。保主要业务、公司期间总额与小计区别、投入、角色及有据上下游，语义支持/主要条件覆盖和必要未读底线不变。

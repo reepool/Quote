@@ -2,7 +2,7 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-11-10。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[A审核§251](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#251-a审核停止末尾补角色策略以完整核心义务重整交付)：§250真实1/1失败结束，实际核心被major筛选和细项调度后置，停止该组合付费。唯一[核心义务优先交付卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-obligation-first-delivery-card.md)在原owner零外呼合并交核心选择/有限打包恢复/原入口三视图，不另派末端差额卡。S1仍0/12、S32执行2/12核心0，旧结果/生产不改，每轮先清后做和收尾。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[用户改向§252](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#252-用户改向先展示三家公司样稿三轮内交效果)生效：[三轮三家公司样稿卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-three-round-preview-card.md)替代旧工程收口，先看内容再定必须/可选；第一轮直接交正文，第二轮交齐三家，第三轮收用户反馈。历史预览已附，不计本轮新跑。原owner样稿/查询导出优先，S1完整性不挡展示，生产不授权；每轮先清后做、保样稿/引用后清本人垃圾。
 
 ## 1. 开发者必须先理解的纠偏
 

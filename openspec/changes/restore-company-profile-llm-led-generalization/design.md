@@ -10,6 +10,8 @@
 
 ## Decisions
 
+**当前用户改向§252（2026-11-11）：** 原业务完整性开发退出当前主线，采用[三轮三家样稿卡](company-profile-three-round-preview-card.md)：公司级摘要早保存/早展示，query/export或Markdown直接给用户看，未核/缺项与真实处理身份明确，completion=false不清空正文。暂用少量通用栏目但不强制齐全，用户看过再定要求；固定3家各一次有界样稿，逐家公司完整性不阻塞其他家，禁止自动第四轮/补窗。历史真实预览与本轮新跑分开，正式S1/生产标准不改。
+
 **当前审核§251（2026-11-11）：** §250真实路径证明模型major=false被成稿pending当作核心免答开关，已读投入/自主生产/直销落到末尾补问，16次被先前细项用完，成稿length未作有界恢复。停止该组合用于付费。唯一[核心义务优先零外呼替换](company-core-obligation-first-delivery-card.md)在原owner以报告未答问题选择/分批，major只作建议、不自动升事实；真实源规模保原标记验证，已核对象复用、重复细项后置且主要义务不删。原物理账本、两次恢复、source-first/核验/单writer和必要未读底线不变，不重建全量虚拟尾额或通用调度平台。
 
 **当前审核§246（2026-11-10）：** §245证明两类失败：full_context控制字段requested_pages遗漏导致5包Schema拒绝；合法裸字符坐标ID又绑到无关表/标题。停止该组合用于下一付费观察。唯一[零外呼业务协议重整](company-core-readable-source-delivery-card.md)在原owner把可选ID与原文邻接呈现，保原始Evidence坐标/hash/上下文并避免全文重复；普通正文requested_pages可省只表无新增建议，page_map仍须返回选页，已有必要未读与语义载荷/支持覆盖不放宽。源到三视图公司级验收同窗交，不做字段修补后自动付费，不造平台；旧冻结身份/原结果不迁移。
