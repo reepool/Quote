@@ -1,0 +1,100 @@
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-11-11 14:18:09][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-11-11 14:18:09][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-11-11 14:18:09][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.01s
+[INFO][2026-11-11 14:18:10][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-11-11 14:18:10][tgbot.py:15] - [tgbot] Reading system configuration...
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+[INFO][2026-11-11 14:18:40][business_profile_async_production.py:3197] - business-profile stage start stage=acquire max_items=1 concurrency=1 max_elapsed_seconds=569.8031582310796 high_water_mark=1000
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-11-11 14:18:42][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-11-11 14:18:42][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-11-11 14:18:42][logging_manager.py:710] - Logging system initialized successfully
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-11-11 14:18:42][logging_manager.py:710] - Logging system initialized successfully
+Logging system initialized from config file
+  - Log level: INFO
+  - File logging: True
+  - Console logging: True
+  - Performance monitoring: True
+[INFO][2026-11-11 14:18:42][logging_manager.py:710] - Logging system initialized successfully
+[INFO][2026-11-11 14:18:42][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.00s
+[INFO][2026-11-11 14:18:42][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-11-11 14:18:42][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-11-11 14:18:42][logging_manager.py:391] - [ExchangeMapper.load_mappings] Starting operation
+[INFO][2026-11-11 14:18:42][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.10s
+[INFO][2026-11-11 14:18:42][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.10s
+[INFO][2026-11-11 14:18:42][logging_manager.py:397] - [ExchangeMapper.load_mappings] Operation completed in 0.09s
+[INFO][2026-11-11 14:18:43][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-11-11 14:18:43][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-11-11 14:18:43][tgbot.py:15] - [tgbot] Reading system configuration...
+[INFO][2026-11-11 14:18:43][aes.py:23] - libssl detected, it will be used for encryption
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+[INFO][2026-11-11 14:18:43][aes.py:23] - libssl detected, it will be used for encryption
+[INFO][2026-11-11 14:18:43][tgbot.py:15] - [tgbot] Reading system configuration...
+[INFO][2026-11-11 14:18:43][tgbot.py:15] - [tgbot] Reading system configuration...
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+[INFO][2026-11-11 14:18:43][tgbot.py:15] - [tgbot] Reading system configuration...
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+/home/python/miniconda3/envs/Quote/lib/python3.11/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.5.0) or chardet (7.6.0)/charset_normalizer (3.4.3) doesn't match a supported version!
+  warnings.warn(
+[INFO][2026-11-11 14:18:48][business_profile_pdf_artifacts.py:1271] - business-profile pdf artifact extracted source_file_id=None bytes=1570114 pages=205 status=parsed parser_warnings=0 timings={'hash_read_seconds': 0.00247, 'cache_read_seconds': 0.0, 'extract_seconds': 6.769065, 'write_seconds': 0.350911, 'total_seconds': 7.138014} path=/home/python/Quote/data/QuoteBak/company-profile-sample-600104-20261111/pdf-cache/derived/business_profile_pdfium_recovery.v4/aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874_57e1dd4f16ef40ff.json.gz
+[INFO][2026-11-11 14:18:54][business_profile_async_production.py:3466] - business-profile stage item stage=acquire work_id=bp-work-3c33ac57785a9d1fd59c00f8 instrument_id=600104.SH duration_seconds=13.212 claimed=1 completed=1 retried=0 terminal_failures=0
+[INFO][2026-11-11 14:18:54][business_profile_async_production.py:3576] - business-profile stage progress stage=acquire finished=1 in_flight=0 claimed=1 completed=1 retried=0 terminal_failures=0 effective_concurrency=1 elapsed_seconds=14.151 active_seconds=13.213
+[INFO][2026-11-11 14:18:55][business_profile_async_production.py:3671] - business-profile stage end stage=acquire status=success claimed=1 completed=1 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=1 elapsed_seconds=14.199 active_work_seconds=13.213 peak_in_flight=1 queue_underfilled_slots=0 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 3, 'wait_seconds': 4.3e-05, 'write_seconds': 0.375367, 'observation_seconds': 16.238976, 'transaction_p50_seconds': 0.127155, 'transaction_p95_seconds': 0.146291, 'transaction_max_seconds': 0.148417, 'writer_lock_duty': 0.023115, 'inter_write_idle_seconds': 12.92541, 'inter_write_seconds': 0.01}
+[INFO][2026-11-11 14:18:55][business_profile_async_production.py:3197] - business-profile stage start stage=parse max_items=1 concurrency=1 max_elapsed_seconds=569.8031582310796 high_water_mark=1000
+[INFO][2026-11-11 14:18:57][business_profile_async_production.py:3466] - business-profile stage item stage=parse work_id=bp-work-3c33ac57785a9d1fd59c00f8 instrument_id=600104.SH duration_seconds=1.656 claimed=1 completed=1 retried=0 terminal_failures=0
+[INFO][2026-11-11 14:18:57][business_profile_async_production.py:3576] - business-profile stage progress stage=parse finished=1 in_flight=0 claimed=1 completed=1 retried=0 terminal_failures=0 effective_concurrency=1 elapsed_seconds=2.653 active_seconds=1.656
+[INFO][2026-11-11 14:18:57][business_profile_async_production.py:3671] - business-profile stage end stage=parse status=success claimed=1 completed=1 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=1 elapsed_seconds=2.71 active_work_seconds=1.656 peak_in_flight=1 queue_underfilled_slots=0 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 5, 'wait_seconds': 7.3e-05, 'write_seconds': 0.624161, 'observation_seconds': 19.01151, 'transaction_p50_seconds': 0.125956, 'transaction_p95_seconds': 0.144165, 'transaction_max_seconds': 0.148417, 'writer_lock_duty': 0.032831, 'inter_write_idle_seconds': 15.397905, 'inter_write_seconds': 0.01}
+[INFO][2026-11-11 14:18:57][business_profile_async_production.py:3197] - business-profile stage start stage=semantic max_items=1 concurrency=1 max_elapsed_seconds=569.8031582310796 high_water_mark=1000
+[INFO][2026-11-11 14:19:00][pool.py:259] - event=llm.pool.lifecycle.started pool=shared_semantic identity=f7e0bebfd16fd4255d64a8d992f22b206e7e50f2b01c67c9cb96bde9d7dea72d total_concurrency=20
+[INFO][2026-11-11 14:19:00][pool.py:315] - event=llm.route.admitted pool=shared_semantic queue_wait_ms=0 active=1 correlation={'business_item_key': '600104.SH:source_inventory', 'workload': 'company_profile_stage5', 'stage': 'extract', 'run_id': 'bp-work-3c33ac57785a9d1fd59c00f8', 'logical_profile': 'semantic_extraction', 'request_hash': '0b813599295d956cfebeb15acfaaa17519d08d3a4ef4161a7be545bcbd2ecfc5'}
+[INFO][2026-11-11 14:19:00][pool.py:417] - event=llm.source.selected pool=shared_semantic logical_profile=semantic_extraction source_label=deepseek:deepseek-flash selected_profile=semantic_extraction__deepseek borrowed=False failover=False correlation={'business_item_key': '600104.SH:source_inventory', 'workload': 'company_profile_stage5', 'stage': 'extract', 'run_id': 'bp-work-3c33ac57785a9d1fd59c00f8', 'logical_profile': 'semantic_extraction', 'request_hash': '0b813599295d956cfebeb15acfaaa17519d08d3a4ef4161a7be545bcbd2ecfc5'}
+[INFO][2026-11-11 14:19:00][client.py:907] - event=llm.attempt.first_admitted profile=semantic_extraction__deepseek request_id=023ec15e32884113aec839aeb4567a35 initial_queue_wait_ms=0 execution_timeout_seconds=180.0
+[INFO][2026-11-11 14:19:00][client.py:1443] - event=llm.attempt.started profile=semantic_extraction__deepseek request_id=023ec15e32884113aec839aeb4567a35 attempt=1/1 timeout_seconds=180.0 remaining_seconds=180.0
+[INFO][2026-11-11 14:19:01][_client.py:1740] - HTTP Request: POST https://api.deepseek.com/v1/chat/completions "HTTP/1.1 200 OK"
+[INFO][2026-11-11 14:19:01][transport.py:269] - event=llm.stream.opened status_code=200 provider_request_id=None elapsed_ms=464
+[INFO][2026-11-11 14:19:01][transport.py:391] - event=llm.stream.first_event provider_request_id=None elapsed_ms=502
+[INFO][2026-11-11 14:19:02][client.py:1102] - event=llm.request.completed profile=semantic_extraction__deepseek request_id=023ec15e32884113aec839aeb4567a35 request_hash=eef48704734959388b6498890d9cd83b56da0468e48002c5aa001921835d2c85 attempts=1 latency_ms=1870 admission_wait_ms=0 execution_elapsed_ms=1721 input_tokens=1834 output_tokens=14 total_tokens=1848
+[INFO][2026-11-11 14:19:02][client.py:437] - event=llm.route.completed pool=shared_semantic logical_profile=semantic_extraction source_label=deepseek:deepseek-flash selected_profile=semantic_extraction__deepseek route_request_id=176cc7486ea649c68210f8509dab601d failover_count=0
+[INFO][2026-11-11 14:19:02][pool.py:315] - event=llm.route.admitted pool=shared_semantic queue_wait_ms=0 active=1 correlation={'business_item_key': '600104.SH:source_inventory', 'workload': 'company_profile_stage5', 'stage': 'extract', 'run_id': 'bp-work-3c33ac57785a9d1fd59c00f8', 'logical_profile': 'semantic_extraction', 'request_hash': '79f1b140bda8d8065060184161168da13217fe52cd3be1d60f4819e9d674085f'}
+[INFO][2026-11-11 14:19:02][pool.py:417] - event=llm.source.selected pool=shared_semantic logical_profile=semantic_extraction source_label=deepseek:deepseek-flash selected_profile=semantic_extraction__deepseek borrowed=False failover=False correlation={'business_item_key': '600104.SH:source_inventory', 'workload': 'company_profile_stage5', 'stage': 'extract', 'run_id': 'bp-work-3c33ac57785a9d1fd59c00f8', 'logical_profile': 'semantic_extraction', 'request_hash': '79f1b140bda8d8065060184161168da13217fe52cd3be1d60f4819e9d674085f'}
+[INFO][2026-11-11 14:19:02][client.py:907] - event=llm.attempt.first_admitted profile=semantic_extraction__deepseek request_id=f4e2f339fd7f472397fe72a70fd6494d initial_queue_wait_ms=0 execution_timeout_seconds=180.0
+[INFO][2026-11-11 14:19:03][client.py:1443] - event=llm.attempt.started profile=semantic_extraction__deepseek request_id=f4e2f339fd7f472397fe72a70fd6494d attempt=1/1 timeout_seconds=179.9 remaining_seconds=179.9
+[INFO][2026-11-11 14:19:03][_client.py:1740] - HTTP Request: POST https://api.deepseek.com/v1/chat/completions "HTTP/1.1 200 OK"
+[INFO][2026-11-11 14:19:03][transport.py:269] - event=llm.stream.opened status_code=200 provider_request_id=None elapsed_ms=142
+[INFO][2026-11-11 14:19:03][transport.py:391] - event=llm.stream.first_event provider_request_id=None elapsed_ms=176
+[INFO][2026-11-11 14:19:17][client.py:1102] - event=llm.request.completed profile=semantic_extraction__deepseek request_id=f4e2f339fd7f472397fe72a70fd6494d request_hash=da9f5302467c15b61f9a2b5a2e70163897b4303673733066224ef0d6194a6c85 attempts=1 latency_ms=14607 admission_wait_ms=0 execution_elapsed_ms=14596 input_tokens=8706 output_tokens=3140 total_tokens=11846
+[INFO][2026-11-11 14:19:17][client.py:437] - event=llm.route.completed pool=shared_semantic logical_profile=semantic_extraction source_label=deepseek:deepseek-flash selected_profile=semantic_extraction__deepseek route_request_id=5169407727fe49e9944238f409ccfbf1 failover_count=0
+[INFO][2026-11-11 14:19:23][business_profile_async_production.py:3466] - business-profile stage item stage=semantic work_id=bp-work-3c33ac57785a9d1fd59c00f8 instrument_id=600104.SH duration_seconds=24.249 claimed=1 completed=1 retried=0 terminal_failures=0
+[INFO][2026-11-11 14:19:23][business_profile_async_production.py:3576] - business-profile stage progress stage=semantic finished=1 in_flight=0 claimed=1 completed=1 retried=0 terminal_failures=0 effective_concurrency=1 elapsed_seconds=25.448 active_seconds=24.249
+[INFO][2026-11-11 14:19:23][business_profile_async_production.py:3671] - business-profile stage end stage=semantic status=success claimed=1 completed=1 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=1 elapsed_seconds=25.528 active_work_seconds=24.249 peak_in_flight=1 queue_underfilled_slots=0 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 9, 'wait_seconds': 0.160079, 'write_seconds': 1.211183, 'observation_seconds': 44.603543, 'transaction_p50_seconds': 0.125956, 'transaction_p95_seconds': 0.187428, 'transaction_max_seconds': 0.209221, 'writer_lock_duty': 0.027154, 'inter_write_idle_seconds': 40.35113, 'inter_write_seconds': 0.01}
+[INFO][2026-11-11 14:19:23][business_profile_async_production.py:3197] - business-profile stage start stage=verify max_items=1 concurrency=1 max_elapsed_seconds=569.8031582310796 high_water_mark=1000
+[INFO][2026-11-11 14:19:25][business_profile_async_production.py:3466] - business-profile stage item stage=verify work_id=bp-work-3c33ac57785a9d1fd59c00f8 instrument_id=600104.SH duration_seconds=1.295 claimed=1 completed=1 retried=0 terminal_failures=0
+[INFO][2026-11-11 14:19:25][business_profile_async_production.py:3576] - business-profile stage progress stage=verify finished=1 in_flight=0 claimed=1 completed=1 retried=0 terminal_failures=0 effective_concurrency=1 elapsed_seconds=2.407 active_seconds=1.296
+[INFO][2026-11-11 14:19:25][business_profile_async_production.py:3671] - business-profile stage end stage=verify status=success claimed=1 completed=1 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=1 elapsed_seconds=2.492 active_work_seconds=1.296 peak_in_flight=1 queue_underfilled_slots=0 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 11, 'wait_seconds': 0.160109, 'write_seconds': 1.4605, 'observation_seconds': 47.166246, 'transaction_p50_seconds': 0.125956, 'transaction_p95_seconds': 0.18198, 'transaction_max_seconds': 0.209221, 'writer_lock_duty': 0.030965, 'inter_write_idle_seconds': 42.664852, 'inter_write_seconds': 0.01}
+[INFO][2026-11-11 14:19:26][business_profile_async_production.py:3197] - business-profile stage start stage=publish max_items=1 concurrency=1 max_elapsed_seconds=569.8031582310796 high_water_mark=1000
+[INFO][2026-11-11 14:19:28][business_profile_async_production.py:3466] - business-profile stage item stage=publish work_id=bp-work-3c33ac57785a9d1fd59c00f8 instrument_id=600104.SH duration_seconds=1.029 claimed=1 completed=1 retried=0 terminal_failures=0
+[INFO][2026-11-11 14:19:28][business_profile_async_production.py:3576] - business-profile stage progress stage=publish finished=1 in_flight=0 claimed=1 completed=1 retried=0 terminal_failures=0 effective_concurrency=1 elapsed_seconds=2.253 active_seconds=1.030
+[INFO][2026-11-11 14:19:28][business_profile_async_production.py:3671] - business-profile stage end stage=publish status=success claimed=1 completed=1 retried=0 terminal_failures=0 configuration_blocked=0 machine_rework_deferred=0 artifact_replay_deferred=0 context_reselect_deferred=0 lease_conflicts=0 claim_exclusions=1 elapsed_seconds=2.311 active_work_seconds=1.03 peak_in_flight=1 queue_underfilled_slots=0 writer={'pending_writers': 0, 'active_writers': 0, 'max_pending_writers': 1, 'max_active_writers': 1, 'write_transactions': 13, 'wait_seconds': 0.160131, 'write_seconds': 1.692521, 'observation_seconds': 49.562846, 'transaction_p50_seconds': 0.125956, 'transaction_p95_seconds': 0.176532, 'transaction_max_seconds': 0.209221, 'writer_lock_duty': 0.034149, 'inter_write_idle_seconds': 44.862934, 'inter_write_seconds': 0.01}

@@ -1,0 +1,16 @@
+{
+  "worker_start": 9575979.700735003,
+  "deadline": 9576576.664748548,
+  "absolute_deadline_seconds": 600,
+  "logical_timeout_seconds": 180,
+  "client_ready": 9575979.70576646,
+  "execute_start": 9576006.861558829,
+  "budget_remaining_before_execute": 569.8031807560474,
+  "pages_loaded": 9576021.38105721,
+  "execute_done": 9576057.434797237,
+  "query_export_done": 9576058.533669978,
+  "transport_sends": 0,
+  "ledger_physical_requests": 2,
+  "ledger_charged_tokens": 13694,
+  "worker_elapsed_seconds": 79.0705407615751
+}

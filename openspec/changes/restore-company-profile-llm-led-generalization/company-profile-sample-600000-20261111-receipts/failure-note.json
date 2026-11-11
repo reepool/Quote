@@ -1,0 +1,9 @@
+{
+  "instrument_id": "600000.SH",
+  "model_calls": 0,
+  "charged_tokens": 0,
+  "stopped_before_model": "KeyError physical_pages",
+  "parsed_pages": 454,
+  "attempt_consumed": true,
+  "reopen": false
+}

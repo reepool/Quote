@@ -1,0 +1,50 @@
+{
+  "attempt-marker.json": {
+    "bytes": 716,
+    "sha256": "922387ff2df5498e396be8d9ab0815ef28af3de0582cb5bab80dff3efc220ce8"
+  },
+  "authorization.json": {
+    "bytes": 545,
+    "sha256": "582ba02ec8716e59620a86ec6361e5737858872c2931e725aee8028d97a67d68"
+  },
+  "binding.json": {
+    "bytes": 5969,
+    "sha256": "2aa6bfee7e03c79d48a614d44bd1dc8cc1c090b34621f0216d6d7cb2e9acfab1"
+  },
+  "budget-final.json": {
+    "bytes": 286,
+    "sha256": "9a43d7ebe29167dbd5a380eca33200e3388a46c3ede8cee578a1ac387450c07e"
+  },
+  "entry-result.json": {
+    "bytes": 23754,
+    "sha256": "78d9ae0326a39631c35f1d59c4ae7501a7db3bbd557026c47e1564e26101a25b"
+  },
+  "entry-stages.json": {
+    "bytes": 484,
+    "sha256": "d01f37a741527519547e7146c900a94a43625080bcfa4f575f72b07e014a6324"
+  },
+  "entry.log": {
+    "bytes": 14149,
+    "sha256": "11ddc75e4b68c283baa79b228bfd91a693ecc7f6cc56d60b3c180e002cdcfdc0"
+  },
+  "export.json": {
+    "bytes": 14491,
+    "sha256": "2019c93903006795b5a604a2f4bf41261cfe76728bdb3361a9e2c492d977ffbc"
+  },
+  "failure-note.json": {
+    "bytes": 201,
+    "sha256": "95f1de79e5ad71b6c102b5cb04a4487dafe84d9c6b5075818a4795b99589744e"
+  },
+  "frozen-config.json": {
+    "bytes": 25785,
+    "sha256": "7abeaae4d6795ac8fdb2de019d98559b1a56a0d9585f58608eed727057745d75"
+  },
+  "query.json": {
+    "bytes": 14309,
+    "sha256": "e7a100400e95b2088ef5e8b308177c90050483ec66284c31bc0411e58744622d"
+  },
+  "supervisor.json": {
+    "bytes": 61,
+    "sha256": "1d0bb7dcea2e0f3c2b565bf32d2e1baa55cf2f43827fa6b996b92bdfe6822d4c"
+  }
+}

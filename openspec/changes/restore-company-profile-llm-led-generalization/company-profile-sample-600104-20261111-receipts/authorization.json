@@ -1,0 +1,11 @@
+{
+  "status": "authorized",
+  "attempt": "s1-600104-sample-preview-20261111",
+  "binding_sha256": "0ec4bc7db7d2e8c1e80b9230f89272617554d129eb28a0c37ac82bb740930412",
+  "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+  "approval_reference": "company-profile-three-round-preview-card round 2; eight-element portraits 2026-11-11",
+  "billing_mode": "development_unpriced",
+  "cost_limit_evaluated": false,
+  "review_status": "sample_preview_round_2",
+  "window": "one fresh sample portrait, 60000/600/6/1"
+}
