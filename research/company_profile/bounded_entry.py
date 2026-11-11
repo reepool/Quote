@@ -39,6 +39,7 @@ CORE_OBSERVATION = "company_profile_core_observation.2026-11-08"
 POST_CLOSURE_OBSERVATION = "company_profile_post_closure_observation.2026-11-10"
 ANCHOR_ALIGNED_OBSERVATION = "company_profile_anchor_aligned_observation.2026-11-10"
 READABLE_SOURCE_OBSERVATION = "company_profile_readable_source_observation.2026-11-11"
+SAMPLE_PREVIEW = "company_profile_sample_preview.2026-11-11"
 
 
 def assert_post_closure_observation(binding: dict, elapsed: int) -> bool:
@@ -123,6 +124,44 @@ def assert_readable_source_observation(binding: dict, elapsed: int) -> bool:
         return assert_anchor_aligned_observation(binding, elapsed)
     except ValueError as exc:
         raise ValueError(str(exc).replace("anchor-aligned", "readable-source")) from None
+
+
+def assert_sample_preview(binding: dict, elapsed: int) -> bool:
+    """One fresh company draft. Saved semantics and extra companies stay closed."""
+    if any(
+        binding.get(key)
+        for key in (
+            "navigation_query",
+            "continuation_checkpoint",
+            "accepted_navigation_query",
+            "accepted_source_query",
+            "accepted_draft_query",
+            "reused_page_map_query",
+            "verification_history_queries",
+            "saved_source_draft",
+            "company_task_state",
+            "continuation_budget",
+        )
+    ):
+        raise ValueError("sample preview refuses saved semantics")
+    instrument = str((binding.get("asset") or {}).get("instrument_id") or "")
+    if instrument not in {"600103.SH", "600000.SH", "600104.SH"}:
+        raise ValueError("sample preview is only the three named companies")
+    if (
+        binding.get("reading_strategy") != "direct_core_v1"
+        or not binding.get("chapter_select")
+        or binding.get("source_reference") != "anchor_v1"
+        or binding.get("sample_preview") != "company_v1"
+        or binding.get("task_route_labels") != ["deepseek:deepseek-flash"]
+        or not binding.get("task_route_first_only")
+    ):
+        raise ValueError("sample preview sends only the reviewed deepseek draft entry")
+    return (
+        0 < elapsed <= 600
+        and int(binding.get("max_tokens") or 0) <= 60_000
+        and int(binding.get("max_physical_requests") or 0) <= 6
+        and int(binding.get("max_recoveries") or 0) <= 1
+    )
 
 
 def company_window_limits(binding: dict, state: dict | None) -> tuple[int, int]:
@@ -1061,6 +1100,8 @@ def validate_binding(
         allowed = assert_anchor_aligned_observation(binding, elapsed)
     elif auth == READABLE_SOURCE_OBSERVATION:
         allowed = assert_readable_source_observation(binding, elapsed)
+    elif auth == SAMPLE_PREVIEW:
+        allowed = assert_sample_preview(binding, elapsed)
     elif auth == S38_OBSERVATION:
         allowed = (
             0 < elapsed <= 900
@@ -1250,6 +1291,9 @@ def validate_binding(
                 "s1-600103-post-closure-20261110",
                 "s1-600103-anchor-aligned-20261110",
                 "s1-600103-readable-source-20261111",
+                "s1-600103-sample-preview-20261111",
+                "s1-600000-sample-preview-20261111",
+                "s1-600104-sample-preview-20261111",
                 "s1-600000-s32",
                 "s1-600094-s32",
                 "s1-600100-s32",
@@ -2152,6 +2196,8 @@ def _worker(
             identity["meter_profile"] = _meter_profile(gateway_config, binding)
         if binding.get("source_reference") == "anchor_v1":
             identity["source_reference"] = "anchor_v1"
+        if binding.get("sample_preview") == "company_v1":
+            identity["sample_preview"] = "company_v1"
         if binding.get("compatible_continue"):
             identity["compatible_continue"] = True
         if binding.get("saved_source_draft"):

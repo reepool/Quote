@@ -5521,6 +5521,150 @@ def interpret_direct_core(
                 + _nonempty_verify_units(sample, report=report, identity=identity)
                 + 2 * max(slice_units)
             )
+        if identity.get("chapter_select") and identity.get("sample_preview") == "company_v1":
+            candidates = chapter_candidate_pages(sources)
+            for page_no in candidates:
+                if page_no in by_page:
+                    by_page[page_no]["map_checked"] = True
+                    by_page[page_no]["structure_indexed"] = True
+            selected: list[int] = []
+            previews = [
+                {
+                    "page": int(page["page"]),
+                    "text": str(page.get("text") or ""),
+                    "readable": True,
+                }
+                for page in sources
+                if int(page["page"]) in set(candidates)
+            ]
+            try:
+                batches = navigation_batches(previews, report, identity, limit)
+            except ValueError as exc:
+                gaps.append(str(exc))
+                batches = []
+            for batch in batches:
+                try:
+                    response = invoke(
+                        "source_inventory",
+                        batch,
+                        source_scope="page_map",
+                        output=_nav_output(identity),
+                        later=0,
+                    )
+                except (ValueError, LlmError, SemanticProviderError) as exc:
+                    gaps.append(f"sample_preview_navigation_stopped:{exc}")
+                    break
+                accepted, selection_gaps = accept_selected_pages(
+                    response.requested_pages, sources
+                )
+                for gap in selection_gaps:
+                    if gap not in gaps:
+                        gaps.append(gap)
+                for page_no in accepted:
+                    if page_no not in selected:
+                        selected.append(page_no)
+            if not selected:
+                gaps.append("chapter_selection_empty")
+                return _result()
+            chapter_required_pages = {int(page) for page in selected}
+            chosen = [
+                page
+                for page in sources
+                if int(page["page"]) in chapter_required_pages
+                and page.get("readable", True)
+            ]
+            try:
+                packages = list(
+                    source_discovery_slices(chosen, report, identity, limit)
+                )
+            except ValueError as exc:
+                gaps.append(str(exc))
+                packages = []
+            if not packages:
+                gaps.append("sample_preview_no_source_package")
+                return _result()
+            first = packages[0]
+            inventory_pages(
+                [
+                    int(page["page"])
+                    for page in first
+                    if page.get("scope") != "boundary_context"
+                ],
+                prepared=[first],
+                keep_tail=False,
+            )
+            read_ids = {
+                int(page["page"])
+                for page in sources
+                if by_page.get(int(page["page"]), {}).get("status") == "read"
+            }
+            for page_no in sorted(chapter_required_pages - read_ids):
+                gap = f"necessary_unread:{page_no}"
+                if gap not in gaps:
+                    gaps.append(gap)
+            draft_pages = [page for page in sources if int(page["page"]) in read_ids]
+            if conditions and draft_pages:
+                try:
+                    draft_packages = list(
+                        body_packages(draft_pages, report, identity, limit)
+                    )
+                except ValueError as exc:
+                    gaps.append(str(exc))
+                    draft_packages = []
+                if not draft_packages:
+                    gaps.append("sample_preview_draft_unpacked")
+                else:
+                    package = draft_packages[0]
+                    if len(draft_packages) > 1:
+                        gaps.append("company_synthesis_context_truncated")
+                    page_set = {int(page["page"]) for page in package}
+                    related = [
+                        item
+                        for item in conditions
+                        if page_set & {int(evidence.page) for evidence in item.evidence}
+                    ][:8]
+                    try:
+                        drafted = invoke(
+                            "synthesize_views",
+                            package,
+                            source_scope="full_context",
+                            output=_body_output(identity),
+                            later=0,
+                            extra={"source_conditions": tuple(related)},
+                        )
+                    except (ValueError, LlmError, SemanticProviderError) as exc:
+                        gaps.append(f"sample_preview_draft_stopped:{exc}")
+                    else:
+                        for claim in drafted.claims:
+                            located = []
+                            failed = False
+                            for evidence in claim.evidence:
+                                bound = _bind_source_evidence(evidence, report, package)
+                                if bound is None:
+                                    failed = True
+                                    break
+                                located.append(bound)
+                            if failed or not located:
+                                gaps.append(f"evidence_not_located:{claim.claim_id}")
+                                claims.append(
+                                    claim.model_copy(
+                                        update={
+                                            "status": "unclear",
+                                            "limitation": "evidence_not_located",
+                                        }
+                                    )
+                                )
+                            else:
+                                claims.append(
+                                    claim.model_copy(
+                                        update={
+                                            "evidence": tuple(located),
+                                            "limitation": "pending_verification",
+                                        }
+                                    )
+                                )
+            gaps.append("sample_preview_unverified")
+            return _result()
         if identity.get("chapter_select"):
             candidates = chapter_candidate_pages(sources)
             candidate_pages = [
