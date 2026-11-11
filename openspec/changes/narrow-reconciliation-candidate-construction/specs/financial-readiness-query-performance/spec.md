@@ -10,8 +10,9 @@ The financial readiness path SHALL issue narrow queries that project only the co
 
 #### Scenario: Official-source merge resolves missing facts
 - **WHEN** a candidate has missing local facts and the readiness merge consults official CNInfo-sourced facts
-- **THEN** the merge fetch SHALL project only consumed columns and push the official-source predicate into SQL
+- **THEN** the merge fetch SHALL project only consumed columns and reduce rows via SQL-side source prefiltering, followed by the exact existing predicate on the narrowed rows
 - **AND** it SHALL NOT fetch the instrument's full fact payload to filter in Python
+- **AND** the prefilter SHALL be a superset of the exact predicate (no false negatives)
 
 #### Scenario: Another consumer reads full facts
 - **WHEN** any non-readiness caller requests financial numeric facts
@@ -20,7 +21,7 @@ The financial readiness path SHALL issue narrow queries that project only the co
 ## ADDED Requirements
 
 ### Requirement: Profile resolution runs once per instrument per scan
-The reconciliation scan SHALL resolve each instrument's statement profile once and share it across all of that instrument's report-period candidates, reusing the existing batch resolution facility rather than a per-candidate implementation.
+The reconciliation scan SHALL resolve each instrument's statement profile at most once and share the result across all of that instrument's report-period candidates. Implementation SHALL reuse the existing batch resolution facility (or an equivalent per-scan memoization over the same lookups) instead of duplicating per-candidate resolution.
 
 #### Scenario: One instrument with eleven period candidates
 - **WHEN** the scan builds candidates for one instrument across multiple report periods

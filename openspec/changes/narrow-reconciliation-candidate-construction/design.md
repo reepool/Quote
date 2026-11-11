@@ -11,18 +11,22 @@
 | local-core 窄查询 | 采样 1/3 命中，已在上一 change 窄化（~4ms/候选） | 已优化 |
 | 审计加载 | 循环前按标的批量预载 ✓ | 已批量化 |
 
-### 1.2 合并读取的筛选语义（必须逐字段保持）
+### 1.2 合并读取的筛选语义（2026-11-11 审核修正：真实谓词与下推策略）
 
-`_is_cninfo_data20_numeric_fact` 将 `source`、`source_mode`、`parser_version` 与 `raw_fact` 解码值拼接成 haystack 后判断是否包含 `cninfo_data20`。SQL 下推等价条件：
+`_is_cninfo_data20_numeric_fact` 的**真实**语义：将 `source`、`source_mode`、`parser_version` 与 `raw_fact` 的**三个特定键**（`source_profile`、`parser_profile`、`source`）str 拼接、**lower() 后**判断 `"cninfo" in haystack OR "data20" in haystack`（两个子串任意命中、大小写不敏感）。
+
+因此**精确单层 SQL 等价不可行**（首版草稿的 `LIKE '%cninfo_data20%'` 是复合串匹配，会漏 "CNINFO"/"data20" 单独命中的行——已证伪）。采用**强制两层设计**：
 
 ```sql
-WHERE source LIKE '%cninfo_data20%'
-   OR source_mode LIKE '%cninfo_data20%'
-   OR parser_version LIKE '%cninfo_data20%'
-   OR raw_fact_json LIKE '%cninfo_data20%'
+-- 第一层：SQL 超集预筛（lower + 双子串 OR；raw_fact_json 为超集，
+-- 覆盖三个特定键的一切取值可能）
+WHERE lower(source) LIKE '%cninfo%' OR lower(source) LIKE '%data20%'
+   OR lower(source_mode) LIKE '%cninfo%' OR lower(source_mode) LIKE '%data20%'
+   OR lower(parser_version) LIKE '%cninfo%' OR lower(parser_version) LIKE '%data20%'
+   OR lower(raw_fact_json) LIKE '%cninfo%' OR lower(raw_fact_json) LIKE '%data20%'
 ```
 
-（`raw_fact_json` 为 `raw_fact` 的序列化原文，LIKE 命中等价于解码值命中。）M1 的等价性双跑必须覆盖此谓词边界（source 命中、仅 raw_fact 命中、均不命中的样本）。
+第二层：对预筛返回的少量行（个位数）**原样执行既有 `_is_cninfo_data20_numeric_fact` 精确终判**。语义严格保持（预筛只做超集收敛，可能出现"SQL 命中但 Python 不命中"的假阳性，由终判排除；不会出现假阴性——预筛条件覆盖 Python 谓词的全部命中面）。M1 等价样本必须覆盖四形态：仅 `cninfo` 命中（含大小写变体）、仅 `data20` 命中、两者皆不命中、以及"其他 raw_fact 键含关键词"的假阳性守卫样本。
 
 ## 2. 目标与非目标
 
@@ -42,7 +46,7 @@ WHERE source LIKE '%cninfo_data20%'
 
 | 杠杆 | 内容 | 决策 |
 |---|---|---|
-| N1 合并读取窄化 | 复用 `get_financial_core_fact_readiness_rows` 设施：扩展可选参数（列集、无 canonical 过滤 + source 谓词），或同级新增窄方法共享同一 SQL 构造器——**不出现第三套独立事实查询实现** | **做**（证据主导项） |
+| N1 合并读取窄化 | 复用 `get_financial_core_fact_readiness_rows` 设施：扩展可选参数（列集、无 canonical 过滤、source 预筛谓词），或同级新增窄方法共享同一 SQL 构造器——**不出现第三套独立事实查询实现**；谓词按 §1.2 **强制两层**（SQL 超集预筛 + Python 精确终判） | **做**（证据主导项） |
 | N2 profile 按标的去重 | 扫描循环按 instrument 建字典：首个候选解析后复用；优先改造为调用既有 `resolve_financial_statement_profiles_for_instruments` 批量设施（消灭同功能双实现） | **做** |
 | N3 按标的批量就绪 | 一次查询覆盖标的全部 11 期 | 条件项（N1+N2 达标即不做） |
 
@@ -63,8 +67,9 @@ WHERE source LIKE '%cninfo_data20%'
 
 | 风险 | 缓解 |
 |---|---|
-| LIKE 谓词语义与 haystack 不完全等价（转义/大小写） | M1 双跑覆盖三形态边界样本；不等价则退化为"SQL 预筛 + Python 终判"双层（仍消除 95%+ 行） |
-| N2 批量设施与逐候选解析行为差异 | M1 先对同一标的集比对两种解析结果一致后才切换 |
+| 预筛条件意外窄于 Python 谓词（假阴性） | 预筛设计为**超集**（lower + 双子串 + raw_fact_json 全键覆盖）；M1 四形态样本含大小写变体；终判层保底语义不变 |
+| raw_fact_json 序列化形式影响 LIKE 命中 | 仅 ASCII 子串匹配，JSON 转义不影响 `cninfo`/`data20` 字面命中；M1 样本含三特定键各自的命中形态 |
+| N2 批量设施与逐候选解析行为差异 | M1 先对同一标的集比对两种解析结果一致后才切换（设施已核验：同样的两次 storage 查询 + 同一解析函数，按标的组织） |
 | 扫描速率仍不达标（剩余成本在别处） | M1 调用分解工具先行（复用 --decompose），不达标启动 N3 |
 
 ## 7. 验证
