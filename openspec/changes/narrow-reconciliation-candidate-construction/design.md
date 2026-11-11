@@ -26,7 +26,7 @@ WHERE lower(source) LIKE '%cninfo%' OR lower(source) LIKE '%data20%'
    OR lower(raw_fact_json) LIKE '%cninfo%' OR lower(raw_fact_json) LIKE '%data20%'
 ```
 
-第二层：对预筛返回的少量行（个位数）**原样执行既有 `_is_cninfo_data20_numeric_fact` 精确终判**。语义严格保持（预筛只做超集收敛，可能出现"SQL 命中但 Python 不命中"的假阳性，由终判排除；不会出现假阴性——预筛条件覆盖 Python 谓词的全部命中面）。M1 等价样本必须覆盖四形态：仅 `cninfo` 命中（含大小写变体）、仅 `data20` 命中、两者皆不命中、以及"其他 raw_fact 键含关键词"的假阳性守卫样本。
+第二层：对预筛返回的少量行（个位数）**原样执行既有 `_is_cninfo_data20_numeric_fact` 精确终判**。语义严格保持（预筛只做超集收敛，可能出现"SQL 命中但 Python 不命中"的假阳性，由终判排除；不会出现假阴性——超集论证：haystack 以空格拼接各字段，`cninfo`/`data20` 子串**不可能由跨字段拼接产生**，任一真实命中必然整体落在 source/source_mode/parser_version 三个列之一或 raw_fact 三个特定键的取值内，而后者必以字面形式出现在 `raw_fact_json` 序列化文本中，故预筛的并集覆盖全部命中面；`raw_fact_json` 为 NULL 时该行 raw_fact 解码为空 dict，两侧均无 raw_fact 命中，不影响超集性）。M1 等价样本必须覆盖四形态：仅 `cninfo` 命中（含大小写变体）、仅 `data20` 命中、两者皆不命中、以及"其他 raw_fact 键含关键词"的假阳性守卫样本。
 
 ## 2. 目标与非目标
 
