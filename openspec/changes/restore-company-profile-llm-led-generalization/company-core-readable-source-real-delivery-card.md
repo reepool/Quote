@@ -1,6 +1,8 @@
-# 可读原文后的真实核心交付（待新授权）
+# 可读原文后的真实核心交付（已执行结束）
 
 > 2026-11-11。依[A审核§248](review-submission.md#248-a审核受控核心收束转有止损的真实交付)、[验收计划v2 §7.106](../../../docs/development/company_profile_acceptance_program.md)、[交付路径v3](../../../docs/development/company_profile_delivery_plan.md)与[A/B流程v3](../../../docs/development/ab_role_development_workflow.md)，沿唯一实施change。§247受控入口2/2结束、§245真实失败1/1保留；不借旧余额。本卡未获新付费授权，真实已用0/1。
+
+> 2026-11-11[A审核§251](review-submission.md#251-a审核停止末尾补角色策略以完整核心义务重整交付)：本次真实入口已用1/1、核心0，16物理/109878账本/0恢复/263.994秒监督/unknown；原授权结束，余额不转后继，query/hash不改。下文仅保原冻结合同。当前只按[核心义务优先零外呼工程卡](company-core-obligation-first-delivery-card.md)，不按本卡新建可发送binding或请求。
 
 ## 唯一交付
 

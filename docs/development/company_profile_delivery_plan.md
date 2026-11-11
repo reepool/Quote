@@ -2,9 +2,11 @@
 
 > 类型：requirements / execution plan；版本：3；更新：2026-11-10。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
-> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。[A审核§248](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#248-a审核受控核心收束转有止损的真实交付)：§247第二次受控核心有限通过，工程卡结束。下一唯一[真实核心交付候选卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-readable-source-real-delivery-card.md)同卡收窄真实发送前短检，待新授权仅600103一次，当前零外呼/探针/可发送binding，不自动后继。S1仍0/12、S32执行2/12核心0，每轮先清后做及收尾。
+> 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[A审核§251](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#251-a审核停止末尾补角色策略以完整核心义务重整交付)：§250真实1/1失败结束，实际核心被major筛选和细项调度后置，停止该组合付费。唯一[核心义务优先交付卡](../../openspec/changes/restore-company-profile-llm-led-generalization/company-core-obligation-first-delivery-card.md)在原owner零外呼合并交核心选择/有限打包恢复/原入口三视图，不另派末端差额卡。S1仍0/12、S32执行2/12核心0，旧结果/生产不改，每轮先清后做和收尾。
 
 ## 1. 开发者必须先理解的纠偏
+
+**2026-11-11审核§251（当前）：** 可读源已让主营/产品/公司总额形成真实部分，§250仍未交完整核心且16次用尽。第7笔已读采购/自主生产/直销，major=false却被实际pending筛掉；产品细项/重复结构表述先展开，角色末尾才补，第8次length也未走已有可用恢复。A先前只核理想核心包而未核真实条件分布，承担就绪/路线判断不足。下一不是加2500上限或16次数，也不是再做一个分组工具；只按§7.107从实际源条件选择点替换末尾补问策略，以未答核心义务推进、保持LLM语义/对象覆盖，原入口真实规模的受控完整核心和length边界同窗交。零真实/探针/binding/扩样/生产，最多两次合并共性修正仍不成交边界止，不自动局部卡/付费；每轮清理并保原结果。
 
 **2026-11-10审核§246（当前）：** §245没有可信核心进展，11/91627/173.383秒/unknown及1/1结束不改；5次Schema失败60587账本均缺requested_pages，格式自洽仍未证明业务可消费。已接受c1主营引金融资产表、c2产品引标题、c4总额引分行业表头，核验拦截正确。A承担上轮就绪只看合法形态/未审引用呈现适用性的规划责任，B范围内执行及清理合规但报告需交代错绑，不只首Schema码。下一明确停止裸偏移目录+无编号正文组合用于付费，原owner合并ID紧邻真实原文/原坐标不变、full_context补页建议可省而page_map仍必填、原任务服务完整核心与错绑定/主要未读限用；不派单字段小卡，不加预算/换模型/建平台。本卡正常受控最多2次/仅一次合并返修，B同窗自主P0—P3/Review/清理；真实/探针/binding0，旧结果/正式源/标记/并行保护。
 

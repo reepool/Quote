@@ -118,6 +118,16 @@ The current v8 policy MUST use key-section reading with targeted expansion for o
 - **THEN** candidate-free discovery and substantive coverage remain accountable to the declared business questions, not only the conditions the model happened to enumerate
 - **AND** unresolved core omissions remain visible without substituting a different total, a future target or evaluation Gold; the frozen acceptance denominator and permitted minor omissions remain unchanged
 
+#### Scenario: Source priority flags do not suppress an unanswered core obligation
+- **WHEN** source discovery marks a disclosed input, operating mode or sales-channel condition supplementary while the corresponding report-level core question is still unanswered
+- **THEN** the owner presents the relevant read evidence and actual candidates to that core question before spending remaining requests on repetitive supplementary detail, without automatically promoting a fact or marking coverage by dimension or priority alone
+- **AND** existing verified claims may support multiple view projections through explicit valid coverage, while another major business and necessary unread sources remain blocking obligations
+
+#### Scenario: Core synthesis is truncated while bounded recovery remains
+- **WHEN** an actual core synthesis response is truncated and the current task still has authorized recovery, requests and ledger room
+- **THEN** the owner preserves the failed attempt and any independent verified results, and may recover the failed logical request with a smaller complete core target under its original parent and cumulative recovery limits
+- **AND** it does not parse partial JSON as success, resend the same oversized batch without change, reset recovery identity, or spend all remaining requests on secondary detail before the missing core is attempted
+
 #### Scenario: Many supplementary conditions remain after major business is answered
 - **WHEN** source-backed business grouping and current valid support and coverage checks establish the substantive core while repeated brands, regional examples or supplementary indicators remain
 - **THEN** the owner stops core generation rather than generating and verifying one sentence for every remaining raw condition
