@@ -2,6 +2,8 @@
 
 > 2026-11-10，依据[A审核§246](review-submission.md#246-a审核停止同配试跑把可读来源与业务载荷一起收束)；唯一change restore-company-profile-llm-led-generalization。执行[产品v8](../../../docs/development/company_profile_product_and_industry_semantic_requirements.md)、[验收v2 §7.105](../../../docs/development/company_profile_acceptance_program.md)、[交付路径v3](../../../docs/development/company_profile_delivery_plan.md)及[A/B v3](../../../docs/development/ab_role_development_workflow.md)。§244一次真实授权已用1/1失败，不续窗、不退次数/余额。本卡**新增真实调用/探针/可发送binding/新公司/生产均0**。
 
+> 2026-11-11[A审核§248](review-submission.md#248-a审核受控核心收束转有止损的真实交付)：本卡正常受控入口2/2已用完，第二次完整核心及三读在工程范围有限通过，结束本卡，不补跑。成功精确计数未保存；真实质量/吞吐不计。下一[候选卡](company-core-readable-source-real-delivery-card.md)仅授权发送前短检；真实调用须用户新授权。
+
 ## 1. 唯一交付与新旧边界
 
 原TaskService能把**可直接阅读并选择引用的原文**交给现有模型接口，并将合法核心源条件消费为完整公司画像、产品暴露、供应链定位及持久三读；普通正文少一个可默认的补页建议字段不再使整包语义丢失。已选必要页未读、错证据、未核主要条件仍不完整。不是交“requested_pages可省了”或“目录加文字了”两份局部报告。
