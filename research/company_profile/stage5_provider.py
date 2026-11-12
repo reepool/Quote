@@ -4176,10 +4176,22 @@ class CommonGatewaySemanticProvider:
         response_model: type[BaseModel],
         max_output_tokens: int,
         timeout_seconds: float,
+        profile_override: str | None = None,
     ) -> Mapping[str, Any]:
         """Versioned v9 purposes, through the same adapter and public gateway."""
-        if purpose not in {"select_profile_sections", "extract_profile_workpaper"}:
+        if purpose not in {
+            "select_profile_sections", "extract_profile_workpaper",
+            "review_profile_workpaper", "repair_profile_workpaper",
+            "verify_profile_workpaper_repair",
+        }:
             raise ValueError("unregistered workpaper purpose")
+        if purpose in {"review_profile_workpaper", "verify_profile_workpaper_repair"} and not profile_override:
+            raise ValueError("explicit workpaper reviewer profile is required")
+        if profile_override:
+            configured = getattr(self._client, "config", None)
+            profile = getattr(configured, "profiles", {}).get(profile_override)
+            if profile is None or not profile.enabled:
+                raise ValueError("workpaper profile override must be an existing enabled profile")
         if not getattr(self, "offline_only", False) and (
             self.execution_authorization.get("status") != "authorized"
             or self.execution_authorization.get("document_version") != report.document_version
@@ -4189,7 +4201,7 @@ class CommonGatewaySemanticProvider:
             raise ValueError("workpaper execution authorization is required")
         encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True)
         return self._execute(
-            call_type="extract",
+            call_type="verify" if purpose in {"review_profile_workpaper", "verify_profile_workpaper_repair"} else "extract",
             semantic_request_id=request_id,
             runtime_payload={
                 "report": report.model_dump(mode="json"),
@@ -4207,6 +4219,7 @@ class CommonGatewaySemanticProvider:
             normalize_response=lambda data: data,
             include_page_contexts=False,
             system_instruction_override=instructions,
+            profile_override=profile_override,
         )
 
     def interpret(self, request: ReportSemanticRequest) -> Mapping[str, Any]:
@@ -4389,6 +4402,7 @@ class CommonGatewaySemanticProvider:
         partition_index: int | None = None,
         partition_count: int | None = None,
         system_instruction_override: str | None = None,
+        profile_override: str | None = None,
     ) -> dict[str, Any]:
         workpaper_reading = schema_version == "company_profile_workpaper_wire.v1"
         report_reading = schema_version in {
@@ -4656,7 +4670,7 @@ class CommonGatewaySemanticProvider:
                 separators=(",", ":"),
             )
         llm_request = LlmRequest(
-            profile=self._profile,
+            profile=profile_override or self._profile,
             messages=(
                 LlmMessage(
                     role="system",
@@ -4739,7 +4753,11 @@ class CommonGatewaySemanticProvider:
                     "source_label": response.source_label,
                     "model": response.model,
                     "selected_profile": response.selected_profile,
-                    "logical_profile": response.logical_profile or self._profile,
+                    "logical_profile": response.logical_profile or profile_override or self._profile,
+                    "reasoning_effort": getattr(
+                        getattr(getattr(self._client, "config", None), "profiles", {}).get(response.selected_profile),
+                        "reasoning_effort", None,
+                    ),
                     "route_fingerprint": response.route_fingerprint,
                     "contract_status": "rejected",
                     "raw_content": response.raw_content,

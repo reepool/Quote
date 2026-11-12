@@ -1,0 +1,103 @@
+{
+  "run_id": "v9-quality-review-grok-ready-600100-20261112",
+  "asset": {
+    "instrument_id": "600100.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "ann_a14a45133bdd3d1fcb132c3049eb820e",
+    "filing_id": "1225244797",
+    "source": "cninfo",
+    "published_at": "2026-04-28T16:00:00+00:00",
+    "content_hash": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/7d/7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497.pdf",
+    "report_type": "annual_report"
+  },
+  "identity": {
+    "semantic_policy": "company_profile_llm_led.v2",
+    "reading_strategy": "chapter_workpaper_v1",
+    "prompt_version": "company_profile_workpaper.2026-11-12.supply-chain.v5",
+    "section_guide_version": "company_profile_section_guide.2026-11-12.v1",
+    "preprocessing_version": "toc_sections_native_layout.v2",
+    "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+    "execution_mode": "provider",
+    "semantic_reuse": false,
+    "max_section_characters": 160000,
+    "max_layout_characters": 500000,
+    "workpaper_max_output_tokens": 12000,
+    "logical_request_timeout_seconds": 620,
+    "workpaper_review_policy": "company_profile_workpaper_review.v1",
+    "quality_review_profile": "semantic_extraction__scorpio_grok",
+    "repair_profile": "semantic_extraction__deepseek",
+    "review_existing_draft_hash": "3802383bdd0f26fc514f0c29367120e837e04153ea28342e80d891e9dd30ecb3",
+    "review_max_output_tokens": 16384
+  },
+  "seed_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-reading-quality-600100-9e9dbaa1c3/export/600100.SH_2025-12-31.json",
+  "seed_file_sha256": "2f4a6aecbb5943808f37cf261a0eef11a083dc99dcd12d4c9156b35b25eda1b9",
+  "original_draft_hash": "3802383bdd0f26fc514f0c29367120e837e04153ea28342e80d891e9dd30ecb3",
+  "gateway": {
+    "profile": "semantic_extraction",
+    "pool": "shared_semantic",
+    "route_fingerprint": "86ad1a2cdbbd8e0f7f4c2283e651ff98dd60ab20348e66330c7f82807697fcd8",
+    "fallback_allowed": true,
+    "billing_mode": "development_unpriced",
+    "task_route_labels": [
+      "deepseek:deepseek-flash",
+      "scorpio:gemini-3.8-flash-high"
+    ],
+    "task_route_preferred_first": true,
+    "sources": [
+      {
+        "profile": "semantic_extraction__scorpio_gemini",
+        "provider_resource": "scorpio:gemini",
+        "model": "gemini-3.8-flash-high",
+        "source_label": "scorpio:gemini-3.8-flash-high"
+      },
+      {
+        "profile": "semantic_extraction__zai",
+        "provider_resource": "zai",
+        "model": "glm-5.3-flash",
+        "source_label": "zai:glm-5.3-flash"
+      },
+      {
+        "profile": "semantic_extraction__scorpio_grok",
+        "provider_resource": "scorpio:grok",
+        "model": "grok-4.7",
+        "source_label": "scorpio:grok-4.7"
+      },
+      {
+        "profile": "semantic_extraction__scorpio_deepseek",
+        "provider_resource": "scorpio:deepseek",
+        "model": "deepseek-v4-flash",
+        "source_label": "scorpio:deepseek-flash"
+      },
+      {
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "source_label": "deepseek:deepseek-flash"
+      }
+    ]
+  },
+  "review_profile": "semantic_extraction__scorpio_grok",
+  "repair_profile": "semantic_extraction__deepseek",
+  "approval_reference": "user-bounded-source-review-and-continued-development-2026-11-12",
+  "limits": {
+    "seconds": 1800,
+    "ledger": 3000000,
+    "physical_requests": 24,
+    "recoveries": 4,
+    "per_logical": 2,
+    "logical_requests": 3,
+    "known_cost_cny": 1000
+  },
+  "code_sha256": {
+    "workpaper.py": "d4eaa47ae3737c83d7fc2e36acfe86d91341212e1af239319a7d25c320153f32",
+    "workpaper_review.py": "5fcfc696a93a761b01d2fae91456d5237583989b245cd188baa2b902be039683",
+    "workpaper_llm.py": "c13d48a9f5ab4ec0dfead572871c33a80642e786460141aa949d86b251afaad1",
+    "runtime.py": "966692ab7106014cee0c8112f155ebc0cfc908acb5db99e6881bda65576d53a8",
+    "reads.py": "5503ae08a3e3d26d98438849c69603d9c03facf370ebdf574fff31a95a042278",
+    "stage5_provider.py": "490c857778321cd76da944999705f0b89262586244696ce1f7920359911454ab",
+    "workpaper_sections.py": "0f0806e4c07ed014c026f6159411f0e80600ed60cbd4902115b29726f7d104e3"
+  },
+  "production_authorization": "not_authorized",
+  "entrance_occupied": true
+}

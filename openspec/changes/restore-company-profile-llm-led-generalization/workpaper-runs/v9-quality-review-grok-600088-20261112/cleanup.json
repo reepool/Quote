@@ -1,0 +1,10 @@
+{
+  "removed_temporary_root": "/home/python/Quote/data/QuoteBak/v9-quality-review-grok-600088-20261112-aynlill3",
+  "released_bytes": 1639106,
+  "preserved": [
+    "original official PDF",
+    "original seed/query/receipts",
+    "this binding/query/export/model receipts/ledger/result"
+  ],
+  "removed": true
+}

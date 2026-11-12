@@ -1,0 +1,12 @@
+{
+  "removed_temporary_root": "/home/python/Quote/data/QuoteBak/v9-quality-review-grok-ready-600088-20261112-rkl7ccxe",
+  "released_bytes": 1613432,
+  "removed": true,
+  "preserved": [
+    "binding",
+    "query/export",
+    "original sandbox ledger",
+    "result",
+    "official source and historical workpaper"
+  ]
+}

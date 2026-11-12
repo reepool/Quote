@@ -1,0 +1,3 @@
+# 真实回执的离线限用投影
+
+真实TaskService在semantic已完成后总deadline到限，operator未在finally保存query/export就清库，这是本轮交付脚本缺陷。此处只使用已持久的两份真实响应（初核、修订）和原正式源，经原runtime/writer重建限用结果；最终再核按已发生的deadline失败，不伪造接受。它不是新的模型运行、不是完整真实三读证明，不改变result.json原失败。物理请求为0，不新增账本。

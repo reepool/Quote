@@ -6,6 +6,10 @@
 
 ## 1. 开发者必须先理解的纠偏
 
+2026-11-12当前6.BF：按用户批准实施[有界源对照闭环](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md#当前6bf高阶读源复核一次局部修订再核原入口交付)。Flash等现有模型保主抽取，高能力/高思考profile复核同一原文包；只隔离具体问题，至多一次合并修订与再核，不丢整份有用画像，不扩成全报告审计。先以中视/美尔雅/同方已有问题稿校准、不扩样；仍待正式核验，不改S1/S32或生产。Luna当前禁用不自动启用，本轮采用已启用Grok high；任务内选择，不改共享配置。每轮先清后做、权威结果持久后清运行库和脚本。
+
+6.BF本轮结束：[实际观察](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-quality-review-observation-20261112.md)为工程完成、真实3/3执行而完整纠正0/3。同方初核找出抵销/主体等4问题并收到4候选，再核到限未采纳；另两家初核超时。保失败与有用正文，6.BF4不勾完成，不自动补窗/扩样。下一主要矛盾是复核路由的完整响应及实际耗时，不是继续细化画像字段/通用审核体系。
+
 2026-11-12收尾（§262）：[6.BE](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md)林海/大名城2/2工作底稿已交，实际模型归因同链保存。当前不是再派公司核心尝试，S1/S32仍保原计数。大名城净额法/实收实支已分开；本次无适用内部抵销行，不能以新公司成稿宣称该缺口已解决。停止本轮扩样，后续复用适用已读表做最小内容验证，保持有用业务正文可读、具体缺项/错句明确限用。每轮先清后做/结束清本人临时物不变。
 
 2026-11-12当前交付（§261）：[6.BC/6.BD](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md)已完成四份不同业务的真实画像与实际模型归因，见[内容、来源与限用对照](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-model-attribution-observation-20261112.md)。模型身份来自成功回执而非首选配置/LLM自报；选章与正文分开。继续主路径应围绕主要板块/数字口径与可读内容取舍收敛，非必要原料明细和百分百填满后置；不以新增日志、门禁或模型排行榜冒充业务进展。当前四个入口均已结束，不为同源补句追加窗口；旧S1/S32和生产权限不变。每轮依旧先清后做/原结果持久后finally清本人过程物。

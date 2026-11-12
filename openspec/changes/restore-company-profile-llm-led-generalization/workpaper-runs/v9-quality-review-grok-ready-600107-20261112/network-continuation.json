@@ -1,0 +1,19 @@
+{
+  "reason": "sandbox_dns_failure; external DNS succeeds",
+  "external_data_permission": "user-explicit-three-public-reports-to-scorpio-grok-2026-11-12",
+  "prior_charged_tokens": 163484,
+  "prior_physical_requests": 2,
+  "elapsed_before_seconds": 1351.6532094478607,
+  "same_code_and_identity": true,
+  "working_database": "recreated after blocked-state cleanup; same source/seed and logical identity",
+  "cumulative_limits": {
+    "seconds": 1800,
+    "ledger": 3000000,
+    "physical_requests": 24,
+    "recoveries": 4,
+    "per_logical": 2,
+    "logical_requests": 3,
+    "known_cost_cny": 1000
+  },
+  "budget_not_reset": true
+}

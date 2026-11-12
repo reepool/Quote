@@ -10,6 +10,14 @@
 
 ## Decisions
 
+### 2026-11-12接续：源对照、局部修订与限用闭环
+
+原workpaper内新增可选review投影，不另建事实库/审批平台。新身份显式启用时，在现有选章/成稿后追加一次读源复核；目的到profile的本任务映射复用CommonGatewaySemanticProvider及LlmClient，共用累计账本。抽取可用Flash/Luna，复核可用更高能力/思考profile；名称和高思考不保证准确，实际model/source/requested_reasoning_effort/usage全部保存。未显式配置复核profile则保旧待核路径，不静默宣称高阶复核。
+
+复核给原章节包+底稿，返回实际检查的fact IDs、要素、错误/歧义/重要遗漏及原文Evidence。错误/歧义条目先退出正文，原响应和被撤回对象留审计；普通可选缺项不补。按问题合并至多一次patch请求，仅允许改原问题对象/增加对应遗漏，不动独立对象或来源。硬引用/数字校验通过仍待同一高阶profile再读源核修订，只有明确resolve且已检查修订对象才采纳；失败保有用部分、问题及具体原因，不重跑公司或无限恢复。reviewed只表示所选范围已做模型复核，不是approved/S1或全报告完整。
+
+为本次已批准校准，原TaskService页源可显式提供report匹配且带hash的review_seed，执行身份标existing_draft；只复用其正式PDF/已有Evidence，不重新选章/成稿，原query/回执不改，后继写新隔离root。先中视阈值、美尔雅利润列和同方抵销三份真实复核/局部修订，故障时正确限用；不自动扩公司或修改共享池。
+
 ### 2026-11-12接续：每份画像的实际模型归因
 
 company_profile_workpaper.v1追加可选generation投影，复用公共网关成功回执和原持久化路径；模型回复schema仍只产事实，不可自行写generation。run_workpaper仅收集本公司本次两逻辑请求的回执，按选章/抽取分别记录模型、来源、请求hash、已发送章节/页和处理版本。选章是标题索引阅读，不冒充正文阅读；正文作者是最终成功响应者，不是池首选或失败尝试。JSON/同源Markdown直接显示，无新数据库/评分平台。先中视传媒600088与美尔雅600107两份正式2025年报继续开发验证，检查业务内容和metadata同链读回；不称模型对比实验、盲测或正式S1。

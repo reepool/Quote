@@ -2,6 +2,26 @@ Current policy: product v9 (2026-11-11), acceptance section 7.109 and company-pr
 
 ## ADDED Requirements
 
+### Requirement: Bounded source review and local correction preserve useful workpapers
+An explicitly review-enabled workpaper MUST reuse the current gateway and writer to review the original selected source packet together with its draft. Extraction and review MAY use different existing profiles or requested reasoning levels; actual successful model/source/profile, requested reasoning effort and usage MUST be recorded for review, repair and final verification. A stronger name or model agreement MUST NOT establish factual truth or production approval. Legacy unreviewed workpapers MUST remain readable without implicit calls.
+
+The reviewer MUST identify checked fact IDs/elements and source-cited errors, ambiguity and material omissions within the supplied scope. Unknown references MUST NOT remove or approve facts. Validly flagged erroneous/ambiguous facts MUST leave the ordinary narrative while remaining auditable. Independent useful facts and all original sources MUST be retained. Optional omissions MUST NOT require repair. At most one combined local repair and one source-grounded verification of its proposed changes are allowed; repairs MUST preserve unrelated facts, report/source identity, exact numeric constraints and original responses. Only explicitly resolved issues with actually checked repaired objects may be applied. Failure, insufficient coverage, unresolved or newly found issues MUST remain visible and limited, never silently clear gaps. Review status MUST distinguish model-reviewed scope from trusted release and full-report completeness.
+
+#### Scenario: A repaired amount still uses the wrong financial column
+- **WHEN** a patch quotes a locatable amount but final source review rejects its metric meaning
+- **THEN** the patch is not accepted, the affected fact remains withheld and independent business facts stay readable
+- **AND** neither shared-dimension membership nor absence of a new issue alone resolves the original issue
+
+#### Scenario: A source table has a missing consolidation adjustment
+- **WHEN** review discovers a materially omitted subtotal/elimination in supplied source text
+- **THEN** one local patch may add source-backed adjustment facts, and final review must explicitly confirm that issue and check those facts before adoption
+- **AND** unrelated facts and the original extraction remain unchanged and the result does not claim whole-report recall
+
+#### Scenario: Review or final verification cannot finish
+- **WHEN** the configured review profile fails, reaches its budget or returns invalid references
+- **THEN** the draft and any valid issue/withdrawal information remain queryable with the concrete failure and incomplete review status
+- **AND** no new company entrance, automatic paid loop, production approval or fabricated pass is introduced
+
 ### Requirement: Workpapers expose the actual model and reading scope
 Each new LLM workpaper MUST bind locally generated model metadata from the existing gateway receipts, not model-authored attribution. Metadata MUST distinguish section selection from actual section-text interpretation, record the model/source label, logical and selected profiles when available, request and response identities, actual supplied section/page scope, prompt/preprocessing/guide versions and known usage. The successful returned model MUST be the content author; failed attempts and retries remain in the existing receipt/ledger and MUST NOT be mislabeled as successful readers. JSON, Markdown, query and export MUST expose this metadata without a new store or evaluation platform. Missing historical metadata MUST remain unknown, and old workpapers MUST stay readable without rewriting their original results.
 

@@ -1,0 +1,10 @@
+{
+  "removed_temporary_root": "/home/python/Quote/data/QuoteBak/v9-quality-review-grok-600107-20261112-6x1ftzzp",
+  "released_bytes": 1642986,
+  "preserved": [
+    "original official PDF",
+    "original seed/query/receipts",
+    "this binding/query/export/model receipts/ledger/result"
+  ],
+  "removed": true
+}

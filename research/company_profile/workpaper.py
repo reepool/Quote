@@ -204,7 +204,11 @@ class WorkpaperModelUsage(_Model):
 
 
 class WorkpaperModelCall(_Model):
-    purpose: Literal["select_profile_sections", "extract_profile_workpaper"]
+    purpose: Literal[
+        "select_profile_sections", "extract_profile_workpaper",
+        "review_profile_workpaper", "repair_profile_workpaper",
+        "verify_profile_workpaper_repair",
+    ]
     request_id: str = Field(min_length=1)
     request_hash: str | None = None
     response_hash: str | None = None
@@ -214,6 +218,7 @@ class WorkpaperModelCall(_Model):
     logical_profile: str | None = None
     route_fingerprint: str | None = None
     finish_reason: str | None = None
+    reasoning_effort: str | None = None
     contract_status: Literal["accepted", "rejected", "unknown"] = "unknown"
     usage: WorkpaperModelUsage = Field(default_factory=WorkpaperModelUsage)
     scope_kind: Literal["report_heading_index", "selected_source_sections"]
@@ -238,6 +243,72 @@ class WorkpaperGenerationMetadata(_Model):
         return self
 
 
+class WorkpaperReviewFindingDraft(_Model):
+    finding_id: str = Field(min_length=1)
+    element: str = Field(min_length=1)
+    severity: Literal["material", "minor"]
+    issue_type: Literal[
+        "unsupported_claim", "contradicts_source", "wrong_subject", "wrong_period",
+        "wrong_column", "wrong_unit_or_denominator", "unsupported_causality",
+        "material_omission", "other",
+    ]
+    action: Literal["quarantine", "correct", "possible_omission", "human_review"]
+    affected_fact_id: str | None = None
+    evidence_ids: tuple[str, ...] = Field(min_length=1)
+    explanation: str = Field(min_length=1)
+
+
+class WorkpaperReviewResponse(_Model):
+    reviewed_fact_ids: tuple[str, ...]
+    findings: tuple[WorkpaperReviewFindingDraft, ...] = ()
+
+
+class WorkpaperRepairResponse(_Model):
+    repaired_facts: tuple[WorkpaperFact, ...]
+
+
+class WorkpaperRepairCheck(_Model):
+    fact_id: str = Field(min_length=1)
+    accepted: bool
+    evidence_ids: tuple[str, ...] = Field(min_length=1)
+    explanation: str = Field(min_length=1)
+
+
+class WorkpaperRepairVerificationResponse(_Model):
+    checked_fact_ids: tuple[str, ...]
+    checks: tuple[WorkpaperRepairCheck, ...]
+
+
+class WorkpaperReviewFinding(_Model):
+    finding_id: str = Field(min_length=1)
+    element: str = Field(min_length=1)
+    severity: Literal["material", "minor"]
+    issue_type: Literal[
+        "unsupported_claim", "contradicts_source", "wrong_subject", "wrong_period",
+        "wrong_column", "wrong_unit_or_denominator", "unsupported_causality",
+        "material_omission", "other",
+    ]
+    affected_fact_id: str | None = None
+    evidence_ids: tuple[str, ...]
+    explanation: str = Field(min_length=1)
+    resolution: Literal[
+        "quarantined", "corrected_pending_trust", "unresolved",
+        "omission_candidate", "repair_rejected", "verification_failed",
+    ]
+    original_fact: WorkpaperFact | None = None
+    revised_fact: WorkpaperFact | None = None
+
+
+class WorkpaperQualityReview(_Model):
+    status: Literal["completed", "completed_with_open_findings", "incomplete", "failed"]
+    policy_version: str = "company_profile_workpaper_review.v1"
+    original_draft_hash: str
+    findings: tuple[WorkpaperReviewFinding, ...] = ()
+    checked_fact_ids: tuple[str, ...] = ()
+    calls: tuple[WorkpaperModelCall, ...] = ()
+    error: str | None = None
+
+
 class CompanyProfileWorkpaper(_Model):
     schema_version: Literal["company_profile_workpaper.v1"] = WORKPAPER_SCHEMA
     origin: Literal["human_reference", "llm_generated", "controlled_fixture"]
@@ -248,6 +319,7 @@ class CompanyProfileWorkpaper(_Model):
     limitations: tuple[str, ...] = ()
     supply_chain: WorkpaperSupplyChain | None = None
     generation: WorkpaperGenerationMetadata | None = None
+    quality_review: WorkpaperQualityReview | None = None
 
     @model_validator(mode="after")
     def source_integrity(self):
@@ -263,6 +335,11 @@ class CompanyProfileWorkpaper(_Model):
             source_pages = {span.page for item in self.evidence for span in item.source_spans}
             if set(self.generation.extraction.physical_pages) != source_pages:
                 raise ValueError("model extraction attribution does not match supplied pages")
+        if self.quality_review is not None:
+            sources_set = set(sources)
+            for finding in self.quality_review.findings:
+                if set(finding.evidence_ids) - sources_set:
+                    raise ValueError("review finding cites unknown source evidence")
         ids: set[str] = set()
         sections = [getattr(self.elements, name) for name in ELEMENT_LABELS]
         if self.supply_chain is not None:
@@ -418,8 +495,28 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
                 f"输入/输出/合计 {usage.input_tokens}/{usage.output_tokens}/{usage.total_tokens}"
                 if usage.total_tokens is not None else "usage未知"
             )
-            out.append(f"- {label}：{model}（{source}，{profile}），{scope}；{usage_text}；finish={call.finish_reason or '未知'}。")
+            effort = f"；requested_reasoning={call.reasoning_effort}" if call.reasoning_effort else ""
+            out.append(f"- {label}：{model}（{source}，{profile}），{scope}；{usage_text}；finish={call.finish_reason or '未知'}{effort}。")
         out.append(f"- 提示版本：`{workpaper.generation.prompt_version}`；预处理：`{workpaper.generation.preprocessing_version}`。")
+    if workpaper.quality_review is not None:
+        review = workpaper.quality_review
+        out.extend(["", "## 原文复核（开发结果仍待正式核验）", "", f"复核状态：`{review.status}`。"])
+        out.append(f"- 已检查原事实：{len(review.checked_fact_ids)}条；范围限于本次所选原文，不是全报告完整性保证。")
+        out.append(f"- 原始底稿哈希：`{review.original_draft_hash}`。")
+        for call in review.calls:
+            out.append(
+                f"- {call.purpose}：{call.model or '未知'}（{call.source_label or '未知'}）；"
+                f"requested_reasoning={call.reasoning_effort or '未知'}；usage={call.usage.total_tokens}。"
+            )
+        for finding in review.findings:
+            refs = "、".join(f"[{value}](#{value.lower()})" for value in finding.evidence_ids)
+            out.append(f"- {finding.severity} / {finding.issue_type} / {finding.resolution}：{finding.explanation}（{refs}）")
+            if finding.original_fact is not None:
+                out.append(f"  - 原事实（已保留审计）：{finding.original_fact.text}")
+            if finding.revised_fact is not None:
+                out.append(f"  - 修订候选（尚非可信发布）：{finding.revised_fact.text}")
+        if review.error:
+            out.append(f"- 复核未完成：{review.error}")
     out.extend(["", "## 来源", ""])
     for item in workpaper.evidence:
         out.extend([f"### {item.evidence_id}", "", " / ".join(item.section_path)])

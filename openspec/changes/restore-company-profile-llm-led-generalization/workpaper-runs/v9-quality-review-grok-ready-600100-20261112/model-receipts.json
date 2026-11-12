@@ -1,0 +1,382 @@
+[
+  {
+    "request_id": "bp-work-51af24d3ec63e967910ca406:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "a44d7c0f569d4f4e91ee9f3c9020bce86e4c0ef718579232e18fb84f57b511e7",
+    "response_hash": "8655df1328bdecf6e88647183eed817cf78d2b4ef20721f7354a75fad683e104",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"BS-01\",\"BS-02\",\"BS-03\",\"PS-01\",\"PS-02\",\"PS-03\",\"PS-04\",\"PS-05\",\"RM-01\",\"RM-02\",\"RM-03\",\"SM-01\",\"SM-02\",\"SM-03\",\"SM-04\",\"OI-01\",\"OI-02\",\"OI-03\",\"CM-01\",\"CM-02\",\"CM-03\",\"CM-04\",\"OD-01\",\"OD-02\",\"OD-03\",\"OD-04\",\"MC-01\",\"MC-02\",\"MC-03\",\"MC-04\",\"SC-P1\",\"SC-P2\",\"SC-U1\",\"SC-U2\",\"SC-D1\",\"SC-D2\",\"SC-D3\"],\"findings\":[{\"finding_id\":\"F-SM01\",\"element\":\"scale_and_mix\",\"affected_fact_id\":\"SM-01\",\"severity\":\"material\",\"issue_type\":\"contradicts_source\",\"action\":\"correct\",\"evidence_ids\":[\"source-0010\"],\"explanation\":\"SM-01将抵销后主营业务收入合计1,497,009.55万元写成由公共安全698,057.58万元、数智产业275,072.20万元、智慧能源450,419.69万元、其他业务67,758.61万元、总部投资及科技园33,812.59万元构成。上述分项相加为抵销前小计1,525,120.68万元，与合计相差业务板块间收入抵销-28,111.12万元，不能作为合计的“其中”构成。应分开列示抵销前小计、板块间抵销和抵销后合计。\"},{\"finding_id\":\"F-SCALE-OMIT\",\"element\":\"scale_and_mix\",\"affected_fact_id\":null,\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"evidence_ids\":[\"source-0010\"],\"explanation\":\"来源主营业务分产业板块表已披露主干产业收入变动和毛利率，底稿只给出现年绝对额和定性原因，未反映这些主要收入与盈利结构调整：公共安全收入增加60,481.61万元，数智产业减少118,490.59万元，智慧能源减少83,746.45万元，抵销后主营业务收入由1,669,062.84万元降至1,497,009.55万元、减少172,053.28万元。2025年毛利率为公共安全29.81%、数智产业46.67%、智慧能源10.79%、合计26.50%（同比增加2.19个百分点）。该合计毛利率变动与叙述中的整体毛利率同比提升2.35个百分点不是同一口径，不能互相替代。\"},{\"finding_id\":\"F-RM03\",\"element\":\"revenue_model\",\"affected_fact_id\":\"RM-03\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"evidence_ids\":[\"source-0001\",\"source-0012\"],\"explanation\":\"来源支持公共安全产业提供基于辐射成像技术的智能检查系统、解决方案及全生命周期运维服务，以及安检设备和综合安检解决方案。但并未披露其盈利模式为“设备、平台与服务相结合的收入来源”；“设备+平台+服务”只出现在九三阅兵保障方案的具体描述中，不能外推为该产业的收入来源结构。\"},{\"finding_id\":\"F-CM04\",\"element\":\"customers_channels_markets\",\"affected_fact_id\":\"CM-04\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"evidence_ids\":[\"source-0007\"],\"explanation\":\"“国内外累计拓展4000余家机构客户”与“CNKI AI产品在哈萨克斯坦实现境外首单突破”处于同一分句，指向CNKI AI相关客户拓展，不是公司整体客户拓展。底稿将4000余家机构客户写成公司层面事实，扩大了主体。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "BS-01",
+        "BS-02",
+        "BS-03",
+        "PS-01",
+        "PS-02",
+        "PS-03",
+        "PS-04",
+        "PS-05",
+        "RM-01",
+        "RM-02",
+        "RM-03",
+        "SM-01",
+        "SM-02",
+        "SM-03",
+        "SM-04",
+        "OI-01",
+        "OI-02",
+        "OI-03",
+        "CM-01",
+        "CM-02",
+        "CM-03",
+        "CM-04",
+        "OD-01",
+        "OD-02",
+        "OD-03",
+        "OD-04",
+        "MC-01",
+        "MC-02",
+        "MC-03",
+        "MC-04",
+        "SC-P1",
+        "SC-P2",
+        "SC-U1",
+        "SC-U2",
+        "SC-D1",
+        "SC-D2",
+        "SC-D3"
+      ],
+      "findings": [
+        {
+          "finding_id": "F-SM01",
+          "element": "scale_and_mix",
+          "affected_fact_id": "SM-01",
+          "severity": "material",
+          "issue_type": "contradicts_source",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "explanation": "SM-01将抵销后主营业务收入合计1,497,009.55万元写成由公共安全698,057.58万元、数智产业275,072.20万元、智慧能源450,419.69万元、其他业务67,758.61万元、总部投资及科技园33,812.59万元构成。上述分项相加为抵销前小计1,525,120.68万元，与合计相差业务板块间收入抵销-28,111.12万元，不能作为合计的“其中”构成。应分开列示抵销前小计、板块间抵销和抵销后合计。"
+        },
+        {
+          "finding_id": "F-SCALE-OMIT",
+          "element": "scale_and_mix",
+          "affected_fact_id": null,
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "explanation": "来源主营业务分产业板块表已披露主干产业收入变动和毛利率，底稿只给出现年绝对额和定性原因，未反映这些主要收入与盈利结构调整：公共安全收入增加60,481.61万元，数智产业减少118,490.59万元，智慧能源减少83,746.45万元，抵销后主营业务收入由1,669,062.84万元降至1,497,009.55万元、减少172,053.28万元。2025年毛利率为公共安全29.81%、数智产业46.67%、智慧能源10.79%、合计26.50%（同比增加2.19个百分点）。该合计毛利率变动与叙述中的整体毛利率同比提升2.35个百分点不是同一口径，不能互相替代。"
+        },
+        {
+          "finding_id": "F-RM03",
+          "element": "revenue_model",
+          "affected_fact_id": "RM-03",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0001",
+            "source-0012"
+          ],
+          "explanation": "来源支持公共安全产业提供基于辐射成像技术的智能检查系统、解决方案及全生命周期运维服务，以及安检设备和综合安检解决方案。但并未披露其盈利模式为“设备、平台与服务相结合的收入来源”；“设备+平台+服务”只出现在九三阅兵保障方案的具体描述中，不能外推为该产业的收入来源结构。"
+        },
+        {
+          "finding_id": "F-CM04",
+          "element": "customers_channels_markets",
+          "affected_fact_id": "CM-04",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "“国内外累计拓展4000余家机构客户”与“CNKI AI产品在哈萨克斯坦实现境外首单突破”处于同一分句，指向CNKI AI相关客户拓展，不是公司整体客户拓展。底稿将4000余家机构客户写成公司层面事实，扩大了主体。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 18976,
+      "output_tokens": 889,
+      "total_tokens": 44780
+    }
+  },
+  {
+    "request_id": "bp-work-51af24d3ec63e967910ca406:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "eb2801ed4ec644cacdb76f77b600be2fe56f230b78249e1aaaa8ee302b7d79c7",
+    "response_hash": "1afee8851f814bb06ed46153fb6168cafcbae02562d0f645c8cff2c159d6a67d",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"SM-01\",\"text\":\"2025年公司实现营业收入150.65亿元；主营业务分产业板块抵销前小计收入1,525,120.68万元，其中公共安全698,057.58万元、数智产业275,072.20万元、智慧能源450,419.69万元、其他业务67,758.61万元、总部投资及科技园33,812.59万元；减业务板块间抵销-28,111.12万元后，主营业务收入合计1,497,009.55万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0010\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"150.65亿元\",\"value\":\"150.65\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null},{\"name\":\"主营业务收入-公共安全\",\"raw_value\":\"698,057.58\",\"value\":\"698057.58\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年1-12月\",\"comparison_basis\":null},{\"name\":\"主营业务收入-数智产业\",\"raw_value\":\"275,072.20\",\"value\":\"275072.20\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年1-12月\",\"comparison_basis\":null},{\"name\":\"主营业务收入-智慧能源\",\"raw_value\":\"450,419.69\",\"value\":\"450419.69\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年1-12月\",\"comparison_basis\":null},{\"name\":\"主营业务收入-其他业务\",\"raw_value\":\"67,758.61\",\"value\":\"67758.61\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年1-12月\",\"comparison_basis\":null},{\"name\":\"主营业务收入-总部投资及科技园\",\"raw_value\":\"33,812.59\",\"value\":\"33812.59\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年1-12月\",\"comparison_basis\":null},{\"name\":\"主营业务收入-抵销前小计\",\"raw_value\":\"1,525,120.68\",\"value\":\"1525120.68\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年1-12月\",\"comparison_basis\":null},{\"name\":\"主营业务收入-业务板块间抵销\",\"raw_value\":\"-28,111.12\",\"value\":\"-28111.12\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年1-12月\",\"comparison_basis\":null},{\"name\":\"主营业务收入-合计\",\"raw_value\":\"1,497,009.55\",\"value\":\"1497009.55\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年1-12月\",\"comparison_basis\":null}]},{\"fact_id\":\"review-add:F-SCALE-OMIT\",\"text\":\"2025年主营业务分产业板块收入变动：公共安全收入增加60,481.61万元，数智产业减少118,490.59万元，智慧能源减少83,746.45万元；抵销后主营业务收入由1,669,062.84万元降至1,497,009.55万元，减少172,053.28万元。2025年毛利率为公共安全29.81%、数智产业46.67%、智慧能源10.79%、合计26.50%，合计毛利率同比增加2.19个百分点；该合计毛利率变动与叙述中整体毛利率同比提升2.35个百分点不是同一口径。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"主营业务收入同比增减-公共安全\",\"raw_value\":\"60,481.61\",\"value\":\"60481.61\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年1-12月\",\"comparison_basis\":\"同比增减\"},{\"name\":\"主营业务收入同比增减-数智产业\",\"raw_value\":\"-118,490.59\",\"value\":\"-118490.59\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年1-12月\",\"comparison_basis\":\"同比增减\"},{\"name\":\"主营业务收入同比增减-智慧能源\",\"raw_value\":\"-83,746.45\",\"value\":\"-83746.45\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年1-12月\",\"comparison_basis\":\"同比增减\"},{\"name\":\"主营业务收入-合计\",\"raw_value\":\"1,497,009.55\",\"value\":\"1497009.55\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年1-12月\",\"comparison_basis\":null},{\"name\":\"主营业务收入-合计上年同期\",\"raw_value\":\"1,669,062.84\",\"value\":\"1669062.84\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年1-12月\",\"comparison_basis\":null},{\"name\":\"主营业务收入同比增减-合计\",\"raw_value\":\"-172,053.28\",\"value\":\"-172053.28\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年1-12月\",\"comparison_basis\":\"同比增减\"},{\"name\":\"毛利率-公共安全\",\"raw_value\":\"29.81%\",\"value\":\"29.81\",\"unit\":\"%\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年1-12月\",\"comparison_basis\":null},{\"name\":\"毛利率-数智产业\",\"raw_value\":\"46.67%\",\"value\":\"46.67\",\"unit\":\"%\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年1-12月\",\"comparison_basis\":null},{\"name\":\"毛利率-智慧能源\",\"raw_value\":\"10.79%\",\"value\":\"10.79\",\"unit\":\"%\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年1-12月\",\"comparison_basis\":null},{\"name\":\"毛利率-合计\",\"raw_value\":\"26.50%\",\"value\":\"26.50\",\"unit\":\"%\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年1-12月\",\"comparison_basis\":null},{\"name\":\"毛利率比上年增减-合计\",\"raw_value\":\"2.19%\",\"value\":\"2.19\",\"unit\":\"%\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年1-12月\",\"comparison_basis\":\"同比增减\"}]},{\"fact_id\":\"RM-03\",\"text\":\"公共安全产业提供基于辐射成像技术的智能检查系统、解决方案及全生命周期运维服务，以及安检设备和综合安检解决方案。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0012\"],\"metrics\":[]},{\"fact_id\":\"CM-04\",\"text\":\"CNKI AI产品在哈萨克斯坦实现境外首单突破，国内外累计拓展4000余家机构客户。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[]}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "SM-01",
+          "text": "2025年公司实现营业收入150.65亿元；主营业务分产业板块抵销前小计收入1,525,120.68万元，其中公共安全698,057.58万元、数智产业275,072.20万元、智慧能源450,419.69万元、其他业务67,758.61万元、总部投资及科技园33,812.59万元；减业务板块间抵销-28,111.12万元后，主营业务收入合计1,497,009.55万元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0005",
+            "source-0010"
+          ],
+          "metrics": [
+            {
+              "name": "营业收入",
+              "raw_value": "150.65亿元",
+              "value": "150.65",
+              "unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null
+            },
+            {
+              "name": "主营业务收入-公共安全",
+              "raw_value": "698,057.58",
+              "value": "698057.58",
+              "unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年1-12月",
+              "comparison_basis": null
+            },
+            {
+              "name": "主营业务收入-数智产业",
+              "raw_value": "275,072.20",
+              "value": "275072.20",
+              "unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年1-12月",
+              "comparison_basis": null
+            },
+            {
+              "name": "主营业务收入-智慧能源",
+              "raw_value": "450,419.69",
+              "value": "450419.69",
+              "unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年1-12月",
+              "comparison_basis": null
+            },
+            {
+              "name": "主营业务收入-其他业务",
+              "raw_value": "67,758.61",
+              "value": "67758.61",
+              "unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年1-12月",
+              "comparison_basis": null
+            },
+            {
+              "name": "主营业务收入-总部投资及科技园",
+              "raw_value": "33,812.59",
+              "value": "33812.59",
+              "unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年1-12月",
+              "comparison_basis": null
+            },
+            {
+              "name": "主营业务收入-抵销前小计",
+              "raw_value": "1,525,120.68",
+              "value": "1525120.68",
+              "unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年1-12月",
+              "comparison_basis": null
+            },
+            {
+              "name": "主营业务收入-业务板块间抵销",
+              "raw_value": "-28,111.12",
+              "value": "-28111.12",
+              "unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年1-12月",
+              "comparison_basis": null
+            },
+            {
+              "name": "主营业务收入-合计",
+              "raw_value": "1,497,009.55",
+              "value": "1497009.55",
+              "unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年1-12月",
+              "comparison_basis": null
+            }
+          ]
+        },
+        {
+          "fact_id": "review-add:F-SCALE-OMIT",
+          "text": "2025年主营业务分产业板块收入变动：公共安全收入增加60,481.61万元，数智产业减少118,490.59万元，智慧能源减少83,746.45万元；抵销后主营业务收入由1,669,062.84万元降至1,497,009.55万元，减少172,053.28万元。2025年毛利率为公共安全29.81%、数智产业46.67%、智慧能源10.79%、合计26.50%，合计毛利率同比增加2.19个百分点；该合计毛利率变动与叙述中整体毛利率同比提升2.35个百分点不是同一口径。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "metrics": [
+            {
+              "name": "主营业务收入同比增减-公共安全",
+              "raw_value": "60,481.61",
+              "value": "60481.61",
+              "unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年1-12月",
+              "comparison_basis": "同比增减"
+            },
+            {
+              "name": "主营业务收入同比增减-数智产业",
+              "raw_value": "-118,490.59",
+              "value": "-118490.59",
+              "unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年1-12月",
+              "comparison_basis": "同比增减"
+            },
+            {
+              "name": "主营业务收入同比增减-智慧能源",
+              "raw_value": "-83,746.45",
+              "value": "-83746.45",
+              "unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年1-12月",
+              "comparison_basis": "同比增减"
+            },
+            {
+              "name": "主营业务收入-合计",
+              "raw_value": "1,497,009.55",
+              "value": "1497009.55",
+              "unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年1-12月",
+              "comparison_basis": null
+            },
+            {
+              "name": "主营业务收入-合计上年同期",
+              "raw_value": "1,669,062.84",
+              "value": "1669062.84",
+              "unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2024年1-12月",
+              "comparison_basis": null
+            },
+            {
+              "name": "主营业务收入同比增减-合计",
+              "raw_value": "-172,053.28",
+              "value": "-172053.28",
+              "unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年1-12月",
+              "comparison_basis": "同比增减"
+            },
+            {
+              "name": "毛利率-公共安全",
+              "raw_value": "29.81%",
+              "value": "29.81",
+              "unit": "%",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年1-12月",
+              "comparison_basis": null
+            },
+            {
+              "name": "毛利率-数智产业",
+              "raw_value": "46.67%",
+              "value": "46.67",
+              "unit": "%",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年1-12月",
+              "comparison_basis": null
+            },
+            {
+              "name": "毛利率-智慧能源",
+              "raw_value": "10.79%",
+              "value": "10.79",
+              "unit": "%",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年1-12月",
+              "comparison_basis": null
+            },
+            {
+              "name": "毛利率-合计",
+              "raw_value": "26.50%",
+              "value": "26.50",
+              "unit": "%",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年1-12月",
+              "comparison_basis": null
+            },
+            {
+              "name": "毛利率比上年增减-合计",
+              "raw_value": "2.19%",
+              "value": "2.19",
+              "unit": "%",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年1-12月",
+              "comparison_basis": "同比增减"
+            }
+          ]
+        },
+        {
+          "fact_id": "RM-03",
+          "text": "公共安全产业提供基于辐射成像技术的智能检查系统、解决方案及全生命周期运维服务，以及安检设备和综合安检解决方案。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0012"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "CM-04",
+          "text": "CNKI AI产品在哈萨克斯坦实现境外首单突破，国内外累计拓展4000余家机构客户。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "metrics": []
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 12166,
+      "output_tokens": 1636,
+      "total_tokens": 13802
+    }
+  }
+]

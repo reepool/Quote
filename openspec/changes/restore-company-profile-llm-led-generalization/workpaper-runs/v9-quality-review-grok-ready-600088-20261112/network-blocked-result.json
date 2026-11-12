@@ -1,0 +1,15 @@
+{
+  "run_id": "v9-quality-review-grok-ready-600088-20261112",
+  "status": "blocked_network_export_approval",
+  "real_model_review_completed": false,
+  "model_responses_received": 0,
+  "three_reads_equal": true,
+  "query_sha256": "8b7666feb3cce5753d08412d4735ce915e9f4cccdb2c378995767a1119d9a3fd",
+  "charged_tokens": 178394,
+  "physical_requests": 2,
+  "usage_status": "unknown_reserved; not supplier usage or proven billing",
+  "reason": "sandbox DNS failed; unsandboxed external transfer was rejected pending explicit user permission",
+  "production_authorization": "not_authorized",
+  "removed_duplicate_query_sha256": "8b7666feb3cce5753d08412d4735ce915e9f4cccdb2c378995767a1119d9a3fd",
+  "reconstruction": "original seed and failed-review message; raw interrupted ledger retained"
+}

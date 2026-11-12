@@ -1,0 +1,10 @@
+{
+  "removed_temporary_root": "/home/python/Quote/data/QuoteBak/v9-quality-review-grok-ready-600100-20261112-authorized-ugrbat9j",
+  "released_bytes": 1726412,
+  "preserved": [
+    "original official PDF",
+    "original seed/query/receipts",
+    "this binding/query/export/model receipts/ledger/result"
+  ],
+  "removed": true
+}

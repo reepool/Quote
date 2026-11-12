@@ -689,7 +689,7 @@ class CompanyProfileTaskService:
         work_id: str | None = None,
         plan_directory: str | Path | None = None,
     ) -> dict[str, Any]:
-        if self.execution_budget is not None:
+        if self.execution_budget is not None and str(action or "").strip().lower() in {"run", "resume"}:
             max_elapsed_seconds = min(
                 max_elapsed_seconds, self.execution_budget.remaining_time()
             )

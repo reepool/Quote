@@ -286,7 +286,13 @@ class CompanyProfileReadService:
             profile["schema_version"] = "company_profile_common_core_profile.v3"
             profile["workpaper"] = record.workpaper.model_dump(mode="json")
             profile["workpaper_markdown"] = render_workpaper(record.workpaper)
-            profile["workpaper_status"] = "pending_verification"
+            review = record.workpaper.quality_review
+            profile["workpaper_status"] = (
+                "model_reviewed_pending_verification"
+                if review is not None and review.status == "completed"
+                else "review_limited_pending_verification"
+                if review is not None else "pending_verification"
+            )
             profile["workpaper_receipts"] = list(record.workpaper_receipts)
         elif isinstance(record, CompanyProfileRuntimeRecordV2):
             from .report_interpretation import research_views

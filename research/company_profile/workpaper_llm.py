@@ -29,8 +29,10 @@ SECTION_GUIDE = (
 WORKPAPER_READING_STRATEGY = "chapter_workpaper_v1"
 
 
-def workpaper_processing_identity(*, real: bool = True) -> dict[str, Any]:
-    return {
+def workpaper_processing_identity(
+    *, real: bool = True, review: bool = False, review_profile: str | None = None,
+) -> dict[str, Any]:
+    identity = {
         "semantic_policy": "company_profile_llm_led.v2",
         "reading_strategy": WORKPAPER_READING_STRATEGY,
         "prompt_version": WORKPAPER_PROMPT_VERSION,
@@ -44,6 +46,17 @@ def workpaper_processing_identity(*, real: bool = True) -> dict[str, Any]:
         "workpaper_max_output_tokens": 12_000,
         "logical_request_timeout_seconds": 620,
     }
+    if review:
+        from .workpaper_review import REVIEW_POLICY
+
+        if real and not review_profile:
+            raise ValueError("real workpaper review requires an explicitly selected enabled profile")
+        identity.update(
+            workpaper_review_policy=REVIEW_POLICY,
+            quality_review_profile=review_profile,
+            repair_profile="semantic_extraction__deepseek" if real else None,
+        )
+    return identity
 
 
 SELECTION_INSTRUCTIONS = """Select annual-report sections from THIS report's TOC/heading tree.
@@ -129,7 +142,7 @@ def _model_call(
                     and item.get("contract_status") == "accepted"), {})
     fields = {key: receipt.get(key) for key in (
         "request_hash", "response_hash", "source_label", "model", "selected_profile",
-        "logical_profile", "route_fingerprint", "finish_reason",
+        "logical_profile", "route_fingerprint", "finish_reason", "reasoning_effort",
     )}
     usage = receipt.get("usage") or {}
     return WorkpaperModelCall(

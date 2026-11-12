@@ -208,6 +208,10 @@ def _reading_policy(identity: Mapping[str, Any] | None) -> tuple:
             "preprocessing_version",
             "section_guide_version",
             "product_contract",
+            "workpaper_review_policy",
+            "review_existing_draft_hash",
+            "quality_review_profile",
+            "repair_profile",
             "discovery_scope",
             "wire_protocol",
             "execution_mode",
@@ -233,6 +237,7 @@ class _WorkState:
     workpaper: CompanyProfileWorkpaper | None = None
     workpaper_packet: SectionPacket | None = None
     workpaper_receipts: list[dict[str, Any]] = field(default_factory=list)
+    review_seed: CompanyProfileWorkpaper | None = None
     source_pdf_path: str | None = None
     completed_scopes: dict[str, CompanyProfileTaskResult] = field(default_factory=dict)
     scope_digests: dict[str, str] = field(default_factory=dict)
@@ -454,6 +459,17 @@ class CompanyProfileStageRuntime:
         if item.get("accepted_records"):
             state.accepted_records = tuple(item["accepted_records"])
         state.processing_identity = processing_identity_from_item(item)
+        if item.get("review_seed") is not None:
+            from .workpaper_review import REVIEW_POLICY, workpaper_hash
+
+            seed = CompanyProfileWorkpaper.model_validate(item["review_seed"])
+            if (
+                state.processing_identity.get("workpaper_review_policy") != REVIEW_POLICY
+                or state.processing_identity.get("review_existing_draft_hash") != workpaper_hash(seed)
+                or seed.report != state.report
+            ):
+                raise ValueError("explicit matching existing-draft review identity is required")
+            state.review_seed = seed
         if state.workpaper is not None and (
             state.workpaper.report != state.report
             or prior_policy != _reading_policy(state.processing_identity)
@@ -555,16 +571,43 @@ class CompanyProfileStageRuntime:
         assert state.report is not None
         if state.processing_identity.get("reading_strategy") == WORKPAPER_READING_STRATEGY:
             if state.workpaper is None:
-                result = run_workpaper(
-                    report=state.report, pages=state.pages,
-                    processing_identity=state.processing_identity,
-                    provider=self._report_provider, work_id=state.work_id,
-                    source_pdf_path=state.source_pdf_path,
-                )
-                state.workpaper = result.workpaper
-                state.workpaper_packet = result.packet
-                state.pages = result.pages
-                state.workpaper_receipts = [dict(item) for item in result.receipts]
+                if state.review_seed is not None:
+                    from .workpaper_review import seed_material
+
+                    state.workpaper, state.workpaper_packet, checked_pages = seed_material(
+                        state.review_seed, report=state.report,
+                        source_pdf_path=state.source_pdf_path,
+                        real=state.processing_identity.get("execution_mode") == "provider",
+                    )
+                    state.pages = checked_pages or state.pages
+                    state.workpaper.validate_pages(state.pages)
+                else:
+                    result = run_workpaper(
+                        report=state.report, pages=state.pages,
+                        processing_identity=state.processing_identity,
+                        provider=self._report_provider, work_id=state.work_id,
+                        source_pdf_path=state.source_pdf_path,
+                    )
+                    state.workpaper = result.workpaper
+                    state.workpaper_packet = result.packet
+                    state.pages = result.pages
+                    state.workpaper_receipts = [dict(item) for item in result.receipts]
+                self._persist_work(state)
+            if state.processing_identity.get("workpaper_review_policy"):
+                from .workpaper_review import REVIEW_POLICY, review_workpaper
+
+                if state.processing_identity["workpaper_review_policy"] != REVIEW_POLICY:
+                    raise ValueError("unknown workpaper review policy")
+                if state.workpaper.quality_review is None:
+                    # Make useful extraction readable before the slower review call.
+                    self._verify(state)
+                    self._publish(state)
+                    state.workpaper, receipts = review_workpaper(
+                        state.workpaper, packet=state.workpaper_packet,
+                        provider=self._report_provider, work_id=state.work_id,
+                        identity=state.processing_identity,
+                    )
+                    state.workpaper_receipts.extend(dict(item) for item in receipts)
             state.provider_calls = [str(item["purpose"]) for item in state.workpaper_receipts]
             gateway_budget = getattr(self._report_provider, "run_budget", None)
             if gateway_budget is not None:
@@ -1008,6 +1051,8 @@ class CompanyProfileStageRuntime:
             state.workpaper = CompanyProfileWorkpaper.model_validate_json(
                 json.dumps(payload["workpaper"], ensure_ascii=False)
             )
+        if payload.get("review_seed") is not None:
+            state.review_seed = CompanyProfileWorkpaper.model_validate(payload["review_seed"])
         if payload.get("workpaper_packet") is not None:
             state.workpaper_packet = SectionPacket.model_validate_json(
                 json.dumps(payload["workpaper_packet"], ensure_ascii=False)
@@ -1184,6 +1229,7 @@ class CompanyProfileStageRuntime:
                     "workpaper": state.workpaper.model_dump(mode="json") if state.workpaper else None,
                     "workpaper_packet": state.workpaper_packet.model_dump(mode="json") if state.workpaper_packet else None,
                     "workpaper_receipts": state.workpaper_receipts,
+                    "review_seed": state.review_seed.model_dump(mode="json") if state.review_seed else None,
                     "source_pdf_path": state.source_pdf_path,
                 } if state.processing_identity.get("reading_strategy") == WORKPAPER_READING_STRATEGY else {}),
                 **(
