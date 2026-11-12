@@ -1,0 +1,20 @@
+{
+  "run_id": "v9-continuous-reviewed-600054-20261112",
+  "name": "黄山旅游",
+  "mode": "fresh_continuous_known_report_development",
+  "production_authorization": "not_authorized",
+  "old_semantics_loaded": false,
+  "preparation_seconds": 56.761,
+  "task_state": "completed",
+  "stage_results": null,
+  "business_seconds": 383.674,
+  "three_reads_equal": true,
+  "query_sha256": "d5eee79a9bc509b9aae081e4687175a4924fc01af47a9e4232c4e48c94e1ea4b",
+  "profile_count": 1,
+  "workpaper_status": "review_limited_pending_verification",
+  "core_complete": false,
+  "review_status": "incomplete",
+  "review_error": "ValueError: review finding names unknown element",
+  "fact_count": 53,
+  "findings": []
+}

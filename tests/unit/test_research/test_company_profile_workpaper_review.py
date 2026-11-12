@@ -171,6 +171,33 @@ def test_material_omission_can_be_added_but_optional_gap_does_not_trigger_repair
     assert limited.quality_review.status == "completed_with_open_findings"
 
 
+def test_scope_and_nonfact_findings_stay_open_without_discarding_fact_repairs():
+    _, _, fixed, review, verify = material()
+    for element, action in (("limitations", "correct"), ("revenue_model", "human_review")):
+        review["findings"].append({**review["findings"][0], "finding_id": element,
+                                   "element": element, "affected_fact_id": None, "action": action})
+    _, result, provider, _ = invoke([review, {"repaired_facts": [fixed]}, verify])
+    assert result.quality_review.status == "completed_with_open_findings"
+    assert [f.resolution for f in result.quality_review.findings] == [
+        "corrected_pending_trust", "unresolved", "unresolved"]
+    assert "未知" in result.limitations[0]
+    assert result.elements.revenue_model.limitations == result.limitations
+    assert len(provider.calls[1]["payload"]["repair_targets"]) == 1
+    assert not result.elements.revenue_model.facts
+
+
+def test_scope_only_issue_never_creates_a_repair_or_a_fake_fact():
+    paper, _, _, review, _ = material()
+    review["findings"] = [{**review["findings"][0], "element": "limitations", "affected_fact_id": None}]
+    _, result, provider, _ = invoke([review])
+    for name in type(paper.elements).model_fields:
+        assert getattr(result.elements, name).facts == getattr(paper.elements, name).facts
+    assert "未知" in result.elements.revenue_model.limitations[0]
+    assert len(provider.calls) == 1
+    assert result.quality_review.status == "completed_with_open_findings"
+    assert result.quality_review.findings[0].resolution == "unresolved"
+
+
 def _retained_review(paper, review, fixed):
     replies = (("review_profile_workpaper", review), ("repair_profile_workpaper", {"repaired_facts": [fixed]}))
     receipts = []

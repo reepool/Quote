@@ -1,0 +1,20 @@
+{
+  "run_id": "v9-continuous-reviewed-600099-20261112",
+  "name": "林海股份",
+  "mode": "fresh_continuous_known_report_development",
+  "production_authorization": "not_authorized",
+  "old_semantics_loaded": false,
+  "preparation_seconds": 55.871,
+  "task_state": "completed",
+  "stage_results": null,
+  "business_seconds": 502.27,
+  "three_reads_equal": true,
+  "query_sha256": "6a3832f1d1af08d256e9e02dc829093746b1ff594571aee878d93ff05b296486",
+  "profile_count": 1,
+  "workpaper_status": "review_limited_pending_verification",
+  "core_complete": false,
+  "review_status": "incomplete",
+  "review_error": "ValueError: review finding names unknown element",
+  "fact_count": 42,
+  "findings": []
+}

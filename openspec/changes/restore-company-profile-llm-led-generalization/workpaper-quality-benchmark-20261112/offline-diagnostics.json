@@ -1,0 +1,157 @@
+[
+  {
+    "mode": "saved_real_extraction_offline_recovery",
+    "new_model_calls": 0,
+    "symbol": "600000",
+    "retained_fact_count": 60,
+    "qualified_metrics": [
+      {
+        "name": "跨境客户数",
+        "raw_value": "近4.9",
+        "value": "4.9",
+        "unit": "万户",
+        "source_unit": null,
+        "currency": null,
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "comparison_basis": null,
+        "qualifier": "approximate"
+      },
+      {
+        "name": "对外报价笔数",
+        "raw_value": "约3,310",
+        "value": "3310",
+        "unit": "万笔",
+        "source_unit": null,
+        "currency": null,
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null,
+        "qualifier": "approximate"
+      },
+      {
+        "name": "机构客户对公人民币存款日均较上年末增加额",
+        "raw_value": "超300",
+        "value": "300",
+        "unit": "亿元",
+        "source_unit": null,
+        "currency": "CNY",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "comparison_basis": null,
+        "qualifier": "greater_than"
+      },
+      {
+        "name": "重点机构客户新增数",
+        "raw_value": "近480",
+        "value": "480",
+        "unit": "户",
+        "source_unit": null,
+        "currency": null,
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "comparison_basis": null,
+        "qualifier": "approximate"
+      },
+      {
+        "name": "合作金融机构一级法人客户数",
+        "raw_value": "约3,300",
+        "value": "3300",
+        "unit": "家",
+        "source_unit": null,
+        "currency": null,
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "comparison_basis": null,
+        "qualifier": "approximate"
+      },
+      {
+        "name": "跨境客户数",
+        "raw_value": "近4.9",
+        "value": "4.9",
+        "unit": "万户",
+        "source_unit": null,
+        "currency": null,
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "comparison_basis": null,
+        "qualifier": "approximate"
+      },
+      {
+        "name": "长三角区域贷款余额",
+        "raw_value": "超2",
+        "value": "2",
+        "unit": "万亿元",
+        "source_unit": null,
+        "currency": "CNY",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "comparison_basis": null,
+        "qualifier": "greater_than"
+      },
+      {
+        "name": "长三角区域贷款余额较上年末增加额",
+        "raw_value": "超1,600",
+        "value": "1600",
+        "unit": "亿元",
+        "source_unit": null,
+        "currency": "CNY",
+        "subject_scope": "consolidated_group",
+        "period": "2025年末",
+        "comparison_basis": null,
+        "qualifier": "greater_than"
+      },
+      {
+        "name": "集团本外币贷款（不含票据贴现）在生息资产日均占比提升幅度",
+        "raw_value": "近2",
+        "value": "2",
+        "unit": "百分点",
+        "source_unit": "%",
+        "currency": null,
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null,
+        "qualifier": "approximate"
+      },
+      {
+        "name": "母公司本外币一般贷款在生息资产日均占比较2024年提升幅度",
+        "raw_value": "约2.5",
+        "value": "2.5",
+        "unit": "百分点",
+        "source_unit": "%",
+        "currency": null,
+        "subject_scope": "issuer",
+        "period": "2025年度",
+        "comparison_basis": null,
+        "qualifier": "approximate"
+      }
+    ],
+    "original_run": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-continuous-reviewed-600000-20261112",
+    "original_receipts_sha256": "1f1652a29295b6ee47722970a38a48cae1a2bb2e02fff20fd37a3fd940f88025",
+    "scope": "Not a new entry/model result or a repair verification. Original failed run immutable."
+  },
+  {
+    "mode": "saved_real_review_offline_limited_projection",
+    "new_model_calls": 0,
+    "retained_findings": 8,
+    "review_status": "incomplete",
+    "symbol": "600099",
+    "retained_fact_count": 35,
+    "qualified_metrics": [],
+    "original_run": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-continuous-reviewed-600099-20261112",
+    "original_receipts_sha256": "8bff459fae063548e8a16a53086d5c71ce1425cfc59c0814a17b4a80bde6c463",
+    "scope": "Not a new entry/model result or a repair verification. Original failed run immutable."
+  },
+  {
+    "mode": "saved_real_review_offline_limited_projection",
+    "new_model_calls": 0,
+    "retained_findings": 6,
+    "review_status": "incomplete",
+    "symbol": "600054",
+    "retained_fact_count": 51,
+    "qualified_metrics": [],
+    "original_run": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-continuous-reviewed-600054-20261112",
+    "original_receipts_sha256": "7789bf381dfbfbea8decf40e4c6ae11f4d58b16cd742f6801236b5183ca55347",
+    "scope": "Not a new entry/model result or a repair verification. Original failed run immutable."
+  }
+]

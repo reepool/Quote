@@ -2,10 +2,28 @@ Current policy: product v9 (2026-11-11), acceptance section 7.109 and company-pr
 
 ## ADDED Requirements
 
+### Requirement: Metric standardization preserves source meaning and audit history
+New workpaper binding and repaired projections MUST clear currency on dimensionless ratios. A rate difference expressed as percentage points MUST remain distinct from relative percentage growth. Standardization MAY retain a source_unit beside the normalized unit, MUST preserve the raw source spelling and decimal value, and MUST leave an auditable note. It MUST NOT guess currency conversions, magnitudes, subject scope or rate-change meaning from a bare number. Historical workpaper files MUST NOT be rewritten by reading them.
+
+#### Scenario: A bank reports approximate or lower-bound business volumes
+- **WHEN** the source and returned raw metric use 近/约/超 with a decimal reference value
+- **THEN** the workpaper MUST retain the source spelling and an explicit approximate or greater-than qualifier, not silently assert an exact value or discard the whole company
+- **AND** a contradictory qualifier or changed magnitude MUST remain invalid
+
+#### Scenario: A gross-margin difference is printed with a percent sign
+- **WHEN** a sourced margin-change metric and its governing comparison context explicitly support percentage-point meaning
+- **THEN** its normalized unit may be percentage points while its original percent spelling/unit and value remain available
+- **AND** ordinary percentage growth is not converted, and no ratio carries a currency
+
 ### Requirement: Bounded source review and local correction preserve useful workpapers
 An explicitly review-enabled workpaper MUST reuse the current gateway and writer to review the original selected source packet together with its draft. Extraction and review MAY use different existing profiles or requested reasoning levels; actual successful model/source/profile, requested reasoning effort and usage MUST be recorded for review, repair and final verification. A stronger name or model agreement MUST NOT establish factual truth or production approval. Legacy unreviewed workpapers MUST remain readable without implicit calls.
 
 The reviewer MUST identify checked fact IDs/elements and source-cited errors, ambiguity and material omissions within the supplied scope. Unknown references MUST NOT remove or approve facts. Validly flagged erroneous/ambiguous facts MUST leave the ordinary narrative while remaining auditable. Independent useful facts and all original sources MUST be retained. Optional omissions MUST NOT require repair. At most one combined local repair and one source-grounded verification of its proposed changes are allowed; repairs MUST preserve unrelated facts, report/source identity, exact numeric constraints and original responses. Only explicitly resolved issues with actually checked repaired objects may be applied. Failure, insufficient coverage, unresolved or newly found issues MUST remain visible and limited, never silently clear gaps. Review status MUST distinguish model-reviewed scope from trusted release and full-report completeness.
+
+#### Scenario: A review identifies a scope limitation without a fact ID
+- **WHEN** an otherwise valid review flags limitations or an element-level ambiguity without an affected fact
+- **THEN** that finding MUST remain unresolved and visible without discarding independent valid findings or inventing a new fact
+- **AND** a limitation correction MUST NOT become a fact repair or approve release; disputed scope assertions are withheld in the limited projection while the original stays auditable
 
 #### Scenario: A repaired amount still uses the wrong financial column
 - **WHEN** a patch quotes a locatable amount but final source review rejects its metric meaning

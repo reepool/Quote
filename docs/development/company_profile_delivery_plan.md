@@ -6,6 +6,8 @@
 
 ## 1. 开发者必须先理解的纠偏
 
+2026-11-12当前6.BI已结束，交付[独立质量标尺和三家限用内容](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-quality-benchmark-20261112/result.md)。同方逐对象核查与人工参考完成；三家真实3/3、完整连续闭环0/3，不以零调用恢复冒充通过。实际主矛盾是数值限定/非fact复核意见的生产消费合同，已做局部修正和保存响应重放；不是新增字段、全报告扩读或新平台。现有内容先供有限核查，任何下一次真实运行均需新明确授权，不自动扩第四家/补窗。每轮先核本人垃圾归属再开发，必要证据一套后清库/临时脚本，旧源、首次结果与并行内容不动。
+
 2026-11-12当前6.BH已完成[一份接续真实闭环](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-closure-result-20261112.md)：只补用户明确批准的最终再核，4候选获接受，3替换/1新增/34未改，原入口三读一致，模型/证据/历史继承可读。仅本次1物理/27631实际usage，不冒充同一新运行三阶段或正式S1；原6.BG两次初核超时不改，不再扩公司/追加窗口。下阶段按已有画像消费与有限人工抽查决定规模，不堆审核平台或追求全字段100%。本人运行库/脚本收尾清理、旧源与并行保护。
 
 2026-11-12用户复盘后当前为[6.BG单份真实闭环](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md#当前6bg正常联网下完成一份真实复核闭环2026-11-12)：不扩公司，先把网络/profile/源/库准备完再开始业务计时，以同方原稿经一次初核/局部修订/再核交可读改进。优先证实真实效果，不继续建规则/平台；旧6.BF失败不改，每轮先清后做和finally清本人过程物。

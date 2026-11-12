@@ -229,6 +229,58 @@ def test_real_metric_unit_suffix_is_standardized_without_conversion_or_guessing(
         WorkpaperMetric.model_validate({**metric.model_dump(), "value": "12345000"})
     with pytest.raises(ValueError):
         WorkpaperMetric.model_validate({**metric.model_dump(), "raw_value": "约1,234.50万元"})
+    with pytest.raises(ValueError, match="magnitude"):
+        WorkpaperMetric.model_validate({**metric.model_dump(), "source_unit": "万元", "unit": "元"})
+
+
+@pytest.mark.parametrize("raw,qualifier", [("近4.9", "approximate"),
+                                           ("约3,310", "approximate"), ("超300", "greater_than")])
+def test_metric_retains_approximation_instead_of_claiming_exact_value(raw, qualifier):
+    from research.company_profile.workpaper import WorkpaperMetric
+
+    value = raw[1:].replace(",", "")
+    payload = dict(name="客户", raw_value=raw, value=value, unit="户",
+                   subject_scope="consolidated_group", period="2025")
+    metric = WorkpaperMetric.model_validate(payload)
+    assert metric.qualifier == qualifier and metric.raw_value == raw
+    assert WorkpaperMetric.model_validate(metric.model_dump()) == metric
+    with pytest.raises(ValueError, match="qualifier"):
+        WorkpaperMetric.model_validate({**payload, "qualifier": "exact"})
+    with pytest.raises(ValueError):
+        WorkpaperMetric.model_validate({**payload, "value": "999"})
+
+
+def test_ratio_currency_and_explicit_margin_points_are_standardized_only_when_binding():
+    from research.company_profile.workpaper import WorkpaperMetric, standardize_workpaper_metrics
+
+    pages = ({"page": 1, "text": "第三节 经营分析\n毛利率比上年增减\n毛利率 26.50% 上年24.31% 增减2.19%\n收入增长2.19%。"},)
+    index = index_sections(pages)
+    packet = build_section_packet(_report(), pages, index, _selection(index))
+    raw = _draft(packet).model_dump(mode="json")
+    raw["elements"]["scale_and_mix"]["facts"] = [{
+        "fact_id": "margin", "text": "毛利率同比增加2.19个百分点。",
+        "subject_scope": "consolidated_group", "period": "2025",
+        "evidence_ids": [e.evidence_id for e in packet.evidence],
+        "metrics": [{"name": "毛利率比上年增减", "raw_value": "2.19%", "value": "2.19", "unit": "%",
+                     "currency": "人民币", "subject_scope": "consolidated_group", "period": "2025"},
+                    {"name": "收入同比增长", "raw_value": "2.19%", "value": "2.19", "unit": "%",
+                     "currency": "人民币", "subject_scope": "consolidated_group", "period": "2025"}],
+    }]
+    result = bind_workpaper_draft(WorkpaperDraftResponse.model_validate(raw), report=_report(),
+        reading_scope=packet.reading_scope, evidence=packet.evidence)
+    delta, growth = result.elements.scale_and_mix.facts[0].metrics
+    assert (delta.unit, delta.source_unit, delta.raw_value, delta.value, delta.currency) == (
+        "百分点", "%", "2.19%", "2.19", None)
+    assert growth.unit == "%" and growth.currency is None
+    assert len(result.standardization_notes) == 3
+    assert standardize_workpaper_metrics(result) == result
+    assert "2.19 百分点（原文2.19%）" in render_workpaper(result)
+    legacy = result.model_dump(mode="json")
+    legacy["elements"]["scale_and_mix"]["facts"][0]["metrics"][0].update(unit="%", source_unit=None, currency="人民币")
+    assert CompanyProfileWorkpaper.model_validate(legacy).elements.scale_and_mix.facts[0].metrics[0].currency == "人民币"
+    with pytest.raises(ValueError):
+        WorkpaperMetric(name="毛利率变化", raw_value="2.19%", value="0.0219", unit="百分点", source_unit="%",
+                        subject_scope="consolidated_group", period="2025")
 
 
 def test_two_calls_use_sections_and_direct_structured_content_without_old_inventory():

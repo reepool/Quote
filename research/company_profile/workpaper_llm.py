@@ -17,7 +17,7 @@ from .workpaper_sections import (
     extract_selected_layout, index_sections, selected_pages,
 )
 
-WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-12.supply-chain.v5"
+WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-12.qualified-metrics.v7"
 SECTION_GUIDE_VERSION = "company_profile_section_guide.2026-11-12.v1"
 SECTION_GUIDE = (
     {"questions": "做什么、产品/服务用途、怎么经营", "sources": "主要业务/经营模式/核心竞争力/业务回顾的实质子节", "priority": "primary"},
@@ -86,6 +86,15 @@ operating modes and inputs/resources, customers/channels/markets, reported drive
 Every fact must cite supplied source-XXXX IDs, never invented IDs, quotes or page numbers.
 For a table metric cite BOTH the amount block and the governing header/unit/continuation blocks.
 Copy source metric name, raw number, same-unit decimal-string value, currency, period and basis.
+Keep 近/约/超 in raw_value: qualifier is approximate for 近/约, greater_than for 超,
+and exact otherwise. value is the same-unit numerical reference, never an exact claim
+when a qualifier is present. Do not remove source qualifiers from fact text.
+Ratios and percentage-point changes have currency=null. Use percentage points for absolute
+rate differences, not percent growth; if a source prints a percent sign for a rate difference,
+retain source_unit='%' and raw_value but set unit='百分点' without changing its decimal value.
+issuer means the explicitly parent-only entity; plain '公司' in report-wide operating text
+uses consolidated_group unless local wording gives a narrower entity. A checked 'not applicable'
+disclosure item is not a categorical assertion that no change/event ever occurred.
 Keep group/parent/segment/industry, operating revenue and total operating revenue distinct.
 For each table row keep the exact column (operating profit is not net profit) and the
 denominator of each percentage. An OR-list/conditional disclosure heading is not a fact

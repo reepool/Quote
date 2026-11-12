@@ -1,0 +1,2456 @@
+{
+  "schema_version": "company_profile_workpaper.v1",
+  "origin": "llm_generated",
+  "report": {
+    "instrument_id": "600054.SH",
+    "report_id": "1225118314",
+    "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-17T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "reading_scope": {
+    "sections": [
+      {
+        "section_id": "section-0036",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        "start_page": 9,
+        "end_page": 10,
+        "rationale": "本报告为黄山旅游年度报告。选择第三节管理层讨论与分析中的核心业务与经营子节：section-0036完整说明景区、索道、酒店、徽菜、旅行社、智慧旅游六大业务及经营模式；section-0044经营情况讨论与分析披露本期经营举措与变化；section-0052核心竞争力分析说明资源、品牌、区位等经营要素；section-0059主营业务分析及section-0061收入和成本分析提供分业务收入、成本、毛利率与规模结构，是量化业务组合的关键；section-0124未来发展讨论含section-0125行业格局趋势与section-0126发展战略，用于理解驱动因素与展望。以上均为信息密集的完整子节，未选父节与其子节重复，也未选治理、薪酬、财务附注等非业务章节。"
+      },
+      {
+        "section_id": "section-0044",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "start_page": 11,
+        "end_page": 12,
+        "rationale": "本报告为黄山旅游年度报告。选择第三节管理层讨论与分析中的核心业务与经营子节：section-0036完整说明景区、索道、酒店、徽菜、旅行社、智慧旅游六大业务及经营模式；section-0044经营情况讨论与分析披露本期经营举措与变化；section-0052核心竞争力分析说明资源、品牌、区位等经营要素；section-0059主营业务分析及section-0061收入和成本分析提供分业务收入、成本、毛利率与规模结构，是量化业务组合的关键；section-0124未来发展讨论含section-0125行业格局趋势与section-0126发展战略，用于理解驱动因素与展望。以上均为信息密集的完整子节，未选父节与其子节重复，也未选治理、薪酬、财务附注等非业务章节。"
+      },
+      {
+        "section_id": "section-0052",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "四、报告期内核心竞争力分析"
+        ],
+        "start_page": 12,
+        "end_page": 13,
+        "rationale": "本报告为黄山旅游年度报告。选择第三节管理层讨论与分析中的核心业务与经营子节：section-0036完整说明景区、索道、酒店、徽菜、旅行社、智慧旅游六大业务及经营模式；section-0044经营情况讨论与分析披露本期经营举措与变化；section-0052核心竞争力分析说明资源、品牌、区位等经营要素；section-0059主营业务分析及section-0061收入和成本分析提供分业务收入、成本、毛利率与规模结构，是量化业务组合的关键；section-0124未来发展讨论含section-0125行业格局趋势与section-0126发展战略，用于理解驱动因素与展望。以上均为信息密集的完整子节，未选父节与其子节重复，也未选治理、薪酬、财务附注等非业务章节。"
+      },
+      {
+        "section_id": "section-0059",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(一) 主营业务分析"
+        ],
+        "start_page": 13,
+        "end_page": 17,
+        "rationale": "本报告为黄山旅游年度报告。选择第三节管理层讨论与分析中的核心业务与经营子节：section-0036完整说明景区、索道、酒店、徽菜、旅行社、智慧旅游六大业务及经营模式；section-0044经营情况讨论与分析披露本期经营举措与变化；section-0052核心竞争力分析说明资源、品牌、区位等经营要素；section-0059主营业务分析及section-0061收入和成本分析提供分业务收入、成本、毛利率与规模结构，是量化业务组合的关键；section-0124未来发展讨论含section-0125行业格局趋势与section-0126发展战略，用于理解驱动因素与展望。以上均为信息密集的完整子节，未选父节与其子节重复，也未选治理、薪酬、财务附注等非业务章节。"
+      },
+      {
+        "section_id": "section-0124",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "六、公司关于公司未来发展的讨论与分析"
+        ],
+        "start_page": 23,
+        "end_page": 26,
+        "rationale": "本报告为黄山旅游年度报告。选择第三节管理层讨论与分析中的核心业务与经营子节：section-0036完整说明景区、索道、酒店、徽菜、旅行社、智慧旅游六大业务及经营模式；section-0044经营情况讨论与分析披露本期经营举措与变化；section-0052核心竞争力分析说明资源、品牌、区位等经营要素；section-0059主营业务分析及section-0061收入和成本分析提供分业务收入、成本、毛利率与规模结构，是量化业务组合的关键；section-0124未来发展讨论含section-0125行业格局趋势与section-0126发展战略，用于理解驱动因素与展望。以上均为信息密集的完整子节，未选父节与其子节重复，也未选治理、薪酬、财务附注等非业务章节。"
+      }
+    ],
+    "unread_or_deferred": [
+      "第四节公司治理、环境和社会：治理、董事薪酬、ESG等与业务经营解释关联弱，暂不读取",
+      "第五节重要事项中的关联交易、募集资金明细：属合规与资金细节，非业务结构核心，暂不读取",
+      "第八节财务报告中的会计政策、报表附注、分部信息：仅在业务收入结构仍有缺口时定向补充，当前主营业务分析已覆盖主要板块，暂不读取"
+    ],
+    "selection_rationale": "本报告为黄山旅游年度报告。选择第三节管理层讨论与分析中的核心业务与经营子节：section-0036完整说明景区、索道、酒店、徽菜、旅行社、智慧旅游六大业务及经营模式；section-0044经营情况讨论与分析披露本期经营举措与变化；section-0052核心竞争力分析说明资源、品牌、区位等经营要素；section-0059主营业务分析及section-0061收入和成本分析提供分业务收入、成本、毛利率与规模结构，是量化业务组合的关键；section-0124未来发展讨论含section-0125行业格局趋势与section-0126发展战略，用于理解驱动因素与展望。以上均为信息密集的完整子节，未选父节与其子节重复，也未选治理、薪酬、财务附注等非业务章节。",
+    "stop_reason": "已覆盖业务结构、产品服务、经营模式、规模与收入成本结构、经营变化及发展战略等核心问题，所选子节合计篇幅适中且信息密度高；剩余治理、合规、财务附注明细对回答业务经营问题边际价值低，可在不追求全报告完整性的前提下停止。",
+    "transcription_version": "shared-pdf-pypdf-layout.v1"
+  },
+  "elements": {
+    "business_structure": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "BS-01",
+          "text": "公司业务由景区、索道及缆车、酒店、徽菜、旅行社、智慧旅游六大板块构成，其中景区业务经营黄山景区、花山谜窟景区及太平湖景区。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "BS-02",
+          "text": "索道及缆车业务由黄山云谷索道、玉屏索道、太平索道和西海观光缆车组成，主要提供客运观光服务。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "BS-03",
+          "text": "酒店业务拥有各类酒店十余家，黄山景区内主要分布雲麓北海宾馆、狮林大酒店、西海饭店、白云宾馆、玉屏楼宾馆、雲野@排云型旅酒店、雲亼·曙光里和雲亼·狮林崖舍等，黄山景区外主要分布雲颐汤泉酒店、轩辕国际大酒店、昱城皇冠假日酒店、黄山国际大酒店、华山宾馆、雲麓酒店（黄旅大厦店）等。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "BS-04",
+          "text": "徽菜业务以“徽商的厨房、家乡的味道”为发展定位，打造徽文化主题餐饮品牌，在全国多地开设连锁主题餐饮门店。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "BS-05",
+          "text": "旅行社业务由下属黄山市中国旅行社有限公司等开展，涵盖国内旅游、入境旅游、出境旅游、定制游、会展服务和疗休养等。",
+          "subject_scope": "named_subsidiary",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "BS-06",
+          "text": "智慧旅游业务依托黄山景区旅游资源，整合黄山市及周边文旅产业要素，开展旅游目的地智慧旅游建设和运营，涵盖黄山旅游官方平台运营、新媒体运营、OTA业务承接、旅游产品和活动策划、旅游服务接待和旅游商品在线销售等。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "BS-07",
+          "text": "报告期内公司新增重要非主营业务的说明勾选“不适用”。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": []
+        }
+      ],
+      "limitations": []
+    },
+    "products_services": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "PS-01",
+          "text": "景区业务主要提供旅游观光和休闲度假等服务，覆盖黄山景区、花山谜窟景区及太平湖景区。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "PS-02",
+          "text": "索道及缆车业务主要提供客运观光服务，旗下索道均为5S等级索道和安全生产标准化一级单位。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "PS-03",
+          "text": "酒店业务主要提供住宿餐饮等旅宿服务，已形成“雲麓”酒管品牌及雲亼、雲麓、雲野、雲颐等多元化品牌矩阵。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "PS-04",
+          "text": "徽菜业务主要提供徽菜餐饮等服务，并形成徽菜体验中心、黄山旅游及徽文化推广中心和徽州特色产品展示中心。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "PS-05",
+          "text": "智慧旅游业务以“黄山旅游官方平台”为基础，打造主客共享的“目的地新旅游新生活”一站式新服务平台，同时加快开发智慧景区系统化解决方案。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "PS-06",
+          "text": "报告期内自主研发黄山AI旅行助手并完成2个大版本、43个小版本功能迭代，AI旅行助手SaaS平台已对外拓展至外部部分景区；智能登山杖、髌骨带、膝关节外骨骼三款产品以及智能“机器狗”在景区公开测试，部分产品已投入租赁或出售。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": []
+        }
+      ],
+      "limitations": []
+    },
+    "revenue_model": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "RM-01",
+          "text": "公司按酒店、索道及缆车、景区、旅游服务、徽菜五个行业口径披露主营业务收入与成本，各行业收入按未合并抵消口径列报，合计金额大于合并抵消后列报的营业收入，差额主要为各行业之间的内部交易抵消。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "RM-02",
+          "text": "索道及缆车业务营业收入增加主要系本期黄山景区接待进山游客增加及景区资源有偿使用费核算方法变化所致；营业成本增加主要系黄山风景名胜资源有偿使用费征收管理优化调整，征收模式发生改变且征收比例增长所致。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "RM-03",
+          "text": "景区业务营业收入增加主要系本期景区有效购票人数及平均客单价增加所致。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "RM-04",
+          "text": "酒店业务营业成本增加主要系黄山风景名胜资源有偿使用费征收管理优化调整，对公司黄山风景区内山上酒店征收风景名胜资源有偿使用费所致。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008",
+            "source-0009"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "RM-05",
+          "text": "公司景区部分产品如门票和索道等收费标准接受政府有关部门审批，在收费标准调整方面存在一定限制。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0014"
+          ],
+          "metrics": []
+        }
+      ],
+      "limitations": []
+    },
+    "scale_and_mix": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "SM-01",
+          "text": "报告期内公司实现营业收入210,932.51万元，同比增长9.23%；营业成本112,079.51万元，同比增长20.35%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": [
+            {
+              "name": "营业收入",
+              "raw_value": "210,932.51",
+              "value": "210932.51",
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact"
+            }
+          ]
+        },
+        {
+          "fact_id": "SM-02",
+          "text": "分行业主营业务收入中，索道及缆车业务842,155,363.75元、毛利率75.20%；旅游服务业务532,255,057.39元、毛利率7.98%；酒店业务492,026,389.87元、毛利率32.57%；景区业务293,201,670.78元、毛利率46.46%；徽菜业务245,296,390.79元、毛利率0.30%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": [
+            {
+              "name": "索道及缆车业务营业收入",
+              "raw_value": "842,155,363.75",
+              "value": "842155363.75",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "索道及缆车业务毛利率",
+              "raw_value": "75.20",
+              "value": "75.20",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "旅游服务业务营业收入",
+              "raw_value": "532,255,057.39",
+              "value": "532255057.39",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "旅游服务业务毛利率",
+              "raw_value": "7.98",
+              "value": "7.98",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "酒店业务营业收入",
+              "raw_value": "492,026,389.87",
+              "value": "492026389.87",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "酒店业务毛利率",
+              "raw_value": "32.57",
+              "value": "32.57",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "景区业务营业收入",
+              "raw_value": "293,201,670.78",
+              "value": "293201670.78",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "景区业务毛利率",
+              "raw_value": "46.46",
+              "value": "46.46",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "徽菜业务营业收入",
+              "raw_value": "245,296,390.79",
+              "value": "245296390.79",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "徽菜业务毛利率",
+              "raw_value": "0.30",
+              "value": "0.30",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            }
+          ]
+        },
+        {
+          "fact_id": "SM-03",
+          "text": "分行业毛利率同比变动：酒店业务减少5.34个百分点，索道及缆车业务减少12.36个百分点，景区业务增加7.06个百分点，旅游服务业务减少1.20个百分点，徽菜业务减少8.32个百分点。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": [
+            {
+              "name": "酒店业务毛利率比上年增减",
+              "raw_value": "5.34",
+              "value": "5.34",
+              "unit": "百分点",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "索道及缆车业务毛利率比上年增减",
+              "raw_value": "12.36",
+              "value": "12.36",
+              "unit": "百分点",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "景区业务毛利率比上年增减",
+              "raw_value": "7.06",
+              "value": "7.06",
+              "unit": "百分点",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "旅游服务业务毛利率比上年增减",
+              "raw_value": "1.20",
+              "value": "1.20",
+              "unit": "百分点",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "徽菜业务毛利率比上年增减",
+              "raw_value": "8.32",
+              "value": "8.32",
+              "unit": "百分点",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            }
+          ]
+        },
+        {
+          "fact_id": "SM-05",
+          "text": "报告期内黄山景区累计接待进山游客516.80万人，较上年同期492.24万人增加24.56万人，增幅4.99%；索道及缆车累计运送游客1,043.38万人次，较上年同期981.49万人次增加61.88万人次，增幅6.31%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": [
+            {
+              "name": "黄山景区累计接待进山游客",
+              "raw_value": "516.80",
+              "value": "516.80",
+              "unit": "万人",
+              "source_unit": "万人",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "索道及缆车累计运送游客",
+              "raw_value": "1,043.38",
+              "value": "1043.38",
+              "unit": "万人次",
+              "source_unit": "万人次",
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            }
+          ]
+        },
+        {
+          "fact_id": "SM-06",
+          "text": "前五名客户销售额18,250.88万元，占年度销售总额7.61%；前五名供应商采购额13,750.74万元，占年度采购总额9.47%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [
+            {
+              "name": "前五名客户销售额",
+              "raw_value": "18,250.88",
+              "value": "18250.88",
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "前五名客户销售额占年度销售总额比例",
+              "raw_value": "7.61",
+              "value": "7.61",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "前五名供应商采购额",
+              "raw_value": "13,750.74",
+              "value": "13750.74",
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "前五名供应商采购额占年度采购总额比例",
+              "raw_value": "9.47",
+              "value": "9.47",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            }
+          ]
+        }
+      ],
+      "limitations": []
+    },
+    "operations_and_inputs": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "OI-01",
+          "text": "公司经营黄山景区、花山谜窟景区及太平湖景区，提供旅游观光和休闲度假等服务，并拥有云谷、玉屏、太平三条索道和西海观光缆车。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "OI-02",
+          "text": "公司拥有各类酒店十余家，形成“雲麓”酒管品牌及雲亼、雲麓、雲野、雲颐等品牌矩阵，并建立四个核心服务团队。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0002",
+            "source-0004"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "OI-03",
+          "text": "公司主编了国家标准《山岳型旅游景区清洁服务规范》，主编或参编《风景名胜区游步道技术标准》《景区玻璃栈道建设标准》《景区垃圾分类设施设置标准》等团体标准，并参与索道行业相关国家法规、标准及技术手册编写。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "OI-04",
+          "text": "公司成功对江西灵山索道、浙江龙游六春湖索道和北京冬奥会滑雪索道等实施了品牌、技术及管理输出。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "OI-05",
+          "text": "报告期内北海宾馆环境整治改造项目、汤泉大酒店改造项目投入运营；黄山国际大酒店升级改造工程项目推进设计优化等前期工作；黄山旅游CBD项目完成办公及酒店区域精装施工；完成半山寺环境整治项目；完成太平湖湖水文化研究中心项目；徽商故里淮南店投入运营，并加快推进仙人洞店改造项目。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "OI-06",
+          "text": "报告期内成功开辟5条无人机物资运输航线，运行以来运输各类物资585万斤，助力缓解景区物资运输难题。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "OI-08",
+          "text": "公司经过20多年的发展和积累，已拥有一支专门从事景区开发、索道运营、酒店管理、餐饮经营及旅游服务的专业人才队伍。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": []
+        }
+      ],
+      "limitations": []
+    },
+    "customers_channels_markets": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "CC-01",
+          "text": "公司所在地黄山市地处皖浙赣闽四省通衢之地，背靠长三角，紧邻华东地区；黄山市已进入杭州、合肥等城市“1.5小时经济圈”，上海、南京等城市“2.5小时经济圈”；报告期内黄山直达香港的高铁线路正式开通，5.5小时即可抵达。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "CC-02",
+          "text": "公司精准营销分人群分区域制定促消费和优惠政策，整合黄山景区及市内相关资源推出大企业大客户专属产品等8款“一站式”高端定制产品，并抢抓冬游、大客户、入境及航空、亲子及研学等专项市场。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "CC-03",
+          "text": "智慧旅游业务涵盖黄山旅游官方平台运营、新媒体运营、OTA业务承接、旅游产品和活动策划、旅游服务接待和旅游商品在线销售等。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "CC-04",
+          "text": "前五名客户销售额18,250.88万元，占年度销售总额7.61%，其中关联方销售额0万元；前五名供应商采购额13,750.74万元，占年度采购总额9.47%，其中关联方采购额0万元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "CC-05",
+          "text": "报告期内向单个客户的销售比例超过总额50%、前5名客户中存在新增客户或严重依赖少数客户的情形勾选“不适用”；向单个供应商的采购比例超过总额50%、前5名供应商中存在新增供应商或严重依赖少数供应商的情形亦勾选“不适用”。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": []
+        }
+      ],
+      "limitations": []
+    },
+    "operating_drivers": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "OD-01",
+          "text": "公司营业收入同比增长9.23%，主要系黄山景区接待进山游客增加及景区资源有偿使用费核算方法变化所致；营业成本同比增长20.35%，主要系本期景区资源有偿使用费增加所致。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "OD-02",
+          "text": "归属于上市公司股东的净利润29,248.09万元，较上年同期减少2,252.81万元，减幅7.15%，主要系本期景区资源有偿使用费增加所致。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": [
+            {
+              "name": "归属于上市公司股东的净利润",
+              "raw_value": "29,248.09",
+              "value": "29248.09",
+              "unit": "万元",
+              "source_unit": "万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            }
+          ]
+        },
+        {
+          "fact_id": "OD-03",
+          "text": "销售费用81,909,853.07元，同比增长34.35%，主要系本期广告宣传及营销费用增加所致；财务费用5,228,085.22元，同比增长94.96%，主要系本期利息收入减少所致；研发费用4,231,651.60元，同比增长34.25%，主要系公司持续加大对研发的投入所致。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007",
+            "source-0010"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "OD-04",
+          "text": "经营活动产生的现金流量净额666,434,842.62元，同比增长27.75%；投资活动产生的现金流量净额-509,995,214.44元，变动原因主要系本期购建固定资产、无形资产和其他长期资产支付的现金增加所致。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007",
+            "source-0011"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "OD-05",
+          "text": "公司认为旅游行业对宏观经济、政策环境、社会事件及自然条件较为敏感，面临行业风险、市场风险、项目投资风险及门票索道收费标准受政府审批限制等其他风险。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0014"
+          ],
+          "metrics": []
+        }
+      ],
+      "limitations": []
+    },
+    "material_changes": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "MC-01",
+          "text": "报告期内公司业务类型、利润构成或利润来源发生重大变动的详细说明勾选“不适用”；公司报告期内业务、产品或服务发生重大变化或调整有关情况亦勾选“不适用”。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007",
+            "source-0009"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "MC-02",
+          "text": "报告期主要子公司股权变动导致合并范围变化勾选“不适用”。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "MC-03",
+          "text": "黄山风景名胜资源有偿使用费征收管理优化调整，对公司黄山风景区内山上酒店征收风景名胜资源有偿使用费，索道及缆车业务征收模式发生改变且征收比例增长，导致酒店及索道缆车业务成本上升。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008",
+            "source-0009"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "MC-04",
+          "text": "报告期内北海宾馆环境整治改造项目、汤泉大酒店改造项目投入运营，完成太平湖湖水文化研究中心项目，徽商故里淮南店投入运营。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "MC-05",
+          "text": "报告期内黄山文旅大模型成功通过中央网信办备案审核，系全省首个通过备案的文旅垂类大模型；完成黄山旅游官方平台升级一期项目，新增“页面改版”“一站式服务”“行李服务”“导览讲解”四项功能。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "MC-06",
+          "text": "报告期内完成公司监事会取消及公司章程相应修订，完成股东大会议事规则、董事会议事规则、独董工作制度、专门委员会工作细则等多项核心制度修订，并完成会计师事务所轮换选聘工作。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": []
+        }
+      ],
+      "limitations": []
+    }
+  },
+  "evidence": [
+    {
+      "evidence_id": "source-0001",
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "一、报告期内公司从事的业务情况"
+      ],
+      "physical_pages": [
+        9
+      ],
+      "source_spans": [
+        {
+          "page": 9,
+          "start": 1514,
+          "end": 2116,
+          "quote": "一、报告期内公司从事的业务情况\n    1、景区业务：公司经营黄山景区、花山谜窟景区及太平湖景区，主要提供旅游观光和休闲度\n假等服务。公司现为中国旅游景区协会副会长单位，多年来公司在景区业务上不断创新，积累了\n丰富的景区运营和管理经验，储备了一批专业性、技术性、实用性景区开发、建设、运营和管理\n人才，主编了国家标准《山岳型旅游景区清洁服务规范》，主编或参编了《风景名胜区游步道技\n术标准》、《景区玻璃栈道建设标准》、《景区垃圾分类设施设置标准》等团体标准。\n    2、索道及缆车业务：公司拥有黄山云谷索道、玉屏索道、太平索道和西海观光缆车，主要提\n供客运观光服务。公司现为中国索道协会副理事长单位，国际索道协会会员单位，旗下索道均为\n5S等级索道和安全生产标准化一级单位。一直以来，公司索道的安全管理、设备维护、服务质量\n均处于国内一流水平，先后参与了索道行业相关国家法规、标准及各类技术手册的编写和索道行\n业课题研究，成功对江西灵山索道、浙江龙游六春湖索道和北京冬奥会滑雪索道等实施了品牌、\n技术及管理输出。\n    3、酒店业务：公司拥有各类酒店十余家，主要提供住宿餐饮等旅宿服务，黄山景区内主要分\n布雲麓北海宾馆、狮林大酒店、西海饭店、白云宾馆、玉屏楼宾馆、雲野@排云型旅酒店、雲亼·曙\n\n\n                                             9/ 185"
+        }
+      ],
+      "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+    },
+    {
+      "evidence_id": "source-0002",
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "一、报告期内公司从事的业务情况"
+      ],
+      "physical_pages": [
+        10
+      ],
+      "source_spans": [
+        {
+          "page": 10,
+          "start": 0,
+          "end": 931,
+          "quote": "                         黄山旅游发展股份有限公司2025         年年度报告\n\n\n光里和雲亼·狮林崖舍等酒店，黄山景区外主要分布雲颐汤泉酒店、轩辕国际大酒店、昱城皇冠\n假日酒店、黄山国际大酒店、华山宾馆、雲麓酒店（黄旅大厦店）等酒店，其中黄山昱城皇冠假\n日酒店是黄山市首家引进国际高端酒店管理品牌的休闲度假与会议酒店。经过多年发展和积累，\n公司已形成景区酒店的管理品牌及标准，即“雲麓”酒管品牌，形成了包括高端山奢美宿品牌“雲\n亼”、目的地豪华休旅品牌“雲麓”、超中端主题生活方式酒店品牌“雲野”以及高端休闲疗愈\n特色酒店品牌“雲颐”在内的多元化品牌矩阵。\n    4、徽菜业务：公司依托黄山旅游品牌、资源、资金及人才优势，以“徽商的厨房、家乡的味\n道”为发展定位，打造了徽文化主题餐饮品牌，在全国多地开设连锁主题餐饮门店，主要提供徽\n菜餐饮等服务。公司徽菜餐饮板块先后荣获“中华老字号”、“中国餐饮百强”、“国家级五钻\n酒家”、“金鼎奖”、“中国十佳文化餐饮品牌”等多项荣誉，逐步形成了徽菜体验中心、黄山\n旅游及徽文化推广中心和徽州特色产品展示中心，并在此基础上加快实现业务领域的扩张。\n    5、旅行社业务：公司旅行社业务涵盖国内旅游、入境旅游、出境旅游、定制游、会展服务和\n疗休养等方面。公司下属的黄山市中国旅行社有限公司是安徽省旅行社协会会长单位、黄山市旅\n行社协会会长单位，为安徽省首批              5A 级旅行社、全国首批旅游标准化示范企业，连续多年荣获“全\n国百强旅行社”。\n    6、智慧旅游业务：公司顺应旅游市场和现代信息技术发展，依托黄山景区旅游资源，整合黄\n山市及周边文旅产业要素，开展旅游目的地智慧旅游建设和运营业务，主要业务涵盖黄山旅游官\n方平台运营、新媒体运营、OTA             业务承接、旅游产品和活动策划、旅游服务接待和旅游商品在线\n销售等。公司以“黄山旅游官方平台”为基础，整合各方品牌及资源优势，创新打造主客共享的\n“目的地新旅游新生活”一站式新服务平台，同时加快开发智慧景区系统化解决方案。\n\n报告期内公司新增重要非主营业务的说明\n□适用    √不适用\n\n"
+        }
+      ],
+      "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+    },
+    {
+      "evidence_id": "source-0003",
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "三、经营情况讨论与分析"
+      ],
+      "physical_pages": [
+        11
+      ],
+      "source_spans": [
+        {
+          "page": 11,
+          "start": 406,
+          "end": 2374,
+          "quote": "三、经营情况讨论与分析\n    2025年是“十四五”规划的收官之年，今年以来，公司在董事会的坚强领导下，积极顺应旅\n游行业发展趋势，坚持稳中求进工作总基调，完整准确全面贯彻新发展理念、构建新发展格局，\n落实高质量发展要求，按照既定发展战略，抢抓机遇、加快转型、规范运作，推动各项工作有序\n开展，企业实现持续稳定健康发展。\n    （一）公司经营常抓不懈。报告期内，公司积极把握旅游行业发展机遇，围绕“真抓实干往\n前赶”的总体要求，坚持强化市场营销，深挖客源市场，加大旅游产品供给侧改革，全力以赴拼\n经济、抢市场、抓项目、优布局。报告期内，黄山景区累计接待进山游客                                  516.80 万人，较去年同\n期 492.24 万人增加     24.56 万人，增幅      4.99%；索道及缆车累计运送游客              1,043.38 万人次，较去\n年同期   981.49 万人次增加      61.88 万人次，增幅       6.31%；实现营业收入         210,932.51 万元，较去年\n同期增加    17,819.32 万元，增幅       9.23%；实现归属于上市公司股东的净利润                  29,248.09 万元，较\n去年同期减少       2,252.81 万元，减幅      7.15%，主要系本期景区资源有偿使用费增加所致。\n    （二）精准营销持续实施。坚持树牢精准营销理念，发挥政策、渠道、宣传、营销等手段，\n深挖旅游市场潜力。一是精准施策促进消费。根据旅游市场动态，分人群分区域精准制定各类促\n消费和优惠政策，充分发挥政策杠杆作用，精准撬动旅游消费。二是联动资源设计产品。整合黄\n山景区及市内相关资源，推出大企业大客户专属产品等                          8 款“一站式”高端定制产品，不断丰富\n产品供给。三是精准营销拓宽市场。在巩固传统市场的基础上，抢抓冬游、大客户、入境及航空、\n亲子及研学等专项市场，通过靶向营销与精准推介，提升市场增量。四是创新宣传提升曝光。坚\n持新媒体矩阵和特色活动共同发力，推出系列新活动新玩法，用好跨界合作资源，延伸营销触角，\n提升市场声量。\n    （三）项目支撑持续稳固。坚持树牢项目为王理念，立足资源禀赋，持续深耕全域旅游，全\n力推动项目建设提速提效。一是全力克服物资运输瓶颈、极端恶劣天气等客观影响，北海宾馆环\n境整治改造项目、汤泉大酒店改造项目投入运营；黄山国际大酒店升级改造工程项目聚焦运营和\n成本，推进设计优化等前期工作；黄山旅游                     CBD 项目完成办公及酒店区域精装施工。二是完成半\n山寺环境整治项目，持续推进游步道提升改造、新增或维护标识标牌、新建或维修旅游公厕等事\n项，进一步完善黄山景区基础设施。三是围绕太平湖景区业态升级，完成太平湖湖水文化研究中\n心项目；围绕徽菜板块拓展及品质提升，徽商故里淮南店投入运营，并加快推进仙人洞店改造项\n目；围绕打造乡村振兴样板点，加快推进茶坦帐篷营地项目和花开南溪项目。四是优化工作机制，\n制定《重点项目指挥调度管理办法（试行）》，强化公司重点项目统筹协调与精准保障。\n    （四）一体两翼持续推进。坚持树牢创新开放思维，立足“旅游主责主业”，依托“科技”\n和“文化”两翼，推进文旅数字化和文旅融合持续发力。一是黄山文旅大模型成功通过中央网信\n办备案审核，系全省首个通过备案的文旅垂类大模型；自主研发黄山                                AI 旅行助手并完成        2个大版\n本、43  个小版本功能的迭代开发，AI              旅行助手     SaaS 平台已成功对外拓展外部部分景区；完成黄\n山旅游官方平台升级一期项目，新增“页面改版”“一站式服务”“行李服务”“导览讲解”四\n项功能；智能登山杖、髌骨带、膝关节外骨骼三款产品以及智能“机器狗”在景区公开测试，部\n分产品已投入租赁或出售；成功开辟                 5 条无人机物资运输航线，运行以来运输各类物资                       585 万斤，\n助力缓解景区物资运输难题。二是链接各类优质资源，深化外部合作，发力网文网剧网游新赛道，\n并力争孵化培育一批优秀文化              IP，其中《海底小纵队·中国之旅               2》中为黄山旅游量身打造的“花\n\n                                         11/185"
+        }
+      ],
+      "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+    },
+    {
+      "evidence_id": "source-0004",
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "三、经营情况讨论与分析"
+      ],
+      "physical_pages": [
+        12
+      ],
+      "source_spans": [
+        {
+          "page": 12,
+          "start": 0,
+          "end": 1358,
+          "quote": "                         黄山旅游发展股份有限公司2025         年年度报告\n\n\n仔”IP  形象不断放大，通过文化产业持续出新出彩及联动品牌营销，积极推进旅游产业发展，推\n动文旅融合初见成效。\n    （五）服务体验持续升级。坚持树牢“服务就是最好的营销”的理念，大力丰富产品体系、\n场景体验和服务内容。一是丰富活动体验。景区酒店、太平湖景区、花山世界组织常态化开展鱼\n灯彩绘、非遗展演等各类特色互动活动和体验活动，持续优化体验场景，吸引游客深度参与。二\n是提升服务质效。根据公司酒店品牌建设，初步建立雲野品牌度假体验师“小野团队”、雲亼品\n牌文化体验师“雲管家”、雲颐品牌康养疗愈师“雲朵儿”、雲麓品牌商旅服务师“雲麓礼士”\n四个核心服务团队，实现酒店服务品牌化、空间场景差异化、游客体验情感化，景区酒店板块网\n评平均分稳居      4.9 分以上；景区各索道持续深化“三延”服务内涵，强化高峰期的游客服务保障。\n三是优化服务机制。坚持用户思维和游客视角，持续推动“优服务                              强品牌”行动，提升对客服务\n质量，积极推行先行赔付工作机制，及时化解游客涉旅纠纷。\n    （六）公司治理持续优化。坚持强化治理根基，不断完善公司治理体系，持续提升公司规范\n运作水平。一是立足公司经营管理需要，及时完成                       1名总工程师、2       名副总裁及      1名总会计师的\n聘任工作，进一步配强管理层力量。二是紧扣中国证监会相关要求，围绕取消监事会、审计委员\n会承接监事会职责等改革领域，完成公司监事会取消及公司章程相应修订，推动治理架构与监管\n新规全面接轨。三是对标监管新规，全面梳理公司治理制度制定及修订清单，完成股东大会议事\n规则、董事会议事规则、独董工作制度、专门委员会工作细则等多项核心制度的修订工作，进一\n步夯实治理制度基础。四是严格落实《国有企业、上市公司选聘会计师事务所管理办法》等要求，\n完成公司会计师事务所轮换选聘工作。五是加快构建财务标准化管理体系，强化财务管理，加强\n对委派财务经理考核并建立定期述职制度，持续加大预算执行控制力度，扎紧财务风险笼子。\n    （七）党的建设持续加强。坚持强化党建引领，全面落实新时代党的建设总要求，纵深推进\n全面从严治党。一是持续筑牢思想根基。严格落实“第一议题”制度，扎实开展深入贯彻中央八\n项规定精神学习教育，一体推进学查改，通过多种形式推进学习教育走深走实。二是打造过硬人\n员队伍。坚持党管干部，认真抓好组织建设，做好干部选拔、交流调整、党员发展等工作，统筹\n任期届满支部完成换届，新设             2 家党支部，并突出抓好年轻干部教育管理。三是抓好意识形态管\n控。牢牢掌握意识形态工作领导权、主动权，做好意识形态及舆情风险研判、舆情监测与应对工\n作，加大意识形态阵地管理力度，筑牢意识形态阵地。四是强化党风廉政建设。加大学习教育力\n度，筑牢防腐拒变思想防线，不断提升党员干部的廉洁自律意识，开展重要节点及重要节日作风\n建设督查，用好监督执纪“四种形态”，扎实做好执纪监督工作，坚持以严的基调强化正风肃纪。\n\n"
+        }
+      ],
+      "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+    },
+    {
+      "evidence_id": "source-0005",
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "四、报告期内核心竞争力分析"
+      ],
+      "physical_pages": [
+        12
+      ],
+      "source_spans": [
+        {
+          "page": 12,
+          "start": 1358,
+          "end": 2108,
+          "quote": "四、报告期内核心竞争力分析\n√适用    □不适用\n    1、资源优势。公司不断推进核心景区资源的整合力度。其中，黄山景区作为公司旗下的核心\n景区，是世界文化与自然双遗产、世界地质公园、全国首批                          5A 级景区，以奇松、怪石、云海、温\n泉、冬雪“五绝”闻名于世；太平湖景区是国家                     4A级景区，首批国家水利风景区，资源禀赋出众，\n地理位置优越，被誉为“黄山情侣”、“东方日内瓦湖”，是安徽省实施“两山一湖”（黄山、\n九华山、太平湖）旅游发展战略的重要内容；花山谜窟景区是国家                             4A 级景区，毗邻黄山市中心城\n区，是以新安江为纽带，集青山、绿水、田园景致、千年谜窟、摩崖石刻等自然景观和人文景观\n为一体的综合景区。此外，黄山市还拥有一流的生态资源，生态环境质量长期位于全国前列，绿\n色生态产品市场空间广阔。\n    2、品牌优势。黄山景区是全国首批               5A 级景区、“中国十大风景区名胜”和“全国文明风景\n旅游区”；公司先后荣获中国驰名商标、中国服务业企业                         500 强、首批全国旅游标准化示范单位、\n首届及第三届全国旅游服务质量标杆企业、第二届安徽省政府质量奖和首届中国质量奖提名奖；\n旗下四条索道均为        5S 等级索道，下属企业黄山市中国旅行社有限公司连续多年荣获“全国百强旅\n行社”，徽文化主题餐饮品牌“徽商故里”独具特色。丰富的品牌资源为公司经营发展发挥了重\n要支撑作用。\n\n                                       12/185"
+        }
+      ],
+      "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+    },
+    {
+      "evidence_id": "source-0006",
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "四、报告期内核心竞争力分析"
+      ],
+      "physical_pages": [
+        13
+      ],
+      "source_spans": [
+        {
+          "page": 13,
+          "start": 0,
+          "end": 711,
+          "quote": "                             黄山旅游发展股份有限公司2025             年年度报告\n\n\n    3、人才优势。公司经过              20 多年的发展和积累，已拥有一支专门从事景区开发、索道运营、\n酒店管理、餐饮经营及旅游服务的专业人才队伍，为公司经营管理提供了强大的人力资源保障。\n    4、区位优势。公司所在地黄山市地处皖浙赣闽四省通衢之地，背靠长三角，紧邻全国旅游消\n费规模最大、消费能力最强的华东地区。在国家贯彻长三角一体化发展战略、黄山市加快融杭接\n沪的背景下，公司区位优势进一步凸显。目前黄山市高速公路密度已达到长三角发达地区平均水\n平，未来将成为安徽省内继合肥之后又一形成“米字型”高铁线路的城市，黄山市已进入杭州、\n合肥等城市“1.5         小时经济圈”，上海、南京等城市“2.5                     小时经济圈”。报告期内，黄山直达香\n港的高铁线路正式开通，5.5               小时即可抵达，实现与粤港澳大湾区的快速联通，为黄山对外开放\n打开了全新窗口。后续高铁线路的不断完善和运营，不仅为游客来黄提供更大便捷，更将通过缩\n短“时空距离”，持续拓宽公司下属景区的客源辐射范围，进一步扩展公司下属景区的客源圈。\n    5、资本优势。作为黄山市内国有控股上市公司，一方面公司拥有充裕的自由现金流，财务状\n况良好，融资渠道畅通；另一方面，可以利用资本市场平台，通过资本运作等方式，整合大黄山\n区域的优质旅游资源和企业，发挥上市公司在区域经济合作和地方经济发展中的领头作用，促进\n公司持续稳定健康发展。\n\n"
+        }
+      ],
+      "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+    },
+    {
+      "evidence_id": "source-0007",
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "五、报告期内主要经营情况",
+        "(一) 主营业务分析"
+      ],
+      "physical_pages": [
+        13
+      ],
+      "source_spans": [
+        {
+          "page": 13,
+          "start": 1116,
+          "end": 2515,
+          "quote": "(一)  主营业务分析\n1、  利润表及现金流量表相关科目变动分析表\n                                                                        单位：元        币种：人民币\n             科目                          本期数                 上年同期数               变动比例（%）\n营业收入                                2,109,325,107.63      1,931,131,905.50                   9.23\n营业成本                                1,120,795,111.83         931,263,241.03                 20.35\n销售费用                                    81,909,853.07         60,966,551.97                 34.35\n管理费用                                   391,286,973.55        382,444,870.60                  2.31\n财务费用                                     5,228,085.22          2,681,560.90                 94.96\n研发费用                                     4,231,651.60          3,151,998.37                 34.25\n经营活动产生的现金流量净额                          666,434,842.62        521,663,003.98                 27.75\n投资活动产生的现金流量净额                         -509,995,214.44       -248,811,568.09                不适用\n筹资活动产生的现金流量净额                         -225,495,948.36       -433,326,788.51                不适用\n销售费用变动原因说明：主要系本期广告宣传及营销费用增加所致。\n财务费用变动原因说明：主要系本期利息收入减少所致。\n研发费用变动原因说明：主要系公司持续加大对研发的投入所致。\n投资活动产生的现金流量净额变动原因说明：主要系本期购建固定资产、无形资产和其他长期资\n产支付的现金增加所致。\n筹资活动产生的现金流量净额变动原因说明：主要系去年同期公司子公司云际置业归还到期的长\n期借款导致偿还债务所支付的现金增加所致。\n\n本期公司业务类型、利润构成或利润来源发生重大变动的详细说明\n□适用     √不适用\n\n\n\n\n\n\n                                             13 /185"
+        }
+      ],
+      "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+    },
+    {
+      "evidence_id": "source-0008",
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "五、报告期内主要经营情况",
+        "(一) 主营业务分析"
+      ],
+      "physical_pages": [
+        14
+      ],
+      "source_spans": [
+        {
+          "page": 14,
+          "start": 0,
+          "end": 3164,
+          "quote": "                              黄山旅游发展股份有限公司2025             年年度报告\n\n\n2、  收入和成本分析\n√适用     □不适用\n    报告期内，公司实现营业收入                   210,932.51  万元，同比增长          9.23%，主要系黄山景区接待进山\n游客增加及景区资源有偿使用费核算方法变化所致；营业成本                                    112,079.51   万元，同比增长         20.35%，\n主要系本期景区资源有偿使用费增加所致。\n\n(1).  主营业务分行业、分产品、分地区、分销售模式情况\n                                                                          单位：元        币种：人民币\n                                       主营业务分行业情况\n                                                                   营业收       营业成\n    分行业               营业收入               营业成本            毛利率       入比上       本比上      毛利率比上年\n                                                          （%）      年增减       年增减        增减（%）\n                                                                   （%）       （%）\n酒店业务               492,026,389.87     331,764,429.18       32.57      7.99    17.27    减少    5.34 个\n                                                                                             百分点\n索道及缆车业务            842,155,363.75     208,848,588.38       75.20    17.37    134.03   减少    12.36 个\n                                                                                             百分点\n景区业务               293,201,670.78     156,979,901.66       46.46    21.92      7.70    增加    7.06 个\n                                                                                             百分点\n旅游服务业务             532,255,057.39     489,760,970.14        7.98    12.13     13.61    减少    1.20 个\n                                                                                             百分点\n徽菜业务               245,296,390.79     244,568,871.09        0.30      1.09    10.30    减少    8.32 个\n                                                                                             百分点\n主营业务分行业、分产品、分地区、分销售模式情况的说明\n    （1）主营业务分行业情况中各行业的收入按未合并抵消的口径列报，因此合计金额大于                                                    2025\n年年度报告列报的营业收入（合并抵消后收入），两者的差额主要是各行业之间的内部交易抵消。\n    （2）酒店业务营业成本增加主要系黄山风景名胜资源有偿使用费征收管理优化调整，对公司\n黄山风景区内山上酒店征收风景名胜资源有偿使用费所致（详见公司                                          2025-010  号公告）。\n    （3）索道及缆车业务营业收入增加主要系本期黄山景区接待进山游客增加及景区资源有偿使\n用费核算方法变化所致；营业成本增加主要系黄山风景名胜资源有偿使用费征收管理优化调整，\n其征收模式发生改变且征收比例增长所致（详见公司                                2025-010  号公告）。\n    （4）景区业务营业收入增加主要系本期景区有效购票人数及平均客单价增加所致。\n\n(2).  产销量情况分析表\n□适用     √不适用\n\n(3).  重大采购合同、重大销售合同的履行情况\n□适用     √不适用\n\n(4).  成本分析表\n                                                                          单位：元        币种：人民币\n                                            分行业情况\n                                                   本期                           上年      本期金\n                                                   占总                           同期      额较上       情\n    分行业            成本构成            本期金额            成本        上年同期金额             占总      年同期       况\n                     项目                            比例                           成本      变动比       说\n                                                    (%)                         比例      例(%)      明\n                                                                                 (%)\n\n                                              14 /185"
+        }
+      ],
+      "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+    },
+    {
+      "evidence_id": "source-0009",
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "五、报告期内主要经营情况",
+        "(一) 主营业务分析"
+      ],
+      "physical_pages": [
+        15
+      ],
+      "source_spans": [
+        {
+          "page": 15,
+          "start": 0,
+          "end": 1563,
+          "quote": "                              黄山旅游发展股份有限公司2025             年年度报告\n\n\n酒店业务              住宿、餐饮         331,764,429.18    23.17      282,898,884.06    24.16     17.27\n索道及缆车业务           索道、缆车         208,848,588.38    14.59       89,240,001.67     7.62    134.03\n                  运输等\n景区业务              景点开发、         156,979,901.66    10.96      145,752,911.24    12.45      7.70\n                  维护等\n旅游服务业务            人员、场          489,760,970.14    34.20      431,101,617.50    36.82     13.61\n                  地、交通等\n徽菜业务              餐饮            244,568,871.09    17.08      221,736,704.48    18.94     10.30\n成本分析其他情况说明\n    （1）酒店业务营业成本增加主要系黄山风景名胜资源有偿使用费征收管理优化调整，对公司\n黄山风景区内山上酒店征收风景名胜资源有偿使用费所致（详见公司                                         2025-010  号公告）。\n    （2）索道及缆车业务营业成本增加主要系黄山风景名胜资源有偿使用费征收管理优化调整，\n其征收模式发生改变且征收比例增长所致（详见公司                                2025-010  号公告）。\n\n(5).  报告期主要子公司股权变动导致合并范围变化\n□适用     √不适用\n\n(6).  公司报告期内业务、产品或服务发生重大变化或调整有关情况\n□适用     √不适用\n\n(7).  主要销售客户及主要供应商情况\n属于同一控制人控制的客户或供应商视为同一客户或供应商合并列示，受同一国有资产管理机构\n实际控制的除外。\n下列客户及供应商信息按照同一控制口径合并计算列示的情况说明\n无。\n\nA.公司主要销售客户及主要供应商情况\n√适用     □不适用\n前五名客户销售额18,250.88万元，占年度销售总额7.61%；其中前五名客户销售额中关联方销售\n额0万元，占年度销售总额0%。\n\n前五名供应商采购额13,750.74万元，占年度采购总额9.47%；其中前五名供应商采购额中关联方\n采购额0万元，占年度采购总额0%。\n\nB.报告期内向单个客户的销售比例超过总额的                           50%、前    5 名客户中存在新增客户的或严重依赖于\n少数客户的情形\n□适用     √不适用\n\n报告期内向单个供应商的采购比例超过总额的                            50%、前    5 名供应商中存在新增供应商的或严重依\n赖于少数供应商的情形\n□适用     √不适用\n\nC. 报告期内公司股票被实施退市风险警示或其他风险警示\n前五名销售客户\n□适用     √不适用\n\n前五名供应商\n□适用     √不适用\n\n\n\n                                              15 /185"
+        }
+      ],
+      "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+    },
+    {
+      "evidence_id": "source-0010",
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "五、报告期内主要经营情况",
+        "(一) 主营业务分析"
+      ],
+      "physical_pages": [
+        16
+      ],
+      "source_spans": [
+        {
+          "page": 16,
+          "start": 0,
+          "end": 2598,
+          "quote": "                              黄山旅游发展股份有限公司2025              年年度报告\n\n\nD. 报告期内公司存在贸易业务收入\n□适用     √不适用\n\n贸易业务占营业收入比例超过                  10%前五名销售客户\n□适用     √不适用\n贸易业务收入占营业收入比例超过                     10%前五名供应商\n□适用     √不适用\n\n其他说明：\n无。\n\n3、  费用\n√适用     □不适用\n                                                                                           单位：元\n         科目                       本期数                    上年同期数                   变动比例（%）\n销售费用                             81,909,853.07             60,966,551.97                       34.35\n管理费用                            391,286,973.55            382,444,870.60                        2.31\n财务费用                              5,228,085.22              2,681,560.90                       94.96\n\n销售费用增加主要系本期广告宣传及营销费用增加所致。\n财务费用增加主要系本期利息收入减少所致。\n\n4、  研发投入\n(1).研发投入情况表\n√适用      □不适用\n                                                                          单位：元        币种：人民币\n本期费用化研发投入                                                                             4,231,651.60\n本期资本化研发投入\n研发投入合计                                                                                4,231,651.60\n研发投入总额占营业收入比例（%）                                                                                0.20\n研发投入资本化的比重（%）\n\n(2).研发人员情况表\n√适用     □不适用\n\n公司研发人员的数量                                                                                         28\n研发人员数量占公司总人数的比例（%）                                                                              0.69\n                                         研发人员学历结构\n学历结构类别                                                                      学历结构人数\n博士研究生                                                                                               0\n硕士研究生                                                                                               1\n本科                                                                                                16\n专科                                                                                                  7\n高中及以下                                                                                               4\n                                         研发人员年龄结构\n年龄结构类别                                                                      年龄结构人数\n30 岁以下（不含         30 岁）                                                                             8\n30-40 岁（含     30 岁，不含      40 岁）                                                                  13\n40-50 岁（含     40 岁，不含      50 岁）                                                                    5\n\n\n                                               16/ 185"
+        }
+      ],
+      "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+    },
+    {
+      "evidence_id": "source-0011",
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "五、报告期内主要经营情况",
+        "(一) 主营业务分析"
+      ],
+      "physical_pages": [
+        17
+      ],
+      "source_spans": [
+        {
+          "page": 17,
+          "start": 0,
+          "end": 972,
+          "quote": "                                   黄山旅游发展股份有限公司2025                   年年度报告\n\n\n50-60  岁（含      50  岁，不含        60 岁）                                                                                1\n60 岁及以上                                                                                                              1\n\n(3).情况说明\n□适用      √不适用\n\n(4).研发人员构成发生重大变化的原因及对公司未来发展的影响\n□适用      √不适用\n\n\n5、   现金流\n√适用      □不适用\n                科目                              本期数                      上年同期数                   变动比例（%）\n经营活动产生的现金流量净额                                666,434,842.62              521,663,003.98                        27.75\n投资活动产生的现金流量净额                               -509,995,214.44            -248,811,568.09                        不适用\n筹资活动产生的现金流量净额                               -225,495,948.36            -433,326,788.51                        不适用\n\n投资活动产生的现金流量净额减少主要系本期购建固定资产、无形资产和其他长期资产支付的现\n金增加所致。\n筹资活动产生的现金流量净额增加主要系去年同期公司子公司云际置业归还到期的长期借款导致\n偿还债务所支付的现金增加所致。\n\n"
+        }
+      ],
+      "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+    },
+    {
+      "evidence_id": "source-0012",
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "六、公司关于公司未来发展的讨论与分析"
+      ],
+      "physical_pages": [
+        23
+      ],
+      "source_spans": [
+        {
+          "page": 23,
+          "start": 58,
+          "end": 1828,
+          "quote": "六、公司关于公司未来发展的讨论与分析\n(一)行业格局和趋势\n√适用     □不适用\n    随着国家社会经济的持续发展，人均可支配收入的稳步提升，综合交通网络的不断完善，以\n及带薪休假、法定节假日、春秋假等休假制度的进一步落地见效，国民旅游消费能力与出行意愿\n持续增强，有力支撑旅游市场规模稳步扩大、质量持续提升。2025                          年旅游市场呈现整体稳定向好、\n提质增效的发展态势，“文化”与“旅游”的有机融合以及“文旅体商”新产业蕴含广阔发展潜\n能，不断赋能我国旅游产业高质量发展，旅游业在稳增长、促消费、增就业等方面的作用进一步\n彰显，旅游业作为国民经济战略性支柱产业的地位更加巩固。目前旅游业已经成为国计民生的重\n要内容，国家亦不断出台政策支持旅游业发展，着力推动文旅产业高质量发展，真正打造成为支\n柱产业、民生产业、幸福产业，《中华人民共和国国民经济和社会发展第十五个五年规划纲要》\n提出，深化以文塑旅、以旅彰文，推进旅游强国建设。根据中国旅游研究院有关研究报告预测，\n我国有望形成年均百亿旅游人次和               10 万亿元消费规模的国内游大市场。从中长期来看，我国旅游\n市场持续向好和稳定发展格局没有改变。\n    当前我国国民消费习惯和旅游市场格局发生了深刻变化，从“十四五”迈向“十五五”，旅\n游业全面进入提质升级、创新驱动的高质量发展新阶段。从需求端来看，旅游已成为人民群众常\n态化生活方式，旅游消费从注重观光向兼顾观光与休闲度假加速转变，需求整体持续升级，情绪\n价值、沉浸体验、文化共鸣成为核心诉求，旅游消费更趋多样化、个性化和品质化并兼顾性价比。\n从供给端来看，核心竞争力正从资源比拼转向价值深耕，叠加数字技术赋能与模式创新驱动，旅\n游供给侧结构性改革纵深推进，旅游产业链全面升级，旅游新业态层出不穷，旅游产品愈加丰富，\n旅游市场越来越细分化。在“以文塑旅、以旅彰文”的深度指引下，文旅与体育、演艺、康养、\n科技、乡村振兴等领域跨界融合不断深化，“文旅体商”融合业态蓬勃发展，“文旅+百业”成为\n激活发展的新引擎，旅游业发展正从“供给迎合需求”迈向“供给创造需求、供需双向互动”的\n新阶段。伴随着旅游产品供给完善与消费需求升级，行业竞争已转向文化价值、体验价值等综合\n服务能力的比拼，旅游业整体创新活力与发展潜力有待进一步释放。\n    2026年是“十五五”规划开局之年，也是旅游经济巩固复苏成果、迈向高质量发展新周期的\n重要一年。在旅游消费需求多元化、政策红利持续释放与数字科技深度赋能的共同驱动下，旅游\n业仍将是拉动经济增长、扩大内需的重要引擎。与此同时，旅游业作为典型敏感性行业，对宏观\n经济、政策环境、社会事件及自然条件较为敏感，仍面临突发性、社会性等外部因素传导带来的\n不确定性与发展风险。\n\n(二)公司发展战略\n√适用     □不适用\n    战略目标：公司对标对表“建设一批富有文化底蕴的世界级旅游景区和度假区”的战略定位，\n紧紧围绕“美丽中国追梦人、美景目的地打造者，美好旅行体验提供商”的职责使命，坚持贯彻\n实施“走下山、走出去”“旅游+”和“山水村窟”发展战略，努力做大黄山目的地旅游资源的整\n合者，加快构建打造引领全球的目的地旅游旗舰企业。\n    战略路径：在持续深化公司体制机制市场化改革、持续强化旅游产品供给侧改革的基础上，\n充分利用上市公司的平台优势、景区运营的人才优势以及紧邻长三角的区位优势，加强资本运作、\n加快外延拓展。一是黄山景区，具体包括做大空间——聚焦皖南国际文化旅游示范区核心区建设，\n扩展、延伸、整合现有发展物理空间并以此带动全域旅游资源开发；做深文化——深度推进文旅\n融合，充分挖掘文化遗产与徽州人文要素；做多业态——丰富完善休闲度假旅游综合体；做高价\n值——通过“山水村窟”战略落地打造若干差异化与品质化兼备的旅游目的地体系，有效承接黄\n山风景区溢出价值。二是黄山市及周边地区，具体包括做优平台——紧跟数字经济及数字产业化\n发展趋势，拓展“本地+在地”生活服务平台；做全服务——全面覆盖旅游+生活方式场景，融合\n\n                                       23/185"
+        }
+      ],
+      "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+    },
+    {
+      "evidence_id": "source-0013",
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "六、公司关于公司未来发展的讨论与分析"
+      ],
+      "physical_pages": [
+        24
+      ],
+      "source_spans": [
+        {
+          "page": 24,
+          "start": 0,
+          "end": 1967,
+          "quote": "                         黄山旅游发展股份有限公司2025         年年度报告\n\n\n实体服务与虚拟经济；做广营销——协同整合目的地资源与服务；做强品牌——强化提升黄山旅\n游品牌。\n\n(三)经营计划\n√适用     □不适用\n    2026年是“十五五”规划的开局之年，也是公司迈向高质量发展的重要一年。公司将继续完\n整准确全面贯彻新发展理念，按照既定的战略方向、战略目标、战略举措，艰苦奋斗、团结奋斗、\n不懈奋斗，扎实抓好全年各项工作，奋力实现“十五五”精彩开局，切实推进公司高质量发展。\n    （一）推进经营提效。一是强化目标导向，设定全年目标并压紧压实到各经营板块及单位，\n确保经营目标具象化、责任明晰化。二是强化考核激励，发挥考核激励的指挥棒作用，加强正向\n激励，树立以实绩论英雄的鲜明导向，以激励促担当。三是强化减亏增效，努力打好减亏扭亏攻\n坚战，坚持“一企一策”制定有针对性的减亏举措。四是在全力稳住存量营收基础上，进一步扩\n大增量营收，挖掘新的业务增长点，培育“第二增长曲线”。\n    （二）推进市场提质。一是围绕特定人群、特定节日、特定渠道、特定活动等制定系列营销\n政策，精准撬动旅游市场；发力长三角等国内市场，持续跟进企业团建、入境、亲子研学等专项\n市场。二是串联公司和全市旅游资源，推出更多组合产品、精品化旅游线路产品以及一站式高端\n商务接待产品。三是用好           OTA 和新媒体平台资源，创新数字化联动打法，提升产品销售力，并深\n入市场一线开展推介，深化与旅行社合作，加大引客入黄力度。四是用好公司新媒体账号矩阵以\n及海外社交平台账号，加大宣传力度，策划举办各类特色主题活动及创意活动，提升黄山影响力。\n    （三）推进项目提速。一是在承租资产的基础上，加快推进黄山景区温泉片区项目进展；推\n进黄山太平索道电气系统更新提升项目开工建设及黄山景区东大门开放有关工作。二是持续打响\n雲麓酒店品牌，推进黄山国际大酒店升级改造工程项目及黄山滨江东路                               12 号酒店项目进展。三是\n围绕“五水”定位，推进太平湖高质量户外运动目的地项目申报，完善基础设施及老旧游船更新\n换代。四是完成花开南溪项目，推进茶坦帐篷营地项目建设，打造乡村振兴样板项目。五是用好\n“中华老字号”价值，通过品牌+管理输出、品牌+管理+参股等模式推进徽菜业务对外拓展布局。\n    （四）增强科技新动能。一是加快推进                 AI旅行助手升级，以黄山应用场景为模板逐步拓展延\n伸；依托黄山文旅大模型底座，推动                AI 旅行助手从功能升级迈向体验革新，并延伸新场景应用。\n二是全面升级迭代黄山旅游官方平台，构建覆盖黄山市域旅游全要素的资源整合和对客服务能力，\n打造全域文旅服务平台。三是链接外部资源探索商业合作模式，开发沉浸式文旅体验项目，力争\n打造更多新场景新应用。四是加快财务共享中心体系建设，完善组织人员、业务流程、信息系统、\n运营服务四大功能，以财务集约管理提升管理水平及收益。\n    （五）增强文化新活力。一是通过宣传带动、活动加持、影视赋能、场景构建以及产品设计\n等多种方式推进花仔         IP 出圈；壮大公司文创市场规模，打响“迎客松”主题爆款产品，并加快打\n造更多文创     IP。二是深化外部合作，持续发力旅游+网剧、网游等新业态，植入文旅资源、文旅\n场景、文旅业态，放大“乘数效应”，并同步推出线下跨界联名活动，强化导流宣传，以业态创\n新助推文旅深度融合。\n    （六）增强改革新动力。一是整合公司宣传端、营销端、渠道端等资源，加快推进公司大营\n销体系方案。二是深化新一轮五大体系改革，进一步完善机制，探索实行更加灵活高效、具有竞\n争优势的薪酬及考核激励制度。三是建立健全市场化选聘机制，优化岗位动态管理与后备人才储\n备，夯实员工全成长周期培训体系，构建人才引育用留全链条体系。四是深入贯彻监管要求，在\n完成监事会取消的基础上，持续做好治理制度的“废改立”工作，不断夯实公司治理根基。五是\n进一步强化安全生产、生态环保、财务管理、财务审计、法务管理等工作，全面提升管理治理效\n能和企业现代化运营水平。\n    （七）提升服务感召力。一是持续优化全方位、一站式全流程服务，用好“先行赔付”机制\n和陌生访客机制，切实保障游客的合法权益，以实际成效和优质服务提升游客满意度。二是持续\n完善黄山景区基础设施，进一步推进游步道升级、旅游厕所改造提升等项目，优化游客体验。三\n\n                                       24/185"
+        }
+      ],
+      "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+    },
+    {
+      "evidence_id": "source-0014",
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "六、公司关于公司未来发展的讨论与分析"
+      ],
+      "physical_pages": [
+        25
+      ],
+      "source_spans": [
+        {
+          "page": 25,
+          "start": 0,
+          "end": 1584,
+          "quote": "                         黄山旅游发展股份有限公司2025         年年度报告\n\n\n是坚持服务带动，突出用户思维、客户体验，完善以游客满意度为导向的服务质量评价体系，以\n优质服务提高市场颗粒度、营销精准度、产品复购率。四是创新打造更多体验产品，常态化推出\n非遗手作等精彩活动，并增加更多互动式活动，让景区好看更好玩。\n    （八）提升党建引领力。一是通过多种载体，引导党员干部深刻领会党的创新理论，强化理\n论武装；全面落实意识形态工作责任制，加强风险防范，扎实抓好阵地管理、舆情引导、队伍建\n设等工作。二是加强党务履职能力培训，强化组织建设，推动基层党组织建设再上新台阶，深化\n党建品牌矩阵建设，加强交流学习，巩固品牌建设成果，增强党建凝聚力。三是巩固学习教育成\n果，推进作风建设常态化长效化，以制度建设为抓手，健全机制，推动工作效率提升；坚持严管\n厚爱相统一、惩治教育相结合，不断提高监督质效，强化正风肃纪，紧盯权力运行关键环节，推\n动风腐同查同治，打造忠诚、干净、担当的过硬队伍。\n\n(四)可能面对的风险\n√适用     □不适用\n    1、行业风险\n    旅游行业具有较强的环境相关性和敏感性，与经济环境、自然环境和社会环境关系密切，经\n济危机、自然灾害、重大疫情或其他不可抗力因素，都可能给旅游行业造成较大冲击和影响，从\n而给公司发展带来局部或全部的风险。\n    对策：公司将加快贯彻落实“走下山、走出去”“旅游+”和“山水村窟”发展战略，力争实\n现旅游全产业链、全域化运营，以避免业务单一而受外部不利因素较大影响。同时公司将密切关\n注旅游行业动态，密切跟踪市场需求，科学决策，不断建立健全各种应急及防范机制，积极应对\n和防范可能存在的风险。\n    2、市场风险\n    随着旅游行业的不断发展，各地的新景区、新景点不断涌现，旅游产品和旅游业态不断创新，\n市场竞争日趋激烈，给公司带来了较大的竞争压力及市场风险。\n    对策：公司将围绕“山水村窟”和“旅游+”发展战略，加快实现从项目储备向落地运营转变，\n形成“山水村窟”产品体系联动发展，构建以“旅游目的地”为竞争优势的资源布局，并在不断\n整合优质旅游资源的同时完善延伸产业链，并加快旅游市场推广、旅游产品创新和服务品质提升，\n进一步提升公司的核心竞争力。\n    3、项目投资风险\n    公司项目投资是建立在充分的市场调研论证基础上的，具有较强的可操作性。但在项目实施\n及后续运营过程中，受经济环境、宏观政策、行业发展及市场变化等多方面不确定性因素的影响，\n可能存在项目投资不达预期的风险。\n    对策：公司将进一步完善项目投资管理体系，提升项目投资决策和管理能力；积极关注外部\n环境变化，注重对可能发生的不利条件及变化因素进行预测并加以防范，切实降低和规避投资风\n险；进一步加强公司内部管理，提高经营管理和内控管理水平，降低项目投资运营成本，同时密\n切关注市场需求，加大宣传推广力度，不断适应市场变化，确保项目投资取得预期收益。\n    4、其他风险\n    公司景区部分产品如门票和索道等收费标准接受政府有关部门审批，在收费标准调整方面存\n在一定限制。政府有关部门对景区门票和索道收费标准调整的审批，将在一定程度上影响公司未\n来的收益状况。\n    对策：公司将按照既定发展战略，稳步推进公司各项业务，同时积极合理调配现有资源，围\n绕“传统业务横向扩张”和“新兴业务纵向拓展”两大实施路径，不断优化产业布局，创新旅游\n产品。加快景区二次消费项目建设，致力推动公司由景区门票经济向产业经济转型发展，提高区\n域内旅游综合收入水平，确保公司持续稳定健康发展。\n\n\n\n\n\n                                       25/185"
+        }
+      ],
+      "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+    },
+    {
+      "evidence_id": "source-0015",
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "section_path": [
+        "第三节 管理层讨论与分析",
+        "六、公司关于公司未来发展的讨论与分析"
+      ],
+      "physical_pages": [
+        26
+      ],
+      "source_spans": [
+        {
+          "page": 26,
+          "start": 0,
+          "end": 78,
+          "quote": "                         黄山旅游发展股份有限公司2025         年年度报告\n\n\n(五)其他\n□适用     √不适用\n\n"
+        }
+      ],
+      "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+    }
+  ],
+  "limitations": [
+    "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。",
+    "本稿为原初核响应的零调用限用投影，未取得真实修订/再核，不能作为新闭环成功。"
+  ],
+  "supply_chain": {
+    "position": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "SC-P-01",
+          "text": "公司作为景区运营方，经营黄山景区、花山谜窟景区及太平湖景区，提供旅游观光和休闲度假等服务；同时经营索道及缆车客运观光、酒店住宿餐饮、徽菜餐饮、旅行社及智慧旅游等业务。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "metrics": []
+        }
+      ],
+      "limitations": []
+    },
+    "upstream_inputs": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "SC-U-01",
+          "text": "公司索道及缆车业务的成本构成项目为索道、缆车运输等，景区业务成本构成项目为景点开发、维护等，酒店业务成本构成项目为住宿、餐饮，旅游服务业务成本构成项目为人员、场地、交通等，徽菜业务成本构成项目为餐饮。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "SC-U-02",
+          "text": "报告期内成功开辟5条无人机物资运输航线，运行以来运输各类物资585万斤，助力缓解景区物资运输难题。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": []
+        }
+      ],
+      "limitations": []
+    },
+    "downstream_customers": {
+      "status": "observed",
+      "facts": [
+        {
+          "fact_id": "SC-D-01",
+          "text": "景区业务面向旅游观光和休闲度假游客，索道及缆车业务提供客运观光服务，酒店业务提供住宿餐饮等旅宿服务，徽菜业务提供徽菜餐饮服务，旅行社业务涵盖国内旅游、入境旅游、出境旅游、定制游、会展服务和疗休养等。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "metrics": []
+        },
+        {
+          "fact_id": "SC-D-02",
+          "text": "公司精准营销抢抓冬游、大客户、入境及航空、亲子及研学等专项市场，并推出大企业大客户专属产品等8款“一站式”高端定制产品。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003"
+          ],
+          "metrics": []
+        }
+      ],
+      "limitations": []
+    }
+  },
+  "generation": {
+    "prompt_version": "company_profile_workpaper.2026-11-12.source-units.v6",
+    "preprocessing_version": "toc_sections_native_layout.v2",
+    "section_guide_version": "company_profile_section_guide.2026-11-12.v1",
+    "selection": {
+      "purpose": "select_profile_sections",
+      "request_id": "bp-work-e37e2262eb48b47267f603e1:workpaper:sections",
+      "request_hash": "352ae455e66afe2d809841440f3c8867ff1799632e496c1a40b6e6b740055b16",
+      "response_hash": "2144c4b3407307a612dfed98d12c05f867b0c4f003f983e889314f8139ec5af5",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+      "finish_reason": "stop",
+      "reasoning_effort": "high",
+      "contract_status": "accepted",
+      "usage": {
+        "input_tokens": 21136,
+        "output_tokens": 385,
+        "total_tokens": 21521
+      },
+      "scope_kind": "report_heading_index",
+      "heading_count": 838,
+      "section_ids": [
+        "section-0001",
+        "section-0002",
+        "section-0003",
+        "section-0004",
+        "section-0005",
+        "section-0006",
+        "section-0007",
+        "section-0008",
+        "section-0009",
+        "section-0010",
+        "section-0011",
+        "section-0012",
+        "section-0013",
+        "section-0014",
+        "section-0015",
+        "section-0016",
+        "section-0017",
+        "section-0018",
+        "section-0019",
+        "section-0020",
+        "section-0021",
+        "section-0022",
+        "section-0023",
+        "section-0024",
+        "section-0025",
+        "section-0026",
+        "section-0027",
+        "section-0028",
+        "section-0029",
+        "section-0030",
+        "section-0031",
+        "section-0032",
+        "section-0033",
+        "section-0034",
+        "section-0035",
+        "section-0036",
+        "section-0037",
+        "section-0038",
+        "section-0039",
+        "section-0040",
+        "section-0041",
+        "section-0042",
+        "section-0043",
+        "section-0044",
+        "section-0045",
+        "section-0046",
+        "section-0047",
+        "section-0048",
+        "section-0049",
+        "section-0050",
+        "section-0051",
+        "section-0052",
+        "section-0053",
+        "section-0054",
+        "section-0055",
+        "section-0056",
+        "section-0057",
+        "section-0058",
+        "section-0059",
+        "section-0060",
+        "section-0061",
+        "section-0075",
+        "section-0076",
+        "section-0081",
+        "section-0082",
+        "section-0083",
+        "section-0084",
+        "section-0101",
+        "section-0102",
+        "section-0103",
+        "section-0104",
+        "section-0105",
+        "section-0106",
+        "section-0107",
+        "section-0108",
+        "section-0117",
+        "section-0118",
+        "section-0119",
+        "section-0120",
+        "section-0121",
+        "section-0122",
+        "section-0123",
+        "section-0124",
+        "section-0125",
+        "section-0126",
+        "section-0127",
+        "section-0128",
+        "section-0129",
+        "section-0130",
+        "section-0131",
+        "section-0132",
+        "section-0133",
+        "section-0134",
+        "section-0135",
+        "section-0136",
+        "section-0137",
+        "section-0138",
+        "section-0139",
+        "section-0140",
+        "section-0141",
+        "section-0142",
+        "section-0143",
+        "section-0144",
+        "section-0145",
+        "section-0146",
+        "section-0147",
+        "section-0148",
+        "section-0149",
+        "section-0150",
+        "section-0151",
+        "section-0152",
+        "section-0153",
+        "section-0154",
+        "section-0155",
+        "section-0156",
+        "section-0157",
+        "section-0158",
+        "section-0159",
+        "section-0160",
+        "section-0161",
+        "section-0162",
+        "section-0163",
+        "section-0164",
+        "section-0165",
+        "section-0166",
+        "section-0167",
+        "section-0168",
+        "section-0169",
+        "section-0170",
+        "section-0171",
+        "section-0172",
+        "section-0173",
+        "section-0174",
+        "section-0175",
+        "section-0176",
+        "section-0177",
+        "section-0178",
+        "section-0179",
+        "section-0180",
+        "section-0181",
+        "section-0182",
+        "section-0183",
+        "section-0184",
+        "section-0185",
+        "section-0186",
+        "section-0187",
+        "section-0188",
+        "section-0189",
+        "section-0190",
+        "section-0191",
+        "section-0192",
+        "section-0193",
+        "section-0194",
+        "section-0196",
+        "section-0197",
+        "section-0198",
+        "section-0199",
+        "section-0200",
+        "section-0201",
+        "section-0202",
+        "section-0203",
+        "section-0204",
+        "section-0205",
+        "section-0206",
+        "section-0207",
+        "section-0208",
+        "section-0209",
+        "section-0210",
+        "section-0211",
+        "section-0212",
+        "section-0213",
+        "section-0214",
+        "section-0215",
+        "section-0216",
+        "section-0217",
+        "section-0218",
+        "section-0219",
+        "section-0220",
+        "section-0221",
+        "section-0222",
+        "section-0223",
+        "section-0224",
+        "section-0225",
+        "section-0226",
+        "section-0227",
+        "section-0228",
+        "section-0229",
+        "section-0230",
+        "section-0231",
+        "section-0232",
+        "section-0233",
+        "section-0234",
+        "section-0235",
+        "section-0236",
+        "section-0237",
+        "section-0238",
+        "section-0239",
+        "section-0240",
+        "section-0241",
+        "section-0242",
+        "section-0243",
+        "section-0244",
+        "section-0245",
+        "section-0246",
+        "section-0247",
+        "section-0248",
+        "section-0249",
+        "section-0250",
+        "section-0251",
+        "section-0252",
+        "section-0253",
+        "section-0254",
+        "section-0255",
+        "section-0256",
+        "section-0257",
+        "section-0258",
+        "section-0259",
+        "section-0260",
+        "section-0261",
+        "section-0262",
+        "section-0263",
+        "section-0264",
+        "section-0265",
+        "section-0266",
+        "section-0267",
+        "section-0268",
+        "section-0269",
+        "section-0270",
+        "section-0271",
+        "section-0272",
+        "section-0274",
+        "section-0275",
+        "section-0278",
+        "section-0282",
+        "section-0283",
+        "section-0284",
+        "section-0285",
+        "section-0288",
+        "section-0289",
+        "section-0292",
+        "section-0293",
+        "section-0294",
+        "section-0295",
+        "section-0296",
+        "section-0297",
+        "section-0298",
+        "section-0299",
+        "section-0300",
+        "section-0301",
+        "section-0302",
+        "section-0303",
+        "section-0304",
+        "section-0305",
+        "section-0306",
+        "section-0307",
+        "section-0308",
+        "section-0309",
+        "section-0310",
+        "section-0311",
+        "section-0312",
+        "section-0313",
+        "section-0314",
+        "section-0315",
+        "section-0316",
+        "section-0317",
+        "section-0318",
+        "section-0319",
+        "section-0320",
+        "section-0321",
+        "section-0322",
+        "section-0323",
+        "section-0324",
+        "section-0325",
+        "section-0326",
+        "section-0327",
+        "section-0328",
+        "section-0329",
+        "section-0330",
+        "section-0331",
+        "section-0332",
+        "section-0333",
+        "section-0334",
+        "section-0335",
+        "section-0336",
+        "section-0337",
+        "section-0338",
+        "section-0339",
+        "section-0340",
+        "section-0341",
+        "section-0342",
+        "section-0343",
+        "section-0344",
+        "section-0345",
+        "section-0346",
+        "section-0347",
+        "section-0348",
+        "section-0349",
+        "section-0350",
+        "section-0351",
+        "section-0352",
+        "section-0353",
+        "section-0354",
+        "section-0355",
+        "section-0356",
+        "section-0357",
+        "section-0364",
+        "section-0365",
+        "section-0366",
+        "section-0373",
+        "section-0374",
+        "section-0375",
+        "section-0376",
+        "section-0377",
+        "section-0378",
+        "section-0379",
+        "section-0380",
+        "section-0381",
+        "section-0382",
+        "section-0383",
+        "section-0384",
+        "section-0385",
+        "section-0386",
+        "section-0387",
+        "section-0388",
+        "section-0389",
+        "section-0390",
+        "section-0391",
+        "section-0392",
+        "section-0397",
+        "section-0405",
+        "section-0406",
+        "section-0407",
+        "section-0408",
+        "section-0409",
+        "section-0410",
+        "section-0411",
+        "section-0412",
+        "section-0413",
+        "section-0414",
+        "section-0415",
+        "section-0416",
+        "section-0417",
+        "section-0418",
+        "section-0419",
+        "section-0420",
+        "section-0421",
+        "section-0422",
+        "section-0423",
+        "section-0424",
+        "section-0425",
+        "section-0426",
+        "section-0427",
+        "section-0428",
+        "section-0429",
+        "section-0430",
+        "section-0431",
+        "section-0432",
+        "section-0433",
+        "section-0434",
+        "section-0435",
+        "section-0436",
+        "section-0437",
+        "section-0438",
+        "section-0439",
+        "section-0440",
+        "section-0441",
+        "section-0442",
+        "section-0443",
+        "section-0444",
+        "section-0445",
+        "section-0446",
+        "section-0447",
+        "section-0448",
+        "section-0449",
+        "section-0450",
+        "section-0451",
+        "section-0452",
+        "section-0453",
+        "section-0454",
+        "section-0455",
+        "section-0456",
+        "section-0457",
+        "section-0458",
+        "section-0459",
+        "section-0460",
+        "section-0461",
+        "section-0462",
+        "section-0463",
+        "section-0464",
+        "section-0465",
+        "section-0466",
+        "section-0467",
+        "section-0468",
+        "section-0469",
+        "section-0470",
+        "section-0471",
+        "section-0472",
+        "section-0473",
+        "section-0474",
+        "section-0475",
+        "section-0476",
+        "section-0477",
+        "section-0478",
+        "section-0479",
+        "section-0480",
+        "section-0481",
+        "section-0482",
+        "section-0483",
+        "section-0484",
+        "section-0485",
+        "section-0486",
+        "section-0487",
+        "section-0488",
+        "section-0489",
+        "section-0490",
+        "section-0491",
+        "section-0492",
+        "section-0493",
+        "section-0494",
+        "section-0495",
+        "section-0496",
+        "section-0497",
+        "section-0498",
+        "section-0499",
+        "section-0500",
+        "section-0501",
+        "section-0502",
+        "section-0503",
+        "section-0504",
+        "section-0505",
+        "section-0506",
+        "section-0507",
+        "section-0508",
+        "section-0509",
+        "section-0510",
+        "section-0511",
+        "section-0512",
+        "section-0513",
+        "section-0514",
+        "section-0515",
+        "section-0516",
+        "section-0517",
+        "section-0518",
+        "section-0519",
+        "section-0520",
+        "section-0521",
+        "section-0522",
+        "section-0523",
+        "section-0524",
+        "section-0525",
+        "section-0526",
+        "section-0527",
+        "section-0528",
+        "section-0529",
+        "section-0530",
+        "section-0531",
+        "section-0532",
+        "section-0533",
+        "section-0534",
+        "section-0535",
+        "section-0536",
+        "section-0537",
+        "section-0538",
+        "section-0539",
+        "section-0540",
+        "section-0541",
+        "section-0542",
+        "section-0543",
+        "section-0544",
+        "section-0545",
+        "section-0546",
+        "section-0547",
+        "section-0548",
+        "section-0549",
+        "section-0550",
+        "section-0551",
+        "section-0552",
+        "section-0553",
+        "section-0554",
+        "section-0555",
+        "section-0556",
+        "section-0557",
+        "section-0558",
+        "section-0559",
+        "section-0560",
+        "section-0561",
+        "section-0562",
+        "section-0563",
+        "section-0564",
+        "section-0565",
+        "section-0568",
+        "section-0569",
+        "section-0570",
+        "section-0571",
+        "section-0572",
+        "section-0581",
+        "section-0582",
+        "section-0583",
+        "section-0584",
+        "section-0585",
+        "section-0586",
+        "section-0587",
+        "section-0588",
+        "section-0591",
+        "section-0593",
+        "section-0596",
+        "section-0599",
+        "section-0600",
+        "section-0601",
+        "section-0602",
+        "section-0605",
+        "section-0608",
+        "section-0609",
+        "section-0610",
+        "section-0615",
+        "section-0616",
+        "section-0617",
+        "section-0618",
+        "section-0623",
+        "section-0627",
+        "section-0628",
+        "section-0630",
+        "section-0637",
+        "section-0639",
+        "section-0640",
+        "section-0641",
+        "section-0642",
+        "section-0643",
+        "section-0644",
+        "section-0645",
+        "section-0646",
+        "section-0647",
+        "section-0648",
+        "section-0649",
+        "section-0650",
+        "section-0657",
+        "section-0663",
+        "section-0669",
+        "section-0678",
+        "section-0681",
+        "section-0701",
+        "section-0707",
+        "section-0708",
+        "section-0709",
+        "section-0710",
+        "section-0715",
+        "section-0720",
+        "section-0726",
+        "section-0728",
+        "section-0729",
+        "section-0731",
+        "section-0734",
+        "section-0735",
+        "section-0737",
+        "section-0738",
+        "section-0739",
+        "section-0741",
+        "section-0743",
+        "section-0744",
+        "section-0745",
+        "section-0746",
+        "section-0748",
+        "section-0750",
+        "section-0751",
+        "section-0752",
+        "section-0753",
+        "section-0754",
+        "section-0755",
+        "section-0756",
+        "section-0757",
+        "section-0758",
+        "section-0761",
+        "section-0763",
+        "section-0764",
+        "section-0765",
+        "section-0771",
+        "section-0775",
+        "section-0776",
+        "section-0777",
+        "section-0778",
+        "section-0783",
+        "section-0787",
+        "section-0788",
+        "section-0789",
+        "section-0790",
+        "section-0792",
+        "section-0794",
+        "section-0795",
+        "section-0796",
+        "section-0797",
+        "section-0805",
+        "section-0811",
+        "section-0815",
+        "section-0818",
+        "section-0820",
+        "section-0821",
+        "section-0822",
+        "section-0825",
+        "section-0828",
+        "section-0829",
+        "section-0830",
+        "section-0831",
+        "section-0833",
+        "section-0836",
+        "section-0837",
+        "section-0838",
+        "section-0839",
+        "section-0841",
+        "section-0843",
+        "section-0844",
+        "section-0845",
+        "section-0846",
+        "section-0848",
+        "section-0850",
+        "section-0851",
+        "section-0852",
+        "section-0855",
+        "section-0857",
+        "section-0858",
+        "section-0859",
+        "section-0860",
+        "section-0863",
+        "section-0865",
+        "section-0866",
+        "section-0867",
+        "section-0868",
+        "section-0870",
+        "section-0872",
+        "section-0873",
+        "section-0874",
+        "section-0875",
+        "section-0882",
+        "section-0888",
+        "section-0889",
+        "section-0895",
+        "section-0896",
+        "section-0897",
+        "section-0898",
+        "section-0899",
+        "section-0901",
+        "section-0903",
+        "section-0904",
+        "section-0905",
+        "section-0907",
+        "section-0910",
+        "section-0914",
+        "section-0918",
+        "section-0920",
+        "section-0921",
+        "section-0922",
+        "section-0923",
+        "section-0925",
+        "section-0926",
+        "section-0927",
+        "section-0928",
+        "section-0929",
+        "section-0930",
+        "section-0931",
+        "section-0933",
+        "section-0934",
+        "section-0935",
+        "section-0936",
+        "section-0937",
+        "section-0942",
+        "section-0943",
+        "section-0944",
+        "section-0945",
+        "section-0947",
+        "section-0952",
+        "section-0953",
+        "section-0956",
+        "section-0957",
+        "section-0958",
+        "section-0959",
+        "section-0960",
+        "section-0961",
+        "section-0964",
+        "section-0965",
+        "section-0966",
+        "section-0967",
+        "section-0968",
+        "section-0969",
+        "section-0970",
+        "section-0971",
+        "section-0972",
+        "section-0973",
+        "section-0974",
+        "section-0975",
+        "section-0976",
+        "section-0977",
+        "section-0983",
+        "section-0984",
+        "section-0985",
+        "section-0986",
+        "section-0987",
+        "section-0988",
+        "section-0989",
+        "section-0990",
+        "section-0991",
+        "section-0992",
+        "section-0993",
+        "section-0994",
+        "section-0995",
+        "section-0996",
+        "section-0997",
+        "section-0998",
+        "section-0999",
+        "section-1000",
+        "section-1001",
+        "section-1002",
+        "section-1003",
+        "section-1004",
+        "section-1005",
+        "section-1006",
+        "section-1007",
+        "section-1008",
+        "section-1009",
+        "section-1012",
+        "section-1013",
+        "section-1019",
+        "section-1021",
+        "section-1022",
+        "section-1023",
+        "section-1027",
+        "section-1028",
+        "section-1029",
+        "section-1032",
+        "section-1033",
+        "section-1036",
+        "section-1040",
+        "section-1041",
+        "section-1042",
+        "section-1043",
+        "section-1044",
+        "section-1045",
+        "section-1046",
+        "section-1047",
+        "section-1048",
+        "section-1049",
+        "section-1050",
+        "section-1051",
+        "section-1053",
+        "section-1054",
+        "section-1055",
+        "section-1061",
+        "section-1062",
+        "section-1071",
+        "section-1072",
+        "section-1073",
+        "section-1074",
+        "section-1075",
+        "section-1076",
+        "section-1077",
+        "section-1078",
+        "section-1079",
+        "section-1080",
+        "section-1084",
+        "section-1085",
+        "section-1088",
+        "section-1092",
+        "section-1096",
+        "section-1097",
+        "section-1098",
+        "section-1099",
+        "section-1100",
+        "section-1104",
+        "section-1107",
+        "section-1108",
+        "section-1109",
+        "section-1110",
+        "section-1111",
+        "section-1112",
+        "section-1113",
+        "section-1114",
+        "section-1115",
+        "section-1116",
+        "section-1117",
+        "section-1118",
+        "section-1119",
+        "section-1120",
+        "section-1121",
+        "section-1122",
+        "section-1123",
+        "section-1124",
+        "section-1125",
+        "section-1126",
+        "section-1127",
+        "section-1128",
+        "section-1129",
+        "section-1130",
+        "section-1131",
+        "section-1132",
+        "section-1133",
+        "section-1134",
+        "section-1135",
+        "section-1139",
+        "section-1145",
+        "section-1149",
+        "section-1150",
+        "section-1151",
+        "section-1152",
+        "section-1155",
+        "section-1156",
+        "section-1157",
+        "section-1158",
+        "section-1159",
+        "section-1160",
+        "section-1161",
+        "section-1163",
+        "section-1166",
+        "section-1167",
+        "section-1168",
+        "section-1169",
+        "section-1170",
+        "section-1171",
+        "section-1172",
+        "section-1173",
+        "section-1174",
+        "section-1175",
+        "section-1178",
+        "section-1179",
+        "section-1180",
+        "section-1185",
+        "section-1186",
+        "section-1187",
+        "section-1188",
+        "section-1194",
+        "section-1214",
+        "section-1217",
+        "section-1218",
+        "section-1220",
+        "section-1226",
+        "section-1227",
+        "section-1228",
+        "section-1229",
+        "section-1230",
+        "section-1231",
+        "section-1232"
+      ],
+      "physical_pages": []
+    },
+    "extraction": {
+      "purpose": "extract_profile_workpaper",
+      "request_id": "bp-work-e37e2262eb48b47267f603e1:workpaper:extract",
+      "request_hash": "ed4f399abd582adc93fdfa703b93e612857b45c9d3be7a9c2f312703e16945a0",
+      "response_hash": "e9e73bee3b390bb3169567ba4becd3da93f6d29b0a425ac56a3d85dec434a0ad",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction__deepseek",
+      "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+      "finish_reason": "stop",
+      "reasoning_effort": "high",
+      "contract_status": "accepted",
+      "usage": {
+        "input_tokens": 20616,
+        "output_tokens": 6397,
+        "total_tokens": 27013
+      },
+      "scope_kind": "selected_source_sections",
+      "heading_count": null,
+      "section_ids": [
+        "section-0036",
+        "section-0044",
+        "section-0052",
+        "section-0059",
+        "section-0124"
+      ],
+      "physical_pages": [
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        23,
+        24,
+        25,
+        26
+      ]
+    }
+  },
+  "quality_review": {
+    "status": "incomplete",
+    "policy_version": "company_profile_workpaper_review.v1",
+    "original_draft_hash": "fcb076645faccfeee7cfdd33040614433e10b48d3916809f2e602717bd03de55",
+    "findings": [
+      {
+        "finding_id": "F-001",
+        "element": "operating_drivers",
+        "severity": "material",
+        "issue_type": "material_omission",
+        "affected_fact_id": null,
+        "evidence_ids": [
+          "source-0007",
+          "source-0011"
+        ],
+        "explanation": "主要现金流调整未收录。source-0007列示筹资活动产生的现金流量净额本期-225,495,948.36元、上年同期-433,326,788.51元，变动比例为不适用；source-0007与source-0011均说明该净额增加，主要系去年同期子公司云际置业归还到期长期借款、使偿还债务所支付的现金增加所致。草稿OD-04只写经营活动现金流量净额及投资活动本期数和原因，未收录筹资活动金额、方向和该调整。投资活动上年同期-248,811,568.09元及source-0011所述净额减少亦未列入；两处变动比例均为不适用，不得自行计算百分比当作已披露变动率。",
+        "resolution": "omission_candidate",
+        "original_fact": null,
+        "revised_fact": null
+      },
+      {
+        "finding_id": "F-002",
+        "element": "scale_and_mix",
+        "severity": "material",
+        "issue_type": "material_omission",
+        "affected_fact_id": null,
+        "evidence_ids": [
+          "source-0008",
+          "source-0009"
+        ],
+        "explanation": "分行业收入和成本的同比变动及上年成本未进入草稿。source-0008列示酒店收入同比7.99%、成本同比17.27%，索道及缆车收入同比17.37%、成本同比134.03%，景区收入同比21.92%、成本同比7.70%，旅游服务收入同比12.13%、成本同比13.61%，徽菜收入同比1.09%、成本同比10.30%。source-0009另有上年成本：酒店282,898,884.06元、索道及缆车89,240,001.67元、景区145,752,911.24元、旅游服务431,101,617.50元、徽菜221,736,704.48元。SM-02、SM-03、SM-04只有本期金额、毛利率和毛利率百分点变动。索道及缆车成本由约0.89亿元增至2.09亿元、增幅134.03%，是合并营业成本上升的主要构成，属于主要经营变动，不是可选明细。",
+        "resolution": "omission_candidate",
+        "original_fact": null,
+        "revised_fact": null
+      },
+      {
+        "finding_id": "F-003",
+        "element": "limitations",
+        "severity": "material",
+        "issue_type": "unsupported_claim",
+        "affected_fact_id": null,
+        "evidence_ids": [
+          "source-0008",
+          "source-0009",
+          "source-0010"
+        ],
+        "explanation": "局限性多处把选定章节未见写成报告未披露，包括分业务净利润或毛利额、前五名客户及供应商名称、分景区索道酒店收入与接待量、主要原材料或能源采购来源、分业务资本开支或产能。所供材料只是管理层讨论与分析选定章节，未出现应视为未知，不能断言全报告未披露。source-0009的客户供应商名称表属于退市风险警示等条件项且勾选不适用，也不能改写成从未发生或全报告没有名称。分行业收入按未合并抵消口径、合计大于合并营业收入这一条有source-0008支持，应保留，不要与上述越权否定一并处理。",
+        "resolution": "unresolved",
+        "original_fact": null,
+        "revised_fact": null
+      },
+      {
+        "finding_id": "F-004",
+        "element": "scale_and_mix",
+        "severity": "minor",
+        "issue_type": "wrong_unit_or_denominator",
+        "affected_fact_id": "SM-04",
+        "evidence_ids": [
+          "source-0007",
+          "source-0008",
+          "source-0009"
+        ],
+        "explanation": "SM-04把成本分析表的本期占总成本比例写成占总成本。五项比例23.17%、14.59%、10.96%、34.20%、17.08%在表内合计为100%，对应成本金额与source-0008未合并抵消的分行业营业成本相同，而合并营业成本为1,120,795,111.83元，分母并不是合并营业成本。RM-01只限定了收入抵消，未限定该成本占比分母。应改为占分行业成本分析表成本合计的比例，避免理解成占合并营业成本的比重。",
+        "resolution": "quarantined",
+        "original_fact": {
+          "fact_id": "SM-04",
+          "text": "成本构成中，旅游服务业务本期金额489,760,970.14元、占总成本34.20%；酒店业务331,764,429.18元、占23.17%；徽菜业务244,568,871.09元、占17.08%；索道及缆车业务208,848,588.38元、占14.59%；景区业务156,979,901.66元、占10.96%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [
+            {
+              "name": "旅游服务业务成本本期金额",
+              "raw_value": "489,760,970.14",
+              "value": "489760970.14",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "酒店业务成本本期金额",
+              "raw_value": "331,764,429.18",
+              "value": "331764429.18",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "徽菜业务成本本期金额",
+              "raw_value": "244,568,871.09",
+              "value": "244568871.09",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "索道及缆车业务成本本期金额",
+              "raw_value": "208,848,588.38",
+              "value": "208848588.38",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "景区业务成本本期金额",
+              "raw_value": "156,979,901.66",
+              "value": "156979901.66",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            }
+          ]
+        },
+        "revised_fact": null
+      },
+      {
+        "finding_id": "F-005",
+        "element": "operations_and_inputs",
+        "severity": "minor",
+        "issue_type": "unsupported_claim",
+        "affected_fact_id": "OI-07",
+        "evidence_ids": [
+          "source-0010"
+        ],
+        "explanation": "OI-07称研发投入全部费用化。source-0010中本期费用化研发投入与研发投入合计均为4,231,651.60元，但本期资本化研发投入和资本化比重为空，并未明示为零。合计等于费用化可以支持推断，仍是由空白单元格作出的不确定断言，需人工复核后再作为零资本化事实使用。",
+        "resolution": "quarantined",
+        "original_fact": {
+          "fact_id": "OI-07",
+          "text": "公司研发投入合计4,231,651.60元，全部费用化，研发投入总额占营业收入比例0.20%；研发人员28人，占公司总人数比例0.69%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "metrics": [
+            {
+              "name": "研发投入合计",
+              "raw_value": "4,231,651.60",
+              "value": "4231651.60",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "研发投入总额占营业收入比例",
+              "raw_value": "0.20",
+              "value": "0.20",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "研发人员数量",
+              "raw_value": "28",
+              "value": "28",
+              "unit": "人",
+              "source_unit": "人",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            },
+            {
+              "name": "研发人员数量占公司总人数比例",
+              "raw_value": "0.69",
+              "value": "0.69",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact"
+            }
+          ]
+        },
+        "revised_fact": null
+      },
+      {
+        "finding_id": "F-006",
+        "element": "revenue_model",
+        "severity": "minor",
+        "issue_type": "other",
+        "affected_fact_id": null,
+        "evidence_ids": [
+          "source-0001",
+          "source-0002",
+          "source-0008"
+        ],
+        "explanation": "业务叙述列景区、索道及缆车、酒店、徽菜、旅行社、智慧旅游六项，分行业收入表列为酒店、索道及缆车、景区、旅游服务、徽菜五项，未单列旅行社或智慧旅游，也未说明旅游服务业务是否涵盖该两项。草稿对两套口径的转述本身未发现数字错误，但未提示差异。来源没有明示映射，不得补写成对应关系，也不得因选定章节未单列就断言该两项收入未发生或未披露。该项口径需人工复核。",
+        "resolution": "unresolved",
+        "original_fact": null,
+        "revised_fact": null
+      }
+    ],
+    "checked_fact_ids": [
+      "BS-01",
+      "BS-02",
+      "BS-03",
+      "BS-04",
+      "BS-05",
+      "BS-06",
+      "BS-07",
+      "PS-01",
+      "PS-02",
+      "PS-03",
+      "PS-04",
+      "PS-05",
+      "PS-06",
+      "RM-01",
+      "RM-02",
+      "RM-03",
+      "RM-04",
+      "RM-05",
+      "SM-01",
+      "SM-02",
+      "SM-03",
+      "SM-04",
+      "SM-05",
+      "SM-06",
+      "OI-01",
+      "OI-02",
+      "OI-03",
+      "OI-04",
+      "OI-05",
+      "OI-06",
+      "OI-07",
+      "OI-08",
+      "CC-01",
+      "CC-02",
+      "CC-03",
+      "CC-04",
+      "CC-05",
+      "OD-01",
+      "OD-02",
+      "OD-03",
+      "OD-04",
+      "OD-05",
+      "MC-01",
+      "MC-02",
+      "MC-03",
+      "MC-04",
+      "MC-05",
+      "MC-06",
+      "SC-P-01",
+      "SC-U-01",
+      "SC-U-02",
+      "SC-D-01",
+      "SC-D-02"
+    ],
+    "calls": [],
+    "retained_request_ids": [],
+    "error": "ValueError: offline diagnostic: no real repair/verification response exists; no sending allowed"
+  },
+  "standardization_notes": []
+}

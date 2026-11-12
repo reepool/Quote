@@ -89,19 +89,40 @@ class WorkpaperMetric(_Model):
     raw_value: str = Field(min_length=1)
     value: str = Field(min_length=1)
     unit: str = Field(min_length=1)
+    source_unit: str | None = None
     currency: str | None = None
     subject_scope: Subject
     period: str = Field(min_length=1)
     comparison_basis: str | None = None
+    qualifier: Literal["exact", "approximate", "greater_than"] = "exact"
+
+    @model_validator(mode="before")
+    @classmethod
+    def preserve_source_qualifier(cls, data):
+        if not isinstance(data, Mapping):
+            return data
+        raw = str(data.get("raw_value", "")).strip()
+        qualifier = ("approximate" if raw.startswith(("近", "约")) else
+                     "greater_than" if raw.startswith("超") else "exact")
+        if "qualifier" in data and data["qualifier"] != qualifier:
+            raise ValueError("metric qualifier must match original raw value")
+        return {**data, "qualifier": qualifier}
 
     @model_validator(mode="after")
     def decimal_value(self):
+        if self.source_unit and self.source_unit != self.unit and (
+            self.source_unit, self.unit
+        ) not in {("%", "百分点"), ("％", "百分点")}:
+            raise ValueError("source_unit cannot relabel a numeric magnitude")
         raw_number = self.raw_value.strip()
+        if self.qualifier != "exact":
+            raw_number = raw_number[1:].strip()
         # Some real responses repeat the separately declared unit in raw_value.
         # Preserve that source spelling, but normalize only that exact suffix;
-        # this does not convert units or accept other decorations/estimates.
-        if raw_number.endswith(self.unit):
-            raw_number = raw_number[:-len(self.unit)].strip()
+        # this does not convert units; estimates retain their explicit qualifier.
+        raw_unit = self.source_unit or self.unit
+        if raw_number.endswith(raw_unit):
+            raw_number = raw_number[:-len(raw_unit)].strip()
         try:
             raw = Decimal(raw_number.replace(",", "").replace("，", ""))
             normalized = Decimal(self.value)
@@ -321,6 +342,7 @@ class CompanyProfileWorkpaper(_Model):
     supply_chain: WorkpaperSupplyChain | None = None
     generation: WorkpaperGenerationMetadata | None = None
     quality_review: WorkpaperQualityReview | None = None
+    standardization_notes: tuple[str, ...] = ()
 
     @model_validator(mode="after")
     def source_integrity(self):
@@ -415,7 +437,7 @@ def bind_workpaper_draft(
                 "limitations": (*element.limitations, *rejected),
             })
         supply_chain = WorkpaperSupplyChain(**cleaned)
-    return CompanyProfileWorkpaper(
+    return standardize_workpaper_metrics(CompanyProfileWorkpaper(
         origin=origin,
         report=report,
         reading_scope=reading_scope,
@@ -424,12 +446,41 @@ def bind_workpaper_draft(
         limitations=response.limitations,
         supply_chain=supply_chain,
         generation=generation,
-    )
+    ))
+
+
+def standardize_workpaper_metrics(paper: CompanyProfileWorkpaper) -> CompanyProfileWorkpaper:
+    """Normalize only explicit metric semantics; never rewrite legacy files on read."""
+    payload = paper.model_dump(mode="json")
+    notes = list(paper.standardization_notes)
+    sources = {e.evidence_id: "".join("".join(s.quote.split()) for s in e.source_spans) for e in paper.evidence}
+    for key in ("elements", "supply_chain"):
+        for element in (payload.get(key) or {}).values():
+            for fact in element["facts"]:
+                context = "".join(sources[eid] for eid in fact["evidence_ids"])
+                for metric in fact["metrics"]:
+                    label = f"{fact['fact_id']}/{metric['name']}"
+                    if metric["unit"] in {"%", "％", "百分点", "基点", "bp", "bps"} and metric["currency"] is not None:
+                        notes.append(f"{label}：无量纲比例清除币种{metric['currency']}，原数值不变。")
+                        metric["currency"] = None
+                    is_margin_delta = "毛利率" in metric["name"] and any(
+                        word in metric["name"] for word in ("比上年增减", "同比变动", "同比变化"))
+                    points_in_answer = re.search(r"(-?\d+(?:\.\d+)?)\s*个百分点", fact["text"])
+                    if (metric["unit"] == "%" and is_margin_delta and points_in_answer
+                        and Decimal(points_in_answer.group(1)) == Decimal(metric["value"])
+                        and all(word in context for word in ("毛利率", "比上年", "增减"))):
+                        metric.update(source_unit="%", unit="百分点")
+                        notes.append(f"{label}：来源表印示%，按已明确的毛利率差值规范为百分点；保留原值及来源单位。")
+    payload["standardization_notes"] = list(dict.fromkeys(notes))
+    return CompanyProfileWorkpaper.model_validate(payload)
 
 
 def _metric_display(metric: WorkpaperMetric) -> str:
     """Display an already validated raw value without repeating its exact unit."""
     raw_value, unit = metric.raw_value.strip(), metric.unit.strip()
+    if metric.source_unit and metric.source_unit != unit:
+        prefix = raw_value[:1] if metric.qualifier != "exact" else ""
+        return f"{prefix}{metric.value} {unit}（原文{metric.raw_value}）"
     return raw_value if raw_value.endswith(unit) else f"{raw_value} {unit}"
 
 
@@ -519,6 +570,9 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
                 out.append(f"  - 修订候选（尚非可信发布）：{finding.revised_fact.text}")
         if review.error:
             out.append(f"- 复核未完成：{review.error}")
+    if workpaper.standardization_notes:
+        out.extend(["", "## 程序标准化说明", ""])
+        out.extend(f"- {note}" for note in workpaper.standardization_notes)
     out.extend(["", "## 来源", ""])
     for item in workpaper.evidence:
         out.extend([f"### {item.evidence_id}", "", " / ".join(item.section_path)])

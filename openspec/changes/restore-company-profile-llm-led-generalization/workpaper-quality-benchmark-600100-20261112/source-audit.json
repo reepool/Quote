@@ -1,0 +1,911 @@
+{
+  "source_profile": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-review-final-recheck-600100-20261112/export/600100.SH_2025-12-31.json",
+  "source_profile_sha256": "1b1ddad99f1c84b43764f7bb9984c9a70253ac731993b7857361df6f0456efbb",
+  "scope": "all 38 facts and 36 structured metrics against supplied original sections; not full-report recall",
+  "auditor": "current agent independent source reading, not an LLM self-grade",
+  "facts": [
+    {
+      "fact_id": "BS-01",
+      "verdict": "scope_metadata_error",
+      "evidence_ids": [
+        "source-0001",
+        "source-0002"
+      ],
+      "judgment": "业务三主干与平台有据；公司整体叙述不支持issuer单体口径。"
+    },
+    {
+      "fact_id": "BS-02",
+      "verdict": "scope_metadata_error",
+      "evidence_ids": [
+        "source-0003"
+      ],
+      "judgment": "所处行业段支持两类行业，但issuer过窄，按报告默认集团口径。"
+    },
+    {
+      "fact_id": "BS-03",
+      "verdict": "scope_metadata_error",
+      "evidence_ids": [
+        "source-0007",
+        "source-0008"
+      ],
+      "judgment": "成立同方数科及培育名单分别见16/17页，issuer缺母公司专属依据。"
+    },
+    {
+      "fact_id": "PS-01",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "judgment": "12页支持辐射成像系统/方案/运维及所列客户领域。"
+    },
+    {
+      "fact_id": "PS-02",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0001",
+        "source-0012"
+      ],
+      "judgment": "12/22页支持拓展方向及煤/磷/银/铅锌矿种；没有推成采购原料。"
+    },
+    {
+      "fact_id": "PS-03",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "judgment": "12页支持两类数智业务、数据库/AI工具/图书平台与定制方案。"
+    },
+    {
+      "fact_id": "PS-04",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0014"
+      ],
+      "judgment": "23页支持华知6.0、MaaS、垂类模型和超200款数据产品。"
+    },
+    {
+      "fact_id": "PS-05",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "judgment": "13页支持热泵/储能/控制器/软件算法及供热、建筑园区等场景。"
+    },
+    {
+      "fact_id": "RM-01",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "judgment": "12页直接披露机构订阅/按需付费/技术授权/设计开发。"
+    },
+    {
+      "fact_id": "RM-02",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "judgment": "13页直接披露咨询、供应、建设、节能、托管服务。"
+    },
+    {
+      "fact_id": "RM-03",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0001",
+        "source-0012"
+      ],
+      "judgment": "12/22页支持删去外推之后的系统、方案和运维描述；未虚构收入占比。"
+    },
+    {
+      "fact_id": "SM-01",
+      "verdict": "wording_requires_qualification",
+      "evidence_ids": [
+        "source-0005",
+        "source-0010"
+      ],
+      "judgment": "14/21页数字/单位/收入列正确；“减抵销-28111.12”双重减号有歧义，改为负向调整表述，保表列尾差。"
+    },
+    {
+      "fact_id": "SM-02",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "judgment": "21页地区表2025收入971560.22/525449.33万元与64.90/35.10%对应。"
+    },
+    {
+      "fact_id": "SM-03",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0005",
+        "source-0007"
+      ],
+      "judgment": "14/16页支持52.54亿元及增6.51亿元/14.15%，不混公司主营表。"
+    },
+    {
+      "fact_id": "SM-04",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "judgment": "15页支持归母4.95/扣非2.88亿元及整体毛利率变动2.35个百分点。"
+    },
+    {
+      "fact_id": "review-add:F-SCALE-OMIT",
+      "verdict": "metric_metadata_error",
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "judgment": "21页收入增减/毛利率数值及15页整体口径可对；5个比例metrics误带人民币，2.19变化应以百分点规范。"
+    },
+    {
+      "fact_id": "OI-01",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0018"
+      ],
+      "judgment": "26页研发投入1500030364.93元、9.96%、48.97%、3171人/28.84%均对应；不是研发费用870923183元。"
+    },
+    {
+      "fact_id": "OI-02",
+      "verdict": "scope_metadata_error",
+      "evidence_ids": [
+        "source-0002",
+        "source-0008"
+      ],
+      "judgment": "13/17页支持平台与三中心，issuer缺单体依据，按默认集团口径。"
+    },
+    {
+      "fact_id": "OI-03",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0017",
+        "source-0008"
+      ],
+      "judgment": "17/25页支持集采及89780万元/8.16%、关联31805.83万元/2.89%。"
+    },
+    {
+      "fact_id": "CM-01",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0012",
+        "source-0001"
+      ],
+      "judgment": "12/22页支持170多个国家地区及所列领域，不推具名客户合同。"
+    },
+    {
+      "fact_id": "CM-02",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "judgment": "12页直接披露CNKI 3.5万家/1.5亿个人，保业务口径。"
+    },
+    {
+      "fact_id": "CM-03",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0017"
+      ],
+      "judgment": "25页直接披露前五客户295015.77万元/19.58%、关联0/0%。"
+    },
+    {
+      "fact_id": "CM-04",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "judgment": "16页原分句支持CNKI AI境外首单及4000余家相关机构，未扩全公司客户数。"
+    },
+    {
+      "fact_id": "OD-01",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0005",
+        "source-0006"
+      ],
+      "judgment": "14/15页完整续句支持优势业务增长、收缩低毛利及上年计算机出表，不倒推本期处置。"
+    },
+    {
+      "fact_id": "OD-02",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0010",
+        "source-0017"
+      ],
+      "judgment": "21页收入表注2与25页成本表注2分别支持下降原因。"
+    },
+    {
+      "fact_id": "OD-03",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0010",
+        "source-0019"
+      ],
+      "judgment": "21/27页支持催收/回款及公共安全、智慧能源现金流改善。"
+    },
+    {
+      "fact_id": "OD-04",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "judgment": "15页支持2.35个百分点、扣非扭亏与有息负债下降。"
+    },
+    {
+      "fact_id": "MC-01",
+      "verdict": "scope_metadata_error",
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "judgment": "16页支持成立同方数科，但不支持issuer专属主体。"
+    },
+    {
+      "fact_id": "MC-02",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "judgment": "17页直接披露全年退出控参股企业16户，未补名称/金额。"
+    },
+    {
+      "fact_id": "MC-03",
+      "verdict": "wording_requires_qualification",
+      "evidence_ids": [
+        "source-0010",
+        "source-0017"
+      ],
+      "judgment": "21/25页仅相关说明项勾选不适用，不能概括成所有业务/产品未发生变化，须保披露项限定。"
+    },
+    {
+      "fact_id": "MC-04",
+      "verdict": "scope_metadata_error",
+      "evidence_ids": [
+        "source-0006"
+      ],
+      "judgment": "15页支持完成十五五编制及三主干规划，issuer单体限定无据。"
+    },
+    {
+      "fact_id": "SC-P1",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0001",
+        "source-0012"
+      ],
+      "judgment": "12/22页支持安检设备/方案/服务环节，未算价格敏感性。"
+    },
+    {
+      "fact_id": "SC-P2",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0002",
+        "source-0015"
+      ],
+      "judgment": "13/23页支持热泵/能源管理及生产输配消费全过程方案服务，不表示拥有整个产业链。"
+    },
+    {
+      "fact_id": "SC-U1",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0017"
+      ],
+      "judgment": "25页采购集中度数字正确；不等于具体原料已找到，仍为可选缺项。"
+    },
+    {
+      "fact_id": "SC-U2",
+      "verdict": "scope_metadata_error",
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "judgment": "17页支持集采中心，issuer单体限定无据。"
+    },
+    {
+      "fact_id": "SC-D1",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0012",
+        "source-0001"
+      ],
+      "judgment": "12/22页支持安检用途/行业/地域，未推具名关系。"
+    },
+    {
+      "fact_id": "SC-D2",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0002"
+      ],
+      "judgment": "13页直接支持供热、建筑园区、轨交、数据中心场景。"
+    },
+    {
+      "fact_id": "SC-D3",
+      "verdict": "supported",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "judgment": "12页支持CNKI服务对象及政企数智方案，不把产品用途当合同客户。"
+    }
+  ],
+  "metrics": [
+    {
+      "fact_id": "SM-01",
+      "metric": {
+        "name": "营业收入",
+        "raw_value": "150.65亿元",
+        "value": "150.65",
+        "unit": "亿元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "14/21页数字/单位/收入列正确；“减抵销-28111.12”双重减号有歧义，改为负向调整表述，保表列尾差。"
+    },
+    {
+      "fact_id": "SM-01",
+      "metric": {
+        "name": "主营业务收入-公共安全",
+        "raw_value": "698,057.58",
+        "value": "698057.58",
+        "unit": "万元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "business_segment",
+        "period": "2025年1-12月",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "14/21页数字/单位/收入列正确；“减抵销-28111.12”双重减号有歧义，改为负向调整表述，保表列尾差。"
+    },
+    {
+      "fact_id": "SM-01",
+      "metric": {
+        "name": "主营业务收入-数智产业",
+        "raw_value": "275,072.20",
+        "value": "275072.20",
+        "unit": "万元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "business_segment",
+        "period": "2025年1-12月",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "14/21页数字/单位/收入列正确；“减抵销-28111.12”双重减号有歧义，改为负向调整表述，保表列尾差。"
+    },
+    {
+      "fact_id": "SM-01",
+      "metric": {
+        "name": "主营业务收入-智慧能源",
+        "raw_value": "450,419.69",
+        "value": "450419.69",
+        "unit": "万元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "business_segment",
+        "period": "2025年1-12月",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "14/21页数字/单位/收入列正确；“减抵销-28111.12”双重减号有歧义，改为负向调整表述，保表列尾差。"
+    },
+    {
+      "fact_id": "SM-01",
+      "metric": {
+        "name": "主营业务收入-其他业务",
+        "raw_value": "67,758.61",
+        "value": "67758.61",
+        "unit": "万元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "business_segment",
+        "period": "2025年1-12月",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "14/21页数字/单位/收入列正确；“减抵销-28111.12”双重减号有歧义，改为负向调整表述，保表列尾差。"
+    },
+    {
+      "fact_id": "SM-01",
+      "metric": {
+        "name": "主营业务收入-总部投资及科技园",
+        "raw_value": "33,812.59",
+        "value": "33812.59",
+        "unit": "万元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "business_segment",
+        "period": "2025年1-12月",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "14/21页数字/单位/收入列正确；“减抵销-28111.12”双重减号有歧义，改为负向调整表述，保表列尾差。"
+    },
+    {
+      "fact_id": "SM-01",
+      "metric": {
+        "name": "主营业务收入-抵销前小计",
+        "raw_value": "1,525,120.68",
+        "value": "1525120.68",
+        "unit": "万元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "consolidated_group",
+        "period": "2025年1-12月",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "14/21页数字/单位/收入列正确；“减抵销-28111.12”双重减号有歧义，改为负向调整表述，保表列尾差。"
+    },
+    {
+      "fact_id": "SM-01",
+      "metric": {
+        "name": "主营业务收入-业务板块间抵销",
+        "raw_value": "-28,111.12",
+        "value": "-28111.12",
+        "unit": "万元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "consolidated_group",
+        "period": "2025年1-12月",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "14/21页数字/单位/收入列正确；“减抵销-28111.12”双重减号有歧义，改为负向调整表述，保表列尾差。"
+    },
+    {
+      "fact_id": "SM-01",
+      "metric": {
+        "name": "主营业务收入-合计",
+        "raw_value": "1,497,009.55",
+        "value": "1497009.55",
+        "unit": "万元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "consolidated_group",
+        "period": "2025年1-12月",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "14/21页数字/单位/收入列正确；“减抵销-28111.12”双重减号有歧义，改为负向调整表述，保表列尾差。"
+    },
+    {
+      "fact_id": "SM-02",
+      "metric": {
+        "name": "主营业务收入-国内市场",
+        "raw_value": "971,560.22",
+        "value": "971560.22",
+        "unit": "万元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "21页地区表2025收入971560.22/525449.33万元与64.90/35.10%对应。"
+    },
+    {
+      "fact_id": "SM-02",
+      "metric": {
+        "name": "主营业务收入-国际市场",
+        "raw_value": "525,449.33",
+        "value": "525449.33",
+        "unit": "万元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "21页地区表2025收入971560.22/525449.33万元与64.90/35.10%对应。"
+    },
+    {
+      "fact_id": "SM-03",
+      "metric": {
+        "name": "海外收入",
+        "raw_value": "52.54亿元",
+        "value": "52.54",
+        "unit": "亿元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "14/16页支持52.54亿元及增6.51亿元/14.15%，不混公司主营表。"
+    },
+    {
+      "fact_id": "SM-04",
+      "metric": {
+        "name": "归母净利润",
+        "raw_value": "4.95亿元",
+        "value": "4.95",
+        "unit": "亿元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "15页支持归母4.95/扣非2.88亿元及整体毛利率变动2.35个百分点。"
+    },
+    {
+      "fact_id": "SM-04",
+      "metric": {
+        "name": "扣非归母净利润",
+        "raw_value": "2.88亿元",
+        "value": "2.88",
+        "unit": "亿元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "15页支持归母4.95/扣非2.88亿元及整体毛利率变动2.35个百分点。"
+    },
+    {
+      "fact_id": "review-add:F-SCALE-OMIT",
+      "metric": {
+        "name": "主营业务收入同比增减-公共安全",
+        "raw_value": "60,481.61",
+        "value": "60481.61",
+        "unit": "万元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "business_segment",
+        "period": "2025年1-12月",
+        "comparison_basis": "同比增减"
+      },
+      "verdict": "supported",
+      "basis": "21页收入增减/毛利率数值及15页整体口径可对；5个比例metrics误带人民币，2.19变化应以百分点规范。"
+    },
+    {
+      "fact_id": "review-add:F-SCALE-OMIT",
+      "metric": {
+        "name": "主营业务收入同比增减-数智产业",
+        "raw_value": "-118,490.59",
+        "value": "-118490.59",
+        "unit": "万元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "business_segment",
+        "period": "2025年1-12月",
+        "comparison_basis": "同比增减"
+      },
+      "verdict": "supported",
+      "basis": "21页收入增减/毛利率数值及15页整体口径可对；5个比例metrics误带人民币，2.19变化应以百分点规范。"
+    },
+    {
+      "fact_id": "review-add:F-SCALE-OMIT",
+      "metric": {
+        "name": "主营业务收入同比增减-智慧能源",
+        "raw_value": "-83,746.45",
+        "value": "-83746.45",
+        "unit": "万元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "business_segment",
+        "period": "2025年1-12月",
+        "comparison_basis": "同比增减"
+      },
+      "verdict": "supported",
+      "basis": "21页收入增减/毛利率数值及15页整体口径可对；5个比例metrics误带人民币，2.19变化应以百分点规范。"
+    },
+    {
+      "fact_id": "review-add:F-SCALE-OMIT",
+      "metric": {
+        "name": "主营业务收入-合计",
+        "raw_value": "1,497,009.55",
+        "value": "1497009.55",
+        "unit": "万元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "consolidated_group",
+        "period": "2025年1-12月",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "21页收入增减/毛利率数值及15页整体口径可对；5个比例metrics误带人民币，2.19变化应以百分点规范。"
+    },
+    {
+      "fact_id": "review-add:F-SCALE-OMIT",
+      "metric": {
+        "name": "主营业务收入-合计上年同期",
+        "raw_value": "1,669,062.84",
+        "value": "1669062.84",
+        "unit": "万元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "consolidated_group",
+        "period": "2024年1-12月",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "21页收入增减/毛利率数值及15页整体口径可对；5个比例metrics误带人民币，2.19变化应以百分点规范。"
+    },
+    {
+      "fact_id": "review-add:F-SCALE-OMIT",
+      "metric": {
+        "name": "主营业务收入同比增减-合计",
+        "raw_value": "-172,053.28",
+        "value": "-172053.28",
+        "unit": "万元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "consolidated_group",
+        "period": "2025年1-12月",
+        "comparison_basis": "同比增减"
+      },
+      "verdict": "supported",
+      "basis": "21页收入增减/毛利率数值及15页整体口径可对；5个比例metrics误带人民币，2.19变化应以百分点规范。"
+    },
+    {
+      "fact_id": "review-add:F-SCALE-OMIT",
+      "metric": {
+        "name": "毛利率-公共安全",
+        "raw_value": "29.81%",
+        "value": "29.81",
+        "unit": "%",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "business_segment",
+        "period": "2025年1-12月",
+        "comparison_basis": null
+      },
+      "verdict": "unit_or_currency_error",
+      "basis": "21页收入增减/毛利率数值及15页整体口径可对；5个比例metrics误带人民币，2.19变化应以百分点规范。"
+    },
+    {
+      "fact_id": "review-add:F-SCALE-OMIT",
+      "metric": {
+        "name": "毛利率-数智产业",
+        "raw_value": "46.67%",
+        "value": "46.67",
+        "unit": "%",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "business_segment",
+        "period": "2025年1-12月",
+        "comparison_basis": null
+      },
+      "verdict": "unit_or_currency_error",
+      "basis": "21页收入增减/毛利率数值及15页整体口径可对；5个比例metrics误带人民币，2.19变化应以百分点规范。"
+    },
+    {
+      "fact_id": "review-add:F-SCALE-OMIT",
+      "metric": {
+        "name": "毛利率-智慧能源",
+        "raw_value": "10.79%",
+        "value": "10.79",
+        "unit": "%",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "business_segment",
+        "period": "2025年1-12月",
+        "comparison_basis": null
+      },
+      "verdict": "unit_or_currency_error",
+      "basis": "21页收入增减/毛利率数值及15页整体口径可对；5个比例metrics误带人民币，2.19变化应以百分点规范。"
+    },
+    {
+      "fact_id": "review-add:F-SCALE-OMIT",
+      "metric": {
+        "name": "毛利率-合计",
+        "raw_value": "26.50%",
+        "value": "26.50",
+        "unit": "%",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "consolidated_group",
+        "period": "2025年1-12月",
+        "comparison_basis": null
+      },
+      "verdict": "unit_or_currency_error",
+      "basis": "21页收入增减/毛利率数值及15页整体口径可对；5个比例metrics误带人民币，2.19变化应以百分点规范。"
+    },
+    {
+      "fact_id": "review-add:F-SCALE-OMIT",
+      "metric": {
+        "name": "毛利率比上年增减-合计",
+        "raw_value": "2.19%",
+        "value": "2.19",
+        "unit": "%",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "consolidated_group",
+        "period": "2025年1-12月",
+        "comparison_basis": "同比增减"
+      },
+      "verdict": "unit_or_currency_error",
+      "basis": "21页收入增减/毛利率数值及15页整体口径可对；5个比例metrics误带人民币，2.19变化应以百分点规范。"
+    },
+    {
+      "fact_id": "OI-01",
+      "metric": {
+        "name": "研发投入合计",
+        "raw_value": "1,500,030,364.93",
+        "value": "1500030364.93",
+        "unit": "元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "26页研发投入1500030364.93元、9.96%、48.97%、3171人/28.84%均对应；不是研发费用870923183元。"
+    },
+    {
+      "fact_id": "OI-01",
+      "metric": {
+        "name": "研发投入总额占营业收入比例",
+        "raw_value": "9.96%",
+        "value": "9.96",
+        "unit": "%",
+        "source_unit": null,
+        "currency": null,
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "26页研发投入1500030364.93元、9.96%、48.97%、3171人/28.84%均对应；不是研发费用870923183元。"
+    },
+    {
+      "fact_id": "OI-01",
+      "metric": {
+        "name": "研发人员数量",
+        "raw_value": "3171",
+        "value": "3171",
+        "unit": "人",
+        "source_unit": null,
+        "currency": null,
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "26页研发投入1500030364.93元、9.96%、48.97%、3171人/28.84%均对应；不是研发费用870923183元。"
+    },
+    {
+      "fact_id": "OI-03",
+      "metric": {
+        "name": "前五名供应商采购额",
+        "raw_value": "89,780.00",
+        "value": "89780.00",
+        "unit": "万元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "17/25页支持集采及89780万元/8.16%、关联31805.83万元/2.89%。"
+    },
+    {
+      "fact_id": "OI-03",
+      "metric": {
+        "name": "前五名供应商采购额占年度采购总额比例",
+        "raw_value": "8.16%",
+        "value": "8.16",
+        "unit": "%",
+        "source_unit": null,
+        "currency": null,
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "17/25页支持集采及89780万元/8.16%、关联31805.83万元/2.89%。"
+    },
+    {
+      "fact_id": "CM-02",
+      "metric": {
+        "name": "CNKI平台机构用户数",
+        "raw_value": "3.5万家",
+        "value": "3.5",
+        "unit": "万家",
+        "source_unit": null,
+        "currency": null,
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "12页直接披露CNKI 3.5万家/1.5亿个人，保业务口径。"
+    },
+    {
+      "fact_id": "CM-02",
+      "metric": {
+        "name": "CNKI平台个人用户数",
+        "raw_value": "1.5亿",
+        "value": "1.5",
+        "unit": "亿",
+        "source_unit": null,
+        "currency": null,
+        "subject_scope": "business_segment",
+        "period": "2025年度",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "12页直接披露CNKI 3.5万家/1.5亿个人，保业务口径。"
+    },
+    {
+      "fact_id": "CM-03",
+      "metric": {
+        "name": "前五名客户销售额",
+        "raw_value": "295,015.77",
+        "value": "295015.77",
+        "unit": "万元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "25页直接披露前五客户295015.77万元/19.58%、关联0/0%。"
+    },
+    {
+      "fact_id": "CM-03",
+      "metric": {
+        "name": "前五名客户销售额占年度销售总额比例",
+        "raw_value": "19.58%",
+        "value": "19.58",
+        "unit": "%",
+        "source_unit": null,
+        "currency": null,
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "25页直接披露前五客户295015.77万元/19.58%、关联0/0%。"
+    },
+    {
+      "fact_id": "MC-02",
+      "metric": {
+        "name": "退出控参股企业数量",
+        "raw_value": "16户",
+        "value": "16",
+        "unit": "户",
+        "source_unit": null,
+        "currency": null,
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "17页直接披露全年退出控参股企业16户，未补名称/金额。"
+    },
+    {
+      "fact_id": "SC-U1",
+      "metric": {
+        "name": "前五名供应商采购额",
+        "raw_value": "89,780.00",
+        "value": "89780.00",
+        "unit": "万元",
+        "source_unit": null,
+        "currency": "人民币",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null
+      },
+      "verdict": "supported",
+      "basis": "25页采购集中度数字正确；不等于具体原料已找到，仍为可选缺项。"
+    }
+  ],
+  "original_supported_facts": 28,
+  "original_fact_denominator": 38,
+  "original_supported_metrics": 31,
+  "original_metric_denominator": 36,
+  "caveat": "strict object judgments include metadata and ambiguity; curated human reference is not model accuracy improvement or S1 score"
+}

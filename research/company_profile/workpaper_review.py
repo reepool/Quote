@@ -17,6 +17,7 @@ from .workpaper import (
     WorkpaperQualityReview, WorkpaperRepairResponse,
     WorkpaperRepairVerificationResponse, WorkpaperReviewFinding,
     WorkpaperReviewResponse, _check_fact_source,
+    standardize_workpaper_metrics,
 )
 from .workpaper_sections import SectionPacket, extract_selected_layout
 
@@ -28,6 +29,10 @@ claim full-report completeness. Seek material missing MAIN businesses/revenue/ad
 from the source even if the draft did not mention them. Do not invent a source inventory.
 Check subject, period, units, financial columns, percentage denominator, inter-segment
 eliminations, negation, plans versus actual events and purchase versus registered scope.
+Plain '公司' in report-wide operating text defaults to consolidated_group; issuer requires
+explicit parent-only scope. Check ratio currency=null and distinguish percentage-point
+differences from relative percent growth. A checked 'not applicable' item must retain
+that disclosure scope rather than claim that no event/change ever occurred.
 An OR-list disclosure heading is not a statement that every row satisfies every condition.
 Use only supplied evidence IDs. Each issue names its element and affected_fact_id; use
 null only for omissions or scope issues without a draft fact. Use correct for source-fixable
@@ -36,6 +41,8 @@ severity means an important omission, not a demand to fill every optional item.
 Supply-chain details and minor model names need not be complete. Missing unselected text
 is unknown, not 'not disclosed'. Do not add findings merely for style. Model agreement
 does not establish truth; do not approve publication. No rewritten whole profile.
+element must name an eight-element or supplied supply-chain key; use limitations for
+scope/limitation issues without an existing fact. These remain unresolved, not new facts.
 """
 REPAIR_INSTRUCTIONS = """Correct only supplied repair_targets using the ORIGINAL source packet.
 Return Chinese JSON repaired_facts, using each target_fact_id exactly. Existing targets
@@ -109,6 +116,16 @@ def _project(paper, *, review, findings, replacements):
             elif facts:
                 element["status"] = "observed"
     payload["quality_review"] = review.model_dump(mode="json")
+    if any(item.element == "limitations" for item in findings):
+        # Preserve the original in the frozen draft/review history, not as an
+        # unqualified negative assertion in the current limited projection.
+        payload["limitations"] = [
+            "原范围说明因复核问题暂停采用；所选章节之外的信息仍属未知，参见复核意见。"
+        ]
+        for section in ("elements", "supply_chain"):
+            for element in (payload.get(section) or {}).values():
+                if element["limitations"]:
+                    element["limitations"] = list(payload["limitations"])
     return CompanyProfileWorkpaper.model_validate(payload)
 
 
@@ -205,7 +222,7 @@ def review_workpaper(
             if finding.finding_id in seen or set(finding.evidence_ids) - sources.keys():
                 raise ValueError("review finding identity/evidence is unknown or duplicated")
             seen.add(finding.finding_id)
-            if finding.element not in {*ELEMENT_LABELS, *SUPPLY_CHAIN_LABELS}:
+            if finding.element not in {*ELEMENT_LABELS, *SUPPLY_CHAIN_LABELS, "limitations"}:
                 raise ValueError("review finding names unknown element")
             if finding.element in SUPPLY_CHAIN_LABELS and paper.supply_chain is None:
                 raise ValueError("review cannot invent an absent optional supply-chain element")
@@ -214,8 +231,10 @@ def review_workpaper(
                 if finding.affected_fact_id not in facts or facts[finding.affected_fact_id][0] != finding.element:
                     raise ValueError("review finding targets a different/unknown element fact")
                 old = facts[finding.affected_fact_id][1]
-            if finding.action in {"quarantine", "correct", "human_review"} and old is None:
+            if finding.action == "quarantine" and old is None:
                 raise ValueError("fact-level review action requires an existing fact ID")
+            if finding.element == "limitations" and finding.action == "possible_omission":
+                raise ValueError("scope issue cannot add a fact to limitations")
             if finding.action == "possible_omission" and old is not None:
                 raise ValueError("omission finding cannot target an existing fact")
             target = finding.affected_fact_id or f"review-add:{finding.finding_id}"
@@ -230,7 +249,8 @@ def review_workpaper(
                 severity=finding.severity, issue_type=finding.issue_type,
                 affected_fact_id=finding.affected_fact_id, evidence_ids=finding.evidence_ids,
                 explanation=finding.explanation, original_fact=old,
-                resolution="omission_candidate" if old is None else "quarantined",
+                resolution=("omission_candidate" if finding.action == "possible_omission"
+                            else "unresolved" if old is None else "quarantined"),
             ))
         findings = validated_findings
         initial_contract_valid = True
@@ -294,7 +314,7 @@ def review_workpaper(
         checked_fact_ids=checked, findings=tuple(findings), calls=tuple(calls), error=error,
         retained_request_ids=tuple(item["request_id"] for item in prior_receipts),
     )
-    safe = _project(paper, review=quality, findings=findings, replacements=replacements)
+    safe = standardize_workpaper_metrics(_project(paper, review=quality, findings=findings, replacements=replacements))
     receipts = (*(dict(item, receipt_origin="retained_receipt") for item in prior_receipts),
                 *(item for item in getattr(provider, "workpaper_receipts", ())
                   if item.get("request_id") in call_ids))
