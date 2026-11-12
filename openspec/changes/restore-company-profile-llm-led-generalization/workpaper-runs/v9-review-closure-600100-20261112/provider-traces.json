@@ -1,0 +1,27 @@
+[
+  {
+    "call_type": "verify",
+    "semantic_request_id": "bp-work-51af24d3ec63e967910ca406:workpaper:review",
+    "gateway_request_id": "362340189ec44e9ab43d514abb2ed7ac",
+    "status": "failed",
+    "profile": "semantic_extraction",
+    "provider": null,
+    "model": null,
+    "selected_profile": null,
+    "source_label": null,
+    "failover_count": 0,
+    "attempts": [],
+    "response_hash": null,
+    "latency_ms": null,
+    "input_tokens": null,
+    "output_tokens": null,
+    "total_tokens": null,
+    "warnings": [],
+    "rejected_extract_items": [],
+    "error_code": "provider_unavailable",
+    "error_detail": "LLM provider request timed out",
+    "parent_semantic_request_id": null,
+    "partition_index": null,
+    "partition_count": null
+  }
+]

@@ -22,6 +22,11 @@ The reviewer MUST identify checked fact IDs/elements and source-cited errors, am
 - **THEN** the draft and any valid issue/withdrawal information remain queryable with the concrete failure and incomplete review status
 - **AND** no new company entrance, automatic paid loop, production approval or fabricated pass is introduced
 
+#### Scenario: An explicitly authorized final recheck reuses accepted prior stages
+- **WHEN** a user authorizes only final source verification of existing review findings and repair candidates
+- **THEN** the original owner may consume the retained accepted responses after binding the source version, original draft and response hashes, and send only final verification
+- **AND** retained model calls and usage are identified separately from the current run, original failures remain unchanged, and exhausted logical recovery limits are not reset to reissue earlier stages
+
 ### Requirement: Workpapers expose the actual model and reading scope
 Each new LLM workpaper MUST bind locally generated model metadata from the existing gateway receipts, not model-authored attribution. Metadata MUST distinguish section selection from actual section-text interpretation, record the model/source label, logical and selected profiles when available, request and response identities, actual supplied section/page scope, prompt/preprocessing/guide versions and known usage. The successful returned model MUST be the content author; failed attempts and retries remain in the existing receipt/ledger and MUST NOT be mislabeled as successful readers. JSON, Markdown, query and export MUST expose this metadata without a new store or evaluation platform. Missing historical metadata MUST remain unknown, and old workpapers MUST stay readable without rewriting their original results.
 

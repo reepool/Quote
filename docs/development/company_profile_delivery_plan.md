@@ -6,6 +6,12 @@
 
 ## 1. 开发者必须先理解的纠偏
 
+2026-11-12当前6.BH已完成[一份接续真实闭环](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-closure-result-20261112.md)：只补用户明确批准的最终再核，4候选获接受，3替换/1新增/34未改，原入口三读一致，模型/证据/历史继承可读。仅本次1物理/27631实际usage，不冒充同一新运行三阶段或正式S1；原6.BG两次初核超时不改，不再扩公司/追加窗口。下阶段按已有画像消费与有限人工抽查决定规模，不堆审核平台或追求全字段100%。本人运行库/脚本收尾清理、旧源与并行保护。
+
+2026-11-12用户复盘后当前为[6.BG单份真实闭环](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md#当前6bg正常联网下完成一份真实复核闭环2026-11-12)：不扩公司，先把网络/profile/源/库准备完再开始业务计时，以同方原稿经一次初核/局部修订/再核交可读改进。优先证实真实效果，不继续建规则/平台；旧6.BF失败不改，每轮先清后做和finally清本人过程物。
+
+6.BG本次已用1/1失败：准备与业务时间已分开，但Grok初核两次300秒物理超时，未获语义响应；三读与清理成立，不代表闭环。不得以总预算余量换身份/清恢复继续。最短后续为[旧真实候选定向再核方案](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-review-recheck-plan-20261112.md)，须用户新批准再发，仅补最后核验，不再初核/扩公司。
+
 2026-11-12当前6.BF：按用户批准实施[有界源对照闭环](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md#当前6bf高阶读源复核一次局部修订再核原入口交付)。Flash等现有模型保主抽取，高能力/高思考profile复核同一原文包；只隔离具体问题，至多一次合并修订与再核，不丢整份有用画像，不扩成全报告审计。先以中视/美尔雅/同方已有问题稿校准、不扩样；仍待正式核验，不改S1/S32或生产。Luna当前禁用不自动启用，本轮采用已启用Grok high；任务内选择，不改共享配置。每轮先清后做、权威结果持久后清运行库和脚本。
 
 6.BF本轮结束：[实际观察](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-quality-review-observation-20261112.md)为工程完成、真实3/3执行而完整纠正0/3。同方初核找出抵销/主体等4问题并收到4候选，再核到限未采纳；另两家初核超时。保失败与有用正文，6.BF4不勾完成，不自动补窗/扩样。下一主要矛盾是复核路由的完整响应及实际耗时，不是继续细化画像字段/通用审核体系。

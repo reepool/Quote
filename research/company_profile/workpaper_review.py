@@ -5,6 +5,7 @@ This is part of the existing workpaper owner, not a publication approval system.
 from __future__ import annotations
 
 import hashlib
+import json
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -111,7 +112,10 @@ def _project(paper, *, review, findings, replacements):
     return CompanyProfileWorkpaper.model_validate(payload)
 
 
-def review_workpaper(paper, *, packet: SectionPacket, provider, work_id: str, identity: Mapping):
+def review_workpaper(
+    paper, *, packet: SectionPacket, provider, work_id: str, identity: Mapping,
+    resume: Mapping | None = None,
+):
     """Bounded local correction; any failure leaves a queryable limited projection."""
     from .workpaper_llm import _model_call
 
@@ -128,6 +132,36 @@ def review_workpaper(paper, *, packet: SectionPacket, provider, work_id: str, id
     verify_id = f"{work_id}:workpaper:repair-verify"
     call_ids = {review_id, repair_id, verify_id}
     real = identity.get("execution_mode") == "provider"
+
+    prior_receipts = tuple((resume or {}).get("receipts") or ())
+    prior_by_purpose = {item.get("purpose"): item for item in prior_receipts}
+    if resume is not None:
+        if resume.get("original_draft_hash") != original_hash:
+            raise ValueError("review continuation belongs to a different original draft")
+        if resume.get("document_version") != paper.report.document_version:
+            raise ValueError("review continuation belongs to a different source version")
+        if len(prior_receipts) != 2 or set(prior_by_purpose) != {"review_profile_workpaper", "repair_profile_workpaper"}:
+            raise ValueError("review continuation requires the accepted original review and repair receipts")
+        if any(item.get("contract_status") != "accepted" or not item.get("response_payload")
+               for item in prior_by_purpose.values()):
+            raise ValueError("review continuation receipts must contain accepted responses")
+        for purpose, key in (("review_profile_workpaper", "review_response"),
+                             ("repair_profile_workpaper", "repair_response")):
+            receipt = prior_by_purpose[purpose]
+            raw = receipt.get("raw_content")
+            if (
+                receipt["response_payload"] != resume.get(key)
+                or not isinstance(raw, str)
+                or hashlib.sha256(raw.encode()).hexdigest() != receipt.get("response_hash")
+                or json.loads(raw) != receipt["response_payload"]
+            ):
+                raise ValueError("retained review responses must match their original receipt hashes")
+        for purpose, receipt in prior_by_purpose.items():
+            calls.append(_model_call(
+                (receipt,), purpose=purpose, request_id=receipt["request_id"],
+                section_ids=tuple(item.section_id for item in paper.reading_scope.sections),
+                pages=tuple(sorted({span.page for item in paper.evidence for span in item.source_spans})),
+            ))
 
     def request(request_id, purpose, response_model, instructions, content):
         profile = identity.get("repair_profile" if purpose == "repair_profile_workpaper" else "quality_review_profile")
@@ -152,12 +186,15 @@ def review_workpaper(paper, *, packet: SectionPacket, provider, work_id: str, id
         return response_model.model_validate(result)
 
     try:
-        initial = request(review_id, "review_profile_workpaper", WorkpaperReviewResponse,
+        initial = (
+            WorkpaperReviewResponse.model_validate(resume["review_response"])
+            if resume is not None else request(review_id, "review_profile_workpaper", WorkpaperReviewResponse,
                           REVIEW_INSTRUCTIONS, {"draft": {
                               "elements": paper.elements.model_dump(mode="json"),
                               "supply_chain": paper.supply_chain.model_dump(mode="json") if paper.supply_chain else None,
                               "limitations": paper.limitations,
                           }})
+        )
         if len(set(initial.reviewed_fact_ids)) != len(initial.reviewed_fact_ids) or set(initial.reviewed_fact_ids) != facts.keys():
             raise ValueError("review must list every known fact ID exactly once")
         checked = initial.reviewed_fact_ids
@@ -199,11 +236,12 @@ def review_workpaper(paper, *, packet: SectionPacket, provider, work_id: str, id
         initial_contract_valid = True
         status = "completed" if set(checked) == set(facts) else "incomplete"
         if targets and status == "completed":
-            repaired = request(repair_id, "repair_profile_workpaper", WorkpaperRepairResponse,
+            repaired = (WorkpaperRepairResponse.model_validate(resume["repair_response"])
+                        if resume is not None else request(repair_id, "repair_profile_workpaper", WorkpaperRepairResponse,
                                REPAIR_INSTRUCTIONS, {"repair_targets": [
                                    {"target_fact_id": target, "finding": finding.model_dump(mode="json"),
                                     "original_fact": facts[target][1].model_dump(mode="json") if target in facts else None}
-                                   for target, finding in targets.items()]})
+                                   for target, finding in targets.items()]}))
             candidates = {}
             for fact in repaired.repaired_facts:
                 if fact.fact_id not in targets or fact.fact_id in candidates:
@@ -254,8 +292,10 @@ def review_workpaper(paper, *, packet: SectionPacket, provider, work_id: str, id
     quality = WorkpaperQualityReview(
         status=status, original_draft_hash=original_hash,
         checked_fact_ids=checked, findings=tuple(findings), calls=tuple(calls), error=error,
+        retained_request_ids=tuple(item["request_id"] for item in prior_receipts),
     )
     safe = _project(paper, review=quality, findings=findings, replacements=replacements)
-    receipts = tuple(item for item in getattr(provider, "workpaper_receipts", ())
-                     if item.get("request_id") in call_ids)
+    receipts = (*(dict(item, receipt_origin="retained_receipt") for item in prior_receipts),
+                *(item for item in getattr(provider, "workpaper_receipts", ())
+                  if item.get("request_id") in call_ids))
     return safe, receipts

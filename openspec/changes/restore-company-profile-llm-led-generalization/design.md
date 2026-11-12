@@ -10,6 +10,14 @@
 
 ## Decisions
 
+### 2026-11-12限定再核：继承成功阶段，不重新支付初核
+
+6.BG已结束失败，用户另明确批准6.BH最终再核。原page_source显式给review_resume（原稿hash、源版本、初核/修订及原成功回执），执行身份给整个resume hash。runtime验证匹配，现有review函数检查原回执/响应hash与payload一致后消费历史阶段，只发final verify；历史request IDs在quality_review单列，正文/JSON区分继承与新调用。后续阶段仍按原目标ID/证据/数字约束，final拒绝不得采纳。新900秒/300000/2物理仅用于这次核验，不能重置旧初核恢复或变成另一整公司入口。
+
+### 2026-11-12复盘接续：先准备，再启动真实业务窗口
+
+不改初核/一次修订/再核协议。本次6.BG只取同方既有公开底稿重新完成真实全过程；路由/网络/凭据、来源校验、隔离库与TaskService构造先完成，冻结绑定之后创建本次累计budget并挂到同一个service/runtime/provider。模型请求、自动恢复和其等待共用1800秒，模型活动不因阶段重置时钟；准备及收尾另报，无隐式续窗。review/repair实际路由仍Grok high/官方DeepSeek，旧DNS故障与等待污染的运行不追改、不拿来评价模型能力。只读query/export不受模型deadline挡住，失败结果也先持久后清库。新窗口源于用户最新继续指令，不复活6.BF余额，详细合同见章节底稿卡6.BG。
+
 ### 2026-11-12接续：源对照、局部修订与限用闭环
 
 原workpaper内新增可选review投影，不另建事实库/审批平台。新身份显式启用时，在现有选章/成稿后追加一次读源复核；目的到profile的本任务映射复用CommonGatewaySemanticProvider及LlmClient，共用累计账本。抽取可用Flash/Luna，复核可用更高能力/思考profile；名称和高思考不保证准确，实际model/source/requested_reasoning_effort/usage全部保存。未显式配置复核profile则保旧待核路径，不静默宣称高阶复核。

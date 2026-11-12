@@ -306,6 +306,7 @@ class WorkpaperQualityReview(_Model):
     findings: tuple[WorkpaperReviewFinding, ...] = ()
     checked_fact_ids: tuple[str, ...] = ()
     calls: tuple[WorkpaperModelCall, ...] = ()
+    retained_request_ids: tuple[str, ...] = ()
     error: str | None = None
 
 
@@ -506,7 +507,8 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
         for call in review.calls:
             out.append(
                 f"- {call.purpose}：{call.model or '未知'}（{call.source_label or '未知'}）；"
-                f"requested_reasoning={call.reasoning_effort or '未知'}；usage={call.usage.total_tokens}。"
+                f"requested_reasoning={call.reasoning_effort or '未知'}；usage={call.usage.total_tokens}；"
+                f"{'继承历史回执，非本次调用' if call.request_id in review.retained_request_ids else '本次调用'}。"
             )
         for finding in review.findings:
             refs = "、".join(f"[{value}](#{value.lower()})" for value in finding.evidence_ids)

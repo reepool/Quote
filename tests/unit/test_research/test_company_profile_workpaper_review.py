@@ -1,5 +1,7 @@
 """Source review repairs only flagged facts; uncertainty does not become approval."""
 import asyncio
+import hashlib
+import json
 import time
 from dataclasses import replace
 from pathlib import Path
@@ -169,6 +171,46 @@ def test_material_omission_can_be_added_but_optional_gap_does_not_trigger_repair
     assert limited.quality_review.status == "completed_with_open_findings"
 
 
+def _retained_review(paper, review, fixed):
+    replies = (("review_profile_workpaper", review), ("repair_profile_workpaper", {"repaired_facts": [fixed]}))
+    receipts = []
+    for purpose, payload in replies:
+        raw = json.dumps(payload, ensure_ascii=False)
+        receipts.append({"purpose": purpose, "request_id": "previous-run:"+purpose,
+                         "contract_status": "accepted", "response_payload": payload,
+                         "raw_content": raw, "response_hash": hashlib.sha256(raw.encode()).hexdigest(),
+                         "model": "historical-model", "source_label": "historical-source"})
+    return {"original_draft_hash": workpaper_hash(paper), "document_version": paper.report.document_version,
+            "review_response": review, "repair_response": {"repaired_facts": [fixed]}, "receipts": receipts}
+
+
+@pytest.mark.parametrize("accept", [True, False])
+def test_retained_real_stages_send_only_final_review_and_preserve_old_attribution(accept):
+    paper, packet, fixed, review, verify = material()
+    verify["checks"][0]["accepted"] = accept
+    retained = _retained_review(paper, review, fixed)
+    provider = Provider([verify])
+    result, receipts = review_workpaper(paper, packet=packet, provider=provider, work_id="continuation",
+        identity=workpaper_processing_identity(real=False, review=True), resume=retained)
+    assert [call["purpose"] for call in provider.calls] == ["verify_profile_workpaper_repair"]
+    assert len(result.quality_review.calls) == len(receipts) == 3
+    assert len(result.quality_review.retained_request_ids) == 2
+    assert "继承历史回执，非本次调用" in render_workpaper(result)
+    assert bool(result.elements.scale_and_mix.facts) is accept
+    assert result.elements.business_structure == paper.elements.business_structure
+
+
+def test_retained_stages_reject_changed_candidate_or_response_hash_before_network():
+    paper, packet, fixed, review, _ = material()
+    retained = _retained_review(paper, review, fixed)
+    retained["receipts"][0]["response_hash"] = "tampered"
+    provider = Provider([])
+    with pytest.raises(ValueError, match="receipt hashes"):
+        review_workpaper(paper, packet=packet, provider=provider, work_id="continuation",
+            identity=workpaper_processing_identity(real=False, review=True), resume=retained)
+    assert provider.calls == []
+
+
 def test_runtime_seed_review_gateway_writer_and_three_reads():
     from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
     from tests.unit.test_utils.test_llm_gateway import _config, _response
@@ -214,7 +256,8 @@ def test_runtime_seed_review_gateway_writer_and_three_reads():
         asyncio.run(client.close())
 
 
-def test_task_service_review_publishes_original_before_review_and_corrected_afterward():
+@pytest.mark.parametrize("resume_prior", [False, True])
+def test_task_service_review_publishes_original_before_review_and_corrected_afterward(resume_prior):
     from research.business_profile_production_operations import BusinessProfileAnnouncementFrontierRepository
     from research.company_profile.operations import CompanyProfileTaskService
     from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
@@ -251,7 +294,8 @@ def test_task_service_review_publishes_original_before_review_and_corrected_afte
                         assert original["profiles"][0]["workpaper"]["elements"]["scale_and_mix"]["facts"][0]["text"] == "净利润100.00元。"
                     return await super().send(*args, **kwargs)
 
-            transport = InspectOriginal([_response(review), _response({"repaired_facts": [fixed]}), _response(verify)])
+            transport = InspectOriginal([_response(verify)] if resume_prior else [
+                _response(review), _response({"repaired_facts": [fixed]}), _response(verify)])
             budget = _budget(deadline=time.monotonic() + 150)
             client = _client(transport, budget, config)
             provider = CommonGatewaySemanticProvider(client=client, profile="test", max_output_tokens=2500, timeout_seconds=10)
@@ -259,9 +303,14 @@ def test_task_service_review_publishes_original_before_review_and_corrected_afte
             identity = workpaper_processing_identity(real=False, review=True)
             identity.update(quality_review_profile="review", repair_profile="test",
                             review_existing_draft_hash=workpaper_hash(paper))
+            retained = _retained_review(paper, review, fixed) if resume_prior else None
+            if retained:
+                identity["review_resume_hash"] = hashlib.sha256(
+                    json.dumps(retained, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
             service = CompanyProfileTaskService(
                 storage=storage, output_root=root / "output", checkpoint_root=root / "checkpoints",
-                page_source=lambda _: {"report": _report(), "pages": PAGES, "review_seed": paper},
+                page_source=lambda _: {"report": _report(), "pages": PAGES, "review_seed": paper,
+                                       **({"review_resume": retained} if retained else {})},
                 provider=provider, processing_identity=identity, execution_budget=budget)
             ran = asyncio.run(service.execute("run", knowledge_cutoff="2026-11-12",
                                              instrument_ids=("600000.SH",), max_items=1, max_elapsed_seconds=150))
@@ -276,7 +325,8 @@ def test_task_service_review_publishes_original_before_review_and_corrected_afte
             assert final["workpaper"]["quality_review"]["status"] == "completed"
             assert final["core_complete"] is False
             assert "营业收入100.00" in final["workpaper"]["elements"]["scale_and_mix"]["facts"][0]["text"]
-            assert len(transport.calls) == 3
+            assert len(transport.calls) == (1 if resume_prior else 3)
+            assert len(final["workpaper"]["quality_review"]["retained_request_ids"]) == (2 if resume_prior else 0)
         finally:
             if client is not None:
                 asyncio.run(client.close())

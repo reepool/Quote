@@ -1,0 +1,67 @@
+[
+  {
+    "request_id": "bp-work-cb5aa57ff6a48bee32435213:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "ce19e1fadad73999a2cee9060428d3b2f7ceb054463aabe887f5a96a8b54bfa6",
+    "response_hash": "7de25cb9fdf51bd60e2202a95ab34ea7daaa1f15e09acd606ef59fc628817d32",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"SM-01\",\"review-add:F-SCALE-OMIT\",\"RM-03\",\"CM-04\"],\"checks\":[{\"fact_id\":\"SM-01\",\"accepted\":true,\"evidence_ids\":[\"source-0005\",\"source-0010\"],\"explanation\":\"已将“其中”限定为抵销前小计，并分开列示2025年1-12月主营业务收入抵销前小计1,525,120.68万元、业务板块间抵销-28,111.12万元和抵销后合计1,497,009.55万元；五个分项均取收入列而非成本列，负向抵销及抵销后净额与原表一致。营业收入150.65亿元另见叙述，未与主营业务收入或万元口径混用。\"},{\"fact_id\":\"review-add:F-SCALE-OMIT\",\"accepted\":true,\"evidence_ids\":[\"source-0010\",\"source-0006\"],\"explanation\":\"补入的公共安全增加60,481.61万元、数智产业减少118,490.59万元、智慧能源减少83,746.45万元，以及抵销后合计由1,669,062.84万元降至1,497,009.55万元、减少172,053.28万元，均对应分产业表收入及同比增减列。2025年毛利率29.81%、46.67%、10.79%和合计26.50%、同比增加2.19个百分点对应毛利率列，并保留其与叙述中整体毛利率提升2.35个百分点并非同一口径的限定。\"},{\"fact_id\":\"RM-03\",\"accepted\":true,\"evidence_ids\":[\"source-0001\",\"source-0012\"],\"explanation\":\"已删除来源未支持的“设备、平台与服务相结合”盈利模式；保留的辐射成像智能检查系统、解决方案、全生命周期运维服务，以及安检设备和综合安检解决方案，分别由公共安全业务描述支持，主体、期间正确且未外推收入结构。\"},{\"fact_id\":\"CM-04\",\"accepted\":true,\"evidence_ids\":[\"source-0007\"],\"explanation\":\"“国内外累计拓展4000余家机构客户”与“CNKI AI产品在哈萨克斯坦实现境外首单突破”保持在同一分句，主体收窄为相关业务而非公司整体，符合原文分句指向，未再扩大主体或改动4000余家的限定。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "SM-01",
+        "review-add:F-SCALE-OMIT",
+        "RM-03",
+        "CM-04"
+      ],
+      "checks": [
+        {
+          "fact_id": "SM-01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0005",
+            "source-0010"
+          ],
+          "explanation": "已将“其中”限定为抵销前小计，并分开列示2025年1-12月主营业务收入抵销前小计1,525,120.68万元、业务板块间抵销-28,111.12万元和抵销后合计1,497,009.55万元；五个分项均取收入列而非成本列，负向抵销及抵销后净额与原表一致。营业收入150.65亿元另见叙述，未与主营业务收入或万元口径混用。"
+        },
+        {
+          "fact_id": "review-add:F-SCALE-OMIT",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0010",
+            "source-0006"
+          ],
+          "explanation": "补入的公共安全增加60,481.61万元、数智产业减少118,490.59万元、智慧能源减少83,746.45万元，以及抵销后合计由1,669,062.84万元降至1,497,009.55万元、减少172,053.28万元，均对应分产业表收入及同比增减列。2025年毛利率29.81%、46.67%、10.79%和合计26.50%、同比增加2.19个百分点对应毛利率列，并保留其与叙述中整体毛利率提升2.35个百分点并非同一口径的限定。"
+        },
+        {
+          "fact_id": "RM-03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001",
+            "source-0012"
+          ],
+          "explanation": "已删除来源未支持的“设备、平台与服务相结合”盈利模式；保留的辐射成像智能检查系统、解决方案、全生命周期运维服务，以及安检设备和综合安检解决方案，分别由公共安全业务描述支持，主体、期间正确且未外推收入结构。"
+        },
+        {
+          "fact_id": "CM-04",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "“国内外累计拓展4000余家机构客户”与“CNKI AI产品在哈萨克斯坦实现境外首单突破”保持在同一分句，主体收窄为相关业务而非公司整体，符合原文分句指向，未再扩大主体或改动4000余家的限定。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 16162,
+      "output_tokens": 541,
+      "total_tokens": 27631
+    }
+  }
+]

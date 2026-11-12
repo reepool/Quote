@@ -1,0 +1,92 @@
+{
+  "run_id": "v9-review-closure-600100-20261112",
+  "asset": {
+    "instrument_id": "600100.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "ann_a14a45133bdd3d1fcb132c3049eb820e",
+    "filing_id": "1225244797",
+    "source": "cninfo",
+    "published_at": "2026-04-28T16:00:00+00:00",
+    "content_hash": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/7d/7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497.pdf",
+    "report_type": "annual_report"
+  },
+  "seed_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-reading-quality-600100-9e9dbaa1c3/export/600100.SH_2025-12-31.json",
+  "seed_file_sha256": "2f4a6aecbb5943808f37cf261a0eef11a083dc99dcd12d4c9156b35b25eda1b9",
+  "original_draft_hash": "3802383bdd0f26fc514f0c29367120e837e04153ea28342e80d891e9dd30ecb3",
+  "identity": {
+    "semantic_policy": "company_profile_llm_led.v2",
+    "reading_strategy": "chapter_workpaper_v1",
+    "prompt_version": "company_profile_workpaper.2026-11-12.supply-chain.v5",
+    "section_guide_version": "company_profile_section_guide.2026-11-12.v1",
+    "preprocessing_version": "toc_sections_native_layout.v2",
+    "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+    "execution_mode": "provider",
+    "semantic_reuse": false,
+    "max_section_characters": 160000,
+    "max_layout_characters": 500000,
+    "workpaper_max_output_tokens": 12000,
+    "logical_request_timeout_seconds": 620,
+    "workpaper_review_policy": "company_profile_workpaper_review.v1",
+    "quality_review_profile": "semantic_extraction__scorpio_grok",
+    "repair_profile": "semantic_extraction__deepseek",
+    "review_existing_draft_hash": "3802383bdd0f26fc514f0c29367120e837e04153ea28342e80d891e9dd30ecb3",
+    "review_max_output_tokens": 16384
+  },
+  "review_profile": "semantic_extraction__scorpio_grok",
+  "repair_profile": "semantic_extraction__deepseek",
+  "selected_profiles": {
+    "semantic_extraction__scorpio_grok": {
+      "model": "grok-4.7",
+      "source_label": "scorpio:grok-4.7",
+      "enabled": true,
+      "reasoning_effort": "high",
+      "disable_thinking": false,
+      "max_output_tokens_field": "max_completion_tokens",
+      "attempt_timeout_seconds": 300.0,
+      "max_retries": 1
+    },
+    "semantic_extraction__deepseek": {
+      "model": "deepseek-flash",
+      "source_label": "deepseek:deepseek-flash",
+      "enabled": true,
+      "reasoning_effort": "high",
+      "disable_thinking": true,
+      "max_output_tokens_field": "max_tokens",
+      "attempt_timeout_seconds": 300.0,
+      "max_retries": 1
+    }
+  },
+  "preflight": {
+    "dns_tls_passed": true,
+    "credentials_present": true,
+    "source_hash_passed": true,
+    "source_spans_passed": true,
+    "research_db_initialized": true,
+    "task_service_constructed": true
+  },
+  "limits": {
+    "business_seconds": 1800,
+    "ledger": 3000000,
+    "physical_requests": 6,
+    "recoveries": 3,
+    "per_logical": 1,
+    "logical_requests": 3,
+    "logical_seconds": 620,
+    "max_output_tokens": 16384,
+    "known_cost_cny": 1000
+  },
+  "authorization": "user-continue-real-review-loop-after-263-recap-2026-11-12",
+  "external_data_scope": "only this public annual-report selected packet and public-derived draft to Scorpio/Grok and official DeepSeek; no private data",
+  "code_sha256": {
+    "operations.py": "26844b0d6a66cd74308032317d3ef096d7ab06823017411078ca0b2b7814dd76",
+    "runtime.py": "966692ab7106014cee0c8112f155ebc0cfc908acb5db99e6881bda65576d53a8",
+    "reads.py": "5503ae08a3e3d26d98438849c69603d9c03facf370ebdf574fff31a95a042278",
+    "workpaper.py": "d4eaa47ae3737c83d7fc2e36acfe86d91341212e1af239319a7d25c320153f32",
+    "workpaper_review.py": "fdb367de3bc6d560ec50bc5fd873d5e97a5652193b1c12dc88ef7b386937e817",
+    "workpaper_llm.py": "c13d48a9f5ab4ec0dfead572871c33a80642e786460141aa949d86b251afaad1",
+    "stage5_provider.py": "490c857778321cd76da944999705f0b89262586244696ce1f7920359911454ab"
+  },
+  "source_packet_characters": 24842,
+  "production_authorization": "not_authorized"
+}
