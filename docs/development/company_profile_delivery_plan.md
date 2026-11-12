@@ -6,6 +6,10 @@
 
 ## 1. 开发者必须先理解的纠偏
 
+2026-11-12收尾（§262）：[6.BE](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md)林海/大名城2/2工作底稿已交，实际模型归因同链保存。当前不是再派公司核心尝试，S1/S32仍保原计数。大名城净额法/实收实支已分开；本次无适用内部抵销行，不能以新公司成稿宣称该缺口已解决。停止本轮扩样，后续复用适用已读表做最小内容验证，保持有用业务正文可读、具体缺项/错句明确限用。每轮先清后做/结束清本人临时物不变。
+
+2026-11-12当前交付（§261）：[6.BC/6.BD](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md)已完成四份不同业务的真实画像与实际模型归因，见[内容、来源与限用对照](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-model-attribution-observation-20261112.md)。模型身份来自成功回执而非首选配置/LLM自报；选章与正文分开。继续主路径应围绕主要板块/数字口径与可读内容取舍收敛，非必要原料明细和百分百填满后置；不以新增日志、门禁或模型排行榜冒充业务进展。当前四个入口均已结束，不为同源补句追加窗口；旧S1/S32和生产权限不变。每轮依旧先清后做/原结果持久后finally清本人过程物。
+
 2026-11-12当前接续为[章节底稿卡6.BB](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md)：已跑通主链继续增加可选供应链和通用章节指引，优先板块收入/规模；制造、能源、服务三份开发报告验证后直接交画像/缺项，不为供应链缺失判失败或扩读全文。用[初步阅读指引](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-reading-guide.md)指导LLM，后续以更多报告收敛，非页码规则。旧日期化“当前”均属历史，生产与成绩不变。
 
 **当前v9执行顺序（审核§257）：** 用户已重新明确“人工有源底稿→来源集中→结构化标准→精选章节文本→LLM读其他公司”。原三家窗口均已用，B第2轮材料不等于两份完整画像；现在不续派尾额/补页小卡，也不直接再次付费跑上汽或浦发。A先完成可读参考业务交付，B再按同一JSON投影接目录章节文本、表格和原query/export；章节策略按本报告目录/标题边界，不按样本页码。缺项和成本取舍写进规范，基础底稿与正式全报告质量验收分开。本文余下日期化裁决仅留历史，不是并行当前卡。

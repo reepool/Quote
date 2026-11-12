@@ -1,0 +1,1951 @@
+{
+  "run": {
+    "action": "run",
+    "state": "completed",
+    "task": {
+      "task_name": "company_profile_common_core",
+      "actions": [
+        "preview",
+        "run",
+        "status",
+        "pause",
+        "resume",
+        "query",
+        "export"
+      ],
+      "parameters": {
+        "action": [
+          "preview",
+          "run",
+          "status",
+          "pause",
+          "resume",
+          "query",
+          "export"
+        ],
+        "knowledge_cutoff": null,
+        "instrument_ids": [],
+        "max_items": 2,
+        "token_budget": 50000,
+        "max_elapsed_seconds": 300.0,
+        "reason": "operator_request",
+        "output_directory": null
+      },
+      "storage_namespace": "company_profile_common_core.v1",
+      "writer": "company_profile_research_writer.v1",
+      "production_authorization": "not_authorized",
+      "legacy_task_names_not_connected": [
+        "business_profile_daily_incremental",
+        "business_profile_backfill",
+        "business_profile_backfill_control",
+        "business_profile_semantic_repair",
+        "company_profile_shadow_sync"
+      ],
+      "stage5_connected": true
+    },
+    "control": {
+      "schema_version": "company_profile_task_control.v1",
+      "state": "completed",
+      "run_id": "company_profile_common_core-87238882bf70",
+      "action": "run",
+      "started_at": "2026-11-12T13:01:13.342403+08:00",
+      "updated_at": "2026-11-12T13:02:05.253526+08:00",
+      "finished_at": "2026-11-12T13:02:05.253526+08:00",
+      "stop_requested": false,
+      "reason": null,
+      "parameters": {
+        "knowledge_cutoff": "2026-11-12",
+        "instrument_ids": [
+          "600097.SH"
+        ],
+        "max_items": 1,
+        "token_budget": 3000000,
+        "max_elapsed_seconds": 1756.9836579989642
+      },
+      "latest_result": {
+        "action": "run",
+        "state": "completed",
+        "task": {
+          "task_name": "company_profile_common_core",
+          "actions": [
+            "preview",
+            "run",
+            "status",
+            "pause",
+            "resume",
+            "query",
+            "export"
+          ],
+          "parameters": {
+            "action": [
+              "preview",
+              "run",
+              "status",
+              "pause",
+              "resume",
+              "query",
+              "export"
+            ],
+            "knowledge_cutoff": null,
+            "instrument_ids": [],
+            "max_items": 2,
+            "token_budget": 50000,
+            "max_elapsed_seconds": 300.0,
+            "reason": "operator_request",
+            "output_directory": null
+          },
+          "storage_namespace": "company_profile_common_core.v1",
+          "writer": "company_profile_research_writer.v1",
+          "production_authorization": "not_authorized",
+          "legacy_task_names_not_connected": [
+            "business_profile_daily_incremental",
+            "business_profile_backfill",
+            "business_profile_backfill_control",
+            "business_profile_semantic_repair",
+            "company_profile_shadow_sync"
+          ],
+          "stage5_connected": true
+        },
+        "control": {
+          "schema_version": "company_profile_task_control.v1",
+          "state": "running",
+          "run_id": "company_profile_common_core-87238882bf70",
+          "action": "run",
+          "started_at": "2026-11-12T13:01:13.342403+08:00",
+          "updated_at": "2026-11-12T13:01:13.342403+08:00",
+          "finished_at": null,
+          "stop_requested": false,
+          "reason": null,
+          "parameters": {
+            "knowledge_cutoff": "2026-11-12",
+            "instrument_ids": [
+              "600097.SH"
+            ],
+            "max_items": 1,
+            "token_budget": 3000000,
+            "max_elapsed_seconds": 1756.9836579989642
+          },
+          "latest_result": null
+        },
+        "queue": {
+          "as_of": "2026-11-12T13:02:03.645939+08:00",
+          "total": 1,
+          "running": 0,
+          "claimable": 0,
+          "terminal": 0,
+          "completed": 1,
+          "machine_rework": 0,
+          "finalized": 1,
+          "groups": [
+            {
+              "stage": "publish",
+              "status": "completed",
+              "row_count": 1,
+              "oldest_created_at": "2026-11-12T13:01:14.368322+08:00",
+              "oldest_age_seconds": 49.730248
+            }
+          ]
+        },
+        "production_authorization": "not_authorized",
+        "storage_namespace": "company_profile_common_core.v1",
+        "writer": "company_profile_research_writer.v1",
+        "knowledge_cutoff": "2026-11-12",
+        "enqueue": {
+          "eligible": 1,
+          "inserted": 1,
+          "reused": 0,
+          "reset": 0,
+          "checkpoint_rotated": 0,
+          "checkpoint_deleted": 0,
+          "checkpoint_delete_failures": [],
+          "superseded": 0,
+          "identity_superseded": 0,
+          "work_ids": [
+            "bp-work-33fe62d052b7a2b786b21f60"
+          ]
+        },
+        "drain": {
+          "acquire": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.851,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 3.995,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 2,
+              "wait_seconds": 2e-05,
+              "write_seconds": 0.477537,
+              "observation_seconds": 5.939888,
+              "transaction_p50_seconds": 0.238769,
+              "transaction_p95_seconds": 0.256282,
+              "transaction_max_seconds": 0.258228,
+              "writer_lock_duty": 0.080395,
+              "inter_write_idle_seconds": 1.652418,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "parse": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.656,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 3.664,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 4,
+              "wait_seconds": 4.3e-05,
+              "write_seconds": 0.797129,
+              "observation_seconds": 9.694498,
+              "transaction_p50_seconds": 0.212731,
+              "transaction_p95_seconds": 0.25239,
+              "transaction_max_seconds": 0.258228,
+              "writer_lock_duty": 0.082225,
+              "inter_write_idle_seconds": 5.095479,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "semantic": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 33.945,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 35.065,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 9,
+              "wait_seconds": 0.113252,
+              "write_seconds": 1.453856,
+              "observation_seconds": 44.804891,
+              "transaction_p50_seconds": 0.127316,
+              "transaction_p95_seconds": 0.24266,
+              "transaction_max_seconds": 0.258228,
+              "writer_lock_duty": 0.032449,
+              "inter_write_idle_seconds": 39.615196,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "verify": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.324,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 2.487,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 11,
+              "wait_seconds": 0.113275,
+              "write_seconds": 1.744205,
+              "observation_seconds": 47.345004,
+              "transaction_p50_seconds": 0.127316,
+              "transaction_p95_seconds": 0.238769,
+              "transaction_max_seconds": 0.258228,
+              "writer_lock_duty": 0.03684,
+              "inter_write_idle_seconds": 41.814685,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "publish": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.411,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 2.855,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 13,
+              "wait_seconds": 0.113299,
+              "write_seconds": 2.00766,
+              "observation_seconds": 50.260885,
+              "transaction_p50_seconds": 0.130578,
+              "transaction_p95_seconds": 0.234877,
+              "transaction_max_seconds": 0.258228,
+              "writer_lock_duty": 0.039945,
+              "inter_write_idle_seconds": 44.506823,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          }
+        }
+      }
+    },
+    "queue": {
+      "as_of": "2026-11-12T13:02:03.645939+08:00",
+      "total": 1,
+      "running": 0,
+      "claimable": 0,
+      "terminal": 0,
+      "completed": 1,
+      "machine_rework": 0,
+      "finalized": 1,
+      "groups": [
+        {
+          "stage": "publish",
+          "status": "completed",
+          "row_count": 1,
+          "oldest_created_at": "2026-11-12T13:01:14.368322+08:00",
+          "oldest_age_seconds": 49.730248
+        }
+      ]
+    },
+    "production_authorization": "not_authorized",
+    "storage_namespace": "company_profile_common_core.v1",
+    "writer": "company_profile_research_writer.v1",
+    "knowledge_cutoff": "2026-11-12",
+    "enqueue": {
+      "eligible": 1,
+      "inserted": 1,
+      "reused": 0,
+      "reset": 0,
+      "checkpoint_rotated": 0,
+      "checkpoint_deleted": 0,
+      "checkpoint_delete_failures": [],
+      "superseded": 0,
+      "identity_superseded": 0,
+      "work_ids": [
+        "bp-work-33fe62d052b7a2b786b21f60"
+      ]
+    },
+    "drain": {
+      "acquire": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.851,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 3.995,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 2,
+          "wait_seconds": 2e-05,
+          "write_seconds": 0.477537,
+          "observation_seconds": 5.939888,
+          "transaction_p50_seconds": 0.238769,
+          "transaction_p95_seconds": 0.256282,
+          "transaction_max_seconds": 0.258228,
+          "writer_lock_duty": 0.080395,
+          "inter_write_idle_seconds": 1.652418,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "parse": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.656,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 3.664,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 4,
+          "wait_seconds": 4.3e-05,
+          "write_seconds": 0.797129,
+          "observation_seconds": 9.694498,
+          "transaction_p50_seconds": 0.212731,
+          "transaction_p95_seconds": 0.25239,
+          "transaction_max_seconds": 0.258228,
+          "writer_lock_duty": 0.082225,
+          "inter_write_idle_seconds": 5.095479,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "semantic": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 33.945,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 35.065,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 9,
+          "wait_seconds": 0.113252,
+          "write_seconds": 1.453856,
+          "observation_seconds": 44.804891,
+          "transaction_p50_seconds": 0.127316,
+          "transaction_p95_seconds": 0.24266,
+          "transaction_max_seconds": 0.258228,
+          "writer_lock_duty": 0.032449,
+          "inter_write_idle_seconds": 39.615196,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "verify": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.324,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 2.487,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 11,
+          "wait_seconds": 0.113275,
+          "write_seconds": 1.744205,
+          "observation_seconds": 47.345004,
+          "transaction_p50_seconds": 0.127316,
+          "transaction_p95_seconds": 0.238769,
+          "transaction_max_seconds": 0.258228,
+          "writer_lock_duty": 0.03684,
+          "inter_write_idle_seconds": 41.814685,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "publish": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.411,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 2.855,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 13,
+          "wait_seconds": 0.113299,
+          "write_seconds": 2.00766,
+          "observation_seconds": 50.260885,
+          "transaction_p50_seconds": 0.130578,
+          "transaction_p95_seconds": 0.234877,
+          "transaction_max_seconds": 0.258228,
+          "writer_lock_duty": 0.039945,
+          "inter_write_idle_seconds": 44.506823,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      }
+    }
+  },
+  "three_reads_equal": true,
+  "profile_count": 1,
+  "elapsed_seconds": 96.402,
+  "ledger": {
+    "physical_requests": 2,
+    "charged_tokens": 38190,
+    "charged_cost_cny": "unknown",
+    "cost_status": "unknown",
+    "billing_mode": "development_unpriced",
+    "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+    "stopped_reason": null,
+    "denied_request": null,
+    "attempts": [
+      {
+        "sequence": 1,
+        "request_id": "cc56e49f565f48ff902d6cabfd02e958",
+        "logical_request_id": "6704a3de9e7e6b0672f39f68f40192fdef64089bbf6f56dd69c1bd00fd77551e",
+        "source_label": "deepseek:deepseek-flash",
+        "attempt": 1,
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "reserved_input_tokens": 71432,
+        "reserved_output_tokens": 2500,
+        "charged_tokens": 21015,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 20676,
+          "output_tokens": 339,
+          "total_tokens": 21015
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 341,
+          "content_fragments": 339,
+          "content_chars": 661,
+          "content_sha256": "3e8a83d0238a5abcc496ec059cdd235d380f2d3c8ea57a3b452835b7f4b2f4cf",
+          "reasoning_present": false,
+          "reasoning_chars": 0,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      },
+      {
+        "sequence": 2,
+        "request_id": "95b61b7c4cb94dc5ba675497cffa73e4",
+        "logical_request_id": "92fafc8dc0bd096999c5fb3b725149b85e362d34c4f81291664f437793548e24",
+        "source_label": "deepseek:deepseek-flash",
+        "attempt": 1,
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "reserved_input_tokens": 53823,
+        "reserved_output_tokens": 12000,
+        "charged_tokens": 17175,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 10655,
+          "output_tokens": 6520,
+          "total_tokens": 17175
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 6519,
+          "content_fragments": 6517,
+          "content_chars": 16664,
+          "content_sha256": "441671917c4ee711b8ca36c498e2f7632494e1153530ba52f404621fd3636193",
+          "reasoning_present": false,
+          "reasoning_chars": 0,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      }
+    ]
+  },
+  "receipts": [
+    {
+      "request_id": "bp-work-33fe62d052b7a2b786b21f60:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "cc4e3e9c085a5c5584582b077addd5465f1228afe5b6bf4ee06762d5340b5c45",
+      "response_hash": "3e8a83d0238a5abcc496ec059cdd235d380f2d3c8ea57a3b452835b7f4b2f4cf",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction",
+      "route_fingerprint": "05c8b3e01cf7ce3251de2533fd438135f78f75ee85fbbb916a5238f065b8fde9",
+      "contract_status": "accepted",
+      "raw_content": "{\"selected_section_ids\":[\"section-0034\",\"section-0035\",\"section-0036\",\"section-0037\",\"section-0042\",\"section-0044\",\"section-0070\",\"section-0080\"],\"rationale\":\"本报告为远洋渔业公司年报。选取第三节中业务情况、行业情况、经营讨论与分析、核心竞争力，以及主要经营情况下的主营业务分析（含收入与成本分析）、行业经营性信息分析和主要控股参股公司分析，可完整覆盖业务结构、产品与服务用途、盈利模式、规模与收入构成、经营资源与客户市场、经营驱动因素及本期变化。这些子节信息密度高且相互衔接，避免选取仅含荣誉、治理或技术细节的章节。\",\"deferred\":[\"第四节公司治理、环境和社会：与业务经营解释关联弱，仅涉及治理、薪酬、分红等，非本次业务画像所需。\",\"第五节重要事项：关联交易、担保、诉讼等属合规与交易细节，业务缺口已由主营分析覆盖，暂不展开。\",\"第八节财务报告会计政策与报表附注：仅在有明确财务缺口时定向补充，当前业务与经营数据已足够，不整体纳入。\",\"第六节股份变动及股东情况：与业务经营解释无直接关系，暂不纳入。\"],\"stop_reason\":\"已选取能共同解释业务结构、产品用途、盈利模式、规模构成、经营资源与市场、驱动因素及本期变化的核心经营子节；剩余章节多为治理、合规、会计政策或股东事项，对业务画像边际贡献低，可在不追求全报告覆盖的前提下停止。\"}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0034",
+          "section-0035",
+          "section-0036",
+          "section-0037",
+          "section-0042",
+          "section-0044",
+          "section-0070",
+          "section-0080"
+        ],
+        "rationale": "本报告为远洋渔业公司年报。选取第三节中业务情况、行业情况、经营讨论与分析、核心竞争力，以及主要经营情况下的主营业务分析（含收入与成本分析）、行业经营性信息分析和主要控股参股公司分析，可完整覆盖业务结构、产品与服务用途、盈利模式、规模与收入构成、经营资源与客户市场、经营驱动因素及本期变化。这些子节信息密度高且相互衔接，避免选取仅含荣誉、治理或技术细节的章节。",
+        "deferred": [
+          "第四节公司治理、环境和社会：与业务经营解释关联弱，仅涉及治理、薪酬、分红等，非本次业务画像所需。",
+          "第五节重要事项：关联交易、担保、诉讼等属合规与交易细节，业务缺口已由主营分析覆盖，暂不展开。",
+          "第八节财务报告会计政策与报表附注：仅在有明确财务缺口时定向补充，当前业务与经营数据已足够，不整体纳入。",
+          "第六节股份变动及股东情况：与业务经营解释无直接关系，暂不纳入。"
+        ],
+        "stop_reason": "已选取能共同解释业务结构、产品用途、盈利模式、规模构成、经营资源与市场、驱动因素及本期变化的核心经营子节；剩余章节多为治理、合规、会计政策或股东事项，对业务画像边际贡献低，可在不追求全报告覆盖的前提下停止。"
+      },
+      "usage": {
+        "input_tokens": 20676,
+        "output_tokens": 339,
+        "total_tokens": 21015
+      }
+    },
+    {
+      "request_id": "bp-work-33fe62d052b7a2b786b21f60:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "bbdfe88a5b8fe743ed642bc09f1454e3453863d80e952974c0fb430a7663db0a",
+      "response_hash": "441671917c4ee711b8ca36c498e2f7632494e1153530ba52f404621fd3636193",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction",
+      "route_fingerprint": "05c8b3e01cf7ce3251de2533fd438135f78f75ee85fbbb916a5238f065b8fde9",
+      "contract_status": "accepted",
+      "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-01\",\"text\":\"公司主要从事远洋渔业捕捞、水产品加工销售及相关贸易，围绕“一鱼一虾”（金枪鱼、南极磷虾）核心主业，形成捕捞、加工、贸易、运输一体化格局。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-BS-02\",\"text\":\"公司拥有完整的产业链，构建了“捕捞—运输—加工—贸易”一体化产业格局，产品涵盖冷冻金枪鱼、鱼柳、罐头食品等。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F-BS-03\",\"text\":\"公司全资子公司开创远洋拥有远洋渔业企业资格证书，且捕捞渔船均获得农业农村部相关项目批文，并在有效期内开展捕捞作业。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"]},{\"fact_id\":\"F-BS-04\",\"text\":\"主要子公司业务涵盖远洋捕捞、远洋捕捞及食品加工业、交易鱼类和鱼产品、水产品加工及销售、罐头食品加工、海上运输、海鲜加工和批发、渔货贸易等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\",\"source-0016\"]}],\"limitations\":[\"未披露各业务板块在集团内的股权层级与持股比例的完整结构，仅能依据主要子公司表判断业务分布。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"远洋捕捞产品以鲣鱼、黄鳍为主；与江苏深蓝远洋渔业有限公司合作经营，在南极海域捕捞磷虾，产品以冻虾和虾粉为主。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-02\",\"text\":\"加工业务中，西班牙ALBO公司加工产品主要以金枪鱼罐头和罐头方便食品为主；国内岱山加工厂加工金枪鱼原料鱼，产品以鱼柳为主，主要销往国外市场。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-03\",\"text\":\"海上运输由冷藏运输船队承担冷冻金枪鱼运输、人员和物资等转运，并积极拓展其他运输业务。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-04\",\"text\":\"贸易业务以远洋渔货及水产品加工品为核心，外销主要面向国际市场。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-PS-05\",\"text\":\"分产品收入包括金枪鱼销售、零星鱼种销售、罐头食品销售、鱼柳加工销售、渔货贸易和海上运输。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]}],\"limitations\":[\"未披露各产品具体终端客户类型或下游行业的完整划分。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"公司依托“捕捞—加工—贸易”全产业链开展运营，通过销售远洋渔货、加工品及提供运输服务取得收入。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-RM-02\",\"text\":\"主营业务分销售模式情况显示，公司销售模式为直销，营业收入2,330,812,544.82元，毛利率29.67%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"主营业务营业收入（直销）\",\"raw_value\":\"2,330,812,544.82\",\"value\":\"2330812544.82\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"分销售模式-直销\"},{\"name\":\"主营业务毛利率（直销）\",\"raw_value\":\"29.67\",\"value\":\"29.67\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"分销售模式-直销\"}]},{\"fact_id\":\"F-RM-03\",\"text\":\"公司境外销售130,245万元，占公司全部营业收入56%；国内销售实现营业收入102,836万元，占公司全部营业收入44%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"境外销售收入\",\"raw_value\":\"130,245\",\"value\":\"130245\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"占全部营业收入56%\"},{\"name\":\"国内销售收入\",\"raw_value\":\"102,836\",\"value\":\"102836\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"占全部营业收入44%\"}]}],\"limitations\":[\"未披露各业务板块的具体定价机制或结算方式。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"2025年公司营业收入2,336,503,042.69元，营业成本1,642,264,864.02元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"2,336,503,042.69\",\"value\":\"2336503042.69\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"本期数\"},{\"name\":\"营业成本\",\"raw_value\":\"1,642,264,864.02\",\"value\":\"1642264864.02\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"本期数\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"主营业务分行业：海洋捕捞营业收入950,763,559.03元、毛利率32.51%；食品加工营业收入1,054,611,208.73元、毛利率34.65%；渔货贸易营业收入318,671,971.02元、毛利率5.18%；海上运输营业收入6,765,806.04元、毛利率6.07%；合计营业收入2,330,812,544.82元、毛利率29.67%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"海洋捕捞营业收入\",\"raw_value\":\"950,763,559.03\",\"value\":\"950763559.03\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"分行业\"},{\"name\":\"海洋捕捞毛利率\",\"raw_value\":\"32.51\",\"value\":\"32.51\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"分行业\"},{\"name\":\"食品加工营业收入\",\"raw_value\":\"1,054,611,208.73\",\"value\":\"1054611208.73\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"分行业\"},{\"name\":\"食品加工毛利率\",\"raw_value\":\"34.65\",\"value\":\"34.65\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"分行业\"},{\"name\":\"渔货贸易营业收入\",\"raw_value\":\"318,671,971.02\",\"value\":\"318671971.02\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"分行业\"},{\"name\":\"渔货贸易毛利率\",\"raw_value\":\"5.18\",\"value\":\"5.18\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"分行业\"},{\"name\":\"海上运输营业收入\",\"raw_value\":\"6,765,806.04\",\"value\":\"6765806.04\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"分行业\"},{\"name\":\"海上运输毛利率\",\"raw_value\":\"6.07\",\"value\":\"6.07\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"分行业\"},{\"name\":\"主营业务合计营业收入\",\"raw_value\":\"2,330,812,544.82\",\"value\":\"2330812544.82\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"分行业合计\"},{\"name\":\"主营业务合计毛利率\",\"raw_value\":\"29.67\",\"value\":\"29.67\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"分行业合计\"}]},{\"fact_id\":\"F-SM-03\",\"text\":\"分产品：金枪鱼销售收入796,979,841.53元、毛利率35.84%；零星鱼种销售收入153,783,717.50元、毛利率15.27%；罐头食品销售收入816,352,061.87元、毛利率44.46%；鱼柳加工销售收入238,259,146.86元、毛利率1.07%；渔货贸易收入318,671,971.02元、毛利率5.18%；海上运输收入6,765,806.04元、毛利率6.07%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"金枪鱼销售收入\",\"raw_value\":\"796,979,841.53\",\"value\":\"796979841.53\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"分产品\"},{\"name\":\"金枪鱼销售毛利率\",\"raw_value\":\"35.84\",\"value\":\"35.84\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"分产品\"},{\"name\":\"罐头食品销售收入\",\"raw_value\":\"816,352,061.87\",\"value\":\"816352061.87\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"分产品\"},{\"name\":\"罐头食品销售毛利率\",\"raw_value\":\"44.46\",\"value\":\"44.46\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"分产品\"},{\"name\":\"鱼柳加工销售收入\",\"raw_value\":\"238,259,146.86\",\"value\":\"238259146.86\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"分产品\"},{\"name\":\"鱼柳加工销售毛利率\",\"raw_value\":\"1.07\",\"value\":\"1.07\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"分产品\"}]},{\"fact_id\":\"F-SM-04\",\"text\":\"产销量：金枪鱼生产量88,560.73吨、销售量67,096.02吨、库存量10,781.66吨；罐头食品生产量5,808.97万罐、销售量6,049.62万罐、库存量2,865.95万罐；鱼柳生产量10,968.47吨、销售量11,017.20吨、库存量2,750.98吨。金枪鱼转移24,300.45吨至后续鱼柳加工。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"金枪鱼生产量\",\"raw_value\":\"88,560.73\",\"value\":\"88560.73\",\"unit\":\"吨\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"产销量情况表\"},{\"name\":\"金枪鱼销售量\",\"raw_value\":\"67,096.02\",\"value\":\"67096.02\",\"unit\":\"吨\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"产销量情况表\"},{\"name\":\"罐头食品生产量\",\"raw_value\":\"5,808.97\",\"value\":\"5808.97\",\"unit\":\"万罐\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"产销量情况表\"},{\"name\":\"罐头食品销售量\",\"raw_value\":\"6,049.62\",\"value\":\"6049.62\",\"unit\":\"万罐\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"产销量情况表\"},{\"name\":\"鱼柳生产量\",\"raw_value\":\"10,968.47\",\"value\":\"10968.47\",\"unit\":\"吨\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"产销量情况表\"},{\"name\":\"鱼柳销售量\",\"raw_value\":\"11,017.20\",\"value\":\"11017.20\",\"unit\":\"吨\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"产销量情况表\"}]},{\"fact_id\":\"F-SM-05\",\"text\":\"公司金枪鱼船队共捕捞金枪鱼88,561吨，较上年增加755吨，增幅1%；销售金枪鱼67,096吨，较上年减少7,814吨，减幅10%，实现销售收入79,698万元，较上年减少2,947万元，减幅4%；“深蓝轮”加工磷虾粉9,041吨（捕捞磷虾70,092吨），捕捞量增幅97%，实现销售收入15,378万元，增幅14%；罐头食品实现营业收入81,635万元，增幅23%；鱼柳加工实现营业收入23,826万元，减幅23%；渔货贸易实现营业收入31,867万元，减幅9%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"金枪鱼捕捞量\",\"raw_value\":\"88,561\",\"value\":\"88561\",\"unit\":\"吨\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"较上年增加755吨，增幅1%\"},{\"name\":\"磷虾粉加工量\",\"raw_value\":\"9,041\",\"value\":\"9041\",\"unit\":\"吨\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"捕捞磷虾70,092吨\"},{\"name\":\"磷虾捕捞量\",\"raw_value\":\"70,092\",\"value\":\"70092\",\"unit\":\"吨\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"捕捞量增幅97%\"}]}],\"limitations\":[\"分行业与分产品收入合计为2,330,812,544.82元，与营业收入2,336,503,042.69元存在差异，未在选定章节中说明差异构成。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"报告期内，公司金枪鱼围网船队11艘船舶全负荷运营，在中西太平洋开展生产作业；与江苏深蓝远洋渔业有限公司开展合作经营，在南极海域捕捞磷虾。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-OI-02\",\"text\":\"冷藏运输船队主要与金枪鱼围网船队作业配套，承担冷冻金枪鱼运输、人员和物资等转运。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-OI-03\",\"text\":\"海洋捕捞板块主要成本构成：燃料、许可证配额费、渔用物资、船舶修理费、人工成本等；食品加工板块主要成本构成：原料鱼、辅料、铁罐头、燃料及动力、人工成本、折旧费、其他加工成本；渔货贸易板块主要成本构成：原料鱼、运输费等；海上运输板块主要成本构成：船舶租金、燃料、船用物资、人工成本、货物保险等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"]},{\"fact_id\":\"F-OI-04\",\"text\":\"公司金枪鱼围网船队核心作业区以中西太平洋为主，与多国签订渔业配额协议，拥有长期稳定的资源获取渠道。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F-OI-05\",\"text\":\"公司严格遵循国际渔业管理规则，积极履行国际组织配额管理要求。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}],\"limitations\":[\"未披露各成本构成项目的具体金额或占比明细。\",\"未披露捕捞配额的具体数量或协议对手方名称。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"公司捕捞的金枪鱼部分在海外销售，ALBO公司产品销售基本在境外销售；2025年境外销售130,245万元，占全部营业收入56%；国内部分金枪鱼、磷虾粉、鱼柳等销售以国内客户为主，实现营业收入102,836万元，占全部营业收入44%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]},{\"fact_id\":\"F-CC-02\",\"text\":\"前五名客户销售额90,078.38万元，占年度销售总额38.55%；其中前五名客户销售额中关联方销售额0万元，占年度销售总额0%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"90,078.38\",\"value\":\"90078.38\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"占年度销售总额38.55%\"}]},{\"fact_id\":\"F-CC-03\",\"text\":\"贸易业务收入占营业收入比例超过10%前五名销售客户为FRINSA DEL NOROESTE, S.A.、TRIMARINE INTER、COLDFISH SEAFOOD CO. LTD.、CALKINS AND BURKE、GENERALE CONSERVE，合计销售额171,449,586.11元，占年度销售总额7.34%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"贸易业务前五名客户合计销售额\",\"raw_value\":\"171,449,586.11\",\"value\":\"171449586.11\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"占年度销售总额7.34%\"}]},{\"fact_id\":\"F-CC-04\",\"text\":\"公司销售模式为直销。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"F-CC-05\",\"text\":\"ALBO公司积极拓展欧洲及海外市场，加强与美国市场合作；沙丁鱼、鱿鱼等罐头产品保持西班牙市占率第一；黄鳍金枪鱼品类罐头品牌市占率提升，稳定在第二位；国际市场销售额增幅126%，其中北美市场成为最大增长点。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]}],\"limitations\":[\"未披露客户集中度以外的具体客户结构或各市场收入明细。\",\"前五名客户表与贸易业务前五名客户表口径不同，未合并计算。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"驱动业务收入增加的主要原因：公司金枪鱼围网全年销售价较上一年度有所上涨，销售量减少，捕捞业务收入减少2,805万元；罐头食品销售量较上一年度上涨，食品加工营业收入增加8,196万元；渔货贸易收入减少3,262万元；海上运输营业收入减少276万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]},{\"fact_id\":\"F-OD-02\",\"text\":\"营业收入变动原因说明：主要系食品加工营业收入同比增加；营业成本变动原因说明：主要系海洋捕捞营业成本同比减少；销售费用变动原因说明：主要系食品加工的广告促销费用同比增加；管理费用变动原因说明：主要系保险费同比增加；财务费用变动原因说明：主要系汇兑损失同比减少；研发费用变动原因说明：主要系海洋捕捞研发费用同比增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F-OD-03\",\"text\":\"贸易业务受关税政策冲击、资源环境变化等多重因素影响，业务成本上升，利润有所下滑；康隆公司面临船舶效率偏低、燃油成本上升等多重不利因素影响，整体经营业绩出现下滑。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F-OD-04\",\"text\":\"公司面临国际资源竞争加剧、部分高端技术待突破等挑战，通过深化国际合作、技术创新与产业链升级等措施促进企业高质量发展。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-OD-05\",\"text\":\"2025年度发生销售费用49,440万元，较上年42,838万元增加6,602万元，主要系广告宣传费、运输费同比增加，职工薪酬同比减少；管理费用11,449万元，同比增加456万元，主要系保险费、专业服务费同期增加；财务费用1,083万元，同比减少1,705万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"]}],\"limitations\":[\"未披露各驱动因素对收入或利润的量化影响金额（除已列示的变动额）。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"报告期内公司新增重要非主营业务的说明为不适用；本期公司业务类型、利润构成或利润来源发生重大变动的详细说明为不适用；报告期主要子公司股权变动导致合并范围变化为不适用；公司报告期内业务、产品或服务发生重大变化或调整有关情况为不适用。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0007\",\"source-0010\"]},{\"fact_id\":\"F-MC-02\",\"text\":\"报告期内取得和处置子公司的情况为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\"]},{\"fact_id\":\"F-MC-03\",\"text\":\"“深蓝轮”超额完成年度目标任务，并创下该项目捕捞量的新纪录；捕捞量增幅97%。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0008\"]},{\"fact_id\":\"F-MC-04\",\"text\":\"ALBO公司国际市场销售额增幅126%，其中北美市场成为最大增长点；环太公司在关税战带来的外部冲击下，产品销售受到一定影响。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]}],\"limitations\":[\"未披露重大变化的具体量化影响或后续安排。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-P-01\",\"text\":\"公司主要从事远洋渔业捕捞、水产品加工销售及相关贸易，形成捕捞、加工、贸易、运输一体化格局，处于远洋渔业生产、加工与流通环节。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-SC-P-02\",\"text\":\"公司拥有完整的产业链，构建了“捕捞—运输—加工—贸易”一体化产业格局。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-U-01\",\"text\":\"海洋捕捞板块主要成本构成包括燃料、许可证配额费、渔用物资、船舶修理费、人工成本等；食品加工板块主要成本构成包括原料鱼、辅料、铁罐头、燃料及动力、人工成本、折旧费、其他加工成本；渔货贸易板块主要成本构成包括原料鱼、运输费等；海上运输板块主要成本构成包括船舶租金、燃料、船用物资、人工成本、货物保险等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"]},{\"fact_id\":\"F-SC-U-02\",\"text\":\"前五名供应商采购额63,005.62万元，占年度采购总额30.15%；其中前五名供应商采购额中关联方采购额0万元，占年度采购总额0%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"前五名供应商采购额\",\"raw_value\":\"63,005.62\",\"value\":\"63005.62\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"占年度采购总额30.15%\"}]},{\"fact_id\":\"F-SC-U-03\",\"text\":\"贸易业务收入占营业收入比例超过10%前五名供应商为ZHEJIANG QIRUN FOOD CO., LTD、PROVEEDORES VARIOS PENDIENTES FRA.、OCEAN PIONEER INTERNATIONAL CO., LTD、FISHHAWK FISHERIES INC.、TROPICAL FOOD MANUFACTURING (ZHOUSHAN)CO., LTD，合计采购额179,579,076.08元，占年度采购总额8.59%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"贸易业务前五名供应商合计采购额\",\"raw_value\":\"179,579,076.08\",\"value\":\"179579076.08\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"占年度采购总额8.59%\"}]}],\"limitations\":[\"成本构成仅列示项目类别，未披露各项目具体金额或对应供应商名称。\",\"未披露捕捞配额的具体来源或协议对手方。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-D-01\",\"text\":\"公司捕捞的金枪鱼部分在海外销售，ALBO公司产品销售基本在境外销售；国内部分金枪鱼、磷虾粉、鱼柳等销售以国内客户为主。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]},{\"fact_id\":\"F-SC-D-02\",\"text\":\"贸易业务收入占营业收入比例超过10%前五名销售客户为FRINSA DEL NOROESTE, S.A.、TRIMARINE INTER、COLDFISH SEAFOOD CO. LTD.、CALKINS AND BURKE、GENERALE CONSERVE。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"]},{\"fact_id\":\"F-SC-D-03\",\"text\":\"ALBO公司沙丁鱼、鱿鱼等罐头产品保持西班牙市占率第一；黄鳍金枪鱼品类罐头品牌市占率提升，稳定在第二位；国际市场销售额增幅126%，其中北美市场成为最大增长点。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]}],\"limitations\":[\"未披露产品最终用途或下游行业的完整划分。\",\"客户名称仅来自贸易业务前五名客户表，不代表全部客户。\"]}},\"limitations\":[\"本工作底稿仅依据选定章节原文编制，未覆盖第四节至第八节等未读章节，不构成对全报告完整性的判断。\",\"分行业与分产品收入合计2,330,812,544.82元与营业收入2,336,503,042.69元存在差异，选定章节未说明差异构成。\",\"成本构成仅列示项目类别，未披露各项目具体金额或占比明细。\",\"未披露捕捞配额的具体数量、协议对手方或各市场收入明细。\",\"前五名客户表与贸易业务前五名客户表口径不同，未合并计算。\",\"未披露各业务板块在集团内的股权层级与持股比例的完整结构。\"]}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-BS-01",
+                "text": "公司主要从事远洋渔业捕捞、水产品加工销售及相关贸易，围绕“一鱼一虾”（金枪鱼、南极磷虾）核心主业，形成捕捞、加工、贸易、运输一体化格局。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-BS-02",
+                "text": "公司拥有完整的产业链，构建了“捕捞—运输—加工—贸易”一体化产业格局，产品涵盖冷冻金枪鱼、鱼柳、罐头食品等。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "F-BS-03",
+                "text": "公司全资子公司开创远洋拥有远洋渔业企业资格证书，且捕捞渔船均获得农业农村部相关项目批文，并在有效期内开展捕捞作业。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0013"
+                ]
+              },
+              {
+                "fact_id": "F-BS-04",
+                "text": "主要子公司业务涵盖远洋捕捞、远洋捕捞及食品加工业、交易鱼类和鱼产品、水产品加工及销售、罐头食品加工、海上运输、海鲜加工和批发、渔货贸易等。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0015",
+                  "source-0016"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露各业务板块在集团内的股权层级与持股比例的完整结构，仅能依据主要子公司表判断业务分布。"
+            ]
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-PS-01",
+                "text": "远洋捕捞产品以鲣鱼、黄鳍为主；与江苏深蓝远洋渔业有限公司合作经营，在南极海域捕捞磷虾，产品以冻虾和虾粉为主。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-PS-02",
+                "text": "加工业务中，西班牙ALBO公司加工产品主要以金枪鱼罐头和罐头方便食品为主；国内岱山加工厂加工金枪鱼原料鱼，产品以鱼柳为主，主要销往国外市场。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-PS-03",
+                "text": "海上运输由冷藏运输船队承担冷冻金枪鱼运输、人员和物资等转运，并积极拓展其他运输业务。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-PS-04",
+                "text": "贸易业务以远洋渔货及水产品加工品为核心，外销主要面向国际市场。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-PS-05",
+                "text": "分产品收入包括金枪鱼销售、零星鱼种销售、罐头食品销售、鱼柳加工销售、渔货贸易和海上运输。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露各产品具体终端客户类型或下游行业的完整划分。"
+            ]
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-RM-01",
+                "text": "公司依托“捕捞—加工—贸易”全产业链开展运营，通过销售远洋渔货、加工品及提供运输服务取得收入。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-RM-02",
+                "text": "主营业务分销售模式情况显示，公司销售模式为直销，营业收入2,330,812,544.82元，毛利率29.67%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "主营业务营业收入（直销）",
+                    "raw_value": "2,330,812,544.82",
+                    "value": "2330812544.82",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "分销售模式-直销"
+                  },
+                  {
+                    "name": "主营业务毛利率（直销）",
+                    "raw_value": "29.67",
+                    "value": "29.67",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "分销售模式-直销"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-RM-03",
+                "text": "公司境外销售130,245万元，占公司全部营业收入56%；国内销售实现营业收入102,836万元，占公司全部营业收入44%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "境外销售收入",
+                    "raw_value": "130,245",
+                    "value": "130245",
+                    "unit": "万元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "占全部营业收入56%"
+                  },
+                  {
+                    "name": "国内销售收入",
+                    "raw_value": "102,836",
+                    "value": "102836",
+                    "unit": "万元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "占全部营业收入44%"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露各业务板块的具体定价机制或结算方式。"
+            ]
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-SM-01",
+                "text": "2025年公司营业收入2,336,503,042.69元，营业成本1,642,264,864.02元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入",
+                    "raw_value": "2,336,503,042.69",
+                    "value": "2336503042.69",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "本期数"
+                  },
+                  {
+                    "name": "营业成本",
+                    "raw_value": "1,642,264,864.02",
+                    "value": "1642264864.02",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "本期数"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SM-02",
+                "text": "主营业务分行业：海洋捕捞营业收入950,763,559.03元、毛利率32.51%；食品加工营业收入1,054,611,208.73元、毛利率34.65%；渔货贸易营业收入318,671,971.02元、毛利率5.18%；海上运输营业收入6,765,806.04元、毛利率6.07%；合计营业收入2,330,812,544.82元、毛利率29.67%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "海洋捕捞营业收入",
+                    "raw_value": "950,763,559.03",
+                    "value": "950763559.03",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "分行业"
+                  },
+                  {
+                    "name": "海洋捕捞毛利率",
+                    "raw_value": "32.51",
+                    "value": "32.51",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "分行业"
+                  },
+                  {
+                    "name": "食品加工营业收入",
+                    "raw_value": "1,054,611,208.73",
+                    "value": "1054611208.73",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "分行业"
+                  },
+                  {
+                    "name": "食品加工毛利率",
+                    "raw_value": "34.65",
+                    "value": "34.65",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "分行业"
+                  },
+                  {
+                    "name": "渔货贸易营业收入",
+                    "raw_value": "318,671,971.02",
+                    "value": "318671971.02",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "分行业"
+                  },
+                  {
+                    "name": "渔货贸易毛利率",
+                    "raw_value": "5.18",
+                    "value": "5.18",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "分行业"
+                  },
+                  {
+                    "name": "海上运输营业收入",
+                    "raw_value": "6,765,806.04",
+                    "value": "6765806.04",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "分行业"
+                  },
+                  {
+                    "name": "海上运输毛利率",
+                    "raw_value": "6.07",
+                    "value": "6.07",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "分行业"
+                  },
+                  {
+                    "name": "主营业务合计营业收入",
+                    "raw_value": "2,330,812,544.82",
+                    "value": "2330812544.82",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "分行业合计"
+                  },
+                  {
+                    "name": "主营业务合计毛利率",
+                    "raw_value": "29.67",
+                    "value": "29.67",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "分行业合计"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SM-03",
+                "text": "分产品：金枪鱼销售收入796,979,841.53元、毛利率35.84%；零星鱼种销售收入153,783,717.50元、毛利率15.27%；罐头食品销售收入816,352,061.87元、毛利率44.46%；鱼柳加工销售收入238,259,146.86元、毛利率1.07%；渔货贸易收入318,671,971.02元、毛利率5.18%；海上运输收入6,765,806.04元、毛利率6.07%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "金枪鱼销售收入",
+                    "raw_value": "796,979,841.53",
+                    "value": "796979841.53",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "分产品"
+                  },
+                  {
+                    "name": "金枪鱼销售毛利率",
+                    "raw_value": "35.84",
+                    "value": "35.84",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "分产品"
+                  },
+                  {
+                    "name": "罐头食品销售收入",
+                    "raw_value": "816,352,061.87",
+                    "value": "816352061.87",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "分产品"
+                  },
+                  {
+                    "name": "罐头食品销售毛利率",
+                    "raw_value": "44.46",
+                    "value": "44.46",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "分产品"
+                  },
+                  {
+                    "name": "鱼柳加工销售收入",
+                    "raw_value": "238,259,146.86",
+                    "value": "238259146.86",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "分产品"
+                  },
+                  {
+                    "name": "鱼柳加工销售毛利率",
+                    "raw_value": "1.07",
+                    "value": "1.07",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "分产品"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SM-04",
+                "text": "产销量：金枪鱼生产量88,560.73吨、销售量67,096.02吨、库存量10,781.66吨；罐头食品生产量5,808.97万罐、销售量6,049.62万罐、库存量2,865.95万罐；鱼柳生产量10,968.47吨、销售量11,017.20吨、库存量2,750.98吨。金枪鱼转移24,300.45吨至后续鱼柳加工。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "金枪鱼生产量",
+                    "raw_value": "88,560.73",
+                    "value": "88560.73",
+                    "unit": "吨",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "产销量情况表"
+                  },
+                  {
+                    "name": "金枪鱼销售量",
+                    "raw_value": "67,096.02",
+                    "value": "67096.02",
+                    "unit": "吨",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "产销量情况表"
+                  },
+                  {
+                    "name": "罐头食品生产量",
+                    "raw_value": "5,808.97",
+                    "value": "5808.97",
+                    "unit": "万罐",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "产销量情况表"
+                  },
+                  {
+                    "name": "罐头食品销售量",
+                    "raw_value": "6,049.62",
+                    "value": "6049.62",
+                    "unit": "万罐",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "产销量情况表"
+                  },
+                  {
+                    "name": "鱼柳生产量",
+                    "raw_value": "10,968.47",
+                    "value": "10968.47",
+                    "unit": "吨",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "产销量情况表"
+                  },
+                  {
+                    "name": "鱼柳销售量",
+                    "raw_value": "11,017.20",
+                    "value": "11017.20",
+                    "unit": "吨",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "产销量情况表"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SM-05",
+                "text": "公司金枪鱼船队共捕捞金枪鱼88,561吨，较上年增加755吨，增幅1%；销售金枪鱼67,096吨，较上年减少7,814吨，减幅10%，实现销售收入79,698万元，较上年减少2,947万元，减幅4%；“深蓝轮”加工磷虾粉9,041吨（捕捞磷虾70,092吨），捕捞量增幅97%，实现销售收入15,378万元，增幅14%；罐头食品实现营业收入81,635万元，增幅23%；鱼柳加工实现营业收入23,826万元，减幅23%；渔货贸易实现营业收入31,867万元，减幅9%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "金枪鱼捕捞量",
+                    "raw_value": "88,561",
+                    "value": "88561",
+                    "unit": "吨",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "较上年增加755吨，增幅1%"
+                  },
+                  {
+                    "name": "磷虾粉加工量",
+                    "raw_value": "9,041",
+                    "value": "9041",
+                    "unit": "吨",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "捕捞磷虾70,092吨"
+                  },
+                  {
+                    "name": "磷虾捕捞量",
+                    "raw_value": "70,092",
+                    "value": "70092",
+                    "unit": "吨",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "捕捞量增幅97%"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "分行业与分产品收入合计为2,330,812,544.82元，与营业收入2,336,503,042.69元存在差异，未在选定章节中说明差异构成。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-OI-01",
+                "text": "报告期内，公司金枪鱼围网船队11艘船舶全负荷运营，在中西太平洋开展生产作业；与江苏深蓝远洋渔业有限公司开展合作经营，在南极海域捕捞磷虾。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-OI-02",
+                "text": "冷藏运输船队主要与金枪鱼围网船队作业配套，承担冷冻金枪鱼运输、人员和物资等转运。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-OI-03",
+                "text": "海洋捕捞板块主要成本构成：燃料、许可证配额费、渔用物资、船舶修理费、人工成本等；食品加工板块主要成本构成：原料鱼、辅料、铁罐头、燃料及动力、人工成本、折旧费、其他加工成本；渔货贸易板块主要成本构成：原料鱼、运输费等；海上运输板块主要成本构成：船舶租金、燃料、船用物资、人工成本、货物保险等。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010"
+                ]
+              },
+              {
+                "fact_id": "F-OI-04",
+                "text": "公司金枪鱼围网船队核心作业区以中西太平洋为主，与多国签订渔业配额协议，拥有长期稳定的资源获取渠道。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "F-OI-05",
+                "text": "公司严格遵循国际渔业管理规则，积极履行国际组织配额管理要求。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露各成本构成项目的具体金额或占比明细。",
+              "未披露捕捞配额的具体数量或协议对手方名称。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-CC-01",
+                "text": "公司捕捞的金枪鱼部分在海外销售，ALBO公司产品销售基本在境外销售；2025年境外销售130,245万元，占全部营业收入56%；国内部分金枪鱼、磷虾粉、鱼柳等销售以国内客户为主，实现营业收入102,836万元，占全部营业收入44%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ]
+              },
+              {
+                "fact_id": "F-CC-02",
+                "text": "前五名客户销售额90,078.38万元，占年度销售总额38.55%；其中前五名客户销售额中关联方销售额0万元，占年度销售总额0%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五名客户销售额",
+                    "raw_value": "90,078.38",
+                    "value": "90078.38",
+                    "unit": "万元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "占年度销售总额38.55%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-CC-03",
+                "text": "贸易业务收入占营业收入比例超过10%前五名销售客户为FRINSA DEL NOROESTE, S.A.、TRIMARINE INTER、COLDFISH SEAFOOD CO. LTD.、CALKINS AND BURKE、GENERALE CONSERVE，合计销售额171,449,586.11元，占年度销售总额7.34%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "贸易业务前五名客户合计销售额",
+                    "raw_value": "171,449,586.11",
+                    "value": "171449586.11",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "占年度销售总额7.34%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-CC-04",
+                "text": "公司销售模式为直销。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ]
+              },
+              {
+                "fact_id": "F-CC-05",
+                "text": "ALBO公司积极拓展欧洲及海外市场，加强与美国市场合作；沙丁鱼、鱿鱼等罐头产品保持西班牙市占率第一；黄鳍金枪鱼品类罐头品牌市占率提升，稳定在第二位；国际市场销售额增幅126%，其中北美市场成为最大增长点。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露客户集中度以外的具体客户结构或各市场收入明细。",
+              "前五名客户表与贸易业务前五名客户表口径不同，未合并计算。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-OD-01",
+                "text": "驱动业务收入增加的主要原因：公司金枪鱼围网全年销售价较上一年度有所上涨，销售量减少，捕捞业务收入减少2,805万元；罐头食品销售量较上一年度上涨，食品加工营业收入增加8,196万元；渔货贸易收入减少3,262万元；海上运输营业收入减少276万元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ]
+              },
+              {
+                "fact_id": "F-OD-02",
+                "text": "营业收入变动原因说明：主要系食品加工营业收入同比增加；营业成本变动原因说明：主要系海洋捕捞营业成本同比减少；销售费用变动原因说明：主要系食品加工的广告促销费用同比增加；管理费用变动原因说明：主要系保险费同比增加；财务费用变动原因说明：主要系汇兑损失同比减少；研发费用变动原因说明：主要系海洋捕捞研发费用同比增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "F-OD-03",
+                "text": "贸易业务受关税政策冲击、资源环境变化等多重因素影响，业务成本上升，利润有所下滑；康隆公司面临船舶效率偏低、燃油成本上升等多重不利因素影响，整体经营业绩出现下滑。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ]
+              },
+              {
+                "fact_id": "F-OD-04",
+                "text": "公司面临国际资源竞争加剧、部分高端技术待突破等挑战，通过深化国际合作、技术创新与产业链升级等措施促进企业高质量发展。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              },
+              {
+                "fact_id": "F-OD-05",
+                "text": "2025年度发生销售费用49,440万元，较上年42,838万元增加6,602万元，主要系广告宣传费、运输费同比增加，职工薪酬同比减少；管理费用11,449万元，同比增加456万元，主要系保险费、专业服务费同期增加；财务费用1,083万元，同比减少1,705万元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露各驱动因素对收入或利润的量化影响金额（除已列示的变动额）。"
+            ]
+          },
+          "material_changes": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-MC-01",
+                "text": "报告期内公司新增重要非主营业务的说明为不适用；本期公司业务类型、利润构成或利润来源发生重大变动的详细说明为不适用；报告期主要子公司股权变动导致合并范围变化为不适用；公司报告期内业务、产品或服务发生重大变化或调整有关情况为不适用。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0007",
+                  "source-0010"
+                ]
+              },
+              {
+                "fact_id": "F-MC-02",
+                "text": "报告期内取得和处置子公司的情况为不适用。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0016"
+                ]
+              },
+              {
+                "fact_id": "F-MC-03",
+                "text": "“深蓝轮”超额完成年度目标任务，并创下该项目捕捞量的新纪录；捕捞量增幅97%。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004",
+                  "source-0008"
+                ]
+              },
+              {
+                "fact_id": "F-MC-04",
+                "text": "ALBO公司国际市场销售额增幅126%，其中北美市场成为最大增长点；环太公司在关税战带来的外部冲击下，产品销售受到一定影响。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露重大变化的具体量化影响或后续安排。"
+            ]
+          }
+        },
+        "supply_chain": {
+          "position": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-SC-P-01",
+                "text": "公司主要从事远洋渔业捕捞、水产品加工销售及相关贸易，形成捕捞、加工、贸易、运输一体化格局，处于远洋渔业生产、加工与流通环节。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-SC-P-02",
+                "text": "公司拥有完整的产业链，构建了“捕捞—运输—加工—贸易”一体化产业格局。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "upstream_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-SC-U-01",
+                "text": "海洋捕捞板块主要成本构成包括燃料、许可证配额费、渔用物资、船舶修理费、人工成本等；食品加工板块主要成本构成包括原料鱼、辅料、铁罐头、燃料及动力、人工成本、折旧费、其他加工成本；渔货贸易板块主要成本构成包括原料鱼、运输费等；海上运输板块主要成本构成包括船舶租金、燃料、船用物资、人工成本、货物保险等。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010"
+                ]
+              },
+              {
+                "fact_id": "F-SC-U-02",
+                "text": "前五名供应商采购额63,005.62万元，占年度采购总额30.15%；其中前五名供应商采购额中关联方采购额0万元，占年度采购总额0%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五名供应商采购额",
+                    "raw_value": "63,005.62",
+                    "value": "63005.62",
+                    "unit": "万元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "占年度采购总额30.15%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SC-U-03",
+                "text": "贸易业务收入占营业收入比例超过10%前五名供应商为ZHEJIANG QIRUN FOOD CO., LTD、PROVEEDORES VARIOS PENDIENTES FRA.、OCEAN PIONEER INTERNATIONAL CO., LTD、FISHHAWK FISHERIES INC.、TROPICAL FOOD MANUFACTURING (ZHOUSHAN)CO., LTD，合计采购额179,579,076.08元，占年度采购总额8.59%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "贸易业务前五名供应商合计采购额",
+                    "raw_value": "179,579,076.08",
+                    "value": "179579076.08",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "占年度采购总额8.59%"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "成本构成仅列示项目类别，未披露各项目具体金额或对应供应商名称。",
+              "未披露捕捞配额的具体来源或协议对手方。"
+            ]
+          },
+          "downstream_customers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-SC-D-01",
+                "text": "公司捕捞的金枪鱼部分在海外销售，ALBO公司产品销售基本在境外销售；国内部分金枪鱼、磷虾粉、鱼柳等销售以国内客户为主。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ]
+              },
+              {
+                "fact_id": "F-SC-D-02",
+                "text": "贸易业务收入占营业收入比例超过10%前五名销售客户为FRINSA DEL NOROESTE, S.A.、TRIMARINE INTER、COLDFISH SEAFOOD CO. LTD.、CALKINS AND BURKE、GENERALE CONSERVE。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011"
+                ]
+              },
+              {
+                "fact_id": "F-SC-D-03",
+                "text": "ALBO公司沙丁鱼、鱿鱼等罐头产品保持西班牙市占率第一；黄鳍金枪鱼品类罐头品牌市占率提升，稳定在第二位；国际市场销售额增幅126%，其中北美市场成为最大增长点。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露产品最终用途或下游行业的完整划分。",
+              "客户名称仅来自贸易业务前五名客户表，不代表全部客户。"
+            ]
+          }
+        },
+        "limitations": [
+          "本工作底稿仅依据选定章节原文编制，未覆盖第四节至第八节等未读章节，不构成对全报告完整性的判断。",
+          "分行业与分产品收入合计2,330,812,544.82元与营业收入2,336,503,042.69元存在差异，选定章节未说明差异构成。",
+          "成本构成仅列示项目类别，未披露各项目具体金额或占比明细。",
+          "未披露捕捞配额的具体数量、协议对手方或各市场收入明细。",
+          "前五名客户表与贸易业务前五名客户表口径不同，未合并计算。",
+          "未披露各业务板块在集团内的股权层级与持股比例的完整结构。"
+        ]
+      },
+      "usage": {
+        "input_tokens": 10655,
+        "output_tokens": 6520,
+        "total_tokens": 17175
+      }
+    }
+  ]
+}

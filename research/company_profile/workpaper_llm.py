@@ -8,13 +8,16 @@ from pathlib import Path
 from typing import Any
 
 from .models import ReportIdentity
-from .workpaper import CompanyProfileWorkpaper, WorkpaperDraftResponse, bind_workpaper_draft
+from .workpaper import (
+    CompanyProfileWorkpaper, WorkpaperDraftResponse, WorkpaperGenerationMetadata,
+    WorkpaperModelCall, bind_workpaper_draft,
+)
 from .workpaper_sections import (
     SectionPacket, SectionSelection, build_section_packet,
     extract_selected_layout, index_sections, selected_pages,
 )
 
-WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-12.supply-chain.v3"
+WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-12.supply-chain.v5"
 SECTION_GUIDE_VERSION = "company_profile_section_guide.2026-11-12.v1"
 SECTION_GUIDE = (
     {"questions": "做什么、产品/服务用途、怎么经营", "sources": "主要业务/经营模式/核心竞争力/业务回顾的实质子节", "priority": "primary"},
@@ -71,9 +74,20 @@ Every fact must cite supplied source-XXXX IDs, never invented IDs, quotes or pag
 For a table metric cite BOTH the amount block and the governing header/unit/continuation blocks.
 Copy source metric name, raw number, same-unit decimal-string value, currency, period and basis.
 Keep group/parent/segment/industry, operating revenue and total operating revenue distinct.
+For each table row keep the exact column (operating profit is not net profit) and the
+denominator of each percentage. An OR-list/conditional disclosure heading is not a fact
+about every row: presence below a >50% OR new-counterparty heading does not prove >50%.
+If table unit labels conflict with another disclosed basis, explain the conflict and do
+not silently choose a unit or convert the number. Prefer an unambiguous duplicate source.
+When a segment table shows subtotal rows, inter-segment eliminations and an adjusted total,
+preserve the displayed subtotal and elimination separately. Do not describe the adjusted
+total as the sum of gross segments, or omit a disclosed elimination that reconciles them.
 Never guess column ownership, compute undisclosed values or invent customers or suppliers.
 R&D on batteries/chips does not establish their purchase; a product use is not a customer.
 Do not turn plans, industry statistics or goals into current company achievements.
+A current-period impact of a disposal does not date the disposal itself to this period;
+retain unknown timing unless the source explicitly dates the event. A subsidiary's
+registered business scope or products do not establish the parent's purchased raw materials.
 Observed requires nonempty facts. Otherwise explain unread, unfound, ambiguity or failure;
 unread/unfound is not not_disclosed. Supplementary detail can remain limited without guessing.
 No approval, full-report completeness claim, confidence score or prior-company answer is allowed.
@@ -104,6 +118,29 @@ class WorkpaperRun:
     receipts: tuple[Mapping, ...]
 
 
+def _model_call(
+    receipts: Sequence[Mapping], *, purpose: str, request_id: str,
+    section_ids: tuple[str, ...] = (), pages: tuple[int, ...] = (),
+    heading_count: int | None = None,
+) -> WorkpaperModelCall:
+    """Attribute only the returned response of this logical request, not a pool preference."""
+    receipt = next((item for item in reversed(receipts)
+                    if item.get("request_id") == request_id and item.get("purpose") == purpose
+                    and item.get("contract_status") == "accepted"), {})
+    fields = {key: receipt.get(key) for key in (
+        "request_hash", "response_hash", "source_label", "model", "selected_profile",
+        "logical_profile", "route_fingerprint", "finish_reason",
+    )}
+    usage = receipt.get("usage") or {}
+    return WorkpaperModelCall(
+        purpose=purpose, request_id=request_id, **fields,
+        contract_status=receipt.get("contract_status", "unknown"),
+        usage={key: usage.get(key) for key in ("input_tokens", "output_tokens", "total_tokens")},
+        scope_kind="report_heading_index" if purpose == "select_profile_sections" else "selected_source_sections",
+        heading_count=heading_count, section_ids=section_ids, physical_pages=pages,
+    )
+
+
 def run_workpaper(
     *, report: ReportIdentity, pages: Sequence[Mapping],
     processing_identity: Mapping[str, Any], provider: Any, work_id: str,
@@ -122,11 +159,13 @@ def run_workpaper(
     if content is not None and hashlib.sha256(content).hexdigest() != report.document_version:
         raise ValueError("source PDF hash differs from the bound report")
     index = index_sections(pages)
+    selection_id = f"{work_id}:workpaper:sections"
+    extraction_id = f"{work_id}:workpaper:extract"
     path_ids = {section.section_path: section.section_id for section in index}
     limit = int(processing_identity.get("max_section_characters", 160_000))
     timeout = float(processing_identity.get("logical_request_timeout_seconds", 300))
     selected = complete(
-        request_id=f"{work_id}:workpaper:sections", purpose="select_profile_sections",
+        request_id=selection_id, purpose="select_profile_sections",
         report=report,
         payload={
             "report": report.model_dump(mode="json"),
@@ -172,7 +211,7 @@ def run_workpaper(
         max_characters=int(processing_identity.get("max_layout_characters", 500_000)) if remap else limit,
     )
     extracted = complete(
-        request_id=f"{work_id}:workpaper:extract", purpose="extract_profile_workpaper",
+        request_id=extraction_id, purpose="extract_profile_workpaper",
         report=report,
         payload={
             "report": report.model_dump(mode="json"),
@@ -183,13 +222,33 @@ def run_workpaper(
         max_output_tokens=int(processing_identity.get("workpaper_max_output_tokens", 12_000)),
         timeout_seconds=timeout,
     )
+    receipts = tuple(item for item in getattr(provider, "workpaper_receipts", ())
+                     if item.get("request_id") in {selection_id, extraction_id})
+    generation = WorkpaperGenerationMetadata(
+        prompt_version=str(processing_identity.get("prompt_version") or WORKPAPER_PROMPT_VERSION),
+        preprocessing_version=str(processing_identity.get("preprocessing_version") or "unknown"),
+        section_guide_version=processing_identity.get("section_guide_version"),
+        selection=_model_call(receipts, purpose="select_profile_sections", request_id=selection_id,
+                              section_ids=tuple(item.section_id for item in index if item.level <= 3),
+                              heading_count=sum(item.level <= 3 for item in index)),
+        extraction=_model_call(
+            receipts, purpose="extract_profile_workpaper", request_id=extraction_id,
+            section_ids=tuple(item.section_id for item in packet.reading_scope.sections),
+            pages=tuple(sorted({span.page for item in packet.evidence for span in item.source_spans})),
+        ),
+    )
+    if real:
+        for stage in (generation.selection, generation.extraction):
+            if stage.contract_status != "accepted" or not stage.model or not stage.source_label:
+                raise ValueError(f"actual model attribution is incomplete for {stage.purpose}")
     workpaper = bind_workpaper_draft(
         WorkpaperDraftResponse.model_validate(extracted),
         report=report, reading_scope=packet.reading_scope, evidence=packet.evidence,
         origin="llm_generated" if real else "controlled_fixture",
+        generation=generation,
     )
     workpaper.validate_pages(packet_pages)
     return WorkpaperRun(
         workpaper=workpaper, packet=packet, pages=tuple(packet_pages),
-        receipts=tuple(getattr(provider, "workpaper_receipts", ())),
+        receipts=receipts,
     )

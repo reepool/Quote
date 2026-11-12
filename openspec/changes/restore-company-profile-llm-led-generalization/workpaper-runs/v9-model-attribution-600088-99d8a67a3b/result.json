@@ -1,0 +1,2301 @@
+{
+  "run": {
+    "action": "run",
+    "state": "completed",
+    "task": {
+      "task_name": "company_profile_common_core",
+      "actions": [
+        "preview",
+        "run",
+        "status",
+        "pause",
+        "resume",
+        "query",
+        "export"
+      ],
+      "parameters": {
+        "action": [
+          "preview",
+          "run",
+          "status",
+          "pause",
+          "resume",
+          "query",
+          "export"
+        ],
+        "knowledge_cutoff": null,
+        "instrument_ids": [],
+        "max_items": 2,
+        "token_budget": 50000,
+        "max_elapsed_seconds": 300.0,
+        "reason": "operator_request",
+        "output_directory": null
+      },
+      "storage_namespace": "company_profile_common_core.v1",
+      "writer": "company_profile_research_writer.v1",
+      "production_authorization": "not_authorized",
+      "legacy_task_names_not_connected": [
+        "business_profile_daily_incremental",
+        "business_profile_backfill",
+        "business_profile_backfill_control",
+        "business_profile_semantic_repair",
+        "company_profile_shadow_sync"
+      ],
+      "stage5_connected": true
+    },
+    "control": {
+      "schema_version": "company_profile_task_control.v1",
+      "state": "completed",
+      "run_id": "company_profile_common_core-3193c587ad53",
+      "action": "run",
+      "started_at": "2026-11-12T12:48:00.566283+08:00",
+      "updated_at": "2026-11-12T12:49:18.008841+08:00",
+      "finished_at": "2026-11-12T12:49:18.008841+08:00",
+      "stop_requested": false,
+      "reason": null,
+      "parameters": {
+        "knowledge_cutoff": "2026-11-12",
+        "instrument_ids": [
+          "600088.SH"
+        ],
+        "max_items": 1,
+        "token_budget": 3000000,
+        "max_elapsed_seconds": 1753.2145107127726
+      },
+      "latest_result": {
+        "action": "run",
+        "state": "completed",
+        "task": {
+          "task_name": "company_profile_common_core",
+          "actions": [
+            "preview",
+            "run",
+            "status",
+            "pause",
+            "resume",
+            "query",
+            "export"
+          ],
+          "parameters": {
+            "action": [
+              "preview",
+              "run",
+              "status",
+              "pause",
+              "resume",
+              "query",
+              "export"
+            ],
+            "knowledge_cutoff": null,
+            "instrument_ids": [],
+            "max_items": 2,
+            "token_budget": 50000,
+            "max_elapsed_seconds": 300.0,
+            "reason": "operator_request",
+            "output_directory": null
+          },
+          "storage_namespace": "company_profile_common_core.v1",
+          "writer": "company_profile_research_writer.v1",
+          "production_authorization": "not_authorized",
+          "legacy_task_names_not_connected": [
+            "business_profile_daily_incremental",
+            "business_profile_backfill",
+            "business_profile_backfill_control",
+            "business_profile_semantic_repair",
+            "company_profile_shadow_sync"
+          ],
+          "stage5_connected": true
+        },
+        "control": {
+          "schema_version": "company_profile_task_control.v1",
+          "state": "running",
+          "run_id": "company_profile_common_core-3193c587ad53",
+          "action": "run",
+          "started_at": "2026-11-12T12:48:00.566283+08:00",
+          "updated_at": "2026-11-12T12:48:00.566283+08:00",
+          "finished_at": null,
+          "stop_requested": false,
+          "reason": null,
+          "parameters": {
+            "knowledge_cutoff": "2026-11-12",
+            "instrument_ids": [
+              "600088.SH"
+            ],
+            "max_items": 1,
+            "token_budget": 3000000,
+            "max_elapsed_seconds": 1753.2145107127726
+          },
+          "latest_result": null
+        },
+        "queue": {
+          "as_of": "2026-11-12T12:49:16.573917+08:00",
+          "total": 1,
+          "running": 0,
+          "claimable": 0,
+          "terminal": 0,
+          "completed": 1,
+          "machine_rework": 0,
+          "finalized": 1,
+          "groups": [
+            {
+              "stage": "publish",
+              "status": "completed",
+              "row_count": 1,
+              "oldest_created_at": "2026-11-12T12:48:01.522680+08:00",
+              "oldest_age_seconds": 75.519243
+            }
+          ]
+        },
+        "production_authorization": "not_authorized",
+        "storage_namespace": "company_profile_common_core.v1",
+        "writer": "company_profile_research_writer.v1",
+        "knowledge_cutoff": "2026-11-12",
+        "enqueue": {
+          "eligible": 1,
+          "inserted": 1,
+          "reused": 0,
+          "reset": 0,
+          "checkpoint_rotated": 0,
+          "checkpoint_deleted": 0,
+          "checkpoint_delete_failures": [],
+          "superseded": 0,
+          "identity_superseded": 0,
+          "work_ids": [
+            "bp-work-1f69378a7da42d5495828906"
+          ]
+        },
+        "drain": {
+          "acquire": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 2.058,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 3.875,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 2,
+              "wait_seconds": 3.5e-05,
+              "write_seconds": 0.475263,
+              "observation_seconds": 5.991681,
+              "transaction_p50_seconds": 0.237631,
+              "transaction_p95_seconds": 0.238867,
+              "transaction_max_seconds": 0.239005,
+              "writer_lock_duty": 0.07932,
+              "inter_write_idle_seconds": 1.828121,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "parse": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.202,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 3.064,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 4,
+              "wait_seconds": 6e-05,
+              "write_seconds": 0.906763,
+              "observation_seconds": 9.143672,
+              "transaction_p50_seconds": 0.237631,
+              "transaction_p95_seconds": 0.26521,
+              "transaction_max_seconds": 0.269834,
+              "writer_lock_duty": 0.099168,
+              "inter_write_idle_seconds": 4.60681,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "semantic": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 59.947,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 61.738,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 11,
+              "wait_seconds": 0.000141,
+              "write_seconds": 1.928678,
+              "observation_seconds": 70.92668,
+              "transaction_p50_seconds": 0.161688,
+              "transaction_p95_seconds": 0.254419,
+              "transaction_max_seconds": 0.269834,
+              "writer_lock_duty": 0.027193,
+              "inter_write_idle_seconds": 65.157145,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "verify": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.414,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 2.517,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 13,
+              "wait_seconds": 0.000166,
+              "write_seconds": 2.277788,
+              "observation_seconds": 73.51505,
+              "transaction_p50_seconds": 0.161688,
+              "transaction_p95_seconds": 0.251336,
+              "transaction_max_seconds": 0.269834,
+              "writer_lock_duty": 0.030984,
+              "inter_write_idle_seconds": 67.613728,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "publish": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.203,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 2.387,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 15,
+              "wait_seconds": 0.000195,
+              "write_seconds": 2.571929,
+              "observation_seconds": 75.946533,
+              "transaction_p50_seconds": 0.161666,
+              "transaction_p95_seconds": 0.248253,
+              "transaction_max_seconds": 0.269834,
+              "writer_lock_duty": 0.033865,
+              "inter_write_idle_seconds": 69.710458,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          }
+        }
+      }
+    },
+    "queue": {
+      "as_of": "2026-11-12T12:49:16.573917+08:00",
+      "total": 1,
+      "running": 0,
+      "claimable": 0,
+      "terminal": 0,
+      "completed": 1,
+      "machine_rework": 0,
+      "finalized": 1,
+      "groups": [
+        {
+          "stage": "publish",
+          "status": "completed",
+          "row_count": 1,
+          "oldest_created_at": "2026-11-12T12:48:01.522680+08:00",
+          "oldest_age_seconds": 75.519243
+        }
+      ]
+    },
+    "production_authorization": "not_authorized",
+    "storage_namespace": "company_profile_common_core.v1",
+    "writer": "company_profile_research_writer.v1",
+    "knowledge_cutoff": "2026-11-12",
+    "enqueue": {
+      "eligible": 1,
+      "inserted": 1,
+      "reused": 0,
+      "reset": 0,
+      "checkpoint_rotated": 0,
+      "checkpoint_deleted": 0,
+      "checkpoint_delete_failures": [],
+      "superseded": 0,
+      "identity_superseded": 0,
+      "work_ids": [
+        "bp-work-1f69378a7da42d5495828906"
+      ]
+    },
+    "drain": {
+      "acquire": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 2.058,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 3.875,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 2,
+          "wait_seconds": 3.5e-05,
+          "write_seconds": 0.475263,
+          "observation_seconds": 5.991681,
+          "transaction_p50_seconds": 0.237631,
+          "transaction_p95_seconds": 0.238867,
+          "transaction_max_seconds": 0.239005,
+          "writer_lock_duty": 0.07932,
+          "inter_write_idle_seconds": 1.828121,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "parse": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.202,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 3.064,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 4,
+          "wait_seconds": 6e-05,
+          "write_seconds": 0.906763,
+          "observation_seconds": 9.143672,
+          "transaction_p50_seconds": 0.237631,
+          "transaction_p95_seconds": 0.26521,
+          "transaction_max_seconds": 0.269834,
+          "writer_lock_duty": 0.099168,
+          "inter_write_idle_seconds": 4.60681,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "semantic": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 59.947,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 61.738,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 11,
+          "wait_seconds": 0.000141,
+          "write_seconds": 1.928678,
+          "observation_seconds": 70.92668,
+          "transaction_p50_seconds": 0.161688,
+          "transaction_p95_seconds": 0.254419,
+          "transaction_max_seconds": 0.269834,
+          "writer_lock_duty": 0.027193,
+          "inter_write_idle_seconds": 65.157145,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "verify": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.414,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 2.517,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 13,
+          "wait_seconds": 0.000166,
+          "write_seconds": 2.277788,
+          "observation_seconds": 73.51505,
+          "transaction_p50_seconds": 0.161688,
+          "transaction_p95_seconds": 0.251336,
+          "transaction_max_seconds": 0.269834,
+          "writer_lock_duty": 0.030984,
+          "inter_write_idle_seconds": 67.613728,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "publish": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.203,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 2.387,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 15,
+          "wait_seconds": 0.000195,
+          "write_seconds": 2.571929,
+          "observation_seconds": 75.946533,
+          "transaction_p50_seconds": 0.161666,
+          "transaction_p95_seconds": 0.248253,
+          "transaction_max_seconds": 0.269834,
+          "writer_lock_duty": 0.033865,
+          "inter_write_idle_seconds": 69.710458,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      }
+    }
+  },
+  "three_reads_equal": true,
+  "profile_count": 1,
+  "elapsed_seconds": 125.247,
+  "ledger": {
+    "physical_requests": 3,
+    "charged_tokens": 64848,
+    "charged_cost_cny": "unknown",
+    "cost_status": "unknown",
+    "billing_mode": "development_unpriced",
+    "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+    "stopped_reason": null,
+    "denied_request": null,
+    "attempts": [
+      {
+        "sequence": 1,
+        "request_id": "398570ff0fb640dcb565be213dc53c40",
+        "logical_request_id": "9ae40cc8aa2afc318dac9f680d75585e8fe91f2c034313ad3f7268fda64705b7",
+        "source_label": "deepseek:deepseek-flash",
+        "attempt": 1,
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "reserved_input_tokens": 71964,
+        "reserved_output_tokens": 2500,
+        "charged_tokens": 20852,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 20515,
+          "output_tokens": 337,
+          "total_tokens": 20852
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 339,
+          "content_fragments": 337,
+          "content_chars": 705,
+          "content_sha256": "5c3d0ff84855ca6664f4aca907a90d92c9c813dda7b06eeacd6c4827ac8a31f6",
+          "reasoning_present": false,
+          "reasoning_chars": 0,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      },
+      {
+        "sequence": 2,
+        "request_id": "37aee00d69c14b3fbde11d30b37ced63",
+        "logical_request_id": "eb15fd9e6c1eeb28fcceb7ef0e9f62235b4cc5915e29c9db24f563c54997bb81",
+        "source_label": "deepseek:deepseek-flash",
+        "attempt": 1,
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "reserved_input_tokens": 45056,
+        "reserved_output_tokens": 12000,
+        "charged_tokens": 17228,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 9327,
+          "output_tokens": 7901,
+          "total_tokens": 17228
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 7903,
+          "content_fragments": 7901,
+          "content_chars": 21224,
+          "content_sha256": "cda63b5c7f10cb1f87b5fa0726dcce95908f0c2d6c2bd3a37a594cce989a25db",
+          "reasoning_present": false,
+          "reasoning_chars": 0,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        },
+        "error_code": "schema_validation_error"
+      },
+      {
+        "sequence": 3,
+        "request_id": "37aee00d69c14b3fbde11d30b37ced63",
+        "logical_request_id": "eb15fd9e6c1eeb28fcceb7ef0e9f62235b4cc5915e29c9db24f563c54997bb81",
+        "source_label": "deepseek:deepseek-flash",
+        "attempt": 2,
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "reserved_input_tokens": 85080,
+        "reserved_output_tokens": 12000,
+        "charged_tokens": 26768,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 18902,
+          "output_tokens": 7866,
+          "total_tokens": 26768
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 7868,
+          "content_fragments": 7866,
+          "content_chars": 21160,
+          "content_sha256": "1233b362c793c7cb3e96917cabac33d5a43620802cac3459fd3c855179f58fa2",
+          "reasoning_present": false,
+          "reasoning_chars": 0,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      }
+    ]
+  },
+  "receipts": [
+    {
+      "request_id": "bp-work-1f69378a7da42d5495828906:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "ceb91be25bb67adb03ee73c28dacc5b53e2cba249371b24f21c9517d39673dd4",
+      "response_hash": "5c3d0ff84855ca6664f4aca907a90d92c9c813dda7b06eeacd6c4827ac8a31f6",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction",
+      "route_fingerprint": "05c8b3e01cf7ce3251de2533fd438135f78f75ee85fbbb916a5238f065b8fde9",
+      "contract_status": "accepted",
+      "raw_content": "{\"selected_section_ids\":[\"section-0049\",\"section-0050\",\"section-0054\",\"section-0055\",\"section-0056\",\"section-0062\",\"section-0072\",\"section-0074\"],\"rationale\":\"所选章节覆盖公司四大业务板块（影视、广告、旅游、基金）的业务模式、产品/服务用途与经营方式（section-0049及其子节），经营情况讨论与分析中的各板块实际经营变化（section-0062），以及主营业务分析中的收入成本结构与规模占比（section-0072、section-0074），可共同回答业务结构、变现方式、规模与主要构成、经营驱动与本期变化等核心问题。未选行业情况、核心竞争力、未来展望等偏宏观或前瞻内容，也未选财务报告附注，以避免冗余。\",\"deferred\":[\"section-0057 行业情况：属外部行业背景，非公司自身业务结构，暂不纳入\",\"section-0067 核心竞争力：偏定性优势描述，业务实质已由业务与经营分析覆盖\",\"section-0119 未来发展讨论：前瞻性计划与风险，非本期经营事实，按material_only原则暂缓\",\"section-0317 财务报告及附注：仅在业务缺口时定向补充，当前无需整章阅读\"],\"stop_reason\":\"已选取能完整解释业务结构、产品服务、变现方式、规模构成与本期经营变化的连续子节，信息密度高且相互衔接；剩余为行业背景、前瞻计划与财务附注，属可选或定向补充范围，故在此停止，不追求全报告覆盖。\"}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0049",
+          "section-0050",
+          "section-0054",
+          "section-0055",
+          "section-0056",
+          "section-0062",
+          "section-0072",
+          "section-0074"
+        ],
+        "rationale": "所选章节覆盖公司四大业务板块（影视、广告、旅游、基金）的业务模式、产品/服务用途与经营方式（section-0049及其子节），经营情况讨论与分析中的各板块实际经营变化（section-0062），以及主营业务分析中的收入成本结构与规模占比（section-0072、section-0074），可共同回答业务结构、变现方式、规模与主要构成、经营驱动与本期变化等核心问题。未选行业情况、核心竞争力、未来展望等偏宏观或前瞻内容，也未选财务报告附注，以避免冗余。",
+        "deferred": [
+          "section-0057 行业情况：属外部行业背景，非公司自身业务结构，暂不纳入",
+          "section-0067 核心竞争力：偏定性优势描述，业务实质已由业务与经营分析覆盖",
+          "section-0119 未来发展讨论：前瞻性计划与风险，非本期经营事实，按material_only原则暂缓",
+          "section-0317 财务报告及附注：仅在业务缺口时定向补充，当前无需整章阅读"
+        ],
+        "stop_reason": "已选取能完整解释业务结构、产品服务、变现方式、规模构成与本期经营变化的连续子节，信息密度高且相互衔接；剩余为行业背景、前瞻计划与财务附注，属可选或定向补充范围，故在此停止，不追求全报告覆盖。"
+      },
+      "usage": {
+        "input_tokens": 20515,
+        "output_tokens": 337,
+        "total_tokens": 20852
+      }
+    },
+    {
+      "request_id": "bp-work-1f69378a7da42d5495828906:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "5b14a87f0a0859f6954673cb0d4219f289182262b2ff108f6fcb64a3b9dc80ba",
+      "response_hash": "1233b362c793c7cb3e96917cabac33d5a43620802cac3459fd3c855179f58fa2",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction",
+      "route_fingerprint": "05c8b3e01cf7ce3251de2533fd438135f78f75ee85fbbb916a5238f065b8fde9",
+      "contract_status": "accepted",
+      "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F001\",\"text\":\"公司已形成多平台协同发展的业务格局，涵盖电视节目制作与销售、影视技术服务与设备租赁、媒体广告代理、影视拍摄基地经营以及基金投资与管理等多个领域。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F002\",\"text\":\"影视业务主要包括电视节目制作与销售、影视技术服务与设备租赁、影视库存剧销售等板块。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F003\",\"text\":\"广告业务主要承包经营总台科教频道及农业农村频道的整频道广告资源。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F004\",\"text\":\"旅游业务主要为无锡影视基地和南海影视城的影视拍摄基地经营。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F005\",\"text\":\"公司自2018年起布局基金投资业务，成立全资子公司宁波梅山保税港区国视融媒投资管理有限公司，专注融合媒体等特色细分行业的投资。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F006\",\"text\":\"报告期内公司新增重要非主营业务的说明为不适用。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}],\"limitations\":[\"业务结构按影视、广告、旅游、基金四大板块披露，未进一步披露各板块内部细分产品收入。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F007\",\"text\":\"电视节目制作与销售业务聚焦超高清/高清纪录片、电视栏目、大型晚会活动及宣传片等全链条服务，覆盖策划、投资、制作、运营与管理的全生命周期。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F008\",\"text\":\"公司积极拓展台外市场，深化与各级政府、企事业单位和社会组织的合作，承制多部重点纪录片与宣传片；并拓展新媒体直播、宣传推广及短视频制作等业务。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F009\",\"text\":\"影视技术服务方面，公司为各类影视节目与剧目提供包括剪辑、包装、调色及设备、机房、演播室运维等全流程技术服务。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F010\",\"text\":\"设备租赁方面，公司拥有完备的超高清及高清前后期制作设备，能够为超高清及高清电视剧、数字电影、纪录片、大型转播活动等多元影视制作提供设备租赁与技术支持服务。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F011\",\"text\":\"影视库存剧销售业务主要依托公司媒资资源，推动影视作品的多轮发行与销售，发行历年投资、制作及引进的电视剧、纪录片、电视栏目等作品。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F012\",\"text\":\"广告业务在稳定传统优势资源销售的基础上，加快向多元化经营转型，积极布局短视频与电商领域，致力于从传统媒介销售型广告公司向频道商务运营商转型。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F013\",\"text\":\"旅游业务主要收入来源包括旅游门票销售、园内经营和影视拍摄服务等。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F014\",\"text\":\"南海影视城业务涉及影视拍摄、休闲旅游、研学教育、户外拓展、婚纱摄影、品牌展示等多元领域。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F015\",\"text\":\"基金业务方面，国视融媒参与设立的中视融合（上海）企业管理合伙企业（有限合伙），配合推进央视融媒体产业投资基金；中视传媒及国视融媒共参与两只专项基金和两只融媒体产业基金的设立与募集。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}],\"limitations\":[\"产品/服务用途多按业务板块定性描述，未披露各细分服务的具体客户名单或合同金额。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F016\",\"text\":\"影视业务收入来自电视节目制作与销售、影视技术服务与设备租赁、影视库存剧销售等板块。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0003\"]},{\"fact_id\":\"F017\",\"text\":\"广告业务通过承包经营总台科教频道及农业农村频道整频道广告资源获取收入，并探索短视频、电商等多元创收路径。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F018\",\"text\":\"旅游业务收入来源包括旅游门票销售、园内经营和影视拍摄服务等。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F019\",\"text\":\"基金业务收入来自基金投资与管理，报告期内公司推进基金投后项目管理与退出工作。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0004\"]},{\"fact_id\":\"F020\",\"text\":\"2025年公司实现营业收入1,037,484,312.21元，利润总额17,330,603.37元，归属于上市公司股东的净利润-17,956,761.63元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"1,037,484,312.21\",\"value\":\"1037484312.21\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"利润总额\",\"raw_value\":\"17,330,603.37\",\"value\":\"17330603.37\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"-17,956,761.63\",\"value\":\"-17956761.63\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F021\",\"text\":\"报告期内公司参与投资的基金减持“海看股份”和“无线传媒”股票，产生大额所得税费用；子公司中视广告前期大额未弥补亏损到期，转回递延所得税费用，受上述所得税费用因素影响，归属于上市公司股东的净利润出现亏损。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}],\"limitations\":[\"未披露各业务板块的单价、计费方式或收入确认时点等细节。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F022\",\"text\":\"主营业务分行业情况：影视业务营业收入597,703,872.09元，营业成本537,684,200.57元，毛利率10.04%，营业收入比上年增减2.56%，营业成本比上年增减-2.09%，毛利率增加4.27个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"影视业务营业收入\",\"raw_value\":\"597,703,872.09\",\"value\":\"597703872.09\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"影视业务营业成本\",\"raw_value\":\"537,684,200.57\",\"value\":\"537684200.57\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"影视业务毛利率\",\"raw_value\":\"10.04\",\"value\":\"10.04\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F023\",\"text\":\"主营业务分行业情况：广告业务营业收入289,904,563.86元，营业成本265,471,667.70元，毛利率8.43%，营业收入比上年增减-25.30%，营业成本比上年增减-19.50%，毛利率减少6.60个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"广告业务营业收入\",\"raw_value\":\"289,904,563.86\",\"value\":\"289904563.86\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"广告业务营业成本\",\"raw_value\":\"265,471,667.70\",\"value\":\"265471667.70\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"广告业务毛利率\",\"raw_value\":\"8.43\",\"value\":\"8.43\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F024\",\"text\":\"主营业务分行业情况：旅游业务营业收入147,151,456.42元，营业成本107,080,345.66元，毛利率27.23%，营业收入比上年增减-10.00%，营业成本比上年增减0.59%，毛利率减少7.66个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"旅游业务营业收入\",\"raw_value\":\"147,151,456.42\",\"value\":\"147151456.42\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"旅游业务营业成本\",\"raw_value\":\"107,080,345.66\",\"value\":\"107080345.66\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"旅游业务毛利率\",\"raw_value\":\"27.23\",\"value\":\"27.23\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F025\",\"text\":\"主营业务分行业情况：基金业务营业收入1,503,221.93元，毛利率100.00%，营业收入比上年增减-3.69%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"基金业务营业收入\",\"raw_value\":\"1,503,221.93\",\"value\":\"1503221.93\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"基金业务毛利率\",\"raw_value\":\"100.00\",\"value\":\"100.00\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F026\",\"text\":\"主营业务分地区情况：上海营业收入242,121,065.72元，营业成本222,669,455.81元，毛利率8.03%；无锡营业收入124,148,585.98元，营业成本87,700,889.71元，毛利率29.36%；北京营业收入642,811,084.51元，营业成本578,981,995.24元，毛利率9.93%；佛山营业收入25,679,156.16元，营业成本20,883,873.17元，毛利率18.67%；宁波营业收入1,503,221.93元，毛利率100.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"上海营业收入\",\"raw_value\":\"242,121,065.72\",\"value\":\"242121065.72\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"无锡营业收入\",\"raw_value\":\"124,148,585.98\",\"value\":\"124148585.98\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"北京营业收入\",\"raw_value\":\"642,811,084.51\",\"value\":\"642811084.51\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"佛山营业收入\",\"raw_value\":\"25,679,156.16\",\"value\":\"25679156.16\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"宁波营业收入\",\"raw_value\":\"1,503,221.93\",\"value\":\"1503221.93\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F027\",\"text\":\"利润表及现金流量表相关科目变动分析表：营业收入本期数1,037,484,312.21元，上年同期数1,137,504,727.93元，变动比例-8.79%；营业成本本期数911,538,539.48元，上年同期数987,413,878.35元，变动比例-7.68%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"1,037,484,312.21\",\"value\":\"1037484312.21\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"营业成本\",\"raw_value\":\"911,538,539.48\",\"value\":\"911538539.48\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}],\"limitations\":[\"分行业收入合计与营业收入总额的勾稽关系未在所选章节中明确说明。\",\"基金业务未披露营业成本金额。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F028\",\"text\":\"公司作为总台准制作岛和技术服务的长期供应商，具备稳定的业务来源与良好的行业声誉；年均完成节目技审及通过专属节目传输通道在总台入库播出的节目约8,000小时。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F029\",\"text\":\"公司拥有一支经验丰富、技术成熟的运维团队，全力保障承接的宣传任务安全、优质地播出。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F030\",\"text\":\"公司拥有完备的超高清及高清前后期制作设备，能够为多元影视制作提供全面的设备租赁与技术支持服务。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F031\",\"text\":\"无锡影视基地位于无锡太湖之滨，占地面积超1,000亩，主要由三国城、水浒城等景区组成；南海影视城位于广东省佛山市南海区，占地面积近1,500亩，涵盖天朝宫殿区、江南水乡区、港澳文化区和休闲游乐区。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F032\",\"text\":\"影视业务成本构成中职工薪酬250,999,754.59元（占46.68%）、技术服务费121,668,134.32元（占22.63%）、劳务费49,006,201.93元（占9.11%）、制作费47,272,703.17元（占8.79%）、租赁费18,282,329.89元（占3.40%）等。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"影视业务职工薪酬\",\"raw_value\":\"250,999,754.59\",\"value\":\"250999754.59\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"影视业务技术服务费\",\"raw_value\":\"121,668,134.32\",\"value\":\"121668134.32\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"影视业务劳务费\",\"raw_value\":\"49,006,201.93\",\"value\":\"49006201.93\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"影视业务制作费\",\"raw_value\":\"47,272,703.17\",\"value\":\"47272703.17\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"影视业务租赁费\",\"raw_value\":\"18,282,329.89\",\"value\":\"18282329.89\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F033\",\"text\":\"广告业务成本构成中媒体广告成本141,251,521.88元（占53.21%）、制作费22,124,254.09元（占8.33%）。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"广告业务媒体广告成本\",\"raw_value\":\"141,251,521.88\",\"value\":\"141251521.88\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"广告业务制作费\",\"raw_value\":\"22,124,254.09\",\"value\":\"22124254.09\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F034\",\"text\":\"旅游业务成本构成中职工薪酬45,194,137.10元（占42.21%）、折旧费13,992,188.62元（占13.07%）、演出费11,998,520.80元（占11.21%）、景区维修费6,780,813.62元（占6.33%）、房水电费6,569,635.44元（占6.14%）等。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"旅游业务职工薪酬\",\"raw_value\":\"45,194,137.10\",\"value\":\"45194137.10\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"旅游业务折旧费\",\"raw_value\":\"13,992,188.62\",\"value\":\"13992188.62\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"旅游业务演出费\",\"raw_value\":\"11,998,520.80\",\"value\":\"11998520.80\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F035\",\"text\":\"报告期内，公司影视业务对外采购劳务服务增加，劳务费支出较上年同期增长37.43%；对外采购制作服务减少，制作费支出较上年同期下降33.51%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F036\",\"text\":\"报告期内，公司广告业务对外采购制作服务减少，制作费支出较上年同期下降57.10%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F037\",\"text\":\"报告期内，无锡景区餐饮业务出租，旅游业务餐饮材料支出较上年同期大幅减少98.28%。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]}],\"limitations\":[\"成本构成按行业列示，未披露具体供应商名称或采购合同金额（除总台整频道广告资源合同外）。\",\"未披露影视设备、场地等资源的具体数量或产能利用率。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F038\",\"text\":\"前五名客户销售额730,193,949.69元，占年度销售总额70.38%；其中前五名客户销售额中关联方销售额660,494,898.68元，占年度销售总额63.66%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"730,193,949.69\",\"value\":\"730193949.69\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"70.38\",\"value\":\"70.38\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F039\",\"text\":\"报告期内向单个客户的销售比例超过总额50%：中央广播电视总台销售额660,494,898.68元，占年度销售总额比例63.66%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"中央广播电视总台销售额\",\"raw_value\":\"660,494,898.68\",\"value\":\"660494898.68\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"中央广播电视总台销售额占年度销售总额比例\",\"raw_value\":\"63.66\",\"value\":\"63.66\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F040\",\"text\":\"前五名供应商采购额173,681,466.18元，占年度采购总额23.77%；其中前五名供应商采购额中关联方采购额127,258,664.50元，占年度采购总额17.42%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"前五名供应商采购额\",\"raw_value\":\"173,681,466.18\",\"value\":\"173681466.18\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"23.77\",\"value\":\"23.77\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F041\",\"text\":\"报告期内向单个供应商的采购比例超过总额50%：中央广播电视总台采购额127,258,664.50元，占年度采购总额比例17.42%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"中央广播电视总台采购额\",\"raw_value\":\"127,258,664.50\",\"value\":\"127258664.50\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"中央广播电视总台采购额占年度采购总额比例\",\"raw_value\":\"17.42\",\"value\":\"17.42\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F042\",\"text\":\"已签订的重大采购合同：科教频道整频道电视广告资源，对方当事人中央广播电视总台，合同总金额7,949.13万元，合计已履行金额7,949.13万元，本报告期履行金额7,949.13万元；农业农村频道整频道广告资源，对方当事人中央广播电视总台，合同总金额5,822.61万元，合计已履行金额5,295.29万元，本报告期履行金额5,295.29万元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"科教频道整频道电视广告资源合同总金额\",\"raw_value\":\"7,949.13\",\"value\":\"7949.13\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"农业农村频道整频道广告资源合同总金额\",\"raw_value\":\"5,822.61\",\"value\":\"5822.61\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F043\",\"text\":\"公司广告业务主要承包经营总台科教频道及农业农村频道的整频道广告资源，客户覆盖相关行业头部企业。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0004\"]},{\"fact_id\":\"F044\",\"text\":\"公司电视节目制作与销售业务与总台保持紧密合作，同时积极拓展台外市场，深化与各级政府、企事业单位和社会组织的合作。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F045\",\"text\":\"南海影视城拓展新媒体营销与多元团队客源，深耕研学市场与“银发”经济。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0004\"]}],\"limitations\":[\"除中央广播电视总台外，未披露其他前五名客户或供应商的具体名称。\",\"分地区收入按上海、无锡、北京、佛山、宁波列示，未披露各地区的客户结构。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F046\",\"text\":\"影视业务：2025年实现收入597,703,872.09元，较上年同期增长2.56%；公司积极开拓市场，承接项目数量有所增加，实现影视业务收入略有增长。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\"],\"metrics\":[{\"name\":\"影视业务营业收入\",\"raw_value\":\"597,703,872.09\",\"value\":\"597703872.09\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F047\",\"text\":\"广告业务：2025年实现收入289,904,563.86元，较上年同期减少25.30%；主要受传统广告市场承压和制作项目调整等因素影响。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"广告业务营业收入\",\"raw_value\":\"289,904,563.86\",\"value\":\"289904563.86\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F048\",\"text\":\"旅游业务：2025年实现收入147,151,456.42元，较上年同期减少10.00%；主要受景区周边同质化竞争加剧导致客源分流，加之极端天气等综合因素影响。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"旅游业务营业收入\",\"raw_value\":\"147,151,456.42\",\"value\":\"147151456.42\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F049\",\"text\":\"基金业务：2025年实现收入1,503,221.93元，较上年同期减少3.69%；报告期内重点跟进“海看股份”和“无线传媒”退出事宜，海看股份完成部分减持，无线传媒已基本完成减持工作。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"基金业务营业收入\",\"raw_value\":\"1,503,221.93\",\"value\":\"1503221.93\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F050\",\"text\":\"财务费用变动原因：主要原因是报告期购买银行委托理财产品，存款利息收入较上年同期减少所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F051\",\"text\":\"投资收益变动原因：主要原因是报告期公司基金业务产生的投资收益较上年同期大幅减少所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F052\",\"text\":\"经营活动产生的现金流量净额变动原因：主要原因是报告期销售商品、提供劳务收到的现金较上年同期减少所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F053\",\"text\":\"公司积极推进AI技术在创意策划、视觉设计、节目包装、字幕初审、内容制作等环节的落地应用，有效支撑了台内外项目的高效开展。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0003\"]}],\"limitations\":[\"未披露各业务板块收入变动的量化归因或敏感性分析。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F054\",\"text\":\"本期公司业务类型、利润构成或利润来源发生重大变动的详细说明为不适用。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F055\",\"text\":\"报告期主要子公司股权变动导致合并范围变化为不适用。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F056\",\"text\":\"公司报告期内业务、产品或服务发生重大变化或调整有关情况为不适用。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F057\",\"text\":\"报告期内公司新增重要非主营业务的说明为不适用。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F058\",\"text\":\"报告期内公司参与投资的基金减持“海看股份”和“无线传媒”股票，产生大额所得税费用；子公司中视广告前期大额未弥补亏损到期，转回递延所得税费用，导致归属于上市公司股东的净利润出现亏损。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F059\",\"text\":\"所得税费用本期金额32,890,076.81元，上年同期金额15,991,316.18元，变动比例105.67%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"所得税费用\",\"raw_value\":\"32,890,076.81\",\"value\":\"32890076.81\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}],\"limitations\":[\"未披露基金减持的具体收益金额或所得税费用明细。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F060\",\"text\":\"公司业务涵盖电视节目制作与销售、影视技术服务与设备租赁、媒体广告代理、影视拍摄基地经营以及基金投资与管理，处于内容制作、技术服务、广告代理和基地运营环节。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F061\",\"text\":\"公司作为总台准制作岛和技术服务的长期供应商，提供全流程技术服务。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"未披露公司在各业务链条中的具体市场份额或排名。\"]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F062\",\"text\":\"公司广告业务主要承包经营总台科教频道及农业农村频道的整频道广告资源，向中央广播电视总台采购广告资源。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0006\"]},{\"fact_id\":\"F063\",\"text\":\"影视业务对外采购劳务服务、制作服务、场地租赁及低值易耗品等，报告期内劳务费增长37.43%、制作费下降33.51%、场租费增长56.71%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F064\",\"text\":\"旅游业务成本包括职工薪酬、折旧费、演出费、景区维修费、房水电费等，其中演出费11,998,520.80元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]}],\"limitations\":[\"未披露具体劳务、制作、场地等供应商名称及采购金额明细。\",\"成本类别不等同于特定材料供应商。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F065\",\"text\":\"公司电视节目制作与销售业务服务总台及台外各级政府、企事业单位和社会组织，承制纪录片与宣传片。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F066\",\"text\":\"公司广告业务客户覆盖农业农村、大健康等行业头部企业，通过栏目合作传递品牌影响力。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F067\",\"text\":\"旅游业务下游为游客及影视拍摄、研学教育、户外拓展、婚纱摄影、品牌展示等客户群体。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]},{\"fact_id\":\"F068\",\"text\":\"中央广播电视总台为公司第一大客户，销售额660,494,898.68元，占年度销售总额63.66%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"中央广播电视总台销售额\",\"raw_value\":\"660,494,898.68\",\"value\":\"660494898.68\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}],\"limitations\":[\"除中央广播电视总台外，未披露其他具体客户名称。\",\"产品用途不等同于具名客户。\"]}},\"limitations\":[\"本工作底稿仅依据所选章节（section-0049、section-0062、section-0072）编制，未阅读行业情况、核心竞争力、未来展望及财务报告附注等章节。\",\"未披露各业务板块的细分产品收入、单价、客户名单（除总台外）及供应商名称。\",\"分行业收入合计与营业收入总额的勾稽关系未在所选章节中明确说明。\",\"基金业务未披露营业成本金额。\",\"未对报告期后事项或前瞻性计划进行评价。\"]}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F001",
+                "text": "公司已形成多平台协同发展的业务格局，涵盖电视节目制作与销售、影视技术服务与设备租赁、媒体广告代理、影视拍摄基地经营以及基金投资与管理等多个领域。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F002",
+                "text": "影视业务主要包括电视节目制作与销售、影视技术服务与设备租赁、影视库存剧销售等板块。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F003",
+                "text": "广告业务主要承包经营总台科教频道及农业农村频道的整频道广告资源。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F004",
+                "text": "旅游业务主要为无锡影视基地和南海影视城的影视拍摄基地经营。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F005",
+                "text": "公司自2018年起布局基金投资业务，成立全资子公司宁波梅山保税港区国视融媒投资管理有限公司，专注融合媒体等特色细分行业的投资。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "F006",
+                "text": "报告期内公司新增重要非主营业务的说明为不适用。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              }
+            ],
+            "limitations": [
+              "业务结构按影视、广告、旅游、基金四大板块披露，未进一步披露各板块内部细分产品收入。"
+            ]
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F007",
+                "text": "电视节目制作与销售业务聚焦超高清/高清纪录片、电视栏目、大型晚会活动及宣传片等全链条服务，覆盖策划、投资、制作、运营与管理的全生命周期。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F008",
+                "text": "公司积极拓展台外市场，深化与各级政府、企事业单位和社会组织的合作，承制多部重点纪录片与宣传片；并拓展新媒体直播、宣传推广及短视频制作等业务。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F009",
+                "text": "影视技术服务方面，公司为各类影视节目与剧目提供包括剪辑、包装、调色及设备、机房、演播室运维等全流程技术服务。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F010",
+                "text": "设备租赁方面，公司拥有完备的超高清及高清前后期制作设备，能够为超高清及高清电视剧、数字电影、纪录片、大型转播活动等多元影视制作提供设备租赁与技术支持服务。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F011",
+                "text": "影视库存剧销售业务主要依托公司媒资资源，推动影视作品的多轮发行与销售，发行历年投资、制作及引进的电视剧、纪录片、电视栏目等作品。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F012",
+                "text": "广告业务在稳定传统优势资源销售的基础上，加快向多元化经营转型，积极布局短视频与电商领域，致力于从传统媒介销售型广告公司向频道商务运营商转型。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F013",
+                "text": "旅游业务主要收入来源包括旅游门票销售、园内经营和影视拍摄服务等。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F014",
+                "text": "南海影视城业务涉及影视拍摄、休闲旅游、研学教育、户外拓展、婚纱摄影、品牌展示等多元领域。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "F015",
+                "text": "基金业务方面，国视融媒参与设立的中视融合（上海）企业管理合伙企业（有限合伙），配合推进央视融媒体产业投资基金；中视传媒及国视融媒共参与两只专项基金和两只融媒体产业基金的设立与募集。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              }
+            ],
+            "limitations": [
+              "产品/服务用途多按业务板块定性描述，未披露各细分服务的具体客户名单或合同金额。"
+            ]
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F016",
+                "text": "影视业务收入来自电视节目制作与销售、影视技术服务与设备租赁、影视库存剧销售等板块。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0003"
+                ]
+              },
+              {
+                "fact_id": "F017",
+                "text": "广告业务通过承包经营总台科教频道及农业农村频道整频道广告资源获取收入，并探索短视频、电商等多元创收路径。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F018",
+                "text": "旅游业务收入来源包括旅游门票销售、园内经营和影视拍摄服务等。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F019",
+                "text": "基金业务收入来自基金投资与管理，报告期内公司推进基金投后项目管理与退出工作。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002",
+                  "source-0004"
+                ]
+              },
+              {
+                "fact_id": "F020",
+                "text": "2025年公司实现营业收入1,037,484,312.21元，利润总额17,330,603.37元，归属于上市公司股东的净利润-17,956,761.63元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入",
+                    "raw_value": "1,037,484,312.21",
+                    "value": "1037484312.21",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "利润总额",
+                    "raw_value": "17,330,603.37",
+                    "value": "17330603.37",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "归属于上市公司股东的净利润",
+                    "raw_value": "-17,956,761.63",
+                    "value": "-17956761.63",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F021",
+                "text": "报告期内公司参与投资的基金减持“海看股份”和“无线传媒”股票，产生大额所得税费用；子公司中视广告前期大额未弥补亏损到期，转回递延所得税费用，受上述所得税费用因素影响，归属于上市公司股东的净利润出现亏损。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露各业务板块的单价、计费方式或收入确认时点等细节。"
+            ]
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F022",
+                "text": "主营业务分行业情况：影视业务营业收入597,703,872.09元，营业成本537,684,200.57元，毛利率10.04%，营业收入比上年增减2.56%，营业成本比上年增减-2.09%，毛利率增加4.27个百分点。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ],
+                "metrics": [
+                  {
+                    "name": "影视业务营业收入",
+                    "raw_value": "597,703,872.09",
+                    "value": "597703872.09",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "影视业务营业成本",
+                    "raw_value": "537,684,200.57",
+                    "value": "537684200.57",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "影视业务毛利率",
+                    "raw_value": "10.04",
+                    "value": "10.04",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F023",
+                "text": "主营业务分行业情况：广告业务营业收入289,904,563.86元，营业成本265,471,667.70元，毛利率8.43%，营业收入比上年增减-25.30%，营业成本比上年增减-19.50%，毛利率减少6.60个百分点。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ],
+                "metrics": [
+                  {
+                    "name": "广告业务营业收入",
+                    "raw_value": "289,904,563.86",
+                    "value": "289904563.86",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "广告业务营业成本",
+                    "raw_value": "265,471,667.70",
+                    "value": "265471667.70",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "广告业务毛利率",
+                    "raw_value": "8.43",
+                    "value": "8.43",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F024",
+                "text": "主营业务分行业情况：旅游业务营业收入147,151,456.42元，营业成本107,080,345.66元，毛利率27.23%，营业收入比上年增减-10.00%，营业成本比上年增减0.59%，毛利率减少7.66个百分点。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ],
+                "metrics": [
+                  {
+                    "name": "旅游业务营业收入",
+                    "raw_value": "147,151,456.42",
+                    "value": "147151456.42",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "旅游业务营业成本",
+                    "raw_value": "107,080,345.66",
+                    "value": "107080345.66",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "旅游业务毛利率",
+                    "raw_value": "27.23",
+                    "value": "27.23",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F025",
+                "text": "主营业务分行业情况：基金业务营业收入1,503,221.93元，毛利率100.00%，营业收入比上年增减-3.69%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ],
+                "metrics": [
+                  {
+                    "name": "基金业务营业收入",
+                    "raw_value": "1,503,221.93",
+                    "value": "1503221.93",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "基金业务毛利率",
+                    "raw_value": "100.00",
+                    "value": "100.00",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F026",
+                "text": "主营业务分地区情况：上海营业收入242,121,065.72元，营业成本222,669,455.81元，毛利率8.03%；无锡营业收入124,148,585.98元，营业成本87,700,889.71元，毛利率29.36%；北京营业收入642,811,084.51元，营业成本578,981,995.24元，毛利率9.93%；佛山营业收入25,679,156.16元，营业成本20,883,873.17元，毛利率18.67%；宁波营业收入1,503,221.93元，毛利率100.00%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "上海营业收入",
+                    "raw_value": "242,121,065.72",
+                    "value": "242121065.72",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "无锡营业收入",
+                    "raw_value": "124,148,585.98",
+                    "value": "124148585.98",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "北京营业收入",
+                    "raw_value": "642,811,084.51",
+                    "value": "642811084.51",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "佛山营业收入",
+                    "raw_value": "25,679,156.16",
+                    "value": "25679156.16",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "宁波营业收入",
+                    "raw_value": "1,503,221.93",
+                    "value": "1503221.93",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F027",
+                "text": "利润表及现金流量表相关科目变动分析表：营业收入本期数1,037,484,312.21元，上年同期数1,137,504,727.93元，变动比例-8.79%；营业成本本期数911,538,539.48元，上年同期数987,413,878.35元，变动比例-7.68%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入",
+                    "raw_value": "1,037,484,312.21",
+                    "value": "1037484312.21",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "营业成本",
+                    "raw_value": "911,538,539.48",
+                    "value": "911538539.48",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "分行业收入合计与营业收入总额的勾稽关系未在所选章节中明确说明。",
+              "基金业务未披露营业成本金额。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F028",
+                "text": "公司作为总台准制作岛和技术服务的长期供应商，具备稳定的业务来源与良好的行业声誉；年均完成节目技审及通过专属节目传输通道在总台入库播出的节目约8,000小时。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F029",
+                "text": "公司拥有一支经验丰富、技术成熟的运维团队，全力保障承接的宣传任务安全、优质地播出。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F030",
+                "text": "公司拥有完备的超高清及高清前后期制作设备，能够为多元影视制作提供全面的设备租赁与技术支持服务。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F031",
+                "text": "无锡影视基地位于无锡太湖之滨，占地面积超1,000亩，主要由三国城、水浒城等景区组成；南海影视城位于广东省佛山市南海区，占地面积近1,500亩，涵盖天朝宫殿区、江南水乡区、港澳文化区和休闲游乐区。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "F032",
+                "text": "影视业务成本构成中职工薪酬250,999,754.59元（占46.68%）、技术服务费121,668,134.32元（占22.63%）、劳务费49,006,201.93元（占9.11%）、制作费47,272,703.17元（占8.79%）、租赁费18,282,329.89元（占3.40%）等。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "影视业务职工薪酬",
+                    "raw_value": "250,999,754.59",
+                    "value": "250999754.59",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "影视业务技术服务费",
+                    "raw_value": "121,668,134.32",
+                    "value": "121668134.32",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "影视业务劳务费",
+                    "raw_value": "49,006,201.93",
+                    "value": "49006201.93",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "影视业务制作费",
+                    "raw_value": "47,272,703.17",
+                    "value": "47272703.17",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "影视业务租赁费",
+                    "raw_value": "18,282,329.89",
+                    "value": "18282329.89",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F033",
+                "text": "广告业务成本构成中媒体广告成本141,251,521.88元（占53.21%）、制作费22,124,254.09元（占8.33%）。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "广告业务媒体广告成本",
+                    "raw_value": "141,251,521.88",
+                    "value": "141251521.88",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "广告业务制作费",
+                    "raw_value": "22,124,254.09",
+                    "value": "22124254.09",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F034",
+                "text": "旅游业务成本构成中职工薪酬45,194,137.10元（占42.21%）、折旧费13,992,188.62元（占13.07%）、演出费11,998,520.80元（占11.21%）、景区维修费6,780,813.62元（占6.33%）、房水电费6,569,635.44元（占6.14%）等。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "旅游业务职工薪酬",
+                    "raw_value": "45,194,137.10",
+                    "value": "45194137.10",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "旅游业务折旧费",
+                    "raw_value": "13,992,188.62",
+                    "value": "13992188.62",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "旅游业务演出费",
+                    "raw_value": "11,998,520.80",
+                    "value": "11998520.80",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F035",
+                "text": "报告期内，公司影视业务对外采购劳务服务增加，劳务费支出较上年同期增长37.43%；对外采购制作服务减少，制作费支出较上年同期下降33.51%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "F036",
+                "text": "报告期内，公司广告业务对外采购制作服务减少，制作费支出较上年同期下降57.10%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "F037",
+                "text": "报告期内，无锡景区餐饮业务出租，旅游业务餐饮材料支出较上年同期大幅减少98.28%。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ]
+              }
+            ],
+            "limitations": [
+              "成本构成按行业列示，未披露具体供应商名称或采购合同金额（除总台整频道广告资源合同外）。",
+              "未披露影视设备、场地等资源的具体数量或产能利用率。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F038",
+                "text": "前五名客户销售额730,193,949.69元，占年度销售总额70.38%；其中前五名客户销售额中关联方销售额660,494,898.68元，占年度销售总额63.66%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五名客户销售额",
+                    "raw_value": "730,193,949.69",
+                    "value": "730193949.69",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "前五名客户销售额占年度销售总额比例",
+                    "raw_value": "70.38",
+                    "value": "70.38",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F039",
+                "text": "报告期内向单个客户的销售比例超过总额50%：中央广播电视总台销售额660,494,898.68元，占年度销售总额比例63.66%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "中央广播电视总台销售额",
+                    "raw_value": "660,494,898.68",
+                    "value": "660494898.68",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "中央广播电视总台销售额占年度销售总额比例",
+                    "raw_value": "63.66",
+                    "value": "63.66",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F040",
+                "text": "前五名供应商采购额173,681,466.18元，占年度采购总额23.77%；其中前五名供应商采购额中关联方采购额127,258,664.50元，占年度采购总额17.42%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五名供应商采购额",
+                    "raw_value": "173,681,466.18",
+                    "value": "173681466.18",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "前五名供应商采购额占年度采购总额比例",
+                    "raw_value": "23.77",
+                    "value": "23.77",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F041",
+                "text": "报告期内向单个供应商的采购比例超过总额50%：中央广播电视总台采购额127,258,664.50元，占年度采购总额比例17.42%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "中央广播电视总台采购额",
+                    "raw_value": "127,258,664.50",
+                    "value": "127258664.50",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "中央广播电视总台采购额占年度采购总额比例",
+                    "raw_value": "17.42",
+                    "value": "17.42",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F042",
+                "text": "已签订的重大采购合同：科教频道整频道电视广告资源，对方当事人中央广播电视总台，合同总金额7,949.13万元，合计已履行金额7,949.13万元，本报告期履行金额7,949.13万元；农业农村频道整频道广告资源，对方当事人中央广播电视总台，合同总金额5,822.61万元，合计已履行金额5,295.29万元，本报告期履行金额5,295.29万元。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "科教频道整频道电视广告资源合同总金额",
+                    "raw_value": "7,949.13",
+                    "value": "7949.13",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "农业农村频道整频道广告资源合同总金额",
+                    "raw_value": "5,822.61",
+                    "value": "5822.61",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F043",
+                "text": "公司广告业务主要承包经营总台科教频道及农业农村频道的整频道广告资源，客户覆盖相关行业头部企业。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0004"
+                ]
+              },
+              {
+                "fact_id": "F044",
+                "text": "公司电视节目制作与销售业务与总台保持紧密合作，同时积极拓展台外市场，深化与各级政府、企事业单位和社会组织的合作。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F045",
+                "text": "南海影视城拓展新媒体营销与多元团队客源，深耕研学市场与“银发”经济。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002",
+                  "source-0004"
+                ]
+              }
+            ],
+            "limitations": [
+              "除中央广播电视总台外，未披露其他前五名客户或供应商的具体名称。",
+              "分地区收入按上海、无锡、北京、佛山、宁波列示，未披露各地区的客户结构。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F046",
+                "text": "影视业务：2025年实现收入597,703,872.09元，较上年同期增长2.56%；公司积极开拓市场，承接项目数量有所增加，实现影视业务收入略有增长。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003",
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "影视业务营业收入",
+                    "raw_value": "597,703,872.09",
+                    "value": "597703872.09",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F047",
+                "text": "广告业务：2025年实现收入289,904,563.86元，较上年同期减少25.30%；主要受传统广告市场承压和制作项目调整等因素影响。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "广告业务营业收入",
+                    "raw_value": "289,904,563.86",
+                    "value": "289904563.86",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F048",
+                "text": "旅游业务：2025年实现收入147,151,456.42元，较上年同期减少10.00%；主要受景区周边同质化竞争加剧导致客源分流，加之极端天气等综合因素影响。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "旅游业务营业收入",
+                    "raw_value": "147,151,456.42",
+                    "value": "147151456.42",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F049",
+                "text": "基金业务：2025年实现收入1,503,221.93元，较上年同期减少3.69%；报告期内重点跟进“海看股份”和“无线传媒”退出事宜，海看股份完成部分减持，无线传媒已基本完成减持工作。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ],
+                "metrics": [
+                  {
+                    "name": "基金业务营业收入",
+                    "raw_value": "1,503,221.93",
+                    "value": "1503221.93",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F050",
+                "text": "财务费用变动原因：主要原因是报告期购买银行委托理财产品，存款利息收入较上年同期减少所致。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "F051",
+                "text": "投资收益变动原因：主要原因是报告期公司基金业务产生的投资收益较上年同期大幅减少所致。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "F052",
+                "text": "经营活动产生的现金流量净额变动原因：主要原因是报告期销售商品、提供劳务收到的现金较上年同期减少所致。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "F053",
+                "text": "公司积极推进AI技术在创意策划、视觉设计、节目包装、字幕初审、内容制作等环节的落地应用，有效支撑了台内外项目的高效开展。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0003"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露各业务板块收入变动的量化归因或敏感性分析。"
+            ]
+          },
+          "material_changes": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F054",
+                "text": "本期公司业务类型、利润构成或利润来源发生重大变动的详细说明为不适用。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "F055",
+                "text": "报告期主要子公司股权变动导致合并范围变化为不适用。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "F056",
+                "text": "公司报告期内业务、产品或服务发生重大变化或调整有关情况为不适用。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "F057",
+                "text": "报告期内公司新增重要非主营业务的说明为不适用。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "F058",
+                "text": "报告期内公司参与投资的基金减持“海看股份”和“无线传媒”股票，产生大额所得税费用；子公司中视广告前期大额未弥补亏损到期，转回递延所得税费用，导致归属于上市公司股东的净利润出现亏损。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              },
+              {
+                "fact_id": "F059",
+                "text": "所得税费用本期金额32,890,076.81元，上年同期金额15,991,316.18元，变动比例105.67%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "所得税费用",
+                    "raw_value": "32,890,076.81",
+                    "value": "32890076.81",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露基金减持的具体收益金额或所得税费用明细。"
+            ]
+          }
+        },
+        "supply_chain": {
+          "position": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F060",
+                "text": "公司业务涵盖电视节目制作与销售、影视技术服务与设备租赁、媒体广告代理、影视拍摄基地经营以及基金投资与管理，处于内容制作、技术服务、广告代理和基地运营环节。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F061",
+                "text": "公司作为总台准制作岛和技术服务的长期供应商，提供全流程技术服务。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露公司在各业务链条中的具体市场份额或排名。"
+            ]
+          },
+          "upstream_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F062",
+                "text": "公司广告业务主要承包经营总台科教频道及农业农村频道的整频道广告资源，向中央广播电视总台采购广告资源。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0006"
+                ]
+              },
+              {
+                "fact_id": "F063",
+                "text": "影视业务对外采购劳务服务、制作服务、场地租赁及低值易耗品等，报告期内劳务费增长37.43%、制作费下降33.51%、场租费增长56.71%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "F064",
+                "text": "旅游业务成本包括职工薪酬、折旧费、演出费、景区维修费、房水电费等，其中演出费11,998,520.80元。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露具体劳务、制作、场地等供应商名称及采购金额明细。",
+              "成本类别不等同于特定材料供应商。"
+            ]
+          },
+          "downstream_customers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F065",
+                "text": "公司电视节目制作与销售业务服务总台及台外各级政府、企事业单位和社会组织，承制纪录片与宣传片。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F066",
+                "text": "公司广告业务客户覆盖农业农村、大健康等行业头部企业，通过栏目合作传递品牌影响力。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ]
+              },
+              {
+                "fact_id": "F067",
+                "text": "旅游业务下游为游客及影视拍摄、研学教育、户外拓展、婚纱摄影、品牌展示等客户群体。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "F068",
+                "text": "中央广播电视总台为公司第一大客户，销售额660,494,898.68元，占年度销售总额63.66%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "中央广播电视总台销售额",
+                    "raw_value": "660,494,898.68",
+                    "value": "660494898.68",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "除中央广播电视总台外，未披露其他具体客户名称。",
+              "产品用途不等同于具名客户。"
+            ]
+          }
+        },
+        "limitations": [
+          "本工作底稿仅依据所选章节（section-0049、section-0062、section-0072）编制，未阅读行业情况、核心竞争力、未来展望及财务报告附注等章节。",
+          "未披露各业务板块的细分产品收入、单价、客户名单（除总台外）及供应商名称。",
+          "分行业收入合计与营业收入总额的勾稽关系未在所选章节中明确说明。",
+          "基金业务未披露营业成本金额。",
+          "未对报告期后事项或前瞻性计划进行评价。"
+        ]
+      },
+      "usage": {
+        "input_tokens": 18902,
+        "output_tokens": 7866,
+        "total_tokens": 26768
+      }
+    }
+  ]
+}

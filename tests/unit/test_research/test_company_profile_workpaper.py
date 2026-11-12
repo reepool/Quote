@@ -83,7 +83,14 @@ class _Provider:
 
     def workpaper_request(self, **kwargs):
         self.calls.append(kwargs)
-        self.workpaper_receipts.append({"purpose": kwargs["purpose"]})
+        self.workpaper_receipts.append({
+            "purpose": kwargs["purpose"], "request_id": kwargs["request_id"],
+            "request_hash": f"hash-{kwargs['purpose']}", "response_hash": f"response-{kwargs['purpose']}",
+            "contract_status": "accepted", "model": "fixture-model", "source_label": "fixture:route",
+            "selected_profile": "fixture-profile", "logical_profile": "semantic_extraction",
+            "route_fingerprint": "route-hash", "finish_reason": "stop",
+            "usage": {"input_tokens": 11, "output_tokens": 7, "total_tokens": 18},
+        })
         index = index_sections(PAGES)
         selection = _selection(index)
         if kwargs["purpose"] == "select_profile_sections":
@@ -233,6 +240,10 @@ def test_two_calls_use_sections_and_direct_structured_content_without_old_invent
     assert "100.00" in render_workpaper(result.workpaper)
     assert "未定位" in render_workpaper(result.workpaper)
     assert provider.calls[0]["payload"]["reading_questions"]
+    assert result.workpaper.generation.selection.model == "fixture-model"
+    assert result.workpaper.generation.selection.scope_kind == "report_heading_index"
+    assert result.workpaper.generation.extraction.physical_pages == (2, 3)
+    assert "fixture-model" in render_workpaper(result.workpaper)
 
 
 def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_replaced():
@@ -247,8 +258,8 @@ def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_repla
     selection = _selection(index)
     packet = build_section_packet(_report(), PAGES, index, selection)
     transport = ScriptedTransport([
-        _response(selection.model_dump(mode="json")),
-        _response(_with_supply_chain(_draft(packet), packet).model_dump(mode="json")),
+        {**_response(selection.model_dump(mode="json")), "model": "navigator-v1"},
+        {**_response(_with_supply_chain(_draft(packet), packet).model_dump(mode="json")), "model": "reader-v2"},
     ])
     client = _client(transport, _budget(), _config(max_schema_repair_attempts=0))
     provider = CommonGatewaySemanticProvider(
@@ -263,14 +274,68 @@ def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_repla
         )
         assert result.workpaper.origin == "controlled_fixture"
         assert result.workpaper.supply_chain.position.facts
+        assert result.workpaper.generation.selection.model == "navigator-v1"
+        assert result.workpaper.generation.extraction.model == "reader-v2"
+        assert result.workpaper.generation.extraction.contract_status == "accepted"
         assert len(transport.calls) == 2
         assert len(result.receipts) == 2
         extraction = transport.calls[1]["payload"]
         assert "100.00" in extraction["messages"][1]["content"]
         assert "source_conditions" not in extraction["messages"][1]["content"]
         assert "WorkpaperElements" in json.dumps(extraction)
+        instructions = extraction["messages"][0]["content"]
+        assert "conditional disclosure heading is not a fact" in instructions
+        assert "denominator of each percentage" in instructions
+        assert "preserve the displayed subtotal and elimination separately" in instructions
+        assert "registered business scope" in instructions
     finally:
         asyncio.run(client.close())
+
+
+def test_attribution_is_local_scoped_to_this_work_and_old_metadata_stays_unknown():
+    provider = _Provider()
+    provider.workpaper_receipts.append({
+        "request_id": "another-company:workpaper:extract", "purpose": "extract_profile_workpaper",
+        "model": "unrelated-model", "source_label": "unrelated", "contract_status": "accepted",
+    })
+    result = run_workpaper(report=_report(), pages=PAGES,
+        processing_identity=workpaper_processing_identity(real=False), provider=provider, work_id="current")
+    assert len(result.receipts) == 2
+    assert "unrelated-model" not in render_workpaper(result.workpaper)
+    assert result.workpaper.generation.extraction.usage.total_tokens == 18
+    from research.company_profile.workpaper_llm import _model_call
+
+    rejected = dict(result.receipts[-1], model="rejected-model", contract_status="rejected")
+    attributed = _model_call(
+        (*result.receipts, rejected), purpose="extract_profile_workpaper",
+        request_id="current:workpaper:extract",
+    )
+    assert attributed.model == "fixture-model"
+    unknown = _model_call(
+        (dict(rejected, contract_status="unknown"),), purpose="extract_profile_workpaper",
+        request_id="current:workpaper:extract",
+    )
+    assert unknown.model is None
+    assert unknown.contract_status == "unknown"
+    normalized_display = result.workpaper.model_dump(mode="json")
+    metric = normalized_display["elements"]["scale_and_mix"]["facts"][0]["metrics"][0]
+    metric.update(name="营业收入", raw_value="100.00元", value="100.00", unit="元")
+    rendered_metric = render_workpaper(CompanyProfileWorkpaper.model_validate(normalized_display))
+    assert "营业收入：100.00元；" in rendered_metric
+    assert "100.00元 元" not in rendered_metric
+    old = result.workpaper.model_dump(mode="json")
+    old.pop("generation")
+    assert CompanyProfileWorkpaper.model_validate(old).generation is None
+    assert "模型处理记录" not in render_workpaper(CompanyProfileWorkpaper.model_validate(old))
+    packet = result.packet
+    spoofed = _draft(packet).model_dump(mode="json")
+    spoofed["generation"] = result.workpaper.generation.model_dump(mode="json")
+    with pytest.raises(ValueError):
+        WorkpaperDraftResponse.model_validate(spoofed)
+    wrong_pages = result.workpaper.model_dump(mode="json")
+    wrong_pages["generation"]["extraction"]["physical_pages"] = [999]
+    with pytest.raises(ValueError, match="supplied pages"):
+        CompanyProfileWorkpaper.model_validate(wrong_pages)
 
 
 def test_original_runtime_writer_query_export_and_new_read_instance_agree():
@@ -298,6 +363,7 @@ def test_original_runtime_writer_query_export_and_new_read_instance_agree():
         assert profile["workpaper_status"] == "pending_verification"
         assert profile["workpaper"]["supply_chain"]["position"]["facts"]
         assert profile["workpaper"]["supply_chain"]["upstream_inputs"]["status"] == "unclear"
+        assert profile["workpaper"]["generation"]["extraction"]["model"] == "fixture-model"
         assert any(str(path).endswith(".md") for path in exported["files"])
     assert not root.exists()
 

@@ -1,0 +1,2065 @@
+{
+  "run": {
+    "action": "run",
+    "state": "completed",
+    "task": {
+      "task_name": "company_profile_common_core",
+      "actions": [
+        "preview",
+        "run",
+        "status",
+        "pause",
+        "resume",
+        "query",
+        "export"
+      ],
+      "parameters": {
+        "action": [
+          "preview",
+          "run",
+          "status",
+          "pause",
+          "resume",
+          "query",
+          "export"
+        ],
+        "knowledge_cutoff": null,
+        "instrument_ids": [],
+        "max_items": 2,
+        "token_budget": 50000,
+        "max_elapsed_seconds": 300.0,
+        "reason": "operator_request",
+        "output_directory": null
+      },
+      "storage_namespace": "company_profile_common_core.v1",
+      "writer": "company_profile_research_writer.v1",
+      "production_authorization": "not_authorized",
+      "legacy_task_names_not_connected": [
+        "business_profile_daily_incremental",
+        "business_profile_backfill",
+        "business_profile_backfill_control",
+        "business_profile_semantic_repair",
+        "company_profile_shadow_sync"
+      ],
+      "stage5_connected": true
+    },
+    "control": {
+      "schema_version": "company_profile_task_control.v1",
+      "state": "completed",
+      "run_id": "company_profile_common_core-51a648d145f1",
+      "action": "run",
+      "started_at": "2026-11-12T13:27:40.656068+08:00",
+      "updated_at": "2026-11-12T13:29:00.815439+08:00",
+      "finished_at": "2026-11-12T13:29:00.815439+08:00",
+      "stop_requested": false,
+      "reason": null,
+      "parameters": {
+        "knowledge_cutoff": "2026-11-12",
+        "instrument_ids": [
+          "600099.SH"
+        ],
+        "max_items": 1,
+        "token_budget": 3000000,
+        "max_elapsed_seconds": 1757.8815268576145
+      },
+      "latest_result": {
+        "action": "run",
+        "state": "completed",
+        "task": {
+          "task_name": "company_profile_common_core",
+          "actions": [
+            "preview",
+            "run",
+            "status",
+            "pause",
+            "resume",
+            "query",
+            "export"
+          ],
+          "parameters": {
+            "action": [
+              "preview",
+              "run",
+              "status",
+              "pause",
+              "resume",
+              "query",
+              "export"
+            ],
+            "knowledge_cutoff": null,
+            "instrument_ids": [],
+            "max_items": 2,
+            "token_budget": 50000,
+            "max_elapsed_seconds": 300.0,
+            "reason": "operator_request",
+            "output_directory": null
+          },
+          "storage_namespace": "company_profile_common_core.v1",
+          "writer": "company_profile_research_writer.v1",
+          "production_authorization": "not_authorized",
+          "legacy_task_names_not_connected": [
+            "business_profile_daily_incremental",
+            "business_profile_backfill",
+            "business_profile_backfill_control",
+            "business_profile_semantic_repair",
+            "company_profile_shadow_sync"
+          ],
+          "stage5_connected": true
+        },
+        "control": {
+          "schema_version": "company_profile_task_control.v1",
+          "state": "running",
+          "run_id": "company_profile_common_core-51a648d145f1",
+          "action": "run",
+          "started_at": "2026-11-12T13:27:40.656068+08:00",
+          "updated_at": "2026-11-12T13:27:40.656068+08:00",
+          "finished_at": null,
+          "stop_requested": false,
+          "reason": null,
+          "parameters": {
+            "knowledge_cutoff": "2026-11-12",
+            "instrument_ids": [
+              "600099.SH"
+            ],
+            "max_items": 1,
+            "token_budget": 3000000,
+            "max_elapsed_seconds": 1757.8815268576145
+          },
+          "latest_result": null
+        },
+        "queue": {
+          "as_of": "2026-11-12T13:28:59.497148+08:00",
+          "total": 1,
+          "running": 0,
+          "claimable": 0,
+          "terminal": 0,
+          "completed": 1,
+          "machine_rework": 0,
+          "finalized": 1,
+          "groups": [
+            {
+              "stage": "publish",
+              "status": "completed",
+              "row_count": 1,
+              "oldest_created_at": "2026-11-12T13:27:41.181417+08:00",
+              "oldest_age_seconds": 78.652253
+            }
+          ]
+        },
+        "production_authorization": "not_authorized",
+        "storage_namespace": "company_profile_common_core.v1",
+        "writer": "company_profile_research_writer.v1",
+        "knowledge_cutoff": "2026-11-12",
+        "enqueue": {
+          "eligible": 1,
+          "inserted": 1,
+          "reused": 0,
+          "reset": 0,
+          "checkpoint_rotated": 0,
+          "checkpoint_deleted": 0,
+          "checkpoint_delete_failures": [],
+          "superseded": 0,
+          "identity_superseded": 0,
+          "work_ids": [
+            "bp-work-48082d0ba2b21b7d442197e6"
+          ]
+        },
+        "drain": {
+          "acquire": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.823,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 3.495,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 2,
+              "wait_seconds": 2.9e-05,
+              "write_seconds": 0.444567,
+              "observation_seconds": 4.892815,
+              "transaction_p50_seconds": 0.222284,
+              "transaction_p95_seconds": 0.260558,
+              "transaction_max_seconds": 0.264811,
+              "writer_lock_duty": 0.090861,
+              "inter_write_idle_seconds": 1.638935,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "parse": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.707,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 3.632,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 4,
+              "wait_seconds": 6.3e-05,
+              "write_seconds": 0.847061,
+              "observation_seconds": 8.599686,
+              "transaction_p50_seconds": 0.21433,
+              "transaction_p95_seconds": 0.262425,
+              "transaction_max_seconds": 0.264811,
+              "writer_lock_duty": 0.098499,
+              "inter_write_idle_seconds": 4.876914,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "semantic": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 63.364,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 65.31,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 11,
+              "wait_seconds": 0.000137,
+              "write_seconds": 1.903448,
+              "observation_seconds": 73.971939,
+              "transaction_p50_seconds": 0.15359,
+              "transaction_p95_seconds": 0.256858,
+              "transaction_max_seconds": 0.264811,
+              "writer_lock_duty": 0.025732,
+              "inter_write_idle_seconds": 69.335539,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "verify": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.257,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 2.368,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 13,
+              "wait_seconds": 0.000158,
+              "write_seconds": 2.138056,
+              "observation_seconds": 76.385555,
+              "transaction_p50_seconds": 0.136772,
+              "transaction_p95_seconds": 0.255267,
+              "transaction_max_seconds": 0.264811,
+              "writer_lock_duty": 0.02799,
+              "inter_write_idle_seconds": 71.488746,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "publish": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.208,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 2.359,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 15,
+              "wait_seconds": 0.000183,
+              "write_seconds": 2.383215,
+              "observation_seconds": 78.797961,
+              "transaction_p50_seconds": 0.134917,
+              "transaction_p95_seconds": 0.253676,
+              "transaction_max_seconds": 0.264811,
+              "writer_lock_duty": 0.030245,
+              "inter_write_idle_seconds": 73.690188,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          }
+        }
+      }
+    },
+    "queue": {
+      "as_of": "2026-11-12T13:28:59.497148+08:00",
+      "total": 1,
+      "running": 0,
+      "claimable": 0,
+      "terminal": 0,
+      "completed": 1,
+      "machine_rework": 0,
+      "finalized": 1,
+      "groups": [
+        {
+          "stage": "publish",
+          "status": "completed",
+          "row_count": 1,
+          "oldest_created_at": "2026-11-12T13:27:41.181417+08:00",
+          "oldest_age_seconds": 78.652253
+        }
+      ]
+    },
+    "production_authorization": "not_authorized",
+    "storage_namespace": "company_profile_common_core.v1",
+    "writer": "company_profile_research_writer.v1",
+    "knowledge_cutoff": "2026-11-12",
+    "enqueue": {
+      "eligible": 1,
+      "inserted": 1,
+      "reused": 0,
+      "reset": 0,
+      "checkpoint_rotated": 0,
+      "checkpoint_deleted": 0,
+      "checkpoint_delete_failures": [],
+      "superseded": 0,
+      "identity_superseded": 0,
+      "work_ids": [
+        "bp-work-48082d0ba2b21b7d442197e6"
+      ]
+    },
+    "drain": {
+      "acquire": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.823,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 3.495,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 2,
+          "wait_seconds": 2.9e-05,
+          "write_seconds": 0.444567,
+          "observation_seconds": 4.892815,
+          "transaction_p50_seconds": 0.222284,
+          "transaction_p95_seconds": 0.260558,
+          "transaction_max_seconds": 0.264811,
+          "writer_lock_duty": 0.090861,
+          "inter_write_idle_seconds": 1.638935,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "parse": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.707,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 3.632,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 4,
+          "wait_seconds": 6.3e-05,
+          "write_seconds": 0.847061,
+          "observation_seconds": 8.599686,
+          "transaction_p50_seconds": 0.21433,
+          "transaction_p95_seconds": 0.262425,
+          "transaction_max_seconds": 0.264811,
+          "writer_lock_duty": 0.098499,
+          "inter_write_idle_seconds": 4.876914,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "semantic": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 63.364,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 65.31,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 11,
+          "wait_seconds": 0.000137,
+          "write_seconds": 1.903448,
+          "observation_seconds": 73.971939,
+          "transaction_p50_seconds": 0.15359,
+          "transaction_p95_seconds": 0.256858,
+          "transaction_max_seconds": 0.264811,
+          "writer_lock_duty": 0.025732,
+          "inter_write_idle_seconds": 69.335539,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "verify": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.257,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 2.368,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 13,
+          "wait_seconds": 0.000158,
+          "write_seconds": 2.138056,
+          "observation_seconds": 76.385555,
+          "transaction_p50_seconds": 0.136772,
+          "transaction_p95_seconds": 0.255267,
+          "transaction_max_seconds": 0.264811,
+          "writer_lock_duty": 0.02799,
+          "inter_write_idle_seconds": 71.488746,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "publish": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.208,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 2.359,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 15,
+          "wait_seconds": 0.000183,
+          "write_seconds": 2.383215,
+          "observation_seconds": 78.797961,
+          "transaction_p50_seconds": 0.134917,
+          "transaction_p95_seconds": 0.253676,
+          "transaction_max_seconds": 0.264811,
+          "writer_lock_duty": 0.030245,
+          "inter_write_idle_seconds": 73.690188,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      }
+    }
+  },
+  "three_reads_equal": true,
+  "profile_count": 1,
+  "elapsed_seconds": 123.41,
+  "ledger": {
+    "physical_requests": 3,
+    "charged_tokens": 80518,
+    "charged_cost_cny": "unknown",
+    "cost_status": "unknown",
+    "billing_mode": "development_unpriced",
+    "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+    "stopped_reason": null,
+    "denied_request": null,
+    "attempts": [
+      {
+        "sequence": 1,
+        "request_id": "af2d8473741c4cd6a19d6684a452a5c7",
+        "logical_request_id": "9b9a8d105c649f0e7e3b36be44f7a87810b67780d883dc1fa4cf36f0afa42aa1",
+        "source_label": "deepseek:deepseek-flash",
+        "attempt": 1,
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "reserved_input_tokens": 67497,
+        "reserved_output_tokens": 2500,
+        "charged_tokens": 19856,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 19529,
+          "output_tokens": 327,
+          "total_tokens": 19856
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 329,
+          "content_fragments": 327,
+          "content_chars": 659,
+          "content_sha256": "69b8b3d83340e6c3b78907acf1cd808aa5d242dbd094d9d5ff99c18b7c6a2682",
+          "reasoning_present": false,
+          "reasoning_chars": 0,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      },
+      {
+        "sequence": 2,
+        "request_id": "f651e000ca864ca889b1681701e733e4",
+        "logical_request_id": "de878ae1bbdef26231036a04ebb3843873ebf8d5fec9b25a71280ae4ebea68cf",
+        "source_label": "deepseek:deepseek-flash",
+        "attempt": 1,
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "reserved_input_tokens": 93046,
+        "reserved_output_tokens": 12000,
+        "charged_tokens": 25762,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 17977,
+          "output_tokens": 7785,
+          "total_tokens": 25762
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 7786,
+          "content_fragments": 7784,
+          "content_chars": 19111,
+          "content_sha256": "23cbd38fdf291d840799d38e7d58aa0bc817d9f3a90265b654b3e66eb5c4ca5b",
+          "reasoning_present": false,
+          "reasoning_chars": 0,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        },
+        "error_code": "schema_validation_error"
+      },
+      {
+        "sequence": 3,
+        "request_id": "f651e000ca864ca889b1681701e733e4",
+        "logical_request_id": "de878ae1bbdef26231036a04ebb3843873ebf8d5fec9b25a71280ae4ebea68cf",
+        "source_label": "deepseek:deepseek-flash",
+        "attempt": 2,
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "reserved_input_tokens": 130623,
+        "reserved_output_tokens": 12000,
+        "charged_tokens": 34900,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 27146,
+          "output_tokens": 7754,
+          "total_tokens": 34900
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 7755,
+          "content_fragments": 7753,
+          "content_chars": 19051,
+          "content_sha256": "dbec4f1100ea67a01b5d64d190fa9ccbee36ae8cf46981e417b1a7fe2cbdb764",
+          "reasoning_present": false,
+          "reasoning_chars": 0,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      }
+    ]
+  },
+  "receipts": [
+    {
+      "request_id": "bp-work-48082d0ba2b21b7d442197e6:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "416c5fc17090ce4bfe7f071c03d906ab8735bbff2383a49978baadd470995001",
+      "response_hash": "69b8b3d83340e6c3b78907acf1cd808aa5d242dbd094d9d5ff99c18b7c6a2682",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction",
+      "route_fingerprint": "05c8b3e01cf7ce3251de2533fd438135f78f75ee85fbbb916a5238f065b8fde9",
+      "contract_status": "accepted",
+      "raw_content": "{\"selected_section_ids\":[\"section-0034\",\"section-0041\",\"section-0042\",\"section-0047\",\"section-0054\",\"section-0157\",\"section-0159\"],\"rationale\":\"所选章节覆盖公司业务结构、产品用途与经营模式（第三节一、公司经营情况及经营模式）、行业环境、经营讨论与分析、核心竞争力、主营业务与收入成本分析（含分产品/分地区收入与毛利率）、主要控股参股公司以及未来发展战略与经营计划，能够共同说明业务、产品、盈利模式、规模与主要构成、经营要素与变化驱动。财务附注仅在需要时定向补充，未纳入整份财务报告。\",\"deferred\":[\"section-0084 收入和成本分析明细：已由 section-0054 主营业务分析覆盖主要收入成本结构，若需更细的分产品/分地区拆分再定向读取\",\"section-1094 分部信息：与主营业务分析存在重叠，暂不重复选取\",\"section-0252 重大关联交易：属关联购销细节，非业务模式核心，暂缓\",\"section-0334 财务报告及各项附注：体量过大，仅在有明确缺口时定向补充\"],\"stop_reason\":\"已选取能完整解释业务结构、产品服务、经营模式、规模与收入构成、经营要素及变化的核心业务与经营讨论章节，信息密度高且相互衔接；其余治理、股本、财务附注及关联交易细节对回答业务经营问题边际价值低，故在此范围停止，不声称覆盖全报告。\"}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0034",
+          "section-0041",
+          "section-0042",
+          "section-0047",
+          "section-0054",
+          "section-0157",
+          "section-0159"
+        ],
+        "rationale": "所选章节覆盖公司业务结构、产品用途与经营模式（第三节一、公司经营情况及经营模式）、行业环境、经营讨论与分析、核心竞争力、主营业务与收入成本分析（含分产品/分地区收入与毛利率）、主要控股参股公司以及未来发展战略与经营计划，能够共同说明业务、产品、盈利模式、规模与主要构成、经营要素与变化驱动。财务附注仅在需要时定向补充，未纳入整份财务报告。",
+        "deferred": [
+          "section-0084 收入和成本分析明细：已由 section-0054 主营业务分析覆盖主要收入成本结构，若需更细的分产品/分地区拆分再定向读取",
+          "section-1094 分部信息：与主营业务分析存在重叠，暂不重复选取",
+          "section-0252 重大关联交易：属关联购销细节，非业务模式核心，暂缓",
+          "section-0334 财务报告及各项附注：体量过大，仅在有明确缺口时定向补充"
+        ],
+        "stop_reason": "已选取能完整解释业务结构、产品服务、经营模式、规模与收入构成、经营要素及变化的核心业务与经营讨论章节，信息密度高且相互衔接；其余治理、股本、财务附注及关联交易细节对回答业务经营问题边际价值低，故在此范围停止，不声称覆盖全报告。"
+      },
+      "usage": {
+        "input_tokens": 19529,
+        "output_tokens": 327,
+        "total_tokens": 19856
+      }
+    },
+    {
+      "request_id": "bp-work-48082d0ba2b21b7d442197e6:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "023bfda0e923cb1546cc18dc73316c74883b49cb9735cd7d9056445d6971fe41",
+      "response_hash": "dbec4f1100ea67a01b5d64d190fa9ccbee36ae8cf46981e417b1a7fe2cbdb764",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction",
+      "route_fingerprint": "05c8b3e01cf7ce3251de2533fd438135f78f75ee85fbbb916a5238f065b8fde9",
+      "contract_status": "accepted",
+      "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-01\",\"text\":\"公司主营业务为森林消防机械、农业机械、特种车辆（全地形车）、摩托车等及以上产品配件的制造和销售。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-BS-02\",\"text\":\"公司主要采用以销定产的生产经营模式，由销售部门根据销售计划或客户订单将生产计划下达至生产部门，实行按单生产，同时根据市场需求适度备货；产品销售以经销模式为主。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-BS-03\",\"text\":\"公司所处行业主要集中在森林消防机械行业、农业机械行业、特种车辆（全地形车）行业及摩托车行业；森林消防机械聚焦其中的森林消防机械细分行业，农业机械聚焦插秧机与履带自走式全喂入谷物联合收割机细分行业。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F-BS-04\",\"text\":\"报告期内公司新增重要非主营业务的说明为“不适用”，业务、产品或服务发生重大变化或调整的说明亦为“不适用”。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0021\"]},{\"fact_id\":\"F-BS-05\",\"text\":\"主要子公司为江苏福马高新动力机械有限公司（子公司，机械制造销售），主要参股公司为江苏联海动力机械有限公司（参股公司，机械制造销售）和福马新能（北京）科技有限公司（参股公司，服务托管）；报告期内取得和处置子公司的情况为“不适用”。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0026\"]}],\"limitations\":[\"未披露各业务板块内部更细的组织层级与法人归属，除上述子公司/参股公司外未展开其他主体。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"森林消防机械产品包括全地形消防车（基于全地形车平台开发，用于复杂地形和恶劣环境的灭火与救援）、消防泵（含离心泵、便携式高扬程森林泵、超高扬程隔膜泵、智能串联森林消防泵、大排量隔膜泵等）和风力灭火机（轻量化设计，广泛用于山地森林灭火）。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]},{\"fact_id\":\"F-PS-02\",\"text\":\"农业机械产品包括插秧机（以高速插秧机为核心代表，已形成6-10行、抛秧机、智能高速插秧机、宽窄行高速插秧机、大功率大马力高速插秧机全产品系列）和履带自走全喂入式谷物联合收割机（主要用于小麦、水稻等主要粮食作物的收获作业，一次完成收割、脱粒、清选等工序，已形成以6kg/s—7kg/s喂入量为主的产品布局，含出口机型共3个系列6款产品）。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F-PS-03\",\"text\":\"特种车辆（全地形车）产品包括多用途ATV全地形车系列（已形成150CC-1000CC小、中、大排量全品种系列，销售覆盖美国、欧盟、南非、东南亚等海外市场）和电动ATV系列（采用锂电新能源动力，适合野外涉猎和娱乐环境使用）。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F-PS-04\",\"text\":\"摩托车产品为林海摩托车系列，环保标准达到国Ⅳ，出口型号排放标准达到欧五+。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-PS-05\",\"text\":\"报告期内公司推出LH2V91MY发动机、ATV1000全地形车等高附加值新品，并完成宽窄行高速插秧机、大功率高速插秧机及4款大马力高速插秧机的系列化开发。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"]}],\"limitations\":[\"产品介绍未逐一披露各型号的销量、单价或对应客户。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"公司通过森林消防机械、农业机械、特种车辆、摩托车四类产品的制造和销售取得收入，产品销售以经销模式为主，采用以销定产、按单生产并适度备货的方式组织经营。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0003\"]},{\"fact_id\":\"F-RM-02\",\"text\":\"2025年公司各主营业务板块销售收入占比分别为：森林消防机械22.10%、农业机械25.22%、特种车辆41.54%、摩托车11.14%；主营业务板块中国际市场、国内市场销售收入占比分别为51.47%、48.53%。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F-RM-03\",\"text\":\"主营业务分行业毛利率：特种车辆行业15.27%、农业机械行业7.14%、森林消防机械行业15.97%、摩托车行业10.34%；分地区毛利率：国内市场11.87%、国外市场13.73%。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"]},{\"fact_id\":\"F-RM-04\",\"text\":\"公司利润来源还包括其他收益（政府补助）、投资收益（参股公司现金分红）、公允价值变动收益等；报告期内投资收益变动主要系所投资参股公司实施现金分红所致。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\"]}],\"limitations\":[\"未披露分产品的单价、单位毛利或经销与直销的分别收入金额。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"报告期内公司实现营业收入113,124.69万元，同比增长7.66%；实现利润总额2,756.91万元，同比增长33.85%；实现归属于上市公司股东的净利润2,455.27万元，同比增长33.24%。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"113,124.69\",\"value\":\"113124.69\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\"},{\"name\":\"利润总额\",\"raw_value\":\"2,756.91\",\"value\":\"2756.91\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\"},{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"2,455.27\",\"value\":\"2455.27\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"利润表相关科目（单位：元，币种：人民币）：营业收入本期1,131,246,944.93元、上年同期1,050,736,998.28元，变动比例7.66%；营业成本本期982,191,234.62元、上年同期926,456,465.12元，变动比例6.02%；营业利润本期26,084,704.54元、上年同期19,689,459.04元，变动比例32.48%；利润总额本期27,569,054.89元、上年同期20,597,395.74元，变动比例33.85%；净利润本期24,552,718.70元、上年同期18,427,900.30元，变动比例33.24%。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\",\"source-0016\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"1,131,246,944.93\",\"value\":\"1131246944.93\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期1,050,736,998.28元，变动比例7.66%\"},{\"name\":\"营业成本\",\"raw_value\":\"982,191,234.62\",\"value\":\"982191234.62\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期926,456,465.12元，变动比例6.02%\"},{\"name\":\"营业利润\",\"raw_value\":\"26,084,704.54\",\"value\":\"26084704.54\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期19,689,459.04元，变动比例32.48%\"},{\"name\":\"利润总额\",\"raw_value\":\"27,569,054.89\",\"value\":\"27569054.89\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期20,597,395.74元，变动比例33.85%\"},{\"name\":\"净利润\",\"raw_value\":\"24,552,718.70\",\"value\":\"24552718.70\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期18,427,900.30元，变动比例33.24%\"}]},{\"fact_id\":\"F-SM-03\",\"text\":\"主营业务分行业情况（单位：元，币种：人民币）：特种车辆行业营业收入467,207,688.51元、营业成本395,852,061.14元、毛利率15.27%、营业收入比上年增减20.60%；农业机械行业营业收入283,722,402.61元、营业成本263,450,913.07元、毛利率7.14%、营业收入比上年增减26.77%；森林消防机械行业营业收入248,582,445.60元、营业成本208,891,463.44元、毛利率15.97%、营业收入比上年增减-27.38%；摩托车行业营业收入125,340,298.09元、营业成本112,384,898.60元、毛利率10.34%、营业收入比上年增减35.70%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"],\"metrics\":[{\"name\":\"特种车辆行业营业收入\",\"raw_value\":\"467,207,688.51\",\"value\":\"467207688.51\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"营业收入比上年增减20.60%\"},{\"name\":\"农业机械行业营业收入\",\"raw_value\":\"283,722,402.61\",\"value\":\"283722402.61\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"营业收入比上年增减26.77%\"},{\"name\":\"森林消防机械行业营业收入\",\"raw_value\":\"248,582,445.60\",\"value\":\"248582445.60\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"营业收入比上年增减-27.38%\"},{\"name\":\"摩托车行业营业收入\",\"raw_value\":\"125,340,298.09\",\"value\":\"125340298.09\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"营业收入比上年增减35.70%\"}]},{\"fact_id\":\"F-SM-04\",\"text\":\"主营业务分地区情况（单位：元，币种：人民币）：国内市场营业收入545,846,527.89元、营业成本481,072,616.85元、毛利率11.87%、营业收入比上年增减-6.14%；国外市场营业收入579,006,306.92元、营业成本499,506,719.40元、毛利率13.73%、营业收入比上年增减24.71%。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"],\"metrics\":[{\"name\":\"国内市场营业收入\",\"raw_value\":\"545,846,527.89\",\"value\":\"545846527.89\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"comparison_basis\":\"营业收入比上年增减-6.14%\"},{\"name\":\"国外市场营业收入\",\"raw_value\":\"579,006,306.92\",\"value\":\"579006306.92\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"comparison_basis\":\"营业收入比上年增减24.71%\"}]},{\"fact_id\":\"F-SM-05\",\"text\":\"产销量情况（单位分别为辆、台）：特种车辆生产量23,413辆、销售量23,429辆、库存量15辆，生产量比上年增减-9.31%、销售量比上年增减-9.27%；农业机械生产量9,167台、销售量9,202台、库存量0台，生产量比上年增减-9.04%、销售量比上年增减-8.40%；森林消防机械生产量18,142台、销售量18,142台、库存量0台，生产量比上年增减104.99%、销售量比上年增减86.11%；摩托车生产量32,408辆、销售量32,433辆、库存量108辆，生产量比上年增减6.01%、销售量比上年增减5.31%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"],\"metrics\":[{\"name\":\"特种车辆销售量\",\"raw_value\":\"23,429\",\"value\":\"23429\",\"unit\":\"辆\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"销售量比上年增减-9.27%\"},{\"name\":\"农业机械销售量\",\"raw_value\":\"9,202\",\"value\":\"9202\",\"unit\":\"台\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"销售量比上年增减-8.40%\"},{\"name\":\"森林消防机械销售量\",\"raw_value\":\"18,142\",\"value\":\"18142\",\"unit\":\"台\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"销售量比上年增减86.11%\"},{\"name\":\"摩托车销售量\",\"raw_value\":\"32,433\",\"value\":\"32433\",\"unit\":\"辆\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"销售量比上年增减5.31%\"}]},{\"fact_id\":\"F-SM-06\",\"text\":\"主要子公司及对公司净利润影响达10%以上的参股公司情况（单位：万元，币种：人民币）：江苏福马高新动力机械有限公司（子公司，机械制造销售）注册资本4,500.00万元、总资产28,478.85万元、净资产11,667.21万元、营业收入42,091.36万元、营业利润1,523.19万元、净利润1,474.29万元；江苏联海动力机械有限公司（参股公司，机械制造销售）注册资本8,442.22万元、总资产17,273.16万元、净资产12,099.42万元、营业收入19,957.09万元、营业利润459.62万元、净利润407.84万元；福马新能（北京）科技有限公司（参股公司，服务托管）注册资本2,520.00万元、总资产5,664.71万元、净资产5,290.41万元、营业收入524.08万元、营业利润114.11万元、净利润112.68万元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0025\",\"source-0026\"],\"metrics\":[{\"name\":\"江苏福马高新动力机械有限公司营业收入\",\"raw_value\":\"42,091.36\",\"value\":\"42091.36\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"江苏福马高新动力机械有限公司净利润\",\"raw_value\":\"1,474.29\",\"value\":\"1474.29\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"江苏联海动力机械有限公司营业收入\",\"raw_value\":\"19,957.09\",\"value\":\"19957.09\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"福马新能（北京）科技有限公司营业收入\",\"raw_value\":\"524.08\",\"value\":\"524.08\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"}]}],\"limitations\":[\"分行业表与分产品表所列金额一致，未披露分部间抵销或调整后合计的单独行；主营业务分行业收入合计与营业收入总额的差异未在所选章节说明。\",\"产销量表未披露金额口径，仅按辆/台列示数量。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"公司主要采用以销定产模式，由销售部门根据销售计划或客户订单下达生产计划，实行按单生产并适度备货；产品销售以经销模式为主。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-OI-02\",\"text\":\"成本构成按行业列示（单位：元，币种：人民币）：特种车辆行业原材料368,596,076.79元（占93.11%）、人工成本12,777,441.96元（3.23%）、燃料动力3,712,881.46元（0.94%）、制造费用10,765,660.93元（2.72%），小计395,852,061.14元；农业机械行业原材料254,795,403.56元（96.72%）、人工成本3,328,322.50元（1.26%）、燃料动力1,977,060.73元（0.75%）、制造费用3,350,126.28元（1.27%），小计263,450,913.07元；森林消防机械行业原材料205,237,087.96元（98.25%）、人工成本1,585,639.20元（0.76%）、燃料动力834,229.26元（0.40%）、制造费用1,234,507.02元（0.59%），小计208,891,463.44元；摩托车行业原材料106,679,714.53元（94.92%）、人工成本3,717,212.96元（3.31%）、燃料动力495,584.44元（0.44%）、制造费用1,492,386.67元（1.33%），小计112,384,898.60元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\",\"source-0020\"],\"metrics\":[{\"name\":\"特种车辆行业营业成本小计\",\"raw_value\":\"395,852,061.14\",\"value\":\"395852061.14\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"农业机械行业营业成本小计\",\"raw_value\":\"263,450,913.07\",\"value\":\"263450913.07\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"森林消防机械行业营业成本小计\",\"raw_value\":\"208,891,463.44\",\"value\":\"208891463.44\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"摩托车行业营业成本小计\",\"raw_value\":\"112,384,898.60\",\"value\":\"112384898.60\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-OI-03\",\"text\":\"公司通过优化供应商体系，成功引入第二厂家11家，推动关键物料采购成本下降；两项核心零部件实现国产化替代。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0011\"]},{\"fact_id\":\"F-OI-04\",\"text\":\"公司构建了由多条专业生产线、工业机器人、加工中心协同运作的生产制造体系，包括以AGV智能物流搬运系统为核心载体的AGV多功能柔性生产线、由一流品牌加工中心构成的新型机加工体系；并以发动机生产线为试点推进精益生产。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0013\"]},{\"fact_id\":\"F-OI-05\",\"text\":\"2025年公司ERP系统进一步优化提升，核心业务板块实现从订单到交付全流程数字化贯通。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"]},{\"fact_id\":\"F-OI-06\",\"text\":\"2025年度全年研发投入4,574.29万元，占营业收入的4.04%；本期费用化研发投入45,742,943.50元，资本化研发投入0.00元；研发人员数量151人，占公司总人数的22.90%。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0022\",\"source-0023\"],\"metrics\":[{\"name\":\"研发投入合计\",\"raw_value\":\"45,742,943.50\",\"value\":\"45742943.50\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\"},{\"name\":\"研发投入总额占营业收入比例\",\"raw_value\":\"4.04\",\"value\":\"4.04\",\"unit\":\"%\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\"},{\"name\":\"研发人员数量\",\"raw_value\":\"151\",\"value\":\"151\",\"unit\":\"人\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-OI-07\",\"text\":\"公司主要产品原材料价格受有色金属等大宗商品价格走势影响较大，具有不确定性；公司拟通过锁价建储、波段采购、价值链优化等举措控制成本。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0030\"]}],\"limitations\":[\"成本分析仅按原材料、人工成本、燃料动力、制造费用分类，未披露具体原材料品种、供应商名称或采购单价。\",\"未披露产能利用率、主要设备原值或能源消耗总量。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"前五名客户销售额50,002.00万元，占年度销售总额44.20%，其中关联方销售额0.00万元；前五名供应商采购额12,997.29万元，占年度采购总额12.37%，其中关联方采购额0.00万元。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0021\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"50,002.00\",\"value\":\"50002.00\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"comparison_basis\":\"占年度销售总额44.20%\"},{\"name\":\"前五名供应商采购额\",\"raw_value\":\"12,997.29\",\"value\":\"12997.29\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"comparison_basis\":\"占年度采购总额12.37%\"}]},{\"fact_id\":\"F-CC-02\",\"text\":\"报告期内向单个客户的销售比例超过总额50%、前5名客户中存在新增客户或严重依赖少数客户的情形为“不适用”；向单个供应商的采购比例超过总额50%、前5名供应商中存在新增供应商或严重依赖少数供应商的情形亦为“不适用”。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0021\"]},{\"fact_id\":\"F-CC-03\",\"text\":\"国际市场方面，公司全地形车产品已渗透到亚洲、欧洲、南北美洲、非洲以及大洋洲等众多国家和地区，形成全球化营销网络；国内市场构建“线上+线下”全渠道营销生态，线上依托数字化营销平台，线下深度绑定核心经销商。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]},{\"fact_id\":\"F-CC-04\",\"text\":\"主营业务板块中国际市场、国内市场销售收入占比分别为51.47%、48.53%；分地区营业收入国外市场579,006,306.92元、国内市场545,846,527.89元。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0018\"]},{\"fact_id\":\"F-CC-05\",\"text\":\"特种车辆与摩托车板块积极拓展欧洲、东南亚等多元化市场以降低单一市场依赖；森林消防机械板块成功开拓山西等地区多个新市场。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0009\"]}],\"limitations\":[\"未披露前五名客户及供应商的具体名称。\",\"分地区收入仅区分国内、国外，未按具体国家列示。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"森林消防机械板块受“万亿国债”项目结束、各地应急管理与林业部门基本完成森林消防装备换装及地方政府债务压力等因素影响，市场需求阶段性收窄，全年销售收入24,858.24万元，同比下降27.38%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"森林消防机械板块销售收入\",\"raw_value\":\"24,858.24\",\"value\":\"24858.24\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"同比下降27.38%\"}]},{\"fact_id\":\"F-OD-02\",\"text\":\"农业机械板块通过“线下推广、线上宣传、优质服务”协同推进及“一地一策”反季节销售方案，全年实现营业收入28,372.24万元，同比增长26.77%，高速插秧机、收割机等主要产品实现较大幅度增长。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"农业机械板块营业收入\",\"raw_value\":\"28,372.24\",\"value\":\"28372.24\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"同比增长26.77%\"}]},{\"fact_id\":\"F-OD-03\",\"text\":\"特种车辆产品2025年实现营业收入46,720.77万元，同比增长20.6%；摩托车产品实现营业收入12,534.03万元，同比增长35.7%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"特种车辆产品营业收入\",\"raw_value\":\"46,720.77\",\"value\":\"46720.77\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"同比增长20.6%\"},{\"name\":\"摩托车产品营业收入\",\"raw_value\":\"12,534.03\",\"value\":\"12534.03\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"同比增长35.7%\"}]},{\"fact_id\":\"F-OD-04\",\"text\":\"森林消防机械行业营业收入、营业成本同比下降主要系全地形消防车等消防产品销售同比减少；摩托车行业营业收入、营业成本同比上升主要系摩托车出口同比增加。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"]},{\"fact_id\":\"F-OD-05\",\"text\":\"森林消防机械生产、销量同比增加主要系根据市场订单需求，风力灭火机、油锯等产品产销量同比增加；特种车辆、农业机械库存数量同比减少主要系加大市场开拓、压降产品库存。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"]},{\"fact_id\":\"F-OD-06\",\"text\":\"营业利润、利润总额、净利润等变动原因主要系报告期内公司积极开拓市场、优化产品结构，实现主营业务稳中提质。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\",\"source-0017\"]},{\"fact_id\":\"F-OD-07\",\"text\":\"财务费用变动主要系汇率变动影响本期汇兑净收益较同期减少，同时存款利率下行、公司存款较同期减少；其他收益变动主要系收到的政府补助较同期减少。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\"]},{\"fact_id\":\"F-OD-08\",\"text\":\"公司面临的主要风险包括宏观风险、市场竞争风险（含美国关税政策及贸易保护主义影响）、汇率风险和原材料价格波动风险。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0029\",\"source-0030\"]}],\"limitations\":[\"行业销量与出口金额等数据为行业统计口径，不代表公司自身销量或收入。\",\"公司未量化各驱动因素对收入或利润的影响金额。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"报告期内公司业务类型、利润构成或利润来源未发生重大变动（说明为“不适用”）；公司业务、产品或服务未发生重大变化或调整（说明为“不适用”）；新增重要非主营业务为“不适用”。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0018\",\"source-0021\"]},{\"fact_id\":\"F-MC-02\",\"text\":\"报告期内公司未发生主要子公司股权变动导致合并范围变化（说明为“不适用”），亦无取得和处置子公司的情况。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0021\",\"source-0026\"]},{\"fact_id\":\"F-MC-03\",\"text\":\"2025年公司累计获得授权专利12件，其中发明专利6件；主导或参与制、修订的3项国家标准正式发布；获评江苏省专精特新中小企业及国家级专精特新“小巨人”企业称号，林海股份、福马高新双双通过国家高新技术企业认定。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"F-MC-04\",\"text\":\"公司成功攻克水冷四级泵、大排量隔膜泵技术，完成宽窄行高速插秧机、大功率高速插秧机及4款大马力高速插秧机的系列化开发，并推出LH2V91MY发动机、ATV1000全地形车等高附加值新品。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0010\"]},{\"fact_id\":\"F-MC-05\",\"text\":\"农业机械板块通过优化供应商体系引入第二厂家11家，两项核心零部件实现国产化替代，推动关键物料采购成本下降并增强供应链自主可控能力。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0011\"]}],\"limitations\":[\"未披露上述变化对营业收入或利润的具体影响金额。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-P1\",\"text\":\"公司从事森林消防机械、农业机械、特种车辆（全地形车）、摩托车等及以上产品配件的制造和销售，处于制造环节。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-SC-P2\",\"text\":\"公司主要采用以销定产、按单生产并适度备货的生产经营模式，产品销售以经销模式为主。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}],\"limitations\":[]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-U1\",\"text\":\"成本构成中原材料占各行业营业成本的主要部分：特种车辆行业原材料占93.11%、农业机械行业占96.72%、森林消防机械行业占98.25%、摩托车行业占94.92%（单位：元，币种：人民币）。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\",\"source-0020\"]},{\"fact_id\":\"F-SC-U2\",\"text\":\"公司主要产品原材料价格受有色金属等大宗商品价格走势影响较大，具有不确定性。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0030\"]},{\"fact_id\":\"F-SC-U3\",\"text\":\"公司通过优化供应商体系引入第二厂家11家，并实现两项核心零部件国产化替代。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0011\"]}],\"limitations\":[\"未披露具体原材料品种、供应商名称或采购单价，成本分类不等同于特定材料供应商。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-D1\",\"text\":\"森林消防机械产品用于复杂地形和恶劣环境的灭火与救援、山地森林灭火等场景；农业机械产品用于水稻插秧及小麦、水稻等主要粮食作物的收获作业；全地形车广泛应用于休闲娱乐、户外作业及军事等特定领域。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\",\"source-0005\"]},{\"fact_id\":\"F-SC-D2\",\"text\":\"前五名客户销售额50,002.00万元，占年度销售总额44.20%，其中关联方销售额0.00万元。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0021\"]},{\"fact_id\":\"F-SC-D3\",\"text\":\"公司全地形车产品销售覆盖美国、欧盟、南非、东南亚等诸多海外市场，并积极拓展欧洲、东南亚等多元化市场。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0009\"]}],\"limitations\":[\"未披露具体客户名称，产品用途不构成对特定客户的认定。\"]}},\"limitations\":[\"本工作底稿仅依据所选章节原文整理，未覆盖整份年度报告，财务附注、分部信息及关联交易细节未纳入。\",\"部分表格存在同一数据在分行业与分产品表中重复列示的情况，已按原文保留，未做合并或调整。\",\"行业销量、出口金额等为行业统计口径，不代表公司自身经营数据。\",\"未披露具体客户、供应商名称及分产品单价、单位成本等明细。\"]}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-BS-01",
+                "text": "公司主营业务为森林消防机械、农业机械、特种车辆（全地形车）、摩托车等及以上产品配件的制造和销售。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-BS-02",
+                "text": "公司主要采用以销定产的生产经营模式，由销售部门根据销售计划或客户订单将生产计划下达至生产部门，实行按单生产，同时根据市场需求适度备货；产品销售以经销模式为主。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              },
+              {
+                "fact_id": "F-BS-03",
+                "text": "公司所处行业主要集中在森林消防机械行业、农业机械行业、特种车辆（全地形车）行业及摩托车行业；森林消防机械聚焦其中的森林消防机械细分行业，农业机械聚焦插秧机与履带自走式全喂入谷物联合收割机细分行业。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0004"
+                ]
+              },
+              {
+                "fact_id": "F-BS-04",
+                "text": "报告期内公司新增重要非主营业务的说明为“不适用”，业务、产品或服务发生重大变化或调整的说明亦为“不适用”。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003",
+                  "source-0021"
+                ]
+              },
+              {
+                "fact_id": "F-BS-05",
+                "text": "主要子公司为江苏福马高新动力机械有限公司（子公司，机械制造销售），主要参股公司为江苏联海动力机械有限公司（参股公司，机械制造销售）和福马新能（北京）科技有限公司（参股公司，服务托管）；报告期内取得和处置子公司的情况为“不适用”。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0026"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露各业务板块内部更细的组织层级与法人归属，除上述子公司/参股公司外未展开其他主体。"
+            ]
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-PS-01",
+                "text": "森林消防机械产品包括全地形消防车（基于全地形车平台开发，用于复杂地形和恶劣环境的灭火与救援）、消防泵（含离心泵、便携式高扬程森林泵、超高扬程隔膜泵、智能串联森林消防泵、大排量隔膜泵等）和风力灭火机（轻量化设计，广泛用于山地森林灭火）。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "F-PS-02",
+                "text": "农业机械产品包括插秧机（以高速插秧机为核心代表，已形成6-10行、抛秧机、智能高速插秧机、宽窄行高速插秧机、大功率大马力高速插秧机全产品系列）和履带自走全喂入式谷物联合收割机（主要用于小麦、水稻等主要粮食作物的收获作业，一次完成收割、脱粒、清选等工序，已形成以6kg/s—7kg/s喂入量为主的产品布局，含出口机型共3个系列6款产品）。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "F-PS-03",
+                "text": "特种车辆（全地形车）产品包括多用途ATV全地形车系列（已形成150CC-1000CC小、中、大排量全品种系列，销售覆盖美国、欧盟、南非、东南亚等海外市场）和电动ATV系列（采用锂电新能源动力，适合野外涉猎和娱乐环境使用）。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "F-PS-04",
+                "text": "摩托车产品为林海摩托车系列，环保标准达到国Ⅳ，出口型号排放标准达到欧五+。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              },
+              {
+                "fact_id": "F-PS-05",
+                "text": "报告期内公司推出LH2V91MY发动机、ATV1000全地形车等高附加值新品，并完成宽窄行高速插秧机、大功率高速插秧机及4款大马力高速插秧机的系列化开发。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010"
+                ]
+              }
+            ],
+            "limitations": [
+              "产品介绍未逐一披露各型号的销量、单价或对应客户。"
+            ]
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-RM-01",
+                "text": "公司通过森林消防机械、农业机械、特种车辆、摩托车四类产品的制造和销售取得收入，产品销售以经销模式为主，采用以销定产、按单生产并适度备货的方式组织经营。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0003"
+                ]
+              },
+              {
+                "fact_id": "F-RM-02",
+                "text": "2025年公司各主营业务板块销售收入占比分别为：森林消防机械22.10%、农业机械25.22%、特种车辆41.54%、摩托车11.14%；主营业务板块中国际市场、国内市场销售收入占比分别为51.47%、48.53%。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "F-RM-03",
+                "text": "主营业务分行业毛利率：特种车辆行业15.27%、农业机械行业7.14%、森林消防机械行业15.97%、摩托车行业10.34%；分地区毛利率：国内市场11.87%、国外市场13.73%。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0018"
+                ]
+              },
+              {
+                "fact_id": "F-RM-04",
+                "text": "公司利润来源还包括其他收益（政府补助）、投资收益（参股公司现金分红）、公允价值变动收益等；报告期内投资收益变动主要系所投资参股公司实施现金分红所致。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0016"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露分产品的单价、单位毛利或经销与直销的分别收入金额。"
+            ]
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-SM-01",
+                "text": "报告期内公司实现营业收入113,124.69万元，同比增长7.66%；实现利润总额2,756.91万元，同比增长33.85%；实现归属于上市公司股东的净利润2,455.27万元，同比增长33.24%。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入",
+                    "raw_value": "113,124.69",
+                    "value": "113124.69",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "issuer",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "利润总额",
+                    "raw_value": "2,756.91",
+                    "value": "2756.91",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "issuer",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "归属于上市公司股东的净利润",
+                    "raw_value": "2,455.27",
+                    "value": "2455.27",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "issuer",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SM-02",
+                "text": "利润表相关科目（单位：元，币种：人民币）：营业收入本期1,131,246,944.93元、上年同期1,050,736,998.28元，变动比例7.66%；营业成本本期982,191,234.62元、上年同期926,456,465.12元，变动比例6.02%；营业利润本期26,084,704.54元、上年同期19,689,459.04元，变动比例32.48%；利润总额本期27,569,054.89元、上年同期20,597,395.74元，变动比例33.85%；净利润本期24,552,718.70元、上年同期18,427,900.30元，变动比例33.24%。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0015",
+                  "source-0016"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入",
+                    "raw_value": "1,131,246,944.93",
+                    "value": "1131246944.93",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "issuer",
+                    "period": "2025年度",
+                    "comparison_basis": "上年同期1,050,736,998.28元，变动比例7.66%"
+                  },
+                  {
+                    "name": "营业成本",
+                    "raw_value": "982,191,234.62",
+                    "value": "982191234.62",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "issuer",
+                    "period": "2025年度",
+                    "comparison_basis": "上年同期926,456,465.12元，变动比例6.02%"
+                  },
+                  {
+                    "name": "营业利润",
+                    "raw_value": "26,084,704.54",
+                    "value": "26084704.54",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "issuer",
+                    "period": "2025年度",
+                    "comparison_basis": "上年同期19,689,459.04元，变动比例32.48%"
+                  },
+                  {
+                    "name": "利润总额",
+                    "raw_value": "27,569,054.89",
+                    "value": "27569054.89",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "issuer",
+                    "period": "2025年度",
+                    "comparison_basis": "上年同期20,597,395.74元，变动比例33.85%"
+                  },
+                  {
+                    "name": "净利润",
+                    "raw_value": "24,552,718.70",
+                    "value": "24552718.70",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "issuer",
+                    "period": "2025年度",
+                    "comparison_basis": "上年同期18,427,900.30元，变动比例33.24%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SM-03",
+                "text": "主营业务分行业情况（单位：元，币种：人民币）：特种车辆行业营业收入467,207,688.51元、营业成本395,852,061.14元、毛利率15.27%、营业收入比上年增减20.60%；农业机械行业营业收入283,722,402.61元、营业成本263,450,913.07元、毛利率7.14%、营业收入比上年增减26.77%；森林消防机械行业营业收入248,582,445.60元、营业成本208,891,463.44元、毛利率15.97%、营业收入比上年增减-27.38%；摩托车行业营业收入125,340,298.09元、营业成本112,384,898.60元、毛利率10.34%、营业收入比上年增减35.70%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0018"
+                ],
+                "metrics": [
+                  {
+                    "name": "特种车辆行业营业收入",
+                    "raw_value": "467,207,688.51",
+                    "value": "467207688.51",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "营业收入比上年增减20.60%"
+                  },
+                  {
+                    "name": "农业机械行业营业收入",
+                    "raw_value": "283,722,402.61",
+                    "value": "283722402.61",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "营业收入比上年增减26.77%"
+                  },
+                  {
+                    "name": "森林消防机械行业营业收入",
+                    "raw_value": "248,582,445.60",
+                    "value": "248582445.60",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "营业收入比上年增减-27.38%"
+                  },
+                  {
+                    "name": "摩托车行业营业收入",
+                    "raw_value": "125,340,298.09",
+                    "value": "125340298.09",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "营业收入比上年增减35.70%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SM-04",
+                "text": "主营业务分地区情况（单位：元，币种：人民币）：国内市场营业收入545,846,527.89元、营业成本481,072,616.85元、毛利率11.87%、营业收入比上年增减-6.14%；国外市场营业收入579,006,306.92元、营业成本499,506,719.40元、毛利率13.73%、营业收入比上年增减24.71%。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0018"
+                ],
+                "metrics": [
+                  {
+                    "name": "国内市场营业收入",
+                    "raw_value": "545,846,527.89",
+                    "value": "545846527.89",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "issuer",
+                    "period": "2025年度",
+                    "comparison_basis": "营业收入比上年增减-6.14%"
+                  },
+                  {
+                    "name": "国外市场营业收入",
+                    "raw_value": "579,006,306.92",
+                    "value": "579006306.92",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "issuer",
+                    "period": "2025年度",
+                    "comparison_basis": "营业收入比上年增减24.71%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SM-05",
+                "text": "产销量情况（单位分别为辆、台）：特种车辆生产量23,413辆、销售量23,429辆、库存量15辆，生产量比上年增减-9.31%、销售量比上年增减-9.27%；农业机械生产量9,167台、销售量9,202台、库存量0台，生产量比上年增减-9.04%、销售量比上年增减-8.40%；森林消防机械生产量18,142台、销售量18,142台、库存量0台，生产量比上年增减104.99%、销售量比上年增减86.11%；摩托车生产量32,408辆、销售量32,433辆、库存量108辆，生产量比上年增减6.01%、销售量比上年增减5.31%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0019"
+                ],
+                "metrics": [
+                  {
+                    "name": "特种车辆销售量",
+                    "raw_value": "23,429",
+                    "value": "23429",
+                    "unit": "辆",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "销售量比上年增减-9.27%"
+                  },
+                  {
+                    "name": "农业机械销售量",
+                    "raw_value": "9,202",
+                    "value": "9202",
+                    "unit": "台",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "销售量比上年增减-8.40%"
+                  },
+                  {
+                    "name": "森林消防机械销售量",
+                    "raw_value": "18,142",
+                    "value": "18142",
+                    "unit": "台",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "销售量比上年增减86.11%"
+                  },
+                  {
+                    "name": "摩托车销售量",
+                    "raw_value": "32,433",
+                    "value": "32433",
+                    "unit": "辆",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "销售量比上年增减5.31%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SM-06",
+                "text": "主要子公司及对公司净利润影响达10%以上的参股公司情况（单位：万元，币种：人民币）：江苏福马高新动力机械有限公司（子公司，机械制造销售）注册资本4,500.00万元、总资产28,478.85万元、净资产11,667.21万元、营业收入42,091.36万元、营业利润1,523.19万元、净利润1,474.29万元；江苏联海动力机械有限公司（参股公司，机械制造销售）注册资本8,442.22万元、总资产17,273.16万元、净资产12,099.42万元、营业收入19,957.09万元、营业利润459.62万元、净利润407.84万元；福马新能（北京）科技有限公司（参股公司，服务托管）注册资本2,520.00万元、总资产5,664.71万元、净资产5,290.41万元、营业收入524.08万元、营业利润114.11万元、净利润112.68万元。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0025",
+                  "source-0026"
+                ],
+                "metrics": [
+                  {
+                    "name": "江苏福马高新动力机械有限公司营业收入",
+                    "raw_value": "42,091.36",
+                    "value": "42091.36",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "江苏福马高新动力机械有限公司净利润",
+                    "raw_value": "1,474.29",
+                    "value": "1474.29",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "江苏联海动力机械有限公司营业收入",
+                    "raw_value": "19,957.09",
+                    "value": "19957.09",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "福马新能（北京）科技有限公司营业收入",
+                    "raw_value": "524.08",
+                    "value": "524.08",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "分行业表与分产品表所列金额一致，未披露分部间抵销或调整后合计的单独行；主营业务分行业收入合计与营业收入总额的差异未在所选章节说明。",
+              "产销量表未披露金额口径，仅按辆/台列示数量。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-OI-01",
+                "text": "公司主要采用以销定产模式，由销售部门根据销售计划或客户订单下达生产计划，实行按单生产并适度备货；产品销售以经销模式为主。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              },
+              {
+                "fact_id": "F-OI-02",
+                "text": "成本构成按行业列示（单位：元，币种：人民币）：特种车辆行业原材料368,596,076.79元（占93.11%）、人工成本12,777,441.96元（3.23%）、燃料动力3,712,881.46元（0.94%）、制造费用10,765,660.93元（2.72%），小计395,852,061.14元；农业机械行业原材料254,795,403.56元（96.72%）、人工成本3,328,322.50元（1.26%）、燃料动力1,977,060.73元（0.75%）、制造费用3,350,126.28元（1.27%），小计263,450,913.07元；森林消防机械行业原材料205,237,087.96元（98.25%）、人工成本1,585,639.20元（0.76%）、燃料动力834,229.26元（0.40%）、制造费用1,234,507.02元（0.59%），小计208,891,463.44元；摩托车行业原材料106,679,714.53元（94.92%）、人工成本3,717,212.96元（3.31%）、燃料动力495,584.44元（0.44%）、制造费用1,492,386.67元（1.33%），小计112,384,898.60元。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0019",
+                  "source-0020"
+                ],
+                "metrics": [
+                  {
+                    "name": "特种车辆行业营业成本小计",
+                    "raw_value": "395,852,061.14",
+                    "value": "395852061.14",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "农业机械行业营业成本小计",
+                    "raw_value": "263,450,913.07",
+                    "value": "263450913.07",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "森林消防机械行业营业成本小计",
+                    "raw_value": "208,891,463.44",
+                    "value": "208891463.44",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "摩托车行业营业成本小计",
+                    "raw_value": "112,384,898.60",
+                    "value": "112384898.60",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-OI-03",
+                "text": "公司通过优化供应商体系，成功引入第二厂家11家，推动关键物料采购成本下降；两项核心零部件实现国产化替代。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010",
+                  "source-0011"
+                ]
+              },
+              {
+                "fact_id": "F-OI-04",
+                "text": "公司构建了由多条专业生产线、工业机器人、加工中心协同运作的生产制造体系，包括以AGV智能物流搬运系统为核心载体的AGV多功能柔性生产线、由一流品牌加工中心构成的新型机加工体系；并以发动机生产线为试点推进精益生产。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010",
+                  "source-0013"
+                ]
+              },
+              {
+                "fact_id": "F-OI-05",
+                "text": "2025年公司ERP系统进一步优化提升，核心业务板块实现从订单到交付全流程数字化贯通。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010"
+                ]
+              },
+              {
+                "fact_id": "F-OI-06",
+                "text": "2025年度全年研发投入4,574.29万元，占营业收入的4.04%；本期费用化研发投入45,742,943.50元，资本化研发投入0.00元；研发人员数量151人，占公司总人数的22.90%。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0022",
+                  "source-0023"
+                ],
+                "metrics": [
+                  {
+                    "name": "研发投入合计",
+                    "raw_value": "45,742,943.50",
+                    "value": "45742943.50",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "issuer",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "研发投入总额占营业收入比例",
+                    "raw_value": "4.04",
+                    "value": "4.04",
+                    "unit": "%",
+                    "subject_scope": "issuer",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "研发人员数量",
+                    "raw_value": "151",
+                    "value": "151",
+                    "unit": "人",
+                    "subject_scope": "issuer",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-OI-07",
+                "text": "公司主要产品原材料价格受有色金属等大宗商品价格走势影响较大，具有不确定性；公司拟通过锁价建储、波段采购、价值链优化等举措控制成本。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0030"
+                ]
+              }
+            ],
+            "limitations": [
+              "成本分析仅按原材料、人工成本、燃料动力、制造费用分类，未披露具体原材料品种、供应商名称或采购单价。",
+              "未披露产能利用率、主要设备原值或能源消耗总量。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-CC-01",
+                "text": "前五名客户销售额50,002.00万元，占年度销售总额44.20%，其中关联方销售额0.00万元；前五名供应商采购额12,997.29万元，占年度采购总额12.37%，其中关联方采购额0.00万元。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0021"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五名客户销售额",
+                    "raw_value": "50,002.00",
+                    "value": "50002.00",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "issuer",
+                    "period": "2025年度",
+                    "comparison_basis": "占年度销售总额44.20%"
+                  },
+                  {
+                    "name": "前五名供应商采购额",
+                    "raw_value": "12,997.29",
+                    "value": "12997.29",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "issuer",
+                    "period": "2025年度",
+                    "comparison_basis": "占年度采购总额12.37%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-CC-02",
+                "text": "报告期内向单个客户的销售比例超过总额50%、前5名客户中存在新增客户或严重依赖少数客户的情形为“不适用”；向单个供应商的采购比例超过总额50%、前5名供应商中存在新增供应商或严重依赖少数供应商的情形亦为“不适用”。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0021"
+                ]
+              },
+              {
+                "fact_id": "F-CC-03",
+                "text": "国际市场方面，公司全地形车产品已渗透到亚洲、欧洲、南北美洲、非洲以及大洋洲等众多国家和地区，形成全球化营销网络；国内市场构建“线上+线下”全渠道营销生态，线上依托数字化营销平台，线下深度绑定核心经销商。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0012"
+                ]
+              },
+              {
+                "fact_id": "F-CC-04",
+                "text": "主营业务板块中国际市场、国内市场销售收入占比分别为51.47%、48.53%；分地区营业收入国外市场579,006,306.92元、国内市场545,846,527.89元。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007",
+                  "source-0018"
+                ]
+              },
+              {
+                "fact_id": "F-CC-05",
+                "text": "特种车辆与摩托车板块积极拓展欧洲、东南亚等多元化市场以降低单一市场依赖；森林消防机械板块成功开拓山西等地区多个新市场。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008",
+                  "source-0009"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露前五名客户及供应商的具体名称。",
+              "分地区收入仅区分国内、国外，未按具体国家列示。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-OD-01",
+                "text": "森林消防机械板块受“万亿国债”项目结束、各地应急管理与林业部门基本完成森林消防装备换装及地方政府债务压力等因素影响，市场需求阶段性收窄，全年销售收入24,858.24万元，同比下降27.38%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "森林消防机械板块销售收入",
+                    "raw_value": "24,858.24",
+                    "value": "24858.24",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "同比下降27.38%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-OD-02",
+                "text": "农业机械板块通过“线下推广、线上宣传、优质服务”协同推进及“一地一策”反季节销售方案，全年实现营业收入28,372.24万元，同比增长26.77%，高速插秧机、收割机等主要产品实现较大幅度增长。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "农业机械板块营业收入",
+                    "raw_value": "28,372.24",
+                    "value": "28372.24",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "同比增长26.77%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-OD-03",
+                "text": "特种车辆产品2025年实现营业收入46,720.77万元，同比增长20.6%；摩托车产品实现营业收入12,534.03万元，同比增长35.7%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "特种车辆产品营业收入",
+                    "raw_value": "46,720.77",
+                    "value": "46720.77",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "同比增长20.6%"
+                  },
+                  {
+                    "name": "摩托车产品营业收入",
+                    "raw_value": "12,534.03",
+                    "value": "12534.03",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "同比增长35.7%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-OD-04",
+                "text": "森林消防机械行业营业收入、营业成本同比下降主要系全地形消防车等消防产品销售同比减少；摩托车行业营业收入、营业成本同比上升主要系摩托车出口同比增加。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0019"
+                ]
+              },
+              {
+                "fact_id": "F-OD-05",
+                "text": "森林消防机械生产、销量同比增加主要系根据市场订单需求，风力灭火机、油锯等产品产销量同比增加；特种车辆、农业机械库存数量同比减少主要系加大市场开拓、压降产品库存。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0019"
+                ]
+              },
+              {
+                "fact_id": "F-OD-06",
+                "text": "营业利润、利润总额、净利润等变动原因主要系报告期内公司积极开拓市场、优化产品结构，实现主营业务稳中提质。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0016",
+                  "source-0017"
+                ]
+              },
+              {
+                "fact_id": "F-OD-07",
+                "text": "财务费用变动主要系汇率变动影响本期汇兑净收益较同期减少，同时存款利率下行、公司存款较同期减少；其他收益变动主要系收到的政府补助较同期减少。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0016"
+                ]
+              },
+              {
+                "fact_id": "F-OD-08",
+                "text": "公司面临的主要风险包括宏观风险、市场竞争风险（含美国关税政策及贸易保护主义影响）、汇率风险和原材料价格波动风险。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0029",
+                  "source-0030"
+                ]
+              }
+            ],
+            "limitations": [
+              "行业销量与出口金额等数据为行业统计口径，不代表公司自身销量或收入。",
+              "公司未量化各驱动因素对收入或利润的影响金额。"
+            ]
+          },
+          "material_changes": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-MC-01",
+                "text": "报告期内公司业务类型、利润构成或利润来源未发生重大变动（说明为“不适用”）；公司业务、产品或服务未发生重大变化或调整（说明为“不适用”）；新增重要非主营业务为“不适用”。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003",
+                  "source-0018",
+                  "source-0021"
+                ]
+              },
+              {
+                "fact_id": "F-MC-02",
+                "text": "报告期内公司未发生主要子公司股权变动导致合并范围变化（说明为“不适用”），亦无取得和处置子公司的情况。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0021",
+                  "source-0026"
+                ]
+              },
+              {
+                "fact_id": "F-MC-03",
+                "text": "2025年公司累计获得授权专利12件，其中发明专利6件；主导或参与制、修订的3项国家标准正式发布；获评江苏省专精特新中小企业及国家级专精特新“小巨人”企业称号，林海股份、福马高新双双通过国家高新技术企业认定。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ]
+              },
+              {
+                "fact_id": "F-MC-04",
+                "text": "公司成功攻克水冷四级泵、大排量隔膜泵技术，完成宽窄行高速插秧机、大功率高速插秧机及4款大马力高速插秧机的系列化开发，并推出LH2V91MY发动机、ATV1000全地形车等高附加值新品。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009",
+                  "source-0010"
+                ]
+              },
+              {
+                "fact_id": "F-MC-05",
+                "text": "农业机械板块通过优化供应商体系引入第二厂家11家，两项核心零部件实现国产化替代，推动关键物料采购成本下降并增强供应链自主可控能力。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010",
+                  "source-0011"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露上述变化对营业收入或利润的具体影响金额。"
+            ]
+          }
+        },
+        "supply_chain": {
+          "position": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-SC-P1",
+                "text": "公司从事森林消防机械、农业机械、特种车辆（全地形车）、摩托车等及以上产品配件的制造和销售，处于制造环节。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-SC-P2",
+                "text": "公司主要采用以销定产、按单生产并适度备货的生产经营模式，产品销售以经销模式为主。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              }
+            ],
+            "limitations": []
+          },
+          "upstream_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-SC-U1",
+                "text": "成本构成中原材料占各行业营业成本的主要部分：特种车辆行业原材料占93.11%、农业机械行业占96.72%、森林消防机械行业占98.25%、摩托车行业占94.92%（单位：元，币种：人民币）。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0019",
+                  "source-0020"
+                ]
+              },
+              {
+                "fact_id": "F-SC-U2",
+                "text": "公司主要产品原材料价格受有色金属等大宗商品价格走势影响较大，具有不确定性。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0030"
+                ]
+              },
+              {
+                "fact_id": "F-SC-U3",
+                "text": "公司通过优化供应商体系引入第二厂家11家，并实现两项核心零部件国产化替代。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010",
+                  "source-0011"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露具体原材料品种、供应商名称或采购单价，成本分类不等同于特定材料供应商。"
+            ]
+          },
+          "downstream_customers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-SC-D1",
+                "text": "森林消防机械产品用于复杂地形和恶劣环境的灭火与救援、山地森林灭火等场景；农业机械产品用于水稻插秧及小麦、水稻等主要粮食作物的收获作业；全地形车广泛应用于休闲娱乐、户外作业及军事等特定领域。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0002",
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "F-SC-D2",
+                "text": "前五名客户销售额50,002.00万元，占年度销售总额44.20%，其中关联方销售额0.00万元。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0021"
+                ]
+              },
+              {
+                "fact_id": "F-SC-D3",
+                "text": "公司全地形车产品销售覆盖美国、欧盟、南非、东南亚等诸多海外市场，并积极拓展欧洲、东南亚等多元化市场。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002",
+                  "source-0009"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露具体客户名称，产品用途不构成对特定客户的认定。"
+            ]
+          }
+        },
+        "limitations": [
+          "本工作底稿仅依据所选章节原文整理，未覆盖整份年度报告，财务附注、分部信息及关联交易细节未纳入。",
+          "部分表格存在同一数据在分行业与分产品表中重复列示的情况，已按原文保留，未做合并或调整。",
+          "行业销量、出口金额等为行业统计口径，不代表公司自身经营数据。",
+          "未披露具体客户、供应商名称及分产品单价、单位成本等明细。"
+        ]
+      },
+      "usage": {
+        "input_tokens": 27146,
+        "output_tokens": 7754,
+        "total_tokens": 34900
+      }
+    }
+  ]
+}

@@ -8600,3 +8600,45 @@ Review分级：当前交付的语义误归已明确限用，不作为确定事�
 清理：开工无本人v9残留；三份运行根的常规文件共5427302字节（1647846/1892964/1886492），均TemporaryDirectory退出已删，cleanup removed=true且路径实查不存在；临时operator脚本7951字节已删，总计5435253常规文件字节，不冒充实际磁盘块释放。测试唯一QuoteBak临时目录退出清理，无v9-enrichment或v9-workpaper-test残留。正式PDF/共享缓存/历史失败/标记、已有配置/骨架/规划及并行文件保持，不清他人目录。必要query/导出/调用回执各一套保留在对应本轮run。
 
 本轮交付实质是三份有供应链描述的新画像，以及可供后续报告持续收敛的结构/选章指引；缺项不是失败、错误不是可信，S1仍0/12。下一优先在更多业务报告上看主要板块数字/产品用途与可选供应链的实际信息收益，不新建门禁框架或为本次三个错句开启付费修补。
+
+
+## 261. 实际模型随画像记录与四份不同业务的真实交付
+
+2026-11-12，开工基线f2882db4，master，stage空；配置、骨架、规划、历史审核和并行文件已有未提交内容，未纳本次。用户要求每份读取记录实际LLM以便以后评估，并持续授权本会话按OpenSpec实施。采用business-first-goal和openspec-apply-change，接现有6.BC/6.BD：不造模型评测平台，不改共享池或生产，不恢复旧S1/旧失败。
+
+工程交付：company_profile_workpaper.v1追加可选generation，由原公共网关接受回执本地绑定；区分标题选章与实际正文分析的model/source/profile/request/hash/finish/usage，正文带实际section IDs/物理页，提示/预处理/指引版本来自执行身份。只看本公司本次两逻辑request的最新accepted回执，LLM自报generation、其他公司和失败/未知回执均不归因；旧JSON无字段继续可读。query/export/Markdown沿原owner同源，未添存储或写入器。实际模型是供应商响应标识，不声称鉴定底层供应商模型实现。
+
+实物、原文对照与已知错误统一见[模型归因/内容观察](workpaper-model-attribution-observation-20261112.md)，不另复制正文。四个全新入口仅复用正式PDF/共享解析和asset，不加载旧语义：
+
+| 公司 | prompt | 选章/正文实际来源 | 物理 | 实际usage账本 | 入口秒 | 原始基础事实 |
+| --- | --- | --- | ---: | ---: | ---: | ---: |
+| 中视传媒600088 | supply-chain.v3 | DeepSeek / DeepSeek | 3 | 64848 | 125.247 | 59 |
+| 美尔雅600107 | supply-chain.v3 | DeepSeek / Scorpio Gemini | 4 | 78136 | 180.568 | 18 |
+| 开创国际600097 | supply-chain.v4 | DeepSeek / DeepSeek | 2 | 38190 | 96.402 | 36 |
+| 同方股份600100 | supply-chain.v4 | DeepSeek / DeepSeek | 2 | 41077 | 85.523 | 30 |
+
+本轮11物理/222251实际usage账本/费用unknown，无整公司后继，unknown非0。中视正文一次schema恢复；美尔雅正文DeepSeek两次格式失败后同一逻辑池换源成功，归因为最终Gemini而非首选DeepSeek；三次失败物理均计账。最后两家4物理无恢复。所有finish为stop，均真实传输无替身、query/export/新实例profiles相同；`pending_verification`、`core_complete=false`，原始条数不作准确率，S1仍0/12，供应链缺项不失败。
+
+本轮真正的业务增量：四类业务均交出有源画像，传媒四板块收入、服装男/女/出口及门店渠道、渔业捕捞加工贸易/原料鱼燃料/客户、同方安检/CNKI订阅/智慧能源场景及三主板块规模均可读。独立读源发现中视模板阈值误归，美尔雅利润列/分母/事件时点和原料推断，先明确错句限用再收敛通用prompt v4；没有改原答案、删历史失败或为每句补窗。v4不同报告仍漏开创归母利润、同方抵销行及部分metrics；这是当前主线的内容取舍/口径问题，不是程序字段全就代表语义全。不宣称两题即证明模型排名或v4质量改进幅度。
+
+源校验：四个正式PDF hash、所存Evidence全部原布局坐标重提，实际非空源页9/15/12/14共50页，Evidence9/19/16/19共63份；model/来源/response hash与成功receipt/raw_content及ledger流hash对齐。导出JSON=query profile，Markdown由同一JSON渲染，新实例一致来自入口result。四份query sha256依次2ac1a56961cb3bd9d61e476f743646b913f45859bb074eaef117f746b8a0d9bd、2768401a61715d3d062d137b1c4871a3563e21545285d289a6778627c5701e0d、01601d5016841b18057ff01cf39941bd7651efa6559ec03ce9634ab9c1628d0d、417bd79d9fcb115dcfe4c6f8ed5a3d5d6740ba687d06b4ac66dbf06f72cb5581。
+
+展示直接缺陷：原值自带单位时原renderer重复追加，局部改为只显示一次；raw_value/value/unit和原query/JSON/模型回执完全不改。四份本轮Markdown用同一持久JSON确定性重渲，旧五家历史制品不动；无重新模型调用，不拼成新语义成绩。最终直接回归命令`bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_workpaper.py tests/unit/test_research/test_company_profile_sample_preview.py`，16 passed/1 warning、7.92秒；期间显示夹具金额没在原文的失败已纠正为同源原值，不放松源约束。OpenSpec严格校验通过。
+
+Review：A类当前归因/跨公司串回执/失败作者与单位展示风险有直接测试及实际池换源证明，局部格式缺陷已修；原始语义错误明确待核限用而非可靠发布，不宣称正式公司可用。B类全量质量评测/排行榜、补齐每项原料/定价、标题美化后置。C类已有共享配置、骨架及其他在途改动不动。当前6.BC/6.BD范围结束；下一应以已读来源上的主要板块权重/合并抵销及缺项取舍推进，不再以日志与门禁建设替业务。
+
+清理：开工盘点无本人v9根；4份运行根分别1708567/1657648/1683904/1660434常规文件字节，TemporaryDirectory退出均删除且实查不存在，合计6710553；本轮operator脚本9521字节已删，合计6720074常规文件字节，不称物理磁盘块。最终data/QuoteBak无本人v9-*残留/活跃脚本；正式PDF/共用缓存、历史回执/标记、并行临时物均保留。必要binding/query/export/result/cleanup各一套持久于四个run。本轮只暂存本人可隔离代码/测试/规范及文档片段，旧1005行审核/其他脏hunk不打包。
+
+## 262. 板块口径v5与林海、大名城两份有限工作底稿
+
+同一2026-11-12会话接用户持续开发授权，按6.BE仅收敛同方实表暴露的分项/小计/抵销/净额保留指令v5，用林海股份600099与大名城600094现有正式2025年报各一次workpaper入口。运行仍复用CompanyProfileTaskService中的chapter_workpaper_v1分支及原writer/网关/读取owner，不触发旧公司核心读取身份或正式评测，不改共享配置/生产/旧尝试计数。正式model/output/源码hash均在新binding，不能把此两份当同方v4重跑。
+
+两份实物、源贡献及限制合并在[模型归因观察](workpaper-model-attribution-observation-20261112.md#v5有限接续林海股份与大名城)：林海45基础/8可选，3物理/80518实际usage/123.410秒；大名城42基础/7可选，2物理/46684实际usage/99.752秒。各两逻辑请求，林海正文有一次schema恢复计入；全部官方deepseek-flash/finish stop，费用unknown、无后继。目录/正文实际身份随JSON/Markdown同存，三读一致，pending/核心false，不计正式可用/S1/S32。6.BC—6.BE共六入口16物理/349453实际usage。
+
+独立读源：林海8—10/18—24页支持机械四主业、经销与以销定产、1,131,246,944.93元收入、行业权重/成本类别；具体原料名不擅自补齐。大名城15—17页支持地产2,231,200,274.53元和算力15,348,294.98元，公司总额2,246,548,569.51元；17页净额法结转1534.83万元与实际收入11243.16/成本9708.33万元分别保留，100%毛利率注明净额口径。参股产品不是公司自营销售，筹备/规划保限定；缺项不强求。未逐条核87基础/15可选，不造准确率。两份已发主营表无明确内部抵销行，因此v5合同发出成立，但抵销真实适用例仍未证；不为凑100%继续付费扩样。后续只复用适用已读表小范围核语义，不重新运行同方整公司。
+
+原源/模型/读回复核：PDF hash、全部layout坐标、导出JSON=query profile、Markdown同JSON、actual response hash/raw文本与ledger流hash全一致。林海25页/30份Evidence、query sha256 e195088b6e32e3d7ce455693283cc80203894cc3d6a839f5e90e2e2452c537ae；大名城18页/21份Evidence、query sha256 591ac908fdaa846bd8847e7e3bfa3118777299840ec619352c52d7348e4e2b7c。连前四份共93页/114份Evidence全部坐标通过，非语义全通过。
+
+相关16项pytest通过、7.84秒/1 warning，OpenSpec strict通过；v5指令经过公共网关系统消息测试。Review仅核当前业务正确性/兼容/身份/临时清理；当前已知语义问题仍限用而非假pass，不为排行榜/字段100%扩平台。读者可看完整画像后决定内容取舍。
+
+清理：新两根1892292/1836277常规文件字节已finally删除且实查不存在，合计3728569；重建临时operator9446字节已删，新增3738015。连§261共10458089常规文件字节，不重复计算旧轮释放，不冒充物理磁盘块；data/QuoteBak本人v9-*与活跃operator均空。正式PDF/共用解析/原回执/历史尝试标记与并行物保留，权威材料只留对应run目录一套。当前6.BC/BD/BE开发边界完成，本轮停止新增真实调用，混合历史文档只隔离本轮段落提交。

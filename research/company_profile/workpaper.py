@@ -197,6 +197,47 @@ class WorkpaperReadingScope(_Model):
     transcription_version: str = "source_page_text.v1"
 
 
+class WorkpaperModelUsage(_Model):
+    input_tokens: int | None = Field(default=None, ge=0)
+    output_tokens: int | None = Field(default=None, ge=0)
+    total_tokens: int | None = Field(default=None, ge=0)
+
+
+class WorkpaperModelCall(_Model):
+    purpose: Literal["select_profile_sections", "extract_profile_workpaper"]
+    request_id: str = Field(min_length=1)
+    request_hash: str | None = None
+    response_hash: str | None = None
+    source_label: str | None = None
+    model: str | None = None
+    selected_profile: str | None = None
+    logical_profile: str | None = None
+    route_fingerprint: str | None = None
+    finish_reason: str | None = None
+    contract_status: Literal["accepted", "rejected", "unknown"] = "unknown"
+    usage: WorkpaperModelUsage = Field(default_factory=WorkpaperModelUsage)
+    scope_kind: Literal["report_heading_index", "selected_source_sections"]
+    heading_count: int | None = Field(default=None, ge=0)
+    section_ids: tuple[str, ...] = ()
+    physical_pages: tuple[int, ...] = ()
+
+
+class WorkpaperGenerationMetadata(_Model):
+    prompt_version: str = Field(min_length=1)
+    preprocessing_version: str = Field(min_length=1)
+    section_guide_version: str | None = None
+    selection: WorkpaperModelCall
+    extraction: WorkpaperModelCall
+
+    @model_validator(mode="after")
+    def stages_match(self):
+        if self.selection.purpose != "select_profile_sections":
+            raise ValueError("selection model attribution has wrong purpose")
+        if self.extraction.purpose != "extract_profile_workpaper":
+            raise ValueError("extraction model attribution has wrong purpose")
+        return self
+
+
 class CompanyProfileWorkpaper(_Model):
     schema_version: Literal["company_profile_workpaper.v1"] = WORKPAPER_SCHEMA
     origin: Literal["human_reference", "llm_generated", "controlled_fixture"]
@@ -206,6 +247,7 @@ class CompanyProfileWorkpaper(_Model):
     evidence: tuple[WorkpaperEvidence, ...]
     limitations: tuple[str, ...] = ()
     supply_chain: WorkpaperSupplyChain | None = None
+    generation: WorkpaperGenerationMetadata | None = None
 
     @model_validator(mode="after")
     def source_integrity(self):
@@ -214,6 +256,13 @@ class CompanyProfileWorkpaper(_Model):
             raise ValueError("duplicate evidence identity")
         if any(item.document_version != self.report.document_version for item in self.evidence):
             raise ValueError("evidence document version mismatch")
+        if self.generation is not None:
+            selected_ids = {item.section_id for item in self.reading_scope.sections}
+            if set(self.generation.extraction.section_ids) != selected_ids:
+                raise ValueError("model extraction attribution does not match selected sections")
+            source_pages = {span.page for item in self.evidence for span in item.source_spans}
+            if set(self.generation.extraction.physical_pages) != source_pages:
+                raise ValueError("model extraction attribution does not match supplied pages")
         ids: set[str] = set()
         sections = [getattr(self.elements, name) for name in ELEMENT_LABELS]
         if self.supply_chain is not None:
@@ -256,6 +305,7 @@ def bind_workpaper_draft(
     reading_scope: WorkpaperReadingScope,
     evidence: Sequence[WorkpaperEvidence],
     origin: Literal["llm_generated", "controlled_fixture"] = "llm_generated",
+    generation: WorkpaperGenerationMetadata | None = None,
 ) -> CompanyProfileWorkpaper:
     """Bind a model's evidence IDs to the immutable local source packet."""
     allowed = {item.evidence_id for item in evidence}
@@ -295,7 +345,14 @@ def bind_workpaper_draft(
         evidence=tuple(evidence),
         limitations=response.limitations,
         supply_chain=supply_chain,
+        generation=generation,
     )
+
+
+def _metric_display(metric: WorkpaperMetric) -> str:
+    """Display an already validated raw value without repeating its exact unit."""
+    raw_value, unit = metric.raw_value.strip(), metric.unit.strip()
+    return raw_value if raw_value.endswith(unit) else f"{raw_value} {unit}"
 
 
 def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
@@ -321,7 +378,7 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
             refs = "、".join(f"[{value}](#{value.lower()})" for value in fact.evidence_ids)
             out.append(f"- {fact.text}（{refs}）")
             for metric in fact.metrics:
-                out.append(f"  - {metric.name}：{metric.raw_value} {metric.unit}；{metric.period}，{metric.subject_scope}。")
+                out.append(f"  - {metric.name}：{_metric_display(metric)}；{metric.period}，{metric.subject_scope}。")
         for limitation in element.limitations:
             out.append(f"- 限制：{limitation}")
         out.append("")
@@ -334,7 +391,7 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
                 refs = "、".join(f"[{value}](#{value.lower()})" for value in fact.evidence_ids)
                 out.append(f"- {fact.text}（{refs}）")
                 for metric in fact.metrics:
-                    out.append(f"  - {metric.name}：{metric.raw_value} {metric.unit}；{metric.period}，{metric.subject_scope}。")
+                    out.append(f"  - {metric.name}：{_metric_display(metric)}；{metric.period}，{metric.subject_scope}。")
             out.extend(f"- 限制：{limit}" for limit in element.limitations)
             out.append("")
     out.extend(["## 阅读范围与取舍", "", workpaper.reading_scope.selection_rationale, ""])
@@ -345,6 +402,24 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
         out.append("- 未读/后置：" + scope)
     for limitation in workpaper.limitations:
         out.append("- 限制：" + limitation)
+    if workpaper.generation is not None:
+        out.extend(["", "## 模型处理记录", ""])
+        for label, call in (("选章", workpaper.generation.selection), ("正文抽取", workpaper.generation.extraction)):
+            model = call.model or "模型未知"
+            source = call.source_label or "来源未知"
+            profile = call.selected_profile or call.logical_profile or "profile未知"
+            if call.scope_kind == "report_heading_index":
+                scope = f"报告标题索引（{call.heading_count if call.heading_count is not None else '未知'}个候选章节）"
+            else:
+                pages = ",".join(str(page) for page in call.physical_pages) or "未知"
+                scope = f"章节 {', '.join(call.section_ids) or '未知'}；物理页 {pages}"
+            usage = call.usage
+            usage_text = (
+                f"输入/输出/合计 {usage.input_tokens}/{usage.output_tokens}/{usage.total_tokens}"
+                if usage.total_tokens is not None else "usage未知"
+            )
+            out.append(f"- {label}：{model}（{source}，{profile}），{scope}；{usage_text}；finish={call.finish_reason or '未知'}。")
+        out.append(f"- 提示版本：`{workpaper.generation.prompt_version}`；预处理：`{workpaper.generation.preprocessing_version}`。")
     out.extend(["", "## 来源", ""])
     for item in workpaper.evidence:
         out.extend([f"### {item.evidence_id}", "", " / ".join(item.section_path)])

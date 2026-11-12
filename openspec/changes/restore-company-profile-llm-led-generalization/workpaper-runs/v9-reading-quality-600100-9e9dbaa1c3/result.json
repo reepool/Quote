@@ -1,0 +1,1728 @@
+{
+  "run": {
+    "action": "run",
+    "state": "completed",
+    "task": {
+      "task_name": "company_profile_common_core",
+      "actions": [
+        "preview",
+        "run",
+        "status",
+        "pause",
+        "resume",
+        "query",
+        "export"
+      ],
+      "parameters": {
+        "action": [
+          "preview",
+          "run",
+          "status",
+          "pause",
+          "resume",
+          "query",
+          "export"
+        ],
+        "knowledge_cutoff": null,
+        "instrument_ids": [],
+        "max_items": 2,
+        "token_budget": 50000,
+        "max_elapsed_seconds": 300.0,
+        "reason": "operator_request",
+        "output_directory": null
+      },
+      "storage_namespace": "company_profile_common_core.v1",
+      "writer": "company_profile_research_writer.v1",
+      "production_authorization": "not_authorized",
+      "legacy_task_names_not_connected": [
+        "business_profile_daily_incremental",
+        "business_profile_backfill",
+        "business_profile_backfill_control",
+        "business_profile_semantic_repair",
+        "company_profile_shadow_sync"
+      ],
+      "stage5_connected": true
+    },
+    "control": {
+      "schema_version": "company_profile_task_control.v1",
+      "state": "completed",
+      "run_id": "company_profile_common_core-0b8560db7337",
+      "action": "run",
+      "started_at": "2026-11-12T13:01:10.830053+08:00",
+      "updated_at": "2026-11-12T13:01:52.951894+08:00",
+      "finished_at": "2026-11-12T13:01:52.951894+08:00",
+      "stop_requested": false,
+      "reason": null,
+      "parameters": {
+        "knowledge_cutoff": "2026-11-12",
+        "instrument_ids": [
+          "600100.SH"
+        ],
+        "max_items": 1,
+        "token_budget": 3000000,
+        "max_elapsed_seconds": 1757.7182219680399
+      },
+      "latest_result": {
+        "action": "run",
+        "state": "completed",
+        "task": {
+          "task_name": "company_profile_common_core",
+          "actions": [
+            "preview",
+            "run",
+            "status",
+            "pause",
+            "resume",
+            "query",
+            "export"
+          ],
+          "parameters": {
+            "action": [
+              "preview",
+              "run",
+              "status",
+              "pause",
+              "resume",
+              "query",
+              "export"
+            ],
+            "knowledge_cutoff": null,
+            "instrument_ids": [],
+            "max_items": 2,
+            "token_budget": 50000,
+            "max_elapsed_seconds": 300.0,
+            "reason": "operator_request",
+            "output_directory": null
+          },
+          "storage_namespace": "company_profile_common_core.v1",
+          "writer": "company_profile_research_writer.v1",
+          "production_authorization": "not_authorized",
+          "legacy_task_names_not_connected": [
+            "business_profile_daily_incremental",
+            "business_profile_backfill",
+            "business_profile_backfill_control",
+            "business_profile_semantic_repair",
+            "company_profile_shadow_sync"
+          ],
+          "stage5_connected": true
+        },
+        "control": {
+          "schema_version": "company_profile_task_control.v1",
+          "state": "running",
+          "run_id": "company_profile_common_core-0b8560db7337",
+          "action": "run",
+          "started_at": "2026-11-12T13:01:10.830053+08:00",
+          "updated_at": "2026-11-12T13:01:10.830053+08:00",
+          "finished_at": null,
+          "stop_requested": false,
+          "reason": null,
+          "parameters": {
+            "knowledge_cutoff": "2026-11-12",
+            "instrument_ids": [
+              "600100.SH"
+            ],
+            "max_items": 1,
+            "token_budget": 3000000,
+            "max_elapsed_seconds": 1757.7182219680399
+          },
+          "latest_result": null
+        },
+        "queue": {
+          "as_of": "2026-11-12T13:01:51.736472+08:00",
+          "total": 1,
+          "running": 0,
+          "claimable": 0,
+          "terminal": 0,
+          "completed": 1,
+          "machine_rework": 0,
+          "finalized": 1,
+          "groups": [
+            {
+              "stage": "publish",
+              "status": "completed",
+              "row_count": 1,
+              "oldest_created_at": "2026-11-12T13:01:11.602060+08:00",
+              "oldest_age_seconds": 40.529142
+            }
+          ]
+        },
+        "production_authorization": "not_authorized",
+        "storage_namespace": "company_profile_common_core.v1",
+        "writer": "company_profile_research_writer.v1",
+        "knowledge_cutoff": "2026-11-12",
+        "enqueue": {
+          "eligible": 1,
+          "inserted": 1,
+          "reused": 0,
+          "reset": 0,
+          "checkpoint_rotated": 0,
+          "checkpoint_deleted": 0,
+          "checkpoint_delete_failures": [],
+          "superseded": 0,
+          "identity_superseded": 0,
+          "work_ids": [
+            "bp-work-ad7d9d927b02b30fbf2ca0a6"
+          ]
+        },
+        "drain": {
+          "acquire": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 2.08,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 3.626,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 2,
+              "wait_seconds": 4.1e-05,
+              "write_seconds": 0.364896,
+              "observation_seconds": 4.928712,
+              "transaction_p50_seconds": 0.182448,
+              "transaction_p95_seconds": 0.202939,
+              "transaction_max_seconds": 0.205216,
+              "writer_lock_duty": 0.074035,
+              "inter_write_idle_seconds": 1.850774,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "parse": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.918,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 3.979,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 4,
+              "wait_seconds": 7.5e-05,
+              "write_seconds": 0.839134,
+              "observation_seconds": 8.978096,
+              "transaction_p50_seconds": 0.193985,
+              "transaction_p95_seconds": 0.278543,
+              "transaction_max_seconds": 0.291484,
+              "writer_lock_duty": 0.093465,
+              "inter_write_idle_seconds": 5.408437,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "semantic": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 25.136,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 26.954,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 8,
+              "wait_seconds": 0.00012,
+              "write_seconds": 1.37668,
+              "observation_seconds": 36.011141,
+              "transaction_p50_seconds": 0.155287,
+              "transaction_p95_seconds": 0.26129,
+              "transaction_max_seconds": 0.291484,
+              "writer_lock_duty": 0.038229,
+              "inter_write_idle_seconds": 31.985149,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "verify": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.249,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 2.326,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 10,
+              "wait_seconds": 0.00014,
+              "write_seconds": 1.609923,
+              "observation_seconds": 38.383286,
+              "transaction_p50_seconds": 0.145588,
+              "transaction_p95_seconds": 0.252663,
+              "transaction_max_seconds": 0.291484,
+              "writer_lock_duty": 0.041943,
+              "inter_write_idle_seconds": 34.049806,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "publish": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.148,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 2.424,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 12,
+              "wait_seconds": 0.00016,
+              "write_seconds": 1.873379,
+              "observation_seconds": 40.862591,
+              "transaction_p50_seconds": 0.138662,
+              "transaction_p95_seconds": 0.244036,
+              "transaction_max_seconds": 0.291484,
+              "writer_lock_duty": 0.045846,
+              "inter_write_idle_seconds": 36.323964,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          }
+        }
+      }
+    },
+    "queue": {
+      "as_of": "2026-11-12T13:01:51.736472+08:00",
+      "total": 1,
+      "running": 0,
+      "claimable": 0,
+      "terminal": 0,
+      "completed": 1,
+      "machine_rework": 0,
+      "finalized": 1,
+      "groups": [
+        {
+          "stage": "publish",
+          "status": "completed",
+          "row_count": 1,
+          "oldest_created_at": "2026-11-12T13:01:11.602060+08:00",
+          "oldest_age_seconds": 40.529142
+        }
+      ]
+    },
+    "production_authorization": "not_authorized",
+    "storage_namespace": "company_profile_common_core.v1",
+    "writer": "company_profile_research_writer.v1",
+    "knowledge_cutoff": "2026-11-12",
+    "enqueue": {
+      "eligible": 1,
+      "inserted": 1,
+      "reused": 0,
+      "reset": 0,
+      "checkpoint_rotated": 0,
+      "checkpoint_deleted": 0,
+      "checkpoint_delete_failures": [],
+      "superseded": 0,
+      "identity_superseded": 0,
+      "work_ids": [
+        "bp-work-ad7d9d927b02b30fbf2ca0a6"
+      ]
+    },
+    "drain": {
+      "acquire": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 2.08,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 3.626,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 2,
+          "wait_seconds": 4.1e-05,
+          "write_seconds": 0.364896,
+          "observation_seconds": 4.928712,
+          "transaction_p50_seconds": 0.182448,
+          "transaction_p95_seconds": 0.202939,
+          "transaction_max_seconds": 0.205216,
+          "writer_lock_duty": 0.074035,
+          "inter_write_idle_seconds": 1.850774,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "parse": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.918,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 3.979,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 4,
+          "wait_seconds": 7.5e-05,
+          "write_seconds": 0.839134,
+          "observation_seconds": 8.978096,
+          "transaction_p50_seconds": 0.193985,
+          "transaction_p95_seconds": 0.278543,
+          "transaction_max_seconds": 0.291484,
+          "writer_lock_duty": 0.093465,
+          "inter_write_idle_seconds": 5.408437,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "semantic": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 25.136,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 26.954,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 8,
+          "wait_seconds": 0.00012,
+          "write_seconds": 1.37668,
+          "observation_seconds": 36.011141,
+          "transaction_p50_seconds": 0.155287,
+          "transaction_p95_seconds": 0.26129,
+          "transaction_max_seconds": 0.291484,
+          "writer_lock_duty": 0.038229,
+          "inter_write_idle_seconds": 31.985149,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "verify": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.249,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 2.326,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 10,
+          "wait_seconds": 0.00014,
+          "write_seconds": 1.609923,
+          "observation_seconds": 38.383286,
+          "transaction_p50_seconds": 0.145588,
+          "transaction_p95_seconds": 0.252663,
+          "transaction_max_seconds": 0.291484,
+          "writer_lock_duty": 0.041943,
+          "inter_write_idle_seconds": 34.049806,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "publish": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.148,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 2.424,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 12,
+          "wait_seconds": 0.00016,
+          "write_seconds": 1.873379,
+          "observation_seconds": 40.862591,
+          "transaction_p50_seconds": 0.138662,
+          "transaction_p95_seconds": 0.244036,
+          "transaction_max_seconds": 0.291484,
+          "writer_lock_duty": 0.045846,
+          "inter_write_idle_seconds": 36.323964,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      }
+    }
+  },
+  "three_reads_equal": true,
+  "profile_count": 1,
+  "elapsed_seconds": 85.523,
+  "ledger": {
+    "physical_requests": 2,
+    "charged_tokens": 41077,
+    "charged_cost_cny": "unknown",
+    "cost_status": "unknown",
+    "billing_mode": "development_unpriced",
+    "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+    "stopped_reason": null,
+    "denied_request": null,
+    "attempts": [
+      {
+        "sequence": 1,
+        "request_id": "1a31d93809e44137b68b2d42896de05e",
+        "logical_request_id": "a07ea9c273b55a34a79cec95c7b56c813f507b41482a5100dc00a3e59704f2c0",
+        "source_label": "deepseek:deepseek-flash",
+        "attempt": 1,
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "reserved_input_tokens": 74658,
+        "reserved_output_tokens": 2500,
+        "charged_tokens": 23737,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 23466,
+          "output_tokens": 271,
+          "total_tokens": 23737
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 273,
+          "content_fragments": 271,
+          "content_chars": 569,
+          "content_sha256": "cc997624e0419bdd39bb90b61910f31f4612cb13591c3c2d25426bf64d5eb5eb",
+          "reasoning_present": false,
+          "reasoning_chars": 0,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      },
+      {
+        "sequence": 2,
+        "request_id": "2e4b1773c1a04bddbe6bbe46d547396f",
+        "logical_request_id": "4f0f3c30daaa641ea0fec15db3c169bdbfdaa42b2c68dfc1909328f86dc90233",
+        "source_label": "deepseek:deepseek-flash",
+        "attempt": 1,
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "reserved_input_tokens": 63623,
+        "reserved_output_tokens": 12000,
+        "charged_tokens": 17340,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 13006,
+          "output_tokens": 4334,
+          "total_tokens": 17340
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 4336,
+          "content_fragments": 4334,
+          "content_chars": 11371,
+          "content_sha256": "8ff4201faf92f55000d5c32013acf4488ca863fef84beceef2e2c9c5ea8459f1",
+          "reasoning_present": false,
+          "reasoning_chars": 0,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      }
+    ]
+  },
+  "receipts": [
+    {
+      "request_id": "bp-work-ad7d9d927b02b30fbf2ca0a6:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "61f4897e763d7caf58646bcf03fc0630d9c34bc844696dcafe5214674ee7d85e",
+      "response_hash": "cc997624e0419bdd39bb90b61910f31f4612cb13591c3c2d25426bf64d5eb5eb",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction",
+      "route_fingerprint": "05c8b3e01cf7ce3251de2533fd438135f78f75ee85fbbb916a5238f065b8fde9",
+      "contract_status": "accepted",
+      "raw_content": "{\"selected_section_ids\":[\"section-0035\",\"section-0036\",\"section-0037\",\"section-0052\",\"section-0054\",\"section-0056\",\"section-0057\",\"section-0058\"],\"rationale\":\"所选章节覆盖公司业务结构、行业环境、经营讨论、主营业务收入与成本分析，以及公共安全、数智产业、智慧能源三大板块的经营情况，能共同说明产品/服务用途、经营模式、收入规模与结构、主要变化及驱动因素，信息密度高且相互关联。\",\"deferred\":[\"section-0045 核心竞争力分析：属定性优势描述，非业务结构与经营数据核心，暂缓\",\"section-0108 未来发展讨论与分析：含较多规划性内容，非本期实际经营变化，暂缓\",\"section-0100 主要控股参股公司分析：可在需要子公司层面补充时再读\",\"section-1038 分部信息：财务附注层面，若板块数据仍有缺口再定向补充\"],\"stop_reason\":\"已选取管理层讨论与分析中业务、行业、经营讨论及主营业务/分板块经营的核心子节，足以回答业务结构、产品用途、收入规模与主要变化；其余为定性优势、未来规划或财务附注细节，非必要，故在此停止。\"}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0035",
+          "section-0036",
+          "section-0037",
+          "section-0052",
+          "section-0054",
+          "section-0056",
+          "section-0057",
+          "section-0058"
+        ],
+        "rationale": "所选章节覆盖公司业务结构、行业环境、经营讨论、主营业务收入与成本分析，以及公共安全、数智产业、智慧能源三大板块的经营情况，能共同说明产品/服务用途、经营模式、收入规模与结构、主要变化及驱动因素，信息密度高且相互关联。",
+        "deferred": [
+          "section-0045 核心竞争力分析：属定性优势描述，非业务结构与经营数据核心，暂缓",
+          "section-0108 未来发展讨论与分析：含较多规划性内容，非本期实际经营变化，暂缓",
+          "section-0100 主要控股参股公司分析：可在需要子公司层面补充时再读",
+          "section-1038 分部信息：财务附注层面，若板块数据仍有缺口再定向补充"
+        ],
+        "stop_reason": "已选取管理层讨论与分析中业务、行业、经营讨论及主营业务/分板块经营的核心子节，足以回答业务结构、产品用途、收入规模与主要变化；其余为定性优势、未来规划或财务附注细节，非必要，故在此停止。"
+      },
+      "usage": {
+        "input_tokens": 23466,
+        "output_tokens": 271,
+        "total_tokens": 23737
+      }
+    },
+    {
+      "request_id": "bp-work-ad7d9d927b02b30fbf2ca0a6:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "9532886a7ef09197d5b1ccf1e4e991e1df938d2802909ba5e240ac5764385941",
+      "response_hash": "8ff4201faf92f55000d5c32013acf4488ca863fef84beceef2e2c9c5ea8459f1",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction",
+      "route_fingerprint": "05c8b3e01cf7ce3251de2533fd438135f78f75ee85fbbb916a5238f065b8fde9",
+      "contract_status": "accepted",
+      "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"BS-01\",\"text\":\"公司定位为“数智技术与核技术创新融合的高科技企业”，聚焦公共安全、数智产业、智慧能源等产业领域，并设有科技成果转化平台、资产管理平台、海外投资协同平台。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]},{\"fact_id\":\"BS-02\",\"text\":\"公司主营业务归属于公共安全、数智产业和智慧能源等产业领域，按所处行业及经营模式可分为制造业和软件与信息技术服务业。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"BS-03\",\"text\":\"报告期内公司整合数智信息产业资源成立同方数科；同方威视、同方超光、同方数科分别入选不同层级的改革或科创培育名单。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"]}],\"limitations\":[\"未提供各产业板块内部法人层级的完整股权结构，业务层级仅依据披露的产业板块与子公司名称说明。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"PS-01\",\"text\":\"公共安全产业提供基于辐射成像技术的智能检查系统、解决方案及全生命周期运维服务，深耕民航、海关、铁路、公路、轨道交通、邮政物流、公安司法、大型活动赛事等领域。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"PS-02\",\"text\":\"公共安全产业持续向无损检测、矿石分选、工业自动化、核安保等新兴领域拓展；智能分选业务已覆盖煤矿、磷矿、银矿、铅锌矿等矿种。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0012\"]},{\"fact_id\":\"PS-03\",\"text\":\"数智产业聚焦“知识服务”和“数智转型服务”两大主营业务方向；知识服务核心产品包括CNKI系列数据库、CNKI AI工具及知网AI+图书平台，数智转型服务核心产品包括定制化行业数智化解决方案、数字化转型方案与系统。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"PS-04\",\"text\":\"数智产业还聚焦人工智能、数据要素方向，华知大模型升级至6.0并构建MaaS平台，落地法律等多个垂类大模型，数据要素平台实现超200款数据产品挂牌。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"]},{\"fact_id\":\"PS-05\",\"text\":\"智慧能源产业开发热泵装备、多种储冷/热/电系统、控制器产品、软件平台和能源系统算法，为北方供暖、清洁供热、建筑园区、城市轨道交通、数据中心等用能场景提供一体化解决方案与运维服务。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}],\"limitations\":[\"产品用途与客户领域依据披露的场景描述，未逐一列示各产品的具体型号与对应客户名单。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"RM-01\",\"text\":\"数智产业知识服务领域盈利模式以机构订阅为主，辅以个人按需付费等；数智转型服务领域盈利模式涵盖技术授权、软件设计与开发等。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"RM-02\",\"text\":\"智慧能源产业通过规划咨询、产品供应、工程建设、节能服务、运维托管等方式向用户提供一体化解决方案与运维服务。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"RM-03\",\"text\":\"公共安全产业提供智能检查系统、解决方案及全生命周期运维服务，形成设备、平台与服务相结合的收入来源。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0012\"]}],\"limitations\":[\"未披露各盈利模式对应的收入金额或占比。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"SM-01\",\"text\":\"2025年公司实现营业收入150.65亿元；主营业务分产业板块合计收入1,497,009.55万元，其中公共安全698,057.58万元、数智产业275,072.20万元、智慧能源450,419.69万元、其他业务67,758.61万元、总部投资及科技园33,812.59万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0010\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"150.65亿元\",\"value\":\"150.65\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"主营业务收入-公共安全\",\"raw_value\":\"698,057.58\",\"value\":\"698057.58\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年1-12月\"},{\"name\":\"主营业务收入-数智产业\",\"raw_value\":\"275,072.20\",\"value\":\"275072.20\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年1-12月\"},{\"name\":\"主营业务收入-智慧能源\",\"raw_value\":\"450,419.69\",\"value\":\"450419.69\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年1-12月\"}]},{\"fact_id\":\"SM-02\",\"text\":\"按地区划分，2025年国内市场主营业务收入971,560.22万元、比重64.90%，国际市场525,449.33万元、比重35.10%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"主营业务收入-国内市场\",\"raw_value\":\"971,560.22\",\"value\":\"971560.22\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"主营业务收入-国际市场\",\"raw_value\":\"525,449.33\",\"value\":\"525449.33\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"SM-03\",\"text\":\"2025年公司实现海外收入52.54亿元，创历史新高；海外市场营收同比增长6.51亿元，增幅14.15%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0007\"],\"metrics\":[{\"name\":\"海外收入\",\"raw_value\":\"52.54亿元\",\"value\":\"52.54\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"SM-04\",\"text\":\"2025年公司实现归母净利润4.95亿元，其中扣非归母净利润2.88亿元，整体毛利率同比提升2.35个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"归母净利润\",\"raw_value\":\"4.95亿元\",\"value\":\"4.95\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"扣非归母净利润\",\"raw_value\":\"2.88亿元\",\"value\":\"2.88\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}],\"limitations\":[\"主营业务分板块表单位为万元，营业收入总额以亿元披露，两者未在同一表中直接勾稽，未做单位换算。\",\"分板块毛利率与收入占比未逐项计算，仅引用原文披露值。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"OI-01\",\"text\":\"公司研发投入合计1,500,030,364.93元，研发投入总额占营业收入比例9.96%，研发投入资本化比重48.97%；研发人员数量3171人，占公司总人数比例28.84%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"],\"metrics\":[{\"name\":\"研发投入合计\",\"raw_value\":\"1,500,030,364.93\",\"value\":\"1500030364.93\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"研发投入总额占营业收入比例\",\"raw_value\":\"9.96%\",\"value\":\"9.96\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"研发人员数量\",\"raw_value\":\"3171\",\"value\":\"3171\",\"unit\":\"人\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"OI-02\",\"text\":\"公司设有专门的科技成果转化平台、资产管理平台、海外投资协同平台；报告期内成立审计中心、集采中心、项目管理中心。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0008\"]},{\"fact_id\":\"OI-03\",\"text\":\"公司推进专业化、集约化，成立集采中心；前五名供应商采购额89,780.00万元，占年度采购总额8.16%，其中关联方采购额31,805.83万元，占年度采购总额2.89%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\",\"source-0008\"],\"metrics\":[{\"name\":\"前五名供应商采购额\",\"raw_value\":\"89,780.00\",\"value\":\"89780.00\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"8.16%\",\"value\":\"8.16\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}],\"limitations\":[\"未披露主要原材料的具体品类、来源或单一供应商名称，采购集中度仅以前五名合计披露。\",\"研发投入与人员为集团合并口径，未按产业板块拆分。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"CM-01\",\"text\":\"公共安全产品及服务遍及全球170多个国家和地区，客户领域包括民航、海关、铁路、公路、轨道交通、邮政物流、公安司法、大型活动赛事等。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\",\"source-0001\"]},{\"fact_id\":\"CM-02\",\"text\":\"数智产业知识服务依托CNKI平台，为全球3.5万家机构及1.5亿个人用户提供学术资源检索、知识管理及智能问答等服务。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"CNKI平台机构用户数\",\"raw_value\":\"3.5万家\",\"value\":\"3.5\",\"unit\":\"万家\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"CNKI平台个人用户数\",\"raw_value\":\"1.5亿\",\"value\":\"1.5\",\"unit\":\"亿\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"CM-03\",\"text\":\"前五名客户销售额295,015.77万元，占年度销售总额19.58%；其中关联方销售额0万元，占年度销售总额0%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"295,015.77\",\"value\":\"295015.77\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"19.58%\",\"value\":\"19.58\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"CM-04\",\"text\":\"报告期内公司国内外累计拓展4000余家机构客户；CNKI AI产品在哈萨克斯坦实现境外首单突破。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]}],\"limitations\":[\"未披露具体客户名称及分板块客户集中度。\",\"“向单个客户销售比例超过50%”等情形披露为不适用，不能据此推断各客户占比均低于50%。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"OD-01\",\"text\":\"2025年安检安保、数据治理、人工智能等优势业务收入实现较好增长；公司主动收缩智慧能源等产业的低毛利业务规模，且上年计算机硬件业务出表，使整体收入规模较上年有所下降。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0006\"]},{\"fact_id\":\"OD-02\",\"text\":\"数智产业主营业务收入同比下降主要系上年转让计算机业务影响所致；主营业务成本同比下降亦主要系上年转让计算机业务影响所致。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0017\"]},{\"fact_id\":\"OD-03\",\"text\":\"经营活动现金流量净额同比增长，主要是公司加大应收账款催收力度、销售回款质量提升，公共安全、智慧能源等主要产业经营现金净流入较上年同期大幅增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0019\"]},{\"fact_id\":\"OD-04\",\"text\":\"公司整体毛利率同比提升2.35个百分点，扣非归母净利润实现扭亏为盈，有息负债规模连续下降。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]}],\"limitations\":[\"收入下降原因中“低毛利业务收缩”与“计算机硬件业务出表”的相对影响程度未量化。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"MC-01\",\"text\":\"报告期内公司整合数智信息产业资源成立同方数科，初步建立基于企业架构的数智化转型范式。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"MC-02\",\"text\":\"公司大力推动结构调整，全年退出控参股企业16户，产业布局持续优化。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"退出控参股企业数量\",\"raw_value\":\"16户\",\"value\":\"16\",\"unit\":\"户\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"MC-03\",\"text\":\"公司披露本期业务类型、利润构成或利润来源未发生重大变动，报告期内业务、产品或服务未发生重大变化或调整。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0017\"]},{\"fact_id\":\"MC-04\",\"text\":\"公司完成“十五五”规划编制，明确“数智技术与核技术创新融合的高科技企业”战略定位，并针对公共安全、数智产业及智慧能源三个主干产业制定专项规划。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]}],\"limitations\":[\"规划内容属战略部署，不代表已实现的经营成果。\",\"未披露退出控参股企业的具体名称与交易金额。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"SC-P1\",\"text\":\"公共安全产业以辐射成像技术为核心，提供安检设备、综合安检解决方案及全生命周期运维服务，处于安检产品与解决方案供应及服务环节。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0012\"]},{\"fact_id\":\"SC-P2\",\"text\":\"智慧能源产业以热泵产品、能源管理技术为根本，提供贯穿能源生产、输配和消费全过程的综合智慧能源解决方案，并通过规划咨询、产品供应、工程建设、节能服务、运维托管等方式参与。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0015\"]}],\"limitations\":[\"未披露各板块在产业链中的具体生产或贸易环节占比。\"]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"SC-U1\",\"text\":\"公司前五名供应商采购额89,780.00万元，占年度采购总额8.16%，其中关联方采购额31,805.83万元，占年度采购总额2.89%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"前五名供应商采购额\",\"raw_value\":\"89,780.00\",\"value\":\"89780.00\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"SC-U2\",\"text\":\"公司成立集采中心推进专业化、集约化采购管理。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]}],\"limitations\":[\"未披露具体原材料、能源或零部件品类及其供应商名称，无法确认电池、芯片等是否为公司采购输入。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"SC-D1\",\"text\":\"公共安全产品及服务应用于民航、海关、铁路、公路、轨道交通、邮政物流、公安司法、大型活动赛事等领域，遍及全球170多个国家和地区。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\",\"source-0001\"]},{\"fact_id\":\"SC-D2\",\"text\":\"智慧能源解决方案面向北方供暖、清洁供热、建筑园区、城市轨道交通、数据中心等城市主要用能场景。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"SC-D3\",\"text\":\"数智产业知识服务为全球3.5万家机构及1.5亿个人用户提供学术资源检索、知识管理及智能问答等服务；数智转型服务面向政务、企业等行业。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"下游客户以行业或用户类型描述，未披露具名客户名单。\"]}},\"limitations\":[\"本工作底稿仅依据所选管理层讨论与分析章节及主营业务分析片段编制，未读取核心竞争力、未来发展、主要控股参股公司分析及分部信息等章节。\",\"部分表格单位存在万元与亿元并存，未做换算，引用时保留原文单位。\",\"分板块收入与成本表未逐项列示各板块毛利率计算分母，仅引用原文披露的毛利率数值。\",\"报告期内处置或出表事项的具体时点未在所选章节明确，未据此推断事件发生期间。\"]}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "BS-01",
+                "text": "公司定位为“数智技术与核技术创新融合的高科技企业”，聚焦公共安全、数智产业、智慧能源等产业领域，并设有科技成果转化平台、资产管理平台、海外投资协同平台。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "BS-02",
+                "text": "公司主营业务归属于公共安全、数智产业和智慧能源等产业领域，按所处行业及经营模式可分为制造业和软件与信息技术服务业。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0003"
+                ]
+              },
+              {
+                "fact_id": "BS-03",
+                "text": "报告期内公司整合数智信息产业资源成立同方数科；同方威视、同方超光、同方数科分别入选不同层级的改革或科创培育名单。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007",
+                  "source-0008"
+                ]
+              }
+            ],
+            "limitations": [
+              "未提供各产业板块内部法人层级的完整股权结构，业务层级仅依据披露的产业板块与子公司名称说明。"
+            ]
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "PS-01",
+                "text": "公共安全产业提供基于辐射成像技术的智能检查系统、解决方案及全生命周期运维服务，深耕民航、海关、铁路、公路、轨道交通、邮政物流、公安司法、大型活动赛事等领域。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "PS-02",
+                "text": "公共安全产业持续向无损检测、矿石分选、工业自动化、核安保等新兴领域拓展；智能分选业务已覆盖煤矿、磷矿、银矿、铅锌矿等矿种。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0012"
+                ]
+              },
+              {
+                "fact_id": "PS-03",
+                "text": "数智产业聚焦“知识服务”和“数智转型服务”两大主营业务方向；知识服务核心产品包括CNKI系列数据库、CNKI AI工具及知网AI+图书平台，数智转型服务核心产品包括定制化行业数智化解决方案、数字化转型方案与系统。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "PS-04",
+                "text": "数智产业还聚焦人工智能、数据要素方向，华知大模型升级至6.0并构建MaaS平台，落地法律等多个垂类大模型，数据要素平台实现超200款数据产品挂牌。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0014"
+                ]
+              },
+              {
+                "fact_id": "PS-05",
+                "text": "智慧能源产业开发热泵装备、多种储冷/热/电系统、控制器产品、软件平台和能源系统算法，为北方供暖、清洁供热、建筑园区、城市轨道交通、数据中心等用能场景提供一体化解决方案与运维服务。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              }
+            ],
+            "limitations": [
+              "产品用途与客户领域依据披露的场景描述，未逐一列示各产品的具体型号与对应客户名单。"
+            ]
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "RM-01",
+                "text": "数智产业知识服务领域盈利模式以机构订阅为主，辅以个人按需付费等；数智转型服务领域盈利模式涵盖技术授权、软件设计与开发等。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "RM-02",
+                "text": "智慧能源产业通过规划咨询、产品供应、工程建设、节能服务、运维托管等方式向用户提供一体化解决方案与运维服务。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "RM-03",
+                "text": "公共安全产业提供智能检查系统、解决方案及全生命周期运维服务，形成设备、平台与服务相结合的收入来源。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0012"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露各盈利模式对应的收入金额或占比。"
+            ]
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "SM-01",
+                "text": "2025年公司实现营业收入150.65亿元；主营业务分产业板块合计收入1,497,009.55万元，其中公共安全698,057.58万元、数智产业275,072.20万元、智慧能源450,419.69万元、其他业务67,758.61万元、总部投资及科技园33,812.59万元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005",
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入",
+                    "raw_value": "150.65亿元",
+                    "value": "150.65",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "主营业务收入-公共安全",
+                    "raw_value": "698,057.58",
+                    "value": "698057.58",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年1-12月"
+                  },
+                  {
+                    "name": "主营业务收入-数智产业",
+                    "raw_value": "275,072.20",
+                    "value": "275072.20",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年1-12月"
+                  },
+                  {
+                    "name": "主营业务收入-智慧能源",
+                    "raw_value": "450,419.69",
+                    "value": "450419.69",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年1-12月"
+                  }
+                ]
+              },
+              {
+                "fact_id": "SM-02",
+                "text": "按地区划分，2025年国内市场主营业务收入971,560.22万元、比重64.90%，国际市场525,449.33万元、比重35.10%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "主营业务收入-国内市场",
+                    "raw_value": "971,560.22",
+                    "value": "971560.22",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "主营业务收入-国际市场",
+                    "raw_value": "525,449.33",
+                    "value": "525449.33",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "SM-03",
+                "text": "2025年公司实现海外收入52.54亿元，创历史新高；海外市场营收同比增长6.51亿元，增幅14.15%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005",
+                  "source-0007"
+                ],
+                "metrics": [
+                  {
+                    "name": "海外收入",
+                    "raw_value": "52.54亿元",
+                    "value": "52.54",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "SM-04",
+                "text": "2025年公司实现归母净利润4.95亿元，其中扣非归母净利润2.88亿元，整体毛利率同比提升2.35个百分点。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "归母净利润",
+                    "raw_value": "4.95亿元",
+                    "value": "4.95",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "扣非归母净利润",
+                    "raw_value": "2.88亿元",
+                    "value": "2.88",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "主营业务分板块表单位为万元，营业收入总额以亿元披露，两者未在同一表中直接勾稽，未做单位换算。",
+              "分板块毛利率与收入占比未逐项计算，仅引用原文披露值。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "OI-01",
+                "text": "公司研发投入合计1,500,030,364.93元，研发投入总额占营业收入比例9.96%，研发投入资本化比重48.97%；研发人员数量3171人，占公司总人数比例28.84%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0018"
+                ],
+                "metrics": [
+                  {
+                    "name": "研发投入合计",
+                    "raw_value": "1,500,030,364.93",
+                    "value": "1500030364.93",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "研发投入总额占营业收入比例",
+                    "raw_value": "9.96%",
+                    "value": "9.96",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "研发人员数量",
+                    "raw_value": "3171",
+                    "value": "3171",
+                    "unit": "人",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "OI-02",
+                "text": "公司设有专门的科技成果转化平台、资产管理平台、海外投资协同平台；报告期内成立审计中心、集采中心、项目管理中心。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002",
+                  "source-0008"
+                ]
+              },
+              {
+                "fact_id": "OI-03",
+                "text": "公司推进专业化、集约化，成立集采中心；前五名供应商采购额89,780.00万元，占年度采购总额8.16%，其中关联方采购额31,805.83万元，占年度采购总额2.89%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0017",
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五名供应商采购额",
+                    "raw_value": "89,780.00",
+                    "value": "89780.00",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "前五名供应商采购额占年度采购总额比例",
+                    "raw_value": "8.16%",
+                    "value": "8.16",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露主要原材料的具体品类、来源或单一供应商名称，采购集中度仅以前五名合计披露。",
+              "研发投入与人员为集团合并口径，未按产业板块拆分。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "CM-01",
+                "text": "公共安全产品及服务遍及全球170多个国家和地区，客户领域包括民航、海关、铁路、公路、轨道交通、邮政物流、公安司法、大型活动赛事等。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0012",
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "CM-02",
+                "text": "数智产业知识服务依托CNKI平台，为全球3.5万家机构及1.5亿个人用户提供学术资源检索、知识管理及智能问答等服务。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ],
+                "metrics": [
+                  {
+                    "name": "CNKI平台机构用户数",
+                    "raw_value": "3.5万家",
+                    "value": "3.5",
+                    "unit": "万家",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "CNKI平台个人用户数",
+                    "raw_value": "1.5亿",
+                    "value": "1.5",
+                    "unit": "亿",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "CM-03",
+                "text": "前五名客户销售额295,015.77万元，占年度销售总额19.58%；其中关联方销售额0万元，占年度销售总额0%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0017"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五名客户销售额",
+                    "raw_value": "295,015.77",
+                    "value": "295015.77",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "前五名客户销售额占年度销售总额比例",
+                    "raw_value": "19.58%",
+                    "value": "19.58",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "CM-04",
+                "text": "报告期内公司国内外累计拓展4000余家机构客户；CNKI AI产品在哈萨克斯坦实现境外首单突破。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露具体客户名称及分板块客户集中度。",
+              "“向单个客户销售比例超过50%”等情形披露为不适用，不能据此推断各客户占比均低于50%。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "OD-01",
+                "text": "2025年安检安保、数据治理、人工智能等优势业务收入实现较好增长；公司主动收缩智慧能源等产业的低毛利业务规模，且上年计算机硬件业务出表，使整体收入规模较上年有所下降。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005",
+                  "source-0006"
+                ]
+              },
+              {
+                "fact_id": "OD-02",
+                "text": "数智产业主营业务收入同比下降主要系上年转让计算机业务影响所致；主营业务成本同比下降亦主要系上年转让计算机业务影响所致。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010",
+                  "source-0017"
+                ]
+              },
+              {
+                "fact_id": "OD-03",
+                "text": "经营活动现金流量净额同比增长，主要是公司加大应收账款催收力度、销售回款质量提升，公共安全、智慧能源等主要产业经营现金净流入较上年同期大幅增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010",
+                  "source-0019"
+                ]
+              },
+              {
+                "fact_id": "OD-04",
+                "text": "公司整体毛利率同比提升2.35个百分点，扣非归母净利润实现扭亏为盈，有息负债规模连续下降。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ]
+              }
+            ],
+            "limitations": [
+              "收入下降原因中“低毛利业务收缩”与“计算机硬件业务出表”的相对影响程度未量化。"
+            ]
+          },
+          "material_changes": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "MC-01",
+                "text": "报告期内公司整合数智信息产业资源成立同方数科，初步建立基于企业架构的数智化转型范式。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "MC-02",
+                "text": "公司大力推动结构调整，全年退出控参股企业16户，产业布局持续优化。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "退出控参股企业数量",
+                    "raw_value": "16户",
+                    "value": "16",
+                    "unit": "户",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "MC-03",
+                "text": "公司披露本期业务类型、利润构成或利润来源未发生重大变动，报告期内业务、产品或服务未发生重大变化或调整。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010",
+                  "source-0017"
+                ]
+              },
+              {
+                "fact_id": "MC-04",
+                "text": "公司完成“十五五”规划编制，明确“数智技术与核技术创新融合的高科技企业”战略定位，并针对公共安全、数智产业及智慧能源三个主干产业制定专项规划。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ]
+              }
+            ],
+            "limitations": [
+              "规划内容属战略部署，不代表已实现的经营成果。",
+              "未披露退出控参股企业的具体名称与交易金额。"
+            ]
+          }
+        },
+        "supply_chain": {
+          "position": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "SC-P1",
+                "text": "公共安全产业以辐射成像技术为核心，提供安检设备、综合安检解决方案及全生命周期运维服务，处于安检产品与解决方案供应及服务环节。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0012"
+                ]
+              },
+              {
+                "fact_id": "SC-P2",
+                "text": "智慧能源产业以热泵产品、能源管理技术为根本，提供贯穿能源生产、输配和消费全过程的综合智慧能源解决方案，并通过规划咨询、产品供应、工程建设、节能服务、运维托管等方式参与。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002",
+                  "source-0015"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露各板块在产业链中的具体生产或贸易环节占比。"
+            ]
+          },
+          "upstream_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "SC-U1",
+                "text": "公司前五名供应商采购额89,780.00万元，占年度采购总额8.16%，其中关联方采购额31,805.83万元，占年度采购总额2.89%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0017"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五名供应商采购额",
+                    "raw_value": "89,780.00",
+                    "value": "89780.00",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "SC-U2",
+                "text": "公司成立集采中心推进专业化、集约化采购管理。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露具体原材料、能源或零部件品类及其供应商名称，无法确认电池、芯片等是否为公司采购输入。"
+            ]
+          },
+          "downstream_customers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "SC-D1",
+                "text": "公共安全产品及服务应用于民航、海关、铁路、公路、轨道交通、邮政物流、公安司法、大型活动赛事等领域，遍及全球170多个国家和地区。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0012",
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "SC-D2",
+                "text": "智慧能源解决方案面向北方供暖、清洁供热、建筑园区、城市轨道交通、数据中心等城市主要用能场景。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "SC-D3",
+                "text": "数智产业知识服务为全球3.5万家机构及1.5亿个人用户提供学术资源检索、知识管理及智能问答等服务；数智转型服务面向政务、企业等行业。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": [
+              "下游客户以行业或用户类型描述，未披露具名客户名单。"
+            ]
+          }
+        },
+        "limitations": [
+          "本工作底稿仅依据所选管理层讨论与分析章节及主营业务分析片段编制，未读取核心竞争力、未来发展、主要控股参股公司分析及分部信息等章节。",
+          "部分表格单位存在万元与亿元并存，未做换算，引用时保留原文单位。",
+          "分板块收入与成本表未逐项列示各板块毛利率计算分母，仅引用原文披露的毛利率数值。",
+          "报告期内处置或出表事项的具体时点未在所选章节明确，未据此推断事件发生期间。"
+        ]
+      },
+      "usage": {
+        "input_tokens": 13006,
+        "output_tokens": 4334,
+        "total_tokens": 17340
+      }
+    }
+  ]
+}

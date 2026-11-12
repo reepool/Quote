@@ -1,0 +1,91 @@
+{
+  "run_id": "v9-reading-quality-600097-9ef49f6288",
+  "asset": {
+    "instrument_id": "600097.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "ann_88e877bd39b3790446440dc4b4e45b07",
+    "filing_id": "1225039976",
+    "source": "cninfo",
+    "published_at": "2026-03-27T16:00:00+00:00",
+    "content_hash": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/4c/4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c.pdf",
+    "report_type": "annual_report"
+  },
+  "identity": {
+    "semantic_policy": "company_profile_llm_led.v2",
+    "reading_strategy": "chapter_workpaper_v1",
+    "prompt_version": "company_profile_workpaper.2026-11-12.supply-chain.v4",
+    "section_guide_version": "company_profile_section_guide.2026-11-12.v1",
+    "preprocessing_version": "toc_sections_native_layout.v2",
+    "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+    "execution_mode": "provider",
+    "semantic_reuse": false,
+    "max_section_characters": 160000,
+    "max_layout_characters": 500000,
+    "workpaper_max_output_tokens": 12000,
+    "logical_request_timeout_seconds": 620
+  },
+  "gateway": {
+    "profile": "semantic_extraction",
+    "pool": "shared_semantic",
+    "route_fingerprint": "86ad1a2cdbbd8e0f7f4c2283e651ff98dd60ab20348e66330c7f82807697fcd8",
+    "fallback_allowed": true,
+    "billing_mode": "development_unpriced",
+    "task_route_labels": [
+      "deepseek:deepseek-flash",
+      "scorpio:gemini-3.8-flash-high"
+    ],
+    "task_route_preferred_first": true,
+    "sources": [
+      {
+        "profile": "semantic_extraction__scorpio_gemini",
+        "provider_resource": "scorpio:gemini",
+        "model": "gemini-3.8-flash-high",
+        "source_label": "scorpio:gemini-3.8-flash-high"
+      },
+      {
+        "profile": "semantic_extraction__zai",
+        "provider_resource": "zai",
+        "model": "glm-5.3-flash",
+        "source_label": "zai:glm-5.3-flash"
+      },
+      {
+        "profile": "semantic_extraction__scorpio_grok",
+        "provider_resource": "scorpio:grok",
+        "model": "grok-4.7",
+        "source_label": "scorpio:grok-4.7"
+      },
+      {
+        "profile": "semantic_extraction__scorpio_deepseek",
+        "provider_resource": "scorpio:deepseek",
+        "model": "deepseek-v4-flash",
+        "source_label": "scorpio:deepseek-flash"
+      },
+      {
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "source_label": "deepseek:deepseek-flash"
+      }
+    ]
+  },
+  "approval_reference": "user-model-attribution-and-continued-development-2026-11-12",
+  "knowledge_cutoff": "2026-11-12",
+  "production_authorization": "not_authorized",
+  "limits": {
+    "seconds": 1800,
+    "ledger": 3000000,
+    "physical_requests": 96,
+    "recoveries": 8,
+    "per_logical": 4
+  },
+  "code_sha256": {
+    "workpaper.py": "4485b209249b2d23e7db02751485fa5e6a80c924df08a3811bdf4d61d2bddc22",
+    "workpaper_llm.py": "c04d3159adbb59b7aacc196d1cefac2c3c7e992401427322dadd562855648814",
+    "workpaper_sections.py": "0f0806e4c07ed014c026f6159411f0e80600ed60cbd4902115b29726f7d104e3",
+    "runtime.py": "9a520cc425863bae1ebc73cc866a9726df69bdece944cff73c391372eadbca77",
+    "reads.py": "134919707d888002c38e525ef7c16aa53927e5bb0e23f1369b77228c195b3f45",
+    "operations.py": "4af641fff84c890a08cd3a622a84f747ab03fd3610d1d1b7356eafe90755dd68",
+    "stage5_provider.py": "35c31acce15c9e84ebc7f1c42781f25cda01ccad93a81ec92bd55e4ed97593e0"
+  }
+}

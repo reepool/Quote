@@ -1,0 +1,2117 @@
+{
+  "run": {
+    "action": "run",
+    "state": "completed",
+    "task": {
+      "task_name": "company_profile_common_core",
+      "actions": [
+        "preview",
+        "run",
+        "status",
+        "pause",
+        "resume",
+        "query",
+        "export"
+      ],
+      "parameters": {
+        "action": [
+          "preview",
+          "run",
+          "status",
+          "pause",
+          "resume",
+          "query",
+          "export"
+        ],
+        "knowledge_cutoff": null,
+        "instrument_ids": [],
+        "max_items": 2,
+        "token_budget": 50000,
+        "max_elapsed_seconds": 300.0,
+        "reason": "operator_request",
+        "output_directory": null
+      },
+      "storage_namespace": "company_profile_common_core.v1",
+      "writer": "company_profile_research_writer.v1",
+      "production_authorization": "not_authorized",
+      "legacy_task_names_not_connected": [
+        "business_profile_daily_incremental",
+        "business_profile_backfill",
+        "business_profile_backfill_control",
+        "business_profile_semantic_repair",
+        "company_profile_shadow_sync"
+      ],
+      "stage5_connected": true
+    },
+    "control": {
+      "schema_version": "company_profile_task_control.v1",
+      "state": "completed",
+      "run_id": "company_profile_common_core-1a84e1cbb13c",
+      "action": "run",
+      "started_at": "2026-11-12T13:27:41.699120+08:00",
+      "updated_at": "2026-11-12T13:28:37.870938+08:00",
+      "finished_at": "2026-11-12T13:28:37.870938+08:00",
+      "stop_requested": false,
+      "reason": null,
+      "parameters": {
+        "knowledge_cutoff": "2026-11-12",
+        "instrument_ids": [
+          "600094.SH"
+        ],
+        "max_items": 1,
+        "token_budget": 3000000,
+        "max_elapsed_seconds": 1757.4778671916574
+      },
+      "latest_result": {
+        "action": "run",
+        "state": "completed",
+        "task": {
+          "task_name": "company_profile_common_core",
+          "actions": [
+            "preview",
+            "run",
+            "status",
+            "pause",
+            "resume",
+            "query",
+            "export"
+          ],
+          "parameters": {
+            "action": [
+              "preview",
+              "run",
+              "status",
+              "pause",
+              "resume",
+              "query",
+              "export"
+            ],
+            "knowledge_cutoff": null,
+            "instrument_ids": [],
+            "max_items": 2,
+            "token_budget": 50000,
+            "max_elapsed_seconds": 300.0,
+            "reason": "operator_request",
+            "output_directory": null
+          },
+          "storage_namespace": "company_profile_common_core.v1",
+          "writer": "company_profile_research_writer.v1",
+          "production_authorization": "not_authorized",
+          "legacy_task_names_not_connected": [
+            "business_profile_daily_incremental",
+            "business_profile_backfill",
+            "business_profile_backfill_control",
+            "business_profile_semantic_repair",
+            "company_profile_shadow_sync"
+          ],
+          "stage5_connected": true
+        },
+        "control": {
+          "schema_version": "company_profile_task_control.v1",
+          "state": "running",
+          "run_id": "company_profile_common_core-1a84e1cbb13c",
+          "action": "run",
+          "started_at": "2026-11-12T13:27:41.699120+08:00",
+          "updated_at": "2026-11-12T13:27:41.699120+08:00",
+          "finished_at": null,
+          "stop_requested": false,
+          "reason": null,
+          "parameters": {
+            "knowledge_cutoff": "2026-11-12",
+            "instrument_ids": [
+              "600094.SH"
+            ],
+            "max_items": 1,
+            "token_budget": 3000000,
+            "max_elapsed_seconds": 1757.4778671916574
+          },
+          "latest_result": null
+        },
+        "queue": {
+          "as_of": "2026-11-12T13:28:36.638612+08:00",
+          "total": 1,
+          "running": 0,
+          "claimable": 0,
+          "terminal": 0,
+          "completed": 1,
+          "machine_rework": 0,
+          "finalized": 1,
+          "groups": [
+            {
+              "stage": "publish",
+              "status": "completed",
+              "row_count": 1,
+              "oldest_created_at": "2026-11-12T13:27:42.531086+08:00",
+              "oldest_age_seconds": 54.544703
+            }
+          ]
+        },
+        "production_authorization": "not_authorized",
+        "storage_namespace": "company_profile_common_core.v1",
+        "writer": "company_profile_research_writer.v1",
+        "knowledge_cutoff": "2026-11-12",
+        "enqueue": {
+          "eligible": 1,
+          "inserted": 1,
+          "reused": 0,
+          "reset": 0,
+          "checkpoint_rotated": 0,
+          "checkpoint_deleted": 0,
+          "checkpoint_delete_failures": [],
+          "superseded": 0,
+          "identity_superseded": 0,
+          "work_ids": [
+            "bp-work-e9c5a9870d5a174bc8169163"
+          ]
+        },
+        "drain": {
+          "acquire": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.979,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 3.617,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 2,
+              "wait_seconds": 2.8e-05,
+              "write_seconds": 0.493717,
+              "observation_seconds": 5.462125,
+              "transaction_p50_seconds": 0.246858,
+              "transaction_p95_seconds": 0.294579,
+              "transaction_max_seconds": 0.299881,
+              "writer_lock_duty": 0.090389,
+              "inter_write_idle_seconds": 1.712794,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "parse": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.825,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 3.54,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 4,
+              "wait_seconds": 5.4e-05,
+              "write_seconds": 0.869066,
+              "observation_seconds": 9.105295,
+              "transaction_p50_seconds": 0.215592,
+              "transaction_p95_seconds": 0.290501,
+              "transaction_max_seconds": 0.299881,
+              "writer_lock_duty": 0.095446,
+              "inter_write_idle_seconds": 5.032933,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "semantic": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 38.816,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 40.388,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 9,
+              "wait_seconds": 0.000107,
+              "write_seconds": 1.471236,
+              "observation_seconds": 49.601539,
+              "transaction_p50_seconds": 0.134803,
+              "transaction_p95_seconds": 0.274868,
+              "transaction_max_seconds": 0.299881,
+              "writer_lock_duty": 0.029661,
+              "inter_write_idle_seconds": 45.008363,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "verify": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.507,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 2.643,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 11,
+              "wait_seconds": 0.000128,
+              "write_seconds": 1.796996,
+              "observation_seconds": 52.2994,
+              "transaction_p50_seconds": 0.134803,
+              "transaction_p95_seconds": 0.268615,
+              "transaction_max_seconds": 0.299881,
+              "writer_lock_duty": 0.03436,
+              "inter_write_idle_seconds": 47.25274,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "publish": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.253,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 2.526,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 13,
+              "wait_seconds": 0.000153,
+              "write_seconds": 2.075098,
+              "observation_seconds": 54.89694,
+              "transaction_p50_seconds": 0.134803,
+              "transaction_p95_seconds": 0.262362,
+              "transaction_max_seconds": 0.299881,
+              "writer_lock_duty": 0.0378,
+              "inter_write_idle_seconds": 49.682277,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          }
+        }
+      }
+    },
+    "queue": {
+      "as_of": "2026-11-12T13:28:36.638612+08:00",
+      "total": 1,
+      "running": 0,
+      "claimable": 0,
+      "terminal": 0,
+      "completed": 1,
+      "machine_rework": 0,
+      "finalized": 1,
+      "groups": [
+        {
+          "stage": "publish",
+          "status": "completed",
+          "row_count": 1,
+          "oldest_created_at": "2026-11-12T13:27:42.531086+08:00",
+          "oldest_age_seconds": 54.544703
+        }
+      ]
+    },
+    "production_authorization": "not_authorized",
+    "storage_namespace": "company_profile_common_core.v1",
+    "writer": "company_profile_research_writer.v1",
+    "knowledge_cutoff": "2026-11-12",
+    "enqueue": {
+      "eligible": 1,
+      "inserted": 1,
+      "reused": 0,
+      "reset": 0,
+      "checkpoint_rotated": 0,
+      "checkpoint_deleted": 0,
+      "checkpoint_delete_failures": [],
+      "superseded": 0,
+      "identity_superseded": 0,
+      "work_ids": [
+        "bp-work-e9c5a9870d5a174bc8169163"
+      ]
+    },
+    "drain": {
+      "acquire": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.979,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 3.617,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 2,
+          "wait_seconds": 2.8e-05,
+          "write_seconds": 0.493717,
+          "observation_seconds": 5.462125,
+          "transaction_p50_seconds": 0.246858,
+          "transaction_p95_seconds": 0.294579,
+          "transaction_max_seconds": 0.299881,
+          "writer_lock_duty": 0.090389,
+          "inter_write_idle_seconds": 1.712794,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "parse": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.825,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 3.54,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 4,
+          "wait_seconds": 5.4e-05,
+          "write_seconds": 0.869066,
+          "observation_seconds": 9.105295,
+          "transaction_p50_seconds": 0.215592,
+          "transaction_p95_seconds": 0.290501,
+          "transaction_max_seconds": 0.299881,
+          "writer_lock_duty": 0.095446,
+          "inter_write_idle_seconds": 5.032933,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "semantic": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 38.816,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 40.388,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 9,
+          "wait_seconds": 0.000107,
+          "write_seconds": 1.471236,
+          "observation_seconds": 49.601539,
+          "transaction_p50_seconds": 0.134803,
+          "transaction_p95_seconds": 0.274868,
+          "transaction_max_seconds": 0.299881,
+          "writer_lock_duty": 0.029661,
+          "inter_write_idle_seconds": 45.008363,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "verify": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.507,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 2.643,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 11,
+          "wait_seconds": 0.000128,
+          "write_seconds": 1.796996,
+          "observation_seconds": 52.2994,
+          "transaction_p50_seconds": 0.134803,
+          "transaction_p95_seconds": 0.268615,
+          "transaction_max_seconds": 0.299881,
+          "writer_lock_duty": 0.03436,
+          "inter_write_idle_seconds": 47.25274,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "publish": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.253,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 2.526,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 13,
+          "wait_seconds": 0.000153,
+          "write_seconds": 2.075098,
+          "observation_seconds": 54.89694,
+          "transaction_p50_seconds": 0.134803,
+          "transaction_p95_seconds": 0.262362,
+          "transaction_max_seconds": 0.299881,
+          "writer_lock_duty": 0.0378,
+          "inter_write_idle_seconds": 49.682277,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      }
+    }
+  },
+  "three_reads_equal": true,
+  "profile_count": 1,
+  "elapsed_seconds": 99.752,
+  "ledger": {
+    "physical_requests": 2,
+    "charged_tokens": 46684,
+    "charged_cost_cny": "unknown",
+    "cost_status": "unknown",
+    "billing_mode": "development_unpriced",
+    "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+    "stopped_reason": null,
+    "denied_request": null,
+    "attempts": [
+      {
+        "sequence": 1,
+        "request_id": "207ba3612d564bf38a1ed4fbc2414f06",
+        "logical_request_id": "951089adb8ed045e893efd158168e2d98560fd9b782c20f14c83af0314fe4729",
+        "source_label": "deepseek:deepseek-flash",
+        "attempt": 1,
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "reserved_input_tokens": 82275,
+        "reserved_output_tokens": 2500,
+        "charged_tokens": 23847,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 23436,
+          "output_tokens": 411,
+          "total_tokens": 23847
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 413,
+          "content_fragments": 411,
+          "content_chars": 769,
+          "content_sha256": "b8a78ccb7505bf5e2991645eea26e5e4ad768807d544dcbddde4e45c5117c362",
+          "reasoning_present": false,
+          "reasoning_chars": 0,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      },
+      {
+        "sequence": 2,
+        "request_id": "8117842192d14826bb389b17616f02d4",
+        "logical_request_id": "14bff267e2f45e9526ffab3b911a14bc7b5eafc8689a9facbd93fc8c0d7996c2",
+        "source_label": "deepseek:deepseek-flash",
+        "attempt": 1,
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "reserved_input_tokens": 78717,
+        "reserved_output_tokens": 12000,
+        "charged_tokens": 22837,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 15421,
+          "output_tokens": 7416,
+          "total_tokens": 22837
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 7408,
+          "content_fragments": 7406,
+          "content_chars": 19179,
+          "content_sha256": "c7f4c4ad77c8d2398c5bc326de39d5a7d5cc2157277d20c2ca585a5b2ff2280a",
+          "reasoning_present": false,
+          "reasoning_chars": 0,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      }
+    ]
+  },
+  "receipts": [
+    {
+      "request_id": "bp-work-e9c5a9870d5a174bc8169163:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "a6b90fb0e8e2c85ae6deedcc86b16ae94fe6ced48a489cceefa246068e4f247d",
+      "response_hash": "b8a78ccb7505bf5e2991645eea26e5e4ad768807d544dcbddde4e45c5117c362",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction",
+      "route_fingerprint": "05c8b3e01cf7ce3251de2533fd438135f78f75ee85fbbb916a5238f065b8fde9",
+      "contract_status": "accepted",
+      "raw_content": "{\"selected_section_ids\":[\"section-0036\",\"section-0039\",\"section-0045\",\"section-0049\",\"section-0054\",\"section-0079\",\"section-0096\"],\"rationale\":\"本报告为房地产企业转型6G通信/低空经济/算力业务。选取第三节管理层讨论与分析中的核心业务子节：业务情况(0036)说明传统地产与转型业务结构；行业情况(0039)含地产及转型行业；经营情况讨论(0045)说明扭亏、现金流与转型战略；核心竞争力(0049)说明资产变现、融资与产业协同；主要经营情况(0054)含利润表、收入成本、区域毛利率及算力服务毛利率变化，是规模与板块收入的核心；行业经营性信息(0079)含地产储备、投资、销售结转、出租与融资，量化运营规模；未来发展(0096)含战略、经营计划与风险，说明驱动与变化。这些子节共同覆盖业务结构、产品用途、变现方式、规模与板块构成、经营资源、客户市场及驱动变化，且不选父节与子节重复。\",\"deferred\":[\"第四节公司治理、环境和社会：治理、薪酬、分红等非业务经营核心，与业务结构/变现问题关联弱\",\"第五节重要事项：承诺、关联交易、募集资金等属合规与交易细节，非业务模式说明必需\",\"第六节股份变动及股东情况：股权结构非经营分析重点\",\"第八节财务报告：仅在有实质缺口时定向补充，本次业务与规模信息已由管理层讨论覆盖，不整体阅读\"],\"stop_reason\":\"已选取覆盖业务结构、产品服务、变现方式、规模与板块构成、经营资源、客户市场及驱动变化的完整管理层讨论子节，信息密度高且相互衔接；治理、合规、股权及完整财务报表对回答业务经营问题非必需，故在此范围停止，不声称覆盖全报告。\"}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0036",
+          "section-0039",
+          "section-0045",
+          "section-0049",
+          "section-0054",
+          "section-0079",
+          "section-0096"
+        ],
+        "rationale": "本报告为房地产企业转型6G通信/低空经济/算力业务。选取第三节管理层讨论与分析中的核心业务子节：业务情况(0036)说明传统地产与转型业务结构；行业情况(0039)含地产及转型行业；经营情况讨论(0045)说明扭亏、现金流与转型战略；核心竞争力(0049)说明资产变现、融资与产业协同；主要经营情况(0054)含利润表、收入成本、区域毛利率及算力服务毛利率变化，是规模与板块收入的核心；行业经营性信息(0079)含地产储备、投资、销售结转、出租与融资，量化运营规模；未来发展(0096)含战略、经营计划与风险，说明驱动与变化。这些子节共同覆盖业务结构、产品用途、变现方式、规模与板块构成、经营资源、客户市场及驱动变化，且不选父节与子节重复。",
+        "deferred": [
+          "第四节公司治理、环境和社会：治理、薪酬、分红等非业务经营核心，与业务结构/变现问题关联弱",
+          "第五节重要事项：承诺、关联交易、募集资金等属合规与交易细节，非业务模式说明必需",
+          "第六节股份变动及股东情况：股权结构非经营分析重点",
+          "第八节财务报告：仅在有实质缺口时定向补充，本次业务与规模信息已由管理层讨论覆盖，不整体阅读"
+        ],
+        "stop_reason": "已选取覆盖业务结构、产品服务、变现方式、规模与板块构成、经营资源、客户市场及驱动变化的完整管理层讨论子节，信息密度高且相互衔接；治理、合规、股权及完整财务报表对回答业务经营问题非必需，故在此范围停止，不声称覆盖全报告。"
+      },
+      "usage": {
+        "input_tokens": 23436,
+        "output_tokens": 411,
+        "total_tokens": 23847
+      }
+    },
+    {
+      "request_id": "bp-work-e9c5a9870d5a174bc8169163:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "8e8b715037261599a015c375658243a76514f7f6cbf6b738aeccfbe945f871f1",
+      "response_hash": "c7f4c4ad77c8d2398c5bc326de39d5a7d5cc2157277d20c2ca585a5b2ff2280a",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "selected_profile": "semantic_extraction__deepseek",
+      "logical_profile": "semantic_extraction",
+      "route_fingerprint": "05c8b3e01cf7ce3251de2533fd438135f78f75ee85fbbb916a5238f065b8fde9",
+      "contract_status": "accepted",
+      "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-01\",\"text\":\"公司传统主营业务形成“地产筑基、金控投资赋能”双轮驱动格局：地产板块承担销售回款、利润修复、资产运营与信用稳定职能，金控板块由传统金融实体投资与财务性投资平台转型为服务公司战略发展的产业投资与资本运作平台。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-BS-02\",\"text\":\"报告期内公司形成“地产稳盘固基、新赛道协同发力”的战略发展格局，6G通信、低空经济、算力运营三大战略板块与地产板块并列，共同推动公司由传统开发型企业向科技引领型企业转型。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F-BS-03\",\"text\":\"6G通信领域由全资子公司名城金控集团有限公司战略受让北京佰才邦技术股份有限公司股权；算力业务以控股子公司名城数字为核心载体；低空经济领域战略投资上海峰飞航空科技有限公司母公司AutoFlightX Inc.。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-BS-04\",\"text\":\"公司设立全资子公司香港名城移动通信有限公司，注册资本1亿元港币，作为海外通信信息行业投资管理平台；截至报告披露日，名城移动通信尚处于前期筹备阶段。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F-BS-05\",\"text\":\"公司完成对佰才邦20.45%股份战略投资，投资总额7.24亿元，该项目为参股项目，未纳入合并报表范围，对2025年度财务状况及经营业绩暂无重大影响。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]}],\"limitations\":[\"未披露各战略板块在集团层面的股权层级全貌，仅能依据原文识别名城金控、名城数字、名城移动通信等载体。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"地产板块产品为物业开发销售及运营，报告期主营业务分产品口径下“物业开发销售及运营”营业收入22.31亿元、营业成本17.84亿元、毛利率20.04%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0009\"],\"metrics\":[{\"name\":\"物业开发销售及运营营业收入\",\"raw_value\":\"2,231,200,274.53\",\"value\":\"2231200274.53\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"物业开发销售及运营营业成本\",\"raw_value\":\"1,784,045,409.69\",\"value\":\"1784045409.69\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"物业开发销售及运营毛利率\",\"raw_value\":\"20.04\",\"value\":\"20.04\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-PS-02\",\"text\":\"算力服务板块以AI算力基础设施运营与产业服务为方向，报告期分产品口径“算力服务”营业收入1,534.83万元、毛利率100.00%；该业务采用净额法核算，实际收入11,243.16万元、实际成本9,708.33万元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0011\"],\"metrics\":[{\"name\":\"算力服务营业收入（净额法结转）\",\"raw_value\":\"15,348,294.98\",\"value\":\"15348294.98\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"算力服务毛利率\",\"raw_value\":\"100.00\",\"value\":\"100.00\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"算力服务实际收入\",\"raw_value\":\"11,243.16\",\"value\":\"11243.16\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"算力服务实际成本\",\"raw_value\":\"9,708.33\",\"value\":\"9708.33\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-PS-03\",\"text\":\"金控板块在分行业、分产品表中列示但营业收入、营业成本栏为空，报告期完成国融证券相关间接股权投资的有序退出。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0001\"]},{\"fact_id\":\"F-PS-04\",\"text\":\"佰才邦重点布局天地融合通信、通感算一体及低空经济应用，自研6G卫星基带芯片与星载基站设备，推进NTN非地面网络技术，面向无人机监管、应急通信、工业物联、车联网等场景提供6G解决方案。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F-PS-05\",\"text\":\"峰飞航空致力于提供空中物流与出行解决方案，已实现飞行器量产线成功试产；公司联合福州新区航空城发展有限公司等伙伴协同推进“低空城际智慧枢纽机场”建设。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}],\"limitations\":[\"金控板块未披露收入、成本金额，无法量化其经营规模。\",\"佰才邦、峰飞航空的产品用途描述来自公司对参股/投资标的的介绍，不代表公司自身已开展相应产品销售。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"公司收入主要来自房地产物业开发销售及运营，报告期该板块营业收入22.31亿元，占主营业务收入主要部分；收入确认与项目交付结转面积相关，营业收入变动原因说明为主要系本期交付结转面积减少。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0010\"]},{\"fact_id\":\"F-RM-02\",\"text\":\"算力服务采用净额法核算，按净额结转收入1,534.83万元，而实际收入11,243.16万元、实际成本9,708.33万元，故表列毛利率100.00%系净额法口径结果。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\",\"source-0010\"]},{\"fact_id\":\"F-RM-03\",\"text\":\"金控板块收益体现为投资收益，报告期国融证券股权投资的有序退出贡献正向投资收益，增厚当期业绩。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0001\"]},{\"fact_id\":\"F-RM-04\",\"text\":\"地产板块另有开发物业租赁及运营收入，报告期受商务活动减少、市场租赁需求及价格双双下降影响，该业务毛利率持续下降。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"]}],\"limitations\":[\"未披露租赁及运营业务单独的收入金额，仅有出租租金收入分项数据。\",\"未披露金控板块投资收益的具体金额。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"报告期公司营业收入22.47亿元（利润表口径2,246,548,569.51元），上年同期41.71亿元，同比下降46.13%；营业成本17.84亿元，同比下降49.09%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"2,246,548,569.51\",\"value\":\"2246548569.51\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期数4,170,683,018.28元，变动比例-46.13%\"},{\"name\":\"营业成本\",\"raw_value\":\"1,784,045,409.69\",\"value\":\"1784045409.69\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期数3,504,161,581.72元，变动比例-49.09%\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"报告期公司实现总营业收入22.47亿元，其中主营业务收入中房地产本期实现营业收入22.31亿元，较上年同比减少46.42%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"metrics\":[{\"name\":\"房地产板块营业收入\",\"raw_value\":\"2,231,200,274.53\",\"value\":\"2231200274.53\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"比上年增减-46.42%\"}]},{\"fact_id\":\"F-SM-03\",\"text\":\"分行业口径下算力服务板块营业收入15,348,294.98元，营业收入比上年增126.04%，营业成本比上年减100.00%，毛利率比上年增加131.34个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"算力服务板块营业收入\",\"raw_value\":\"15,348,294.98\",\"value\":\"15348294.98\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"比上年增减126.04%\"}]},{\"fact_id\":\"F-SM-04\",\"text\":\"房地产板块分地区：华东区域营业收入16.01亿元、毛利率21.79%、收入占比71.77%；东南区域营业收入3.74亿元、毛利率21.57%、收入占比16.75%；西北区域营业收入2.56亿元、毛利率6.89%、收入占比11.48%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"华东区域营业收入\",\"raw_value\":\"1,601,285,038.35\",\"value\":\"1601285038.35\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"华东区域毛利率\",\"raw_value\":\"21.79\",\"value\":\"21.79\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"华东区域收入占比\",\"raw_value\":\"71.77\",\"value\":\"71.77\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"东南区域营业收入\",\"raw_value\":\"373,786,834.45\",\"value\":\"373786834.45\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"东南区域毛利率\",\"raw_value\":\"21.57\",\"value\":\"21.57\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"东南区域收入占比\",\"raw_value\":\"16.75\",\"value\":\"16.75\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"西北区域营业收入\",\"raw_value\":\"256,128,401.73\",\"value\":\"256128401.73\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"西北区域毛利率\",\"raw_value\":\"6.89\",\"value\":\"6.89\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"西北区域收入占比\",\"raw_value\":\"11.48\",\"value\":\"11.48\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-SM-05\",\"text\":\"报告期公司实现销售金额16.12亿元（含车位销售金额），销售面积9.26万平方米，实现结转收入（不含联营映蓝项目、含时代名城商铺）20.42亿元，结转面积11.43万平方米，报告期末待结转面积3.87万平方米。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"销售金额（含车位）\",\"raw_value\":\"16.12\",\"value\":\"16.12\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"销售面积\",\"raw_value\":\"9.26\",\"value\":\"9.26\",\"unit\":\"万平方米\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"结转收入\",\"raw_value\":\"20.42\",\"value\":\"20.42\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"结转面积\",\"raw_value\":\"11.43\",\"value\":\"11.43\",\"unit\":\"万平方米\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"报告期末待结转面积\",\"raw_value\":\"3.87\",\"value\":\"3.87\",\"unit\":\"万平方米\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-SM-06\",\"text\":\"报告期归属于母公司净利润1.43亿元，实现扭亏为盈；经营活动产生的现金流量净额6.49亿元（648,795,247.52元），上年同期22,343,560.47元，同比增2,803.72%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0009\"],\"metrics\":[{\"name\":\"归属于母公司净利润\",\"raw_value\":\"1.43\",\"value\":\"1.43\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"经营活动产生的现金流量净额\",\"raw_value\":\"648,795,247.52\",\"value\":\"648795247.52\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期数22,343,560.47元，变动比例2,803.72%\"}]}],\"limitations\":[\"分行业表中金控板块收入、成本为空，无法计算三大板块完整收入构成。\",\"算力服务表列毛利率100.00%系净额法核算结果，与实际收入成本口径不同，不宜与房地产毛利率直接比较。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"地产板块执行“稳健经营、降本增效”方针，以去库存、保现金流为核心目标，聚焦核心区域与重点城市，围绕项目去化、资产价值提升及经营性现金流管理实施精细化运营；现阶段不以高周转扩张为导向。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-OI-02\",\"text\":\"公司已连续四年暂停新增房地产投资，可结转项目规模逐年收缩；截至报告期末，公司在上海等重点发展区域未能新获取土地。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0020\"]},{\"fact_id\":\"F-OI-03\",\"text\":\"报告期房地产储备：东南区域持有待开发土地面积38,440.00平方米、规划计容建筑面积69,192.00平方米；西北区域341,606.50平方米、645,458.64平方米；大湾区23,434.00平方米，涉及合作开发，权益占比51%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"东南区域持有待开发土地面积\",\"raw_value\":\"38,440.00\",\"value\":\"38440.00\",\"unit\":\"平方米\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"西北区域持有待开发土地面积\",\"raw_value\":\"341,606.50\",\"value\":\"341606.50\",\"unit\":\"平方米\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"大湾区持有待开发土地面积\",\"raw_value\":\"23,434.00\",\"value\":\"23434.00\",\"unit\":\"平方米\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-OI-04\",\"text\":\"报告期房地产开发投资情况列示映园二期、兰州东部科技新城一期、兰州东部科技新城二期、映辰（毛家角）等项目，其中映辰（毛家角）为竣工项目，报告期实际投资额17,331.95万元；总投资额不包含三费。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\",\"source-0016\"],\"metrics\":[{\"name\":\"映辰（毛家角）报告期实际投资额\",\"raw_value\":\"17,331.95\",\"value\":\"17331.95\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-OI-05\",\"text\":\"报告期房地产出租情况列示社区配套商业、商业综合体、出租公寓、工业园、酒店等业态，其中东南商业综合体租金收入58,322,708.81元、西北商业综合体45,962,588.13元、东南酒店27,833,217.64元，权益比例均为100%，均不采用公允价值计量模式。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"东南商业综合体租金收入\",\"raw_value\":\"58,322,708.81\",\"value\":\"58322708.81\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"西北商业综合体租金收入\",\"raw_value\":\"45,962,588.13\",\"value\":\"45962588.13\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"东南酒店租金收入\",\"raw_value\":\"27,833,217.64\",\"value\":\"27833217.64\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-OI-06\",\"text\":\"报告期期末融资总额14.04亿元，整体平均融资成本5.84%，利息资本化金额0.08亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"],\"metrics\":[{\"name\":\"期末融资总额\",\"raw_value\":\"14.04\",\"value\":\"14.04\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"整体平均融资成本\",\"raw_value\":\"5.84\",\"value\":\"5.84\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"利息资本化金额\",\"raw_value\":\"0.08\",\"value\":\"0.08\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-OI-07\",\"text\":\"截至2025年末，公司资产负债率35.08%，扣除预收账款后为32.83%，净负债率7.28%，现金短债比2.19倍。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"资产负债率\",\"raw_value\":\"35.08\",\"value\":\"35.08\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"},{\"name\":\"扣除预收账款后资产负债率\",\"raw_value\":\"32.83\",\"value\":\"32.83\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"},{\"name\":\"净负债率\",\"raw_value\":\"7.28\",\"value\":\"7.28\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"},{\"name\":\"现金短债比\",\"raw_value\":\"2.19\",\"value\":\"2.19\",\"unit\":\"倍\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\"}]}],\"limitations\":[\"未披露算力业务的具体基础设施投入、机柜规模或能耗等运营资源数据。\",\"未披露6G通信、低空经济板块的运营投入与产能数据，相关标的为参股或战略投资，未纳入合并报表。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"前五名客户销售额19,775.32万元，占年度销售总额11.84%；其中前五名客户销售额中关联方销售额0万元，占年度销售总额0%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"19,775.32\",\"value\":\"19775.32\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"11.84\",\"value\":\"11.84\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-CC-02\",\"text\":\"前五名供应商采购额37,331.06万元，占年度采购总额55.45%；其中前五名供应商采购额中关联方采购额0万元，占年度采购总额0%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"前五名供应商采购额\",\"raw_value\":\"37,331.06\",\"value\":\"37331.06\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"55.45\",\"value\":\"55.45\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-CC-03\",\"text\":\"公司报告期不存在向单个客户销售比例超过总额50%、前5名客户中存在新增客户或严重依赖少数客户的情形，亦不存在向单个供应商采购比例超过总额50%等情形（相关栏目均勾选“不适用”）。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]},{\"fact_id\":\"F-CC-04\",\"text\":\"地产销售区域覆盖华东、东南、西北，项目包括常州大名城、上海大名城名郡、上海紫金九号、杭州大名城、南京大名城、兰州东部科技新城、名城港湾、福州名城城市广场等；报告期华东区域收入占比71.77%，为最主要市场。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\",\"source-0010\"]},{\"fact_id\":\"F-CC-05\",\"text\":\"海外通信业务方面，公司拟聚焦新兴市场及“一带一路”沿线国家，稳步推进涵盖4G/5G/6G通信基础设施运营业务的全球化布局，名城移动通信尚处于前期筹备阶段。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]}],\"limitations\":[\"未披露前五名客户、供应商的具体名称。\",\"算力服务、6G通信、低空经济板块的客户与渠道未披露具体信息。\",\"海外通信市场布局处于筹备或规划阶段，不构成当前已实现的市场收入。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"盈利改善驱动：一是过往年度已对存货及投资性房地产等核心资产充分计提减值准备，报告期减值损失大幅收窄；二是金控板块国融证券股权投资的有序退出贡献正向投资收益。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F-OD-02\",\"text\":\"营业收入及营业成本下降主要系本期交付结转面积减少；销售费用下降主要系当期新建及在售项目减少、广告及前期推广减少；管理费用下降主要系降本增效措施下人工费及租赁、差旅办公等费用减少；财务费用上升主要系项目完工在建项目减少、利息停止资本化转为费用化增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"F-OD-03\",\"text\":\"经营活动现金流量净额大幅增加主要系上期存在大额一次性税金支出，上期缴纳以前年度开发项目土地增值税清算税金4.16亿元；投资活动现金流量净额变动主要系本期收回投资收到现金8.05亿元、投资支付现金6.94亿元；筹资活动现金流量净额变动主要系公司调整融资结构、借款减少。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"F-OD-04\",\"text\":\"房地产板块毛利率较上年增长3.98个百分点，主要系华东区域毛利率提升：前期预售的映辰二期项目当期交付结转收入，且前期已交付项目完成工程结算、实际结算金额小于账面暂估金额导致单方成本下降；西北区域毛利率由负转正，主要系上年同期已计提减值准备、本报告期减值因素不再持续恶化；东南区域毛利率略降，主要受存量房销售价格下降影响。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"]},{\"fact_id\":\"F-OD-05\",\"text\":\"算力服务毛利率较上年由负转正，报告期算力服务已正常运营。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"]}],\"limitations\":[\"未披露减值损失收窄及国融证券退出投资收益的具体金额。\",\"未量化各驱动因素对毛利率变动的贡献比例。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"公司金控板块全面完成战略升级，由传统金融实体投资与财务性投资平台转型为服务公司战略发展的产业投资与资本运作核心平台；本年度顺利完成国融证券相关间接股权投资的有序退出。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-MC-02\",\"text\":\"报告期内新产业布局落地：6G通信领域通过名城金控战略受让佰才邦股权；低空经济领域战略投资AutoFlightX Inc.；算力业务以名城数字为核心载体聚焦AI算力基础设施运营与产业服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-MC-03\",\"text\":\"公司完成对佰才邦20.45%股份战略投资，投资总额7.24亿元，为参股项目、未纳入合并报表范围，对2025年度财务状况及经营业绩暂无重大影响。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F-MC-04\",\"text\":\"报告期内公司完成三次股份回购注销，累计金额530,130,843.75元，占本年度归属于上市公司股东净利润的369.48%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"股份回购注销累计金额\",\"raw_value\":\"530,130,843.75\",\"value\":\"530130843.75\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"股份回购注销金额占归母净利润比例\",\"raw_value\":\"369.48\",\"value\":\"369.48\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-MC-05\",\"text\":\"公司报告期内业务、产品或服务发生重大变化或调整栏目勾选“不适用”，新增重要非主营业务说明亦勾选“不适用”。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\",\"source-0002\"]}],\"limitations\":[\"公司一方面披露新产业布局落地，另一方面在“业务、产品或服务发生重大变化或调整”栏目勾选不适用，两者口径存在差异，原文未解释。\",\"未披露佰才邦、AutoFlightX投资的完成时点与交割细节。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-P1\",\"text\":\"公司地产板块从事物业开发销售及运营，属于房地产开发与销售运营环节；算力业务以名城数字为载体从事AI算力基础设施运营与产业服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0001\"]},{\"fact_id\":\"F-SC-P2\",\"text\":\"公司通过参股佰才邦（20.45%）及战略投资AutoFlightX Inc.切入6G通信设备与eVTOL飞行器环节，上述标的未纳入合并报表范围。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0001\"]}],\"limitations\":[\"公司自身在6G通信、低空经济产业链中的具体经营环节尚处筹备或参股阶段，未披露自营生产或运营安排。\"]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-U1\",\"text\":\"地产板块成本构成为开发成本，报告期金额1,784,045,409.69元，占本期总成本100.00%，本期较上年同期减48.96%，主要系房地产板块交付结转面积减少。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"房地产板块开发成本\",\"raw_value\":\"1,784,045,409.69\",\"value\":\"1784045409.69\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"F-SC-U2\",\"text\":\"算力服务成本项目上年同期金额8,918,170.05元、占总成本0.25%，本期金额栏为空、本期较上年同期变动-100.00%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"算力服务成本（上年同期）\",\"raw_value\":\"8,918,170.05\",\"value\":\"8918170.05\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"上年同期\"}]},{\"fact_id\":\"F-SC-U3\",\"text\":\"前五名供应商采购额37,331.06万元，占年度采购总额55.45%，其中关联方采购额0万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]}],\"limitations\":[\"成本分析表仅列示“开发成本”“算力服务成本”等成本项目，未披露具体原材料、设备或能源供应商类别。\",\"未披露算力业务本期成本金额，仅有上年同期数。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-D1\",\"text\":\"地产板块下游为购房客户，报告期实现销售金额16.12亿元（含车位）、销售面积9.26万平方米；前五名客户销售额占年度销售总额11.84%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\",\"source-0012\"]},{\"fact_id\":\"F-SC-D2\",\"text\":\"佰才邦的6G解决方案面向无人机监管、应急通信、工业物联、车联网等应用场景；峰飞航空提供空中物流与出行解决方案。上述为参股/投资标的下游应用方向。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0001\"]}],\"limitations\":[\"未披露具体客户名称及算力服务、通信业务的下游客户构成。\",\"佰才邦、峰飞航空的应用场景描述不代表公司自身已形成相应客户收入。\"]}}}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-BS-01",
+                "text": "公司传统主营业务形成“地产筑基、金控投资赋能”双轮驱动格局：地产板块承担销售回款、利润修复、资产运营与信用稳定职能，金控板块由传统金融实体投资与财务性投资平台转型为服务公司战略发展的产业投资与资本运作平台。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-BS-02",
+                "text": "报告期内公司形成“地产稳盘固基、新赛道协同发力”的战略发展格局，6G通信、低空经济、算力运营三大战略板块与地产板块并列，共同推动公司由传统开发型企业向科技引领型企业转型。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "F-BS-03",
+                "text": "6G通信领域由全资子公司名城金控集团有限公司战略受让北京佰才邦技术股份有限公司股权；算力业务以控股子公司名城数字为核心载体；低空经济领域战略投资上海峰飞航空科技有限公司母公司AutoFlightX Inc.。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-BS-04",
+                "text": "公司设立全资子公司香港名城移动通信有限公司，注册资本1亿元港币，作为海外通信信息行业投资管理平台；截至报告披露日，名城移动通信尚处于前期筹备阶段。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "F-BS-05",
+                "text": "公司完成对佰才邦20.45%股份战略投资，投资总额7.24亿元，该项目为参股项目，未纳入合并报表范围，对2025年度财务状况及经营业绩暂无重大影响。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露各战略板块在集团层面的股权层级全貌，仅能依据原文识别名城金控、名城数字、名城移动通信等载体。"
+            ]
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-PS-01",
+                "text": "地产板块产品为物业开发销售及运营，报告期主营业务分产品口径下“物业开发销售及运营”营业收入22.31亿元、营业成本17.84亿元、毛利率20.04%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010",
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "物业开发销售及运营营业收入",
+                    "raw_value": "2,231,200,274.53",
+                    "value": "2231200274.53",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "物业开发销售及运营营业成本",
+                    "raw_value": "1,784,045,409.69",
+                    "value": "1784045409.69",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "物业开发销售及运营毛利率",
+                    "raw_value": "20.04",
+                    "value": "20.04",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-PS-02",
+                "text": "算力服务板块以AI算力基础设施运营与产业服务为方向，报告期分产品口径“算力服务”营业收入1,534.83万元、毛利率100.00%；该业务采用净额法核算，实际收入11,243.16万元、实际成本9,708.33万元。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010",
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "算力服务营业收入（净额法结转）",
+                    "raw_value": "15,348,294.98",
+                    "value": "15348294.98",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "算力服务毛利率",
+                    "raw_value": "100.00",
+                    "value": "100.00",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "算力服务实际收入",
+                    "raw_value": "11,243.16",
+                    "value": "11243.16",
+                    "unit": "万元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "算力服务实际成本",
+                    "raw_value": "9,708.33",
+                    "value": "9708.33",
+                    "unit": "万元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-PS-03",
+                "text": "金控板块在分行业、分产品表中列示但营业收入、营业成本栏为空，报告期完成国融证券相关间接股权投资的有序退出。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010",
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-PS-04",
+                "text": "佰才邦重点布局天地融合通信、通感算一体及低空经济应用，自研6G卫星基带芯片与星载基站设备，推进NTN非地面网络技术，面向无人机监管、应急通信、工业物联、车联网等场景提供6G解决方案。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "F-PS-05",
+                "text": "峰飞航空致力于提供空中物流与出行解决方案，已实现飞行器量产线成功试产；公司联合福州新区航空城发展有限公司等伙伴协同推进“低空城际智慧枢纽机场”建设。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": [
+              "金控板块未披露收入、成本金额，无法量化其经营规模。",
+              "佰才邦、峰飞航空的产品用途描述来自公司对参股/投资标的的介绍，不代表公司自身已开展相应产品销售。"
+            ]
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-RM-01",
+                "text": "公司收入主要来自房地产物业开发销售及运营，报告期该板块营业收入22.31亿元，占主营业务收入主要部分；收入确认与项目交付结转面积相关，营业收入变动原因说明为主要系本期交付结转面积减少。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009",
+                  "source-0010"
+                ]
+              },
+              {
+                "fact_id": "F-RM-02",
+                "text": "算力服务采用净额法核算，按净额结转收入1,534.83万元，而实际收入11,243.16万元、实际成本9,708.33万元，故表列毛利率100.00%系净额法口径结果。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011",
+                  "source-0010"
+                ]
+              },
+              {
+                "fact_id": "F-RM-03",
+                "text": "金控板块收益体现为投资收益，报告期国融证券股权投资的有序退出贡献正向投资收益，增厚当期业绩。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005",
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-RM-04",
+                "text": "地产板块另有开发物业租赁及运营收入，报告期受商务活动减少、市场租赁需求及价格双双下降影响，该业务毛利率持续下降。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露租赁及运营业务单独的收入金额，仅有出租租金收入分项数据。",
+              "未披露金控板块投资收益的具体金额。"
+            ]
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-SM-01",
+                "text": "报告期公司营业收入22.47亿元（利润表口径2,246,548,569.51元），上年同期41.71亿元，同比下降46.13%；营业成本17.84亿元，同比下降49.09%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业收入",
+                    "raw_value": "2,246,548,569.51",
+                    "value": "2246548569.51",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "上年同期数4,170,683,018.28元，变动比例-46.13%"
+                  },
+                  {
+                    "name": "营业成本",
+                    "raw_value": "1,784,045,409.69",
+                    "value": "1784045409.69",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "上年同期数3,504,161,581.72元，变动比例-49.09%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SM-02",
+                "text": "报告期公司实现总营业收入22.47亿元，其中主营业务收入中房地产本期实现营业收入22.31亿元，较上年同比减少46.42%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009",
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "房地产板块营业收入",
+                    "raw_value": "2,231,200,274.53",
+                    "value": "2231200274.53",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "比上年增减-46.42%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SM-03",
+                "text": "分行业口径下算力服务板块营业收入15,348,294.98元，营业收入比上年增126.04%，营业成本比上年减100.00%，毛利率比上年增加131.34个百分点。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "算力服务板块营业收入",
+                    "raw_value": "15,348,294.98",
+                    "value": "15348294.98",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度",
+                    "comparison_basis": "比上年增减126.04%"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SM-04",
+                "text": "房地产板块分地区：华东区域营业收入16.01亿元、毛利率21.79%、收入占比71.77%；东南区域营业收入3.74亿元、毛利率21.57%、收入占比16.75%；西北区域营业收入2.56亿元、毛利率6.89%、收入占比11.48%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "华东区域营业收入",
+                    "raw_value": "1,601,285,038.35",
+                    "value": "1601285038.35",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "华东区域毛利率",
+                    "raw_value": "21.79",
+                    "value": "21.79",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "华东区域收入占比",
+                    "raw_value": "71.77",
+                    "value": "71.77",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "东南区域营业收入",
+                    "raw_value": "373,786,834.45",
+                    "value": "373786834.45",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "东南区域毛利率",
+                    "raw_value": "21.57",
+                    "value": "21.57",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "东南区域收入占比",
+                    "raw_value": "16.75",
+                    "value": "16.75",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "西北区域营业收入",
+                    "raw_value": "256,128,401.73",
+                    "value": "256128401.73",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "西北区域毛利率",
+                    "raw_value": "6.89",
+                    "value": "6.89",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "西北区域收入占比",
+                    "raw_value": "11.48",
+                    "value": "11.48",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SM-05",
+                "text": "报告期公司实现销售金额16.12亿元（含车位销售金额），销售面积9.26万平方米，实现结转收入（不含联营映蓝项目、含时代名城商铺）20.42亿元，结转面积11.43万平方米，报告期末待结转面积3.87万平方米。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0017"
+                ],
+                "metrics": [
+                  {
+                    "name": "销售金额（含车位）",
+                    "raw_value": "16.12",
+                    "value": "16.12",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "销售面积",
+                    "raw_value": "9.26",
+                    "value": "9.26",
+                    "unit": "万平方米",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "结转收入",
+                    "raw_value": "20.42",
+                    "value": "20.42",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "结转面积",
+                    "raw_value": "11.43",
+                    "value": "11.43",
+                    "unit": "万平方米",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "报告期末待结转面积",
+                    "raw_value": "3.87",
+                    "value": "3.87",
+                    "unit": "万平方米",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SM-06",
+                "text": "报告期归属于母公司净利润1.43亿元，实现扭亏为盈；经营活动产生的现金流量净额6.49亿元（648,795,247.52元），上年同期22,343,560.47元，同比增2,803.72%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005",
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "归属于母公司净利润",
+                    "raw_value": "1.43",
+                    "value": "1.43",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "经营活动产生的现金流量净额",
+                    "raw_value": "648,795,247.52",
+                    "value": "648795247.52",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度",
+                    "comparison_basis": "上年同期数22,343,560.47元，变动比例2,803.72%"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "分行业表中金控板块收入、成本为空，无法计算三大板块完整收入构成。",
+              "算力服务表列毛利率100.00%系净额法核算结果，与实际收入成本口径不同，不宜与房地产毛利率直接比较。"
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-OI-01",
+                "text": "地产板块执行“稳健经营、降本增效”方针，以去库存、保现金流为核心目标，聚焦核心区域与重点城市，围绕项目去化、资产价值提升及经营性现金流管理实施精细化运营；现阶段不以高周转扩张为导向。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-OI-02",
+                "text": "公司已连续四年暂停新增房地产投资，可结转项目规模逐年收缩；截至报告期末，公司在上海等重点发展区域未能新获取土地。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010",
+                  "source-0020"
+                ]
+              },
+              {
+                "fact_id": "F-OI-03",
+                "text": "报告期房地产储备：东南区域持有待开发土地面积38,440.00平方米、规划计容建筑面积69,192.00平方米；西北区域341,606.50平方米、645,458.64平方米；大湾区23,434.00平方米，涉及合作开发，权益占比51%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0015"
+                ],
+                "metrics": [
+                  {
+                    "name": "东南区域持有待开发土地面积",
+                    "raw_value": "38,440.00",
+                    "value": "38440.00",
+                    "unit": "平方米",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "西北区域持有待开发土地面积",
+                    "raw_value": "341,606.50",
+                    "value": "341606.50",
+                    "unit": "平方米",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "大湾区持有待开发土地面积",
+                    "raw_value": "23,434.00",
+                    "value": "23434.00",
+                    "unit": "平方米",
+                    "currency": null,
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-OI-04",
+                "text": "报告期房地产开发投资情况列示映园二期、兰州东部科技新城一期、兰州东部科技新城二期、映辰（毛家角）等项目，其中映辰（毛家角）为竣工项目，报告期实际投资额17,331.95万元；总投资额不包含三费。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0015",
+                  "source-0016"
+                ],
+                "metrics": [
+                  {
+                    "name": "映辰（毛家角）报告期实际投资额",
+                    "raw_value": "17,331.95",
+                    "value": "17331.95",
+                    "unit": "万元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-OI-05",
+                "text": "报告期房地产出租情况列示社区配套商业、商业综合体、出租公寓、工业园、酒店等业态，其中东南商业综合体租金收入58,322,708.81元、西北商业综合体45,962,588.13元、东南酒店27,833,217.64元，权益比例均为100%，均不采用公允价值计量模式。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0017"
+                ],
+                "metrics": [
+                  {
+                    "name": "东南商业综合体租金收入",
+                    "raw_value": "58,322,708.81",
+                    "value": "58322708.81",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "西北商业综合体租金收入",
+                    "raw_value": "45,962,588.13",
+                    "value": "45962588.13",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "东南酒店租金收入",
+                    "raw_value": "27,833,217.64",
+                    "value": "27833217.64",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-OI-06",
+                "text": "报告期期末融资总额14.04亿元，整体平均融资成本5.84%，利息资本化金额0.08亿元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0018"
+                ],
+                "metrics": [
+                  {
+                    "name": "期末融资总额",
+                    "raw_value": "14.04",
+                    "value": "14.04",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "整体平均融资成本",
+                    "raw_value": "5.84",
+                    "value": "5.84",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "利息资本化金额",
+                    "raw_value": "0.08",
+                    "value": "0.08",
+                    "unit": "亿元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-OI-07",
+                "text": "截至2025年末，公司资产负债率35.08%，扣除预收账款后为32.83%，净负债率7.28%，现金短债比2.19倍。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年末",
+                "evidence_ids": [
+                  "source-0005"
+                ],
+                "metrics": [
+                  {
+                    "name": "资产负债率",
+                    "raw_value": "35.08",
+                    "value": "35.08",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末"
+                  },
+                  {
+                    "name": "扣除预收账款后资产负债率",
+                    "raw_value": "32.83",
+                    "value": "32.83",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末"
+                  },
+                  {
+                    "name": "净负债率",
+                    "raw_value": "7.28",
+                    "value": "7.28",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末"
+                  },
+                  {
+                    "name": "现金短债比",
+                    "raw_value": "2.19",
+                    "value": "2.19",
+                    "unit": "倍",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年末"
+                  }
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露算力业务的具体基础设施投入、机柜规模或能耗等运营资源数据。",
+              "未披露6G通信、低空经济板块的运营投入与产能数据，相关标的为参股或战略投资，未纳入合并报表。"
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-CC-01",
+                "text": "前五名客户销售额19,775.32万元，占年度销售总额11.84%；其中前五名客户销售额中关联方销售额0万元，占年度销售总额0%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0012"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五名客户销售额",
+                    "raw_value": "19,775.32",
+                    "value": "19775.32",
+                    "unit": "万元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "前五名客户销售额占年度销售总额比例",
+                    "raw_value": "11.84",
+                    "value": "11.84",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-CC-02",
+                "text": "前五名供应商采购额37,331.06万元，占年度采购总额55.45%；其中前五名供应商采购额中关联方采购额0万元，占年度采购总额0%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0012"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五名供应商采购额",
+                    "raw_value": "37,331.06",
+                    "value": "37331.06",
+                    "unit": "万元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "前五名供应商采购额占年度采购总额比例",
+                    "raw_value": "55.45",
+                    "value": "55.45",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-CC-03",
+                "text": "公司报告期不存在向单个客户销售比例超过总额50%、前5名客户中存在新增客户或严重依赖少数客户的情形，亦不存在向单个供应商采购比例超过总额50%等情形（相关栏目均勾选“不适用”）。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0012"
+                ]
+              },
+              {
+                "fact_id": "F-CC-04",
+                "text": "地产销售区域覆盖华东、东南、西北，项目包括常州大名城、上海大名城名郡、上海紫金九号、杭州大名城、南京大名城、兰州东部科技新城、名城港湾、福州名城城市广场等；报告期华东区域收入占比71.77%，为最主要市场。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0016",
+                  "source-0010"
+                ]
+              },
+              {
+                "fact_id": "F-CC-05",
+                "text": "海外通信业务方面，公司拟聚焦新兴市场及“一带一路”沿线国家，稳步推进涵盖4G/5G/6G通信基础设施运营业务的全球化布局，名城移动通信尚处于前期筹备阶段。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露前五名客户、供应商的具体名称。",
+              "算力服务、6G通信、低空经济板块的客户与渠道未披露具体信息。",
+              "海外通信市场布局处于筹备或规划阶段，不构成当前已实现的市场收入。"
+            ]
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-OD-01",
+                "text": "盈利改善驱动：一是过往年度已对存货及投资性房地产等核心资产充分计提减值准备，报告期减值损失大幅收窄；二是金控板块国融证券股权投资的有序退出贡献正向投资收益。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "F-OD-02",
+                "text": "营业收入及营业成本下降主要系本期交付结转面积减少；销售费用下降主要系当期新建及在售项目减少、广告及前期推广减少；管理费用下降主要系降本增效措施下人工费及租赁、差旅办公等费用减少；财务费用上升主要系项目完工在建项目减少、利息停止资本化转为费用化增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ]
+              },
+              {
+                "fact_id": "F-OD-03",
+                "text": "经营活动现金流量净额大幅增加主要系上期存在大额一次性税金支出，上期缴纳以前年度开发项目土地增值税清算税金4.16亿元；投资活动现金流量净额变动主要系本期收回投资收到现金8.05亿元、投资支付现金6.94亿元；筹资活动现金流量净额变动主要系公司调整融资结构、借款减少。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ]
+              },
+              {
+                "fact_id": "F-OD-04",
+                "text": "房地产板块毛利率较上年增长3.98个百分点，主要系华东区域毛利率提升：前期预售的映辰二期项目当期交付结转收入，且前期已交付项目完成工程结算、实际结算金额小于账面暂估金额导致单方成本下降；西北区域毛利率由负转正，主要系上年同期已计提减值准备、本报告期减值因素不再持续恶化；东南区域毛利率略降，主要受存量房销售价格下降影响。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010"
+                ]
+              },
+              {
+                "fact_id": "F-OD-05",
+                "text": "算力服务毛利率较上年由负转正，报告期算力服务已正常运营。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露减值损失收窄及国融证券退出投资收益的具体金额。",
+              "未量化各驱动因素对毛利率变动的贡献比例。"
+            ]
+          },
+          "material_changes": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-MC-01",
+                "text": "公司金控板块全面完成战略升级，由传统金融实体投资与财务性投资平台转型为服务公司战略发展的产业投资与资本运作核心平台；本年度顺利完成国融证券相关间接股权投资的有序退出。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-MC-02",
+                "text": "报告期内新产业布局落地：6G通信领域通过名城金控战略受让佰才邦股权；低空经济领域战略投资AutoFlightX Inc.；算力业务以名城数字为核心载体聚焦AI算力基础设施运营与产业服务。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-MC-03",
+                "text": "公司完成对佰才邦20.45%股份战略投资，投资总额7.24亿元，为参股项目、未纳入合并报表范围，对2025年度财务状况及经营业绩暂无重大影响。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "F-MC-04",
+                "text": "报告期内公司完成三次股份回购注销，累计金额530,130,843.75元，占本年度归属于上市公司股东净利润的369.48%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ],
+                "metrics": [
+                  {
+                    "name": "股份回购注销累计金额",
+                    "raw_value": "530,130,843.75",
+                    "value": "530130843.75",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "股份回购注销金额占归母净利润比例",
+                    "raw_value": "369.48",
+                    "value": "369.48",
+                    "unit": "%",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-MC-05",
+                "text": "公司报告期内业务、产品或服务发生重大变化或调整栏目勾选“不适用”，新增重要非主营业务说明亦勾选“不适用”。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011",
+                  "source-0002"
+                ]
+              }
+            ],
+            "limitations": [
+              "公司一方面披露新产业布局落地，另一方面在“业务、产品或服务发生重大变化或调整”栏目勾选不适用，两者口径存在差异，原文未解释。",
+              "未披露佰才邦、AutoFlightX投资的完成时点与交割细节。"
+            ]
+          }
+        },
+        "supply_chain": {
+          "position": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-SC-P1",
+                "text": "公司地产板块从事物业开发销售及运营，属于房地产开发与销售运营环节；算力业务以名城数字为载体从事AI算力基础设施运营与产业服务。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010",
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "F-SC-P2",
+                "text": "公司通过参股佰才邦（20.45%）及战略投资AutoFlightX Inc.切入6G通信设备与eVTOL飞行器环节，上述标的未纳入合并报表范围。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005",
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": [
+              "公司自身在6G通信、低空经济产业链中的具体经营环节尚处筹备或参股阶段，未披露自营生产或运营安排。"
+            ]
+          },
+          "upstream_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-SC-U1",
+                "text": "地产板块成本构成为开发成本，报告期金额1,784,045,409.69元，占本期总成本100.00%，本期较上年同期减48.96%，主要系房地产板块交付结转面积减少。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "房地产板块开发成本",
+                    "raw_value": "1,784,045,409.69",
+                    "value": "1784045409.69",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SC-U2",
+                "text": "算力服务成本项目上年同期金额8,918,170.05元、占总成本0.25%，本期金额栏为空、本期较上年同期变动-100.00%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0011"
+                ],
+                "metrics": [
+                  {
+                    "name": "算力服务成本（上年同期）",
+                    "raw_value": "8,918,170.05",
+                    "value": "8918170.05",
+                    "unit": "元",
+                    "currency": "CNY",
+                    "subject_scope": "business_segment",
+                    "period": "上年同期"
+                  }
+                ]
+              },
+              {
+                "fact_id": "F-SC-U3",
+                "text": "前五名供应商采购额37,331.06万元，占年度采购总额55.45%，其中关联方采购额0万元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0012"
+                ]
+              }
+            ],
+            "limitations": [
+              "成本分析表仅列示“开发成本”“算力服务成本”等成本项目，未披露具体原材料、设备或能源供应商类别。",
+              "未披露算力业务本期成本金额，仅有上年同期数。"
+            ]
+          },
+          "downstream_customers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "F-SC-D1",
+                "text": "地产板块下游为购房客户，报告期实现销售金额16.12亿元（含车位）、销售面积9.26万平方米；前五名客户销售额占年度销售总额11.84%。",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0017",
+                  "source-0012"
+                ]
+              },
+              {
+                "fact_id": "F-SC-D2",
+                "text": "佰才邦的6G解决方案面向无人机监管、应急通信、工业物联、车联网等应用场景；峰飞航空提供空中物流与出行解决方案。上述为参股/投资标的下游应用方向。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005",
+                  "source-0001"
+                ]
+              }
+            ],
+            "limitations": [
+              "未披露具体客户名称及算力服务、通信业务的下游客户构成。",
+              "佰才邦、峰飞航空的应用场景描述不代表公司自身已形成相应客户收入。"
+            ]
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 15421,
+        "output_tokens": 7416,
+        "total_tokens": 22837
+      }
+    }
+  ]
+}

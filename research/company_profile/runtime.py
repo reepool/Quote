@@ -206,6 +206,8 @@ def _reading_policy(identity: Mapping[str, Any] | None) -> tuple:
             "semantic_policy",
             "prompt_version",
             "preprocessing_version",
+            "section_guide_version",
+            "product_contract",
             "discovery_scope",
             "wire_protocol",
             "execution_mode",

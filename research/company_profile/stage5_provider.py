@@ -4723,13 +4723,14 @@ class CommonGatewaySemanticProvider:
             content_is_untrusted=True,
         )
         response: LlmResponse | None = None
+        workpaper_receipt: dict[str, Any] | None = None
         rejected_items: tuple[Stage5RejectedExtractItem, ...] = ()
         if self._physical_call_admission is not None:
             self._physical_call_admission()
         try:
             response = _run_complete(self._client, llm_request, self._runner)
             if workpaper_reading:
-                self.workpaper_receipts.append({
+                workpaper_receipt = {
                     "request_id": semantic_request_id,
                     "purpose": runtime_payload["purpose"],
                     "request_hash": response.request_hash,
@@ -4737,6 +4738,10 @@ class CommonGatewaySemanticProvider:
                     "finish_reason": response.finish_reason,
                     "source_label": response.source_label,
                     "model": response.model,
+                    "selected_profile": response.selected_profile,
+                    "logical_profile": response.logical_profile or self._profile,
+                    "route_fingerprint": response.route_fingerprint,
+                    "contract_status": "rejected",
                     "raw_content": response.raw_content,
                     "response_payload": response.data,
                     "usage": {
@@ -4744,7 +4749,8 @@ class CommonGatewaySemanticProvider:
                         "output_tokens": response.usage.output_tokens if response.usage else None,
                         "total_tokens": response.usage.total_tokens if response.usage else None,
                     },
-                })
+                }
+                self.workpaper_receipts.append(workpaper_receipt)
             normalized_response = normalize_response(response.data)
             if isinstance(normalized_response, _NormalizedExtractPayload):
                 rejected_items = normalized_response.rejected_items
@@ -4763,6 +4769,8 @@ class CommonGatewaySemanticProvider:
                     f"{call_type} response request_id does not match the request",
                 )
         except SemanticProviderError as exc:
+            if workpaper_receipt is not None:
+                workpaper_receipt.update(contract_status="rejected", contract_error=exc.code.value)
             self._append_failure_trace(
                 call_type,
                 semantic_request_id,
@@ -4774,6 +4782,8 @@ class CommonGatewaySemanticProvider:
             )
             raise
         except LlmError as exc:
+            if workpaper_receipt is not None:
+                workpaper_receipt.update(contract_status="rejected", contract_error=exc.code)
             code = _contract_error_for_llm(exc)
             gateway_lineage = _safe_gateway_lineage(exc.lineage)
             self._append_failure_trace(
@@ -4793,6 +4803,8 @@ class CommonGatewaySemanticProvider:
             )
             raise SemanticProviderError(code, exc.message) from exc
         except (ValidationError, TypeError, ValueError) as exc:
+            if workpaper_receipt is not None:
+                workpaper_receipt.update(contract_status="rejected", contract_error="schema_validation_error")
             code = ContractErrorCode.CANDIDATE_SCHEMA_INVALID
             self._append_failure_trace(
                 call_type,
@@ -4809,6 +4821,8 @@ class CommonGatewaySemanticProvider:
             raise SemanticProviderError(
                 code, f"gateway response violates the schema: {exc}"[:500]
             ) from exc
+        if workpaper_receipt is not None:
+            workpaper_receipt["contract_status"] = "accepted"
         self._traces.append(
             Stage5ProviderCallTrace(
                 call_type=call_type,
