@@ -9,7 +9,7 @@ from research.company_profile.models import ReportIdentity
 from research.company_profile.runtime import CompanyProfileResearchWriter, CompanyProfileStageRuntime
 from research.company_profile.reads import CompanyProfileReadService
 from research.company_profile.workpaper import (
-    CompanyProfileWorkpaper, ELEMENT_LABELS, WorkpaperDraftResponse,
+    CompanyProfileWorkpaper, ELEMENT_LABELS, WorkpaperDraftResponse, SUPPLY_CHAIN_LABELS,
     bind_workpaper_draft, render_workpaper,
 )
 from research.company_profile.workpaper_llm import run_workpaper, workpaper_processing_identity
@@ -76,9 +76,10 @@ def _draft(packet):
 class _Provider:
     offline_only = True
 
-    def __init__(self):
+    def __init__(self, *, supply_chain=False):
         self.workpaper_receipts = []
         self.calls = []
+        self.supply_chain = supply_chain
 
     def workpaper_request(self, **kwargs):
         self.calls.append(kwargs)
@@ -88,7 +89,8 @@ class _Provider:
         if kwargs["purpose"] == "select_profile_sections":
             return selection.model_dump(mode="json")
         packet = build_section_packet(_report(), PAGES, index, selection)
-        return _draft(packet).model_dump(mode="json")
+        draft = _with_supply_chain(_draft(packet), packet) if self.supply_chain else _draft(packet)
+        return draft.model_dump(mode="json")
 
 
 def test_section_boundary_is_not_one_opening_page_and_continuation_keeps_header():
@@ -104,6 +106,82 @@ def test_section_boundary_is_not_one_opening_page_and_continuation_keeps_header(
     shifted = build_section_packet(_report(), altered, shifted_index, _selection(shifted_index))
     assert "100.00" in shifted.model_text()
     assert shifted.reading_scope.sections[0].start_page == 22
+
+
+def test_decimal_headings_offer_complete_report_local_business_subsections():
+    pages = (
+        {"page": 31, "text": "第三节 管理层讨论与分析\n3.6 公司主要业务\n3.6.2 公司金融业务\n对公收入685.79亿元。\n"},
+        {"page": 32, "text": "对公客户服务。\n3.6.3 零售金融业务\n个人AUM46,645.33亿元。\n3.7 利润表分析\n营业收入173,964百万元。\n"},
+        {"page": 33, "text": "第四节 其他\n"},
+    )
+    index = index_sections(pages)
+    corporate = next(s for s in index if s.section_path[-1] == "3.6.2 公司金融业务")
+    assert corporate.section_path == ("第三节 管理层讨论与分析", "3.6 公司主要业务", "3.6.2 公司金融业务")
+    assert corporate.start_page == 31 and corporate.end_page == 32
+    packet = build_section_packet(_report(), pages, index, SectionSelection(
+        selected_section_ids=(corporate.section_id,), rationale="业务子节", stop_reason="集中阅读",
+    ))
+    assert "685.79" in packet.model_text() and "对公客户服务" in packet.model_text()
+    assert "46,645.33" not in packet.model_text()
+
+
+def test_heading_joined_to_previous_paragraph_keeps_original_source_boundary():
+    text = "第三节 经营分析\n二、行业情况\n行业承压。 三、经营讨论\n公司收入增长。 四、主要经营情况\n(一) 主营业务分析\n本期营业收入100元。\n"
+    pages = ({"page": 13, "text": text}, {"page": 14, "text": "第四节 其他\n"})
+    index = index_sections(pages)
+    business = next(s for s in index if s.section_path[-1] == "(一) 主营业务分析")
+    assert business.section_path == ("第三节 经营分析", "四、主要经营情况", "(一) 主营业务分析")
+    discussion = next(s for s in index if s.section_path[-1] == "三、经营讨论")
+    assert text[discussion.start_offset:discussion.end_offset] == "三、经营讨论\n公司收入增长。 "
+
+
+def _with_supply_chain(draft, packet, *, bad_input=False):
+    raw = draft.model_dump(mode="json")
+    raw["supply_chain"] = {
+        name: {"status": "unclear", "facts": [], "limitations": ["所选范围未定位，非全报告未披露。"]}
+        for name in SUPPLY_CHAIN_LABELS
+    }
+    raw["supply_chain"]["position"] = {
+        "status": "observed", "limitations": [], "facts": [{
+            "fact_id": "chain-position", "text": "公司提供银行存贷款和结算服务。",
+            "subject_scope": "consolidated_group", "period": "2025",
+            "evidence_ids": [packet.evidence[0].evidence_id], "metrics": [],
+        }],
+    }
+    if bad_input:
+        raw["supply_chain"]["upstream_inputs"] = {
+            "status": "observed", "limitations": [], "facts": [{
+                **raw["supply_chain"]["position"]["facts"][0],
+                "fact_id": "bad-input", "evidence_ids": ["not-sent"],
+            }],
+        }
+    return WorkpaperDraftResponse.model_validate(raw)
+
+
+def test_supply_chain_is_optional_and_bad_bonus_citations_do_not_discard_profile():
+    packet = build_section_packet(_report(), PAGES, index_sections(PAGES), _selection(index_sections(PAGES)))
+    plain = bind_workpaper_draft(_draft(packet), report=_report(), reading_scope=packet.reading_scope, evidence=packet.evidence)
+    assert plain.supply_chain is None
+    assert "供应链信息（可选加分项）" not in render_workpaper(plain)
+    enriched = bind_workpaper_draft(
+        _with_supply_chain(_draft(packet), packet, bad_input=True),
+        report=_report(), reading_scope=packet.reading_scope, evidence=packet.evidence,
+    )
+    assert enriched.elements == plain.elements
+    assert enriched.supply_chain.position.facts
+    assert not enriched.supply_chain.upstream_inputs.facts
+    assert enriched.supply_chain.upstream_inputs.status == "unclear"
+    assert "未纳入" in enriched.supply_chain.upstream_inputs.limitations[-1]
+    assert "供应链信息（可选加分项）" in render_workpaper(enriched)
+    partial = _with_supply_chain(_draft(packet), packet).model_dump(mode="json")
+    partial["supply_chain"] = {"position": partial["supply_chain"]["position"]}
+    loaded = bind_workpaper_draft(
+        WorkpaperDraftResponse.model_validate(partial), report=_report(),
+        reading_scope=packet.reading_scope, evidence=packet.evidence,
+    )
+    assert loaded.supply_chain.position.facts
+    assert not loaded.supply_chain.upstream_inputs.facts
+    assert loaded.supply_chain.upstream_inputs.limitations
 
 
 def test_unknown_section_and_unknown_evidence_are_rejected():
@@ -154,6 +232,7 @@ def test_two_calls_use_sections_and_direct_structured_content_without_old_invent
     assert "source_conditions" not in provider.calls[1]["payload"]
     assert "100.00" in render_workpaper(result.workpaper)
     assert "未定位" in render_workpaper(result.workpaper)
+    assert provider.calls[0]["payload"]["reading_questions"]
 
 
 def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_replaced():
@@ -169,7 +248,7 @@ def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_repla
     packet = build_section_packet(_report(), PAGES, index, selection)
     transport = ScriptedTransport([
         _response(selection.model_dump(mode="json")),
-        _response(_draft(packet).model_dump(mode="json")),
+        _response(_with_supply_chain(_draft(packet), packet).model_dump(mode="json")),
     ])
     client = _client(transport, _budget(), _config(max_schema_repair_attempts=0))
     provider = CommonGatewaySemanticProvider(
@@ -183,6 +262,7 @@ def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_repla
             provider=provider, work_id="wire-fixture",
         )
         assert result.workpaper.origin == "controlled_fixture"
+        assert result.workpaper.supply_chain.position.facts
         assert len(transport.calls) == 2
         assert len(result.receipts) == 2
         extraction = transport.calls[1]["payload"]
@@ -198,7 +278,7 @@ def test_original_runtime_writer_query_export_and_new_read_instance_agree():
 
     with TemporaryDirectory(prefix="v9-workpaper-test-") as directory:
         root = Path(directory)
-        provider = _Provider()
+        provider = _Provider(supply_chain=True)
         writer = CompanyProfileResearchWriter(root / "output")
         runtime = CompanyProfileStageRuntime(writer=writer, provider=provider, page_source=None)
         item = {
@@ -216,6 +296,8 @@ def test_original_runtime_writer_query_export_and_new_read_instance_agree():
         assert profile["workpaper"]["origin"] == "controlled_fixture"
         assert profile["core_complete"] is False
         assert profile["workpaper_status"] == "pending_verification"
+        assert profile["workpaper"]["supply_chain"]["position"]["facts"]
+        assert profile["workpaper"]["supply_chain"]["upstream_inputs"]["status"] == "unclear"
         assert any(str(path).endswith(".md") for path in exported["files"])
     assert not root.exists()
 

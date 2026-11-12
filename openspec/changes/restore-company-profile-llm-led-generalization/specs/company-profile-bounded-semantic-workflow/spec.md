@@ -89,6 +89,7 @@ Verification MUST compare actual content against original source evidence and pr
 - **AND** average accuracy cannot override the blocker
 
 ### Requirement: Report usability requires complete core chapters and no frozen blocker
+For new profiles after the 2026-11-12 user instruction, absence of supply-chain information MUST NOT create a core blocker or mandatory additional reading. Optional supply-chain facts still require valid source references and known errors remain excluded from reliable use. Historical frozen completeness contracts are not re-scored.
 The v9 system MUST distinguish basic workpaper delivery, selected-section information coverage, formal core completeness and production authorization. A sourced pending workpaper MAY be rendered and queried with explicit partial elements and unread scopes without running a complete-report condition checklist. Formal usable company status still requires substantive principal business, major products/services, revenue model, relevant exposures/roles and the applicable acceptance checks; known material errors or major omissions cannot be hidden as minor gaps. Reading MUST use report-local section boundaries, not isolated candidate pages or fixed page counts. Missing secondary operating/input/counterparty/event detail does not block independent facts. Legacy six-chapter statuses, old first-run results and authorization limits remain unchanged.
 
 #### Scenario: Enhanced operating quantities fail

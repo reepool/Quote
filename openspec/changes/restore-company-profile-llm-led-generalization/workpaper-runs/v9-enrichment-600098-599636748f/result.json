@@ -1,0 +1,2243 @@
+{
+  "run": {
+    "action": "run",
+    "state": "completed",
+    "task": {
+      "task_name": "company_profile_common_core",
+      "actions": [
+        "preview",
+        "run",
+        "status",
+        "pause",
+        "resume",
+        "query",
+        "export"
+      ],
+      "parameters": {
+        "action": [
+          "preview",
+          "run",
+          "status",
+          "pause",
+          "resume",
+          "query",
+          "export"
+        ],
+        "knowledge_cutoff": null,
+        "instrument_ids": [],
+        "max_items": 2,
+        "token_budget": 50000,
+        "max_elapsed_seconds": 300.0,
+        "reason": "operator_request",
+        "output_directory": null
+      },
+      "storage_namespace": "company_profile_common_core.v1",
+      "writer": "company_profile_research_writer.v1",
+      "production_authorization": "not_authorized",
+      "legacy_task_names_not_connected": [
+        "business_profile_daily_incremental",
+        "business_profile_backfill",
+        "business_profile_backfill_control",
+        "business_profile_semantic_repair",
+        "company_profile_shadow_sync"
+      ],
+      "stage5_connected": true
+    },
+    "control": {
+      "schema_version": "company_profile_task_control.v1",
+      "state": "completed",
+      "run_id": "company_profile_common_core-6cabaa82f044",
+      "action": "run",
+      "started_at": "2026-11-12T10:48:57.771729+08:00",
+      "updated_at": "2026-11-12T10:50:19.515485+08:00",
+      "finished_at": "2026-11-12T10:50:19.515485+08:00",
+      "stop_requested": false,
+      "reason": null,
+      "parameters": {
+        "knowledge_cutoff": "2026-11-12",
+        "instrument_ids": [
+          "600098.SH"
+        ],
+        "max_items": 1,
+        "token_budget": 3000000,
+        "max_elapsed_seconds": 1742.613658297807
+      },
+      "latest_result": {
+        "action": "run",
+        "state": "completed",
+        "task": {
+          "task_name": "company_profile_common_core",
+          "actions": [
+            "preview",
+            "run",
+            "status",
+            "pause",
+            "resume",
+            "query",
+            "export"
+          ],
+          "parameters": {
+            "action": [
+              "preview",
+              "run",
+              "status",
+              "pause",
+              "resume",
+              "query",
+              "export"
+            ],
+            "knowledge_cutoff": null,
+            "instrument_ids": [],
+            "max_items": 2,
+            "token_budget": 50000,
+            "max_elapsed_seconds": 300.0,
+            "reason": "operator_request",
+            "output_directory": null
+          },
+          "storage_namespace": "company_profile_common_core.v1",
+          "writer": "company_profile_research_writer.v1",
+          "production_authorization": "not_authorized",
+          "legacy_task_names_not_connected": [
+            "business_profile_daily_incremental",
+            "business_profile_backfill",
+            "business_profile_backfill_control",
+            "business_profile_semantic_repair",
+            "company_profile_shadow_sync"
+          ],
+          "stage5_connected": true
+        },
+        "control": {
+          "schema_version": "company_profile_task_control.v1",
+          "state": "running",
+          "run_id": "company_profile_common_core-6cabaa82f044",
+          "action": "run",
+          "started_at": "2026-11-12T10:48:57.771729+08:00",
+          "updated_at": "2026-11-12T10:48:57.771729+08:00",
+          "finished_at": null,
+          "stop_requested": false,
+          "reason": null,
+          "parameters": {
+            "knowledge_cutoff": "2026-11-12",
+            "instrument_ids": [
+              "600098.SH"
+            ],
+            "max_items": 1,
+            "token_budget": 3000000,
+            "max_elapsed_seconds": 1742.613658297807
+          },
+          "latest_result": null
+        },
+        "queue": {
+          "as_of": "2026-11-12T10:50:18.089334+08:00",
+          "total": 1,
+          "running": 0,
+          "claimable": 0,
+          "terminal": 0,
+          "completed": 1,
+          "machine_rework": 0,
+          "finalized": 1,
+          "groups": [
+            {
+              "stage": "publish",
+              "status": "completed",
+              "row_count": 1,
+              "oldest_created_at": "2026-11-12T10:48:59.156054+08:00",
+              "oldest_age_seconds": 79.4647
+            }
+          ]
+        },
+        "production_authorization": "not_authorized",
+        "storage_namespace": "company_profile_common_core.v1",
+        "writer": "company_profile_research_writer.v1",
+        "knowledge_cutoff": "2026-11-12",
+        "enqueue": {
+          "eligible": 1,
+          "inserted": 1,
+          "reused": 0,
+          "reset": 0,
+          "checkpoint_rotated": 0,
+          "checkpoint_deleted": 0,
+          "checkpoint_delete_failures": [],
+          "superseded": 0,
+          "identity_superseded": 0,
+          "work_ids": [
+            "bp-work-8d28e1c64c715bb76a5785ff"
+          ]
+        },
+        "drain": {
+          "acquire": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 2.282,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 4.612,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 2,
+              "wait_seconds": 3.1e-05,
+              "write_seconds": 0.440225,
+              "observation_seconds": 7.206682,
+              "transaction_p50_seconds": 0.220113,
+              "transaction_p95_seconds": 0.249642,
+              "transaction_max_seconds": 0.252923,
+              "writer_lock_duty": 0.061086,
+              "inter_write_idle_seconds": 2.257443,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "parse": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 2.064,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 3.739,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 4,
+              "wait_seconds": 7.3e-05,
+              "write_seconds": 0.892992,
+              "observation_seconds": 11.025679,
+              "transaction_p50_seconds": 0.220113,
+              "transaction_p95_seconds": 0.277132,
+              "transaction_max_seconds": 0.281405,
+              "writer_lock_duty": 0.080992,
+              "inter_write_idle_seconds": 5.605807,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "semantic": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 62.198,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 64.268,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 11,
+              "wait_seconds": 0.00017,
+              "write_seconds": 1.969763,
+              "observation_seconds": 75.373712,
+              "transaction_p50_seconds": 0.160664,
+              "transaction_p95_seconds": 0.267164,
+              "transaction_max_seconds": 0.281405,
+              "writer_lock_duty": 0.026133,
+              "inter_write_idle_seconds": 68.98884,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "verify": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.321,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 2.454,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 13,
+              "wait_seconds": 0.00019,
+              "write_seconds": 2.249076,
+              "observation_seconds": 77.880742,
+              "transaction_p50_seconds": 0.152799,
+              "transaction_p95_seconds": 0.264316,
+              "transaction_max_seconds": 0.281405,
+              "writer_lock_duty": 0.028878,
+              "inter_write_idle_seconds": 71.181473,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          },
+          "publish": {
+            "status": "success",
+            "stop_requested": false,
+            "claimed": 1,
+            "completed": 1,
+            "finalized": 0,
+            "retried": 0,
+            "terminal_failures": 0,
+            "lease_conflicts": 0,
+            "configuration_blocked": 0,
+            "machine_rework_deferred": 0,
+            "artifact_replay_deferred": 0,
+            "context_reselect_deferred": 0,
+            "claim_exclusions": 1,
+            "empty_polls": 0,
+            "queue_underfilled_slots": 0,
+            "peak_in_flight": 1,
+            "active_work_seconds": 1.169,
+            "errors": [],
+            "quality": {
+              "blocking_machine_rework": 0,
+              "selected_documents": 0,
+              "selected_pages": 0,
+              "outline_pages_scoped": 0,
+              "evidence_records": 0,
+              "record_count": 0,
+              "verified_records": 0,
+              "empty_output_documents": 0,
+              "expected_non_disclosure_documents": 0,
+              "structured_fallback_required": 0,
+              "structured_fallback_calls": 0,
+              "structured_fallback_accepted_records": 0,
+              "structured_fallback_rejected": 0,
+              "page_artifact_cache_hits": 0,
+              "page_artifact_cache_misses": 0,
+              "pdf_parser_warning_count": 0,
+              "outline_sources": {},
+              "outline_confidences": {},
+              "empty_output_reasons": {},
+              "blocked_configuration_reasons": {},
+              "machine_rework_reasons": {}
+            },
+            "execution_mode": null,
+            "elapsed_seconds": 2.351,
+            "writer": {
+              "pending_writers": 0,
+              "active_writers": 0,
+              "max_pending_writers": 1,
+              "max_active_writers": 1,
+              "write_transactions": 15,
+              "wait_seconds": 0.000216,
+              "write_seconds": 2.475077,
+              "observation_seconds": 80.275978,
+              "transaction_p50_seconds": 0.140336,
+              "transaction_p95_seconds": 0.261467,
+              "transaction_max_seconds": 0.281405,
+              "writer_lock_duty": 0.030832,
+              "inter_write_idle_seconds": 73.335264,
+              "inter_write_seconds": 0.01
+            },
+            "gateway_admission": {
+              "requested_concurrency": 1,
+              "effective_concurrency": 1,
+              "admitted_requests": 1,
+              "throttled_requests": 0,
+              "queue_underfilled_slots": 0,
+              "provider_congestion_events": 0,
+              "provider_congestion_failures": 0,
+              "in_flight": 0,
+              "peak_in_flight": 1
+            }
+          }
+        }
+      }
+    },
+    "queue": {
+      "as_of": "2026-11-12T10:50:18.089334+08:00",
+      "total": 1,
+      "running": 0,
+      "claimable": 0,
+      "terminal": 0,
+      "completed": 1,
+      "machine_rework": 0,
+      "finalized": 1,
+      "groups": [
+        {
+          "stage": "publish",
+          "status": "completed",
+          "row_count": 1,
+          "oldest_created_at": "2026-11-12T10:48:59.156054+08:00",
+          "oldest_age_seconds": 79.4647
+        }
+      ]
+    },
+    "production_authorization": "not_authorized",
+    "storage_namespace": "company_profile_common_core.v1",
+    "writer": "company_profile_research_writer.v1",
+    "knowledge_cutoff": "2026-11-12",
+    "enqueue": {
+      "eligible": 1,
+      "inserted": 1,
+      "reused": 0,
+      "reset": 0,
+      "checkpoint_rotated": 0,
+      "checkpoint_deleted": 0,
+      "checkpoint_delete_failures": [],
+      "superseded": 0,
+      "identity_superseded": 0,
+      "work_ids": [
+        "bp-work-8d28e1c64c715bb76a5785ff"
+      ]
+    },
+    "drain": {
+      "acquire": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 2.282,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 4.612,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 2,
+          "wait_seconds": 3.1e-05,
+          "write_seconds": 0.440225,
+          "observation_seconds": 7.206682,
+          "transaction_p50_seconds": 0.220113,
+          "transaction_p95_seconds": 0.249642,
+          "transaction_max_seconds": 0.252923,
+          "writer_lock_duty": 0.061086,
+          "inter_write_idle_seconds": 2.257443,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "parse": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 2.064,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 3.739,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 4,
+          "wait_seconds": 7.3e-05,
+          "write_seconds": 0.892992,
+          "observation_seconds": 11.025679,
+          "transaction_p50_seconds": 0.220113,
+          "transaction_p95_seconds": 0.277132,
+          "transaction_max_seconds": 0.281405,
+          "writer_lock_duty": 0.080992,
+          "inter_write_idle_seconds": 5.605807,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "semantic": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 62.198,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 64.268,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 11,
+          "wait_seconds": 0.00017,
+          "write_seconds": 1.969763,
+          "observation_seconds": 75.373712,
+          "transaction_p50_seconds": 0.160664,
+          "transaction_p95_seconds": 0.267164,
+          "transaction_max_seconds": 0.281405,
+          "writer_lock_duty": 0.026133,
+          "inter_write_idle_seconds": 68.98884,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "verify": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.321,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 2.454,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 13,
+          "wait_seconds": 0.00019,
+          "write_seconds": 2.249076,
+          "observation_seconds": 77.880742,
+          "transaction_p50_seconds": 0.152799,
+          "transaction_p95_seconds": 0.264316,
+          "transaction_max_seconds": 0.281405,
+          "writer_lock_duty": 0.028878,
+          "inter_write_idle_seconds": 71.181473,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      },
+      "publish": {
+        "status": "success",
+        "stop_requested": false,
+        "claimed": 1,
+        "completed": 1,
+        "finalized": 0,
+        "retried": 0,
+        "terminal_failures": 0,
+        "lease_conflicts": 0,
+        "configuration_blocked": 0,
+        "machine_rework_deferred": 0,
+        "artifact_replay_deferred": 0,
+        "context_reselect_deferred": 0,
+        "claim_exclusions": 1,
+        "empty_polls": 0,
+        "queue_underfilled_slots": 0,
+        "peak_in_flight": 1,
+        "active_work_seconds": 1.169,
+        "errors": [],
+        "quality": {
+          "blocking_machine_rework": 0,
+          "selected_documents": 0,
+          "selected_pages": 0,
+          "outline_pages_scoped": 0,
+          "evidence_records": 0,
+          "record_count": 0,
+          "verified_records": 0,
+          "empty_output_documents": 0,
+          "expected_non_disclosure_documents": 0,
+          "structured_fallback_required": 0,
+          "structured_fallback_calls": 0,
+          "structured_fallback_accepted_records": 0,
+          "structured_fallback_rejected": 0,
+          "page_artifact_cache_hits": 0,
+          "page_artifact_cache_misses": 0,
+          "pdf_parser_warning_count": 0,
+          "outline_sources": {},
+          "outline_confidences": {},
+          "empty_output_reasons": {},
+          "blocked_configuration_reasons": {},
+          "machine_rework_reasons": {}
+        },
+        "execution_mode": null,
+        "elapsed_seconds": 2.351,
+        "writer": {
+          "pending_writers": 0,
+          "active_writers": 0,
+          "max_pending_writers": 1,
+          "max_active_writers": 1,
+          "write_transactions": 15,
+          "wait_seconds": 0.000216,
+          "write_seconds": 2.475077,
+          "observation_seconds": 80.275978,
+          "transaction_p50_seconds": 0.140336,
+          "transaction_p95_seconds": 0.261467,
+          "transaction_max_seconds": 0.281405,
+          "writer_lock_duty": 0.030832,
+          "inter_write_idle_seconds": 73.335264,
+          "inter_write_seconds": 0.01
+        },
+        "gateway_admission": {
+          "requested_concurrency": 1,
+          "effective_concurrency": 1,
+          "admitted_requests": 1,
+          "throttled_requests": 0,
+          "queue_underfilled_slots": 0,
+          "provider_congestion_events": 0,
+          "provider_congestion_failures": 0,
+          "in_flight": 0,
+          "peak_in_flight": 1
+        }
+      }
+    }
+  },
+  "three_reads_equal": true,
+  "elapsed_seconds": 140.45954201743007,
+  "ledger": {
+    "physical_requests": 3,
+    "charged_tokens": 85689,
+    "charged_cost_cny": "unknown",
+    "cost_status": "unknown",
+    "billing_mode": "development_unpriced",
+    "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+    "stopped_reason": null,
+    "denied_request": null,
+    "attempts": [
+      {
+        "sequence": 1,
+        "request_id": "379429f98f8847a39575cd77b1fa6806",
+        "logical_request_id": "2173fa11defcb996eaa41f004eb8a4ac24b6f52404b6447861ef1d0d2d93571d",
+        "source_label": "deepseek:deepseek-flash",
+        "attempt": 1,
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "reserved_input_tokens": 82536,
+        "reserved_output_tokens": 2500,
+        "charged_tokens": 24504,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 24179,
+          "output_tokens": 325,
+          "total_tokens": 24504
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 327,
+          "content_fragments": 325,
+          "content_chars": 648,
+          "content_sha256": "81146624837d479a64d88069c6f7c999b939161f9f960e4b10b89cded50cbfee",
+          "reasoning_present": false,
+          "reasoning_chars": 0,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      },
+      {
+        "sequence": 2,
+        "request_id": "a06d5359d7894aecb595a0e0c6ecb951",
+        "logical_request_id": "ebf8fecb82ed191bc6d94134be0c92420e188bf24d05b3d934e91df293430237",
+        "source_label": "deepseek:deepseek-flash",
+        "attempt": 1,
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "reserved_input_tokens": 99245,
+        "reserved_output_tokens": 12000,
+        "charged_tokens": 25966,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 18335,
+          "output_tokens": 7631,
+          "total_tokens": 25966
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 7633,
+          "content_fragments": 7631,
+          "content_chars": 20309,
+          "content_sha256": "97447ff2409559779ab0907c3bb77872c1336aea4dc67995a5821445d9374371",
+          "reasoning_present": false,
+          "reasoning_chars": 0,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        },
+        "error_code": "response_parse_error"
+      },
+      {
+        "sequence": 3,
+        "request_id": "a06d5359d7894aecb595a0e0c6ecb951",
+        "logical_request_id": "ebf8fecb82ed191bc6d94134be0c92420e188bf24d05b3d934e91df293430237",
+        "source_label": "deepseek:deepseek-flash",
+        "attempt": 2,
+        "profile": "semantic_extraction__deepseek",
+        "provider_resource": "deepseek",
+        "model": "deepseek-flash",
+        "reserved_input_tokens": 137478,
+        "reserved_output_tokens": 12000,
+        "charged_tokens": 35219,
+        "charged_cost_cny": "unknown",
+        "usage": {
+          "input_tokens": 27588,
+          "output_tokens": 7631,
+          "total_tokens": 35219
+        },
+        "status": "success",
+        "billing_basis": "unpriced_development_observation",
+        "cost_status": "unknown",
+        "finish_reason": "stop",
+        "stream_summary": {
+          "event_count": 7633,
+          "content_fragments": 7631,
+          "content_chars": 20310,
+          "content_sha256": "d4d65fbefe57f32fc0227d66f06671e9eb248ed4ea0978704ab9348f7c38056c",
+          "reasoning_present": false,
+          "reasoning_chars": 0,
+          "finish_reason": "stop",
+          "done": true,
+          "usage_present": true
+        }
+      }
+    ]
+  },
+  "receipts": [
+    {
+      "request_id": "bp-work-8d28e1c64c715bb76a5785ff:workpaper:sections",
+      "purpose": "select_profile_sections",
+      "request_hash": "5a398d135d990770fd867240cffbfab6ca3a3659e64817f657ee203f04bf4b18",
+      "response_hash": "81146624837d479a64d88069c6f7c999b939161f9f960e4b10b89cded50cbfee",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "raw_content": "{\"selected_section_ids\":[\"section-0035\",\"section-0036\",\"section-0064\",\"section-0066\",\"section-0093\",\"section-0116\",\"section-0056\"],\"rationale\":\"所选章节覆盖公司业务结构、行业环境、主营业务收入与成本构成、电力经营规模（电量电价、装机容量、发电效率、资本性支出）、主要控股参股公司以及核心竞争力，能够共同说明公司做什么、产品与服务用途、盈利模式、规模与主要结构、经营资源与市场变化。行业情况选取父节以保持完整；主营业务分析选取父节及其收入和成本分析子节，避免与更细碎子项重复。\",\"deferred\":[\"section-0034 管理层讨论与分析整章：包含大量荣誉、治理与细节性叙述，已用其下业务、行业、经营分析等实质子节替代\",\"section-0063 报告期内主要经营情况整章：范围过大，已定向选取主营业务分析、行业经营性信息与主要控股参股公司\",\"section-0390 财务报告整章及分部信息附注：仅在业务章节存在实质缺口时再定向补充，当前业务与经营数据已足够\",\"section-0118 未来发展讨论与分析：属前瞻性计划，非本期经营事实，暂不纳入\"],\"stop_reason\":\"已获得业务模式、产品用途、收入成本结构、经营规模与主要变化等核心信息，可停止；未追求覆盖治理、债券、财务报告全文及前瞻性计划，故不声称完整覆盖全报告。\"}",
+      "response_payload": {
+        "selected_section_ids": [
+          "section-0035",
+          "section-0036",
+          "section-0064",
+          "section-0066",
+          "section-0093",
+          "section-0116",
+          "section-0056"
+        ],
+        "rationale": "所选章节覆盖公司业务结构、行业环境、主营业务收入与成本构成、电力经营规模（电量电价、装机容量、发电效率、资本性支出）、主要控股参股公司以及核心竞争力，能够共同说明公司做什么、产品与服务用途、盈利模式、规模与主要结构、经营资源与市场变化。行业情况选取父节以保持完整；主营业务分析选取父节及其收入和成本分析子节，避免与更细碎子项重复。",
+        "deferred": [
+          "section-0034 管理层讨论与分析整章：包含大量荣誉、治理与细节性叙述，已用其下业务、行业、经营分析等实质子节替代",
+          "section-0063 报告期内主要经营情况整章：范围过大，已定向选取主营业务分析、行业经营性信息与主要控股参股公司",
+          "section-0390 财务报告整章及分部信息附注：仅在业务章节存在实质缺口时再定向补充，当前业务与经营数据已足够",
+          "section-0118 未来发展讨论与分析：属前瞻性计划，非本期经营事实，暂不纳入"
+        ],
+        "stop_reason": "已获得业务模式、产品用途、收入成本结构、经营规模与主要变化等核心信息，可停止；未追求覆盖治理、债券、财务报告全文及前瞻性计划，故不声称完整覆盖全报告。"
+      },
+      "usage": {
+        "input_tokens": 24179,
+        "output_tokens": 325,
+        "total_tokens": 24504
+      }
+    },
+    {
+      "request_id": "bp-work-8d28e1c64c715bb76a5785ff:workpaper:extract",
+      "purpose": "extract_profile_workpaper",
+      "request_hash": "e257834738660768b36761e91a18122f388cfb0f16393af35f2a2c4fd41a67f6",
+      "response_hash": "d4d65fbefe57f32fc0227d66f06671e9eb248ed4ea0978704ab9348f7c38056c",
+      "finish_reason": "stop",
+      "source_label": "deepseek:deepseek-flash",
+      "model": "deepseek-flash",
+      "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"BS-01\",\"text\":\"公司从事绿色低碳综合智慧能源、节能、环保、能源金融等业务的投资开发和经营，是广东省重要的综合能源企业之一。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"BS-02\",\"text\":\"公司以构建“大产业链”思路推动产能互融、多能互补、煤气电联动，形成产、购、销、储、运、用的综合能源产业链。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"BS-03\",\"text\":\"公司已形成电力、能源物流、燃气、新能源、储能、能源金融等业务协同发展的“1+6+N”能源产供储销体系。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"BS-04\",\"text\":\"全资子公司燃气集团是广州市城市燃气高压管网建设和天然气购销的主体，统筹全市高压管网建设和上游气源采购、下游天然气输配及分销。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"BS-05\",\"text\":\"全资子公司能源物流集团是华南地区最大的纵向一体化煤炭经营企业，拥有煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场、电厂用户等完整产业链。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0005\"]},{\"fact_id\":\"BS-06\",\"text\":\"储能集团在源网荷侧全面布局，已搭建一体化储能电站运维云平台，推动本地储能产业集群化发展。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"BS-07\",\"text\":\"金融业务主要由财务公司和融资租赁公司承担，为能源产业发展提供金融支持，实现产融结合。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"PS-01\",\"text\":\"公司向客户提供电力、煤炭、天然气、蒸汽、成品油等能源产品，以及能源管理服务。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"PS-02\",\"text\":\"公司提供天然气、煤炭和油品的装卸、运输和储存服务。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"PS-03\",\"text\":\"公司电力、蒸汽主要通过所属火力发电机组、风力和光伏发电设备生产。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"PS-04\",\"text\":\"公司依托电力、燃气、能源物流、新能源、储能等多元化综合能源体系，提供源网荷储充一体化、能源托管、节能运维、碳资产管理等一体化服务，构建“投资-建设-运营-增值服务”全链条服务模式。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"PS-05\",\"text\":\"公司拓展售电、配电网、能源检修与技术服务。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"PS-06\",\"text\":\"公司拥有67万立方米大型油库及配套8万吨级石油化工专业码头，是甲醇、生物质油料重要集散基地，为郑州商品交易所指定交割油库。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"PS-07\",\"text\":\"公司新能源业务打造“风光储充运”一体化产业链，并搭建“广发生态时令”展销平台实现价值链延伸。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"RM-01\",\"text\":\"公司电力主要通过国家电网、南方电网销售给终端用户，并积极推进发售电一体运营模式。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"RM-02\",\"text\":\"公司天然气、煤炭、成品油、蒸汽等通过自有管网、销售平台及运输、批发、销售一体化的产业链等销售给终端用户。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"RM-03\",\"text\":\"公司天然气、煤炭和成品油等通过外部采购，与国内外知名供应商建立长期战略合作关系以控制采购成本。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"RM-04\",\"text\":\"公司2025年实现营业总收入508.83亿元，营业总成本（含财务公司对外利息、手续费及佣金支出）492.91亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"营业总收入\",\"raw_value\":\"508.83\",\"value\":\"508.83\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"营业总成本\",\"raw_value\":\"492.91\",\"value\":\"492.91\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"RM-05\",\"text\":\"主营业务分行业毛利率：燃煤发电及供热业务14.21%，天然气发电及供热业务13.45%，能源物流业务1.10%，天然气业务13.66%，新能源及储能业务49.30%，其他产业78.02%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0009\"]},{\"fact_id\":\"RM-06\",\"text\":\"公司营业收入、营业成本变动原因为煤炭和油品销量增加，风电及光伏发电装机规模增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"RM-07\",\"text\":\"公司营业利润、归属于母公司股东的净利润变动原因为天然气业务、风电及光伏发电业务规模增加，确认土地交储收益。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"SM-01\",\"text\":\"截至2025年12月31日，公司发电装机容量达到1,097万千瓦，其中火力发电可控装机容量484万千瓦，风力及光伏发电可控装机容量613万千瓦，绿色低碳能源装机占比超77%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"SM-02\",\"text\":\"截至2025年12月31日，公司可控发电装机容量为1,097.06万千瓦，其中火电可控装机容量483.65万千瓦，同比减少11.7%；光伏发电可控装机容量355.34万千瓦，同比增长51.4%；风力发电可控装机容量258.07万千瓦，同比增长5.7%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\",\"evidence_ids\":[\"source-0016\",\"source-0017\"],\"metrics\":[{\"name\":\"可控发电装机容量\",\"raw_value\":\"1,097.06\",\"value\":\"1097.06\",\"unit\":\"万千瓦\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\"},{\"name\":\"火电可控装机容量\",\"raw_value\":\"483.65\",\"value\":\"483.65\",\"unit\":\"万千瓦\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\"},{\"name\":\"光伏发电可控装机容量\",\"raw_value\":\"355.34\",\"value\":\"355.34\",\"unit\":\"万千瓦\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\"},{\"name\":\"风力发电可控装机容量\",\"raw_value\":\"258.07\",\"value\":\"258.07\",\"unit\":\"万千瓦\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025-12-31\"}]},{\"fact_id\":\"SM-03\",\"text\":\"主营业务分行业营业收入：燃煤发电及供热业务4,349,947,127.70元，天然气发电及供热业务3,204,831,500.79元，能源物流业务29,485,020,343.45元，天然气业务10,502,056,882.42元，新能源及储能业务3,245,504,723.82元，其他产业95,784,921.17元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0009\"],\"metrics\":[{\"name\":\"燃煤发电及供热业务营业收入\",\"raw_value\":\"4,349,947,127.70\",\"value\":\"4349947127.70\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"天然气发电及供热业务营业收入\",\"raw_value\":\"3,204,831,500.79\",\"value\":\"3204831500.79\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"能源物流业务营业收入\",\"raw_value\":\"29,485,020,343.45\",\"value\":\"29485020343.45\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"天然气业务营业收入\",\"raw_value\":\"10,502,056,882.42\",\"value\":\"10502056882.42\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"新能源及储能业务营业收入\",\"raw_value\":\"3,245,504,723.82\",\"value\":\"3245504723.82\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"其他产业营业收入\",\"raw_value\":\"95,784,921.17\",\"value\":\"95784921.17\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"SM-04\",\"text\":\"主要产品产销量：电力生产量243.76亿千瓦时、销售量233.89亿千瓦时；热力生产量682.58万吉焦、销售量684.66万吉焦；市场煤销售量4,801.25万吨；成品油销售量100.37万吨；天然气销售量359,796.93万立方米。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"电力生产量\",\"raw_value\":\"243.76\",\"value\":\"243.76\",\"unit\":\"亿千瓦时\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"电力销售量\",\"raw_value\":\"233.89\",\"value\":\"233.89\",\"unit\":\"亿千瓦时\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"热力生产量\",\"raw_value\":\"682.58\",\"value\":\"682.58\",\"unit\":\"万吉焦\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"热力销售量\",\"raw_value\":\"684.66\",\"value\":\"684.66\",\"unit\":\"万吉焦\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"市场煤销售量\",\"raw_value\":\"4,801.25\",\"value\":\"4801.25\",\"unit\":\"万吨\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"成品油销售量\",\"raw_value\":\"100.37\",\"value\":\"100.37\",\"unit\":\"万吨\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"天然气销售量\",\"raw_value\":\"359,796.93\",\"value\":\"359796.93\",\"unit\":\"万立方米\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"SM-05\",\"text\":\"主营业务分地区营业收入：华南地区28,489,632,478.05元，其他地区22,393,513,021.30元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"华南地区营业收入\",\"raw_value\":\"28,489,632,478.05\",\"value\":\"28489632478.05\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"其他地区营业收入\",\"raw_value\":\"22,393,513,021.30\",\"value\":\"22393513021.30\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"SM-06\",\"text\":\"2025年公司市场化交易的总电量1,821,650万千瓦时，总上网电量2,303,657万千瓦时，占比79.08%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0020\"],\"metrics\":[{\"name\":\"市场化交易的总电量\",\"raw_value\":\"1,821,650\",\"value\":\"1821650\",\"unit\":\"万千瓦时\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"总上网电量\",\"raw_value\":\"2,303,657\",\"value\":\"2303657\",\"unit\":\"万千瓦时\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"SM-07\",\"text\":\"2025年公司售电业务全年在广东电力市场签约总电量约27.65亿千瓦时。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0020\"]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"OI-01\",\"text\":\"公司火力发电厂集中在粤港澳大湾区电力负荷中心，是华南地区大型发电企业之一；风力及光伏发电等新能源项目已覆盖全国20个省市。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"OI-02\",\"text\":\"公司天然气、煤炭和成品油等通过外部采购，与国内外知名供应商建立长期战略合作关系。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"OI-03\",\"text\":\"燃气集团拥有基本覆盖广州市全区域的高、中压管网，统筹全市高压管网建设和上游气源采购、下游天然气输配及分销。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"OI-04\",\"text\":\"能源物流集团拥有67万立方米大型油库及配套8万吨级石油化工专业码头，建成广州市危险物品卸载（仓储）南沙基地。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"OI-05\",\"text\":\"公司已建立涵盖上游气源、LNG接收站、燃气管网、城市燃气、燃气电厂用户等燃气上下游一体化产业链。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"OI-06\",\"text\":\"公司拥有煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场、电厂用户等完整煤炭产业链，已形成全国性营销网络并建立海外资源与销售渠道。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"OI-07\",\"text\":\"2025年公司资本性支出775,182万元，其中股权投资与项目前期费用支出84,498万元，新扩建项目支出639,835万元，技改项目支出37,039万元，固定/无形资产购置支出12,139万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"],\"metrics\":[{\"name\":\"资本性支出\",\"raw_value\":\"775,182\",\"value\":\"775182\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"OI-08\",\"text\":\"公司2025年研发投入合计647,912,418.52元，全部费用化，研发投入总额占营业收入比例1.27%；研发人员数量1,069人，占公司总人数比例16.73%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[{\"name\":\"研发投入合计\",\"raw_value\":\"647,912,418.52\",\"value\":\"647912418.52\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"研发人员数量\",\"raw_value\":\"1,069\",\"value\":\"1069\",\"unit\":\"人\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"OI-09\",\"text\":\"公司已建成20个市级及以上研发平台，14家省级专精特新中小企业、4家创新型中小企业、19家高新技术企业。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]},{\"fact_id\":\"OI-10\",\"text\":\"公司主要子公司中，能源物流集团营业收入3,066,856.13万元、净利润-17,368.85万元；燃气集团营业收入722,940.59万元、净利润6,381.95万元；新能源集团营业收入304,897.84万元、净利润40,192.98万元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0022\"],\"metrics\":[{\"name\":\"能源物流集团营业收入\",\"raw_value\":\"3,066,856.13\",\"value\":\"3066856.13\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"能源物流集团净利润\",\"raw_value\":\"-17,368.85\",\"value\":\"-17368.85\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"燃气集团营业收入\",\"raw_value\":\"722,940.59\",\"value\":\"722940.59\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"燃气集团净利润\",\"raw_value\":\"6,381.95\",\"value\":\"6381.95\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"新能源集团营业收入\",\"raw_value\":\"304,897.84\",\"value\":\"304897.84\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"},{\"name\":\"新能源集团净利润\",\"raw_value\":\"40,192.98\",\"value\":\"40192.98\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\"}]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"CC-01\",\"text\":\"公司深耕华南，服务粤港澳大湾区，业务拓展到国内26个省市，外延至11个国家和地区。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"CC-02\",\"text\":\"公司电力主要通过国家电网、南方电网销售给终端用户；天然气、煤炭、成品油、蒸汽等通过自有管网、销售平台及运输、批发、销售一体化的产业链等销售给终端用户。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"CC-03\",\"text\":\"能源物流集团业务覆盖国内经济发达的20个省市及海外地区，被纳入首批国家电煤重点保供贸易企业。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"CC-04\",\"text\":\"前五名客户销售额1,630,937.15万元，占年度销售总额32.08%；其中关联方销售额0万元。前五名供应商采购额787,537.73万元，占年度采购总额16.97%；其中关联方采购额146,943.11万元，占年度采购总额3.17%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"1,630,937.15\",\"value\":\"1630937.15\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"前五名供应商采购额\",\"raw_value\":\"787,537.73\",\"value\":\"787537.73\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"CC-05\",\"text\":\"贸易业务收入中，煤炭23,064,543,028.53元，油品6,395,908,933.37元，天然气3,603,362,079.80元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"煤炭贸易业务营业收入\",\"raw_value\":\"23,064,543,028.53\",\"value\":\"23064543028.53\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"油品贸易业务营业收入\",\"raw_value\":\"6,395,908,933.37\",\"value\":\"6395908933.37\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"天然气贸易业务营业收入\",\"raw_value\":\"3,603,362,079.80\",\"value\":\"3603362079.80\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]},{\"fact_id\":\"CC-06\",\"text\":\"公司已签订重大采购合同，对方当事人包括BP新加坡公司、中化石油（新加坡）公司、墨西哥太平洋有限公司、摩科瑞，合同标的为天然气；2025年按合同分别向BP新加坡公司、中化石油（新加坡）公司采购38.49万吨和41.2万吨天然气。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"OD-01\",\"text\":\"公司营业收入、营业成本变动原因为煤炭和油品销量增加，风电及光伏发电装机规模增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"OD-02\",\"text\":\"公司营业利润、归属于母公司股东的净利润变动原因为天然气业务、风电及光伏发电业务规模增加，确认土地交储收益。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]},{\"fact_id\":\"OD-03\",\"text\":\"公司资产处置收益变动原因为确认土地交储收益；营业外支出变动原因为确认光伏项目受台风灾害导致的资产毁损报废损失以及支付合同履约补偿。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]},{\"fact_id\":\"OD-04\",\"text\":\"公司财务费用变动原因为融资利率下降；研发费用变动原因为研发资源优化配置，直接投入等减少。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"OD-05\",\"text\":\"公司经营活动产生的现金流量净额变动原因为业务规模扩大，营运资金占用减少；投资活动产生的现金流量净额变动原因为项目建设支出及股权投资支出同比增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"OD-06\",\"text\":\"公司新能源及储能业务成本中折旧同比增加31.75%，原因为风电、光伏装机容量增加；光伏发电成本中折旧同比增加49.40%，原因为光伏装机容量增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0012\"]},{\"fact_id\":\"OD-07\",\"text\":\"公司能源物流业务成本中，成品油销售量上升增加采购成本，外购油品成本同比增加219.34%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0011\"]},{\"fact_id\":\"OD-08\",\"text\":\"公司火电发电量同比下降7.87%，风电发电量同比增长18.69%，光伏发电量同比增长46.91%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\"]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"MC-01\",\"text\":\"报告期内公司业务类型、利润构成或利润来源未发生重大变动。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]},{\"fact_id\":\"MC-02\",\"text\":\"报告期内公司业务、产品或服务未发生重大变化或调整。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]},{\"fact_id\":\"MC-03\",\"text\":\"报告期内公司新增重要非主营业务的说明为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"MC-04\",\"text\":\"报告期内公司主要子公司股权变动导致合并范围变化的情况为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]},{\"fact_id\":\"MC-05\",\"text\":\"公司火电可控装机容量由2024年的547.65万千瓦下降至2025年的483.65万千瓦，同比减少11.69%；光伏发电可控装机容量由234.67万千瓦增至355.34万千瓦，同比增长51.42%；风力发电可控装机容量由244.07万千瓦增至258.07万千瓦，同比增长5.74%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"火电可控装机容量\",\"raw_value\":\"483.65\",\"value\":\"483.65\",\"unit\":\"万千瓦\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"光伏发电可控装机容量\",\"raw_value\":\"355.34\",\"value\":\"355.34\",\"unit\":\"万千瓦\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"},{\"name\":\"风力发电可控装机容量\",\"raw_value\":\"258.07\",\"value\":\"258.07\",\"unit\":\"万千瓦\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]},{\"fact_id\":\"MC-06\",\"text\":\"公司2025年资本性支出775,182万元，较上年购建固定资产、无形资产和其他长期资产支付的现金6,642,719,995.33元同比增长67.98%，原因为新能源、储能及气电项目建设支出增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0018\"]}]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"SC-P-01\",\"text\":\"公司以构建“大产业链”思路，形成产、购、销、储、运、用的综合能源产业链，业务涵盖能源生产、采购、销售、储存、运输和终端使用环节。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"SC-P-02\",\"text\":\"公司电力、蒸汽主要通过所属火力发电机组、风力和光伏发电设备生产，处于能源生产环节。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"SC-P-03\",\"text\":\"能源物流集团是华南地区最大的纵向一体化煤炭经营企业，业务覆盖煤炭采购、运输、仓储和销售。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0005\"]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"SC-U-01\",\"text\":\"公司天然气、煤炭和成品油等通过外部采购，与国内外知名供应商建立长期战略合作关系。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"SC-U-02\",\"text\":\"燃气集团统筹全市高压管网建设和上游气源采购；公司已建立涵盖上游气源、LNG接收站、燃气管网等燃气上下游一体化产业链。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0005\"]},{\"fact_id\":\"SC-U-03\",\"text\":\"公司已签订重大采购合同，对方当事人包括BP新加坡公司、中化石油（新加坡）公司、墨西哥太平洋有限公司、摩科瑞，合同标的为天然气；2025年按合同分别向BP新加坡公司、中化石油（新加坡）公司采购38.49万吨和41.2万吨天然气。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"]},{\"fact_id\":\"SC-U-04\",\"text\":\"公司火电成本中燃料成本2,912,103,112.91元，天然气发电及供热业务燃料成本2,148,623,621.18元，天然气业务外购燃气成本7,591,261,336.43元，能源物流业务煤炭供应链成本22,726,364,423.78元、外购油品成本6,323,377,466.53元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"燃煤发电及供热业务燃料成本\",\"raw_value\":\"2,912,103,112.91\",\"value\":\"2912103112.91\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"天然气发电及供热业务燃料成本\",\"raw_value\":\"2,148,623,621.18\",\"value\":\"2148623621.18\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"天然气业务外购燃气成本\",\"raw_value\":\"7,591,261,336.43\",\"value\":\"7591261336.43\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"能源物流业务煤炭供应链成本\",\"raw_value\":\"22,726,364,423.78\",\"value\":\"22726364423.78\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"},{\"name\":\"能源物流业务外购油品成本\",\"raw_value\":\"6,323,377,466.53\",\"value\":\"6323377466.53\",\"unit\":\"元\",\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\"}]}]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"SC-D-01\",\"text\":\"公司电力主要通过国家电网、南方电网销售给终端用户；天然气、煤炭、成品油、蒸汽等通过自有管网、销售平台及运输、批发、销售一体化的产业链等销售给终端用户。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"SC-D-02\",\"text\":\"公司燃气产业链涵盖城市燃气、燃气电厂用户等下游环节；煤炭产业链涵盖电厂用户等下游环节。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"SC-D-03\",\"text\":\"公司业务拓展到国内26个省市，外延至11个国家和地区；能源物流集团业务覆盖国内经济发达的20个省市及海外地区。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"SC-D-04\",\"text\":\"前五名客户销售额1,630,937.15万元，占年度销售总额32.08%；其中关联方销售额0万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"1,630,937.15\",\"value\":\"1630937.15\",\"unit\":\"万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\"}]}]}},\"limitations\":[\"本工作底稿仅依据所选章节原文编制，未覆盖治理、债券、财务报告全文及前瞻性计划，不声称完整覆盖全报告。\",\"行业统计数据和全国性数据（如全国用电量、煤炭消费量、天然气消费量、新能源装机等）为行业背景信息，不代表公司自身经营成果。\",\"公司未在所选章节披露具体客户名称和具体供应商名称（重大采购合同对方当事人除外），本底稿未推测或编造客户与供应商身份。\",\"公司研发投入涉及可燃冰、氢能等课题，但所选章节未披露相关资源采购情况，本底稿未据此推断任何采购关系。\",\"部分表格存在跨页续表，本底稿已同时引用表头/单位所在片段与金额片段，但未对未披露数值进行计算或推断。\",\"2026年资本性支出计划属前瞻性计划，未纳入本期经营事实。\",\"公司未在所选章节披露各业务板块的详细客户结构、区域收入与板块收入的交叉对应关系，相关分析受限。\"]}",
+      "response_payload": {
+        "schema_version": "company_profile_workpaper_draft.v1",
+        "elements": {
+          "business_structure": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "BS-01",
+                "text": "公司从事绿色低碳综合智慧能源、节能、环保、能源金融等业务的投资开发和经营，是广东省重要的综合能源企业之一。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "BS-02",
+                "text": "公司以构建“大产业链”思路推动产能互融、多能互补、煤气电联动，形成产、购、销、储、运、用的综合能源产业链。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "BS-03",
+                "text": "公司已形成电力、能源物流、燃气、新能源、储能、能源金融等业务协同发展的“1+6+N”能源产供储销体系。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "BS-04",
+                "text": "全资子公司燃气集团是广州市城市燃气高压管网建设和天然气购销的主体，统筹全市高压管网建设和上游气源采购、下游天然气输配及分销。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "BS-05",
+                "text": "全资子公司能源物流集团是华南地区最大的纵向一体化煤炭经营企业，拥有煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场、电厂用户等完整产业链。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "BS-06",
+                "text": "储能集团在源网荷侧全面布局，已搭建一体化储能电站运维云平台，推动本地储能产业集群化发展。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "BS-07",
+                "text": "金融业务主要由财务公司和融资租赁公司承担，为能源产业发展提供金融支持，实现产融结合。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0002"
+                ]
+              }
+            ]
+          },
+          "products_services": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "PS-01",
+                "text": "公司向客户提供电力、煤炭、天然气、蒸汽、成品油等能源产品，以及能源管理服务。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "PS-02",
+                "text": "公司提供天然气、煤炭和油品的装卸、运输和储存服务。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "PS-03",
+                "text": "公司电力、蒸汽主要通过所属火力发电机组、风力和光伏发电设备生产。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "PS-04",
+                "text": "公司依托电力、燃气、能源物流、新能源、储能等多元化综合能源体系，提供源网荷储充一体化、能源托管、节能运维、碳资产管理等一体化服务，构建“投资-建设-运营-增值服务”全链条服务模式。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "PS-05",
+                "text": "公司拓展售电、配电网、能源检修与技术服务。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "PS-06",
+                "text": "公司拥有67万立方米大型油库及配套8万吨级石油化工专业码头，是甲醇、生物质油料重要集散基地，为郑州商品交易所指定交割油库。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "PS-07",
+                "text": "公司新能源业务打造“风光储充运”一体化产业链，并搭建“广发生态时令”展销平台实现价值链延伸。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ]
+              }
+            ]
+          },
+          "revenue_model": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "RM-01",
+                "text": "公司电力主要通过国家电网、南方电网销售给终端用户，并积极推进发售电一体运营模式。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "RM-02",
+                "text": "公司天然气、煤炭、成品油、蒸汽等通过自有管网、销售平台及运输、批发、销售一体化的产业链等销售给终端用户。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "RM-03",
+                "text": "公司天然气、煤炭和成品油等通过外部采购，与国内外知名供应商建立长期战略合作关系以控制采购成本。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "RM-04",
+                "text": "公司2025年实现营业总收入508.83亿元，营业总成本（含财务公司对外利息、手续费及佣金支出）492.91亿元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ],
+                "metrics": [
+                  {
+                    "name": "营业总收入",
+                    "raw_value": "508.83",
+                    "value": "508.83",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "营业总成本",
+                    "raw_value": "492.91",
+                    "value": "492.91",
+                    "unit": "亿元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "RM-05",
+                "text": "主营业务分行业毛利率：燃煤发电及供热业务14.21%，天然气发电及供热业务13.45%，能源物流业务1.10%，天然气业务13.66%，新能源及储能业务49.30%，其他产业78.02%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008",
+                  "source-0009"
+                ]
+              },
+              {
+                "fact_id": "RM-06",
+                "text": "公司营业收入、营业成本变动原因为煤炭和油品销量增加，风电及光伏发电装机规模增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "RM-07",
+                "text": "公司营业利润、归属于母公司股东的净利润变动原因为天然气业务、风电及光伏发电业务规模增加，确认土地交储收益。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ]
+              }
+            ]
+          },
+          "scale_and_mix": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "SM-01",
+                "text": "截至2025年12月31日，公司发电装机容量达到1,097万千瓦，其中火力发电可控装机容量484万千瓦，风力及光伏发电可控装机容量613万千瓦，绿色低碳能源装机占比超77%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "SM-02",
+                "text": "截至2025年12月31日，公司可控发电装机容量为1,097.06万千瓦，其中火电可控装机容量483.65万千瓦，同比减少11.7%；光伏发电可控装机容量355.34万千瓦，同比增长51.4%；风力发电可控装机容量258.07万千瓦，同比增长5.7%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025-12-31",
+                "evidence_ids": [
+                  "source-0016",
+                  "source-0017"
+                ],
+                "metrics": [
+                  {
+                    "name": "可控发电装机容量",
+                    "raw_value": "1,097.06",
+                    "value": "1097.06",
+                    "unit": "万千瓦",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025-12-31"
+                  },
+                  {
+                    "name": "火电可控装机容量",
+                    "raw_value": "483.65",
+                    "value": "483.65",
+                    "unit": "万千瓦",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025-12-31"
+                  },
+                  {
+                    "name": "光伏发电可控装机容量",
+                    "raw_value": "355.34",
+                    "value": "355.34",
+                    "unit": "万千瓦",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025-12-31"
+                  },
+                  {
+                    "name": "风力发电可控装机容量",
+                    "raw_value": "258.07",
+                    "value": "258.07",
+                    "unit": "万千瓦",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025-12-31"
+                  }
+                ]
+              },
+              {
+                "fact_id": "SM-03",
+                "text": "主营业务分行业营业收入：燃煤发电及供热业务4,349,947,127.70元，天然气发电及供热业务3,204,831,500.79元，能源物流业务29,485,020,343.45元，天然气业务10,502,056,882.42元，新能源及储能业务3,245,504,723.82元，其他产业95,784,921.17元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008",
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "燃煤发电及供热业务营业收入",
+                    "raw_value": "4,349,947,127.70",
+                    "value": "4349947127.70",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "天然气发电及供热业务营业收入",
+                    "raw_value": "3,204,831,500.79",
+                    "value": "3204831500.79",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "能源物流业务营业收入",
+                    "raw_value": "29,485,020,343.45",
+                    "value": "29485020343.45",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "天然气业务营业收入",
+                    "raw_value": "10,502,056,882.42",
+                    "value": "10502056882.42",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "新能源及储能业务营业收入",
+                    "raw_value": "3,245,504,723.82",
+                    "value": "3245504723.82",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "其他产业营业收入",
+                    "raw_value": "95,784,921.17",
+                    "value": "95784921.17",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "SM-04",
+                "text": "主要产品产销量：电力生产量243.76亿千瓦时、销售量233.89亿千瓦时；热力生产量682.58万吉焦、销售量684.66万吉焦；市场煤销售量4,801.25万吨；成品油销售量100.37万吨；天然气销售量359,796.93万立方米。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "电力生产量",
+                    "raw_value": "243.76",
+                    "value": "243.76",
+                    "unit": "亿千瓦时",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "电力销售量",
+                    "raw_value": "233.89",
+                    "value": "233.89",
+                    "unit": "亿千瓦时",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "热力生产量",
+                    "raw_value": "682.58",
+                    "value": "682.58",
+                    "unit": "万吉焦",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "热力销售量",
+                    "raw_value": "684.66",
+                    "value": "684.66",
+                    "unit": "万吉焦",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "市场煤销售量",
+                    "raw_value": "4,801.25",
+                    "value": "4801.25",
+                    "unit": "万吨",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "成品油销售量",
+                    "raw_value": "100.37",
+                    "value": "100.37",
+                    "unit": "万吨",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "天然气销售量",
+                    "raw_value": "359,796.93",
+                    "value": "359796.93",
+                    "unit": "万立方米",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "SM-05",
+                "text": "主营业务分地区营业收入：华南地区28,489,632,478.05元，其他地区22,393,513,021.30元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0009"
+                ],
+                "metrics": [
+                  {
+                    "name": "华南地区营业收入",
+                    "raw_value": "28,489,632,478.05",
+                    "value": "28489632478.05",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "其他地区营业收入",
+                    "raw_value": "22,393,513,021.30",
+                    "value": "22393513021.30",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "SM-06",
+                "text": "2025年公司市场化交易的总电量1,821,650万千瓦时，总上网电量2,303,657万千瓦时，占比79.08%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0020"
+                ],
+                "metrics": [
+                  {
+                    "name": "市场化交易的总电量",
+                    "raw_value": "1,821,650",
+                    "value": "1821650",
+                    "unit": "万千瓦时",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "总上网电量",
+                    "raw_value": "2,303,657",
+                    "value": "2303657",
+                    "unit": "万千瓦时",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "SM-07",
+                "text": "2025年公司售电业务全年在广东电力市场签约总电量约27.65亿千瓦时。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0020"
+                ]
+              }
+            ]
+          },
+          "operations_and_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "OI-01",
+                "text": "公司火力发电厂集中在粤港澳大湾区电力负荷中心，是华南地区大型发电企业之一；风力及光伏发电等新能源项目已覆盖全国20个省市。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "OI-02",
+                "text": "公司天然气、煤炭和成品油等通过外部采购，与国内外知名供应商建立长期战略合作关系。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "OI-03",
+                "text": "燃气集团拥有基本覆盖广州市全区域的高、中压管网，统筹全市高压管网建设和上游气源采购、下游天然气输配及分销。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "OI-04",
+                "text": "能源物流集团拥有67万立方米大型油库及配套8万吨级石油化工专业码头，建成广州市危险物品卸载（仓储）南沙基地。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "OI-05",
+                "text": "公司已建立涵盖上游气源、LNG接收站、燃气管网、城市燃气、燃气电厂用户等燃气上下游一体化产业链。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "OI-06",
+                "text": "公司拥有煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场、电厂用户等完整煤炭产业链，已形成全国性营销网络并建立海外资源与销售渠道。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "OI-07",
+                "text": "2025年公司资本性支出775,182万元，其中股权投资与项目前期费用支出84,498万元，新扩建项目支出639,835万元，技改项目支出37,039万元，固定/无形资产购置支出12,139万元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0018"
+                ],
+                "metrics": [
+                  {
+                    "name": "资本性支出",
+                    "raw_value": "775,182",
+                    "value": "775182",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "OI-08",
+                "text": "公司2025年研发投入合计647,912,418.52元，全部费用化，研发投入总额占营业收入比例1.27%；研发人员数量1,069人，占公司总人数比例16.73%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0014"
+                ],
+                "metrics": [
+                  {
+                    "name": "研发投入合计",
+                    "raw_value": "647,912,418.52",
+                    "value": "647912418.52",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "研发人员数量",
+                    "raw_value": "1,069",
+                    "value": "1069",
+                    "unit": "人",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "OI-09",
+                "text": "公司已建成20个市级及以上研发平台，14家省级专精特新中小企业、4家创新型中小企业、19家高新技术企业。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0006"
+                ]
+              },
+              {
+                "fact_id": "OI-10",
+                "text": "公司主要子公司中，能源物流集团营业收入3,066,856.13万元、净利润-17,368.85万元；燃气集团营业收入722,940.59万元、净利润6,381.95万元；新能源集团营业收入304,897.84万元、净利润40,192.98万元。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0022"
+                ],
+                "metrics": [
+                  {
+                    "name": "能源物流集团营业收入",
+                    "raw_value": "3,066,856.13",
+                    "value": "3066856.13",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "能源物流集团净利润",
+                    "raw_value": "-17,368.85",
+                    "value": "-17368.85",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "燃气集团营业收入",
+                    "raw_value": "722,940.59",
+                    "value": "722940.59",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "燃气集团净利润",
+                    "raw_value": "6,381.95",
+                    "value": "6381.95",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "新能源集团营业收入",
+                    "raw_value": "304,897.84",
+                    "value": "304897.84",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "新能源集团净利润",
+                    "raw_value": "40,192.98",
+                    "value": "40192.98",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "named_subsidiary",
+                    "period": "2025年度"
+                  }
+                ]
+              }
+            ]
+          },
+          "customers_channels_markets": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "CC-01",
+                "text": "公司深耕华南，服务粤港澳大湾区，业务拓展到国内26个省市，外延至11个国家和地区。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "CC-02",
+                "text": "公司电力主要通过国家电网、南方电网销售给终端用户；天然气、煤炭、成品油、蒸汽等通过自有管网、销售平台及运输、批发、销售一体化的产业链等销售给终端用户。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "CC-03",
+                "text": "能源物流集团业务覆盖国内经济发达的20个省市及海外地区，被纳入首批国家电煤重点保供贸易企业。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "CC-04",
+                "text": "前五名客户销售额1,630,937.15万元，占年度销售总额32.08%；其中关联方销售额0万元。前五名供应商采购额787,537.73万元，占年度采购总额16.97%；其中关联方采购额146,943.11万元，占年度采购总额3.17%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0012"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五名客户销售额",
+                    "raw_value": "1,630,937.15",
+                    "value": "1630937.15",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "前五名供应商采购额",
+                    "raw_value": "787,537.73",
+                    "value": "787537.73",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "CC-05",
+                "text": "贸易业务收入中，煤炭23,064,543,028.53元，油品6,395,908,933.37元，天然气3,603,362,079.80元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0013"
+                ],
+                "metrics": [
+                  {
+                    "name": "煤炭贸易业务营业收入",
+                    "raw_value": "23,064,543,028.53",
+                    "value": "23064543028.53",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "油品贸易业务营业收入",
+                    "raw_value": "6,395,908,933.37",
+                    "value": "6395908933.37",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "天然气贸易业务营业收入",
+                    "raw_value": "3,603,362,079.80",
+                    "value": "3603362079.80",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "CC-06",
+                "text": "公司已签订重大采购合同，对方当事人包括BP新加坡公司、中化石油（新加坡）公司、墨西哥太平洋有限公司、摩科瑞，合同标的为天然气；2025年按合同分别向BP新加坡公司、中化石油（新加坡）公司采购38.49万吨和41.2万吨天然气。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010"
+                ]
+              }
+            ]
+          },
+          "operating_drivers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "OD-01",
+                "text": "公司营业收入、营业成本变动原因为煤炭和油品销量增加，风电及光伏发电装机规模增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "OD-02",
+                "text": "公司营业利润、归属于母公司股东的净利润变动原因为天然气业务、风电及光伏发电业务规模增加，确认土地交储收益。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ]
+              },
+              {
+                "fact_id": "OD-03",
+                "text": "公司资产处置收益变动原因为确认土地交储收益；营业外支出变动原因为确认光伏项目受台风灾害导致的资产毁损报废损失以及支付合同履约补偿。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ]
+              },
+              {
+                "fact_id": "OD-04",
+                "text": "公司财务费用变动原因为融资利率下降；研发费用变动原因为研发资源优化配置，直接投入等减少。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "OD-05",
+                "text": "公司经营活动产生的现金流量净额变动原因为业务规模扩大，营运资金占用减少；投资活动产生的现金流量净额变动原因为项目建设支出及股权投资支出同比增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007"
+                ]
+              },
+              {
+                "fact_id": "OD-06",
+                "text": "公司新能源及储能业务成本中折旧同比增加31.75%，原因为风电、光伏装机容量增加；光伏发电成本中折旧同比增加49.40%，原因为光伏装机容量增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010",
+                  "source-0012"
+                ]
+              },
+              {
+                "fact_id": "OD-07",
+                "text": "公司能源物流业务成本中，成品油销售量上升增加采购成本，外购油品成本同比增加219.34%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010",
+                  "source-0011"
+                ]
+              },
+              {
+                "fact_id": "OD-08",
+                "text": "公司火电发电量同比下降7.87%，风电发电量同比增长18.69%，光伏发电量同比增长46.91%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0016"
+                ]
+              }
+            ]
+          },
+          "material_changes": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "MC-01",
+                "text": "报告期内公司业务类型、利润构成或利润来源未发生重大变动。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0008"
+                ]
+              },
+              {
+                "fact_id": "MC-02",
+                "text": "报告期内公司业务、产品或服务未发生重大变化或调整。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0012"
+                ]
+              },
+              {
+                "fact_id": "MC-03",
+                "text": "报告期内公司新增重要非主营业务的说明为不适用。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0002"
+                ]
+              },
+              {
+                "fact_id": "MC-04",
+                "text": "报告期内公司主要子公司股权变动导致合并范围变化的情况为不适用。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0012"
+                ]
+              },
+              {
+                "fact_id": "MC-05",
+                "text": "公司火电可控装机容量由2024年的547.65万千瓦下降至2025年的483.65万千瓦，同比减少11.69%；光伏发电可控装机容量由234.67万千瓦增至355.34万千瓦，同比增长51.42%；风力发电可控装机容量由244.07万千瓦增至258.07万千瓦，同比增长5.74%。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0017"
+                ],
+                "metrics": [
+                  {
+                    "name": "火电可控装机容量",
+                    "raw_value": "483.65",
+                    "value": "483.65",
+                    "unit": "万千瓦",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "光伏发电可控装机容量",
+                    "raw_value": "355.34",
+                    "value": "355.34",
+                    "unit": "万千瓦",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "风力发电可控装机容量",
+                    "raw_value": "258.07",
+                    "value": "258.07",
+                    "unit": "万千瓦",
+                    "currency": null,
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              },
+              {
+                "fact_id": "MC-06",
+                "text": "公司2025年资本性支出775,182万元，较上年购建固定资产、无形资产和其他长期资产支付的现金6,642,719,995.33元同比增长67.98%，原因为新能源、储能及气电项目建设支出增加。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0007",
+                  "source-0018"
+                ]
+              }
+            ]
+          }
+        },
+        "supply_chain": {
+          "position": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "SC-P-01",
+                "text": "公司以构建“大产业链”思路，形成产、购、销、储、运、用的综合能源产业链，业务涵盖能源生产、采购、销售、储存、运输和终端使用环节。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "SC-P-02",
+                "text": "公司电力、蒸汽主要通过所属火力发电机组、风力和光伏发电设备生产，处于能源生产环节。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "SC-P-03",
+                "text": "能源物流集团是华南地区最大的纵向一体化煤炭经营企业，业务覆盖煤炭采购、运输、仓储和销售。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0005"
+                ]
+              }
+            ]
+          },
+          "upstream_inputs": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "SC-U-01",
+                "text": "公司天然气、煤炭和成品油等通过外部采购，与国内外知名供应商建立长期战略合作关系。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "SC-U-02",
+                "text": "燃气集团统筹全市高压管网建设和上游气源采购；公司已建立涵盖上游气源、LNG接收站、燃气管网等燃气上下游一体化产业链。",
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001",
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "SC-U-03",
+                "text": "公司已签订重大采购合同，对方当事人包括BP新加坡公司、中化石油（新加坡）公司、墨西哥太平洋有限公司、摩科瑞，合同标的为天然气；2025年按合同分别向BP新加坡公司、中化石油（新加坡）公司采购38.49万吨和41.2万吨天然气。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010"
+                ]
+              },
+              {
+                "fact_id": "SC-U-04",
+                "text": "公司火电成本中燃料成本2,912,103,112.91元，天然气发电及供热业务燃料成本2,148,623,621.18元，天然气业务外购燃气成本7,591,261,336.43元，能源物流业务煤炭供应链成本22,726,364,423.78元、外购油品成本6,323,377,466.53元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0010"
+                ],
+                "metrics": [
+                  {
+                    "name": "燃煤发电及供热业务燃料成本",
+                    "raw_value": "2,912,103,112.91",
+                    "value": "2912103112.91",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "天然气发电及供热业务燃料成本",
+                    "raw_value": "2,148,623,621.18",
+                    "value": "2148623621.18",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "天然气业务外购燃气成本",
+                    "raw_value": "7,591,261,336.43",
+                    "value": "7591261336.43",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "能源物流业务煤炭供应链成本",
+                    "raw_value": "22,726,364,423.78",
+                    "value": "22726364423.78",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  },
+                  {
+                    "name": "能源物流业务外购油品成本",
+                    "raw_value": "6,323,377,466.53",
+                    "value": "6323377466.53",
+                    "unit": "元",
+                    "currency": "人民币",
+                    "subject_scope": "business_segment",
+                    "period": "2025年度"
+                  }
+                ]
+              }
+            ]
+          },
+          "downstream_customers": {
+            "status": "observed",
+            "facts": [
+              {
+                "fact_id": "SC-D-01",
+                "text": "公司电力主要通过国家电网、南方电网销售给终端用户；天然气、煤炭、成品油、蒸汽等通过自有管网、销售平台及运输、批发、销售一体化的产业链等销售给终端用户。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "SC-D-02",
+                "text": "公司燃气产业链涵盖城市燃气、燃气电厂用户等下游环节；煤炭产业链涵盖电厂用户等下游环节。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0005"
+                ]
+              },
+              {
+                "fact_id": "SC-D-03",
+                "text": "公司业务拓展到国内26个省市，外延至11个国家和地区；能源物流集团业务覆盖国内经济发达的20个省市及海外地区。",
+                "subject_scope": "issuer",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0001"
+                ]
+              },
+              {
+                "fact_id": "SC-D-04",
+                "text": "前五名客户销售额1,630,937.15万元，占年度销售总额32.08%；其中关联方销售额0万元。",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "evidence_ids": [
+                  "source-0012"
+                ],
+                "metrics": [
+                  {
+                    "name": "前五名客户销售额",
+                    "raw_value": "1,630,937.15",
+                    "value": "1630937.15",
+                    "unit": "万元",
+                    "currency": "人民币",
+                    "subject_scope": "consolidated_group",
+                    "period": "2025年度"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "limitations": [
+          "本工作底稿仅依据所选章节原文编制，未覆盖治理、债券、财务报告全文及前瞻性计划，不声称完整覆盖全报告。",
+          "行业统计数据和全国性数据（如全国用电量、煤炭消费量、天然气消费量、新能源装机等）为行业背景信息，不代表公司自身经营成果。",
+          "公司未在所选章节披露具体客户名称和具体供应商名称（重大采购合同对方当事人除外），本底稿未推测或编造客户与供应商身份。",
+          "公司研发投入涉及可燃冰、氢能等课题，但所选章节未披露相关资源采购情况，本底稿未据此推断任何采购关系。",
+          "部分表格存在跨页续表，本底稿已同时引用表头/单位所在片段与金额片段，但未对未披露数值进行计算或推断。",
+          "2026年资本性支出计划属前瞻性计划，未纳入本期经营事实。",
+          "公司未在所选章节披露各业务板块的详细客户结构、区域收入与板块收入的交叉对应关系，相关分析受限。"
+        ]
+      },
+      "usage": {
+        "input_tokens": 27588,
+        "output_tokens": 7631,
+        "total_tokens": 35219
+      }
+    }
+  ]
+}

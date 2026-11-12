@@ -10,6 +10,10 @@
 
 ## Decisions
 
+### 2026-11-12接续：可选供应链与阅读问题指引
+
+沿v9单owner扩展可选supply_chain（position/upstream_inputs/downstream_customers），各项复用WorkpaperElement/Fact/Evidence，旧JSON无该字段继续可读。缺项不进入完成门槛、不触发额外调用；仅新合同生效。选章请求提供通用“问题→章节族”指引，八要素与供应链同一份原文一次抽取；主营板块的收入/规模优先于注册、荣誉或技术细节。支持报告本地3.6/3.6.2层级标题；程序只恢复层级和原页边界，语义取舍仍交LLM。先3份开发报告（青山纸业、广州发展、黄山旅游）检查新增描述和缺项，禁目标答案输入，不称盲测/S1，不启用生产。
+
 ### 当前v9：人工参考、章节输入与JSON投影（§257）
 
 实施接续（2026-11-11）：用户已将规划、实现和核查合并交由本会话并授权现有池并发开发。上汽人工参考已完成，代码沿原TaskService→runtime→CommonGatewaySemanticProvider→公共网关→原writer/query/export接入company_profile_workpaper.v1。版本化v3 runtime保存pending底稿，旧正式核心状态保持false，不以展示晋升可信。实际新开发身份及止损见章节底稿卡，旧§257零调用不再是当前授权。

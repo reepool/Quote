@@ -26,6 +26,11 @@ ELEMENT_LABELS = {
     "operating_drivers": "关键经营影响因素",
     "material_changes": "近期重要变化",
 }
+SUPPLY_CHAIN_LABELS = {
+    "position": "公司所处环节",
+    "upstream_inputs": "上游原材料与资源",
+    "downstream_customers": "下游用途与客户领域",
+}
 Subject = Literal[
     "consolidated_group", "issuer", "named_subsidiary", "business_segment", "unclear"
 ]
@@ -141,6 +146,35 @@ class WorkpaperElements(_Model):
     material_changes: WorkpaperElement
 
 
+def _missing_supply_chain_element() -> WorkpaperElement:
+    return WorkpaperElement(
+        status="unclear",
+        limitations=("本次未返回该项供应链信息；不代表全报告未披露。",),
+    )
+
+
+class WorkpaperSupplyChain(_Model):
+    """Optional enrichment, never a prerequisite for the eight-element profile."""
+
+    position: WorkpaperElement = Field(default_factory=_missing_supply_chain_element)
+    upstream_inputs: WorkpaperElement = Field(default_factory=_missing_supply_chain_element)
+    downstream_customers: WorkpaperElement = Field(default_factory=_missing_supply_chain_element)
+
+
+def _check_fact_source(fact: WorkpaperFact, sources: Mapping[str, WorkpaperEvidence]) -> None:
+    if set(fact.evidence_ids) - sources.keys():
+        raise ValueError("fact cites unknown evidence")
+    numbers = {
+        Decimal(value.replace(",", ""))
+        for evidence_id in fact.evidence_ids
+        for span in sources[evidence_id].source_spans
+        for value in re.findall(r"(?<![\d.])-?\d[\d,]*(?:\.\d+)?(?![\d.])", span.quote)
+    }
+    for metric in fact.metrics:
+        if Decimal(metric.value) not in numbers:
+            raise ValueError(f"metric number is absent from cited source: {metric.name}")
+
+
 class WorkpaperSection(_Model):
     section_id: str = Field(min_length=1)
     section_path: tuple[str, ...] = Field(min_length=1)
@@ -171,6 +205,7 @@ class CompanyProfileWorkpaper(_Model):
     elements: WorkpaperElements
     evidence: tuple[WorkpaperEvidence, ...]
     limitations: tuple[str, ...] = ()
+    supply_chain: WorkpaperSupplyChain | None = None
 
     @model_validator(mode="after")
     def source_integrity(self):
@@ -180,22 +215,15 @@ class CompanyProfileWorkpaper(_Model):
         if any(item.document_version != self.report.document_version for item in self.evidence):
             raise ValueError("evidence document version mismatch")
         ids: set[str] = set()
-        for name in ELEMENT_LABELS:
-            for fact in getattr(self.elements, name).facts:
+        sections = [getattr(self.elements, name) for name in ELEMENT_LABELS]
+        if self.supply_chain is not None:
+            sections.extend(getattr(self.supply_chain, name) for name in SUPPLY_CHAIN_LABELS)
+        for section in sections:
+            for fact in section.facts:
                 if fact.fact_id in ids:
                     raise ValueError("duplicate fact identity")
                 ids.add(fact.fact_id)
-                if set(fact.evidence_ids) - sources.keys():
-                    raise ValueError("fact cites unknown evidence")
-                numbers = {
-                    Decimal(value.replace(",", ""))
-                    for evidence_id in fact.evidence_ids
-                    for span in sources[evidence_id].source_spans
-                    for value in re.findall(r"(?<![\d.])-?\d[\d,]*(?:\.\d+)?(?![\d.])", span.quote)
-                }
-                for metric in fact.metrics:
-                    if Decimal(metric.value) not in numbers:
-                        raise ValueError(f"metric number is absent from cited source: {metric.name}")
+                _check_fact_source(fact, sources)
         return self
 
     def validate_pages(self, pages: Sequence[Mapping]) -> None:
@@ -218,6 +246,7 @@ class WorkpaperDraftResponse(_Model):
     )
     elements: WorkpaperElements
     limitations: tuple[str, ...] = ()
+    supply_chain: WorkpaperSupplyChain | None = None
 
 
 def bind_workpaper_draft(
@@ -234,6 +263,30 @@ def bind_workpaper_draft(
         for fact in getattr(response.elements, name).facts:
             if set(fact.evidence_ids) - allowed:
                 raise ValueError(f"model cited evidence outside the supplied packet: {fact.fact_id}")
+    supply_chain = response.supply_chain
+    if supply_chain is not None:
+        sources = {item.evidence_id: item for item in evidence}
+        used_ids = {fact.fact_id for name in ELEMENT_LABELS for fact in getattr(response.elements, name).facts}
+        cleaned = {}
+        for name in SUPPLY_CHAIN_LABELS:
+            element = getattr(supply_chain, name)
+            kept, rejected = [], []
+            for fact in element.facts:
+                try:
+                    if fact.fact_id in used_ids:
+                        raise ValueError("duplicate fact identity")
+                    _check_fact_source(fact, sources)
+                except ValueError as exc:
+                    rejected.append(f"可选事实{fact.fact_id}未纳入：{exc}")
+                    continue
+                kept.append(fact)
+                used_ids.add(fact.fact_id)
+            cleaned[name] = element.model_copy(update={
+                "facts": tuple(kept),
+                "status": "unclear" if rejected and not kept else element.status,
+                "limitations": (*element.limitations, *rejected),
+            })
+        supply_chain = WorkpaperSupplyChain(**cleaned)
     return CompanyProfileWorkpaper(
         origin=origin,
         report=report,
@@ -241,6 +294,7 @@ def bind_workpaper_draft(
         elements=response.elements,
         evidence=tuple(evidence),
         limitations=response.limitations,
+        supply_chain=supply_chain,
     )
 
 
@@ -271,6 +325,18 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
         for limitation in element.limitations:
             out.append(f"- 限制：{limitation}")
         out.append("")
+    if workpaper.supply_chain is not None:
+        out.extend(["## 供应链信息（可选加分项）", "", "未获取到的信息不影响基础画像交付；以下内容仍待核。", ""])
+        for name, label in SUPPLY_CHAIN_LABELS.items():
+            element = getattr(workpaper.supply_chain, name)
+            out.extend([f"### {label}", ""])
+            for fact in element.facts:
+                refs = "、".join(f"[{value}](#{value.lower()})" for value in fact.evidence_ids)
+                out.append(f"- {fact.text}（{refs}）")
+                for metric in fact.metrics:
+                    out.append(f"  - {metric.name}：{metric.raw_value} {metric.unit}；{metric.period}，{metric.subject_scope}。")
+            out.extend(f"- 限制：{limit}" for limit in element.limitations)
+            out.append("")
     out.extend(["## 阅读范围与取舍", "", workpaper.reading_scope.selection_rationale, ""])
     for section in workpaper.reading_scope.sections:
         out.append(f"- {' / '.join(section.section_path)}，物理页{section.start_page}—{section.end_page}：{section.rationale}")

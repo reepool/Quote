@@ -24,10 +24,11 @@ from .workpaper import (
 
 _CN = "一二三四五六七八九十百零〇"
 _HEADING = re.compile(
-    rf"^(第[{_CN}0-9]+[章节]\s*.+|[{_CN}]+[、．.]\s*.+|"
+    rf"^(\d{{1,3}}(?:\.\d{{1,3}})+\s+[^\d\s].+|第[{_CN}0-9]+[章节]\s*.+|[{_CN}]+[、．.]\s*.+|"
     rf"[（(][{_CN}]+[）)]\s*.+|[0-9]{{1,3}}[、．.]\s*[^0-9].+|"
     r"[（(][0-9]{1,3}[）)][.．]?\s*.+)$"
 )
+_INLINE_HEADING = re.compile(rf"[。；]\s+([{_CN}]+[、．.]\s*[^。；\r\n]{{2,80}})\s*$")
 
 
 class IndexedSection(_Model):
@@ -80,6 +81,9 @@ class SectionPacket(_Model):
 
 
 def _level(title: str) -> int:
+    decimal = re.match(r"^(\d+(?:\.\d+)+)\s", title)
+    if decimal:
+        return len(decimal.group(1).split(".")) - 1
     if title.startswith("第"):
         return 0
     if re.match(rf"^[{_CN}]+[、．.]", title):
@@ -113,11 +117,18 @@ def index_sections(pages: Sequence[Mapping]) -> tuple[IndexedSection, ...]:
         offset = 0
         for line in text.splitlines(keepends=True):
             stripped = line.strip()
+            inline = _INLINE_HEADING.search(stripped)
+            leading = len(line) - len(line.lstrip())
+            if inline:
+                # Some official native text appends the next heading to the
+                # previous paragraph. Keep the original character position.
+                leading += inline.start(1)
+                stripped = inline.group(1).strip()
             match = _HEADING.match(stripped)
             if match and len(stripped) <= 150 and not re.search(r"\.{3,}|…{2,}", stripped):
                 title = re.split(r"[。；]", stripped, maxsplit=1)[0].strip()
                 level = _level(title)
-                start = offset + len(line) - len(line.lstrip())
+                start = offset + leading
                 while stack and stack[-1]["level"] >= level:
                     closed = stack.pop()
                     closed.update(end_page=page, end_offset=start, next_title=title)

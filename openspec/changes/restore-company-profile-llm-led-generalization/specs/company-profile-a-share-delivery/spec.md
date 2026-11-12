@@ -1,6 +1,7 @@
 ## MODIFIED Requirements
 
 ### Requirement: Core usefulness measures substantive business answers
+For new profiles after the 2026-11-12 user instruction, the system MUST treat supply-chain position, inputs and downstream fields as optional enrichment, not a company pass/fail prerequisite. Missing enrichment remains explicit and does not invalidate the substantive business/products/revenue profile. Existing frozen scores and their historical view requirements are unchanged.
 The system MUST distinguish the v9 eight-element workpaper's readable usefulness from formal company completeness. A structured, sourced partial workpaper may answer business structure, products/services, monetization, scale/mix, operating inputs, customers/channels/markets, drivers and changes with explicit gaps; successful JSON keys or raw fact counts do not prove useful content. Formal core completeness still requires separate substantive evidence-backed principal business, products/services and revenue model, with product/input exposure and roles evaluated under the acceptance program. Absent optional numeric segmentation must not prevent an evidenced qualitative model. Existing fact/Evidence types and the sole writer/query owner MUST serve the workpaper projection and rendering, without a parallel database or semantic rules replacing the LLM.
 
 #### Scenario: Single business has no segment amounts

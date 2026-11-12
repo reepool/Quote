@@ -2,6 +2,22 @@ Current policy: product v9 (2026-11-11), acceptance section 7.109 and company-pr
 
 ## ADDED Requirements
 
+### Requirement: Supply chain enrichment is optional and source grounded
+For new workpapers under the 2026-11-12 user instruction, company_profile_workpaper.v1 MAY include an additive optional supply_chain projection. It contains position, upstream_inputs and downstream_customers elements using the same fact, metric, status and Evidence contract. Missing or ambiguous supply-chain information MUST NOT fail an otherwise deliverable company profile, trigger mandatory recovery, or lower historical scores. Existing workpapers without the field MUST remain readable. Company position describes its reported production, processing, trade, operation or service role; upstream describes explicitly disclosed materials, energy or service resources; downstream describes disclosed uses, industries or customer types. Banks use funding/resources and service customers rather than fictitious manufacturing inputs. Product uses MUST NOT imply a named customer relationship, and R&D MUST NOT imply procurement.
+
+#### Scenario: The selected sections do not name raw materials
+- **WHEN** supported business/profile facts exist but raw materials or downstream customers cannot be found in the selected source scope
+- **THEN** the profile remains queryable/exportable with an absent or explicitly limited optional supply-chain element
+- **AND** no automatic extra search, failed-company result or invented relationship is introduced to fill it
+
+### Requirement: Reading questions guide report-local section selection
+The selector MUST receive a versioned general question-to-section-family guide inferred from reviewed reports. Business and operating-mode subsections are primary sources; revenue/cost and business review sections provide main segment weights; procurement/production/sales, product applications and customer sections may enrich supply chains. Financial or segment notes are targeted supplements, while honors, governance and minor technical details are deferred. Families are semantic hints, never exact heading/page whitelists. Numbered decimal headings such as 3.6 and 3.6.2 MUST preserve their report-local hierarchy so useful subsections can be selected without reading an entire management chapter. Extraction MUST prioritize a supported main segment's revenue or operating scale before minor organization/technology details; unknown values remain unknown.
+
+#### Scenario: A bank uses decimal subsection numbering
+- **WHEN** the report contains a business subsection with its own revenue/scale and a later financial analysis subsection
+- **THEN** the heading tree exposes both with correct boundaries, and the model can select them using the same company-neutral questions
+- **AND** guidance contains no target-company answers and no reusable physical page policy
+
 ### Requirement: Manual reference workpapers precede extraction calibration
 A MUST first independently read one official report and deliver a human_reference workpaper, its readable rendering and an explicit concentrated source scope before B tunes a v9 extraction route against it. The workpaper MUST cover the eight content elements as far as the selected sources support, retaining gaps rather than searching every appendix for marginal detail. Source choices MUST identify chapter, section and physical page, prefer a jointly informative authoritative occurrence for duplicate facts, and distinguish fact correctness from selected-source coverage. The reference is a development example, not proof that most listed companies already pass and not a per-company production hand-authoring requirement.
 
