@@ -1,0 +1,51 @@
+"""Local constructor diagnosis only: never executes a company or a model request."""
+import asyncio
+import json
+from pathlib import Path
+import sys
+from tempfile import TemporaryDirectory
+import time
+
+ROOT=Path('/home/python/Quote'); sys.path.insert(0,str(ROOT))
+from research.company_profile.operations import CompanyProfileTaskService
+from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
+from research.company_profile.workpaper_llm import workpaper_processing_identity,run_workpaper
+from research.company_profile.models import ReportIdentity
+from research.storage import ResearchStorageManager
+from utils.config_manager import ResearchConfig,ResearchStorageConfig
+
+class ForbiddenClient:
+    physical_budget=None
+    calls=0
+    async def complete(self, request):
+        self.calls+=1
+        raise AssertionError('this local constructor check must not reach a model')
+
+start=time.monotonic(); client=ForbiddenClient()
+provider=CommonGatewaySemanticProvider(client=client,profile='local-constructor-only',max_output_tokens=1000,timeout_seconds=1)
+report=ReportIdentity(instrument_id='600094.SH',report_id='local-diagnosis',document_version='0'*64,report_period='2025-12-31',published_at='2026-04-22T16:00:00+00:00')
+with TemporaryDirectory(prefix='workpaper-bu-wiring-proof-') as folder:
+    root=Path(folder); db=str(root/'research.db')
+    storage=ResearchStorageManager(ResearchConfig(storage=ResearchStorageConfig(db_path=db,financials_db_path=db,valuation_db_path=db,interests_db_path=db,quotes_db_path=str(root/'quotes.db'),attach_quotes_db=False)))
+    storage.initialize()
+    identity=workpaper_processing_identity(real=True)
+    original=CompanyProfileTaskService(storage=storage,output_root=root/'bad-output',checkpoint_root=root/'bad-checkpoints',provider=None,processing_identity=identity)
+    original.provider=provider; original.runtime.provider=provider
+    assert original.runtime._report_provider is None
+    try:
+        run_workpaper(report=report,pages=(),processing_identity=identity,provider=original.runtime._report_provider,work_id='local-only')
+    except ValueError as exc:
+        assert str(exc)=='registered workpaper provider is unavailable'
+    else: raise AssertionError('original operator miswiring must reproduce')
+    corrected=CompanyProfileTaskService(storage=storage,output_root=root/'correct-output',checkpoint_root=root/'correct-checkpoints',provider=provider,processing_identity=identity)
+    assert corrected.runtime._report_provider is provider
+    try:
+        provider.workpaper_request(request_id='local-only',purpose='select_profile_sections',report=report,payload={},instructions='local check',response_model=ReportIdentity,max_output_tokens=1000,timeout_seconds=1)
+    except ValueError as exc:
+        assert str(exc)=='workpaper execution authorization is required'
+    else: raise AssertionError('no authorization and budget must reject before client')
+    assert client.calls==0
+    result={'task':'6.BU','mode':'zero_call_constructor_diagnosis','original_failure_reproduced':True,'root_cause':'temporary operator constructed TaskService with provider=None, then assigned runtime.provider but left runtime._report_provider=None','corrected_public_constructor_propagates_provider':True,'unauthorized_send_still_rejected':True,'task_execute_run_called':False,'new_attempt_markers':0,'new_model_calls':client.calls,'production_code_changed':False,'seconds':round(time.monotonic()-start,3)}
+    destination=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-fixed-pool-result-20261114/wiring-diagnosis.json'
+    destination.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+    print(json.dumps(result,ensure_ascii=False),flush=True)

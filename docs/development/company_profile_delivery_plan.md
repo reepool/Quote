@@ -6,6 +6,8 @@
 
 ## 1. 开发者必须先理解的纠偏
 
+2026-11-14 6.BU已按卡止损：原12份解析全命中缓存、60项源参考和六类风险实源冻结，但首批4家因本会话operator没有把provider通过构造参数交给正文实际owner而发送前失败，实际模型/账本0，4入口占用、余8未启动，不能把准备或空三读作新画像进展。根因是本会话接线和入口自检失误，不是LLM；零调用实际TaskService构造已复现原错并验证正确接法，不改业务代码、不重开入口。见[结果/责任/收尾](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-fixed-pool-result-20261114/result.md)。后续如另获授权，仅最小改正operator公开构造接线并复用源参考/原有效回归，不再扩平台/供应链或滚动细节。整组当前结束，新运行另裁；本轮库/重复源包/脚本清，正式源/旧失败/开工并行不动。
+
 2026-11-13 6.BT已交[四类有限质量结论和原12源就绪](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-quality-and-regression-readiness-20261113/result.md)：主营/产品/核心收入已有实质支持，48检查的5限用/3隔离不包装成全稿准确率，40支持只限所述范围。现在主要矛盾是当前同版完整入口稳定性，不再为四家供应链或可选句子补卡。12份原PDF/hash就绪，但当前源先行参考/风险实源与全量评分尚缺；下一6.BU将源参考→冻结→原入口12家一次开发回归→末端质量/耗时对照合成连续卡，不逐公司等待、不热修拼成绩。当前只是草案，新的公开材料外传/调用尚未批准，0绑定/0运行，不改S1/原2/4或生产；清本人临时脚本、原结果仅链接，正式源/有效缓存/开工并行保护。
 
 2026-11-13 6.BS已交[浦发78／同方49条真实复核后画像](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-retained-review-result-20261113/profiles.md)。复用原真实raw本地隔离、不重付选章/抽取，原rejected/usage保留；两家原TaskService初核/必要修订再核成立，均限用非可信发布。用户接受当前供应链粒度，不为细物料/量化补源。新6物理/214754/0恢复/unknown，不改原四类同版2/4或S1，卡结束无自动后继。下一围绕最终版本有限质量验收和12家回归就绪，不滚动两家公司补句；有效回归复用、有限源核/三读/清理已交，旧源/结果/并行保护。

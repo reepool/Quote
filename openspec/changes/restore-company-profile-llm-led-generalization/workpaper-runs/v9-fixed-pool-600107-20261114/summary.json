@@ -1,0 +1,27 @@
+{
+  "instrument_id": "600107.SH",
+  "name": "美尔雅",
+  "run_id": "v9-fixed-pool-600107-20261114",
+  "three_reads_equal": true,
+  "exception": null,
+  "preparation_seconds": 52.054,
+  "business_seconds": 24.177,
+  "contract_errors": [],
+  "failed_calls": [],
+  "readable": false,
+  "facts": 0,
+  "review_status": null,
+  "core_missing_elements": [
+    "business_structure",
+    "products_services",
+    "revenue_model"
+  ],
+  "failure_signature": "missing_core_elements:business_structure,products_services,revenue_model",
+  "physical_requests": 0,
+  "charged_tokens": 0,
+  "cost": "0",
+  "stopped_reason": null,
+  "recoveries": 0,
+  "supervision_seconds": 25.526,
+  "cleanup_bytes": 1644014
+}

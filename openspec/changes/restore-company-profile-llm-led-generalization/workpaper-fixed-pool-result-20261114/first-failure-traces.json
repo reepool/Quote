@@ -1,0 +1,34 @@
+{
+  "original_group_stop_reason_is_proxy_not_root_cause": true,
+  "actual_shared_root_cause": "operator supplied provider=None to TaskService constructor and never bound runtime._report_provider",
+  "traces": [
+    {
+      "instrument_id": "600094.SH",
+      "warnings": [
+        "[WARNING][2026-11-14 00:12:49][business_profile_async_production.py:3445] - business-profile work failed work_id=bp-work-b3d0ba2dde33d33f381e401a instrument_id=600094.SH stage=semantic disposition=terminal_failure category=ValueError error=registered workpaper provider is unavailable"
+      ],
+      "failure": "registered workpaper provider is unavailable"
+    },
+    {
+      "instrument_id": "600103.SH",
+      "warnings": [
+        "[WARNING][2026-11-14 00:12:50][business_profile_async_production.py:3445] - business-profile work failed work_id=bp-work-52505f2d79eeea715064b046 instrument_id=600103.SH stage=semantic disposition=terminal_failure category=ValueError error=registered workpaper provider is unavailable"
+      ],
+      "failure": "registered workpaper provider is unavailable"
+    },
+    {
+      "instrument_id": "600100.SH",
+      "warnings": [
+        "[WARNING][2026-11-14 00:12:50][business_profile_async_production.py:3445] - business-profile work failed work_id=bp-work-a9090919bea814cdf4a6ad51 instrument_id=600100.SH stage=semantic disposition=terminal_failure category=ValueError error=registered workpaper provider is unavailable"
+      ],
+      "failure": "registered workpaper provider is unavailable"
+    },
+    {
+      "instrument_id": "600107.SH",
+      "warnings": [
+        "[WARNING][2026-11-14 00:12:51][business_profile_async_production.py:3445] - business-profile work failed work_id=bp-work-442f6d80abebd71bf1ed4e23 instrument_id=600107.SH stage=semantic disposition=terminal_failure category=ValueError error=registered workpaper provider is unavailable"
+      ],
+      "failure": "registered workpaper provider is unavailable"
+    }
+  ]
+}

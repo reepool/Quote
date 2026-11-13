@@ -1,0 +1,27 @@
+Traceback (most recent call last):
+  File "/home/python/Quote/research/business_profile_async_production.py", line 3254, in run_one
+    result = dict(await self.stage_runner(stage, item))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/Quote/research/company_profile/runtime.py", line 414, in __call__
+    return await _run_thread_call(self.run_stage, stage, item)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/Quote/research/business_profile_async_production.py", line 56, in _run_thread_call
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/python/miniconda3/envs/Quote/lib/python3.11/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/Quote/research/company_profile/runtime.py", line 437, in run_stage
+    return self._semantic(state)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/python/Quote/research/company_profile/runtime.py", line 598, in _semantic
+    result = run_workpaper(
+             ^^^^^^^^^^^^^^
+  File "/home/python/Quote/research/company_profile/workpaper_llm.py", line 185, in run_workpaper
+    raise ValueError("registered workpaper provider is unavailable")
+ValueError: registered workpaper provider is unavailable
