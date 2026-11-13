@@ -463,6 +463,7 @@ def bind_workpaper_draft(
     # retaining a possibly wrong number in the narrative without its metric.
     sources = {item.evidence_id: item for item in evidence}
     cleaned_elements = {}
+    binding_notes = []
     for name in ELEMENT_LABELS:
         element = getattr(response.elements, name)
         kept, rejected = [], []
@@ -478,6 +479,7 @@ def bind_workpaper_draft(
             "status": "unclear" if rejected and not kept else element.status,
             "limitations": (*element.limitations, *rejected),
         })
+        binding_notes.extend(rejected)
     elements = response.elements.model_copy(update=cleaned_elements)
     supply_chain = response.supply_chain
     if supply_chain is not None:
@@ -502,6 +504,7 @@ def bind_workpaper_draft(
                 "status": "unclear" if rejected and not kept else element.status,
                 "limitations": (*element.limitations, *rejected),
             })
+            binding_notes.extend(rejected)
         supply_chain = WorkpaperSupplyChain(**cleaned)
     return standardize_workpaper_metrics(CompanyProfileWorkpaper(
         origin=origin,
@@ -512,6 +515,7 @@ def bind_workpaper_draft(
         limitations=response.limitations,
         supply_chain=supply_chain,
         generation=generation,
+        standardization_notes=tuple(binding_notes),
     ))
 
 
@@ -648,7 +652,7 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
         if review.error:
             out.append(f"- 复核未完成：{review.error}")
     if workpaper.standardization_notes:
-        out.extend(["", "## 程序标准化说明", ""])
+        out.extend(["", "## 程序处理说明", ""])
         out.extend(f"- {note}" for note in workpaper.standardization_notes)
     out.extend(["", "## 来源", ""])
     for item in workpaper.evidence:

@@ -1,0 +1,16 @@
+{
+  "observation": "BI",
+  "mode": "offline_saved_response_task_service",
+  "new_model_calls": 0,
+  "network_allowed": false,
+  "source_receipts_sha256": "8bff459fae063548e8a16a53086d5c71ce1425cfc59c0814a17b4a80bde6c463",
+  "task_seconds": 20.55,
+  "three_reads_equal": true,
+  "retained_facts": 35,
+  "retained_findings": 8,
+  "review_status": "incomplete",
+  "local_scripted_sends": 4,
+  "record_source": "first pytest run output; passing BI case reused, not rerun merely to capture another workpaper copy",
+  "controlled_failure": "no saved repair response",
+  "original_observation_unchanged": true
+}

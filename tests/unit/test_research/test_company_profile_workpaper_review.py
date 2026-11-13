@@ -208,6 +208,26 @@ def test_scope_only_issue_never_creates_a_repair_or_a_fake_fact():
     assert result.quality_review.findings[0].resolution == "unresolved"
 
 
+def test_review_scope_notice_cannot_erase_local_fact_isolation_reason():
+    from research.company_profile.workpaper import WorkpaperDraftResponse, bind_workpaper_draft
+
+    _, packet, *_ = material()
+    raw = _draft(packet).model_dump(mode="json")
+    raw['elements']['scale_and_mix']['facts'][0]['metrics'][0].update(raw_value='999', value='999')
+    paper = bind_workpaper_draft(WorkpaperDraftResponse.model_validate(raw), report=_report(),
+                                reading_scope=packet.reading_scope, evidence=packet.evidence)
+    provider = Provider([{'reviewed_fact_ids': ['main'], 'findings': [{
+        'finding_id': 'scope', 'element': 'limitations', 'severity': 'minor', 'issue_type': 'other',
+        'action': 'human_review', 'affected_fact_id': None, 'evidence_ids': [packet.evidence[0].evidence_id],
+        'explanation': '所选范围外未知。'}]}])
+    result, _ = review_workpaper(paper, packet=packet, provider=provider, work_id='scope-keeps-local-note',
+                               identity=workpaper_processing_identity(real=False, review=True))
+    assert result.quality_review.status == 'completed_with_open_findings'
+    assert not result.elements.scale_and_mix.facts
+    assert any('事实revenue已隔离' in s for s in result.standardization_notes)
+    assert '事实revenue已隔离' in render_workpaper(result)
+
+
 def test_source_uncertainty_can_remain_after_review_without_a_repair_call():
     paper, packet, *_ = material()
     raw = paper.model_dump(mode="json")

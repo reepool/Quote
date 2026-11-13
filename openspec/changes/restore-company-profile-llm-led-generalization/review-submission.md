@@ -8726,3 +8726,23 @@ Review：A类nullable数值进入原Decimal路径、空值与证据对齐、提�
 清理：三家真实根2206912/1567829/1662387字节、两次离线根723217/1153686字节均finally删除；本人脚本11575/5682字节删除，总计7331288常规文件字节，不算旧释放/物理磁盘块或未知测试空间。必要源/结果/账本/回执及一份用途明确离线稿保留，正式PDF/有效共享解析/首次失败/并行物未动。活动开发与审核耗时未可靠测量，不编造。提交只纳本人局部代码/测试、新run/离线目录及明确文档hunk，不纳旧审核1005行等。
 
 6.BJ2未达标保持未勾，6.BJ3按实际失败/有限交付收尾；不以资源余量、离线修正或用户不强求百分百恢复已用入口。本轮到此结束，不再自动申请相同三家付费重跑，下一业务应先确认局部失败的内容保留与消费足够可靠，再另裁真实闭环与规模验证。
+
+## 268. 6.BK继续推进：原TaskService限用内容与复核处置零网络闭环
+
+末端只读核验：5份保存响应的raw SHA256与response_hash一致，raw解析对象与response_payload一致。测试增加同样断言并标integration/slow；显式留证只能选本change的新输出路径，存在的冻结输出拒绝覆盖。该输入/输出保护用只读检查和测试收集核过，不为非业务变化再重跑已通过的长入口。
+
+用户继续指令接续§267零调用建议。本轮方向明确为验证原应用owner的内容保留和消费，而非再付费试跑三家、补齐字段或新增审核平台。6.BK在同一change发卡，真实模型/探针/可发送绑定/新恢复额度均0；原S1/6.BJ失败/生产边界不变。开工Git基线stage空，旧配置/骨架/规划及未跟踪内容保护；未见本人前轮无依赖相关临时根，不盲删并行物。
+
+新增一份保存响应集成式测试，输入原林海正式PDF/缓存/真实回执。禁socket.create_connection/getaddrinfo，CommonGatewaySemanticProvider经ScriptedTransport返回保存payload，TaskService从acquire/parse/semantic/verify/publish到writer/query/export新实例全走原owner。缺本地正式PDF/回执时明确skip不联网补资产；工程结果均controlled_fixture/test profile，不冒充真实DeepSeek/Grok。本轮没有新真实响应或供应商用量。
+
+6.BK1：6.BJ真实选章与57候选原样通过网关，OD-01被单独隔离，原入口在复核前已能读56事实。受控范围问题（非真实初核）后仍56、completed_with_open_findings/三读一致；56facts与§267恢复稿逐对象完全相等，没有补答案/新数值；隔离原因仍显示。正常BJ定向复验测试53.79秒、task+三读20.531秒、3本地scripted sends，整命令57.20秒，零外呼。新原入口稿和摘要一套持久见workpaper-saved-entry-result-20261113。
+
+6.BK2：6.BI真实选章/抽取/8项Grok初核原样经过同入口，在没有真实修订响应的位置受控抛错，不制造候选/accepted。35条独立事实继续可读，7问题对象不回正文，8项意见全在，review incomplete，三读一致。测试47.18秒、task+三读20.550秒、4本地scripted sends，不是4次模型请求。首轮BI通过后复用，不仅为另存整稿重跑；终端成功摘要录入BI-summary，原回执hash前后不变。
+
+首轮BJ未过是测试夹具沿工具合成价格context120000，源/草稿约107421 UTF8字节加输出/Schema后在受控预算处拒绝，非生产LLM/资源失败。把测试改成既有workpaper离线unpriced预算，不改生产限制。另独立直接检查发现：复核撤回争议范围文字会覆盖element limitations，之前写在其中的程序隔离编号/原因可能随之消失。生产只加4行累计绑定隔离理由到已有standardization_notes，显示“程序处理说明”，旧模型/读取不自动重写；不保留有争议范围断言、不放坏事实。独立短反例证明限制更新后坏事实不回来且隔离编号/原因仍可读。无新增状态库或框架。
+
+验证命令：`bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q -s --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_workpaper_saved_entry.py`首轮BI通过/BJ失败94.95秒；仅BJ修正后带QUOTE_WORKPAPER_REPLAY_EVIDENCE指向当前change的必要证据目录、`-k BJ`定向通过57.20秒。`test_company_profile_workpaper_review.py -k 'scope_only_issue or scope_notice'`2项3.52秒通过；两文件直接组`test_company_profile_workpaper.py test_company_profile_workpaper_review.py -k 'not task_service'`47项35.04秒通过（2未改旧长入口不重跑、既有requests警告）。OpenSpec strict与git diff检查通过，旧源/回执hash及56facts独立对照通过。测试时间是离线工程，不替代真实生产吞吐；活跃开发/审核时间未可靠计量。
+
+Review A类当前隔离理由可能丢失已修并直接反例/原入口复验；B类全字段一致化/更多格式变体/全报告补读后置；C类开工旧脏改不纳入。遵循business-first只实现当前内容可用/限用行为，没有扩LLM平台或继续原付费补救。真实复核质量和新版真实稳定性仍未证明，不把两个回放pass折算S1。
+
+清理：本轮3次TaskService隔离根均TemporaryDirectory/finally删除，末端扫描无workpaper-bk-task-service-*；直接测试临时目录按既有用例finally清理。无一次性operator脚本，已释放字节未单独计量，不重报§267的7331288字节。必要新56事实原入口JSON/Markdown与两个摘要一套留current change；较早35事实不重复复制，正式源/共享有效解析/原首次失败/并行物不动。只提交本人代码/测试、明确文档hunk及这套新回放证据，旧审核约1005行等留工作区不纳入。6.BK范围内工程交付完成，原6.BJ2未达标保持未勾，后继真实调用不从这次继续指令或旧余额推定授权。

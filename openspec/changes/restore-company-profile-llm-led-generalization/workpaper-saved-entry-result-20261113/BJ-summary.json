@@ -1,0 +1,12 @@
+{
+  "observation": "BJ",
+  "mode": "offline_saved_response_task_service",
+  "new_model_calls": 0,
+  "network_allowed": false,
+  "source_receipts_sha256": "3204b6db4c89bd15487b4ca2849107816dc5d9f154b4bfefc961bbe7c3bc96a0",
+  "task_seconds": 20.531,
+  "three_reads_equal": true,
+  "retained_facts": 56,
+  "review_status": "completed_with_open_findings",
+  "local_scripted_sends": 3
+}

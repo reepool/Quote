@@ -19,6 +19,7 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 - **WHEN** an otherwise schema-valid extraction contains one fact whose metric number or unnormalized raw wording is not present in the supplied evidence
 - **THEN** binding MUST withhold that fact, record its identity and concrete limitation, and retain independently valid facts in the same workpaper
 - **AND** direct workpaper validation still rejects invalid retained facts, unknown source identities remain rejected, and this local isolation does not authorize a new paid entry or rewrite the original failed run
+- **AND** local isolation identities and reasons MUST survive a later review that withdraws disputed scope prose; they remain program processing notes rather than being erased with model-authored limitations
 
 #### Scenario: Supplementary container formatting is invalid
 - **WHEN** the extraction includes unknown keys beside the eight required elements or a malformed optional supply-chain container
