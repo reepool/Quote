@@ -1,0 +1,41 @@
+{
+  "new_model_calls_in_audit": 0,
+  "query_hash_matches": true,
+  "raw_response_hashes_match": true,
+  "original_source_hash_matches": true,
+  "whole_profile_accuracy_claim": false,
+  "local_contract_errors": [
+    {
+      "type": "value_error",
+      "loc": [
+        "elements",
+        "operating_drivers",
+        "facts",
+        4,
+        "metrics",
+        1
+      ],
+      "msg": "Value error, unnormalized metric requires an uncertainty reason",
+      "ctx": {
+        "error": "unnormalized metric requires an uncertainty reason"
+      }
+    },
+    {
+      "type": "value_error",
+      "loc": [
+        "elements",
+        "operating_drivers",
+        "facts",
+        5,
+        "metrics",
+        0
+      ],
+      "msg": "Value error, unnormalized metric requires an uncertainty reason",
+      "ctx": {
+        "error": "unnormalized metric requires an uncertainty reason"
+      }
+    }
+  ],
+  "review_not_reached": true,
+  "final_not_reached": true
+}

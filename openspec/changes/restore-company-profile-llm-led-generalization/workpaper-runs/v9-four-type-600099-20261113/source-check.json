@@ -1,0 +1,57 @@
+{
+  "new_model_calls_in_audit": 0,
+  "query_hash_matches": true,
+  "raw_response_hashes_match": true,
+  "original_source_hash_matches": true,
+  "whole_profile_accuracy_claim": false,
+  "all_source_coordinates_match": true,
+  "evidence_objects": 25,
+  "independent_facts_unchanged": 51,
+  "initial_facts": 57,
+  "final_facts": 59,
+  "accepted_repair_ids": [
+    "F-MC-01",
+    "F-MC-02",
+    "F-MC-03",
+    "F-MC-04",
+    "F-OI-03",
+    "F-SC-U-03",
+    "review-add:WF-007",
+    "review-add:WF-008"
+  ],
+  "no_retained_prior_review_calls": true,
+  "finite_independent_source_checks": [
+    {
+      "pages": [
+        8,
+        9,
+        10,
+        12,
+        18,
+        21
+      ],
+      "conclusion": "制造销售四类产品、经销/按单生产、营业收入113124.69万元及表1,131,246,944.93元、四行业本期收入有源，未把子公司收入代集团。"
+    },
+    {
+      "pages": [
+        10,
+        15,
+        16,
+        21,
+        23
+      ],
+      "conclusion": "四项不适用说明只复述勾选；第二厂家11家和两项国产替代仅限农业机械板块。"
+    },
+    {
+      "pages": [
+        21,
+        22
+      ],
+      "conclusion": "行业/地区毛利率增减是百分点；生产销售变动与收入方向背离如原表，不自行推因果，库存同比不适用不写零。"
+    }
+  ],
+  "remaining_limits": [
+    "复核完成不等于59条全人工准确。部分限制仍用未披露措辞，实际只能确认所选范围。",
+    "供应链原材料成本分类不是具体采购物料或客户关系；范围外未知。"
+  ]
+}

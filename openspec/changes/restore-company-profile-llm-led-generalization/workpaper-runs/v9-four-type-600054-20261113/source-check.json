@@ -1,0 +1,49 @@
+{
+  "new_model_calls_in_audit": 0,
+  "query_hash_matches": true,
+  "raw_response_hashes_match": true,
+  "original_source_hash_matches": true,
+  "whole_profile_accuracy_claim": false,
+  "all_source_coordinates_match": true,
+  "evidence_objects": 15,
+  "independent_facts_unchanged": 42,
+  "initial_facts": 44,
+  "final_facts": 44,
+  "accepted_repair_ids": [
+    "mc-05",
+    "review-add:F3"
+  ],
+  "no_retained_prior_review_calls": true,
+  "finite_independent_source_checks": [
+    {
+      "pages": [
+        9,
+        10,
+        11,
+        13,
+        14
+      ],
+      "conclusion": "六业务板块、公司营业收入210932.51万元及表2,109,325,107.63元、客运与游客不同口径匹配；未抵销行业收入不当公司总额。"
+    },
+    {
+      "pages": [
+        13,
+        14,
+        15
+      ],
+      "conclusion": "不适用说明保披露范围；五行业收入/成本同比、毛利率增减方向与本期表相符。"
+    },
+    {
+      "pages": [
+        13,
+        23,
+        24
+      ],
+      "conclusion": "地理邻近和未来营销计划不能证明本期客源结构，被撤回cc-01未回正文。"
+    }
+  ],
+  "remaining_limits": [
+    "客户市场原无据判断F1仍隔离，可用部分继续展示；无可选supply_chain投影不算失败。",
+    "44条未逐对象全人工审，成本续页单事实表头充分性仍有限。"
+  ]
+}

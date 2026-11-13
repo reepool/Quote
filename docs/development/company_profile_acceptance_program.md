@@ -6,6 +6,8 @@
 
 ## 1. 目标与完成边界
 
+2026-11-13新批准6.BQ四类当前同版全流程4/4入口已用，真实可读/初核/连续纠正链2/4：林海59事实/8候选实际采纳，黄山44事实/2采纳/1隔离；浦发/同方各两个指标本地合同错误导致整稿拒绝。本组15物理/372397实际usage/1恢复/unknown，未热修或载旧语义，不进入S1/规模。详见[同版全组结果](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-four-type-result-20261113/result.md)。组末6.BR仅一次零调用通用局部隔离、37回归通过，原保存响应保浦发78/同方49条controlled稿、无真实复核，不改本组2/4/旧query/原失败。供应链仍可选、原三家情况已核在workpaper-supply-chain-observation-20261113.md，必要结果后清本人过程物，无新追加窗口/公司/生产授权。
+
 2026-11-13 6.BP完成已有画像的原查询/导出消费，不新增模型或公司：同方38/36、林海47/59、黄山59/39事实/指标经原writer隔离重展现及query/export/新实例一致，底稿内容量/原业务描述、复核/未决/实际模型在独立摘要、CSV和[总览](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-read-overview-20261113/profiles.md)可见。旧accepted_fact_count=0/core_complete=false/生产未授权、所有旧字段值/全文及源文件hash不改；旧稿只补已有可空默认元数据，非新语义/评分。37项169.67秒、定向5项9.63秒通过，零网络消费验证1.037秒，不作模型生成耗时。S1/旧失败/后继授权不变，必要展示只保一套并复用原全文，清本人过程物后交付。
 
 2026-11-13新批准6.BO黄山5候选最终再核1/1完成，5全部实际接受进入59条真实画像，54独立事实原样保留，三读一致。四项毛利率方向与不适用说明实际纠正，范围意见f002仍未决，review completed_with_open_findings/core_complete=false；非全59条真值、非连续首发/S1或生产。仅本次1物理/20585实际usage/0恢复/unknown、85.700业务秒/30.619准备秒，原初核59039/修订13826单列继承，旧拒绝及6.BN失败不改。5项改动有限独立核源、全坐标/旧hash核过；实物见[最终再核交付](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-recheck-600054-20261113/result.md)。本卡权限已用，当前无自动浦发/扩样/生产授权。

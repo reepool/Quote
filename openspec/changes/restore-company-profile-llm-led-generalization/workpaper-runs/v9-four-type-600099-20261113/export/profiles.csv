@@ -1,0 +1,8 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600099.SH,2025-12-31,2026-03-27T16:00:00+00:00,False,False,False,False,0,0,model_reviewed_pending_verification,llm_generated,"公司从事的主营业务是森林消防机械、农业机械、特种车辆（全地形车）、摩托车等及以上产品配件的制造和销售。
+公司主要采用以销定产的生产经营模式，由销售部门根据销售计划或客户订单将生产计划下达至生产部门，实行按单生产，同时根据市场需求适度备货；公司产品销售以经销模式为主。
+报告期内公司各主营业务板块结构进一步优化，森林消防机械、农业机械、特种车辆、摩托车业务销售收入占比分别为22.10%、25.22%、41.54%、11.14%。
+主营业务板块中国际市场、国内市场销售收入占比分别为51.47%、48.53%。
+主要子公司江苏福马高新动力机械有限公司（子公司，机械制造销售）注册资本4,500.00万元，总资产28,478.85万元，净资产11,667.21万元，营业收入42,091.36万元，营业利润1,523.19万元，净利润1,474.29万元。
+参股公司江苏联海动力机械有限公司（机械制造销售）注册资本8,442.22万元，总资产17,273.16万元，净资产12,099.42万元，营业收入19,957.09万元，营业利润459.62万元，净利润407.84万元。
+参股公司福马新能（北京）科技有限公司（服务托管）注册资本2,520.00万元，总资产5,664.71万元，净资产5,290.41万元，营业收入524.08万元，营业利润114.11万元，净利润112.68万元。",59,77,completed,0,deepseek-flash,grok-4.7

@@ -1,0 +1,10 @@
+{
+  "mode": "offline_operator_binding_error",
+  "new_model_calls": 0,
+  "reason": "Operator rebound compact native pages before verify, replacing the layout coordinates already produced by semantic.",
+  "cleanup": {
+    "removed_temporary_root": "/home/python/Quote/data/QuoteBak/workpaper-bq-local-b8jt9bbp",
+    "released_bytes": 823817,
+    "removed_on_context_exit": true
+  }
+}

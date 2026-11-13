@@ -41,6 +41,11 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 - **THEN** the wire contract MUST permit retaining that original response, and the application adapter MUST withhold the unknown/invalid portion with an explicit limitation before typed binding
 - **AND** required business fields, evidence identities and metric validation remain enforced; neither discarded content nor a preserved raw response counts as a supported conclusion
 
+#### Scenario: A returned fact has an invalid metric representation
+- **WHEN** a schema-valid draft contains a fact that fails local validation only within its metrics, such as an inconsistent raw qualifier or a null normalized value without the required reason
+- **THEN** the extraction adapter MUST withhold that complete fact and retain independent valid facts, its original raw response, affected fact ID and concrete validation reason
+- **AND** the adapter MUST NOT guess a missing qualifier, value, unit or reason; direct typed validation and non-metric/source identity errors remain strict, and program isolation notes survive later review scope changes
+
 ### Requirement: Metric standardization preserves source meaning and audit history
 New workpaper binding and repaired projections MUST clear currency on dimensionless ratios. A rate difference expressed as percentage points MUST remain distinct from relative percentage growth. Standardization MAY retain a source_unit beside the normalized unit, MUST preserve the raw source spelling and decimal value, and MUST leave an auditable note. It MUST NOT guess currency conversions, magnitudes, subject scope or rate-change meaning from a bare number. Historical workpaper files MUST NOT be rewritten by reading them.
 

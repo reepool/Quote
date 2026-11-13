@@ -1,0 +1,41 @@
+{
+  "new_model_calls_in_audit": 0,
+  "query_hash_matches": true,
+  "raw_response_hashes_match": true,
+  "original_source_hash_matches": true,
+  "whole_profile_accuracy_claim": false,
+  "local_contract_errors": [
+    {
+      "type": "value_error",
+      "loc": [
+        "elements",
+        "revenue_model",
+        "facts",
+        5,
+        "metrics",
+        0
+      ],
+      "msg": "Value error, metric qualifier must match original raw value",
+      "ctx": {
+        "error": "metric qualifier must match original raw value"
+      }
+    },
+    {
+      "type": "value_error",
+      "loc": [
+        "elements",
+        "scale_and_mix",
+        "facts",
+        5,
+        "metrics",
+        1
+      ],
+      "msg": "Value error, metric qualifier must match original raw value",
+      "ctx": {
+        "error": "metric qualifier must match original raw value"
+      }
+    }
+  ],
+  "review_not_reached": true,
+  "final_not_reached": true
+}

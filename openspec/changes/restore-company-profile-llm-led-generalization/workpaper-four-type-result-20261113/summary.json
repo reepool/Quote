@@ -1,0 +1,237 @@
+{
+  "new_model_calls_in_audit": 0,
+  "companies_started": 4,
+  "readable_workpapers": 2,
+  "initial_reviews_completed": 2,
+  "bounded_correction_chains_completed": 2,
+  "full_group_passed": false,
+  "counts_are_not_quality_accuracy": true,
+  "physical_requests": 15,
+  "charged_tokens": 372397,
+  "recoveries": 1,
+  "fees": "unknown",
+  "same_code_and_identity": true,
+  "runtime_hot_changes": false,
+  "shared_config_unchanged": true,
+  "production_authorization": "not_authorized",
+  "results": [
+    {
+      "run_id": "v9-four-type-600099-20261113",
+      "instrument_id": "600099.SH",
+      "category": "manufacturing",
+      "new_entry_used": true,
+      "new_real_model_calls": 5,
+      "production_authorization": "not_authorized",
+      "preparation_seconds": 51.356,
+      "business_seconds": 467.329,
+      "three_reads_equal": true,
+      "query_sha256": "1eb2da77caa8c818f26eb3c2a1ac35fcb7d25d990ebda22ffcd867edd76a19dd",
+      "state": "completed",
+      "source_hash_unchanged": true,
+      "facts": 59,
+      "metrics": 77,
+      "workpaper_status": "model_reviewed_pending_verification",
+      "core_complete": false,
+      "element_fact_counts": {
+        "business_structure": 7,
+        "products_services": 5,
+        "revenue_model": 6,
+        "scale_and_mix": 5,
+        "operations_and_inputs": 6,
+        "customers_channels_markets": 6,
+        "operating_drivers": 7,
+        "material_changes": 7,
+        "position": 2,
+        "upstream_inputs": 4,
+        "downstream_customers": 4
+      },
+      "review_status": "completed",
+      "review_error": null,
+      "findings": 8,
+      "finding_resolutions": {
+        "WF-001": "corrected_pending_trust",
+        "WF-002": "corrected_pending_trust",
+        "WF-003": "corrected_pending_trust",
+        "WF-004": "corrected_pending_trust",
+        "WF-005": "corrected_pending_trust",
+        "WF-006": "corrected_pending_trust",
+        "WF-007": "corrected_pending_trust",
+        "WF-008": "corrected_pending_trust"
+      },
+      "charged_tokens": 142216,
+      "cost": "unknown",
+      "recoveries": 0,
+      "code_unchanged": true,
+      "shared_config_unchanged": true
+    },
+    {
+      "run_id": "v9-four-type-600054-20261113",
+      "instrument_id": "600054.SH",
+      "category": "nonfinancial_services",
+      "new_entry_used": true,
+      "new_real_model_calls": 6,
+      "production_authorization": "not_authorized",
+      "preparation_seconds": 52.715,
+      "business_seconds": 448.805,
+      "three_reads_equal": true,
+      "query_sha256": "8c3232ebce2aa24858f3df364c5403802ae7e226edbb739e7657488463a48369",
+      "state": "completed",
+      "source_hash_unchanged": true,
+      "facts": 44,
+      "metrics": 53,
+      "workpaper_status": "review_limited_pending_verification",
+      "core_complete": false,
+      "element_fact_counts": {
+        "business_structure": 6,
+        "products_services": 6,
+        "revenue_model": 3,
+        "scale_and_mix": 6,
+        "operations_and_inputs": 7,
+        "customers_channels_markets": 4,
+        "operating_drivers": 7,
+        "material_changes": 5
+      },
+      "review_status": "completed_with_open_findings",
+      "review_error": null,
+      "findings": 3,
+      "finding_resolutions": {
+        "F1": "quarantined",
+        "F2": "corrected_pending_trust",
+        "F3": "corrected_pending_trust"
+      },
+      "charged_tokens": 144036,
+      "cost": "unknown",
+      "recoveries": 1,
+      "code_unchanged": true,
+      "shared_config_unchanged": true
+    },
+    {
+      "run_id": "v9-four-type-600000-20261113",
+      "instrument_id": "600000.SH",
+      "category": "bank",
+      "new_entry_used": true,
+      "new_real_model_calls": 2,
+      "production_authorization": "not_authorized",
+      "preparation_seconds": 52.463,
+      "business_seconds": 59.645,
+      "three_reads_equal": true,
+      "query_sha256": "858aeebe20a044efed93cd8fbf4ba7d63fc673b8d4fb9e9759758f597ddb7c62",
+      "state": "incomplete",
+      "source_hash_unchanged": true,
+      "facts": 0,
+      "metrics": 0,
+      "workpaper_status": null,
+      "core_complete": null,
+      "element_fact_counts": {},
+      "review_status": null,
+      "review_error": null,
+      "findings": 0,
+      "finding_resolutions": {},
+      "charged_tokens": 43040,
+      "cost": "unknown",
+      "recoveries": 0,
+      "code_unchanged": true,
+      "shared_config_unchanged": true
+    },
+    {
+      "run_id": "v9-four-type-600100-20261113",
+      "instrument_id": "600100.SH",
+      "category": "multi_segment",
+      "new_entry_used": true,
+      "new_real_model_calls": 2,
+      "production_authorization": "not_authorized",
+      "preparation_seconds": 49.239,
+      "business_seconds": 44.527,
+      "three_reads_equal": true,
+      "query_sha256": "80b9b8b8f4cc97d3d008784288d99cf421ed002594bcb35f4b8814dcaab763e4",
+      "state": "incomplete",
+      "source_hash_unchanged": true,
+      "facts": 0,
+      "metrics": 0,
+      "workpaper_status": null,
+      "core_complete": null,
+      "element_fact_counts": {},
+      "review_status": null,
+      "review_error": null,
+      "findings": 0,
+      "finding_resolutions": {},
+      "charged_tokens": 43105,
+      "cost": "unknown",
+      "recoveries": 0,
+      "code_unchanged": true,
+      "shared_config_unchanged": true
+    }
+  ],
+  "blocking_error_groups": [
+    {
+      "instrument_id": "600000.SH",
+      "errors": [
+        {
+          "type": "value_error",
+          "loc": [
+            "elements",
+            "revenue_model",
+            "facts",
+            5,
+            "metrics",
+            0
+          ],
+          "msg": "Value error, metric qualifier must match original raw value",
+          "ctx": {
+            "error": "metric qualifier must match original raw value"
+          }
+        },
+        {
+          "type": "value_error",
+          "loc": [
+            "elements",
+            "scale_and_mix",
+            "facts",
+            5,
+            "metrics",
+            1
+          ],
+          "msg": "Value error, metric qualifier must match original raw value",
+          "ctx": {
+            "error": "metric qualifier must match original raw value"
+          }
+        }
+      ]
+    },
+    {
+      "instrument_id": "600100.SH",
+      "errors": [
+        {
+          "type": "value_error",
+          "loc": [
+            "elements",
+            "operating_drivers",
+            "facts",
+            4,
+            "metrics",
+            1
+          ],
+          "msg": "Value error, unnormalized metric requires an uncertainty reason",
+          "ctx": {
+            "error": "unnormalized metric requires an uncertainty reason"
+          }
+        },
+        {
+          "type": "value_error",
+          "loc": [
+            "elements",
+            "operating_drivers",
+            "facts",
+            5,
+            "metrics",
+            0
+          ],
+          "msg": "Value error, unnormalized metric requires an uncertainty reason",
+          "ctx": {
+            "error": "unnormalized metric requires an uncertainty reason"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "instrument_id": "600100.SH",
+  "mode": "saved_response_runtime_writer_projection",
+  "new_model_calls": 0,
+  "network_allowed": false,
+  "three_reads_equal": true,
+  "origin": "controlled_fixture",
+  "facts": 49,
+  "quarantined_metric_fact_ids": [
+    "F037",
+    "F038"
+  ],
+  "program_notes": [
+    "指标格式隔离：事实F037未作为结论采用；metrics.1: Value error, unnormalized metric requires an uncertainty reason；原内容保留在模型回执。",
+    "指标格式隔离：事实F038未作为结论采用；metrics.0: Value error, unnormalized metric requires an uncertainty reason；原内容保留在模型回执。"
+  ],
+  "real_review_performed": false,
+  "original_file_sha256": {
+    "query.json": "80b9b8b8f4cc97d3d008784288d99cf421ed002594bcb35f4b8814dcaab763e4",
+    "binding.json": "386a79e3d085e0884d65070e9aaee9b0981856947125bf2f163fdd41acd891f3",
+    "model-receipts.json": "1f3ca3d8ea70afb468e984108fd16b346f9d372a2df4d97f6c23522f7943e7cc"
+  },
+  "original_files_unchanged": true,
+  "current_workpaper_code_sha256": "7aeaac414598cf2b1b9e70ca6e1e3bc861759eb9f09748f4301d992e0ceba42c"
+}

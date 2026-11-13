@@ -1,0 +1,41 @@
+{
+  "run_id": "v9-four-type-600054-20261113",
+  "instrument_id": "600054.SH",
+  "category": "nonfinancial_services",
+  "new_entry_used": true,
+  "new_real_model_calls": 6,
+  "production_authorization": "not_authorized",
+  "preparation_seconds": 52.715,
+  "business_seconds": 448.805,
+  "three_reads_equal": true,
+  "query_sha256": "8c3232ebce2aa24858f3df364c5403802ae7e226edbb739e7657488463a48369",
+  "state": "completed",
+  "source_hash_unchanged": true,
+  "facts": 44,
+  "metrics": 53,
+  "workpaper_status": "review_limited_pending_verification",
+  "core_complete": false,
+  "element_fact_counts": {
+    "business_structure": 6,
+    "products_services": 6,
+    "revenue_model": 3,
+    "scale_and_mix": 6,
+    "operations_and_inputs": 7,
+    "customers_channels_markets": 4,
+    "operating_drivers": 7,
+    "material_changes": 5
+  },
+  "review_status": "completed_with_open_findings",
+  "review_error": null,
+  "findings": 3,
+  "finding_resolutions": {
+    "F1": "quarantined",
+    "F2": "corrected_pending_trust",
+    "F3": "corrected_pending_trust"
+  },
+  "charged_tokens": 144036,
+  "cost": "unknown",
+  "recoveries": 1,
+  "code_unchanged": true,
+  "shared_config_unchanged": true
+}

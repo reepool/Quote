@@ -441,7 +441,7 @@ def workpaper_draft_wire_schema() -> dict:
 
 
 def normalize_workpaper_draft(data):
-    """Isolate the two observed container failures; never invent required facts."""
+    """Withhold observed local failures, never guess missing facts or metric meaning."""
     if not isinstance(data, Mapping):
         return data
     payload = dict(data)
@@ -452,6 +452,28 @@ def normalize_workpaper_draft(data):
         if unknown:
             payload["elements"] = {k: v for k, v in elements.items() if k in ELEMENT_LABELS}
             limitations.append("未归类要素字段未作结论采用，原内容保留在模型回执：" + "、".join(sorted(unknown)))
+        cleaned = dict(payload.get("elements", elements))
+        for name, element in cleaned.items():
+            if not isinstance(element, Mapping) or not isinstance(element.get("facts"), (list, tuple)):
+                continue  # Other contract errors still fail the typed response.
+            kept, rejected = [], []
+            for fact in element["facts"]:
+                try:
+                    WorkpaperFact.model_validate(fact)
+                except ValidationError as exc:
+                    errors = exc.errors(include_input=False, include_url=False)
+                    if not all(error["loc"] and error["loc"][0] == "metrics" for error in errors):
+                        kept.append(fact)
+                        continue
+                    reason = "; ".join(f"{'.'.join(map(str, e['loc']))}: {e['msg']}" for e in errors)
+                    rejected.append(f"指标格式隔离：事实{fact['fact_id']}未作为结论采用；{reason}；原内容保留在模型回执。")
+                    continue
+                kept.append(fact)
+            if rejected:
+                cleaned[name] = {**element, "facts": kept,
+                    "status": "unclear" if not kept else element.get("status"),
+                    "limitations": [*(element.get("limitations") or ()), *rejected]}
+        payload["elements"] = cleaned
     if payload.get("supply_chain") is not None:
         try:
             WorkpaperSupplyChain.model_validate(payload["supply_chain"])
@@ -482,7 +504,9 @@ def bind_workpaper_draft(
     # retaining a possibly wrong number in the narrative without its metric.
     sources = {item.evidence_id: item for item in evidence}
     cleaned_elements = {}
-    binding_notes = []
+    binding_notes = [note for name in ELEMENT_LABELS
+                     for note in getattr(response.elements, name).limitations
+                     if note.startswith("指标格式隔离：")]
     for name in ELEMENT_LABELS:
         element = getattr(response.elements, name)
         kept, rejected = [], []

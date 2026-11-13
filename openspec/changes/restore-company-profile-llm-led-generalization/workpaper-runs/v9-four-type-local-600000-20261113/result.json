@@ -1,0 +1,25 @@
+{
+  "instrument_id": "600000.SH",
+  "mode": "saved_response_runtime_writer_projection",
+  "new_model_calls": 0,
+  "network_allowed": false,
+  "three_reads_equal": true,
+  "origin": "controlled_fixture",
+  "facts": 78,
+  "quarantined_metric_fact_ids": [
+    "F-RM-06",
+    "F-SM-06"
+  ],
+  "program_notes": [
+    "指标格式隔离：事实F-RM-06未作为结论采用；metrics.0: Value error, metric qualifier must match original raw value；原内容保留在模型回执。",
+    "指标格式隔离：事实F-SM-06未作为结论采用；metrics.1: Value error, metric qualifier must match original raw value；原内容保留在模型回执。"
+  ],
+  "real_review_performed": false,
+  "original_file_sha256": {
+    "query.json": "858aeebe20a044efed93cd8fbf4ba7d63fc673b8d4fb9e9759758f597ddb7c62",
+    "binding.json": "b7ba2439b85abab5346e58ad863657393d433b552e7273554d6b602cd3224ebb",
+    "model-receipts.json": "4f618e3e63243cfdd227c59b6eb1c371fc8f85a11724be9bec4066bb1d64780b"
+  },
+  "original_files_unchanged": true,
+  "current_workpaper_code_sha256": "7aeaac414598cf2b1b9e70ca6e1e3bc861759eb9f09748f4301d992e0ceba42c"
+}

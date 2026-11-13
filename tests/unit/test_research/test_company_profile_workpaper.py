@@ -218,6 +218,57 @@ def test_lenient_supplements_do_not_allow_missing_required_business_elements():
         WorkpaperDraftResponse.model_validate(normalize_workpaper_draft(raw))
 
 
+@pytest.mark.parametrize('failure', ['qualifier', 'null_reason'])
+def test_gateway_withholds_only_fact_with_invalid_metric_and_preserves_raw_response(failure):
+    import asyncio
+    import copy
+    from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
+    from research.company_profile.workpaper import normalize_workpaper_draft
+    from tests.unit.test_utils.test_llm_gateway import _config, _response
+    from tests.unit.test_utils.test_llm_physical_budget import _budget, _client
+    from utils.llm.testing import ScriptedTransport
+
+    index = index_sections(PAGES)
+    selection = _selection(index)
+    packet = build_section_packet(_report(), PAGES, index, selection)
+    raw = _draft(packet).model_dump(mode='json')
+    metric = raw['elements']['scale_and_mix']['facts'][0]['metrics'][0]
+    if failure == 'qualifier':
+        metric.update(qualifier='greater_than')
+    else:
+        metric.update(value=None, uncertainty_reason=None)
+    frozen = copy.deepcopy(raw)
+    with pytest.raises(ValueError):
+        WorkpaperDraftResponse.model_validate(raw)  # Direct parsing stays strict.
+    transport = ScriptedTransport([_response(selection.model_dump(mode='json')), _response(raw)])
+    client = _client(transport, _budget(), _config(max_schema_repair_attempts=0))
+    provider = CommonGatewaySemanticProvider(client=client, profile='test', max_output_tokens=2500, timeout_seconds=10)
+    provider.offline_only = True
+    try:
+        result = run_workpaper(report=_report(), pages=PAGES, processing_identity=workpaper_processing_identity(real=False),
+            provider=provider, work_id='metric-isolation')
+        assert result.workpaper.elements.business_structure.facts[0].fact_id == 'main'
+        assert result.workpaper.elements.scale_and_mix.facts == ()
+        assert result.workpaper.elements.scale_and_mix.status == 'unclear'
+        assert any('指标格式隔离：事实revenue' in note for note in result.workpaper.standardization_notes)
+        assert provider.workpaper_receipts[-1]['response_payload'] == frozen
+        assert raw == frozen and len(transport.calls) == 2
+        from research.company_profile.workpaper import WorkpaperQualityReview, WorkpaperReviewFinding
+        from research.company_profile.workpaper_review import _project
+        finding = WorkpaperReviewFinding(finding_id='scope', element='limitations', severity='minor', issue_type='other',
+            evidence_ids=(), explanation='所选范围未知。', resolution='unresolved')
+        review = WorkpaperQualityReview(status='completed_with_open_findings', original_draft_hash='fixture', findings=(finding,))
+        after = _project(result.workpaper, review=review, findings=[finding], replacements={})
+        assert after.standardization_notes == result.workpaper.standardization_notes
+        assert after.elements.business_structure == result.workpaper.elements.business_structure
+        # Non-metric fact identity failures are not hidden by the isolation.
+        raw['elements']['scale_and_mix']['facts'][0].pop('fact_id')
+        with pytest.raises(ValueError):
+            WorkpaperDraftResponse.model_validate(normalize_workpaper_draft(raw))
+    finally:
+        asyncio.run(client.close())
+
+
 def test_metric_needs_source_number_and_source_coordinates_are_checked():
     packet = build_section_packet(_report(), PAGES, index_sections(PAGES), _selection(index_sections(PAGES)))
     raw = _draft(packet).model_dump(mode="json")
