@@ -1,0 +1,28 @@
+{
+  "new_model_calls_in_audit": 0,
+  "all_source_coordinates_match": true,
+  "evidence_objects": 22,
+  "raw_response_and_query_hashes_match": true,
+  "old_receipts_and_results_unchanged": true,
+  "independent_facts_unchanged": 77,
+  "finite_independent_source_checks": [
+    {
+      "pages": [
+        32,
+        34,
+        64
+      ],
+      "conclusion": "原集团营业收入1739.64亿元、原科技金融公司披露贷款10470.92亿元/服务超25.6万户可区分；补项保央行统计/年末/超限定。"
+    },
+    {
+      "pages": [
+        34
+      ],
+      "conclusion": "抹香鲸拓客与科学评价授信属不同归因，原事实与未获final接受的候选均未回正文；主体范围争议不靠本次本地判断放行。"
+    }
+  ],
+  "old_extraction_status_preserved": "rejected",
+  "old_content_locally_revalidated_not_new_extraction": true,
+  "whole_profile_accuracy_claim": false,
+  "production_authorization": "not_authorized"
+}

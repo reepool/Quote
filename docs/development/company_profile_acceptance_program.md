@@ -6,6 +6,8 @@
 
 ## 1. 目标与完成边界
 
+2026-11-13新批准6.BS银行/综合保存真实内容接续2/2完成，均真实初核→一次修订→再核→三读，限用交付：浦发78事实/3发现/1新增接受/1拒绝与1次要遗漏；同方49/2发现/1新增接受/1隔离，独立77/48条不变。新6物理/214754实际usage/0恢复/unknown，业务724.483/624.157秒，原抽取rejected与43040/43105账本明确继承、不重抽或读受控稿、不改6.BQ2/4。用户确认粗粒度供应链可接受，产品/物料/数字精细化不作门槛。实物与有限核源见[接续结果](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-retained-review-result-20261113/result.md)。四类能力有真实内容/纠正证据但非同版全新首发或S1；本卡用尽，下一有限质量验收/正式回归就绪另裁，不追加公司/生产。
+
 2026-11-13新批准6.BQ四类当前同版全流程4/4入口已用，真实可读/初核/连续纠正链2/4：林海59事实/8候选实际采纳，黄山44事实/2采纳/1隔离；浦发/同方各两个指标本地合同错误导致整稿拒绝。本组15物理/372397实际usage/1恢复/unknown，未热修或载旧语义，不进入S1/规模。详见[同版全组结果](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-four-type-result-20261113/result.md)。组末6.BR仅一次零调用通用局部隔离、37回归通过，原保存响应保浦发78/同方49条controlled稿、无真实复核，不改本组2/4/旧query/原失败。供应链仍可选、原三家情况已核在workpaper-supply-chain-observation-20261113.md，必要结果后清本人过程物，无新追加窗口/公司/生产授权。
 
 2026-11-13 6.BP完成已有画像的原查询/导出消费，不新增模型或公司：同方38/36、林海47/59、黄山59/39事实/指标经原writer隔离重展现及query/export/新实例一致，底稿内容量/原业务描述、复核/未决/实际模型在独立摘要、CSV和[总览](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-read-overview-20261113/profiles.md)可见。旧accepted_fact_count=0/core_complete=false/生产未授权、所有旧字段值/全文及源文件hash不改；旧稿只补已有可空默认元数据，非新语义/评分。37项169.67秒、定向5项9.63秒通过，零网络消费验证1.037秒，不作模型生成耗时。S1/旧失败/后继授权不变，必要展示只保一套并复用原全文，清本人过程物后交付。

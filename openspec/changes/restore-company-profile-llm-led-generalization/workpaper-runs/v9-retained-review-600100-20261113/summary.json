@@ -1,0 +1,31 @@
+{
+  "instrument_id": "600100.SH",
+  "run_id": "v9-retained-review-600100-20261113",
+  "new_entry_used": true,
+  "new_real_model_calls": 3,
+  "production_authorization": "not_authorized",
+  "preparation_seconds": 47.936,
+  "initial_facts": 49,
+  "business_seconds": 624.157,
+  "three_reads_equal": true,
+  "query_sha256": "d7cb7298f322c163ad87140bf02b84419f659f3c953e1b0e36a255aaae7a545b",
+  "facts": 49,
+  "independent_facts_unchanged": 48,
+  "metrics": 38,
+  "state": "completed",
+  "review_status": "completed_with_open_findings",
+  "review_error": null,
+  "findings": 2,
+  "finding_resolutions": {
+    "Q001": "corrected_pending_trust",
+    "Q002": "quarantined"
+  },
+  "core_complete": false,
+  "workpaper_status": "review_limited_pending_verification",
+  "charged_tokens": 90689,
+  "cost": "unknown",
+  "recoveries": 0,
+  "old_files_unchanged": true,
+  "code_unchanged": true,
+  "shared_config_unchanged": true
+}

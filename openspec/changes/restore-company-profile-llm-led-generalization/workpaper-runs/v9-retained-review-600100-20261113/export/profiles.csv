@@ -1,0 +1,5 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600100.SH,2025-12-31,2026-04-28T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,llm_generated,"公司定位为“数智技术与核技术创新融合的高科技企业”，聚焦公共安全、数智产业、智慧能源等产业领域，并设有科技成果转化平台、资产管理平台、海外投资协同平台。
+公司主营业务归属于公共安全、数智产业和智慧能源等产业领域，按所处行业及经营模式可分为制造业和软件与信息技术服务业。
+报告期内公司整合数智信息产业资源成立同方数科，初步建立基于企业架构的数智化转型范式。
+公司业务主要分为公共安全、数智产业、智慧能源业务领域，主营业务分板块列示公共安全、数智产业、智慧能源、其他业务、总部投资及科技园，并单独列示业务板块间抵销。",49,38,completed_with_open_findings,1,deepseek-flash,grok-4.7

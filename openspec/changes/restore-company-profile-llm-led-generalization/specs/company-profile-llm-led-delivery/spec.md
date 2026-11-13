@@ -115,6 +115,11 @@ For new workpapers under the 2026-11-12 user instruction, company_profile_workpa
 - **THEN** the profile remains queryable/exportable with an absent or explicitly limited optional supply-chain element
 - **AND** no automatic extra search, failed-company result or invented relationship is introduced to fill it
 
+#### Scenario: Existing high-level supply-chain descriptions are sufficient
+- **WHEN** the workpaper already describes supported company position, resources or downstream uses but lacks precise material/product lists or quantities
+- **THEN** the workflow MUST retain that useful optional content and MAY stop without further supply-chain reading or repair
+- **AND** finer granularity is not a completion criterion; source correctness and isolation of known errors still apply
+
 ### Requirement: Reading questions guide report-local section selection
 The selector MUST receive a versioned general question-to-section-family guide inferred from reviewed reports. Business and operating-mode subsections are primary sources; revenue/cost and business review sections provide main segment weights; procurement/production/sales, product applications and customer sections may enrich supply chains. Financial or segment notes are targeted supplements, while honors, governance and minor technical details are deferred. Families are semantic hints, never exact heading/page whitelists. Numbered decimal headings such as 3.6 and 3.6.2 MUST preserve their report-local hierarchy so useful subsections can be selected without reading an entire management chapter. Extraction MUST prioritize a supported main segment's revenue or operating scale before minor organization/technology details; unknown values remain unknown.
 

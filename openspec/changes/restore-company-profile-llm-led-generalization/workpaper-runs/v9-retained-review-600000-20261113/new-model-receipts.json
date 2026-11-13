@@ -1,0 +1,257 @@
+[
+  {
+    "request_id": "bp-work-ec4ad75ad504bf94c0587f88:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "6b8e09d6eed28d8a315472e2cacc130527336554c7602f698faf7bd32fac8f46",
+    "response_hash": "33bf4dd866722db88da347e5ffac36125a779925a69061c38f5669e35b9e5204",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"WR-001\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0004\",\"source-0015\"],\"explanation\":\"源文两处披露报告期末科技金融贷款规模（中国人民银行统计口径）为10,470.92亿元，并称服务科技企业超25.6万户。该余额是“五大赛道”中科技金融的主要规模，与已收录的普惠两增贷款、在线供应链业务量、跨境贷款及财资管理规模同级，但草稿未收录。已有“五大拳头产品提供超1,400亿元融资”口径不同，不能替代该贷款规模。\"},{\"finding_id\":\"WR-002\",\"element\":\"revenue_model\",\"severity\":\"minor\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0001\"],\"explanation\":\"源文在同一经营效益段落披露归属于母公司股东的扣除非经常性损益的净利润501.44亿元，同比增加59.37亿元，增长13.43%。草稿已收录营业收入、利润总额和归母净利润500.17亿元（增长10.52%），但未收录该扣非调整后利润；两口径金额接近，增速并不相同。\"},{\"finding_id\":\"WR-003\",\"element\":\"operations_and_inputs\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F-OI-04\",\"evidence_ids\":[\"source-0004\"],\"explanation\":\"F-OI-04把“助力超6,900家企业获得超2,400亿元授信”接在科技金融数智平台“抹香鲸”升级3.0、拓客超7,000家之后，易被读成抹香鲸的成果。源文仅将拓客超7,000家归于抹香鲸；超6,900家企业及超2,400亿元授信属于“科学评价方面”，应分开归因。\"}],\"reviewed_fact_ids\":[\"F-BS-01\",\"F-BS-02\",\"F-BS-03\",\"F-BS-04\",\"F-BS-05\",\"F-BS-06\",\"F-PS-01\",\"F-PS-02\",\"F-PS-03\",\"F-PS-04\",\"F-PS-05\",\"F-PS-06\",\"F-PS-07\",\"F-PS-08\",\"F-PS-09\",\"F-PS-10\",\"F-RM-01\",\"F-RM-02\",\"F-RM-03\",\"F-RM-04\",\"F-RM-05\",\"F-SM-01\",\"F-SM-02\",\"F-SM-03\",\"F-SM-04\",\"F-SM-05\",\"F-SM-07\",\"F-SM-08\",\"F-SM-09\",\"F-SM-10\",\"F-SM-11\",\"F-SM-12\",\"F-SM-13\",\"F-SM-14\",\"F-OI-01\",\"F-OI-02\",\"F-OI-03\",\"F-OI-04\",\"F-OI-05\",\"F-OI-06\",\"F-OI-07\",\"F-OI-08\",\"F-OI-09\",\"F-OI-10\",\"F-CC-01\",\"F-CC-02\",\"F-CC-03\",\"F-CC-04\",\"F-CC-05\",\"F-CC-06\",\"F-CC-07\",\"F-CC-08\",\"F-CC-09\",\"F-CC-10\",\"F-OD-01\",\"F-OD-02\",\"F-OD-03\",\"F-OD-04\",\"F-OD-05\",\"F-OD-06\",\"F-OD-07\",\"F-OD-08\",\"F-MC-01\",\"F-MC-02\",\"F-MC-03\",\"F-MC-04\",\"F-MC-05\",\"F-MC-06\",\"F-MC-07\",\"F-MC-08\",\"F-MC-09\",\"F-MC-10\",\"F-SC-P-01\",\"F-SC-U-01\",\"F-SC-U-02\",\"F-SC-D-01\",\"F-SC-D-02\",\"F-SC-D-03\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "WR-001",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0004",
+            "source-0015"
+          ],
+          "explanation": "源文两处披露报告期末科技金融贷款规模（中国人民银行统计口径）为10,470.92亿元，并称服务科技企业超25.6万户。该余额是“五大赛道”中科技金融的主要规模，与已收录的普惠两增贷款、在线供应链业务量、跨境贷款及财资管理规模同级，但草稿未收录。已有“五大拳头产品提供超1,400亿元融资”口径不同，不能替代该贷款规模。"
+        },
+        {
+          "finding_id": "WR-002",
+          "element": "revenue_model",
+          "severity": "minor",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "源文在同一经营效益段落披露归属于母公司股东的扣除非经常性损益的净利润501.44亿元，同比增加59.37亿元，增长13.43%。草稿已收录营业收入、利润总额和归母净利润500.17亿元（增长10.52%），但未收录该扣非调整后利润；两口径金额接近，增速并不相同。"
+        },
+        {
+          "finding_id": "WR-003",
+          "element": "operations_and_inputs",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F-OI-04",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "F-OI-04把“助力超6,900家企业获得超2,400亿元授信”接在科技金融数智平台“抹香鲸”升级3.0、拓客超7,000家之后，易被读成抹香鲸的成果。源文仅将拓客超7,000家归于抹香鲸；超6,900家企业及超2,400亿元授信属于“科学评价方面”，应分开归因。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-BS-03",
+        "F-BS-04",
+        "F-BS-05",
+        "F-BS-06",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-PS-04",
+        "F-PS-05",
+        "F-PS-06",
+        "F-PS-07",
+        "F-PS-08",
+        "F-PS-09",
+        "F-PS-10",
+        "F-RM-01",
+        "F-RM-02",
+        "F-RM-03",
+        "F-RM-04",
+        "F-RM-05",
+        "F-SM-01",
+        "F-SM-02",
+        "F-SM-03",
+        "F-SM-04",
+        "F-SM-05",
+        "F-SM-07",
+        "F-SM-08",
+        "F-SM-09",
+        "F-SM-10",
+        "F-SM-11",
+        "F-SM-12",
+        "F-SM-13",
+        "F-SM-14",
+        "F-OI-01",
+        "F-OI-02",
+        "F-OI-03",
+        "F-OI-04",
+        "F-OI-05",
+        "F-OI-06",
+        "F-OI-07",
+        "F-OI-08",
+        "F-OI-09",
+        "F-OI-10",
+        "F-CC-01",
+        "F-CC-02",
+        "F-CC-03",
+        "F-CC-04",
+        "F-CC-05",
+        "F-CC-06",
+        "F-CC-07",
+        "F-CC-08",
+        "F-CC-09",
+        "F-CC-10",
+        "F-OD-01",
+        "F-OD-02",
+        "F-OD-03",
+        "F-OD-04",
+        "F-OD-05",
+        "F-OD-06",
+        "F-OD-07",
+        "F-OD-08",
+        "F-MC-01",
+        "F-MC-02",
+        "F-MC-03",
+        "F-MC-04",
+        "F-MC-05",
+        "F-MC-06",
+        "F-MC-07",
+        "F-MC-08",
+        "F-MC-09",
+        "F-MC-10",
+        "F-SC-P-01",
+        "F-SC-U-01",
+        "F-SC-U-02",
+        "F-SC-D-01",
+        "F-SC-D-02",
+        "F-SC-D-03"
+      ]
+    },
+    "usage": {
+      "input_tokens": 33372,
+      "output_tokens": 976,
+      "total_tokens": 68257
+    }
+  },
+  {
+    "request_id": "bp-work-ec4ad75ad504bf94c0587f88:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "36cab97fe8dee44c8336cacd0c1a248edbbee560eda25a82450ebf4a73fc497a",
+    "response_hash": "06a2292497eea5f32ecb0c328761a2736bffd31c526d8edcbbc8b861d11d735e",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:WR-001\",\"text\":\"报告期末，公司科技金融贷款规模（中国人民银行统计口径）10,470.92亿元，服务科技企业超25.6万户。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0015\"],\"metrics\":[{\"name\":\"科技金融贷款规模（中国人民银行统计口径）\",\"raw_value\":\"10,470.92\",\"value\":\"10470.92\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"period\":\"2025年末\",\"subject_scope\":\"issuer\",\"qualifier\":\"exact\",\"source_unit\":\"亿元\"},{\"name\":\"服务科技企业户数\",\"raw_value\":\"超25.6\",\"value\":\"25.6\",\"unit\":\"万户\",\"period\":\"2025年末\",\"subject_scope\":\"issuer\",\"qualifier\":\"greater_than\",\"source_unit\":\"万户\"}],\"uncertainty_reason\":null},{\"fact_id\":\"F-OI-04\",\"text\":\"公司强化数智技术赋能：科技金融数智平台“抹香鲸”升级3.0，集成商机分析、营销追踪、产品测额等功能，拓客超7,000家企业；科学评价方面，助力超6,900家企业获得超2,400亿元授信。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "review-add:WR-001",
+          "text": "报告期末，公司科技金融贷款规模（中国人民银行统计口径）10,470.92亿元，服务科技企业超25.6万户。",
+          "subject_scope": "issuer",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004",
+            "source-0015"
+          ],
+          "metrics": [
+            {
+              "name": "科技金融贷款规模（中国人民银行统计口径）",
+              "raw_value": "10,470.92",
+              "value": "10470.92",
+              "unit": "亿元",
+              "currency": "CNY",
+              "period": "2025年末",
+              "subject_scope": "issuer",
+              "qualifier": "exact",
+              "source_unit": "亿元"
+            },
+            {
+              "name": "服务科技企业户数",
+              "raw_value": "超25.6",
+              "value": "25.6",
+              "unit": "万户",
+              "period": "2025年末",
+              "subject_scope": "issuer",
+              "qualifier": "greater_than",
+              "source_unit": "万户"
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F-OI-04",
+          "text": "公司强化数智技术赋能：科技金融数智平台“抹香鲸”升级3.0，集成商机分析、营销追踪、产品测额等功能，拓客超7,000家企业；科学评价方面，助力超6,900家企业获得超2,400亿元授信。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 17648,
+      "output_tokens": 314,
+      "total_tokens": 17962
+    }
+  },
+  {
+    "request_id": "bp-work-ec4ad75ad504bf94c0587f88:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "510caf2acfeee168bcf093c530fdb18e0bec0eaa801eef2b3d3a9ee2bff8ae18",
+    "response_hash": "c15b3a13514184605625268a2c48ef8284ea8e75af0d142b1c1ae74dc390f272",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"review-add:WR-001\",\"F-OI-04\"],\"checks\":[{\"fact_id\":\"review-add:WR-001\",\"accepted\":true,\"evidence_ids\":[\"source-0004\",\"source-0015\"],\"explanation\":\"接受。该补录实质补上遗漏，且与source-0004、source-0015一致：报告期末公司科技金融贷款规模（中国人民银行统计口径）为10,470.92亿元，服务科技企业超25.6万户。主体为公司而非本集团，时点为报告期末，亿元单位、央行统计口径及“超”的大于限定均保留；未用五大拳头产品超1,400亿元融资口径替代该贷款规模。\"},{\"fact_id\":\"F-OI-04\",\"accepted\":false,\"evidence_ids\":[\"source-0004\"],\"explanation\":\"不接受。正文虽将拓客超7,000家归于抹香鲸，并将助力超6,900家企业获得超2,400亿元授信分开归于“科学评价方面”，方向上分开了归因且保留“超”，但subject_scope标为consolidated_group。source-0004该段属于公司科技金融叙述，明确以“公司”为主语，并未表述为本集团口径；同页贷款规模与服务户数亦以公司披露。合并集团主体与源文不符，不能仅因数字可定位或事实编号相同而接受。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "review-add:WR-001",
+        "F-OI-04"
+      ],
+      "checks": [
+        {
+          "fact_id": "review-add:WR-001",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0004",
+            "source-0015"
+          ],
+          "explanation": "接受。该补录实质补上遗漏，且与source-0004、source-0015一致：报告期末公司科技金融贷款规模（中国人民银行统计口径）为10,470.92亿元，服务科技企业超25.6万户。主体为公司而非本集团，时点为报告期末，亿元单位、央行统计口径及“超”的大于限定均保留；未用五大拳头产品超1,400亿元融资口径替代该贷款规模。"
+        },
+        {
+          "fact_id": "F-OI-04",
+          "accepted": false,
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "不接受。正文虽将拓客超7,000家归于抹香鲸，并将助力超6,900家企业获得超2,400亿元授信分开归于“科学评价方面”，方向上分开了归因且保留“超”，但subject_scope标为consolidated_group。source-0004该段属于公司科技金融叙述，明确以“公司”为主语，并未表述为本集团口径；同页贷款规模与服务户数亦以公司披露。合并集团主体与源文不符，不能仅因数字可定位或事实编号相同而接受。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 21319,
+      "output_tokens": 318,
+      "total_tokens": 37846
+    }
+  }
+]

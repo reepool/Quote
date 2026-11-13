@@ -1,0 +1,268 @@
+[
+  {
+    "request_id": "bp-work-366ea6230cb2e96004576da5:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "7f917c48940f0da7e37edb0da815a94b1b8356a4b7decf9c37fd59b47c487d77",
+    "response_hash": "1b68fe3eaa3962f4c5a19c5f8a1da24c82b9164b988f56690c089f59b89a7e7e",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"F001\",\"F002\",\"F003\",\"F004\",\"F005\",\"F006\",\"F007\",\"F008\",\"F009\",\"F010\",\"F011\",\"F012\",\"F013\",\"F014\",\"F015\",\"F016\",\"F017\",\"F018\",\"F019\",\"F020\",\"F021\",\"F022\",\"F023\",\"F024\",\"F025\",\"F026\",\"F027\",\"F028\",\"F029\",\"F030\",\"F031\",\"F032\",\"F033\",\"F034\",\"F035\",\"F036\",\"F039\",\"F040\",\"F041\",\"F042\",\"F043\",\"F044\",\"F045\",\"F046\",\"F047\",\"F048\",\"F049\",\"F050\",\"F051\"],\"findings\":[{\"finding_id\":\"Q001\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0010\"],\"explanation\":\"主营业务分板块及分地区表已给出主要收入调整，但草稿只保留2025年绝对额，并仅以“一定下降”概括。源表合计主营业务收入由1,669,062.84万元降至1,497,009.55万元，收入比上年增减为-172,053.28万元；公共安全增加60,481.61万元，数智产业减少118,490.59万元，智慧能源减少83,746.45万元。国内市场减少237,197.98万元；国际市场增加65,144.69万元，与已记录的海外增长6.51亿元相符，但国内减少额未进入草稿。同期主营业务毛利率由24.31%至26.50%，表内增减2.19%，数智产业由32.73%至46.67%、表内增减13.94%，均为百分点差额而非相对增长率，且不得替换叙事中的整体毛利率提升2.35个百分点。F016、F017的本期金额本身与2025年栏目一致，本项只标记缺失的主要收入与毛利率调整。\"},{\"finding_id\":\"Q002\",\"element\":\"upstream_inputs\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"quarantine\",\"affected_fact_id\":\"F048\",\"evidence_ids\":[\"source-0017\"],\"explanation\":\"F048末句断言“报告未按产业板块披露具体原材料或能源采购构成”。所供材料只是选定章节，source-0017仅有前五名供应商采购额89,780.00万元、占年度采购总额8.16%，以及前五名中的关联方采购额31,805.83万元、占年度采购总额2.89%。这些金额与口径相符，但不能把未选入文本写成整份报告未披露；缺失文本属于未知，而非已证实的未披露。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "F001",
+        "F002",
+        "F003",
+        "F004",
+        "F005",
+        "F006",
+        "F007",
+        "F008",
+        "F009",
+        "F010",
+        "F011",
+        "F012",
+        "F013",
+        "F014",
+        "F015",
+        "F016",
+        "F017",
+        "F018",
+        "F019",
+        "F020",
+        "F021",
+        "F022",
+        "F023",
+        "F024",
+        "F025",
+        "F026",
+        "F027",
+        "F028",
+        "F029",
+        "F030",
+        "F031",
+        "F032",
+        "F033",
+        "F034",
+        "F035",
+        "F036",
+        "F039",
+        "F040",
+        "F041",
+        "F042",
+        "F043",
+        "F044",
+        "F045",
+        "F046",
+        "F047",
+        "F048",
+        "F049",
+        "F050",
+        "F051"
+      ],
+      "findings": [
+        {
+          "finding_id": "Q001",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "explanation": "主营业务分板块及分地区表已给出主要收入调整，但草稿只保留2025年绝对额，并仅以“一定下降”概括。源表合计主营业务收入由1,669,062.84万元降至1,497,009.55万元，收入比上年增减为-172,053.28万元；公共安全增加60,481.61万元，数智产业减少118,490.59万元，智慧能源减少83,746.45万元。国内市场减少237,197.98万元；国际市场增加65,144.69万元，与已记录的海外增长6.51亿元相符，但国内减少额未进入草稿。同期主营业务毛利率由24.31%至26.50%，表内增减2.19%，数智产业由32.73%至46.67%、表内增减13.94%，均为百分点差额而非相对增长率，且不得替换叙事中的整体毛利率提升2.35个百分点。F016、F017的本期金额本身与2025年栏目一致，本项只标记缺失的主要收入与毛利率调整。"
+        },
+        {
+          "finding_id": "Q002",
+          "element": "upstream_inputs",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "quarantine",
+          "affected_fact_id": "F048",
+          "evidence_ids": [
+            "source-0017"
+          ],
+          "explanation": "F048末句断言“报告未按产业板块披露具体原材料或能源采购构成”。所供材料只是选定章节，source-0017仅有前五名供应商采购额89,780.00万元、占年度采购总额8.16%，以及前五名中的关联方采购额31,805.83万元、占年度采购总额2.89%。这些金额与口径相符，但不能把未选入文本写成整份报告未披露；缺失文本属于未知，而非已证实的未披露。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 21234,
+      "output_tokens": 629,
+      "total_tokens": 56275
+    }
+  },
+  {
+    "request_id": "bp-work-366ea6230cb2e96004576da5:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "7135795045c6f04cf0dd416a8b71aba1294a5c2d15977052c0880ebdf6dcab6d",
+    "response_hash": "f63a15aac20cedfead6b6a2636dc1be182ebf7a628c75125e4cb704b3cb8520c",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:Q001\",\"text\":\"主营业务分板块及分地区收入变动：合计主营业务收入由2024年1,669,062.84万元降至2025年1,497,009.55万元，主营业务收入比上年增减-172,053.28万元；其中公共安全增加60,481.61万元，数智产业减少118,490.59万元，智慧能源减少83,746.45万元。分地区看，国内市场主营业务收入减少237,197.98万元，国际市场增加65,144.69万元。同期主营业务毛利率由24.31%升至26.50%，表内毛利率比上年增减2.19个百分点；数智产业毛利率由32.73%升至46.67%，表内增减13.94个百分点（均为百分点差额，非相对增长率）。上述毛利率变动不替代经营讨论中整体毛利率同比提升2.35个百分点的表述。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度（本期2025年1-12月，上年同期2024年1-12月）\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"主营业务收入合计\",\"raw_value\":\"1,497,009.55\",\"value\":\"1497009.55\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年1-12月\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\",\"comparison_basis\":\"2024年1-12月为1,669,062.84万元；主营业务收入比上年增减-172,053.28万元\"},{\"name\":\"公共安全主营业务收入比上年增减\",\"raw_value\":\"60,481.61\",\"value\":\"60481.61\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年1-12月\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"万元\",\"comparison_basis\":\"较2024年1-12月\"},{\"name\":\"数智产业主营业务收入比上年增减\",\"raw_value\":\"-118,490.59\",\"value\":\"-118490.59\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年1-12月\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"万元\",\"comparison_basis\":\"较2024年1-12月\"},{\"name\":\"智慧能源主营业务收入比上年增减\",\"raw_value\":\"-83,746.45\",\"value\":\"-83746.45\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年1-12月\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"万元\",\"comparison_basis\":\"较2024年1-12月\"},{\"name\":\"国内市场主营业务收入比上年增减\",\"raw_value\":\"-237,197.98\",\"value\":\"-237197.98\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年1-12月\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\",\"comparison_basis\":\"较2024年1-12月\"},{\"name\":\"国际市场主营业务收入比上年增减\",\"raw_value\":\"65,144.69\",\"value\":\"65144.69\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年1-12月\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\",\"comparison_basis\":\"较2024年1-12月\"},{\"name\":\"主营业务毛利率\",\"raw_value\":\"26.50%\",\"value\":\"26.50\",\"unit\":\"%\",\"currency\":\"人民币\",\"period\":\"2025年1-12月\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"2024年1-12月为24.31%；表内毛利率比上年增减2.19个百分点\"},{\"name\":\"数智产业毛利率\",\"raw_value\":\"46.67%\",\"value\":\"46.67\",\"unit\":\"%\",\"currency\":\"人民币\",\"period\":\"2025年1-12月\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"comparison_basis\":\"2024年1-12月为32.73%；表内增减13.94个百分点\"}]}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "review-add:Q001",
+          "text": "主营业务分板块及分地区收入变动：合计主营业务收入由2024年1,669,062.84万元降至2025年1,497,009.55万元，主营业务收入比上年增减-172,053.28万元；其中公共安全增加60,481.61万元，数智产业减少118,490.59万元，智慧能源减少83,746.45万元。分地区看，国内市场主营业务收入减少237,197.98万元，国际市场增加65,144.69万元。同期主营业务毛利率由24.31%升至26.50%，表内毛利率比上年增减2.19个百分点；数智产业毛利率由32.73%升至46.67%，表内增减13.94个百分点（均为百分点差额，非相对增长率）。上述毛利率变动不替代经营讨论中整体毛利率同比提升2.35个百分点的表述。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度（本期2025年1-12月，上年同期2024年1-12月）",
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "metrics": [
+            {
+              "name": "主营业务收入合计",
+              "raw_value": "1,497,009.55",
+              "value": "1497009.55",
+              "unit": "万元",
+              "currency": "人民币",
+              "period": "2025年1-12月",
+              "subject_scope": "consolidated_group",
+              "qualifier": "exact",
+              "source_unit": "万元",
+              "comparison_basis": "2024年1-12月为1,669,062.84万元；主营业务收入比上年增减-172,053.28万元"
+            },
+            {
+              "name": "公共安全主营业务收入比上年增减",
+              "raw_value": "60,481.61",
+              "value": "60481.61",
+              "unit": "万元",
+              "currency": "人民币",
+              "period": "2025年1-12月",
+              "subject_scope": "business_segment",
+              "qualifier": "exact",
+              "source_unit": "万元",
+              "comparison_basis": "较2024年1-12月"
+            },
+            {
+              "name": "数智产业主营业务收入比上年增减",
+              "raw_value": "-118,490.59",
+              "value": "-118490.59",
+              "unit": "万元",
+              "currency": "人民币",
+              "period": "2025年1-12月",
+              "subject_scope": "business_segment",
+              "qualifier": "exact",
+              "source_unit": "万元",
+              "comparison_basis": "较2024年1-12月"
+            },
+            {
+              "name": "智慧能源主营业务收入比上年增减",
+              "raw_value": "-83,746.45",
+              "value": "-83746.45",
+              "unit": "万元",
+              "currency": "人民币",
+              "period": "2025年1-12月",
+              "subject_scope": "business_segment",
+              "qualifier": "exact",
+              "source_unit": "万元",
+              "comparison_basis": "较2024年1-12月"
+            },
+            {
+              "name": "国内市场主营业务收入比上年增减",
+              "raw_value": "-237,197.98",
+              "value": "-237197.98",
+              "unit": "万元",
+              "currency": "人民币",
+              "period": "2025年1-12月",
+              "subject_scope": "consolidated_group",
+              "qualifier": "exact",
+              "source_unit": "万元",
+              "comparison_basis": "较2024年1-12月"
+            },
+            {
+              "name": "国际市场主营业务收入比上年增减",
+              "raw_value": "65,144.69",
+              "value": "65144.69",
+              "unit": "万元",
+              "currency": "人民币",
+              "period": "2025年1-12月",
+              "subject_scope": "consolidated_group",
+              "qualifier": "exact",
+              "source_unit": "万元",
+              "comparison_basis": "较2024年1-12月"
+            },
+            {
+              "name": "主营业务毛利率",
+              "raw_value": "26.50%",
+              "value": "26.50",
+              "unit": "%",
+              "currency": "人民币",
+              "period": "2025年1-12月",
+              "subject_scope": "consolidated_group",
+              "qualifier": "exact",
+              "source_unit": "%",
+              "comparison_basis": "2024年1-12月为24.31%；表内毛利率比上年增减2.19个百分点"
+            },
+            {
+              "name": "数智产业毛利率",
+              "raw_value": "46.67%",
+              "value": "46.67",
+              "unit": "%",
+              "currency": "人民币",
+              "period": "2025年1-12月",
+              "subject_scope": "business_segment",
+              "qualifier": "exact",
+              "source_unit": "%",
+              "comparison_basis": "2024年1-12月为32.73%；表内增减13.94个百分点"
+            }
+          ]
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 11439,
+      "output_tokens": 906,
+      "total_tokens": 12345
+    }
+  },
+  {
+    "request_id": "bp-work-366ea6230cb2e96004576da5:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "328952a5a0c44132665aa4aa579fece31f896a4a2ca3dabf811e2f8e04e64973",
+    "response_hash": "19e1b295b2956dab43f0997597ffefcacfa37af037a7aa6f4652c375a9762158",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"review-add:Q001\"],\"checks\":[{\"fact_id\":\"review-add:Q001\",\"accepted\":true,\"evidence_ids\":[\"source-0010\",\"source-0006\"],\"explanation\":\"该候选实质补足Q001所标主要收入与毛利率调整，主体、期间、栏目、单位和口径均与源表相符。source-0010抵销后合计主营业务收入由2024年1-12月1,669,062.84万元降至2025年1-12月1,497,009.55万元，收入比上年增减为-172,053.28万元；公共安全、数智产业、智慧能源分别取收入增减栏的60,481.61万元、-118,490.59万元、-83,746.45万元，未误用成本增减栏。分地区表中国内市场减少237,197.98万元、国际市场增加65,144.69万元，单位均为万元。合计毛利率由24.31%至26.50%、表内增减2.19%，数智产业由32.73%至46.67%、表内增减13.94%，均按百分点差额表述。source-0006所述整体毛利率同比提升2.35个百分点被明确保留，未被表内2.19个百分点替代；合计采用抵销后净额，且未抹平地区表-172,053.29万元的四舍五入差异。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "review-add:Q001"
+      ],
+      "checks": [
+        {
+          "fact_id": "review-add:Q001",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0010",
+            "source-0006"
+          ],
+          "explanation": "该候选实质补足Q001所标主要收入与毛利率调整，主体、期间、栏目、单位和口径均与源表相符。source-0010抵销后合计主营业务收入由2024年1-12月1,669,062.84万元降至2025年1-12月1,497,009.55万元，收入比上年增减为-172,053.28万元；公共安全、数智产业、智慧能源分别取收入增减栏的60,481.61万元、-118,490.59万元、-83,746.45万元，未误用成本增减栏。分地区表中国内市场减少237,197.98万元、国际市场增加65,144.69万元，单位均为万元。合计毛利率由24.31%至26.50%、表内增减2.19%，数智产业由32.73%至46.67%、表内增减13.94%，均按百分点差额表述。source-0006所述整体毛利率同比提升2.35个百分点被明确保留，未被表内2.19个百分点替代；合计采用抵销后净额，且未抹平地区表-172,053.29万元的四舍五入差异。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 15165,
+      "output_tokens": 314,
+      "total_tokens": 22069
+    }
+  }
+]

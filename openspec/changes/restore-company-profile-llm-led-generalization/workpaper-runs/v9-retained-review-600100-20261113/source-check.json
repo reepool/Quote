@@ -1,0 +1,33 @@
+{
+  "new_model_calls_in_audit": 0,
+  "all_source_coordinates_match": true,
+  "evidence_objects": 19,
+  "raw_response_and_query_hashes_match": true,
+  "old_receipts_and_results_unchanged": true,
+  "independent_facts_unchanged": 48,
+  "finite_independent_source_checks": [
+    {
+      "pages": [
+        17,
+        21
+      ],
+      "conclusion": "主营净收入2025/2024两列1497009.55/1669062.84万元，列示差额-172053.28万元；板块/国内外变化取收入差额列，抵销后总额不代营业收入总额。"
+    },
+    {
+      "pages": [
+        21
+      ],
+      "conclusion": "表内毛利率水平26.50/24.31、数智46.67/32.73，差额2.19/13.94为百分点；不替经营讨论整体2.35百分点。地区差额-172053.29万元的末位差异未强行归一。"
+    },
+    {
+      "pages": [
+        25
+      ],
+      "conclusion": "供应商集中度只能证实该表，不能证明整份报告未披露原料采购构成，含过度否定的F048保持隔离，不追加供应链精修。"
+    }
+  ],
+  "old_extraction_status_preserved": "rejected",
+  "old_content_locally_revalidated_not_new_extraction": true,
+  "whole_profile_accuracy_claim": false,
+  "production_authorization": "not_authorized"
+}

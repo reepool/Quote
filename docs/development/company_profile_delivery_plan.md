@@ -6,6 +6,8 @@
 
 ## 1. 开发者必须先理解的纠偏
 
+2026-11-13 6.BS已交[浦发78／同方49条真实复核后画像](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-retained-review-result-20261113/profiles.md)。复用原真实raw本地隔离、不重付选章/抽取，原rejected/usage保留；两家原TaskService初核/必要修订再核成立，均限用非可信发布。用户接受当前供应链粒度，不为细物料/量化补源。新6物理/214754/0恢复/unknown，不改原四类同版2/4或S1，卡结束无自动后继。下一围绕最终版本有限质量验收和12家回归就绪，不滚动两家公司补句；有效回归复用、有限源核/三读/清理已交，旧源/结果/并行保护。
+
 2026-11-13 6.BQ四类同版一次观察已结束：林海/黄山各在一个新入口内自动完成初核修订再核，跨窗补卡不再是这两家的必要前提；浦发/同方仍因局部指标格式整稿拒绝，故整组2/4不放行规模。主线取舍见[全组结果](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-four-type-result-20261113/result.md)。不再逐词修raw或补满供应链；组末只做6.BR共性局部事实隔离、37直接测试和两份保存响应零网络恢复，不能拼成4/4。后续只围绕银行/综合的实际复核消费决策，不重跑制造/服务或新增第5家，本卡真实权限用尽。原三家供应链的内容/缺口另有原事实对照；每轮清理本人库/脚本、保护正式源/旧结果/既有改动不变。
 
 2026-11-13 6.BP已交[三家现有画像总览](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-read-overview-20261113/profiles.md)：原query/export新增底稿摘要、CSV可见内容及可点读索引，研究者不再只能看到旧可信计数0；旧可信计数/门槛仍不改。实际内容直接来自原结构化事实，不另写LLM摘要，不复制全文、导入生产或重新处理公司。37相关验证及5定向复验、三读/旧hash成立，无新增模型调用；第一份旧JSON可空默认值检查失败有记录。本人两次临时根/测试输出/脚本已核归属清理，见同目录result.md；下一围绕可见业务与当前同版连续验证取舍，不补可选细节/扩平台，任何真实调用仍需新范围授权。
