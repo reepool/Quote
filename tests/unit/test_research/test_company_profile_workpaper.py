@@ -204,13 +204,34 @@ def test_unknown_section_and_unknown_evidence_are_rejected():
         bind_workpaper_draft(WorkpaperDraftResponse.model_validate(raw), report=_report(), reading_scope=packet.reading_scope, evidence=packet.evidence)
 
 
+def test_lenient_supplements_do_not_allow_missing_required_business_elements():
+    from utils.llm.schema import validate_data
+    from utils.llm.errors import LlmSchemaValidationError
+    from research.company_profile.workpaper import normalize_workpaper_draft, workpaper_draft_wire_schema
+
+    packet = build_section_packet(_report(), PAGES, index_sections(PAGES), _selection(index_sections(PAGES)))
+    raw = _draft(packet).model_dump(mode="json")
+    raw["elements"].pop("business_structure")
+    with pytest.raises(LlmSchemaValidationError, match="required"):
+        validate_data(raw, workpaper_draft_wire_schema())
+    with pytest.raises(ValueError):
+        WorkpaperDraftResponse.model_validate(normalize_workpaper_draft(raw))
+
+
 def test_metric_needs_source_number_and_source_coordinates_are_checked():
     packet = build_section_packet(_report(), PAGES, index_sections(PAGES), _selection(index_sections(PAGES)))
     raw = _draft(packet).model_dump(mode="json")
     metric = raw["elements"]["scale_and_mix"]["facts"][0]["metrics"][0]
     metric.update(raw_value="999.00", value="999.00")
+    limited = bind_workpaper_draft(WorkpaperDraftResponse.model_validate(raw), report=_report(), reading_scope=packet.reading_scope, evidence=packet.evidence)
+    assert limited.elements.business_structure.facts[0].fact_id == "main"
+    assert not limited.elements.scale_and_mix.facts
+    assert limited.elements.scale_and_mix.status == "unclear"
+    assert "absent" in limited.elements.scale_and_mix.limitations[-1]
+    invalid_retained = limited.model_dump(mode="json")
+    invalid_retained["elements"]["scale_and_mix"] = raw["elements"]["scale_and_mix"]
     with pytest.raises(ValueError, match="absent"):
-        bind_workpaper_draft(WorkpaperDraftResponse.model_validate(raw), report=_report(), reading_scope=packet.reading_scope, evidence=packet.evidence)
+        CompanyProfileWorkpaper.model_validate(invalid_retained)
     workpaper = bind_workpaper_draft(_draft(packet), report=_report(), reading_scope=packet.reading_scope, evidence=packet.evidence)
     workpaper.validate_pages(PAGES)
     with pytest.raises(ValueError, match="does not match"):
@@ -305,9 +326,11 @@ def test_uncertain_metric_and_scope_keep_original_source_without_forced_number()
     with pytest.raises(ValueError, match="null normalized"):
         WorkpaperMetric.model_validate({**metric, "value": "100.00"})
     metric["raw_value"] = "999.99"
-    with pytest.raises(ValueError, match="original wording"):
-        bind_workpaper_draft(WorkpaperDraftResponse.model_validate(raw), report=_report(),
-            reading_scope=packet.reading_scope, evidence=packet.evidence)
+    limited = bind_workpaper_draft(WorkpaperDraftResponse.model_validate(raw), report=_report(),
+        reading_scope=packet.reading_scope, evidence=packet.evidence)
+    assert not limited.elements.scale_and_mix.facts
+    assert limited.elements.business_structure.facts
+    assert "original wording" in limited.elements.scale_and_mix.limitations[-1]
 
 
 def test_known_metric_value_still_displays_uncertain_scope_and_reason():
@@ -336,7 +359,8 @@ def test_two_calls_use_sections_and_direct_structured_content_without_old_invent
 
 
 @pytest.mark.parametrize("uncertain", [False, True])
-def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_replaced(uncertain):
+@pytest.mark.parametrize("container_error", [False, True])
+def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_replaced(uncertain, container_error):
     import asyncio
 
     from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
@@ -352,6 +376,9 @@ def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_repla
         fact = raw["elements"]["scale_and_mix"]["facts"][0]
         fact.update(subject_scope="unclear", uncertainty_reason="保留原文口径")
         fact["metrics"][0].update(value=None, unit=None, uncertainty_reason="不强制数值标准化")
+    if container_error:
+        raw["elements"]["extra_operating_note"] = {"text": "未归类字段，不能冒充已支持的要素"}
+        raw["supply_chain"] = {"unrecognized_position": "结构错误的可选信息，不得采用"}
     transport = ScriptedTransport([
         {**_response(selection.model_dump(mode="json")), "model": "navigator-v1"},
         {**_response(raw), "model": "reader-v2"},
@@ -368,7 +395,15 @@ def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_repla
             provider=provider, work_id="wire-fixture",
         )
         assert result.workpaper.origin == "controlled_fixture"
-        assert result.workpaper.supply_chain.position.facts
+        if container_error:
+            assert result.workpaper.supply_chain is None
+            assert any("未归类" in s for s in result.workpaper.limitations)
+            assert any("供应链结构" in s for s in result.workpaper.limitations)
+            retained = result.receipts[-1]["response_payload"]
+            assert "extra_operating_note" in retained["elements"]
+            assert "unrecognized_position" in retained["supply_chain"]
+        else:
+            assert result.workpaper.supply_chain.position.facts
         assert result.workpaper.generation.selection.model == "navigator-v1"
         assert result.workpaper.generation.extraction.model == "reader-v2"
         assert result.workpaper.generation.extraction.contract_status == "accepted"

@@ -1,0 +1,42 @@
+[
+  {
+    "request_id": "bp-work-6a72348f0f28f1d4645a497a:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "352ae455e66afe2d809841440f3c8867ff1799632e496c1a40b6e6b740055b16",
+    "response_hash": "dcd0c139c63b043f1d322f516fd7d3384c7cb629c497a1469b4b078f3278e9d6",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0036\",\"section-0044\",\"section-0052\",\"section-0059\",\"section-0061\",\"section-0124\",\"section-0125\",\"section-0126\"],\"rationale\":\"所选章节覆盖公司业务结构（景区、索道缆车、酒店、徽菜、旅行社、智慧旅游六大板块）、经营模式与资源禀赋、报告期经营情况讨论、主营业务收入成本分析（板块收入与毛利构成）、核心竞争力，以及行业格局趋势与公司发展战略，可完整回答“做什么、怎么经营、规模与收入结构、经营因素与变化”等核心问题。未选财务报告附注与治理、分红、股东等章节，因与业务经营解释关联度低。\",\"deferred\":[\"section-0058 报告期内主要经营情况：其核心子节已选，父节不再重复选取以避免父子重叠\",\"section-0127至section-0135 经营计划细项：属未来计划性表述，非本期实际经营变化，暂不纳入\",\"section-1180 分部信息：主营业务分析已提供板块收入成本，暂不补充\",\"section-0352 财务报告及附注：仅在有实质缺口时定向补充，当前无需整章阅读\"],\"stop_reason\":\"已覆盖业务结构、产品服务、经营模式、收入成本构成、核心竞争力与行业趋势等主要信息，可支撑业务经营层面的完整解释；剩余为治理、分红、股东及财务附注等非业务核心内容，停止选取。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0036",
+        "section-0044",
+        "section-0052",
+        "section-0059",
+        "section-0061",
+        "section-0124",
+        "section-0125",
+        "section-0126"
+      ],
+      "rationale": "所选章节覆盖公司业务结构（景区、索道缆车、酒店、徽菜、旅行社、智慧旅游六大板块）、经营模式与资源禀赋、报告期经营情况讨论、主营业务收入成本分析（板块收入与毛利构成）、核心竞争力，以及行业格局趋势与公司发展战略，可完整回答“做什么、怎么经营、规模与收入结构、经营因素与变化”等核心问题。未选财务报告附注与治理、分红、股东等章节，因与业务经营解释关联度低。",
+      "deferred": [
+        "section-0058 报告期内主要经营情况：其核心子节已选，父节不再重复选取以避免父子重叠",
+        "section-0127至section-0135 经营计划细项：属未来计划性表述，非本期实际经营变化，暂不纳入",
+        "section-1180 分部信息：主营业务分析已提供板块收入成本，暂不补充",
+        "section-0352 财务报告及附注：仅在有实质缺口时定向补充，当前无需整章阅读"
+      ],
+      "stop_reason": "已覆盖业务结构、产品服务、经营模式、收入成本构成、核心竞争力与行业趋势等主要信息，可支撑业务经营层面的完整解释；剩余为治理、分红、股东及财务附注等非业务核心内容，停止选取。"
+    },
+    "usage": {
+      "input_tokens": 21136,
+      "output_tokens": 323,
+      "total_tokens": 21459
+    }
+  }
+]

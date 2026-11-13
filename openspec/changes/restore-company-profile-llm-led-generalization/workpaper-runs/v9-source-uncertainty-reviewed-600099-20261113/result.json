@@ -1,0 +1,13 @@
+{
+  "run_id": "v9-source-uncertainty-reviewed-600099-20261113",
+  "name": "林海股份",
+  "mode": "fresh_known_report_development",
+  "old_semantics_loaded": false,
+  "production_authorization": "not_authorized",
+  "preparation_seconds": 34.812,
+  "task_state": "incomplete",
+  "business_seconds": 62.526,
+  "three_reads_equal": true,
+  "query_sha256": "7d0fc6b7cd9e07f9d0caa5ffa1996c514ae5ff7fc9bb53da86d6d1f25955c993",
+  "profile_count": 0
+}

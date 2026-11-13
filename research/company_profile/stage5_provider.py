@@ -4200,6 +4200,13 @@ class CommonGatewaySemanticProvider:
         ):
             raise ValueError("workpaper execution authorization is required")
         encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True)
+        wire_schema = response_model.model_json_schema()
+        normalizer = lambda data: data
+        if purpose == "extract_profile_workpaper":
+            from .workpaper import normalize_workpaper_draft, workpaper_draft_wire_schema
+
+            wire_schema = workpaper_draft_wire_schema()
+            normalizer = normalize_workpaper_draft
         return self._execute(
             call_type="verify" if purpose in {"review_profile_workpaper", "verify_profile_workpaper_repair"} else "extract",
             semantic_request_id=request_id,
@@ -4215,8 +4222,8 @@ class CommonGatewaySemanticProvider:
             response_model=response_model,
             schema_name=purpose,
             schema_version="company_profile_workpaper_wire.v1",
-            model_schema=response_model.model_json_schema(),
-            normalize_response=lambda data: data,
+            model_schema=wire_schema,
+            normalize_response=normalizer,
             include_page_contexts=False,
             system_instruction_override=instructions,
             profile_override=profile_override,

@@ -1,0 +1,16 @@
+{
+  "mode": "saved_real_response_zero_call_diagnostic",
+  "original_run": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-source-uncertainty-reviewed-600099-20261113",
+  "original_receipts_sha256": "3204b6db4c89bd15487b4ca2849107816dc5d9f154b4bfefc961bbe7c3bc96a0",
+  "new_model_calls": 0,
+  "retained_fact_count": 56,
+  "isolated": [
+    "事实OD-01已隔离，未作为结论采用：metric number is absent from cited source: 森林消防机械板块销售收入同比变动"
+  ],
+  "three_reads_equal": true,
+  "profile_sha256": "96f095e6e351df58a47e4c329222dd5535be00b6813eacf10a0a65050023213d",
+  "review_status": "not_performed",
+  "source_coordinates_checked": true,
+  "binding_code_sha256": "f09e0ea331ec11afa0560a3b8fac1b736fd9f11881d81f8e562cb4a4cf1e8c04",
+  "note": "Original 6.BJ failed entry unchanged. Local binding fix after all 3 real entries ended; no new semantic response."
+}

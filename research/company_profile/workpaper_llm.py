@@ -17,7 +17,7 @@ from .workpaper_sections import (
     extract_selected_layout, index_sections, selected_pages,
 )
 
-WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-13.sourced-uncertainty.v8"
+WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-13.local-failure-isolation.v9"
 SECTION_GUIDE_VERSION = "company_profile_section_guide.2026-11-12.v1"
 SECTION_GUIDE = (
     {"questions": "做什么、产品/服务用途、怎么经营", "sources": "主要业务/经营模式/核心竞争力/业务回顾的实质子节", "priority": "primary"},

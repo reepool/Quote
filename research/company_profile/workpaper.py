@@ -11,7 +11,7 @@ from collections.abc import Mapping, Sequence
 from decimal import Decimal, InvalidOperation
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from .models import Evidence, ReportIdentity, TextAnchor
 
@@ -411,6 +411,38 @@ class WorkpaperDraftResponse(_Model):
     supply_chain: WorkpaperSupplyChain | None = None
 
 
+def workpaper_draft_wire_schema() -> dict:
+    """Keep required business fields typed, without losing optional/raw extras."""
+    schema = WorkpaperDraftResponse.model_json_schema()
+    schema["$defs"]["WorkpaperElements"]["additionalProperties"] = True
+    # Preserve the intended shape as a model hint; malformed optional content
+    # must reach the adapter receipt before it is locally withheld.
+    schema["properties"]["supply_chain"]["anyOf"].append({})
+    return schema
+
+
+def normalize_workpaper_draft(data):
+    """Isolate the two observed container failures; never invent required facts."""
+    if not isinstance(data, Mapping):
+        return data
+    payload = dict(data)
+    limitations = list(payload.get("limitations") or ())
+    elements = payload.get("elements")
+    if isinstance(elements, Mapping):
+        unknown = set(elements) - ELEMENT_LABELS.keys()
+        if unknown:
+            payload["elements"] = {k: v for k, v in elements.items() if k in ELEMENT_LABELS}
+            limitations.append("未归类要素字段未作结论采用，原内容保留在模型回执：" + "、".join(sorted(unknown)))
+    if payload.get("supply_chain") is not None:
+        try:
+            WorkpaperSupplyChain.model_validate(payload["supply_chain"])
+        except (ValidationError, ValueError, TypeError):
+            payload["supply_chain"] = None
+            limitations.append("可选供应链结构无法解析，未作为结论采用；原内容保留在模型回执。")
+    payload["limitations"] = limitations
+    return payload
+
+
 def bind_workpaper_draft(
     response: WorkpaperDraftResponse,
     *,
@@ -426,6 +458,27 @@ def bind_workpaper_draft(
         for fact in getattr(response.elements, name).facts:
             if set(fact.evidence_ids) - allowed:
                 raise ValueError(f"model cited evidence outside the supplied packet: {fact.fact_id}")
+    # A bad metric must not erase the other business content already returned.
+    # Withhold the entire affected fact rather than guessing its sign/unit or
+    # retaining a possibly wrong number in the narrative without its metric.
+    sources = {item.evidence_id: item for item in evidence}
+    cleaned_elements = {}
+    for name in ELEMENT_LABELS:
+        element = getattr(response.elements, name)
+        kept, rejected = [], []
+        for fact in element.facts:
+            try:
+                _check_fact_source(fact, sources)
+            except ValueError as exc:
+                rejected.append(f"事实{fact.fact_id}已隔离，未作为结论采用：{exc}")
+                continue
+            kept.append(fact)
+        cleaned_elements[name] = element.model_copy(update={
+            "facts": tuple(kept),
+            "status": "unclear" if rejected and not kept else element.status,
+            "limitations": (*element.limitations, *rejected),
+        })
+    elements = response.elements.model_copy(update=cleaned_elements)
     supply_chain = response.supply_chain
     if supply_chain is not None:
         sources = {item.evidence_id: item for item in evidence}
@@ -454,7 +507,7 @@ def bind_workpaper_draft(
         origin=origin,
         report=report,
         reading_scope=reading_scope,
-        elements=response.elements,
+        elements=elements,
         evidence=tuple(evidence),
         limitations=response.limitations,
         supply_chain=supply_chain,

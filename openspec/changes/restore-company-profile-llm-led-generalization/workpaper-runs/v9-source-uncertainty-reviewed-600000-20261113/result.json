@@ -1,0 +1,13 @@
+{
+  "run_id": "v9-source-uncertainty-reviewed-600000-20261113",
+  "name": "浦发银行",
+  "mode": "fresh_known_report_development",
+  "old_semantics_loaded": false,
+  "production_authorization": "not_authorized",
+  "preparation_seconds": 35.211,
+  "task_state": "incomplete",
+  "business_seconds": 86.704,
+  "three_reads_equal": true,
+  "query_sha256": "fa299b74f22b340ee717b6c001fcebfc5583b6691bb4c4d03fae1567607a7dd0",
+  "profile_count": 0
+}

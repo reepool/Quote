@@ -1,0 +1,13 @@
+{
+  "run_id": "v9-source-uncertainty-reviewed-600054-20261113",
+  "name": "黄山旅游",
+  "mode": "fresh_known_report_development",
+  "old_semantics_loaded": false,
+  "production_authorization": "not_authorized",
+  "preparation_seconds": 35.108,
+  "task_state": "incomplete",
+  "business_seconds": 98.593,
+  "three_reads_equal": true,
+  "query_sha256": "ddc57d7e92622bf3d794aaab1fd10c4f39ce4c80f7da5791a06b2ab968bde098",
+  "profile_count": 0
+}

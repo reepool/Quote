@@ -1,0 +1,76 @@
+[
+  {
+    "call_type": "extract",
+    "semantic_request_id": "bp-work-52fb37468784c2c1e055f94d:workpaper:sections",
+    "gateway_request_id": "239eec8e5bf84dccac77d95ed1275adb",
+    "status": "success",
+    "profile": "semantic_extraction__deepseek",
+    "provider": "openai_compatible",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "source_label": "deepseek:deepseek-flash",
+    "failover_count": 0,
+    "attempts": [
+      {
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "attempt_sequence": 1,
+        "request_id": "239eec8e5bf84dccac77d95ed1275adb",
+        "provider_request_id": "9c5dae13-b2da-46be-a604-78eceb318c37",
+        "status": "success",
+        "attempt_count": 1,
+        "latency_ms": 4122
+      }
+    ],
+    "response_hash": "d8a734720cdf866920911dff6164beff2f503e77ffd867cfcd60d27100627df1",
+    "latency_ms": 4122,
+    "input_tokens": 19529,
+    "output_tokens": 331,
+    "total_tokens": 19860,
+    "warnings": [],
+    "rejected_extract_items": [],
+    "error_code": null,
+    "error_detail": null,
+    "parent_semantic_request_id": null,
+    "partition_index": null,
+    "partition_count": null
+  },
+  {
+    "call_type": "extract",
+    "semantic_request_id": "bp-work-52fb37468784c2c1e055f94d:workpaper:extract",
+    "gateway_request_id": "ccdeaf944d0a4bb6bbe5ec817dcccdd9",
+    "status": "success",
+    "profile": "semantic_extraction__deepseek",
+    "provider": "openai_compatible",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "source_label": "deepseek:deepseek-flash",
+    "failover_count": 0,
+    "attempts": [
+      {
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "attempt_sequence": 1,
+        "request_id": "ccdeaf944d0a4bb6bbe5ec817dcccdd9",
+        "provider_request_id": "7e2b0071-78dd-41c6-a142-5d89f24dd922",
+        "status": "success",
+        "attempt_count": 1,
+        "latency_ms": 29601
+      }
+    ],
+    "response_hash": "5983b09722ffb9cd409279996b3480e38e1e9d0398bb19a6f41d8e73ba6c7ab9",
+    "latency_ms": 29601,
+    "input_tokens": 16080,
+    "output_tokens": 8837,
+    "total_tokens": 24917,
+    "warnings": [],
+    "rejected_extract_items": [],
+    "error_code": null,
+    "error_detail": null,
+    "parent_semantic_request_id": null,
+    "partition_index": null,
+    "partition_count": null
+  }
+]

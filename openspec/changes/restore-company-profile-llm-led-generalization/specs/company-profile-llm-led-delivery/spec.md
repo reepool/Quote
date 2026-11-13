@@ -15,6 +15,16 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 - **THEN** review may complete with that content still uncertain and need not request a deterministic replacement
 - **AND** a wrong amount or unsupported company attribution is not approved merely because the draft adds an uncertainty label
 
+#### Scenario: One returned metric cannot be located in its cited source
+- **WHEN** an otherwise schema-valid extraction contains one fact whose metric number or unnormalized raw wording is not present in the supplied evidence
+- **THEN** binding MUST withhold that fact, record its identity and concrete limitation, and retain independently valid facts in the same workpaper
+- **AND** direct workpaper validation still rejects invalid retained facts, unknown source identities remain rejected, and this local isolation does not authorize a new paid entry or rewrite the original failed run
+
+#### Scenario: Supplementary container formatting is invalid
+- **WHEN** the extraction includes unknown keys beside the eight required elements or a malformed optional supply-chain container
+- **THEN** the wire contract MUST permit retaining that original response, and the application adapter MUST withhold the unknown/invalid portion with an explicit limitation before typed binding
+- **AND** required business fields, evidence identities and metric validation remain enforced; neither discarded content nor a preserved raw response counts as a supported conclusion
+
 ### Requirement: Metric standardization preserves source meaning and audit history
 New workpaper binding and repaired projections MUST clear currency on dimensionless ratios. A rate difference expressed as percentage points MUST remain distinct from relative percentage growth. Standardization MAY retain a source_unit beside the normalized unit, MUST preserve the raw source spelling and decimal value, and MUST leave an auditable note. It MUST NOT guess currency conversions, magnitudes, subject scope or rate-change meaning from a bare number. Historical workpaper files MUST NOT be rewritten by reading them.
 
