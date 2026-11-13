@@ -1,0 +1,89 @@
+[
+  {
+    "request_id": "bp-work-90fb5f0487ac4e1c85bf4e2d:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "db16cdcd546b3dfd2b6375d05957f2f3d69961b374bab93dba59fc3fa1a10616",
+    "response_hash": "8f11956daab067e0472a861b2a30fd46dffcee2d43e4ed7a9829a8f6e9066c53",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F-MC-01\",\"F-OI-03\",\"F-SC-U1\",\"F-PS-04\",\"review-add:FND-006\",\"review-add:FND-007\"],\"checks\":[{\"fact_id\":\"F-MC-01\",\"accepted\":true,\"evidence_ids\":[\"source-0018\",\"source-0021\"],\"explanation\":\"原文仅分别对“本期公司业务类型、利润构成或利润来源发生重大变动的详细说明”和“报告期内业务、产品或服务发生重大变化或调整有关情况”勾选不适用。候选事实只复述两项披露标题及勾选结果，未把或列示事项改写成相应变动均未发生，主体、期间和证据范围正确。\"},{\"fact_id\":\"F-OI-03\",\"accepted\":true,\"evidence_ids\":[\"source-0010\",\"source-0011\"],\"explanation\":\"原文将引入第二厂家11家、推动关键物料采购成本下降及两项核心零部件国产化替代，明确写在“农业机械板块成本管控成效尤为显著”之下。候选事实已限定为农业机械板块，数量、措施和期间均与原文一致，未再扩成未限定的公司整体措施。\"},{\"fact_id\":\"F-SC-U1\",\"accepted\":true,\"evidence_ids\":[\"source-0019\",\"source-0020\",\"source-0010\",\"source-0011\"],\"explanation\":\"分行业成本表中原材料占总成本比例分别为特种车辆93.11%、农业机械96.72%、森林消防机械98.25%、摩托车94.92%，各行业成本小计亦与对应营业成本一致。后半句已明确限定为农业机械板块引入第二厂家11家并实现两项核心零部件国产化替代，纠正了原主体过宽问题。\"},{\"fact_id\":\"F-PS-04\",\"accepted\":true,\"evidence_ids\":[\"source-0005\",\"source-0003\"],\"explanation\":\"原文称公司摩托车产品“主要是”中等排量的二轮燃油摩托车，产品介绍另载明摩托车系列环保标准达到国Ⅳ、出口型号达到欧五+。候选事实恢复“主要是”限定，排放标准未超出产品介绍，已纠正删除限定后的过度断言。\"},{\"fact_id\":\"review-add:FND-006\",\"accepted\":true,\"evidence_ids\":[\"source-0018\"],\"explanation\":\"主营业务分行业、分地区表的“毛利率比上年增减”列分别为特种车辆减少0.82个百分点、农业机械减少1.92个百分点、森林消防机械增加4.75个百分点、摩托车增加9.13个百分点、国内市场减少0.24个百分点、国外市场增加2.60个百分点。候选事实的主体、2025年度同比口径、增减方向和百分点单位均与该列一致，补上原遗漏且未误作相对增长率。\"},{\"fact_id\":\"review-add:FND-007\",\"accepted\":true,\"evidence_ids\":[\"source-0019\",\"source-0018\"],\"explanation\":\"产销量表显示森林消防机械生产量、销售量同比分别增加104.99%、86.11%，说明主要因风力灭火机、油锯等按市场订单增加；分行业表显示该行业营业收入同比下降27.38%，说明主要因全地形消防车等消防产品销售减少。候选事实分别保留两类产品口径和百分比变动，补上产销量上升原因，且未把收入下降与产销量上升混为同一原因。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F-MC-01",
+        "F-OI-03",
+        "F-SC-U1",
+        "F-PS-04",
+        "review-add:FND-006",
+        "review-add:FND-007"
+      ],
+      "checks": [
+        {
+          "fact_id": "F-MC-01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0018",
+            "source-0021"
+          ],
+          "explanation": "原文仅分别对“本期公司业务类型、利润构成或利润来源发生重大变动的详细说明”和“报告期内业务、产品或服务发生重大变化或调整有关情况”勾选不适用。候选事实只复述两项披露标题及勾选结果，未把或列示事项改写成相应变动均未发生，主体、期间和证据范围正确。"
+        },
+        {
+          "fact_id": "F-OI-03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0010",
+            "source-0011"
+          ],
+          "explanation": "原文将引入第二厂家11家、推动关键物料采购成本下降及两项核心零部件国产化替代，明确写在“农业机械板块成本管控成效尤为显著”之下。候选事实已限定为农业机械板块，数量、措施和期间均与原文一致，未再扩成未限定的公司整体措施。"
+        },
+        {
+          "fact_id": "F-SC-U1",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0019",
+            "source-0020",
+            "source-0010",
+            "source-0011"
+          ],
+          "explanation": "分行业成本表中原材料占总成本比例分别为特种车辆93.11%、农业机械96.72%、森林消防机械98.25%、摩托车94.92%，各行业成本小计亦与对应营业成本一致。后半句已明确限定为农业机械板块引入第二厂家11家并实现两项核心零部件国产化替代，纠正了原主体过宽问题。"
+        },
+        {
+          "fact_id": "F-PS-04",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0005",
+            "source-0003"
+          ],
+          "explanation": "原文称公司摩托车产品“主要是”中等排量的二轮燃油摩托车，产品介绍另载明摩托车系列环保标准达到国Ⅳ、出口型号达到欧五+。候选事实恢复“主要是”限定，排放标准未超出产品介绍，已纠正删除限定后的过度断言。"
+        },
+        {
+          "fact_id": "review-add:FND-006",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0018"
+          ],
+          "explanation": "主营业务分行业、分地区表的“毛利率比上年增减”列分别为特种车辆减少0.82个百分点、农业机械减少1.92个百分点、森林消防机械增加4.75个百分点、摩托车增加9.13个百分点、国内市场减少0.24个百分点、国外市场增加2.60个百分点。候选事实的主体、2025年度同比口径、增减方向和百分点单位均与该列一致，补上原遗漏且未误作相对增长率。"
+        },
+        {
+          "fact_id": "review-add:FND-007",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0019",
+            "source-0018"
+          ],
+          "explanation": "产销量表显示森林消防机械生产量、销售量同比分别增加104.99%、86.11%，说明主要因风力灭火机、油锯等按市场订单增加；分行业表显示该行业营业收入同比下降27.38%，说明主要因全地形消防车等消防产品销售减少。候选事实分别保留两类产品口径和百分比变动，补上产销量上升原因，且未把收入下降与产销量上升混为同一原因。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 19965,
+      "output_tokens": 767,
+      "total_tokens": 26876
+    }
+  }
+]

@@ -1,0 +1,53 @@
+{
+  "run_id": "v9-recheck-600099-20261113",
+  "mode": "real_final_recheck_of_six_retained_candidates",
+  "substituted_transport": false,
+  "production_authorization": "not_authorized",
+  "preparation_seconds": 30.925,
+  "task_state": "completed",
+  "business_seconds": 101.629,
+  "three_reads_equal": true,
+  "query_sha256": "462e63dabdb6a8a7246da6d24354dd75ab51149b6f3db0680d05f8d2d4f6c2d0",
+  "profile_count": 1,
+  "workpaper_status": "review_limited_pending_verification",
+  "review_status": "completed_with_open_findings",
+  "review_error": null,
+  "fact_count": 47,
+  "findings": [
+    {
+      "id": "FND-001",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "id": "FND-002",
+      "resolution": "quarantined"
+    },
+    {
+      "id": "FND-003",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "id": "FND-004",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "id": "FND-005",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "id": "FND-006",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "id": "FND-007",
+      "resolution": "corrected_pending_trust"
+    }
+  ],
+  "retained_request_ids": [
+    "bp-work-062bb2da6d746a6ce50057a4:workpaper:review",
+    "bp-work-062bb2da6d746a6ce50057a4:workpaper:repair"
+  ],
+  "locally_revalidated_request_ids": [
+    "bp-work-062bb2da6d746a6ce50057a4:workpaper:repair"
+  ]
+}

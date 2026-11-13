@@ -10,6 +10,10 @@
 
 ## Decisions
 
+### 2026-11-13 6.BM真实final完成：原6候选採纳，独立内容不变
+
+用户明确批准后只1个Grok high final请求，6候选全accepted，4替换/2新增/41独立未改，行业用途F-SC-D1保持隔离；原TaskService三读47事实。保六项百分点literal/value=null，不以标准化完成作采纳门槛，真实源再核确认了语义。旧修订contract_status=rejected/56505+16534继承不洗白或重计，本次1新物理/26876独立入账，原失败与S1不追改。此为跨明确授权窗口真实候选纠正链完成，不是当前全47事实真值、连续首发吞吐或生产授权。代码未改、复用6.BM1有效测试，有限源核/必要证据持久后清临时库，不继续为单家公司抠可选细节。
+
 ### 2026-11-13 6.BM只补final：保留历史拒绝的本地重校验
 
 原review_resume只允许两份accepted历史响应，会阻止本次真实候选在当前decoder已能保literal时继续。增加显式revalidate_rejected_repair：只适用于历史repair schema_validation_error且finish=stop；原raw SHA256/解析payload/源与原稿hash先核，当前WorkpaperRepairResponse/目标/来源硬约束仍先于final发送。旧receipt不改accepted，模型归因/usage仍按原status=rejected记录，quality_review.locally_revalidated_request_ids单列，Markdown明确本地重校验非新模型通过。其他失败/缺finish/截断/篡改/无效目标或数值在final前拒绝。沿原TaskService/同一writer，不新建checkpoint平台；受控接续已证明仅final发送，真实林海6候选只做零调用就绪，新的最终外呼另待明确批准。

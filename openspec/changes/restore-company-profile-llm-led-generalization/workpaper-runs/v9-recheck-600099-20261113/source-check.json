@@ -1,0 +1,61 @@
+{
+  "scope": "Independent limited source check of all 6 changed candidates and preservation checks for 41 independent facts; not a full 47-fact audit or full-report recall",
+  "source_document_sha256": "3dbe17e87d3b79bb5327d821786eb7a971ef367b24fd37ac3511da4a212cf07c",
+  "original_query_sha256": "8824c3bd126b684a2c312b2c54dc460162196a266334d91467b2fe16556492ba",
+  "new_query_sha256": "462e63dabdb6a8a7246da6d24354dd75ab51149b6f3db0680d05f8d2d4f6c2d0",
+  "all_41_independent_fact_objects_unchanged": true,
+  "source_coordinates_checked_against_official_pdf": true,
+  "original_receipts_unchanged": true,
+  "retained_repair_contract_status": "rejected",
+  "retained_repair_response_sha256": "90e4e8b2fcdaa87c2e9fddc355dbaf589cd4ae62f10432b9fdc7ea69a131702d",
+  "six_real_final_checks_accepted": true,
+  "checks": [
+    {
+      "fact_id": "F-MC-01",
+      "pages": [21, 24],
+      "source_path": "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (一) 主营业务分析",
+      "judgment": "原文仅对两个说明项勾选不适用，修订只复述标题和勾选，不再断言所有相关变动都未发生。"
+    },
+    {
+      "fact_id": "F-OI-03",
+      "pages": [15, 16],
+      "source_path": "第三节 管理层讨论与分析 / 三、经营情况讨论与分析",
+      "judgment": "原句农业机械板块限定统领第二厂家11家和跨页续句两项零部件国产化替代；修订恢复该限定。"
+    },
+    {
+      "fact_id": "F-SC-U1",
+      "pages": [15, 16, 22, 23],
+      "source_path": "第三节 管理层讨论与分析 / 三、经营情况讨论与分析；五、报告期内主要经营情况 / (一) 主营业务分析",
+      "judgment": "93.11/96.72/98.25/94.92是各行业原材料成本占该行业成本小计的比例，不推为集团总成本比重。采购措施仅写农业机械板块，不补具体原料或供应商。"
+    },
+    {
+      "fact_id": "F-PS-04",
+      "pages": [10, 11],
+      "source_path": "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况；二、报告期内公司所处行业情况",
+      "judgment": "公司产品主要是中等排量二轮燃油摩托车，修订保主要限定；国Ⅳ/出口欧五+来自公司产品介绍。"
+    },
+    {
+      "fact_id": "review-add:FND-006",
+      "pages": [21],
+      "source_path": "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (一) 主营业务分析",
+      "judgment": "六项毛利率变化的方向、金额和单位对应原表最后一列：减少0.82/减少1.92/增加4.75/增加9.13/减少0.24/增加2.60个百分点。保原文，标准化value=null，不改成相对增长率或猜带符号数值。"
+    },
+    {
+      "fact_id": "review-add:FND-007",
+      "pages": [21, 22],
+      "source_path": "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (一) 主营业务分析",
+      "judgment": "产量+104.99%和销量+86.11%由风力灭火机/油锯订单增长解释；收入-27.38%由全地形消防车等销售减少解释，修订没有把不同产品变化混为同一原因。"
+    }
+  ],
+  "remaining_quarantine": {
+    "finding_id": "FND-002",
+    "fact_id": "F-SC-D1",
+    "absent_from_final_narrative": true,
+    "reason": "行业全地形车军事用途不是本公司有据下游，未作为本轮修订对象，不恢复。"
+  },
+  "limits": [
+    "6 accepted candidates do not establish all 47 facts independently accurate.",
+    "This is a final recheck of retained real stages across authorized windows, not a new continuous fresh full run.",
+    "Known development sample, no S1 score or production authorization."
+  ]
+}
