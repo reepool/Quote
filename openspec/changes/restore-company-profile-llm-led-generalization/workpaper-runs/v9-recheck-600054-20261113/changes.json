@@ -1,0 +1,460 @@
+[
+  {
+    "finding_id": "f001",
+    "resolution": "corrected_pending_trust",
+    "original_fact": {
+      "fact_id": "mc-06",
+      "text": "报告期内公司业务类型、利润构成或利润来源未发生重大变动；报告期主要子公司股权变动导致合并范围变化：不适用；公司报告期内业务、产品或服务发生重大变化或调整有关情况：不适用。",
+      "subject_scope": "consolidated_group",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0007",
+        "source-0009"
+      ],
+      "metrics": [],
+      "uncertainty_reason": null
+    },
+    "revised_fact": {
+      "fact_id": "mc-06",
+      "text": "本期公司业务类型、利润构成或利润来源发生重大变动的详细说明：不适用；报告期主要子公司股权变动导致合并范围变化：不适用；公司报告期内业务、产品或服务发生重大变化或调整有关情况：不适用。",
+      "subject_scope": "consolidated_group",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0007",
+        "source-0009"
+      ],
+      "metrics": [],
+      "uncertainty_reason": null
+    }
+  },
+  {
+    "finding_id": "f002",
+    "resolution": "unresolved",
+    "original_fact": null,
+    "revised_fact": null
+  },
+  {
+    "finding_id": "f003",
+    "resolution": "corrected_pending_trust",
+    "original_fact": {
+      "fact_id": "sm-01",
+      "text": "主营业务分行业情况：酒店业务营业收入492,026,389.87元，营业成本331,764,429.18元，毛利率32.57%，营业收入比上年增减7.99%，营业成本比上年增减17.27%，毛利率比上年减少5.34个百分点。",
+      "subject_scope": "business_segment",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "metrics": [
+        {
+          "name": "酒店业务营业收入",
+          "raw_value": "492,026,389.87",
+          "value": "492026389.87",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "人民币",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "酒店业务毛利率",
+          "raw_value": "32.57",
+          "value": "32.57",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "酒店业务毛利率比上年增减",
+          "raw_value": "5.34",
+          "value": "5.34",
+          "unit": "百分点",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        }
+      ],
+      "uncertainty_reason": null
+    },
+    "revised_fact": {
+      "fact_id": "sm-01",
+      "text": "主营业务分行业情况：酒店业务营业收入492,026,389.87元，营业成本331,764,429.18元，毛利率32.57%，营业收入比上年增减7.99%，营业成本比上年增减17.27%，毛利率比上年减少5.34个百分点。",
+      "subject_scope": "business_segment",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "metrics": [
+        {
+          "name": "酒店业务营业收入",
+          "raw_value": "492,026,389.87",
+          "value": "492026389.87",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "人民币",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "酒店业务毛利率",
+          "raw_value": "32.57",
+          "value": "32.57",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "酒店业务毛利率比上年增减",
+          "raw_value": "减少5.34个百分点",
+          "value": null,
+          "unit": "百分点",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": "原文带增减方向及单位；保留原文，未统一为带符号数值。"
+        }
+      ],
+      "uncertainty_reason": null
+    }
+  },
+  {
+    "finding_id": "f004",
+    "resolution": "corrected_pending_trust",
+    "original_fact": {
+      "fact_id": "sm-02",
+      "text": "主营业务分行业情况：索道及缆车业务营业收入842,155,363.75元，营业成本208,848,588.38元，毛利率75.20%，营业收入比上年增减17.37%，营业成本比上年增减134.03%，毛利率比上年减少12.36个百分点。",
+      "subject_scope": "business_segment",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "metrics": [
+        {
+          "name": "索道及缆车业务营业收入",
+          "raw_value": "842,155,363.75",
+          "value": "842155363.75",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "人民币",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "索道及缆车业务毛利率",
+          "raw_value": "75.20",
+          "value": "75.20",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "索道及缆车业务毛利率比上年增减",
+          "raw_value": "12.36",
+          "value": "12.36",
+          "unit": "百分点",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        }
+      ],
+      "uncertainty_reason": null
+    },
+    "revised_fact": {
+      "fact_id": "sm-02",
+      "text": "主营业务分行业情况：索道及缆车业务营业收入842,155,363.75元，营业成本208,848,588.38元，毛利率75.20%，营业收入比上年增减17.37%，营业成本比上年增减134.03%，毛利率比上年减少12.36个百分点。",
+      "subject_scope": "business_segment",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "metrics": [
+        {
+          "name": "索道及缆车业务营业收入",
+          "raw_value": "842,155,363.75",
+          "value": "842155363.75",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "人民币",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "索道及缆车业务毛利率",
+          "raw_value": "75.20",
+          "value": "75.20",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "索道及缆车业务毛利率比上年增减",
+          "raw_value": "减少12.36个百分点",
+          "value": null,
+          "unit": "百分点",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": "原文带增减方向及单位；保留原文，未统一为带符号数值。"
+        }
+      ],
+      "uncertainty_reason": null
+    }
+  },
+  {
+    "finding_id": "f005",
+    "resolution": "corrected_pending_trust",
+    "original_fact": {
+      "fact_id": "sm-04",
+      "text": "主营业务分行业情况：旅游服务业务营业收入532,255,057.39元，营业成本489,760,970.14元，毛利率7.98%，营业收入比上年增减12.13%，营业成本比上年增减13.61%，毛利率比上年减少1.20个百分点。",
+      "subject_scope": "business_segment",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "metrics": [
+        {
+          "name": "旅游服务业务营业收入",
+          "raw_value": "532,255,057.39",
+          "value": "532255057.39",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "人民币",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "旅游服务业务毛利率",
+          "raw_value": "7.98",
+          "value": "7.98",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "旅游服务业务毛利率比上年增减",
+          "raw_value": "1.20",
+          "value": "1.20",
+          "unit": "百分点",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        }
+      ],
+      "uncertainty_reason": null
+    },
+    "revised_fact": {
+      "fact_id": "sm-04",
+      "text": "主营业务分行业情况：旅游服务业务营业收入532,255,057.39元，营业成本489,760,970.14元，毛利率7.98%，营业收入比上年增减12.13%，营业成本比上年增减13.61%，毛利率比上年减少1.20个百分点。",
+      "subject_scope": "business_segment",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "metrics": [
+        {
+          "name": "旅游服务业务营业收入",
+          "raw_value": "532,255,057.39",
+          "value": "532255057.39",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "人民币",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "旅游服务业务毛利率",
+          "raw_value": "7.98",
+          "value": "7.98",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "旅游服务业务毛利率比上年增减",
+          "raw_value": "减少1.20个百分点",
+          "value": null,
+          "unit": "百分点",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": "原文带增减方向及单位；保留原文，未统一为带符号数值。"
+        }
+      ],
+      "uncertainty_reason": null
+    }
+  },
+  {
+    "finding_id": "f006",
+    "resolution": "corrected_pending_trust",
+    "original_fact": {
+      "fact_id": "sm-05",
+      "text": "主营业务分行业情况：徽菜业务营业收入245,296,390.79元，营业成本244,568,871.09元，毛利率0.30%，营业收入比上年增减1.09%，营业成本比上年增减10.30%，毛利率比上年减少8.32个百分点。",
+      "subject_scope": "business_segment",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "metrics": [
+        {
+          "name": "徽菜业务营业收入",
+          "raw_value": "245,296,390.79",
+          "value": "245296390.79",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "人民币",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "徽菜业务毛利率",
+          "raw_value": "0.30",
+          "value": "0.30",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "徽菜业务毛利率比上年增减",
+          "raw_value": "8.32",
+          "value": "8.32",
+          "unit": "百分点",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        }
+      ],
+      "uncertainty_reason": null
+    },
+    "revised_fact": {
+      "fact_id": "sm-05",
+      "text": "主营业务分行业情况：徽菜业务营业收入245,296,390.79元，营业成本244,568,871.09元，毛利率0.30%，营业收入比上年增减1.09%，营业成本比上年增减10.30%，毛利率比上年减少8.32个百分点。",
+      "subject_scope": "business_segment",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "metrics": [
+        {
+          "name": "徽菜业务营业收入",
+          "raw_value": "245,296,390.79",
+          "value": "245296390.79",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "人民币",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "徽菜业务毛利率",
+          "raw_value": "0.30",
+          "value": "0.30",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "徽菜业务毛利率比上年增减",
+          "raw_value": "减少8.32个百分点",
+          "value": null,
+          "unit": "百分点",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": "原文带增减方向及单位；保留原文，未统一为带符号数值。"
+        }
+      ],
+      "uncertainty_reason": null
+    }
+  }
+]

@@ -1,0 +1,45 @@
+{
+  "run_id": "v9-recheck-600054-20261113",
+  "new_entry_used": true,
+  "new_real_model_calls": 1,
+  "production_authorization": "not_authorized",
+  "preparation_seconds": 30.619,
+  "business_seconds": 85.7,
+  "three_reads_equal": true,
+  "query_sha256": "a1335088c7d09313529c082e992e303f483dd9917e6aa6cc72a6eb504958c06e",
+  "final_facts": 59,
+  "all_54_independent_facts_unchanged": true,
+  "original_facts": 59,
+  "restored_candidate_ids": [
+    "mc-06",
+    "sm-01",
+    "sm-02",
+    "sm-04",
+    "sm-05"
+  ],
+  "review_status": "completed_with_open_findings",
+  "review_error": null,
+  "finding_resolutions": {
+    "f001": "corrected_pending_trust",
+    "f002": "unresolved",
+    "f003": "corrected_pending_trust",
+    "f004": "corrected_pending_trust",
+    "f005": "corrected_pending_trust",
+    "f006": "corrected_pending_trust"
+  },
+  "core_complete": false,
+  "workpaper_status": "review_limited_pending_verification",
+  "retained_request_ids": [
+    "bp-work-f8508dacc55a189f39c0351d:workpaper:review",
+    "bp-work-f8508dacc55a189f39c0351d:workpaper:repair"
+  ],
+  "locally_revalidated_request_ids": [
+    "bp-work-f8508dacc55a189f39c0351d:workpaper:repair"
+  ],
+  "charged_tokens": 20585,
+  "cost": "unknown",
+  "recoveries": 0,
+  "original_files_unchanged": true,
+  "code_unchanged": true,
+  "shared_config_unchanged": true
+}

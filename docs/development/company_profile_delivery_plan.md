@@ -6,7 +6,9 @@
 
 ## 1. 开发者必须先理解的纠偏
 
-2026-11-13当前下一交付6.BO仅补黄山已保存5候选final，以实际改进画像收口，不再重跑抽取/初核、补满可选供应链或扩平台。原服务接续与原稿/raw/source hash、5候选目标/定位已零调用核过，54独立正文不变、范围意见不洗白；新限定再核已询问，确认前不发模型/建绑定。具体见[章节底稿卡6.BO](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md#当前6bo黄山已有5候选仅补最终再核待新的明确批准)。复用66回归/原TaskService有效证明，无业务代码改动，不重跑长测；开工无本人前轮垃圾，本轮释放0，批准后的库/脚本一套结果后finally清，旧源/成绩/既有改动保护。
+2026-11-13 6.BO已交[黄山59条真实纠正后画像](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-recheck-600054-20261113/result.md)：仅补一笔final，5候选全部接受、54独立不变；原范围意见仍未决，不为了全绿继续补细节。本次1物理/20585/85.700秒，未重付成功前段，旧拒绝/用量与新接受分列。真实候选纠正跨窗口完成，仍非同版连续首发质量或S1/生产；现停止本卡外呼，不自动扩公司。无业务代码变化、有效回归复用，有限源核/三读/Review成立，本人库/脚本清后交接，保护旧源和既有改动。
+
+2026-11-13当前下一交付6.BO仅补黄山已保存5候选final，以实际改进画像收口，不再重跑抽取/初核、补满可选供应链或扩平台。原服务接续与原稿/raw/source hash、5候选目标/定位已零调用核过，54独立正文不变、范围意见不洗白；新限定再核已询问，确认前不发模型/建绑定。具体见[章节底稿卡6.BO](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md#当前6bo黄山已有5候选仅补最终再核用户已明确批准)。复用66回归/原TaskService有效证明，无业务代码改动，不重跑长测；开工无本人前轮垃圾，本轮释放0，批准后的库/脚本一套结果后finally清，旧源/成绩/既有改动保护。
 
 2026-11-13 6.BN两份同版真实入口已结束，交[黄山54条真实限用画像及浦发原响应恢复稿](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuity-result-20261113.md)。主要阻塞仍是程序消费合法原文的规则过严，不是网络或金额用尽；已在全部停止后局部修正并原响应零网络核验，不能拼成同版真实通过。黄山真实初核确实纠出4项方向等6问题，5候选未获final不采纳；浦发恢复63条但未真实复核。当前授权用尽，不自动重跑两份、扩样或生产；下次只考虑既有修订最短接续，不重复成功前段。66相关回归及有限核源成立，必要结果一套后清本人3运行根/3脚本，旧源/原失败/既有改动保护。
 

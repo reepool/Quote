@@ -1,0 +1,61 @@
+{
+  "new_model_requests": 1,
+  "only_purpose": "verify_profile_workpaper_repair",
+  "candidate_checks_accepted": 5,
+  "final_fact_count": 59,
+  "unchanged_independent_fact_count": 54,
+  "all_54_independent_objects_unchanged": true,
+  "whole_profile_accuracy_claim": false,
+  "all_source_coordinates_match": true,
+  "evidence_objects": 15,
+  "finite_independent_change_checks": [
+    {
+      "fact_id": "sm-01",
+      "physical_pages": [
+        14
+      ],
+      "independent_conclusion": "原表减少5.34个百分点，方向/本期行列相符；保raw与source_unit=%、value=null，不换算相对降幅。"
+    },
+    {
+      "fact_id": "sm-02",
+      "physical_pages": [
+        14
+      ],
+      "independent_conclusion": "原表减少12.36个百分点，方向/本期行列相符；保raw与source_unit=%、value=null，不换算相对降幅。"
+    },
+    {
+      "fact_id": "sm-04",
+      "physical_pages": [
+        14
+      ],
+      "independent_conclusion": "原表减少1.20个百分点，方向/本期行列相符；保raw与source_unit=%、value=null，不换算相对降幅。"
+    },
+    {
+      "fact_id": "sm-05",
+      "physical_pages": [
+        14
+      ],
+      "independent_conclusion": "原表减少8.32个百分点，方向/本期行列相符；保raw与source_unit=%、value=null，不换算相对降幅。"
+    },
+    {
+      "fact_id": "mc-06",
+      "physical_pages": [
+        13,
+        15
+      ],
+      "independent_conclusion": "逐一保留三项说明勾选不适用，不推成未发生重大变化。"
+    }
+  ],
+  "scope_finding_f002_remains_unresolved": true,
+  "old_repair_contract_status_preserved": "rejected",
+  "old_file_hashes_match": true,
+  "original_query_sha256": "2a99c7e3904f8b82c9318af0c5442c659909bea9c601b8b71ef14b12c812b3b2",
+  "new_query_sha256": "a1335088c7d09313529c082e992e303f483dd9917e6aa6cc72a6eb504958c06e",
+  "new_response_sha256": "9ee76784aea789d917266c29c981c5a8cd156ca4308a1eb2f43a391c0f360638",
+  "business_code_and_shared_config_unchanged": true,
+  "limitations": [
+    "只独立核这5项改动及来源坐标，不宣称59条全人工准确或全报告召回。",
+    "所选范围之外未知，部分成本续表的单事实表头引用限制保留。",
+    "初核/修订为历史继承，新final用量单列，不称当前版本一次连续首发或生产发布。"
+  ]
+}

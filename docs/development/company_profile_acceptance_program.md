@@ -6,6 +6,8 @@
 
 ## 1. 目标与完成边界
 
+2026-11-13新批准6.BO黄山5候选最终再核1/1完成，5全部实际接受进入59条真实画像，54独立事实原样保留，三读一致。四项毛利率方向与不适用说明实际纠正，范围意见f002仍未决，review completed_with_open_findings/core_complete=false；非全59条真值、非连续首发/S1或生产。仅本次1物理/20585实际usage/0恢复/unknown、85.700业务秒/30.619准备秒，原初核59039/修订13826单列继承，旧拒绝及6.BN失败不改。5项改动有限独立核源、全坐标/旧hash核过；实物见[最终再核交付](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-recheck-600054-20261113/result.md)。本卡权限已用，当前无自动浦发/扩样/生产授权。
+
 2026-11-13当前6.BO只拟黄山已有5真实候选一次final，不重跑两家公司或成功前段。零调用重建原稿hash与原初核匹配，旧raw hash/源/typed与目标约束通过，只到final发送接口后明确停止；54独立正文不变、f002范围意见未决，旧repair仍rejected/候选未采纳。新的明确外呼已询问，当前0模型/探针/可发送绑定，非6.BN补救成功/S1。拟900秒/300000账本/2物理含1恢复，仅既有Scorpio-Grok high，原TaskService；完整边界见章节底稿卡6.BO与workpaper-recheck-readiness-600054-20261113.json。批准后直接一次执行，不新增前段/公司/窗口或生产。
 
 2026-11-13 6.BN新批准两份真实入口2/2已用，真实限用画像1/2、初核1/2、完整纠正链0/2，不能放行规模或生产。浦发因本地不认“突破”整稿拒绝，黄山初核6意见、5修订因原表%/literal百分点消费者拒绝，54独立事实保留。6物理/156180实际usage/0恢复/unknown，业务分别50.420/607.578秒，两份实际源码同版未改。后继仅零调用局部修正、原响应恢复浦发63条controlled待核稿及黄山5候选可消费证明，不改真实失败或采纳候选。详见[本轮实物与限制](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuity-result-20261113.md)。6.BN2保持未完成、授权用尽；必要核源/回归/清理已交，不自动补窗或计S1。
