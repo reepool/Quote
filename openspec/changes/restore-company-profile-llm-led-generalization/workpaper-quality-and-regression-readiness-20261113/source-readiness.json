@@ -1,0 +1,301 @@
+{
+  "schema_version": "company_workpaper_regression_source_readiness.v1",
+  "task": "6.BT",
+  "prepared_at": "2026-11-13",
+  "status": "sources_ready_not_execution_authorization",
+  "fixed_original_order": true,
+  "source_contract_reference": "../s1-official-source-contract.json",
+  "source_contract_sha256": "8aa0d4e684824226fecee854c0bfd9c833e4a63eea1753688047b4ab1bb00e94",
+  "scope": "source metadata only; old prompts, semantic answers, budgets and run authorizations are not reused",
+  "new_model_requests": 0,
+  "sendable_bindings_created": 0,
+  "companies": [
+    {
+      "instrument_id": "600094.SH",
+      "name": "大名城",
+      "asset": {
+        "instrument_id": "600094.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_f33b0049c49d3cd17a1eab62352b9327",
+        "filing_id": "1225155390",
+        "source": "cninfo",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "content_hash": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/f5/f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591.pdf",
+        "report_type": "annual_report"
+      },
+      "pdf_pages": 194,
+      "pdf_sha256_verified": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600094-binding.json",
+      "source_binding_sha256": "57a61a4508e2f8104f497bb5535910747095e9868385da556b07fcd07e0c5944"
+    },
+    {
+      "instrument_id": "600103.SH",
+      "name": "青山纸业",
+      "asset": {
+        "instrument_id": "600103.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_e26654bf6cc4bf44f45f6c342da566e4",
+        "filing_id": "1225099218",
+        "source": "cninfo",
+        "published_at": "2026-04-13T16:00:00+00:00",
+        "content_hash": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/68/6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c.pdf",
+        "report_type": "annual_report"
+      },
+      "pdf_pages": 220,
+      "pdf_sha256_verified": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600103-binding.json",
+      "source_binding_sha256": "9fc8d0c231bd66d7d63776a5c800331658327b2944fcafe89e1fbbda9b347579"
+    },
+    {
+      "instrument_id": "600100.SH",
+      "name": "同方股份",
+      "asset": {
+        "instrument_id": "600100.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_a14a45133bdd3d1fcb132c3049eb820e",
+        "filing_id": "1225244797",
+        "source": "cninfo",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "content_hash": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/7d/7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497.pdf",
+        "report_type": "annual_report"
+      },
+      "pdf_pages": 260,
+      "pdf_sha256_verified": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600100-binding.json",
+      "source_binding_sha256": "6a0bb9bf2ab13ec37e446eda60f76a79a67e7df9c555d86028aba1dc8c556da6"
+    },
+    {
+      "instrument_id": "600107.SH",
+      "name": "美尔雅",
+      "asset": {
+        "instrument_id": "600107.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_4f15063821c1d2a2c762132d3e4c5a3a",
+        "filing_id": "1225264726",
+        "source": "cninfo",
+        "published_at": "2026-04-29T16:00:00+00:00",
+        "content_hash": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/2d/2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8.pdf",
+        "report_type": "annual_report"
+      },
+      "pdf_pages": 243,
+      "pdf_sha256_verified": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600107-binding.json",
+      "source_binding_sha256": "c80c16653e9be76ac738ab8d10797c5a1ada5ab9e9a0080397beb552d0e9d904"
+    },
+    {
+      "instrument_id": "600098.SH",
+      "name": "广州发展",
+      "asset": {
+        "instrument_id": "600098.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_1f64d5e8214809eacb37e8a83da0452a",
+        "filing_id": "1225103737",
+        "source": "cninfo",
+        "published_at": "2026-04-14T16:00:00+00:00",
+        "content_hash": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/78/78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07.pdf",
+        "report_type": "annual_report"
+      },
+      "pdf_pages": 259,
+      "pdf_sha256_verified": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600098-binding.json",
+      "source_binding_sha256": "501ef6c2c50d4d054bac531d0619f93b64677b6c329213c5f33db27b7ce9cddb"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "name": "上汽集团",
+      "asset": {
+        "instrument_id": "600104.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+        "filing_id": "1225071780",
+        "source": "cninfo",
+        "published_at": "2026-04-01T16:00:00+00:00",
+        "content_hash": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/ac/aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874.pdf",
+        "report_type": "annual_report"
+      },
+      "pdf_pages": 205,
+      "pdf_sha256_verified": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600104-binding.json",
+      "source_binding_sha256": "db92c9f994064d94bf21a8e64ae1dae6164c7ded34dd0a2cda08c6118da63abd"
+    },
+    {
+      "instrument_id": "600088.SH",
+      "name": "中视传媒",
+      "asset": {
+        "instrument_id": "600088.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_e7e7327460fd52d9e2d8ccde3ce05102",
+        "filing_id": "1225118832",
+        "source": "cninfo",
+        "published_at": "2026-04-17T16:00:00+00:00",
+        "content_hash": "5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/5a/5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c.pdf",
+        "report_type": "annual_report"
+      },
+      "pdf_pages": 177,
+      "pdf_sha256_verified": "5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c",
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600088-binding.json",
+      "source_binding_sha256": "3c02e42160d19b29d8001bbfc4a7bcd0b3970b216734ecbf908ff46774317307"
+    },
+    {
+      "instrument_id": "600099.SH",
+      "name": "林海股份",
+      "asset": {
+        "instrument_id": "600099.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_7dde0cff6333e66e23631daa30bfa10d",
+        "filing_id": "1225042363",
+        "source": "cninfo",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "content_hash": "3dbe17e87d3b79bb5327d821786eb7a971ef367b24fd37ac3511da4a212cf07c",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/3d/3dbe17e87d3b79bb5327d821786eb7a971ef367b24fd37ac3511da4a212cf07c.pdf",
+        "report_type": "annual_report"
+      },
+      "pdf_pages": 194,
+      "pdf_sha256_verified": "3dbe17e87d3b79bb5327d821786eb7a971ef367b24fd37ac3511da4a212cf07c",
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600099-binding.json",
+      "source_binding_sha256": "02388d33e5fae03b3c9221008ec96fb6a5e62722f7a81845a2db4bcbebee9c02"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "name": "海泰发展",
+      "asset": {
+        "instrument_id": "600082.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_77a492082b5827f4129bb8232d1f715a",
+        "filing_id": "1225246039",
+        "source": "cninfo",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "content_hash": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/97/979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad.pdf",
+        "report_type": "annual_report"
+      },
+      "pdf_pages": 203,
+      "pdf_sha256_verified": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600082-binding.json",
+      "source_binding_sha256": "8d231eef272ea403d7f544c2cbf7244fb00593bfab9ffd11ccbe6286723db428"
+    },
+    {
+      "instrument_id": "600097.SH",
+      "name": "开创国际",
+      "asset": {
+        "instrument_id": "600097.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_88e877bd39b3790446440dc4b4e45b07",
+        "filing_id": "1225039976",
+        "source": "cninfo",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "content_hash": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/4c/4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c.pdf",
+        "report_type": "annual_report"
+      },
+      "pdf_pages": 158,
+      "pdf_sha256_verified": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600097-binding.json",
+      "source_binding_sha256": "bf0f619c15276241048dd23b4f7a78acbacd2c6c41581a7147cba328fbf49d41"
+    },
+    {
+      "instrument_id": "600054.SH",
+      "name": "黄山旅游",
+      "asset": {
+        "instrument_id": "600054.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_6c1c10fda0c84960cd9f5ed70c235be8",
+        "filing_id": "1225118314",
+        "source": "cninfo",
+        "published_at": "2026-04-17T16:00:00+00:00",
+        "content_hash": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/f8/f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f.pdf",
+        "report_type": "annual_report"
+      },
+      "pdf_pages": 185,
+      "pdf_sha256_verified": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600054-binding.json",
+      "source_binding_sha256": "6332d6853d138bb051223c6ee5d5744a077c4e21f84d7e7109b7dd781cac176b"
+    },
+    {
+      "instrument_id": "600000.SH",
+      "name": "浦发银行",
+      "asset": {
+        "instrument_id": "600000.SH",
+        "report_period": "2025-12-31",
+        "source_asset_id": "ann_40e282b55b9f660348911fb6a3531126",
+        "filing_id": "1225062336",
+        "source": "cninfo",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "content_hash": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+        "archive_path": "/home/python/Quote/data/filings/announcements/blobs/e4/e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22.pdf",
+        "report_type": "annual_report"
+      },
+      "pdf_pages": 454,
+      "pdf_sha256_verified": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+      "source_binding": "openspec/changes/restore-company-profile-llm-led-generalization/s1-pool-s1-600000-binding.json",
+      "source_binding_sha256": "1d10fb68abb33a8aa967efd184c021270991a7bacae2c13bf7c523622ec765e3"
+    }
+  ],
+  "risk_mapping": {
+    "reference": "openspec/changes/prepare-company-profile-s1-s2-bounded-acceptance/s1-core-regression-contract.json",
+    "reference_sha256": "9b1dd2079ed86355bf2fa8aa50d86064a3e170ce228768a92518056187cbd396",
+    "status": "historical_categories_pending_new_pdf_source_check_and_current_run",
+    "categories": {
+      "associated_leasing": [
+        "600094.SH",
+        "600103.SH",
+        "600088.SH",
+        "600054.SH"
+      ],
+      "body": [
+        "600100.SH",
+        "600107.SH",
+        "600082.SH",
+        "600097.SH",
+        "600054.SH"
+      ],
+      "financial_disclosure": [
+        "600098.SH",
+        "600104.SH",
+        "600000.SH"
+      ],
+      "income_columns_units": [
+        "600094.SH",
+        "600107.SH",
+        "600082.SH",
+        "600000.SH"
+      ],
+      "purchase_sale_direction": [
+        "600103.SH",
+        "600104.SH",
+        "600099.SH",
+        "600097.SH"
+      ],
+      "subject_period": [
+        "600100.SH",
+        "600098.SH",
+        "600088.SH",
+        "600099.SH"
+      ]
+    },
+    "financial_scope_note": "仅浦发是银行；广州发展/上汽的能源金融/汽车金融披露为历史待查线索，不把标签当新PDF实证或称三家金融行业公司。"
+  },
+  "readiness": {
+    "pdf_available_and_hash_matched": 12,
+    "download_needed": 0,
+    "current_version_source_first_core_contracts_frozen": 0,
+    "current_same_version_new_runs_executed": 0,
+    "formal_quality_denominator_ready": false,
+    "risks_currently_verified": false,
+    "production_authorized": false
+  },
+  "remaining_before_formal_scoring": [
+    "逐公司从正式章节先独立冻结最小主营/产品/变现/公司收入和主要构成参考合同，按当份标题而非旧页码定位；供应链可选。",
+    "核每类至少两家真实PDF对应风险与负例；历史fixture/标签不作新证据，读不到则未测，不凑数。",
+    "冻结当前实际源码/提示/schema/模型和资源，新的整组公开材料外传/调用授权；不沿旧binding发送。",
+    "逐对象审核实际输出，采用现有正式门槛和分母；有限源核不替代全量评分，开发回归与S1分列。"
+  ]
+}

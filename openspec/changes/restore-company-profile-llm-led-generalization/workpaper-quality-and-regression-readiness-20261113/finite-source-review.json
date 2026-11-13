@@ -1,0 +1,1432 @@
+{
+  "schema_version": "company_workpaper_finite_source_review.v1",
+  "task": "6.BT",
+  "review_date": "2026-11-13",
+  "reviewer": "Codex independent source reading",
+  "method": "从同版正式PDF重新提取相关原页，人工先读业务/表头/期间/限定，再对照保存的最终事实；坐标相等只是来源检查，不作语义判真。无新模型、无整家公司重跑。",
+  "scope": "每家12个预定业务检查点，含多事实检查、局部范围和隔离边界；不是随机抽样或全部输出对象的计分分母。",
+  "accuracy_rate": null,
+  "recall_rate": null,
+  "formal_s1_credit": 0,
+  "new_model_requests": 0,
+  "production_authorization": "not_authorized",
+  "companies": [
+    {
+      "instrument_id": "600099.SH",
+      "report": {
+        "instrument_id": "600099.SH",
+        "report_id": "1225042363",
+        "document_version": "3dbe17e87d3b79bb5327d821786eb7a971ef367b24fd37ac3511da4a212cf07c",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "source_query": "../workpaper-runs/v9-four-type-600099-20261113/query.json",
+      "query_sha256": "1eb2da77caa8c818f26eb3c2a1ac35fcb7d25d990ebda22ffcd867edd76a19dd",
+      "checks": [
+        {
+          "check_id": "600099-01",
+          "criterion": "四项主营与经营角色",
+          "fact_ids": [
+            "F-BS-01"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0001",
+              "pages": [
+                8
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "森林消防机械、农业机械、特种车辆和摩托车及配件的制造销售；不是由行业标签推断。"
+        },
+        {
+          "check_id": "600099-02",
+          "criterion": "消防产品与用途",
+          "fact_ids": [
+            "F-PS-01"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0001",
+              "pages": [
+                8
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0002",
+              "pages": [
+                9
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "全地形消防车、消防泵和风力灭火机；灭火救援/山地森林用途有原文。"
+        },
+        {
+          "check_id": "600099-03",
+          "criterion": "农业机械与用途",
+          "fact_ids": [
+            "F-PS-02"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0002",
+              "pages": [
+                9
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "插秧机与谷物联合收割机；小麦、水稻等收获用途明确。"
+        },
+        {
+          "check_id": "600099-04",
+          "criterion": "ATV与摩托车产品边界",
+          "fact_ids": [
+            "F-PS-03",
+            "F-PS-04"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0002",
+              "pages": [
+                9
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0003",
+              "pages": [
+                10
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "ATV及电动ATV、摩托车分开；出口标准为产品说明，不推广为全部产品。"
+        },
+        {
+          "check_id": "600099-05",
+          "criterion": "变现与经营模式",
+          "fact_ids": [
+            "F-BS-02",
+            "F-RM-05"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0003",
+              "pages": [
+                10
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "按单/以销定产并适度备货，以经销为主，保留主要而非全部。"
+        },
+        {
+          "check_id": "600099-06",
+          "criterion": "公司期间营业收入",
+          "fact_ids": [
+            "F-RM-01",
+            "F-RM-02"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0004",
+              "pages": [
+                12
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0012",
+              "pages": [
+                18
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "113124.69万元与1131246944.93元为同期间不同精度披露，未用业务小计替代。"
+        },
+        {
+          "check_id": "600099-07",
+          "criterion": "四行业收入成本列",
+          "fact_ids": [
+            "F-RM-03"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0015",
+              "pages": [
+                21
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "收入467207688.51/283722402.61/248582445.60/125340298.09元，对应行业正确，不借成本或同比列。"
+        },
+        {
+          "check_id": "600099-08",
+          "criterion": "地区与销售收入占比",
+          "fact_ids": [
+            "F-BS-04",
+            "F-RM-04"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0004",
+              "pages": [
+                12
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0015",
+              "pages": [
+                21
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "国际/国内51.47%/48.53%保主营板块口径；地区收入与成本分开，不混入集团占比。"
+        },
+        {
+          "check_id": "600099-09",
+          "criterion": "供应商替代主体范围",
+          "fact_ids": [
+            "F-OI-03"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "pages": [
+                15
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0008",
+              "pages": [
+                16
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "11家第二厂家、2项核心零部件国产化限定农业机械板块；不细化为具名原料供应商。"
+        },
+        {
+          "check_id": "600099-10",
+          "criterion": "毛利百分点方向",
+          "fact_ids": [
+            "review-add:WF-007"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0015",
+              "pages": [
+                21
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "四行业-0.82/-1.92/+4.75/+9.13个百分点，国内-0.24/国外+2.60，不当相对增幅。"
+        },
+        {
+          "check_id": "600099-11",
+          "criterion": "销量和收入背离",
+          "fact_ids": [
+            "F-SM-01",
+            "review-add:WF-008"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0016",
+              "pages": [
+                22
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0015",
+              "pages": [
+                21
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "特种车辆/农机量降收入增、消防量增收入降；库存同比不适用不造零。"
+        },
+        {
+          "check_id": "600099-12",
+          "criterion": "披露项不适用边界",
+          "fact_ids": [
+            "F-MC-01",
+            "F-MC-03"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0015",
+              "pages": [
+                21
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0003",
+              "pages": [
+                10
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "仅复述业务类型利润来源重大变动及新增非主营的勾选，不推出没有任何变化。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600054.SH",
+      "report": {
+        "instrument_id": "600054.SH",
+        "report_id": "1225118314",
+        "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-17T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "source_query": "../workpaper-runs/v9-four-type-600054-20261113/query.json",
+      "query_sha256": "8c3232ebce2aa24858f3df364c5403802ae7e226edbb739e7657488463a48369",
+      "checks": [
+        {
+          "check_id": "600054-01",
+          "criterion": "六业务总体概述的引用范围",
+          "fact_ids": [
+            "bs-01",
+            "bs-04",
+            "bs-05",
+            "bs-06"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0001",
+              "pages": [
+                9
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0002",
+              "pages": [
+                10
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "decision": "limited",
+          "observation": "六板块整体有源，但bs-01只挂p9，p9仅含前三类；后三类见p10及各独立事实。不是业务虚构，综合句不能据单一引文作逐句全支持证明。"
+        },
+        {
+          "check_id": "600054-02",
+          "criterion": "景区与索道服务",
+          "fact_ids": [
+            "ps-01",
+            "ps-02"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0001",
+              "pages": [
+                9
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "景区观光休闲与索道缆车客运观光，不混成同一游客指标。"
+        },
+        {
+          "check_id": "600054-03",
+          "criterion": "酒店与徽菜服务",
+          "fact_ids": [
+            "ps-03",
+            "ps-04"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0001",
+              "pages": [
+                9
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0002",
+              "pages": [
+                10
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "旅宿餐饮、徽菜餐饮有独立业务介绍。"
+        },
+        {
+          "check_id": "600054-04",
+          "criterion": "旅行社与智慧旅游",
+          "fact_ids": [
+            "bs-05",
+            "bs-06",
+            "ps-05"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0002",
+              "pages": [
+                10
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "旅行社各类旅游/会展等与平台/OTA/目的地服务分开。"
+        },
+        {
+          "check_id": "600054-05",
+          "criterion": "集团期间收入",
+          "fact_ids": [
+            "sm-01"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0008",
+              "pages": [
+                14
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0007",
+              "pages": [
+                13
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "210932.51万元；原表精确值2109325107.63元，2025本期，不借成本或未抵销行业合计。"
+        },
+        {
+          "check_id": "600054-06",
+          "criterion": "行业金额与抵销范围",
+          "fact_ids": [
+            "rm-01",
+            "sm-02"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0008",
+              "pages": [
+                14
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "酒店492026389.87、索道842155363.75等5行业按未抵销口径；不能相加当集团收入或直接算集团权重。"
+        },
+        {
+          "check_id": "600054-07",
+          "criterion": "毛利率及同比方向",
+          "fact_ids": [
+            "sm-03",
+            "review-add:F3"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0008",
+              "pages": [
+                14
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "索道75.20%/-12.36个百分点、景区46.46%/+7.06百分点等与本期列一致。"
+        },
+        {
+          "check_id": "600054-08",
+          "criterion": "游客与客运人次",
+          "fact_ids": [
+            "sm-04"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0003",
+              "pages": [
+                11
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "进山516.80万人与索道缆车1043.38万人次不同，不作唯一人数相加。"
+        },
+        {
+          "check_id": "600054-09",
+          "criterion": "费用变化影响",
+          "fact_ids": [
+            "od-01",
+            "od-02",
+            "od-05"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0008",
+              "pages": [
+                14
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0003",
+              "pages": [
+                11
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "资源有偿使用费核算/征收影响营业收入成本和归母净利润；不据此量化未经披露的因果金额。"
+        },
+        {
+          "check_id": "600054-10",
+          "criterion": "当前运营与项目完成",
+          "fact_ids": [
+            "od-07",
+            "ps-06"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0003",
+              "pages": [
+                11
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "北海/汤泉等投入运营、AI助手及部分产品试用/租售保留限定；不把未来计划写成已完成。"
+        },
+        {
+          "check_id": "600054-11",
+          "criterion": "无据当前客源隔离",
+          "fact_ids": [],
+          "sources": [
+            {
+              "evidence_id": "source-0003",
+              "pages": [
+                11
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0013",
+              "pages": [
+                24
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "六、公司关于公司未来发展的讨论与分析"
+              ]
+            }
+          ],
+          "decision": "isolated",
+          "observation": "cc-01不在最终正文；当前营销活动和2026计划不能推出当前客源占比或全部客群。",
+          "isolated_fact_id": "cc-01",
+          "absent_from_visible_facts": true
+        },
+        {
+          "check_id": "600054-12",
+          "criterion": "赚钱方式说明深度",
+          "fact_ids": [
+            "rm-01",
+            "ps-01",
+            "ps-02",
+            "ps-03"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0001",
+              "pages": [
+                9
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0008",
+              "pages": [
+                14
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "decision": "limited",
+          "observation": "已能读出景区/客运/旅宿服务及各行业收入，但本检查不证明收费机制/收入确认完整，不能把有行业表等同完整盈利模型；不补读全附注。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600000.SH",
+      "report": {
+        "instrument_id": "600000.SH",
+        "report_id": "1225062336",
+        "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-30T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "source_query": "../workpaper-runs/v9-retained-review-600000-20261113/query.json",
+      "query_sha256": "4f2b24e2650905bd82979274c15b5413ca9949a9feb7603552763d7c926acdd2",
+      "checks": [
+        {
+          "check_id": "600000-01",
+          "criterion": "四类银行业务概述的引用范围",
+          "fact_ids": [
+            "F-BS-01",
+            "F-BS-02",
+            "F-BS-03",
+            "F-BS-04",
+            "F-BS-05"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0003",
+              "pages": [
+                33
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.2 公司数智化战略执行成效",
+                "3.2.2 做强“五大赛道”，夯实客户经营"
+              ]
+            },
+            {
+              "evidence_id": "source-0013",
+              "pages": [
+                62
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.6 公司主要业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0016",
+              "pages": [
+                65
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.6 公司主要业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0019",
+              "pages": [
+                68
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.6 公司主要业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0020",
+              "pages": [
+                69
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.6 公司主要业务情况"
+              ]
+            }
+          ],
+          "decision": "limited",
+          "observation": "公司/零售/金融市场机构/跨境四类有正式章节，但综合F-BS-01的证据未挂含零售标题的p65；零售独立F-BS-03有p65-67。整体有源不等于综合句逐项引证齐全。"
+        },
+        {
+          "check_id": "600000-02",
+          "criterion": "服务而非工业投入",
+          "fact_ids": [
+            "F-PS-01",
+            "F-PS-08",
+            "F-PS-09"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0004",
+              "pages": [
+                34
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.2 公司数智化战略执行成效",
+                "3.2.2 做强“五大赛道”，夯实客户经营"
+              ]
+            },
+            {
+              "evidence_id": "source-0017",
+              "pages": [
+                66
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.6 公司主要业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0019",
+              "pages": [
+                68
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.6 公司主要业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0020",
+              "pages": [
+                69
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.6 公司主要业务情况"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "信贷/消费金融/投资交易/避险/托管均有原文，贵金属和大宗商品是金融业务标的，不当工业采购。"
+        },
+        {
+          "check_id": "600000-03",
+          "criterion": "主要收入结构完整性",
+          "fact_ids": [
+            "F-RM-01",
+            "F-RM-02",
+            "F-RM-03",
+            "F-RM-05"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0001",
+              "pages": [
+                32
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.1 公司总体经营情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0013",
+              "pages": [
+                62
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.6 公司主要业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0020",
+              "pages": [
+                69
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.6 公司主要业务情况"
+              ]
+            }
+          ],
+          "decision": "limited",
+          "observation": "总收入、净息差、对公营业净收入685.79亿、托管24.81亿已有源；没有由本次选章核出完整利息/非息或互斥板块分解，不能用AUM或存贷款余额补收入结构。"
+        },
+        {
+          "check_id": "600000-04",
+          "criterion": "集团期间营业收入",
+          "fact_ids": [
+            "F-RM-01"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0001",
+              "pages": [
+                32
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.1 公司总体经营情况"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "报告期集团营业收入1739.64亿元、利润总额533.74亿、归母500.17亿分别列示，不混入行业收入。"
+        },
+        {
+          "check_id": "600000-05",
+          "criterion": "集团期末资产存贷",
+          "fact_ids": [
+            "F-SM-01",
+            "F-SM-02"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0001",
+              "pages": [
+                32
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.1 公司总体经营情况"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "资产100817.46亿、含票据贷款57039.73亿、存款55824.35亿为期末余额，非收入。"
+        },
+        {
+          "check_id": "600000-06",
+          "criterion": "母公司对公与零售范围",
+          "fact_ids": [
+            "F-SM-09",
+            "F-SM-10"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0013",
+              "pages": [
+                62
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.6 公司主要业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0017",
+              "pages": [
+                66
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.6 公司主要业务情况"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "对公存款38103.74亿、个人存款17177.05亿及不含经营贷零售贷款15137.37亿保母公司；本次未扩核对公贷款续页列。"
+        },
+        {
+          "check_id": "600000-07",
+          "criterion": "AUM不当收入",
+          "fact_ids": [
+            "F-SM-05"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0017",
+              "pages": [
+                66
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.6 公司主要业务情况"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "只核个人AUM含市值46645.33亿元、同比20.26%；财资赛道另一个值不在本检查，不能把AUM当营收。"
+        },
+        {
+          "check_id": "600000-08",
+          "criterion": "托管规模与收入",
+          "fact_ids": [
+            "F-SM-12",
+            "F-RM-05"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0020",
+              "pages": [
+                69
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.6 公司主要业务情况"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "20.21万亿元是期末规模，24.81亿元是期间托管收入；单位和性质分开。"
+        },
+        {
+          "check_id": "600000-09",
+          "criterion": "科技金融补项",
+          "fact_ids": [
+            "review-add:WR-001"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0004",
+              "pages": [
+                34
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.2 公司数智化战略执行成效",
+                "3.2.2 做强“五大赛道”，夯实客户经营"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "10470.92亿元保人民银行统计和期末；服务超25.6万户保超，不替五产品融资超1400亿。"
+        },
+        {
+          "check_id": "600000-10",
+          "criterion": "近约超与流量存量",
+          "fact_ids": [
+            "F-SM-08",
+            "F-CC-04"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0007",
+              "pages": [
+                37
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.2 公司数智化战略执行成效",
+                "3.2.2 做强“五大赛道”，夯实客户经营"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "跨境客户近4.9万户不强制精确，44931亿元是期间交易结算量，3363亿元是期末贷款余额。"
+        },
+        {
+          "check_id": "600000-11",
+          "criterion": "资产质量与百分点",
+          "fact_ids": [
+            "F-MC-01",
+            "F-MC-03"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0001",
+              "pages": [
+                32
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.1 公司总体经营情况"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "不良率1.26%下降0.10百分点、拨备200.72%升13.76百分点、净息差1.42%持平，有源区别。"
+        },
+        {
+          "check_id": "600000-12",
+          "criterion": "平台归因错误仍隔离",
+          "fact_ids": [],
+          "sources": [
+            {
+              "evidence_id": "source-0004",
+              "pages": [
+                34
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "3.2 公司数智化战略执行成效",
+                "3.2.2 做强“五大赛道”，夯实客户经营"
+              ]
+            }
+          ],
+          "decision": "isolated",
+          "observation": "F-OI-04修订未获采纳，原平台拓客和科学评价归因不混回正文；扣非501.44亿的次要遗漏仍明确，不为凑齐追加。",
+          "isolated_fact_id": "F-OI-04",
+          "absent_from_visible_facts": true
+        }
+      ]
+    },
+    {
+      "instrument_id": "600100.SH",
+      "report": {
+        "instrument_id": "600100.SH",
+        "report_id": "1225244797",
+        "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "source_query": "../workpaper-runs/v9-retained-review-600100-20261113/query.json",
+      "query_sha256": "d7cb7298f322c163ad87140bf02b84419f659f3c953e1b0e36a255aaae7a545b",
+      "checks": [
+        {
+          "check_id": "600100-01",
+          "criterion": "三主业与其他边界",
+          "fact_ids": [
+            "F001",
+            "F004"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0001",
+              "pages": [
+                12
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0002",
+              "pages": [
+                13
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0010",
+              "pages": [
+                21
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "公共安全/数智/智慧能源为主要领域，其他/总部及板块抵销不是新的主营产品。"
+        },
+        {
+          "check_id": "600100-02",
+          "criterion": "公共安全产品及应用",
+          "fact_ids": [
+            "F005"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0001",
+              "pages": [
+                12
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "辐射成像安检系统/方案/运维，民航海关铁路等应用，不把客户应用当自产产品。"
+        },
+        {
+          "check_id": "600100-03",
+          "criterion": "知识服务产品和变现",
+          "fact_ids": [
+            "F007",
+            "F008",
+            "F012"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0001",
+              "pages": [
+                12
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "CNKI知识服务机构订阅为主+个人按需付费，数智转型技术授权/软件开发；不互换为同一收入机制。"
+        },
+        {
+          "check_id": "600100-04",
+          "criterion": "能源服务与下游场景",
+          "fact_ids": [
+            "F010",
+            "F013",
+            "F030"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0002",
+              "pages": [
+                13
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "热泵/储能/控制平台、咨询供应工程节能运维，面向供暖/园区/轨交/数据中心等，粗粒度供应链足够。"
+        },
+        {
+          "check_id": "600100-05",
+          "criterion": "公司期间营业收入",
+          "fact_ids": [
+            "F015"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0005",
+              "pages": [
+                14
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "公司2025收入150.65亿元，不用主营业务净额1497009.55万元冒充总营业收入。"
+        },
+        {
+          "check_id": "600100-06",
+          "criterion": "板块收入成本单位",
+          "fact_ids": [
+            "F016"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0010",
+              "pages": [
+                21
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "公共安全698057.58/数智275072.20/能源450419.69万元等，收入和成本列不同。"
+        },
+        {
+          "check_id": "600100-07",
+          "criterion": "小计抵销与净额",
+          "fact_ids": [
+            "F017"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0010",
+              "pages": [
+                21
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "decision": "limited",
+          "observation": "小计1525120.68、负抵销-28111.12、合计1497009.55万元保原表；表四舍五入和减负数措辞不能当程序计算公式，不由此强制算一致。"
+        },
+        {
+          "check_id": "600100-08",
+          "criterion": "地区收入范围",
+          "fact_ids": [
+            "F018",
+            "F032"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0010",
+              "pages": [
+                21
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "国内971560.22万元/64.90%、国际525449.33/35.10%为主营业务地区分布，不替集团收入权重。"
+        },
+        {
+          "check_id": "600100-09",
+          "criterion": "收入变化绝对额",
+          "fact_ids": [
+            "review-add:Q001"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0010",
+              "pages": [
+                21
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "主营收入同比-172053.28万元、公共安全+60481.61/数智-118490.59/能源-83746.45；不是百分比。地区末位差不强求归一。"
+        },
+        {
+          "check_id": "600100-10",
+          "criterion": "两类毛利变化口径",
+          "fact_ids": [
+            "review-add:Q001",
+            "F020"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0010",
+              "pages": [
+                21
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0006",
+              "pages": [
+                15
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "表内26.50%-24.31%=2.19个百分点，数智13.94；经营叙述整体2.35百分点不强并。"
+        },
+        {
+          "check_id": "600100-11",
+          "criterion": "净利润与经营现金流",
+          "fact_ids": [
+            "F020",
+            "F021"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0006",
+              "pages": [
+                15
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            }
+          ],
+          "decision": "supported",
+          "observation": "归母4.95亿、扣非2.88亿/同比增9.10亿、经营现金14.17亿/同比增8.34亿，增量非增幅。"
+        },
+        {
+          "check_id": "600100-12",
+          "criterion": "范围过度否定隔离与历史变化",
+          "fact_ids": [
+            "F034",
+            "F042",
+            "F027",
+            "F031"
+          ],
+          "sources": [
+            {
+              "evidence_id": "source-0005",
+              "pages": [
+                14
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0017",
+              "pages": [
+                25
+              ],
+              "section": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "（三）智慧能源"
+              ]
+            }
+          ],
+          "decision": "isolated",
+          "observation": "F048不在正文，集中度不能证明全报告没披露投入；上年计算机出表不写为本年剥离。p25标题路径错挂能源层级另限用，原页和正文不改。",
+          "isolated_fact_id": "F048",
+          "absent_from_visible_facts": true
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "不宣称所有事实逐条人工准确或全报告召回；48个检查不折算百分比。",
+    "同一事实含多个数字时只对observation明示项目负责；未核分句不自动算通过。",
+    "综合概述的Evidence覆盖不足、收入机制深度和表格措辞保留限用；不改历史源、原稿、模型状态或失败。",
+    "有限核查足以支持继续有界开发回归，不足以正式S1/生产发布；供应链细粒度不作阻塞。"
+  ]
+}
