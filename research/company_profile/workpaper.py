@@ -87,14 +87,15 @@ class WorkpaperEvidence(_Model):
 class WorkpaperMetric(_Model):
     name: str = Field(min_length=1)
     raw_value: str = Field(min_length=1)
-    value: str = Field(min_length=1)
-    unit: str = Field(min_length=1)
+    value: str | None = Field(default=None, min_length=1)
+    unit: str | None = Field(default=None, min_length=1)
     source_unit: str | None = None
     currency: str | None = None
     subject_scope: Subject
     period: str = Field(min_length=1)
     comparison_basis: str | None = None
     qualifier: Literal["exact", "approximate", "greater_than"] = "exact"
+    uncertainty_reason: str | None = Field(default=None, min_length=1)
 
     @model_validator(mode="before")
     @classmethod
@@ -110,6 +111,12 @@ class WorkpaperMetric(_Model):
 
     @model_validator(mode="after")
     def decimal_value(self):
+        if self.value is None:
+            if not self.uncertainty_reason:
+                raise ValueError("unnormalized metric requires an uncertainty reason")
+            return self
+        if self.unit is None:
+            raise ValueError("unknown unit requires a null normalized value")
         if self.source_unit and self.source_unit != self.unit and (
             self.source_unit, self.unit
         ) not in {("%", "百分点"), ("％", "百分点")}:
@@ -140,6 +147,7 @@ class WorkpaperFact(_Model):
     period: str = Field(min_length=1)
     evidence_ids: tuple[str, ...] = Field(min_length=1)
     metrics: tuple[WorkpaperMetric, ...] = ()
+    uncertainty_reason: str | None = Field(default=None, min_length=1)
 
 
 class WorkpaperElement(_Model):
@@ -192,6 +200,11 @@ def _check_fact_source(fact: WorkpaperFact, sources: Mapping[str, WorkpaperEvide
         for value in re.findall(r"(?<![\d.])-?\d[\d,]*(?:\.\d+)?(?![\d.])", span.quote)
     }
     for metric in fact.metrics:
+        if metric.value is None:
+            quoted = "".join(span.quote for eid in fact.evidence_ids for span in sources[eid].source_spans)
+            if "".join(metric.raw_value.split()) not in "".join(quoted.split()):
+                raise ValueError(f"uncertain metric original wording is absent from cited source: {metric.name}")
+            continue
         if Decimal(metric.value) not in numbers:
             raise ValueError(f"metric number is absent from cited source: {metric.name}")
 
@@ -466,7 +479,7 @@ def standardize_workpaper_metrics(paper: CompanyProfileWorkpaper) -> CompanyProf
                     is_margin_delta = "毛利率" in metric["name"] and any(
                         word in metric["name"] for word in ("比上年增减", "同比变动", "同比变化"))
                     points_in_answer = re.search(r"(-?\d+(?:\.\d+)?)\s*个百分点", fact["text"])
-                    if (metric["unit"] == "%" and is_margin_delta and points_in_answer
+                    if (metric["value"] is not None and metric["unit"] == "%" and is_margin_delta and points_in_answer
                         and Decimal(points_in_answer.group(1)) == Decimal(metric["value"])
                         and all(word in context for word in ("毛利率", "比上年", "增减"))):
                         metric.update(source_unit="%", unit="百分点")
@@ -477,11 +490,20 @@ def standardize_workpaper_metrics(paper: CompanyProfileWorkpaper) -> CompanyProf
 
 def _metric_display(metric: WorkpaperMetric) -> str:
     """Display an already validated raw value without repeating its exact unit."""
-    raw_value, unit = metric.raw_value.strip(), metric.unit.strip()
+    raw_value = metric.raw_value.strip()
+    unit = (metric.unit or "").strip()
+    if metric.value is None:
+        source_unit = metric.source_unit or unit
+        original = raw_value if not source_unit or raw_value.endswith(source_unit) else f"{raw_value} {source_unit}"
+        return f"{original}（不确定：{metric.uncertainty_reason}；未标准化）"
+    qualification = {"exact": "", "approximate": "（约数，非精确值）", "greater_than": "（下限，非精确值）"}[metric.qualifier]
+    reason = metric.uncertainty_reason or ("指标主体范围未明确" if metric.subject_scope == "unclear" else None)
+    if reason:
+        qualification += f"（不确定：{reason}）"
     if metric.source_unit and metric.source_unit != unit:
         prefix = raw_value[:1] if metric.qualifier != "exact" else ""
-        return f"{prefix}{metric.value} {unit}（原文{metric.raw_value}）"
-    return raw_value if raw_value.endswith(unit) else f"{raw_value} {unit}"
+        return f"{prefix}{metric.value} {unit}（原文{metric.raw_value}）{qualification}"
+    return (raw_value if raw_value.endswith(unit) else f"{raw_value} {unit}") + qualification
 
 
 def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
@@ -505,7 +527,8 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
         out.extend([f"## {label}", ""])
         for fact in element.facts:
             refs = "、".join(f"[{value}](#{value.lower()})" for value in fact.evidence_ids)
-            out.append(f"- {fact.text}（{refs}）")
+            uncertain = f"【不确定：{fact.uncertainty_reason or '主体范围未明确'}】" if fact.uncertainty_reason or fact.subject_scope == "unclear" else ""
+            out.append(f"- {uncertain}{fact.text}（{refs}）")
             for metric in fact.metrics:
                 out.append(f"  - {metric.name}：{_metric_display(metric)}；{metric.period}，{metric.subject_scope}。")
         for limitation in element.limitations:
@@ -518,7 +541,8 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
             out.extend([f"### {label}", ""])
             for fact in element.facts:
                 refs = "、".join(f"[{value}](#{value.lower()})" for value in fact.evidence_ids)
-                out.append(f"- {fact.text}（{refs}）")
+                uncertain = f"【不确定：{fact.uncertainty_reason or '主体范围未明确'}】" if fact.uncertainty_reason or fact.subject_scope == "unclear" else ""
+                out.append(f"- {uncertain}{fact.text}（{refs}）")
                 for metric in fact.metrics:
                     out.append(f"  - {metric.name}：{_metric_display(metric)}；{metric.period}，{metric.subject_scope}。")
             out.extend(f"- 限制：{limit}" for limit in element.limitations)

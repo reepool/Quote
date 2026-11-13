@@ -2,6 +2,19 @@ Current policy: product v9 (2026-11-11), acceptance section 7.109 and company-pr
 
 ## ADDED Requirements
 
+### Requirement: Source-backed uncertainty does not require deterministic closure
+New workpapers MUST retain source qualifications such as approximate values, bounds, differing units and unclear scope without forcing exact normalization. A metric MAY carry a null normalized value with its original spelling, source reference and uncertainty reason. Such a metric MUST NOT enter exact arithmetic. Facts with unclear scope MAY retain sourced text and an explicit uncertainty reason. Rendering MUST expose the qualification and original source, and MUST NOT label unknown scope as absence of disclosure. Correctly qualified uncertainty alone MUST NOT trigger repair or block the remaining profile or review workflow. Known false assertions and invalid evidence MUST remain withdrawn or rejected, not laundered by an uncertainty label. Historical results MUST remain unchanged.
+
+#### Scenario: A metric cannot safely be reduced to one number and unit
+- **WHEN** a selected source supports the quoted description but its magnitude, unit or scope cannot safely be normalized
+- **THEN** JSON and the readable profile retain the original wording, evidence and uncertainty reason with a null normalized value
+- **AND** useful independent business content remains available without a paid clarification loop
+
+#### Scenario: A qualified estimate is not a review defect
+- **WHEN** the draft preserves a source estimate or boundary with its original qualification and no unsupported conclusion
+- **THEN** review may complete with that content still uncertain and need not request a deterministic replacement
+- **AND** a wrong amount or unsupported company attribution is not approved merely because the draft adds an uncertainty label
+
 ### Requirement: Metric standardization preserves source meaning and audit history
 New workpaper binding and repaired projections MUST clear currency on dimensionless ratios. A rate difference expressed as percentage points MUST remain distinct from relative percentage growth. Standardization MAY retain a source_unit beside the normalized unit, MUST preserve the raw source spelling and decimal value, and MUST leave an auditable note. It MUST NOT guess currency conversions, magnitudes, subject scope or rate-change meaning from a bare number. Historical workpaper files MUST NOT be rewritten by reading them.
 

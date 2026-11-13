@@ -283,6 +283,43 @@ def test_ratio_currency_and_explicit_margin_points_are_standardized_only_when_bi
                         subject_scope="consolidated_group", period="2025")
 
 
+def test_uncertain_metric_and_scope_keep_original_source_without_forced_number():
+    from research.company_profile.workpaper import WorkpaperMetric
+
+    packet = build_section_packet(_report(), PAGES, index_sections(PAGES), _selection(index_sections(PAGES)))
+    raw = _draft(packet).model_dump(mode="json")
+    fact = raw["elements"]["scale_and_mix"]["facts"][0]
+    fact.update(subject_scope="unclear", uncertainty_reason="指标主体范围未明确")
+    fact["metrics"][0].update(value=None, unit=None, subject_scope="unclear", uncertainty_reason="保留本期原表数，不强定口径")
+    result = bind_workpaper_draft(WorkpaperDraftResponse.model_validate(raw), report=_report(),
+        reading_scope=packet.reading_scope, evidence=packet.evidence)
+    assert result.elements.scale_and_mix.facts[0].metrics[0].value is None
+    assert CompanyProfileWorkpaper.model_validate(result.model_dump()) == result
+    rendered = render_workpaper(result)
+    assert "【不确定：指标主体范围未明确】" in rendered
+    assert "100.00（不确定：" in rendered and "未标准化" in rendered
+    assert result.elements.business_structure.facts[0].fact_id == "main"
+    metric = fact["metrics"][0]
+    with pytest.raises(ValueError, match="uncertainty reason"):
+        WorkpaperMetric.model_validate({**metric, "uncertainty_reason": None})
+    with pytest.raises(ValueError, match="null normalized"):
+        WorkpaperMetric.model_validate({**metric, "value": "100.00"})
+    metric["raw_value"] = "999.99"
+    with pytest.raises(ValueError, match="original wording"):
+        bind_workpaper_draft(WorkpaperDraftResponse.model_validate(raw), report=_report(),
+            reading_scope=packet.reading_scope, evidence=packet.evidence)
+
+
+def test_known_metric_value_still_displays_uncertain_scope_and_reason():
+    from research.company_profile.workpaper import WorkpaperMetric, _metric_display
+
+    metric = WorkpaperMetric(name="收入", raw_value="100.00", value="100.00", unit="元",
+                             subject_scope="unclear", period="2025")
+    assert "不确定：指标主体范围未明确" in _metric_display(metric)
+    metric = metric.model_copy(update={"uncertainty_reason": "两处披露的范围未统一"})
+    assert "两处披露的范围未统一" in _metric_display(metric)
+
+
 def test_two_calls_use_sections_and_direct_structured_content_without_old_inventory():
     provider = _Provider()
     result = run_workpaper(report=_report(), pages=PAGES, processing_identity=workpaper_processing_identity(real=False), provider=provider, work_id="test")
@@ -298,7 +335,8 @@ def test_two_calls_use_sections_and_direct_structured_content_without_old_invent
     assert "fixture-model" in render_workpaper(result.workpaper)
 
 
-def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_replaced():
+@pytest.mark.parametrize("uncertain", [False, True])
+def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_replaced(uncertain):
     import asyncio
 
     from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
@@ -309,9 +347,14 @@ def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_repla
     index = index_sections(PAGES)
     selection = _selection(index)
     packet = build_section_packet(_report(), PAGES, index, selection)
+    raw = _with_supply_chain(_draft(packet), packet).model_dump(mode="json")
+    if uncertain:
+        fact = raw["elements"]["scale_and_mix"]["facts"][0]
+        fact.update(subject_scope="unclear", uncertainty_reason="保留原文口径")
+        fact["metrics"][0].update(value=None, unit=None, uncertainty_reason="不强制数值标准化")
     transport = ScriptedTransport([
         {**_response(selection.model_dump(mode="json")), "model": "navigator-v1"},
-        {**_response(_with_supply_chain(_draft(packet), packet).model_dump(mode="json")), "model": "reader-v2"},
+        {**_response(raw), "model": "reader-v2"},
     ])
     client = _client(transport, _budget(), _config(max_schema_repair_attempts=0))
     provider = CommonGatewaySemanticProvider(
@@ -329,6 +372,8 @@ def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_repla
         assert result.workpaper.generation.selection.model == "navigator-v1"
         assert result.workpaper.generation.extraction.model == "reader-v2"
         assert result.workpaper.generation.extraction.contract_status == "accepted"
+        if uncertain:
+            assert result.workpaper.elements.scale_and_mix.facts[0].metrics[0].value is None
         assert len(transport.calls) == 2
         assert len(result.receipts) == 2
         extraction = transport.calls[1]["payload"]

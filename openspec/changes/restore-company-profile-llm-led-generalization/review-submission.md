@@ -8690,3 +8690,21 @@ Review：A类当前归因/跨公司串回执/失败作者与单位展示风险�
 验证：初步标准化全组36项157.52秒通过，含普通/接续TaskService；后继直接组36项（排除未改长入口与fresh路径）通过，命令为quote_dev_env.sh Python -m pytest -q --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_workpaper.py tests/unit/test_research/test_company_profile_workpaper_review.py -k 'not task_service and not fresh_extraction'。一次范围保护修改使原“elements完全不变”断言失败，因本次要求暂停范围断言，改为无关facts不变且限制标未知再验；不放宽事实/覆盖。OpenSpec strict通过。Review A类数值量纲误重标和范围消费丢问题均直接修；B类可选遗漏、吞吐与新样本不扩大；C类开工已有配置/骨架/规划等保护。
 
 清理：三家本人运行根已finally删除，共5784043常规文件字节；本人核查/运行/离线脚本8064/11824/5889字节清除，合计5809820字节，不计历史释放/自动测试已清空间或物理块。正式PDF、有效共享解析、原首次结果、旧回执与并行物不动；留一套权威源/结果/模型原响应/账本/失败及诊断用途明确的后继投影。提交只纳本轮代码/测试、新交付目录和文档明确hunk，审核旧大段未提交内容不纳入。本卡外呼到此结束，后续优先验证修正后的真实连续闭环，但须新授权，不以换身份消耗原余额。
+
+## 266. 用户不确定性接续：保原文可读，不强求确定值
+
+末端有限Review补充：数值虽可标准化但指标主体仍unclear/有uncertainty_reason时，展示不能遗漏原因，已局部修正。对`test_company_profile_workpaper.py -k 'uncertain_metric or known_metric_value or retains_approximation or margin_points'`定向复验6项3.90秒通过，未重复未变的长入口；此前42项15.61秒结果与本次定向复验分列。
+
+目标按2026-11-13用户明确要求，单位不统一、范围未明确、近/约/超等信息不必强求确定性收口。产品§14、当前change spec/design/6.BJ卡同步，历史S1/6.BI及生产边界不追改。当前业务owner仍TaskService→workpaper provider→原writer/query/export，无平行审核平台，非必要字段补齐后置。
+
+6.BJ1完成：WorkpaperMetric允许value=null（unit可空）但必须有uncertainty_reason和可定位raw原文，不以null当0；保确定值时仍同量纲同值、错金额/无据引文拒绝。WorkpaperFact可保不确定原因，原scope unclear也明确显示。Markdown对约数/下限作非精确值提示，不能归一时展示原数/原因而不猜。抽取prompt v8、review policy v2消除“有源不确定性也必须拒绝/补修”的冲突；复核不为这类信息本身追加修订，必要纠错允许回退为忠实原文+不确定性，不能用标签洗白已知错误。
+
+直接公共网关Schema/解析、原stage runtime/writer查询/导出新实例、错误引文/错误数值反例、已知错断言保审计、修订保源不确定性与复核无额外修补均验证。精确命令（临时输出继承QuoteBak、用例finally清理）：`bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_workpaper.py tests/unit/test_research/test_company_profile_workpaper_review.py -k 'not task_service'`，最终42 passed/2 deselected/1既有requests依赖警告，15.61秒。排除两项未改长TaskService普通/继承测试，复用§265已有效证明，不以受控结果冒充真实模型质量。OpenSpec strict通过，git diff检查通过。
+
+只读复用浦发已有真实响应/所引原文核显示：物理70页3.6节“跨境客户数近4.9万户”仍标约数；57页3.5节“长三角区域贷款超2万亿元、增加超1600亿元”仍标下限，未改为精确值。小示例在workpaper-uncertainty-example-20261113.md；没有重写旧JSON、补新模型意见或称画像已正式可用。
+
+6.BJ2原计划仅原三份已许可公开材料各一次新修正版入口，同原1800秒/500000账本/10物理含3恢复（每逻辑1）、DeepSeek/Scorpio-Grok high、并发3、不扩公司/共享配置/充值/生产。执行前权限检查拒绝：6.BI三次已用尽，泛化继续指令未视为新具体外呼批准。未重试或绕过，已向用户说明并异步请求新的明确确认；当前新模型请求/探针/恢复/可发送绑定均0，不能说已经运行三家。6.BJ2及其后真实独立核验仍未完成，S1仍0/12，不能提前勾整卡完成。
+
+Review：A类nullable数值进入原Decimal路径、空值与证据对齐、提示相互冲突及错误贴不确定标签风险均在直接路径处理/正反验证；B类扩更多近似词、统一所有单位、全报告完备度及通用平台不做；C类开工前配置/骨架/旧规划和未跟踪内容保留。开发/审核活跃耗时未可靠计量，不编造。
+
+清理：开工核未见本人前轮相关临时根，未启动新运行库。本人未执行operator脚本11459字节已删；测试隔离目录由finally删除，不重复报旧释放或估算自动测试空间。仅保当前实现/测试/规范/一份有来源可读示例，正式源、有效解析、原失败/成绩与并行临时物不动；提交隔离本人hunk，旧审核1005行等不纳入。真实验证仍待明确授权，不为了填0/3追加窗口或换身份发送。

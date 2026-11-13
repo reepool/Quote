@@ -90,13 +90,19 @@ def test_real_review_identity_requires_explicit_profile():
         workpaper_processing_identity(real=True, review=True)
 
 
-def test_fresh_extraction_can_review_without_existing_seed():
+@pytest.mark.parametrize("uncertain", [False, True])
+def test_fresh_extraction_can_review_without_existing_seed(uncertain):
     from tests.unit.test_research.test_company_profile_workpaper import _Provider
 
     class FreshProvider(_Provider):
         def workpaper_request(self, **kwargs):
             if kwargs["purpose"] in {"select_profile_sections", "extract_profile_workpaper"}:
-                return super().workpaper_request(**kwargs)
+                reply = super().workpaper_request(**kwargs)
+                if uncertain and kwargs["purpose"] == "extract_profile_workpaper":
+                    fact = reply["elements"]["scale_and_mix"]["facts"][0]
+                    fact.update(subject_scope="unclear", uncertainty_reason="保留原文口径")
+                    fact["metrics"][0].update(value=None, unit=None, uncertainty_reason="仅引原数")
+                return reply
             self.calls.append(kwargs)
             return {"reviewed_fact_ids": ["main", "revenue"], "findings": []}
 
@@ -112,6 +118,10 @@ def test_fresh_extraction_can_review_without_existing_seed():
         assert len(profile["workpaper"]["elements"]["scale_and_mix"]["facts"]) == 1
         assert [call["purpose"] for call in provider.calls] == [
             "select_profile_sections", "extract_profile_workpaper", "review_profile_workpaper"]
+        exported = CompanyProfileReadService(Path(directory)).export(("600000.SH",), export_directory=Path(directory) / "export")
+        assert exported["profiles"][0] == profile
+        if uncertain:
+            assert profile["workpaper"]["elements"]["scale_and_mix"]["facts"][0]["metrics"][0]["value"] is None
 
 
 @pytest.mark.parametrize("failure", ["rejected", "bad_number", "unrelated", "missing_check", "provider_failure"])
@@ -196,6 +206,38 @@ def test_scope_only_issue_never_creates_a_repair_or_a_fake_fact():
     assert len(provider.calls) == 1
     assert result.quality_review.status == "completed_with_open_findings"
     assert result.quality_review.findings[0].resolution == "unresolved"
+
+
+def test_source_uncertainty_can_remain_after_review_without_a_repair_call():
+    paper, packet, *_ = material()
+    raw = paper.model_dump(mode="json")
+    fact = raw["elements"]["scale_and_mix"]["facts"][0]
+    fact.update(text="原表本期数为100.00，主体范围保留不确定。", subject_scope="unclear",
+                uncertainty_reason="所选材料不足以确定主体")
+    fact["metrics"][0].update(value=None, unit=None, uncertainty_reason="仅引原数，不作为精确统一口径")
+    paper = CompanyProfileWorkpaper.model_validate(raw)
+    provider = Provider([{"reviewed_fact_ids": ["main", "revenue"], "findings": []}])
+    result, _ = review_workpaper(paper, packet=packet, provider=provider, work_id="uncertain-review",
+                               identity=workpaper_processing_identity(real=False, review=True))
+    assert result.quality_review.status == "completed"
+    assert result.quality_review.policy_version == REVIEW_POLICY
+    assert result.elements.scale_and_mix.facts[0].metrics[0].value is None
+    assert "不确定" in render_workpaper(result)
+    assert len(provider.calls) == 1
+
+
+def test_repair_can_replace_an_overstatement_with_an_explicitly_uncertain_source_quote():
+    _, _, fixed, review, verify = material()
+    fixed.update(text="原表营业收入本期100.00；主体范围不作进一步归一。",
+                 subject_scope="unclear", uncertainty_reason="仅保留所引表格口径")
+    fixed["metrics"][0].update(value=None, unit=None, uncertainty_reason="仅引原值")
+    _, result, provider, _ = invoke([review, {"repaired_facts": [fixed]}, verify])
+    assert result.quality_review.status == "completed"
+    assert result.quality_review.findings[0].original_fact.text == "净利润100.00元。"
+    fact = result.elements.scale_and_mix.facts[0]
+    assert fact.uncertainty_reason and fact.metrics[0].value is None
+    assert "【不确定：仅保留所引表格口径】" in render_workpaper(result)
+    assert len(provider.calls) == 3
 
 
 def _retained_review(paper, review, fixed):
