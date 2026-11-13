@@ -6,6 +6,8 @@
 
 ## 1. 开发者必须先理解的纠偏
 
+2026-11-13当前下一交付6.BO仅补黄山已保存5候选final，以实际改进画像收口，不再重跑抽取/初核、补满可选供应链或扩平台。原服务接续与原稿/raw/source hash、5候选目标/定位已零调用核过，54独立正文不变、范围意见不洗白；新限定再核已询问，确认前不发模型/建绑定。具体见[章节底稿卡6.BO](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md#当前6bo黄山已有5候选仅补最终再核待新的明确批准)。复用66回归/原TaskService有效证明，无业务代码改动，不重跑长测；开工无本人前轮垃圾，本轮释放0，批准后的库/脚本一套结果后finally清，旧源/成绩/既有改动保护。
+
 2026-11-13 6.BN两份同版真实入口已结束，交[黄山54条真实限用画像及浦发原响应恢复稿](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-continuity-result-20261113.md)。主要阻塞仍是程序消费合法原文的规则过严，不是网络或金额用尽；已在全部停止后局部修正并原响应零网络核验，不能拼成同版真实通过。黄山真实初核确实纠出4项方向等6问题，5候选未获final不采纳；浦发恢复63条但未真实复核。当前授权用尽，不自动重跑两份、扩样或生产；下次只考虑既有修订最短接续，不重复成功前段。66相关回归及有限核源成立，必要结果一套后清本人3运行根/3脚本，旧源/原失败/既有改动保护。
 
 2026-11-13下一交付6.BN转向浦发/黄山两类报告的同版连续业务效果，不为林海47条稿再派字段修补或扩审核平台。已核两份正式PDF hash与当前启用DeepSeek/Grok profile；仅方案0/2，新的限定外呼已询问，批准前不建可发送绑定/发模型探针。范围见[章节底稿卡6.BN](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md#当前6bn银行旅游同版连续真实交付用户已明确批准)，批准后原TaskService各一次、同版并发2、精确资源与可读画像/问题处置一起交付；有源不确定和可选供应链不补满，已知错误仍隔离。复用已有直接回归，开工未见本人相关垃圾，本轮不重复旧释放；权威结果一套后finally清本人库/脚本，旧源/失败/并行保护。未变S1/生产，不自动新增公司或窗口。

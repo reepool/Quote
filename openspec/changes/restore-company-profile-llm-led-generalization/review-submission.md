@@ -8830,3 +8830,13 @@ Review A类当前隔离理由可能丢失已修并直接反例/原入口复验�
 66项相关回归159.54秒通过，含原writer/TaskService接续、突破与literal%/百分点及错值/号/单位反例；不再重跑固定长测。有限Review A类两处过严规则已修并用原响应复现，旧结果/新旧调用混记及错误恢复均检查；B类全部字段/成本续表精修和扩样后置；C类开工既有配置/骨架/规划/未跟踪文件保护。OpenSpec strict/diff按当前变更核验，Git仅本人可隔离hunk。新真实总6物理/156180账本/0恢复/unknown，不把并发时长求和当墙钟或开发成本。6.BN2业务条件未全成故未勾，6.BN3按实际核源/修正/清理完成；S1仍0/12、生产not_authorized，无自动补窗/第三家。
 
 清理：本人两真实运行根2192457/1861576、离线恢复根1917365字节已finally删除；三份operator/核源脚本26554字节收尾删除，共5997952常规文件字节，不重算历史或未测测试空间。测试根随finally清理，权威回执一套，正式PDF/有效解析/原首次失败/并行产物不动。下一仅考虑既有候选最短有界接续或实际画像消费，不重付成功前段；任何新外呼仍需另明确批准，不把本轮剩余恢复成第二入口。
+
+## 275. 6.BO只补黄山已有候选final：零调用就绪，新的外呼待明确批准
+
+用户继续推进；沿business-first-goal/openspec-apply-change及唯一change，不再补两份抽取或扩标准化/审核框架。当前主要剩余是黄山5真实候选尚未再核，最短下一业务交付只对它们做最终源核并按实际结果采纳/隔离，不要求可选内容全满或core_complete=true。6.BN原两次已用/完整纠正0/2、浦发原失败、黄山54事实/6意见及修订拒绝均保留，S1/生产不改。
+
+本轮无业务代码改动，复用66项159.54秒及已有原TaskService显式接续有效证明。直接零调用从原extract响应+原generation/reading_scope/Evidence重建59事实原稿，hash1695ac0721997531a12a58832d7df200fc6c41097ab57ee3925b11656105577d与真实初核original_draft_hash相等。正式PDF f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f、全部坐标、原review/repair raw hash及parsed payload均匹配；旧repair仍rejected/schema_validation_error/finish stop。原resume显式重校验后typed/目标/源先过，唯一到达purpose为verify_profile_workpaper_repair，5目标mc-06/sm-01/sm-02/sm-04/sm-05齐全；发送接口明确readiness异常停止，未返回模拟pass/新模型回执/候选采纳。54独立正文等于原限用稿，f002范围意见仍未决。摘要唯一见workpaper-recheck-readiness-600054-20261113.json，不复制整套旧run。
+
+已向用户请求新的明确批准：只黄山原公开所选章节/5候选到已许可Scorpio/Grok grok-4.7 high，1final逻辑/2物理含1恢复/900秒/300000账本，单物理600秒/逻辑900秒/输出16384/载荷1000000，有价10元/无价unknown。不发DeepSeek、不重跑前段/浦发/新公司，不补窗/充值/共享配置/生产；旧窗口余额不复活。当前新模型/探针/可发送绑定0，批准后原TaskService直接一次执行，继承59039+13826用量与新final分列；未批准就只保方案，不再为非阻塞字段开发。
+
+有限Review关注原稿绑定、拒绝洗白、无关54条更改及范围意见误消除，直接核查均通过，无需A类新修复；B类完整字段/所有意见清零及扩样后置，C类开工既有改动保护。按文档/摘要范围做diff与OpenSpec strict，Git只纳本轮hunk。开工未见本人6.BN运行根/operator残留，本轮未建新库/脚本、释放0，不重算5997952。批准执行后再按唯一QuoteBak/权威证据一套/finally清库脚本；正式源/有效解析/旧失败/并行不动。
