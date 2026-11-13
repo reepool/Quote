@@ -1,0 +1,31 @@
+{
+  "mode": "saved_real_responses_local_revalidation_with_controlled_final_only",
+  "new_model_calls": 0,
+  "original_query_sha256": "8824c3bd126b684a2c312b2c54dc460162196a266334d91467b2fe16556492ba",
+  "original_draft_hash": "22a1d1cb478f5e85d4012a902b463d86061404489c9b4bd94b7d0bf64004ea0a",
+  "raw_repair_contract_status": "rejected",
+  "raw_repair_error": "schema_validation_error",
+  "raw_repair_response_hash": "90e4e8b2fcdaa87c2e9fddc355dbaf589cd4ae62f10432b9fdc7ea69a131702d",
+  "locally_revalidated_request_id": "bp-work-062bb2da6d746a6ce50057a4:workpaper:repair",
+  "inherited_call_sources": [
+    [
+      "review_profile_workpaper",
+      "scorpio:grok-4.7",
+      "accepted"
+    ],
+    [
+      "repair_profile_workpaper",
+      "deepseek:deepseek-flash",
+      "rejected"
+    ]
+  ],
+  "controlled_requested_purposes": [
+    "verify_profile_workpaper_repair"
+  ],
+  "candidate_count": 6,
+  "controlled_result_fact_count": 47,
+  "all_41_independent_facts_unchanged": true,
+  "quarantined_industry_use_not_revived": true,
+  "old_receipts_and_query_unchanged": true,
+  "limits": "This does not approve any candidate or replace the 41-fact real workpaper; real final recheck still needs new authorization."
+}

@@ -300,6 +300,66 @@ def test_retained_stages_reject_changed_candidate_or_response_hash_before_networ
     assert provider.calls == []
 
 
+@pytest.mark.parametrize('accept', [True, False])
+def test_explicit_schema_revalidation_preserves_old_rejected_receipt(accept):
+    paper, packet, fixed, review, verify = material()
+    verify['checks'][0]['accepted'] = accept
+    retained = _retained_review(paper, review, fixed)
+    receipt = retained['receipts'][1]
+    receipt.update(contract_status='rejected', contract_error='schema_validation_error', finish_reason='stop')
+    before = json.dumps(retained, sort_keys=True)
+    provider = Provider([])
+    with pytest.raises(ValueError, match='explicit schema'):
+        review_workpaper(paper, packet=packet, provider=provider, work_id='revalidation',
+            identity=workpaper_processing_identity(real=False, review=True), resume=retained)
+    assert provider.calls == []
+    retained['revalidate_rejected_repair'] = True
+    provider = Provider([verify])
+    result, receipts = review_workpaper(paper, packet=packet, provider=provider, work_id='revalidation',
+        identity=workpaper_processing_identity(real=False, review=True), resume=retained)
+    assert [c['purpose'] for c in provider.calls] == ['verify_profile_workpaper_repair']
+    assert result.quality_review.locally_revalidated_request_ids == (receipt['request_id'],)
+    assert result.quality_review.calls[1].contract_status == 'rejected'
+    assert result.quality_review.calls[1].model == 'historical-model'
+    assert receipts[1]['contract_status'] == 'rejected'
+    assert bool(result.elements.scale_and_mix.facts) is accept
+    assert '历史合同状态仍为rejected' in render_workpaper(result)
+    assert json.dumps({k:v for k,v in retained.items() if k != 'revalidate_rejected_repair'}, sort_keys=True) == before
+
+
+@pytest.mark.parametrize('failure', ['hash', 'payload', 'other_rejection', 'bad_target', 'bad_number', 'truncated', 'missing_finish'])
+def test_revalidated_repair_still_fails_before_final_send_for_invalid_history(failure):
+    paper, packet, fixed, review, _ = material()
+    if failure == 'bad_target':
+        fixed['fact_id'] = 'unrelated'
+    elif failure == 'bad_number':
+        fixed['metrics'][0].update(raw_value='999', value='999')
+    retained = _retained_review(paper, review, fixed)
+    receipt = retained['receipts'][1]
+    receipt.update(contract_status='rejected', contract_error='schema_validation_error', finish_reason='stop')
+    retained['revalidate_rejected_repair'] = True
+    if failure == 'hash':
+        receipt['response_hash'] = 'changed'
+    elif failure == 'payload':
+        retained['repair_response'] = {'repaired_facts': []}
+    elif failure == 'other_rejection':
+        receipt['contract_error'] = 'response_truncated'
+    elif failure == 'truncated':
+        receipt['finish_reason'] = 'length'
+    elif failure == 'missing_finish':
+        receipt.pop('finish_reason')
+    provider = Provider([])
+    try:
+        result, _ = review_workpaper(paper, packet=packet, provider=provider, work_id='bad-revalidation',
+            identity=workpaper_processing_identity(real=False, review=True), resume=retained)
+    except ValueError:
+        pass
+    else:
+        assert result.quality_review.status != 'completed'
+        assert not result.elements.scale_and_mix.facts
+    assert provider.calls == []
+
+
 def test_runtime_seed_review_gateway_writer_and_three_reads():
     from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
     from tests.unit.test_utils.test_llm_gateway import _config, _response
@@ -345,8 +405,10 @@ def test_runtime_seed_review_gateway_writer_and_three_reads():
         asyncio.run(client.close())
 
 
-@pytest.mark.parametrize("resume_prior", [False, True])
-def test_task_service_review_publishes_original_before_review_and_corrected_afterward(resume_prior):
+@pytest.mark.parametrize(('resume_prior', 'revalidate_rejected'), [
+    (False, False), (True, False), pytest.param(True, True, id='revalidated_schema_repair'),
+])
+def test_task_service_review_publishes_original_before_review_and_corrected_afterward(resume_prior, revalidate_rejected):
     from research.business_profile_production_operations import BusinessProfileAnnouncementFrontierRepository
     from research.company_profile.operations import CompanyProfileTaskService
     from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
@@ -393,6 +455,9 @@ def test_task_service_review_publishes_original_before_review_and_corrected_afte
             identity.update(quality_review_profile="review", repair_profile="test",
                             review_existing_draft_hash=workpaper_hash(paper))
             retained = _retained_review(paper, review, fixed) if resume_prior else None
+            if revalidate_rejected:
+                retained['revalidate_rejected_repair'] = True
+                retained['receipts'][1].update(contract_status='rejected', contract_error='schema_validation_error', finish_reason='stop')
             if retained:
                 identity["review_resume_hash"] = hashlib.sha256(
                     json.dumps(retained, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
@@ -416,6 +481,9 @@ def test_task_service_review_publishes_original_before_review_and_corrected_afte
             assert "营业收入100.00" in final["workpaper"]["elements"]["scale_and_mix"]["facts"][0]["text"]
             assert len(transport.calls) == (1 if resume_prior else 3)
             assert len(final["workpaper"]["quality_review"]["retained_request_ids"]) == (2 if resume_prior else 0)
+            if revalidate_rejected:
+                assert final['workpaper']['quality_review']['calls'][1]['contract_status'] == 'rejected'
+                assert final['workpaper']['quality_review']['locally_revalidated_request_ids'] == [retained['receipts'][1]['request_id']]
         finally:
             if client is not None:
                 asyncio.run(client.close())

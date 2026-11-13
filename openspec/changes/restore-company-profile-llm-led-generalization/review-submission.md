@@ -8778,3 +8778,17 @@ Review A类当前隔离理由可能丢失已修并直接反例/原入口复验�
 清理：本人真实运行根1935820字节finally删除；运行/零调用核查脚本11493/6145字节删除，总计1953458常规文件字节，不称物理块、不重报历史释放或未测测试空间。只留必要正式回执/结果/账本/同源JSON人读/有限源核及诊断各一套，正式PDF/有效共享解析/原首次失败和并行物不动。提交只纳本人代码/测试、文档明确hunk及新run；旧审核约1005行等留工作区保护。
 
 6.BL按本卡“一次真实交付或断点”完成，但完整修订再核仍未成立，不计S1公司、生产不授权，旧6.BJ 0/3和S1 0/12不改。下一若另有明确授权，只考虑现有真实候选的有界定向再核，不重跑已成功选章/抽取/初核；本次到此停止，不自动继续。
+
+## 271. 6.BM零调用接续就绪：原拒绝保留，只补最终再核
+
+用户要求按OpenSpec继续，主线只补林海6.BL已有6真实候选的final，不重做成功选章/抽取/初核/修订、不扩字段或续跑平台。先按产品→验收→交付/A-B→当前change核范围，开工stage空，未见本人前轮相关临时根残留。原resume硬性要求两份accepted回执会挡住格式已能消费的真实候选，是当前P2接续阻塞；不是再请求模型改一遍答案的理由。只在原review函数/元数据投影局部接续，所有源、旧回执/失败/S1和生产权限不变。
+
+6.BM1完成：显式revalidate_rejected_repair且原repair contract_status=rejected/contract_error=schema_validation_error/finish=stop才允许当前typed重新校验；原raw SHA256、raw解析payload、原稿hash/源版本仍必须一致，所有目标/源约束在final前执行。未声明、截断/缺finish、其他拒绝原因、篡改、错目标/错数均不发送。历史receipt保持rejected，不伪造accepted，_model_call只有这个显式历史路径读取拒绝响应的原model/source/usage，quality.locally_revalidated_request_ids及Markdown单列“本地重校验非新模型通过”。旧accepted接续默认兼容，runtime已存在resume hash覆盖新flag，无新增数据库/平台。
+
+真实材料零调用诊断：按原accepted抽取+原Evidence/generation重建初稿，hash=22a1d1cb478f5e85d4012a902b463d86061404489c9b4bd94b7d0bf64004ea0a，与6.BL真实初核绑定一致；原7意见/6修订原样继承，原修订仍rejected。受控final仅用于工程投影，确认只请求verify_profile_workpaper_repair、41独立事实不变、错误F-SC-D1不复活；模拟全接受时47条是受控结果，不是真实发布或模型新成绩。本轮只保workpaper-recheck-readiness-600099-20261113.json摘要，不另造完整“已通过”稿；原query/hash/历史用量都未修改，也未把模拟final写进真实41条稿。
+
+验证：两文件直接组`bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_workpaper.py tests/unit/test_research/test_company_profile_workpaper_review.py -k 'not task_service'`57项19.38秒通过。收紧finish=stop/新增缺finish负例后，`test_company_profile_workpaper_review.py -k 'schema_revalidation or revalidated_repair'`9项4.61秒通过。只跑新增原TaskService参数`-k revalidated_schema_repair`，1项51.05秒通过（call47.83秒），外传输替换、只1个本地final发送、旧2回执单列继承且修订status仍rejected、三读一致；旧未改两条长入口不重复。OpenSpec strict/git diff检查通过，既有requests版本警告不相关。有限Review A类历史失败洗成通过/字节篡改/新旧调用混记/仍无效目标出网已用正反覆盖；B类更多格式和平台后置；C类旧配置/骨架/规划/未跟踪内容保护。
+
+已向用户请求新的明确真实外呼批准，仅林海已有公开原文/6候选到Scorpio/Grok grok-4.7 high：1final逻辑/最多2物理含1恢复/900秒/300000保守账本、无价unknown，不追加窗口/公司/充值/共享配置/生产，也不调用DeepSeek。当前未获明确答复，新增模型/探针/可发送绑定均0，6.BM2及其真实最终改动审核未完成；不能从继续指令、旧6.BL余额或工程通过推定权限。本轮在权限处停止，不继续堆离线加固；获批后直接冻结并只发这一次final。
+
+清理：新增TaskService隔离测试根由TemporaryDirectory/finally删除，末端无v9-review-service-*；本人就绪operator4860字节删除（只此项计量，不重复历史或未计测试库空间）。仅留一份原响应接续就绪摘要、代码/测试/规范，正式PDF/有效共享解析/旧首次失败及并行物不动。文档按本人hunk隔离提交，不纳旧审核约1005行等，业务活跃开发/审核耗时未可靠计量。business-first将工作限制到复用真实阶段完成最后一环，未新增框架或补齐非必要字段；本轮并未声称真实再核完成。

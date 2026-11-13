@@ -359,6 +359,7 @@ class WorkpaperQualityReview(_Model):
     checked_fact_ids: tuple[str, ...] = ()
     calls: tuple[WorkpaperModelCall, ...] = ()
     retained_request_ids: tuple[str, ...] = ()
+    locally_revalidated_request_ids: tuple[str, ...] = ()
     error: str | None = None
 
 
@@ -660,6 +661,8 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
                 f"requested_reasoning={call.reasoning_effort or '未知'}；usage={call.usage.total_tokens}；"
                 f"{'继承历史回执，非本次调用' if call.request_id in review.retained_request_ids else '本次调用'}。"
             )
+            if call.request_id in review.locally_revalidated_request_ids:
+                out.append("  - 历史合同状态仍为rejected；本次仅本地重校验候选有效，不是新的模型通过。")
         for finding in review.findings:
             refs = "、".join(f"[{value}](#{value.lower()})" for value in finding.evidence_ids)
             out.append(f"- {finding.severity} / {finding.issue_type} / {finding.resolution}：{finding.explanation}（{refs}）")

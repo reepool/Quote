@@ -74,6 +74,12 @@ The reviewer MUST identify checked fact IDs/elements and source-cited errors, am
 - **THEN** the original owner may consume the retained accepted responses after binding the source version, original draft and response hashes, and send only final verification
 - **AND** retained model calls and usage are identified separately from the current run, original failures remain unchanged, and exhausted logical recovery limits are not reset to reissue earlier stages
 
+#### Scenario: A retained repair failed an older local schema contract
+- **WHEN** a hash-bound continuation explicitly requests local revalidation of a retained repair rejected only as schema_validation_error
+- **THEN** the current typed repair decoder and all target/source constraints MUST validate the unchanged original response before any final request
+- **AND** the original receipt MUST retain rejected status, model and usage; quality output separately identifies local revalidation, never treating it as a new successful model call
+- **AND** absent explicit revalidation, tampered bytes/payload, unknown targets, or still-invalid candidates MUST fail before a final send; other rejection reasons are not implicitly eligible
+
 ### Requirement: Workpapers expose the actual model and reading scope
 Each new LLM workpaper MUST bind locally generated model metadata from the existing gateway receipts, not model-authored attribution. Metadata MUST distinguish section selection from actual section-text interpretation, record the model/source label, logical and selected profiles when available, request and response identities, actual supplied section/page scope, prompt/preprocessing/guide versions and known usage. The successful returned model MUST be the content author; failed attempts and retries remain in the existing receipt/ledger and MUST NOT be mislabeled as successful readers. JSON, Markdown, query and export MUST expose this metadata without a new store or evaluation platform. Missing historical metadata MUST remain unknown, and old workpapers MUST stay readable without rewriting their original results.
 

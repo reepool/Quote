@@ -150,11 +150,13 @@ def _model_call(
     receipts: Sequence[Mapping], *, purpose: str, request_id: str,
     section_ids: tuple[str, ...] = (), pages: tuple[int, ...] = (),
     heading_count: int | None = None,
+    include_rejected: bool = False,
 ) -> WorkpaperModelCall:
     """Attribute only the returned response of this logical request, not a pool preference."""
     receipt = next((item for item in reversed(receipts)
                     if item.get("request_id") == request_id and item.get("purpose") == purpose
-                    and item.get("contract_status") == "accepted"), {})
+                    and item.get("contract_status") in (
+                        {"accepted", "rejected"} if include_rejected else {"accepted"})), {})
     fields = {key: receipt.get(key) for key in (
         "request_hash", "response_hash", "source_label", "model", "selected_profile",
         "logical_profile", "route_fingerprint", "finish_reason", "reasoning_effort",

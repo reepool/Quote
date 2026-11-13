@@ -161,6 +161,7 @@ def review_workpaper(
 
     prior_receipts = tuple((resume or {}).get("receipts") or ())
     prior_by_purpose = {item.get("purpose"): item for item in prior_receipts}
+    locally_revalidated = []
     if resume is not None:
         if resume.get("original_draft_hash") != original_hash:
             raise ValueError("review continuation belongs to a different original draft")
@@ -168,9 +169,20 @@ def review_workpaper(
             raise ValueError("review continuation belongs to a different source version")
         if len(prior_receipts) != 2 or set(prior_by_purpose) != {"review_profile_workpaper", "repair_profile_workpaper"}:
             raise ValueError("review continuation requires the accepted original review and repair receipts")
-        if any(item.get("contract_status") != "accepted" or not item.get("response_payload")
-               for item in prior_by_purpose.values()):
-            raise ValueError("review continuation receipts must contain accepted responses")
+        for purpose, receipt in prior_by_purpose.items():
+            eligible_repair = (
+                purpose == "repair_profile_workpaper"
+                and resume.get("revalidate_rejected_repair") is True
+                and receipt.get("contract_status") == "rejected"
+                and receipt.get("contract_error") == "schema_validation_error"
+                and receipt.get("finish_reason") == "stop"
+            )
+            if not receipt.get("response_payload") or (
+                receipt.get("contract_status") != "accepted" and not eligible_repair
+            ):
+                raise ValueError("review continuation receipts require accepted responses or explicit schema repair revalidation")
+            if eligible_repair:
+                locally_revalidated.append(receipt["request_id"])
         for purpose, key in (("review_profile_workpaper", "review_response"),
                              ("repair_profile_workpaper", "repair_response")):
             receipt = prior_by_purpose[purpose]
@@ -182,11 +194,17 @@ def review_workpaper(
                 or json.loads(raw) != receipt["response_payload"]
             ):
                 raise ValueError("retained review responses must match their original receipt hashes")
+        if locally_revalidated:
+            # Validate unchanged original bytes under the current decoder, not
+            # a caller-rewritten accepted payload. Target/source checks below
+            # still run before the sole final-verification request.
+            WorkpaperRepairResponse.model_validate(resume["repair_response"])
         for purpose, receipt in prior_by_purpose.items():
             calls.append(_model_call(
                 (receipt,), purpose=purpose, request_id=receipt["request_id"],
                 section_ids=tuple(item.section_id for item in paper.reading_scope.sections),
                 pages=tuple(sorted({span.page for item in paper.evidence for span in item.source_spans})),
+                include_rejected=receipt["request_id"] in locally_revalidated,
             ))
 
     def request(request_id, purpose, response_model, instructions, content):
@@ -322,6 +340,7 @@ def review_workpaper(
         status=status, policy_version=REVIEW_POLICY, original_draft_hash=original_hash,
         checked_fact_ids=checked, findings=tuple(findings), calls=tuple(calls), error=error,
         retained_request_ids=tuple(item["request_id"] for item in prior_receipts),
+        locally_revalidated_request_ids=tuple(locally_revalidated),
     )
     safe = standardize_workpaper_metrics(_project(paper, review=quality, findings=findings, replacements=replacements))
     receipts = (*(dict(item, receipt_origin="retained_receipt") for item in prior_receipts),

@@ -10,6 +10,10 @@
 
 ## Decisions
 
+### 2026-11-13 6.BM只补final：保留历史拒绝的本地重校验
+
+原review_resume只允许两份accepted历史响应，会阻止本次真实候选在当前decoder已能保literal时继续。增加显式revalidate_rejected_repair：只适用于历史repair schema_validation_error且finish=stop；原raw SHA256/解析payload/源与原稿hash先核，当前WorkpaperRepairResponse/目标/来源硬约束仍先于final发送。旧receipt不改accepted，模型归因/usage仍按原status=rejected记录，quality_review.locally_revalidated_request_ids单列，Markdown明确本地重校验非新模型通过。其他失败/缺finish/截断/篡改/无效目标或数值在final前拒绝。沿原TaskService/同一writer，不新建checkpoint平台；受控接续已证明仅final发送，真实林海6候选只做零调用就绪，新的最终外呼另待明确批准。
+
 ### 2026-11-13 6.BL真实初核与literal原文修订收尾
 
 用户明确批准后当前冻结版本真实一次：正文46候选、Grok初核7发现，隔离5条留41事实；额外elements.limitations被局部屏蔽而未丢整稿，证明新wire实际生效。修订已回6候选，6个“增加/减少X个百分点”raw被旧Decimal校验拒绝，最终再核未发，不改真实incomplete结果。仅结束后按已批准产品原则局部消费：同unit百分点/来源单位兼容、原方向与signed参考同值时转value=null保raw及未标准化原因；错符号/数值/单位仍拒绝，引用定位仍硬核。保存响应替传输+源检查只证明6候选本地可消费，不是新真实核验或采纳。没有新平台、共享配置或追加付费；下一若获授权只做候选定向再核，不重新支付成功前段。
