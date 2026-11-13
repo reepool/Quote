@@ -1,0 +1,20 @@
+{
+  "mode": "saved_repair_zero_network_diagnostic_not_adopted",
+  "new_model_calls": 0,
+  "scripted_sends": 1,
+  "candidate_count": 6,
+  "literal_metrics_retained_without_normalization": 6,
+  "candidate_ids": [
+    "F-MC-01",
+    "F-OI-03",
+    "F-SC-U1",
+    "F-PS-04",
+    "review-add:FND-006",
+    "review-add:FND-007"
+  ],
+  "all_candidate_source_numbers_or_literal_wording_located": true,
+  "real_recheck_performed": false,
+  "original_rejected_repair_response_hash": "90e4e8b2fcdaa87c2e9fddc355dbaf589cd4ae62f10432b9fdc7ea69a131702d",
+  "original_query_unchanged": true,
+  "note": "Only local format/source binding now consumable. No repaired fact applied to the original 41-fact real delivery."
+}

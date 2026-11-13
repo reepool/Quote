@@ -15,6 +15,11 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 - **THEN** review may complete with that content still uncertain and need not request a deterministic replacement
 - **AND** a wrong amount or unsupported company attribution is not approved merely because the draft adds an uncertainty label
 
+#### Scenario: A returned rate change preserves literal directional wording
+- **WHEN** a metric preserves literal 增加/减少 followed by a decimal amount and 个百分点, and its same-unit signed reference agrees with that direction
+- **THEN** local projection MAY retain that literal raw value as an explicitly unnormalized value with a reason instead of rejecting the entire response
+- **AND** a conflicting sign, amount or unit remains invalid; source binding still locates the complete literal wording, and a repaired candidate still requires real source recheck before adoption
+
 #### Scenario: One returned metric cannot be located in its cited source
 - **WHEN** an otherwise schema-valid extraction contains one fact whose metric number or unnormalized raw wording is not present in the supplied evidence
 - **THEN** binding MUST withhold that fact, record its identity and concrete limitation, and retain independently valid facts in the same workpaper

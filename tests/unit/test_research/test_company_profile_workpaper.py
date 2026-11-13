@@ -343,6 +343,24 @@ def test_known_metric_value_still_displays_uncertain_scope_and_reason():
     assert "两处披露的范围未统一" in _metric_display(metric)
 
 
+@pytest.mark.parametrize('raw,value', [('减少0.82个百分点', '-0.82'), ('增加4.75个百分点', '4.75')])
+def test_literal_rate_change_stays_source_only_without_forcing_signed_normalization(raw, value):
+    from research.company_profile.workpaper import WorkpaperMetric, _metric_display
+
+    data = dict(name='毛利率同比变动', raw_value=raw, value=value, unit='百分点', source_unit='百分点',
+                period='2025', subject_scope='business_segment')
+    metric = WorkpaperMetric.model_validate(data)
+    assert metric.value is None and metric.raw_value == raw and metric.uncertainty_reason
+    assert WorkpaperMetric.model_validate(metric.model_dump()) == metric
+    assert raw in _metric_display(metric) and '未标准化' in _metric_display(metric)
+    with pytest.raises(ValueError):
+        WorkpaperMetric.model_validate({**data, 'value': '999'})
+    with pytest.raises(ValueError):
+        WorkpaperMetric.model_validate({**data, 'value': value[1:] if value.startswith('-') else '-' + value})
+    with pytest.raises(ValueError):
+        WorkpaperMetric.model_validate({**data, 'unit': '%'})
+
+
 def test_two_calls_use_sections_and_direct_structured_content_without_old_inventory():
     provider = _Provider()
     result = run_workpaper(report=_report(), pages=PAGES, processing_identity=workpaper_processing_identity(real=False), provider=provider, work_id="test")

@@ -1,0 +1,63 @@
+{
+  "scope": "independent limited reading of selected original sections; NOT 41-fact full audit or full-report recall",
+  "query_sha256": "8824c3bd126b684a2c312b2c54dc460162196a266334d91467b2fe16556492ba",
+  "source_coordinates_checked": true,
+  "all_41_retained_fact_objects_unchanged": true,
+  "withdrawn_fact_ids": [
+    "F-MC-01",
+    "F-OI-03",
+    "F-PS-04",
+    "F-SC-D1",
+    "F-SC-U1"
+  ],
+  "new_model_calls": 0,
+  "checks": [
+    {
+      "area": "main business/products/operating model",
+      "pages": [
+        8,
+        9,
+        10
+      ],
+      "result": "四业务制造销售、产品用途、以销定产/按单/适度备货/经销有据；不从行业用途推公司军事客户。"
+    },
+    {
+      "area": "company revenue and business mix",
+      "pages": [
+        12,
+        18,
+        21
+      ],
+      "result": "113124.69万元与表1131246944.93元按原披露并列；板块467207688.51/283722402.61/248582445.60/125340298.09元与公司总额分开；占比22.10/25.22/41.54/11.14%保主业口径。"
+    },
+    {
+      "area": "R&D and subsidiaries",
+      "pages": [
+        25,
+        26,
+        30,
+        31
+      ],
+      "result": "费用化45742943.50元/资本化0.00为明示，非空白借零；子公司/参股单位万元及跨页表头与数据列可对。"
+    },
+    {
+      "area": "seven initial findings",
+      "pages": [
+        10,
+        11,
+        15,
+        16,
+        21,
+        22,
+        24
+      ],
+      "result": "5原主张退出正文有据；不适用泛化、行业用途外推、农业板块范围与主要限定均有实质问题。2遗漏有源，但仍为待补，不因模型称material强制额外调用。"
+    }
+  ],
+  "limits": [
+    "41条是模型检查后保留，不等于独立41条全准确。",
+    "具体原料不全可留空。",
+    "6候选未获真实再核，不能补进原稿。",
+    "known development sample, not S1 or production approval."
+  ]
+}

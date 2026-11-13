@@ -1,0 +1,48 @@
+{
+  "run_id": "v9-current-600099-20261113",
+  "name": "林海股份",
+  "mode": "fresh_known_report_real_observation",
+  "old_semantics_loaded": false,
+  "substituted_transport": false,
+  "production_authorization": "not_authorized",
+  "preparation_seconds": 24.782,
+  "task_state": "completed",
+  "business_seconds": 446.176,
+  "three_reads_equal": true,
+  "query_sha256": "8824c3bd126b684a2c312b2c54dc460162196a266334d91467b2fe16556492ba",
+  "profile_count": 1,
+  "workpaper_status": "review_limited_pending_verification",
+  "review_status": "incomplete",
+  "review_error": "SemanticProviderError: gateway response violates the schema: 6 validation errors for WorkpaperRepairResponse\nrepaired_facts.4.metrics.0\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '特种车辆行...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error\nrepaired_facts.4.metrics.1\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '农业机械行...certainty_reason': None}, input_",
+  "fact_count": 41,
+  "findings": [
+    {
+      "id": "FND-001",
+      "resolution": "quarantined"
+    },
+    {
+      "id": "FND-002",
+      "resolution": "quarantined"
+    },
+    {
+      "id": "FND-003",
+      "resolution": "quarantined"
+    },
+    {
+      "id": "FND-004",
+      "resolution": "quarantined"
+    },
+    {
+      "id": "FND-005",
+      "resolution": "quarantined"
+    },
+    {
+      "id": "FND-006",
+      "resolution": "omission_candidate"
+    },
+    {
+      "id": "FND-007",
+      "resolution": "omission_candidate"
+    }
+  ]
+}

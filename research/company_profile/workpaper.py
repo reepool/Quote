@@ -107,7 +107,25 @@ class WorkpaperMetric(_Model):
                      "greater_than" if raw.startswith("超") else "exact")
         if "qualifier" in data and data["qualifier"] != qualifier:
             raise ValueError("metric qualifier must match original raw value")
-        return {**data, "qualifier": qualifier}
+        result = {**data, "qualifier": qualifier}
+        # Preserve a real returned source phrase rather than forcing a signed
+        # number onto it. Only an agreeing same-unit reference can fall back;
+        # a wrong sign/unit/value is still an error, not "uncertainty".
+        if (raw.startswith(("增加", "减少")) and raw.endswith("个百分点")
+            and data.get("unit") == "百分点"
+            and data.get("source_unit") in (None, "百分点") and data.get("value") is not None):
+            try:
+                amount = Decimal(raw[2:-len("个百分点")].strip())
+                reference = Decimal(str(data["value"]))
+            except InvalidOperation:
+                pass
+            else:
+                if amount.is_finite() and amount >= 0 and reference.is_finite():
+                    signed = amount.copy_negate() if raw.startswith("减少") else amount
+                    if reference == signed:
+                        result.update(value=None, uncertainty_reason=data.get("uncertainty_reason") or
+                                      "原文带增减方向及单位；保留原文，未统一为带符号数值。")
+        return result
 
     @model_validator(mode="after")
     def decimal_value(self):

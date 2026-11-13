@@ -8756,3 +8756,25 @@ Review A类当前隔离理由可能丢失已修并直接反例/原入口复验�
 本轮实际业务增量仅就绪范围/下一明确方案，不称新增画像、模型分数或真实稳定性已验证。6.BL1完成，6.BL2–3待明确批准及实际执行；6.BJ2原0/3与S1 0/12不改。OpenSpec strict和git diff检查通过；复用6.BK机械回执，不重跑未变代码。Review A类主要是旧授权误用/范围扩张，已用待批准状态与单份限额收住；B类理论容错不新增；C类旧脏改保护。business-first使本轮在需要新权限处停下，而不是继续堆纯准备工程。开发/审核活跃时间未可靠记录。
 
 清理：开工及收尾核无本人前序相关临时根残留；本轮未创建临时库/脚本/备份，释放0，不重报历史空间。正式PDF/有效共享解析、旧源/首次失败及并行/既有改动未动。只提交当前卡/规划/任务/交接的本人段落，不纳旧审核约1005行或其他基线差异；不把文档提交当付费授权或已完成真实验收。
+
+## 270. 6.BL已批准真实一次：41条限用画像与初核成立，修订未获最终再核
+
+末端Review用Decimal.copy_negate保方向比较不经上下文舍入，literal正反定向2项3.60秒再验通过；原query hash仍不变，未再跑模型或长入口。
+
+用户明确回复“批准林海这一次限定真实验证”。本轮先核Git基线（stage空）、正式PDF/hash/热解析、指定路由启用/凭据/host、DNS/TLS及隔离库；只用旧binding的asset元数据，不加载旧导航/答案/受控响应。沿CompanyProfileTaskService→CommonGatewaySemanticProvider→原writer/query/export新实例。完整业务源码hash（含开工既有骨架实际hash）/源/profile/prompt v9/review v2在发送前冻结，真实运行中未改版，不重复6.BK有效长测。正式源/共享配置/旧失败/并行改动保护，无其他公司/充值/生产。
+
+本次1/1已执行结束，真实抽取/初核及有用限用交付成立，不是完整纠正闭环。准备24.782秒，业务446.176秒；4物理/116794实际usage/0恢复/费用unknown，全部finish=stop，导航/抽取/初核/修订分别19780/23975/56505/16534。抽取25.821秒、Grok high初核392.602秒为主要等待，无网络超时、截断或换路由；供应商total按原回执记，不自行把输入输出求和改账。未达1800秒/500000/10含3恢复（每逻辑1）上限，仍不追加入口。原query sha256=8824c3bd126b684a2c312b2c54dc460162196a266334d91467b2fe16556492ba，三读一致，workpaper_status=review_limited_pending_verification、review_status=incomplete、core_complete=false。
+
+真实内容：46候选进初核，Grok列46个检查ID、7项有源意见。5原主张隔离（不适用泛化、行业军事用途外推、两个农业板块范围过宽、摩托车漏“主要”），剩41条事实与初稿同ID对象（按统一typed默认字段）完全相等；另2项毛利率变动/消防产销结构解释遗漏保待补。可见主营四业务、产品用途、以销定产/经销、公司营业收入113124.69万元及精确表数1131246944.93元、主要板块金额/占比、客户市场与经营因素。可选上游/下游被隔离可留空，不为补满扩全文。原extract额外把limitations放elements里，当前wire确实只屏蔽该字段并保主稿，真实验证了上轮容错，而非又一个空入口。
+
+有限独立读源：物理8–10页主营/经营模式、11页行业与公司区分、12/18/21页公司收入和分行业表头，15–16农业板块范围、22页产销结构、24页不适用范围、25–26研发资本化0.00明示、30–31子公司跨页表头均已核。本轮全Evidence与正式PDF重提坐标一致，41保留对象/5撤回对象与原响应对应，4原响应raw hash/response_payload一致。不是独立41条全准确、全报告召回或全市场模型质量分数；已有标准“不确定保原文”不等于已知错误可用。内容与来源/资源/限制集中见workpaper-runs/v9-current-600099-20261113/result.md及source-check.json。
+
+未完成点：DeepSeek返回6个修订候选，其中review-add:FND-006的6个raw保留“减少0.82个百分点/增加4.75个百分点”等原文，但纯十进制validator拒绝，原修订contract_status=rejected，6候选均未采纳，最终再核未发。已保完整原响应，可判断是本地消费格式而非空模型/网络故障。只在真实运行结束后做本任务现实P1收尾：literal增加/减少+十进制+个百分点，单位及来源单位兼容且signed参考同值时转value=null、保原文/未标准化原因；不强制统一为带符号数值。错方向/错值/错单位仍拒绝，完整literal须源定位。未改原真实失败回执或41条稿，不以剩余额度再发核验。
+
+保存6候选通过公共网关替传输的零调用诊断及原引用检查，6个literal指标均以null+原因保原文，但没有真实final accepted，诊断写repair-offline-diagnostic.json。不将它冒充6新模型候选或修订通过。审计operator最初误扫raw额外limitations字段/比较原始缺省字段，修正为已知要素及typed对象比较后通过，非真实输入变化或额外模型调用；两个operator均收尾删除。
+
+验证：`bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_workpaper.py tests/unit/test_research/test_company_profile_workpaper_review.py -k 'not task_service'`49项19.08秒通过；literal/近似/不确定定向6项4.24秒通过，既有requests警告，未改长TaskService/6.BK回执复用。OpenSpec strict及git diff检查通过。Review A类literal格式挡住整修订已局部修，反方向/错单位不洗白；B类两项遗漏是否必须补满及更多单位格式不扩规则/平台；C类开工旧配置/骨架/规划不纳入。business-first使本轮以实际41事实/问题处置交付，而非追字段100%或再开付费窗口。活跃开发/审核耗时未可靠记录。
+
+清理：本人真实运行根1935820字节finally删除；运行/零调用核查脚本11493/6145字节删除，总计1953458常规文件字节，不称物理块、不重报历史释放或未测测试空间。只留必要正式回执/结果/账本/同源JSON人读/有限源核及诊断各一套，正式PDF/有效共享解析/原首次失败和并行物不动。提交只纳本人代码/测试、文档明确hunk及新run；旧审核约1005行等留工作区保护。
+
+6.BL按本卡“一次真实交付或断点”完成，但完整修订再核仍未成立，不计S1公司、生产不授权，旧6.BJ 0/3和S1 0/12不改。下一若另有明确授权，只考虑现有真实候选的有界定向再核，不重跑已成功选章/抽取/初核；本次到此停止，不自动继续。
