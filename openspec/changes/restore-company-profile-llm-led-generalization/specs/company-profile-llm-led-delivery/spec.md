@@ -148,6 +148,12 @@ Evidence MUST bind evidence_id, document version, section_path, physical pages a
 - **THEN** the workpaper publishes the supported facts with explicit missing scope/reason and no fabricated value
 - **AND** eight populated keys or successful JSON parsing alone establishes neither content completeness nor a passing company score
 
+#### Scenario: A useful workpaper has no trusted core facts yet
+- **WHEN** query/export reads a sourced workpaper whose trusted-core accepted_fact_count is still zero
+- **THEN** it MUST also expose a separate workpaper summary with its original business description, fact/metric counts, origin, review status, unresolved-finding count and known actual extraction/review models
+- **AND** CSV and a readable export overview MUST distinguish this draft content from trusted facts; legacy accepted counts, dimensions, core_complete, source contents and production authorization MUST remain unchanged
+- **AND** old profiles without a workpaper remain readable with no fabricated workpaper counts or model attribution, and the view performs no model calls or production writes
+
 #### Scenario: Human reference is rendered for review
 - **WHEN** a human_reference JSON workpaper is used to check presentation and local mapping
 - **THEN** the rendered facts, metrics and evidence remain the same as the JSON and their origin remains visible

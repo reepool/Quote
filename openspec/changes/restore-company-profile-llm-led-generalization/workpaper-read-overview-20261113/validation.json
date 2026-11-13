@@ -1,0 +1,111 @@
+{
+  "mode": "retained_workpapers_read_only_projection",
+  "new_model_calls": 0,
+  "network_allowed": false,
+  "new_companies_processed": 0,
+  "production_authorization": "not_authorized",
+  "three_reads_equal": true,
+  "all_original_content_and_trust_fields_unchanged": true,
+  "source_hashes": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-review-final-recheck-600100-20261112/query.json": "a9a6d3ba1b263a66a884cf8f3215e9b6e1398d14435b1c3a81f4a212cd6507a5",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-recheck-600099-20261113/query.json": "462e63dabdb6a8a7246da6d24354dd75ab51149b6f3db0680d05f8d2d4f6c2d0",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-recheck-600054-20261113/query.json": "a1335088c7d09313529c082e992e303f483dd9917e6aa6cc72a6eb504958c06e",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-review-final-recheck-600100-20261112/export/600100.SH_2025-12-31.json": "1b1ddad99f1c84b43764f7bb9984c9a70253ac731993b7857361df6f0456efbb",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-review-final-recheck-600100-20261112/export/600100.SH_2025-12-31.md": "d74f167eef874580395db09c87caa722b9c4ee117c1df7084086b50693f0ac91",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-recheck-600099-20261113/export/600099.SH_2025-12-31.json": "baf2e929b8285e5e0593290c46e9e2a41b6afc928ab7feca4af83bdfb094ed3b",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-recheck-600099-20261113/export/600099.SH_2025-12-31.md": "67f96bd973954706ab3e8d1ef595a9bb38c35b22583876509d196a4994381d48",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-recheck-600054-20261113/export/600054.SH_2025-12-31.json": "1314a596ad6f1f757777fea8b3cc1bdc380f33618d65907e2b04482076bde664",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-recheck-600054-20261113/export/600054.SH_2025-12-31.md": "b10d406c4c2a627adaefd3813b203d27b262a1a03b4cac97715d72262b35d083"
+  },
+  "profiles": [
+    {
+      "instrument_id": "600100.SH",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-review-final-recheck-600100-20261112/query.json",
+      "summary": {
+        "origin": "llm_generated",
+        "business_description": "公司定位为“数智技术与核技术创新融合的高科技企业”，聚焦公共安全、数智产业、智慧能源等产业领域，并设有科技成果转化平台、资产管理平台、海外投资协同平台。\n公司主营业务归属于公共安全、数智产业和智慧能源等产业领域，按所处行业及经营模式可分为制造业和软件与信息技术服务业。\n报告期内公司整合数智信息产业资源成立同方数科；同方威视、同方超光、同方数科分别入选不同层级的改革或科创培育名单。",
+        "fact_count": 38,
+        "metric_count": 36,
+        "element_fact_counts": {
+          "business_structure": 3,
+          "products_services": 5,
+          "revenue_model": 3,
+          "scale_and_mix": 5,
+          "operations_and_inputs": 3,
+          "customers_channels_markets": 4,
+          "operating_drivers": 4,
+          "material_changes": 4,
+          "position": 2,
+          "upstream_inputs": 2,
+          "downstream_customers": 3
+        },
+        "review_status": "completed",
+        "open_finding_count": 0,
+        "extraction_model": "deepseek-flash",
+        "review_model": "grok-4.7"
+      },
+      "core_complete": false,
+      "accepted_fact_count": 0
+    },
+    {
+      "instrument_id": "600099.SH",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-recheck-600099-20261113/query.json",
+      "summary": {
+        "origin": "llm_generated",
+        "business_description": "公司主营业务为森林消防机械、农业机械、特种车辆（全地形车）、摩托车等及以上产品配件的制造和销售。\n公司主要采用以销定产的生产经营模式，由销售部门根据销售计划或客户订单将生产计划下达至生产部门，实行按单生产，同时根据市场需求适度备货；产品销售以经销模式为主。\n公司所处行业主要集中在森林消防机械行业、农业机械行业、特种车辆（全地形车）行业及摩托车行业。\n主要子公司江苏福马高新动力机械有限公司为公司子公司，主营机械制造销售，注册资本4,500.00万元。\n江苏联海动力机械有限公司为参股公司，主营机械制造销售，注册资本8,442.22万元；福马新能（北京）科技有限公司为参股公司，主营服务托管，注册资本2,520.00万元。",
+        "fact_count": 47,
+        "metric_count": 59,
+        "element_fact_counts": {
+          "business_structure": 5,
+          "products_services": 4,
+          "revenue_model": 4,
+          "scale_and_mix": 8,
+          "operations_and_inputs": 6,
+          "customers_channels_markets": 5,
+          "operating_drivers": 8,
+          "material_changes": 5,
+          "position": 1,
+          "upstream_inputs": 1,
+          "downstream_customers": 0
+        },
+        "review_status": "completed_with_open_findings",
+        "open_finding_count": 1,
+        "extraction_model": "deepseek-flash",
+        "review_model": "grok-4.7"
+      },
+      "core_complete": false,
+      "accepted_fact_count": 0
+    },
+    {
+      "instrument_id": "600054.SH",
+      "source_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-recheck-600054-20261113/query.json",
+      "summary": {
+        "origin": "llm_generated",
+        "business_description": "公司业务分为景区、索道及缆车、酒店、徽菜、旅行社、智慧旅游六大板块；景区业务经营黄山景区、花山谜窟景区及太平湖景区，提供旅游观光和休闲度假等服务。\n索道及缆车业务拥有黄山云谷索道、玉屏索道、太平索道和西海观光缆车，主要提供客运观光服务。\n酒店业务拥有各类酒店十余家，黄山景区内主要分布雲麓北海宾馆、狮林大酒店、西海饭店、白云宾馆、玉屏楼宾馆、雲野@排云型旅酒店、雲亼·曙光里和雲亼·狮林崖舍等酒店，黄山景区外主要分布雲颐汤泉酒店、轩辕国际大酒店、昱城皇冠假日酒店、黄山国际大酒店、华山宾馆、雲麓酒店（黄旅大厦店）等酒店。\n徽菜业务以“徽商的厨房、家乡的味道”为发展定位，打造徽文化主题餐饮品牌，在全国多地开设连锁主题餐饮门店。\n旅行社业务涵盖国内旅游、入境旅游、出境旅游、定制游、会展服务和疗休养等方面，下属黄山市中国旅行社有限公司为安徽省首批5A级旅行社。\n智慧旅游业务依托黄山景区旅游资源，整合黄山市及周边文旅产业要素，开展旅游目的地智慧旅游建设和运营业务，涵盖黄山旅游官方平台运营、新媒体运营、OTA业务承接、旅游产品和活动策划、旅游服务接待和旅游商品在线销售等。",
+        "fact_count": 59,
+        "metric_count": 39,
+        "element_fact_counts": {
+          "business_structure": 6,
+          "products_services": 6,
+          "revenue_model": 4,
+          "scale_and_mix": 11,
+          "operations_and_inputs": 7,
+          "customers_channels_markets": 6,
+          "operating_drivers": 8,
+          "material_changes": 6,
+          "position": 1,
+          "upstream_inputs": 2,
+          "downstream_customers": 2
+        },
+        "review_status": "completed_with_open_findings",
+        "open_finding_count": 1,
+        "extraction_model": "deepseek-flash",
+        "review_model": "grok-4.7"
+      },
+      "core_complete": false,
+      "accepted_fact_count": 0
+    }
+  ],
+  "read_export_seconds": 1.037,
+  "canonical_full_profiles_reused_not_copied": true
+}

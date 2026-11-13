@@ -523,6 +523,99 @@ def test_original_runtime_writer_query_export_and_new_read_instance_agree():
     assert not root.exists()
 
 
+@pytest.mark.parametrize('review_status', [None, 'completed', 'completed_with_open_findings', 'failed'])
+def test_workpaper_query_csv_overview_distinguish_visible_content_from_trusted_core(workpaper_read_root, review_status):
+    import csv
+
+    from research.company_profile.runtime import CompanyProfileRuntimeRecordV3
+    from research.company_profile.workpaper import WorkpaperQualityReview, WorkpaperReviewFinding, WorkpaperModelCall
+
+    tmp_path = workpaper_read_root
+    writer = CompanyProfileResearchWriter(tmp_path / 'output')
+    provider = _Provider(supply_chain=True)
+    runtime = CompanyProfileStageRuntime(writer=writer, provider=provider)
+    item = {'work_id': 'summary', 'report': _report(), 'pages': PAGES,
+            'processing_identity': workpaper_processing_identity(real=False)}
+    for stage in ('acquire', 'parse', 'semantic', 'verify', 'publish'):
+        assert runtime.run_stage(stage, item)['status'] == 'success'
+    record = CompanyProfileRuntimeRecordV3.model_validate_json(writer.paths[-1].read_text())
+    if review_status:
+        finding = WorkpaperReviewFinding(finding_id='scope-note', element='limitations', severity='minor',
+            issue_type='other', evidence_ids=(), explanation='未选范围未知。', resolution='unresolved')
+        calls = () if review_status == 'failed' else (WorkpaperModelCall(purpose='review_profile_workpaper',
+            request_id='review-fixture', scope_kind='selected_source_sections', model='review-fixture', contract_status='accepted'),)
+        review = WorkpaperQualityReview(status=review_status, original_draft_hash='fixture',
+            findings=() if review_status == 'completed' else (finding,), calls=calls)
+        writer.persist(record.model_copy(update={'workpaper': record.workpaper.model_copy(update={'quality_review': review})}))
+    reader = CompanyProfileReadService(tmp_path / 'output')
+    before = reader.query(('600000.SH',))
+    exported = reader.export(('600000.SH',), tmp_path / 'export')
+    reloaded = CompanyProfileReadService(tmp_path / 'output').query(('600000.SH',))
+    assert before['profiles'] == exported['profiles'] == reloaded['profiles']
+    profile = before['profiles'][0]
+    summary = profile['workpaper_summary']
+    assert summary['fact_count'] == 3 and summary['metric_count'] == 1
+    assert summary['element_fact_counts']['position'] == 1
+    assert summary['origin'] == 'controlled_fixture'
+    assert summary['business_description'] == '公司提供存贷款和结算服务。'
+    assert summary['review_status'] == review_status
+    assert summary['open_finding_count'] == (None if review_status is None else 0 if review_status == 'completed' else 1)
+    assert summary['extraction_model'] == 'fixture-model'
+    assert summary['review_model'] == ('review-fixture' if review_status in {'completed', 'completed_with_open_findings'} else None)
+    assert profile['core_complete'] is False and profile['accepted_facts'] == []
+    assert all(d['answered'] is False for d in profile['dimensions'])
+    row = next(csv.DictReader((tmp_path / 'export/profiles.csv').open()))
+    assert row['accepted_fact_count'] == '0' and row['core_complete'] == 'False'
+    assert row['workpaper_fact_count'] == '3' and row['workpaper_metric_count'] == '1'
+    assert row['workpaper_review_status'] == (review_status or '')
+    overview = (tmp_path / 'export/profiles.md').read_text()
+    assert '公司提供存贷款和结算服务。' in overview and 'controlled_fixture' in overview
+    assert '非已接受核心事实数' in overview and '未复核不表示零问题' in overview
+    assert '[画像](600000.SH_2025-12-31.md)' in overview
+    assert str(tmp_path / 'export/profiles.md') in exported['files']
+    assert len(provider.calls) == 2  # Reading/export did not issue another semantic request.
+    unknown = reader.render_profile(record.model_copy(update={
+        'workpaper': record.workpaper.model_copy(update={'generation': None})}))
+    assert unknown['workpaper_summary']['extraction_model'] is None
+
+
+@pytest.fixture
+def workpaper_read_root():
+    from tempfile import TemporaryDirectory
+
+    with TemporaryDirectory(prefix='workpaper-read-test-') as directory:
+        yield Path(directory)
+
+
+def test_workpaper_overview_preserves_unknown_model_and_escapes_source_markup(workpaper_read_root):
+    from research.company_profile.reads import _write_profile_overview, _write_profile_csv
+    import csv
+
+    tmp_path = workpaper_read_root
+    legacy = {'instrument_id': '600036.SH', 'freshness': {'report_period': '2025-12-31'},
+              'accepted_facts': [], 'dimensions': [], 'core_complete': False}
+    paper = {'instrument_id': '600000.SH', 'freshness': {'report_period': '2025-12-31'},
+             'workpaper_status': 'pending_verification', 'workpaper_summary': {
+                 'business_description': '公司甲|业务\n<script>原文</script>', 'fact_count': 1, 'metric_count': 0,
+                 'origin': 'human_reference', 'review_status': None, 'open_finding_count': None,
+                 'extraction_model': None, 'review_model': None}}
+    _write_profile_overview(tmp_path / 'profiles.md', [legacy, paper])
+    overview = (tmp_path / 'profiles.md').read_text()
+    assert '旧路径；无底稿投影' in overview and '[JSON](600036.SH_2025-12-31.json)' in overview
+    assert '公司甲\\|业务<br>&lt;script&gt;原文&lt;/script&gt;' in overview
+    assert '未知 / 未知' in overview and 'human_reference' in overview
+    _write_profile_csv(tmp_path / 'profiles.csv', [legacy, paper])
+    rows = list(csv.DictReader((tmp_path / 'profiles.csv').open()))
+    assert rows[0]['workpaper_fact_count'] == '' and rows[0]['workpaper_extraction_model'] == ''
+    assert rows[1]['workpaper_business_description'] == paper['workpaper_summary']['business_description']
+    for text in ('=HYPERLINK("x")', '+SUM(1)', '-1+2', '\t@SUM(1)'):
+        paper['workpaper_summary']['business_description'] = text
+        _write_profile_csv(tmp_path / 'profiles.csv', [paper])
+        row = next(csv.DictReader((tmp_path / 'profiles.csv').open()))
+        assert row['workpaper_business_description'] == "'" + text
+        assert paper['workpaper_summary']['business_description'] == text
+
+
 def test_manual_reference_is_substantive_and_rendered_from_same_json():
     root = Path(__file__).resolve().parents[3]
     path = root / "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-reference-600104-2025.json"

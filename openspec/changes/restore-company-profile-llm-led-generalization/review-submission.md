@@ -8854,3 +8854,17 @@ Review A类当前隔离理由可能丢失已修并直接反例/原入口复验�
 验证为本次实际原入口/源/新旧回执/对象/三读及有限Review，不新增测试数量成绩；OpenSpec strict和差异检查核过。Review A类无关对象更改、旧拒绝洗白、新旧费用混记和范围意见误清均经真实结果核验，无新阻塞待修；B类全字段完善/扩样和生产后置；C类开工既有配置/骨架/规划/未跟踪内容保护。6.BO2–3按真实结果完成，旧6.BN完整纠正0/2不追改、S1仍0/12。本次授权用尽，外呼结束，不自动追加浦发或其他公司。
 
 清理：本人运行根1916934常规文件字节已finally删除，operator14394字节交接前删除，共1931328字节；不重报前轮5997952或未量测测试空间。必要原响应引用/新final/预算/画像/源核一套持久，不复制旧整库；正式PDF、有用解析、旧失败和开工并行改动不动。Git仅提交本轮新run与本人文档hunk，保护原审核约1005行等未提交差异。
+
+## 277. 6.BP已有画像进入查询／导出：内容量与可信状态分开，零新模型
+
+用户继续按OpenSpec推进，本轮沿business-first-goal/openspec-apply-change回到实际画像消费，不再为黄山/林海可选细节追加调用。已确认原JSON/Markdown有正文，但profiles.csv只有旧可信核心维度/accepted_fact_count，59条底稿仍只能看到0可信事实；0本身正确，问题是看不到待核内容。因此只在原CompanyProfileReadService.render_profile加入workpaper_summary，CSV保旧列顺序/原义追加底稿列，有底稿时另由同read owner导出profiles.md。来源原句、事实/指标数、origin、复核/未决与实际抽取/初核模型可读，缺历史归因未知/未复核问题数null，不伪造0问题或可信成立。没有新服务/DB/平台/模型提示或生产开关，旧core_complete/accepted_facts/原业务事实/引文和权限不变。
+
+实际交付为workpaper-read-overview-20261113/profiles.md、profiles.csv和validation.json：同方38事实/36指标/review completed/未决0，林海47/59/with_open_findings/1，黄山59/39/with_open_findings/1，均原llm_generated/pending可信验证，DeepSeek正文/Grok初核归因来自原元数据。业务描述直接串联原business_structure事实，不调用LLM另写摘要，不把各类计数当准确率/召回率。完整JSON/Markdown仍链接原权威文件，只保新增索引/CSV/必要验证，未复制三套完整源或画像、未导入生产默认目录。新模型/探针/绑定/新增公司处理均0，旧S1 0/12及历次失败不改。
+
+沿原writer在QuoteBak临时封装已有底稿→原query/export→新实例，三读一致，原accepted_fact_count仍0、维度false/core_complete false/生产not_authorized；全部旧字段值及原Markdown/hash不变。首次本地检查因同方旧JSON缺新增可空元数据导致逐字对象比较失败，未改业务代码或原稿，核明只补None/空数组/exact等兼容默认值后采用严格旧字段不变和列明新增默认值核查，原失败/清理记录保first-local-check.json。第二次只读三家query/export1.037秒，不含原模型、源准备或开发时间，不作新采集性能声明；无网络、未运行语义provider，临时execution明确零新工作、旧真实用量仍在原对象中。
+
+验证37项169.67秒通过、7未选，其中旧可信导出兼容149.60秒；不再重复。新增用例退出清理/缺历史模型断言后只复验5项9.63秒，通过。覆盖原writer/query/export/新实例、pending与可信0分离、无/有/失败/未决复核、旧空列/混合读取/未知归因、特殊字符/HTML安全转义及无新语义请求。有限Review A类可信晋升、未复核造0、来源正文变更及旧字段回归均有直接证明，无新阻塞；B类更短摘要/样式/全字段补齐和扩样后置；C类开工配置/骨架/规划和未跟踪内容保护。OpenSpec strict/diff及本人Git隔离按本轮范围完成，不用勾选数量声称产品质量阶段通过。
+
+清理：开工无本人前轮临时物；本人两份本地重展现根各1696548、结束测试根pytest-13中本轮6目录共4912375常规文件字节已核确切路径/归属/进程结束后删除，新测试改TemporaryDirectory保证退出即清；operator7894字节交接前删除。已测合计8313365字节，其他随用例清理但未量测的不编数字；不重算旧释放，不删正式PDF/有效解析/历史结果/并行文件。临时封装与测试可重建，唯一新展示/验证持久；Git只纳本轮清楚hunk，不纳原审核约1005行等既有差异。本卡结束无自动外呼或生产授权，下一应按实际可见内容决定同版小组验证/必要消费者，不再滚动补可选细枝末节。
+
+有限Review另核到新增CSV外部文本可能被表格当作公式执行，已仅对新业务描述列的危险开头加文本前缀，JSON原值不变；四种开头1项定向复验3.78秒通过。最终版本重导三家CSV与交付逐字一致、所有原JSON/Markdown hash再次核过；不重跑149秒旧链或扩大安全框架。

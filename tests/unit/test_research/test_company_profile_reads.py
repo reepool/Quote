@@ -250,6 +250,9 @@ def test_export_writes_structured_json_and_csv_for_completed_company(tmp_path):
     assert profile["schema_version"] == PROFILE_SCHEMA_VERSION
     assert profile["instrument_id"] == "600000.SH"
     assert rows[0]["instrument_id"] == "600000.SH"
+    assert rows[0]["workpaper_fact_count"] == ""
+    assert rows[0]["workpaper_origin"] == ""
+    assert not (export_dir / "profiles.md").exists()
     assert manifest["schema_version"] == EXPORT_SCHEMA_VERSION
     assert manifest["legacy_export_used"] is False
     assert "export_company_profile_research_data" not in json.dumps(result)

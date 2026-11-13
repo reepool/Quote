@@ -6,6 +6,8 @@
 
 ## 1. 开发者必须先理解的纠偏
 
+2026-11-13 6.BP已交[三家现有画像总览](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-read-overview-20261113/profiles.md)：原query/export新增底稿摘要、CSV可见内容及可点读索引，研究者不再只能看到旧可信计数0；旧可信计数/门槛仍不改。实际内容直接来自原结构化事实，不另写LLM摘要，不复制全文、导入生产或重新处理公司。37相关验证及5定向复验、三读/旧hash成立，无新增模型调用；第一份旧JSON可空默认值检查失败有记录。本人两次临时根/测试输出/脚本已核归属清理，见同目录result.md；下一围绕可见业务与当前同版连续验证取舍，不补可选细节/扩平台，任何真实调用仍需新范围授权。
+
 2026-11-13 6.BO已交[黄山59条真实纠正后画像](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-recheck-600054-20261113/result.md)：仅补一笔final，5候选全部接受、54独立不变；原范围意见仍未决，不为了全绿继续补细节。本次1物理/20585/85.700秒，未重付成功前段，旧拒绝/用量与新接受分列。真实候选纠正跨窗口完成，仍非同版连续首发质量或S1/生产；现停止本卡外呼，不自动扩公司。无业务代码变化、有效回归复用，有限源核/三读/Review成立，本人库/脚本清后交接，保护旧源和既有改动。
 
 2026-11-13当前下一交付6.BO仅补黄山已保存5候选final，以实际改进画像收口，不再重跑抽取/初核、补满可选供应链或扩平台。原服务接续与原稿/raw/source hash、5候选目标/定位已零调用核过，54独立正文不变、范围意见不洗白；新限定再核已询问，确认前不发模型/建绑定。具体见[章节底稿卡6.BO](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md#当前6bo黄山已有5候选仅补最终再核用户已明确批准)。复用66回归/原TaskService有效证明，无业务代码改动，不重跑长测；开工无本人前轮垃圾，本轮释放0，批准后的库/脚本一套结果后finally清，旧源/成绩/既有改动保护。

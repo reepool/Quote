@@ -6,6 +6,8 @@
 
 ## 1. 目标与完成边界
 
+2026-11-13 6.BP完成已有画像的原查询/导出消费，不新增模型或公司：同方38/36、林海47/59、黄山59/39事实/指标经原writer隔离重展现及query/export/新实例一致，底稿内容量/原业务描述、复核/未决/实际模型在独立摘要、CSV和[总览](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-read-overview-20261113/profiles.md)可见。旧accepted_fact_count=0/core_complete=false/生产未授权、所有旧字段值/全文及源文件hash不改；旧稿只补已有可空默认元数据，非新语义/评分。37项169.67秒、定向5项9.63秒通过，零网络消费验证1.037秒，不作模型生成耗时。S1/旧失败/后继授权不变，必要展示只保一套并复用原全文，清本人过程物后交付。
+
 2026-11-13新批准6.BO黄山5候选最终再核1/1完成，5全部实际接受进入59条真实画像，54独立事实原样保留，三读一致。四项毛利率方向与不适用说明实际纠正，范围意见f002仍未决，review completed_with_open_findings/core_complete=false；非全59条真值、非连续首发/S1或生产。仅本次1物理/20585实际usage/0恢复/unknown、85.700业务秒/30.619准备秒，原初核59039/修订13826单列继承，旧拒绝及6.BN失败不改。5项改动有限独立核源、全坐标/旧hash核过；实物见[最终再核交付](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-recheck-600054-20261113/result.md)。本卡权限已用，当前无自动浦发/扩样/生产授权。
 
 2026-11-13当前6.BO只拟黄山已有5真实候选一次final，不重跑两家公司或成功前段。零调用重建原稿hash与原初核匹配，旧raw hash/源/typed与目标约束通过，只到final发送接口后明确停止；54独立正文不变、f002范围意见未决，旧repair仍rejected/候选未采纳。新的明确外呼已询问，当前0模型/探针/可发送绑定，非6.BN补救成功/S1。拟900秒/300000账本/2物理含1恢复，仅既有Scorpio-Grok high，原TaskService；完整边界见章节底稿卡6.BO与workpaper-recheck-readiness-600054-20261113.json。批准后直接一次执行，不新增前段/公司/窗口或生产。

@@ -16,6 +16,7 @@ import re
 import threading
 from collections.abc import Iterator, Mapping, Sequence
 from contextlib import contextmanager
+from html import escape
 from pathlib import Path
 from typing import Any
 
@@ -281,7 +282,7 @@ class CompanyProfileReadService:
             ),
         }
         if isinstance(record, CompanyProfileRuntimeRecordV3):
-            from .workpaper import render_workpaper
+            from .workpaper import ELEMENT_LABELS, SUPPLY_CHAIN_LABELS, render_workpaper
 
             profile["schema_version"] = "company_profile_common_core_profile.v3"
             profile["workpaper"] = record.workpaper.model_dump(mode="json")
@@ -294,6 +295,23 @@ class CompanyProfileReadService:
                 if review is not None else "pending_verification"
             )
             profile["workpaper_receipts"] = list(record.workpaper_receipts)
+            elements = {name: getattr(record.workpaper.elements, name) for name in ELEMENT_LABELS}
+            if record.workpaper.supply_chain is not None:
+                elements.update({name: getattr(record.workpaper.supply_chain, name) for name in SUPPLY_CHAIN_LABELS})
+            facts = [fact for element in elements.values() for fact in element.facts]
+            generation = record.workpaper.generation
+            profile["workpaper_summary"] = {
+                "origin": record.workpaper.origin,
+                "business_description": "\n".join(f.text for f in record.workpaper.elements.business_structure.facts),
+                "fact_count": len(facts),
+                "metric_count": sum(len(f.metrics) for f in facts),
+                "element_fact_counts": {name: len(element.facts) for name, element in elements.items()},
+                "review_status": review.status if review else None,
+                "open_finding_count": sum(f.resolution != "corrected_pending_trust" for f in review.findings) if review else None,
+                "extraction_model": generation.extraction.model if generation else None,
+                "review_model": next((call.model for call in review.calls
+                                      if call.purpose == "review_profile_workpaper" and call.contract_status == "accepted"), None) if review else None,
+            }
         elif isinstance(record, CompanyProfileRuntimeRecordV2):
             from .report_interpretation import research_views
 
@@ -540,6 +558,10 @@ def _profile_filename(profile: Mapping[str, Any]) -> str:
 
 
 def _write_profile_csv(path: Path, profiles: Sequence[Mapping[str, Any]]) -> None:
+    workpaper_fields = (
+        "origin", "business_description", "fact_count", "metric_count",
+        "review_status", "open_finding_count", "extraction_model", "review_model",
+    )
     fieldnames = [
         "instrument_id",
         "report_period",
@@ -550,6 +572,8 @@ def _write_profile_csv(path: Path, profiles: Sequence[Mapping[str, Any]]) -> Non
         "revenue_model",
         "accepted_fact_count",
         "gap_count",
+        "workpaper_status",
+        *(f"workpaper_{name}" for name in workpaper_fields),
     ]
     with path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
@@ -560,6 +584,12 @@ def _write_profile_csv(path: Path, profiles: Sequence[Mapping[str, Any]]) -> Non
                 for item in profile.get("dimensions") or ()
             }
             freshness = profile.get("freshness") or {}
+            workpaper = profile.get("workpaper_summary") or {}
+            workpaper_values = {f"workpaper_{name}": workpaper.get(name) for name in workpaper_fields}
+            description = workpaper_values["workpaper_business_description"]
+            if isinstance(description, str) and description.lstrip().startswith(("=", "+", "-", "@")):
+                # External/model text must remain text when opened in a spreadsheet.
+                workpaper_values["workpaper_business_description"] = "'" + description
             writer.writerow(
                 {
                     "instrument_id": profile.get("instrument_id"),
@@ -571,6 +601,8 @@ def _write_profile_csv(path: Path, profiles: Sequence[Mapping[str, Any]]) -> Non
                     "revenue_model": answered.get("revenue_model"),
                     "accepted_fact_count": len(profile.get("accepted_facts") or ()),
                     "gap_count": len(profile.get("gaps") or ()),
+                    "workpaper_status": profile.get("workpaper_status"),
+                    **workpaper_values,
                 }
             )
 
@@ -666,7 +698,39 @@ def _write_profile_export(
     csv_path = target / "profiles.csv"
     _write_profile_csv(csv_path, profiles)
     written.append(str(csv_path))
+    if any(profile.get("workpaper_summary") for profile in profiles):
+        overview_path = target / "profiles.md"
+        _write_profile_overview(overview_path, profiles)
+        written.append(str(overview_path))
     return written
+
+
+def _write_profile_overview(path: Path, profiles: Sequence[Mapping[str, Any]]) -> None:
+    """Index existing sourced text; draft counts never replace trusted-core counts."""
+    def cell(value: Any) -> str:
+        return escape(str(value if value is not None else "未知"), quote=False).replace("|", "\\|").replace("\n", "<br>")
+
+    lines = [
+        "# 公司画像底稿总览", "",
+        "以下是底稿内容，不等于可信发布或完整性通过。事实/数字为当前可读底稿计数，非已接受核心事实数；未复核不表示零问题。生产未授权。", "",
+        "| 公司／报告期 | 原业务描述 | 底稿事实／数字 | 来源及复核状态 | 实际抽取／初核模型 | 完整内容 |",
+        "| --- | --- | --- | --- | --- | --- |",
+    ]
+    for profile in profiles:
+        paper = profile.get("workpaper_summary")
+        filename = _profile_filename(profile)
+        period = (profile.get("freshness") or {}).get("report_period")
+        if paper is None:
+            values = (f"{profile.get('instrument_id')} / {period}", "旧路径；无底稿投影", "—", "无底稿", "未知", f"[JSON]({filename})")
+        else:
+            markdown = Path(filename).with_suffix(".md").name
+            state = f"{paper['origin']} / {profile['workpaper_status']} / {paper['review_status'] or '未复核'}；未决={cell(paper['open_finding_count'])}"
+            values = (f"{profile.get('instrument_id')} / {period}", paper["business_description"] or "本次无主营描述，查看缺项",
+                      f"{paper['fact_count']} / {paper['metric_count']}", state,
+                      f"{paper['extraction_model'] or '未知'} / {paper['review_model'] or '未知'}",
+                      f"[画像]({markdown}) · [JSON]({filename})")
+        lines.append("| " + " | ".join(cell(value) for value in values) + " |")
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 def _write_stage4_export(

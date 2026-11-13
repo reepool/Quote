@@ -1,0 +1,15 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600100.SH,2025-12-31,2026-04-28T16:00:00+00:00,False,False,False,False,0,0,model_reviewed_pending_verification,llm_generated,"公司定位为“数智技术与核技术创新融合的高科技企业”，聚焦公共安全、数智产业、智慧能源等产业领域，并设有科技成果转化平台、资产管理平台、海外投资协同平台。
+公司主营业务归属于公共安全、数智产业和智慧能源等产业领域，按所处行业及经营模式可分为制造业和软件与信息技术服务业。
+报告期内公司整合数智信息产业资源成立同方数科；同方威视、同方超光、同方数科分别入选不同层级的改革或科创培育名单。",38,36,completed,0,deepseek-flash,grok-4.7
+600099.SH,2025-12-31,2026-03-27T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,llm_generated,"公司主营业务为森林消防机械、农业机械、特种车辆（全地形车）、摩托车等及以上产品配件的制造和销售。
+公司主要采用以销定产的生产经营模式，由销售部门根据销售计划或客户订单将生产计划下达至生产部门，实行按单生产，同时根据市场需求适度备货；产品销售以经销模式为主。
+公司所处行业主要集中在森林消防机械行业、农业机械行业、特种车辆（全地形车）行业及摩托车行业。
+主要子公司江苏福马高新动力机械有限公司为公司子公司，主营机械制造销售，注册资本4,500.00万元。
+江苏联海动力机械有限公司为参股公司，主营机械制造销售，注册资本8,442.22万元；福马新能（北京）科技有限公司为参股公司，主营服务托管，注册资本2,520.00万元。",47,59,completed_with_open_findings,1,deepseek-flash,grok-4.7
+600054.SH,2025-12-31,2026-04-17T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,llm_generated,"公司业务分为景区、索道及缆车、酒店、徽菜、旅行社、智慧旅游六大板块；景区业务经营黄山景区、花山谜窟景区及太平湖景区，提供旅游观光和休闲度假等服务。
+索道及缆车业务拥有黄山云谷索道、玉屏索道、太平索道和西海观光缆车，主要提供客运观光服务。
+酒店业务拥有各类酒店十余家，黄山景区内主要分布雲麓北海宾馆、狮林大酒店、西海饭店、白云宾馆、玉屏楼宾馆、雲野@排云型旅酒店、雲亼·曙光里和雲亼·狮林崖舍等酒店，黄山景区外主要分布雲颐汤泉酒店、轩辕国际大酒店、昱城皇冠假日酒店、黄山国际大酒店、华山宾馆、雲麓酒店（黄旅大厦店）等酒店。
+徽菜业务以“徽商的厨房、家乡的味道”为发展定位，打造徽文化主题餐饮品牌，在全国多地开设连锁主题餐饮门店。
+旅行社业务涵盖国内旅游、入境旅游、出境旅游、定制游、会展服务和疗休养等方面，下属黄山市中国旅行社有限公司为安徽省首批5A级旅行社。
+智慧旅游业务依托黄山景区旅游资源，整合黄山市及周边文旅产业要素，开展旅游目的地智慧旅游建设和运营业务，涵盖黄山旅游官方平台运营、新媒体运营、OTA业务承接、旅游产品和活动策划、旅游服务接待和旅游商品在线销售等。",59,39,completed_with_open_findings,1,deepseek-flash,grok-4.7

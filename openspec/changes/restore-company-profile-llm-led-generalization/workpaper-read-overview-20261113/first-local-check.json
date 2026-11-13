@@ -1,0 +1,9 @@
+{
+  "failed_check": "Old JSON lacks additive optional defaults; no old value changed.",
+  "new_model_calls": 0,
+  "cleanup": {
+    "removed_temporary_root": "/home/python/Quote/data/QuoteBak/workpaper-bp-read-delivery-ua3zsidh",
+    "released_bytes": 1696548,
+    "removed": true
+  }
+}
