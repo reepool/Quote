@@ -1,0 +1,54 @@
+{
+  "instrument_id": "600000.SH",
+  "source_sha256": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+  "evidence_objects": 22,
+  "source_spans": 22,
+  "all_source_coordinates_match": true,
+  "finite_independent_challenges": [
+    {
+      "source_pages": [
+        32
+      ],
+      "check": "集团营业收入1,739.64亿元与资产100,817.46亿元、贷款57,039.73亿元、存款55,824.35亿元指标不同；未混成同一规模。",
+      "fact_ids": [
+        "rm-01",
+        "sm-01",
+        "sm-02"
+      ]
+    },
+    {
+      "source_pages": [
+        62,
+        63
+      ],
+      "check": "对公营业净收入685.79亿元；存贷款38,103.74/36,654.74亿元限定母公司；国内贸易融资原文确为突破2.8万亿元，不是精确2.8。",
+      "fact_ids": [
+        "rm-03",
+        "sm-04",
+        "mc-08"
+      ]
+    },
+    {
+      "source_pages": [
+        66,
+        69
+      ],
+      "check": "AUM 46,645.33亿元、托管规模20.21万亿元、托管收入24.81亿元均可读；AUM/托管规模不是银行营业收入。",
+      "fact_ids": [
+        "sm-05",
+        "sm-10",
+        "rm-05"
+      ]
+    }
+  ],
+  "limitations": [
+    "仅独立挑战上述关键事实及全部坐标；未对63条逐对象判真，未执行本轮真实高阶复核。",
+    "结构完整不等于召回完整，所选业务段仍未形成完整分部收入桥接；不为此扩读。",
+    "原失败结果和拒绝回执保持，离线原入口投影是controlled_fixture，不是新真实通过。"
+  ],
+  "new_model_calls": 0,
+  "whole_profile_accuracy_claim": false,
+  "production_authorization": "not_authorized",
+  "original_query_sha256": "cfeb4aa70eb50b50fe99db88657731773a5731e0fc052df2a55c8b2f5cb1031e",
+  "original_query_unchanged": true
+}

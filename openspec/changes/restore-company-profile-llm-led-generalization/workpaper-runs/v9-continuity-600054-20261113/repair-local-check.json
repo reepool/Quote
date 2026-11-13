@@ -1,0 +1,71 @@
+{
+  "new_real_model_calls": 0,
+  "adopted": false,
+  "original_contract_status": "rejected",
+  "raw_response_hash": "a4b74782cb7acdac473c7e9c127d140878730aba8d11f0401941e088807dc49f",
+  "valid_candidates": [
+    "mc-06",
+    "sm-01",
+    "sm-02",
+    "sm-04",
+    "sm-05"
+  ],
+  "literal_metrics": [
+    {
+      "name": "酒店业务毛利率比上年增减",
+      "raw_value": "减少5.34个百分点",
+      "value": null,
+      "unit": "百分点",
+      "source_unit": "%",
+      "currency": null,
+      "subject_scope": "business_segment",
+      "period": "2025年度",
+      "comparison_basis": null,
+      "qualifier": "exact",
+      "uncertainty_reason": "原文带增减方向及单位；保留原文，未统一为带符号数值。"
+    },
+    {
+      "name": "索道及缆车业务毛利率比上年增减",
+      "raw_value": "减少12.36个百分点",
+      "value": null,
+      "unit": "百分点",
+      "source_unit": "%",
+      "currency": null,
+      "subject_scope": "business_segment",
+      "period": "2025年度",
+      "comparison_basis": null,
+      "qualifier": "exact",
+      "uncertainty_reason": "原文带增减方向及单位；保留原文，未统一为带符号数值。"
+    },
+    {
+      "name": "旅游服务业务毛利率比上年增减",
+      "raw_value": "减少1.20个百分点",
+      "value": null,
+      "unit": "百分点",
+      "source_unit": "%",
+      "currency": null,
+      "subject_scope": "business_segment",
+      "period": "2025年度",
+      "comparison_basis": null,
+      "qualifier": "exact",
+      "uncertainty_reason": "原文带增减方向及单位；保留原文，未统一为带符号数值。"
+    },
+    {
+      "name": "徽菜业务毛利率比上年增减",
+      "raw_value": "减少8.32个百分点",
+      "value": null,
+      "unit": "百分点",
+      "source_unit": "%",
+      "currency": null,
+      "subject_scope": "business_segment",
+      "period": "2025年度",
+      "comparison_basis": null,
+      "qualifier": "exact",
+      "uncertainty_reason": "原文带增减方向及单位；保留原文，未统一为带符号数值。"
+    }
+  ],
+  "source_binding_passed": true,
+  "original_query_sha256": "2a99c7e3904f8b82c9318af0c5442c659909bea9c601b8b71ef14b12c812b3b2",
+  "original_query_unchanged": true,
+  "final_model_recheck_performed": false
+}

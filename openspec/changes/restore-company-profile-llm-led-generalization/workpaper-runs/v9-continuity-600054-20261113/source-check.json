@@ -1,0 +1,74 @@
+{
+  "instrument_id": "600054.SH",
+  "source_sha256": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+  "evidence_objects": 15,
+  "source_spans": 15,
+  "all_source_coordinates_match": true,
+  "finite_independent_challenges": [
+    {
+      "source_pages": [
+        9,
+        10
+      ],
+      "check": "景区、索道及缆车、酒店、徽菜、旅行社、智慧旅游六板块，与基础业务和产品服务相符。",
+      "fact_ids": [
+        "bs-01",
+        "bs-02",
+        "bs-03",
+        "bs-04",
+        "bs-05",
+        "bs-06"
+      ]
+    },
+    {
+      "source_pages": [
+        11,
+        13,
+        14
+      ],
+      "check": "公司营业收入210,932.51万元（精确表2,109,325,107.63元）同比+9.23%；进山游客516.80万人、索道及缆车1,043.38万人次分别是不同统计对象。",
+      "fact_ids": [
+        "rm-02",
+        "sm-11"
+      ]
+    },
+    {
+      "source_pages": [
+        14
+      ],
+      "check": "行业收入为未合并抵销口径，不得用其合计替代公司收入；索道842,155,363.75元、酒店492,026,389.87元等四行因结构化方向问题暂随主张隔离，不在最终正文恢复。",
+      "fact_ids": [
+        "rm-01",
+        "sm-01",
+        "sm-02",
+        "sm-04",
+        "sm-05"
+      ]
+    },
+    {
+      "source_pages": [
+        13,
+        14,
+        15
+      ],
+      "check": "四项毛利率是减少5.34/12.36/1.20/8.32个百分点，原表列头印%；修订方向符合，但只做本地来源定位，不代替final。不适用说明项也不能扩大成未发生重大变动。",
+      "fact_ids": [
+        "mc-06",
+        "sm-01",
+        "sm-02",
+        "sm-04",
+        "sm-05"
+      ]
+    }
+  ],
+  "limitations": [
+    "复核查59个候选、6意见，5问题主张仍隔离；已保存5修订候选未获final，不采纳。",
+    "若干成本续表事实只引15页数据，14页单位/表头没有共同挂在该事实上；整体材料有表头，但单事实引用充分性仍有限。",
+    "独立坐标定位不证明54条全准确；不适用、未选范围和未披露仍须严格区分。"
+  ],
+  "new_model_calls": 0,
+  "whole_profile_accuracy_claim": false,
+  "production_authorization": "not_authorized",
+  "original_query_sha256": "2a99c7e3904f8b82c9318af0c5442c659909bea9c601b8b71ef14b12c812b3b2",
+  "original_query_unchanged": true
+}

@@ -1,0 +1,18 @@
+{
+  "mode": "offline_saved_response_original_task_service",
+  "new_real_model_calls": 0,
+  "network_allowed": false,
+  "three_reads_equal": true,
+  "origin": "controlled_fixture",
+  "facts": 63,
+  "local_task_seconds": 21.085,
+  "original_receipt_hashes": {
+    "query.json": "cfeb4aa70eb50b50fe99db88657731773a5731e0fc052df2a55c8b2f5cb1031e",
+    "model-receipts.json": "db895313e87d3806ed9e6cece6943a4faa897b83d90b4acc2d8e513bb1ec9c26",
+    "binding.json": "0c6878e29bd1945e0a25edd8ecf00f22ff5622b8bb5d160f530f88e897a6aa06"
+  },
+  "original_failed_result_unchanged": true,
+  "real_review_performed": false,
+  "synthetic_wire_sends": 2,
+  "query_sha256": "663206106d0f2e8c312b07e26f505cef9c4b85a3d0559800d562e7097130a739"
+}

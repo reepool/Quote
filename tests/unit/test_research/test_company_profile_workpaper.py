@@ -255,11 +255,12 @@ def test_real_metric_unit_suffix_is_standardized_without_conversion_or_guessing(
 
 
 @pytest.mark.parametrize("raw,qualifier", [("近4.9", "approximate"),
-                                           ("约3,310", "approximate"), ("超300", "greater_than")])
+                                           ("约3,310", "approximate"), ("超300", "greater_than"),
+                                           ("突破 2.8", "greater_than")])
 def test_metric_retains_approximation_instead_of_claiming_exact_value(raw, qualifier):
     from research.company_profile.workpaper import WorkpaperMetric
 
-    value = raw[1:].replace(",", "")
+    value = raw[2 if raw.startswith("突破") else 1:].strip().replace(",", "")
     payload = dict(name="客户", raw_value=raw, value=value, unit="户",
                    subject_scope="consolidated_group", period="2025")
     metric = WorkpaperMetric.model_validate(payload)
@@ -344,13 +345,15 @@ def test_known_metric_value_still_displays_uncertain_scope_and_reason():
 
 
 @pytest.mark.parametrize('raw,value', [('减少0.82个百分点', '-0.82'), ('增加4.75个百分点', '4.75')])
-def test_literal_rate_change_stays_source_only_without_forcing_signed_normalization(raw, value):
+@pytest.mark.parametrize('source_unit', ['百分点', '%', '％'])
+def test_literal_rate_change_stays_source_only_without_forcing_signed_normalization(raw, value, source_unit):
     from research.company_profile.workpaper import WorkpaperMetric, _metric_display
 
-    data = dict(name='毛利率同比变动', raw_value=raw, value=value, unit='百分点', source_unit='百分点',
+    data = dict(name='毛利率同比变动', raw_value=raw, value=value, unit='百分点', source_unit=source_unit,
                 period='2025', subject_scope='business_segment')
     metric = WorkpaperMetric.model_validate(data)
     assert metric.value is None and metric.raw_value == raw and metric.uncertainty_reason
+    assert metric.source_unit == source_unit
     assert WorkpaperMetric.model_validate(metric.model_dump()) == metric
     assert raw in _metric_display(metric) and '未标准化' in _metric_display(metric)
     with pytest.raises(ValueError):
@@ -359,6 +362,8 @@ def test_literal_rate_change_stays_source_only_without_forcing_signed_normalizat
         WorkpaperMetric.model_validate({**data, 'value': value[1:] if value.startswith('-') else '-' + value})
     with pytest.raises(ValueError):
         WorkpaperMetric.model_validate({**data, 'unit': '%'})
+    with pytest.raises(ValueError):
+        WorkpaperMetric.model_validate({**data, 'source_unit': '元'})
 
 
 def test_two_calls_use_sections_and_direct_structured_content_without_old_inventory():

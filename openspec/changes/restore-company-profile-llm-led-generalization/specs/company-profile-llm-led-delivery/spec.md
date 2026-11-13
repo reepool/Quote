@@ -20,6 +20,16 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 - **THEN** local projection MAY retain that literal raw value as an explicitly unnormalized value with a reason instead of rejecting the entire response
 - **AND** a conflicting sign, amount or unit remains invalid; source binding still locates the complete literal wording, and a repaired candidate still requires real source recheck before adoption
 
+#### Scenario: A reported business volume exceeds a stated boundary
+- **WHEN** a metric preserves a source phrase such as 突破2.8万亿元 and declares a matching greater-than qualifier
+- **THEN** the consumer MUST retain that lower-bound meaning and original spelling, not reject it merely because the source uses 突破 rather than 超
+- **AND** a conflicting exact qualifier, changed decimal value, magnitude or unit remains invalid
+
+#### Scenario: A printed percent header governs a literal margin-point change
+- **WHEN** the cited table prints its margin-change header as % but the returned raw cell explicitly says 增加/减少X个百分点, with a consistent signed reference and unit 百分点
+- **THEN** the consumer MAY retain source_unit=% beside that original wording and a null normalized value with its uncertainty reason
+- **AND** a changed sign, number or incompatible unit remains invalid; local parsing alone never accepts a repaired fact without its authorized source recheck
+
 #### Scenario: One returned metric cannot be located in its cited source
 - **WHEN** an otherwise schema-valid extraction contains one fact whose metric number or unnormalized raw wording is not present in the supplied evidence
 - **THEN** binding MUST withhold that fact, record its identity and concrete limitation, and retain independently valid facts in the same workpaper

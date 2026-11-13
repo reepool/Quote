@@ -104,7 +104,7 @@ class WorkpaperMetric(_Model):
             return data
         raw = str(data.get("raw_value", "")).strip()
         qualifier = ("approximate" if raw.startswith(("近", "约")) else
-                     "greater_than" if raw.startswith("超") else "exact")
+                     "greater_than" if raw.startswith(("超", "突破")) else "exact")
         if "qualifier" in data and data["qualifier"] != qualifier:
             raise ValueError("metric qualifier must match original raw value")
         result = {**data, "qualifier": qualifier}
@@ -113,7 +113,7 @@ class WorkpaperMetric(_Model):
         # a wrong sign/unit/value is still an error, not "uncertainty".
         if (raw.startswith(("增加", "减少")) and raw.endswith("个百分点")
             and data.get("unit") == "百分点"
-            and data.get("source_unit") in (None, "百分点") and data.get("value") is not None):
+            and data.get("source_unit") in (None, "百分点", "%", "％") and data.get("value") is not None):
             try:
                 amount = Decimal(raw[2:-len("个百分点")].strip())
                 reference = Decimal(str(data["value"]))
@@ -141,7 +141,7 @@ class WorkpaperMetric(_Model):
             raise ValueError("source_unit cannot relabel a numeric magnitude")
         raw_number = self.raw_value.strip()
         if self.qualifier != "exact":
-            raw_number = raw_number[1:].strip()
+            raw_number = raw_number[2 if raw_number.startswith("突破") else 1:].strip()
         # Some real responses repeat the separately declared unit in raw_value.
         # Preserve that source spelling, but normalize only that exact suffix;
         # this does not convert units; estimates retain their explicit qualifier.
@@ -577,7 +577,7 @@ def _metric_display(metric: WorkpaperMetric) -> str:
     if reason:
         qualification += f"（不确定：{reason}）"
     if metric.source_unit and metric.source_unit != unit:
-        prefix = raw_value[:1] if metric.qualifier != "exact" else ""
+        prefix = raw_value[:2 if raw_value.startswith("突破") else 1] if metric.qualifier != "exact" else ""
         return f"{prefix}{metric.value} {unit}（原文{metric.raw_value}）{qualification}"
     return (raw_value if raw_value.endswith(unit) else f"{raw_value} {unit}") + qualification
 

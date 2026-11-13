@@ -1,0 +1,1322 @@
+[
+  {
+    "request_id": "bp-work-0263714e426a762c330677f3:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "b8067ca7bea232a1dec8b7a3d1673f2f32bb18a7099cbade5367a39ad40e979d",
+    "response_hash": "953ddbce05b065af65d7f8a7cd28efac97902fb7d84a5c787ad906a0b1ac5c25",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0071\",\"section-0074\",\"section-0101\",\"section-0103\",\"section-0104\",\"section-0105\",\"section-0106\",\"section-0091\"],\"rationale\":\"本报告为浦发银行年报。选择逻辑：3.1公司总体经营情况提供规模与总体经营概览；3.2.2做强“五大赛道”夯实客户经营完整覆盖科技、供应链、普惠、跨境、财资五大业务板块的客户经营与产品服务；3.6公司主要业务情况及其下3.6.2公司金融、3.6.3零售金融、3.6.4金融市场与金融机构、3.6.5跨境及境外机构业务完整说明业务结构、产品服务用途、客户与市场及经营规模；3.5经营中关注的重点问题说明资产投放、负债业务、资产负债管理、资产质量等经营因素与本期变化。以上共同解释业务结构、产品服务、盈利来源、规模与主要构成、客户渠道市场及经营驱动变化，且避免选择父节与其子节并存。\",\"deferred\":[\"3.7利润表分析、3.8资产负债表分析、3.10贷款质量分析、3.11监管指标分析：属财务与风险明细，业务结构已由所选章节覆盖，仅在需要精确财务缺口时定向补充\",\"3.2.3“三超”内核、3.2.4四大策略、3.3五篇大文章、3.4服务上海五个中心：多为战略举措与荣誉性叙述，与业务实质重复，暂不纳入\",\"第四节公司治理、环境和社会及第五节重要事项、第六节股份变动、第七节债券、第八节财务报告：治理、股东、债券与完整财务报表非业务经营核心，暂不阅读\"],\"stop_reason\":\"已选取覆盖业务结构、产品服务、客户与市场、经营规模及本期经营变化的完整业务子节，信息密度高且相互衔接；其余为财务明细、治理与战略叙述，对回答业务经营问题边际价值低，可在需要精确财务数据时再定向补充，故在此停止。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0071",
+        "section-0074",
+        "section-0101",
+        "section-0103",
+        "section-0104",
+        "section-0105",
+        "section-0106",
+        "section-0091"
+      ],
+      "rationale": "本报告为浦发银行年报。选择逻辑：3.1公司总体经营情况提供规模与总体经营概览；3.2.2做强“五大赛道”夯实客户经营完整覆盖科技、供应链、普惠、跨境、财资五大业务板块的客户经营与产品服务；3.6公司主要业务情况及其下3.6.2公司金融、3.6.3零售金融、3.6.4金融市场与金融机构、3.6.5跨境及境外机构业务完整说明业务结构、产品服务用途、客户与市场及经营规模；3.5经营中关注的重点问题说明资产投放、负债业务、资产负债管理、资产质量等经营因素与本期变化。以上共同解释业务结构、产品服务、盈利来源、规模与主要构成、客户渠道市场及经营驱动变化，且避免选择父节与其子节并存。",
+      "deferred": [
+        "3.7利润表分析、3.8资产负债表分析、3.10贷款质量分析、3.11监管指标分析：属财务与风险明细，业务结构已由所选章节覆盖，仅在需要精确财务缺口时定向补充",
+        "3.2.3“三超”内核、3.2.4四大策略、3.3五篇大文章、3.4服务上海五个中心：多为战略举措与荣誉性叙述，与业务实质重复，暂不纳入",
+        "第四节公司治理、环境和社会及第五节重要事项、第六节股份变动、第七节债券、第八节财务报告：治理、股东、债券与完整财务报表非业务经营核心，暂不阅读"
+      ],
+      "stop_reason": "已选取覆盖业务结构、产品服务、客户与市场、经营规模及本期经营变化的完整业务子节，信息密度高且相互衔接；其余为财务明细、治理与战略叙述，对回答业务经营问题边际价值低，可在需要精确财务数据时再定向补充，故在此停止。"
+    },
+    "usage": {
+      "input_tokens": 12246,
+      "output_tokens": 454,
+      "total_tokens": 12700
+    }
+  },
+  {
+    "request_id": "bp-work-0263714e426a762c330677f3:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "2e69c4e9729178b70fc78002b45efc3cb7058697b1539f7a355ceaed09e693e9",
+    "response_hash": "d954f69a2d2e38d25f4fdc1eaab05a0941f46a15c301f52bd072f6f53e65ee4d",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "rejected",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"bs-01\",\"text\":\"公司主要业务分为公司金融业务、零售金融业务、金融市场与金融机构业务、跨境及境外机构业务，并以“五大赛道”（科技金融、供应链金融、普惠金融、跨境金融、财资金融）作为业务经营的主要领域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0013\",\"source-0019\",\"source-0020\"]},{\"fact_id\":\"bs-02\",\"text\":\"公司金融业务涵盖商业信贷、交易银行、投资银行、电子银行、跨境业务、离岸业务等多个领域，并推动“四层四类”公司客户经营体系建设。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"]},{\"fact_id\":\"bs-03\",\"text\":\"科技金融形成“集团大科创+科技金融专班+总行科技金融部+分行科技金融部+科技（特色）支行”组织架构，在全国建设510家科技（特色）支行。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"bs-04\",\"text\":\"公司通过离岸银行、自贸金融、境外分行和海外投行等多平台协同开展跨境及境外机构业务，境外机构包括香港分行、新加坡分行、伦敦分行及浦银国际。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0020\",\"source-0021\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"ps-01\",\"text\":\"科技金融打磨浦科“5+7+X”产品体系，5大拳头产品“浦创贷、浦投贷、浦新贷、浦研贷、浦科并购贷”服务企业超5,900户，提供超1,400亿元融资，满足科技企业初创、成长、成熟期不同阶段需求。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"ps-02\",\"text\":\"供应链金融以“浦链通”“浦证通”“浦贴通”“浦订通”4个在线重点产品开展服务，投放余额1,914.60亿元，其中小微企业余额1,088.61亿元，占比56.86%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"ps-03\",\"text\":\"普惠金融迭代“浦惠贷”数字化产品矩阵，其中惠闪贷为全行首个全流程在线的对公信用类产品，惠链贷累计上线场景超百个，惠抵贷实现流程提速。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]},{\"fact_id\":\"ps-04\",\"text\":\"跨境金融打造“极速”系列跨境产品，“跨境极速汇”实现客户汇款秒级汇出，“跨境极速证”“极速押汇”实现单证结算和融资全线上操作，并升级跨境电商数智化服务“跨境商e汇”。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]},{\"fact_id\":\"ps-05\",\"text\":\"财资金融以存款、理财、基金、保险“四大支柱”为核心构建财富管理产品体系，焕新推出“财资α”资产配置服务体系及财富管理AI智能体“浦小财”。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0018\"]},{\"fact_id\":\"ps-06\",\"text\":\"零售贷款方面，浦闪贷嵌入装修、电商购物等场景，浦发i车贷与数十家新能源厂商实现系统对接提供汽车金融服务，并全国首创推出换电消费贷款产品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"]},{\"fact_id\":\"ps-07\",\"text\":\"金融市场业务以“自营投资交易+浦银避险代客”双核驱动，浦银避险在固定收益、外汇、贵金属及大宗商品方面提供投资交易和产品创设能力。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\",\"source-0020\"]},{\"fact_id\":\"ps-08\",\"text\":\"投资银行业务打造“并购+组合融资”综合服务模式，构建“4+8+16+N”并购金融服务体系，并为国资国企、科技企业、产业基金、上市公司、跨境企业提供解决方案。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"rm-01\",\"text\":\"报告期内，本集团实现营业收入1,739.64亿元，同比增加32.16亿元，增长1.88%；实现利润总额533.74亿元，同比增长10.35%；归属于母公司股东的净利润500.17亿元，同比增长10.52%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"1,739.64\",\"value\":\"1739.64\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"利润总额\",\"raw_value\":\"533.74\",\"value\":\"533.74\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"归属于母公司股东的净利润\",\"raw_value\":\"500.17\",\"value\":\"500.17\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"rm-02\",\"text\":\"集团净息差为1.42%，较上年持平；平均总资产收益率（ROA）为0.52%，较上年上升0.02个百分点；加权平均净资产收益率（ROE）为6.76%，较上年上升0.48个百分点；成本收入比为28.50%，较上年下降0.66个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"净息差\",\"raw_value\":\"1.42\",\"value\":\"1.42\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"平均总资产收益率（ROA）\",\"raw_value\":\"0.52\",\"value\":\"0.52\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"加权平均净资产收益率（ROE）\",\"raw_value\":\"6.76\",\"value\":\"6.76\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"成本收入比\",\"raw_value\":\"28.50\",\"value\":\"28.50\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"rm-03\",\"text\":\"报告期内，公司实现对公业务营业净收入685.79亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"对公业务营业净收入\",\"raw_value\":\"685.79\",\"value\":\"685.79\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"rm-04\",\"text\":\"财资赛道实现财资中收71.86亿元，较上年增长17.55%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"财资中收\",\"raw_value\":\"71.86\",\"value\":\"71.86\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"rm-05\",\"text\":\"报告期内，公司托管收入24.81亿元，同比增长7.23%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0020\"],\"metrics\":[{\"name\":\"托管收入\",\"raw_value\":\"24.81\",\"value\":\"24.81\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"rm-06\",\"text\":\"公司通过“自营投资交易+浦银避险代客”双核驱动金融市场业务，并在本外币债券、外汇、贵金属及大宗商品领域挖掘市场交易专业能力对营收的贡献潜力。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sm-01\",\"text\":\"报告期末，本集团资产总额突破10万亿元至100,817.46亿元，较上年末增加6,198.66亿元，增长6.55%；本外币贷款总额（含票据贴现）为57,039.73亿元，较上年末增加3,124.43亿元，增长5.80%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"资产总额\",\"raw_value\":\"100,817.46\",\"value\":\"100817.46\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"本外币贷款总额（含票据贴现）\",\"raw_value\":\"57,039.73\",\"value\":\"57039.73\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-02\",\"text\":\"本集团负债总额92,573.16亿元，较上年末增加5,402.17亿元，增长6.20%；本外币存款总额为55,824.35亿元，较上年末增加4,364.76亿元，增长8.48%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"负债总额\",\"raw_value\":\"92,573.16\",\"value\":\"92573.16\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"本外币存款总额\",\"raw_value\":\"55,824.35\",\"value\":\"55824.35\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-03\",\"text\":\"报告期末，公司客户数达到252.29万户，较上年末增加15.44万户，增长6.52%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"公司客户数\",\"raw_value\":\"252.29\",\"value\":\"252.29\",\"unit\":\"万户\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-04\",\"text\":\"报告期末，母公司对公存款余额38,103.74亿元，较上年末增加2,750.16亿元，增长7.78%；母公司对公贷款（含票据贴现）总额36,654.74亿元，较上年末增加2,787.51亿元，增长8.23%。\",\"subject_scope\":\"issuer\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0013\",\"source-0014\"],\"metrics\":[{\"name\":\"母公司对公存款余额\",\"raw_value\":\"38,103.74\",\"value\":\"38103.74\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"issuer\",\"qualifier\":\"exact\"},{\"name\":\"母公司对公贷款（含票据贴现）总额\",\"raw_value\":\"36,654.74\",\"value\":\"36654.74\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"issuer\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-05\",\"text\":\"报告期末，个人客户（含信用卡）达到1.71亿户，较上年末增加1,396.59万户；AUM个人金融资产余额（含市值）46,645.33亿元，较上年末增加7,859.26亿元，增长20.26%；母公司个人存款余额达到17,177.05亿元，较上年末增加1,673.22亿元，增长10.79%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"个人客户（含信用卡）\",\"raw_value\":\"1.71\",\"value\":\"1.71\",\"unit\":\"亿户\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"AUM个人金融资产余额（含市值）\",\"raw_value\":\"46,645.33\",\"value\":\"46645.33\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"母公司个人存款余额\",\"raw_value\":\"17,177.05\",\"value\":\"17177.05\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"issuer\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-06\",\"text\":\"报告期末，母公司零售贷款（不含个人经营贷款）余额15,137.37亿元，较上年末增加506.10亿元，增长3.46%；个人住房贷款余额8,768.34亿元，较上年末增长2.04%。\",\"subject_scope\":\"issuer\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"母公司零售贷款（不含个人经营贷款）余额\",\"raw_value\":\"15,137.37\",\"value\":\"15137.37\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"issuer\",\"qualifier\":\"exact\"},{\"name\":\"个人住房贷款余额\",\"raw_value\":\"8,768.34\",\"value\":\"8768.34\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-07\",\"text\":\"报告期末，信用卡及透支余额3,893.27亿元，较上年末增加191.04亿元，增长5.16%；借记卡累计发卡量11,257万张。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0018\",\"source-0019\"],\"metrics\":[{\"name\":\"信用卡及透支余额\",\"raw_value\":\"3,893.27\",\"value\":\"3893.27\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"借记卡累计发卡量\",\"raw_value\":\"11,257\",\"value\":\"11257\",\"unit\":\"万张\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-08\",\"text\":\"报告期末，科技金融贷款规模（中国人民银行统计口径）10,470.92亿元，服务科技企业超25.6万户；普惠两增贷款规模5,239.91亿元，较上年末增长12.51%，普惠两增客户数50.98万户，增长24.22%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0004\",\"source-0006\"],\"metrics\":[{\"name\":\"科技金融贷款规模（中国人民银行统计口径）\",\"raw_value\":\"10,470.92\",\"value\":\"10470.92\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"服务科技企业\",\"raw_value\":\"超 25.6\",\"value\":\"25.6\",\"unit\":\"万户\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"greater_than\"},{\"name\":\"普惠两增贷款规模\",\"raw_value\":\"5,239.91\",\"value\":\"5239.91\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"普惠两增客户数\",\"raw_value\":\"50.98\",\"value\":\"50.98\",\"unit\":\"万户\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-09\",\"text\":\"报告期末，绿色信贷余额7,073.74亿元，较上年末增加1,366.80亿元，增长23.95%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"绿色信贷余额\",\"raw_value\":\"7,073.74\",\"value\":\"7073.74\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-10\",\"text\":\"报告期末，托管规模20.21万亿元，较上年末增长11.45%；跨境客户数近4.9万户，增长24%；跨境本外币贷款余额3,363亿元人民币，增长27%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0020\",\"source-0007\"],\"metrics\":[{\"name\":\"托管规模\",\"raw_value\":\"20.21\",\"value\":\"20.21\",\"unit\":\"万亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"跨境客户数\",\"raw_value\":\"近 4.9\",\"value\":\"4.9\",\"unit\":\"万户\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"approximate\"},{\"name\":\"跨境本外币贷款余额\",\"raw_value\":\"3,363\",\"value\":\"3363\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-11\",\"text\":\"报告期末，财资赛道的资产管理规模达33,604.69亿元，较上年末增加6,429.18亿元，增长23.66%；浦银理财、上海信托、浦银安盛基金和浦银国际四家子公司的资产管理规模合计突破3万亿元，达3.36万亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"metrics\":[{\"name\":\"财资赛道的资产管理规模\",\"raw_value\":\"33,604.69\",\"value\":\"33604.69\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"四家子公司资产管理规模合计\",\"raw_value\":\"3.36\",\"value\":\"3.36\",\"unit\":\"万亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"oi-01\",\"text\":\"公司通过“集团大科创+科技金融专班+总行科技金融部+分行科技金融部+科技（特色）支行”组织架构开展科技金融业务，在全国建设510家科技（特色）支行。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"oi-02\",\"text\":\"公司构建“上下联动、全域协同”的立体化服务体系，为产业链客户提供“总分支协同、集团联动、一揽子定制”的综合金融服务，并将人工智能技术融入智能触客、产品拓客、服务暖客。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]},{\"fact_id\":\"oi-03\",\"text\":\"公司在全国各家分行落地小微及个贷中心建设，近50%的业务流程纳入中心集中进行标准化作业，累计挂牌201家普惠金融特色支行及旗舰支行。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"oi-04\",\"text\":\"公司构建“数据驱动、模型支撑、动态迭代”的智能化风控体系，建成覆盖公司+个人客户全生命周期的数字普惠风控模型体系。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\"]},{\"fact_id\":\"oi-05\",\"text\":\"公司强化数智技术赋能，科技金融数智平台“抹香鲸”升级3.0，集成商机分析、营销追踪、产品测额等多种功能。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"oi-06\",\"text\":\"公司作为银行，其经营资源与投入体现为存款等负债来源、资本补充及数字化系统建设，而非制造业原材料采购。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\",\"source-0012\"]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"cc-01\",\"text\":\"公司金融业务推动“四层四类”公司客户经营体系建设，报告期末公司客户数达到252.29万户，较上年末增长6.52%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0013\"]},{\"fact_id\":\"cc-02\",\"text\":\"零售金融形成5层、16级、六位一体服务体系，报告期末个人客户（含信用卡）达到1.71亿户，月日均金融资产5万元以上客户数达到469.26万户，月日均金融资产600万元以上私人银行客户规模达5.55万户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0016\",\"source-0017\"]},{\"fact_id\":\"cc-03\",\"text\":\"供应链金融累计服务供应链上下游客户37,408户，较上年末增加18,492户，增长97.76%；报告期内新增987家核心企业、14,157家供应商。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"cc-04\",\"text\":\"跨境金融跨境客户数近4.9万户，增长24%，跨境数字化渠道活跃客户达2.8万户；总分行战略客户海外贷款余额1,884亿元人民币，增长48%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0007\",\"source-0021\"]},{\"fact_id\":\"cc-05\",\"text\":\"金融机构客户经营方面，报告期末合作金融机构一级法人客户约3,300家，与公募基金、保险资管、信托、银行理财、券商、期货等持牌非银资产管理机构合作覆盖度达80%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0019\"]},{\"fact_id\":\"cc-06\",\"text\":\"公司机构客户面向全国各级党政机关、事业单位和社会组织等，报告期末机构客户对公人民币存款日均首次突破6,000亿元，重点机构客户新增长近480户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0016\"]},{\"fact_id\":\"cc-07\",\"text\":\"公司渠道包括线上“浦惠来了”与手机银行两大超级平台，以及线下分支机构和特色支行；手机银行为财富管理主阵地。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0010\"]},{\"fact_id\":\"cc-08\",\"text\":\"公司区域策略坚持“箭型”区域策略，精耕细作长三角，重点布局京津冀与大湾区，深度挖潜长江经济带；报告期末长三角区域贷款余额超2万亿元，较上年末增加超1,600亿元，占公司贷款增量一半以上。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0011\"]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"od-01\",\"text\":\"报告期内，“五大赛道”业务成为公司贷款主要增长极；制造业中长期贷款总额3,599.26亿元，较上年末增加410.14亿元，增长12.86%，高于整体贷款增速7个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"制造业中长期贷款总额\",\"raw_value\":\"3,599.26\",\"value\":\"3599.26\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"od-02\",\"text\":\"公司坚持“提质增效、动态调优”策略，将资源向高收益资产倾斜，2025年集团本外币贷款（不含票据贴现）在生息资产日均占比提升近2个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"od-03\",\"text\":\"公司强化市场趋势前瞻性研判，系统构建负债质量管理体系，负债付息率较上年下降46bps；本外币存款付息率较上年下降38bps。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"od-04\",\"text\":\"公司聚焦“五大赛道”、重点区域及重点行业，通过场景化、圈链经营夯实全行信贷客户基础；在岸银团贷款余额6,438.47亿元，较上年末增长15.59%；并购融资余额2,431亿元，新发放并购贷款1,139亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"在岸银团贷款余额\",\"raw_value\":\"6,438.47\",\"value\":\"6438.47\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"并购融资余额\",\"raw_value\":\"2,431\",\"value\":\"2431\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"od-05\",\"text\":\"公司持续深化主动资产负债管理，在资产端优化信贷投放节奏，延缓生息资产收益率下降速度；在负债端推动存款业务有效增长，本外币存款在计息负债日均占比较2024年提升近3个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]},{\"fact_id\":\"od-06\",\"text\":\"公司净息差管理成效明显，报告期内集团净息差1.42%，较2024年度持平。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"净息差\",\"raw_value\":\"1.42\",\"value\":\"1.42\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"od-07\",\"text\":\"公司坚持“控新降旧”并举，构建数字化风控体系，严格新增准入标准，持续加大存量不良资产处置力度；报告期末不良贷款率1.26%，较上年末下降0.10个百分点，拨备覆盖率200.72%，较上年末上升13.76个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"不良贷款率\",\"raw_value\":\"1.26\",\"value\":\"1.26\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"拨备覆盖率\",\"raw_value\":\"200.72\",\"value\":\"200.72\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"od-08\",\"text\":\"公司在线供应链业务量占比由2024年末的23.46%提升至46.25%；银票直通车业务线上最快30秒完成出票，贸易背景线上化核查业务处理时效提升40%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]},{\"fact_id\":\"od-09\",\"text\":\"公司成功完成498.37亿元可转债转股，并发行500亿元无固定期限资本债券和200亿元二级资本债券；报告期末资本充足率12.47%，一级资本充足率9.99%，核心一级资本充足率8.99%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"资本充足率\",\"raw_value\":\"12.47\",\"value\":\"12.47\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"一级资本充足率\",\"raw_value\":\"9.99\",\"value\":\"9.99\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"核心一级资本充足率\",\"raw_value\":\"8.99\",\"value\":\"8.99\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"mc-01\",\"text\":\"报告期末，本集团不良贷款余额719.90亿元，较上年末减少11.64亿元，为2019年以来最低水平；不良贷款率1.26%，较上年末下降0.10个百分点，为2015年以来最好水平。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"不良贷款余额\",\"raw_value\":\"719.90\",\"value\":\"719.90\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"不良贷款率\",\"raw_value\":\"1.26\",\"value\":\"1.26\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"mc-02\",\"text\":\"报告期内，公司在线供应链业务量当年实现7,871.13亿元，较上年增加5,201.36亿元，增长194.82%；累计服务供应链上下游客户37,408户，增长97.76%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"在线供应链业务量\",\"raw_value\":\"7,871.13\",\"value\":\"7871.13\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"mc-03\",\"text\":\"报告期内，公司跨境交易结算量44,931亿元人民币，增长44%；自贸存贷款业务规模达1,634亿元人民币，较上年末增加203亿元人民币，增长14%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"跨境交易结算量\",\"raw_value\":\"44,931\",\"value\":\"44931\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"自贸存贷款业务规模\",\"raw_value\":\"1,634\",\"value\":\"1634\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"mc-04\",\"text\":\"报告期内，境外分行规模效益增长显著，总资产增长21.70%，营收同比增长23.98%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]},{\"fact_id\":\"mc-05\",\"text\":\"报告期内，公司主承销债券2,032只，主承销金额6,407.78亿元，其中承销债务融资工具4,721.11亿元；境内外并购贷款余额2,431.43亿元，较上年末增长17.11%，新发放并购贷款1,139.43亿元，同比增长47.05%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[{\"name\":\"主承销金额\",\"raw_value\":\"6,407.78\",\"value\":\"6407.78\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"境内外并购贷款余额\",\"raw_value\":\"2,431.43\",\"value\":\"2431.43\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"mc-06\",\"text\":\"报告期内，公司新增投资科技创新主题债券536亿元，同比增长近300%；全年对外报价笔数约3,310万笔，同比增长47%，成交笔数216万笔，同比增长65%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"],\"metrics\":[{\"name\":\"新增投资科技创新主题债券\",\"raw_value\":\"536\",\"value\":\"536\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"mc-07\",\"text\":\"报告期内，公司浦银避险交易量超1.5万亿元，其中面向企业客户的浦银避险交易量超9,700亿元，同比增长37%；服务客户超2.6万户，同比增长6%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0020\"],\"metrics\":[{\"name\":\"浦银避险交易量\",\"raw_value\":\"超 1.5\",\"value\":\"1.5\",\"unit\":\"万亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"greater_than\"},{\"name\":\"面向企业客户的浦银避险交易量\",\"raw_value\":\"超 9,700\",\"value\":\"9700\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"greater_than\"}]},{\"fact_id\":\"mc-08\",\"text\":\"报告期内，公司国内贸易融资总业务量突破2.8万亿元，同比增幅16.5%；云监管业务量超10,000亿元，同比增长57%；对公收款业务量同比增长155%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[{\"name\":\"国内贸易融资总业务量\",\"raw_value\":\"突破 2.8\",\"value\":\"2.8\",\"unit\":\"万亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"greater_than\"},{\"name\":\"云监管业务量\",\"raw_value\":\"超 10,000\",\"value\":\"10000\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"greater_than\"}]}]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sc-pos-01\",\"text\":\"公司为银行，在供应链金融中作为金融服务提供方，将供应链金融深度嵌入产业链产、供、销全场景，为产业链上下游企业提供融资与结算服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sc-up-01\",\"text\":\"公司经营所需资源主要为存款等负债来源及资本补充，报告期内本外币存款总额55,824.35亿元，并通过可转债转股、发行无固定期限资本债券和二级资本债券补充资本。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]}]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sc-down-01\",\"text\":\"供应链金融下游服务对象为产业链上下游企业，重点聚焦电力能源、石油石化、铁路运输、通信、物流等重点产业，累计服务供应链上下游客户37,408户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]}]}},\"limitations\":[\"本工作底稿仅依据所选取的第三节管理层讨论与分析相关章节编制，未阅读3.7利润表分析、3.8资产负债表分析、3.10贷款质量分析、3.11监管指标分析及第八节财务报告，故未对营业收入按业务条线的完整构成、净利润明细及监管指标进行系统核对。\",\"部分指标（如科技金融贷款规模、普惠两增贷款、绿色信贷余额等）采用中国人民银行等监管统计口径，与公司财务报表口径可能存在差异，本底稿未作口径调整。\",\"报告中“公司”一词在部分段落指代集团、部分段落指代母公司，本底稿已按上下文区分subject_scope，但个别表述可能存在歧义。\",\"本底稿未对报告中提及的荣誉、奖项、战略规划及行业统计数据进行独立验证，相关表述仅作为背景信息，不作为公司当前经营成果的确认。\",\"供应链金融上下游信息仅依据报告披露的客户类型与重点产业，未获取具体交易对手名称及采购金额，故未列示具名供应商或客户。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "bs-01",
+              "text": "公司主要业务分为公司金融业务、零售金融业务、金融市场与金融机构业务、跨境及境外机构业务，并以“五大赛道”（科技金融、供应链金融、普惠金融、跨境金融、财资金融）作为业务经营的主要领域。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0013",
+                "source-0019",
+                "source-0020"
+              ]
+            },
+            {
+              "fact_id": "bs-02",
+              "text": "公司金融业务涵盖商业信贷、交易银行、投资银行、电子银行、跨境业务、离岸业务等多个领域，并推动“四层四类”公司客户经营体系建设。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ]
+            },
+            {
+              "fact_id": "bs-03",
+              "text": "科技金融形成“集团大科创+科技金融专班+总行科技金融部+分行科技金融部+科技（特色）支行”组织架构，在全国建设510家科技（特色）支行。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "bs-04",
+              "text": "公司通过离岸银行、自贸金融、境外分行和海外投行等多平台协同开展跨境及境外机构业务，境外机构包括香港分行、新加坡分行、伦敦分行及浦银国际。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0020",
+                "source-0021"
+              ]
+            }
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "ps-01",
+              "text": "科技金融打磨浦科“5+7+X”产品体系，5大拳头产品“浦创贷、浦投贷、浦新贷、浦研贷、浦科并购贷”服务企业超5,900户，提供超1,400亿元融资，满足科技企业初创、成长、成熟期不同阶段需求。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "ps-02",
+              "text": "供应链金融以“浦链通”“浦证通”“浦贴通”“浦订通”4个在线重点产品开展服务，投放余额1,914.60亿元，其中小微企业余额1,088.61亿元，占比56.86%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "ps-03",
+              "text": "普惠金融迭代“浦惠贷”数字化产品矩阵，其中惠闪贷为全行首个全流程在线的对公信用类产品，惠链贷累计上线场景超百个，惠抵贷实现流程提速。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "ps-04",
+              "text": "跨境金融打造“极速”系列跨境产品，“跨境极速汇”实现客户汇款秒级汇出，“跨境极速证”“极速押汇”实现单证结算和融资全线上操作，并升级跨境电商数智化服务“跨境商e汇”。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "ps-05",
+              "text": "财资金融以存款、理财、基金、保险“四大支柱”为核心构建财富管理产品体系，焕新推出“财资α”资产配置服务体系及财富管理AI智能体“浦小财”。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009",
+                "source-0018"
+              ]
+            },
+            {
+              "fact_id": "ps-06",
+              "text": "零售贷款方面，浦闪贷嵌入装修、电商购物等场景，浦发i车贷与数十家新能源厂商实现系统对接提供汽车金融服务，并全国首创推出换电消费贷款产品。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0017"
+              ]
+            },
+            {
+              "fact_id": "ps-07",
+              "text": "金融市场业务以“自营投资交易+浦银避险代客”双核驱动，浦银避险在固定收益、外汇、贵金属及大宗商品方面提供投资交易和产品创设能力。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019",
+                "source-0020"
+              ]
+            },
+            {
+              "fact_id": "ps-08",
+              "text": "投资银行业务打造“并购+组合融资”综合服务模式，构建“4+8+16+N”并购金融服务体系，并为国资国企、科技企业、产业基金、上市公司、跨境企业提供解决方案。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ]
+            }
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "rm-01",
+              "text": "报告期内，本集团实现营业收入1,739.64亿元，同比增加32.16亿元，增长1.88%；实现利润总额533.74亿元，同比增长10.35%；归属于母公司股东的净利润500.17亿元，同比增长10.52%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "1,739.64",
+                  "value": "1739.64",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "利润总额",
+                  "raw_value": "533.74",
+                  "value": "533.74",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于母公司股东的净利润",
+                  "raw_value": "500.17",
+                  "value": "500.17",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "rm-02",
+              "text": "集团净息差为1.42%，较上年持平；平均总资产收益率（ROA）为0.52%，较上年上升0.02个百分点；加权平均净资产收益率（ROE）为6.76%，较上年上升0.48个百分点；成本收入比为28.50%，较上年下降0.66个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "净息差",
+                  "raw_value": "1.42",
+                  "value": "1.42",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "平均总资产收益率（ROA）",
+                  "raw_value": "0.52",
+                  "value": "0.52",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "加权平均净资产收益率（ROE）",
+                  "raw_value": "6.76",
+                  "value": "6.76",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "成本收入比",
+                  "raw_value": "28.50",
+                  "value": "28.50",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "rm-03",
+              "text": "报告期内，公司实现对公业务营业净收入685.79亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "对公业务营业净收入",
+                  "raw_value": "685.79",
+                  "value": "685.79",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "rm-04",
+              "text": "财资赛道实现财资中收71.86亿元，较上年增长17.55%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "财资中收",
+                  "raw_value": "71.86",
+                  "value": "71.86",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "rm-05",
+              "text": "报告期内，公司托管收入24.81亿元，同比增长7.23%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0020"
+              ],
+              "metrics": [
+                {
+                  "name": "托管收入",
+                  "raw_value": "24.81",
+                  "value": "24.81",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "rm-06",
+              "text": "公司通过“自营投资交易+浦银避险代客”双核驱动金融市场业务，并在本外币债券、外汇、贵金属及大宗商品领域挖掘市场交易专业能力对营收的贡献潜力。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019"
+              ]
+            }
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "sm-01",
+              "text": "报告期末，本集团资产总额突破10万亿元至100,817.46亿元，较上年末增加6,198.66亿元，增长6.55%；本外币贷款总额（含票据贴现）为57,039.73亿元，较上年末增加3,124.43亿元，增长5.80%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "资产总额",
+                  "raw_value": "100,817.46",
+                  "value": "100817.46",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "本外币贷款总额（含票据贴现）",
+                  "raw_value": "57,039.73",
+                  "value": "57039.73",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "sm-02",
+              "text": "本集团负债总额92,573.16亿元，较上年末增加5,402.17亿元，增长6.20%；本外币存款总额为55,824.35亿元，较上年末增加4,364.76亿元，增长8.48%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "负债总额",
+                  "raw_value": "92,573.16",
+                  "value": "92573.16",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "本外币存款总额",
+                  "raw_value": "55,824.35",
+                  "value": "55824.35",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "sm-03",
+              "text": "报告期末，公司客户数达到252.29万户，较上年末增加15.44万户，增长6.52%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "公司客户数",
+                  "raw_value": "252.29",
+                  "value": "252.29",
+                  "unit": "万户",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "sm-04",
+              "text": "报告期末，母公司对公存款余额38,103.74亿元，较上年末增加2,750.16亿元，增长7.78%；母公司对公贷款（含票据贴现）总额36,654.74亿元，较上年末增加2,787.51亿元，增长8.23%。",
+              "subject_scope": "issuer",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0013",
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "母公司对公存款余额",
+                  "raw_value": "38,103.74",
+                  "value": "38103.74",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "issuer",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "母公司对公贷款（含票据贴现）总额",
+                  "raw_value": "36,654.74",
+                  "value": "36654.74",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "issuer",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "sm-05",
+              "text": "报告期末，个人客户（含信用卡）达到1.71亿户，较上年末增加1,396.59万户；AUM个人金融资产余额（含市值）46,645.33亿元，较上年末增加7,859.26亿元，增长20.26%；母公司个人存款余额达到17,177.05亿元，较上年末增加1,673.22亿元，增长10.79%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0017"
+              ],
+              "metrics": [
+                {
+                  "name": "个人客户（含信用卡）",
+                  "raw_value": "1.71",
+                  "value": "1.71",
+                  "unit": "亿户",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "AUM个人金融资产余额（含市值）",
+                  "raw_value": "46,645.33",
+                  "value": "46645.33",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "母公司个人存款余额",
+                  "raw_value": "17,177.05",
+                  "value": "17177.05",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "issuer",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "sm-06",
+              "text": "报告期末，母公司零售贷款（不含个人经营贷款）余额15,137.37亿元，较上年末增加506.10亿元，增长3.46%；个人住房贷款余额8,768.34亿元，较上年末增长2.04%。",
+              "subject_scope": "issuer",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0017"
+              ],
+              "metrics": [
+                {
+                  "name": "母公司零售贷款（不含个人经营贷款）余额",
+                  "raw_value": "15,137.37",
+                  "value": "15137.37",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "issuer",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "个人住房贷款余额",
+                  "raw_value": "8,768.34",
+                  "value": "8768.34",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "sm-07",
+              "text": "报告期末，信用卡及透支余额3,893.27亿元，较上年末增加191.04亿元，增长5.16%；借记卡累计发卡量11,257万张。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0018",
+                "source-0019"
+              ],
+              "metrics": [
+                {
+                  "name": "信用卡及透支余额",
+                  "raw_value": "3,893.27",
+                  "value": "3893.27",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "借记卡累计发卡量",
+                  "raw_value": "11,257",
+                  "value": "11257",
+                  "unit": "万张",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "sm-08",
+              "text": "报告期末，科技金融贷款规模（中国人民银行统计口径）10,470.92亿元，服务科技企业超25.6万户；普惠两增贷款规模5,239.91亿元，较上年末增长12.51%，普惠两增客户数50.98万户，增长24.22%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0004",
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "科技金融贷款规模（中国人民银行统计口径）",
+                  "raw_value": "10,470.92",
+                  "value": "10470.92",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "服务科技企业",
+                  "raw_value": "超 25.6",
+                  "value": "25.6",
+                  "unit": "万户",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "greater_than"
+                },
+                {
+                  "name": "普惠两增贷款规模",
+                  "raw_value": "5,239.91",
+                  "value": "5239.91",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "普惠两增客户数",
+                  "raw_value": "50.98",
+                  "value": "50.98",
+                  "unit": "万户",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "sm-09",
+              "text": "报告期末，绿色信贷余额7,073.74亿元，较上年末增加1,366.80亿元，增长23.95%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "绿色信贷余额",
+                  "raw_value": "7,073.74",
+                  "value": "7073.74",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "sm-10",
+              "text": "报告期末，托管规模20.21万亿元，较上年末增长11.45%；跨境客户数近4.9万户，增长24%；跨境本外币贷款余额3,363亿元人民币，增长27%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0020",
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "托管规模",
+                  "raw_value": "20.21",
+                  "value": "20.21",
+                  "unit": "万亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "跨境客户数",
+                  "raw_value": "近 4.9",
+                  "value": "4.9",
+                  "unit": "万户",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "approximate"
+                },
+                {
+                  "name": "跨境本外币贷款余额",
+                  "raw_value": "3,363",
+                  "value": "3363",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "sm-11",
+              "text": "报告期末，财资赛道的资产管理规模达33,604.69亿元，较上年末增加6,429.18亿元，增长23.66%；浦银理财、上海信托、浦银安盛基金和浦银国际四家子公司的资产管理规模合计突破3万亿元，达3.36万亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0009",
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "财资赛道的资产管理规模",
+                  "raw_value": "33,604.69",
+                  "value": "33604.69",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "四家子公司资产管理规模合计",
+                  "raw_value": "3.36",
+                  "value": "3.36",
+                  "unit": "万亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "oi-01",
+              "text": "公司通过“集团大科创+科技金融专班+总行科技金融部+分行科技金融部+科技（特色）支行”组织架构开展科技金融业务，在全国建设510家科技（特色）支行。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "oi-02",
+              "text": "公司构建“上下联动、全域协同”的立体化服务体系，为产业链客户提供“总分支协同、集团联动、一揽子定制”的综合金融服务，并将人工智能技术融入智能触客、产品拓客、服务暖客。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "oi-03",
+              "text": "公司在全国各家分行落地小微及个贷中心建设，近50%的业务流程纳入中心集中进行标准化作业，累计挂牌201家普惠金融特色支行及旗舰支行。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "oi-04",
+              "text": "公司构建“数据驱动、模型支撑、动态迭代”的智能化风控体系，建成覆盖公司+个人客户全生命周期的数字普惠风控模型体系。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "oi-05",
+              "text": "公司强化数智技术赋能，科技金融数智平台“抹香鲸”升级3.0，集成商机分析、营销追踪、产品测额等多种功能。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "oi-06",
+              "text": "公司作为银行，其经营资源与投入体现为存款等负债来源、资本补充及数字化系统建设，而非制造业原材料采购。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002",
+                "source-0012"
+              ]
+            }
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "cc-01",
+              "text": "公司金融业务推动“四层四类”公司客户经营体系建设，报告期末公司客户数达到252.29万户，较上年末增长6.52%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0013"
+              ]
+            },
+            {
+              "fact_id": "cc-02",
+              "text": "零售金融形成5层、16级、六位一体服务体系，报告期末个人客户（含信用卡）达到1.71亿户，月日均金融资产5万元以上客户数达到469.26万户，月日均金融资产600万元以上私人银行客户规模达5.55万户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0016",
+                "source-0017"
+              ]
+            },
+            {
+              "fact_id": "cc-03",
+              "text": "供应链金融累计服务供应链上下游客户37,408户，较上年末增加18,492户，增长97.76%；报告期内新增987家核心企业、14,157家供应商。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "cc-04",
+              "text": "跨境金融跨境客户数近4.9万户，增长24%，跨境数字化渠道活跃客户达2.8万户；总分行战略客户海外贷款余额1,884亿元人民币，增长48%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0007",
+                "source-0021"
+              ]
+            },
+            {
+              "fact_id": "cc-05",
+              "text": "金融机构客户经营方面，报告期末合作金融机构一级法人客户约3,300家，与公募基金、保险资管、信托、银行理财、券商、期货等持牌非银资产管理机构合作覆盖度达80%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0019"
+              ]
+            },
+            {
+              "fact_id": "cc-06",
+              "text": "公司机构客户面向全国各级党政机关、事业单位和社会组织等，报告期末机构客户对公人民币存款日均首次突破6,000亿元，重点机构客户新增长近480户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0016"
+              ]
+            },
+            {
+              "fact_id": "cc-07",
+              "text": "公司渠道包括线上“浦惠来了”与手机银行两大超级平台，以及线下分支机构和特色支行；手机银行为财富管理主阵地。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0010"
+              ]
+            },
+            {
+              "fact_id": "cc-08",
+              "text": "公司区域策略坚持“箭型”区域策略，精耕细作长三角，重点布局京津冀与大湾区，深度挖潜长江经济带；报告期末长三角区域贷款余额超2万亿元，较上年末增加超1,600亿元，占公司贷款增量一半以上。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0011"
+              ]
+            }
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "od-01",
+              "text": "报告期内，“五大赛道”业务成为公司贷款主要增长极；制造业中长期贷款总额3,599.26亿元，较上年末增加410.14亿元，增长12.86%，高于整体贷款增速7个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "制造业中长期贷款总额",
+                  "raw_value": "3,599.26",
+                  "value": "3599.26",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "od-02",
+              "text": "公司坚持“提质增效、动态调优”策略，将资源向高收益资产倾斜，2025年集团本外币贷款（不含票据贴现）在生息资产日均占比提升近2个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "od-03",
+              "text": "公司强化市场趋势前瞻性研判，系统构建负债质量管理体系，负债付息率较上年下降46bps；本外币存款付息率较上年下降38bps。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "od-04",
+              "text": "公司聚焦“五大赛道”、重点区域及重点行业，通过场景化、圈链经营夯实全行信贷客户基础；在岸银团贷款余额6,438.47亿元，较上年末增长15.59%；并购融资余额2,431亿元，新发放并购贷款1,139亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "在岸银团贷款余额",
+                  "raw_value": "6,438.47",
+                  "value": "6438.47",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "并购融资余额",
+                  "raw_value": "2,431",
+                  "value": "2431",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "od-05",
+              "text": "公司持续深化主动资产负债管理，在资产端优化信贷投放节奏，延缓生息资产收益率下降速度；在负债端推动存款业务有效增长，本外币存款在计息负债日均占比较2024年提升近3个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            },
+            {
+              "fact_id": "od-06",
+              "text": "公司净息差管理成效明显，报告期内集团净息差1.42%，较2024年度持平。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "净息差",
+                  "raw_value": "1.42",
+                  "value": "1.42",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "od-07",
+              "text": "公司坚持“控新降旧”并举，构建数字化风控体系，严格新增准入标准，持续加大存量不良资产处置力度；报告期末不良贷款率1.26%，较上年末下降0.10个百分点，拨备覆盖率200.72%，较上年末上升13.76个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "不良贷款率",
+                  "raw_value": "1.26",
+                  "value": "1.26",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "拨备覆盖率",
+                  "raw_value": "200.72",
+                  "value": "200.72",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "od-08",
+              "text": "公司在线供应链业务量占比由2024年末的23.46%提升至46.25%；银票直通车业务线上最快30秒完成出票，贸易背景线上化核查业务处理时效提升40%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "od-09",
+              "text": "公司成功完成498.37亿元可转债转股，并发行500亿元无固定期限资本债券和200亿元二级资本债券；报告期末资本充足率12.47%，一级资本充足率9.99%，核心一级资本充足率8.99%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "资本充足率",
+                  "raw_value": "12.47",
+                  "value": "12.47",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "一级资本充足率",
+                  "raw_value": "9.99",
+                  "value": "9.99",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "核心一级资本充足率",
+                  "raw_value": "8.99",
+                  "value": "8.99",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "mc-01",
+              "text": "报告期末，本集团不良贷款余额719.90亿元，较上年末减少11.64亿元，为2019年以来最低水平；不良贷款率1.26%，较上年末下降0.10个百分点，为2015年以来最好水平。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "不良贷款余额",
+                  "raw_value": "719.90",
+                  "value": "719.90",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "不良贷款率",
+                  "raw_value": "1.26",
+                  "value": "1.26",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "mc-02",
+              "text": "报告期内，公司在线供应链业务量当年实现7,871.13亿元，较上年增加5,201.36亿元，增长194.82%；累计服务供应链上下游客户37,408户，增长97.76%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "在线供应链业务量",
+                  "raw_value": "7,871.13",
+                  "value": "7871.13",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "mc-03",
+              "text": "报告期内，公司跨境交易结算量44,931亿元人民币，增长44%；自贸存贷款业务规模达1,634亿元人民币，较上年末增加203亿元人民币，增长14%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "跨境交易结算量",
+                  "raw_value": "44,931",
+                  "value": "44931",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "自贸存贷款业务规模",
+                  "raw_value": "1,634",
+                  "value": "1634",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "mc-04",
+              "text": "报告期内，境外分行规模效益增长显著，总资产增长21.70%，营收同比增长23.98%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "mc-05",
+              "text": "报告期内，公司主承销债券2,032只，主承销金额6,407.78亿元，其中承销债务融资工具4,721.11亿元；境内外并购贷款余额2,431.43亿元，较上年末增长17.11%，新发放并购贷款1,139.43亿元，同比增长47.05%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "主承销金额",
+                  "raw_value": "6,407.78",
+                  "value": "6407.78",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "境内外并购贷款余额",
+                  "raw_value": "2,431.43",
+                  "value": "2431.43",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "mc-06",
+              "text": "报告期内，公司新增投资科技创新主题债券536亿元，同比增长近300%；全年对外报价笔数约3,310万笔，同比增长47%，成交笔数216万笔，同比增长65%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019"
+              ],
+              "metrics": [
+                {
+                  "name": "新增投资科技创新主题债券",
+                  "raw_value": "536",
+                  "value": "536",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "mc-07",
+              "text": "报告期内，公司浦银避险交易量超1.5万亿元，其中面向企业客户的浦银避险交易量超9,700亿元，同比增长37%；服务客户超2.6万户，同比增长6%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0020"
+              ],
+              "metrics": [
+                {
+                  "name": "浦银避险交易量",
+                  "raw_value": "超 1.5",
+                  "value": "1.5",
+                  "unit": "万亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "greater_than"
+                },
+                {
+                  "name": "面向企业客户的浦银避险交易量",
+                  "raw_value": "超 9,700",
+                  "value": "9700",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "greater_than"
+                }
+              ]
+            },
+            {
+              "fact_id": "mc-08",
+              "text": "报告期内，公司国内贸易融资总业务量突破2.8万亿元，同比增幅16.5%；云监管业务量超10,000亿元，同比增长57%；对公收款业务量同比增长155%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "国内贸易融资总业务量",
+                  "raw_value": "突破 2.8",
+                  "value": "2.8",
+                  "unit": "万亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "greater_than"
+                },
+                {
+                  "name": "云监管业务量",
+                  "raw_value": "超 10,000",
+                  "value": "10000",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "greater_than"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "sc-pos-01",
+              "text": "公司为银行，在供应链金融中作为金融服务提供方，将供应链金融深度嵌入产业链产、供、销全场景，为产业链上下游企业提供融资与结算服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "sc-up-01",
+              "text": "公司经营所需资源主要为存款等负债来源及资本补充，报告期内本外币存款总额55,824.35亿元，并通过可转债转股、发行无固定期限资本债券和二级资本债券补充资本。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            }
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "sc-down-01",
+              "text": "供应链金融下游服务对象为产业链上下游企业，重点聚焦电力能源、石油石化、铁路运输、通信、物流等重点产业，累计服务供应链上下游客户37,408户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            }
+          ]
+        }
+      },
+      "limitations": [
+        "本工作底稿仅依据所选取的第三节管理层讨论与分析相关章节编制，未阅读3.7利润表分析、3.8资产负债表分析、3.10贷款质量分析、3.11监管指标分析及第八节财务报告，故未对营业收入按业务条线的完整构成、净利润明细及监管指标进行系统核对。",
+        "部分指标（如科技金融贷款规模、普惠两增贷款、绿色信贷余额等）采用中国人民银行等监管统计口径，与公司财务报表口径可能存在差异，本底稿未作口径调整。",
+        "报告中“公司”一词在部分段落指代集团、部分段落指代母公司，本底稿已按上下文区分subject_scope，但个别表述可能存在歧义。",
+        "本底稿未对报告中提及的荣誉、奖项、战略规划及行业统计数据进行独立验证，相关表述仅作为背景信息，不作为公司当前经营成果的确认。",
+        "供应链金融上下游信息仅依据报告披露的客户类型与重点产业，未获取具体交易对手名称及采购金额，故未列示具名供应商或客户。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 19896,
+      "output_tokens": 8521,
+      "total_tokens": 28417
+    },
+    "contract_error": "schema_validation_error"
+  }
+]
