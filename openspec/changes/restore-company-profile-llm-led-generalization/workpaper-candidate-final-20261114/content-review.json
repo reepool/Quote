@@ -1,0 +1,84 @@
+{
+  "task": "6.BZ",
+  "scope": "finite independent source check of the ten actually adopted changes; not full-profile accuracy",
+  "changes": [
+    {
+      "instrument_id": "600082.SH",
+      "fact_id": "review-add:R001",
+      "source": "第三节/五(一)主营业务分析，物理15页",
+      "conclusion": "两类主业收入418710800.51/30105192.48及对应成本/毛利率/同比取原表各列，减少29.68/2.21保百分点方向，不当相对百分比。",
+      "result": "source_supported_with_stated_scope"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "fact_id": "review-add:R002",
+      "source": "第三节/五(一)主营业务分析，物理14–15页",
+      "conclusion": "公司成本355491553.96元与行业表合计毛利20.87%、减少27.97个百分点分口径表达。",
+      "result": "source_supported_with_stated_scope"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "fact_id": "review-add:R003",
+      "source": "主要控股参股公司分析，物理27页/source-0018",
+      "conclusion": "创意科技园收入418714190.51和百竹净资产-4265299.72等保具名子公司/正负号；不与开发分行业418710800.51混同、不计2026年增资。",
+      "result": "source_supported_with_stated_scope"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "fact_id": "review-add:R004",
+      "source": "第三节/五(一)主营业务分析，物理14页",
+      "conclusion": "仅保所得税费用下降、利润总额减少/递延税调整的原文，不造利润总额金额。",
+      "result": "source_supported_with_stated_scope"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "fact_id": "F035",
+      "source": "主营业务分析/合并范围变化，物理17页；主要控股参股公司分析物理28页",
+      "conclusion": "2025-07-21临时股东会、100%转让、9065.95万元、关联交易、已全款/交割与本期影响有原文；未造收益金额。",
+      "result": "source_supported_with_stated_scope"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "fact_id": "F027",
+      "source": "第三节/五(一)主营业务分析，物理15页",
+      "conclusion": "全部内销限定为主营分地区披露，449240562.34元取收入列，不延伸为全报告未披露境外。",
+      "result": "source_supported_with_stated_scope"
+    },
+    {
+      "instrument_id": "600000.SH",
+      "fact_id": "bs-06",
+      "source": "第三节/3.2.2五大赛道，物理40页",
+      "conclusion": "3.36万亿元保报告期内、四家资管子公司合计，不改为报告期末余额。",
+      "result": "source_supported_with_stated_scope"
+    },
+    {
+      "instrument_id": "600000.SH",
+      "fact_id": "review-add:F002",
+      "source": "第三节/3.1总体经营，物理32页",
+      "conclusion": "501.44亿元为集团扣非归母净利，59.37亿元及13.43%保同比，不用归母净利500.17替代。",
+      "result": "source_supported_with_stated_scope"
+    },
+    {
+      "instrument_id": "600000.SH",
+      "fact_id": "review-add:F004",
+      "source": "第三节/3.6主要业务，物理63页",
+      "conclusion": "突破2.8万亿元保下限/null；2032只、6407.78亿元及其中4721.11亿元保主承销/子集关系，非公司营收。",
+      "result": "source_supported_with_stated_scope"
+    },
+    {
+      "instrument_id": "600000.SH",
+      "fact_id": "review-add:F005",
+      "source": "第三节/3.1总体经营及3.5经营关注问题，物理32、58页",
+      "conclusion": "集团贷款日均生息资产占比近2、存款日均计息负债占比近3，保近似/null；不拿母公司一般贷款约2.5替代。",
+      "result": "source_supported_with_stated_scope"
+    }
+  ],
+  "unchanged_old_objects": 101,
+  "remaining_limitations": [
+    "浦发rm-06仍为quarantined；未选读的完整利息/非息收入构成未补，不以其他候选通过消除。",
+    "海泰旧F005等绑定隔离记录作为历史说明保留，主要收入通过新修订review-add:R001补入；土地成本等可选明细未强补。",
+    "海泰原标题树少数中间层噪声不在本卡改动，物理页与原Evidence坐标可核。",
+    "111条当前事实未做逐对象全真值审查，模型一致与10修改有源不代表可信发布。"
+  ],
+  "production_authorization": "not_authorized"
+}

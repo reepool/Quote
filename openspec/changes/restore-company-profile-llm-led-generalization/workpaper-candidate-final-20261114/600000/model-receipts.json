@@ -1,0 +1,65 @@
+[
+  {
+    "request_id": "bp-work-d67a2b37789d03400bdbd73c:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "5cc9aa6a8025357984c74009f522f81704005ac8ec8f56b77bdf8b3011705e8f",
+    "response_hash": "8ed4bccfd1f5226792de24736cd816c2fae6a965ef1ccf6fd31b2847a0c67c98",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"bs-06\",\"review-add:F002\",\"review-add:F004\",\"review-add:F005\"],\"checks\":[{\"fact_id\":\"bs-06\",\"accepted\":true,\"evidence_ids\":[\"source-0010\"],\"explanation\":\"source-0010明确为报告期内浦银理财、上海信托、浦银安盛基金和浦银国际四家子公司资产管理规模合计突破3万亿元、达3.36万亿元。候选已将期间改回报告期内，主体、突破限定和3.36万亿元表述均与该句一致，且未用另一处财资赛道年末余额改写成报告期末已核实数。\"},{\"fact_id\":\"review-add:F002\",\"accepted\":true,\"evidence_ids\":[\"source-0001\"],\"explanation\":\"source-0001在本集团报告期内经营效益中单独披露归属于母公司股东的扣除非经常性损益的净利润501.44亿元，同比增加59.37亿元、增长13.43%。候选的主体、期间、金额、增减额、增速和同比口径均一致，补足了该利润调整遗漏。\"},{\"fact_id\":\"review-add:F004\",\"accepted\":true,\"evidence_ids\":[\"source-0014\"],\"explanation\":\"source-0014载明报告期内全行国内贸易融资总业务量突破2.8万亿元、同比增幅16.5%，以及公司主承销债券2,032只、主承销金额6,407.78亿元，其中承销债务融资工具4,721.11亿元。候选保留突破限定，主体、期间、单位及其中子集关系均与原文一致。\"},{\"fact_id\":\"review-add:F005\",\"accepted\":true,\"evidence_ids\":[\"source-0001\",\"source-0012\"],\"explanation\":\"source-0001写明2025年集团本外币贷款（不含票据贴现）在生息资产日均占比提升近2个百分点，存款在计息负债日均占比较上年提升近3个百分点；source-0012的近3个百分点同属集团存款日均口径，另列的母公司一般贷款约2.5个百分点口径不同。候选采用正确主体、分母和近的近似限定，未互相替代。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "bs-06",
+        "review-add:F002",
+        "review-add:F004",
+        "review-add:F005"
+      ],
+      "checks": [
+        {
+          "fact_id": "bs-06",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "explanation": "source-0010明确为报告期内浦银理财、上海信托、浦银安盛基金和浦银国际四家子公司资产管理规模合计突破3万亿元、达3.36万亿元。候选已将期间改回报告期内，主体、突破限定和3.36万亿元表述均与该句一致，且未用另一处财资赛道年末余额改写成报告期末已核实数。"
+        },
+        {
+          "fact_id": "review-add:F002",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "source-0001在本集团报告期内经营效益中单独披露归属于母公司股东的扣除非经常性损益的净利润501.44亿元，同比增加59.37亿元、增长13.43%。候选的主体、期间、金额、增减额、增速和同比口径均一致，补足了该利润调整遗漏。"
+        },
+        {
+          "fact_id": "review-add:F004",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0014"
+          ],
+          "explanation": "source-0014载明报告期内全行国内贸易融资总业务量突破2.8万亿元、同比增幅16.5%，以及公司主承销债券2,032只、主承销金额6,407.78亿元，其中承销债务融资工具4,721.11亿元。候选保留突破限定，主体、期间、单位及其中子集关系均与原文一致。"
+        },
+        {
+          "fact_id": "review-add:F005",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001",
+            "source-0012"
+          ],
+          "explanation": "source-0001写明2025年集团本外币贷款（不含票据贴现）在生息资产日均占比提升近2个百分点，存款在计息负债日均占比较上年提升近3个百分点；source-0012的近3个百分点同属集团存款日均口径，另列的母公司一般贷款约2.5个百分点口径不同。候选采用正确主体、分母和近的近似限定，未互相替代。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 22517,
+      "output_tokens": 502,
+      "total_tokens": 30971
+    }
+  }
+]

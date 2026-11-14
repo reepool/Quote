@@ -1,0 +1,48 @@
+{
+  "task": "6.BZ",
+  "mode": "read_only",
+  "new_calls_in_this_verification": 0,
+  "results": [
+    {
+      "instrument_id": "600082.SH",
+      "new_model_final": true,
+      "accepted_candidates": [
+        "F027",
+        "F035",
+        "review-add:R001",
+        "review-add:R002",
+        "review-add:R003",
+        "review-add:R004"
+      ],
+      "new_physical_requests": 1,
+      "new_usage": 29087,
+      "raw_hash_and_original_hashes_equal": true,
+      "unchanged_old_facts": 36,
+      "current_fact_count": 42,
+      "three_reads_equal": true,
+      "source_coordinates_equal": true
+    },
+    {
+      "instrument_id": "600000.SH",
+      "new_model_final": true,
+      "accepted_candidates": [
+        "bs-06",
+        "review-add:F002",
+        "review-add:F004",
+        "review-add:F005"
+      ],
+      "new_physical_requests": 1,
+      "new_usage": 30971,
+      "raw_hash_and_original_hashes_equal": true,
+      "unchanged_old_facts": 65,
+      "current_fact_count": 69,
+      "three_reads_equal": true,
+      "source_coordinates_equal": true
+    }
+  ],
+  "old_independent_facts_unchanged": 101,
+  "accepted_candidates": 10,
+  "fee": "unknown",
+  "business_wall_seconds": 167.769,
+  "production_authorization": "not_authorized"
+}

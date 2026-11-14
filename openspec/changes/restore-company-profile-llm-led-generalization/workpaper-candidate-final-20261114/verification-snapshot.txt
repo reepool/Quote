@@ -1,0 +1,37 @@
+from pathlib import Path
+import hashlib,json
+from research.company_profile.workpaper import CompanyProfileWorkpaper
+root=Path.cwd()
+d=root/"openspec/changes/restore-company-profile-llm-led-generalization/workpaper-candidate-final-20261114"
+g=json.loads((d/"group-execution.json").read_text())
+checks=[]
+for s in ("600082","600000"):
+    p=d/s
+    summary=json.loads((p/"summary.json").read_text())
+    assert summary["entry_started"] and summary["three_reads_equal"] and summary["original_facts_unchanged"] and summary["exception"] is None
+    budget=json.loads((p/"budget.json").read_text())
+    receipts=json.loads((p/"model-receipts.json").read_text())
+    assert len(receipts)==1 and receipts[0]["purpose"]=="verify_profile_workpaper_repair"
+    receipt=receipts[0]
+    assert hashlib.sha256(receipt["raw_content"].encode()).hexdigest()==receipt["response_hash"]
+    assert json.loads(receipt["raw_content"])==receipt["response_payload"]
+    ids={c["fact_id"] for c in receipt["response_payload"]["checks"] if c["accepted"]}
+    assert ids==set(summary["adopted_candidate_ids"]) and len(ids)==(6 if s=="600082" else 4)
+    assert budget["physical_requests"]==1 and len(budget["attempts"])==1
+    assert budget["attempts"][0]["finish_reason"]=="stop" and budget["attempts"][0]["source_label"]=="scorpio:grok-4.7"
+    assert budget["charged_tokens"]==receipt["usage"]["total_tokens"] and budget["charged_tokens"]<=300000
+    for path,value in summary["original_hashes"].items(): assert hashlib.sha256((root/path).read_bytes()).hexdigest()==value
+    profile=json.loads((p/"query.json").read_text())["profiles"][0]
+    paper=CompanyProfileWorkpaper.model_validate(profile["workpaper"])
+    assert not profile["core_complete"] and paper.origin=="llm_generated"
+    if s=="600000":
+        issue=next(f for f in paper.quality_review.findings if f.affected_fact_id=="rm-06")
+        assert issue.resolution=="quarantined" and paper.quality_review.status=="completed_with_open_findings"
+    checks.append({"instrument_id":s+".SH","new_model_final":True,"accepted_candidates":sorted(ids),
+        "new_physical_requests":1,"new_usage":budget["charged_tokens"],"raw_hash_and_original_hashes_equal":True,
+        "unchanged_old_facts":summary["old_facts"],"current_fact_count":profile["workpaper_summary"]["fact_count"],
+        "three_reads_equal":True,"source_coordinates_equal":summary["source_coordinates_equal"]})
+assert g["source_code_unchanged"] and g["physical_requests"]==2 and g["charged_tokens"]==60058
+print("VERIFICATION_JSON="+json.dumps({"task":"6.BZ","mode":"read_only","new_calls_in_this_verification":0,
+    "results":checks,"old_independent_facts_unchanged":101,"accepted_candidates":10,"fee":"unknown",
+    "business_wall_seconds":g["business_wall_seconds"],"production_authorization":"not_authorized"},ensure_ascii=False))

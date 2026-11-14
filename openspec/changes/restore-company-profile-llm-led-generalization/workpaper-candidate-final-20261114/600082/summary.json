@@ -1,0 +1,70 @@
+{
+  "instrument_id": "600082.SH",
+  "entry_started": true,
+  "three_reads_equal": true,
+  "exception": null,
+  "business_started_monotonic": 9837247.045493344,
+  "preparation_seconds": 49.378,
+  "business_ended_monotonic": 9837414.293806732,
+  "business_seconds": 167.248,
+  "retained_facts": 42,
+  "original_facts_unchanged": true,
+  "old_facts": 36,
+  "adopted_candidate_ids": [
+    "review-add:R001",
+    "review-add:R002",
+    "review-add:R003",
+    "review-add:R004",
+    "F035",
+    "F027"
+  ],
+  "query_sha256": "584574bd10ecc5d3c14eb6ef82b98edd90b72660d5d73bd0cf7a87f997d900a4",
+  "review_status": "completed",
+  "review_error": null,
+  "findings": [
+    {
+      "id": "R001",
+      "target": null,
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "id": "R002",
+      "target": null,
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "id": "R003",
+      "target": null,
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "id": "R004",
+      "target": null,
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "id": "R005",
+      "target": "F035",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "id": "R006",
+      "target": "F027",
+      "resolution": "corrected_pending_trust"
+    }
+  ],
+  "old_all_stages_usage_inherited": 108200,
+  "source_coordinates_equal": true,
+  "original_hashes": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v10-remaining-pool-600082-20261114/query.json": "35cdd748c84b1cf9790d1e68340016ef595566b035839bf4b6682324c4495529",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v10-remaining-pool-600082-20261114/model-receipts.json": "b68272f800fe570aedffcbb86b12557ff1850a7efcc93d1872de657cd473aa82",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v10-remaining-pool-600082-20261114/binding.json": "97477c5cb7dfe4f4fcc239b95c917631275c44a869517c523a3812a49f576f91"
+  },
+  "physical_requests": 1,
+  "charged_tokens": 29087,
+  "cost": "unknown",
+  "recoveries": 0,
+  "stopped_reason": null,
+  "supervision_seconds": 167.625,
+  "runtime_cleanup_bytes": 2024370
+}

@@ -1,0 +1,84 @@
+[
+  {
+    "request_id": "bp-work-bd3f3734a76a0ab9bbe7ddb6:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "8b0a024c43a6da27d792d58aee0bb59fcb2c3c27cef87e9c5b287fbc04af1fa6",
+    "response_hash": "cae8b3c494f95d754ea5b373d8d301f123fb180c41787fe1732594bc9a59c89c",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"review-add:R001\",\"review-add:R002\",\"review-add:R003\",\"review-add:R004\",\"F035\",\"F027\"],\"checks\":[{\"fact_id\":\"review-add:R001\",\"accepted\":true,\"evidence_ids\":[\"source-0008\"],\"explanation\":\"source-0008分行业、分产品表均列示科技园区开发营业收入418,710,800.51元、营业成本341,118,587.17元、毛利率18.53%，收入同比增35.15%、成本同比增112.60%、毛利率减少29.68个百分点；科技园区运营营业收入30,105,192.48元、营业成本14,372,966.79元、毛利率52.26%，收入同比增11.60%、成本同比增17.02%、毛利率减少2.21个百分点。单位为元，合并口径和2025年度正确，百分点未被改成相对百分比，实质性补记两大主业。\"},{\"fact_id\":\"review-add:R002\",\"accepted\":true,\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"explanation\":\"source-0007利润表营业成本本期数为355,491,553.96元、较上年同期变动105.81%且说明为增加；source-0008主营业务合计行毛利率20.87%，比上年减少27.97个百分点。成本金额、增幅、毛利率及百分点口径均与对应栏目一致，未把百分点降幅归一为下降27.97%。\"},{\"fact_id\":\"review-add:R003\",\"accepted\":true,\"evidence_ids\":[\"source-0018\"],\"explanation\":\"source-0018确认创意科技园投资公司营业收入418,714,190.51元、净利润35,352,048.05元、净资产122,773,936.76元，百竹公司总资产640,547,307.21元、净资产-4,265,299.72元、营业收入4,064,919.11元、净利润-3,007,898.85元。科目、正负号和元单位正确，主体限定为相应子公司，未与合并分行业开发收入418,710,800.51元混同，也未计入2026年增资。\"},{\"fact_id\":\"review-add:R004\",\"accepted\":true,\"evidence_ids\":[\"source-0007\"],\"explanation\":\"候选文字与source-0007所得税费用变动原因说明一致，只记录利润总额减少及递延所得税资产调整、当期和递延所得税费用均减少，未编造来源未披露的利润总额金额，并明示金额未知，从而补上与收入增长方向相反的业绩事实。\"},{\"fact_id\":\"F035\",\"accepted\":true,\"evidence_ids\":[\"source-0010\",\"source-0019\"],\"explanation\":\"source-0010载明2025年7月21日召开2025年第一次临时股东会，审议转让全资子公司股权暨关联交易议案，天津海发方信置地有限公司100%股权以9,065.95万元转让给天津海泰房地产开发有限公司，报告期内完成全款支付和股权交割；source-0019仅说明本期投资收益增加。关联交易和临时股东会已补入，价格单位正确，未编造收益金额。\"},{\"fact_id\":\"F027\",\"accepted\":true,\"evidence_ids\":[\"source-0008\"],\"explanation\":\"source-0008分地区表内销营业收入449,240,562.34元与合计行完全一致，支持主营业务全部为内销。候选删除了把未单列境外行说成未披露境外销售的错误，保留已披露的全部内销范围，且金额取自营业收入而非营业成本。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "review-add:R001",
+        "review-add:R002",
+        "review-add:R003",
+        "review-add:R004",
+        "F035",
+        "F027"
+      ],
+      "checks": [
+        {
+          "fact_id": "review-add:R001",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "explanation": "source-0008分行业、分产品表均列示科技园区开发营业收入418,710,800.51元、营业成本341,118,587.17元、毛利率18.53%，收入同比增35.15%、成本同比增112.60%、毛利率减少29.68个百分点；科技园区运营营业收入30,105,192.48元、营业成本14,372,966.79元、毛利率52.26%，收入同比增11.60%、成本同比增17.02%、毛利率减少2.21个百分点。单位为元，合并口径和2025年度正确，百分点未被改成相对百分比，实质性补记两大主业。"
+        },
+        {
+          "fact_id": "review-add:R002",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007",
+            "source-0008"
+          ],
+          "explanation": "source-0007利润表营业成本本期数为355,491,553.96元、较上年同期变动105.81%且说明为增加；source-0008主营业务合计行毛利率20.87%，比上年减少27.97个百分点。成本金额、增幅、毛利率及百分点口径均与对应栏目一致，未把百分点降幅归一为下降27.97%。"
+        },
+        {
+          "fact_id": "review-add:R003",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0018"
+          ],
+          "explanation": "source-0018确认创意科技园投资公司营业收入418,714,190.51元、净利润35,352,048.05元、净资产122,773,936.76元，百竹公司总资产640,547,307.21元、净资产-4,265,299.72元、营业收入4,064,919.11元、净利润-3,007,898.85元。科目、正负号和元单位正确，主体限定为相应子公司，未与合并分行业开发收入418,710,800.51元混同，也未计入2026年增资。"
+        },
+        {
+          "fact_id": "review-add:R004",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "候选文字与source-0007所得税费用变动原因说明一致，只记录利润总额减少及递延所得税资产调整、当期和递延所得税费用均减少，未编造来源未披露的利润总额金额，并明示金额未知，从而补上与收入增长方向相反的业绩事实。"
+        },
+        {
+          "fact_id": "F035",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0010",
+            "source-0019"
+          ],
+          "explanation": "source-0010载明2025年7月21日召开2025年第一次临时股东会，审议转让全资子公司股权暨关联交易议案，天津海发方信置地有限公司100%股权以9,065.95万元转让给天津海泰房地产开发有限公司，报告期内完成全款支付和股权交割；source-0019仅说明本期投资收益增加。关联交易和临时股东会已补入，价格单位正确，未编造收益金额。"
+        },
+        {
+          "fact_id": "F027",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "explanation": "source-0008分地区表内销营业收入449,240,562.34元与合计行完全一致，支持主营业务全部为内销。候选删除了把未单列境外行说成未披露境外销售的错误，保留已披露的全部内销范围，且金额取自营业收入而非营业成本。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 18496,
+      "output_tokens": 832,
+      "total_tokens": 29087
+    }
+  }
+]

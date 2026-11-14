@@ -1,0 +1,42 @@
+{
+  "task": "6.BZ",
+  "approval_reference": "用户2026-11-14明确回复：批准这两份候选限定再核；仅6.BZ海泰6/浦发4候选",
+  "asset": {
+    "instrument_id": "600082.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "ann_77a492082b5827f4129bb8232d1f715a",
+    "filing_id": "1225246039",
+    "source": "cninfo",
+    "published_at": "2026-04-28T16:00:00+00:00",
+    "content_hash": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/97/979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad.pdf",
+    "report_type": "annual_report"
+  },
+  "identity": {
+    "semantic_policy": "company_profile_llm_led.v2",
+    "reading_strategy": "chapter_workpaper_v1",
+    "prompt_version": "company_profile_workpaper.2026-11-14.wrapped-cells-source-literals.v11",
+    "section_guide_version": "company_profile_section_guide.2026-11-12.v1",
+    "preprocessing_version": "toc_sections_native_layout.v2",
+    "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+    "execution_mode": "provider",
+    "semantic_reuse": false,
+    "max_section_characters": 160000,
+    "max_layout_characters": 500000,
+    "workpaper_max_output_tokens": 12000,
+    "logical_request_timeout_seconds": 900,
+    "workpaper_review_policy": "company_profile_workpaper_review.v2",
+    "quality_review_profile": "semantic_extraction__scorpio_grok",
+    "repair_profile": "semantic_extraction__deepseek",
+    "review_existing_draft_hash": "4b1c70f5418f7af4528e034d751f9cac7755b79963e45ca4ba94505d19cb92cd",
+    "review_resume_hash": "ee39dd887f9d08df5eeb270b811c771754f8cad96dae1f9bcb70a25e04e7517c",
+    "review_max_output_tokens": 16384
+  },
+  "original_hashes": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v10-remaining-pool-600082-20261114/query.json": "35cdd748c84b1cf9790d1e68340016ef595566b035839bf4b6682324c4495529",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v10-remaining-pool-600082-20261114/model-receipts.json": "b68272f800fe570aedffcbb86b12557ff1850a7efcc93d1872de657cd473aa82",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v10-remaining-pool-600082-20261114/binding.json": "97477c5cb7dfe4f4fcc239b95c917631275c44a869517c523a3812a49f576f91"
+  },
+  "authorization_sha256": "95dc79662c07d826e4763fc787c85e2cbcd2a97211918c41444a8a3015127aa4",
+  "provider_constructor_binding_verified": true
+}

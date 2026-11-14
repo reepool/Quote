@@ -1,0 +1,285 @@
+"""Authorized 6.BZ: two retained candidate final checks through the original owner."""
+import asyncio
+import copy
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+from tempfile import TemporaryDirectory
+import time
+import traceback
+from dataclasses import replace
+from decimal import Decimal
+
+ROOT=Path('/home/python/Quote')
+sys.path.insert(0,str(ROOT))
+CHANGE=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST=CHANGE/'workpaper-candidate-final-20261114'
+PROFILE='semantic_extraction__scorpio_grok'
+APPROVAL='用户2026-11-14明确回复：批准这两份候选限定再核；仅6.BZ海泰6/浦发4候选'
+from research.announcements import AnnouncementAttachment, AnnouncementRecord
+from research.business_profile_production_operations import BusinessProfileAnnouncementFrontierRepository
+from research.company_profile.operations import CompanyProfileTaskService
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
+from research.company_profile.workpaper import CompanyProfileWorkpaper
+from research.company_profile.workpaper_llm import workpaper_processing_identity
+from research.company_profile.workpaper_review import workpaper_hash
+from research.company_profile.workpaper_sections import extract_selected_layout
+from research.storage import ResearchStorageManager
+from utils.config_manager import ResearchConfig, ResearchStorageConfig
+from utils.llm.client import LlmClient
+from utils.llm.budget import LlmRunBudget, LogicalRecoveryPolicy, DEVELOPMENT_UNPRICED_BILLING
+
+def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+def dump(path,value):
+    path.parent.mkdir(parents=True,exist_ok=True)
+    path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+def facts(paper):
+    parts=[*paper.elements.__dict__.values(),*(paper.supply_chain.__dict__.values() if paper.supply_chain else [])]
+    return {f.fact_id:f.model_dump(mode='json') for part in parts for f in part.facts}
+def code_hashes():
+    paths=sorted((ROOT/'research/company_profile').glob('*.py'))+sorted((ROOT/'utils/llm').glob('*.py'))
+    paths += [ROOT/'research/storage.py',ROOT/'research/business_profile_pdf_artifacts.py',ROOT/'research/business_profile_production_operations.py']
+    return {str(p.relative_to(ROOT)):sha(p) for p in paths}
+def config_for_run():
+    from urllib.parse import urlsplit
+    from utils.llm.models import LlmConfig
+    from utils.llm.config import load_project_environment
+    load_project_environment(ROOT)
+    config=LlmConfig.from_mapping(json.loads((ROOT/'config/13_llm.json').read_text())['llm'])
+    profile=config.profiles[PROFILE]
+    assert config.enabled and profile.enabled and os.environ.get(profile.api_key_env)
+    assert PROFILE not in config.routes and urlsplit(profile.base_url).hostname=='scorpio.reepool.com'
+    assert profile.model=='grok-4.7' and profile.reasoning_effort=='high'
+    return replace(config,profiles={PROFILE:replace(profile,timeout_seconds=900,attempt_timeout_seconds=600,
+        max_retries=1,max_schema_repair_attempts=1)},routes={},pools={})
+
+class FinalOnly(CommonGatewaySemanticProvider):
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        self.final_requests=[]
+    def workpaper_request(self,**request):
+        assert request['purpose']=='verify_profile_workpaper_repair'
+        self.final_requests.append(request)
+        assert len(self.final_requests)==1
+        return super().workpaper_request(**request)
+
+def material(symbol):
+    run = CHANGE / 'workpaper-runs' / ('v10-remaining-pool-' + symbol + '-20261114')
+    paths = [run / name for name in ('query.json', 'model-receipts.json', 'binding.json')]
+    hashes = {str(path.relative_to(ROOT)): sha(path) for path in paths}
+    data = json.loads(paths[0].read_text())['profiles'][0]['workpaper']
+    old = CompanyProfileWorkpaper.model_validate(data)
+    receipts = json.loads(paths[1].read_text())
+    for receipt in receipts:
+        assert hashlib.sha256(receipt['raw_content'].encode()).hexdigest() == receipt['response_hash']
+        assert json.loads(receipt['raw_content']) == receipt['response_payload']
+    by_purpose = {r['purpose']: r for r in receipts}
+    review, repair = by_purpose['review_profile_workpaper'], by_purpose['repair_profile_workpaper']
+    assert repair['contract_status'] == 'rejected'
+    # Restore only the old initial objects/order. New binding would recover extra
+    # facts and invalidate this original review's checked-set and exact draft hash.
+    seed_data = copy.deepcopy(data)
+    quality = seed_data['quality_review']
+    seed_data['quality_review'] = None
+    raw = by_purpose['extract_profile_workpaper']['response_payload']
+    for name, element in seed_data['elements'].items():
+        original = {f['fact_id']: f for f in element['facts']}
+        original.update({f['affected_fact_id']: f['original_fact'] for f in quality['findings']
+                         if f['element'] == name and f['original_fact'] is not None})
+        element['facts'] = [original[f['fact_id']] for f in raw['elements'][name]['facts'] if f['fact_id'] in original]
+    seed = CompanyProfileWorkpaper.model_validate(seed_data)
+    assert workpaper_hash(seed) == quality['original_draft_hash']
+    asset = json.loads(paths[2].read_text())['asset']
+    assert sha(Path(asset['archive_path'])) == seed.report.document_version
+    pages = extract_selected_layout(Path(asset['archive_path']).read_bytes(), sorted({s.page for e in seed.evidence for s in e.source_spans}))
+    seed.validate_pages(pages)
+    resume = {'original_draft_hash': workpaper_hash(seed), 'document_version': seed.report.document_version,
+              'review_response': review['response_payload'], 'repair_response': repair['response_payload'],
+              'receipts': [review, repair], 'revalidate_rejected_repair': True}
+    return old, seed, asset, pages, resume, hashes, run
+
+def freeze():
+    assert os.environ.get('TMPDIR')==str(ROOT/'data/QuoteBak')
+    assert not (DEST/'authorization.json').exists()
+    config=config_for_run(); profile=config.profiles[PROFILE]
+    sources={}
+    for symbol in ('600082','600000'):
+        old,seed,asset,pages,resume,hashes,run=material(symbol)
+        ready=CHANGE/'workpaper-candidate-readiness-20261114'/symbol/'validation.json'
+        assert json.loads(ready.read_text())['original_seed_hash_matches']
+        sources[symbol]={'original_hashes':hashes,'source_version':seed.report.document_version,
+            'original_seed_hash':workpaper_hash(seed),'readiness_sha256':sha(ready),
+            'expected_candidates':6 if symbol=='600082' else 4}
+    dump(DEST/'authorization.json',{'task':'6.BZ','status':'authorized','approval_reference':APPROVAL,
+        'base_commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
+        'operator_sha256':sha(Path(__file__)),'code_sha256':code_hashes(),
+        'shared_config_sha256':sha(ROOT/'config/13_llm.json'),'sources':sources,
+        'profile':{'name':PROFILE,'model':profile.model,'source_label':profile.source_label,
+            'resource':config.resource_for_profile(profile).name,'reasoning_effort':profile.reasoning_effort,
+            'stream':profile.stream,'output_field':profile.max_output_tokens_field},
+        'per_company':{'logical_requests':1,'physical_requests':2,'recoveries':1,'tokens':300000,'seconds':900},
+        'group':{'companies':2,'physical_requests':4,'recoveries':2,'tokens':600000,'business_seconds':1200,'concurrency':2},
+        'old_stages_rerun':False,'production_authorization':'not_authorized'})
+    print('FROZEN two retained finals; no model call',flush=True)
+
+def run_one(symbol,group_deadline):
+    preparation=time.monotonic()
+    frozen=json.loads((DEST/'authorization.json').read_text())
+    assert code_hashes()==frozen['code_sha256'] and sha(ROOT/'config/13_llm.json')==frozen['shared_config_sha256']
+    assert sha(Path(__file__))==frozen['operator_sha256']
+    destination=DEST/symbol
+    assert not destination.exists()
+    destination.mkdir(parents=True)
+    summary={'instrument_id':symbol+'.SH','entry_started':False,'three_reads_equal':False,'exception':None}
+    client=provider=budget=None; started=None
+    with TemporaryDirectory(prefix='workpaper-bz-'+symbol+'-') as directory:
+        root=Path(directory)
+        try:
+            old,seed,asset,pages,resume,hashes,run=material(symbol)
+            assert hashes==frozen['sources'][symbol]['original_hashes']
+            db=str(root/'research.db')
+            storage=ResearchStorageManager(ResearchConfig(storage=ResearchStorageConfig(db_path=db,
+                financials_db_path=db,valuation_db_path=db,interests_db_path=db,
+                quotes_db_path=str(root/'quotes.db'),attach_quotes_db=False)))
+            storage.initialize()
+            items=json.loads((CHANGE/'workpaper-quality-and-regression-readiness-20261113/source-readiness.json').read_text())['companies']
+            source=next(i for i in items if i['instrument_id']==asset['instrument_id'])
+            announcement=json.loads((ROOT/source['source_binding']).read_text())['announcement']
+            BusinessProfileAnnouncementFrontierRepository(storage).upsert_record(
+                instrument={'instrument_id':asset['instrument_id'],'symbol':symbol,'exchange':'SSE'},
+                record=AnnouncementRecord(source='cninfo',source_announcement_id=asset['filing_id'],
+                    announcement_key='cninfo:'+asset['filing_id'],title=announcement['title'],
+                    published_at=asset['published_at'],exchange='SSE',symbols=(symbol,),
+                    attachments=(AnnouncementAttachment(source_url=announcement['source_url'],file_extension='PDF'),)))
+            identity=workpaper_processing_identity(real=True,review=True,review_profile=PROFILE)
+            identity.update(review_existing_draft_hash=workpaper_hash(seed),
+                review_resume_hash=hashlib.sha256(json.dumps(resume,ensure_ascii=False,sort_keys=True).encode()).hexdigest(),
+                review_max_output_tokens=16384,logical_request_timeout_seconds=900)
+            client=LlmClient(config_for_run())
+            provider=FinalOnly(client=client,profile=PROFILE,max_output_tokens=16384,timeout_seconds=900,
+                execution_authorization={'status':'authorized','document_version':seed.report.document_version,'approval_reference':APPROVAL})
+            service=CompanyProfileTaskService(storage=storage,output_root=root/'output',checkpoint_root=root/'checkpoints',
+                provider=provider,processing_identity=identity,page_source=lambda _: {'report':seed.report,'pages':pages,
+                    'source_pdf_path':asset['archive_path'],'review_seed':seed,'review_resume':resume},token_budget=300000)
+            assert service.provider is provider and service.runtime._report_provider is provider
+            dump(destination/'binding.json',{'task':'6.BZ','approval_reference':APPROVAL,'asset':asset,'identity':identity,
+                'original_hashes':hashes,'authorization_sha256':sha(DEST/'authorization.json'),
+                'provider_constructor_binding_verified':True})
+            marker=ROOT/'data/QuoteBak/s1-attempts'/('workpaper-bz-'+symbol+'-20261114.json')
+            marker.parent.mkdir(parents=True,exist_ok=True)
+            assert time.monotonic()<group_deadline
+            with marker.open('x') as handle: json.dump({'task':'6.BZ','approval_reference':APPROVAL,
+                'binding_sha256':sha(destination/'binding.json')},handle,ensure_ascii=False)
+            started=time.monotonic(); summary.update(entry_started=True,business_started_monotonic=started,
+                preparation_seconds=round(started-preparation,3))
+            budget=LlmRunBudget(deadline=min(started+900,group_deadline),prices={},max_tokens=300000,max_requests=2,
+                max_cost_cny=Decimal(10),ledger_path=destination/'budget.json',billing_mode=DEVELOPMENT_UNPRICED_BILLING,
+                recovery_policy=LogicalRecoveryPolicy(1,1),run_authorization='company_profile_workpaper_development.2026-11-11')
+            client.physical_budget=budget
+            service.execution_budget=budget; service.runtime.execution_budget=budget
+            assert provider.run_budget is budget
+            print('BUSINESS_STARTED '+symbol,flush=True)
+            execution=asyncio.run(service.execute('run',knowledge_cutoff='2026-11-14',
+                instrument_ids=(seed.report.instrument_id,),max_items=1,max_elapsed_seconds=900))
+            summary['business_ended_monotonic']=time.monotonic()
+            summary['business_seconds']=round(summary['business_ended_monotonic']-started,3)
+            dump(destination/'execution.json',execution)
+            reader=CompanyProfileReadService(root/'output')
+            query=reader.query((seed.report.instrument_id,))
+            exported=reader.export((seed.report.instrument_id,),destination/'export')
+            reloaded=CompanyProfileReadService(root/'output').query((seed.report.instrument_id,))
+            assert query['profiles']==exported['profiles']==reloaded['profiles']
+            dump(destination/'query.json',query)
+            paper=CompanyProfileWorkpaper.model_validate(query['profiles'][0]['workpaper'])
+            before,after=facts(old),facts(paper)
+            assert all(after.get(k)==v for k,v in before.items())
+            assert paper.origin=='llm_generated' and paper.generation==old.generation
+            assert paper.quality_review.locally_revalidated_request_ids==(resume['receipts'][1]['request_id'],)
+            assert set(paper.quality_review.retained_request_ids)=={r['request_id'] for r in resume['receipts']}
+            assert len(provider.final_requests)==1
+            candidates=provider.final_requests[0]['payload']['candidates']
+            assert len(candidates)==frozen['sources'][symbol]['expected_candidates']
+            actual_candidates={c['fact_id']:c for c in candidates}
+            adopted=[]
+            for finding in paper.quality_review.findings:
+                key=finding.affected_fact_id or 'review-add:'+finding.finding_id
+                if finding.resolution!='corrected_pending_trust': continue
+                adopted.append(key)
+                a,b=after[key],actual_candidates[key]
+                assert all(a[k]==b[k] for k in ('text','subject_scope','period','evidence_ids'))
+                assert len(a['metrics'])==len(b['metrics'])
+                for x,y in zip(a['metrics'],b['metrics']):
+                    assert all(x[k]==y[k] for k in ('name','raw_value','value','qualifier','subject_scope','period'))
+                    assert x['unit']==y['unit'] or (x['unit']=='百分点' and y['unit']=='个百分点')
+            assert set(after)-set(before)==set(adopted)
+            assert query['profiles'][0]['core_complete'] is False
+            paper.validate_pages(pages)
+            for path,expected in hashes.items(): assert sha(ROOT/path)==expected
+            assert code_hashes()==frozen['code_sha256'] and sha(ROOT/'config/13_llm.json')==frozen['shared_config_sha256']
+            summary.update(three_reads_equal=True,retained_facts=len(after),original_facts_unchanged=True,
+                old_facts=len(before),adopted_candidate_ids=adopted,query_sha256=sha(destination/'query.json'),
+                review_status=paper.quality_review.status,review_error=paper.quality_review.error,
+                findings=[{'id':f.finding_id,'target':f.affected_fact_id,'resolution':f.resolution}
+                          for f in paper.quality_review.findings],old_all_stages_usage_inherited=json.loads((run/'budget.json').read_text())['charged_tokens'],
+                source_coordinates_equal=True,original_hashes=hashes)
+        except Exception as exc:
+            summary['exception']=type(exc).__name__+': '+str(exc)[:3000]
+            (destination/'error-trace.txt').write_text(traceback.format_exc())
+        finally:
+            if provider:
+                dump(destination/'model-receipts.json',provider.workpaper_receipts)
+                dump(destination/'provider-traces.json',[t.model_dump(mode='json') for t in provider.traces])
+            if budget:
+                snapshot=budget.snapshot(); dump(destination/'budget.json',snapshot)
+                counts={}
+                for attempt in snapshot['attempts']:
+                    key=attempt.get('logical_request_id') or attempt['request_id']; counts[key]=counts.get(key,0)+1
+                summary.update(physical_requests=snapshot['physical_requests'],charged_tokens=snapshot['charged_tokens'],
+                    cost=snapshot['charged_cost_cny'],recoveries=sum(n-1 for n in counts.values()),stopped_reason=snapshot['stopped_reason'])
+                assert len(counts)<=1 and all(n<=2 for n in counts.values())
+                assert all(a['source_label']=='scorpio:grok-4.7' for a in snapshot['attempts'])
+            if client:
+                try: asyncio.run(client.close())
+                except Exception as exc: summary['close_error']=type(exc).__name__
+            summary['supervision_seconds']=round(time.monotonic()-started,3) if started else None
+            summary['runtime_cleanup_bytes']=sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
+    assert not root.exists()
+    dump(destination/'summary.json',summary)
+    print('RESULT '+json.dumps(summary,ensure_ascii=False),flush=True)
+    return summary
+
+def main():
+    if len(sys.argv)>1:
+        run_one(sys.argv[1],float(sys.argv[2])); return
+    freeze()
+    start=time.monotonic(); deadline=start+1200
+    with TemporaryDirectory(prefix='workpaper-bz-logs-') as directory:
+        logs=Path(directory); processes={}; handles={}
+        for symbol in ('600082','600000'):
+            handles[symbol]=(logs/(symbol+'.log')).open('w')
+            processes[symbol]=subprocess.Popen([sys.executable,str(Path(__file__)),symbol,str(deadline)],
+                stdout=handles[symbol],stderr=subprocess.STDOUT)
+        while any(p.poll() is None for p in processes.values()):
+            if time.monotonic()>deadline:
+                raise TimeoutError('group supervision deadline; no extra window authorized')
+            time.sleep(1)
+        for h in handles.values(): h.close()
+        results=[json.loads((DEST/s/'summary.json').read_text()) for s in ('600082','600000')]
+        for r in results: print('COMPANY_DONE '+json.dumps(r,ensure_ascii=False),flush=True)
+        starts=[r['business_started_monotonic'] for r in results if r.get('business_started_monotonic')]
+        ends=[r['business_ended_monotonic'] for r in results if r.get('business_ended_monotonic')]
+        dump(DEST/'group-execution.json',{'task':'6.BZ','results':results,
+            'physical_requests':sum(r.get('physical_requests',0) for r in results),
+            'charged_tokens':sum(r.get('charged_tokens',0) for r in results),
+            'recoveries':sum(r.get('recoveries',0) for r in results),'cost':'unknown',
+            'supervision_wall_seconds':round(time.monotonic()-start,3),
+            'business_wall_seconds':round(max(ends)-min(starts),3) if starts and ends else None,
+            'logs_cleanup_bytes':sum(p.stat().st_size for p in logs.iterdir() if p.is_file()),
+            'source_code_unchanged':code_hashes()==json.loads((DEST/'authorization.json').read_text())['code_sha256']})
+    print('GROUP_DONE',flush=True)
+
+if __name__=='__main__': main()
