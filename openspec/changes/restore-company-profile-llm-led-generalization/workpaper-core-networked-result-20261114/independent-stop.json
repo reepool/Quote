@@ -1,0 +1,16 @@
+{
+  "task": "6.CG",
+  "reason": "unisolated_source_blank_promoted_to_zero",
+  "instrument_id": "600107.SH",
+  "fact_id": "F-RM-02",
+  "current_assertion": "医疗营业收入与成本均为0（同比-100.00%）",
+  "source_evidence_id": "source-0007",
+  "physical_page": 15,
+  "section": "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析 / 主营业务分行业情况",
+  "source_observation": "医疗本期营业收入、营业成本单元格为空，营业收入/成本同比列为-100.00%。所引证据不能把空收入金额写为确定零；成本分析中其他位置的0不能替代该收入单元格。",
+  "review_gap": "真实高阶初核发现处置期间及减值遗漏，但未撤回这条空栏造零；当前review状态completed不能代替独立真值。",
+  "action": "按已批停止条件停止后两批派发，保留四家真实稿/原失败与独立有效内容；不改原query/raw、不热修/重跑或借余额。对阅览交付明确排除该条确定零结论。",
+  "started_companies": 4,
+  "unstarted_companies": 8,
+  "production_authorization": "not_authorized"
+}

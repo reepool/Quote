@@ -1,0 +1,93 @@
+"""Verify current immutable outputs and clear this task's rebuildable preparation only."""
+from pathlib import Path
+import hashlib,json,os,runpy,shutil,subprocess,sys
+ROOT=Path('/home/python/Quote');sys.path.insert(0,str(ROOT))
+C=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+D=C/'workpaper-core-networked-result-20261114'
+TMP=ROOT/'data/QuoteBak';OP=TMP/'workpaper_cg_operator.py'
+PREP=TMP/'workpaper-cg-prepared-pr9a71js'
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def dump(p,x):p.write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\n')
+for proc in Path('/proc').iterdir():
+ if not proc.name.isdigit():continue
+ try:args=[x.decode(errors='replace') for x in (proc/'cmdline').read_bytes().split(b'\0') if x]
+ except OSError:continue
+ if args and 'python' in Path(args[0]).name and (str(OP) in args or 'data/QuoteBak/workpaper_cg_operator.py' in args):
+  assert not ('run' in args or 'group' in args),('active task',proc.name)
+ops=runpy.run_path(str(OP));a=json.loads((D/'authorization.json').read_text())
+assert ops['code_hashes']()==a['code_sha256']
+assert sha(OP)==a['operator_sha256']==sha(D/'operator-snapshot.txt')
+assert sha(ROOT/'config/13_llm.json')==a['shared_config_sha256']
+assert sha(D/'network-preflight.json')==a['network_preflight_sha256']
+assert json.loads((D/'network-preflight.json').read_text())['namespace']==a['network_context']['namespace']
+ref=json.loads((C/'workpaper-core-readiness-20261114/source-first-contract.json').read_text())
+for co in ref['companies']:
+ assert sha(ROOT/co['current_query'])==co['current_query_sha256']
+ assert sha(Path(co['source_pdf']))==co['document_version']
+assert subprocess.run(['git','diff','--quiet','HEAD','--',str(C/'workpaper-core-same-version-result-20261114')],cwd=ROOT).returncode==0
+audit=json.loads((D/'content-review.json').read_text());records=[];cleanup=[]
+for co in audit['companies']:
+ s=co['instrument_id'][:6];p=D/s
+ q=json.loads((p/'query.json').read_text());w=q['profiles'][0]['workpaper'];summary=json.loads((p/'summary.json').read_text());b=json.loads((p/'budget.json').read_text())
+ assert summary['three_reads_equal'] and summary['state']=='completed' and summary['exception'] is None
+ assert json.loads((p/'export'/(s+'.SH_2025-12-31.json')).read_text())==q['profiles'][0]
+ assert sha(p/'query.json')==summary['query_sha256']==co['query_sha256']
+ assert json.loads((p/'source-check.json').read_text())['all_retained_evidence_coordinates_equal']
+ binding=json.loads((p/'binding.json').read_text())
+ assert binding['network_context']==a['network_context'] and binding['code_sha256']==a['code_sha256']
+ assert binding['identity']['source_binding_policy']=='company_workpaper_source_literals.signed-rate.v1'
+ rs=json.loads((p/'model-receipts.json').read_text());capture=json.loads((p/'content-capture-index.json').read_text())
+ assert len(rs)==len(b['attempts'])==b['physical_requests']==5
+ assert all(r['contract_status']=='accepted' and r['finish_reason']=='stop' for r in rs)
+ assert all(x['status']=='success' and x.get('usage') for x in b['attempts'])
+ assert sum(x['usage']['total_tokens'] for x in b['attempts'])==b['charged_tokens']
+ assert b['charged_cost_cny']=='unknown'
+ rawhashes={hashlib.sha256(r['raw_content'].encode()).hexdigest() for r in rs}
+ assert all(x['content_sha256'] in rawhashes for x in capture['responses'])
+ assert not capture['responses'] or all(not x['retained'] for x in capture['responses'])
+ fm={f['fact_id']:f for e in list(w['elements'].values())+list((w.get('supply_chain') or {}).values()) for f in e['facts']}
+ assert len(fm)==co['all_fact_count']
+ for row in co['core_comparison']:
+  assert all(fid in fm for fid in row['actual_fact_ids'])
+ timing=json.loads((p/'entry-timing.json').read_text())
+ assert summary['business_seconds']<=1800 and summary['business_ended_monotonic']<=timing['absolute_deadline_monotonic']
+ assert not list(TMP.glob('workpaper-cg-'+s+'-*'))
+ marker=TMP/'s1-attempts'/('workpaper-cg-'+s+'-20261114.json')
+ assert json.loads(marker.read_text())['binding_sha256']==sha(p/'binding.json')
+ records.append({'instrument_id':co['instrument_id'],'name':co['name'],'facts':len(fm),'metrics':sum(len(f['metrics']) for f in fm.values()),
+  'model_review_status':summary['review_status'],'query_sha256':sha(p/'query.json'),
+  'physical_requests':5,'actual_total_usage':b['charged_tokens'],'recoveries':summary['recoveries'],
+  'preparation_seconds':summary['preparation_seconds'],'business_seconds':summary['business_seconds'],
+  'model_review_dispositions':co['model_review_dispositions'],'fee':'unknown'})
+ cleanup.append({'kind':'completed_company_runtime','bytes':summary['cleanup_bytes'],'already_removed_by_original_operator_finally':True,'instrument_id':co['instrument_id']})
+assert sum(c['facts'] for c in records)==171 and sum(c['metrics'] for c in records)==192
+from research.company_profile.workpaper_sections import extract_selected_layout
+b=json.loads((D/'600107/binding.json').read_text())
+page=extract_selected_layout(Path(b['asset']['archive_path']).read_bytes(),[15])[0]['text']
+start=page.index('主营业务分行业情况');end=page.index('主营业务分产品情况',start)
+dump(D/'independent-medical-source.json',{'document_version':b['asset']['content_hash'],'physical_page':15,'section':'主营业务分行业情况',
+ 'page_text_sha256':hashlib.sha256(page.encode()).hexdigest(),'excerpt_start':start,'excerpt_end':end,'quote':page[start:end],
+ 'human_reading':'医疗收入/成本金额栏空，-100.00在同比列；不能标成直接披露的收入零。',
+ 'retained_fact_id':'F-RM-02','zero_is_in_structured_metrics':False,'original_query_not_modified':True})
+assert PREP.parent==TMP and PREP.name=='workpaper-cg-prepared-pr9a71js' and not PREP.is_symlink()
+size=sum(p.stat().st_size for p in PREP.rglob('*') if p.is_file())
+shutil.rmtree(PREP);cleanup.append({'kind':'prepared_pages_and_process_logs','path':str(PREP.relative_to(ROOT)),'bytes':size})
+starts=[json.loads((D/r['instrument_id'][:6]/'summary.json').read_text())['business_started_monotonic'] for r in records]
+ends=[json.loads((D/r['instrument_id'][:6]/'summary.json').read_text())['business_ended_monotonic'] for r in records]
+result={'task':'6.CG','outcome':'stopped_after_first_batch_independent_quality_blocker','entries_started':4,'not_started':a['order'][4:],
+ 'readable':4,'model_review_flow_completed':4,'facts_including_optional_supply_chain':171,'metrics_including_optional_supply_chain':192,
+ 'physical_requests':20,'actual_supplier_total_usage':sum(r['actual_total_usage'] for r in records),'recoveries':0,'fee':'unknown',
+ 'business_wall_seconds':round(max(ends)-min(starts),3),'records':records,
+ 'source_core_comparison':audit['summary'],'formal_accuracy':None,'formal_recall':None,
+ 'supplemental_audit':'not_completed_no_claim','six_risk_group_complete':False,'s1_changed':False,'production_authorization':'not_authorized',
+ 'source_code_config_and_twelve_prior_queries_unchanged':True,'prior_CF_failure_unchanged':True,
+ 'cleanup':cleanup,'runtime_preparation_bytes_released':sum(x['bytes'] for x in cleanup),
+ 'script_bytes_pending_cleanup':OP.stat().st_size+Path(__file__).stat().st_size}
+dump(D/'group-execution.json',result)
+dump(D/'validation.json',{'source_code_config_and_operator_hashes':'matched_frozen','actual_network_identity':'all original workers assert same approved network namespace before entry',
+ 'current_query_export_and_original_new_reader':'4/4 equal','all_retained_source_coordinates':'4/4 passed original PDF validation',
+ 'twenty_receipts':'20 accepted/stop; original content hashes match captures, no duplicate body retained','usage':'20 actual returns sum to 518672',
+ 'old_twelve_queries_pdf_versions_and_CF_failure':'unchanged','current_audit_fact_references':'all exist','cleanup_runtime_preparation':'removed; script snapshots then delete',
+ 'tests':'No business source change; reuse db9178de 78 targeted tests, no new pytest run claimed'})
+print(json.dumps({'entries_started':4,'readable':4,'actual_total_usage':result['actual_supplier_total_usage'],'business_wall_seconds':result['business_wall_seconds'],
+ 'runtime_preparation_bytes_released':result['runtime_preparation_bytes_released'],'script_bytes_pending_cleanup':result['script_bytes_pending_cleanup']},ensure_ascii=False))

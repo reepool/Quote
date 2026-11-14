@@ -1,0 +1,8 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600094.SH,2025-12-31,2026-04-22T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,llm_generated,"报告期内公司传统主营业务构建“地产筑基、金控投资赋能”双轮驱动发展格局；地产板块承担销售回款、利润修复、资产运营与信用稳定职能，金控板块由传统金融实体投资与财务性投资平台转型为服务公司战略发展的产业投资与资本运作平台。
+在稳固传统主业的同时，公司推进转型业务布局，构建以未来通信、“空天地一体化”产业生态为核心支柱的新业务体系，涉及6G通信、低空经济、算力运营三大战略板块。
+报告期内公司已形成“地产稳盘固基、新赛道协同发力”的战略发展格局，地产板块保障经营安全与现金流稳定，6G通信、低空经济、算力运营三大战略板块相互协同。
+公司通过全资子公司名城金控集团有限公司战略受让北京佰才邦技术股份有限公司股权，布局6G通信技术及全产业链；截至报告日完成对佰才邦20.45%股份战略投资，该项目为参股项目，未纳入合并报表范围。
+公司战略投资上海峰飞航空科技有限公司母公司AutoFlightX Inc.，切入eVTOL飞行器赛道，并联合福州新区航空城发展有限公司等伙伴推进“低空城际智慧枢纽机场”建设。
+算力业务以控股子公司名城数字为核心载体，聚焦AI算力基础设施运营与产业服务能力打造。
+公司设立全资子公司香港名城移动通信有限公司，注册资本1亿元港币，搭建海外通信信息行业投资管理平台；截至报告披露日，名城移动通信尚处于前期筹备阶段。",41,43,completed_with_open_findings,3,deepseek-flash,grok-4.7

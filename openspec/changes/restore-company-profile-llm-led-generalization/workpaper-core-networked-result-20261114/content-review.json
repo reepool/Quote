@@ -1,0 +1,1593 @@
+{
+  "task": "6.CG",
+  "origin": "independent_human_source_review_of_real_workpapers",
+  "source_contract": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-core-readiness-20261114/source-first-contract.json",
+  "reference_not_model_input": true,
+  "scope": "首批4家44个源核心问题的有限独立对照；其余8家89条件未运行。并非171事实逐对象准确率或全报告召回；补充正式抽审未完成。",
+  "formal_accuracy": null,
+  "formal_recall": null,
+  "s1_changed": false,
+  "new_source_blocker": {
+    "instrument_id": "600107.SH",
+    "fact_id": "F-RM-02",
+    "kind": "blank_revenue_promoted_to_definite_zero",
+    "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+    "physical_page": 15,
+    "evidence_id": "source-0007",
+    "claim": "医疗营业收入与成本均为0",
+    "source": "医疗本期收入/成本栏空、同比列-100.00%；未把空栏确定为0。",
+    "cause_observed": "这句确定零没有进入本条metrics（仅四个其他指标），原数值源检查只遍历metrics；Grok的两个真实发现没有覆盖它。说明正文断言不能因结构化metrics已核或review completed而自动视为有源。",
+    "read_disposition": "不得采用该条确定零；原query/raw保留，不声称程序已经自动隔离。独立选读入口只引用其他独立事实。",
+    "stop": "independent-stop.json"
+  },
+  "companies": [
+    {
+      "instrument_id": "600094.SH",
+      "name": "大名城",
+      "report": {
+        "instrument_id": "600094.SH",
+        "report_id": "1225155390",
+        "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-22T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "query": "600094/query.json",
+      "query_sha256": "2f0d7da58eb4dcf0475efb4986198f0b785bae61228b4f7f7cfe7b771026fa04",
+      "all_fact_count": 41,
+      "all_metric_count": 43,
+      "model_review_status": "completed_with_open_findings",
+      "core_comparison": [
+        {
+          "condition_id": "600094-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600094-C1",
+          "actual_fact_ids": [
+            "F-BS-01",
+            "F-PS-01"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0001",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                10
+              ]
+            },
+            {
+              "evidence_id": "source-0006",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                16
+              ]
+            },
+            {
+              "evidence_id": "source-0011",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第八节 财务报告",
+                "二、将重分类进损",
+                "61、 营业收入和营业成本"
+              ],
+              "physical_pages": [
+                151
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600094-K02",
+          "dimension": "business_structure",
+          "source_context_id": "600094-C1",
+          "actual_fact_ids": [
+            "F-BS-02",
+            "F-BS-04",
+            "F-BS-06"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0001",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                10
+              ]
+            },
+            {
+              "evidence_id": "source-0002",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                11
+              ]
+            },
+            {
+              "evidence_id": "source-0003",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ],
+              "physical_pages": [
+                13
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600094-K03",
+          "dimension": "products_services",
+          "source_context_id": "600094-C2",
+          "actual_fact_ids": [
+            "F-PS-01"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0006",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                16
+              ]
+            },
+            {
+              "evidence_id": "source-0011",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第八节 财务报告",
+                "二、将重分类进损",
+                "61、 营业收入和营业成本"
+              ],
+              "physical_pages": [
+                151
+              ]
+            }
+          ],
+          "status": "partial_not_material_followup",
+          "note": "物业开发销售/运营已回答，住宅商住等具体业态未逐项展现；不为这份名单补读重跑。"
+        },
+        {
+          "condition_id": "600094-K04",
+          "dimension": "products_services",
+          "source_context_id": "600094-C2",
+          "actual_fact_ids": [
+            "F-PS-02",
+            "F-PS-03"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0006",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                16
+              ]
+            },
+            {
+              "evidence_id": "source-0007",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                17
+              ]
+            },
+            {
+              "evidence_id": "source-0001",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                10
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600094-K05",
+          "dimension": "revenue_model",
+          "source_context_id": "600094-C3",
+          "actual_fact_ids": [
+            "F-PS-04",
+            "F-RM-03"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0011",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第八节 财务报告",
+                "二、将重分类进损",
+                "61、 营业收入和营业成本"
+              ],
+              "physical_pages": [
+                151
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600094-K06",
+          "dimension": "revenue_model",
+          "source_context_id": "600094-C3",
+          "actual_fact_ids": [
+            "F-PS-01",
+            "F-RM-03"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0006",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                16
+              ]
+            },
+            {
+              "evidence_id": "source-0011",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第八节 财务报告",
+                "二、将重分类进损",
+                "61、 营业收入和营业成本"
+              ],
+              "physical_pages": [
+                151
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600094-K07",
+          "dimension": "revenue_model",
+          "source_context_id": "600094-C3",
+          "actual_fact_ids": [
+            "F-RM-02",
+            "F-RM-04"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0006",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                16
+              ]
+            },
+            {
+              "evidence_id": "source-0007",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                17
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600094-K08",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600094-C4",
+          "actual_fact_ids": [
+            "F-SM-02"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0011",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第八节 财务报告",
+                "二、将重分类进损",
+                "61、 营业收入和营业成本"
+              ],
+              "physical_pages": [
+                151
+              ]
+            }
+          ],
+          "status": "source_scope_limited",
+          "note": "附注主营/合计2,246,548,569.51元可定位，经营讨论20.42亿元与之口径存在来源争议；当前SM-01被模型隔离，不据另一独立附注声称全报告唯一口径已收口。"
+        },
+        {
+          "condition_id": "600094-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600094-C5",
+          "actual_fact_ids": [
+            "F-RM-02"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0006",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                16
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600094-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600094-C5",
+          "actual_fact_ids": [
+            "F-RM-02",
+            "F-RM-03"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0006",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                16
+              ]
+            },
+            {
+              "evidence_id": "source-0011",
+              "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+              "section_path": [
+                "第八节 财务报告",
+                "二、将重分类进损",
+                "61、 营业收入和营业成本"
+              ],
+              "physical_pages": [
+                151
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        }
+      ],
+      "model_review_dispositions": [
+        {
+          "finding_id": "WR-001",
+          "affected_fact_id": "F-CC-03",
+          "resolution": "corrected_pending_trust",
+          "issue_type": "unsupported_claim",
+          "severity": "material",
+          "element": "customers_channels_markets"
+        },
+        {
+          "finding_id": "WR-002",
+          "affected_fact_id": "F-MC-03",
+          "resolution": "corrected_pending_trust",
+          "issue_type": "wrong_period",
+          "severity": "material",
+          "element": "material_changes"
+        },
+        {
+          "finding_id": "WR-003",
+          "affected_fact_id": "F-OD-04",
+          "resolution": "quarantined",
+          "issue_type": "contradicts_source",
+          "severity": "material",
+          "element": "operating_drivers"
+        },
+        {
+          "finding_id": "WR-004",
+          "affected_fact_id": "F-SM-01",
+          "resolution": "quarantined",
+          "issue_type": "other",
+          "severity": "material",
+          "element": "scale_and_mix"
+        },
+        {
+          "finding_id": "WR-005",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected",
+          "issue_type": "material_omission",
+          "severity": "material",
+          "element": "operating_drivers"
+        }
+      ],
+      "supplemental_unique_object_audit": "not_completed_no_sample_accuracy_claim",
+      "scope_limitations": "总额来源口径争议/一条新增业绩候选被拒，细项不追。"
+    },
+    {
+      "instrument_id": "600103.SH",
+      "name": "青山纸业",
+      "report": {
+        "instrument_id": "600103.SH",
+        "report_id": "1225099218",
+        "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-13T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "query": "600103/query.json",
+      "query_sha256": "bd30d8c6a7b22e1f4df59fe23e5757b30d3f465476681a77e0925fb4c616127d",
+      "all_fact_count": 49,
+      "all_metric_count": 40,
+      "model_review_status": "completed_with_open_findings",
+      "core_comparison": [
+        {
+          "condition_id": "600103-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600103-C1",
+          "actual_fact_ids": [
+            "F001",
+            "F002",
+            "F003"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0001",
+              "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                9
+              ]
+            },
+            {
+              "evidence_id": "source-0002",
+              "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                10
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600103-K02",
+          "dimension": "products_services",
+          "source_context_id": "600103-C2",
+          "actual_fact_ids": [
+            "F006"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0002",
+              "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                10
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600103-K03",
+          "dimension": "products_services",
+          "source_context_id": "600103-C2",
+          "actual_fact_ids": [
+            "F007",
+            "F008"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0002",
+              "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                10
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600103-K04",
+          "dimension": "products_services",
+          "source_context_id": "600103-C2",
+          "actual_fact_ids": [
+            "F009"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0002",
+              "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                10
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600103-K05",
+          "dimension": "products_services",
+          "source_context_id": "600103-C2",
+          "actual_fact_ids": [
+            "F010"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0002",
+              "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                10
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600103-K06",
+          "dimension": "products_services",
+          "source_context_id": "600103-C2",
+          "actual_fact_ids": [
+            "F011"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0002",
+              "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                10
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600103-K07",
+          "dimension": "revenue_model",
+          "source_context_id": "600103-C3",
+          "actual_fact_ids": [
+            "F013",
+            "F014"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0003",
+              "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                11
+              ]
+            },
+            {
+              "evidence_id": "source-0007",
+              "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                18
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600103-K08",
+          "dimension": "operations_and_inputs",
+          "source_context_id": "600103-C3",
+          "actual_fact_ids": [
+            "F023",
+            "F024"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0003",
+              "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                11
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600103-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600103-C4",
+          "actual_fact_ids": [
+            "F016"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0005",
+              "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                16
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600103-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600103-C5",
+          "actual_fact_ids": [
+            "F017"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0005",
+              "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                16
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600103-K11",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600103-C5",
+          "actual_fact_ids": [
+            "F017"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0005",
+              "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                16
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600103-K12",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600103-C5",
+          "actual_fact_ids": [
+            "F015",
+            "F018"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0006",
+              "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                17
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        }
+      ],
+      "model_review_dispositions": [
+        {
+          "finding_id": "Q001",
+          "affected_fact_id": "F003",
+          "resolution": "corrected_pending_trust",
+          "issue_type": "wrong_subject",
+          "severity": "minor",
+          "element": "business_structure"
+        },
+        {
+          "finding_id": "Q002",
+          "affected_fact_id": null,
+          "resolution": "unresolved",
+          "issue_type": "contradicts_source",
+          "severity": "minor",
+          "element": "limitations"
+        }
+      ],
+      "supplemental_unique_object_audit": "not_completed_no_sample_accuracy_claim",
+      "scope_limitations": "已有有源核心，未声称全部补充事实/原文所有子句已审。"
+    },
+    {
+      "instrument_id": "600100.SH",
+      "name": "同方股份",
+      "report": {
+        "instrument_id": "600100.SH",
+        "report_id": "1225244797",
+        "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-28T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "query": "600100/query.json",
+      "query_sha256": "3951778370a50f5dbc661315fd745d1c2d8cefcc3bdbbd90cbaf38e6f5e8690e",
+      "all_fact_count": 41,
+      "all_metric_count": 58,
+      "model_review_status": "completed",
+      "core_comparison": [
+        {
+          "condition_id": "600100-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600100-C1",
+          "actual_fact_ids": [
+            "F001"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0001",
+              "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                12
+              ]
+            },
+            {
+              "evidence_id": "source-0002",
+              "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                13
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600100-K02",
+          "dimension": "products_services",
+          "source_context_id": "600100-C2",
+          "actual_fact_ids": [
+            "F006"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0001",
+              "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                12
+              ]
+            },
+            {
+              "evidence_id": "source-0010",
+              "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "（一）公共安全"
+              ],
+              "physical_pages": [
+                22
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600100-K03",
+          "dimension": "products_services",
+          "source_context_id": "600100-C2",
+          "actual_fact_ids": [
+            "F007",
+            "F008"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0001",
+              "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                12
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600100-K04",
+          "dimension": "products_services",
+          "source_context_id": "600100-C2",
+          "actual_fact_ids": [
+            "F009"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0002",
+              "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                13
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600100-K05",
+          "dimension": "revenue_model",
+          "source_context_id": "600100-C3",
+          "actual_fact_ids": [
+            "F011"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0001",
+              "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                12
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600100-K06",
+          "dimension": "revenue_model",
+          "source_context_id": "600100-C3",
+          "actual_fact_ids": [
+            "F011"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0001",
+              "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                12
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600100-K07",
+          "dimension": "revenue_model",
+          "source_context_id": "600100-C3",
+          "actual_fact_ids": [
+            "F012"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0002",
+              "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                13
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600100-K08",
+          "dimension": "revenue_model",
+          "source_context_id": "600100-C3",
+          "actual_fact_ids": [
+            "F013"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0010",
+              "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "（一）公共安全"
+              ],
+              "physical_pages": [
+                22
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600100-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600100-C4",
+          "actual_fact_ids": [
+            "F014"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0003",
+              "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ],
+              "physical_pages": [
+                14
+              ]
+            },
+            {
+              "evidence_id": "source-0004",
+              "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ],
+              "physical_pages": [
+                15
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600100-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600100-C5",
+          "actual_fact_ids": [
+            "F015"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0008",
+              "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                21
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600100-K11",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600100-C5",
+          "actual_fact_ids": [
+            "F015"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0008",
+              "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                21
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600100-K12",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600100-C5",
+          "actual_fact_ids": [
+            "F016"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0008",
+              "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                21
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        }
+      ],
+      "model_review_dispositions": [
+        {
+          "finding_id": "R001",
+          "affected_fact_id": "F004",
+          "resolution": "corrected_pending_trust",
+          "issue_type": "wrong_subject",
+          "severity": "material",
+          "element": "business_structure"
+        },
+        {
+          "finding_id": "R002",
+          "affected_fact_id": "F003",
+          "resolution": "corrected_pending_trust",
+          "issue_type": "wrong_subject",
+          "severity": "minor",
+          "element": "business_structure"
+        },
+        {
+          "finding_id": "R003",
+          "affected_fact_id": "F034",
+          "resolution": "corrected_pending_trust",
+          "issue_type": "unsupported_claim",
+          "severity": "material",
+          "element": "material_changes"
+        },
+        {
+          "finding_id": "R004",
+          "affected_fact_id": null,
+          "resolution": "corrected_pending_trust",
+          "issue_type": "material_omission",
+          "severity": "material",
+          "element": "scale_and_mix"
+        },
+        {
+          "finding_id": "R005",
+          "affected_fact_id": null,
+          "resolution": "corrected_pending_trust",
+          "issue_type": "material_omission",
+          "severity": "material",
+          "element": "business_structure"
+        },
+        {
+          "finding_id": "R006",
+          "affected_fact_id": null,
+          "resolution": "corrected_pending_trust",
+          "issue_type": "material_omission",
+          "severity": "material",
+          "element": "operating_drivers"
+        }
+      ],
+      "supplemental_unique_object_audit": "not_completed_no_sample_accuracy_claim",
+      "scope_limitations": "已有有源核心，未声称全部补充事实/原文所有子句已审。"
+    },
+    {
+      "instrument_id": "600107.SH",
+      "name": "美尔雅",
+      "report": {
+        "instrument_id": "600107.SH",
+        "report_id": "1225264726",
+        "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+        "report_period": "2025-12-31",
+        "published_at": "2026-04-29T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "query": "600107/query.json",
+      "query_sha256": "41b5840ffd5fb227d78a39faf6f3b9294414d117fe27b23fcf23abf3c7edf6cd",
+      "all_fact_count": 40,
+      "all_metric_count": 51,
+      "model_review_status": "completed",
+      "core_comparison": [
+        {
+          "condition_id": "600107-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600107-C1",
+          "actual_fact_ids": [
+            "F-BS-01",
+            "F-BS-02",
+            "F-BS-03"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0001",
+              "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                12
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600107-K02",
+          "dimension": "products_services",
+          "source_context_id": "600107-C2",
+          "actual_fact_ids": [
+            "F-PS-01"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0001",
+              "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                12
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600107-K03",
+          "dimension": "products_services",
+          "source_context_id": "600107-C2",
+          "actual_fact_ids": [
+            "F-PS-02"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0001",
+              "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                12
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600107-K04",
+          "dimension": "revenue_model",
+          "source_context_id": "600107-C3",
+          "actual_fact_ids": [
+            "F-RM-04",
+            "F-SC-D-01"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0008",
+              "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                16
+              ]
+            },
+            {
+              "evidence_id": "source-0001",
+              "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                12
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600107-K05",
+          "dimension": "revenue_model",
+          "source_context_id": "600107-C3",
+          "actual_fact_ids": [
+            "F-BS-03",
+            "F-OI-01"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0001",
+              "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                12
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600107-K06",
+          "dimension": "operations_and_inputs",
+          "source_context_id": "600107-C1",
+          "actual_fact_ids": [
+            "F-BS-01",
+            "F-SC-P-01"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0001",
+              "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ],
+              "physical_pages": [
+                12
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600107-K07",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600107-C4",
+          "actual_fact_ids": [
+            "F-RM-01"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0005",
+              "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ],
+              "physical_pages": [
+                14
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600107-K08",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600107-C4",
+          "actual_fact_ids": [
+            "F-RM-01"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0005",
+              "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ],
+              "physical_pages": [
+                14
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        },
+        {
+          "condition_id": "600107-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600107-C5",
+          "actual_fact_ids": [
+            "F-RM-02"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0007",
+              "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                15
+              ]
+            }
+          ],
+          "status": "unsafe_assertion_do_not_use",
+          "note": "服装/其他金额虽有源，但同条把医疗空栏改写为确定零，不能把整条作为通过答案。"
+        },
+        {
+          "condition_id": "600107-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600107-C5",
+          "actual_fact_ids": [
+            "F-RM-03"
+          ],
+          "evidence": [
+            {
+              "evidence_id": "source-0007",
+              "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                15
+              ]
+            },
+            {
+              "evidence_id": "source-0008",
+              "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ],
+              "physical_pages": [
+                16
+              ]
+            }
+          ],
+          "status": "source_supported_in_this_core_scope",
+          "note": "按源先行条件对照实际文字、原文主体/期间/数字；不是该对象全部补充细节已核。"
+        }
+      ],
+      "model_review_dispositions": [
+        {
+          "finding_id": "REV-001",
+          "affected_fact_id": "F-MC-01",
+          "resolution": "corrected_pending_trust",
+          "issue_type": "wrong_period",
+          "severity": "material",
+          "element": "material_changes"
+        },
+        {
+          "finding_id": "REV-002",
+          "affected_fact_id": null,
+          "resolution": "corrected_pending_trust",
+          "issue_type": "material_omission",
+          "severity": "material",
+          "element": "operating_drivers"
+        }
+      ],
+      "supplemental_unique_object_audit": "not_completed_no_sample_accuracy_claim",
+      "scope_limitations": "模型completed不是事实准确保证；独立禁用F-RM-02确定零，其余事实仍按待核研究稿。"
+    }
+  ],
+  "risk_challenges": [
+    {
+      "category": "body",
+      "companies": [
+        "600082.SH",
+        "600097.SH"
+      ],
+      "status": "not_evaluated_unstarted"
+    },
+    {
+      "category": "income_columns_units",
+      "companies": [
+        "600094.SH",
+        "600107.SH"
+      ],
+      "status": "failed_in_started_pair",
+      "positive": "大名城实际金控空栏保为未列金额，地产/算力收入与成本分开。",
+      "negative": "美尔雅实际源的医疗空栏仍输出为0，独立挑战失败，不以模型completed通过。"
+    },
+    {
+      "category": "subject_period",
+      "companies": [
+        "600094.SH",
+        "600107.SH"
+      ],
+      "status": "limited_source_challenges_supported",
+      "positive": "大名城修订后投资时点为截至报告日，参股/不并表及被投业务不改集团自产；美尔雅删本期处置时点，仅保本期医药收入影响。",
+      "limits": "仅这些实源冲突/修订对象，不是所有主体/期间输出全审。"
+    },
+    {
+      "category": "purchase_sale_direction",
+      "companies": [
+        "600098.SH",
+        "600103.SH"
+      ],
+      "status": "partial_one_company_only",
+      "positive": "青山原文采购/自主生产/直销在实际稿中分别表达，木竹片采购不改产品销售。",
+      "unstarted": "600098.SH"
+    },
+    {
+      "category": "associated_leasing",
+      "companies": [
+        "600088.SH",
+        "600082.SH"
+      ],
+      "status": "not_evaluated_unstarted"
+    },
+    {
+      "category": "financial_disclosure",
+      "companies": [
+        "600098.SH",
+        "600104.SH",
+        "600000.SH"
+      ],
+      "status": "not_evaluated_unstarted"
+    }
+  ],
+  "unstarted": [
+    {
+      "instrument_id": "600098.SH",
+      "core_conditions": 12,
+      "status": "not_run_not_evaluated"
+    },
+    {
+      "instrument_id": "600104.SH",
+      "core_conditions": 10,
+      "status": "not_run_not_evaluated"
+    },
+    {
+      "instrument_id": "600088.SH",
+      "core_conditions": 11,
+      "status": "not_run_not_evaluated"
+    },
+    {
+      "instrument_id": "600099.SH",
+      "core_conditions": 12,
+      "status": "not_run_not_evaluated"
+    },
+    {
+      "instrument_id": "600082.SH",
+      "core_conditions": 10,
+      "status": "not_run_not_evaluated"
+    },
+    {
+      "instrument_id": "600097.SH",
+      "core_conditions": 10,
+      "status": "not_run_not_evaluated"
+    },
+    {
+      "instrument_id": "600054.SH",
+      "core_conditions": 13,
+      "status": "not_run_not_evaluated"
+    },
+    {
+      "instrument_id": "600000.SH",
+      "core_conditions": 11,
+      "status": "not_run_not_evaluated"
+    }
+  ],
+  "summary": {
+    "started_core_conditions": 44,
+    "source_supported": 41,
+    "partial_or_scope_limited": 2,
+    "unsafe_assertions": 1,
+    "unstarted_core_conditions": 89,
+    "not_a_formal_accuracy_or_recall": true
+  },
+  "next_priority": "先修正文确定性金额/零值断言未纳入结构化数值核查且复核漏掉的共性漏洞；保住独立事实，不重抽这4家，不追供应链细节。旧失败及本轮原稿不改，未启动8家未经新明确裁决不自动续。"
+}

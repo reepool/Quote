@@ -1,0 +1,1227 @@
+[
+  {
+    "request_id": "bp-work-b667cf7677310f6c091af63a:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "d781d9ace7f665a72291243f6414445a48ba05959a15fadb13806430349b807f",
+    "response_hash": "5d981c7c280fe4b2e5887a238151d054c5159f2bb5f403843b1afa8b7da57a35",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0034\",\"section-0035\",\"section-0036\",\"section-0062\",\"section-0064\",\"section-0043\",\"section-0106\"],\"rationale\":\"所选章节覆盖公司业务与产品用途（section-0034及其子节0035、0036）、经营模式、主营业务分析中的收入与成本构成（section-0062、0064，含分产品/分行业收入与毛利率，是收入来源与主要业务权重的实质披露）、经营情况讨论（section-0043）以及主要控股参股公司分析（section-0106，补充业务板块与子公司贡献）。这些章节共同解释业务结构、产品服务、盈利来源、规模与主要构成、经营角色与资源投入及本期变化，信息密度高且相互关联。未选母公司报表及大量财务附注，避免冗余。\",\"stop_reason\":\"已覆盖业务介绍、经营模式、收入成本构成与主要子公司分析等核心问题；行业展望、治理、股东、募集资金及财务报表附注等与收入来源和业务结构关系较弱，属可延后范围，故在此停止。\",\"deferred\":[\"section-0037 行业情况\",\"section-0044 核心竞争力\",\"section-0108 未来发展讨论\",\"section-0377 财务报告附注（分部信息section-1284等）\"]}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0034",
+        "section-0035",
+        "section-0036",
+        "section-0062",
+        "section-0064",
+        "section-0043",
+        "section-0106"
+      ],
+      "rationale": "所选章节覆盖公司业务与产品用途（section-0034及其子节0035、0036）、经营模式、主营业务分析中的收入与成本构成（section-0062、0064，含分产品/分行业收入与毛利率，是收入来源与主要业务权重的实质披露）、经营情况讨论（section-0043）以及主要控股参股公司分析（section-0106，补充业务板块与子公司贡献）。这些章节共同解释业务结构、产品服务、盈利来源、规模与主要构成、经营角色与资源投入及本期变化，信息密度高且相互关联。未选母公司报表及大量财务附注，避免冗余。",
+      "stop_reason": "已覆盖业务介绍、经营模式、收入成本构成与主要子公司分析等核心问题；行业展望、治理、股东、募集资金及财务报表附注等与收入来源和业务结构关系较弱，属可延后范围，故在此停止。",
+      "deferred": [
+        "section-0037 行业情况",
+        "section-0044 核心竞争力",
+        "section-0108 未来发展讨论",
+        "section-0377 财务报告附注（分部信息section-1284等）"
+      ]
+    },
+    "usage": {
+      "input_tokens": 23175,
+      "output_tokens": 289,
+      "total_tokens": 23464
+    }
+  },
+  {
+    "request_id": "bp-work-b667cf7677310f6c091af63a:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "31d0bedd9bcab1b0d610014ae6b63e25e440a54869cfb408cf6a4b4c50447c46",
+    "response_hash": "983e88d570403e8102e8dd1c779053ec0d866d1fdb8c19cc2327c58ffa22a343",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F001\",\"text\":\"公司属于制浆造纸行业，已发展为集制浆、造纸、热电联产、碱回收、纸箱及纸袋制造、医药、光电子、林业开发于一体的国有控股上市公司，系全国包装纸袋纸、纺织新材料溶解浆的重点生产企业。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F002\",\"text\":\"公司主要从事竹木浆、溶解浆、纸袋纸、纸制品、光电子产品、医药产品、林木产品等产品产销及贸易经营。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F003\",\"text\":\"公司及子公司按行业类型划分为制浆行业、造纸行业（母公司）、纸制品加工（子公司）、医药行业（子公司）、电子通讯行业（子公司）、林业（子公司）。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F004\",\"text\":\"报告期内公司所从事的主要业务未发生重大变化。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F005\",\"text\":\"报告期内公司新增重要非主营业务的说明为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F006\",\"text\":\"母公司制浆行业产品包括本色木浆、漂白木浆（针叶、阔叶）、本色竹浆、漂白竹浆、木溶解浆、竹溶解浆；其中木浆、竹浆用于抄造各种纸张、纸浆模塑及其他纸制品，溶解浆用于纺织用粘胶纤维。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F007\",\"text\":\"母公司造纸行业产品包括纸袋纸、复合原纸、手提袋纸、牛皮卡纸；纸袋纸、复合原纸广泛用于水泥、化工、建材、食品、工业、饲料等包装用纸，手提袋纸用于制作各种款式的手提袋子，牛皮卡纸用于纸箱、纸袋用纸。\",\"subject_scope\":\"issuer\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F008\",\"text\":\"子公司纸制品加工产品包括纸箱、纸板、纸袋；纸箱为产品包装用，纸板用于制作纸箱或用于建材，纸袋广泛用于水泥、化工、建材、食品、工业、饲料等包装用。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F009\",\"text\":\"子公司医药行业产品包括风油精（清凉、止痛、驱风、止痒）、无极膏（消炎、镇痛、止痒、抗菌、局部麻醉作用）、软脉灵（滋补肝肾，益气活血，软化血管）。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F010\",\"text\":\"子公司电子通讯行业产品为光电子器件，为数据中心、数据通信等光纤传输、接入系统提供高速光模块产品。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F011\",\"text\":\"子公司林业产品为木材、竹材，涉及森林培育、营造、管护及木材、竹材生产销售。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F012\",\"text\":\"公司主导产品伸性纸袋纸被评为制造业单项冠军产品，市场占有率位居全国第一；“水仙牌”风油精系国内传统品牌，被列入“福建省制造业单项冠军产品名录”；竹溶解浆为国内首创以毛竹为原料的溶解浆产品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F013\",\"text\":\"公司销售采取“产品直销，以销定产”的销售模式，与客户建立长期合作伙伴关系。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F014\",\"text\":\"主营业务分销售模式情况显示，直销模式营业收入2,028,696,061.86元、毛利率11.55%；经销模式营业收入303,680,631.79元、毛利率47.37%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"直销营业收入\",\"raw_value\":\"2,028,696,061.86\",\"value\":\"2028696061.86\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"经销营业收入\",\"raw_value\":\"303,680,631.79\",\"value\":\"303680631.79\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]},{\"fact_id\":\"F015\",\"text\":\"公司主营业务分行业合计营业收入2,332,376,693.65元、营业成本1,954,239,255.89元、毛利率16.21%，营业收入比上年减少8.35%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"主营业务合计营业收入\",\"raw_value\":\"2,332,376,693.65\",\"value\":\"2332376693.65\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"主营业务合计毛利率\",\"raw_value\":\"16.21\",\"value\":\"16.21\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F016\",\"text\":\"公司营业收入2,418,990,221.17元，比上年同期减少6.98%；营业成本1,965,747,663.71元，比上年同期减少9.34%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"2,418,990,221.17\",\"value\":\"2418990221.17\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"营业成本\",\"raw_value\":\"1,965,747,663.71\",\"value\":\"1965747663.71\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F017\",\"text\":\"分行业营业收入：纸行业1,197,089,976.81元（毛利率10.74%）、浆行业358,768,319.71元（毛利率7.54%）、纸制品加工行业284,450,942.34元（毛利率-0.43%）、医药行业303,680,631.79元（毛利率47.37%）、光电子行业206,025,784.54元（毛利率25.85%）。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"纸行业营业收入\",\"raw_value\":\"1,197,089,976.81\",\"value\":\"1197089976.81\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"浆行业营业收入\",\"raw_value\":\"358,768,319.71\",\"value\":\"358768319.71\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"医药行业营业收入\",\"raw_value\":\"303,680,631.79\",\"value\":\"303680631.79\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"光电子行业营业收入\",\"raw_value\":\"206,025,784.54\",\"value\":\"206025784.54\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]},{\"fact_id\":\"F018\",\"text\":\"分行业营业收入：营林业30,598,132.37元（毛利率23.31%）、商贸业2,034,990.83元（毛利率1.76%）、环保业63,795,075.10元（毛利率2.46%）、机电维修安装53,693,710.43元（毛利率13.40%）、内部抵销-167,760,870.27元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"营林业营业收入\",\"raw_value\":\"30,598,132.37\",\"value\":\"30598132.37\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"环保业营业收入\",\"raw_value\":\"63,795,075.10\",\"value\":\"63795075.10\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"内部抵销营业收入\",\"raw_value\":\"-167,760,870.27\",\"value\":\"-167760870.27\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]},{\"fact_id\":\"F019\",\"text\":\"分产品营业收入：纸1,195,472,819.30元（毛利率10.64%）、浆粕166,061,100.93元（毛利率19.42%）、浆板192,707,218.78元（毛利率-2.71%）、纸板纸箱284,450,942.34元（毛利率-0.43%）、医药303,680,631.79元（毛利率47.37%）、光电子206,025,784.54元（毛利率25.85%）、木材30,598,132.37元（毛利率23.31%）。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"纸产品营业收入\",\"raw_value\":\"1,195,472,819.30\",\"value\":\"1195472819.30\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"浆粕营业收入\",\"raw_value\":\"166,061,100.93\",\"value\":\"166061100.93\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"浆板营业收入\",\"raw_value\":\"192,707,218.78\",\"value\":\"192707218.78\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]},{\"fact_id\":\"F020\",\"text\":\"分地区营业收入：国内2,154,870,243.36元（毛利率15.23%）、国外177,506,450.29元（毛利率28.09%）。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"国内营业收入\",\"raw_value\":\"2,154,870,243.36\",\"value\":\"2154870243.36\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"国外营业收入\",\"raw_value\":\"177,506,450.29\",\"value\":\"177506450.29\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]},{\"fact_id\":\"F021\",\"text\":\"主要产品产销量：纸生产量24.98万吨、销售量24.09万吨、库存量2.40万吨；浆粕生产量2.49万吨、销售量2.58万吨；浆板生产量7.19万吨、销售量4.94万吨；纸箱板箱生产量7.61万吨、销售量7.27万吨；光电子模块生产量197.37万只、销售量194.44万只；风油精系列生产量5,555.50万瓶、销售量5,413.83万瓶。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"metrics\":[{\"name\":\"纸销售量\",\"raw_value\":\"24.09\",\"value\":\"24.09\",\"unit\":\"万吨\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万吨\"},{\"name\":\"光电子模块销售量\",\"raw_value\":\"194.44\",\"value\":\"194.44\",\"unit\":\"万只\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万只\"},{\"name\":\"风油精系列销售量\",\"raw_value\":\"5,413.83\",\"value\":\"5413.83\",\"unit\":\"万瓶\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万瓶\"}]},{\"fact_id\":\"F022\",\"text\":\"前五名客户销售额52,052.72万元，占年度销售总额21.52%；前五名供应商采购额66,455.25万元，占年度采购总额32.82%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"52,052.72\",\"value\":\"52052.72\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"21.52\",\"value\":\"21.52\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F023\",\"text\":\"采购模式：大宗原材料、燃料、设备等主要采用公开招标、竞争性谈判等方式，国内木竹片采购定价主要采取挂牌采购，根据库存及市场供需变化灵活调整。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F024\",\"text\":\"生产模式：公司浆纸主业秉承自主生产模式，具备制浆造纸生产线及配套的碱回收、热电、污水处理系统，并建立标准化生产流程。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F025\",\"text\":\"纸行业成本构成：原辅材料754,038,839.61元（占70.57%）、燃料动力106,203,729.36元（占9.94%）、直接人工79,307,203.00元（占7.42%）、制造费用128,936,436.61元（占12.07%）。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"纸行业原辅材料成本\",\"raw_value\":\"754,038,839.61\",\"value\":\"754038839.61\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"纸行业燃料动力成本\",\"raw_value\":\"106,203,729.36\",\"value\":\"106203729.36\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]},{\"fact_id\":\"F026\",\"text\":\"浆行业成本构成：原辅材料229,925,303.00元（占69.31%）、燃料动力23,287,774.16元（占7.02%）、直接人工23,884,896.58元（占7.20%）、制造费用54,636,700.92元（占16.47%）。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"浆行业原辅材料成本\",\"raw_value\":\"229,925,303.00\",\"value\":\"229925303.00\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]},{\"fact_id\":\"F027\",\"text\":\"研发投入合计59,078,869.62元，其中费用化54,469,826.41元、资本化4,609,043.21元；研发投入总额占营业收入比例2.44%；研发人员173人，占公司总人数6.13%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\",\"source-0012\"],\"metrics\":[{\"name\":\"研发投入合计\",\"raw_value\":\"59,078,869.62\",\"value\":\"59078869.62\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"研发投入总额占营业收入比例\",\"raw_value\":\"2.44\",\"value\":\"2.44\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"研发人员数量\",\"raw_value\":\"173\",\"value\":\"173\",\"unit\":\"人\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"人\"}]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F028\",\"text\":\"公司产品行销全国各地和国际市场；分地区营业收入国内2,154,870,243.36元、国外177,506,450.29元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0006\"]},{\"fact_id\":\"F029\",\"text\":\"前五名客户销售额52,052.72万元，占年度销售总额21.52%，其中关联方销售额为0元；前五名供应商采购额66,455.25万元，占年度采购总额32.82%，其中关联方采购额为0元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"]},{\"fact_id\":\"F030\",\"text\":\"报告期内向单个客户的销售比例超过总额50%、前5名客户中存在新增客户或严重依赖少数客户的情形为不适用；向单个供应商采购比例超过总额50%等情形亦为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"]},{\"fact_id\":\"F031\",\"text\":\"贸易业务（木竹片及木浆产品贸易业务）本期营业收入60.15万元，上期3,061.94万元，本期比上年同期减少98.04%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"木竹片及木浆产品贸易业务本期营业收入\",\"raw_value\":\"60.15\",\"value\":\"60.15\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"}]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F032\",\"text\":\"2025年包装纸行业受产能过剩、需求疲软、环保高压等多重因素影响，呈现“两极分化、持续探底”态势；制浆行业处于供需调整期，传统纸浆供需宽松、价格承压震荡，溶解浆价格全年重心下移。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F033\",\"text\":\"报告期公司浆、纸及纸制品等主导产品量价同比下降，主营业务收入和利润有所减少；新型包装用纸销量占纸产品比重大幅提升；药业及光电子板块业务发展态势良好，漳州水仙业绩稳定增长、利润同比上升，深圳恒宝通实现扭亏为盈。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F034\",\"text\":\"公司纸行业及其产品因主导产品销量下降及售价下跌，报告期营业收入、营业成本及毛利率同比减少。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F035\",\"text\":\"公司浆行业及其产品因主导产品销量下降，营业收入、营业成本同比减少，但单位成本降幅大于售价降幅，毛利率同比增加。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F036\",\"text\":\"公司光电行业及其产品因加工贸易产品订单销量增加，报告期营业收入、营业成本及毛利率均同比增加。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F037\",\"text\":\"公司医药行业及其产品因产品销量下降，报告期营业收入、营业成本及毛利率同比减少。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F038\",\"text\":\"公司营林业及其产品因林木产品销量上升，营业收入、营业成本同比增加，但受采伐疫材人工成本影响，毛利率同比减少。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F039\",\"text\":\"公司环保行业及其服务因污水处理量同比增加，营业收入、营业成本同比增加，但受原辅材料采购价影响，毛利率同比减少。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F040\",\"text\":\"公司国外业务因光电子产品销量上升，国外业务营业收入、营业成本及毛利率均同比增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F041\",\"text\":\"公司全年实现营业收入24.19亿元，比上年同期减少1.81亿元，下降6.98%；实现利润总额0.90亿元，比上年同期减少0.31亿元，下降25.27%；归属于上市公司股东的净利润0.55亿元，比上年同期减少0.30亿元，下降35.48%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"24.19\",\"value\":\"24.19\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"亿元\"},{\"name\":\"利润总额\",\"raw_value\":\"0.90\",\"value\":\"0.90\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"亿元\"},{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"0.55\",\"value\":\"0.55\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"亿元\"}]},{\"fact_id\":\"F042\",\"text\":\"本期公司业务类型、利润构成或利润来源发生重大变动的详细说明为不适用；公司报告期内业务、产品或服务发生重大变化或调整有关情况为不适用；报告期主要子公司股权变动导致合并范围变化为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0010\"]},{\"fact_id\":\"F043\",\"text\":\"经营活动产生的现金流量净额136,419,367.57元，比上年同期减少67.26%，主要是销售商品及收到保证金同比减少；投资活动产生的现金流量净额-130,796,721.35元；筹资活动产生的现金流量净额-271,612,879.66元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0013\"],\"metrics\":[{\"name\":\"经营活动产生的现金流量净额\",\"raw_value\":\"136,419,367.57\",\"value\":\"136419367.57\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]},{\"fact_id\":\"F044\",\"text\":\"漳州水仙药业股份有限公司营业收入30,377.59万元，营业利润5,649.10万元，营业利润同比上升17.31%，主要是计提信用减值损失及资产减值损失同比减少。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\",\"source-0015\"],\"metrics\":[{\"name\":\"漳州水仙药业营业收入\",\"raw_value\":\"30,377.59\",\"value\":\"30377.59\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"漳州水仙药业营业利润\",\"raw_value\":\"5,649.10\",\"value\":\"5649.10\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"}]},{\"fact_id\":\"F045\",\"text\":\"深圳市恒宝通光电子股份有限公司营业收入20,695.02万元，营业利润527.50万元，营业利润同比上升143.85%，主要是OEM/ODM业务的光模块产品销售同比增加。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\",\"source-0015\"],\"metrics\":[{\"name\":\"深圳恒宝通营业收入\",\"raw_value\":\"20,695.02\",\"value\":\"20695.02\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"深圳恒宝通营业利润\",\"raw_value\":\"527.50\",\"value\":\"527.50\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"}]},{\"fact_id\":\"F046\",\"text\":\"深圳市龙岗闽环实业有限公司营业收入29,403.23万元，营业利润-1,298.02万元，营业利润同比下降16.25%，主要是产品销量同比减少以及计提信用减值损失和资产减值损失同比增加。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\",\"source-0015\"],\"metrics\":[{\"name\":\"深圳龙岗闽环营业收入\",\"raw_value\":\"29,403.23\",\"value\":\"29403.23\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"深圳龙岗闽环营业利润\",\"raw_value\":\"-1,298.02\",\"value\":\"-1298.02\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"}]}]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F047\",\"text\":\"公司属于制浆造纸行业，集制浆、造纸、热电联产、碱回收、纸箱及纸袋制造、医药、光电子、林业开发于一体；浆纸主业秉承自主生产模式，具备制浆造纸生产线及配套的碱回收、热电、污水处理系统。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0003\"]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F048\",\"text\":\"公司大宗原材料、燃料、设备等主要采用公开招标、竞争性谈判等方式采购，国内木竹片采购定价主要采取挂牌采购；成本构成中列示原辅材料、燃料动力、直接人工、制造费用等项目。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0008\"]}]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F049\",\"text\":\"公司产品行销全国各地和国际市场；纸袋纸、复合原纸、纸袋广泛用于水泥、化工、建材、食品、工业、饲料等包装用纸，溶解浆用于纺织用粘胶纤维，光电子器件为数据中心、数据通信等光纤传输、接入系统提供高速光模块产品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]}]}},\"limitations\":[\"未阅读行业情况、核心竞争力、未来发展讨论及财务报告附注（含分部信息）等章节，相关细节未纳入。\",\"分行业、分产品表中存在内部抵销行，合计为抵销后金额，不应视为各分部简单加总。\",\"贸易业务收入表单位为万元，与利润表单位元不同，已按原表单位保留。\",\"主要子公司表部分子公司营业收入为空，未推断其数值。\",\"未披露具体客户及供应商名称（仅列示同一控制口径合并说明），未推断具体交易对手。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F001",
+              "text": "公司属于制浆造纸行业，已发展为集制浆、造纸、热电联产、碱回收、纸箱及纸袋制造、医药、光电子、林业开发于一体的国有控股上市公司，系全国包装纸袋纸、纺织新材料溶解浆的重点生产企业。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F002",
+              "text": "公司主要从事竹木浆、溶解浆、纸袋纸、纸制品、光电子产品、医药产品、林木产品等产品产销及贸易经营。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F003",
+              "text": "公司及子公司按行业类型划分为制浆行业、造纸行业（母公司）、纸制品加工（子公司）、医药行业（子公司）、电子通讯行业（子公司）、林业（子公司）。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F004",
+              "text": "报告期内公司所从事的主要业务未发生重大变化。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F005",
+              "text": "报告期内公司新增重要非主营业务的说明为不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F006",
+              "text": "母公司制浆行业产品包括本色木浆、漂白木浆（针叶、阔叶）、本色竹浆、漂白竹浆、木溶解浆、竹溶解浆；其中木浆、竹浆用于抄造各种纸张、纸浆模塑及其他纸制品，溶解浆用于纺织用粘胶纤维。",
+              "subject_scope": "issuer",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F007",
+              "text": "母公司造纸行业产品包括纸袋纸、复合原纸、手提袋纸、牛皮卡纸；纸袋纸、复合原纸广泛用于水泥、化工、建材、食品、工业、饲料等包装用纸，手提袋纸用于制作各种款式的手提袋子，牛皮卡纸用于纸箱、纸袋用纸。",
+              "subject_scope": "issuer",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F008",
+              "text": "子公司纸制品加工产品包括纸箱、纸板、纸袋；纸箱为产品包装用，纸板用于制作纸箱或用于建材，纸袋广泛用于水泥、化工、建材、食品、工业、饲料等包装用。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F009",
+              "text": "子公司医药行业产品包括风油精（清凉、止痛、驱风、止痒）、无极膏（消炎、镇痛、止痒、抗菌、局部麻醉作用）、软脉灵（滋补肝肾，益气活血，软化血管）。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F010",
+              "text": "子公司电子通讯行业产品为光电子器件，为数据中心、数据通信等光纤传输、接入系统提供高速光模块产品。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F011",
+              "text": "子公司林业产品为木材、竹材，涉及森林培育、营造、管护及木材、竹材生产销售。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F012",
+              "text": "公司主导产品伸性纸袋纸被评为制造业单项冠军产品，市场占有率位居全国第一；“水仙牌”风油精系国内传统品牌，被列入“福建省制造业单项冠军产品名录”；竹溶解浆为国内首创以毛竹为原料的溶解浆产品。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F013",
+              "text": "公司销售采取“产品直销，以销定产”的销售模式，与客户建立长期合作伙伴关系。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F014",
+              "text": "主营业务分销售模式情况显示，直销模式营业收入2,028,696,061.86元、毛利率11.55%；经销模式营业收入303,680,631.79元、毛利率47.37%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "直销营业收入",
+                  "raw_value": "2,028,696,061.86",
+                  "value": "2028696061.86",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "经销营业收入",
+                  "raw_value": "303,680,631.79",
+                  "value": "303680631.79",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F015",
+              "text": "公司主营业务分行业合计营业收入2,332,376,693.65元、营业成本1,954,239,255.89元、毛利率16.21%，营业收入比上年减少8.35%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务合计营业收入",
+                  "raw_value": "2,332,376,693.65",
+                  "value": "2332376693.65",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "主营业务合计毛利率",
+                  "raw_value": "16.21",
+                  "value": "16.21",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F016",
+              "text": "公司营业收入2,418,990,221.17元，比上年同期减少6.98%；营业成本1,965,747,663.71元，比上年同期减少9.34%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "2,418,990,221.17",
+                  "value": "2418990221.17",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "营业成本",
+                  "raw_value": "1,965,747,663.71",
+                  "value": "1965747663.71",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                }
+              ]
+            }
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F017",
+              "text": "分行业营业收入：纸行业1,197,089,976.81元（毛利率10.74%）、浆行业358,768,319.71元（毛利率7.54%）、纸制品加工行业284,450,942.34元（毛利率-0.43%）、医药行业303,680,631.79元（毛利率47.37%）、光电子行业206,025,784.54元（毛利率25.85%）。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "纸行业营业收入",
+                  "raw_value": "1,197,089,976.81",
+                  "value": "1197089976.81",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "浆行业营业收入",
+                  "raw_value": "358,768,319.71",
+                  "value": "358768319.71",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "医药行业营业收入",
+                  "raw_value": "303,680,631.79",
+                  "value": "303680631.79",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "光电子行业营业收入",
+                  "raw_value": "206,025,784.54",
+                  "value": "206025784.54",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F018",
+              "text": "分行业营业收入：营林业30,598,132.37元（毛利率23.31%）、商贸业2,034,990.83元（毛利率1.76%）、环保业63,795,075.10元（毛利率2.46%）、机电维修安装53,693,710.43元（毛利率13.40%）、内部抵销-167,760,870.27元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "营林业营业收入",
+                  "raw_value": "30,598,132.37",
+                  "value": "30598132.37",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "环保业营业收入",
+                  "raw_value": "63,795,075.10",
+                  "value": "63795075.10",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "内部抵销营业收入",
+                  "raw_value": "-167,760,870.27",
+                  "value": "-167760870.27",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F019",
+              "text": "分产品营业收入：纸1,195,472,819.30元（毛利率10.64%）、浆粕166,061,100.93元（毛利率19.42%）、浆板192,707,218.78元（毛利率-2.71%）、纸板纸箱284,450,942.34元（毛利率-0.43%）、医药303,680,631.79元（毛利率47.37%）、光电子206,025,784.54元（毛利率25.85%）、木材30,598,132.37元（毛利率23.31%）。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "纸产品营业收入",
+                  "raw_value": "1,195,472,819.30",
+                  "value": "1195472819.30",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "浆粕营业收入",
+                  "raw_value": "166,061,100.93",
+                  "value": "166061100.93",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "浆板营业收入",
+                  "raw_value": "192,707,218.78",
+                  "value": "192707218.78",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F020",
+              "text": "分地区营业收入：国内2,154,870,243.36元（毛利率15.23%）、国外177,506,450.29元（毛利率28.09%）。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "国内营业收入",
+                  "raw_value": "2,154,870,243.36",
+                  "value": "2154870243.36",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "国外营业收入",
+                  "raw_value": "177,506,450.29",
+                  "value": "177506450.29",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F021",
+              "text": "主要产品产销量：纸生产量24.98万吨、销售量24.09万吨、库存量2.40万吨；浆粕生产量2.49万吨、销售量2.58万吨；浆板生产量7.19万吨、销售量4.94万吨；纸箱板箱生产量7.61万吨、销售量7.27万吨；光电子模块生产量197.37万只、销售量194.44万只；风油精系列生产量5,555.50万瓶、销售量5,413.83万瓶。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "纸销售量",
+                  "raw_value": "24.09",
+                  "value": "24.09",
+                  "unit": "万吨",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万吨"
+                },
+                {
+                  "name": "光电子模块销售量",
+                  "raw_value": "194.44",
+                  "value": "194.44",
+                  "unit": "万只",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万只"
+                },
+                {
+                  "name": "风油精系列销售量",
+                  "raw_value": "5,413.83",
+                  "value": "5413.83",
+                  "unit": "万瓶",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万瓶"
+                }
+              ]
+            },
+            {
+              "fact_id": "F022",
+              "text": "前五名客户销售额52,052.72万元，占年度销售总额21.52%；前五名供应商采购额66,455.25万元，占年度采购总额32.82%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户销售额",
+                  "raw_value": "52,052.72",
+                  "value": "52052.72",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "前五名客户销售额占年度销售总额比例",
+                  "raw_value": "21.52",
+                  "value": "21.52",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            }
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F023",
+              "text": "采购模式：大宗原材料、燃料、设备等主要采用公开招标、竞争性谈判等方式，国内木竹片采购定价主要采取挂牌采购，根据库存及市场供需变化灵活调整。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F024",
+              "text": "生产模式：公司浆纸主业秉承自主生产模式，具备制浆造纸生产线及配套的碱回收、热电、污水处理系统，并建立标准化生产流程。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F025",
+              "text": "纸行业成本构成：原辅材料754,038,839.61元（占70.57%）、燃料动力106,203,729.36元（占9.94%）、直接人工79,307,203.00元（占7.42%）、制造费用128,936,436.61元（占12.07%）。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "纸行业原辅材料成本",
+                  "raw_value": "754,038,839.61",
+                  "value": "754038839.61",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "纸行业燃料动力成本",
+                  "raw_value": "106,203,729.36",
+                  "value": "106203729.36",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F026",
+              "text": "浆行业成本构成：原辅材料229,925,303.00元（占69.31%）、燃料动力23,287,774.16元（占7.02%）、直接人工23,884,896.58元（占7.20%）、制造费用54,636,700.92元（占16.47%）。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "浆行业原辅材料成本",
+                  "raw_value": "229,925,303.00",
+                  "value": "229925303.00",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F027",
+              "text": "研发投入合计59,078,869.62元，其中费用化54,469,826.41元、资本化4,609,043.21元；研发投入总额占营业收入比例2.44%；研发人员173人，占公司总人数6.13%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011",
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "研发投入合计",
+                  "raw_value": "59,078,869.62",
+                  "value": "59078869.62",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "研发投入总额占营业收入比例",
+                  "raw_value": "2.44",
+                  "value": "2.44",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "研发人员数量",
+                  "raw_value": "173",
+                  "value": "173",
+                  "unit": "人",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "人"
+                }
+              ]
+            }
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F028",
+              "text": "公司产品行销全国各地和国际市场；分地区营业收入国内2,154,870,243.36元、国外177,506,450.29元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "F029",
+              "text": "前五名客户销售额52,052.72万元，占年度销售总额21.52%，其中关联方销售额为0元；前五名供应商采购额66,455.25万元，占年度采购总额32.82%，其中关联方采购额为0元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ]
+            },
+            {
+              "fact_id": "F030",
+              "text": "报告期内向单个客户的销售比例超过总额50%、前5名客户中存在新增客户或严重依赖少数客户的情形为不适用；向单个供应商采购比例超过总额50%等情形亦为不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ]
+            },
+            {
+              "fact_id": "F031",
+              "text": "贸易业务（木竹片及木浆产品贸易业务）本期营业收入60.15万元，上期3,061.94万元，本期比上年同期减少98.04%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "木竹片及木浆产品贸易业务本期营业收入",
+                  "raw_value": "60.15",
+                  "value": "60.15",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                }
+              ]
+            }
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F032",
+              "text": "2025年包装纸行业受产能过剩、需求疲软、环保高压等多重因素影响，呈现“两极分化、持续探底”态势；制浆行业处于供需调整期，传统纸浆供需宽松、价格承压震荡，溶解浆价格全年重心下移。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F033",
+              "text": "报告期公司浆、纸及纸制品等主导产品量价同比下降，主营业务收入和利润有所减少；新型包装用纸销量占纸产品比重大幅提升；药业及光电子板块业务发展态势良好，漳州水仙业绩稳定增长、利润同比上升，深圳恒宝通实现扭亏为盈。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F034",
+              "text": "公司纸行业及其产品因主导产品销量下降及售价下跌，报告期营业收入、营业成本及毛利率同比减少。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F035",
+              "text": "公司浆行业及其产品因主导产品销量下降，营业收入、营业成本同比减少，但单位成本降幅大于售价降幅，毛利率同比增加。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F036",
+              "text": "公司光电行业及其产品因加工贸易产品订单销量增加，报告期营业收入、营业成本及毛利率均同比增加。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F037",
+              "text": "公司医药行业及其产品因产品销量下降，报告期营业收入、营业成本及毛利率同比减少。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F038",
+              "text": "公司营林业及其产品因林木产品销量上升，营业收入、营业成本同比增加，但受采伐疫材人工成本影响，毛利率同比减少。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F039",
+              "text": "公司环保行业及其服务因污水处理量同比增加，营业收入、营业成本同比增加，但受原辅材料采购价影响，毛利率同比减少。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F040",
+              "text": "公司国外业务因光电子产品销量上升，国外业务营业收入、营业成本及毛利率均同比增加。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            }
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F041",
+              "text": "公司全年实现营业收入24.19亿元，比上年同期减少1.81亿元，下降6.98%；实现利润总额0.90亿元，比上年同期减少0.31亿元，下降25.27%；归属于上市公司股东的净利润0.55亿元，比上年同期减少0.30亿元，下降35.48%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "24.19",
+                  "value": "24.19",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "亿元"
+                },
+                {
+                  "name": "利润总额",
+                  "raw_value": "0.90",
+                  "value": "0.90",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "亿元"
+                },
+                {
+                  "name": "归属于上市公司股东的净利润",
+                  "raw_value": "0.55",
+                  "value": "0.55",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "亿元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F042",
+              "text": "本期公司业务类型、利润构成或利润来源发生重大变动的详细说明为不适用；公司报告期内业务、产品或服务发生重大变化或调整有关情况为不适用；报告期主要子公司股权变动导致合并范围变化为不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0010"
+              ]
+            },
+            {
+              "fact_id": "F043",
+              "text": "经营活动产生的现金流量净额136,419,367.57元，比上年同期减少67.26%，主要是销售商品及收到保证金同比减少；投资活动产生的现金流量净额-130,796,721.35元；筹资活动产生的现金流量净额-271,612,879.66元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "经营活动产生的现金流量净额",
+                  "raw_value": "136,419,367.57",
+                  "value": "136419367.57",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F044",
+              "text": "漳州水仙药业股份有限公司营业收入30,377.59万元，营业利润5,649.10万元，营业利润同比上升17.31%，主要是计提信用减值损失及资产减值损失同比减少。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014",
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "漳州水仙药业营业收入",
+                  "raw_value": "30,377.59",
+                  "value": "30377.59",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "漳州水仙药业营业利润",
+                  "raw_value": "5,649.10",
+                  "value": "5649.10",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F045",
+              "text": "深圳市恒宝通光电子股份有限公司营业收入20,695.02万元，营业利润527.50万元，营业利润同比上升143.85%，主要是OEM/ODM业务的光模块产品销售同比增加。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014",
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "深圳恒宝通营业收入",
+                  "raw_value": "20,695.02",
+                  "value": "20695.02",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "深圳恒宝通营业利润",
+                  "raw_value": "527.50",
+                  "value": "527.50",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F046",
+              "text": "深圳市龙岗闽环实业有限公司营业收入29,403.23万元，营业利润-1,298.02万元，营业利润同比下降16.25%，主要是产品销量同比减少以及计提信用减值损失和资产减值损失同比增加。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014",
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "深圳龙岗闽环营业收入",
+                  "raw_value": "29,403.23",
+                  "value": "29403.23",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "深圳龙岗闽环营业利润",
+                  "raw_value": "-1,298.02",
+                  "value": "-1298.02",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F047",
+              "text": "公司属于制浆造纸行业，集制浆、造纸、热电联产、碱回收、纸箱及纸袋制造、医药、光电子、林业开发于一体；浆纸主业秉承自主生产模式，具备制浆造纸生产线及配套的碱回收、热电、污水处理系统。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0003"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F048",
+              "text": "公司大宗原材料、燃料、设备等主要采用公开招标、竞争性谈判等方式采购，国内木竹片采购定价主要采取挂牌采购；成本构成中列示原辅材料、燃料动力、直接人工、制造费用等项目。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0008"
+              ]
+            }
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F049",
+              "text": "公司产品行销全国各地和国际市场；纸袋纸、复合原纸、纸袋广泛用于水泥、化工、建材、食品、工业、饲料等包装用纸，溶解浆用于纺织用粘胶纤维，光电子器件为数据中心、数据通信等光纤传输、接入系统提供高速光模块产品。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            }
+          ]
+        }
+      },
+      "limitations": [
+        "未阅读行业情况、核心竞争力、未来发展讨论及财务报告附注（含分部信息）等章节，相关细节未纳入。",
+        "分行业、分产品表中存在内部抵销行，合计为抵销后金额，不应视为各分部简单加总。",
+        "贸易业务收入表单位为万元，与利润表单位元不同，已按原表单位保留。",
+        "主要子公司表部分子公司营业收入为空，未推断其数值。",
+        "未披露具体客户及供应商名称（仅列示同一控制口径合并说明），未推断具体交易对手。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 14631,
+      "output_tokens": 6848,
+      "total_tokens": 21479
+    }
+  },
+  {
+    "request_id": "bp-work-b667cf7677310f6c091af63a:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "3adb215c12facb5a79e56b363888b8df6a1ffb2faba0e73a9916b9a98a2cabfd",
+    "response_hash": "9eb6a78fa6d3502c322ff9a96e1759abe789147e0962e789ccf793d396c36302",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"F001\",\"F002\",\"F003\",\"F004\",\"F005\",\"F006\",\"F007\",\"F008\",\"F009\",\"F010\",\"F011\",\"F012\",\"F013\",\"F014\",\"F015\",\"F016\",\"F017\",\"F018\",\"F019\",\"F020\",\"F021\",\"F022\",\"F023\",\"F024\",\"F025\",\"F026\",\"F027\",\"F028\",\"F029\",\"F030\",\"F031\",\"F032\",\"F033\",\"F034\",\"F035\",\"F036\",\"F037\",\"F038\",\"F039\",\"F040\",\"F041\",\"F042\",\"F043\",\"F044\",\"F045\",\"F046\",\"F047\",\"F048\",\"F049\"],\"findings\":[{\"finding_id\":\"Q001\",\"element\":\"business_structure\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"F003\",\"evidence_ids\":[\"source-0002\"],\"explanation\":\"产品用途表将制浆行业与造纸行业的母子公司栏均列为母公司，纸制品加工、医药、电子通讯及林业为子公司。F003只把“（母公司）”标在造纸行业后，未标明制浆行业同样属于母公司，主体归属不完整。\"},{\"finding_id\":\"Q002\",\"element\":\"limitations\",\"severity\":\"minor\",\"issue_type\":\"contradicts_source\",\"action\":\"correct\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0010\"],\"explanation\":\"局限性称未披露具体客户名称，但原文已列示同受安徽海螺水泥股份有限公司控制的英德海螺塑料包装有限责任公司、江华海螺塑料包装有限责任公司、昌江海螺华盛塑料包装有限公司。供应商名称及上述客户销售额在所供章节中未见，不能据此补造金额。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "F001",
+        "F002",
+        "F003",
+        "F004",
+        "F005",
+        "F006",
+        "F007",
+        "F008",
+        "F009",
+        "F010",
+        "F011",
+        "F012",
+        "F013",
+        "F014",
+        "F015",
+        "F016",
+        "F017",
+        "F018",
+        "F019",
+        "F020",
+        "F021",
+        "F022",
+        "F023",
+        "F024",
+        "F025",
+        "F026",
+        "F027",
+        "F028",
+        "F029",
+        "F030",
+        "F031",
+        "F032",
+        "F033",
+        "F034",
+        "F035",
+        "F036",
+        "F037",
+        "F038",
+        "F039",
+        "F040",
+        "F041",
+        "F042",
+        "F043",
+        "F044",
+        "F045",
+        "F046",
+        "F047",
+        "F048",
+        "F049"
+      ],
+      "findings": [
+        {
+          "finding_id": "Q001",
+          "element": "business_structure",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "F003",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "产品用途表将制浆行业与造纸行业的母子公司栏均列为母公司，纸制品加工、医药、电子通讯及林业为子公司。F003只把“（母公司）”标在造纸行业后，未标明制浆行业同样属于母公司，主体归属不完整。"
+        },
+        {
+          "finding_id": "Q002",
+          "element": "limitations",
+          "severity": "minor",
+          "issue_type": "contradicts_source",
+          "action": "correct",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0010"
+          ],
+          "explanation": "局限性称未披露具体客户名称，但原文已列示同受安徽海螺水泥股份有限公司控制的英德海螺塑料包装有限责任公司、江华海螺塑料包装有限责任公司、昌江海螺华盛塑料包装有限公司。供应商名称及上述客户销售额在所供章节中未见，不能据此补造金额。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 24334,
+      "output_tokens": 418,
+      "total_tokens": 58377
+    }
+  },
+  {
+    "request_id": "bp-work-b667cf7677310f6c091af63a:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "4e92213acb1d170aec7fd88d2aa7504abdf8076f8d07171eb554d02e049700f2",
+    "response_hash": "a53d8450900f283c04069f12a0551763dfa8288dfaea7ffe86df709f911daf6a",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F003\",\"text\":\"公司及子公司按行业类型划分为制浆行业（母公司）、造纸行业（母公司）、纸制品加工（子公司）、医药行业（子公司）、电子通讯行业（子公司）、林业（子公司）。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F003",
+          "text": "公司及子公司按行业类型划分为制浆行业（母公司）、造纸行业（母公司）、纸制品加工（子公司）、医药行业（子公司）、电子通讯行业（子公司）、林业（子公司）。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 12480,
+      "output_tokens": 93,
+      "total_tokens": 12573
+    }
+  },
+  {
+    "request_id": "bp-work-b667cf7677310f6c091af63a:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "cc01acd796d1717e299496bfac45646c796d26e5d28b727d8aaa825341dbb2bb",
+    "response_hash": "f9b38631825017162ed7b96769a3a5a48a02bca55ad1fde4da6cba9239759ba8",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F003\"],\"checks\":[{\"fact_id\":\"F003\",\"accepted\":true,\"evidence_ids\":[\"source-0002\"],\"explanation\":\"原文产品用途表按“母子公司”栏明确列示：制浆行业、造纸行业均为母公司，纸制品加工、医药行业、电子通讯行业、林业均为子公司。候选事实已同时标明制浆与造纸同属母公司，并正确区分其余子公司行业，主体归属完整，且未引入原文没有的金额、期间或确定性判断，实质性纠正了原先只在造纸行业后标注母公司的问题。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F003"
+      ],
+      "checks": [
+        {
+          "fact_id": "F003",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0002"
+          ],
+          "explanation": "原文产品用途表按“母子公司”栏明确列示：制浆行业、造纸行业均为母公司，纸制品加工、医药行业、电子通讯行业、林业均为子公司。候选事实已同时标明制浆与造纸同属母公司，并正确区分其余子公司行业，主体归属完整，且未引入原文没有的金额、期间或确定性判断，实质性纠正了原先只在造纸行业后标注母公司的问题。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 15513,
+      "output_tokens": 134,
+      "total_tokens": 17360
+    }
+  }
+]

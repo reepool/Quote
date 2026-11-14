@@ -1,0 +1,262 @@
+{
+  "task": "6.CG",
+  "outcome": "stopped_after_first_batch_independent_quality_blocker",
+  "entries_started": 4,
+  "not_started": [
+    "600098.SH",
+    "600104.SH",
+    "600088.SH",
+    "600099.SH",
+    "600082.SH",
+    "600097.SH",
+    "600054.SH",
+    "600000.SH"
+  ],
+  "readable": 4,
+  "model_review_flow_completed": 4,
+  "facts_including_optional_supply_chain": 171,
+  "metrics_including_optional_supply_chain": 192,
+  "physical_requests": 20,
+  "actual_supplier_total_usage": 518672,
+  "recoveries": 0,
+  "fee": "unknown",
+  "business_wall_seconds": 701.508,
+  "records": [
+    {
+      "instrument_id": "600094.SH",
+      "name": "大名城",
+      "facts": 41,
+      "metrics": 43,
+      "model_review_status": "completed_with_open_findings",
+      "query_sha256": "2f0d7da58eb4dcf0475efb4986198f0b785bae61228b4f7f7cfe7b771026fa04",
+      "physical_requests": 5,
+      "actual_total_usage": 116467,
+      "recoveries": 0,
+      "preparation_seconds": 57.081,
+      "business_seconds": 644.142,
+      "model_review_dispositions": [
+        {
+          "finding_id": "WR-001",
+          "affected_fact_id": "F-CC-03",
+          "resolution": "corrected_pending_trust",
+          "issue_type": "unsupported_claim",
+          "severity": "material",
+          "element": "customers_channels_markets"
+        },
+        {
+          "finding_id": "WR-002",
+          "affected_fact_id": "F-MC-03",
+          "resolution": "corrected_pending_trust",
+          "issue_type": "wrong_period",
+          "severity": "material",
+          "element": "material_changes"
+        },
+        {
+          "finding_id": "WR-003",
+          "affected_fact_id": "F-OD-04",
+          "resolution": "quarantined",
+          "issue_type": "contradicts_source",
+          "severity": "material",
+          "element": "operating_drivers"
+        },
+        {
+          "finding_id": "WR-004",
+          "affected_fact_id": "F-SM-01",
+          "resolution": "quarantined",
+          "issue_type": "other",
+          "severity": "material",
+          "element": "scale_and_mix"
+        },
+        {
+          "finding_id": "WR-005",
+          "affected_fact_id": null,
+          "resolution": "repair_rejected",
+          "issue_type": "material_omission",
+          "severity": "material",
+          "element": "operating_drivers"
+        }
+      ],
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "600103.SH",
+      "name": "青山纸业",
+      "facts": 49,
+      "metrics": 40,
+      "model_review_status": "completed_with_open_findings",
+      "query_sha256": "bd30d8c6a7b22e1f4df59fe23e5757b30d3f465476681a77e0925fb4c616127d",
+      "physical_requests": 5,
+      "actual_total_usage": 133253,
+      "recoveries": 0,
+      "preparation_seconds": 58.815,
+      "business_seconds": 613.639,
+      "model_review_dispositions": [
+        {
+          "finding_id": "Q001",
+          "affected_fact_id": "F003",
+          "resolution": "corrected_pending_trust",
+          "issue_type": "wrong_subject",
+          "severity": "minor",
+          "element": "business_structure"
+        },
+        {
+          "finding_id": "Q002",
+          "affected_fact_id": null,
+          "resolution": "unresolved",
+          "issue_type": "contradicts_source",
+          "severity": "minor",
+          "element": "limitations"
+        }
+      ],
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "600100.SH",
+      "name": "同方股份",
+      "facts": 41,
+      "metrics": 58,
+      "model_review_status": "completed",
+      "query_sha256": "3951778370a50f5dbc661315fd745d1c2d8cefcc3bdbbd90cbaf38e6f5e8690e",
+      "physical_requests": 5,
+      "actual_total_usage": 143415,
+      "recoveries": 0,
+      "preparation_seconds": 58.523,
+      "business_seconds": 699.695,
+      "model_review_dispositions": [
+        {
+          "finding_id": "R001",
+          "affected_fact_id": "F004",
+          "resolution": "corrected_pending_trust",
+          "issue_type": "wrong_subject",
+          "severity": "material",
+          "element": "business_structure"
+        },
+        {
+          "finding_id": "R002",
+          "affected_fact_id": "F003",
+          "resolution": "corrected_pending_trust",
+          "issue_type": "wrong_subject",
+          "severity": "minor",
+          "element": "business_structure"
+        },
+        {
+          "finding_id": "R003",
+          "affected_fact_id": "F034",
+          "resolution": "corrected_pending_trust",
+          "issue_type": "unsupported_claim",
+          "severity": "material",
+          "element": "material_changes"
+        },
+        {
+          "finding_id": "R004",
+          "affected_fact_id": null,
+          "resolution": "corrected_pending_trust",
+          "issue_type": "material_omission",
+          "severity": "material",
+          "element": "scale_and_mix"
+        },
+        {
+          "finding_id": "R005",
+          "affected_fact_id": null,
+          "resolution": "corrected_pending_trust",
+          "issue_type": "material_omission",
+          "severity": "material",
+          "element": "business_structure"
+        },
+        {
+          "finding_id": "R006",
+          "affected_fact_id": null,
+          "resolution": "corrected_pending_trust",
+          "issue_type": "material_omission",
+          "severity": "material",
+          "element": "operating_drivers"
+        }
+      ],
+      "fee": "unknown"
+    },
+    {
+      "instrument_id": "600107.SH",
+      "name": "美尔雅",
+      "facts": 40,
+      "metrics": 51,
+      "model_review_status": "completed",
+      "query_sha256": "41b5840ffd5fb227d78a39faf6f3b9294414d117fe27b23fcf23abf3c7edf6cd",
+      "physical_requests": 5,
+      "actual_total_usage": 125537,
+      "recoveries": 0,
+      "preparation_seconds": 59.211,
+      "business_seconds": 676.911,
+      "model_review_dispositions": [
+        {
+          "finding_id": "REV-001",
+          "affected_fact_id": "F-MC-01",
+          "resolution": "corrected_pending_trust",
+          "issue_type": "wrong_period",
+          "severity": "material",
+          "element": "material_changes"
+        },
+        {
+          "finding_id": "REV-002",
+          "affected_fact_id": null,
+          "resolution": "corrected_pending_trust",
+          "issue_type": "material_omission",
+          "severity": "material",
+          "element": "operating_drivers"
+        }
+      ],
+      "fee": "unknown"
+    }
+  ],
+  "source_core_comparison": {
+    "started_core_conditions": 44,
+    "source_supported": 41,
+    "partial_or_scope_limited": 2,
+    "unsafe_assertions": 1,
+    "unstarted_core_conditions": 89,
+    "not_a_formal_accuracy_or_recall": true
+  },
+  "formal_accuracy": null,
+  "formal_recall": null,
+  "supplemental_audit": "not_completed_no_claim",
+  "six_risk_group_complete": false,
+  "s1_changed": false,
+  "production_authorization": "not_authorized",
+  "source_code_config_and_twelve_prior_queries_unchanged": true,
+  "prior_CF_failure_unchanged": true,
+  "cleanup": [
+    {
+      "kind": "completed_company_runtime",
+      "bytes": 1865750,
+      "already_removed_by_original_operator_finally": true,
+      "instrument_id": "600094.SH"
+    },
+    {
+      "kind": "completed_company_runtime",
+      "bytes": 1879563,
+      "already_removed_by_original_operator_finally": true,
+      "instrument_id": "600103.SH"
+    },
+    {
+      "kind": "completed_company_runtime",
+      "bytes": 1931920,
+      "already_removed_by_original_operator_finally": true,
+      "instrument_id": "600100.SH"
+    },
+    {
+      "kind": "completed_company_runtime",
+      "bytes": 1875151,
+      "already_removed_by_original_operator_finally": true,
+      "instrument_id": "600107.SH"
+    },
+    {
+      "kind": "prepared_pages_and_process_logs",
+      "path": "data/QuoteBak/workpaper-cg-prepared-pr9a71js",
+      "bytes": 12507443
+    }
+  ],
+  "runtime_preparation_bytes_released": 20059827,
+  "script_bytes_pending_cleanup": 0,
+  "script_bytes_released": 35293,
+  "total_bytes_released": 20095120,
+  "script_cleanup": "operator26986+verifier8307 removed after necessary snapshots persisted; no active task runtime remains"
+}

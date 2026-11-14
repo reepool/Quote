@@ -1,0 +1,7 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600100.SH,2025-12-31,2026-04-28T16:00:00+00:00,False,False,False,False,0,0,model_reviewed_pending_verification,llm_generated,"公司定位为“数智技术与核技术创新融合的高科技企业”，聚焦公共安全、数智产业、智慧能源等产业领域，并设有科技成果转化平台、资产管理平台、海外投资协同平台。
+公共安全产业由同方威视技术股份有限公司承载，公司持股71.25%，主要生产和销售货物/车辆成像检查系统、放射性物质监测系统、行李及包裹成像检查系统、人体安全检查系统等系列产品。
+同方知网数字科技有限公司（同方数科）成立于1999年7月8日，公司持股100%，2025年3月更名为同方知网数字科技有限公司，全面支撑同方股份落实中核集团赋予的“数智产业发展平台和信息技术支撑总体单位”的使命定位。
+同方智慧能源有限责任公司成立于2021年12月22日，注册资本43,184.21万元，公司持股100%，定位为智慧能源的创新研发、规划设计、装备制造、投资运营平台。
+公司还控股或参股同方泰德（合计持股36.61%，第一大股东）、同方友友（合计持股64.81%）、同方国信（全资子公司持股26.32%）等企业。
+同方国信投资控股有限公司主要从事基础设施投资和股权投资及经营，其中基础设施投资板块主要通过重庆渝涪高速公路有限公司等经营，股权投资及经营板块主要通过重庆国际信托股份有限公司、益民基金管理有限公司等经营。",41,58,completed,0,deepseek-flash,grok-4.7

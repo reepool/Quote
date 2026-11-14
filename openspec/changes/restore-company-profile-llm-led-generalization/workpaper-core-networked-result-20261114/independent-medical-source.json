@@ -1,0 +1,13 @@
+{
+  "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+  "physical_page": 15,
+  "section": "主营业务分行业情况",
+  "page_text_sha256": "330999d87fcc2e2523e3fc04ae53fe29ed7f1d34003dee89d34cb5cce08b31d5",
+  "excerpt_start": 1518,
+  "excerpt_end": 2690,
+  "quote": "主营业务分行业情况\n 分行                                            毛利率         营业收入比            营业成本比           毛利率比上\n  业         营业收入              营业成本             （%）          上年增减             上年增减              年增减\n                                                              （%）              （%）             （%）\n 服装                                                                                            增加    0.12\n         229,197,408.86     148,381,101.41        35.26           -19.89           -20.04      个百分点\n 医疗                                                                                           减少    31.99\n                                                                 -100.00          -100.00      个百分点\n 其他                                                                                           增加    52.07\n 业务         6,997,591.25      5,308,475.14        24.14           -48.60           -69.52      个百分点\n 小计                                                                                            增加    2.68\n         236,195,000.11     153,689,576.55        34.93           -28.32           -31.16      个百分点\n                                          ",
+  "human_reading": "医疗收入/成本金额栏空，-100.00在同比列；不能标成直接披露的收入零。",
+  "retained_fact_id": "F-RM-02",
+  "zero_is_in_structured_metrics": false,
+  "original_query_not_modified": true
+}

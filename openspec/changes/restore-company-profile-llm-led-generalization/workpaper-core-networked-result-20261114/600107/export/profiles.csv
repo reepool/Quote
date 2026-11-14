@@ -1,0 +1,6 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600107.SH,2025-12-31,2026-04-29T16:00:00+00:00,False,False,False,False,0,0,model_reviewed_pending_verification,llm_generated,"公司主营业务为服装服饰类产品的研发、设计、生产和销售，业务模式未发生重大变化；按面向市场和经营模式不同，经营模式可分为国外市场的外贸生产加工和国内市场品牌生产加工销售等。
+公司在国内开展服装全链条业务，涵盖生产加工与终端销售，主营自主品牌男装、女装及各类配套服饰。
+外贸加工业务主要采用来料加工、进料加工和一般贸易三种运营模式，并形成以来料加工、进料加工为主的外贸业务格局。
+公司经营业务划分为2个经营分部、2个报告分部，分别为服装及纺织品报告分部和其他报告分部；其他报告分部组织生产销售蒸汽、转售水、电并提供运输服务。
+报告期内公司新增重要非主营业务的说明为不适用。",40,51,completed,0,deepseek-flash,grok-4.7

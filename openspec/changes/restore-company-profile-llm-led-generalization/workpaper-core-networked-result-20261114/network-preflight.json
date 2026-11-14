@@ -1,0 +1,20 @@
+{
+  "task": "6.CG",
+  "namespace": "net:[4026531840]",
+  "permission_mode": "approved_network_exec",
+  "checks": [
+    {
+      "host": "api.deepseek.com",
+      "dns_addresses": 2,
+      "tls": "TLSv1.3",
+      "seconds": 0.031
+    },
+    {
+      "host": "scorpio.reepool.com",
+      "dns_addresses": 1,
+      "tls": "TLSv1.3",
+      "seconds": 0.587
+    }
+  ],
+  "model_requests": 0
+}

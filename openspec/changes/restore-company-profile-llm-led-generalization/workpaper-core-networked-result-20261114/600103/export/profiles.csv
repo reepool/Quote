@@ -1,0 +1,6 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600103.SH,2025-12-31,2026-04-13T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,llm_generated,"公司属于制浆造纸行业，已发展为集制浆、造纸、热电联产、碱回收、纸箱及纸袋制造、医药、光电子、林业开发于一体的国有控股上市公司，系全国包装纸袋纸、纺织新材料溶解浆的重点生产企业。
+公司主要从事竹木浆、溶解浆、纸袋纸、纸制品、光电子产品、医药产品、林木产品等产品产销及贸易经营。
+公司及子公司按行业类型划分为制浆行业（母公司）、造纸行业（母公司）、纸制品加工（子公司）、医药行业（子公司）、电子通讯行业（子公司）、林业（子公司）。
+报告期内公司所从事的主要业务未发生重大变化。
+报告期内公司新增重要非主营业务的说明为不适用。",49,40,completed_with_open_findings,1,deepseek-flash,grok-4.7
