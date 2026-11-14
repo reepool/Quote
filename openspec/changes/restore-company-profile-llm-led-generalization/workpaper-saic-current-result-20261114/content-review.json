@@ -1,0 +1,220 @@
+{
+  "task": "6.CB",
+  "origin": "human_limited_source_review",
+  "formal_accuracy_or_recall": false,
+  "all_33_facts_audited": false,
+  "model_review_is_not_independent_truth": true,
+  "scope": "人工读源核主要业务、产品/经营方式、公司总额/主要收入构成和本轮修订首断点；不声称33事实/66数字全准确或全报告完整。",
+  "checks": [
+    {
+      "reference_id": "600104-C1",
+      "dimension": "主营与边界",
+      "status": "main_question_answered_not_all_subclauses_scored",
+      "current_fact_ids": [
+        "bs-01",
+        "bs-02",
+        "bs-03"
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0004",
+        "source-0013",
+        "source-0014",
+        "source-0015",
+        "source-0017"
+      ],
+      "judgment": "整车为核心，零部件/移动出行和服务/金融均在稿；量产技术与研发仍按原文限定。"
+    },
+    {
+      "reference_id": "600104-C2",
+      "dimension": "产品服务",
+      "status": "main_question_answered_not_all_subclauses_scored",
+      "current_fact_ids": [
+        "ps-01",
+        "ps-03",
+        "ps-05",
+        "bs-03",
+        "oi-06"
+      ],
+      "evidence_ids": [
+        "source-0004",
+        "source-0013",
+        "source-0014",
+        "source-0015",
+        "source-0017",
+        "source-0001"
+      ],
+      "judgment": "自主品牌及车型、乘用/商用新能源、汽车金融可见；部分零部件/物流/合资产品句因初核隔离，不以同组事实被隔离抹掉其余业务。"
+    },
+    {
+      "reference_id": "600104-C3",
+      "dimension": "变现",
+      "status": "main_question_answered_not_all_subclauses_scored",
+      "current_fact_ids": [
+        "rm-01",
+        "rm-02",
+        "cc-02",
+        "cc-04"
+      ],
+      "evidence_ids": [
+        "source-0007",
+        "source-0004"
+      ],
+      "judgment": "销售/零部件/劳务及其他/金融收入、4S/快闪与海外生产保留；不采用贷款直接推出利息及服务收入。"
+    },
+    {
+      "reference_id": "600104-C4",
+      "dimension": "公司收入",
+      "status": "main_question_answered_not_all_subclauses_scored",
+      "current_fact_ids": [
+        "rm-03"
+      ],
+      "evidence_ids": [
+        "source-0004",
+        "source-0006"
+      ],
+      "judgment": "合并营业总收入6562.4亿元来自9页舍入叙述，与10页营业收入646152101889.30元分科目；不强求把原文舍入值改成6562.44。"
+    },
+    {
+      "reference_id": "600104-C5",
+      "dimension": "主要构成",
+      "status": "main_question_answered_not_all_subclauses_scored",
+      "current_fact_ids": [
+        "rm-01",
+        "rm-02",
+        "sm-01"
+      ],
+      "evidence_ids": [
+        "source-0007",
+        "source-0001"
+      ],
+      "judgment": "整车410196473001.11、零部件203019866775.26、劳务及其他32935762112.94、金融10091710191.88元；行业与产品两套表不相加；450.7万辆只作销量。"
+    }
+  ],
+  "repair_blocker": {
+    "code": "metric_number_absent",
+    "fact_id": "review-add:F09",
+    "evidence_id": "source-0017",
+    "physical_page": 26,
+    "expected_cell": "720,726.81",
+    "source_excerpt": "18,399,890.05943,418.20720,726.81",
+    "explanation": "布局文本中相邻货币列黏连，严格数字边界检查不能把720726.81定位为独立单元格；这不证明模型改错数字，也不授权用子串命中借列。整份repair在本地绑定处停止，7候选均未到final。",
+    "unadopted_candidate_ids": [
+      "ps-02",
+      "ps-04",
+      "review-add:F05",
+      "review-add:F06",
+      "od-05",
+      "review-add:F09",
+      "mc-05"
+    ],
+    "primary_business_amounts_are_not_blocked": true
+  },
+  "model_findings": [
+    {
+      "finding_id": "F01",
+      "severity": "minor",
+      "issue_type": "wrong_subject",
+      "affected_fact_id": "ps-02",
+      "resolution": "quarantined"
+    },
+    {
+      "finding_id": "F02",
+      "severity": "minor",
+      "issue_type": "unsupported_claim",
+      "affected_fact_id": "ps-04",
+      "resolution": "quarantined"
+    },
+    {
+      "finding_id": "F03",
+      "severity": "minor",
+      "issue_type": "unsupported_claim",
+      "affected_fact_id": "ps-06",
+      "resolution": "quarantined"
+    },
+    {
+      "finding_id": "F04",
+      "severity": "minor",
+      "issue_type": "unsupported_claim",
+      "affected_fact_id": "rm-04",
+      "resolution": "quarantined"
+    },
+    {
+      "finding_id": "F05",
+      "severity": "material",
+      "issue_type": "material_omission",
+      "affected_fact_id": null,
+      "resolution": "omission_candidate"
+    },
+    {
+      "finding_id": "F06",
+      "severity": "material",
+      "issue_type": "material_omission",
+      "affected_fact_id": null,
+      "resolution": "omission_candidate"
+    },
+    {
+      "finding_id": "F07",
+      "severity": "minor",
+      "issue_type": "unsupported_causality",
+      "affected_fact_id": "od-01",
+      "resolution": "quarantined"
+    },
+    {
+      "finding_id": "F08",
+      "severity": "minor",
+      "issue_type": "other",
+      "affected_fact_id": "od-05",
+      "resolution": "quarantined"
+    },
+    {
+      "finding_id": "F09",
+      "severity": "material",
+      "issue_type": "material_omission",
+      "affected_fact_id": null,
+      "resolution": "omission_candidate"
+    },
+    {
+      "finding_id": "F10",
+      "severity": "material",
+      "issue_type": "unsupported_claim",
+      "affected_fact_id": "mc-05",
+      "resolution": "quarantined"
+    }
+  ],
+  "supply_chain": {
+    "dedicated_container": null,
+    "available_in_body": [
+      "制造环节/零部件/汽车金融协同",
+      "原材料、人工工资、折旧、能源等成本类别",
+      "4S/快闪与海外市场渠道",
+      "安吉物流21艘自营滚装船及报告期8艘新船"
+    ],
+    "missing": "没有形成具体钢铝/电池等原料清单及定量上下游关系；不推断、不为此补跑",
+    "optional_not_blocking": true
+  },
+  "selected_source_pages": [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    26,
+    27,
+    28,
+    29
+  ],
+  "deferred": [
+    "个别标题父级被数值行误识别，不影响本次正文范围，后置",
+    "子公司利润和若干毛利/补贴遗漏留限用，不为其重开本次入口",
+    "完整三视图可信状态/正式S1与生产不由本轮粗核心对照放行"
+  ]
+}

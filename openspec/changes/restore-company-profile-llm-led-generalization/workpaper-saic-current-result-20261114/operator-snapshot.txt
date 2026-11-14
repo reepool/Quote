@@ -1,0 +1,272 @@
+"""Approved 6.CB one-report operator; original TaskService, fresh semantic input."""
+from __future__ import annotations
+import argparse
+import asyncio
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import runpy
+import shutil
+import signal
+import subprocess
+import sys
+import tempfile
+import time
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import replace
+from decimal import Decimal
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0, str(ROOT))
+CHANGE = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+MANIFEST = CHANGE / 'workpaper-quality-and-regression-readiness-20261113/source-readiness.json'
+DEST = CHANGE / 'workpaper-saic-current-result-20261114'
+CAPTURE_HELPER = CHANGE / 'workpaper-content-acceptance-20261114/response_capture.py'
+ContentCapture = runpy.run_path(str(CAPTURE_HELPER))['ContentCapture']
+EXTRACT = 'semantic_extraction__deepseek'
+REVIEW = 'semantic_extraction__scorpio_grok'
+
+def config_for_run():
+    from utils.llm.models import LlmConfig
+    from utils.llm.config import load_project_environment
+    load_project_environment(ROOT)
+    original=LlmConfig.from_mapping(json.loads((ROOT/'config/13_llm.json').read_text())['llm'])
+    profiles={}
+    for name in (EXTRACT,REVIEW):
+        profile=original.profiles[name]
+        assert original.enabled and profile.enabled and os.environ.get(profile.api_key_env)
+        assert name not in original.routes
+        profiles[name]=replace(profile,timeout_seconds=620,attempt_timeout_seconds=600,max_retries=1,max_schema_repair_attempts=1)
+    assert original.resource_for_profile(profiles[EXTRACT]).name=='deepseek'
+    assert profiles[EXTRACT].model=='deepseek-flash'
+    profiles[EXTRACT]=replace(profiles[EXTRACT],max_output_tokens_field='max_tokens',disable_thinking=True)
+    from urllib.parse import urlsplit
+    assert urlsplit(profiles[REVIEW].base_url).hostname=='scorpio.reepool.com'
+    assert profiles[REVIEW].model=='grok-4.7' and profiles[REVIEW].reasoning_effort=='high'
+    return replace(original,profiles=profiles,routes={},pools={})
+
+def code_hashes():
+    paths=sorted((ROOT/'research/company_profile').glob('*.py'))+sorted((ROOT/'utils/llm').glob('*.py'))
+    paths += [ROOT/'research/storage.py',ROOT/'research/business_profile_pdf_artifacts.py',ROOT/'research/business_profile_production_operations.py']
+    return {str(p.relative_to(ROOT)):sha(p) for p in paths}
+
+def dump(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2, default=str) + '\n')
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+def source_items():
+    items = [i for i in json.loads(MANIFEST.read_text())['companies'] if i['instrument_id'] in {'600104.SH'}]
+    assert [i['instrument_id'] for i in items] == ['600104.SH']
+    return items
+
+def prepare_one(item, directory):
+    from research.business_profile_pdf_artifacts import ensure_archived_pdf_page_artifact
+    from research.company_profile.workpaper_sections import index_sections
+    started=time.monotonic(); asset=item['asset']; symbol=item['instrument_id'][:6]
+    assert sha(Path(asset['archive_path'])) == asset['content_hash']
+    parsed=ensure_archived_pdf_page_artifact(asset)
+    artifact=parsed['artifact']
+    pages=[{'page':p.page_number,'text':p.text} for p in artifact.pages]
+    assert len(pages)==item['pdf_pages']
+    index=index_sections(pages)
+    prepared={'asset':asset,'name':item['name'],'pages':pages,
+              'index':[s.model_dump(mode='json') for s in index],
+              'preparation_seconds':round(time.monotonic()-started,3),
+              'source_preparation':{k:parsed.get(k) for k in ('artifact_path','artifact_hash','status','cache_status','timings')}}
+    dump(directory/(symbol+'.json'),prepared)
+    print(json.dumps({'prepared':symbol,'pages':len(pages),'source_seconds':prepared['preparation_seconds'],'cache_status':parsed.get('cache_status')},ensure_ascii=False),flush=True)
+    return symbol
+
+def prepare():
+    assert os.environ.get('TMPDIR')==str(ROOT/'data/QuoteBak')
+    directory=Path(tempfile.mkdtemp(prefix='workpaper-cb-prepared-'))
+    print('PREPARED_ROOT='+str(directory),flush=True)
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        list(pool.map(lambda item:prepare_one(item,directory),source_items()))
+    print('PREPARE_DONE='+str(directory),flush=True)
+
+def inspect(directory, symbol, pages=None, sections=None):
+    prepared=json.loads((directory/(symbol+'.json')).read_text())
+    if sections:
+        for entry in prepared['index']:
+            if re.search(sections,entry['section_path'][-1]):
+                print(json.dumps({k:entry[k] for k in ('section_id','section_path','start_page','end_page','characters')},ensure_ascii=False))
+        return
+    from research.company_profile.workpaper_sections import extract_selected_layout
+    page_numbers=[int(v) for v in pages.split(',')]
+    for page in extract_selected_layout(Path(prepared['asset']['archive_path']).read_bytes(), page_numbers):
+        print('\nPHYSICAL PAGE',symbol,page['page'])
+        print(page['text'])
+
+def freeze(directory):
+    config=config_for_run()
+    reference=CHANGE/'workpaper-fixed-pool-result-20261114/source-first-reference.json'
+    assert reference.is_file() and len(json.loads(reference.read_text())['companies'])==12
+    selected={name:{'model':p.model,'source_label':p.source_label,'resource':config.resource_for_profile(p).name,
+                    'reasoning_effort':p.reasoning_effort,'disable_thinking':p.disable_thinking,
+                    'max_output_tokens_field':p.max_output_tokens_field,'stream':p.stream,
+                    'max_retries':p.max_retries,'max_schema_repair_attempts':p.max_schema_repair_attempts}
+              for name,p in config.profiles.items()}
+    frozen={'task':'6.CB','status':'authorized','approval_reference':'用户2026-11-14明确回复：批准上汽这一次限定完整处理；仅6.CB上汽600104.SH',
+            'base_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
+            'source_first_reference':str(reference.relative_to(ROOT)),'source_first_reference_sha256':sha(reference),'prepared_root':str(directory),'operator_sha256':sha(Path(__file__)),
+            'code_sha256':code_hashes(),'shared_config_sha256':sha(ROOT/'config/13_llm.json'),'selected_profiles':selected,
+            'order':[i['instrument_id'] for i in source_items()],'each_limits':{'business_seconds':1800,'tokens':500000,'physical_requests':10,'recoveries':3,'per_logical':1,'known_cost_cny':10},
+            'group_limits':{'tokens':500000,'physical_requests':10,'recoveries':3,'business_wall_seconds':1800,'max_concurrency':1},'capture_helper_sha256':sha(CAPTURE_HELPER),
+            'production_authorization':'not_authorized','old_semantic_input':False,'cold_pdf_download':False}
+    assert not (DEST/'authorization.json').exists()
+    dump(DEST/'authorization.json',frozen)
+    print(json.dumps({'frozen':True,'companies':1,'profiles':selected,'new_model_requests':0},ensure_ascii=False),flush=True)
+
+def run_one(directory,symbol,group_deadline):
+    from research.announcements import AnnouncementAttachment, AnnouncementRecord
+    from research.business_profile_production_operations import BusinessProfileAnnouncementFrontierRepository
+    from research.company_profile.models import ReportIdentity
+    from research.company_profile.operations import CompanyProfileTaskService
+    from research.company_profile.reads import CompanyProfileReadService
+    from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
+    from research.company_profile.workpaper_llm import workpaper_processing_identity
+    from research.storage import ResearchStorageManager
+    from utils.config_manager import ResearchConfig,ResearchStorageConfig
+    from utils.llm.client import LlmClient
+    from utils.llm.transport import HttpxOpenAICompatibleTransport
+    from utils.llm.budget import LlmRunBudget, LogicalRecoveryPolicy, DEVELOPMENT_UNPRICED_BILLING
+    preparation=time.monotonic(); frozen=json.loads((DEST/'authorization.json').read_text())
+    assert code_hashes()==frozen['code_sha256'] and sha(ROOT/'config/13_llm.json')==frozen['shared_config_sha256']
+    assert sha(Path(__file__))==frozen['operator_sha256']
+    assert sha(CAPTURE_HELPER)==frozen['capture_helper_sha256']
+    config=config_for_run(); source=json.loads((directory/(symbol+'.json')).read_text()); asset=source['asset']
+    assert asset['instrument_id'] in frozen['order'] and sha(Path(asset['archive_path']))==asset['content_hash']
+    item=next(i for i in source_items() if i['instrument_id']==asset['instrument_id'])
+    announcement=json.loads((ROOT/item['source_binding']).read_text())['announcement']
+    report=ReportIdentity(instrument_id=asset['instrument_id'],report_id=asset['filing_id'],document_version=asset['content_hash'],report_period=asset['report_period'],published_at=asset['published_at'])
+    run_id='v12-saic-current-'+symbol+'-20261114'; destination=DEST/'run'
+    assert not destination.exists(); destination.mkdir(parents=True)
+    root=Path(tempfile.mkdtemp(prefix='workpaper-cb-'+symbol+'-')); client=None; budget=None; service=None; provider=None
+    summary={'instrument_id':asset['instrument_id'],'name':source['name'],'run_id':run_id,'three_reads_equal':False,'exception':None}
+    started=None
+    stop_requested = False
+    def stop_group(_signum, _frame):
+        nonlocal stop_requested
+        stop_requested = True
+        if budget is not None:
+            budget.cancel('group_stop_requested')
+    signal.signal(signal.SIGUSR1, stop_group)
+    try:
+        db=str(root/'research.db')
+        storage=ResearchStorageManager(ResearchConfig(storage=ResearchStorageConfig(db_path=db,financials_db_path=db,valuation_db_path=db,interests_db_path=db,quotes_db_path=str(root/'quotes.db'),attach_quotes_db=False)))
+        storage.initialize()
+        BusinessProfileAnnouncementFrontierRepository(storage).upsert_record(instrument={'instrument_id':asset['instrument_id'],'symbol':symbol,'exchange':'SSE'},
+            record=AnnouncementRecord(source='cninfo',source_announcement_id=asset['filing_id'],announcement_key='cninfo:'+asset['filing_id'],title=announcement['title'],published_at=asset['published_at'],exchange='SSE',symbols=(symbol,),attachments=(AnnouncementAttachment(source_url=announcement['source_url'],resolved_url=announcement['source_url'],file_extension='PDF'),)))
+        identity=workpaper_processing_identity(real=True,review=True,review_profile=REVIEW)
+        identity.update(review_max_output_tokens=16384,repair_profile=EXTRACT)
+        # Bind the concrete provider via the public constructor BEFORE occupying an entry.
+        # No run budget is attached yet, so workpaper authorization still rejects sends.
+        client=LlmClient(config,transport=ContentCapture(HttpxOpenAICompatibleTransport(),root/'captured-content'),owns_transport=True)
+        provider=CommonGatewaySemanticProvider(client=client,profile=EXTRACT,max_output_tokens=16384,timeout_seconds=620,execution_authorization={'status':'authorized','document_version':asset['content_hash'],'approval_reference':frozen['approval_reference']})
+        service=CompanyProfileTaskService(storage=storage,output_root=root/'output',checkpoint_root=root/'checkpoints',page_source=lambda _: {'report':report,'pages':source['pages'],'source_pdf_path':asset['archive_path']},provider=provider,processing_identity=identity,token_budget=500000)
+        assert service.provider is provider and service.runtime._report_provider is provider
+        assert callable(service.runtime._report_provider.workpaper_request)
+        assert client.physical_budget is None
+        summary['provider_constructor_binding_verified_before_entry']=True
+        binding={**frozen,'run_id':run_id,'asset':asset,'physical_pages':len(source['pages']),'identity':identity,'source_preparation':source['source_preparation'],'source_only_metadata_from':item['source_binding'],'provider_constructor_binding_verified_before_entry':True}
+        binding.pop('prepared_root',None); binding.pop('order',None)
+        dump(destination/'binding.json',binding)
+        if stop_requested:
+            raise RuntimeError('group stopped before entry')
+        marker=ROOT/'data/QuoteBak/s1-attempts'/('workpaper-cb-'+symbol+'-20261114.json')
+        marker.parent.mkdir(parents=True,exist_ok=True)
+        with marker.open('x') as handle: json.dump({'run_id':run_id,'approval_reference':frozen['approval_reference'],'binding_sha256':sha(destination/'binding.json')},handle,ensure_ascii=False)
+        assert time.monotonic()<group_deadline
+        started=time.monotonic(); summary['business_started_monotonic']=started; summary['preparation_seconds']=round(started-preparation+source['preparation_seconds'],3)
+        budget=LlmRunBudget(deadline=min(started+1800,group_deadline),prices={},max_tokens=500000,max_requests=10,max_cost_cny=Decimal(10),ledger_path=destination/'budget.json',billing_mode=DEVELOPMENT_UNPRICED_BILLING,recovery_policy=LogicalRecoveryPolicy(3,1),run_authorization='company_profile_workpaper_development.2026-11-11')
+        client.physical_budget=budget
+        service.execution_budget=budget; service.runtime.execution_budget=budget
+        assert service.runtime._report_provider is provider and provider.run_budget is budget
+        print('BUSINESS_STARTED '+symbol,flush=True)
+        try:
+            executed=asyncio.run(service.execute('run',knowledge_cutoff='2026-11-14',instrument_ids=(asset['instrument_id'],),max_items=1,max_elapsed_seconds=1800))
+            dump(destination/'execution.json',executed)
+            summary['state']=executed['state']
+        except Exception as exc:
+            summary['exception']=type(exc).__name__+': '+str(exc)[:3000]
+        summary['business_ended_monotonic']=time.monotonic()
+        summary['business_seconds']=round(summary['business_ended_monotonic']-started,3)
+        query=asyncio.run(service.execute('query',instrument_ids=(asset['instrument_id'],)))
+        exported=asyncio.run(service.execute('export',instrument_ids=(asset['instrument_id'],),output_directory=destination/'export'))
+        reloaded=CompanyProfileReadService(root/'output').query((asset['instrument_id'],))
+        summary['three_reads_equal']=query['profiles']==exported['profiles']==reloaded['profiles']
+        dump(destination/'query.json',query); dump(destination/'model-receipts.json',provider.workpaper_receipts)
+        dump(destination/'provider-traces.json',[t.model_dump(mode='json') for t in provider.traces])
+        summary['contract_errors']=[{'purpose':r['purpose'],'error':r.get('contract_error')} for r in provider.workpaper_receipts if r.get('contract_status')=='rejected']
+        summary['failed_calls']=[{'stage':t.call_type,'code':t.error_code,'detail':t.error_detail} for t in provider.traces if t.status=='failed']
+        paper=(query['profiles'][0].get('workpaper') if query.get('profiles') else None)
+        if paper:
+            facts=[f for e in paper['elements'].values() for f in e['facts']]
+            review=paper.get('quality_review') or {}
+            summary.update(readable=True,facts=len(facts),metrics=sum(len(f['metrics']) for f in facts),review_status=review.get('status'),review_error=review.get('error'),findings=len(review.get('findings',[])),origin=paper['origin'],core_complete=query['profiles'][0].get('core_complete'),element_counts={k:len(v['facts']) for k,v in paper['elements'].items()},query_sha256=sha(destination/'query.json'))
+            from research.company_profile.workpaper import CompanyProfileWorkpaper
+            from research.company_profile.workpaper_sections import extract_selected_layout
+            verified=CompanyProfileWorkpaper.model_validate(paper)
+            pages=sorted({span.page for e in verified.evidence for span in e.source_spans})
+            verified.validate_pages(extract_selected_layout(Path(asset['archive_path']).read_bytes(),pages))
+            dump(destination/'source-check.json',{'source_sha256':asset['content_hash'],'all_retained_evidence_coordinates_equal':True,'pages':pages,'semantic_accuracy_not_claimed':True})
+        else: summary.update(readable=False,facts=0,review_status=None)
+        missing=[k for k in ('business_structure','products_services','revenue_model') if not (summary.get('element_counts') or {}).get(k)]
+        summary['core_missing_elements']=missing
+        failure=summary.get('review_error') if summary.get('review_status') in ('failed','incomplete') else summary.get('exception')
+        if missing and not failure:
+            errors=summary['contract_errors'] or summary['failed_calls']
+            failure=json.dumps(errors[-1],ensure_ascii=False,sort_keys=True) if errors else 'missing_core_elements:'+','.join(missing)
+        summary['failure_signature']=re.sub(r'[0-9a-f]{16,}|\d+', '#', failure or '')[:800] or None
+        snapshot=budget.snapshot(); dump(destination/'budget.json',snapshot)
+        summary.update(physical_requests=snapshot['physical_requests'],charged_tokens=snapshot['charged_tokens'],cost=snapshot['charged_cost_cny'],stopped_reason=snapshot['stopped_reason'])
+        counts={}
+        for a in snapshot['attempts']:
+            key=a.get('logical_request_id') or a['request_id']; counts[key]=counts.get(key,0)+1
+        summary['recoveries']=sum(n-1 for n in counts.values())
+        assert summary['three_reads_equal'] and summary['recoveries']<=3 and all(n<=2 for n in counts.values())
+        assert code_hashes()==frozen['code_sha256'] and sha(ROOT/'config/13_llm.json')==frozen['shared_config_sha256']
+    except Exception as exc:
+        summary['exception']=type(exc).__name__+': '+str(exc)[:3000]
+        if budget:
+            snapshot=budget.snapshot(); dump(destination/'budget.json',snapshot)
+            summary.update(physical_requests=snapshot['physical_requests'],charged_tokens=snapshot['charged_tokens'],cost=snapshot['charged_cost_cny'])
+    finally:
+        if client:
+            try: asyncio.run(client.close())
+            except Exception as exc: summary['close_error']=type(exc).__name__
+        summary['supervision_seconds']=round(time.monotonic()-started,3) if started else None
+        captures=[]
+        known_raw_hashes={hashlib.sha256(r['raw_content'].encode('utf-8')).hexdigest() for r in getattr(provider,'workpaper_receipts',[]) if isinstance(r.get('raw_content'),str)} if client else set()
+        for captured in sorted((root/'captured-content').glob('*.json')):
+            record=json.loads(captured.read_text())
+            duplicate=record.get('content_sha256') in known_raw_hashes
+            if not duplicate:
+                target=destination/'failed-model-content'/captured.name
+                target.parent.mkdir(parents=True,exist_ok=True)
+                shutil.copy2(captured,target)
+            captures.append({'physical_sequence':record['physical_sequence'],'content_sha256':record.get('content_sha256'),'finish_reason':record.get('finish_reason'),'usage':record.get('usage'),'retained':not duplicate,'retained_path':str(target.relative_to(ROOT)) if not duplicate else None})
+        dump(destination/'content-capture-index.json',{'representation':'model_content_strings_not_http_bytes','responses':captures,'duplicates_not_copied':sum(not r['retained'] for r in captures)})
+        summary['captured_model_contents']=len(captures)
+        summary['failed_contents_retained']=sum(r['retained'] for r in captures)
+        summary['cleanup_bytes']=sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
+        assert root.parent==ROOT/'data/QuoteBak' and root.name.startswith('workpaper-cb-'+symbol+'-')
+        shutil.rmtree(root)
+        dump(destination/'summary.json',summary)
+        print('RESULT '+json.dumps(summary,ensure_ascii=False),flush=True)
+
+def main():
+    parser=argparse.ArgumentParser()
+    parser.add_argument('mode',choices=['prepare','freeze','run'])
+    parser.add_argument('--prepared',type=Path)
+    args=parser.parse_args()
+    if args.mode=='prepare':prepare()
+    elif args.mode=='freeze':freeze(args.prepared)
+    else:run_one(args.prepared,'600104',float('inf'))
+if __name__=='__main__':main()

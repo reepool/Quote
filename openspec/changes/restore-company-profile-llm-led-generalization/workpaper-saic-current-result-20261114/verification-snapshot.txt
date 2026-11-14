@@ -1,0 +1,85 @@
+"""Read-only 6.CB verification; does not execute the task or contact models."""
+import hashlib
+import json
+from pathlib import Path
+import runpy
+import sys
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0, str(ROOT))
+operator = runpy.run_path(str(ROOT / 'data/QuoteBak/workpaper_cb_run.py'))
+dest = operator['DEST']
+run = dest / 'run'
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+frozen = json.loads((dest / 'authorization.json').read_text())
+assert operator['code_hashes']() == frozen['code_sha256']
+assert sha(ROOT / 'config/13_llm.json') == frozen['shared_config_sha256']
+assert sha(ROOT / 'data/QuoteBak/workpaper_cb_run.py') == frozen['operator_sha256']
+assert sha(operator['CAPTURE_HELPER']) == frozen['capture_helper_sha256']
+summary = json.loads((run / 'summary.json').read_text())
+query = json.loads((run / 'query.json').read_text())
+receipts = json.loads((run / 'model-receipts.json').read_text())
+for receipt in receipts:
+    assert hashlib.sha256(receipt['raw_content'].encode()).hexdigest() == receipt['response_hash']
+    assert json.loads(receipt['raw_content']) == receipt['response_payload']
+budget = json.loads((run / 'budget.json').read_text())
+counts = {}
+for attempt in budget['attempts']:
+    key = attempt.get('logical_request_id') or attempt['request_id']
+    counts[key] = counts.get(key, 0) + 1
+    assert attempt['source_label'] in {'deepseek:deepseek-flash', 'scorpio:grok-4.7'}
+assert budget['physical_requests'] <= 10 and budget['charged_tokens'] <= 500000
+assert sum(n - 1 for n in counts.values()) <= 3 and all(n <= 2 for n in counts.values())
+assert summary['three_reads_equal'] and summary['business_seconds'] <= 1800
+assert query['profiles'][0]['core_complete'] is False
+binding = json.loads((run / 'binding.json').read_text())
+assert binding['old_semantic_input'] is False
+assert binding['asset']['instrument_id'] == '600104.SH'
+assert sha(Path(binding['asset']['archive_path'])) == binding['asset']['content_hash']
+captures = json.loads((run / 'content-capture-index.json').read_text())
+for record in captures['responses']:
+    if record['retained']:
+        captured = json.loads((ROOT / record['retained_path']).read_text())
+        if captured['content'] is not None:
+            assert hashlib.sha256(captured['content'].encode()).hexdigest() == captured['content_sha256']
+    else:
+        assert record['content_sha256'] in {r['response_hash'] for r in receipts}
+
+result = {
+    'task': '6.CB', 'verification_mode': 'read_only_no_new_calls',
+    'actual_frozen_code_and_config_unchanged': True,
+    'raw_hashes_and_json_match': True, 'three_reads_equal': True,
+    'query_sha256': sha(run / 'query.json'),
+    'physical_requests': budget['physical_requests'],
+    'charged_tokens': budget['charged_tokens'],
+    'recoveries': sum(n - 1 for n in counts.values()),
+    'physical_results': [{k:a.get(k) for k in ('status','source_label','finish_reason','error_code','charged_tokens')} for a in budget['attempts']],
+    'retained_failure_contents': sum(r['retained'] for r in captures['responses']),
+    'cost': budget['charged_cost_cny'], 'production_authorization': 'not_authorized'
+}
+paper = query['profiles'][0].get('workpaper')
+if paper:
+    from research.company_profile.workpaper import CompanyProfileWorkpaper, WorkpaperDraftResponse, bind_workpaper_draft, normalize_workpaper_draft
+    from research.company_profile.workpaper_review import workpaper_hash
+    typed = CompanyProfileWorkpaper.model_validate(paper)
+    raw = next(r['response_payload'] for r in receipts if r['purpose'] == 'extract_profile_workpaper')
+    seed = bind_workpaper_draft(WorkpaperDraftResponse.model_validate(normalize_workpaper_draft(raw)), report=typed.report, reading_scope=typed.reading_scope, evidence=typed.evidence, generation=typed.generation)
+    def facts(value):
+        parts = [*value.elements.__dict__.values(), *(value.supply_chain.__dict__.values() if value.supply_chain else [])]
+        return {f.fact_id: f.model_dump(mode='json') for e in parts for f in e.facts}
+    before, after = facts(seed), facts(typed)
+    review = typed.quality_review
+    if review:
+        assert workpaper_hash(seed) == review.original_draft_hash
+        assert not review.retained_request_ids and not review.locally_revalidated_request_ids
+        adopted = {f.affected_fact_id or 'review-add:' + f.finding_id: f.revised_fact.model_dump(mode='json') for f in review.findings if f.resolution in ('corrected_pending_trust','added_pending_trust')}
+        for key, value in after.items():
+            assert value == (adopted[key] if key in adopted else before[key])
+        assert set(before) - set(after) <= {f.affected_fact_id for f in review.findings}
+        result.update(original_draft_hash_matches=True, independent_facts_unchanged=True, adopted_fact_ids=sorted(adopted), removed_fact_ids=sorted(set(before)-set(after)))
+    assert sha(Path(binding['asset']['archive_path'])) == typed.report.document_version
+    result.update(fact_count=len(after), metric_count=query['profiles'][0]['workpaper_summary']['metric_count'], retained_receipts_loaded=False)
+print('VALIDATION_JSON=' + json.dumps(result, ensure_ascii=False))

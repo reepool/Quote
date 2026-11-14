@@ -1,0 +1,59 @@
+{
+  "task": "6.CB",
+  "verification_mode": "read_only_no_new_calls",
+  "actual_frozen_code_and_config_unchanged": true,
+  "raw_hashes_and_json_match": true,
+  "three_reads_equal": true,
+  "query_sha256": "4be0124f32970aa5767ba3762cd3928fe4ff8fccc9a587f54cf9c44611693fc9",
+  "physical_requests": 4,
+  "charged_tokens": 130666,
+  "recoveries": 0,
+  "physical_results": [
+    {
+      "status": "success",
+      "source_label": "deepseek:deepseek-flash",
+      "finish_reason": "stop",
+      "error_code": null,
+      "charged_tokens": 24576
+    },
+    {
+      "status": "success",
+      "source_label": "deepseek:deepseek-flash",
+      "finish_reason": "stop",
+      "error_code": null,
+      "charged_tokens": 23599
+    },
+    {
+      "status": "success",
+      "source_label": "scorpio:grok-4.7",
+      "finish_reason": "stop",
+      "error_code": null,
+      "charged_tokens": 67073
+    },
+    {
+      "status": "success",
+      "source_label": "deepseek:deepseek-flash",
+      "finish_reason": "stop",
+      "error_code": null,
+      "charged_tokens": 15418
+    }
+  ],
+  "retained_failure_contents": 0,
+  "cost": "unknown",
+  "production_authorization": "not_authorized",
+  "original_draft_hash_matches": true,
+  "independent_facts_unchanged": true,
+  "adopted_fact_ids": [],
+  "removed_fact_ids": [
+    "mc-05",
+    "od-01",
+    "od-05",
+    "ps-02",
+    "ps-04",
+    "ps-06",
+    "rm-04"
+  ],
+  "fact_count": 33,
+  "metric_count": 66,
+  "retained_receipts_loaded": false
+}
