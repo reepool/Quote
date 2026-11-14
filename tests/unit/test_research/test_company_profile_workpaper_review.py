@@ -20,8 +20,8 @@ from research.company_profile.workpaper_sections import build_section_packet, in
 from tests.unit.test_research.test_company_profile_workpaper import PAGES, _report, _selection, _draft
 
 
-def material():
-    packet = build_section_packet(_report(), PAGES, index_sections(PAGES), _selection(index_sections(PAGES)))
+def material(pages=PAGES):
+    packet = build_section_packet(_report(), pages, index_sections(pages), _selection(index_sections(pages)))
     raw = _draft(packet).model_dump(mode="json")
     bad = raw["elements"]["scale_and_mix"]["facts"][0]
     bad["text"] = "净利润100.00元。"
@@ -145,6 +145,64 @@ def test_invalid_or_unconfirmed_repair_never_revives_bad_fact(failure):
     assert result.quality_review.findings[0].original_fact.fact_id == "revenue"
     if failure in {"rejected", "missing_check", "provider_failure"}:
         assert result.quality_review.findings[0].revised_fact is not None
+    if failure == "bad_number":
+        assert len(provider.calls) == 2
+        assert result.quality_review.findings[0].resolution == "repair_rejected"
+        assert any("修订源检查隔离：revenue" in note for note in result.standardization_notes)
+
+
+@pytest.mark.parametrize("bad_source", ["number", "unit", "evidence"])
+@pytest.mark.parametrize("confirmed", [True, False])
+def test_invalid_repair_is_isolated_without_blocking_independent_final_candidate(bad_source, confirmed):
+    # The original fixture is a cross-page table without a repeated unit header;
+    # use an explicit same-page header to exercise an unambiguous unit conflict.
+    pages = tuple({**p, "text": "单位：元\n" + p["text"]} if p["page"] == 3 else p
+                  for p in PAGES) if bad_source == "unit" else PAGES
+    original, packet, fixed, review, verify = material(pages)
+    omitted = {**fixed, "fact_id": "review-add:bad-extra"}
+    omitted["metrics"] = [dict(metric) for metric in fixed["metrics"]]
+    if bad_source == "number":
+        omitted["metrics"][0].update(raw_value="777", value="777")
+    elif bad_source == "unit":
+        omitted["metrics"][0].update(unit="万元", source_unit="万元")
+    else:
+        omitted["evidence_ids"] = ["not-a-source"]
+    review["findings"].append({**review["findings"][0], "finding_id": "bad-extra",
+        "action": "possible_omission", "affected_fact_id": None, "issue_type": "material_omission"})
+    replies = [review, {"repaired_facts": [omitted, fixed]},
+               verify if confirmed else ValueError("offline_final_not_authorized")]
+    before = json.dumps(replies[:2], ensure_ascii=False, sort_keys=True)
+    provider = Provider(replies)
+    result, _ = review_workpaper(original, packet=packet, provider=provider, work_id="mixed-repair",
+        identity=workpaper_processing_identity(real=False, review=True))
+    assert [c["purpose"] for c in provider.calls] == [
+        "review_profile_workpaper", "repair_profile_workpaper", "verify_profile_workpaper_repair"]
+    final = provider.calls[-1]["payload"]
+    assert [f["fact_id"] for f in final["candidates"]] == ["revenue"]
+    assert [f["finding_id"] for f in final["initial_findings"]] == ["wrong-profit-column"]
+    assert result.elements.business_structure == original.elements.business_structure
+    assert bool(result.elements.scale_and_mix.facts) is confirmed
+    rejected = result.quality_review.findings[1]
+    assert rejected.resolution == "repair_rejected" and rejected.revised_fact.fact_id == omitted["fact_id"]
+    assert result.quality_review.findings[0].resolution == (
+        "corrected_pending_trust" if confirmed else "verification_failed")
+    assert result.quality_review.status == ("completed_with_open_findings" if confirmed else "incomplete")
+    assert any("修订源检查隔离：review-add:bad-extra" in note for note in result.standardization_notes)
+    assert json.dumps(replies[:2], ensure_ascii=False, sort_keys=True) == before
+    result.validate_pages(pages)
+
+
+@pytest.mark.parametrize("bad_targets", ["unknown", "duplicate"])
+def test_repair_target_identity_errors_still_reject_whole_batch_before_final(bad_targets):
+    paper, packet, fixed, review, _ = material()
+    first = {**fixed, "fact_id": "unknown"} if bad_targets == "unknown" else fixed
+    provider = Provider([review, {"repaired_facts": [first, fixed]}])
+    result, _ = review_workpaper(paper, packet=packet, provider=provider, work_id="invalid-targets",
+        identity=workpaper_processing_identity(real=False, review=True))
+    assert len(provider.calls) == 2
+    assert "unflagged or duplicate" in result.quality_review.error
+    assert not result.elements.scale_and_mix.facts
+    assert result.elements.business_structure == paper.elements.business_structure
 
 
 @pytest.mark.parametrize("bad_contract", ["incomplete", "unknown_fact", "unknown_evidence", "unknown_element"])

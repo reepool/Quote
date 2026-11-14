@@ -1,5 +1,7 @@
 # 公司画像开发路线纠偏：文档交付与审核
 
+最新状态（2026-11-14，[6.CC逐项隔离§289](#289-6cc修订逐项隔离与上汽保存响应零调用闭环)）：已修“一条候选源定位失败挡整组”；上汽原TaskService六合法候选到final边界离线拒绝，F09仍单独拒，33独立正文/原作者/三读及旧hash不变，0新模型/绑定/采纳。68定向15.55秒通过，清本人2057290字节。下一6.CD仅拟这六项一次Grok high原文final，新的明确批准前不发请求；原6.CB/S1/生产不改。
+
 最新状态（2026-11-14，[6.CB真实上汽§288](#288-6cb上汽真实稿已交修订未到最终再核)）：已补原12家唯一无稿，上汽33事实/66数字可读、三读一致；4物理/130666实际usage/0恢复/645.103业务秒、unknown。真实初核10意见、隔离7原事实有质量作用；7修订候选因次要子公司利润列黏连定位未过，未final/未采纳，review仍incomplete。当前12份跨版可读不计正式S1/同版12通过；本次1/1已用、无追加窗。清本人3166036字节，源/旧失败/尝试标记/既有并行保护。
 
 最新状态（2026-11-14，[6.CA内容初审§287](#287-6ca现有11稿内容初审与唯一无稿公司的后续取舍)）：已交11家公司可点读内容对照及源/版本边界；53组主要问题有回答、2组限用，上汽5组无稿，不作全子句评分、准确率或同版成功率。银行收入构成子节的核源经验已最小进入通用选章指引，9定向测试通过、真实效果未测。下一6.CB仅拟上汽一次新完整入口，待新的明确限定批准；当前0模型/探针/可发送绑定，原S1/失败/生产不改。以下旧日期状态只属其记录时点，每轮先清后做、交付后清本人过程物。
@@ -9042,3 +9044,19 @@ Review A类当前隔离理由可能丢失已修并直接反例/原入口复验�
 只读命令bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python data/QuoteBak/workpaper_cb_verify.py已通过：实际相关源码/共享配置与operator/捕获器冻结不变，4raw字符串hash/JSON、原初稿hash、33独立对象/7隔离/0采纳、3读、4路由/usage/恢复及硬限成立，Evidence坐标原入口对正式布局核过；结果和两份必要操作/验证快照均一套。复用61d9f253的9项7.06秒定向测试，业务代码没改不重跑长整链。有限Review A类实际修订整组断点未关闭，按限用交付、不称闭环；B类可选供应链/标题噪声/次要数字后置；C类开工配置/骨架/旧规划/约1005行审核及并行差异不动不纳提交。strict及本人差异/链接/hash收尾，不以提交或测试量作业务成绩；活跃开发/人工审核时间未知，不拿584秒模型等待冒充。
 
 运行根2060701字节finally删除，准备副本1079847、operator20306、verifier5182在证据/快照核齐且进程退出后删除，可测合计3166036字节。4被动捕获与权威raw逐个hash相等，过程副本随根清理，仅保索引对应关系，不双存正文；本次没有非法JSON失败正文需额外持久。正式PDF/共享有效缓存、原失败/11稿及新253字节attempt标记保护，无本人库/checkpoint/重复全页文本残留，开工既有/并行保持。
+
+## 289. 6.CC修订逐项隔离与上汽保存响应零调用闭环
+
+用户“继续”接续6.CB明确下一步，本会话按business-first-goal/openspec-apply-change/唯一change只修实际消费阻塞，不修子公司利润表格或重跑12家。开工HEAD7433b69a、空暂存区，开工配置/骨架/旧规划/约1005行审核与并行保护；未见本人6.CB根/脚本，开工释放0不重报3166036。先同步delta/同卡边界，再workpaper_review最小修改及直接正反，真实模型/探针/可发送绑定保持0。
+
+REVIEW_POLICY显式v3：修订先整组检查目标唯一且已知，未知/重复仍全拒，防同一目标先坏后好绕过检查；随后原数字/单位/引用源检查逐候选执行。失败只标该候选repair_rejected、保原候选/模型说明及单独程序原因，其他合法候选进入原一次final，initial_findings相应限定为这些候选。无合法项不请求；final未检查齐、否决/失败/未授权不采纳，相关原事实仍隔离，其他独立正文保留。不松数值边界、借列/未知引用、不改Schema或建通用恢复层。源定位/标准化算法及旧读取政策不动，历史源/结果/分数不追改。
+
+定向命令bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_workpaper_review.py -k 'not task_service and not runtime_seed' tests/unit/test_research/test_company_profile_workpaper_local_consumption.py tests/unit/test_research/test_company_profile_workpaper_source_cells.py；68 passed/4 deselected/15.55秒。新增混合好坏数值/明确单位/未知证据、final未授权不采纳、未知/重复ID整体拒绝及全坏无final。首轮2个新unit夹具只有跨页表头，按原规则不能当明确单位冲突；补同页单位原文后通过，未改生产单位判断/降预期。原TaskService另用实际保存输入证明本次分支，不重复4个无关长fixture入口。
+
+原6.CB query、4份raw/JSON/hash与binding核过，按原对象/顺序重建40合法初稿（不把原cc-03格式拒绝恢复成新分母），seed hash与原review精确相等。正式PDF/Evidence坐标一致，原TaskService existing-draft/resume→唯一writer/query/export/新实例实际走完；唯一planned purpose为verify_profile_workpaper_repair，在provider边界明确offline_final_not_authorized拒绝且禁网，不给受控pass。合法六项ps-02、ps-04、review-add:F05/F06、od-05、mc-05到边界，F09仍单独拒，7原候选/旧失败保留。33独立正文/原generation逐个不变、三读一致、所有旧hash不改；新quality记录v3与原2个review/repair继承调用，0候选采纳，core_complete仍false。具体见workpaper-repair-isolation-result-20261114/及同源profiles.md；本地25.885秒、库准备29.216秒分列，不当新模型耗时或活跃开发计时。
+
+业务闭环的本轮进展是原真实输入下从0到6个独立修订可继续原文final，不是新增可信画像/模型公司。下一6.CD只拟六候选一次原文再核，Scorpio/Grok grok-4.7 high，原公开所选2025章节/原发现和候选；1逻辑/最多2物理含1恢复/900秒/300000保守账本，物理600/输出16384/payload1000000，有价10元/无价unknown、不承诺人民币总额。不重跑选章/抽取/初核/修订、不发DeepSeek/第二家公司/追加窗/充值/共享配置修改或生产，F09不追补。新的明确批准前0可发送绑定/外呼，原6.CB已用1/1及130666不续；接受才入稿，未修问题仍限用，不追求10意见全绿，不自动S1或扩批。
+
+有限Review A类：已发生整组源检查断点按最窄修订隔离，目标身份/未知证据/无final采纳边界直接验证；真实语义未验证的候选仍pending，不能借“本地可用”洗白。B类非核心子公司利润/表格恢复/供应链细度/更多泛化后置；C类开工配置/骨架/旧审核和并行改动不动不纳提交。OpenSpec strict、本人差异/原件hash/链接与清理检查后Git隔离收尾；活跃开发/人工审核时间未精确记录，不用测试或LLM等待替代。满足本卡即结束，不再为零建议扩工程。
+
+清理：TemporaryDirectory内本轮库/输出/检查点2046551字节finally删除，必要当前query-export/候选及原raw引用、一个operator快照一套后，本人临时脚本10739字节已删，可测合计2057290字节。正式PDF/有效缓存、原6.CB失败/query/raw/attempt及既有并行保护；没有为离线接续复制整套源或新增模型运行根，旧释放不重报。

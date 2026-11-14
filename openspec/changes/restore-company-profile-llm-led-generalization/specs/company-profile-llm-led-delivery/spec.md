@@ -99,6 +99,11 @@ The reviewer MUST identify checked fact IDs/elements and source-cited errors, am
 - **THEN** the patch is not accepted, the affected fact remains withheld and independent business facts stay readable
 - **AND** neither shared-dimension membership nor absence of a new issue alone resolves the original issue
 
+#### Scenario: One repair candidate cannot safely bind its source
+- **WHEN** a combined repair has unique known target IDs but one candidate fails its existing source, number or unit checks
+- **THEN** only that candidate is rejected with its original proposal and concrete local reason retained, while independent valid candidates may reach the single bounded final source verification
+- **AND** unknown target IDs or duplicate targets still reject the batch before any final send; invalid candidates are never verified or adopted, no valid candidates means no final request, and local validity never substitutes for an explicit final check
+
 #### Scenario: A source table has a missing consolidation adjustment
 - **WHEN** review discovers a materially omitted subtotal/elimination in supplied source text
 - **THEN** one local patch may add source-backed adjustment facts, and final review must explicitly confirm that issue and check those facts before adoption
@@ -118,7 +123,7 @@ The reviewer MUST identify checked fact IDs/elements and source-cited errors, am
 - **WHEN** a hash-bound continuation explicitly requests local revalidation of a retained repair rejected only as schema_validation_error
 - **THEN** the current typed repair decoder and all target/source constraints MUST validate the unchanged original response before any final request
 - **AND** the original receipt MUST retain rejected status, model and usage; quality output separately identifies local revalidation, never treating it as a new successful model call
-- **AND** absent explicit revalidation, tampered bytes/payload, unknown targets, or still-invalid candidates MUST fail before a final send; other rejection reasons are not implicitly eligible
+- **AND** absent explicit revalidation, tampered bytes/payload or unknown/duplicate targets MUST fail before a final send; still-invalid known candidates remain rejected and excluded from final verification without discarding independent valid candidates, and other rejection reasons are not implicitly eligible
 
 ### Requirement: Workpapers expose the actual model and reading scope
 Each new LLM workpaper MUST bind locally generated model metadata from the existing gateway receipts, not model-authored attribution. Metadata MUST distinguish section selection from actual section-text interpretation, record the model/source label, logical and selected profiles when available, request and response identities, actual supplied section/page scope, prompt/preprocessing/guide versions and known usage. The successful returned model MUST be the content author; failed attempts and retries remain in the existing receipt/ledger and MUST NOT be mislabeled as successful readers. JSON, Markdown, query and export MUST expose this metadata without a new store or evaluation platform. Missing historical metadata MUST remain unknown, and old workpapers MUST stay readable without rewriting their original results.

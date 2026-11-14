@@ -1,0 +1,268 @@
+{
+  "status": "source_checked_locally_not_model_verified",
+  "candidate_ids": [
+    "ps-02",
+    "ps-04",
+    "review-add:F05",
+    "review-add:F06",
+    "od-05",
+    "mc-05"
+  ],
+  "candidates": [
+    {
+      "fact_id": "ps-02",
+      "text": "公司通过推出多款HEV混动车型，MG品牌在欧洲市场销量超过30万辆，成为欧洲最畅销的中国品牌，并在澳新、中东、拉美、东南亚等地区的18个国家乘用车市场排名跻身当地前十；上汽大众、上汽通用分别推出AUDI E5、别克至境L7等中高端智电新品。",
+      "subject_scope": "consolidated_group",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0004"
+      ],
+      "metrics": [],
+      "uncertainty_reason": null
+    },
+    {
+      "fact_id": "ps-04",
+      "text": "零部件业务主要由下属控股子公司华域汽车系统股份有限公司开展，涵盖汽车零部件生产、销售；动力新科从事柴油机及配件的生产销售；中联汽车电子从事汽车用电子产品的生产、经营和研发。",
+      "subject_scope": "consolidated_group",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0013",
+        "source-0017"
+      ],
+      "metrics": [],
+      "uncertainty_reason": null
+    },
+    {
+      "fact_id": "review-add:F05",
+      "text": "新能源汽车收入及补贴：乘用车收入11,921,125万元，商用车收入1,431,094万元；新能源汽车补贴金额均为0，补贴占比均为0%。",
+      "subject_scope": "consolidated_group",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0014"
+      ],
+      "metrics": [
+        {
+          "name": "新能源汽车收入（乘用车）",
+          "raw_value": "11,921,125",
+          "value": "11921125",
+          "unit": "万元",
+          "source_unit": "万元",
+          "currency": "人民币",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "新能源汽车收入（商用车）",
+          "raw_value": "1,431,094",
+          "value": "1431094",
+          "unit": "万元",
+          "source_unit": "万元",
+          "currency": "人民币",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "新能源汽车补贴金额（乘用车）",
+          "raw_value": "0",
+          "value": "0",
+          "unit": "万元",
+          "source_unit": "万元",
+          "currency": "人民币",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "新能源汽车补贴金额（商用车）",
+          "raw_value": "0",
+          "value": "0",
+          "unit": "万元",
+          "source_unit": "万元",
+          "currency": "人民币",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "新能源汽车补贴占比（乘用车）",
+          "raw_value": "0%",
+          "value": "0",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "新能源汽车补贴占比（商用车）",
+          "raw_value": "0%",
+          "value": "0",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        }
+      ],
+      "uncertainty_reason": null
+    },
+    {
+      "fact_id": "review-add:F06",
+      "text": "主营业务分产品毛利率：整车业务4.30%（比上年增加0.44个百分点），零部件业务19.15%（增加1.24个百分点），劳务及其他26.38%（增加5.61个百分点），金融业务88.47%（增加3.32个百分点），合计11.30%（增加0.28个百分点）；金融业务营业收入同比下降25.33%，劳务及其他营业收入同比下降21.83%。",
+      "subject_scope": "consolidated_group",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "metrics": [
+        {
+          "name": "整车业务毛利率",
+          "raw_value": "4.30",
+          "value": "4.30",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": "比上年增加0.44个百分点",
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "零部件业务毛利率",
+          "raw_value": "19.15",
+          "value": "19.15",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": "比上年增加1.24个百分点",
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "劳务及其他毛利率",
+          "raw_value": "26.38",
+          "value": "26.38",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": "比上年增加5.61个百分点",
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "金融业务毛利率",
+          "raw_value": "88.47",
+          "value": "88.47",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": "比上年增加3.32个百分点",
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "合计毛利率",
+          "raw_value": "11.30",
+          "value": "11.30",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": "比上年增加0.28个百分点",
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "金融业务营业收入同比变动",
+          "raw_value": "-25.33",
+          "value": "-25.33",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "劳务及其他营业收入同比变动",
+          "raw_value": "-21.83",
+          "value": "-21.83",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        }
+      ],
+      "uncertainty_reason": null
+    },
+    {
+      "fact_id": "od-05",
+      "text": "经营活动产生的现金流量净额34,306,601,905.98元，同比下降50.47%；公司通过狠抓零售、加强资金管理，制造业务经营活动净现金流得到显著改善，但由于子公司上汽财务公司汽车金融贷款等业务规模变动，导致合并经营活动产生的现金流量净额比上年同期减少。",
+      "subject_scope": "consolidated_group",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0006",
+        "source-0007"
+      ],
+      "metrics": [
+        {
+          "name": "经营活动产生的现金流量净额",
+          "raw_value": "34,306,601,905.98",
+          "value": "34306601905.98",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "人民币",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        }
+      ],
+      "uncertainty_reason": null
+    },
+    {
+      "fact_id": "mc-05",
+      "text": "“本期公司业务类型、利润构成或利润来源发生重大变动的详细说明”及“公司报告期内业务、产品或服务发生重大变化或调整有关情况”均勾选不适用。",
+      "subject_scope": "consolidated_group",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0007",
+        "source-0009"
+      ],
+      "metrics": [],
+      "uncertainty_reason": null
+    }
+  ],
+  "source_text_sha256": "faf5a3a7bfc568b9dfbbfda25c6f6c3db99aa7a80e20168eee3a4d9fb06aa5e3"
+}

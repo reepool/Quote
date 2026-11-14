@@ -1,0 +1,4 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600104.SH,2025-12-31,2026-04-01T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,llm_generated,"公司业务以整车业务为核心，同时包含零部件、移动出行和服务、金融等板块，并通过与华为合作推出“尚界”品牌、整合商用车业务等方式调整自主品牌与合资业务的布局。
+公司撤销商用车事业部，将职能整合并入上汽大通，聚焦轻型商用车核心产品；上汽大众、上汽通用优化基地布局，释放产能用于生产“尚界”等自主品牌产品。
+零部件业务主要由下属控股子公司华域汽车系统股份有限公司开展；金融板块包含上汽财务公司、上汽通用汽车金融、上海东正汽车金融等汽车金融子公司。",33,66,incomplete,10,deepseek-flash,grok-4.7

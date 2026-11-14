@@ -1,0 +1,36 @@
+{
+  "task": "6.CC",
+  "results": [
+    {
+      "task": "6.CC",
+      "instrument_id": "600104.SH",
+      "entry": "CompanyProfileTaskService.execute(run)",
+      "mode": "offline_retained_response_consumption",
+      "new_model_calls": 0,
+      "new_model_ledger": 0,
+      "original_hashes": {
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saic-current-result-20261114/run/query.json": "4be0124f32970aa5767ba3762cd3928fe4ff8fccc9a587f54cf9c44611693fc9",
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saic-current-result-20261114/run/model-receipts.json": "31ae1d47c83b3c61ef3d4a9280315a51ab8a73dcf1600cc2a5e5f5bd558dc5ba",
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saic-current-result-20261114/run/binding.json": "4f1c4d1bf49b2ecb419280c6fa6d71df26890fb37d2339b82d170ec63a7b00ae"
+      },
+      "original_seed_hash_matches": true,
+      "old_local_repair_failure_preserved": true,
+      "locally_rejected_candidate_ids": [
+        "review-add:F09"
+      ],
+      "original_facts_unchanged": true,
+      "retained_facts": 33,
+      "candidates": 6,
+      "only_next_logical_purpose": "verify_profile_workpaper_repair",
+      "no_candidate_adopted": true,
+      "three_reads_equal": true,
+      "source_coordinates_equal": true,
+      "seconds": 25.885,
+      "production_authorization": "not_authorized"
+    }
+  ],
+  "new_model_calls": 0,
+  "new_model_ledger": 0,
+  "storage_preparation_seconds": 29.216,
+  "runtime_cleanup_bytes": 2046551
+}
