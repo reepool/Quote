@@ -49,6 +49,16 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 ### Requirement: Metric standardization preserves source meaning and audit history
 New workpaper binding and repaired projections MUST clear currency on dimensionless ratios. A rate difference expressed as percentage points MUST remain distinct from relative percentage growth. Standardization MAY retain a source_unit beside the normalized unit, MUST preserve the raw source spelling and decimal value, and MUST leave an auditable note. It MUST NOT guess currency conversions, magnitudes, subject scope or rate-change meaning from a bare number. Historical workpaper files MUST NOT be rewritten by reading them.
 
+#### Scenario: A literal percentage-point suffix repeats the declared unit
+- **WHEN** a returned raw value ends in 个百分点 while its declared unit is 百分点 and its same-unit decimal reference agrees
+- **THEN** the consumer preserves the original spelling and accepts that equivalent suffix without leaving 个 in the decimal parser
+- **AND** a changed sign, numeric value or incompatible unit remains invalid; local repair decoding is not final source verification
+
+#### Scenario: A new binding changes an explicit monetary table unit
+- **WHEN** the supplied cited amount has one unambiguous explicit governing monetary unit but the returned monetary unit differs
+- **THEN** new binding or repair validation withholds the affected fact with its concrete source-unit limitation, preserving other business facts and the original response
+- **AND** it does not select a different unit by magnitude or turn source ambiguity into an exact amount; historical JSON remains readable without retroactive mutation, and faithful uncertain source-only values remain allowed
+
 #### Scenario: A bank reports approximate or lower-bound business volumes
 - **WHEN** the source and returned raw metric use 近/约/超 with a decimal reference value
 - **THEN** the workpaper MUST retain the source spelling and an explicit approximate or greater-than qualifier, not silently assert an exact value or discard the whole company
@@ -63,6 +73,11 @@ New workpaper binding and repaired projections MUST clear currency on dimensionl
 An explicitly review-enabled workpaper MUST reuse the current gateway and writer to review the original selected source packet together with its draft. Extraction and review MAY use different existing profiles or requested reasoning levels; actual successful model/source/profile, requested reasoning effort and usage MUST be recorded for review, repair and final verification. A stronger name or model agreement MUST NOT establish factual truth or production approval. Legacy unreviewed workpapers MUST remain readable without implicit calls.
 
 The reviewer MUST identify checked fact IDs/elements and source-cited errors, ambiguity and material omissions within the supplied scope. Unknown references MUST NOT remove or approve facts. Validly flagged erroneous/ambiguous facts MUST leave the ordinary narrative while remaining auditable. Independent useful facts and all original sources MUST be retained. Optional omissions MUST NOT require repair. At most one combined local repair and one source-grounded verification of its proposed changes are allowed; repairs MUST preserve unrelated facts, report/source identity, exact numeric constraints and original responses. Only explicitly resolved issues with actually checked repaired objects may be applied. Failure, insufficient coverage, unresolved or newly found issues MUST remain visible and limited, never silently clear gaps. Review status MUST distinguish model-reviewed scope from trusted release and full-report completeness.
+
+#### Scenario: A valid unique fact ID has a mismatched element hint
+- **WHEN** a finding cites an existing unique draft fact and valid source IDs but supplies a different known element hint
+- **THEN** local consumption binds that ID to its actual draft element and records the original-to-bound mapping without rewriting the raw review receipt
+- **AND** an important omission attached to that existing ID becomes a correction of that ID, not a new fact; it still requires a confirmed source recheck before adoption, while unknown IDs/elements/evidence remain invalid
 
 #### Scenario: A review identifies a scope limitation without a fact ID
 - **WHEN** an otherwise valid review flags limitations or an element-level ambiguity without an affected fact

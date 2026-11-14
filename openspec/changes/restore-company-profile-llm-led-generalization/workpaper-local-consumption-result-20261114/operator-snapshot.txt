@@ -1,0 +1,166 @@
+"""Zero-network local consumption of three frozen real response sets.
+
+No selection/extraction/review/final model is run. Historical model attribution
+is retained, local validation is identified separately, and no final is invented.
+"""
+import hashlib
+import json
+from pathlib import Path
+import socket
+import sys
+from tempfile import TemporaryDirectory
+import time
+
+ROOT=Path('/home/python/Quote'); sys.path.insert(0,str(ROOT))
+CHANGE=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST=CHANGE/'workpaper-local-consumption-result-20261114'
+
+def deny_network(*args,**kwargs):
+    raise AssertionError('BW local consumption forbids network')
+socket.create_connection=deny_network
+socket.getaddrinfo=deny_network
+
+from research.company_profile.workpaper import (
+    CompanyProfileWorkpaper,WorkpaperDraftResponse,WorkpaperRepairResponse,bind_workpaper_draft,normalize_workpaper_draft,
+)
+from research.company_profile.workpaper_llm import workpaper_processing_identity
+from research.company_profile.workpaper_review import review_workpaper,workpaper_hash
+from research.company_profile.workpaper_sections import SectionPacket,extract_selected_layout
+from research.company_profile.runtime import CompanyProfileResearchWriter,CompanyProfileRuntimeRecordV3
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.core_assessment_projection import project_core_assessment
+from research.company_profile.execution import CompanyProfileExecutionRecord,CompanyProfileInputIdentity,CompanyProfileTokenBudget
+
+def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+def dump(path,value):
+    path.parent.mkdir(parents=True,exist_ok=True)
+    path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+def facts(paper):
+    parts=[*paper.elements.__dict__.values(),*((paper.supply_chain.__dict__.values()) if paper.supply_chain else [])]
+    return {f.fact_id:f.model_dump(mode='json') for part in parts for f in part.facts}
+
+class RetainedOnly:
+    offline_only=True
+    def __init__(self,review=None):
+        self.review=review; self.workpaper_receipts=[]; self.blocked=[]
+    def workpaper_request(self,**request):
+        if request['purpose']=='review_profile_workpaper' and self.review is not None:
+            assert request['request_id']==self.review['request_id']
+            self.workpaper_receipts.append(dict(self.review,receipt_origin='retained_receipt'))
+            return self.review['response_payload']
+        self.blocked.append({'purpose':request['purpose'],'targets':[
+            f.get('target_fact_id',f.get('fact_id')) for f in request['payload'].get('repair_targets',request['payload'].get('candidates',[]))]})
+        raise ValueError('offline local consumption: no saved next response or new model authority')
+
+def consume(symbol):
+    started=time.monotonic(); source=CHANGE/'workpaper-runs'/('v9-fixed-pool-corrected-'+symbol+'-20261114')
+    query=json.loads((source/'query.json').read_text()); profile=query['profiles'][0]
+    old=CompanyProfileWorkpaper.model_validate(profile['workpaper']); before=facts(old)
+    receipts=json.loads((source/'model-receipts.json').read_text())
+    for r in receipts:
+        assert hashlib.sha256(r['raw_content'].encode()).hexdigest()==r['response_hash']
+        assert json.loads(r['raw_content'])==r['response_payload']
+    original_hashes={str(p.relative_to(ROOT)):sha(p) for p in (source/'query.json',source/'model-receipts.json',source/'binding.json')}
+    binding=json.loads((source/'binding.json').read_text()); pdf=Path(binding['asset']['archive_path'])
+    assert sha(pdf)==old.report.document_version
+    pages=extract_selected_layout(pdf.read_bytes(),sorted({s.page for e in old.evidence for s in e.source_spans}))
+    old.validate_pages(pages)
+    details={'instrument_id':old.report.instrument_id,'mode':'local_consumption_of_retained_real_content',
+        'new_model_calls':0,'new_model_ledger':0,'original_hashes':original_hashes,
+        'old_real_usage_inherited':json.loads((source/'budget.json').read_text())['charged_tokens'],
+        'original_failure_unchanged':True,'trusted_core_complete':False,'production_authorization':'not_authorized'}
+    if symbol=='600094':
+        response=WorkpaperDraftResponse(elements=old.elements,supply_chain=old.supply_chain,limitations=old.limitations)
+        safe=bind_workpaper_draft(response,report=old.report,reading_scope=old.reading_scope,evidence=old.evidence,generation=old.generation)
+        quality=old.quality_review.model_copy(update={'retained_request_ids':tuple(c.request_id for c in old.quality_review.calls)})
+        safe=safe.model_copy(update={'quality_review':quality,'standardization_notes':(*old.standardization_notes,*safe.standardization_notes,
+            '本地后继消费隔离单位冲突；继承的模型复核为旧回执，不是本次新核验。')})
+        assert set(before)-set(facts(safe))=={'F015'}
+        assert any('原表万元' in n and '返回元' in n for n in safe.standardization_notes)
+        details.update(local_withheld_ids=['F015'],historical_model_review_inherited=True)
+    else:
+        by_purpose={r['purpose']:r for r in receipts}; review=by_purpose['review_profile_workpaper']
+        work_id=review['request_id'].split(':workpaper:review')[0]
+        if symbol=='600100':
+            raw=by_purpose['extract_profile_workpaper']['response_payload']
+            seed=bind_workpaper_draft(WorkpaperDraftResponse.model_validate(normalize_workpaper_draft(raw)),
+                report=old.report,reading_scope=old.reading_scope,evidence=old.evidence,generation=old.generation)
+            assert workpaper_hash(seed)==old.quality_review.original_draft_hash
+            repair=by_purpose['repair_profile_workpaper']; assert repair['contract_status']=='rejected'
+            decoded=WorkpaperRepairResponse.model_validate(repair['response_payload'])
+            details['locally_decoded_repair_candidates']=[f.fact_id for f in decoded.repaired_facts]
+            resume={'original_draft_hash':workpaper_hash(seed),'document_version':old.report.document_version,
+                'review_response':review['response_payload'],'repair_response':repair['response_payload'],
+                'receipts':[review,repair],'revalidate_rejected_repair':True}
+            provider=RetainedOnly()
+        else:
+            seed=old.model_copy(update={'quality_review':None})
+            assert workpaper_hash(seed)==old.quality_review.original_draft_hash
+            resume=None; provider=RetainedOnly(review)
+        packet=SectionPacket(report=seed.report,reading_scope=seed.reading_scope,evidence=seed.evidence)
+        safe,_=review_workpaper(seed,packet=packet,provider=provider,work_id=work_id,
+            identity=workpaper_processing_identity(real=False,review=True),resume=resume)
+        if symbol=='600107':
+            quality=safe.quality_review.model_copy(update={'retained_request_ids':(review['request_id'],)})
+            safe=safe.model_copy(update={'quality_review':quality})
+            assert {'F036','F039','F041'}.isdisjoint(facts(safe))
+            assert len(safe.quality_review.findings)==3
+            assert any('scale_and_mix' in n and 'material_changes' in n for n in safe.standardization_notes)
+        else:
+            assert set(facts(safe))==set(before)
+            assert safe.quality_review.locally_revalidated_request_ids==(repair['request_id'],)
+            candidates=[f for f in safe.quality_review.findings if f.revised_fact is not None]
+            assert not candidates and 'metric number is absent from cited source' in safe.quality_review.error
+            assert 'review-add:Q002' not in facts(safe) and 'F029' not in facts(safe)
+            details['source_validation_complete']=False
+            details['remaining_source_limitation']=safe.quality_review.error
+        assert safe.quality_review.status=='incomplete'
+        assert len(provider.blocked)==(0 if symbol=='600100' else 1)
+        details['unsent_next_request']=provider.blocked
+        if symbol=='600107':
+            local=bind_workpaper_draft(WorkpaperDraftResponse(elements=safe.elements,supply_chain=safe.supply_chain,
+                limitations=safe.limitations),report=safe.report,reading_scope=safe.reading_scope,
+                evidence=safe.evidence,generation=safe.generation)
+            unit_removed=sorted(set(facts(safe))-set(facts(local)))
+            assert unit_removed==['F016','F017','F018']
+            details['local_unit_withheld_ids']=unit_removed
+            safe=local.model_copy(update={'quality_review':safe.quality_review,
+                'standardization_notes':(*safe.standardization_notes,*local.standardization_notes)})
+    safe=safe.model_copy(update={'standardization_notes':(*safe.standardization_notes,
+        '本次仅消费保存的真实文本/回执；新增模型请求和账本均为0，旧拒绝/费用保留。')})
+    safe.validate_pages(pages)
+    after=facts(safe)
+    assert all(value==before[key] for key,value in after.items())
+    assert safe.origin=='llm_generated' and safe.generation==old.generation
+    with TemporaryDirectory(prefix='workpaper-bw-'+symbol+'-') as directory:
+        temp=Path(directory); writer=CompanyProfileResearchWriter(temp/'output')
+        execution=CompanyProfileExecutionRecord(input_identity=CompanyProfileInputIdentity(
+            instrument_id=safe.report.instrument_id,report_id=safe.report.report_id,document_version=safe.report.document_version,
+            report_period=safe.report.report_period,policy_version='workpaper-local-consumption.2026-11-14',
+            processing_identity={'execution_mode':'offline_local_projection','source_query_sha256':sha(source/'query.json')}),
+            token_budget=CompanyProfileTokenBudget(total_token_budget=0,extract_max_output_tokens=0,verify_max_output_tokens=0,tokens_used=0,tokens_remaining=0),
+            transport_retries=0,predecessor_lineage=({'source_query':str((source/'query.json').relative_to(ROOT)),
+                'original_receipts':str((source/'model-receipts.json').relative_to(ROOT)),
+                'original_receipts_sha256':sha(source/'model-receipts.json'),'all_model_usage_is_inherited':True},))
+        record=CompanyProfileRuntimeRecordV3(work_id='bw-local-'+symbol,report=safe.report,
+            assessment=project_core_assessment(report=safe.report,task_results=()),activated_chapters=(),
+            evidence_gap_codes=(),provider_calls=(),provider_blocked=False,execution=execution,workpaper=safe)
+        writer.persist(record)
+        reader=CompanyProfileReadService(temp/'output'); current=reader.query((safe.report.instrument_id,))
+        exported=reader.export((safe.report.instrument_id,),DEST/symbol)
+        reloaded=CompanyProfileReadService(temp/'output').query((safe.report.instrument_id,))
+        assert current['profiles']==exported['profiles']==reloaded['profiles']
+        assert current['profiles'][0]['core_complete'] is False
+        assert current['profiles'][0]['workpaper']['generation']==profile['workpaper']['generation']
+        dump(DEST/symbol/'query.json',current)
+        details.update(three_reads_equal=True,original_fact_count=len(before),retained_fact_count=len(after),
+            withheld_fact_ids=sorted(set(before)-set(after)),retained_facts_unchanged=True,
+            review_status=safe.quality_review.status,seconds=round(time.monotonic()-started,3),
+            runtime_cleanup_bytes=sum(p.stat().st_size for p in temp.rglob('*') if p.is_file()))
+    assert not temp.exists()
+    for path,value in original_hashes.items():assert sha(ROOT/path)==value
+    dump(DEST/symbol/'validation.json',details)
+    print(json.dumps(details,ensure_ascii=False),flush=True)
+
+if __name__=='__main__':
+    for symbol in ('600094','600100','600107'):consume(symbol)

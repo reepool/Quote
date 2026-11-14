@@ -149,6 +149,7 @@ def review_workpaper(
     sources = {item.evidence_id: item for item in paper.evidence}
     original_hash = workpaper_hash(paper)
     findings, replacements, calls = [], {}, []
+    target_notes = []
     checked = ()
     error = None
     status = "failed"
@@ -245,19 +246,31 @@ def review_workpaper(
         seen = set()
         targets = {}
         validated_findings = []
+        bound_findings = []
         for finding in initial.findings:
             if finding.finding_id in seen or set(finding.evidence_ids) - sources.keys():
                 raise ValueError("review finding identity/evidence is unknown or duplicated")
             seen.add(finding.finding_id)
             if finding.element not in {*ELEMENT_LABELS, *SUPPLY_CHAIN_LABELS, "limitations"}:
                 raise ValueError("review finding names unknown element")
-            if finding.element in SUPPLY_CHAIN_LABELS and paper.supply_chain is None:
-                raise ValueError("review cannot invent an absent optional supply-chain element")
             old = None
             if finding.affected_fact_id is not None:
-                if finding.affected_fact_id not in facts or facts[finding.affected_fact_id][0] != finding.element:
+                if finding.affected_fact_id not in facts:
                     raise ValueError("review finding targets a different/unknown element fact")
-                old = facts[finding.affected_fact_id][1]
+                actual_element, old = facts[finding.affected_fact_id]
+                if finding.element != actual_element:
+                    target_notes.append(f"复核目标标准化：{finding.finding_id}/{old.fact_id}的要素提示{finding.element}按已有唯一编号绑定为{actual_element}；原回复未改。")
+                    finding = finding.model_copy(update={"element": actual_element})
+                if finding.action == "possible_omission" and finding.issue_type == "material_omission":
+                    if finding.severity == "material":
+                        target_notes.append(f"复核目标标准化：{finding.finding_id}的已有事实{old.fact_id}重要遗漏按原编号修订，不新增事实；仍须原文再核。")
+                        finding = finding.model_copy(update={"action": "correct"})
+                    else:
+                        target_notes.append(f"复核目标标准化：{finding.finding_id}针对已有事实{old.fact_id}的次要遗漏仅留缺项说明，不撤回原事实或触发修订。")
+                        finding = finding.model_copy(update={"affected_fact_id": None})
+                        old = None
+            if finding.element in SUPPLY_CHAIN_LABELS and paper.supply_chain is None:
+                raise ValueError("review cannot invent an absent optional supply-chain element")
             if finding.action == "quarantine" and old is None:
                 raise ValueError("fact-level review action requires an existing fact ID")
             if finding.element == "limitations" and finding.action == "possible_omission":
@@ -279,6 +292,8 @@ def review_workpaper(
                 resolution=("omission_candidate" if finding.action == "possible_omission"
                             else "unresolved" if old is None else "quarantined"),
             ))
+            bound_findings.append(finding)
+        initial = initial.model_copy(update={"findings": tuple(bound_findings)})
         findings = validated_findings
         initial_contract_valid = True
         status = "completed" if set(checked) == set(facts) else "incomplete"
@@ -293,7 +308,7 @@ def review_workpaper(
             for fact in repaired.repaired_facts:
                 if fact.fact_id not in targets or fact.fact_id in candidates:
                     raise ValueError("repair changed unflagged or duplicate fact ID")
-                _check_fact_source(fact, sources)
+                _check_fact_source(fact, sources, check_units=True)
                 candidates[fact.fact_id] = fact
             if candidates:
                 # Keep proposed edits auditable even when the final call times out.
@@ -334,6 +349,7 @@ def review_workpaper(
         if not initial_contract_valid:
             findings.clear()
             replacements.clear()
+            target_notes.clear()
         error = f"{type(exc).__name__}: {exc}"[:800]
         status = "incomplete" if checked else "failed"
     quality = WorkpaperQualityReview(
@@ -343,6 +359,8 @@ def review_workpaper(
         locally_revalidated_request_ids=tuple(locally_revalidated),
     )
     safe = standardize_workpaper_metrics(_project(paper, review=quality, findings=findings, replacements=replacements))
+    if target_notes:
+        safe = safe.model_copy(update={"standardization_notes": (*safe.standardization_notes, *target_notes)})
     receipts = (*(dict(item, receipt_origin="retained_receipt") for item in prior_receipts),
                 *(item for item in getattr(provider, "workpaper_receipts", ())
                   if item.get("request_id") in call_ids))

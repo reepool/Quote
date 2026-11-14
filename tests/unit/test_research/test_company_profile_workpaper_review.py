@@ -147,7 +147,7 @@ def test_invalid_or_unconfirmed_repair_never_revives_bad_fact(failure):
         assert result.quality_review.findings[0].revised_fact is not None
 
 
-@pytest.mark.parametrize("bad_contract", ["incomplete", "unknown_fact", "unknown_evidence", "wrong_element"])
+@pytest.mark.parametrize("bad_contract", ["incomplete", "unknown_fact", "unknown_evidence", "unknown_element"])
 def test_invalid_initial_review_does_not_remove_independent_facts(bad_contract):
     paper, _, _, review, _ = material()
     if bad_contract == "incomplete":
@@ -157,7 +157,7 @@ def test_invalid_initial_review_does_not_remove_independent_facts(bad_contract):
     elif bad_contract == "unknown_evidence":
         review["findings"][0]["evidence_ids"] = ["not-a-source"]
     else:
-        review["findings"][0]["element"] = "business_structure"
+        review["findings"][0]["element"] = "unknown_element"
     _, result, provider, _ = invoke([review])
     assert result.elements == paper.elements
     assert result.quality_review.status != "completed"

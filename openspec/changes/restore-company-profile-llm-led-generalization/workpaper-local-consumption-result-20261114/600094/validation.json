@@ -1,0 +1,29 @@
+{
+  "instrument_id": "600094.SH",
+  "mode": "local_consumption_of_retained_real_content",
+  "new_model_calls": 0,
+  "new_model_ledger": 0,
+  "original_hashes": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-fixed-pool-corrected-600094-20261114/query.json": "dd0e19e368675af2ee09599db399005511192f32cf730a12256361f799a33406",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-fixed-pool-corrected-600094-20261114/model-receipts.json": "bc9043f5b348e608c1a12ec7b2cac93fccff002a03c0d9ff31402b5e25079f17",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-fixed-pool-corrected-600094-20261114/binding.json": "d6d0b61f2db12642e1b5c9b453bc72ea6ab7a074b35efa6c9b16597a0d58796f"
+  },
+  "old_real_usage_inherited": 151197,
+  "original_failure_unchanged": true,
+  "trusted_core_complete": false,
+  "production_authorization": "not_authorized",
+  "local_withheld_ids": [
+    "F015"
+  ],
+  "historical_model_review_inherited": true,
+  "three_reads_equal": true,
+  "original_fact_count": 46,
+  "retained_fact_count": 45,
+  "withheld_fact_ids": [
+    "F015"
+  ],
+  "retained_facts_unchanged": true,
+  "review_status": "completed_with_open_findings",
+  "seconds": 2.796,
+  "runtime_cleanup_bytes": 177461
+}

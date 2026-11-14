@@ -1,0 +1,43 @@
+{
+  "instrument_id": "600107.SH",
+  "mode": "local_consumption_of_retained_real_content",
+  "new_model_calls": 0,
+  "new_model_ledger": 0,
+  "original_hashes": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-fixed-pool-corrected-600107-20261114/query.json": "aeb6a8906a8a09fa5b5f026b7b33c60b793b83c7d41e4a21049ed709b1dc3675",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-fixed-pool-corrected-600107-20261114/model-receipts.json": "31a26f3f510472580652b7c4aea6818965bc37318a4df2e44e7a00e4f1487490",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-fixed-pool-corrected-600107-20261114/binding.json": "f2fece87b84bf4bb29b6736b7cc44475a396eab2d41b2ab665af2d3c1a48837a"
+  },
+  "old_real_usage_inherited": 101539,
+  "original_failure_unchanged": true,
+  "trusted_core_complete": false,
+  "production_authorization": "not_authorized",
+  "unsent_next_request": [
+    {
+      "purpose": "repair_profile_workpaper",
+      "targets": [
+        "F039"
+      ]
+    }
+  ],
+  "local_unit_withheld_ids": [
+    "F016",
+    "F017",
+    "F018"
+  ],
+  "three_reads_equal": true,
+  "original_fact_count": 39,
+  "retained_fact_count": 33,
+  "withheld_fact_ids": [
+    "F016",
+    "F017",
+    "F018",
+    "F036",
+    "F039",
+    "F041"
+  ],
+  "retained_facts_unchanged": true,
+  "review_status": "incomplete",
+  "seconds": 1.523,
+  "runtime_cleanup_bytes": 154636
+}

@@ -146,6 +146,8 @@ class WorkpaperMetric(_Model):
         # Preserve that source spelling, but normalize only that exact suffix;
         # this does not convert units; estimates retain their explicit qualifier.
         raw_unit = self.source_unit or self.unit
+        if self.unit == "百分点" and raw_unit in {"百分点", "%", "％"} and raw_number.endswith("个百分点"):
+            raw_unit = "个百分点"
         if raw_number.endswith(raw_unit):
             raw_number = raw_number[:-len(raw_unit)].strip()
         try:
@@ -208,7 +210,9 @@ class WorkpaperSupplyChain(_Model):
     downstream_customers: WorkpaperElement = Field(default_factory=_missing_supply_chain_element)
 
 
-def _check_fact_source(fact: WorkpaperFact, sources: Mapping[str, WorkpaperEvidence]) -> None:
+def _check_fact_source(
+    fact: WorkpaperFact, sources: Mapping[str, WorkpaperEvidence], *, check_units: bool = False,
+) -> None:
     if set(fact.evidence_ids) - sources.keys():
         raise ValueError("fact cites unknown evidence")
     numbers = {
@@ -218,6 +222,8 @@ def _check_fact_source(fact: WorkpaperFact, sources: Mapping[str, WorkpaperEvide
         for value in re.findall(r"(?<![\d.])-?\d[\d,]*(?:\.\d+)?(?![\d.])", span.quote)
     }
     for metric in fact.metrics:
+        if check_units:
+            _check_explicit_money_unit(metric, fact, sources)
         if metric.value is None:
             quoted = "".join(span.quote for eid in fact.evidence_ids for span in sources[eid].source_spans)
             if "".join(metric.raw_value.split()) not in "".join(quoted.split()):
@@ -225,6 +231,47 @@ def _check_fact_source(fact: WorkpaperFact, sources: Mapping[str, WorkpaperEvide
             continue
         if Decimal(metric.value) not in numbers:
             raise ValueError(f"metric number is absent from cited source: {metric.name}")
+
+
+def _check_explicit_money_unit(
+    metric: WorkpaperMetric, fact: WorkpaperFact, sources: Mapping[str, WorkpaperEvidence],
+) -> None:
+    """Reject only a clear cited table-unit conflict; never infer a missing unit.
+
+    Called for new binding/repairs, not legacy deserialization. A multi-unit or
+    headerless match is deliberately undecided rather than guessed by magnitude.
+    """
+    money_units = {"元", "千元", "万元", "亿元"}
+    declared = {u for u in (metric.unit, metric.source_unit) if u in money_units}
+    if not declared:
+        return
+    reference = metric.value
+    if reference is None:
+        literal = re.fullmatch(r"(?:近|约|超|突破)?\s*(-?\d[\d,，]*(?:\.\d+)?)\s*(?:亿元|万元|千元|元)?", metric.raw_value)
+        if literal is None:
+            return
+        reference = literal.group(1).replace(",", "").replace("，", "")
+    reference = Decimal(reference)
+    units, headerless = set(), False
+    for eid in fact.evidence_ids:
+        for span in sources[eid].source_spans:
+            headers = list(re.finditer(r"(?:金额单位|单位)\s*[:：]\s*(?:人民币\s*)?(亿元|万元|千元|元)", span.quote))
+            for match in re.finditer(r"(?<![\d.])-?\d[\d,]*(?:\.\d+)?(?![\d.])", span.quote):
+                if Decimal(match.group().replace(",", "")) != reference:
+                    continue
+                # A paragraph may follow a table on the same source fragment.
+                # Its explicit amount suffix owns the unit, not that old header.
+                inline = re.match(r"\s*(亿元|万元|千元|元)", span.quote[match.end():])
+                if inline:
+                    units.add(inline.group(1))
+                    continue
+                governing = [h for h in headers if h.end() <= match.start()]
+                if governing:
+                    units.add(governing[-1].group(1))
+                else:
+                    headerless = True
+    if not headerless and len(units) == 1 and declared != units:
+        raise ValueError(f"source monetary unit conflict: {metric.name}; 原表{'/'.join(units)}，返回{'/'.join(sorted(declared))}；未猜测换算")
 
 
 class WorkpaperSection(_Model):
@@ -512,7 +559,7 @@ def bind_workpaper_draft(
         kept, rejected = [], []
         for fact in element.facts:
             try:
-                _check_fact_source(fact, sources)
+                _check_fact_source(fact, sources, check_units=True)
             except ValueError as exc:
                 rejected.append(f"事实{fact.fact_id}已隔离，未作为结论采用：{exc}")
                 continue
@@ -536,7 +583,7 @@ def bind_workpaper_draft(
                 try:
                     if fact.fact_id in used_ids:
                         raise ValueError("duplicate fact identity")
-                    _check_fact_source(fact, sources)
+                    _check_fact_source(fact, sources, check_units=True)
                 except ValueError as exc:
                     rejected.append(f"可选事实{fact.fact_id}未纳入：{exc}")
                     continue

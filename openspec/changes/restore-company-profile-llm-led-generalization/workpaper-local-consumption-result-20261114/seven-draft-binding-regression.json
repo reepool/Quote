@@ -1,0 +1,71 @@
+{
+  "mode": "local_binding_only_no_company_execution",
+  "new_model_calls": 0,
+  "results": [
+    {
+      "instrument_id": "600094.SH",
+      "removed_fact_ids": [
+        "F015"
+      ],
+      "retained_fact_objects_unchanged": true,
+      "old_query_sha256": "dd0e19e368675af2ee09599db399005511192f32cf730a12256361f799a33406",
+      "unit_limitations": [
+        "事实F015已隔离，未作为结论采用：source monetary unit conflict: 东南商业综合体租金收入; 原表万元，返回元；未猜测换算"
+      ]
+    },
+    {
+      "instrument_id": "600103.SH",
+      "removed_fact_ids": [],
+      "retained_fact_objects_unchanged": true,
+      "old_query_sha256": "71413e8fb1366516dcc0999d5096d484dd3e62683a2ff7c380d569f9430ae4a2",
+      "unit_limitations": []
+    },
+    {
+      "instrument_id": "600100.SH",
+      "removed_fact_ids": [],
+      "retained_fact_objects_unchanged": true,
+      "old_query_sha256": "8d19f203ed19f08f72606f9d3885227106018b5320fbf4d43f2e745952835df9",
+      "unit_limitations": []
+    },
+    {
+      "instrument_id": "600107.SH",
+      "removed_fact_ids": [
+        "F016",
+        "F017",
+        "F018"
+      ],
+      "retained_fact_objects_unchanged": true,
+      "old_query_sha256": "aeb6a8906a8a09fa5b5f026b7b33c60b793b83c7d41e4a21049ed709b1dc3675",
+      "unit_limitations": [
+        "事实F016已隔离，未作为结论采用：source monetary unit conflict: 品牌营业收入; 原表万元，返回元；未猜测换算",
+        "事实F017已隔离，未作为结论采用：source monetary unit conflict: 线上销售收入; 原表万元，返回元；未猜测换算",
+        "事实F018已隔离，未作为结论采用：source monetary unit conflict: 华中地区营业收入; 原表万元，返回元；未猜测换算"
+      ]
+    },
+    {
+      "instrument_id": "600098.SH",
+      "removed_fact_ids": [],
+      "retained_fact_objects_unchanged": true,
+      "old_query_sha256": "051acbea438292722c420aaf24ef60fe8fa4d3036970efecd4f6003a62a9925e",
+      "unit_limitations": []
+    },
+    {
+      "instrument_id": "600088.SH",
+      "removed_fact_ids": [],
+      "retained_fact_objects_unchanged": true,
+      "old_query_sha256": "f5aca684ba3432e0a2d975aeecda66bd302e1c8121dccf6ff28718bbcb152506",
+      "unit_limitations": []
+    },
+    {
+      "instrument_id": "600099.SH",
+      "removed_fact_ids": [],
+      "retained_fact_objects_unchanged": true,
+      "old_query_sha256": "4bb8478c59c7d05a4d272e75ccb443443259ea5d059f9ca6fbc83f3077a23f8d",
+      "unit_limitations": []
+    }
+  ],
+  "new_conflicts_independently_read_from_formal_pdf": [
+    "600094 physical23",
+    "600107 physical23-24"
+  ]
+}

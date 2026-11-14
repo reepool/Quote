@@ -1,0 +1,30 @@
+{
+  "instrument_id": "600100.SH",
+  "mode": "local_consumption_of_retained_real_content",
+  "new_model_calls": 0,
+  "new_model_ledger": 0,
+  "original_hashes": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-fixed-pool-corrected-600100-20261114/query.json": "8d19f203ed19f08f72606f9d3885227106018b5320fbf4d43f2e745952835df9",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-fixed-pool-corrected-600100-20261114/model-receipts.json": "441745097ac3c67927e5fed9c292062726f66661e172f477ab67c6641d0b4180",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-fixed-pool-corrected-600100-20261114/binding.json": "82dc94976af50c6670fe61772917acd74adcc841d3aba48c6b99a4af90d9e007"
+  },
+  "old_real_usage_inherited": 108315,
+  "original_failure_unchanged": true,
+  "trusted_core_complete": false,
+  "production_authorization": "not_authorized",
+  "locally_decoded_repair_candidates": [
+    "F029",
+    "review-add:Q002"
+  ],
+  "source_validation_complete": false,
+  "remaining_source_limitation": "ValueError: metric number is absent from cited source: 主营业务收入同比减少额",
+  "unsent_next_request": [],
+  "three_reads_equal": true,
+  "original_fact_count": 29,
+  "retained_fact_count": 29,
+  "withheld_fact_ids": [],
+  "retained_facts_unchanged": true,
+  "review_status": "incomplete",
+  "seconds": 2.498,
+  "runtime_cleanup_bytes": 127147
+}
