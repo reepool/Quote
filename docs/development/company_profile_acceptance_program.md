@@ -6,6 +6,8 @@
 
 ## 1. 目标与完成边界
 
+2026-11-14 6.CD用户明确批准后真实final1/1完成：[39事实/80数字上汽修订后稿](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saic-candidate-final-20261114/profiles.md)。六候选全部接受并实际采纳，4条纠正恢复/2新增，原33对象/实际generation/Evidence不变、三读一致；F09仍拒、F03/F04/F07仍隔离，不洗白剩余问题。仅1新Grok high请求/25234实际total usage/0恢复/117.447业务秒，准备33.523秒单列、unknown；旧130666用量和原失败继承不重计。源码/共享配置/原source/seed/raw/pending及wire候选/原文hash冻结相同，有限6修改核源通过，非39条全准确或同版12/12/S1；旧S1仍0/12、生产不启。本人2117125字节清，正式源/缓存/原件/attempt/既有并行保护。本卡权限用完，停止上汽细项补跑，下一转现有12稿核心质量结论与正式同版验收准备，不自动再核/扩样。
+
 2026-11-14 6.CC零新调用修订逐项隔离已交：[六待核候选/一拒绝及原稿](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-repair-isolation-result-20261114/profiles.md)。policy v3只改源检查失败的局部消费，未知/重复目标仍全拒、数字/单位/证据约束不松；68直接15.55秒通过。上汽原40合法初稿/原review/repair精确seed hash接续，经原TaskService只到final边界离线拒绝；6合法候选到达、F09仍拒，33独立正文/原generation/三读/原hash不变、0采纳。本轮0模型/探针/可发送绑定，不改6.CB原1/1、130666账本、S1或生产。下一6.CD只拟六候选一次Grok high final，900秒/300000/2物理含1恢复，新明确批准前不发送、不重跑前段/追加修订或补F09；原其他缺口继续限用。本人2057290字节已收尾清，正式源/缓存/旧失败/attempt/既有并行保护。
 
 2026-11-14 6.CB已按新明确批准执行1/1并结束：[上汽真实研究稿](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saic-current-result-20261114/profiles.md)，33事实/66数字、原writer三读一致，主营/产品/收入来源/公司规模/主要构成有实际内容。4物理/130666供应商total usage/0恢复/645.103业务秒、准备32.517秒、费用unknown，无超时/截断，未到1800/500000/10硬限但不续余量。Grok10意见隔离7原事实；7候选因26页子公司利润数值列黏连、整组源定位失败未到final、0采纳，review仍incomplete。原12家均有跨版本可读稿，不是同版12/12或正式S1；原S1仍0/12、质量及生产权限不变。有限5组核心内容/原source/raw/hash/账本及33独立对象核过，不声称全稿准确率或召回。下一只考虑保存修订逐候选限用的零调用验证，不为非核心利润/供应链重新跑本家或12家，不自动新final。源码/共享配置未改，4被动捕获与权威raw去重；清本人3166036字节，正式源/缓存/原失败/尝试标记及既有并行保护。

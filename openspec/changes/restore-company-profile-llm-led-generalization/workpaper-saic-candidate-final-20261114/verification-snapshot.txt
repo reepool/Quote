@@ -1,0 +1,84 @@
+"""Read-only verification of 6.CD; no task execution or model access."""
+import hashlib
+import json
+from pathlib import Path
+import runpy
+
+ROOT = Path('/home/python/Quote')
+operator = runpy.run_path(str(ROOT / 'data/QuoteBak/workpaper_cd_run.py'))
+dest = operator['DEST']
+run = dest / '600104'
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+frozen = json.loads((dest / 'authorization.json').read_text())
+assert operator['code_hashes']() == frozen['code_sha256']
+assert sha(ROOT / 'config/13_llm.json') == frozen['shared_config_sha256']
+assert sha(ROOT / 'data/QuoteBak/workpaper_cd_run.py') == frozen['operator_sha256']
+assert sha(operator['CAPTURE_HELPER']) == frozen['capture_helper_sha256']
+summary = json.loads((run / 'summary.json').read_text())
+assert summary['exception'] is None and summary['entry_started'] and summary['three_reads_equal']
+assert summary['business_seconds'] <= 900 and summary['original_facts_unchanged']
+for path, expected in summary['original_hashes'].items():
+    assert sha(ROOT / path) == expected
+ready = operator['READY'] / 'pending-candidates.json'
+assert sha(ready) == frozen['sources']['600104']['pending_sha256']
+pending = {c['fact_id']: c for c in json.loads(ready.read_text())['candidates']}
+expected_ids = {'ps-02', 'ps-04', 'review-add:F05', 'review-add:F06', 'od-05', 'mc-05'}
+assert set(pending) == expected_ids
+receipts = json.loads((run / 'model-receipts.json').read_text())
+assert len(receipts) == 1 and receipts[0]['purpose'] == 'verify_profile_workpaper_repair'
+receipt = receipts[0]
+assert hashlib.sha256(receipt['raw_content'].encode()).hexdigest() == receipt['response_hash']
+assert json.loads(receipt['raw_content']) == receipt['response_payload']
+response = receipt['response_payload']
+assert len(response['checked_fact_ids']) == 6 and set(response['checked_fact_ids']) == expected_ids
+assert len(response['checks']) == 6 and {c['fact_id'] for c in response['checks']} == expected_ids
+accepted = {c['fact_id'] for c in response['checks'] if c['accepted']}
+assert accepted == set(summary['adopted_candidate_ids'])
+from research.company_profile.workpaper import CompanyProfileWorkpaper
+old_path = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saic-current-result-20261114/run/query.json'
+old = CompanyProfileWorkpaper.model_validate(json.loads(old_path.read_text())['profiles'][0]['workpaper'])
+profile = json.loads((run / 'query.json').read_text())['profiles'][0]
+paper = CompanyProfileWorkpaper.model_validate(profile['workpaper'])
+before, after = operator['facts'](old), operator['facts'](paper)
+assert len(before) == 33 and all(after.get(k) == v for k, v in before.items())
+assert set(after) - set(before) == accepted
+for target in accepted:
+    assert after[target] == pending[target]
+assert paper.generation == old.generation and paper.evidence == old.evidence
+assert paper.origin == 'llm_generated' and profile['core_complete'] is False
+issue = next(f for f in paper.quality_review.findings if f.finding_id == 'F09')
+assert issue.resolution == 'repair_rejected' and issue.revised_fact.fact_id not in after
+for issue_id in ('F03', 'F04', 'F07'):
+    assert next(f for f in paper.quality_review.findings if f.finding_id == issue_id).resolution == 'quarantined'
+assert len(paper.quality_review.retained_request_ids) == 2
+assert not paper.quality_review.locally_revalidated_request_ids
+assert paper.quality_review.calls[-1].response_hash == receipt['response_hash']
+budget = json.loads((run / 'budget.json').read_text())
+assert budget['physical_requests'] <= 2 and budget['charged_tokens'] <= 300000
+counts = {}
+for attempt in budget['attempts']:
+    key = attempt.get('logical_request_id') or attempt['request_id']
+    counts[key] = counts.get(key, 0) + 1
+    assert attempt['source_label'] == 'scorpio:grok-4.7'
+assert len(counts) == 1 and sum(n - 1 for n in counts.values()) <= 1
+assert budget['charged_tokens'] == sum(a['charged_tokens'] for a in budget['attempts'])
+captures = json.loads((run / 'content-capture-index.json').read_text())
+assert len(captures['responses']) == len(receipts)
+assert all(not r['retained'] and r['content_sha256'] == receipt['response_hash'] for r in captures['responses'])
+print('VERIFICATION_JSON=' + json.dumps({
+    'task': '6.CD', 'mode': 'read_only', 'new_calls_in_verification': 0,
+    'frozen_code_config_and_operator_unchanged': True,
+    'old_hashes_unchanged': True, 'retained_independent_facts': 33,
+    'accepted_candidates': sorted(accepted), 'current_fact_count': len(after),
+    'current_metric_count': profile['workpaper_summary']['metric_count'],
+    'old_generation_and_evidence_unchanged': True, 'three_reads_equal': True,
+    'raw_hash_json_checked_ids_and_candidates_match': True,
+    'f09_still_rejected_and_other_quarantines_preserved': True,
+    'new_physical_requests': budget['physical_requests'], 'new_usage': budget['charged_tokens'],
+    'recoveries': sum(n - 1 for n in counts.values()),
+    'business_seconds': summary['business_seconds'], 'cost': budget['charged_cost_cny'],
+    'query_sha256': sha(run / 'query.json'), 'production_authorization': 'not_authorized'
+}, ensure_ascii=False))

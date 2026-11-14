@@ -746,11 +746,11 @@ R6 / A0-R、R7 / B1-R（原§10）已撤销，不再作为当前待办，也不�
 - [x] 6.CC2 review policy v3逐项源检查/拒绝记录，未知/重复目标仍全拒、无合法项不发final、未通过不采纳；68定向15.55秒通过，数字/单位/未知证据及无final混合正反成立。
 - [x] 6.CC3 上汽原TaskService保存真实resume只到final边界离线拒绝，6候选/F09拒绝/33正文/三读/旧hash成立，新模型/绑定0；Review/strict/Git隔离及本人2057290字节清理收尾，见workpaper-repair-isolation-result-20261114/，不计S1或启生产。
 
-### 6.CD 上汽六个保存候选只补原文final（待新的明确批准）
+### 6.CD 上汽六个保存候选只补原文final（已批准并完成）
 
 - [x] 6.CD1 仅六候选/原公开所选章节及Scorpio-Grok high，写明1逻辑/2物理含1恢复/900秒/300000、停止/清理，F09不追补；批准前不绑定不调用。
-- [ ] 6.CD2 新明确批准后原TaskService只发final一次逻辑，实际采纳/拒绝及33独立正文/三读、真实新旧资源分列，原失败/author/hash保持，不新修订/公司/窗口。
-- [ ] 6.CD3 有限独立核实际变化、原来源/账本/模型及Review/strict/本人Git隔离，必要权威一套后finally清本人过程物；不计正式S1或启生产。
+- [x] 6.CD2 用户明确批准后只发一次Grok high final，六项全部接受并实际采用，39事实/80数字、原33独立对象/作者及三读保持；1物理/25234新usage/0恢复/117.447业务秒、unknown。F09仍拒/其他未修隔离不变，不重跑前段/新修订/公司/窗口。
+- [x] 6.CD3 6实际修改有限独立核源，原source/raw/seed/pending与当前代码/配置hash、33对象、新raw/checked IDs/唯一路由/资源/三读只读验证通过；Review/strict/Git本人隔离及2117125字节清理收尾，见workpaper-saic-candidate-final-20261114/，不改S1或启生产。
 
 ### 6.BY 保存真实候选主业构成收口（零新调用）
 

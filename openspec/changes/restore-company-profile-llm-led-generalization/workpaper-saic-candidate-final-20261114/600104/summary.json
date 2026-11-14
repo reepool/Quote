@@ -1,0 +1,91 @@
+{
+  "instrument_id": "600104.SH",
+  "entry_started": true,
+  "three_reads_equal": true,
+  "exception": null,
+  "business_started_monotonic": 9847572.97404354,
+  "preparation_seconds": 33.523,
+  "business_ended_monotonic": 9847690.421412364,
+  "business_seconds": 117.447,
+  "retained_facts": 39,
+  "original_facts_unchanged": true,
+  "old_facts": 33,
+  "adopted_candidate_ids": [
+    "ps-02",
+    "ps-04",
+    "review-add:F05",
+    "review-add:F06",
+    "od-05",
+    "mc-05"
+  ],
+  "query_sha256": "8edeb65daefdfe84a967e75296d84e0cf18d10e3462ef75dfd5060d33f8faf8f",
+  "metric_count": 80,
+  "review_status": "completed_with_open_findings",
+  "review_error": null,
+  "findings": [
+    {
+      "id": "F01",
+      "target": "ps-02",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "id": "F02",
+      "target": "ps-04",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "id": "F03",
+      "target": "ps-06",
+      "resolution": "quarantined"
+    },
+    {
+      "id": "F04",
+      "target": "rm-04",
+      "resolution": "quarantined"
+    },
+    {
+      "id": "F05",
+      "target": null,
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "id": "F06",
+      "target": null,
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "id": "F07",
+      "target": "od-01",
+      "resolution": "quarantined"
+    },
+    {
+      "id": "F08",
+      "target": "od-05",
+      "resolution": "corrected_pending_trust"
+    },
+    {
+      "id": "F09",
+      "target": null,
+      "resolution": "repair_rejected"
+    },
+    {
+      "id": "F10",
+      "target": "mc-05",
+      "resolution": "corrected_pending_trust"
+    }
+  ],
+  "old_all_stages_usage_inherited": 130666,
+  "source_coordinates_equal": true,
+  "original_hashes": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saic-current-result-20261114/run/query.json": "4be0124f32970aa5767ba3762cd3928fe4ff8fccc9a587f54cf9c44611693fc9",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saic-current-result-20261114/run/model-receipts.json": "31ae1d47c83b3c61ef3d4a9280315a51ab8a73dcf1600cc2a5e5f5bd558dc5ba",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saic-current-result-20261114/run/binding.json": "4f1c4d1bf49b2ecb419280c6fa6d71df26890fb37d2339b82d170ec63a7b00ae"
+  },
+  "physical_requests": 1,
+  "charged_tokens": 25234,
+  "cost": "unknown",
+  "recoveries": 0,
+  "stopped_reason": null,
+  "supervision_seconds": 117.846,
+  "runtime_cleanup_bytes": 2092340
+}

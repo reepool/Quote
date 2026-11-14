@@ -1,0 +1,29 @@
+{
+  "task": "6.CD",
+  "mode": "read_only",
+  "new_calls_in_verification": 0,
+  "frozen_code_config_and_operator_unchanged": true,
+  "old_hashes_unchanged": true,
+  "retained_independent_facts": 33,
+  "accepted_candidates": [
+    "mc-05",
+    "od-05",
+    "ps-02",
+    "ps-04",
+    "review-add:F05",
+    "review-add:F06"
+  ],
+  "current_fact_count": 39,
+  "current_metric_count": 80,
+  "old_generation_and_evidence_unchanged": true,
+  "three_reads_equal": true,
+  "raw_hash_json_checked_ids_and_candidates_match": true,
+  "f09_still_rejected_and_other_quarantines_preserved": true,
+  "new_physical_requests": 1,
+  "new_usage": 25234,
+  "recoveries": 0,
+  "business_seconds": 117.447,
+  "cost": "unknown",
+  "query_sha256": "8edeb65daefdfe84a967e75296d84e0cf18d10e3462ef75dfd5060d33f8faf8f",
+  "production_authorization": "not_authorized"
+}

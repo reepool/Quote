@@ -1,0 +1,85 @@
+[
+  {
+    "request_id": "bp-work-864f47aa669e2f8ed2f830e3:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "03e2f41c076336362f4b052b7d8830dd6df847a905cbd93a00ef0ce1a726d260",
+    "response_hash": "dae31a01e903aff8a65c52a5b4085171ea83cb3506dd92f41e142f882e58637f",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"ps-02\",\"ps-04\",\"review-add:F05\",\"review-add:F06\",\"od-05\",\"mc-05\"],\"checks\":[{\"fact_id\":\"ps-02\",\"accepted\":true,\"evidence_ids\":[\"source-0004\"],\"explanation\":\"原文主语是公司通过推出多款HEV混动车型，并另行披露MG品牌欧洲销量超过30万辆、成为欧洲最畅销中国品牌，以及在澳新、中东、拉美、东南亚等地区18个国家乘用车市场跻身当地前十；上汽大众、上汽通用分别推出AUDI E5、别克至境L7。候选恢复了正确投放主体并保留销量结果，未再把欧洲投放归为MG品牌。\"},{\"fact_id\":\"ps-04\",\"accepted\":true,\"evidence_ids\":[\"source-0013\",\"source-0017\"],\"explanation\":\"原文限定零部件业务“主要由”华域汽车开展，候选已恢复该限定，没有再表述为全部由华域开展。动力新科的柴油机及配件业务、中联汽车电子的汽车电子产品生产、经营和研发，均与主要子公司表一致。\"},{\"fact_id\":\"review-add:F05\",\"accepted\":true,\"evidence_ids\":[\"source-0014\"],\"explanation\":\"新能源汽车收入及补贴表以万元列示乘用车收入11,921,125万元、商用车收入1,431,094万元，两类补贴金额均为0、补贴占比均为0%。候选的车型主体、期间、金额单位及零补贴口径均与该表一致，补记了原先遗漏的收入和补贴依赖披露。\"},{\"fact_id\":\"review-add:F06\",\"accepted\":true,\"evidence_ids\":[\"source-0007\"],\"explanation\":\"分产品表毛利率分别为整车4.30%、零部件19.15%、劳务及其他26.38%、金融业务88.47%、合计11.30%，对应增加0.44、1.24、5.61、3.32、0.28个百分点；营业收入同比变动中金融业务为-25.33%、劳务及其他为-21.83%。候选保持百分点与收入变动比例的区别，且未与营业成本变动列混淆。\"},{\"fact_id\":\"od-05\",\"accepted\":true,\"evidence_ids\":[\"source-0006\",\"source-0007\"],\"explanation\":\"经营活动现金流量净额34,306,601,905.98元及变动比例-50.47%与现金流量科目表一致。原因说明同时保留制造业务经营净现金流显著改善，以及上汽财务公司汽车金融贷款等业务规模变动导致公司经营现金流净额同比减少，纠正了只归因财务公司的片面表述。\"},{\"fact_id\":\"mc-05\",\"accepted\":true,\"evidence_ids\":[\"source-0007\",\"source-0009\"],\"explanation\":\"“业务类型、利润构成或利润来源发生重大变动的详细说明”和“业务、产品或服务发生重大变化或调整有关情况”两处原文均勾选不适用。候选只复述勾选结果，没有将其扩写成相关事项未发生重大变动或调整。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "ps-02",
+        "ps-04",
+        "review-add:F05",
+        "review-add:F06",
+        "od-05",
+        "mc-05"
+      ],
+      "checks": [
+        {
+          "fact_id": "ps-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "原文主语是公司通过推出多款HEV混动车型，并另行披露MG品牌欧洲销量超过30万辆、成为欧洲最畅销中国品牌，以及在澳新、中东、拉美、东南亚等地区18个国家乘用车市场跻身当地前十；上汽大众、上汽通用分别推出AUDI E5、别克至境L7。候选恢复了正确投放主体并保留销量结果，未再把欧洲投放归为MG品牌。"
+        },
+        {
+          "fact_id": "ps-04",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0013",
+            "source-0017"
+          ],
+          "explanation": "原文限定零部件业务“主要由”华域汽车开展，候选已恢复该限定，没有再表述为全部由华域开展。动力新科的柴油机及配件业务、中联汽车电子的汽车电子产品生产、经营和研发，均与主要子公司表一致。"
+        },
+        {
+          "fact_id": "review-add:F05",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0014"
+          ],
+          "explanation": "新能源汽车收入及补贴表以万元列示乘用车收入11,921,125万元、商用车收入1,431,094万元，两类补贴金额均为0、补贴占比均为0%。候选的车型主体、期间、金额单位及零补贴口径均与该表一致，补记了原先遗漏的收入和补贴依赖披露。"
+        },
+        {
+          "fact_id": "review-add:F06",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "分产品表毛利率分别为整车4.30%、零部件19.15%、劳务及其他26.38%、金融业务88.47%、合计11.30%，对应增加0.44、1.24、5.61、3.32、0.28个百分点；营业收入同比变动中金融业务为-25.33%、劳务及其他为-21.83%。候选保持百分点与收入变动比例的区别，且未与营业成本变动列混淆。"
+        },
+        {
+          "fact_id": "od-05",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006",
+            "source-0007"
+          ],
+          "explanation": "经营活动现金流量净额34,306,601,905.98元及变动比例-50.47%与现金流量科目表一致。原因说明同时保留制造业务经营净现金流显著改善，以及上汽财务公司汽车金融贷款等业务规模变动导致公司经营现金流净额同比减少，纠正了只归因财务公司的片面表述。"
+        },
+        {
+          "fact_id": "mc-05",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007",
+            "source-0009"
+          ],
+          "explanation": "“业务类型、利润构成或利润来源发生重大变动的详细说明”和“业务、产品或服务发生重大变化或调整有关情况”两处原文均勾选不适用。候选只复述勾选结果，没有将其扩写成相关事项未发生重大变动或调整。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 17079,
+      "output_tokens": 703,
+      "total_tokens": 25234
+    }
+  }
+]

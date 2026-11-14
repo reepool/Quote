@@ -1,0 +1,66 @@
+{
+  "task": "6.CD",
+  "origin": "human_limited_review_of_actual_changes",
+  "scope": "只核这次6项实际采纳的原文/主体/期间/列/单位和限定；不声称39事实或80数字全准确，也不作全报告召回或正式S1评分。",
+  "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+  "checks": [
+    {
+      "fact_id": "ps-02",
+      "source_pages": [
+        9
+      ],
+      "judgment": "有源支持；HEV投放主语保公司，MG欧洲超过30万辆/18国家前十与合资新品分别保留，不由原数据推出MG为独立投放主体。"
+    },
+    {
+      "fact_id": "ps-04",
+      "source_pages": [
+        17,
+        26
+      ],
+      "judgment": "有源支持；保零部件主要由华域开展，动力新科及汽车电子为原子公司业务类型，不把子公司金额并为集团。"
+    },
+    {
+      "fact_id": "review-add:F05",
+      "source_pages": [
+        18
+      ],
+      "judgment": "有源支持；车型收入11,921,125/1,431,094万元及补贴金额0、占比0%原列对应，未改为元或由销量推收入。"
+    },
+    {
+      "fact_id": "review-add:F06",
+      "source_pages": [
+        11
+      ],
+      "judgment": "有源支持；各产品毛利率4.30/19.15/26.38/88.47/11.30%，增加0.44/1.24/5.61/3.32/0.28个百分点分别保留；金融与劳务收入同比-25.33/-21.83不借成本列。"
+    },
+    {
+      "fact_id": "od-05",
+      "source_pages": [
+        10,
+        11
+      ],
+      "judgment": "有源支持；现金流净额34,306,601,905.98元及-50.47%保本期/同比，制造改善和集团因财务公司金融业务变动下降并列，不造成主业同步恶化的外推。"
+    },
+    {
+      "fact_id": "mc-05",
+      "source_pages": [
+        11,
+        13
+      ],
+      "judgment": "有源支持；只复述两披露项目勾选不适用，不扩成业务或利润来源未发生变化。"
+    }
+  ],
+  "independent_original_facts_unchanged": 33,
+  "adopted_after_real_final": 6,
+  "current_fact_count": 39,
+  "current_metric_count": 80,
+  "remaining_issues": {
+    "F03": "Robotaxi归入具体板块的旧句仍quarantined",
+    "F04": "贷款规模推定利息/服务收入的旧句仍quarantined",
+    "F07": "销量增长推整体规模因果的旧句仍quarantined",
+    "F09": "黏连表格的子公司净利润候选repair_rejected，不入正文，不追补"
+  },
+  "supply_chain": "独立供应链容器仍null，正文制造/成本/渠道/物流线索可选接受，不为精细原料/定量关系继续调用。",
+  "formal_s1_changed": false,
+  "production_authorization": "not_authorized"
+}

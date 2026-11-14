@@ -1,0 +1,42 @@
+{
+  "task": "6.CD",
+  "approval_reference": "用户2026-11-14明确回复：批准上汽六候选这一次限定再核；仅6.CD上汽600104.SH六候选",
+  "asset": {
+    "instrument_id": "600104.SH",
+    "report_period": "2025-12-31",
+    "source_asset_id": "ann_b3224a6dec8ca9461302fb368e14f55f",
+    "filing_id": "1225071780",
+    "source": "cninfo",
+    "published_at": "2026-04-01T16:00:00+00:00",
+    "content_hash": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+    "archive_path": "/home/python/Quote/data/filings/announcements/blobs/ac/aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874.pdf",
+    "report_type": "annual_report"
+  },
+  "identity": {
+    "semantic_policy": "company_profile_llm_led.v2",
+    "reading_strategy": "chapter_workpaper_v1",
+    "prompt_version": "company_profile_workpaper.2026-11-14.income-mechanism-sections.v12",
+    "section_guide_version": "company_profile_section_guide.2026-11-14.income-composition.v2",
+    "preprocessing_version": "toc_sections_native_layout.v2",
+    "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+    "execution_mode": "provider",
+    "semantic_reuse": false,
+    "max_section_characters": 160000,
+    "max_layout_characters": 500000,
+    "workpaper_max_output_tokens": 12000,
+    "logical_request_timeout_seconds": 900,
+    "workpaper_review_policy": "company_profile_workpaper_review.v3",
+    "quality_review_profile": "semantic_extraction__scorpio_grok",
+    "repair_profile": "semantic_extraction__deepseek",
+    "review_existing_draft_hash": "3a4288b6491162557baca73bc42d2bfdf174d65c7c6c9243a75603795d98b1e6",
+    "review_resume_hash": "ff0eff4c5046755b17f9c4a3e609acfb2e5bdd54e20746c7a30160406c589d8f",
+    "review_max_output_tokens": 16384
+  },
+  "original_hashes": {
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saic-current-result-20261114/run/query.json": "4be0124f32970aa5767ba3762cd3928fe4ff8fccc9a587f54cf9c44611693fc9",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saic-current-result-20261114/run/model-receipts.json": "31ae1d47c83b3c61ef3d4a9280315a51ab8a73dcf1600cc2a5e5f5bd558dc5ba",
+    "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saic-current-result-20261114/run/binding.json": "4f1c4d1bf49b2ecb419280c6fa6d71df26890fb37d2339b82d170ec63a7b00ae"
+  },
+  "authorization_sha256": "0dac663f45dd3897c982c685ea3e5243b68a17e49ee94dd93e5db956983d4439",
+  "provider_constructor_binding_verified": true
+}
