@@ -1,0 +1,5 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600097.SH,2025-12-31,2026-03-27T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,llm_generated,"公司主要从事远洋渔业捕捞、水产品加工销售及相关贸易，围绕“一鱼一虾”（金枪鱼、南极磷虾）核心主业，构建金枪鱼产业链，形成捕捞、加工、贸易、运输一体化格局。
+公司拥有完整的产业链，构建了“捕捞—运输—加工—贸易”一体化产业格局，产品涵盖冷冻金枪鱼、鱼柳、罐头食品等，旗下境外加工基地与国内销售网络联动。
+主营业务分行业包括海洋捕捞、食品加工、渔货贸易、海上运输四个板块。
+主要子公司业务涵盖远洋捕捞、远洋捕捞及食品加工业、交易鱼类和鱼产品、水产品加工及销售、罐头食品加工、海上运输、海鲜加工和批发、渔货贸易等。",53,27,completed_with_open_findings,1,deepseek-flash,grok-4.7

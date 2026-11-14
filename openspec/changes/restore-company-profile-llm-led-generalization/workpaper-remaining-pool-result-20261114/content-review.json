@@ -1,0 +1,256 @@
+{
+  "task": "6.BX",
+  "scope": "20 frozen company-level narrow business checks, not fact-level accuracy or full-report recall",
+  "source_reference": "../workpaper-fixed-pool-result-20261114/source-first-reference.json",
+  "frozen_reference_not_model_input": true,
+  "companies": [
+    {
+      "instrument_id": "600082.SH",
+      "name": "海泰发展",
+      "checks": [
+        {
+          "condition_id": "600082-C1",
+          "status": "supported",
+          "supporting_fact_ids": [
+            "F001",
+            "F002",
+            "F003"
+          ],
+          "reason": "园区运营、产业投资和孵化主业明确；没有以商品贸易替代主营。"
+        },
+        {
+          "condition_id": "600082-C2",
+          "status": "supported",
+          "supporting_fact_ids": [
+            "F002",
+            "F008"
+          ],
+          "reason": "园区载体和咨询/培训服务在全稿中可见；细分数字遗漏另计C5，不按字段所在栏目重算。"
+        },
+        {
+          "condition_id": "600082-C3",
+          "status": "supported",
+          "supporting_fact_ids": [
+            "F007",
+            "F009",
+            "F010"
+          ],
+          "reason": "房产销售、租赁/物业和代理人净额法贸易得到区分。"
+        },
+        {
+          "condition_id": "600082-C4",
+          "status": "supported",
+          "supporting_fact_ids": [
+            "F009",
+            "F010"
+          ],
+          "reason": "2025营业收入449240562.34元/44924.06万元与正式物理14页一致，不是成本。"
+        },
+        {
+          "condition_id": "600082-C5",
+          "status": "limited",
+          "supporting_fact_ids": [],
+          "reason": "科技园区开发/运营主要金额已在所选表内，但原页小数拆行导致绑定隔离F005/F006/F013/F014；真实初核R001/R002已发现，修订消费失败，不能称业务构成完整。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600097.SH",
+      "name": "开创国际",
+      "checks": [
+        {
+          "condition_id": "600097-C1",
+          "status": "supported",
+          "supporting_fact_ids": [
+            "F-BS-01",
+            "F-BS-02",
+            "F-BS-03"
+          ],
+          "reason": "捕捞—运输—加工—贸易主线明确。"
+        },
+        {
+          "condition_id": "600097-C2",
+          "status": "supported",
+          "supporting_fact_ids": [
+            "F-PS-01",
+            "F-PS-02",
+            "F-PS-03"
+          ],
+          "reason": "金枪鱼、磷虾合作经营、ALBO罐头、鱼柳及配套运输得到表达，未把合作改成独立自产。"
+        },
+        {
+          "condition_id": "600097-C3",
+          "status": "supported",
+          "supporting_fact_ids": [
+            "F-RM-01",
+            "F-RM-02",
+            "F-RM-03",
+            "F-RM-05"
+          ],
+          "reason": "产品销售/运输与直销口径有源，行业/产品收入不当集团总额。"
+        },
+        {
+          "condition_id": "600097-C4",
+          "status": "supported",
+          "supporting_fact_ids": [
+            "F-RM-01"
+          ],
+          "reason": "营业收入2336503042.69元与物理10页一致；2330812544.82元保为主营小计。"
+        },
+        {
+          "condition_id": "600097-C5",
+          "status": "supported",
+          "supporting_fact_ids": [
+            "F-RM-02",
+            "F-SM-04"
+          ],
+          "reason": "四类行业金额与原参考一致，24300.45吨保为转移至鱼柳加工，不新增额外销量。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600054.SH",
+      "name": "黄山旅游",
+      "checks": [
+        {
+          "condition_id": "600054-C1",
+          "status": "supported",
+          "supporting_fact_ids": [
+            "F-BS-01",
+            "F-BS-04",
+            "F-BS-05",
+            "F-BS-06"
+          ],
+          "reason": "六业务由物理9–10页共同支持，不用p9独撑后续业务。"
+        },
+        {
+          "condition_id": "600054-C2",
+          "status": "supported",
+          "supporting_fact_ids": [
+            "F-PS-01",
+            "F-PS-02",
+            "F-PS-03",
+            "F-PS-04",
+            "F-PS-05",
+            "F-PS-06"
+          ],
+          "reason": "观光、客运、旅宿餐饮、徽菜、旅行与平台服务有实质内容。"
+        },
+        {
+          "condition_id": "600054-C3",
+          "status": "supported",
+          "supporting_fact_ids": [
+            "F-RM-01",
+            "F-OI-05",
+            "F-MC-03"
+          ],
+          "reason": "服务业务收入和项目状态保留原文，未造客源比例；未来转型表述仍是提出/致力推动。"
+        },
+        {
+          "condition_id": "600054-C4",
+          "status": "supported",
+          "supporting_fact_ids": [
+            "F-SM-01",
+            "F-SM-08"
+          ],
+          "reason": "2109325107.63元/210932.51万元保本期公司口径，与物理13–14页一致。"
+        },
+        {
+          "condition_id": "600054-C5",
+          "status": "supported",
+          "supporting_fact_ids": [
+            "F-RM-01",
+            "F-SM-03",
+            "F-SM-04",
+            "F-SM-05",
+            "F-SM-06",
+            "F-SM-07"
+          ],
+          "reason": "五类行业金额有源，F-RM-01明确未合并抵消与内部交易差额，不加总替集团或计算伪集团占比。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600000.SH",
+      "name": "浦发银行",
+      "checks": [
+        {
+          "condition_id": "600000-C1",
+          "status": "supported",
+          "supporting_fact_ids": [
+            "bs-01",
+            "bs-02",
+            "bs-03",
+            "bs-04",
+            "bs-05"
+          ],
+          "reason": "四大业务和五赛道分开表达，不强迫互斥；此为全稿组合核查，不代表综合句某一引文覆盖所有分句。"
+        },
+        {
+          "condition_id": "600000-C2",
+          "status": "supported",
+          "supporting_fact_ids": [
+            "ps-01",
+            "ps-02",
+            "ps-04",
+            "ps-06",
+            "ps-07",
+            "ps-09",
+            "ps-10"
+          ],
+          "reason": "信贷、结算、投行、财富、托管、跨境等服务与客群可见，不套制造投入。"
+        },
+        {
+          "condition_id": "600000-C3",
+          "status": "limited",
+          "supporting_fact_ids": [
+            "rm-02",
+            "rm-03",
+            "rm-04",
+            "rm-05"
+          ],
+          "reason": "对公营业净收入685.79亿元、托管24.81亿元及净息差等有源；泛化利息/投资/手续费机制rm-06已被复核隔离。3.7完整利息/非息分解未选读，不能称构成完整或拿AUM补收入。"
+        },
+        {
+          "condition_id": "600000-C4",
+          "status": "supported",
+          "supporting_fact_ids": [
+            "rm-01"
+          ],
+          "reason": "集团期间营业收入1739.64亿元，与物理32页一致，余额不当收入。"
+        },
+        {
+          "condition_id": "600000-C5",
+          "status": "supported",
+          "supporting_fact_ids": [
+            "sm-05",
+            "sm-06",
+            "sm-09",
+            "sm-10"
+          ],
+          "reason": "母公司对公存款38103.74亿元保issuer；托管20.21万亿元为规模，AUM含市值、科技金融保统计口径/期末，未升集团或改收入。"
+        }
+      ]
+    }
+  ],
+  "counts": {
+    "supported": 18,
+    "limited": 2,
+    "total": 20
+  },
+  "actual_change_source_check": {
+    "company": "600097.SH",
+    "fact_id": "F-OI-06",
+    "source": "第三节/五(四)行业经营性信息分析，物理16页/source-0013",
+    "result": "修订恢复相应自捕水产品国内销售、本公司远洋捕捞所得及具名香港子公司税率限定，未把税收优惠扩为全集团/全部国内销售；其他独立事实不变。",
+    "limitation": "这是披露事实原文核对，不是税务适用性意见。"
+  },
+  "unresolved_review_limitations": [
+    "开创磷虾收入增速14%与表格勾稽的范围争议仍隔离，不裁成另一个确定数。",
+    "海泰修订返回unit=个百分点/raw=减少…个百分点未过decimal消费者；同时主要构成数字在源表小数续行，不能称模型没找到。",
+    "浦发修订对突破/近的null值未给uncertainty_reason，未到final，候选不采纳。",
+    "海泰后续两个子节的中间祖先误识别为数值行，原物理页/实质子节仍可定位；本次未重构标题树。"
+  ],
+  "formal_accuracy_not_claimed": true,
+  "production_authorization": "not_authorized"
+}

@@ -1,0 +1,82 @@
+{
+  "task": "6.BX",
+  "verification_mode": "read_only_no_new_calls",
+  "actual_frozen_code_and_config_unchanged": true,
+  "results": [
+    {
+      "instrument_id": "600082.SH",
+      "fact_count": 36,
+      "metric_count": 34,
+      "independent_facts_unchanged": true,
+      "adopted_fact_ids": [],
+      "removed_fact_ids": [
+        "F027",
+        "F035"
+      ],
+      "original_draft_hash_matches": true,
+      "raw_hashes_and_json_match": true,
+      "retained_receipts_loaded": false,
+      "three_reads_equal": true,
+      "query_sha256": "35cdd748c84b1cf9790d1e68340016ef595566b035839bf4b6682324c4495529",
+      "physical_requests": 4,
+      "charged_tokens": 108200
+    },
+    {
+      "instrument_id": "600097.SH",
+      "fact_count": 53,
+      "metric_count": 27,
+      "independent_facts_unchanged": true,
+      "adopted_fact_ids": [
+        "F-OI-06"
+      ],
+      "removed_fact_ids": [
+        "F-SM-02"
+      ],
+      "original_draft_hash_matches": true,
+      "raw_hashes_and_json_match": true,
+      "retained_receipts_loaded": false,
+      "three_reads_equal": true,
+      "query_sha256": "d40ddecd649e3a30b851311c2e4806db6af5aaae9695ac971203f821801874a3",
+      "physical_requests": 5,
+      "charged_tokens": 116035
+    },
+    {
+      "instrument_id": "600054.SH",
+      "fact_count": 64,
+      "metric_count": 71,
+      "independent_facts_unchanged": true,
+      "adopted_fact_ids": [],
+      "removed_fact_ids": [],
+      "original_draft_hash_matches": true,
+      "raw_hashes_and_json_match": true,
+      "retained_receipts_loaded": false,
+      "three_reads_equal": true,
+      "query_sha256": "dc0d310bc723873df520ca5a01ef9ea67ef8afa4cf2a031c373bc4376adb6bae",
+      "physical_requests": 3,
+      "charged_tokens": 94953
+    },
+    {
+      "instrument_id": "600000.SH",
+      "fact_count": 65,
+      "metric_count": 46,
+      "independent_facts_unchanged": true,
+      "adopted_fact_ids": [],
+      "removed_fact_ids": [
+        "bs-06",
+        "rm-06"
+      ],
+      "original_draft_hash_matches": true,
+      "raw_hashes_and_json_match": true,
+      "retained_receipts_loaded": false,
+      "three_reads_equal": true,
+      "query_sha256": "e2fd13ba19fff80824fb8f17571d92896e65ef44aace3961cc2ec53e319e4aae",
+      "physical_requests": 4,
+      "charged_tokens": 130312
+    }
+  ],
+  "physical_requests": 16,
+  "actual_usage": 449500,
+  "recoveries": 0,
+  "cost": "unknown",
+  "production_authorization": "not_authorized"
+}
