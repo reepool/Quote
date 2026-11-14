@@ -1,0 +1,26 @@
+{
+  "task": "6.CF",
+  "classification": "operator_error_before_any_model_response",
+  "operator_error": "本会话使用默认网络受限exec启动了需要联网的四家业务进程；未先在与实际运行一致的权限环境核验联网。",
+  "sandbox_dns": [
+    {"host": "api.deepseek.com", "result": "gaierror", "errno": -3},
+    {"host": "scorpio.reepool.com", "result": "gaierror", "errno": -3}
+  ],
+  "authorized_outside_sandbox_dns_only": [
+    {"host": "api.deepseek.com", "result": "DNS_OK", "address_count": 2, "seconds": 0.017},
+    {"host": "scorpio.reepool.com", "result": "DNS_OK", "address_count": 1, "seconds": 0.001}
+  ],
+  "business_process_network_observation": {
+    "host_pids": [2232970, 2232971, 2232972, 2232973],
+    "network_namespace": "net:[4026532641]",
+    "tcp_connection_rows_each": 0,
+    "tcp6_connection_rows_each": 0
+  },
+  "new_model_responses_at_stop": 0,
+  "provider_usage": "unknown",
+  "money_spent": "unknown",
+  "limits_not_reset": true,
+  "terminal_followup": "原600秒物理时限未能让调用返回，未据此推断供应商超时或具体内部调用栈。SIGUSR1已封后继发送；本会话随后对已核身份的四个本人worker发送SIGTERM，主管正常收束。原账本保failed_or_cancelled、unknown_reserved和usage=null，没有伪造模型结算。",
+  "shared_configuration_changed": false,
+  "corrective_action": "停止后续派发和在途恢复；等待原物理尝试超时结算并持久化失败、只读查询后清理。未重新启动四家、未启动其余八家。后续联网业务须从获准的联网exec启动，先同环境只读DNS/路由核对，不是更换模型或修改业务算法。"
+}

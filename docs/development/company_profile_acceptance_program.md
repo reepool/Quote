@@ -6,6 +6,8 @@
 
 ## 1. 目标与完成边界
 
+2026-11-14 6.CF获用户新批准后因本会话执行环境错误止损：[结案](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-core-same-version-result-20261114/result.md)。首4入口在不通网沙箱启动，4物理尝试/0恢复/0模型响应/0新稿、余8未启动；323898仅unknown_reserved保守账本，实际usage/费用unknown，不能归因LLM质量。DNS内失败/外成功、进程无连接；封后继且核身份终止，未重跑或借余量。133核心、补充抽审/六风险及完整同版验收未评估，S1仍0/12、生产不启。源码/配置/12原query/PDF版本未改；本人19239400字节收尾清，原attempt/源/缓存/既有并行保护。本次授权结束，后续须新明确裁决及同联网权限预检，不用模型/语义补丁处理operator错误。
+
 2026-11-14 6.CE零新调用交[12稿核心结论/133源条件](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-core-readiness-20261114/result.md)：12稿547事实/694数字仅内容量；每家10–13项核心及六类风险的源/版本和现稿文字对应已整理，尚未完成逐对象完整核源、补充抽审与实际负例，不造正式准确率/召回或同版成绩。美尔雅总收入/亏损原F011已抽取，只因方向比率无字面负号被误隔离；原绑定器最小修正/保存真实响应本地源核通过，不回写旧稿或扩大checked集合。浦发完整收入构成仍缺，通用选章指引真实效果待测。下一6.CF只拟原12家当前同版全新开发回归，仍须新明确整组外传/调用批准；拟1800秒/500000/10物理含3恢复/并发4，开发与正式900秒/120000/16及价格unknown分列，不自动计S1或启生产。0新绑定/模型、0新运行根、释放0，原源/结果/尝试标记及既有并行保护。
 
 2026-11-14 6.CD用户明确批准后真实final1/1完成：[39事实/80数字上汽修订后稿](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saic-candidate-final-20261114/profiles.md)。六候选全部接受并实际采纳，4条纠正恢复/2新增，原33对象/实际generation/Evidence不变、三读一致；F09仍拒、F03/F04/F07仍隔离，不洗白剩余问题。仅1新Grok high请求/25234实际total usage/0恢复/117.447业务秒，准备33.523秒单列、unknown；旧130666用量和原失败继承不重计。源码/共享配置/原source/seed/raw/pending及wire候选/原文hash冻结相同，有限6修改核源通过，非39条全准确或同版12/12/S1；旧S1仍0/12、生产不启。本人2117125字节清，正式源/缓存/原件/attempt/既有并行保护。本卡权限用完，停止上汽细项补跑，下一转现有12稿核心质量结论与正式同版验收准备，不自动再核/扩样。

@@ -1,0 +1,6 @@
+{
+  "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-core-readiness-20261114/source-first-contract.json",
+  "sha256": "1f52e5bbf76610a1dd156d2135b0b4276c03c1693a23467accc56e17bf307d62",
+  "conditions": 133,
+  "not_model_input": true
+}

@@ -1,0 +1,31 @@
+{
+  "physical_requests": 1,
+  "charged_tokens": 77753,
+  "charged_cost_cny": "unknown",
+  "cost_status": "unknown",
+  "billing_mode": "development_unpriced",
+  "token_reservation_method": "utf8_payload_bytes_plus_256_framing",
+  "stopped_reason": "group_stop_requested",
+  "denied_request": null,
+  "attempts": [
+    {
+      "sequence": 1,
+      "request_id": "bdecfc3693264e77a8196286aea93c8e",
+      "logical_request_id": "f9e51334327c2a75f48cc4359e0626094eec32e073dee12990f8943ca12942fa",
+      "source_label": "deepseek:deepseek-flash",
+      "attempt": 1,
+      "profile": "semantic_extraction__deepseek",
+      "provider_resource": "deepseek",
+      "model": "deepseek-flash",
+      "reserved_input_tokens": 75253,
+      "reserved_output_tokens": 2500,
+      "charged_tokens": 77753,
+      "charged_cost_cny": "unknown",
+      "usage": null,
+      "status": "failed_or_cancelled",
+      "billing_basis": "unpriced_development_observation",
+      "cost_status": "unknown",
+      "usage_status": "unknown_reserved"
+    }
+  ]
+}

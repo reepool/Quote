@@ -1,0 +1,110 @@
+"""Read-only result inspection and cleanup of this stopped 6.CF, no model calls."""
+from pathlib import Path
+import hashlib
+import json
+import re
+import runpy
+import shutil
+import sys
+
+ROOT=Path('/home/python/Quote')
+sys.path.insert(0,str(ROOT))
+C=ROOT/'openspec/changes/restore-company-profile-llm-led-generalization'
+D=C/'workpaper-core-same-version-result-20261114'
+TMP=ROOT/'data/QuoteBak'
+RUNTIME={
+ '600094':TMP/'workpaper-cf-600094-gjcujzb7',
+ '600103':TMP/'workpaper-cf-600103-2kjur7l5',
+ '600100':TMP/'workpaper-cf-600100-6iomfpd5',
+ '600107':TMP/'workpaper-cf-600107-0hpuzoug',
+}
+PREPARED=TMP/'workpaper-cf-prepared-vsjdi6gb'
+
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def dump(p,v):
+ p.parent.mkdir(parents=True,exist_ok=True)
+ p.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n')
+
+ops=runpy.run_path(str(TMP/'workpaper_cf_operator.py'))
+auth=json.loads((D/'authorization.json').read_text())
+assert ops['code_hashes']()==auth['code_sha256']
+assert sha(ROOT/'config/13_llm.json')==auth['shared_config_sha256']
+assert sha(TMP/'workpaper_cf_operator.py')==auth['operator_sha256']==sha(D/'operator-snapshot.txt')
+assert sha(ops['CAPTURE_HELPER'])==auth['capture_helper_sha256']
+core=json.loads((C/'workpaper-core-readiness-20261114/source-first-contract.json').read_text())
+assert sha(C/'workpaper-core-readiness-20261114/source-first-contract.json')==auth['source_first_reference_sha256']
+for company in core['companies']:
+ assert sha(ROOT/company['current_query'])==company['current_query_sha256']
+ assert sha(Path(company['source_pdf']))==company['document_version']
+from research.company_profile.reads import CompanyProfileReadService
+records=[]; cleanup=[]
+for symbol,root in RUNTIME.items():
+ assert root.is_dir() and not root.is_symlink() and root.parent==TMP
+ assert root.name.startswith('workpaper-cf-'+symbol+'-')
+ binding=json.loads((D/symbol/'binding.json').read_text())
+ assert binding['provider_constructor_binding_verified_before_entry']
+ assert binding['identity']['source_binding_policy']=='company_workpaper_source_literals.signed-rate.v1'
+ reader=CompanyProfileReadService(root/'output')
+ query=reader.query((symbol+'.SH',))
+ exported=reader.export((symbol+'.SH',),root/'post-stop-export')
+ reread=CompanyProfileReadService(root/'output').query((symbol+'.SH',))
+ assert query['profiles']==exported['profiles']==reread['profiles']==[]
+ dump(D/symbol/'post-stop-query.json',query)
+ ckpts=list((root/'output/company_profile_common_core.v1/checkpoints').glob('*.json'))
+ assert len(ckpts)==1
+ ckpt=json.loads(ckpts[0].read_text())
+ assert ckpt['workpaper'] is None and not ckpt['workpaper_receipts']
+ assert ckpt['review_seed'] is None and ckpt['review_resume'] is None
+ assert not list((root/'captured-content').glob('*.json'))
+ budget=json.loads((D/symbol/'budget.json').read_text())
+ assert budget['physical_requests']==1 and len(budget['attempts'])==1
+ attempt=budget['attempts'][0]
+ assert attempt['usage'] is None and attempt['usage_status']=='unknown_reserved'
+ assert attempt['source_label']=='deepseek:deepseek-flash'
+ assert budget['charged_cost_cny']=='unknown'
+ assert budget['stopped_reason']=='group_stop_requested'
+ marker=TMP/'s1-attempts'/('workpaper-cf-'+symbol+'-20261114.json')
+ assert json.loads(marker.read_text())['binding_sha256']==sha(D/symbol/'binding.json')
+ lines=(PREPARED/(symbol+'-run.log')).read_text(errors='replace').splitlines()
+ events=[line for line in lines if 'event=llm.' in line or line.startswith('BUSINESS_STARTED') or '[ERROR]' in line]
+ heartbeats=[line for line in lines if 'stage heartbeat stage=semantic' in line]
+ if heartbeats:events.append(heartbeats[-1])
+ (D/symbol/'operator-events.log').write_text('\n'.join(events)+'\n')
+ record={'instrument_id':symbol+'.SH','outcome':'interrupted_operator_environment_failure',
+   'task_service_completed':False,'post_stop_reader_profiles':0,
+   'post_stop_query_export_new_reader_equal_empty_only':True,
+   'model_responses':0,'provider_usage':'unknown','physical_attempts':1,'recoveries':0,
+   'conservative_ledger_tokens':budget['charged_tokens'],'fee':'unknown',
+   'attempt_status_preserved':attempt['status'],'usage_status_preserved':attempt['usage_status'],
+   'checkpoint_sha256':sha(ckpts[0]),'checkpoint_workpaper':None,'checkpoint_old_semantic_input':False,
+   'attempt_marker_sha256':sha(marker),'post_stop_query_sha256':sha(D/symbol/'post-stop-query.json'),
+   'business_seconds':'unknown_not_reconstructed_from_mtime',
+   'termination_signal':'SIGTERM','operator_error':'network-restricted exec rather than authorized network exec'}
+ records.append(record);dump(D/symbol/'post-stop-result.json',record)
+for root in [*RUNTIME.values(),PREPARED]:
+ assert root.parent==TMP and root.is_dir() and not root.is_symlink()
+ size=sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
+ cleanup.append({'path':str(root.relative_to(ROOT)),'bytes':size,'reason':'only this task; necessary metadata and no-model-response checkpoint state persisted; source PDFs/caches retained'})
+ shutil.rmtree(root)
+order=auth['order']
+assert all(not (D/s[:6]).exists() for s in order[4:])
+assert all(not (TMP/'s1-attempts'/('workpaper-cf-'+s[:6]+'-20261114.json')).exists() for s in order[4:])
+progress=json.loads((D/'progress.json').read_text())
+summary={'task':'6.CF','outcome':'stopped_operator_error','authorized_companies':12,
+ 'entries_started':4,'not_started_instrument_ids':order[4:],'results':records,
+ 'physical_attempts':4,'model_responses':0,'recoveries':0,
+ 'conservative_ledger_tokens':sum(r['conservative_ledger_tokens'] for r in records),
+ 'provider_usage':'unknown','fee':'unknown','same_version_business_successes':0,
+ 'supervision_seconds_including_preparation':progress['supervision_wall_seconds'],
+ 'business_wall_seconds':'unknown; no successful return and no persisted end monotonic',
+ 'stale_progress_executed_zero_not_used_for_denominator':True,
+ 'core_audit':'not_evaluated_no_model_content','supplemental_audit':'not_evaluated_no_model_content',
+ 'six_risk_actual_challenges':'not_evaluated_no_model_content',
+ 's1_changed':False,'production_authorization':'not_authorized',
+ 'code_shared_config_and_source_contract_unchanged':True,'original_twelve_query_hashes_unchanged':True,
+ 'source_pdf_versions_verified':12,'original_budget_attempt_statuses_preserved':True,
+ 'network_and_timeout_cause':'environment-diagnosis.json; physical cap did not return; supervisor actively terminated exact own processes',
+ 'cleanup':cleanup,'runtime_bytes_released':sum(x['bytes'] for x in cleanup),
+ 'additional_scripts_to_remove':[str((TMP/'workpaper_cf_operator.py').relative_to(ROOT)),str(Path(__file__).relative_to(ROOT))]}
+dump(D/'stopped-group-result.json',summary)
+print(json.dumps(summary,ensure_ascii=False))

@@ -1,0 +1,23 @@
+{
+  "instrument_id": "600094.SH",
+  "outcome": "interrupted_operator_environment_failure",
+  "task_service_completed": false,
+  "post_stop_reader_profiles": 0,
+  "post_stop_query_export_new_reader_equal_empty_only": true,
+  "model_responses": 0,
+  "provider_usage": "unknown",
+  "physical_attempts": 1,
+  "recoveries": 0,
+  "conservative_ledger_tokens": 85370,
+  "fee": "unknown",
+  "attempt_status_preserved": "failed_or_cancelled",
+  "usage_status_preserved": "unknown_reserved",
+  "checkpoint_sha256": "129836db1ad95514502a619d7852c916f9cf4fb3d000a6b5b2ada29061d6c5cd",
+  "checkpoint_workpaper": null,
+  "checkpoint_old_semantic_input": false,
+  "attempt_marker_sha256": "be25f396a14213e550c3d7aa72b6945e83ac7c97a1c3cee08dab41df0d8151c5",
+  "post_stop_query_sha256": "438ab9c9f2ef24d47446b0fd87db6e9c456c87170f5ed91bf3ae35151356ff88",
+  "business_seconds": "unknown_not_reconstructed_from_mtime",
+  "termination_signal": "SIGTERM",
+  "operator_error": "network-restricted exec rather than authorized network exec"
+}

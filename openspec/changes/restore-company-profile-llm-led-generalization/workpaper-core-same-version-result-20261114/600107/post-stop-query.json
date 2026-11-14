@@ -1,0 +1,17 @@
+{
+  "action": "query",
+  "state": "not_found",
+  "requested_instrument_ids": [
+    "600107.SH"
+  ],
+  "missing_instrument_ids": [
+    "600107.SH"
+  ],
+  "delivered": 0,
+  "profiles": [],
+  "stage4_restricted_views": [],
+  "production_authorization": "not_authorized",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "legacy_export_used": false
+}

@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-14当前6.CF已按失败结束：[首4家operator环境错误/余8未启动](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-core-same-version-result-20261114/result.md)。用户已批但本会话误用受限联网环境，4物理尝试没有模型响应/新稿，不是模型能力结论；未热修/重开/借余额，旧S1/源/结果/生产不改。本人运行库/准备副本/临时脚本19239400字节已清。下一必须先纠正实际启动权限并经新明确运行裁决，不再围此失败修语义或单公司细句；下面6.CF待授权/执行措辞仅保原规划时点，不自动恢复已结束授权。
+
 2026-11-14当前6.CE已交[12稿核心对照与133源条件](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-core-readiness-20261114/result.md)。停止上汽细项补卡；美尔雅核心误隔离最小修正已本地证实，浦发收入构成选章缺口待真实验证。下一唯一候选为[章节卡6.CF](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md#下一6cf133核心条件下的12家同版内容与安全回归待新授权)原12家一次同版整组内容/安全开发回归，先新明确整组授权再冻结执行，不自动续旧额度/运行、启S2或生产。现有跨版本稿不计正式S1；完整核源、补充抽审/六风险实测与常规效率仍未就绪，开发放宽额度不冒充正式资源达标。每轮先清后做、持久必要一套后收尾，源/原件/既有并行保护。
 
 > 类型：requirements / execution plan；版本：3；更新：2026-11-10。

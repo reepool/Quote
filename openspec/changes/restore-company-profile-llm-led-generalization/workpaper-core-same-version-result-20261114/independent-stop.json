@@ -1,0 +1,11 @@
+{
+  "task": "6.CF",
+  "reason": "operator_network_environment_mismatch",
+  "detail": "本会话错误地在网络受限沙箱中启动了已获联网授权的第一批四家；沙箱内api.deepseek.com与scorpio.reepool.com均DNS EAI_AGAIN，获准的沙箱外只读DNS诊断均成功。尚无模型响应，不得归因于模型阅读质量。停止后续派发和在途后继发送，保留初始尝试、失败/未知用量，不重新启动四家或借剩余入口继续。",
+  "started_instrument_ids": ["600094.SH", "600103.SH", "600100.SH", "600107.SH"],
+  "unstarted_count": 8,
+  "new_model_response_count_at_stop": 0,
+  "retry_or_fresh_entry_authorized_by_this_record": false,
+  "shared_configuration_changed": false,
+  "production_authorization": "not_authorized"
+}
