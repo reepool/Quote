@@ -17,11 +17,11 @@ from .workpaper_sections import (
     extract_selected_layout, index_sections, selected_pages,
 )
 
-WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-14.wrapped-cells-source-literals.v11"
-SECTION_GUIDE_VERSION = "company_profile_section_guide.2026-11-12.v1"
+WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-14.income-mechanism-sections.v12"
+SECTION_GUIDE_VERSION = "company_profile_section_guide.2026-11-14.income-composition.v2"
 SECTION_GUIDE = (
     {"questions": "做什么、产品/服务用途、怎么经营", "sources": "主要业务/经营模式/核心竞争力/业务回顾的实质子节", "priority": "primary"},
-    {"questions": "公司规模、主要板块收入/占比或运营规模", "sources": "主营业务分析/收入和成本分析/各业务板块经营情况/主要财务指标", "priority": "primary"},
+    {"questions": "怎么赚钱、公司收入与主要业务权重", "sources": "主营业务分析/收入和成本分析/利润表分析/财务情况分析中的营业收入或收入构成子节；结合各业务板块经营情况", "priority": "primary"},
     {"questions": "供应链位置、原材料/资源、客户领域（可选）", "sources": "经营模式/原料采购/生产销售/产品用途/客户与渠道", "priority": "optional_same_pack"},
     {"questions": "经营因素与本期重要变化", "sources": "管理层经营讨论/业务变化/重要风险/展望（保留计划限定）", "priority": "material_only"},
     {"questions": "主要业务仍有实质缺口时定向补充", "sources": "分部信息/收入附注/必要关联购销", "priority": "targeted_only"},
@@ -69,6 +69,12 @@ explain business structure, products/services and uses, monetization, scale and 
 operating roles and inputs/resources, customers/channels/markets, drivers and actual changes.
 Choose about 2-8 related useful sections. Prefer a compact parent subsection over many tiny
 items, but do not select an ancestor and its child together or selectable=false entries.
+For monetization and main mix, seek substantive report-local revenue composition or
+income-statement analysis, not just business introductions or operating highlights.
+Assets, AUM, capacity or client counts cannot substitute for revenue sources. Keep net
+operating revenue distinct from gross business receipts, with their own table headers.
+A TOC-only duplicate or heading stub is not substantive source text; prefer the actual
+body occurrence. Do not expand to the entire financial report to fill minor details.
 Use financial/segment notes only for meaningful gaps, not the entire financial report.
 Preserve table headers, units and continuations by selecting the complete owning subsection.
 Banks use financial services/funding, not manufacturing inputs. Do not chase all appendices.

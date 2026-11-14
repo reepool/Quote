@@ -485,6 +485,16 @@ def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_repla
             assert result.workpaper.elements.scale_and_mix.facts[0].metrics[0].value is None
         assert len(transport.calls) == 2
         assert len(result.receipts) == 2
+        from research.company_profile.workpaper_llm import SECTION_GUIDE, SECTION_GUIDE_VERSION
+
+        selection_wire = json.dumps(transport.calls[0]["payload"], ensure_ascii=False)
+        assert SECTION_GUIDE_VERSION in selection_wire
+        assert "利润表分析" in selection_wire and "收入构成" in selection_wire
+        selection_instructions = transport.calls[0]["payload"]["messages"][0]["content"]
+        assert "income-statement analysis" in selection_instructions
+        assert "TOC-only duplicate" in selection_instructions
+        assert "gross business receipts" in selection_instructions
+        assert "600000" not in json.dumps(SECTION_GUIDE, ensure_ascii=False)
         extraction = transport.calls[1]["payload"]
         assert "100.00" in extraction["messages"][1]["content"]
         assert "source_conditions" not in extraction["messages"][1]["content"]

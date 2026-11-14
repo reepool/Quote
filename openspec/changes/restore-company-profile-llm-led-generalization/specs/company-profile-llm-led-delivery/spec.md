@@ -148,6 +148,11 @@ For new workpapers under the 2026-11-12 user instruction, company_profile_workpa
 ### Requirement: Reading questions guide report-local section selection
 The selector MUST receive a versioned general question-to-section-family guide inferred from reviewed reports. Business and operating-mode subsections are primary sources; revenue/cost and business review sections provide main segment weights; procurement/production/sales, product applications and customer sections may enrich supply chains. Financial or segment notes are targeted supplements, while honors, governance and minor technical details are deferred. Families are semantic hints, never exact heading/page whitelists. Numbered decimal headings such as 3.6 and 3.6.2 MUST preserve their report-local hierarchy so useful subsections can be selected without reading an entire management chapter. Extraction MUST prioritize a supported main segment's revenue or operating scale before minor organization/technology details; unknown values remain unknown.
 
+#### Scenario: Business introductions omit the main income composition
+- **WHEN** business descriptions and scale highlights do not substantively explain revenue sources or main mix
+- **THEN** the question-to-section guide points to this report's substantive income-statement, financial-condition or revenue-composition subsections without using a fixed company, page or exact title
+- **AND** TOC-only duplicates and assets/AUM/capacity do not substitute for those sources; gross business receipts and net operating revenue retain their separate headers, and minor omissions do not require the full financial report
+
 #### Scenario: A bank uses decimal subsection numbering
 - **WHEN** the report contains a business subsection with its own revenue/scale and a later financial analysis subsection
 - **THEN** the heading tree exposes both with correct boundaries, and the model can select them using the same company-neutral questions
