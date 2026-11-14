@@ -1,0 +1,40 @@
+[
+  {
+    "request_id": "bp-work-887e2a7040b8b0e2a1a36ea5:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "2cebfb6a0327e75b81851e30cf0a68a400c5098d30fe232b098bd966b1078092",
+    "response_hash": "24327ab25fc2901464ab50972cdc35dc186265aacd9b522c854a21fd23626549",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0039\",\"section-0044\",\"section-0045\",\"section-0051\",\"section-0053\",\"section-0078\",\"section-0108\"],\"rationale\":\"所选章节覆盖公司业务结构、行业环境、经营讨论、核心竞争力、主营业务分析（收入成本、费用、研发、现金流）、行业经营性信息（产能、整车/零部件产销量、新能源汽车、汽车金融）以及未来发展战略与经营计划，能共同解释产品服务、盈利模式、规模与结构、经营驱动因素及本期变化。未选财务报告附注与治理、股东、债券等章节，避免冗余。\",\"deferred\":[\"第八节财务报告中的分部信息、收入附注、关联交易等：仅在主营业务分析仍存在实质缺口时定向补充，当前业务与经营章节已足够说明整体结构\",\"第四节公司治理、环境和社会：与业务经营解释关联弱，非本次范围\",\"第六节股份变动及股东情况、第七节债券相关情况：属资本结构信息，非业务经营核心\"],\"stop_reason\":\"已选取覆盖业务、行业、经营分析、核心竞争力、主营业务分析、行业经营性信息及未来展望的完整信息密集子节，可回答业务结构、产品用途、盈利模式、规模与主要构成、经营驱动及变化；财务附注与治理类章节属非必要范围，可在出现实质缺口时再定向补充。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0039",
+        "section-0044",
+        "section-0045",
+        "section-0051",
+        "section-0053",
+        "section-0078",
+        "section-0108"
+      ],
+      "rationale": "所选章节覆盖公司业务结构、行业环境、经营讨论、核心竞争力、主营业务分析（收入成本、费用、研发、现金流）、行业经营性信息（产能、整车/零部件产销量、新能源汽车、汽车金融）以及未来发展战略与经营计划，能共同解释产品服务、盈利模式、规模与结构、经营驱动因素及本期变化。未选财务报告附注与治理、股东、债券等章节，避免冗余。",
+      "deferred": [
+        "第八节财务报告中的分部信息、收入附注、关联交易等：仅在主营业务分析仍存在实质缺口时定向补充，当前业务与经营章节已足够说明整体结构",
+        "第四节公司治理、环境和社会：与业务经营解释关联弱，非本次范围",
+        "第六节股份变动及股东情况、第七节债券相关情况：属资本结构信息，非业务经营核心"
+      ],
+      "stop_reason": "已选取覆盖业务、行业、经营分析、核心竞争力、主营业务分析、行业经营性信息及未来展望的完整信息密集子节，可回答业务结构、产品用途、盈利模式、规模与主要构成、经营驱动及变化；财务附注与治理类章节属非必要范围，可在出现实质缺口时再定向补充。"
+    },
+    "usage": {
+      "input_tokens": 24052,
+      "output_tokens": 296,
+      "total_tokens": 24348
+    }
+  }
+]

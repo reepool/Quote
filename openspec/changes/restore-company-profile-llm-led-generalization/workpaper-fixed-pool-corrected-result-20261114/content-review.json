@@ -1,0 +1,1730 @@
+{
+  "task": "6.BV",
+  "method": "复用运行前独立正式源参考；人工对照本轮最终正文，而非字段存在判完整；对实际修订和新发现单位冲突再次直接读正式PDF对应原页。原模型通过/坐标命中不替代语义判断。",
+  "reference": "../workpaper-fixed-pool-result-20261114/source-first-reference.json",
+  "formal_accuracy_rate": null,
+  "formal_recall_rate": null,
+  "s1_credit": 0,
+  "production_authorization": "not_authorized",
+  "companies": [
+    {
+      "instrument_id": "600094.SH",
+      "name": "大名城",
+      "started": true,
+      "readable": true,
+      "review_status": "completed_with_open_findings",
+      "source_query": "../workpaper-runs/v9-fixed-pool-corrected-600094-20261114/query.json",
+      "checks": [
+        {
+          "reference_condition_id": "600094-C1",
+          "dimension": "主营与边界",
+          "status": "limited",
+          "actual_fact_ids": [
+            "F001",
+            "F002",
+            "F003",
+            "F004",
+            "F008"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                10
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0002",
+              "physical_pages": [
+                11
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0005",
+              "physical_pages": [
+                13
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            }
+          ],
+          "observation": "地产/金控/算力主次及参股未并表的修订有源；被投公司产品仍需按投资范围阅读，不当集团自产。"
+        },
+        {
+          "reference_condition_id": "600094-C2",
+          "dimension": "产品服务",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F005",
+            "F006",
+            "F007"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0010",
+              "physical_pages": [
+                16
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0016",
+              "physical_pages": [
+                22
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(四) 行业经营性信息分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0017",
+              "physical_pages": [
+                23
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(四) 行业经营性信息分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                10
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0011",
+              "physical_pages": [
+                17
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "observation": "物业开发销售运营、算力服务、投资平台可读；不以飞行器/芯片做上市公司自产证据。"
+        },
+        {
+          "reference_condition_id": "600094-C3",
+          "dimension": "变现",
+          "status": "limited",
+          "actual_fact_ids": [
+            "F010",
+            "F011",
+            "F014",
+            "F015"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0009",
+              "physical_pages": [
+                15
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0010",
+              "physical_pages": [
+                16
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0011",
+              "physical_pages": [
+                17
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0017",
+              "physical_pages": [
+                23
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(四) 行业经营性信息分析"
+              ]
+            }
+          ],
+          "observation": "物业销售结转、租赁和净额算力机制可读；F015租金原万元却写元且exact，为独立止损项，不作可靠金额。"
+        },
+        {
+          "reference_condition_id": "600094-C4",
+          "dimension": "公司收入",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F016",
+            "F019"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0009",
+              "physical_pages": [
+                15
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0005",
+              "physical_pages": [
+                13
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0017",
+              "physical_pages": [
+                23
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(四) 行业经营性信息分析"
+              ]
+            }
+          ],
+          "observation": "全年22.47亿元/2246548569.51元；修订把20.42亿元限定为房地产结转收入，不再替全年收入。"
+        },
+        {
+          "reference_condition_id": "600094-C5",
+          "dimension": "主要构成",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F010",
+            "F012",
+            "F013",
+            "F018"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0009",
+              "physical_pages": [
+                15
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0010",
+              "physical_pages": [
+                16
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "observation": "房地产22.31亿元、算力1534.83万元和金融空栏保留；区域收入占比是地产板块口径。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600103.SH",
+      "name": "青山纸业",
+      "started": true,
+      "readable": true,
+      "review_status": "completed",
+      "source_query": "../workpaper-runs/v9-fixed-pool-corrected-600103-20261114/query.json",
+      "checks": [
+        {
+          "reference_condition_id": "600103-C1",
+          "dimension": "主营与边界",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F001",
+            "F002",
+            "F003"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                9
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0002",
+              "physical_pages": [
+                10
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "observation": "浆纸为主并保医药、光电子、林业；母子公司业务范围分开。"
+        },
+        {
+          "reference_condition_id": "600103-C2",
+          "dimension": "产品服务",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F005",
+            "F006",
+            "F007",
+            "F008",
+            "F009",
+            "F010"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0002",
+              "physical_pages": [
+                10
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "observation": "浆纸、纸制品、医药及光模块等与实际用途有源。"
+        },
+        {
+          "reference_condition_id": "600103-C3",
+          "dimension": "变现",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F012",
+            "F013",
+            "F020",
+            "F021"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0003",
+              "physical_pages": [
+                11
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0010",
+              "physical_pages": [
+                18
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "observation": "浆纸自主生产/直销以销定产，采购木竹片/燃料设备与销售不混。"
+        },
+        {
+          "reference_condition_id": "600103-C4",
+          "dimension": "公司收入",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F015",
+            "F016"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0007",
+              "physical_pages": [
+                13
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0008",
+              "physical_pages": [
+                16
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "observation": "2025总营业收入2418990221.17元及24.19亿元舍入，不用行业数或主营小计替代。"
+        },
+        {
+          "reference_condition_id": "600103-C5",
+          "dimension": "主要构成",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F004",
+            "F017",
+            "F018"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0008",
+              "physical_pages": [
+                16
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0009",
+              "physical_pages": [
+                17
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0010",
+              "physical_pages": [
+                18
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "observation": "主要行业/产品及内部抵销、主营合计2332376693.65与总营业收入分开。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600100.SH",
+      "name": "同方股份",
+      "started": true,
+      "readable": true,
+      "review_status": "incomplete",
+      "source_query": "../workpaper-runs/v9-fixed-pool-corrected-600100-20261114/query.json",
+      "checks": [
+        {
+          "reference_condition_id": "600100-C1",
+          "dimension": "主营与边界",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F001",
+            "F002"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                12
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0002",
+              "physical_pages": [
+                13
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0003",
+              "physical_pages": [
+                13
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "二、报告期内公司所处行业情况"
+              ]
+            }
+          ],
+          "observation": "三主业有源；过度解读不适用的F029已被初核隔离，不在当前正文。"
+        },
+        {
+          "reference_condition_id": "600100-C2",
+          "dimension": "产品服务",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F004",
+            "F005",
+            "F006",
+            "F007"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                12
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0002",
+              "physical_pages": [
+                13
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0012",
+              "physical_pages": [
+                22
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "（一）公共安全"
+              ]
+            }
+          ],
+          "observation": "安检、知识服务/数智转型、热泵储能能源方案可读。"
+        },
+        {
+          "reference_condition_id": "600100-C3",
+          "dimension": "变现",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F008",
+            "F009",
+            "F010"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                12
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0002",
+              "physical_pages": [
+                13
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0012",
+              "physical_pages": [
+                22
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "（一）公共安全"
+              ]
+            }
+          ],
+          "observation": "订阅、个人按需付费、技术授权软件开发与能源咨询工程/运维有源。"
+        },
+        {
+          "reference_condition_id": "600100-C4",
+          "dimension": "公司收入",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F011"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0005",
+              "physical_pages": [
+                14
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            }
+          ],
+          "observation": "公司营业收入150.65亿元，不与主营净额1497009.55万元合并。"
+        },
+        {
+          "reference_condition_id": "600100-C5",
+          "dimension": "主要构成",
+          "status": "limited",
+          "actual_fact_ids": [
+            "F012",
+            "F013"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0010",
+              "physical_pages": [
+                21
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "observation": "主要本期板块/抵销/地区金额仍可读；主营变动和毛利变化重要遗漏Q002未采纳，修订因一项非十进制数值整批拒绝。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600107.SH",
+      "name": "美尔雅",
+      "started": true,
+      "readable": true,
+      "review_status": "incomplete",
+      "source_query": "../workpaper-runs/v9-fixed-pool-corrected-600107-20261114/query.json",
+      "checks": [
+        {
+          "reference_condition_id": "600107-C1",
+          "dimension": "主营与边界",
+          "status": "limited",
+          "actual_fact_ids": [
+            "F001",
+            "F002",
+            "F036"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                12
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0006",
+              "physical_pages": [
+                14
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、报告期内核心竞争力分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0008",
+              "physical_pages": [
+                15
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "observation": "服装主业与内外贸清楚；F036擅称报告期内处置仍在原限用稿，原文只说明处置对本期收入的影响，处置发生期不能确定。"
+        },
+        {
+          "reference_condition_id": "600107-C2",
+          "dimension": "产品服务",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F005",
+            "F006",
+            "F007",
+            "F008"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                12
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "observation": "男装/女装系列、定位、外贸加工有源。"
+        },
+        {
+          "reference_condition_id": "600107-C3",
+          "dimension": "变现",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F009",
+            "F010"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                12
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0009",
+              "physical_pages": [
+                16
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "observation": "零售/团购/电商和出口加工及渠道收入可读。"
+        },
+        {
+          "reference_condition_id": "600107-C4",
+          "dimension": "公司收入",
+          "status": "limited",
+          "actual_fact_ids": [
+            "F012",
+            "F013",
+            "F039"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0008",
+              "physical_pages": [
+                15
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0009",
+              "physical_pages": [
+                16
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0005",
+              "physical_pages": [
+                14
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            }
+          ],
+          "observation": "236195000.11元在分项合计中但未单列公司总收入，归母亏损8909.26万元未收录；原文公司收入/亏损仍可核，不能把分项合计当完整经营规模交付。"
+        },
+        {
+          "reference_condition_id": "600107-C5",
+          "dimension": "主要构成",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F012",
+            "F013",
+            "F014"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0008",
+              "physical_pages": [
+                15
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0009",
+              "physical_pages": [
+                16
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "observation": "服装/其他、男装/女装/出口加工与国内外分项；医疗本期空栏不借同比-100%造金额。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600098.SH",
+      "name": "广州发展",
+      "started": true,
+      "readable": true,
+      "review_status": "completed",
+      "source_query": "../workpaper-runs/v9-fixed-pool-corrected-600098-20261114/query.json",
+      "checks": [
+        {
+          "reference_condition_id": "600098-C1",
+          "dimension": "主营与边界",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F001",
+            "F002",
+            "F003"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                9
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0005",
+              "physical_pages": [
+                15
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "四、报告期内核心竞争力分析"
+              ]
+            }
+          ],
+          "observation": "电力/燃气/能源物流/新能源储能及能源金融属于综合能源，不能把全集团当银行。"
+        },
+        {
+          "reference_condition_id": "600098-C2",
+          "dimension": "产品服务",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F007",
+            "F008",
+            "F009",
+            "F010",
+            "F011"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                9
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0002",
+              "physical_pages": [
+                10
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0009",
+              "physical_pages": [
+                19
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "observation": "能源产品、管理与储运服务、能源金融有源；设备资源不等于新增自产工业产品。"
+        },
+        {
+          "reference_condition_id": "600098-C3",
+          "dimension": "变现",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F012",
+            "F013",
+            "F014"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                9
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0002",
+              "physical_pages": [
+                10
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "observation": "电汽自产、煤气油外购与经电网/自有管网销售分开，金融支持与经营收入不混。"
+        },
+        {
+          "reference_condition_id": "600098-C4",
+          "dimension": "公司收入",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F015",
+            "F016"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0008",
+              "physical_pages": [
+                18
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0007",
+              "physical_pages": [
+                17
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "observation": "营业收入50841626989.35元与营业总收入508.83亿元分科目保留，不强并。"
+        },
+        {
+          "reference_condition_id": "600098-C5",
+          "dimension": "主要构成",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F018",
+            "F019",
+            "F020"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0008",
+              "physical_pages": [
+                18
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0009",
+              "physical_pages": [
+                19
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "observation": "主要六行业和产品/地区构成有源；集团与具名子公司规模不相互替代。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600104.SH",
+      "name": "上汽集团",
+      "started": true,
+      "readable": false,
+      "review_status": null,
+      "source_query": "../workpaper-runs/v9-fixed-pool-corrected-600104-20261114/query.json",
+      "checks": [
+        {
+          "reference_condition_id": "600104-C1",
+          "dimension": "主营与边界",
+          "status": "unavailable",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "正文两次返回均非合法JSON，无画像可核。"
+        },
+        {
+          "reference_condition_id": "600104-C2",
+          "dimension": "产品服务",
+          "status": "unavailable",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "无正文，不以历史品牌清单替本轮结果。"
+        },
+        {
+          "reference_condition_id": "600104-C3",
+          "dimension": "变现",
+          "status": "unavailable",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "无正文，不把选章成功计作业务交付。"
+        },
+        {
+          "reference_condition_id": "600104-C4",
+          "dimension": "公司收入",
+          "status": "unavailable",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "源参考有营业收入/总收入差异，但本轮无答案。"
+        },
+        {
+          "reference_condition_id": "600104-C5",
+          "dimension": "主要构成",
+          "status": "unavailable",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "无新输出，主要汽车/金融收入构成未完成。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600088.SH",
+      "name": "中视传媒",
+      "started": true,
+      "readable": true,
+      "review_status": "completed_with_open_findings",
+      "source_query": "../workpaper-runs/v9-fixed-pool-corrected-600088-20261114/query.json",
+      "checks": [
+        {
+          "reference_condition_id": "600088-C1",
+          "dimension": "主营与边界",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F001",
+            "F002",
+            "F003",
+            "F004",
+            "F005"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                11
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0002",
+              "physical_pages": [
+                12
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "observation": "影视/广告/旅游/基金四类，投资收益不与营业收入混。"
+        },
+        {
+          "reference_condition_id": "600088-C2",
+          "dimension": "产品服务",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F006",
+            "F007",
+            "F008",
+            "F009",
+            "F010",
+            "F011"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                11
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0002",
+              "physical_pages": [
+                12
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "observation": "节目制作发行、技术设备租赁、频道广告和基地门票/拍摄服务有源。"
+        },
+        {
+          "reference_condition_id": "600088-C3",
+          "dimension": "变现",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F003",
+            "F007",
+            "F008",
+            "F010",
+            "F021"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                11
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0002",
+              "physical_pages": [
+                12
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0006",
+              "physical_pages": [
+                17
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "observation": "频道资源采购再经营、设备租赁/技术和门票拍摄收费；不得因revenue_model栏目只列规模而误称全稿没有变现信息。"
+        },
+        {
+          "reference_condition_id": "600088-C4",
+          "dimension": "公司收入",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F012",
+            "review-add:R003"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0003",
+              "physical_pages": [
+                13
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0005",
+              "physical_pages": [
+                16
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0009",
+              "physical_pages": [
+                20
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "observation": "集团收入1037484312.21元，利润总额和归母亏损分开。"
+        },
+        {
+          "reference_condition_id": "600088-C5",
+          "dimension": "主要构成",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F015",
+            "F016",
+            "review-add:R002"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0005",
+              "physical_pages": [
+                16
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            },
+            {
+              "evidence_id": "source-0006",
+              "physical_pages": [
+                17
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "observation": "四行业金额/成本与毛利变动、地区分列；基金成本空不造零，毛利变动按百分点。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600099.SH",
+      "name": "林海股份",
+      "started": true,
+      "readable": true,
+      "review_status": "completed",
+      "source_query": "../workpaper-runs/v9-fixed-pool-corrected-600099-20261114/query.json",
+      "checks": [
+        {
+          "reference_condition_id": "600099-C1",
+          "dimension": "主营与边界",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F-BS-01",
+            "F-BS-02",
+            "F-BS-03"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                8
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0004",
+              "physical_pages": [
+                10
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "二、报告期内公司所处行业情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0007",
+              "physical_pages": [
+                12
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            }
+          ],
+          "observation": "四制造主业及配件保持，不把参股公司事项当集团。"
+        },
+        {
+          "reference_condition_id": "600099-C2",
+          "dimension": "产品服务",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F-PS-01",
+            "F-PS-02",
+            "F-PS-03",
+            "F-PS-04"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0001",
+              "physical_pages": [
+                8
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0002",
+              "physical_pages": [
+                9
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0003",
+              "physical_pages": [
+                10
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            }
+          ],
+          "observation": "消防/农业/ATV/摩托车主要产品和用途有源。"
+        },
+        {
+          "reference_condition_id": "600099-C3",
+          "dimension": "变现",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F-RM-01",
+            "F-RM-02",
+            "F-RM-03"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0003",
+              "physical_pages": [
+                10
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "一、报告期内公司从事的业务情况"
+              ]
+            },
+            {
+              "evidence_id": "source-0007",
+              "physical_pages": [
+                12
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            }
+          ],
+          "observation": "按单生产/适度备货、经销为主，不写全部直销。"
+        },
+        {
+          "reference_condition_id": "600099-C4",
+          "dimension": "公司收入",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F-SM-01"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0007",
+              "physical_pages": [
+                12
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "三、经营情况讨论与分析"
+              ]
+            }
+          ],
+          "observation": "公司营业收入113124.69万元同比7.66%，为报告舍入值，不强迫改成元精确值。"
+        },
+        {
+          "reference_condition_id": "600099-C5",
+          "dimension": "主要构成",
+          "status": "supported",
+          "actual_fact_ids": [
+            "F-SM-02",
+            "F-SM-03"
+          ],
+          "actual_sources": [
+            {
+              "evidence_id": "source-0018",
+              "physical_pages": [
+                21
+              ],
+              "section_path": [
+                "第三节 管理层讨论与分析",
+                "五、报告期内主要经营情况",
+                "(一) 主营业务分析"
+              ]
+            }
+          ],
+          "observation": "四行业及国内外收入/毛利可读；消防收入-27.38%的遗漏经本次真实修订再核补入。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600082.SH",
+      "name": "海泰发展",
+      "started": false,
+      "readable": false,
+      "review_status": null,
+      "source_query": null,
+      "checks": [
+        {
+          "reference_condition_id": "600082-C1",
+          "dimension": "主营与边界",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        },
+        {
+          "reference_condition_id": "600082-C2",
+          "dimension": "产品服务",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        },
+        {
+          "reference_condition_id": "600082-C3",
+          "dimension": "变现",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        },
+        {
+          "reference_condition_id": "600082-C4",
+          "dimension": "公司收入",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        },
+        {
+          "reference_condition_id": "600082-C5",
+          "dimension": "主要构成",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600097.SH",
+      "name": "开创国际",
+      "started": false,
+      "readable": false,
+      "review_status": null,
+      "source_query": null,
+      "checks": [
+        {
+          "reference_condition_id": "600097-C1",
+          "dimension": "主营与边界",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        },
+        {
+          "reference_condition_id": "600097-C2",
+          "dimension": "产品服务",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        },
+        {
+          "reference_condition_id": "600097-C3",
+          "dimension": "变现",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        },
+        {
+          "reference_condition_id": "600097-C4",
+          "dimension": "公司收入",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        },
+        {
+          "reference_condition_id": "600097-C5",
+          "dimension": "主要构成",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600054.SH",
+      "name": "黄山旅游",
+      "started": false,
+      "readable": false,
+      "review_status": null,
+      "source_query": null,
+      "checks": [
+        {
+          "reference_condition_id": "600054-C1",
+          "dimension": "主营与边界",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        },
+        {
+          "reference_condition_id": "600054-C2",
+          "dimension": "产品服务",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        },
+        {
+          "reference_condition_id": "600054-C3",
+          "dimension": "变现",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        },
+        {
+          "reference_condition_id": "600054-C4",
+          "dimension": "公司收入",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        },
+        {
+          "reference_condition_id": "600054-C5",
+          "dimension": "主要构成",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        }
+      ]
+    },
+    {
+      "instrument_id": "600000.SH",
+      "name": "浦发银行",
+      "started": false,
+      "readable": false,
+      "review_status": null,
+      "source_query": null,
+      "checks": [
+        {
+          "reference_condition_id": "600000-C1",
+          "dimension": "主营与边界",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        },
+        {
+          "reference_condition_id": "600000-C2",
+          "dimension": "产品服务",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        },
+        {
+          "reference_condition_id": "600000-C3",
+          "dimension": "变现",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        },
+        {
+          "reference_condition_id": "600000-C4",
+          "dimension": "公司收入",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        },
+        {
+          "reference_condition_id": "600000-C5",
+          "dimension": "主要构成",
+          "status": "not_run",
+          "actual_fact_ids": [],
+          "actual_sources": [],
+          "observation": "触发组级止损后未启动；不以历史模型稿补本轮结果。"
+        }
+      ]
+    }
+  ],
+  "classification_counts": {
+    "limited": 5,
+    "supported": 30,
+    "unavailable": 5,
+    "not_run": 20
+  },
+  "independent_blocking_finding": {
+    "instrument_id": "600094.SH",
+    "fact_id": "F015",
+    "reason": "租金原表单位万元与稿中exact元不一致，原source_unit也被改元，不能按量级猜定单位；本轮未隔离，已触发停组。",
+    "receipt": "independent-stop.json",
+    "not_for_reliable_use": true
+  },
+  "additional_limits": [
+    {
+      "instrument_id": "600107.SH",
+      "fact_ids": [
+        "F036",
+        "F041"
+      ],
+      "reason": "复核意见被目标要素/编号校验整体拒绝，F036处置发生期和F041未披露断言仍在未核原稿，不作可靠研究结论；其余可读正文不因本审核改写。"
+    },
+    {
+      "instrument_id": "600100.SH",
+      "finding_id": "Q002",
+      "reason": "合法原文形式2.19个百分点未通过repair严格格式消费，未采纳整组修订；本期主要金额仍可读，重要变化保遗漏说明。"
+    }
+  ],
+  "risk_outcomes": [
+    {
+      "category": "body",
+      "frozen_cases": [
+        "600082.SH",
+        "600097.SH"
+      ],
+      "current": "两家因止损均未启动，不用其他已跑公司或旧夹具补成正式覆盖。"
+    },
+    {
+      "category": "income_columns_units",
+      "frozen_cases": [
+        "600094.SH",
+        "600107.SH"
+      ],
+      "current": "两家有本轮稿：金融投资/医疗空栏没有借同比造金额；大名城独立发现租金单位不确定被写成exact，未隔离，风险挑战不通过。"
+    },
+    {
+      "category": "subject_period",
+      "frozen_cases": [
+        "600094.SH",
+        "600107.SH"
+      ],
+      "current": "大名城参股未并表错误获实际修订；美尔雅处置时点断言仍在复核未完成原稿，不能作当前期间确定结论。"
+    },
+    {
+      "category": "purchase_sale_direction",
+      "frozen_cases": [
+        "600098.SH",
+        "600103.SH"
+      ],
+      "current": "两家原料外购/自主生产/渠道销售有源区分；广州发展煤炭产业链资产主体修订经独立读源确认。"
+    },
+    {
+      "category": "associated_leasing",
+      "frozen_cases": [
+        "600088.SH",
+        "600082.SH"
+      ],
+      "current": "中视设备出租/费用及频道资源采购有本轮证据；海泰未启动，类别当前不足两家，不能声称覆盖通过。"
+    },
+    {
+      "category": "financial_disclosure",
+      "frozen_cases": [
+        "600098.SH",
+        "600104.SH",
+        "600000.SH"
+      ],
+      "current": "广州发展保营业收入/营业总收入不同科目；上汽正文失败，浦发未启动，未达到实际两家验证。"
+    }
+  ]
+}

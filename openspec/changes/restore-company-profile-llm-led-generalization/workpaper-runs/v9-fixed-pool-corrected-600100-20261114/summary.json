@@ -1,0 +1,52 @@
+{
+  "instrument_id": "600100.SH",
+  "name": "同方股份",
+  "run_id": "v9-fixed-pool-corrected-600100-20261114",
+  "three_reads_equal": true,
+  "exception": null,
+  "provider_constructor_binding_verified_before_entry": true,
+  "preparation_seconds": 53.639,
+  "state": "completed",
+  "business_seconds": 550.733,
+  "contract_errors": [
+    {
+      "purpose": "repair_profile_workpaper",
+      "error": "schema_validation_error"
+    }
+  ],
+  "failed_calls": [
+    {
+      "stage": "extract",
+      "code": "candidate_schema_invalid",
+      "detail": "1 validation error for WorkpaperRepairResponse\nrepaired_facts.1.metrics.23\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '主营业务合...sis': '较上年同期'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error"
+    }
+  ],
+  "readable": true,
+  "facts": 27,
+  "metrics": 19,
+  "review_status": "incomplete",
+  "review_error": "SemanticProviderError: gateway response violates the schema: 1 validation error for WorkpaperRepairResponse\nrepaired_facts.1.metrics.23\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '主营业务合...sis': '较上年同期'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error",
+  "findings": 3,
+  "origin": "llm_generated",
+  "core_complete": false,
+  "element_counts": {
+    "business_structure": 3,
+    "products_services": 4,
+    "revenue_model": 3,
+    "scale_and_mix": 5,
+    "operations_and_inputs": 3,
+    "customers_channels_markets": 3,
+    "operating_drivers": 4,
+    "material_changes": 2
+  },
+  "query_sha256": "8d19f203ed19f08f72606f9d3885227106018b5320fbf4d43f2e745952835df9",
+  "core_missing_elements": [],
+  "failure_signature": "SemanticProviderError: gateway response violates the schema: # validation error for WorkpaperRepairResponse\nrepaired_facts.#.metrics.#\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '主营业务合...sis': '较上年同期'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/#.#/v/value_error",
+  "physical_requests": 4,
+  "charged_tokens": 108315,
+  "cost": "unknown",
+  "stopped_reason": null,
+  "recoveries": 0,
+  "supervision_seconds": 554.126,
+  "cleanup_bytes": 1730138
+}

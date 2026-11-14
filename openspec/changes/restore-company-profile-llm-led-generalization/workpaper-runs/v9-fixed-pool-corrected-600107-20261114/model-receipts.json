@@ -1,0 +1,1811 @@
+[
+  {
+    "request_id": "bp-work-442f6d80abebd71bf1ed4e23:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "6d036b0d1983dea6ab459d3a45e80f837c3b9a91a18ad7ce023ed586e29c980c",
+    "response_hash": "24044ebcca5a4cdc3f95adcbce9e97e0fed794f2ed21c3994886f7ce0af49db8",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0048\",\"section-0049\",\"section-0050\",\"section-0051\",\"section-0055\",\"section-0057\",\"section-0078\",\"section-0091\"],\"rationale\":\"选取第三节管理层讨论与分析中信息密度最高的业务与经营子节：section-0048说明公司从事的业务与经营模式，section-0049说明所处行业，section-0050为经营情况讨论，section-0051为核心竞争力（含产品品质与资质品牌），section-0055主营业务分析及section-0057收入与成本分析提供规模、板块收入占比与毛利结构，section-0078行业经营性信息分析含门店、品牌、直营/加盟、线上线下及地区盈利，section-0091主要控股参股公司分析补充经营主体。上述子节共同覆盖业务结构、产品用途、盈利模式、规模与结构、渠道与市场及经营变化，且均为完整可选子节，未同时选取父子节。\",\"deferred\":[\"第四节公司治理、环境和社会（董事薪酬、专门委员会、分红预案等治理细节）\",\"第五节重要事项中的资金占用、违规担保、退市风险及处罚整改细节\",\"第八节财务报告中的会计政策、报表项目注释与审计程序明细\",\"第六节股份变动及股东情况\"],\"stop_reason\":\"已覆盖业务、产品、经营模式、收入成本结构、渠道市场与主要子公司等核心经营信息，足以回答业务与经营问题；治理、合规处罚、退市风险及财务报表附注属于不同问题域，且篇幅巨大，按需另行定向阅读即可，无需在本轮全量展开。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0048",
+        "section-0049",
+        "section-0050",
+        "section-0051",
+        "section-0055",
+        "section-0057",
+        "section-0078",
+        "section-0091"
+      ],
+      "rationale": "选取第三节管理层讨论与分析中信息密度最高的业务与经营子节：section-0048说明公司从事的业务与经营模式，section-0049说明所处行业，section-0050为经营情况讨论，section-0051为核心竞争力（含产品品质与资质品牌），section-0055主营业务分析及section-0057收入与成本分析提供规模、板块收入占比与毛利结构，section-0078行业经营性信息分析含门店、品牌、直营/加盟、线上线下及地区盈利，section-0091主要控股参股公司分析补充经营主体。上述子节共同覆盖业务结构、产品用途、盈利模式、规模与结构、渠道与市场及经营变化，且均为完整可选子节，未同时选取父子节。",
+      "deferred": [
+        "第四节公司治理、环境和社会（董事薪酬、专门委员会、分红预案等治理细节）",
+        "第五节重要事项中的资金占用、违规担保、退市风险及处罚整改细节",
+        "第八节财务报告中的会计政策、报表项目注释与审计程序明细",
+        "第六节股份变动及股东情况"
+      ],
+      "stop_reason": "已覆盖业务、产品、经营模式、收入成本结构、渠道市场与主要子公司等核心经营信息，足以回答业务与经营问题；治理、合规处罚、退市风险及财务报表附注属于不同问题域，且篇幅巨大，按需另行定向阅读即可，无需在本轮全量展开。"
+    },
+    "usage": {
+      "input_tokens": 20760,
+      "output_tokens": 347,
+      "total_tokens": 21107
+    }
+  },
+  {
+    "request_id": "bp-work-442f6d80abebd71bf1ed4e23:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "11fb5fade39cfe8b5395527f7cde037a88729499edfe17eec27cca8b310205a1",
+    "response_hash": "e8b509df5ed847076d92100d502be98e7a2f59fad69ed2b34d360393d911e415",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F001\",\"text\":\"公司主营业务为服装服饰类产品的研发、设计、生产和销售，业务模式未发生重大变化；按面向市场和经营模式不同，分为国外市场的外贸生产加工和国内市场品牌生产加工销售等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F002\",\"text\":\"公司逐步形成加工贸易（含来料加工和进料加工）、一般贸易和自主品牌运营并重的格局，按面对市场和经营模式可分为国外市场外贸生产加工业务和国内市场“美尔雅”品牌生产、加工和销售业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]},{\"fact_id\":\"F003\",\"text\":\"报告期内公司新增重要非主营业务的说明为“不适用”。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F004\",\"text\":\"公司主要子公司包括湖北美尔雅服装集团有限公司（子公司，主要业务为精毛纺织制品、服装及辅料制造、加工、销售）和美尔雅服饰有限公司（子公司，生产中、高档西服的中日合资企业）。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F005\",\"text\":\"公司主营自主品牌的男装、女装及各类配套服饰；美尔雅男装品类齐全，包含西服、衬衣、毛衫、T恤、大衣、休闲服及裤装等，定位中高档商务政务男装。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F006\",\"text\":\"“美尔雅”西服作为公司传统核心产品，获评“中国驰名商标”并荣获“中国服装年度大奖——品质大奖”，在内销业务中占据主导地位。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F007\",\"text\":\"美尔雅女装分为职业装、礼服、时装、休闲装四大系列，主要面向职业女性，主打商务时尚风格。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F008\",\"text\":\"外贸加工业务主要采用来料加工、进料加工和一般贸易三种运营模式，形成以来料加工、进料加工为主的外贸业务格局。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F009\",\"text\":\"国内市场构建零售、团购定制、线上网购相结合的多元化营销体系；零售以直营店、加盟店、商场专柜为主要形式，团购定制承接各类团体服装加工与定制业务，网购渠道依托京东、天猫、抖音等平台销售与线下门店差异化的产品。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F010\",\"text\":\"主营业务分销售模式情况显示：直营店营业收入56,431,306.80元、毛利率52.39%；加盟联营店营业收入75,185,231.39元、毛利率49.40%；出口加工营业收入46,761,060.90元、毛利率1.41%；其他业务营业收入57,817,401.02元、毛利率26.19%；小计营业收入236,195,000.11元、毛利率34.93%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"直营店营业收入\",\"raw_value\":\"56,431,306.80\",\"value\":\"56431306.80\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"直营店毛利率\",\"raw_value\":\"52.39\",\"value\":\"52.39\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"加盟联营店营业收入\",\"raw_value\":\"75,185,231.39\",\"value\":\"75185231.39\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"加盟联营店毛利率\",\"raw_value\":\"49.40\",\"value\":\"49.40\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"出口加工营业收入\",\"raw_value\":\"46,761,060.90\",\"value\":\"46761060.90\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"出口加工毛利率\",\"raw_value\":\"1.41\",\"value\":\"1.41\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"其他业务营业收入\",\"raw_value\":\"57,817,401.02\",\"value\":\"57817401.02\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"其他业务毛利率\",\"raw_value\":\"26.19\",\"value\":\"26.19\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"主营业务小计营业收入\",\"raw_value\":\"236,195,000.11\",\"value\":\"236195000.11\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"主营业务小计毛利率\",\"raw_value\":\"34.93\",\"value\":\"34.93\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F011\",\"text\":\"报告期内公司整体实现营业收入23,619.50万元，同比下降28.32%；实现归属于母公司所有者的净利润-8,909.26万元，同比下降30.82%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"23,619.50\",\"value\":\"23619.50\",\"unit\":\"万元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"营业收入同比变动\",\"raw_value\":\"-28.32\",\"value\":\"-28.32\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"归属于母公司所有者的净利润\",\"raw_value\":\"-8,909.26\",\"value\":\"-8909.26\",\"unit\":\"万元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"归属于母公司所有者的净利润同比变动\",\"raw_value\":\"-30.82\",\"value\":\"-30.82\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F012\",\"text\":\"主营业务分行业情况：服装营业收入229,197,408.86元、营业成本148,381,101.41元、毛利率35.26%；医疗营业收入与成本同比均为-100.00%；其他业务营业收入6,997,591.25元、营业成本5,308,475.14元、毛利率24.14%；小计营业收入236,195,000.11元、营业成本153,689,576.55元、毛利率34.93%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"服装营业收入\",\"raw_value\":\"229,197,408.86\",\"value\":\"229197408.86\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"服装营业成本\",\"raw_value\":\"148,381,101.41\",\"value\":\"148381101.41\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"服装毛利率\",\"raw_value\":\"35.26\",\"value\":\"35.26\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"其他业务营业收入\",\"raw_value\":\"6,997,591.25\",\"value\":\"6997591.25\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"其他业务营业成本\",\"raw_value\":\"5,308,475.14\",\"value\":\"5308475.14\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"其他业务毛利率\",\"raw_value\":\"24.14\",\"value\":\"24.14\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"主营业务小计营业收入\",\"raw_value\":\"236,195,000.11\",\"value\":\"236195000.11\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"主营业务小计营业成本\",\"raw_value\":\"153,689,576.55\",\"value\":\"153689576.55\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"主营业务小计毛利率\",\"raw_value\":\"34.93\",\"value\":\"34.93\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F013\",\"text\":\"主营业务分产品情况：品牌男装营业收入129,735,100.43元、营业成本74,034,437.68元、毛利率42.93%；品牌女装营业收入52,701,247.53元、营业成本28,243,423.34元、毛利率46.41%；出口加工类营业收入46,761,060.90元、营业成本46,103,240.39元、毛利率1.41%；其他业务营业收入6,997,591.25元、营业成本5,308,475.14元、毛利率24.14%；小计营业收入236,195,000.11元、营业成本153,689,576.55元、毛利率34.93%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0009\"],\"metrics\":[{\"name\":\"品牌男装营业收入\",\"raw_value\":\"129,735,100.43\",\"value\":\"129735100.43\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"品牌男装营业成本\",\"raw_value\":\"74,034,437.68\",\"value\":\"74034437.68\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"品牌男装毛利率\",\"raw_value\":\"42.93\",\"value\":\"42.93\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"品牌女装营业收入\",\"raw_value\":\"52,701,247.53\",\"value\":\"52701247.53\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"品牌女装营业成本\",\"raw_value\":\"28,243,423.34\",\"value\":\"28243423.34\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"品牌女装毛利率\",\"raw_value\":\"46.41\",\"value\":\"46.41\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"出口加工类营业收入\",\"raw_value\":\"46,761,060.90\",\"value\":\"46761060.90\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"出口加工类营业成本\",\"raw_value\":\"46,103,240.39\",\"value\":\"46103240.39\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"出口加工类毛利率\",\"raw_value\":\"1.41\",\"value\":\"1.41\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F014\",\"text\":\"主营业务分地区情况：国内营业收入189,433,939.21元、营业成本107,586,336.16元、毛利率43.21%；国际营业收入46,761,060.90元、营业成本46,103,240.39元、毛利率1.41%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"国内营业收入\",\"raw_value\":\"189,433,939.21\",\"value\":\"189433939.21\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"国内营业成本\",\"raw_value\":\"107,586,336.16\",\"value\":\"107586336.16\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"国内毛利率\",\"raw_value\":\"43.21\",\"value\":\"43.21\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"国际营业收入\",\"raw_value\":\"46,761,060.90\",\"value\":\"46761060.90\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"国际营业成本\",\"raw_value\":\"46,103,240.39\",\"value\":\"46103240.39\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"国际毛利率\",\"raw_value\":\"1.41\",\"value\":\"1.41\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F015\",\"text\":\"产销量情况：美尔雅品牌男装生产量659,689.00件/套、销售量815,915.00件/套、库存量701,810.00件/套；美尔雅品牌女装生产量628,976.00件/套、销售量669,828.00件/套、库存量439,802.00件/套；合计生产量1,288,665.00件/套、销售量1,485,743.00件/套、库存量1,141,612.00件/套。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0010\"],\"metrics\":[{\"name\":\"美尔雅品牌男装生产量\",\"raw_value\":\"659,689.00\",\"value\":\"659689.00\",\"unit\":\"件/套\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"件/套\"},{\"name\":\"美尔雅品牌男装销售量\",\"raw_value\":\"815,915.00\",\"value\":\"815915.00\",\"unit\":\"件/套\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"件/套\"},{\"name\":\"美尔雅品牌男装库存量\",\"raw_value\":\"701,810.00\",\"value\":\"701810.00\",\"unit\":\"件/套\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"件/套\"},{\"name\":\"美尔雅品牌女装生产量\",\"raw_value\":\"628,976.00\",\"value\":\"628976.00\",\"unit\":\"件/套\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"件/套\"},{\"name\":\"美尔雅品牌女装销售量\",\"raw_value\":\"669,828.00\",\"value\":\"669828.00\",\"unit\":\"件/套\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"件/套\"},{\"name\":\"美尔雅品牌女装库存量\",\"raw_value\":\"439,802.00\",\"value\":\"439802.00\",\"unit\":\"件/套\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"件/套\"},{\"name\":\"合计生产量\",\"raw_value\":\"1,288,665.00\",\"value\":\"1288665.00\",\"unit\":\"件/套\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"件/套\"},{\"name\":\"合计销售量\",\"raw_value\":\"1,485,743.00\",\"value\":\"1485743.00\",\"unit\":\"件/套\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"件/套\"},{\"name\":\"合计库存量\",\"raw_value\":\"1,141,612.00\",\"value\":\"1141612.00\",\"unit\":\"件/套\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"件/套\"}]},{\"fact_id\":\"F016\",\"text\":\"报告期内各品牌盈利情况：品牌营业收入182,436,347.96元、营业成本102,277,861.02元、毛利率43.94%；出口加工营业收入46,761,060.90元、营业成本46,103,240.39元、毛利率1.41%；合计营业收入229,197,408.86元、营业成本148,381,101.41元、毛利率35.26%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"品牌营业收入\",\"raw_value\":\"182,436,347.96\",\"value\":\"182436347.96\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"品牌营业成本\",\"raw_value\":\"102,277,861.02\",\"value\":\"102277861.02\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"品牌毛利率\",\"raw_value\":\"43.94\",\"value\":\"43.94\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"出口加工营业收入\",\"raw_value\":\"46,761,060.90\",\"value\":\"46761060.90\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"出口加工毛利率\",\"raw_value\":\"1.41\",\"value\":\"1.41\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"合计营业收入\",\"raw_value\":\"229,197,408.86\",\"value\":\"229197408.86\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"合计毛利率\",\"raw_value\":\"35.26\",\"value\":\"35.26\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F017\",\"text\":\"报告期内线上、线下销售渠道盈利情况：线上销售收入5,580,869.71元、占比2.43%、毛利率44.65%；线下销售收入223,616,539.15元、占比97.57%、毛利率35.03%；合计229,197,408.86元、占比100.00%、毛利率35.26%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\"],\"metrics\":[{\"name\":\"线上销售收入\",\"raw_value\":\"5,580,869.71\",\"value\":\"5580869.71\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"线上销售营业收入占比\",\"raw_value\":\"2.43\",\"value\":\"2.43\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"线上销售毛利率\",\"raw_value\":\"44.65\",\"value\":\"44.65\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"线下销售收入\",\"raw_value\":\"223,616,539.15\",\"value\":\"223616539.15\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"线下销售营业收入占比\",\"raw_value\":\"97.57\",\"value\":\"97.57\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"线下销售毛利率\",\"raw_value\":\"35.03\",\"value\":\"35.03\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F018\",\"text\":\"报告期内各地区的盈利情况：华中地区营业收入150,610,378.46元、占比65.71%；境内小计182,436,347.96元、占比79.60%；国际地区46,761,060.90元、占比20.40%；合计229,197,408.86元、占比100.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\"],\"metrics\":[{\"name\":\"华中地区营业收入\",\"raw_value\":\"150,610,378.46\",\"value\":\"150610378.46\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"华中地区营业收入占比\",\"raw_value\":\"65.71\",\"value\":\"65.71\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"境内小计营业收入\",\"raw_value\":\"182,436,347.96\",\"value\":\"182436347.96\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"境内小计营业收入占比\",\"raw_value\":\"79.60\",\"value\":\"79.60\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"国际地区营业收入\",\"raw_value\":\"46,761,060.90\",\"value\":\"46761060.90\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"国际地区营业收入占比\",\"raw_value\":\"20.40\",\"value\":\"20.40\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F019\",\"text\":\"主要子公司经营数据：湖北美尔雅服装集团有限公司营业收入175,793,460.36元、营业利润-54,064,053.81元、净利润-50,794,205.86元；美尔雅服饰有限公司营业收入41,300,845.88元、营业利润-5,492,821.57元、净利润-5,488,576.99元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"],\"metrics\":[{\"name\":\"湖北美尔雅服装集团有限公司营业收入\",\"raw_value\":\"175,793,460.36\",\"value\":\"175793460.36\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"湖北美尔雅服装集团有限公司营业利润\",\"raw_value\":\"-54,064,053.81\",\"value\":\"-54064053.81\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"湖北美尔雅服装集团有限公司净利润\",\"raw_value\":\"-50,794,205.86\",\"value\":\"-50794205.86\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"美尔雅服饰有限公司营业收入\",\"raw_value\":\"41,300,845.88\",\"value\":\"41300845.88\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"美尔雅服饰有限公司营业利润\",\"raw_value\":\"-5,492,821.57\",\"value\":\"-5492821.57\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"美尔雅服饰有限公司净利润\",\"raw_value\":\"-5,488,576.99\",\"value\":\"-5488576.99\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F020\",\"text\":\"外贸加工业务主要采用来料加工、进料加工和一般贸易三种运营模式；公司凭借高效的生产组织能力与精细化现场管理，结合成熟的营销网络和订单资源，形成以来料加工、进料加工为主的外贸业务格局。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F021\",\"text\":\"公司在稳固日本、东南亚等传统加工贸易市场的同时，积极依托自身产能与外贸渠道拓展海外一般贸易业务，进一步优化产品结构与市场布局。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F022\",\"text\":\"公司通过优化产品结构、升级生产设备、提升人员专业素养与工作效能推进提质增效，并整合高覆盖、多层次的渠道资源以及成熟稳定、优质高效的供应链资源。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F023\",\"text\":\"成本分析表显示服装营业成本148,381,101.41元、本期占总成本比例96.55%；其他业务营业成本5,308,475.14元、占比3.45%；小计营业成本153,689,576.55元、占比100.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"服装营业成本\",\"raw_value\":\"148,381,101.41\",\"value\":\"148381101.41\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"服装营业成本占总成本比例\",\"raw_value\":\"96.55\",\"value\":\"96.55\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"其他业务营业成本\",\"raw_value\":\"5,308,475.14\",\"value\":\"5308475.14\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"其他业务营业成本占总成本比例\",\"raw_value\":\"3.45\",\"value\":\"3.45\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"营业成本小计\",\"raw_value\":\"153,689,576.55\",\"value\":\"153689576.55\",\"unit\":\"元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]},{\"fact_id\":\"F024\",\"text\":\"前五名供应商采购额1,749.56万元，占年度采购总额19.30%；其中前五名供应商采购额中关联方采购额0.00万元，占年度采购总额0.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"前五名供应商采购额\",\"raw_value\":\"1,749.56\",\"value\":\"1749.56\",\"unit\":\"万元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"19.30\",\"value\":\"19.30\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F025\",\"text\":\"国内市场零售以直营店、加盟店、商场专柜为主要形式；团购定制主要承接各类团体服装加工与定制业务，服务金融、电力、电信、政府机构、学校及各类企事业单位；网购渠道依托京东、天猫、抖音等平台。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F026\",\"text\":\"外贸加工业务在稳固日本、东南亚等传统加工贸易市场的同时，拓展海外一般贸易业务；国际市场通过灵活布局供应链、精细化深耕区域市场保障业务稳定发展。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]},{\"fact_id\":\"F027\",\"text\":\"报告期内实体门店情况：美尔雅品牌直营店2024年末31家、2025年末33家、2025年新开3家、关闭1家；加盟联营店2024年末121家、2025年末103家、2025年新开2家、关闭20家；合计2024年末152家、2025年末136家、新开5家、关闭21家。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"美尔雅品牌直营店2025年末数量\",\"raw_value\":\"33\",\"value\":\"33\",\"unit\":\"家\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"家\"},{\"name\":\"美尔雅品牌加盟联营店2025年末数量\",\"raw_value\":\"103\",\"value\":\"103\",\"unit\":\"家\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"家\"},{\"name\":\"门店合计2025年末数量\",\"raw_value\":\"136\",\"value\":\"136\",\"unit\":\"家\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"家\"},{\"name\":\"门店合计2025年新开\",\"raw_value\":\"5\",\"value\":\"5\",\"unit\":\"家\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"家\"},{\"name\":\"门店合计2025年关闭\",\"raw_value\":\"21\",\"value\":\"21\",\"unit\":\"家\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"家\"}]},{\"fact_id\":\"F028\",\"text\":\"前五名客户销售额5,574.13万元，占年度销售总额24.32%；其中前五名客户销售额中关联方销售额0.00万元，占年度销售总额0.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"5,574.13\",\"value\":\"5574.13\",\"unit\":\"万元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"24.32\",\"value\":\"24.32\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F029\",\"text\":\"前五名客户明细：客户1销售额3,730.25万元、占比16.28%；客户2销售额625.51万元、占比2.73%；客户3销售额537.80万元、占比2.35%；客户4销售额353.81万元、占比1.54%；客户5销售额326.76万元、占比1.43%；合计5,574.13万元、占比24.32%。客户5为报告期内新增客户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0011\",\"source-0012\"],\"metrics\":[{\"name\":\"客户1销售额\",\"raw_value\":\"3,730.25\",\"value\":\"3730.25\",\"unit\":\"万元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"客户1销售额占年度销售总额比例\",\"raw_value\":\"16.28\",\"value\":\"16.28\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"客户5销售额\",\"raw_value\":\"326.76\",\"value\":\"326.76\",\"unit\":\"万元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"客户5销售额占年度销售总额比例\",\"raw_value\":\"1.43\",\"value\":\"1.43\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F030\",\"text\":\"营业收入变动原因：一方面由于处置子公司青海众友健康惠嘉医药连锁有限公司股权，本报告期减少医药板块收入约3,000万元；另一方面，服装业务收入也较上年同期有所下降。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"医药板块收入减少额\",\"raw_value\":\"约3,000\",\"value\":\"3000\",\"unit\":\"万元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"approximate\",\"source_unit\":\"万元\"}]},{\"fact_id\":\"F031\",\"text\":\"销售费用变动原因：受业绩下滑影响，职工薪酬、商场费用、租赁费、装修费用减少；财务费用变动原因：主要是利息支出减少、利息收入增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]},{\"fact_id\":\"F032\",\"text\":\"经济疲软，人们消费降级，直营店客流量下降。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"]},{\"fact_id\":\"F033\",\"text\":\"2025年我国服装行业规模以上企业工业增加值同比下降3.0%，降幅较2024年同期回落3.8个百分点；规模以上企业服装产量同比下降3.44%，增速较2024年同期回落7.66个百分点。\",\"subject_scope\":\"unclear\",\"period\":\"2025年1-12月\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"服装行业规模以上企业工业增加值同比变动\",\"raw_value\":\"-3.0\",\"value\":\"-3.0\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年1-12月\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"服装行业规模以上企业工业增加值降幅较2024年同期回落\",\"raw_value\":\"3.8\",\"value\":\"3.8\",\"unit\":\"百分点\",\"currency\":null,\"period\":\"2025年1-12月\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"uncertainty_reason\":\"原文以百分号表述降幅回落，按规则保留源单位并将单位记为百分点\"},{\"name\":\"规模以上企业服装产量同比变动\",\"raw_value\":\"-3.44\",\"value\":\"-3.44\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年1-12月\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"规模以上企业服装产量增速较2024年同期回落\",\"raw_value\":\"7.66\",\"value\":\"7.66\",\"unit\":\"百分点\",\"currency\":null,\"period\":\"2025年1-12月\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"source_unit\":\"%\",\"uncertainty_reason\":\"原文以百分号表述增速回落，按规则保留源单位并将单位记为百分点\"}]},{\"fact_id\":\"F034\",\"text\":\"2025年1-12月我国限额以上单位服装类商品零售额11,044.5亿元，同比增长2.8%，增速较2024年同期加快2.7个百分点；穿类商品网上零售额同比增长1.9%，增速较2024年同期加快0.4个百分点。\",\"subject_scope\":\"unclear\",\"period\":\"2025年1-12月\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"限额以上单位服装类商品零售额\",\"raw_value\":\"11,044.5\",\"value\":\"11044.5\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"period\":\"2025年1-12月\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"source_unit\":\"亿元\"},{\"name\":\"限额以上单位服装类商品零售额同比增速\",\"raw_value\":\"2.8\",\"value\":\"2.8\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年1-12月\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"source_unit\":\"%\"},{\"name\":\"穿类商品网上零售额同比增速\",\"raw_value\":\"1.9\",\"value\":\"1.9\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年1-12月\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F035\",\"text\":\"2025年1-12月我国累计完成服装及衣着附件出口1,511.8亿美元，同比下降5.0%，增速较2024年同期回落5.3个百分点。\",\"subject_scope\":\"unclear\",\"period\":\"2025年1-12月\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"服装及衣着附件出口额\",\"raw_value\":\"1,511.8\",\"value\":\"1511.8\",\"unit\":\"亿美元\",\"currency\":\"USD\",\"period\":\"2025年1-12月\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"source_unit\":\"亿美元\"},{\"name\":\"服装及衣着附件出口额同比变动\",\"raw_value\":\"-5.0\",\"value\":\"-5.0\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年1-12月\",\"subject_scope\":\"unclear\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F036\",\"text\":\"报告期内公司处置子公司青海众友健康惠嘉医药连锁有限公司股权，本报告期减少医药板块收入约3,000万元；主营业务分行业情况中医疗营业收入与成本同比均为-100.00%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"医药板块收入减少额\",\"raw_value\":\"约3,000\",\"value\":\"3000\",\"unit\":\"万元\",\"currency\":\"CNY\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"approximate\",\"source_unit\":\"万元\"}]},{\"fact_id\":\"F037\",\"text\":\"报告期内公司业务类型、利润构成或利润来源发生重大变动的详细说明为“不适用”；公司报告期内业务、产品或服务发生重大变化或调整有关情况的说明为“不适用”。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0011\"]},{\"fact_id\":\"F038\",\"text\":\"报告期内实体门店合计由2024年末152家减少至2025年末136家，新开5家、关闭21家；其中加盟联营店由121家减少至103家，关闭20家。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"门店合计2024年末数量\",\"raw_value\":\"152\",\"value\":\"152\",\"unit\":\"家\",\"currency\":null,\"period\":\"2024年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"家\"},{\"name\":\"门店合计2025年末数量\",\"raw_value\":\"136\",\"value\":\"136\",\"unit\":\"家\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"家\"},{\"name\":\"门店合计2025年关闭\",\"raw_value\":\"21\",\"value\":\"21\",\"unit\":\"家\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"家\"}]},{\"fact_id\":\"F039\",\"text\":\"报告期内公司整体营业收入同比下降28.32%，归属于母公司所有者的净利润同比下降30.82%；服装业务收入也较上年同期有所下降。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0008\"]}]},\"limitations\":[\"仅阅读了指定章节，未阅读公司治理、重要事项、财务报表附注及股东情况等章节，相关细节未纳入。\",\"行业数据（服装行业工业增加值、产量、零售额、出口额）为行业统计口径，subject_scope记为unclear，不代表公司自身经营数据。\",\"部分表格（如分品牌、分渠道、分地区）单位标注为“万元”，但所列金额数值与“元”口径一致，存在单位标注冲突；本工作底稿按数值原样保留并标注为元，未作换算，使用时需注意该冲突。\",\"门店、客户、供应商名称在原文中以编号或类别列示，未披露具体名称，无法识别具体交易对手。\",\"处置子公司青海众友健康惠嘉医药连锁有限公司股权的具体时间未在选定章节中明确，仅知本报告期减少医药板块收入约3,000万元。\",\"研发投入相关表格标注为“不适用”，未获取研发投入金额及研发人员数据。\"]},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F040\",\"text\":\"公司在国内开展服装全链条业务，涵盖生产加工与终端销售；外贸加工业务采用来料加工、进料加工和一般贸易三种运营模式。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F041\",\"text\":\"公司整合成熟稳定、优质高效的供应链资源；成本分析表列示服装营业成本、其他业务营业成本等成本构成，但未披露具体原材料或供应商名称。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0010\"]}]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F042\",\"text\":\"团购定制业务服务金融、电力、电信、政府机构、学校及各类企事业单位；零售直面消费者；网购渠道依托京东、天猫、抖音等平台。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]}}}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F001",
+              "text": "公司主营业务为服装服饰类产品的研发、设计、生产和销售，业务模式未发生重大变化；按面向市场和经营模式不同，分为国外市场的外贸生产加工和国内市场品牌生产加工销售等。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F002",
+              "text": "公司逐步形成加工贸易（含来料加工和进料加工）、一般贸易和自主品牌运营并重的格局，按面对市场和经营模式可分为国外市场外贸生产加工业务和国内市场“美尔雅”品牌生产、加工和销售业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "F003",
+              "text": "报告期内公司新增重要非主营业务的说明为“不适用”。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F004",
+              "text": "公司主要子公司包括湖北美尔雅服装集团有限公司（子公司，主要业务为精毛纺织制品、服装及辅料制造、加工、销售）和美尔雅服饰有限公司（子公司，生产中、高档西服的中日合资企业）。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0018"
+              ]
+            }
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F005",
+              "text": "公司主营自主品牌的男装、女装及各类配套服饰；美尔雅男装品类齐全，包含西服、衬衣、毛衫、T恤、大衣、休闲服及裤装等，定位中高档商务政务男装。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F006",
+              "text": "“美尔雅”西服作为公司传统核心产品，获评“中国驰名商标”并荣获“中国服装年度大奖——品质大奖”，在内销业务中占据主导地位。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F007",
+              "text": "美尔雅女装分为职业装、礼服、时装、休闲装四大系列，主要面向职业女性，主打商务时尚风格。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F008",
+              "text": "外贸加工业务主要采用来料加工、进料加工和一般贸易三种运营模式，形成以来料加工、进料加工为主的外贸业务格局。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F009",
+              "text": "国内市场构建零售、团购定制、线上网购相结合的多元化营销体系；零售以直营店、加盟店、商场专柜为主要形式，团购定制承接各类团体服装加工与定制业务，网购渠道依托京东、天猫、抖音等平台销售与线下门店差异化的产品。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F010",
+              "text": "主营业务分销售模式情况显示：直营店营业收入56,431,306.80元、毛利率52.39%；加盟联营店营业收入75,185,231.39元、毛利率49.40%；出口加工营业收入46,761,060.90元、毛利率1.41%；其他业务营业收入57,817,401.02元、毛利率26.19%；小计营业收入236,195,000.11元、毛利率34.93%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "直营店营业收入",
+                  "raw_value": "56,431,306.80",
+                  "value": "56431306.80",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "直营店毛利率",
+                  "raw_value": "52.39",
+                  "value": "52.39",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "加盟联营店营业收入",
+                  "raw_value": "75,185,231.39",
+                  "value": "75185231.39",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "加盟联营店毛利率",
+                  "raw_value": "49.40",
+                  "value": "49.40",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "出口加工营业收入",
+                  "raw_value": "46,761,060.90",
+                  "value": "46761060.90",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "出口加工毛利率",
+                  "raw_value": "1.41",
+                  "value": "1.41",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "其他业务营业收入",
+                  "raw_value": "57,817,401.02",
+                  "value": "57817401.02",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "其他业务毛利率",
+                  "raw_value": "26.19",
+                  "value": "26.19",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "主营业务小计营业收入",
+                  "raw_value": "236,195,000.11",
+                  "value": "236195000.11",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "主营业务小计毛利率",
+                  "raw_value": "34.93",
+                  "value": "34.93",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F011",
+              "text": "报告期内公司整体实现营业收入23,619.50万元，同比下降28.32%；实现归属于母公司所有者的净利润-8,909.26万元，同比下降30.82%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "23,619.50",
+                  "value": "23619.50",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "营业收入同比变动",
+                  "raw_value": "-28.32",
+                  "value": "-28.32",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "归属于母公司所有者的净利润",
+                  "raw_value": "-8,909.26",
+                  "value": "-8909.26",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "归属于母公司所有者的净利润同比变动",
+                  "raw_value": "-30.82",
+                  "value": "-30.82",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            }
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F012",
+              "text": "主营业务分行业情况：服装营业收入229,197,408.86元、营业成本148,381,101.41元、毛利率35.26%；医疗营业收入与成本同比均为-100.00%；其他业务营业收入6,997,591.25元、营业成本5,308,475.14元、毛利率24.14%；小计营业收入236,195,000.11元、营业成本153,689,576.55元、毛利率34.93%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "服装营业收入",
+                  "raw_value": "229,197,408.86",
+                  "value": "229197408.86",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "服装营业成本",
+                  "raw_value": "148,381,101.41",
+                  "value": "148381101.41",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "服装毛利率",
+                  "raw_value": "35.26",
+                  "value": "35.26",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "其他业务营业收入",
+                  "raw_value": "6,997,591.25",
+                  "value": "6997591.25",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "其他业务营业成本",
+                  "raw_value": "5,308,475.14",
+                  "value": "5308475.14",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "其他业务毛利率",
+                  "raw_value": "24.14",
+                  "value": "24.14",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "主营业务小计营业收入",
+                  "raw_value": "236,195,000.11",
+                  "value": "236195000.11",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "主营业务小计营业成本",
+                  "raw_value": "153,689,576.55",
+                  "value": "153689576.55",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "主营业务小计毛利率",
+                  "raw_value": "34.93",
+                  "value": "34.93",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F013",
+              "text": "主营业务分产品情况：品牌男装营业收入129,735,100.43元、营业成本74,034,437.68元、毛利率42.93%；品牌女装营业收入52,701,247.53元、营业成本28,243,423.34元、毛利率46.41%；出口加工类营业收入46,761,060.90元、营业成本46,103,240.39元、毛利率1.41%；其他业务营业收入6,997,591.25元、营业成本5,308,475.14元、毛利率24.14%；小计营业收入236,195,000.11元、营业成本153,689,576.55元、毛利率34.93%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "品牌男装营业收入",
+                  "raw_value": "129,735,100.43",
+                  "value": "129735100.43",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "品牌男装营业成本",
+                  "raw_value": "74,034,437.68",
+                  "value": "74034437.68",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "品牌男装毛利率",
+                  "raw_value": "42.93",
+                  "value": "42.93",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "品牌女装营业收入",
+                  "raw_value": "52,701,247.53",
+                  "value": "52701247.53",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "品牌女装营业成本",
+                  "raw_value": "28,243,423.34",
+                  "value": "28243423.34",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "品牌女装毛利率",
+                  "raw_value": "46.41",
+                  "value": "46.41",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "出口加工类营业收入",
+                  "raw_value": "46,761,060.90",
+                  "value": "46761060.90",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "出口加工类营业成本",
+                  "raw_value": "46,103,240.39",
+                  "value": "46103240.39",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "出口加工类毛利率",
+                  "raw_value": "1.41",
+                  "value": "1.41",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F014",
+              "text": "主营业务分地区情况：国内营业收入189,433,939.21元、营业成本107,586,336.16元、毛利率43.21%；国际营业收入46,761,060.90元、营业成本46,103,240.39元、毛利率1.41%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "国内营业收入",
+                  "raw_value": "189,433,939.21",
+                  "value": "189433939.21",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "国内营业成本",
+                  "raw_value": "107,586,336.16",
+                  "value": "107586336.16",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "国内毛利率",
+                  "raw_value": "43.21",
+                  "value": "43.21",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "国际营业收入",
+                  "raw_value": "46,761,060.90",
+                  "value": "46761060.90",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "国际营业成本",
+                  "raw_value": "46,103,240.39",
+                  "value": "46103240.39",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "国际毛利率",
+                  "raw_value": "1.41",
+                  "value": "1.41",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F015",
+              "text": "产销量情况：美尔雅品牌男装生产量659,689.00件/套、销售量815,915.00件/套、库存量701,810.00件/套；美尔雅品牌女装生产量628,976.00件/套、销售量669,828.00件/套、库存量439,802.00件/套；合计生产量1,288,665.00件/套、销售量1,485,743.00件/套、库存量1,141,612.00件/套。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009",
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "美尔雅品牌男装生产量",
+                  "raw_value": "659,689.00",
+                  "value": "659689.00",
+                  "unit": "件/套",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "件/套"
+                },
+                {
+                  "name": "美尔雅品牌男装销售量",
+                  "raw_value": "815,915.00",
+                  "value": "815915.00",
+                  "unit": "件/套",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "件/套"
+                },
+                {
+                  "name": "美尔雅品牌男装库存量",
+                  "raw_value": "701,810.00",
+                  "value": "701810.00",
+                  "unit": "件/套",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "件/套"
+                },
+                {
+                  "name": "美尔雅品牌女装生产量",
+                  "raw_value": "628,976.00",
+                  "value": "628976.00",
+                  "unit": "件/套",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "件/套"
+                },
+                {
+                  "name": "美尔雅品牌女装销售量",
+                  "raw_value": "669,828.00",
+                  "value": "669828.00",
+                  "unit": "件/套",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "件/套"
+                },
+                {
+                  "name": "美尔雅品牌女装库存量",
+                  "raw_value": "439,802.00",
+                  "value": "439802.00",
+                  "unit": "件/套",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "件/套"
+                },
+                {
+                  "name": "合计生产量",
+                  "raw_value": "1,288,665.00",
+                  "value": "1288665.00",
+                  "unit": "件/套",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "件/套"
+                },
+                {
+                  "name": "合计销售量",
+                  "raw_value": "1,485,743.00",
+                  "value": "1485743.00",
+                  "unit": "件/套",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "件/套"
+                },
+                {
+                  "name": "合计库存量",
+                  "raw_value": "1,141,612.00",
+                  "value": "1141612.00",
+                  "unit": "件/套",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "件/套"
+                }
+              ]
+            },
+            {
+              "fact_id": "F016",
+              "text": "报告期内各品牌盈利情况：品牌营业收入182,436,347.96元、营业成本102,277,861.02元、毛利率43.94%；出口加工营业收入46,761,060.90元、营业成本46,103,240.39元、毛利率1.41%；合计营业收入229,197,408.86元、营业成本148,381,101.41元、毛利率35.26%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "品牌营业收入",
+                  "raw_value": "182,436,347.96",
+                  "value": "182436347.96",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "品牌营业成本",
+                  "raw_value": "102,277,861.02",
+                  "value": "102277861.02",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "品牌毛利率",
+                  "raw_value": "43.94",
+                  "value": "43.94",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "出口加工营业收入",
+                  "raw_value": "46,761,060.90",
+                  "value": "46761060.90",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "出口加工毛利率",
+                  "raw_value": "1.41",
+                  "value": "1.41",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "合计营业收入",
+                  "raw_value": "229,197,408.86",
+                  "value": "229197408.86",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "合计毛利率",
+                  "raw_value": "35.26",
+                  "value": "35.26",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F017",
+              "text": "报告期内线上、线下销售渠道盈利情况：线上销售收入5,580,869.71元、占比2.43%、毛利率44.65%；线下销售收入223,616,539.15元、占比97.57%、毛利率35.03%；合计229,197,408.86元、占比100.00%、毛利率35.26%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0016"
+              ],
+              "metrics": [
+                {
+                  "name": "线上销售收入",
+                  "raw_value": "5,580,869.71",
+                  "value": "5580869.71",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "线上销售营业收入占比",
+                  "raw_value": "2.43",
+                  "value": "2.43",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "线上销售毛利率",
+                  "raw_value": "44.65",
+                  "value": "44.65",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "线下销售收入",
+                  "raw_value": "223,616,539.15",
+                  "value": "223616539.15",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "线下销售营业收入占比",
+                  "raw_value": "97.57",
+                  "value": "97.57",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "线下销售毛利率",
+                  "raw_value": "35.03",
+                  "value": "35.03",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F018",
+              "text": "报告期内各地区的盈利情况：华中地区营业收入150,610,378.46元、占比65.71%；境内小计182,436,347.96元、占比79.60%；国际地区46,761,060.90元、占比20.40%；合计229,197,408.86元、占比100.00%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0016"
+              ],
+              "metrics": [
+                {
+                  "name": "华中地区营业收入",
+                  "raw_value": "150,610,378.46",
+                  "value": "150610378.46",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "华中地区营业收入占比",
+                  "raw_value": "65.71",
+                  "value": "65.71",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "境内小计营业收入",
+                  "raw_value": "182,436,347.96",
+                  "value": "182436347.96",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "境内小计营业收入占比",
+                  "raw_value": "79.60",
+                  "value": "79.60",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "国际地区营业收入",
+                  "raw_value": "46,761,060.90",
+                  "value": "46761060.90",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "国际地区营业收入占比",
+                  "raw_value": "20.40",
+                  "value": "20.40",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F019",
+              "text": "主要子公司经营数据：湖北美尔雅服装集团有限公司营业收入175,793,460.36元、营业利润-54,064,053.81元、净利润-50,794,205.86元；美尔雅服饰有限公司营业收入41,300,845.88元、营业利润-5,492,821.57元、净利润-5,488,576.99元。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0018"
+              ],
+              "metrics": [
+                {
+                  "name": "湖北美尔雅服装集团有限公司营业收入",
+                  "raw_value": "175,793,460.36",
+                  "value": "175793460.36",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "湖北美尔雅服装集团有限公司营业利润",
+                  "raw_value": "-54,064,053.81",
+                  "value": "-54064053.81",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "湖北美尔雅服装集团有限公司净利润",
+                  "raw_value": "-50,794,205.86",
+                  "value": "-50794205.86",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "美尔雅服饰有限公司营业收入",
+                  "raw_value": "41,300,845.88",
+                  "value": "41300845.88",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "美尔雅服饰有限公司营业利润",
+                  "raw_value": "-5,492,821.57",
+                  "value": "-5492821.57",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "美尔雅服饰有限公司净利润",
+                  "raw_value": "-5,488,576.99",
+                  "value": "-5488576.99",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                }
+              ]
+            }
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F020",
+              "text": "外贸加工业务主要采用来料加工、进料加工和一般贸易三种运营模式；公司凭借高效的生产组织能力与精细化现场管理，结合成熟的营销网络和订单资源，形成以来料加工、进料加工为主的外贸业务格局。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F021",
+              "text": "公司在稳固日本、东南亚等传统加工贸易市场的同时，积极依托自身产能与外贸渠道拓展海外一般贸易业务，进一步优化产品结构与市场布局。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F022",
+              "text": "公司通过优化产品结构、升级生产设备、提升人员专业素养与工作效能推进提质增效，并整合高覆盖、多层次的渠道资源以及成熟稳定、优质高效的供应链资源。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F023",
+              "text": "成本分析表显示服装营业成本148,381,101.41元、本期占总成本比例96.55%；其他业务营业成本5,308,475.14元、占比3.45%；小计营业成本153,689,576.55元、占比100.00%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "服装营业成本",
+                  "raw_value": "148,381,101.41",
+                  "value": "148381101.41",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "服装营业成本占总成本比例",
+                  "raw_value": "96.55",
+                  "value": "96.55",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "其他业务营业成本",
+                  "raw_value": "5,308,475.14",
+                  "value": "5308475.14",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "其他业务营业成本占总成本比例",
+                  "raw_value": "3.45",
+                  "value": "3.45",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "营业成本小计",
+                  "raw_value": "153,689,576.55",
+                  "value": "153689576.55",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F024",
+              "text": "前五名供应商采购额1,749.56万元，占年度采购总额19.30%；其中前五名供应商采购额中关联方采购额0.00万元，占年度采购总额0.00%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商采购额",
+                  "raw_value": "1,749.56",
+                  "value": "1749.56",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "前五名供应商采购额占年度采购总额比例",
+                  "raw_value": "19.30",
+                  "value": "19.30",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            }
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F025",
+              "text": "国内市场零售以直营店、加盟店、商场专柜为主要形式；团购定制主要承接各类团体服装加工与定制业务，服务金融、电力、电信、政府机构、学校及各类企事业单位；网购渠道依托京东、天猫、抖音等平台。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F026",
+              "text": "外贸加工业务在稳固日本、东南亚等传统加工贸易市场的同时，拓展海外一般贸易业务；国际市场通过灵活布局供应链、精细化深耕区域市场保障业务稳定发展。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F027",
+              "text": "报告期内实体门店情况：美尔雅品牌直营店2024年末31家、2025年末33家、2025年新开3家、关闭1家；加盟联营店2024年末121家、2025年末103家、2025年新开2家、关闭20家；合计2024年末152家、2025年末136家、新开5家、关闭21家。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "美尔雅品牌直营店2025年末数量",
+                  "raw_value": "33",
+                  "value": "33",
+                  "unit": "家",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "家"
+                },
+                {
+                  "name": "美尔雅品牌加盟联营店2025年末数量",
+                  "raw_value": "103",
+                  "value": "103",
+                  "unit": "家",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "家"
+                },
+                {
+                  "name": "门店合计2025年末数量",
+                  "raw_value": "136",
+                  "value": "136",
+                  "unit": "家",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "家"
+                },
+                {
+                  "name": "门店合计2025年新开",
+                  "raw_value": "5",
+                  "value": "5",
+                  "unit": "家",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "家"
+                },
+                {
+                  "name": "门店合计2025年关闭",
+                  "raw_value": "21",
+                  "value": "21",
+                  "unit": "家",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "家"
+                }
+              ]
+            },
+            {
+              "fact_id": "F028",
+              "text": "前五名客户销售额5,574.13万元，占年度销售总额24.32%；其中前五名客户销售额中关联方销售额0.00万元，占年度销售总额0.00%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户销售额",
+                  "raw_value": "5,574.13",
+                  "value": "5574.13",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "前五名客户销售额占年度销售总额比例",
+                  "raw_value": "24.32",
+                  "value": "24.32",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F029",
+              "text": "前五名客户明细：客户1销售额3,730.25万元、占比16.28%；客户2销售额625.51万元、占比2.73%；客户3销售额537.80万元、占比2.35%；客户4销售额353.81万元、占比1.54%；客户5销售额326.76万元、占比1.43%；合计5,574.13万元、占比24.32%。客户5为报告期内新增客户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0011",
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "客户1销售额",
+                  "raw_value": "3,730.25",
+                  "value": "3730.25",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "客户1销售额占年度销售总额比例",
+                  "raw_value": "16.28",
+                  "value": "16.28",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "客户5销售额",
+                  "raw_value": "326.76",
+                  "value": "326.76",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "客户5销售额占年度销售总额比例",
+                  "raw_value": "1.43",
+                  "value": "1.43",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            }
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F030",
+              "text": "营业收入变动原因：一方面由于处置子公司青海众友健康惠嘉医药连锁有限公司股权，本报告期减少医药板块收入约3,000万元；另一方面，服装业务收入也较上年同期有所下降。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "医药板块收入减少额",
+                  "raw_value": "约3,000",
+                  "value": "3000",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "approximate",
+                  "source_unit": "万元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F031",
+              "text": "销售费用变动原因：受业绩下滑影响，职工薪酬、商场费用、租赁费、装修费用减少；财务费用变动原因：主要是利息支出减少、利息收入增加。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F032",
+              "text": "经济疲软，人们消费降级，直营店客流量下降。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ]
+            },
+            {
+              "fact_id": "F033",
+              "text": "2025年我国服装行业规模以上企业工业增加值同比下降3.0%，降幅较2024年同期回落3.8个百分点；规模以上企业服装产量同比下降3.44%，增速较2024年同期回落7.66个百分点。",
+              "subject_scope": "unclear",
+              "period": "2025年1-12月",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "服装行业规模以上企业工业增加值同比变动",
+                  "raw_value": "-3.0",
+                  "value": "-3.0",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年1-12月",
+                  "subject_scope": "unclear",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "服装行业规模以上企业工业增加值降幅较2024年同期回落",
+                  "raw_value": "3.8",
+                  "value": "3.8",
+                  "unit": "百分点",
+                  "currency": null,
+                  "period": "2025年1-12月",
+                  "subject_scope": "unclear",
+                  "qualifier": "exact",
+                  "source_unit": "%",
+                  "uncertainty_reason": "原文以百分号表述降幅回落，按规则保留源单位并将单位记为百分点"
+                },
+                {
+                  "name": "规模以上企业服装产量同比变动",
+                  "raw_value": "-3.44",
+                  "value": "-3.44",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年1-12月",
+                  "subject_scope": "unclear",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "规模以上企业服装产量增速较2024年同期回落",
+                  "raw_value": "7.66",
+                  "value": "7.66",
+                  "unit": "百分点",
+                  "currency": null,
+                  "period": "2025年1-12月",
+                  "subject_scope": "unclear",
+                  "qualifier": "exact",
+                  "source_unit": "%",
+                  "uncertainty_reason": "原文以百分号表述增速回落，按规则保留源单位并将单位记为百分点"
+                }
+              ]
+            },
+            {
+              "fact_id": "F034",
+              "text": "2025年1-12月我国限额以上单位服装类商品零售额11,044.5亿元，同比增长2.8%，增速较2024年同期加快2.7个百分点；穿类商品网上零售额同比增长1.9%，增速较2024年同期加快0.4个百分点。",
+              "subject_scope": "unclear",
+              "period": "2025年1-12月",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "限额以上单位服装类商品零售额",
+                  "raw_value": "11,044.5",
+                  "value": "11044.5",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "period": "2025年1-12月",
+                  "subject_scope": "unclear",
+                  "qualifier": "exact",
+                  "source_unit": "亿元"
+                },
+                {
+                  "name": "限额以上单位服装类商品零售额同比增速",
+                  "raw_value": "2.8",
+                  "value": "2.8",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年1-12月",
+                  "subject_scope": "unclear",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                },
+                {
+                  "name": "穿类商品网上零售额同比增速",
+                  "raw_value": "1.9",
+                  "value": "1.9",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年1-12月",
+                  "subject_scope": "unclear",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F035",
+              "text": "2025年1-12月我国累计完成服装及衣着附件出口1,511.8亿美元，同比下降5.0%，增速较2024年同期回落5.3个百分点。",
+              "subject_scope": "unclear",
+              "period": "2025年1-12月",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "服装及衣着附件出口额",
+                  "raw_value": "1,511.8",
+                  "value": "1511.8",
+                  "unit": "亿美元",
+                  "currency": "USD",
+                  "period": "2025年1-12月",
+                  "subject_scope": "unclear",
+                  "qualifier": "exact",
+                  "source_unit": "亿美元"
+                },
+                {
+                  "name": "服装及衣着附件出口额同比变动",
+                  "raw_value": "-5.0",
+                  "value": "-5.0",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年1-12月",
+                  "subject_scope": "unclear",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            }
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F036",
+              "text": "报告期内公司处置子公司青海众友健康惠嘉医药连锁有限公司股权，本报告期减少医药板块收入约3,000万元；主营业务分行业情况中医疗营业收入与成本同比均为-100.00%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "医药板块收入减少额",
+                  "raw_value": "约3,000",
+                  "value": "3000",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "approximate",
+                  "source_unit": "万元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F037",
+              "text": "报告期内公司业务类型、利润构成或利润来源发生重大变动的详细说明为“不适用”；公司报告期内业务、产品或服务发生重大变化或调整有关情况的说明为“不适用”。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0011"
+              ]
+            },
+            {
+              "fact_id": "F038",
+              "text": "报告期内实体门店合计由2024年末152家减少至2025年末136家，新开5家、关闭21家；其中加盟联营店由121家减少至103家，关闭20家。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "门店合计2024年末数量",
+                  "raw_value": "152",
+                  "value": "152",
+                  "unit": "家",
+                  "currency": null,
+                  "period": "2024年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "家"
+                },
+                {
+                  "name": "门店合计2025年末数量",
+                  "raw_value": "136",
+                  "value": "136",
+                  "unit": "家",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "家"
+                },
+                {
+                  "name": "门店合计2025年关闭",
+                  "raw_value": "21",
+                  "value": "21",
+                  "unit": "家",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "家"
+                }
+              ]
+            },
+            {
+              "fact_id": "F039",
+              "text": "报告期内公司整体营业收入同比下降28.32%，归属于母公司所有者的净利润同比下降30.82%；服装业务收入也较上年同期有所下降。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0008"
+              ]
+            }
+          ]
+        },
+        "limitations": [
+          "仅阅读了指定章节，未阅读公司治理、重要事项、财务报表附注及股东情况等章节，相关细节未纳入。",
+          "行业数据（服装行业工业增加值、产量、零售额、出口额）为行业统计口径，subject_scope记为unclear，不代表公司自身经营数据。",
+          "部分表格（如分品牌、分渠道、分地区）单位标注为“万元”，但所列金额数值与“元”口径一致，存在单位标注冲突；本工作底稿按数值原样保留并标注为元，未作换算，使用时需注意该冲突。",
+          "门店、客户、供应商名称在原文中以编号或类别列示，未披露具体名称，无法识别具体交易对手。",
+          "处置子公司青海众友健康惠嘉医药连锁有限公司股权的具体时间未在选定章节中明确，仅知本报告期减少医药板块收入约3,000万元。",
+          "研发投入相关表格标注为“不适用”，未获取研发投入金额及研发人员数据。"
+        ]
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F040",
+              "text": "公司在国内开展服装全链条业务，涵盖生产加工与终端销售；外贸加工业务采用来料加工、进料加工和一般贸易三种运营模式。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F041",
+              "text": "公司整合成熟稳定、优质高效的供应链资源；成本分析表列示服装营业成本、其他业务营业成本等成本构成，但未披露具体原材料或供应商名称。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0010"
+              ]
+            }
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F042",
+              "text": "团购定制业务服务金融、电力、电信、政府机构、学校及各类企事业单位；零售直面消费者；网购渠道依托京东、天猫、抖音等平台。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "usage": {
+      "input_tokens": 11458,
+      "output_tokens": 10468,
+      "total_tokens": 21926
+    }
+  },
+  {
+    "request_id": "bp-work-442f6d80abebd71bf1ed4e23:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "2a84b9068f2e643400dbf2f523903baa22489b1ab76ca40037f476c8c4f175e7",
+    "response_hash": "210fd9ac11131138f432aa1bedf4562f7aa21849072cc38f22f00836acecf738",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"F001\",\"F002\",\"F003\",\"F004\",\"F005\",\"F006\",\"F007\",\"F008\",\"F009\",\"F010\",\"F012\",\"F013\",\"F014\",\"F015\",\"F016\",\"F017\",\"F018\",\"F019\",\"F020\",\"F021\",\"F022\",\"F023\",\"F024\",\"F025\",\"F026\",\"F027\",\"F028\",\"F029\",\"F030\",\"F031\",\"F032\",\"F034\",\"F036\",\"F037\",\"F038\",\"F039\",\"F040\",\"F041\",\"F042\"],\"findings\":[{\"finding_id\":\"WF001\",\"element\":\"material_changes\",\"severity\":\"material\",\"issue_type\":\"wrong_period\",\"action\":\"human_review\",\"affected_fact_id\":\"F036\",\"evidence_ids\":[\"source-0008\",\"source-0011\",\"source-0018\"],\"explanation\":\"F036将股权处置写成“报告期内公司处置”。source-0008只说明因处置青海众友健康惠嘉医药连锁有限公司股权，本报告期医药板块收入减少约3,000万元，并未写明处置交易发生在2025年报告期内；医疗收入、成本同比-100.00%同样只说明本期已无该板块收入。source-0011将“报告期主要子公司股权变动导致合并范围变化”勾选为不适用，source-0018将“报告期内取得和处置子公司的情况”勾选为不适用。处置时点属于未经限定且与正式披露口径冲突的断言，不能直接采信，也不得把上述“不适用”改写成从未发生处置。约3,000万元减少额本身可保留为近似口径。\"},{\"finding_id\":\"WF002\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":\"F039\",\"evidence_ids\":[\"source-0005\"],\"explanation\":\"source-0005载明公司整体实现归属于母公司所有者的净利润-8,909.26万元，并同比下降30.82%。F039只保留下降比例，未给出亏损绝对额，易被理解成盈利下滑而非当期亏损。该金额未出现在任何已采纳事实中，属于重要经营结果遗漏。营业收入23,619.50万元已以236,195,000.11元出现在分项合计中，不另计遗漏。\"},{\"finding_id\":\"WF003\",\"element\":\"upstream_inputs\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"quarantine\",\"affected_fact_id\":\"F041\",\"evidence_ids\":[\"source-0005\",\"source-0010\",\"source-0011\",\"source-0012\"],\"explanation\":\"F041断言未披露具体原材料或供应商名称。选定章节未出现的内容只能视为未知，不能写成未披露。source-0010的成本分析表仅列营业成本，不能外推为全文无原材料信息；source-0011、source-0012已按供应商1至供应商5列示采购额，只是未给出法律名称。该否定性结论应隔离，不得作为事实采用。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "F001",
+        "F002",
+        "F003",
+        "F004",
+        "F005",
+        "F006",
+        "F007",
+        "F008",
+        "F009",
+        "F010",
+        "F012",
+        "F013",
+        "F014",
+        "F015",
+        "F016",
+        "F017",
+        "F018",
+        "F019",
+        "F020",
+        "F021",
+        "F022",
+        "F023",
+        "F024",
+        "F025",
+        "F026",
+        "F027",
+        "F028",
+        "F029",
+        "F030",
+        "F031",
+        "F032",
+        "F034",
+        "F036",
+        "F037",
+        "F038",
+        "F039",
+        "F040",
+        "F041",
+        "F042"
+      ],
+      "findings": [
+        {
+          "finding_id": "WF001",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "wrong_period",
+          "action": "human_review",
+          "affected_fact_id": "F036",
+          "evidence_ids": [
+            "source-0008",
+            "source-0011",
+            "source-0018"
+          ],
+          "explanation": "F036将股权处置写成“报告期内公司处置”。source-0008只说明因处置青海众友健康惠嘉医药连锁有限公司股权，本报告期医药板块收入减少约3,000万元，并未写明处置交易发生在2025年报告期内；医疗收入、成本同比-100.00%同样只说明本期已无该板块收入。source-0011将“报告期主要子公司股权变动导致合并范围变化”勾选为不适用，source-0018将“报告期内取得和处置子公司的情况”勾选为不适用。处置时点属于未经限定且与正式披露口径冲突的断言，不能直接采信，也不得把上述“不适用”改写成从未发生处置。约3,000万元减少额本身可保留为近似口径。"
+        },
+        {
+          "finding_id": "WF002",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": "F039",
+          "evidence_ids": [
+            "source-0005"
+          ],
+          "explanation": "source-0005载明公司整体实现归属于母公司所有者的净利润-8,909.26万元，并同比下降30.82%。F039只保留下降比例，未给出亏损绝对额，易被理解成盈利下滑而非当期亏损。该金额未出现在任何已采纳事实中，属于重要经营结果遗漏。营业收入23,619.50万元已以236,195,000.11元出现在分项合计中，不另计遗漏。"
+        },
+        {
+          "finding_id": "WF003",
+          "element": "upstream_inputs",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "quarantine",
+          "affected_fact_id": "F041",
+          "evidence_ids": [
+            "source-0005",
+            "source-0010",
+            "source-0011",
+            "source-0012"
+          ],
+          "explanation": "F041断言未披露具体原材料或供应商名称。选定章节未出现的内容只能视为未知，不能写成未披露。source-0010的成本分析表仅列营业成本，不能外推为全文无原材料信息；source-0011、source-0012已按供应商1至供应商5列示采购额，只是未给出法律名称。该否定性结论应隔离，不得作为事实采用。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 23229,
+      "output_tokens": 701,
+      "total_tokens": 58506
+    }
+  }
+]

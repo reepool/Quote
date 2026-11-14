@@ -1,0 +1,1205 @@
+[
+  {
+    "request_id": "bp-work-062bb2da6d746a6ce50057a4:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "416c5fc17090ce4bfe7f071c03d906ab8735bbff2383a49978baadd470995001",
+    "response_hash": "853f2506c289fe3588fc5cfaf2a9600016e4a0a908d2670277224edb3c40cc24",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0034\",\"section-0041\",\"section-0042\",\"section-0047\",\"section-0054\",\"section-0084\",\"section-0157\"],\"rationale\":\"所选章节覆盖公司业务结构、产品用途、经营模式、行业环境、经营讨论、核心竞争力、主营业务收入成本构成及主要子公司情况，可完整回答业务、产品、盈利模式、规模与变化等问题；未选治理、薪酬、财务报告附注等非业务核心内容。\",\"deferred\":[\"section-0033 管理层讨论与分析整章：包含治理、荣誉等非业务细节，已用其下业务子节替代\",\"section-0334 财务报告及会计政策附注：仅在需要时定向补充，不整体阅读\",\"section-0175 公司治理、环境和社会：与业务经营问题关联弱\",\"section-0230 重要事项：关联交易等仅在业务缺口时定向补充\"],\"stop_reason\":\"已选取业务与经营核心子节，能解释业务结构、产品服务、收入构成、规模与主要变化；剩余为治理、财务附注及合规性披露，对业务问题边际信息低，故在此停止。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0034",
+        "section-0041",
+        "section-0042",
+        "section-0047",
+        "section-0054",
+        "section-0084",
+        "section-0157"
+      ],
+      "rationale": "所选章节覆盖公司业务结构、产品用途、经营模式、行业环境、经营讨论、核心竞争力、主营业务收入成本构成及主要子公司情况，可完整回答业务、产品、盈利模式、规模与变化等问题；未选治理、薪酬、财务报告附注等非业务核心内容。",
+      "deferred": [
+        "section-0033 管理层讨论与分析整章：包含治理、荣誉等非业务细节，已用其下业务子节替代",
+        "section-0334 财务报告及会计政策附注：仅在需要时定向补充，不整体阅读",
+        "section-0175 公司治理、环境和社会：与业务经营问题关联弱",
+        "section-0230 重要事项：关联交易等仅在业务缺口时定向补充"
+      ],
+      "stop_reason": "已选取业务与经营核心子节，能解释业务结构、产品服务、收入构成、规模与主要变化；剩余为治理、财务附注及合规性披露，对业务问题边际信息低，故在此停止。"
+    },
+    "usage": {
+      "input_tokens": 19529,
+      "output_tokens": 254,
+      "total_tokens": 19783
+    }
+  },
+  {
+    "request_id": "bp-work-062bb2da6d746a6ce50057a4:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "a4ba42e8316c74f9c766c17f5fb73e09511b93f36f742f353f3255de1c32af9e",
+    "response_hash": "d6f1031846ff783683df9c13c113094d8ecb6741ccce5ccbe55d81f222ac9e32",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-BS-01\",\"text\":\"公司主营业务为森林消防机械、农业机械、特种车辆（全地形车）、摩托车及上述产品配件的制造和销售。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-BS-02\",\"text\":\"公司所处行业主要集中在森林消防机械行业、农业机械行业、特种车辆（全地形车）行业及摩托车行业。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"F-BS-03\",\"text\":\"2025年公司各主营业务板块结构进一步优化，森林消防机械、农业机械、特种车辆、摩托车业务销售收入占比分别为22.10%、25.22%、41.54%、11.14%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F-BS-04\",\"text\":\"主要子公司江苏福马高新动力机械有限公司为公司子公司，主营机械制造销售；江苏联海动力机械有限公司、福马新能（北京）科技有限公司为参股公司。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0025\",\"source-0026\"]}],\"limitations\":[\"未披露各业务板块内部更细的组织层级或事业部划分。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-PS-01\",\"text\":\"森林消防机械产品包括全地形消防车系列（基于全地形车平台开发，适合小范围灭火和救援）、消防泵系列（含离心泵、便携式高扬程森林泵、超高扬程隔膜泵、智能串联森林消防泵、大排量隔膜泵等）以及风力灭火机系列（广泛用于山地森林灭火）。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]},{\"fact_id\":\"F-PS-02\",\"text\":\"农业机械产品包括插秧机系列（以高速插秧机为核心代表，已形成6-10行、抛秧机、智能高速插秧机、宽窄行高速插秧机、大功率大马力高速插秧机全产品系列）和履带自走全喂入式谷物联合收割机系列（主要用于小麦、水稻等主要粮食作物的收获作业，一次完成收割、脱粒、清选等工序）。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F-PS-03\",\"text\":\"特种车辆（全地形车）产品包括多用途ATV全地形车系列（已形成150CC-1000CC小、中、大排量全品种系列，销售覆盖美国、欧盟、南非、东南亚等海外市场）和电动ATV系列（采用锂电新能源动力，适合野外涉猎和娱乐环境下使用）。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F-PS-04\",\"text\":\"摩托车产品为林海摩托车系列，环保标准达到国Ⅳ，出口型号排放标准达到欧五+。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-PS-05\",\"text\":\"公司摩托车产品主要是中等排量的二轮燃油摩托车。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]}],\"limitations\":[\"产品介绍未逐一披露各型号的销售价格或单位售价。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-RM-01\",\"text\":\"公司主要采用以销定产的生产经营模式，由销售部门根据销售计划或客户订单将生产计划下达至生产部门，实行按单生产，同时根据市场需求适度备货。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-RM-02\",\"text\":\"公司产品销售以经销模式为主。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-RM-03\",\"text\":\"公司收入来自森林消防机械、农业机械、特种车辆、摩托车等产品的制造与销售，2025年营业收入113,124.69万元，同比增长7.66%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"113,124.69\",\"value\":\"113124.69\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"营业收入同比增长\",\"raw_value\":\"7.66\",\"value\":\"7.66\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F-RM-04\",\"text\":\"公司利润表列示营业收入1,131,246,944.93元，上年同期1,050,736,998.28元，变动比例7.66%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"1,131,246,944.93\",\"value\":\"1131246944.93\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]}],\"limitations\":[\"未披露各业务板块的具体定价机制或毛利率目标。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SM-01\",\"text\":\"2025年公司实现营业收入113,124.69万元，同比增长7.66%；实现利润总额2,756.91万元，同比增长33.85%；实现归属于上市公司股东的净利润2,455.27万元，同比增长33.24%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"113,124.69\",\"value\":\"113124.69\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"利润总额\",\"raw_value\":\"2,756.91\",\"value\":\"2756.91\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"2,455.27\",\"value\":\"2455.27\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"}]},{\"fact_id\":\"F-SM-02\",\"text\":\"主营业务分行业情况：特种车辆行业营业收入467,207,688.51元、营业成本395,852,061.14元、毛利率15.27%；农业机械行业营业收入283,722,402.61元、营业成本263,450,913.07元、毛利率7.14%；森林消防机械行业营业收入248,582,445.60元、营业成本208,891,463.44元、毛利率15.97%；摩托车行业营业收入125,340,298.09元、营业成本112,384,898.60元、毛利率10.34%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"],\"metrics\":[{\"name\":\"特种车辆行业营业收入\",\"raw_value\":\"467,207,688.51\",\"value\":\"467207688.51\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"农业机械行业营业收入\",\"raw_value\":\"283,722,402.61\",\"value\":\"283722402.61\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"森林消防机械行业营业收入\",\"raw_value\":\"248,582,445.60\",\"value\":\"248582445.60\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"摩托车行业营业收入\",\"raw_value\":\"125,340,298.09\",\"value\":\"125340298.09\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]},{\"fact_id\":\"F-SM-03\",\"text\":\"主营业务分地区情况：国内市场营业收入545,846,527.89元、毛利率11.87%、营业收入比上年增减-6.14%；国外市场营业收入579,006,306.92元、毛利率13.73%、营业收入比上年增减24.71%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"],\"metrics\":[{\"name\":\"国内市场营业收入\",\"raw_value\":\"545,846,527.89\",\"value\":\"545846527.89\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"国外市场营业收入\",\"raw_value\":\"579,006,306.92\",\"value\":\"579006306.92\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]},{\"fact_id\":\"F-SM-04\",\"text\":\"产销量情况：特种车辆生产量23,413辆、销售量23,429辆、库存量15辆；农业机械生产量9,167台、销售量9,202台、库存量0台；森林消防机械生产量18,142台、销售量18,142台、库存量0台；摩托车生产量32,408辆、销售量32,433辆、库存量108辆。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"],\"metrics\":[{\"name\":\"特种车辆销售量\",\"raw_value\":\"23,429\",\"value\":\"23429\",\"unit\":\"辆\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"辆\"},{\"name\":\"农业机械销售量\",\"raw_value\":\"9,202\",\"value\":\"9202\",\"unit\":\"台\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"台\"},{\"name\":\"森林消防机械销售量\",\"raw_value\":\"18,142\",\"value\":\"18142\",\"unit\":\"台\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"台\"},{\"name\":\"摩托车销售量\",\"raw_value\":\"32,433\",\"value\":\"32433\",\"unit\":\"辆\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"辆\"}]},{\"fact_id\":\"F-SM-05\",\"text\":\"主要子公司江苏福马高新动力机械有限公司注册资本4,500.00万元，总资产28,478.85万元，净资产11,667.21万元，营业收入42,091.36万元，营业利润1,523.19万元，净利润1,474.29万元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0025\",\"source-0026\"],\"metrics\":[{\"name\":\"江苏福马高新动力机械有限公司营业收入\",\"raw_value\":\"42,091.36\",\"value\":\"42091.36\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"江苏福马高新动力机械有限公司净利润\",\"raw_value\":\"1,474.29\",\"value\":\"1474.29\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"}]}],\"limitations\":[\"分行业与分产品表列示的营业收入金额相同，未单独披露配件等其他收入。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OI-01\",\"text\":\"公司主要采用以销定产模式，按单生产并适度备货，产品销售以经销模式为主。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-OI-02\",\"text\":\"成本构成按行业分为原材料、人工成本、燃料动力、制造费用；特种车辆行业原材料本期金额368,596,076.79元、占本期总成本比例93.11%；农业机械行业原材料254,795,403.56元、占96.72%；森林消防机械行业原材料205,237,087.96元、占98.25%；摩托车行业原材料106,679,714.53元、占94.92%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\",\"source-0020\"],\"metrics\":[{\"name\":\"特种车辆行业原材料成本\",\"raw_value\":\"368,596,076.79\",\"value\":\"368596076.79\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"农业机械行业原材料成本\",\"raw_value\":\"254,795,403.56\",\"value\":\"254795403.56\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"森林消防机械行业原材料成本\",\"raw_value\":\"205,237,087.96\",\"value\":\"205237087.96\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"},{\"name\":\"摩托车行业原材料成本\",\"raw_value\":\"106,679,714.53\",\"value\":\"106679714.53\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"元\"}]},{\"fact_id\":\"F-OI-03\",\"text\":\"公司构建了由多条专业生产线、工业机器人、加工中心协同运作的先进生产制造体系，包括以AGV智能物流搬运系统为核心载体的AGV多功能柔性生产线、由一流品牌加工中心构成的新型机加工体系。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"]},{\"fact_id\":\"F-OI-04\",\"text\":\"2025年公司ERP系统进一步优化提升，核心业务板块实现从订单到交付全流程数字化贯通。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"]},{\"fact_id\":\"F-OI-05\",\"text\":\"农业机械板块通过优化供应商体系，成功引入第二厂家11家，推动关键物料采购成本进一步下降；两项核心零部件实现国产化替代。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0011\"]},{\"fact_id\":\"F-OI-06\",\"text\":\"2025年度全年研发投入4,574.29万元，占营业收入的4.04%；研发人员数量151人，占公司总人数的比例22.90%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0022\",\"source-0023\"],\"metrics\":[{\"name\":\"研发投入\",\"raw_value\":\"4,574.29\",\"value\":\"4574.29\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"研发投入占营业收入比例\",\"raw_value\":\"4.04\",\"value\":\"4.04\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]}],\"limitations\":[\"未披露主要原材料的具体品种名称及对应供应商。\",\"成本分析仅按成本构成项目列示，未披露各原材料的具体采购来源。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-CC-01\",\"text\":\"国际市场与国内市场协同发展，主营业务板块中国际市场、国内市场销售收入占比分别为51.47%、48.53%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F-CC-02\",\"text\":\"国际市场方面，公司全地形车产品深入渗透到亚洲、欧洲、南北美洲、非洲以及大洋洲等世界众多国家和地区，形成完善的全球化营销网络。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]},{\"fact_id\":\"F-CC-03\",\"text\":\"国内市场方面，公司构建“线上+线下”全渠道营销生态，线上依托数字化营销平台，线下通过深度绑定核心经销商，打造覆盖全国的立体化服务网络。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]},{\"fact_id\":\"F-CC-04\",\"text\":\"前五名客户销售额50,002.00万元，占年度销售总额44.20%；其中前五名客户销售额中关联方销售额0.00万元。前五名供应商采购额12,997.29万元，占年度采购总额12.37%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0021\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"50,002.00\",\"value\":\"50002.00\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"44.20\",\"value\":\"44.20\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F-CC-05\",\"text\":\"报告期内公司向单个客户的销售比例超过总额50%、前5名客户中存在新增客户或严重依赖少数客户的情形，以及向单个供应商采购比例超过总额50%等情形均标注为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0021\"]}],\"limitations\":[\"未披露具体客户名称及经销商数量。\",\"前五名客户/供应商为汇总数据，未按业务板块拆分。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-OD-01\",\"text\":\"森林消防机械板块受“万亿国债”项目结束、各地应急管理及林业部门基本完成森林消防装备换装、地方政府债务压力等因素影响，市场需求出现阶段性收窄，全年销售收入24,858.24万元，同比下降27.38%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"森林消防机械板块销售收入\",\"raw_value\":\"24,858.24\",\"value\":\"24858.24\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"森林消防机械板块销售收入同比\",\"raw_value\":\"-27.38\",\"value\":\"-27.38\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F-OD-02\",\"text\":\"农业机械板块全年实现营业收入28,372.24万元，同比增长26.77%，高速插秧机、收割机等主要产品实现较大幅度增长。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"农业机械板块营业收入\",\"raw_value\":\"28,372.24\",\"value\":\"28372.24\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"农业机械板块营业收入同比\",\"raw_value\":\"26.77\",\"value\":\"26.77\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]},{\"fact_id\":\"F-OD-03\",\"text\":\"2025年特种车辆产品实现营业收入46,720.77万元，同比增长20.6%；摩托车产品实现营业收入12,534.03万元，同比增长35.7%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"特种车辆产品营业收入\",\"raw_value\":\"46,720.77\",\"value\":\"46720.77\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"},{\"name\":\"摩托车产品营业收入\",\"raw_value\":\"12,534.03\",\"value\":\"12534.03\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"}]},{\"fact_id\":\"F-OD-04\",\"text\":\"森林消防机械行业营业收入、营业成本同比下降的原因为报告期内公司全地形消防车等消防产品销售同比减少；摩托车行业营业收入、营业成本同比上升的原因为报告期内公司摩托车出口同比增加。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"]},{\"fact_id\":\"F-OD-05\",\"text\":\"森林消防机械生产、销量同比增加的原因主要是报告期内根据市场订单需求，公司风力灭火机、油锯等产品产销量同比增加。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\"]},{\"fact_id\":\"F-OD-06\",\"text\":\"特种车辆行业人工成本上升主要因报告期内特种车辆产品结构变化致生产人员薪酬上涨；农业机械行业人工成本、制造费用上升主要因高速插秧机等农机产品生产销售数量增加；森林消防机械行业制造费用上升主要因消防产品结构变化及新厂房投入使用折旧增加。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0020\",\"source-0021\"]}],\"limitations\":[\"行业销量与出口数据为行业统计，不代表公司自身销量。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-MC-01\",\"text\":\"报告期内公司新增重要非主营业务的说明标注为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"F-MC-02\",\"text\":\"本期公司业务类型、利润构成或利润来源发生重大变动的详细说明标注为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"]},{\"fact_id\":\"F-MC-03\",\"text\":\"报告期主要子公司股权变动导致合并范围变化标注为不适用；报告期内取得和处置子公司的情况标注为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0021\",\"source-0026\"]},{\"fact_id\":\"F-MC-04\",\"text\":\"公司报告期内业务、产品或服务发生重大变化或调整有关情况标注为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0021\"]},{\"fact_id\":\"F-MC-05\",\"text\":\"2025年公司成功获评江苏省专精特新中小企业，并获国家级专精特新“小巨人”企业称号；林海股份、福马高新双双通过国家高新技术企业认定。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"F-MC-06\",\"text\":\"2025年公司全年累计获得授权专利12件，其中发明专利6件；主导或参与制、修订的3项国家标准正式发布。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]}],\"limitations\":[\"上述“不适用”标注为披露勾选项，不构成对报告期内任何变化或事件均未发生的绝对断言。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-P1\",\"text\":\"公司主营业务为森林消防机械、农业机械、特种车辆（全地形车）、摩托车等及以上产品配件的制造和销售，处于制造环节。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F-SC-P2\",\"text\":\"公司主要采用以销定产的生产经营模式，实行按单生产，同时根据市场需求适度备货。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]}],\"limitations\":[\"未披露公司在产业链中的具体上下游议价地位。\"]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-U1\",\"text\":\"成本构成中原材料占各行业营业成本的主要部分：特种车辆行业原材料占93.11%、农业机械行业占96.72%、森林消防机械行业占98.25%、摩托车行业占94.92%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0019\",\"source-0020\"]},{\"fact_id\":\"F-SC-U2\",\"text\":\"农业机械板块通过优化供应商体系，成功引入第二厂家11家，推动关键物料采购成本进一步下降；两项核心零部件实现国产化替代。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0011\"]},{\"fact_id\":\"F-SC-U3\",\"text\":\"前五名供应商采购额12,997.29万元，占年度采购总额12.37%；其中前五名供应商采购额中关联方采购额0.00万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0021\"],\"metrics\":[{\"name\":\"前五名供应商采购额\",\"raw_value\":\"12,997.29\",\"value\":\"12997.29\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"万元\"}]}],\"limitations\":[\"未披露主要原材料的具体品种名称及对应供应商名称。\",\"成本构成项目仅列示原材料、人工成本、燃料动力、制造费用，未细分具体物料。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F-SC-D1\",\"text\":\"全地形车广泛应用于休闲娱乐、户外作业及军事等特定领域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F-SC-D2\",\"text\":\"插秧机用于将水稻秧苗自动、高效地移植到稻田；履带自走全喂入式谷物联合收割机主要用于小麦、水稻等主要粮食作物的收获作业。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0004\"]},{\"fact_id\":\"F-SC-D3\",\"text\":\"森林消防机械产品适合在复杂地形和恶劣环境中执行灭火和救援任务，广泛用于山地森林灭火。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]},{\"fact_id\":\"F-SC-D4\",\"text\":\"公司产品销售以经销模式为主，国内市场通过深度绑定核心经销商打造覆盖全国的立体化服务网络。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0012\"]}],\"limitations\":[\"未披露具体下游客户名称或终端用户构成比例。\"]},\"limitations\":[\"供应链信息为基于选定章节的补充性描述，未覆盖全部采购与销售细节。\"]},\"limitations\":[\"本工作底稿仅基于选定章节原文，未阅读治理、财务报告附注等章节，可能遗漏相关细节。\",\"行业统计数据（如插秧机、全地形车、摩托车行业销量与出口数据）为行业整体情况，不代表公司自身经营成果。\",\"部分表格数据（如产销量、成本构成）未按产品型号细分。\",\"“不适用”勾选项为披露格式，不构成对相关事项绝对未发生的断言。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-BS-01",
+              "text": "公司主营业务为森林消防机械、农业机械、特种车辆（全地形车）、摩托车及上述产品配件的制造和销售。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-BS-02",
+              "text": "公司所处行业主要集中在森林消防机械行业、农业机械行业、特种车辆（全地形车）行业及摩托车行业。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F-BS-03",
+              "text": "2025年公司各主营业务板块结构进一步优化，森林消防机械、农业机械、特种车辆、摩托车业务销售收入占比分别为22.10%、25.22%、41.54%、11.14%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F-BS-04",
+              "text": "主要子公司江苏福马高新动力机械有限公司为公司子公司，主营机械制造销售；江苏联海动力机械有限公司、福马新能（北京）科技有限公司为参股公司。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0025",
+                "source-0026"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露各业务板块内部更细的组织层级或事业部划分。"
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-PS-01",
+              "text": "森林消防机械产品包括全地形消防车系列（基于全地形车平台开发，适合小范围灭火和救援）、消防泵系列（含离心泵、便携式高扬程森林泵、超高扬程隔膜泵、智能串联森林消防泵、大排量隔膜泵等）以及风力灭火机系列（广泛用于山地森林灭火）。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F-PS-02",
+              "text": "农业机械产品包括插秧机系列（以高速插秧机为核心代表，已形成6-10行、抛秧机、智能高速插秧机、宽窄行高速插秧机、大功率大马力高速插秧机全产品系列）和履带自走全喂入式谷物联合收割机系列（主要用于小麦、水稻等主要粮食作物的收获作业，一次完成收割、脱粒、清选等工序）。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F-PS-03",
+              "text": "特种车辆（全地形车）产品包括多用途ATV全地形车系列（已形成150CC-1000CC小、中、大排量全品种系列，销售覆盖美国、欧盟、南非、东南亚等海外市场）和电动ATV系列（采用锂电新能源动力，适合野外涉猎和娱乐环境下使用）。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F-PS-04",
+              "text": "摩托车产品为林海摩托车系列，环保标准达到国Ⅳ，出口型号排放标准达到欧五+。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-PS-05",
+              "text": "公司摩托车产品主要是中等排量的二轮燃油摩托车。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            }
+          ],
+          "limitations": [
+            "产品介绍未逐一披露各型号的销售价格或单位售价。"
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-RM-01",
+              "text": "公司主要采用以销定产的生产经营模式，由销售部门根据销售计划或客户订单将生产计划下达至生产部门，实行按单生产，同时根据市场需求适度备货。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-RM-02",
+              "text": "公司产品销售以经销模式为主。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-RM-03",
+              "text": "公司收入来自森林消防机械、农业机械、特种车辆、摩托车等产品的制造与销售，2025年营业收入113,124.69万元，同比增长7.66%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "113,124.69",
+                  "value": "113124.69",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "营业收入同比增长",
+                  "raw_value": "7.66",
+                  "value": "7.66",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-RM-04",
+              "text": "公司利润表列示营业收入1,131,246,944.93元，上年同期1,050,736,998.28元，变动比例7.66%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "1,131,246,944.93",
+                  "value": "1131246944.93",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露各业务板块的具体定价机制或毛利率目标。"
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SM-01",
+              "text": "2025年公司实现营业收入113,124.69万元，同比增长7.66%；实现利润总额2,756.91万元，同比增长33.85%；实现归属于上市公司股东的净利润2,455.27万元，同比增长33.24%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "113,124.69",
+                  "value": "113124.69",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "利润总额",
+                  "raw_value": "2,756.91",
+                  "value": "2756.91",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "归属于上市公司股东的净利润",
+                  "raw_value": "2,455.27",
+                  "value": "2455.27",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-02",
+              "text": "主营业务分行业情况：特种车辆行业营业收入467,207,688.51元、营业成本395,852,061.14元、毛利率15.27%；农业机械行业营业收入283,722,402.61元、营业成本263,450,913.07元、毛利率7.14%；森林消防机械行业营业收入248,582,445.60元、营业成本208,891,463.44元、毛利率15.97%；摩托车行业营业收入125,340,298.09元、营业成本112,384,898.60元、毛利率10.34%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0018"
+              ],
+              "metrics": [
+                {
+                  "name": "特种车辆行业营业收入",
+                  "raw_value": "467,207,688.51",
+                  "value": "467207688.51",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "农业机械行业营业收入",
+                  "raw_value": "283,722,402.61",
+                  "value": "283722402.61",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "森林消防机械行业营业收入",
+                  "raw_value": "248,582,445.60",
+                  "value": "248582445.60",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "摩托车行业营业收入",
+                  "raw_value": "125,340,298.09",
+                  "value": "125340298.09",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-03",
+              "text": "主营业务分地区情况：国内市场营业收入545,846,527.89元、毛利率11.87%、营业收入比上年增减-6.14%；国外市场营业收入579,006,306.92元、毛利率13.73%、营业收入比上年增减24.71%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0018"
+              ],
+              "metrics": [
+                {
+                  "name": "国内市场营业收入",
+                  "raw_value": "545,846,527.89",
+                  "value": "545846527.89",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "国外市场营业收入",
+                  "raw_value": "579,006,306.92",
+                  "value": "579006306.92",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-04",
+              "text": "产销量情况：特种车辆生产量23,413辆、销售量23,429辆、库存量15辆；农业机械生产量9,167台、销售量9,202台、库存量0台；森林消防机械生产量18,142台、销售量18,142台、库存量0台；摩托车生产量32,408辆、销售量32,433辆、库存量108辆。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019"
+              ],
+              "metrics": [
+                {
+                  "name": "特种车辆销售量",
+                  "raw_value": "23,429",
+                  "value": "23429",
+                  "unit": "辆",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "辆"
+                },
+                {
+                  "name": "农业机械销售量",
+                  "raw_value": "9,202",
+                  "value": "9202",
+                  "unit": "台",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "台"
+                },
+                {
+                  "name": "森林消防机械销售量",
+                  "raw_value": "18,142",
+                  "value": "18142",
+                  "unit": "台",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "台"
+                },
+                {
+                  "name": "摩托车销售量",
+                  "raw_value": "32,433",
+                  "value": "32433",
+                  "unit": "辆",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "辆"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-SM-05",
+              "text": "主要子公司江苏福马高新动力机械有限公司注册资本4,500.00万元，总资产28,478.85万元，净资产11,667.21万元，营业收入42,091.36万元，营业利润1,523.19万元，净利润1,474.29万元。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0025",
+                "source-0026"
+              ],
+              "metrics": [
+                {
+                  "name": "江苏福马高新动力机械有限公司营业收入",
+                  "raw_value": "42,091.36",
+                  "value": "42091.36",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "江苏福马高新动力机械有限公司净利润",
+                  "raw_value": "1,474.29",
+                  "value": "1474.29",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "分行业与分产品表列示的营业收入金额相同，未单独披露配件等其他收入。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OI-01",
+              "text": "公司主要采用以销定产模式，按单生产并适度备货，产品销售以经销模式为主。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-OI-02",
+              "text": "成本构成按行业分为原材料、人工成本、燃料动力、制造费用；特种车辆行业原材料本期金额368,596,076.79元、占本期总成本比例93.11%；农业机械行业原材料254,795,403.56元、占96.72%；森林消防机械行业原材料205,237,087.96元、占98.25%；摩托车行业原材料106,679,714.53元、占94.92%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019",
+                "source-0020"
+              ],
+              "metrics": [
+                {
+                  "name": "特种车辆行业原材料成本",
+                  "raw_value": "368,596,076.79",
+                  "value": "368596076.79",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "农业机械行业原材料成本",
+                  "raw_value": "254,795,403.56",
+                  "value": "254795403.56",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "森林消防机械行业原材料成本",
+                  "raw_value": "205,237,087.96",
+                  "value": "205237087.96",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                },
+                {
+                  "name": "摩托车行业原材料成本",
+                  "raw_value": "106,679,714.53",
+                  "value": "106679714.53",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OI-03",
+              "text": "公司构建了由多条专业生产线、工业机器人、加工中心协同运作的先进生产制造体系，包括以AGV智能物流搬运系统为核心载体的AGV多功能柔性生产线、由一流品牌加工中心构成的新型机加工体系。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ]
+            },
+            {
+              "fact_id": "F-OI-04",
+              "text": "2025年公司ERP系统进一步优化提升，核心业务板块实现从订单到交付全流程数字化贯通。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ]
+            },
+            {
+              "fact_id": "F-OI-05",
+              "text": "农业机械板块通过优化供应商体系，成功引入第二厂家11家，推动关键物料采购成本进一步下降；两项核心零部件实现国产化替代。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010",
+                "source-0011"
+              ]
+            },
+            {
+              "fact_id": "F-OI-06",
+              "text": "2025年度全年研发投入4,574.29万元，占营业收入的4.04%；研发人员数量151人，占公司总人数的比例22.90%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0022",
+                "source-0023"
+              ],
+              "metrics": [
+                {
+                  "name": "研发投入",
+                  "raw_value": "4,574.29",
+                  "value": "4574.29",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "研发投入占营业收入比例",
+                  "raw_value": "4.04",
+                  "value": "4.04",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露主要原材料的具体品种名称及对应供应商。",
+            "成本分析仅按成本构成项目列示，未披露各原材料的具体采购来源。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-CC-01",
+              "text": "国际市场与国内市场协同发展，主营业务板块中国际市场、国内市场销售收入占比分别为51.47%、48.53%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F-CC-02",
+              "text": "国际市场方面，公司全地形车产品深入渗透到亚洲、欧洲、南北美洲、非洲以及大洋洲等世界众多国家和地区，形成完善的全球化营销网络。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            },
+            {
+              "fact_id": "F-CC-03",
+              "text": "国内市场方面，公司构建“线上+线下”全渠道营销生态，线上依托数字化营销平台，线下通过深度绑定核心经销商，打造覆盖全国的立体化服务网络。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            },
+            {
+              "fact_id": "F-CC-04",
+              "text": "前五名客户销售额50,002.00万元，占年度销售总额44.20%；其中前五名客户销售额中关联方销售额0.00万元。前五名供应商采购额12,997.29万元，占年度采购总额12.37%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0021"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户销售额",
+                  "raw_value": "50,002.00",
+                  "value": "50002.00",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "前五名客户销售额占年度销售总额比例",
+                  "raw_value": "44.20",
+                  "value": "44.20",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-CC-05",
+              "text": "报告期内公司向单个客户的销售比例超过总额50%、前5名客户中存在新增客户或严重依赖少数客户的情形，以及向单个供应商采购比例超过总额50%等情形均标注为不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0021"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体客户名称及经销商数量。",
+            "前五名客户/供应商为汇总数据，未按业务板块拆分。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-OD-01",
+              "text": "森林消防机械板块受“万亿国债”项目结束、各地应急管理及林业部门基本完成森林消防装备换装、地方政府债务压力等因素影响，市场需求出现阶段性收窄，全年销售收入24,858.24万元，同比下降27.38%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "森林消防机械板块销售收入",
+                  "raw_value": "24,858.24",
+                  "value": "24858.24",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "森林消防机械板块销售收入同比",
+                  "raw_value": "-27.38",
+                  "value": "-27.38",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-02",
+              "text": "农业机械板块全年实现营业收入28,372.24万元，同比增长26.77%，高速插秧机、收割机等主要产品实现较大幅度增长。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "农业机械板块营业收入",
+                  "raw_value": "28,372.24",
+                  "value": "28372.24",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "农业机械板块营业收入同比",
+                  "raw_value": "26.77",
+                  "value": "26.77",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-03",
+              "text": "2025年特种车辆产品实现营业收入46,720.77万元，同比增长20.6%；摩托车产品实现营业收入12,534.03万元，同比增长35.7%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "特种车辆产品营业收入",
+                  "raw_value": "46,720.77",
+                  "value": "46720.77",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                },
+                {
+                  "name": "摩托车产品营业收入",
+                  "raw_value": "12,534.03",
+                  "value": "12534.03",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                }
+              ]
+            },
+            {
+              "fact_id": "F-OD-04",
+              "text": "森林消防机械行业营业收入、营业成本同比下降的原因为报告期内公司全地形消防车等消防产品销售同比减少；摩托车行业营业收入、营业成本同比上升的原因为报告期内公司摩托车出口同比增加。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019"
+              ]
+            },
+            {
+              "fact_id": "F-OD-05",
+              "text": "森林消防机械生产、销量同比增加的原因主要是报告期内根据市场订单需求，公司风力灭火机、油锯等产品产销量同比增加。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019"
+              ]
+            },
+            {
+              "fact_id": "F-OD-06",
+              "text": "特种车辆行业人工成本上升主要因报告期内特种车辆产品结构变化致生产人员薪酬上涨；农业机械行业人工成本、制造费用上升主要因高速插秧机等农机产品生产销售数量增加；森林消防机械行业制造费用上升主要因消防产品结构变化及新厂房投入使用折旧增加。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0020",
+                "source-0021"
+              ]
+            }
+          ],
+          "limitations": [
+            "行业销量与出口数据为行业统计，不代表公司自身销量。"
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-MC-01",
+              "text": "报告期内公司新增重要非主营业务的说明标注为不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "F-MC-02",
+              "text": "本期公司业务类型、利润构成或利润来源发生重大变动的详细说明标注为不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0018"
+              ]
+            },
+            {
+              "fact_id": "F-MC-03",
+              "text": "报告期主要子公司股权变动导致合并范围变化标注为不适用；报告期内取得和处置子公司的情况标注为不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0021",
+                "source-0026"
+              ]
+            },
+            {
+              "fact_id": "F-MC-04",
+              "text": "公司报告期内业务、产品或服务发生重大变化或调整有关情况标注为不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0021"
+              ]
+            },
+            {
+              "fact_id": "F-MC-05",
+              "text": "2025年公司成功获评江苏省专精特新中小企业，并获国家级专精特新“小巨人”企业称号；林海股份、福马高新双双通过国家高新技术企业认定。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            },
+            {
+              "fact_id": "F-MC-06",
+              "text": "2025年公司全年累计获得授权专利12件，其中发明专利6件；主导或参与制、修订的3项国家标准正式发布。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            }
+          ],
+          "limitations": [
+            "上述“不适用”标注为披露勾选项，不构成对报告期内任何变化或事件均未发生的绝对断言。"
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-P1",
+              "text": "公司主营业务为森林消防机械、农业机械、特种车辆（全地形车）、摩托车等及以上产品配件的制造和销售，处于制造环节。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F-SC-P2",
+              "text": "公司主要采用以销定产的生产经营模式，实行按单生产，同时根据市场需求适度备货。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露公司在产业链中的具体上下游议价地位。"
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-U1",
+              "text": "成本构成中原材料占各行业营业成本的主要部分：特种车辆行业原材料占93.11%、农业机械行业占96.72%、森林消防机械行业占98.25%、摩托车行业占94.92%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0019",
+                "source-0020"
+              ]
+            },
+            {
+              "fact_id": "F-SC-U2",
+              "text": "农业机械板块通过优化供应商体系，成功引入第二厂家11家，推动关键物料采购成本进一步下降；两项核心零部件实现国产化替代。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010",
+                "source-0011"
+              ]
+            },
+            {
+              "fact_id": "F-SC-U3",
+              "text": "前五名供应商采购额12,997.29万元，占年度采购总额12.37%；其中前五名供应商采购额中关联方采购额0.00万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0021"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商采购额",
+                  "raw_value": "12,997.29",
+                  "value": "12997.29",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "万元"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露主要原材料的具体品种名称及对应供应商名称。",
+            "成本构成项目仅列示原材料、人工成本、燃料动力、制造费用，未细分具体物料。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F-SC-D1",
+              "text": "全地形车广泛应用于休闲娱乐、户外作业及军事等特定领域。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F-SC-D2",
+              "text": "插秧机用于将水稻秧苗自动、高效地移植到稻田；履带自走全喂入式谷物联合收割机主要用于小麦、水稻等主要粮食作物的收获作业。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "F-SC-D3",
+              "text": "森林消防机械产品适合在复杂地形和恶劣环境中执行灭火和救援任务，广泛用于山地森林灭火。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F-SC-D4",
+              "text": "公司产品销售以经销模式为主，国内市场通过深度绑定核心经销商打造覆盖全国的立体化服务网络。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0012"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体下游客户名称或终端用户构成比例。"
+          ]
+        },
+        "limitations": [
+          "供应链信息为基于选定章节的补充性描述，未覆盖全部采购与销售细节。"
+        ]
+      },
+      "limitations": [
+        "本工作底稿仅基于选定章节原文，未阅读治理、财务报告附注等章节，可能遗漏相关细节。",
+        "行业统计数据（如插秧机、全地形车、摩托车行业销量与出口数据）为行业整体情况，不代表公司自身经营成果。",
+        "部分表格数据（如产销量、成本构成）未按产品型号细分。",
+        "“不适用”勾选项为披露格式，不构成对相关事项绝对未发生的断言。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 16188,
+      "output_tokens": 6466,
+      "total_tokens": 22654
+    }
+  },
+  {
+    "request_id": "bp-work-062bb2da6d746a6ce50057a4:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "04e366eafc6e27d7e991f2b02a648e1dbf84297a1084272466bae9cca93ed97a",
+    "response_hash": "eeab24ee99ca76fd2112ff10a1985796e0209505866210c432aeafbd62e33f60",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"F-BS-01\",\"F-BS-02\",\"F-BS-03\",\"F-BS-04\",\"F-PS-01\",\"F-PS-02\",\"F-PS-03\",\"F-PS-04\",\"F-PS-05\",\"F-RM-01\",\"F-RM-02\",\"F-RM-03\",\"F-RM-04\",\"F-SM-01\",\"F-SM-02\",\"F-SM-03\",\"F-SM-04\",\"F-SM-05\",\"F-OI-01\",\"F-OI-02\",\"F-OI-03\",\"F-OI-04\",\"F-OI-05\",\"F-OI-06\",\"F-CC-01\",\"F-CC-02\",\"F-CC-03\",\"F-CC-04\",\"F-CC-05\",\"F-OD-02\",\"F-OD-03\",\"F-OD-04\",\"F-OD-05\",\"F-OD-06\",\"F-MC-01\",\"F-MC-02\",\"F-MC-03\",\"F-MC-04\",\"F-MC-05\",\"F-MC-06\"],\"findings\":[{\"finding_id\":\"WF-001\",\"element\":\"operating_drivers\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0008\",\"source-0018\"],\"explanation\":\"来源明确披露森林消防机械这一主营板块2025年销售收入24,858.24万元、同比下降27.38%（分行业表同期营业收入248,582,445.60元、营业收入比上年增减-27.38%，营业成本同比-31.26%）。草稿已在F-OD-02、F-OD-03列示农业机械、特种车辆、摩托车的营业收入及同比增幅，F-SM-02仅有森林消防机械绝对额与毛利率，F-OD-04只说明收入、成本同比下降及原因，未收录该量化降幅。四大主营中降幅最大的收入变动因此缺失，属于重要遗漏；该数字见于上述来源，并非来源不确定。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "F-BS-01",
+        "F-BS-02",
+        "F-BS-03",
+        "F-BS-04",
+        "F-PS-01",
+        "F-PS-02",
+        "F-PS-03",
+        "F-PS-04",
+        "F-PS-05",
+        "F-RM-01",
+        "F-RM-02",
+        "F-RM-03",
+        "F-RM-04",
+        "F-SM-01",
+        "F-SM-02",
+        "F-SM-03",
+        "F-SM-04",
+        "F-SM-05",
+        "F-OI-01",
+        "F-OI-02",
+        "F-OI-03",
+        "F-OI-04",
+        "F-OI-05",
+        "F-OI-06",
+        "F-CC-01",
+        "F-CC-02",
+        "F-CC-03",
+        "F-CC-04",
+        "F-CC-05",
+        "F-OD-02",
+        "F-OD-03",
+        "F-OD-04",
+        "F-OD-05",
+        "F-OD-06",
+        "F-MC-01",
+        "F-MC-02",
+        "F-MC-03",
+        "F-MC-04",
+        "F-MC-05",
+        "F-MC-06"
+      ],
+      "findings": [
+        {
+          "finding_id": "WF-001",
+          "element": "operating_drivers",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0008",
+            "source-0018"
+          ],
+          "explanation": "来源明确披露森林消防机械这一主营板块2025年销售收入24,858.24万元、同比下降27.38%（分行业表同期营业收入248,582,445.60元、营业收入比上年增减-27.38%，营业成本同比-31.26%）。草稿已在F-OD-02、F-OD-03列示农业机械、特种车辆、摩托车的营业收入及同比增幅，F-SM-02仅有森林消防机械绝对额与毛利率，F-OD-04只说明收入、成本同比下降及原因，未收录该量化降幅。四大主营中降幅最大的收入变动因此缺失，属于重要遗漏；该数字见于上述来源，并非来源不确定。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 24755,
+      "output_tokens": 477,
+      "total_tokens": 45921
+    }
+  },
+  {
+    "request_id": "bp-work-062bb2da6d746a6ce50057a4:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "fb6af2e772ab85d00136d934fbe58d547e22ff672ff1f33d8e753b3a061c4186",
+    "response_hash": "f53c34018d64fe6ab720e77764c0ec1395008b816193e338b7168460c2b7fa11",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:WF-001\",\"text\":\"森林消防机械板块2025年实现销售收入24,858.24万元，同比下降27.38%；分行业营业收入248,582,445.60元，营业收入比上年增减-27.38%，营业成本比上年增减-31.26%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0018\"],\"metrics\":[{\"name\":\"森林消防机械板块销售收入\",\"raw_value\":\"24,858.24\",\"value\":\"24858.24\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比下降27.38%\"},{\"name\":\"森林消防机械行业营业收入\",\"raw_value\":\"248,582,445.60\",\"value\":\"248582445.60\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"comparison_basis\":\"营业收入比上年增减-27.38%\"},{\"name\":\"森林消防机械行业营业成本同比增减\",\"raw_value\":\"-31.26\",\"value\":\"-31.26\",\"unit\":\"%\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\",\"comparison_basis\":\"营业成本比上年增减\"}]}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "review-add:WF-001",
+          "text": "森林消防机械板块2025年实现销售收入24,858.24万元，同比下降27.38%；分行业营业收入248,582,445.60元，营业收入比上年增减-27.38%，营业成本比上年增减-31.26%。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008",
+            "source-0018"
+          ],
+          "metrics": [
+            {
+              "name": "森林消防机械板块销售收入",
+              "raw_value": "24,858.24",
+              "value": "24858.24",
+              "unit": "万元",
+              "currency": "人民币",
+              "period": "2025年度",
+              "subject_scope": "business_segment",
+              "qualifier": "exact",
+              "comparison_basis": "同比下降27.38%"
+            },
+            {
+              "name": "森林消防机械行业营业收入",
+              "raw_value": "248,582,445.60",
+              "value": "248582445.60",
+              "unit": "元",
+              "currency": "人民币",
+              "period": "2025年度",
+              "subject_scope": "business_segment",
+              "qualifier": "exact",
+              "comparison_basis": "营业收入比上年增减-27.38%"
+            },
+            {
+              "name": "森林消防机械行业营业成本同比增减",
+              "raw_value": "-31.26",
+              "value": "-31.26",
+              "unit": "%",
+              "period": "2025年度",
+              "subject_scope": "business_segment",
+              "qualifier": "exact",
+              "comparison_basis": "营业成本比上年增减"
+            }
+          ]
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 14197,
+      "output_tokens": 297,
+      "total_tokens": 14494
+    }
+  },
+  {
+    "request_id": "bp-work-062bb2da6d746a6ce50057a4:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "610fcf0915835ec1ea8e6a315f6819c895bcd3a11c5022e649c14cadc4c7d1ee",
+    "response_hash": "a8771ec9056b1c2893d891e8b8039b3e057a088e770808375d101e9b2b677315",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"review-add:WF-001\"],\"checks\":[{\"fact_id\":\"review-add:WF-001\",\"accepted\":true,\"evidence_ids\":[\"source-0008\",\"source-0018\"],\"explanation\":\"该候选补上了初稿遗漏的森林消防机械量化降幅，且主体、期间、栏目、单位与原文一致。source-0008载明森林消防机械板块全年实现销售收入24,858.24万元、同比下降27.38%；source-0018分行业表对应营业收入248,582,445.60元、营业收入比上年增减-27.38%、营业成本比上年增减-31.26%，单位为元、币种人民币。候选分别保留“销售收入/万元”与“营业收入/元”及成本变动率，未把万元四舍五入数强行等同于元金额，也未新增来源没有的确定性判断，足以解决该重要遗漏。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "review-add:WF-001"
+      ],
+      "checks": [
+        {
+          "fact_id": "review-add:WF-001",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0008",
+            "source-0018"
+          ],
+          "explanation": "该候选补上了初稿遗漏的森林消防机械量化降幅，且主体、期间、栏目、单位与原文一致。source-0008载明森林消防机械板块全年实现销售收入24,858.24万元、同比下降27.38%；source-0018分行业表对应营业收入248,582,445.60元、营业收入比上年增减-27.38%、营业成本比上年增减-31.26%，单位为元、币种人民币。候选分别保留“销售收入/万元”与“营业收入/元”及成本变动率，未把万元四舍五入数强行等同于元金额，也未新增来源没有的确定性判断，足以解决该重要遗漏。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 18075,
+      "output_tokens": 207,
+      "total_tokens": 21410
+    }
+  }
+]

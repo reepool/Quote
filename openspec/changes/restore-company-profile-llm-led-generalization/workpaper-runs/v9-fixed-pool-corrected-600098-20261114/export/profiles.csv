@@ -1,0 +1,7 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600098.SH,2025-12-31,2026-04-14T16:00:00+00:00,False,False,False,False,0,0,model_reviewed_pending_verification,llm_generated,"公司从事绿色低碳综合智慧能源、节能、环保、能源金融等业务投资开发和经营，是广东省重要的综合能源企业之一，形成产、购、销、储、运、用的综合能源产业链。
+公司已形成电力、能源物流、燃气、新能源、储能、能源金融等业务协同发展的“1+6+N”能源产供储销体系，并打造煤电联营、气电联营、传统能源与新能源联营产业链。
+全资子公司燃气集团是广州市城市燃气高压管网建设和天然气购销的主体，统筹全市高压管网建设和上游气源采购、下游天然气输配及分销。
+全资子公司能源物流集团是华南地区最大的纵向一体化煤炭经营企业，业务覆盖国内经济发达的20个省市及海外地区，被纳入首批国家电煤重点保供贸易企业。
+储能集团在源网荷侧全面布局，已搭建一体化储能电站运维云平台，推动本地储能产业集群化发展。
+主要子公司中，东电公司、天然气发电公司、恒益热电公司、中电荔新公司、南沙电力公司从事电力（及热力）生产销售；能源物流集团从事燃料批发零售；燃气集团从事燃气管网建设与燃气销售；新能源集团从事风力、光伏发电及充电桩；储能集团从事电力供应；财务公司为非银金融机构。",49,96,completed,0,deepseek-flash,grok-4.7

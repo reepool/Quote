@@ -1,0 +1,1912 @@
+[
+  {
+    "request_id": "bp-work-52eda8b9465813e09b4450bb:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "546ab8b384a1fab61d7f8cf915ca2ae32219b1848e9b40030429b7c69eac9977",
+    "response_hash": "9f82d5f8f0438b50b3a84577904063da4a20758046a91fc5a28d67599aea512d",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0035\",\"section-0036\",\"section-0064\",\"section-0066\",\"section-0093\",\"section-0116\",\"section-0056\"],\"rationale\":\"本报告为广州发展（600098.SH）2025年年报。所选章节覆盖：公司业务情况（section-0035）说明主营产品/服务与经营模式；行业情况（section-0036）说明电力、煤炭、天然气、新能源、储能等外部环境；主营业务分析（section-0064）与收入和成本分析（section-0066）提供规模、板块收入占比与成本结构；行业经营性信息分析（section-0093）含电量电价、装机容量、发电效率、资本性支出等运营规模数据；主要控股参股公司分析（section-0116）补充主要经营主体；核心竞争力（section-0056）说明产业布局、供应链协同与资源保障。这些章节共同解释业务结构、产品用途、盈利模式、规模与主要构成、经营资源与客户市场及本期变化，信息密度高且相互衔接。\",\"deferred\":[\"section-0034（管理层讨论与分析整章）：范围过大，含大量非经营细节，已用其下实质子节替代\",\"section-0118（未来发展讨论）：属前瞻性计划，非本期经营事实，按material_only原则暂不纳入\",\"section-0391（财务报告整章）：仅在有实质缺口时定向补充，避免整章财务附注\",\"section-1255（分部信息）：若前述板块收入占比已充分，则无需重复读取\"],\"stop_reason\":\"已选取覆盖业务模式、产品服务、规模与收入构成、运营规模、主要经营主体及核心资源的完整子节，可回答业务结构与经营问题；财务附注、治理、债券及前瞻计划等非核心范围不再展开，故在此停止。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0035",
+        "section-0036",
+        "section-0064",
+        "section-0066",
+        "section-0093",
+        "section-0116",
+        "section-0056"
+      ],
+      "rationale": "本报告为广州发展（600098.SH）2025年年报。所选章节覆盖：公司业务情况（section-0035）说明主营产品/服务与经营模式；行业情况（section-0036）说明电力、煤炭、天然气、新能源、储能等外部环境；主营业务分析（section-0064）与收入和成本分析（section-0066）提供规模、板块收入占比与成本结构；行业经营性信息分析（section-0093）含电量电价、装机容量、发电效率、资本性支出等运营规模数据；主要控股参股公司分析（section-0116）补充主要经营主体；核心竞争力（section-0056）说明产业布局、供应链协同与资源保障。这些章节共同解释业务结构、产品用途、盈利模式、规模与主要构成、经营资源与客户市场及本期变化，信息密度高且相互衔接。",
+      "deferred": [
+        "section-0034（管理层讨论与分析整章）：范围过大，含大量非经营细节，已用其下实质子节替代",
+        "section-0118（未来发展讨论）：属前瞻性计划，非本期经营事实，按material_only原则暂不纳入",
+        "section-0391（财务报告整章）：仅在有实质缺口时定向补充，避免整章财务附注",
+        "section-1255（分部信息）：若前述板块收入占比已充分，则无需重复读取"
+      ],
+      "stop_reason": "已选取覆盖业务模式、产品服务、规模与收入构成、运营规模、主要经营主体及核心资源的完整子节，可回答业务结构与经营问题；财务附注、治理、债券及前瞻计划等非核心范围不再展开，故在此停止。"
+    },
+    "usage": {
+      "input_tokens": 24207,
+      "output_tokens": 397,
+      "total_tokens": 24604
+    }
+  },
+  {
+    "request_id": "bp-work-52eda8b9465813e09b4450bb:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "6b1eaec2b18db06ead71931f23f463f8134930e1f80751b92076e178a4a13435",
+    "response_hash": "a2cbf3d9a4bd679e04ddeae4ab2780e2de43e4e56410d7503da929e64e658836",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F001\",\"text\":\"公司从事绿色低碳综合智慧能源、节能、环保、能源金融等业务投资开发和经营，是广东省重要的综合能源企业之一，形成产、购、销、储、运、用的综合能源产业链。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F002\",\"text\":\"公司已形成电力、能源物流、燃气、新能源、储能、能源金融等业务协同发展的“1+6+N”能源产供储销体系，并打造煤电联营、气电联营、传统能源与新能源联营产业链。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"]},{\"fact_id\":\"F003\",\"text\":\"全资子公司燃气集团是广州市城市燃气高压管网建设和天然气购销的主体，统筹全市高压管网建设和上游气源采购、下游天然气输配及分销。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F004\",\"text\":\"全资子公司能源物流集团是华南地区最大的纵向一体化煤炭经营企业，业务覆盖国内经济发达的20个省市及海外地区，被纳入首批国家电煤重点保供贸易企业。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F005\",\"text\":\"储能集团在源网荷侧全面布局，已搭建一体化储能电站运维云平台，推动本地储能产业集群化发展。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F006\",\"text\":\"主要子公司中，东电公司、天然气发电公司、恒益热电公司、中电荔新公司、南沙电力公司从事电力（及热力）生产销售；能源物流集团从事燃料批发零售；燃气集团从事燃气管网建设与燃气销售；新能源集团从事风力、光伏发电及充电桩；储能集团从事电力供应；财务公司为非银金融机构。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0022\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F007\",\"text\":\"公司为广大客户提供电力、煤炭、天然气、蒸汽、成品油等能源产品和能源管理服务，同时提供天然气、煤炭和油品装卸、运输和储存服务，金融业务主要为能源产业发展提供金融支持。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F008\",\"text\":\"公司电力、蒸汽主要通过所属火力发电机组、风力和光伏发电设备生产；火力发电涵盖燃煤发电、燃气发电、热电联产、分布式能源站，并拓展售电、配电网、能源检修与技术服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F009\",\"text\":\"公司依托涵盖电力、燃气、能源物流、新能源、储能等多元化的综合能源体系，提供源网荷储充一体化、能源托管、节能运维、碳资产管理等一体化服务，构建“投资-建设-运营-增值服务”全链条服务模式。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F010\",\"text\":\"能源物流集团拥有67万立方米大型油库及配套8万吨级石油化工专业码头，是甲醇、生物质油料重要集散基地，是海关高级认证企业、郑州商品交易所指定交割油库。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F011\",\"text\":\"分产品收入显示公司经营燃煤发电、天然气发电、煤电热力、气电热力、加气混凝土、煤炭、油品、危化品仓储、天然气、光伏发电、风力发电、充电桩、储能及综合能源、房产租赁、金融业务等产品与服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F012\",\"text\":\"公司电力主要通过国家电网、南方电网销售给终端用户，并积极推进发售电一体运营模式；天然气、煤炭、成品油、蒸汽等通过自有管网、销售平台及运输、批发、销售一体化的产业链等销售给终端用户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F013\",\"text\":\"公司天然气、煤炭和成品油等通过外部采购，与国内外知名供应商建立长期战略合作关系，以有效控制采购成本。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F014\",\"text\":\"公司经营业绩稳步提升，融资渠道丰富，发挥财务公司和融资租赁公司专业的金融服务优势，绿色低碳产业基金加快产业布局，并积极推进REITs申报发行工作。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"F015\",\"text\":\"2025年公司实现营业总收入508.83亿元，营业总成本（含财务公司对外利息、手续费及佣金支出）492.91亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"营业总收入\",\"raw_value\":\"508.83\",\"value\":\"508.83\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"营业总成本（含财务公司对外利息、手续费及佣金支出）\",\"raw_value\":\"492.91\",\"value\":\"492.91\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F016\",\"text\":\"利润表科目显示，2025年营业收入50,841,626,989.35元，营业成本46,398,940,235.15元，营业利润3,288,203,440.26元，归属于母公司股东的净利润2,319,437,070.79元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"50,841,626,989.35\",\"value\":\"50841626989.35\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"营业成本\",\"raw_value\":\"46,398,940,235.15\",\"value\":\"46398940235.15\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"营业利润\",\"raw_value\":\"3,288,203,440.26\",\"value\":\"3288203440.26\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"归属于母公司股东的净利润\",\"raw_value\":\"2,319,437,070.79\",\"value\":\"2319437070.79\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F017\",\"text\":\"营业收入、营业成本变动原因说明为煤炭和油品销量增加，风电及光伏发电装机规模增加；营业利润、归属于母公司股东的净利润变动原因说明为天然气业务、风电及光伏发电业务规模增加，确认土地交储收益。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F018\",\"text\":\"主营业务分行业情况：燃煤发电及供热业务营业收入4,349,947,127.70元、毛利率14.21%；天然气发电及供热业务营业收入3,204,831,500.79元、毛利率13.45%；能源物流业务营业收入29,485,020,343.45元、毛利率1.10%；天然气业务营业收入10,502,056,882.42元、毛利率13.66%；新能源及储能业务营业收入3,245,504,723.82元、毛利率49.30%；其他产业营业收入95,784,921.17元、毛利率78.02%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\",\"source-0009\"],\"metrics\":[{\"name\":\"燃煤发电及供热业务营业收入\",\"raw_value\":\"4,349,947,127.70\",\"value\":\"4349947127.70\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"燃煤发电及供热业务毛利率\",\"raw_value\":\"14.21\",\"value\":\"14.21\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"天然气发电及供热业务营业收入\",\"raw_value\":\"3,204,831,500.79\",\"value\":\"3204831500.79\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"天然气发电及供热业务毛利率\",\"raw_value\":\"13.45\",\"value\":\"13.45\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"能源物流业务营业收入\",\"raw_value\":\"29,485,020,343.45\",\"value\":\"29485020343.45\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"能源物流业务毛利率\",\"raw_value\":\"1.10\",\"value\":\"1.10\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"天然气业务营业收入\",\"raw_value\":\"10,502,056,882.42\",\"value\":\"10502056882.42\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"天然气业务毛利率\",\"raw_value\":\"13.66\",\"value\":\"13.66\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"新能源及储能业务营业收入\",\"raw_value\":\"3,245,504,723.82\",\"value\":\"3245504723.82\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"新能源及储能业务毛利率\",\"raw_value\":\"49.30\",\"value\":\"49.30\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"其他产业营业收入\",\"raw_value\":\"95,784,921.17\",\"value\":\"95784921.17\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"其他产业毛利率\",\"raw_value\":\"78.02\",\"value\":\"78.02\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F019\",\"text\":\"分产品收入中，煤炭营业收入23,064,543,028.53元、毛利率1.29%；油品营业收入6,395,908,933.37元、毛利率0.22%；天然气营业收入10,502,056,882.42元、毛利率13.66%；风力发电营业收入2,194,507,260.36元、毛利率52.48%；光伏发电营业收入1,020,539,666.84元、毛利率43.45%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"煤炭营业收入\",\"raw_value\":\"23,064,543,028.53\",\"value\":\"23064543028.53\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"煤炭毛利率\",\"raw_value\":\"1.29\",\"value\":\"1.29\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"油品营业收入\",\"raw_value\":\"6,395,908,933.37\",\"value\":\"6395908933.37\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"油品毛利率\",\"raw_value\":\"0.22\",\"value\":\"0.22\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"天然气营业收入\",\"raw_value\":\"10,502,056,882.42\",\"value\":\"10502056882.42\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"天然气毛利率\",\"raw_value\":\"13.66\",\"value\":\"13.66\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"风力发电营业收入\",\"raw_value\":\"2,194,507,260.36\",\"value\":\"2194507260.36\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"风力发电毛利率\",\"raw_value\":\"52.48\",\"value\":\"52.48\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"光伏发电营业收入\",\"raw_value\":\"1,020,539,666.84\",\"value\":\"1020539666.84\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"光伏发电毛利率\",\"raw_value\":\"43.45\",\"value\":\"43.45\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F020\",\"text\":\"分地区情况：华南地区营业收入28,489,632,478.05元、毛利率8.82%；其他地区营业收入22,393,513,021.30元、毛利率8.81%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"华南地区营业收入\",\"raw_value\":\"28,489,632,478.05\",\"value\":\"28489632478.05\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"华南地区毛利率\",\"raw_value\":\"8.82\",\"value\":\"8.82\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"其他地区营业收入\",\"raw_value\":\"22,393,513,021.30\",\"value\":\"22393513021.30\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"其他地区毛利率\",\"raw_value\":\"8.81\",\"value\":\"8.81\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F021\",\"text\":\"截至2025年12月31日，公司发电装机容量达到1,097万千瓦，其中火力发电可控装机容量484万千瓦，风力及光伏发电可控装机容量613万千瓦，绿色低碳能源装机占比超77%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"发电装机容量\",\"raw_value\":\"1,097\",\"value\":\"1097\",\"unit\":\"万千瓦\",\"currency\":null,\"period\":\"截至2025年12月31日\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"火力发电可控装机容量\",\"raw_value\":\"484\",\"value\":\"484\",\"unit\":\"万千瓦\",\"currency\":null,\"period\":\"截至2025年12月31日\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"风力及光伏发电可控装机容量\",\"raw_value\":\"613\",\"value\":\"613\",\"unit\":\"万千瓦\",\"currency\":null,\"period\":\"截至2025年12月31日\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"绿色低碳能源装机占比\",\"raw_value\":\"超77\",\"value\":\"77\",\"unit\":\"%\",\"currency\":null,\"period\":\"截至2025年12月31日\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"greater_than\"}]},{\"fact_id\":\"F022\",\"text\":\"行业经营性信息分析显示，截至2025年12月31日，公司可控发电装机容量为1,097.06万千瓦，其中火电可控装机容量483.65万千瓦、同比减少11.7%，光伏发电可控装机容量355.34万千瓦、同比增长51.4%，风力发电可控装机容量258.07万千瓦、同比增长5.7%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\"],\"metrics\":[{\"name\":\"可控发电装机容量\",\"raw_value\":\"1,097.06\",\"value\":\"1097.06\",\"unit\":\"万千瓦\",\"currency\":null,\"period\":\"截至2025年12月31日\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"火电可控装机容量\",\"raw_value\":\"483.65\",\"value\":\"483.65\",\"unit\":\"万千瓦\",\"currency\":null,\"period\":\"截至2025年12月31日\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"光伏发电可控装机容量\",\"raw_value\":\"355.34\",\"value\":\"355.34\",\"unit\":\"万千瓦\",\"currency\":null,\"period\":\"截至2025年12月31日\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"风力发电可控装机容量\",\"raw_value\":\"258.07\",\"value\":\"258.07\",\"unit\":\"万千瓦\",\"currency\":null,\"period\":\"截至2025年12月31日\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F023\",\"text\":\"产销量情况：电力生产量243.76亿千瓦时、销售量233.89亿千瓦时；热力生产量682.58万吉焦、销售量684.66万吉焦；市场煤销售量4,801.25万吨、库存量161.00万吨；成品油销售量100.37万吨、库存量1.30万吨；天然气销售量359,796.93万立方米、库存量27,466.93万立方米。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"电力生产量\",\"raw_value\":\"243.76\",\"value\":\"243.76\",\"unit\":\"亿千瓦时\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"电力销售量\",\"raw_value\":\"233.89\",\"value\":\"233.89\",\"unit\":\"亿千瓦时\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"热力生产量\",\"raw_value\":\"682.58\",\"value\":\"682.58\",\"unit\":\"万吉焦\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"热力销售量\",\"raw_value\":\"684.66\",\"value\":\"684.66\",\"unit\":\"万吉焦\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"市场煤销售量\",\"raw_value\":\"4,801.25\",\"value\":\"4801.25\",\"unit\":\"万吨\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"成品油销售量\",\"raw_value\":\"100.37\",\"value\":\"100.37\",\"unit\":\"万吨\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"天然气销售量\",\"raw_value\":\"359,796.93\",\"value\":\"359796.93\",\"unit\":\"万立方米\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F024\",\"text\":\"主要子公司经营规模：能源物流集团营业收入3,066,856.13万元、净利润-17,368.85万元；燃气集团营业收入722,940.59万元、净利润6,381.95万元；新能源集团营业收入304,897.84万元、净利润40,192.98万元；储能集团营业收入1,290.10万元、净利润75.16万元；财务公司营业收入15,779.80万元、净利润6,365.28万元。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0022\"],\"metrics\":[{\"name\":\"能源物流集团营业收入\",\"raw_value\":\"3,066,856.13\",\"value\":\"3066856.13\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\"},{\"name\":\"能源物流集团净利润\",\"raw_value\":\"-17,368.85\",\"value\":\"-17368.85\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\"},{\"name\":\"燃气集团营业收入\",\"raw_value\":\"722,940.59\",\"value\":\"722940.59\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\"},{\"name\":\"燃气集团净利润\",\"raw_value\":\"6,381.95\",\"value\":\"6381.95\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\"},{\"name\":\"新能源集团营业收入\",\"raw_value\":\"304,897.84\",\"value\":\"304897.84\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\"},{\"name\":\"新能源集团净利润\",\"raw_value\":\"40,192.98\",\"value\":\"40192.98\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\"},{\"name\":\"储能集团营业收入\",\"raw_value\":\"1,290.10\",\"value\":\"1290.10\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\"},{\"name\":\"储能集团净利润\",\"raw_value\":\"75.16\",\"value\":\"75.16\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\"},{\"name\":\"财务公司营业收入\",\"raw_value\":\"15,779.80\",\"value\":\"15779.80\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\"},{\"name\":\"财务公司净利润\",\"raw_value\":\"6,365.28\",\"value\":\"6365.28\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"named_subsidiary\",\"qualifier\":\"exact\"}]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F025\",\"text\":\"公司火力发电厂集中在粤港澳大湾区电力负荷中心，是华南地区大型发电企业之一；风力及光伏发电等新能源项目已覆盖全国20个省市。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F026\",\"text\":\"燃气集团拥有基本覆盖广州市全区域的高、中压管网，燃气全产业链全面贯通；能源物流集团拥有煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场、电厂用户等完整产业链。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0005\"]},{\"fact_id\":\"F027\",\"text\":\"成本构成显示，燃煤发电及供热业务燃料成本2,912,103,112.91元、折旧342,378,696.18元；天然气发电及供热业务燃料成本2,148,623,621.18元；能源物流业务煤炭供应链成本22,726,364,423.78元、外购油品6,323,377,466.53元；天然气业务外购燃气7,591,261,336.43元；新能源及储能业务折旧1,359,691,405.36元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0011\"],\"metrics\":[{\"name\":\"燃煤发电及供热业务燃料成本\",\"raw_value\":\"2,912,103,112.91\",\"value\":\"2912103112.91\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"天然气发电及供热业务燃料成本\",\"raw_value\":\"2,148,623,621.18\",\"value\":\"2148623621.18\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"能源物流业务煤炭供应链成本\",\"raw_value\":\"22,726,364,423.78\",\"value\":\"22726364423.78\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"能源物流业务外购油品成本\",\"raw_value\":\"6,323,377,466.53\",\"value\":\"6323377466.53\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"天然气业务外购燃气成本\",\"raw_value\":\"7,591,261,336.43\",\"value\":\"7591261336.43\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"新能源及储能业务折旧\",\"raw_value\":\"1,359,691,405.36\",\"value\":\"1359691405.36\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F028\",\"text\":\"2025年资本性支出775,182万元，其中股权投资与项目前期费用支出84,498万元，新扩建项目支出639,835万元，技改项目支出37,039万元，固定/无形资产购置支出12,139万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0018\"],\"metrics\":[{\"name\":\"资本性支出\",\"raw_value\":\"775,182\",\"value\":\"775182\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"股权投资与项目前期费用支出\",\"raw_value\":\"84,498\",\"value\":\"84498\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"新扩建项目支出\",\"raw_value\":\"639,835\",\"value\":\"639835\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"技改项目支出\",\"raw_value\":\"37,039\",\"value\":\"37039\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"固定/无形资产购置支出\",\"raw_value\":\"12,139\",\"value\":\"12139\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F029\",\"text\":\"公司已建成20个市级及以上研发平台，14家省级专精特新中小企业、4家创新型中小企业、19家高新技术企业；2025年研发投入合计647,912,418.52元，占营业收入比例1.27%，研发人员1,069人、占公司总人数16.73%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0014\"],\"metrics\":[{\"name\":\"研发投入合计\",\"raw_value\":\"647,912,418.52\",\"value\":\"647912418.52\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"研发投入总额占营业收入比例\",\"raw_value\":\"1.27\",\"value\":\"1.27\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"研发人员数量\",\"raw_value\":\"1,069\",\"value\":\"1069\",\"unit\":\"人\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"研发人员数量占公司总人数比例\",\"raw_value\":\"16.73\",\"value\":\"16.73\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F030\",\"text\":\"公司深耕华南，服务粤港澳大湾区，业务拓展到国内26个省市，外延至11个国家和地区。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F031\",\"text\":\"公司电力主要通过国家电网、南方电网销售给终端用户；天然气、煤炭、成品油、蒸汽等通过自有管网、销售平台及运输、批发、销售一体化的产业链等销售给终端用户，销售范围不断拓展。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"F032\",\"text\":\"前五名客户销售额1,630,937.15万元，占年度销售总额32.08%，其中关联方销售额0万元；前五名供应商采购额787,537.73万元，占年度采购总额16.97%，其中关联方采购额146,943.11万元、占年度采购总额3.17%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"1,630,937.15\",\"value\":\"1630937.15\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"32.08\",\"value\":\"32.08\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商采购额\",\"raw_value\":\"787,537.73\",\"value\":\"787537.73\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"16.97\",\"value\":\"16.97\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F033\",\"text\":\"贸易业务收入中，煤炭本期营业收入23,064,543,028.53元、同比减少5.90%；油品本期营业收入6,395,908,933.37元、同比增长214.00%；天然气本期营业收入3,603,362,079.80元、同比增长0.85%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"煤炭贸易业务营业收入\",\"raw_value\":\"23,064,543,028.53\",\"value\":\"23064543028.53\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"油品贸易业务营业收入\",\"raw_value\":\"6,395,908,933.37\",\"value\":\"6395908933.37\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"天然气贸易业务营业收入\",\"raw_value\":\"3,603,362,079.80\",\"value\":\"3603362079.80\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F034\",\"text\":\"2025年公司售电业务稳步推进，全年在广东电力市场签约总电量约27.65亿千瓦时。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0020\"],\"metrics\":[{\"name\":\"广东电力市场签约总电量\",\"raw_value\":\"约27.65\",\"value\":\"27.65\",\"unit\":\"亿千瓦时\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"approximate\"}]},{\"fact_id\":\"F035\",\"text\":\"2025年公司市场化交易的总电量1,821,650万千瓦时，总上网电量2,303,657万千瓦时，占比79.08%，较上年增加1.41个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0020\"],\"metrics\":[{\"name\":\"市场化交易的总电量\",\"raw_value\":\"1,821,650\",\"value\":\"1821650\",\"unit\":\"万千瓦时\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"总上网电量\",\"raw_value\":\"2,303,657\",\"value\":\"2303657\",\"unit\":\"万千瓦时\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"市场化交易电量占总上网电量比例\",\"raw_value\":\"79.08\",\"value\":\"79.08\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"市场化交易电量占比同比变动\",\"raw_value\":\"1.41\",\"value\":\"1.41\",\"unit\":\"百分点\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"%\"}]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F036\",\"text\":\"营业收入、营业成本变动原因为煤炭和油品销量增加，风电及光伏发电装机规模增加；销售费用、管理费用变动原因为业务规模扩大；财务费用变动原因为融资利率下降；研发费用变动原因为研发资源优化配置、直接投入等减少。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"F037\",\"text\":\"营业利润、归属于母公司股东的净利润变动原因为天然气业务、风电及光伏发电业务规模增加，确认土地交储收益；资产处置收益变动原因为确认土地交储收益；资产减值损失变动原因为计提固定资产减值、存货跌价准备及商誉减值增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"]},{\"fact_id\":\"F038\",\"text\":\"营业外支出变动原因为确认光伏项目受台风灾害导致的资产毁损报废损失以及支付合同履约补偿；购建固定资产、无形资产和其他长期资产支付的现金变动原因为新能源、储能及气电项目建设支出增加。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]},{\"fact_id\":\"F039\",\"text\":\"发电效率方面，火电利用小时3,248小时、同比变动4.32%，供电标煤耗290.02克/千瓦时、同比变动0.28%；光伏发电利用小时898小时、同比变动-10.02%；风力发电利用小时2,276小时、同比变动4.41%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0017\"],\"metrics\":[{\"name\":\"火电利用小时\",\"raw_value\":\"3,248\",\"value\":\"3248\",\"unit\":\"小时\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"火电供电标煤耗\",\"raw_value\":\"290.02\",\"value\":\"290.02\",\"unit\":\"克/千瓦时\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"光伏发电利用小时\",\"raw_value\":\"898\",\"value\":\"898\",\"unit\":\"小时\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"风力发电利用小时\",\"raw_value\":\"2,276\",\"value\":\"2276\",\"unit\":\"小时\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F040\",\"text\":\"电量电价情况显示，火电上网电价520.27元/兆瓦时，风电上网电价435.24元/兆瓦时，光伏发电上网电价412.12元/兆瓦时。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\"],\"metrics\":[{\"name\":\"火电上网电价\",\"raw_value\":\"520.27\",\"value\":\"520.27\",\"unit\":\"元/兆瓦时\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"风电上网电价\",\"raw_value\":\"435.24\",\"value\":\"435.24\",\"unit\":\"元/兆瓦时\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"光伏发电上网电价\",\"raw_value\":\"412.12\",\"value\":\"412.12\",\"unit\":\"元/兆瓦时\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F041\",\"text\":\"报告期内公司新增重要非主营业务的说明为不适用；公司报告期内业务、产品或服务发生重大变化或调整有关情况的说明为不适用；报告期主要子公司股权变动导致合并范围变化的说明为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0012\"]},{\"fact_id\":\"F042\",\"text\":\"本期公司业务类型、利润构成或利润来源发生重大变动的详细说明为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]},{\"fact_id\":\"F043\",\"text\":\"报告期内向单个客户的销售比例超过总额50%、前5名客户中存在新增客户或严重依赖少数客户的情形为不适用；向单个供应商的采购比例超过总额50%、前5名供应商中存在新增供应商或严重依赖少数供应商的情形为不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"]},{\"fact_id\":\"F044\",\"text\":\"公司2025年经营活动产生的现金净流入同比增长24.64%；投资活动产生的现金净流出同比增长201.98%；筹资活动产生的现金上年为净流出35.99亿元，本年为净流入20.07亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[{\"name\":\"经营活动产生的现金净流入同比变动\",\"raw_value\":\"24.64\",\"value\":\"24.64\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"投资活动产生的现金净流出同比变动\",\"raw_value\":\"201.98\",\"value\":\"201.98\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"筹资活动产生的现金净额（上年）\",\"raw_value\":\"-35.99\",\"value\":\"-35.99\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2024年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"筹资活动产生的现金净额（本年）\",\"raw_value\":\"20.07\",\"value\":\"20.07\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"F045\",\"text\":\"2025年公司按合同分别向BP新加坡公司、中化石油（新加坡）公司采购38.49万吨和41.2万吨天然气；截至2025年底，按合同分别累计向BP新加坡公司、中化石油（新加坡）公司采购184.45万吨和125.5万吨天然气。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"向BP新加坡公司采购天然气（2025年）\",\"raw_value\":\"38.49\",\"value\":\"38.49\",\"unit\":\"万吨\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"向中化石油（新加坡）公司采购天然气（2025年）\",\"raw_value\":\"41.2\",\"value\":\"41.2\",\"unit\":\"万吨\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F046\",\"text\":\"公司以构建“大产业链”的思路，推动产能互融、多能互补、煤气电联动，建设能源产业支撑保障基地，形成产、购、销、储、运、用的综合能源产业链；电力、蒸汽主要通过所属发电设备生产，天然气、煤炭和成品油等通过外部采购。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F047\",\"text\":\"公司天然气、煤炭和成品油等通过外部采购，与国内外知名供应商建立长期战略合作关系；燃气集团统筹上游气源采购；能源物流集团拥有煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场等完整产业链。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0005\"]},{\"fact_id\":\"F048\",\"text\":\"成本构成中，燃煤发电及供热业务燃料成本2,912,103,112.91元，天然气发电及供热业务燃料成本2,148,623,621.18元，天然气业务外购燃气7,591,261,336.43元，能源物流业务外购油品6,323,377,466.53元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0011\"],\"metrics\":[{\"name\":\"燃煤发电及供热业务燃料成本\",\"raw_value\":\"2,912,103,112.91\",\"value\":\"2912103112.91\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"天然气发电及供热业务燃料成本\",\"raw_value\":\"2,148,623,621.18\",\"value\":\"2148623621.18\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"天然气业务外购燃气成本\",\"raw_value\":\"7,591,261,336.43\",\"value\":\"7591261336.43\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"能源物流业务外购油品成本\",\"raw_value\":\"6,323,377,466.53\",\"value\":\"6323377466.53\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]}]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"F049\",\"text\":\"公司电力主要通过国家电网、南方电网销售给终端用户；天然气、煤炭、成品油、蒸汽等通过自有管网、销售平台及运输、批发、销售一体化的产业链等销售给终端用户；能源服务面向客户提供源网荷储充一体化、能源托管、节能运维、碳资产管理等服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]},{\"fact_id\":\"F050\",\"text\":\"公司业务覆盖国内26个省市、外延至11个国家和地区；前五名客户销售额占年度销售总额32.08%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0012\"],\"metrics\":[{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"32.08\",\"value\":\"32.08\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}]}},\"limitations\":[\"本工作底稿仅依据所选章节原文编制，未覆盖财务报告附注、分部信息、治理及前瞻性计划等未读章节。\",\"部分表格存在同一指标在不同章节的表述差异（如装机容量在业务情况章节与行业经营性信息分析章节的数值口径），已分别保留原文，未做统一换算。\",\"主要控股参股公司分析表中的营业收入、净利润等为子公司单体口径，与合并口径不可直接加总。\",\"贸易业务客户与供应商仅披露排名及金额，未披露具体名称，无法识别具体交易对手。\",\"资本性支出计划及项目进展属报告期披露信息，未来实际执行存在不确定性。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F001",
+              "text": "公司从事绿色低碳综合智慧能源、节能、环保、能源金融等业务投资开发和经营，是广东省重要的综合能源企业之一，形成产、购、销、储、运、用的综合能源产业链。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F002",
+              "text": "公司已形成电力、能源物流、燃气、新能源、储能、能源金融等业务协同发展的“1+6+N”能源产供储销体系，并打造煤电联营、气电联营、传统能源与新能源联营产业链。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F003",
+              "text": "全资子公司燃气集团是广州市城市燃气高压管网建设和天然气购销的主体，统筹全市高压管网建设和上游气源采购、下游天然气输配及分销。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F004",
+              "text": "全资子公司能源物流集团是华南地区最大的纵向一体化煤炭经营企业，业务覆盖国内经济发达的20个省市及海外地区，被纳入首批国家电煤重点保供贸易企业。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F005",
+              "text": "储能集团在源网荷侧全面布局，已搭建一体化储能电站运维云平台，推动本地储能产业集群化发展。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F006",
+              "text": "主要子公司中，东电公司、天然气发电公司、恒益热电公司、中电荔新公司、南沙电力公司从事电力（及热力）生产销售；能源物流集团从事燃料批发零售；燃气集团从事燃气管网建设与燃气销售；新能源集团从事风力、光伏发电及充电桩；储能集团从事电力供应；财务公司为非银金融机构。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0022"
+              ]
+            }
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F007",
+              "text": "公司为广大客户提供电力、煤炭、天然气、蒸汽、成品油等能源产品和能源管理服务，同时提供天然气、煤炭和油品装卸、运输和储存服务，金融业务主要为能源产业发展提供金融支持。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F008",
+              "text": "公司电力、蒸汽主要通过所属火力发电机组、风力和光伏发电设备生产；火力发电涵盖燃煤发电、燃气发电、热电联产、分布式能源站，并拓展售电、配电网、能源检修与技术服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F009",
+              "text": "公司依托涵盖电力、燃气、能源物流、新能源、储能等多元化的综合能源体系，提供源网荷储充一体化、能源托管、节能运维、碳资产管理等一体化服务，构建“投资-建设-运营-增值服务”全链条服务模式。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F010",
+              "text": "能源物流集团拥有67万立方米大型油库及配套8万吨级石油化工专业码头，是甲醇、生物质油料重要集散基地，是海关高级认证企业、郑州商品交易所指定交割油库。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F011",
+              "text": "分产品收入显示公司经营燃煤发电、天然气发电、煤电热力、气电热力、加气混凝土、煤炭、油品、危化品仓储、天然气、光伏发电、风力发电、充电桩、储能及综合能源、房产租赁、金融业务等产品与服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            }
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F012",
+              "text": "公司电力主要通过国家电网、南方电网销售给终端用户，并积极推进发售电一体运营模式；天然气、煤炭、成品油、蒸汽等通过自有管网、销售平台及运输、批发、销售一体化的产业链等销售给终端用户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F013",
+              "text": "公司天然气、煤炭和成品油等通过外部采购，与国内外知名供应商建立长期战略合作关系，以有效控制采购成本。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F014",
+              "text": "公司经营业绩稳步提升，融资渠道丰富，发挥财务公司和融资租赁公司专业的金融服务优势，绿色低碳产业基金加快产业布局，并积极推进REITs申报发行工作。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F015",
+              "text": "2025年公司实现营业总收入508.83亿元，营业总成本（含财务公司对外利息、手续费及佣金支出）492.91亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "营业总收入",
+                  "raw_value": "508.83",
+                  "value": "508.83",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业总成本（含财务公司对外利息、手续费及佣金支出）",
+                  "raw_value": "492.91",
+                  "value": "492.91",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F016",
+              "text": "利润表科目显示，2025年营业收入50,841,626,989.35元，营业成本46,398,940,235.15元，营业利润3,288,203,440.26元，归属于母公司股东的净利润2,319,437,070.79元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "50,841,626,989.35",
+                  "value": "50841626989.35",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业成本",
+                  "raw_value": "46,398,940,235.15",
+                  "value": "46398940235.15",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业利润",
+                  "raw_value": "3,288,203,440.26",
+                  "value": "3288203440.26",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于母公司股东的净利润",
+                  "raw_value": "2,319,437,070.79",
+                  "value": "2319437070.79",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F017",
+              "text": "营业收入、营业成本变动原因说明为煤炭和油品销量增加，风电及光伏发电装机规模增加；营业利润、归属于母公司股东的净利润变动原因说明为天然气业务、风电及光伏发电业务规模增加，确认土地交储收益。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0008"
+              ]
+            }
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F018",
+              "text": "主营业务分行业情况：燃煤发电及供热业务营业收入4,349,947,127.70元、毛利率14.21%；天然气发电及供热业务营业收入3,204,831,500.79元、毛利率13.45%；能源物流业务营业收入29,485,020,343.45元、毛利率1.10%；天然气业务营业收入10,502,056,882.42元、毛利率13.66%；新能源及储能业务营业收入3,245,504,723.82元、毛利率49.30%；其他产业营业收入95,784,921.17元、毛利率78.02%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008",
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "燃煤发电及供热业务营业收入",
+                  "raw_value": "4,349,947,127.70",
+                  "value": "4349947127.70",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "燃煤发电及供热业务毛利率",
+                  "raw_value": "14.21",
+                  "value": "14.21",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "天然气发电及供热业务营业收入",
+                  "raw_value": "3,204,831,500.79",
+                  "value": "3204831500.79",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "天然气发电及供热业务毛利率",
+                  "raw_value": "13.45",
+                  "value": "13.45",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "能源物流业务营业收入",
+                  "raw_value": "29,485,020,343.45",
+                  "value": "29485020343.45",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "能源物流业务毛利率",
+                  "raw_value": "1.10",
+                  "value": "1.10",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "天然气业务营业收入",
+                  "raw_value": "10,502,056,882.42",
+                  "value": "10502056882.42",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "天然气业务毛利率",
+                  "raw_value": "13.66",
+                  "value": "13.66",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "新能源及储能业务营业收入",
+                  "raw_value": "3,245,504,723.82",
+                  "value": "3245504723.82",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "新能源及储能业务毛利率",
+                  "raw_value": "49.30",
+                  "value": "49.30",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他产业营业收入",
+                  "raw_value": "95,784,921.17",
+                  "value": "95784921.17",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他产业毛利率",
+                  "raw_value": "78.02",
+                  "value": "78.02",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F019",
+              "text": "分产品收入中，煤炭营业收入23,064,543,028.53元、毛利率1.29%；油品营业收入6,395,908,933.37元、毛利率0.22%；天然气营业收入10,502,056,882.42元、毛利率13.66%；风力发电营业收入2,194,507,260.36元、毛利率52.48%；光伏发电营业收入1,020,539,666.84元、毛利率43.45%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "煤炭营业收入",
+                  "raw_value": "23,064,543,028.53",
+                  "value": "23064543028.53",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "煤炭毛利率",
+                  "raw_value": "1.29",
+                  "value": "1.29",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "油品营业收入",
+                  "raw_value": "6,395,908,933.37",
+                  "value": "6395908933.37",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "油品毛利率",
+                  "raw_value": "0.22",
+                  "value": "0.22",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "天然气营业收入",
+                  "raw_value": "10,502,056,882.42",
+                  "value": "10502056882.42",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "天然气毛利率",
+                  "raw_value": "13.66",
+                  "value": "13.66",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "风力发电营业收入",
+                  "raw_value": "2,194,507,260.36",
+                  "value": "2194507260.36",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "风力发电毛利率",
+                  "raw_value": "52.48",
+                  "value": "52.48",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "光伏发电营业收入",
+                  "raw_value": "1,020,539,666.84",
+                  "value": "1020539666.84",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "光伏发电毛利率",
+                  "raw_value": "43.45",
+                  "value": "43.45",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F020",
+              "text": "分地区情况：华南地区营业收入28,489,632,478.05元、毛利率8.82%；其他地区营业收入22,393,513,021.30元、毛利率8.81%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "华南地区营业收入",
+                  "raw_value": "28,489,632,478.05",
+                  "value": "28489632478.05",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "华南地区毛利率",
+                  "raw_value": "8.82",
+                  "value": "8.82",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他地区营业收入",
+                  "raw_value": "22,393,513,021.30",
+                  "value": "22393513021.30",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他地区毛利率",
+                  "raw_value": "8.81",
+                  "value": "8.81",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F021",
+              "text": "截至2025年12月31日，公司发电装机容量达到1,097万千瓦，其中火力发电可控装机容量484万千瓦，风力及光伏发电可控装机容量613万千瓦，绿色低碳能源装机占比超77%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "发电装机容量",
+                  "raw_value": "1,097",
+                  "value": "1097",
+                  "unit": "万千瓦",
+                  "currency": null,
+                  "period": "截至2025年12月31日",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "火力发电可控装机容量",
+                  "raw_value": "484",
+                  "value": "484",
+                  "unit": "万千瓦",
+                  "currency": null,
+                  "period": "截至2025年12月31日",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "风力及光伏发电可控装机容量",
+                  "raw_value": "613",
+                  "value": "613",
+                  "unit": "万千瓦",
+                  "currency": null,
+                  "period": "截至2025年12月31日",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "绿色低碳能源装机占比",
+                  "raw_value": "超77",
+                  "value": "77",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "截至2025年12月31日",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "greater_than"
+                }
+              ]
+            },
+            {
+              "fact_id": "F022",
+              "text": "行业经营性信息分析显示，截至2025年12月31日，公司可控发电装机容量为1,097.06万千瓦，其中火电可控装机容量483.65万千瓦、同比减少11.7%，光伏发电可控装机容量355.34万千瓦、同比增长51.4%，风力发电可控装机容量258.07万千瓦、同比增长5.7%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0016"
+              ],
+              "metrics": [
+                {
+                  "name": "可控发电装机容量",
+                  "raw_value": "1,097.06",
+                  "value": "1097.06",
+                  "unit": "万千瓦",
+                  "currency": null,
+                  "period": "截至2025年12月31日",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "火电可控装机容量",
+                  "raw_value": "483.65",
+                  "value": "483.65",
+                  "unit": "万千瓦",
+                  "currency": null,
+                  "period": "截至2025年12月31日",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "光伏发电可控装机容量",
+                  "raw_value": "355.34",
+                  "value": "355.34",
+                  "unit": "万千瓦",
+                  "currency": null,
+                  "period": "截至2025年12月31日",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "风力发电可控装机容量",
+                  "raw_value": "258.07",
+                  "value": "258.07",
+                  "unit": "万千瓦",
+                  "currency": null,
+                  "period": "截至2025年12月31日",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F023",
+              "text": "产销量情况：电力生产量243.76亿千瓦时、销售量233.89亿千瓦时；热力生产量682.58万吉焦、销售量684.66万吉焦；市场煤销售量4,801.25万吨、库存量161.00万吨；成品油销售量100.37万吨、库存量1.30万吨；天然气销售量359,796.93万立方米、库存量27,466.93万立方米。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "电力生产量",
+                  "raw_value": "243.76",
+                  "value": "243.76",
+                  "unit": "亿千瓦时",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "电力销售量",
+                  "raw_value": "233.89",
+                  "value": "233.89",
+                  "unit": "亿千瓦时",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "热力生产量",
+                  "raw_value": "682.58",
+                  "value": "682.58",
+                  "unit": "万吉焦",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "热力销售量",
+                  "raw_value": "684.66",
+                  "value": "684.66",
+                  "unit": "万吉焦",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "市场煤销售量",
+                  "raw_value": "4,801.25",
+                  "value": "4801.25",
+                  "unit": "万吨",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "成品油销售量",
+                  "raw_value": "100.37",
+                  "value": "100.37",
+                  "unit": "万吨",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "天然气销售量",
+                  "raw_value": "359,796.93",
+                  "value": "359796.93",
+                  "unit": "万立方米",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F024",
+              "text": "主要子公司经营规模：能源物流集团营业收入3,066,856.13万元、净利润-17,368.85万元；燃气集团营业收入722,940.59万元、净利润6,381.95万元；新能源集团营业收入304,897.84万元、净利润40,192.98万元；储能集团营业收入1,290.10万元、净利润75.16万元；财务公司营业收入15,779.80万元、净利润6,365.28万元。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0022"
+              ],
+              "metrics": [
+                {
+                  "name": "能源物流集团营业收入",
+                  "raw_value": "3,066,856.13",
+                  "value": "3066856.13",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "能源物流集团净利润",
+                  "raw_value": "-17,368.85",
+                  "value": "-17368.85",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "燃气集团营业收入",
+                  "raw_value": "722,940.59",
+                  "value": "722940.59",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "燃气集团净利润",
+                  "raw_value": "6,381.95",
+                  "value": "6381.95",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "新能源集团营业收入",
+                  "raw_value": "304,897.84",
+                  "value": "304897.84",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "新能源集团净利润",
+                  "raw_value": "40,192.98",
+                  "value": "40192.98",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "储能集团营业收入",
+                  "raw_value": "1,290.10",
+                  "value": "1290.10",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "储能集团净利润",
+                  "raw_value": "75.16",
+                  "value": "75.16",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "财务公司营业收入",
+                  "raw_value": "15,779.80",
+                  "value": "15779.80",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "财务公司净利润",
+                  "raw_value": "6,365.28",
+                  "value": "6365.28",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "named_subsidiary",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F025",
+              "text": "公司火力发电厂集中在粤港澳大湾区电力负荷中心，是华南地区大型发电企业之一；风力及光伏发电等新能源项目已覆盖全国20个省市。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F026",
+              "text": "燃气集团拥有基本覆盖广州市全区域的高、中压管网，燃气全产业链全面贯通；能源物流集团拥有煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场、电厂用户等完整产业链。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F027",
+              "text": "成本构成显示，燃煤发电及供热业务燃料成本2,912,103,112.91元、折旧342,378,696.18元；天然气发电及供热业务燃料成本2,148,623,621.18元；能源物流业务煤炭供应链成本22,726,364,423.78元、外购油品6,323,377,466.53元；天然气业务外购燃气7,591,261,336.43元；新能源及储能业务折旧1,359,691,405.36元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010",
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "燃煤发电及供热业务燃料成本",
+                  "raw_value": "2,912,103,112.91",
+                  "value": "2912103112.91",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "天然气发电及供热业务燃料成本",
+                  "raw_value": "2,148,623,621.18",
+                  "value": "2148623621.18",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "能源物流业务煤炭供应链成本",
+                  "raw_value": "22,726,364,423.78",
+                  "value": "22726364423.78",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "能源物流业务外购油品成本",
+                  "raw_value": "6,323,377,466.53",
+                  "value": "6323377466.53",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "天然气业务外购燃气成本",
+                  "raw_value": "7,591,261,336.43",
+                  "value": "7591261336.43",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "新能源及储能业务折旧",
+                  "raw_value": "1,359,691,405.36",
+                  "value": "1359691405.36",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F028",
+              "text": "2025年资本性支出775,182万元，其中股权投资与项目前期费用支出84,498万元，新扩建项目支出639,835万元，技改项目支出37,039万元，固定/无形资产购置支出12,139万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0018"
+              ],
+              "metrics": [
+                {
+                  "name": "资本性支出",
+                  "raw_value": "775,182",
+                  "value": "775182",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "股权投资与项目前期费用支出",
+                  "raw_value": "84,498",
+                  "value": "84498",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "新扩建项目支出",
+                  "raw_value": "639,835",
+                  "value": "639835",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "技改项目支出",
+                  "raw_value": "37,039",
+                  "value": "37039",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "固定/无形资产购置支出",
+                  "raw_value": "12,139",
+                  "value": "12139",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F029",
+              "text": "公司已建成20个市级及以上研发平台，14家省级专精特新中小企业、4家创新型中小企业、19家高新技术企业；2025年研发投入合计647,912,418.52元，占营业收入比例1.27%，研发人员1,069人、占公司总人数16.73%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "研发投入合计",
+                  "raw_value": "647,912,418.52",
+                  "value": "647912418.52",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发投入总额占营业收入比例",
+                  "raw_value": "1.27",
+                  "value": "1.27",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发人员数量",
+                  "raw_value": "1,069",
+                  "value": "1069",
+                  "unit": "人",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发人员数量占公司总人数比例",
+                  "raw_value": "16.73",
+                  "value": "16.73",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F030",
+              "text": "公司深耕华南，服务粤港澳大湾区，业务拓展到国内26个省市，外延至11个国家和地区。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F031",
+              "text": "公司电力主要通过国家电网、南方电网销售给终端用户；天然气、煤炭、成品油、蒸汽等通过自有管网、销售平台及运输、批发、销售一体化的产业链等销售给终端用户，销售范围不断拓展。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "F032",
+              "text": "前五名客户销售额1,630,937.15万元，占年度销售总额32.08%，其中关联方销售额0万元；前五名供应商采购额787,537.73万元，占年度采购总额16.97%，其中关联方采购额146,943.11万元、占年度采购总额3.17%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户销售额",
+                  "raw_value": "1,630,937.15",
+                  "value": "1630937.15",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户销售额占年度销售总额比例",
+                  "raw_value": "32.08",
+                  "value": "32.08",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商采购额",
+                  "raw_value": "787,537.73",
+                  "value": "787537.73",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商采购额占年度采购总额比例",
+                  "raw_value": "16.97",
+                  "value": "16.97",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F033",
+              "text": "贸易业务收入中，煤炭本期营业收入23,064,543,028.53元、同比减少5.90%；油品本期营业收入6,395,908,933.37元、同比增长214.00%；天然气本期营业收入3,603,362,079.80元、同比增长0.85%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "煤炭贸易业务营业收入",
+                  "raw_value": "23,064,543,028.53",
+                  "value": "23064543028.53",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "油品贸易业务营业收入",
+                  "raw_value": "6,395,908,933.37",
+                  "value": "6395908933.37",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "天然气贸易业务营业收入",
+                  "raw_value": "3,603,362,079.80",
+                  "value": "3603362079.80",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F034",
+              "text": "2025年公司售电业务稳步推进，全年在广东电力市场签约总电量约27.65亿千瓦时。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0020"
+              ],
+              "metrics": [
+                {
+                  "name": "广东电力市场签约总电量",
+                  "raw_value": "约27.65",
+                  "value": "27.65",
+                  "unit": "亿千瓦时",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "approximate"
+                }
+              ]
+            },
+            {
+              "fact_id": "F035",
+              "text": "2025年公司市场化交易的总电量1,821,650万千瓦时，总上网电量2,303,657万千瓦时，占比79.08%，较上年增加1.41个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0020"
+              ],
+              "metrics": [
+                {
+                  "name": "市场化交易的总电量",
+                  "raw_value": "1,821,650",
+                  "value": "1821650",
+                  "unit": "万千瓦时",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "总上网电量",
+                  "raw_value": "2,303,657",
+                  "value": "2303657",
+                  "unit": "万千瓦时",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "市场化交易电量占总上网电量比例",
+                  "raw_value": "79.08",
+                  "value": "79.08",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "市场化交易电量占比同比变动",
+                  "raw_value": "1.41",
+                  "value": "1.41",
+                  "unit": "百分点",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "source_unit": "%"
+                }
+              ]
+            }
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F036",
+              "text": "营业收入、营业成本变动原因为煤炭和油品销量增加，风电及光伏发电装机规模增加；销售费用、管理费用变动原因为业务规模扩大；财务费用变动原因为融资利率下降；研发费用变动原因为研发资源优化配置、直接投入等减少。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "F037",
+              "text": "营业利润、归属于母公司股东的净利润变动原因为天然气业务、风电及光伏发电业务规模增加，确认土地交储收益；资产处置收益变动原因为确认土地交储收益；资产减值损失变动原因为计提固定资产减值、存货跌价准备及商誉减值增加。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007",
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F038",
+              "text": "营业外支出变动原因为确认光伏项目受台风灾害导致的资产毁损报废损失以及支付合同履约补偿；购建固定资产、无形资产和其他长期资产支付的现金变动原因为新能源、储能及气电项目建设支出增加。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F039",
+              "text": "发电效率方面，火电利用小时3,248小时、同比变动4.32%，供电标煤耗290.02克/千瓦时、同比变动0.28%；光伏发电利用小时898小时、同比变动-10.02%；风力发电利用小时2,276小时、同比变动4.41%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0017"
+              ],
+              "metrics": [
+                {
+                  "name": "火电利用小时",
+                  "raw_value": "3,248",
+                  "value": "3248",
+                  "unit": "小时",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "火电供电标煤耗",
+                  "raw_value": "290.02",
+                  "value": "290.02",
+                  "unit": "克/千瓦时",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "光伏发电利用小时",
+                  "raw_value": "898",
+                  "value": "898",
+                  "unit": "小时",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "风力发电利用小时",
+                  "raw_value": "2,276",
+                  "value": "2276",
+                  "unit": "小时",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F040",
+              "text": "电量电价情况显示，火电上网电价520.27元/兆瓦时，风电上网电价435.24元/兆瓦时，光伏发电上网电价412.12元/兆瓦时。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0016"
+              ],
+              "metrics": [
+                {
+                  "name": "火电上网电价",
+                  "raw_value": "520.27",
+                  "value": "520.27",
+                  "unit": "元/兆瓦时",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "风电上网电价",
+                  "raw_value": "435.24",
+                  "value": "435.24",
+                  "unit": "元/兆瓦时",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "光伏发电上网电价",
+                  "raw_value": "412.12",
+                  "value": "412.12",
+                  "unit": "元/兆瓦时",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F041",
+              "text": "报告期内公司新增重要非主营业务的说明为不适用；公司报告期内业务、产品或服务发生重大变化或调整有关情况的说明为不适用；报告期主要子公司股权变动导致合并范围变化的说明为不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0012"
+              ]
+            },
+            {
+              "fact_id": "F042",
+              "text": "本期公司业务类型、利润构成或利润来源发生重大变动的详细说明为不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "F043",
+              "text": "报告期内向单个客户的销售比例超过总额50%、前5名客户中存在新增客户或严重依赖少数客户的情形为不适用；向单个供应商的采购比例超过总额50%、前5名供应商中存在新增供应商或严重依赖少数供应商的情形为不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ]
+            },
+            {
+              "fact_id": "F044",
+              "text": "公司2025年经营活动产生的现金净流入同比增长24.64%；投资活动产生的现金净流出同比增长201.98%；筹资活动产生的现金上年为净流出35.99亿元，本年为净流入20.07亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "经营活动产生的现金净流入同比变动",
+                  "raw_value": "24.64",
+                  "value": "24.64",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "投资活动产生的现金净流出同比变动",
+                  "raw_value": "201.98",
+                  "value": "201.98",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "筹资活动产生的现金净额（上年）",
+                  "raw_value": "-35.99",
+                  "value": "-35.99",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2024年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "筹资活动产生的现金净额（本年）",
+                  "raw_value": "20.07",
+                  "value": "20.07",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "F045",
+              "text": "2025年公司按合同分别向BP新加坡公司、中化石油（新加坡）公司采购38.49万吨和41.2万吨天然气；截至2025年底，按合同分别累计向BP新加坡公司、中化石油（新加坡）公司采购184.45万吨和125.5万吨天然气。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "向BP新加坡公司采购天然气（2025年）",
+                  "raw_value": "38.49",
+                  "value": "38.49",
+                  "unit": "万吨",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "向中化石油（新加坡）公司采购天然气（2025年）",
+                  "raw_value": "41.2",
+                  "value": "41.2",
+                  "unit": "万吨",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F046",
+              "text": "公司以构建“大产业链”的思路，推动产能互融、多能互补、煤气电联动，建设能源产业支撑保障基地，形成产、购、销、储、运、用的综合能源产业链；电力、蒸汽主要通过所属发电设备生产，天然气、煤炭和成品油等通过外部采购。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F047",
+              "text": "公司天然气、煤炭和成品油等通过外部采购，与国内外知名供应商建立长期战略合作关系；燃气集团统筹上游气源采购；能源物流集团拥有煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场等完整产业链。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0005"
+              ]
+            },
+            {
+              "fact_id": "F048",
+              "text": "成本构成中，燃煤发电及供热业务燃料成本2,912,103,112.91元，天然气发电及供热业务燃料成本2,148,623,621.18元，天然气业务外购燃气7,591,261,336.43元，能源物流业务外购油品6,323,377,466.53元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010",
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "燃煤发电及供热业务燃料成本",
+                  "raw_value": "2,912,103,112.91",
+                  "value": "2912103112.91",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "天然气发电及供热业务燃料成本",
+                  "raw_value": "2,148,623,621.18",
+                  "value": "2148623621.18",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "天然气业务外购燃气成本",
+                  "raw_value": "7,591,261,336.43",
+                  "value": "7591261336.43",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "能源物流业务外购油品成本",
+                  "raw_value": "6,323,377,466.53",
+                  "value": "6323377466.53",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "F049",
+              "text": "公司电力主要通过国家电网、南方电网销售给终端用户；天然气、煤炭、成品油、蒸汽等通过自有管网、销售平台及运输、批发、销售一体化的产业链等销售给终端用户；能源服务面向客户提供源网荷储充一体化、能源托管、节能运维、碳资产管理等服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "F050",
+              "text": "公司业务覆盖国内26个省市、外延至11个国家和地区；前五名客户销售额占年度销售总额32.08%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户销售额占年度销售总额比例",
+                  "raw_value": "32.08",
+                  "value": "32.08",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "limitations": [
+        "本工作底稿仅依据所选章节原文编制，未覆盖财务报告附注、分部信息、治理及前瞻性计划等未读章节。",
+        "部分表格存在同一指标在不同章节的表述差异（如装机容量在业务情况章节与行业经营性信息分析章节的数值口径），已分别保留原文，未做统一换算。",
+        "主要控股参股公司分析表中的营业收入、净利润等为子公司单体口径，与合并口径不可直接加总。",
+        "贸易业务客户与供应商仅披露排名及金额，未披露具体名称，无法识别具体交易对手。",
+        "资本性支出计划及项目进展属报告期披露信息，未来实际执行存在不确定性。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 32459,
+      "output_tokens": 10451,
+      "total_tokens": 42910
+    }
+  },
+  {
+    "request_id": "bp-work-52eda8b9465813e09b4450bb:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "4676bd0e61797428ab8b5d64290bdf5004615ba7b06cfd67eab5ddfd6aade1fc",
+    "response_hash": "662ef7df379c350ebfc7865b94e68d72fc48bf2368886fddd8efd0876fa7936a",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"Q001\",\"element\":\"operations_and_inputs\",\"affected_fact_id\":\"F026\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"evidence_ids\":[\"source-0005\",\"source-0001\"],\"explanation\":\"F026将煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场及电厂用户等完整产业链归属于能源物流集团，但source-0005原文主语是“公司拥有”，并未写明由能源物流集团持有。source-0001只明确能源物流集团为纵向一体化煤炭经营企业并拥有油库及配套码头，不能据此改写煤炭产业链资产主体。燃气集团管网及全产业链表述与source-0001一致，应仅将煤炭产业链主体改回公司（合并口径）。\"},{\"finding_id\":\"Q002\",\"element\":\"upstream_inputs\",\"affected_fact_id\":\"F047\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"evidence_ids\":[\"source-0005\",\"source-0001\"],\"explanation\":\"F047同样把煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场写成能源物流集团拥有。source-0005对应表述的主体是公司，source-0001对能源物流集团只支持其煤炭经营地位及油库码头，不支持将上游煤矿与码头堆场资产改记到该子公司。外部采购及燃气集团统筹上游气源采购的表述有原文支持，应只修正煤炭产业链持有主体。\"},{\"finding_id\":\"Q003\",\"element\":\"operating_drivers\",\"affected_fact_id\":null,\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"explanation\":\"底稿仅在变动原因中定性提到确认土地交储收益，未列入资产处置收益金额。source-0007本期资产处置收益为1,826,406,356.30元，上年同期仅956,186.08元；该金额相对归属于母公司股东的净利润2,319,437,070.79元具有实质性，且source-0008明确其原因为土地交储。缺少该金额会低估这项非经常性收益对利润变动的影响，属于重要调整遗漏，不是要求补齐全部可选明细。\"}],\"reviewed_fact_ids\":[\"F001\",\"F002\",\"F003\",\"F004\",\"F005\",\"F006\",\"F007\",\"F008\",\"F009\",\"F010\",\"F011\",\"F012\",\"F013\",\"F014\",\"F015\",\"F016\",\"F017\",\"F018\",\"F019\",\"F020\",\"F021\",\"F022\",\"F023\",\"F024\",\"F025\",\"F026\",\"F027\",\"F028\",\"F029\",\"F030\",\"F031\",\"F032\",\"F033\",\"F034\",\"F035\",\"F036\",\"F037\",\"F038\",\"F040\",\"F041\",\"F042\",\"F043\",\"F045\",\"F046\",\"F047\",\"F048\",\"F049\",\"F050\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "Q001",
+          "element": "operations_and_inputs",
+          "affected_fact_id": "F026",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0005",
+            "source-0001"
+          ],
+          "explanation": "F026将煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场及电厂用户等完整产业链归属于能源物流集团，但source-0005原文主语是“公司拥有”，并未写明由能源物流集团持有。source-0001只明确能源物流集团为纵向一体化煤炭经营企业并拥有油库及配套码头，不能据此改写煤炭产业链资产主体。燃气集团管网及全产业链表述与source-0001一致，应仅将煤炭产业链主体改回公司（合并口径）。"
+        },
+        {
+          "finding_id": "Q002",
+          "element": "upstream_inputs",
+          "affected_fact_id": "F047",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0005",
+            "source-0001"
+          ],
+          "explanation": "F047同样把煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场写成能源物流集团拥有。source-0005对应表述的主体是公司，source-0001对能源物流集团只支持其煤炭经营地位及油库码头，不支持将上游煤矿与码头堆场资产改记到该子公司。外部采购及燃气集团统筹上游气源采购的表述有原文支持，应只修正煤炭产业链持有主体。"
+        },
+        {
+          "finding_id": "Q003",
+          "element": "operating_drivers",
+          "affected_fact_id": null,
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "evidence_ids": [
+            "source-0007",
+            "source-0008"
+          ],
+          "explanation": "底稿仅在变动原因中定性提到确认土地交储收益，未列入资产处置收益金额。source-0007本期资产处置收益为1,826,406,356.30元，上年同期仅956,186.08元；该金额相对归属于母公司股东的净利润2,319,437,070.79元具有实质性，且source-0008明确其原因为土地交储。缺少该金额会低估这项非经常性收益对利润变动的影响，属于重要调整遗漏，不是要求补齐全部可选明细。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "F001",
+        "F002",
+        "F003",
+        "F004",
+        "F005",
+        "F006",
+        "F007",
+        "F008",
+        "F009",
+        "F010",
+        "F011",
+        "F012",
+        "F013",
+        "F014",
+        "F015",
+        "F016",
+        "F017",
+        "F018",
+        "F019",
+        "F020",
+        "F021",
+        "F022",
+        "F023",
+        "F024",
+        "F025",
+        "F026",
+        "F027",
+        "F028",
+        "F029",
+        "F030",
+        "F031",
+        "F032",
+        "F033",
+        "F034",
+        "F035",
+        "F036",
+        "F037",
+        "F038",
+        "F040",
+        "F041",
+        "F042",
+        "F043",
+        "F045",
+        "F046",
+        "F047",
+        "F048",
+        "F049",
+        "F050"
+      ]
+    },
+    "usage": {
+      "input_tokens": 33870,
+      "output_tokens": 687,
+      "total_tokens": 67478
+    }
+  },
+  {
+    "request_id": "bp-work-52eda8b9465813e09b4450bb:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "15fb2fd361e31b8f9d93567c9543b0d237b011db0f7e49c2e11e88b08008a3c7",
+    "response_hash": "305b4a47ab38a82e693faf313a977e77e672dd877d3dc47f16fa3bbd7e2853c2",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"F026\",\"text\":\"燃气集团拥有基本覆盖广州市全区域的高、中压管网，燃气全产业链全面贯通；公司拥有煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场、电厂用户等完整产业链。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0005\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"F047\",\"text\":\"公司天然气、煤炭和成品油等通过外部采购，与国内外知名供应商建立长期战略合作关系；燃气集团统筹上游气源采购；公司拥有煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场等完整产业链。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0005\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:Q003\",\"text\":\"资产处置收益本期数为1,826,406,356.30元，上年同期数为956,186.08元，变动原因说明为确认土地交储收益。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"metrics\":[{\"name\":\"资产处置收益\",\"raw_value\":\"1,826,406,356.30\",\"value\":\"1826406356.30\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\",\"comparison_basis\":\"本期数\",\"uncertainty_reason\":null},{\"name\":\"资产处置收益\",\"raw_value\":\"956,186.08\",\"value\":\"956186.08\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2024年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"source_unit\":\"元\",\"comparison_basis\":\"上年同期数\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "F026",
+          "text": "燃气集团拥有基本覆盖广州市全区域的高、中压管网，燃气全产业链全面贯通；公司拥有煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场、电厂用户等完整产业链。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0005"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "F047",
+          "text": "公司天然气、煤炭和成品油等通过外部采购，与国内外知名供应商建立长期战略合作关系；燃气集团统筹上游气源采购；公司拥有煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场等完整产业链。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0005"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:Q003",
+          "text": "资产处置收益本期数为1,826,406,356.30元，上年同期数为956,186.08元，变动原因说明为确认土地交储收益。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007",
+            "source-0008"
+          ],
+          "metrics": [
+            {
+              "name": "资产处置收益",
+              "raw_value": "1,826,406,356.30",
+              "value": "1826406356.30",
+              "unit": "元",
+              "currency": "人民币",
+              "period": "2025年度",
+              "subject_scope": "consolidated_group",
+              "qualifier": "exact",
+              "source_unit": "元",
+              "comparison_basis": "本期数",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "资产处置收益",
+              "raw_value": "956,186.08",
+              "value": "956186.08",
+              "unit": "元",
+              "currency": "人民币",
+              "period": "2024年度",
+              "subject_scope": "consolidated_group",
+              "qualifier": "exact",
+              "source_unit": "元",
+              "comparison_basis": "上年同期数",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 17228,
+      "output_tokens": 447,
+      "total_tokens": 17675
+    }
+  },
+  {
+    "request_id": "bp-work-52eda8b9465813e09b4450bb:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "832d8da025d0d78c565d5589aaaade9427974635bbb9e67057193cb5e7cc6333",
+    "response_hash": "53c91c4c3c3c3fcfdfb84af84530209471ac5592de6a53b29c7b82247f982e3a",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"F026\",\"F047\",\"review-add:Q003\"],\"checks\":[{\"fact_id\":\"F026\",\"accepted\":true,\"evidence_ids\":[\"source-0001\",\"source-0005\"],\"explanation\":\"source-0001写明燃气集团拥有基本覆盖广州市全区域的高、中压管网，且燃气全产业链全面贯通；source-0005的主语是公司拥有煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场、电厂用户等完整产业链，并未记到能源物流集团。候选事实已把煤炭产业链主体改回公司，燃气集团表述与原文一致，合并口径和2025年度报告期亦相符，实质性解决了主体错误。\"},{\"fact_id\":\"F047\",\"accepted\":true,\"evidence_ids\":[\"source-0001\",\"source-0005\"],\"explanation\":\"source-0001支持公司通过外部采购天然气、煤炭和成品油并建立长期战略合作，以及燃气集团统筹上游气源采购；source-0005支持煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场等完整产业链的持有主体为公司。候选事实只修正了原错误主体，未把上述资产改记到能源物流集团，也未新增无依据的确定性内容。\"},{\"fact_id\":\"review-add:Q003\",\"accepted\":true,\"evidence_ids\":[\"source-0007\",\"source-0008\"],\"explanation\":\"source-0007利润表科目变动表以元、人民币列示资产处置收益本期数1,826,406,356.30元、上年同期数956,186.08元；source-0008明确变动原因为确认土地交储收益。候选事实的合并主体、期间、栏目和单位均正确，补入了原先遗漏的实质性金额并保留原文原因，未作额外推断。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "F026",
+        "F047",
+        "review-add:Q003"
+      ],
+      "checks": [
+        {
+          "fact_id": "F026",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001",
+            "source-0005"
+          ],
+          "explanation": "source-0001写明燃气集团拥有基本覆盖广州市全区域的高、中压管网，且燃气全产业链全面贯通；source-0005的主语是公司拥有煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场、电厂用户等完整产业链，并未记到能源物流集团。候选事实已把煤炭产业链主体改回公司，燃气集团表述与原文一致，合并口径和2025年度报告期亦相符，实质性解决了主体错误。"
+        },
+        {
+          "fact_id": "F047",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001",
+            "source-0005"
+          ],
+          "explanation": "source-0001支持公司通过外部采购天然气、煤炭和成品油并建立长期战略合作，以及燃气集团统筹上游气源采购；source-0005支持煤矿、北方码头堆场、航运公司、南方煤炭码头、堆场等完整产业链的持有主体为公司。候选事实只修正了原错误主体，未把上述资产改记到能源物流集团，也未新增无依据的确定性内容。"
+        },
+        {
+          "fact_id": "review-add:Q003",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007",
+            "source-0008"
+          ],
+          "explanation": "source-0007利润表科目变动表以元、人民币列示资产处置收益本期数1,826,406,356.30元、上年同期数956,186.08元；source-0008明确变动原因为确认土地交储收益。候选事实的合并主体、期间、栏目和单位均正确，补入了原先遗漏的实质性金额并保留原文原因，未作额外推断。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 21304,
+      "output_tokens": 410,
+      "total_tokens": 25798
+    }
+  }
+]

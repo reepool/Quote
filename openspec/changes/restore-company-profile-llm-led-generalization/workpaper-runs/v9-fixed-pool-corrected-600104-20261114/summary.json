@@ -1,0 +1,35 @@
+{
+  "instrument_id": "600104.SH",
+  "name": "上汽集团",
+  "run_id": "v9-fixed-pool-corrected-600104-20261114",
+  "three_reads_equal": true,
+  "exception": null,
+  "provider_constructor_binding_verified_before_entry": true,
+  "preparation_seconds": 59.806,
+  "state": "incomplete",
+  "business_seconds": 100.272,
+  "contract_errors": [],
+  "failed_calls": [
+    {
+      "stage": "extract",
+      "code": "candidate_schema_invalid",
+      "detail": "LLM response is not valid JSON"
+    }
+  ],
+  "readable": false,
+  "facts": 0,
+  "review_status": null,
+  "core_missing_elements": [
+    "business_structure",
+    "products_services",
+    "revenue_model"
+  ],
+  "failure_signature": "{\"code\": \"candidate_schema_invalid\", \"detail\": \"LLM response is not valid JSON\", \"stage\": \"extract\"}",
+  "physical_requests": 3,
+  "charged_tokens": 92181,
+  "cost": "unknown",
+  "stopped_reason": null,
+  "recoveries": 1,
+  "supervision_seconds": 101.433,
+  "cleanup_bytes": 1734687
+}

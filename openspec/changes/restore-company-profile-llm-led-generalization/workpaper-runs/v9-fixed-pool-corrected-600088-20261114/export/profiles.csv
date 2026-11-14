@@ -1,0 +1,6 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600088.SH,2025-12-31,2026-04-17T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,llm_generated,"公司已形成多平台协同发展的业务格局，涵盖电视节目制作与销售、影视技术服务与设备租赁、媒体广告代理、影视拍摄基地经营以及基金投资与管理等多个领域。
+影视业务主要包括电视节目制作与销售、影视技术服务与设备租赁、影视库存剧销售等板块。
+广告业务主要承包经营总台科教频道及农业农村频道的整频道广告资源。
+旅游业务主要为无锡影视基地和南海影视城的影视拍摄基地经营。
+公司自2018年起布局基金投资业务，成立全资子公司宁波梅山保税港区国视融媒投资管理有限公司，专注融合媒体等特色细分行业的投资；中视传媒及国视融媒共参与两只专项基金和两只融媒体产业基金的设立与募集。",38,73,completed_with_open_findings,1,deepseek-flash,grok-4.7
