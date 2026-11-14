@@ -273,7 +273,19 @@ def _check_fact_source(
             if literal not in "".join(quoted.split()) and not any(literal in text for text, _, _ in cells):
                 raise ValueError(f"uncertain metric original wording is absent from cited source: {metric.name}")
             continue
-        if Decimal(metric.value) not in numbers:
+        # A signed change may be spelled as a direction-qualified rate in prose.
+        # Only an explicit period-on-period clause with its rate unit supplies
+        # this alternative; it never supplies a negative monetary balance.
+        rate_unit = {"%": "%", "％": "%", "百分点": "百分点", "个百分点": "百分点"}
+        negative_rates = {
+            -Decimal(amount.replace(",", ""))
+            for eid in fact.evidence_ids for span in sources[eid].source_spans
+            for amount, unit in re.findall(
+                r"(?:^|[，,；;。\n])\s*(?:同比|环比)\s*(?:下降|减少|降低)\s*"
+                r"(\d[\d,]*(?:\.\d+)?)\s*(%|％|个百分点|百分点)", span.quote)
+            if rate_unit.get(unit) == rate_unit.get(metric.unit) and metric.unit in rate_unit
+        } if metric.unit in rate_unit and Decimal(metric.value) < 0 else set()
+        if Decimal(metric.value) not in numbers | negative_rates:
             raise ValueError(f"metric number is absent from cited source: {metric.name}")
 
 

@@ -36,6 +36,11 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 - **AND** direct workpaper validation still rejects invalid retained facts, unknown source identities remain rejected, and this local isolation does not authorize a new paid entry or rewrite the original failed run
 - **AND** local isolation identities and reasons MUST survive a later review that withdraws disputed scope prose; they remain program processing notes rather than being erased with model-authored limitations
 
+#### Scenario: An explicit period change spells the negative direction in words
+- **WHEN** a cited prose clause explicitly reports 同比 or 环比 followed by 下降/减少/降低, a magnitude and its percent or percentage-point unit
+- **THEN** numeric source binding MAY recognize the same-unit negative signed change without requiring a printed minus sign, preserving the original source and returned raw value
+- **AND** this does not turn a decline into a negative absolute balance, accept a changed magnitude or unit, infer subject/period/negation/plan semantics, or approve a fact without source review; the binding policy is included in new processing identities and historical results remain unchanged
+
 #### Scenario: Supplementary container formatting is invalid
 - **WHEN** the extraction includes unknown keys beside the eight required elements or a malformed optional supply-chain container
 - **THEN** the wire contract MUST permit retaining that original response, and the application adapter MUST withhold the unknown/invalid portion with an explicit limitation before typed binding

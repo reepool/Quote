@@ -1,0 +1,80 @@
+{
+  "new_model_calls": 0,
+  "candidate_only_not_applied_to_old_profile": true,
+  "original_query_sha256": "77adf19d149c3db3ecead53116aa08bc23d9cc7f6e061e4295e22ba7632d2ec5",
+  "original_receipts_sha256": "31a26f3f510472580652b7c4aea6818965bc37318a4df2e44e7a00e4f1487490",
+  "same_report": {
+    "instrument_id": "600107.SH",
+    "report_id": "1225264726",
+    "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+    "report_period": "2025-12-31",
+    "published_at": "2026-04-29T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "source_checked_fact": {
+    "fact_id": "F011",
+    "text": "报告期内公司整体实现营业收入23,619.50万元，同比下降28.32%；实现归属于母公司所有者的净利润-8,909.26万元，同比下降30.82%。",
+    "subject_scope": "consolidated_group",
+    "period": "2025年度",
+    "evidence_ids": [
+      "source-0005"
+    ],
+    "metrics": [
+      {
+        "name": "营业收入",
+        "raw_value": "23,619.50",
+        "value": "23619.50",
+        "unit": "万元",
+        "source_unit": "万元",
+        "currency": "CNY",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null,
+        "qualifier": "exact",
+        "uncertainty_reason": null
+      },
+      {
+        "name": "营业收入同比变动",
+        "raw_value": "-28.32",
+        "value": "-28.32",
+        "unit": "%",
+        "source_unit": "%",
+        "currency": null,
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null,
+        "qualifier": "exact",
+        "uncertainty_reason": null
+      },
+      {
+        "name": "归属于母公司所有者的净利润",
+        "raw_value": "-8,909.26",
+        "value": "-8909.26",
+        "unit": "万元",
+        "source_unit": "万元",
+        "currency": "CNY",
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null,
+        "qualifier": "exact",
+        "uncertainty_reason": null
+      },
+      {
+        "name": "归属于母公司所有者的净利润同比变动",
+        "raw_value": "-30.82",
+        "value": "-30.82",
+        "unit": "%",
+        "source_unit": "%",
+        "currency": null,
+        "subject_scope": "consolidated_group",
+        "period": "2025年度",
+        "comparison_basis": null,
+        "qualifier": "exact",
+        "uncertainty_reason": null
+      }
+    ],
+    "uncertainty_reason": null
+  },
+  "new_source_binding_policy": "company_workpaper_source_literals.signed-rate.v1",
+  "old_current_profile_fact_count": 33
+}

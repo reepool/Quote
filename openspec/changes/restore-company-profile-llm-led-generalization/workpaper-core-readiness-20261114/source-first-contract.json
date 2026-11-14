@@ -1,0 +1,3082 @@
+{
+  "task": "6.CE",
+  "purpose": "known_report_core_reference_and_baseline_comparison_not_a_quality_certificate",
+  "origin": "human_source_reference",
+  "not_model_input": true,
+  "frozen_before_next_model_request": true,
+  "new_model_requests": 0,
+  "sendable_bindings": 0,
+  "authoritative_requirements": [
+    "docs/development/company_profile_product_and_industry_semantic_requirements.md",
+    "docs/development/company_profile_acceptance_program.md#41-冻结核心条件"
+  ],
+  "source_reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-fixed-pool-result-20261114/source-first-reference.json",
+  "source_manifest": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-quality-and-regression-readiness-20261113/source-readiness.json",
+  "scope": "已知12份报告的集中业务/收入章节；非未见泛化、全报告召回、正式S1或生产许可。页码只定位本报告，不是选章规则。",
+  "reference_method": "主要条件从6.BU运行前独立源参考细化；美尔雅公司总收入/亏损与浦发3.7收入构成由本轮正式源核补充。未向待测模型提供本公司参考、旧答案或旧语义。当前答案对照只表示实际文字是否回答，不充作逐对象完整核源。",
+  "current_baseline_score": {
+    "formal_accuracy": null,
+    "formal_recall": null,
+    "same_version_score": null,
+    "reason": "12稿跨版本；逐核心对象完整核源、补充对象抽审和六风险实际挑战尚未完成。"
+  },
+  "dimensions": {
+    "business_structure": "主营/主要板块",
+    "products_services": "主要产品服务及用途；产品暴露",
+    "revenue_model": "主要收入机制",
+    "scale_and_mix": "公司规模和主要收入构成",
+    "operations_and_inputs": "改变业务理解的生产/贸易/代理/运营/服务角色"
+  },
+  "optional_supply_chain": "尽力获取公司位置、明示投入/客户领域；缺项不计核心失败，不为精细化补读或调用。",
+  "companies": [
+    {
+      "instrument_id": "600094.SH",
+      "name": "大名城",
+      "report_period": "2025-12-31",
+      "document_version": "f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591",
+      "source_pdf": "/home/python/Quote/data/filings/announcements/blobs/f5/f5985f0edef10959c4b51827a1b1c4e1e32fe3c9c62631f512e02397761c7591.pdf",
+      "current_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-local-consumption-result-20261114/600094/query.json",
+      "current_query_sha256": "b442c6db46963515f002269a7dfcabb50cff8948d8873335f7dca6bd48627a38",
+      "fact_count": 45,
+      "metric_count": 44,
+      "model_review_status_not_quality_grade": "completed_with_open_findings",
+      "source_contexts": [
+        {
+          "condition_id": "600094-C1",
+          "dimension": "主营与边界",
+          "expected": "地产开发运营、金控投资与算力服务；6G及eVTOL为投资布局，不能当上市公司自产产品。",
+          "physical_pages": [
+            10
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600094-C2",
+          "dimension": "产品服务",
+          "expected": "物业开发销售及运营、算力服务与投资平台；非被投飞行器的自主制造。",
+          "physical_pages": [
+            10,
+            16
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600094-C3",
+          "dimension": "变现",
+          "expected": "房地产销售交付结转、开发物业租赁运营、算力服务；金融投资本期收入空，不造零。",
+          "physical_pages": [
+            15,
+            16
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600094-C4",
+          "dimension": "公司收入",
+          "expected": "2025营业收入2,246,548,569.51元，约22.47亿元；上年4,170,683,018.28元。",
+          "physical_pages": [
+            15
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600094-C5",
+          "dimension": "主要构成",
+          "expected": "房地产2,231,200,274.53元；算力15,348,294.98元；金控/金融投资空栏不借成本利润。",
+          "physical_pages": [
+            15,
+            16
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        }
+      ],
+      "core_conditions": [
+        {
+          "condition_id": "600094-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600094-C1",
+          "expected": "地产开发运营是当前主要经营业务。",
+          "current_comparison": {
+            "fact_ids": [
+              "F001",
+              "F005"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600094-K02",
+          "dimension": "business_structure",
+          "source_context_id": "600094-C1",
+          "expected": "金控投资和算力服务作为不同业务保留，不混为地产。",
+          "current_comparison": {
+            "fact_ids": [
+              "F001",
+              "F003"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600094-K03",
+          "dimension": "products_services",
+          "source_context_id": "600094-C2",
+          "expected": "住宅、商住、商办、综合体等物业开发销售及运营。",
+          "current_comparison": {
+            "fact_ids": [
+              "F005"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600094-K04",
+          "dimension": "products_services",
+          "source_context_id": "600094-C2",
+          "expected": "算力基础设施运营/算力服务与投资平台区分。",
+          "current_comparison": {
+            "fact_ids": [
+              "F006",
+              "F007"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600094-K05",
+          "dimension": "revenue_model",
+          "source_context_id": "600094-C3",
+          "expected": "物业开发销售通过交付结转收入，销售额不直接等同公司营收。",
+          "current_comparison": {
+            "fact_ids": [
+              "F014",
+              "F019"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600094-K06",
+          "dimension": "revenue_model",
+          "source_context_id": "600094-C3",
+          "expected": "开发物业出租运营有别于房产销售。",
+          "current_comparison": {
+            "fact_ids": [
+              "F005",
+              "F026"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600094-K07",
+          "dimension": "revenue_model",
+          "source_context_id": "600094-C3",
+          "expected": "算力服务形成独立收入；金融投资本期收入空栏不造零、不借成本利润。",
+          "current_comparison": {
+            "fact_ids": [
+              "F010",
+              "F011"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600094-K08",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600094-C4",
+          "expected": "2025公司营业收入2,246,548,569.51元，可保约22.47亿元。",
+          "current_comparison": {
+            "fact_ids": [
+              "F016",
+              "F019"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600094-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600094-C5",
+          "expected": "房地产收入2,231,200,274.53元，为当前主要收入。",
+          "current_comparison": {
+            "fact_ids": [
+              "F010"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600094-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600094-C5",
+          "expected": "算力收入15,348,294.98元，金控空栏不借额。",
+          "current_comparison": {
+            "fact_ids": [
+              "F010",
+              "F011"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        }
+      ],
+      "current_limits": "主营/收入仍以地产为主；投资标的产品不得升为集团自产。F008/F009带源范围限定，F043旧错误已隔离；F015单位冲突不采用。上年公司收入未独立呈现，不把主要问题有回答当逐子句全满。",
+      "supplemental_objects_audited_in_this_round": 0
+    },
+    {
+      "instrument_id": "600103.SH",
+      "name": "青山纸业",
+      "report_period": "2025-12-31",
+      "document_version": "6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c",
+      "source_pdf": "/home/python/Quote/data/filings/announcements/blobs/68/6865d58c27331e60d4db83632076baa3cf237769994df6c2aa6dfe51e97fc63c.pdf",
+      "current_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-fixed-pool-corrected-600103-20261114/query.json",
+      "current_query_sha256": "71413e8fb1366516dcc0999d5096d484dd3e62683a2ff7c380d569f9430ae4a2",
+      "fact_count": 45,
+      "metric_count": 62,
+      "model_review_status_not_quality_grade": "completed",
+      "source_contexts": [
+        {
+          "condition_id": "600103-C1",
+          "dimension": "主营与边界",
+          "expected": "制浆造纸一体，兼医药、光电子、林业及其他披露业务；不只保纸行业。",
+          "physical_pages": [
+            9,
+            10
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600103-C2",
+          "dimension": "产品服务",
+          "expected": "纸袋纸、竹木浆、溶解浆、纸箱纸袋、风油精、光器件光模块等；用途包括包装和纺织粘胶纤维。",
+          "physical_pages": [
+            9,
+            10
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600103-C3",
+          "dimension": "变现",
+          "expected": "浆纸自主生产、产品直销/以销定产；子公司医药有经销。木竹片挂牌及燃料设备招标是投入而非销售。",
+          "physical_pages": [
+            11,
+            18
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600103-C4",
+          "dimension": "公司收入",
+          "expected": "2025营业收入2,418,990,221.17元；不是行业14,186.7亿元或主营小计。",
+          "physical_pages": [
+            11,
+            16
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600103-C5",
+          "dimension": "主要构成",
+          "expected": "纸1,197,089,976.81、浆358,768,319.71、纸制品284,450,942.34、医药303,680,631.79、光电子206,025,784.54元；主营合计2,332,376,693.65元及抵销独立。",
+          "physical_pages": [
+            16,
+            17,
+            18
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        }
+      ],
+      "core_conditions": [
+        {
+          "condition_id": "600103-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600103-C1",
+          "expected": "制浆造纸一体为主，医药、光电子和林业不能整体漏掉。",
+          "current_comparison": {
+            "fact_ids": [
+              "F001",
+              "F002",
+              "F003"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600103-K02",
+          "dimension": "products_services",
+          "source_context_id": "600103-C2",
+          "expected": "木浆、竹浆、溶解浆及纺织粘胶纤维用途。",
+          "current_comparison": {
+            "fact_ids": [
+              "F005"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600103-K03",
+          "dimension": "products_services",
+          "source_context_id": "600103-C2",
+          "expected": "纸袋纸及纸箱纸袋等包装产品与用途。",
+          "current_comparison": {
+            "fact_ids": [
+              "F006",
+              "F007"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600103-K04",
+          "dimension": "products_services",
+          "source_context_id": "600103-C2",
+          "expected": "医药产品风油精等属于子公司医药业务。",
+          "current_comparison": {
+            "fact_ids": [
+              "F008"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600103-K05",
+          "dimension": "products_services",
+          "source_context_id": "600103-C2",
+          "expected": "光电子器件/光模块面向光纤传输等用途。",
+          "current_comparison": {
+            "fact_ids": [
+              "F009"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600103-K06",
+          "dimension": "products_services",
+          "source_context_id": "600103-C2",
+          "expected": "林业木竹材及森林培育销售作为单独披露业务。",
+          "current_comparison": {
+            "fact_ids": [
+              "F010"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600103-K07",
+          "dimension": "revenue_model",
+          "source_context_id": "600103-C3",
+          "expected": "浆纸产品直销、以销定产；子公司医药有经销。",
+          "current_comparison": {
+            "fact_ids": [
+              "F012",
+              "F013"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600103-K08",
+          "dimension": "operations_and_inputs",
+          "source_context_id": "600103-C3",
+          "expected": "浆纸主业自主生产，不把木竹片采购写成对外销售。",
+          "current_comparison": {
+            "fact_ids": [
+              "F020",
+              "F021"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600103-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600103-C4",
+          "expected": "公司2025营业收入2,418,990,221.17元，而非主营合计。",
+          "current_comparison": {
+            "fact_ids": [
+              "F015",
+              "F016"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600103-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600103-C5",
+          "expected": "纸/浆/纸制品收入分别1,197,089,976.81/358,768,319.71/284,450,942.34元。",
+          "current_comparison": {
+            "fact_ids": [
+              "F004"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600103-K11",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600103-C5",
+          "expected": "医药303,680,631.79元、光电子206,025,784.54元为独立主要构成。",
+          "current_comparison": {
+            "fact_ids": [
+              "F004"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600103-K12",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600103-C5",
+          "expected": "主营表合计2,332,376,693.65元，内部抵销独立，不替公司总收入。",
+          "current_comparison": {
+            "fact_ids": [
+              "F004",
+              "F017"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        }
+      ],
+      "current_limits": "公司营业收入与主营小计/内部抵销分开；纸浆、医药和光电子均已显示，采购/自主生产/直销有源。",
+      "supplemental_objects_audited_in_this_round": 0
+    },
+    {
+      "instrument_id": "600100.SH",
+      "name": "同方股份",
+      "report_period": "2025-12-31",
+      "document_version": "7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497",
+      "source_pdf": "/home/python/Quote/data/filings/announcements/blobs/7d/7da270b951920fe3276680c8b9aed7a16d20084913dc21d31913bd4735dec497.pdf",
+      "current_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-local-consumption-result-20261114/600100/query.json",
+      "current_query_sha256": "59136d7fa5e5784bee6d64ac7bee98371091f68ae246ba8d22929ac45902f989",
+      "fact_count": 29,
+      "metric_count": 19,
+      "model_review_status_not_quality_grade": "incomplete",
+      "source_contexts": [
+        {
+          "condition_id": "600100-C1",
+          "dimension": "主营与边界",
+          "expected": "公共安全、数智产业、智慧能源；其他/总部及抵销另列，上年计算机业务出表不写成本年发生。",
+          "physical_pages": [
+            12,
+            13,
+            14,
+            21
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600100-C2",
+          "dimension": "产品服务",
+          "expected": "安检系统/运维、CNKI知识服务/数智转型、热泵储能及能源方案。",
+          "physical_pages": [
+            12,
+            13
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600100-C3",
+          "dimension": "变现",
+          "expected": "机构订阅为主+个人按需付费，技术授权/软件开发；能源咨询、供货、工程、节能及运维。",
+          "physical_pages": [
+            12,
+            13
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600100-C4",
+          "dimension": "公司收入",
+          "expected": "2025公司营业收入150.65亿元，非主营净额1497009.55万元。",
+          "physical_pages": [
+            14,
+            21
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 三、经营情况讨论与分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600100-C5",
+          "dimension": "主要构成",
+          "expected": "公共安全698057.58、数智275072.20、智慧能源450419.69万元；小计1525120.68、抵销-28111.12、净合计1497009.55；金额差与百分点不写成相对增幅。",
+          "physical_pages": [
+            21
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        }
+      ],
+      "core_conditions": [
+        {
+          "condition_id": "600100-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600100-C1",
+          "expected": "公共安全、数智产业、智慧能源三主业均保留。",
+          "current_comparison": {
+            "fact_ids": [
+              "F001",
+              "F002"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600100-K02",
+          "dimension": "products_services",
+          "source_context_id": "600100-C2",
+          "expected": "安检系统/解决方案及全生命周期运维。",
+          "current_comparison": {
+            "fact_ids": [
+              "F004",
+              "F007"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600100-K03",
+          "dimension": "products_services",
+          "source_context_id": "600100-C2",
+          "expected": "CNKI知识服务、数据库与数智转型方案。",
+          "current_comparison": {
+            "fact_ids": [
+              "F005"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600100-K04",
+          "dimension": "products_services",
+          "source_context_id": "600100-C2",
+          "expected": "热泵/储能及城市能源解决方案。",
+          "current_comparison": {
+            "fact_ids": [
+              "F006"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600100-K05",
+          "dimension": "revenue_model",
+          "source_context_id": "600100-C3",
+          "expected": "知识服务以机构订阅为主，辅以个人按需付费。",
+          "current_comparison": {
+            "fact_ids": [
+              "F008"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600100-K06",
+          "dimension": "revenue_model",
+          "source_context_id": "600100-C3",
+          "expected": "数智转型通过技术授权、软件设计开发等变现。",
+          "current_comparison": {
+            "fact_ids": [
+              "F008"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600100-K07",
+          "dimension": "revenue_model",
+          "source_context_id": "600100-C3",
+          "expected": "智慧能源通过咨询、供货、工程、节能及运维服务变现。",
+          "current_comparison": {
+            "fact_ids": [
+              "F009"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600100-K08",
+          "dimension": "revenue_model",
+          "source_context_id": "600100-C3",
+          "expected": "公共安全的设备、综合方案与运维为收入来源。",
+          "current_comparison": {
+            "fact_ids": [
+              "F010"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600100-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600100-C4",
+          "expected": "2025公司营业收入150.65亿元，非主营表净额。",
+          "current_comparison": {
+            "fact_ids": [
+              "F011"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600100-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600100-C5",
+          "expected": "公共安全主营收入698,057.58万元。",
+          "current_comparison": {
+            "fact_ids": [
+              "F012"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600100-K11",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600100-C5",
+          "expected": "数智275,072.20万元、智慧能源450,419.69万元。",
+          "current_comparison": {
+            "fact_ids": [
+              "F012"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600100-K12",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600100-C5",
+          "expected": "小计1,525,120.68万元、抵销-28,111.12万元、净合计1,497,009.55万元不混为集团总收入。",
+          "current_comparison": {
+            "fact_ids": [
+              "F012"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        }
+      ],
+      "current_limits": "三主业及本期金额/抵销已显示；上年计算机出表和毛利桥等补充内容未全入稿，拟修减少额仍无final，不作可信结论，不为这句续跑。",
+      "supplemental_objects_audited_in_this_round": 0
+    },
+    {
+      "instrument_id": "600107.SH",
+      "name": "美尔雅",
+      "report_period": "2025-12-31",
+      "document_version": "2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8",
+      "source_pdf": "/home/python/Quote/data/filings/announcements/blobs/2d/2d2e73f7ab29177abdcf8e98b116bbddcfdbbd61b540c64096efcf1ffa90f7e8.pdf",
+      "current_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-local-consumption-result-20261114/600107/query.json",
+      "current_query_sha256": "77adf19d149c3db3ecead53116aa08bc23d9cc7f6e061e4295e22ba7632d2ec5",
+      "fact_count": 33,
+      "metric_count": 74,
+      "model_review_status_not_quality_grade": "incomplete",
+      "source_contexts": [
+        {
+          "condition_id": "600107-C1",
+          "dimension": "主营与边界",
+          "expected": "服装服饰研发设计生产销售；国内品牌与国外加工，医疗收入本期空栏，处置影响不强定处置发生年。",
+          "physical_pages": [
+            12,
+            15,
+            16
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600107-C2",
+          "dimension": "产品服务",
+          "expected": "中高档商务政务男装：西服衬衣等；女装职业/礼服/时装/休闲，出口加工。",
+          "physical_pages": [
+            12
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600107-C3",
+          "dimension": "变现",
+          "expected": "直营/加盟商场零售、团购定制、电商；出口以来料/进料加工为主及一般贸易。",
+          "physical_pages": [
+            12,
+            16
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600107-C4",
+          "dimension": "公司收入",
+          "expected": "2025营业收入236,195,000.11元，同比-28.32%；归母净利润-8,909.26万元，不拿营业利润或其他单位替代。",
+          "physical_pages": [
+            14,
+            15
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 三、经营情况讨论与分析",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600107-C5",
+          "dimension": "主要构成",
+          "expected": "服装229,197,408.86、其他6,997,591.25元；男装129,735,100.43、女装52,701,247.53、出口加工46,761,060.90元，医疗空不借同比值。",
+          "physical_pages": [
+            15,
+            16
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        }
+      ],
+      "core_conditions": [
+        {
+          "condition_id": "600107-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600107-C1",
+          "expected": "服装研发设计生产销售；内销品牌与外贸加工为两种经营模式。",
+          "current_comparison": {
+            "fact_ids": [
+              "F001",
+              "F002"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600107-K02",
+          "dimension": "products_services",
+          "source_context_id": "600107-C2",
+          "expected": "中高档商务政务男装及西服、衬衣等主要产品。",
+          "current_comparison": {
+            "fact_ids": [
+              "F005",
+              "F006"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600107-K03",
+          "dimension": "products_services",
+          "source_context_id": "600107-C2",
+          "expected": "女装职业、礼服、时装、休闲系列。",
+          "current_comparison": {
+            "fact_ids": [
+              "F007"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600107-K04",
+          "dimension": "revenue_model",
+          "source_context_id": "600107-C3",
+          "expected": "直营/加盟商场、团购定制及电商销售。",
+          "current_comparison": {
+            "fact_ids": [
+              "F009"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600107-K05",
+          "dimension": "revenue_model",
+          "source_context_id": "600107-C3",
+          "expected": "出口以来料、进料加工为主，并有一般贸易。",
+          "current_comparison": {
+            "fact_ids": [
+              "F008",
+              "F020"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600107-K06",
+          "dimension": "operations_and_inputs",
+          "source_context_id": "600107-C1",
+          "expected": "本企业的生产加工与销售角色有源，不由投入常识补原料。",
+          "current_comparison": {
+            "fact_ids": [
+              "F001",
+              "F002"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600107-K07",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600107-C4",
+          "expected": "公司2025营业收入236,195,000.11元，或23,619.50万元；分项合计本身不代独立公司总额。",
+          "current_comparison": {
+            "fact_ids": [],
+            "observation": "missing_in_current_profile_program_isolation",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600107-K08",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600107-C4",
+          "expected": "经营讨论披露归母净利润-8,909.26万元，保亏损与同比下降限定。",
+          "current_comparison": {
+            "fact_ids": [],
+            "observation": "missing_in_current_profile_program_isolation",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600107-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600107-C5",
+          "expected": "服装229,197,408.86元、其他6,997,591.25元；医疗本期空不借同比值。",
+          "current_comparison": {
+            "fact_ids": [
+              "F012"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600107-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600107-C5",
+          "expected": "品牌男装129,735,100.43元、女装52,701,247.53元、出口加工46,761,060.90元。",
+          "current_comparison": {
+            "fact_ids": [
+              "F013"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        }
+      ],
+      "current_limits": "当前33事实稿仍无独立公司总收入与亏损；原F011本地源核可恢复但未新高阶复核，不写回旧稿。",
+      "supplemental_objects_audited_in_this_round": 0
+    },
+    {
+      "instrument_id": "600098.SH",
+      "name": "广州发展",
+      "report_period": "2025-12-31",
+      "document_version": "78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07",
+      "source_pdf": "/home/python/Quote/data/filings/announcements/blobs/78/78decfc3152ce172bc3f1343abc1fb0110641cbbef9f92864c374ed296ab1c07.pdf",
+      "current_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-fixed-pool-corrected-600098-20261114/query.json",
+      "current_query_sha256": "051acbea438292722c420aaf24ef60fe8fa4d3036970efecd4f6003a62a9925e",
+      "fact_count": 49,
+      "metric_count": 96,
+      "model_review_status_not_quality_grade": "completed",
+      "source_contexts": [
+        {
+          "condition_id": "600098-C1",
+          "dimension": "主营与边界",
+          "expected": "综合能源：电力、天然气、能源物流、新能源储能及能源金融，产购销储运用；金融是能源产业支持非全集团银行。",
+          "physical_pages": [
+            9,
+            10
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600098-C2",
+          "dimension": "产品服务",
+          "expected": "电力煤炭天然气蒸汽成品油、能源管理以及装卸运输仓储服务。",
+          "physical_pages": [
+            9
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600098-C3",
+          "dimension": "变现",
+          "expected": "电力蒸汽自产，煤气油外购；电力经电网销售，其他经自有管网平台等；托管节能及产融支持。",
+          "physical_pages": [
+            9,
+            10
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600098-C4",
+          "dimension": "公司收入",
+          "expected": "利润表营业收入50,841,626,989.35元；经营讨论营业总收入508.83亿元为另一口径，不能静默合并。",
+          "physical_pages": [
+            17,
+            18
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600098-C5",
+          "dimension": "主要构成",
+          "expected": "煤电供热4,349,947,127.70、气电供热3,204,831,500.79、能源物流29,485,020,343.45、天然气10,502,056,882.42、新能源储能3,245,504,723.82元；金融业务42,626,535.93元保原表。",
+          "physical_pages": [
+            18,
+            19
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        }
+      ],
+      "core_conditions": [
+        {
+          "condition_id": "600098-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600098-C1",
+          "expected": "综合能源包含电力、天然气、能源物流、新能源储能。",
+          "current_comparison": {
+            "fact_ids": [
+              "F001",
+              "F002"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600098-K02",
+          "dimension": "business_structure",
+          "source_context_id": "600098-C1",
+          "expected": "能源金融用于产业支持，不把全集团认作银行。",
+          "current_comparison": {
+            "fact_ids": [
+              "F006",
+              "F007"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600098-K03",
+          "dimension": "products_services",
+          "source_context_id": "600098-C2",
+          "expected": "电力/蒸汽等自产能源产品。",
+          "current_comparison": {
+            "fact_ids": [
+              "F007",
+              "F008"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600098-K04",
+          "dimension": "products_services",
+          "source_context_id": "600098-C2",
+          "expected": "煤炭、天然气、成品油及相关装卸运输储存服务。",
+          "current_comparison": {
+            "fact_ids": [
+              "F007"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600098-K05",
+          "dimension": "revenue_model",
+          "source_context_id": "600098-C3",
+          "expected": "电力经电网销售给终端用户。",
+          "current_comparison": {
+            "fact_ids": [
+              "F012"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600098-K06",
+          "dimension": "revenue_model",
+          "source_context_id": "600098-C3",
+          "expected": "其他能源经自有管网、销售平台等销售。",
+          "current_comparison": {
+            "fact_ids": [
+              "F012"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600098-K07",
+          "dimension": "operations_and_inputs",
+          "source_context_id": "600098-C3",
+          "expected": "电汽生产与煤气油外购、购销储运角色分开。",
+          "current_comparison": {
+            "fact_ids": [
+              "F008",
+              "F013"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600098-K08",
+          "dimension": "revenue_model",
+          "source_context_id": "600098-C3",
+          "expected": "能源托管/节能运维等服务与单纯产品销售区分。",
+          "current_comparison": {
+            "fact_ids": [
+              "F009"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600098-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600098-C4",
+          "expected": "利润表营业收入50,841,626,989.35元。",
+          "current_comparison": {
+            "fact_ids": [
+              "F016"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600098-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600098-C4",
+          "expected": "经营讨论营业总收入508.83亿元为另一科目，不静默合并。",
+          "current_comparison": {
+            "fact_ids": [
+              "F015"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600098-K11",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600098-C5",
+          "expected": "煤电供热4,349,947,127.70元、气电供热3,204,831,500.79元；收入非成本。",
+          "current_comparison": {
+            "fact_ids": [
+              "F018"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600098-K12",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600098-C5",
+          "expected": "能源物流29,485,020,343.45元、天然气10,502,056,882.42元、新能源储能3,245,504,723.82元；金融另列42,626,535.93元。",
+          "current_comparison": {
+            "fact_ids": [
+              "F018",
+              "F019"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        }
+      ],
+      "current_limits": "营业总收入与营业收入保持不同科目；行业/产品/子公司金额不相加替集团；金融业务独立在分产品披露，不把集团视为银行。",
+      "supplemental_objects_audited_in_this_round": 0
+    },
+    {
+      "instrument_id": "600104.SH",
+      "name": "上汽集团",
+      "report_period": "2025-12-31",
+      "document_version": "aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874",
+      "source_pdf": "/home/python/Quote/data/filings/announcements/blobs/ac/aca3b701a1d6c2d59c8063801c579c0b1a589fd7d183e13146e4790cce3d0874.pdf",
+      "current_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saic-candidate-final-20261114/600104/query.json",
+      "current_query_sha256": "8edeb65daefdfe84a967e75296d84e0cf18d10e3462ef75dfd5060d33f8faf8f",
+      "fact_count": 39,
+      "metric_count": 80,
+      "model_review_status_not_quality_grade": "completed_with_open_findings",
+      "source_contexts": [
+        {
+          "condition_id": "600104-C1",
+          "dimension": "主营与边界",
+          "expected": "整车为主，协同零部件、移动出行和服务、汽车金融；量产/中试和研发分开。",
+          "physical_pages": [
+            8,
+            9
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600104-C2",
+          "dimension": "产品服务",
+          "expected": "自主/合资整车及新能源汽车，零部件、物流出行和汽车金融；品牌例全新MG4、荣威M7、尚界H5、智己等有当前披露。",
+          "physical_pages": [
+            8,
+            9
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600104-C3",
+          "dimension": "变现",
+          "expected": "汽车制造销售与相应金融/出行服务协同，含经销网络、海外当地生产和物流支持，不由技术研发推原料采购。",
+          "physical_pages": [
+            9,
+            10
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600104-C4",
+          "dimension": "公司收入",
+          "expected": "营业总收入6562.44亿元；营业收入646,152,101,889.30元为不同科目。",
+          "physical_pages": [
+            9,
+            10
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600104-C5",
+          "dimension": "主要构成",
+          "expected": "分行业汽车制造646,152,101,889.30元、金融10,091,710,191.88元、合计656,243,812,081.18元；整车销量450.7万辆非收入。",
+          "physical_pages": [
+            8,
+            11
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        }
+      ],
+      "core_conditions": [
+        {
+          "condition_id": "600104-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600104-C1",
+          "expected": "整车为核心，零部件、移动出行与服务、汽车金融均保留。",
+          "current_comparison": {
+            "fact_ids": [
+              "bs-01",
+              "bs-03"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600104-K02",
+          "dimension": "products_services",
+          "source_context_id": "600104-C2",
+          "expected": "自主/合资整车与新能源汽车，保报告原名及当前产品性质。",
+          "current_comparison": {
+            "fact_ids": [
+              "ps-01",
+              "ps-02",
+              "ps-03"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600104-K03",
+          "dimension": "products_services",
+          "source_context_id": "600104-C2",
+          "expected": "汽车零部件、柴油机及汽车电子等产品归属具体板块。",
+          "current_comparison": {
+            "fact_ids": [
+              "ps-04"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600104-K04",
+          "dimension": "products_services",
+          "source_context_id": "600104-C2",
+          "expected": "汽车金融提供贷款等服务，不把全集团当银行。",
+          "current_comparison": {
+            "fact_ids": [
+              "ps-05"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600104-K05",
+          "dimension": "revenue_model",
+          "source_context_id": "600104-C3",
+          "expected": "整车/零部件销售与劳务其他、金融服务分别变现。",
+          "current_comparison": {
+            "fact_ids": [
+              "rm-01"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600104-K06",
+          "dimension": "operations_and_inputs",
+          "source_context_id": "600104-C3",
+          "expected": "汽车制造销售与物流、海外生产/经销支持区分，研发不推采购角色。",
+          "current_comparison": {
+            "fact_ids": [
+              "oi-06",
+              "bs-01"
+            ],
+            "observation": "partial_answer_observed_not_full_scope_audit",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600104-K07",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600104-C4",
+          "expected": "合并营业总收入约6,562.4亿元与营业收入646,152,101,889.30元是不同科目。",
+          "current_comparison": {
+            "fact_ids": [
+              "rm-03"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600104-K08",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600104-C5",
+          "expected": "汽车制造646,152,101,889.30元、金融10,091,710,191.88元及合计656,243,812,081.18元保表头。",
+          "current_comparison": {
+            "fact_ids": [
+              "rm-02",
+              "rm-01"
+            ],
+            "observation": "partial_answer_observed_total_not_independently_present",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600104-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600104-C5",
+          "expected": "整车/零部件/服务/金融为收入构成，不把销量当收入。",
+          "current_comparison": {
+            "fact_ids": [
+              "rm-01"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600104-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600104-C5",
+          "expected": "2025整车销量450.7万辆为经营规模。",
+          "current_comparison": {
+            "fact_ids": [
+              "sm-01"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        }
+      ],
+      "current_limits": "主要业务/产品/公司总额和主要构成已出现；F03/F04/F07隔离、F09修订拒绝；六改动有限核源不是39条全审。",
+      "supplemental_objects_audited_in_this_round": 0
+    },
+    {
+      "instrument_id": "600088.SH",
+      "name": "中视传媒",
+      "report_period": "2025-12-31",
+      "document_version": "5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c",
+      "source_pdf": "/home/python/Quote/data/filings/announcements/blobs/5a/5a682b4cd3afae021006c939604fe745c63b9eff3ae26aadf80400c39bf7fa2c.pdf",
+      "current_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-fixed-pool-corrected-600088-20261114/query.json",
+      "current_query_sha256": "f5aca684ba3432e0a2d975aeecda66bd302e1c8121dccf6ff28718bbcb152506",
+      "fact_count": 38,
+      "metric_count": 73,
+      "model_review_status_not_quality_grade": "completed_with_open_findings",
+      "source_contexts": [
+        {
+          "condition_id": "600088-C1",
+          "dimension": "主营与边界",
+          "expected": "影视、广告、旅游、基金投资管理；不把基金投资收益当全基金收入。",
+          "physical_pages": [
+            11,
+            12
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600088-C2",
+          "dimension": "产品服务",
+          "expected": "节目制作销售/技术/设备租赁/库存剧发行，频道广告，影视基地观光及拍摄服务。",
+          "physical_pages": [
+            11
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600088-C3",
+          "dimension": "变现",
+          "expected": "节目/技术/租赁销售、承包频道广告资源转售，旅游门票/园内经营/拍摄服务，基金管理投资。",
+          "physical_pages": [
+            11,
+            12
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600088-C4",
+          "dimension": "公司收入",
+          "expected": "营业收入1,037,484,312.21元，非行业小计或成本911,538,539.48元。",
+          "physical_pages": [
+            16
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600088-C5",
+          "dimension": "主要构成",
+          "expected": "影视597,703,872.09、广告289,904,563.86、旅游147,151,456.42、基金1,503,221.93元；基金成本空不擅造零。",
+          "physical_pages": [
+            16,
+            17
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        }
+      ],
+      "core_conditions": [
+        {
+          "condition_id": "600088-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600088-C1",
+          "expected": "影视、广告、旅游、基金投资管理四块业务均保留。",
+          "current_comparison": {
+            "fact_ids": [
+              "F001",
+              "F002",
+              "F003",
+              "F004",
+              "F005"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600088-K02",
+          "dimension": "products_services",
+          "source_context_id": "600088-C2",
+          "expected": "节目制作销售及库存剧发行。",
+          "current_comparison": {
+            "fact_ids": [
+              "F006",
+              "F008"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600088-K03",
+          "dimension": "products_services",
+          "source_context_id": "600088-C2",
+          "expected": "影视技术服务及设备出租。",
+          "current_comparison": {
+            "fact_ids": [
+              "F007"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600088-K04",
+          "dimension": "products_services",
+          "source_context_id": "600088-C2",
+          "expected": "频道广告资源经营与转售服务。",
+          "current_comparison": {
+            "fact_ids": [
+              "F003",
+              "F009"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600088-K05",
+          "dimension": "products_services",
+          "source_context_id": "600088-C2",
+          "expected": "影视基地观光旅游及拍摄服务。",
+          "current_comparison": {
+            "fact_ids": [
+              "F004",
+              "F010"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600088-K06",
+          "dimension": "revenue_model",
+          "source_context_id": "600088-C3",
+          "expected": "节目/技术/租赁与广告资源经营的收费来源分开。",
+          "current_comparison": {
+            "fact_ids": [
+              "F002",
+              "F003",
+              "F007"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600088-K07",
+          "dimension": "revenue_model",
+          "source_context_id": "600088-C3",
+          "expected": "旅游门票、园内经营及影视拍摄服务构成收入。",
+          "current_comparison": {
+            "fact_ids": [
+              "F010"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600088-K08",
+          "dimension": "revenue_model",
+          "source_context_id": "600088-C3",
+          "expected": "基金管理投资业务与基金投资收益、基金总规模区分。",
+          "current_comparison": {
+            "fact_ids": [
+              "F005",
+              "F011"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600088-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600088-C4",
+          "expected": "公司营业收入1,037,484,312.21元，不是成本。",
+          "current_comparison": {
+            "fact_ids": [
+              "F012",
+              "review-add:R003"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600088-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600088-C5",
+          "expected": "影视597,703,872.09元、广告289,904,563.86元。",
+          "current_comparison": {
+            "fact_ids": [
+              "F015"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600088-K11",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600088-C5",
+          "expected": "旅游147,151,456.42元、基金1,503,221.93元；基金成本空不造零。",
+          "current_comparison": {
+            "fact_ids": [
+              "F015",
+              "review-add:R002"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        }
+      ],
+      "current_limits": "影视/广告/旅游/基金及其变现/行业金额可读；基金空成本不造零；供应商过半与主要成本原错误不采用。",
+      "supplemental_objects_audited_in_this_round": 0
+    },
+    {
+      "instrument_id": "600099.SH",
+      "name": "林海股份",
+      "report_period": "2025-12-31",
+      "document_version": "3dbe17e87d3b79bb5327d821786eb7a971ef367b24fd37ac3511da4a212cf07c",
+      "source_pdf": "/home/python/Quote/data/filings/announcements/blobs/3d/3dbe17e87d3b79bb5327d821786eb7a971ef367b24fd37ac3511da4a212cf07c.pdf",
+      "current_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v9-fixed-pool-corrected-600099-20261114/query.json",
+      "current_query_sha256": "4bb8478c59c7d05a4d272e75ccb443443259ea5d059f9ca6fbc83f3077a23f8d",
+      "fact_count": 41,
+      "metric_count": 33,
+      "model_review_status_not_quality_grade": "completed",
+      "source_contexts": [
+        {
+          "condition_id": "600099-C1",
+          "dimension": "主营与边界",
+          "expected": "森林消防机械、农业机械、特种车辆ATV、摩托车及配件制造销售。",
+          "physical_pages": [
+            8,
+            9,
+            10
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600099-C2",
+          "dimension": "产品服务",
+          "expected": "消防车泵/风力灭火机、插秧机收割机、ATV及摩托车；消防/农业/越野用途有源。",
+          "physical_pages": [
+            8,
+            9,
+            10
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600099-C3",
+          "dimension": "变现",
+          "expected": "以销定产按单生产适度备货，以经销为主；采购替代两项限定农业机械。",
+          "physical_pages": [
+            10,
+            15,
+            16
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600099-C4",
+          "dimension": "公司收入",
+          "expected": "营业收入1,131,246,944.93元，113124.69万元为舍入叙述。",
+          "physical_pages": [
+            12,
+            18
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600099-C5",
+          "dimension": "主要构成",
+          "expected": "特种车辆467207688.51、农机283722402.61、消防248582445.60、摩托125340298.09元；产销量与收入背离不能互相替代。",
+          "physical_pages": [
+            21,
+            22
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        }
+      ],
+      "core_conditions": [
+        {
+          "condition_id": "600099-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600099-C1",
+          "expected": "森林消防、农业机械、ATV、摩托车及配件制造销售四板块。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-BS-01",
+              "F-BS-02"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600099-K02",
+          "dimension": "products_services",
+          "source_context_id": "600099-C2",
+          "expected": "消防车、泵、风力灭火机与森林消防用途。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-PS-01"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600099-K03",
+          "dimension": "products_services",
+          "source_context_id": "600099-C2",
+          "expected": "插秧机、收割机与农业作业用途。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-PS-02"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600099-K04",
+          "dimension": "products_services",
+          "source_context_id": "600099-C2",
+          "expected": "ATV全地形车及对应使用场景。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-PS-03"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600099-K05",
+          "dimension": "products_services",
+          "source_context_id": "600099-C2",
+          "expected": "摩托车作为独立产品板块。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-PS-04",
+              "F-PS-05"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600099-K06",
+          "dimension": "operations_and_inputs",
+          "source_context_id": "600099-C3",
+          "expected": "以销定产、按单生产并适度备货。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-RM-01",
+              "F-OI-01"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600099-K07",
+          "dimension": "revenue_model",
+          "source_context_id": "600099-C3",
+          "expected": "产品销售以经销为主。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-RM-02"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600099-K08",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600099-C4",
+          "expected": "2025公司营业收入1,131,246,944.93元，可保113,124.69万元舍入叙述。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-RM-03",
+              "F-RM-04"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600099-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600099-C5",
+          "expected": "特种车辆营业收入467,207,688.51元。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-SM-02"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600099-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600099-C5",
+          "expected": "农业机械营业收入283,722,402.61元。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-SM-02"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600099-K11",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600099-C5",
+          "expected": "森林消防机械营业收入248,582,445.60元。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-SM-02"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600099-K12",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600099-C5",
+          "expected": "摩托车营业收入125,340,298.09元，产销量不互代收入。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-SM-02",
+              "F-SM-04"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        }
+      ],
+      "current_limits": "四行业、经销/以销定产、公司总额及行业金额可读；两项国产替代仅农业机械；供应链容器被隔离不阻塞基础内容。",
+      "supplemental_objects_audited_in_this_round": 0
+    },
+    {
+      "instrument_id": "600082.SH",
+      "name": "海泰发展",
+      "report_period": "2025-12-31",
+      "document_version": "979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad",
+      "source_pdf": "/home/python/Quote/data/filings/announcements/blobs/97/979a4c58dffacac7ade1e9f7df2feed41fe365e2a2aadb3a63c926709be716ad.pdf",
+      "current_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-candidate-final-20261114/600082/query.json",
+      "current_query_sha256": "584574bd10ecc5d3c14eb6ef82b98edd90b72660d5d73bd0cf7a87f997d900a4",
+      "fact_count": 42,
+      "metric_count": 59,
+      "model_review_status_not_quality_grade": "completed",
+      "source_contexts": [
+        {
+          "condition_id": "600082-C1",
+          "dimension": "主营与边界",
+          "expected": "工业/科技园区开发运营，产业投资和孵化服务；不能以商品贸易替主业。",
+          "physical_pages": [
+            11
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600082-C2",
+          "dimension": "产品服务",
+          "expected": "园区载体/招商、科创投资、在孵企业咨询培训及配套服务。",
+          "physical_pages": [
+            11
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600082-C3",
+          "dimension": "变现",
+          "expected": "房产销售和租赁运营、商品销售以代理人净额法贸易；不把合同收款和集团收入直接等同。",
+          "physical_pages": [
+            14,
+            15,
+            16
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600082-C4",
+          "dimension": "公司收入",
+          "expected": "营业收入449,240,562.34元，同比增长33.06%，成本355,491,553.96元不是营收。",
+          "physical_pages": [
+            14
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600082-C5",
+          "dimension": "主要构成",
+          "expected": "科技园区开发418,710,800.51元，运营30,105,192.48元，商品销售424,569.35元；原表换行小数续行必须保列。",
+          "physical_pages": [
+            15,
+            16
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        }
+      ],
+      "core_conditions": [
+        {
+          "condition_id": "600082-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600082-C1",
+          "expected": "工业科技园区开发运营为核心，而非商品贸易主导。",
+          "current_comparison": {
+            "fact_ids": [
+              "F001",
+              "F004"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600082-K02",
+          "dimension": "business_structure",
+          "source_context_id": "600082-C1",
+          "expected": "产业投资和孵化服务属于披露业务。",
+          "current_comparison": {
+            "fact_ids": [
+              "F002",
+              "F003"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600082-K03",
+          "dimension": "products_services",
+          "source_context_id": "600082-C2",
+          "expected": "园区载体、招商及园区运营服务。",
+          "current_comparison": {
+            "fact_ids": [
+              "F008",
+              "F019"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600082-K04",
+          "dimension": "products_services",
+          "source_context_id": "600082-C2",
+          "expected": "在孵企业咨询培训等专业服务。",
+          "current_comparison": {
+            "fact_ids": [
+              "F002"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600082-K05",
+          "dimension": "revenue_model",
+          "source_context_id": "600082-C3",
+          "expected": "开发房产销售与租赁、物业运营收入分开。",
+          "current_comparison": {
+            "fact_ids": [
+              "F009"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600082-K06",
+          "dimension": "revenue_model",
+          "source_context_id": "600082-C3",
+          "expected": "产业投资追求长期投资回报，不将被投项目当本企业自产。",
+          "current_comparison": {
+            "fact_ids": [
+              "F011",
+              "F012"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600082-K07",
+          "dimension": "operations_and_inputs",
+          "source_context_id": "600082-C3",
+          "expected": "商品销售仅代理人净额法贸易，与开发运营角色分开。",
+          "current_comparison": {
+            "fact_ids": [
+              "F007"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600082-K08",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600082-C4",
+          "expected": "2025公司营业收入449,240,562.34元，不是营业成本。",
+          "current_comparison": {
+            "fact_ids": [
+              "F009",
+              "F010"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600082-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600082-C5",
+          "expected": "园区开发收入418,710,800.51元、运营30,105,192.48元，保续行小数及列头。",
+          "current_comparison": {
+            "fact_ids": [
+              "review-add:R001"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600082-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600082-C5",
+          "expected": "商品销售424,569.35元，不扩大为主业规模。",
+          "current_comparison": {
+            "fact_ids": [
+              "F007"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        }
+      ],
+      "current_limits": "开发/运营两大主业金额已由真实final进入稿；代理人净额贸易与销售收款/子公司营业收入分开。",
+      "supplemental_objects_audited_in_this_round": 0
+    },
+    {
+      "instrument_id": "600097.SH",
+      "name": "开创国际",
+      "report_period": "2025-12-31",
+      "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+      "source_pdf": "/home/python/Quote/data/filings/announcements/blobs/4c/4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c.pdf",
+      "current_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v10-remaining-pool-600097-20261114/query.json",
+      "current_query_sha256": "d40ddecd649e3a30b851311c2e4806db6af5aaae9695ac971203f821801874a3",
+      "fact_count": 53,
+      "metric_count": 27,
+      "model_review_status_not_quality_grade": "completed_with_open_findings",
+      "source_contexts": [
+        {
+          "condition_id": "600097-C1",
+          "dimension": "主营与边界",
+          "expected": "远洋捕捞、水产品加工销售、贸易、运输一体化；磷虾合作经营不是独立自产推定。",
+          "physical_pages": [
+            8
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600097-C2",
+          "dimension": "产品服务",
+          "expected": "金枪鱼鲣鱼黄鳍、磷虾冻虾虾粉、ALBO罐头及国内鱼柳加工。",
+          "physical_pages": [
+            8
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600097-C3",
+          "dimension": "变现",
+          "expected": "捕捞/加工/贸易产品销售及海上运输服务，以直销为主，国内外客户分开；内部转移不是对外加工服务量。",
+          "physical_pages": [
+            8,
+            11,
+            12
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600097-C4",
+          "dimension": "公司收入",
+          "expected": "营业收入2,336,503,042.69元，不是主营合计2,330,812,544.82元。",
+          "physical_pages": [
+            10,
+            11
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600097-C5",
+          "dimension": "主要构成",
+          "expected": "海洋捕捞950,763,559.03、食品加工1,054,611,208.73、贸易318,671,971.02、运输6,765,806.04元；金枪鱼转移24300.45吨到鱼柳加工不作额外销量。",
+          "physical_pages": [
+            11,
+            12
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        }
+      ],
+      "core_conditions": [
+        {
+          "condition_id": "600097-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600097-C1",
+          "expected": "远洋捕捞、加工、贸易、运输一体化四板块。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-BS-01",
+              "F-BS-02",
+              "F-BS-03"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600097-K02",
+          "dimension": "products_services",
+          "source_context_id": "600097-C2",
+          "expected": "金枪鱼鲣鱼黄鳍等捕捞产品。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-PS-01"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600097-K03",
+          "dimension": "products_services",
+          "source_context_id": "600097-C2",
+          "expected": "合作经营的南极磷虾冻虾/虾粉，不改成独立自产。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-PS-01"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600097-K04",
+          "dimension": "products_services",
+          "source_context_id": "600097-C2",
+          "expected": "ALBO罐头及国内鱼柳加工产品。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-PS-02"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600097-K05",
+          "dimension": "revenue_model",
+          "source_context_id": "600097-C3",
+          "expected": "捕捞加工贸易产品销售和海上运输服务收入。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-PS-03",
+              "F-PS-04",
+              "F-RM-03"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600097-K06",
+          "dimension": "revenue_model",
+          "source_context_id": "600097-C3",
+          "expected": "直销为主，国内外市场分开。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-RM-05",
+              "F-SM-05"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600097-K07",
+          "dimension": "operations_and_inputs",
+          "source_context_id": "600097-C3",
+          "expected": "内部原料鱼转入鱼柳加工不变成新增对外销量或加工服务量。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-SM-04"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600097-K08",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600097-C4",
+          "expected": "公司营业收入2,336,503,042.69元，非主营合计2,330,812,544.82元。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-RM-01",
+              "F-RM-02"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600097-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600097-C5",
+          "expected": "海洋捕捞950,763,559.03元、食品加工1,054,611,208.73元。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-RM-02"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600097-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600097-C5",
+          "expected": "渔货贸易318,671,971.02元、海上运输6,765,806.04元。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-RM-02"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        }
+      ],
+      "current_limits": "捕捞/加工/贸易/运输、合作磷虾有源；主营小计不代公司总额，内部转移加工不另作销售。",
+      "supplemental_objects_audited_in_this_round": 0
+    },
+    {
+      "instrument_id": "600054.SH",
+      "name": "黄山旅游",
+      "report_period": "2025-12-31",
+      "document_version": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+      "source_pdf": "/home/python/Quote/data/filings/announcements/blobs/f8/f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f.pdf",
+      "current_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v10-remaining-pool-600054-20261114/query.json",
+      "current_query_sha256": "dc0d310bc723873df520ca5a01ef9ea67ef8afa4cf2a031c373bc4376adb6bae",
+      "fact_count": 64,
+      "metric_count": 71,
+      "model_review_status_not_quality_grade": "completed",
+      "source_contexts": [
+        {
+          "condition_id": "600054-C1",
+          "dimension": "主营与边界",
+          "expected": "景区、索道缆车、酒店、徽菜、旅行社、智慧旅游六业务；不能只用p9支持后三类。",
+          "physical_pages": [
+            9,
+            10
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600054-C2",
+          "dimension": "产品服务",
+          "expected": "观光休闲、客运、住宿餐饮、徽菜、旅行/会展/疗休养、平台OTA等服务。",
+          "physical_pages": [
+            9,
+            10
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600054-C3",
+          "dimension": "变现",
+          "expected": "景区观光客运、旅宿餐饮等服务收入；已开业项目与2026经营计划分开，不造客源占比。",
+          "physical_pages": [
+            9,
+            10,
+            11
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况",
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600054-C4",
+          "dimension": "公司收入",
+          "expected": "营业收入2,109,325,107.63元或210932.51万元，2025本期。",
+          "physical_pages": [
+            11,
+            13,
+            14
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600054-C5",
+          "dimension": "主要构成",
+          "expected": "酒店492026389.87、索道842155363.75、景区293201670.78、旅游服务532255057.39、徽菜245296390.79元为未合并抵销口径，不加总替集团或直接算集团占比。",
+          "physical_pages": [
+            14
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / 主营业务分析"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        }
+      ],
+      "core_conditions": [
+        {
+          "condition_id": "600054-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600054-C1",
+          "expected": "景区、索道缆车、酒店、徽菜、旅行社、智慧旅游六业务。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-BS-01",
+              "F-BS-02",
+              "F-BS-03",
+              "F-BS-04",
+              "F-BS-05",
+              "F-BS-06"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600054-K02",
+          "dimension": "products_services",
+          "source_context_id": "600054-C2",
+          "expected": "景区观光休闲服务。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-PS-01"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600054-K03",
+          "dimension": "products_services",
+          "source_context_id": "600054-C2",
+          "expected": "索道缆车客运服务。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-PS-02"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600054-K04",
+          "dimension": "products_services",
+          "source_context_id": "600054-C2",
+          "expected": "酒店住宿餐饮与徽菜服务。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-PS-03",
+              "F-PS-04"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600054-K05",
+          "dimension": "products_services",
+          "source_context_id": "600054-C2",
+          "expected": "旅行社会展疗休养及智慧旅游/OTA服务。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-PS-05",
+              "F-PS-06"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600054-K06",
+          "dimension": "revenue_model",
+          "source_context_id": "600054-C3",
+          "expected": "观光、客运、旅宿、餐饮、旅行等服务收费是变现来源。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-RM-01"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600054-K07",
+          "dimension": "operations_and_inputs",
+          "source_context_id": "600054-C3",
+          "expected": "公司经营景区/索道、旅宿餐饮和旅行服务；计划不写成已发生，不套制造角色。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-RM-03"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600054-K08",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600054-C4",
+          "expected": "2025营业收入2,109,325,107.63元，可保210,932.51万元。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-SM-01",
+              "F-SM-08"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600054-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600054-C5",
+          "expected": "酒店营业收入492,026,389.87元。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-SM-03"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600054-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600054-C5",
+          "expected": "索道营业收入842,155,363.75元。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-SM-04"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600054-K11",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600054-C5",
+          "expected": "景区营业收入293,201,670.78元。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-SM-05"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600054-K12",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600054-C5",
+          "expected": "旅游服务532,255,057.39元、徽菜245,296,390.79元。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-SM-06",
+              "F-SM-07"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600054-K13",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600054-C5",
+          "expected": "行业表未合并抵销，不能直接相加作集团收入或集团占比分母。",
+          "current_comparison": {
+            "fact_ids": [
+              "F-RM-01"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        }
+      ],
+      "current_limits": "六业务和五行业金额可读，抵销前行业表不作集团分母；计划不当已发生。",
+      "supplemental_objects_audited_in_this_round": 0
+    },
+    {
+      "instrument_id": "600000.SH",
+      "name": "浦发银行",
+      "report_period": "2025-12-31",
+      "document_version": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+      "source_pdf": "/home/python/Quote/data/filings/announcements/blobs/e4/e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22.pdf",
+      "current_query": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-candidate-final-20261114/600000/query.json",
+      "current_query_sha256": "efe2f3670f383f72af6771cabfea70d16a5e5d2eeac601c0a27c2d59630bec73",
+      "fact_count": 69,
+      "metric_count": 56,
+      "model_review_status_not_quality_grade": "completed_with_open_findings",
+      "source_contexts": [
+        {
+          "condition_id": "600000-C1",
+          "dimension": "主营与边界",
+          "expected": "公司金融、零售、金融市场与机构、跨境境外四大业务，五大赛道与业务分部不强制互斥。",
+          "physical_pages": [
+            33,
+            62,
+            65,
+            68,
+            69
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 3.6 公司主要业务情况",
+            "第三节 管理层讨论与分析 / 3.2.2 做强五大赛道"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600000-C2",
+          "dimension": "产品服务",
+          "expected": "信贷存款结算投行交易财富托管跨境金融，服务企业个人金融机构，不套制造原料。",
+          "physical_pages": [
+            62,
+            65,
+            66,
+            68,
+            69
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 3.6 公司主要业务情况",
+            "第三节 管理层讨论与分析 / 3.2.2 做强五大赛道"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600000-C3",
+          "dimension": "变现",
+          "expected": "金融中介及金融服务、对公营业净收入685.79亿元、托管收入24.81亿元；净息差1.42%，完整利息/非息分解在未读3.7，不能用AUM补。",
+          "physical_pages": [
+            32,
+            62,
+            69
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 3.6 公司主要业务情况",
+            "第三节 管理层讨论与分析 / 3.2.2 做强五大赛道"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600000-C4",
+          "dimension": "公司收入",
+          "expected": "集团期间营业收入1739.64亿元，集团期末资产100817.46亿元、存款55824.35亿元等余额不当收入。",
+          "physical_pages": [
+            32
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 3.1 公司总体经营情况"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600000-C5",
+          "dimension": "主要构成",
+          "expected": "母公司对公存款38103.74亿元不升集团；托管20.21万亿元是规模，个人AUM46645.33亿元含市值；科技金融10470.92亿元保人民银行期末口径和服务超25.6万户。",
+          "physical_pages": [
+            34,
+            62,
+            66,
+            69
+          ],
+          "section_family": "公司从事业务/经营模式；管理层经营讨论；主营业务分析/收入成本分析（按当份目录）",
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 3.6 公司主要业务情况",
+            "第三节 管理层讨论与分析 / 3.2.2 做强五大赛道"
+          ],
+          "role": "independent_source_context_not_a_score_unit"
+        },
+        {
+          "condition_id": "600000-C6",
+          "dimension": "完整收入构成",
+          "expected": "单位人民币百万元，2025本集团：营业收入173964；利息净收入120483/69.26%；手续费及佣金净收入22725/13.06%；其他净收入30756/17.68%。业务总收入325269为gross，不能混作净收入分母。",
+          "physical_pages": [
+            71,
+            72
+          ],
+          "section_paths": [
+            "第三节 管理层讨论与分析 / 3.7 利润表分析 / 3.7.1 营业收入"
+          ],
+          "origin": "6.CA_and_6.CE_human_source_read",
+          "role": "independent_source_context_not_a_score_unit"
+        }
+      ],
+      "core_conditions": [
+        {
+          "condition_id": "600000-K01",
+          "dimension": "business_structure",
+          "source_context_id": "600000-C1",
+          "expected": "公司金融、零售、金融市场及机构、跨境境外四块，不与五大赛道强制互斥。",
+          "current_comparison": {
+            "fact_ids": [
+              "bs-01",
+              "bs-02",
+              "bs-03",
+              "bs-04",
+              "bs-05"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600000-K02",
+          "dimension": "products_services",
+          "source_context_id": "600000-C2",
+          "expected": "公司信贷、结算交易银行、投行等企业金融服务。",
+          "current_comparison": {
+            "fact_ids": [
+              "bs-02",
+              "ps-06",
+              "ps-07"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600000-K03",
+          "dimension": "products_services",
+          "source_context_id": "600000-C2",
+          "expected": "零售信贷、财富管理及个人金融服务。",
+          "current_comparison": {
+            "fact_ids": [
+              "bs-03",
+              "ps-08",
+              "ps-09"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600000-K04",
+          "dimension": "products_services",
+          "source_context_id": "600000-C2",
+          "expected": "金融市场投资交易、风险管理及托管服务。",
+          "current_comparison": {
+            "fact_ids": [
+              "bs-04",
+              "ps-10",
+              "ps-11"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600000-K05",
+          "dimension": "products_services",
+          "source_context_id": "600000-C2",
+          "expected": "跨境/境外综合金融服务。",
+          "current_comparison": {
+            "fact_ids": [
+              "bs-05"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600000-K06",
+          "dimension": "revenue_model",
+          "source_context_id": "600000-C6",
+          "expected": "本集团2025利息净收入120,483百万元，占营业收入69.26%。",
+          "current_comparison": {
+            "fact_ids": [],
+            "observation": "missing_not_selected_income_analysis",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600000-K07",
+          "dimension": "revenue_model",
+          "source_context_id": "600000-C6",
+          "expected": "本集团2025手续费及佣金净收入22,725百万元，占13.06%。",
+          "current_comparison": {
+            "fact_ids": [],
+            "observation": "missing_not_selected_income_analysis",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600000-K08",
+          "dimension": "revenue_model",
+          "source_context_id": "600000-C6",
+          "expected": "本集团2025其他净收入30,756百万元，占17.68%。",
+          "current_comparison": {
+            "fact_ids": [],
+            "observation": "missing_not_selected_income_analysis",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600000-K09",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600000-C4",
+          "expected": "本集团2025营业收入173,964百万元/1,739.64亿元，与业务总收入325,269百万元不同。",
+          "current_comparison": {
+            "fact_ids": [
+              "rm-01"
+            ],
+            "observation": "partial_answer_observed_net_gross_not_audited",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600000-K10",
+          "dimension": "scale_and_mix",
+          "source_context_id": "600000-C5",
+          "expected": "集团期间营收、集团资产与母公司余额分开；AUM/托管规模不是收入。",
+          "current_comparison": {
+            "fact_ids": [
+              "rm-01",
+              "sm-01",
+              "sm-05",
+              "sm-06",
+              "sm-09"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        },
+        {
+          "condition_id": "600000-K11",
+          "dimension": "operations_and_inputs",
+          "source_context_id": "600000-C2",
+          "expected": "银行面向企业、个人、金融机构提供金融服务，不套制造原料。",
+          "current_comparison": {
+            "fact_ids": [
+              "bs-02",
+              "bs-03",
+              "bs-04"
+            ],
+            "observation": "answer_observed_not_full_source_verdict",
+            "independent_full_source_verdict": null
+          }
+        }
+      ],
+      "current_limits": "当前69事实稿缺完整利息/手续费/其他净收入构成；人工补充不是模型结果，rm-06仍隔离。",
+      "supplemental_objects_audited_in_this_round": 0
+    }
+  ],
+  "risk_challenges": [
+    {
+      "category": "body",
+      "companies": [
+        "600082.SH",
+        "600097.SH"
+      ],
+      "source_pages": [
+        [
+          11
+        ],
+        [
+          8
+        ]
+      ],
+      "challenge": "园区运营/产业投资与商品代理贸易分主次；捕捞/加工/贸易/运输不混为单一加工服务。",
+      "source_context": "原独立source-first-reference.json同名风险；按当份章/节/页核主体、期间、表头和限定",
+      "positive_required": "园区运营/产业投资与商品代理贸易分主次；捕捞/加工/贸易/运输不混为单一加工服务。",
+      "prohibited_error": "将投资标的/非主业当本公司主业或只保一块业务",
+      "actual_negative_result": "not_evaluated_in_6.CE",
+      "pass_not_inferred_from_absence": true
+    },
+    {
+      "category": "income_columns_units",
+      "companies": [
+        "600094.SH",
+        "600107.SH"
+      ],
+      "source_pages": [
+        [
+          15,
+          16
+        ],
+        [
+          15,
+          16
+        ]
+      ],
+      "challenge": "金融投资及医疗本期空栏不借同比/利润或造零；表头收入和成本列不同。",
+      "source_context": "原独立source-first-reference.json同名风险；按当份章/节/页核主体、期间、表头和限定",
+      "positive_required": "金融投资及医疗本期空栏不借同比/利润或造零；表头收入和成本列不同。",
+      "prohibited_error": "空位借额、金额单位错读、收入成本互换",
+      "actual_negative_result": "not_evaluated_in_6.CE",
+      "pass_not_inferred_from_absence": true
+    },
+    {
+      "category": "subject_period",
+      "companies": [
+        "600094.SH",
+        "600107.SH"
+      ],
+      "source_pages": [
+        [
+          10
+        ],
+        [
+          15
+        ]
+      ],
+      "challenge": "被投6G/飞行器公司不当上市公司自产；处置在本期影响不强推为本期处置事件。",
+      "source_context": "原独立source-first-reference.json同名风险；按当份章/节/页核主体、期间、表头和限定",
+      "positive_required": "被投6G/飞行器公司不当上市公司自产；处置在本期影响不强推为本期处置事件。",
+      "prohibited_error": "被投/子公司事实升为集团自产、本期影响误作本期发生",
+      "actual_negative_result": "not_evaluated_in_6.CE",
+      "pass_not_inferred_from_absence": true
+    },
+    {
+      "category": "purchase_sale_direction",
+      "companies": [
+        "600098.SH",
+        "600103.SH"
+      ],
+      "source_pages": [
+        [
+          9
+        ],
+        [
+          11
+        ]
+      ],
+      "challenge": "外购煤气油、自产电汽与销售分开；木竹片挂牌采购非产品销售。",
+      "source_context": "原独立source-first-reference.json同名风险；按当份章/节/页核主体、期间、表头和限定",
+      "positive_required": "外购煤气油、自产电汽与销售分开；木竹片挂牌采购非产品销售。",
+      "prohibited_error": "采购当销售、贸易当自产",
+      "actual_negative_result": "not_evaluated_in_6.CE",
+      "pass_not_inferred_from_absence": true
+    },
+    {
+      "category": "associated_leasing",
+      "companies": [
+        "600088.SH",
+        "600082.SH"
+      ],
+      "source_pages": [
+        [
+          11,
+          17
+        ],
+        [
+          15,
+          16
+        ]
+      ],
+      "challenge": "影视设备出租与租赁成本区分；园区出租运营与土地建安成本/融资租赁还款区分；本范围不声称关联交易全查。",
+      "source_context": "原独立source-first-reference.json同名风险；按当份章/节/页核主体、期间、表头和限定",
+      "positive_required": "影视设备出租与租赁成本区分；园区出租运营与土地建安成本/融资租赁还款区分；本范围不声称关联交易全查。",
+      "prohibited_error": "出租收入与租入成本/融资还款混淆；不得据此声称关联交易全查",
+      "actual_negative_result": "not_evaluated_in_6.CE",
+      "pass_not_inferred_from_absence": true
+    },
+    {
+      "category": "financial_disclosure",
+      "companies": [
+        "600098.SH",
+        "600104.SH",
+        "600000.SH"
+      ],
+      "source_pages": [
+        [
+          9,
+          10,
+          17,
+          18,
+          19
+        ],
+        [
+          9,
+          10,
+          11
+        ],
+        [
+          32,
+          62,
+          69
+        ]
+      ],
+      "challenge": "能源金融和汽车金融并非全集团银行；营业收入/营业总收入不同，存贷/AUM/托管余额不当期间收入。",
+      "source_context": "原独立source-first-reference.json同名风险；按当份章/节/页核主体、期间、表头和限定",
+      "positive_required": "能源金融和汽车金融并非全集团银行；营业收入/营业总收入不同，存贷/AUM/托管余额不当期间收入。",
+      "prohibited_error": "营业总收入/营业收入/余额/AUM混为同一收入",
+      "actual_negative_result": "not_evaluated_in_6.CE",
+      "pass_not_inferred_from_absence": true
+    }
+  ],
+  "next_audit_method": {
+    "core": "所有适用核心条件及支持对象逐原文检查；明确满足/部分/未满足/未读，核心召回按公司和维度分别列。不可比口径不强加总。",
+    "accuracy": "核心及全部高风险疑点全查；每家补充唯一对象至少20、不足全查，去重后按验收计划分列，未核项不默认正确。",
+    "sampling_seed": "company-profile-core-20261114.v1",
+    "supplemental_selection": "冻结seed+instrument_id+fact_id的SHA256升序，在非核心剩余唯一事实中按含metric/非metric两层轮取；不足时该层全取并从另一层补足。额外加查全部疑点，不重复计分。",
+    "negative": "六类各至少两家公司实源挑战；必须实际触发并评估。未输出错误句不算通过；正式core/补充/负例分列。",
+    "thresholds": "不改验收计划§4-6；公司已审准确率98%、核心召回90%仅为公司分级，S1仍要求12家核心正反例全部通过。",
+    "version": "运行前冻结源码/处理身份/模型及thinking/prompt/guide/preprocess/source_binding_policy；整组不热修，旧稿不拼新同版成绩。"
+  },
+  "new_run_authority": "none; requires one explicit new bounded group approval"
+}

@@ -38,6 +38,7 @@ def workpaper_processing_identity(
         "prompt_version": WORKPAPER_PROMPT_VERSION,
         "section_guide_version": SECTION_GUIDE_VERSION,
         "preprocessing_version": "toc_sections_native_layout.v2",
+        "source_binding_policy": "company_workpaper_source_literals.signed-rate.v1",
         "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
         "execution_mode": "provider" if real else "offline_fake",
         "semantic_reuse": False,

@@ -1,0 +1,52 @@
+{
+  "task": "6.CE",
+  "new_model_requests": 0,
+  "sendable_bindings": 0,
+  "old_profiles_modified": false,
+  "current_readable_workpapers": 12,
+  "total_facts": 547,
+  "total_metrics": 694,
+  "formal_s1_usable": 0,
+  "core_condition_count": 133,
+  "count_meaning": "条件是后续独立审核单位，本轮不是逐条件通过分母；当前文字对照不是准确率。",
+  "main_blockers": [
+    {
+      "instrument_id": "600107.SH",
+      "type": "program_isolation_of_core_fact",
+      "explanation": "原真实F011已有总收入/亏损；方向词同比下降无字面负号导致整条误隔离。原绑定器窄修后本地可消费，不更新旧33事实/复核checked集合。",
+      "evidence": "mei-f011-source-binding.json"
+    },
+    {
+      "instrument_id": "600000.SH",
+      "type": "section_selection_omission",
+      "explanation": "选读业务与经营摘要，未完整选入3.7.1营业收入；净利息、手续费佣金及其他净收入构成缺失。指引v2已改，真实效果仍待同版观察。"
+    }
+  ],
+  "remaining_readiness": {
+    "full_current_core_source_audit": "not_completed_not_claimed",
+    "supplemental_audit": "not_performed",
+    "six_risk_actual_challenges": "not_performed",
+    "new_same_version_business_result": "not_started",
+    "formal_standard_efficiency": "not_proven",
+    "reliable_total_price": "unknown",
+    "production": "not_authorized"
+  },
+  "verification": {
+    "targeted_tests": {
+      "passed": 78,
+      "deselected": 4,
+      "seconds": 15.96,
+      "command": "bash scripts/quote_dev_env.sh /home/python/miniconda3/envs/Quote/bin/python -m pytest -q --confcutdir=tests/unit/test_research tests/unit/test_research/test_company_profile_workpaper_source_cells.py tests/unit/test_research/test_company_profile_workpaper_local_consumption.py tests/unit/test_research/test_company_profile_workpaper_review.py -k 'not task_service and not runtime_seed'"
+    },
+    "old_query_hashes": "12/12 unchanged; all current comparison fact IDs exist; original Mei query and raw hashes unchanged",
+    "formal_pdf_hashes": "12/12 matched frozen document versions",
+    "openspec_strict": "passed; subsequent unrelated PostHog telemetry DNS failure does not change validation result",
+    "review": "blocking P1 core-fact false isolation fixed and directly tested; nonblocking full supplemental audit and real risk challenges deferred to the bounded group; pre-existing changes protected"
+  },
+  "cleanup": {
+    "new_persistent_runtime_roots": 0,
+    "temporary_runtime_artifacts_created": 0,
+    "bytes_released": 0,
+    "protected": "正式PDF/有效解析缓存、旧raw/query/review/attempt、开工既有及并行改动；不重报6.CD的2117125字节"
+  }
+}

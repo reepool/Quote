@@ -6,6 +6,8 @@
 
 ## 1. 目标与完成边界
 
+2026-11-14 6.CE零新调用交[12稿核心结论/133源条件](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-core-readiness-20261114/result.md)：12稿547事实/694数字仅内容量；每家10–13项核心及六类风险的源/版本和现稿文字对应已整理，尚未完成逐对象完整核源、补充抽审与实际负例，不造正式准确率/召回或同版成绩。美尔雅总收入/亏损原F011已抽取，只因方向比率无字面负号被误隔离；原绑定器最小修正/保存真实响应本地源核通过，不回写旧稿或扩大checked集合。浦发完整收入构成仍缺，通用选章指引真实效果待测。下一6.CF只拟原12家当前同版全新开发回归，仍须新明确整组外传/调用批准；拟1800秒/500000/10物理含3恢复/并发4，开发与正式900秒/120000/16及价格unknown分列，不自动计S1或启生产。0新绑定/模型、0新运行根、释放0，原源/结果/尝试标记及既有并行保护。
+
 2026-11-14 6.CD用户明确批准后真实final1/1完成：[39事实/80数字上汽修订后稿](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-saic-candidate-final-20261114/profiles.md)。六候选全部接受并实际采纳，4条纠正恢复/2新增，原33对象/实际generation/Evidence不变、三读一致；F09仍拒、F03/F04/F07仍隔离，不洗白剩余问题。仅1新Grok high请求/25234实际total usage/0恢复/117.447业务秒，准备33.523秒单列、unknown；旧130666用量和原失败继承不重计。源码/共享配置/原source/seed/raw/pending及wire候选/原文hash冻结相同，有限6修改核源通过，非39条全准确或同版12/12/S1；旧S1仍0/12、生产不启。本人2117125字节清，正式源/缓存/原件/attempt/既有并行保护。本卡权限用完，停止上汽细项补跑，下一转现有12稿核心质量结论与正式同版验收准备，不自动再核/扩样。
 
 2026-11-14 6.CC零新调用修订逐项隔离已交：[六待核候选/一拒绝及原稿](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-repair-isolation-result-20261114/profiles.md)。policy v3只改源检查失败的局部消费，未知/重复目标仍全拒、数字/单位/证据约束不松；68直接15.55秒通过。上汽原40合法初稿/原review/repair精确seed hash接续，经原TaskService只到final边界离线拒绝；6合法候选到达、F09仍拒，33独立正文/原generation/三读/原hash不变、0采纳。本轮0模型/探针/可发送绑定，不改6.CB原1/1、130666账本、S1或生产。下一6.CD只拟六候选一次Grok high final，900秒/300000/2物理含1恢复，新明确批准前不发送、不重跑前段/追加修订或补F09；原其他缺口继续限用。本人2057290字节已收尾清，正式源/缓存/旧失败/attempt/既有并行保护。

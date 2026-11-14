@@ -115,3 +115,37 @@ def test_legacy_valid_literal_alias_is_not_rewritten_on_read():
     data = metric(raw_value="2.19个百分点", value="2.19", unit="个百分点", source_unit="个百分点")
     actual = WorkpaperMetric.model_validate(data)
     assert actual.unit == actual.source_unit == "个百分点" and actual.value == "2.19"
+
+
+def test_new_processing_identity_versions_signed_source_rate_binding():
+    from research.company_profile.workpaper_llm import workpaper_processing_identity
+
+    for real in (False, True):
+        identity = workpaper_processing_identity(real=real)
+        assert identity["source_binding_policy"] == "company_workpaper_source_literals.signed-rate.v1"
+        assert identity["semantic_reuse"] is False
+
+
+@pytest.mark.parametrize("wording,unit", [
+    ("，同比下降 28.32%。", "%"), ("；环比减少28.32％。", "%"),
+    ("\n同比降低28.32个百分点。", "百分点"),
+])
+def test_explicit_period_rate_decline_can_support_signed_change(wording, unit):
+    data = metric(name="收入同比变动", raw_value="-28.32", value="-28.32",
+                  unit=unit, source_unit=unit, currency=None)
+    fact, evidence = source_check(data, "公司营业收入100元" + wording)
+    assert fact.metrics[0].value == "-28.32" and evidence.source_spans[0].quote.endswith(wording)
+
+
+@pytest.mark.parametrize("quote,unit", [
+    ("公司营业收入100元，同比增加28.32%。", "%"),
+    ("公司营业收入100元，未同比下降28.32%。", "%"),
+    ("公司营业收入100元，没有同比下降28.32%。", "%"),
+    ("公司营业收入100元，同比下降28.33%。", "%"),
+    ("公司营业收入100元，同比下降28.32个百分点。", "%"),
+    ("公司营业收入100元，同比下降28.32%。", "元"),
+])
+def test_rate_wording_does_not_supply_wrong_sign_magnitude_unit_or_absolute_loss(quote, unit):
+    with pytest.raises(ValueError, match="absent"):
+        source_check(metric(raw_value="-28.32", value="-28.32", unit=unit,
+                            source_unit=unit, currency=None), quote)

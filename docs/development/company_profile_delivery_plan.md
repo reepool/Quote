@@ -1,5 +1,7 @@
 # 公司画像交付路径与开发任务卡
 
+2026-11-14当前6.CE已交[12稿核心对照与133源条件](../../openspec/changes/restore-company-profile-llm-led-generalization/workpaper-core-readiness-20261114/result.md)。停止上汽细项补卡；美尔雅核心误隔离最小修正已本地证实，浦发收入构成选章缺口待真实验证。下一唯一候选为[章节卡6.CF](../../openspec/changes/restore-company-profile-llm-led-generalization/company-profile-chapter-workpaper-card.md#下一6cf133核心条件下的12家同版内容与安全回归待新授权)原12家一次同版整组内容/安全开发回归，先新明确整组授权再冻结执行，不自动续旧额度/运行、启S2或生产。现有跨版本稿不计正式S1；完整核源、补充抽审/六风险实测与常规效率仍未就绪，开发放宽额度不冒充正式资源达标。每轮先清后做、持久必要一套后收尾，源/原件/既有并行保护。
+
 > 类型：requirements / execution plan；版本：3；更新：2026-11-10。
 > 业务定义见[产品总需求](company_profile_product_and_industry_semantic_requirements.md)，全部数值门槛/预算/进度只以[验收计划v2](company_profile_acceptance_program.md)为准；本文件不复制成绩台账。
 > 唯一实施change：[restore-company-profile-llm-led-generalization](../../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)。当前[直接实施交接§258](../../openspec/changes/restore-company-profile-llm-led-generalization/review-submission.md#258-直接实施v9章节底稿与两家公司真实交付)：本会话按用户新授权已完成人工参考、标题树选章、章节/表格包、同结构真实抽取与原owner读回。上汽、浦发各有可读pending底稿，6.BA结束；正式S1/生产仍未评估。下一步直接以这两份内容检查遗漏、推进更多报告消费，非阻塞细节后置，不恢复旧卡或逐字段等待B。以下历次“当前”均为历史上下文；每轮先清后做、必要交付一套后清本人过程物。
