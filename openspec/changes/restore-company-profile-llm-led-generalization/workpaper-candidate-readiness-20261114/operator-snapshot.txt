@@ -1,0 +1,157 @@
+"""Original TaskService continuation of BX real candidates; network is forbidden."""
+import asyncio
+import copy
+import hashlib
+import json
+from pathlib import Path
+import socket
+import sys
+from tempfile import TemporaryDirectory
+import time
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0, str(ROOT))
+CHANGE = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+DEST = CHANGE / 'workpaper-candidate-readiness-20261114'
+
+def no_network(*args, **kwargs):
+    raise AssertionError('6.BY forbids network')
+socket.create_connection = no_network
+socket.getaddrinfo = no_network
+
+from research.announcements import AnnouncementAttachment, AnnouncementRecord
+from research.business_profile_production_operations import BusinessProfileAnnouncementFrontierRepository
+from research.company_profile.operations import CompanyProfileTaskService
+from research.company_profile.reads import CompanyProfileReadService
+from research.company_profile.workpaper import CompanyProfileWorkpaper
+from research.company_profile.workpaper_llm import workpaper_processing_identity
+from research.company_profile.workpaper_review import workpaper_hash
+from research.company_profile.workpaper_sections import extract_selected_layout
+from research.storage import ResearchStorageManager
+from utils.config_manager import ResearchConfig, ResearchStorageConfig
+
+def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+def dump(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+def facts(paper):
+    parts = [*paper.elements.__dict__.values(), *(paper.supply_chain.__dict__.values() if paper.supply_chain else [])]
+    return {f.fact_id: f.model_dump(mode='json') for part in parts for f in part.facts}
+
+class FinalBoundary:
+    offline_only = True
+    workpaper_receipts = ()
+    def __init__(self): self.requests = []
+    def workpaper_request(self, **request):
+        assert request['purpose'] == 'verify_profile_workpaper_repair'
+        self.requests.append(request)
+        raise ValueError('offline_final_not_authorized: no new model request')
+
+def consume(symbol, storage, root):
+    started = time.monotonic()
+    run = CHANGE / 'workpaper-runs' / ('v10-remaining-pool-' + symbol + '-20261114')
+    paths = [run / name for name in ('query.json', 'model-receipts.json', 'binding.json')]
+    hashes = {str(path.relative_to(ROOT)): sha(path) for path in paths}
+    data = json.loads(paths[0].read_text())['profiles'][0]['workpaper']
+    old = CompanyProfileWorkpaper.model_validate(data)
+    receipts = json.loads(paths[1].read_text())
+    for receipt in receipts:
+        assert hashlib.sha256(receipt['raw_content'].encode()).hexdigest() == receipt['response_hash']
+        assert json.loads(receipt['raw_content']) == receipt['response_payload']
+    by_purpose = {r['purpose']: r for r in receipts}
+    review, repair = by_purpose['review_profile_workpaper'], by_purpose['repair_profile_workpaper']
+    assert repair['contract_status'] == 'rejected'
+    # Restore only the old initial objects/order. New binding would recover extra
+    # facts and invalidate this original review's checked-set and exact draft hash.
+    seed_data = copy.deepcopy(data)
+    quality = seed_data['quality_review']
+    seed_data['quality_review'] = None
+    raw = by_purpose['extract_profile_workpaper']['response_payload']
+    for name, element in seed_data['elements'].items():
+        original = {f['fact_id']: f for f in element['facts']}
+        original.update({f['affected_fact_id']: f['original_fact'] for f in quality['findings']
+                         if f['element'] == name and f['original_fact'] is not None})
+        element['facts'] = [original[f['fact_id']] for f in raw['elements'][name]['facts'] if f['fact_id'] in original]
+    seed = CompanyProfileWorkpaper.model_validate(seed_data)
+    assert workpaper_hash(seed) == quality['original_draft_hash']
+    asset = json.loads(paths[2].read_text())['asset']
+    assert sha(Path(asset['archive_path'])) == seed.report.document_version
+    pages = extract_selected_layout(Path(asset['archive_path']).read_bytes(), sorted({s.page for e in seed.evidence for s in e.source_spans}))
+    seed.validate_pages(pages)
+    resume = {'original_draft_hash': workpaper_hash(seed), 'document_version': seed.report.document_version,
+              'review_response': review['response_payload'], 'repair_response': repair['response_payload'],
+              'receipts': [review, repair], 'revalidate_rejected_repair': True}
+    identity = workpaper_processing_identity(real=False, review=True)
+    identity.update(review_existing_draft_hash=workpaper_hash(seed),
+                    review_resume_hash=hashlib.sha256(json.dumps(resume, ensure_ascii=False, sort_keys=True).encode()).hexdigest(),
+                    quality_review_profile='semantic_extraction__scorpio_grok', review_max_output_tokens=16384)
+    provider = FinalBoundary()
+    service = CompanyProfileTaskService(storage=storage, output_root=root / symbol / 'output',
+        checkpoint_root=root / symbol / 'checkpoints', provider=provider, processing_identity=identity,
+        page_source=lambda _: {'report': seed.report, 'pages': pages, 'source_pdf_path': asset['archive_path'],
+                               'review_seed': seed, 'review_resume': resume})
+    execution = asyncio.run(service.execute('run', knowledge_cutoff='2026-11-14',
+        instrument_ids=(seed.report.instrument_id,), max_items=1, max_elapsed_seconds=180))
+    assert execution['state'] == 'completed' and len(provider.requests) == 1
+    query = asyncio.run(service.execute('query', instrument_ids=(seed.report.instrument_id,)))
+    exported = asyncio.run(service.execute('export', instrument_ids=(seed.report.instrument_id,), output_directory=DEST / symbol))
+    reloaded = CompanyProfileReadService(root / symbol / 'output').query((seed.report.instrument_id,))
+    assert query['profiles'] == exported['profiles'] == reloaded['profiles']
+    paper = CompanyProfileWorkpaper.model_validate(query['profiles'][0]['workpaper'])
+    assert facts(paper) == facts(old) and paper.origin == 'llm_generated' and paper.generation == old.generation
+    assert paper.quality_review.status == 'incomplete' and 'offline_final_not_authorized' in paper.quality_review.error
+    assert paper.quality_review.locally_revalidated_request_ids == (repair['request_id'],)
+    assert {c.request_id for c in paper.quality_review.calls} == {review['request_id'], repair['request_id']}
+    candidates = provider.requests[0]['payload']['candidates']
+    assert len(candidates) == (6 if symbol == '600082' else 4)
+    assert all(f.resolution != 'corrected_pending_trust' for f in paper.quality_review.findings)
+    assert query['profiles'][0]['core_complete'] is False
+    paper.validate_pages(pages)
+    dump(DEST / symbol / 'query.json', query)
+    dump(DEST / symbol / 'pending-candidates.json', {'status': 'source_checked_locally_not_model_verified',
+        'candidate_ids': [c['fact_id'] for c in candidates], 'candidates': candidates,
+        'source_text_sha256': hashlib.sha256(provider.requests[0]['payload']['source_text'].encode()).hexdigest()})
+    summary = {'task': '6.BY', 'instrument_id': seed.report.instrument_id, 'entry': 'CompanyProfileTaskService.execute(run)',
+        'mode': 'offline_retained_response_consumption', 'new_model_calls': 0, 'new_model_ledger': 0,
+        'original_hashes': hashes, 'original_seed_hash_matches': True, 'old_repair_rejection_preserved': True,
+        'original_facts_unchanged': True, 'retained_facts': len(facts(paper)), 'candidates': len(candidates),
+        'only_next_logical_purpose': 'verify_profile_workpaper_repair', 'no_candidate_adopted': True,
+        'three_reads_equal': True, 'source_coordinates_equal': True,
+        'seconds': round(time.monotonic() - started, 3), 'production_authorization': 'not_authorized'}
+    for path, expected in hashes.items(): assert sha(ROOT / path) == expected
+    dump(DEST / symbol / 'validation.json', summary)
+    print('RESULT ' + json.dumps(summary, ensure_ascii=False), flush=True)
+    return summary
+
+def main():
+    with TemporaryDirectory(prefix='workpaper-by-entry-') as directory:
+        root = Path(directory)
+        db = str(root / 'research.db')
+        storage = ResearchStorageManager(ResearchConfig(storage=ResearchStorageConfig(db_path=db,
+            financials_db_path=db, valuation_db_path=db, interests_db_path=db,
+            quotes_db_path=str(root / 'quotes.db'), attach_quotes_db=False)))
+        prepare_start = time.monotonic()
+        storage.initialize()
+        for symbol in ('600082', '600000'):
+            run = CHANGE / 'workpaper-runs' / ('v10-remaining-pool-' + symbol + '-20261114')
+            asset = json.loads((run / 'binding.json').read_text())['asset']
+            source_items = json.loads((CHANGE / 'workpaper-quality-and-regression-readiness-20261113/source-readiness.json').read_text())['companies']
+            source_item = next(i for i in source_items if i['instrument_id'] == asset['instrument_id'])
+            announcement = json.loads((ROOT / source_item['source_binding']).read_text())['announcement']
+            BusinessProfileAnnouncementFrontierRepository(storage).upsert_record(
+                instrument={'instrument_id': symbol + '.SH', 'symbol': symbol, 'exchange': 'SSE'},
+                record=AnnouncementRecord(source='cninfo', source_announcement_id=asset['filing_id'],
+                    announcement_key='cninfo:' + asset['filing_id'], title=announcement['title'],
+                    published_at=asset['published_at'], exchange='SSE', symbols=(symbol,),
+                    attachments=(AnnouncementAttachment(source_url=announcement['source_url'],
+                        file_extension='PDF'),)))
+        preparation_seconds = round(time.monotonic() - prepare_start, 3)
+        results = [consume(symbol, storage, root) for symbol in ('600082', '600000')]
+        cleanup_bytes = sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
+    assert not root.exists()
+    dump(DEST / 'validation.json', {'task': '6.BY', 'results': results, 'new_model_calls': 0,
+        'new_model_ledger': 0, 'storage_preparation_seconds': preparation_seconds,
+        'runtime_cleanup_bytes': cleanup_bytes})
+    print('DONE cleanup_bytes=' + str(cleanup_bytes), flush=True)
+
+if __name__ == '__main__': main()

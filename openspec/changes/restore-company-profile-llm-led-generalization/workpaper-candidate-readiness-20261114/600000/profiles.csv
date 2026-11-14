@@ -1,0 +1,6 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600000.SH,2025-12-31,2026-03-30T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,llm_generated,"公司为银行类金融机构，主要业务分为公司金融业务、零售金融业务、金融市场与金融机构业务、跨境及境外机构业务等板块，并以“五大赛道”（科技金融、供应链金融、普惠金融、跨境金融、财资金融）作为数智化战略在业务层面落地的主要领域。
+公司金融业务涵盖商业信贷、交易银行、投资银行、电子银行、跨境业务、离岸业务等多个领域，并推动“四层四类”公司客户经营体系建设。
+零售金融业务涵盖零售客户经营、零售贷款、财富管理、传承保障、借记卡、信用卡、养老金融等，公司以数智化、均衡化、专业化、生态化推进零售业务。
+金融市场与金融机构业务以“自营投资交易+浦银避险代客”双核驱动，并包含金融机构客户经营、投资交易、浦银避险、资产托管等业务。
+跨境及境外机构业务依托离岸银行、自贸金融、境外分行和海外投行等多平台协同，重点打磨自贸业务、跨境电商、跨境避险、跨境资金管理、跨境并购、跨境贸易、跨境资产托管、跨境人民币等场景。",65,46,incomplete,5,deepseek-flash,grok-4.7

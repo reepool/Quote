@@ -44,10 +44,20 @@ New workpapers MUST retain source qualifications such as approximate values, bou
 #### Scenario: A returned fact has an invalid metric representation
 - **WHEN** a schema-valid draft contains a fact that fails local validation only within its metrics, such as an inconsistent raw qualifier or a null normalized value without the required reason
 - **THEN** the extraction adapter MUST withhold that complete fact and retain independent valid facts, its original raw response, affected fact ID and concrete validation reason
-- **AND** the adapter MUST NOT guess a missing qualifier, value, unit or reason; direct typed validation and non-metric/source identity errors remain strict, and program isolation notes survive later review scope changes
+- **AND** the adapter MUST NOT guess a missing qualifier, value, unit or source explanation; a literal approximate/bounded raw value with null MAY carry an explicit program-only non-normalization note rather than an invented source reason, while contradictory qualifiers, non-metric/source identity errors and unsourced original wording remain invalid, and program isolation notes survive later review scope changes
 
 ### Requirement: Metric standardization preserves source meaning and audit history
 New workpaper binding and repaired projections MUST clear currency on dimensionless ratios. A rate difference expressed as percentage points MUST remain distinct from relative percentage growth. Standardization MAY retain a source_unit beside the normalized unit, MUST preserve the raw source spelling and decimal value, and MUST leave an auditable note. It MUST NOT guess currency conversions, magnitudes, subject scope or rate-change meaning from a bare number. Historical workpaper files MUST NOT be rewritten by reading them.
+
+#### Scenario: A monetary table wraps one cell over an explicit continuation row
+- **WHEN** a cited fixed-layout monetary table has a unique aligned numeric continuation and a matching wrapped percentage-point cell identifying the same continued row
+- **THEN** source validation MAY join only those same-column cell fragments without changing the immutable quote or coordinates
+- **AND** it MUST reject cross-column concatenation, changed digits and ambiguous or unmarked row joins; this is not permission to remove arbitrary whitespace or combine figures from different rows/pages
+
+#### Scenario: An approximate null has no model-authored uncertainty explanation
+- **WHEN** an original metric explicitly retains 近/约/超/突破 and null but omits its explanation
+- **THEN** the local representation MAY add a program-only note that the original qualification was retained and no exact value was normalized, with the raw response and source wording still verified and unchanged
+- **AND** it MUST NOT fabricate a numeric value or source explanation, override a contradictory qualifier, or treat local decoding as a confirmed final review
 
 #### Scenario: A literal percentage-point suffix repeats the declared unit
 - **WHEN** a returned raw value ends in 个百分点 while its declared unit is 百分点 and its same-unit decimal reference agrees

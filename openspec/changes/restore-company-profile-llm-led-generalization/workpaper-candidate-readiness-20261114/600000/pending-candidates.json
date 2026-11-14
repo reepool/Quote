@@ -1,0 +1,190 @@
+{
+  "status": "source_checked_locally_not_model_verified",
+  "candidate_ids": [
+    "bs-06",
+    "review-add:F002",
+    "review-add:F004",
+    "review-add:F005"
+  ],
+  "candidates": [
+    {
+      "fact_id": "bs-06",
+      "text": "公司通过集团子公司开展资产管理等业务，报告期内，浦银理财、上海信托、浦银安盛基金和浦银国际四家子公司的资产管理规模合计突破3万亿元，达3.36万亿元。",
+      "subject_scope": "consolidated_group",
+      "period": "报告期内",
+      "evidence_ids": [
+        "source-0010"
+      ],
+      "metrics": [],
+      "uncertainty_reason": null
+    },
+    {
+      "fact_id": "review-add:F002",
+      "text": "报告期内，本集团归属于母公司股东的扣除非经常性损益的净利润501.44亿元，同比增加59.37亿元，增长13.43%。",
+      "subject_scope": "consolidated_group",
+      "period": "报告期内",
+      "evidence_ids": [
+        "source-0001"
+      ],
+      "metrics": [
+        {
+          "name": "归属于母公司股东的扣除非经常性损益的净利润",
+          "raw_value": "501.44",
+          "value": "501.44",
+          "unit": "亿元",
+          "source_unit": "亿元",
+          "currency": "CNY",
+          "subject_scope": "consolidated_group",
+          "period": "报告期内",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "归属于母公司股东的扣除非经常性损益的净利润同比增加额",
+          "raw_value": "59.37",
+          "value": "59.37",
+          "unit": "亿元",
+          "source_unit": "亿元",
+          "currency": "CNY",
+          "subject_scope": "consolidated_group",
+          "period": "报告期内",
+          "comparison_basis": "同比",
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "归属于母公司股东的扣除非经常性损益的净利润同比增长率",
+          "raw_value": "13.43",
+          "value": "13.43",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "报告期内",
+          "comparison_basis": "同比",
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        }
+      ],
+      "uncertainty_reason": null
+    },
+    {
+      "fact_id": "review-add:F004",
+      "text": "报告期内，全行国内贸易融资总业务量突破2.8万亿元，同比增幅16.5%；公司主承销债券2,032只，主承销金额6,407.78亿元，其中承销债务融资工具4,721.11亿元。",
+      "subject_scope": "issuer",
+      "period": "报告期内",
+      "evidence_ids": [
+        "source-0014"
+      ],
+      "metrics": [
+        {
+          "name": "国内贸易融资总业务量",
+          "raw_value": "突破2.8万亿元",
+          "value": null,
+          "unit": "万亿元",
+          "source_unit": "万亿元",
+          "currency": "CNY",
+          "subject_scope": "issuer",
+          "period": "报告期内",
+          "comparison_basis": null,
+          "qualifier": "greater_than",
+          "uncertainty_reason": "程序说明：保留原文限定，未作精确数值标准化。"
+        },
+        {
+          "name": "国内贸易融资总业务量同比增幅",
+          "raw_value": "16.5",
+          "value": "16.5",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "issuer",
+          "period": "报告期内",
+          "comparison_basis": "同比",
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "主承销债券只数",
+          "raw_value": "2,032",
+          "value": "2032",
+          "unit": "只",
+          "source_unit": "只",
+          "currency": null,
+          "subject_scope": "issuer",
+          "period": "报告期内",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "主承销金额",
+          "raw_value": "6,407.78",
+          "value": "6407.78",
+          "unit": "亿元",
+          "source_unit": "亿元",
+          "currency": "CNY",
+          "subject_scope": "issuer",
+          "period": "报告期内",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "承销债务融资工具金额",
+          "raw_value": "4,721.11",
+          "value": "4721.11",
+          "unit": "亿元",
+          "source_unit": "亿元",
+          "currency": "CNY",
+          "subject_scope": "issuer",
+          "period": "报告期内",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        }
+      ],
+      "uncertainty_reason": null
+    },
+    {
+      "fact_id": "review-add:F005",
+      "text": "2025年集团本外币贷款（不含票据贴现）在生息资产日均占比提升近2个百分点；本外币存款在计息负债日均占比较上年提升近3个百分点。",
+      "subject_scope": "consolidated_group",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0001",
+        "source-0012"
+      ],
+      "metrics": [
+        {
+          "name": "本外币贷款（不含票据贴现）在生息资产日均占比提升幅度",
+          "raw_value": "近2",
+          "value": null,
+          "unit": "个百分点",
+          "source_unit": "个百分点",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "approximate",
+          "uncertainty_reason": "程序说明：保留原文限定，未作精确数值标准化。"
+        },
+        {
+          "name": "本外币存款在计息负债日均占比提升幅度",
+          "raw_value": "近3",
+          "value": null,
+          "unit": "个百分点",
+          "source_unit": "个百分点",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": "较上年",
+          "qualifier": "approximate",
+          "uncertainty_reason": "程序说明：保留原文限定，未作精确数值标准化。"
+        }
+      ],
+      "uncertainty_reason": null
+    }
+  ],
+  "source_text_sha256": "f4c9cfe34c4597caab131de4ca103defa7df9dbb30d519c4f3faac6322331b5a"
+}

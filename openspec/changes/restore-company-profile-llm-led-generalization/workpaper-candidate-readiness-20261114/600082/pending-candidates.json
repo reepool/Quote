@@ -1,0 +1,412 @@
+{
+  "status": "source_checked_locally_not_model_verified",
+  "candidate_ids": [
+    "review-add:R001",
+    "review-add:R002",
+    "review-add:R003",
+    "review-add:R004",
+    "F035",
+    "F027"
+  ],
+  "candidates": [
+    {
+      "fact_id": "review-add:R001",
+      "text": "报告期内，主营业务分行业/分产品情况显示：科技园区开发营业收入418,710,800.51元、营业成本341,118,587.17元、毛利率18.53%，营业收入比上年增35.15%、营业成本比上年增112.60%、毛利率比上年减少29.68个百分点；科技园区运营营业收入30,105,192.48元、营业成本14,372,966.79元、毛利率52.26%，营业收入比上年增11.60%、营业成本比上年增17.02%、毛利率比上年减少2.21个百分点。",
+      "subject_scope": "consolidated_group",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "metrics": [
+        {
+          "name": "科技园区开发营业收入",
+          "raw_value": "418,710,800.51",
+          "value": "418710800.51",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "CNY",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "科技园区开发营业成本",
+          "raw_value": "341,118,587.17",
+          "value": "341118587.17",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "CNY",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "科技园区开发毛利率",
+          "raw_value": "18.53",
+          "value": "18.53",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "科技园区开发营业收入比上年增减",
+          "raw_value": "35.15",
+          "value": "35.15",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": "上年同期",
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "科技园区开发营业成本比上年增减",
+          "raw_value": "112.60",
+          "value": "112.60",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": "上年同期",
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "科技园区开发毛利率比上年增减",
+          "raw_value": "减少29.68个百分点",
+          "value": null,
+          "unit": "个百分点",
+          "source_unit": "个百分点",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": "上年同期",
+          "qualifier": "exact",
+          "uncertainty_reason": "原文带增减方向及单位；保留原文，未统一为带符号数值。"
+        },
+        {
+          "name": "科技园区运营营业收入",
+          "raw_value": "30,105,192.48",
+          "value": "30105192.48",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "CNY",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "科技园区运营营业成本",
+          "raw_value": "14,372,966.79",
+          "value": "14372966.79",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "CNY",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "科技园区运营毛利率",
+          "raw_value": "52.26",
+          "value": "52.26",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "科技园区运营营业收入比上年增减",
+          "raw_value": "11.60",
+          "value": "11.60",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": "上年同期",
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "科技园区运营营业成本比上年增减",
+          "raw_value": "17.02",
+          "value": "17.02",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": "上年同期",
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "科技园区运营毛利率比上年增减",
+          "raw_value": "减少2.21个百分点",
+          "value": null,
+          "unit": "个百分点",
+          "source_unit": "个百分点",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": "上年同期",
+          "qualifier": "exact",
+          "uncertainty_reason": "原文带增减方向及单位；保留原文，未统一为带符号数值。"
+        }
+      ],
+      "uncertainty_reason": null
+    },
+    {
+      "fact_id": "review-add:R002",
+      "text": "报告期内，公司营业成本355,491,553.96元，较上年同期增加105.81%；主营业务合计毛利率20.87%，较上年减少27.97个百分点。",
+      "subject_scope": "consolidated_group",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0007",
+        "source-0008"
+      ],
+      "metrics": [
+        {
+          "name": "营业成本",
+          "raw_value": "355,491,553.96",
+          "value": "355491553.96",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "CNY",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "营业成本比上年增减",
+          "raw_value": "105.81",
+          "value": "105.81",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": "上年同期",
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "主营业务合计毛利率",
+          "raw_value": "20.87",
+          "value": "20.87",
+          "unit": "%",
+          "source_unit": "%",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "主营业务合计毛利率比上年增减",
+          "raw_value": "减少27.97个百分点",
+          "value": null,
+          "unit": "个百分点",
+          "source_unit": "个百分点",
+          "currency": null,
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": "上年同期",
+          "qualifier": "exact",
+          "uncertainty_reason": "原文带增减方向及单位；保留原文，未统一为带符号数值。"
+        }
+      ],
+      "uncertainty_reason": null
+    },
+    {
+      "fact_id": "review-add:R003",
+      "text": "主要子公司情况：天津海泰创意科技园投资有限公司（子公司，房地产开发）营业收入418,714,190.51元、净利润35,352,048.05元、净资产122,773,936.76元；天津百竹科技产业发展有限公司（子公司，房地产开发）总资产640,547,307.21元、净资产-4,265,299.72元、营业收入4,064,919.11元、净利润-3,007,898.85元。",
+      "subject_scope": "named_subsidiary",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0018"
+      ],
+      "metrics": [
+        {
+          "name": "天津海泰创意科技园投资有限公司营业收入",
+          "raw_value": "418,714,190.51",
+          "value": "418714190.51",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "CNY",
+          "subject_scope": "named_subsidiary",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "天津海泰创意科技园投资有限公司净利润",
+          "raw_value": "35,352,048.05",
+          "value": "35352048.05",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "CNY",
+          "subject_scope": "named_subsidiary",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "天津海泰创意科技园投资有限公司净资产",
+          "raw_value": "122,773,936.76",
+          "value": "122773936.76",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "CNY",
+          "subject_scope": "named_subsidiary",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "天津百竹科技产业发展有限公司总资产",
+          "raw_value": "640,547,307.21",
+          "value": "640547307.21",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "CNY",
+          "subject_scope": "named_subsidiary",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "天津百竹科技产业发展有限公司净资产",
+          "raw_value": "-4,265,299.72",
+          "value": "-4265299.72",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "CNY",
+          "subject_scope": "named_subsidiary",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "天津百竹科技产业发展有限公司营业收入",
+          "raw_value": "4,064,919.11",
+          "value": "4064919.11",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "CNY",
+          "subject_scope": "named_subsidiary",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        },
+        {
+          "name": "天津百竹科技产业发展有限公司净利润",
+          "raw_value": "-3,007,898.85",
+          "value": "-3007898.85",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "CNY",
+          "subject_scope": "named_subsidiary",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        }
+      ],
+      "uncertainty_reason": null
+    },
+    {
+      "fact_id": "review-add:R004",
+      "text": "所得税费用变动原因说明：所得税费用减少，主要系本期公司利润总额减少和递延所得税资产调整，当期所得税费用和递延所得税费用均减少所致。",
+      "subject_scope": "consolidated_group",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0007"
+      ],
+      "metrics": [],
+      "uncertainty_reason": "来源仅说明利润总额减少的方向，未披露利润总额金额。"
+    },
+    {
+      "fact_id": "F035",
+      "text": "2025年7月21日，公司召开2025年第一次临时股东会审议通过《关于转让全资子公司股权暨关联交易的议案》，将全资子公司天津海发方信置地有限公司100%股权以9,065.95万元价格转让给天津海泰房地产开发有限公司；报告期内已完成交易全款支付和股权交割，本期投资收益增加。",
+      "subject_scope": "consolidated_group",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0010",
+        "source-0019"
+      ],
+      "metrics": [
+        {
+          "name": "天津海发方信置地有限公司100%股权转让价格",
+          "raw_value": "9,065.95",
+          "value": "9065.95",
+          "unit": "万元",
+          "source_unit": "万元",
+          "currency": "CNY",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        }
+      ],
+      "uncertainty_reason": null
+    },
+    {
+      "fact_id": "F027",
+      "text": "公司主营业务全部为内销，分地区情况表内销营业收入449,240,562.34元与合计一致。",
+      "subject_scope": "consolidated_group",
+      "period": "2025年度",
+      "evidence_ids": [
+        "source-0008"
+      ],
+      "metrics": [
+        {
+          "name": "内销营业收入",
+          "raw_value": "449,240,562.34",
+          "value": "449240562.34",
+          "unit": "元",
+          "source_unit": "元",
+          "currency": "CNY",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "comparison_basis": null,
+          "qualifier": "exact",
+          "uncertainty_reason": null
+        }
+      ],
+      "uncertainty_reason": null
+    }
+  ],
+  "source_text_sha256": "6e3ed9682a9134a1bc0148c05e2b6cb18ec35383b9f874bb97abd7225a199ded"
+}

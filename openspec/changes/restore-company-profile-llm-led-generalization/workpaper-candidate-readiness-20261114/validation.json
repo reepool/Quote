@@ -1,0 +1,57 @@
+{
+  "task": "6.BY",
+  "results": [
+    {
+      "task": "6.BY",
+      "instrument_id": "600082.SH",
+      "entry": "CompanyProfileTaskService.execute(run)",
+      "mode": "offline_retained_response_consumption",
+      "new_model_calls": 0,
+      "new_model_ledger": 0,
+      "original_hashes": {
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v10-remaining-pool-600082-20261114/query.json": "35cdd748c84b1cf9790d1e68340016ef595566b035839bf4b6682324c4495529",
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v10-remaining-pool-600082-20261114/model-receipts.json": "b68272f800fe570aedffcbb86b12557ff1850a7efcc93d1872de657cd473aa82",
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v10-remaining-pool-600082-20261114/binding.json": "97477c5cb7dfe4f4fcc239b95c917631275c44a869517c523a3812a49f576f91"
+      },
+      "original_seed_hash_matches": true,
+      "old_repair_rejection_preserved": true,
+      "original_facts_unchanged": true,
+      "retained_facts": 36,
+      "candidates": 6,
+      "only_next_logical_purpose": "verify_profile_workpaper_repair",
+      "no_candidate_adopted": true,
+      "three_reads_equal": true,
+      "source_coordinates_equal": true,
+      "seconds": 24.355,
+      "production_authorization": "not_authorized"
+    },
+    {
+      "task": "6.BY",
+      "instrument_id": "600000.SH",
+      "entry": "CompanyProfileTaskService.execute(run)",
+      "mode": "offline_retained_response_consumption",
+      "new_model_calls": 0,
+      "new_model_ledger": 0,
+      "original_hashes": {
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v10-remaining-pool-600000-20261114/query.json": "e2fd13ba19fff80824fb8f17571d92896e65ef44aace3961cc2ec53e319e4aae",
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v10-remaining-pool-600000-20261114/model-receipts.json": "6cfdf6ea6f65374ea91a108632891b06e763dd2a34e5c8c6589a71f4597dd858",
+        "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-runs/v10-remaining-pool-600000-20261114/binding.json": "3d22c1baa9748f949cb1bdbcbf2226177a21bf95cf50a62aaad26ebb0faec77e"
+      },
+      "original_seed_hash_matches": true,
+      "old_repair_rejection_preserved": true,
+      "original_facts_unchanged": true,
+      "retained_facts": 65,
+      "candidates": 4,
+      "only_next_logical_purpose": "verify_profile_workpaper_repair",
+      "no_candidate_adopted": true,
+      "three_reads_equal": true,
+      "source_coordinates_equal": true,
+      "seconds": 21.649,
+      "production_authorization": "not_authorized"
+    }
+  ],
+  "new_model_calls": 0,
+  "new_model_ledger": 0,
+  "storage_preparation_seconds": 26.747,
+  "runtime_cleanup_bytes": 2804286
+}

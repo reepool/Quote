@@ -108,12 +108,14 @@ class WorkpaperMetric(_Model):
         if "qualifier" in data and data["qualifier"] != qualifier:
             raise ValueError("metric qualifier must match original raw value")
         result = {**data, "qualifier": qualifier}
+        if qualifier != "exact" and data.get("value") is None and not data.get("uncertainty_reason"):
+            result["uncertainty_reason"] = "程序说明：保留原文限定，未作精确数值标准化。"
         # Preserve a real returned source phrase rather than forcing a signed
         # number onto it. Only an agreeing same-unit reference can fall back;
         # a wrong sign/unit/value is still an error, not "uncertainty".
         if (raw.startswith(("增加", "减少")) and raw.endswith("个百分点")
-            and data.get("unit") == "百分点"
-            and data.get("source_unit") in (None, "百分点", "%", "％") and data.get("value") is not None):
+            and data.get("unit") in {"百分点", "个百分点"}
+            and data.get("source_unit") in (None, "百分点", "个百分点", "%", "％") and data.get("value") is not None):
             try:
                 amount = Decimal(raw[2:-len("个百分点")].strip())
                 reference = Decimal(str(data["value"]))
@@ -137,7 +139,7 @@ class WorkpaperMetric(_Model):
             raise ValueError("unknown unit requires a null normalized value")
         if self.source_unit and self.source_unit != self.unit and (
             self.source_unit, self.unit
-        ) not in {("%", "百分点"), ("％", "百分点")}:
+        ) not in {("%", "百分点"), ("％", "百分点"), ("个百分点", "百分点")}:
             raise ValueError("source_unit cannot relabel a numeric magnitude")
         raw_number = self.raw_value.strip()
         if self.qualifier != "exact":
@@ -210,6 +212,43 @@ class WorkpaperSupplyChain(_Model):
     downstream_customers: WorkpaperElement = Field(default_factory=_missing_supply_chain_element)
 
 
+def _wrapped_table_cells(quote: str) -> list[tuple[str, int, int]]:
+    """Read explicit same-column continuations, never arbitrary whitespace joins.
+
+    This narrow layout case has a monetary header, a wrapped change-in-points
+    cell marking the continued row, and uniquely aligned fractional digits.
+    Original quotes/coordinates are untouched; other damaged tables stay unclear.
+    """
+    cells = []
+    lines = quote.splitlines(keepends=True)
+    offset = 0
+    for upper, lower in zip(lines, lines[1:]):
+        change = re.search(r"(增加|减少)\s*(\d+(?:\.\d+)?)\s*$", upper.rstrip())
+        unit = re.search(r"个百分点\s*$", lower.rstrip())
+        header = re.search(r"单位\s*[:：]\s*(?:人民币\s*)?(亿元|万元|千元|元)", quote[:offset])
+        if change and unit and header and change.start() <= unit.start() <= change.end():
+            fragments = list(re.finditer(r"(?<![\d.,])-?\d[\d,]*(?:\.\d*)?(?![\d.,])", lower))
+            prefixes = list(re.finditer(r"(?<![\d.,])-?\d{1,3}(?:,\d{3})+\.(\d?)(?!\d)", upper))
+            joins = []
+            for fragment in fragments:
+                if not re.fullmatch(r"\d{1,2}", fragment.group()):
+                    break
+                aligned = [p for p in prefixes if abs(p.end() - fragment.end()) <= 2
+                           and len(p.group(1)) + len(fragment.group()) == 2]
+                if len(aligned) != 1:
+                    break
+                prefix = aligned[0]
+                joins.append((prefix.group() + fragment.group(), offset + prefix.start(), offset + prefix.end()))
+            else:
+                # The points cell and every numeric fragment belong to this row.
+                if len({start for _, start, _ in joins}) == len(joins):
+                    cells.extend(joins)
+                    cells.append((f"{change.group(1)}{change.group(2)}个百分点",
+                                  offset + change.start(), offset + change.end()))
+        offset += len(upper)
+    return cells
+
+
 def _check_fact_source(
     fact: WorkpaperFact, sources: Mapping[str, WorkpaperEvidence], *, check_units: bool = False,
 ) -> None:
@@ -221,12 +260,17 @@ def _check_fact_source(
         for span in sources[evidence_id].source_spans
         for value in re.findall(r"(?<![\d.])-?\d[\d,]*(?:\.\d+)?(?![\d.])", span.quote)
     }
+    cells = [cell for eid in fact.evidence_ids for span in sources[eid].source_spans
+             for cell in _wrapped_table_cells(span.quote)]
+    numbers.update(Decimal(text.replace(",", "")) for text, _, _ in cells
+                   if re.fullmatch(r"-?\d[\d,]*(?:\.\d+)?", text))
     for metric in fact.metrics:
         if check_units:
             _check_explicit_money_unit(metric, fact, sources)
         if metric.value is None:
             quoted = "".join(span.quote for eid in fact.evidence_ids for span in sources[eid].source_spans)
-            if "".join(metric.raw_value.split()) not in "".join(quoted.split()):
+            literal = "".join(metric.raw_value.split())
+            if literal not in "".join(quoted.split()) and not any(literal in text for text, _, _ in cells):
                 raise ValueError(f"uncertain metric original wording is absent from cited source: {metric.name}")
             continue
         if Decimal(metric.value) not in numbers:
@@ -256,16 +300,20 @@ def _check_explicit_money_unit(
     for eid in fact.evidence_ids:
         for span in sources[eid].source_spans:
             headers = list(re.finditer(r"(?:金额单位|单位)\s*[:：]\s*(?:人民币\s*)?(亿元|万元|千元|元)", span.quote))
-            for match in re.finditer(r"(?<![\d.])-?\d[\d,]*(?:\.\d+)?(?![\d.])", span.quote):
-                if Decimal(match.group().replace(",", "")) != reference:
+            matches = [(m.group(), m.start(), m.end()) for m in
+                       re.finditer(r"(?<![\d.])-?\d[\d,]*(?:\.\d+)?(?![\d.])", span.quote)]
+            matches.extend(cell for cell in _wrapped_table_cells(span.quote)
+                           if re.fullmatch(r"-?\d[\d,]*(?:\.\d+)?", cell[0]))
+            for text, start, end in matches:
+                if Decimal(text.replace(",", "")) != reference:
                     continue
                 # A paragraph may follow a table on the same source fragment.
                 # Its explicit amount suffix owns the unit, not that old header.
-                inline = re.match(r"\s*(亿元|万元|千元|元)", span.quote[match.end():])
+                inline = re.match(r"\s*(亿元|万元|千元|元)", span.quote[end:])
                 if inline:
                     units.add(inline.group(1))
                     continue
-                governing = [h for h in headers if h.end() <= match.start()]
+                governing = [h for h in headers if h.end() <= start]
                 if governing:
                     units.add(governing[-1].group(1))
                 else:
@@ -620,6 +668,11 @@ def standardize_workpaper_metrics(paper: CompanyProfileWorkpaper) -> CompanyProf
                 context = "".join(sources[eid] for eid in fact["evidence_ids"])
                 for metric in fact["metrics"]:
                     label = f"{fact['fact_id']}/{metric['name']}"
+                    if metric["unit"] == "个百分点":
+                        metric.update(source_unit=metric["source_unit"] or "个百分点", unit="百分点")
+                        notes.append(f"{label}：个百分点与百分点为同义单位，保留原文/来源单位，未改数值。")
+                    if (metric.get("uncertainty_reason") or "").startswith("程序说明："):
+                        notes.append(f"{label}：{metric['uncertainty_reason']}")
                     if metric["unit"] in {"%", "％", "百分点", "基点", "bp", "bps"} and metric["currency"] is not None:
                         notes.append(f"{label}：无量纲比例清除币种{metric['currency']}，原数值不变。")
                         metric["currency"] = None
