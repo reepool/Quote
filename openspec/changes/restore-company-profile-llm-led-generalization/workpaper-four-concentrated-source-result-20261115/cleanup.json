@@ -1,0 +1,25 @@
+{
+  "active_real_workers": 0,
+  "active_worker_check": "approved-network-environment pgrep exact CK Python operator returned no matches before cleanup",
+  "worker_roots_removed_bytes": 7360263,
+  "post_run_local_diagnostic_roots_removed_bytes": 1145570,
+  "prepared_pages_and_logs_removed_path": "/home/python/Quote/data/QuoteBak/workpaper-ck-prepared-hxztmudq",
+  "prepared_pages_and_logs_removed_bytes": 4190225,
+  "owned_operator_and_closeout_scripts_removed_bytes": 52363,
+  "released_bytes_this_task": 12748421,
+  "not_recounted": [
+    "CJ",
+    "CI",
+    "CG",
+    "other_previous_tasks"
+  ],
+  "recovery": "Rebuild from retained official PDFs, source cache, original responses and operator/closeout snapshots.",
+  "retained": [
+    "one_authoritative_CK_evidence_set",
+    "official_PDFs",
+    "useful_shared_parse_cache",
+    "original_attempt_markers",
+    "previous_results",
+    "preexisting_and_parallel_worktree_changes"
+  ]
+}

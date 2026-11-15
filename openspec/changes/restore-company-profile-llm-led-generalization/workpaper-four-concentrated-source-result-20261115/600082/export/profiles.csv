@@ -1,0 +1,4 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600082.SH,2025-12-31,2026-04-28T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,llm_generated,"公司为天津滨海高新区国有控股上市公司，以工业园区运营为核心主业，形成“园区运营为存量根基、产业投资为增量引擎”的双轮驱动架构，向产业园区运营商及科技服务提供商转型。
+业务板块包括园区运营（科技园区开发、科技园区运营）、产业投资和孵化服务；报告期内新增重要非主营业务说明为不适用。
+报告期内公司将全资子公司天津海发方信置地有限公司100%股权以9,065.95万元转让给天津海泰房地产开发有限公司，已完成全款支付和股权交割，合并范围相应变化。",37,39,incomplete,0,deepseek-flash,grok-4.7

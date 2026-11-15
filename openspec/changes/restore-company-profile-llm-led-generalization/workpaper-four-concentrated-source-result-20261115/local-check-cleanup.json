@@ -1,0 +1,15 @@
+{
+  "removed_runs": [
+    {
+      "removed_root": "/home/python/Quote/data/QuoteBak/workpaper-ck-local-readback-rvjvxcvw",
+      "removed_bytes": 572785,
+      "recoverable": "rebuild from retained original responses and PDF"
+    },
+    {
+      "removed_root": "/home/python/Quote/data/QuoteBak/workpaper-ck-local-readback-ghbwbh9c",
+      "removed_bytes": 572785,
+      "recoverable": "rebuild from retained original responses and PDF"
+    }
+  ],
+  "removed_bytes": 1145570
+}

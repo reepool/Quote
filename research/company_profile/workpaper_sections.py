@@ -31,6 +31,21 @@ _HEADING = re.compile(
 _INLINE_HEADING = re.compile(rf"[。；]\s+([{_CN}]+[、．.]\s*[^。；\r\n]{{2,80}})\s*$")
 
 
+def _numeric_table_row(title: str) -> bool:
+    """Do not let decimal amounts/ratios terminate a real section.
+
+    Multi-level headings such as 3.7 / 3.6.2 remain valid. Financial
+    continuations can start with 000.00 or 1.47 -69.51; retain that text
+    as source, not as a new heading/boundary.
+    """
+    match = re.match(r"^(\d+(?:\.\d+)+)\s+(.+)$", title)
+    if not match:
+        return False
+    return any(len(part) > 1 and part.startswith("0") for part in match[1].split(".")) or bool(
+        re.fullmatch(r"[\d\s.,，%％+−—–\-()（）/]+", match[2])
+    )
+
+
 class IndexedSection(_Model):
     section_id: str
     section_path: tuple[str, ...]
@@ -125,7 +140,7 @@ def index_sections(pages: Sequence[Mapping]) -> tuple[IndexedSection, ...]:
                 leading += inline.start(1)
                 stripped = inline.group(1).strip()
             match = _HEADING.match(stripped)
-            if match and len(stripped) <= 150 and not re.search(r"\.{3,}|…{2,}", stripped):
+            if match and not _numeric_table_row(stripped) and len(stripped) <= 150 and not re.search(r"\.{3,}|…{2,}", stripped):
                 title = re.split(r"[。；]", stripped, maxsplit=1)[0].strip()
                 level = _level(title)
                 start = offset + leading

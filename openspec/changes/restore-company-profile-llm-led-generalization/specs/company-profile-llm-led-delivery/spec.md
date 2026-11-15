@@ -99,6 +99,11 @@ The reviewer MUST identify checked fact IDs/elements and source-cited errors, am
 - **THEN** that finding MUST remain unresolved and visible without discarding independent valid findings or inventing a new fact
 - **AND** a limitation correction MUST NOT become a fact repair or approve release; disputed scope assertions are withheld in the limited projection while the original stays auditable
 
+#### Scenario: Several valid review issues concern the same original fact
+- **WHEN** the initial source review reports distinct valid findings for one fact, such as subject scope and revenue attribution
+- **THEN** all findings remain auditable and the existing combined repair request contains one target with every issue, not duplicate replacement targets
+- **AND** the final source check receives all issues for that candidate; absent, rejected or unverified repairs do not revive the flagged fact, while duplicate returned candidates remain invalid
+
 #### Scenario: A repaired amount still uses the wrong financial column
 - **WHEN** a patch quotes a locatable amount but final source review rejects its metric meaning
 - **THEN** the patch is not accepted, the affected fact remains withheld and independent business facts stay readable
@@ -444,6 +449,11 @@ The v9 ordinary path MUST begin with each report's TOC, bookmarks or equivalent 
 #### Scenario: Requested necessary reading crosses a batch boundary
 - **WHEN** a model requests necessary context in more than one batch and only the first batch or a fragment has been read
 - **THEN** every outstanding necessary scope remains explicit and blocks affected core completeness; it cannot be relabeled as an ordinary unread supplementary note, nor may a fragment imply the entire page was read
+
+#### Scenario: A financial continuation resembles a numbered heading
+- **WHEN** a table continuation starts with a decimal fragment with leading zeros or a decimal followed only by numeric cells
+- **THEN** that row remains original source text but does not terminate the containing section or become its title boundary
+- **AND** genuine decimal subsection headings such as 3.7 and 3.6.2 remain selectable; an unlocatable boundary still fails explicitly rather than falling back to the whole report
 
 #### Scenario: A major business uses an unfamiliar heading
 - **WHEN** no historical heading regex matches a disclosed business

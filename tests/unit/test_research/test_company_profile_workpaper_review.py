@@ -85,6 +85,35 @@ def test_source_column_repair_preserves_unrelated_business_and_original():
     result.validate_pages(PAGES)
 
 
+@pytest.mark.parametrize("outcome", ["accepted", "rejected", "duplicate_candidate", "repair_failure"])
+def test_multiple_issues_on_one_fact_keep_all_findings_and_request_one_candidate(outcome):
+    original, _, fixed, review, verify = material()
+    review["findings"].append({**review["findings"][0], "finding_id": "also-scope",
+                               "issue_type": "wrong_subject", "explanation": "主体也需核对。"})
+    repair = {"repaired_facts": [fixed]}
+    if outcome == "duplicate_candidate":
+        repair["repaired_facts"].append(fixed)
+    elif outcome == "rejected":
+        verify["checks"][0]["accepted"] = False
+    elif outcome == "repair_failure":
+        repair = ValueError("repair stopped")
+    _, result, provider, _ = invoke([review, repair, verify])
+    assert len(result.quality_review.findings) == 2
+    targets = provider.calls[1]["payload"]["repair_targets"]
+    assert len(targets) == 1
+    assert targets[0]["finding"]["finding_id"] == "wrong-profit-column"
+    assert targets[0]["additional_findings"][0]["finding_id"] == "also-scope"
+    assert result.elements.business_structure == original.elements.business_structure
+    if outcome == "accepted":
+        assert len(provider.calls) == 3
+        assert len(provider.calls[2]["payload"]["initial_findings"]) == 2
+        assert len(result.elements.scale_and_mix.facts) == 1
+        assert all(f.resolution == "corrected_pending_trust" for f in result.quality_review.findings)
+    else:
+        assert not result.elements.scale_and_mix.facts
+        assert all(f.resolution != "corrected_pending_trust" for f in result.quality_review.findings)
+
+
 def test_real_review_identity_requires_explicit_profile():
     with pytest.raises(ValueError, match="explicitly selected"):
         workpaper_processing_identity(real=True, review=True)

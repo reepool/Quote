@@ -1,0 +1,48 @@
+{
+  "original_results_and_raw_response_hashes_unchanged": true,
+  "shared_configuration_unchanged": true,
+  "source_pdfs_unchanged": true,
+  "post_run_changed_files": {
+    "research/company_profile/workpaper_llm.py": "fcde147197d77163fc8ae71dbc58432b62bb77aaf667694efd5582e56010d646",
+    "research/company_profile/workpaper_review.py": "7901627960283d550f5eb43bfd6367d640e9db928bfbda59236f24a29be4d354",
+    "research/company_profile/workpaper_sections.py": "af3b1c8df1d64f5d251df044c98a0b774c610857f1aaa37bb1a4e9289ca1a3c6"
+  },
+  "closeout_snapshot_sha256": "49035e950ead70698eee0e6a35d02fd03b0245c87cd175706bdb1b89977007ab",
+  "no_new_model_calls_after_original_batch": true,
+  "targeted_tests": {
+    "passed": 18,
+    "deselected": 68,
+    "seconds": 8.17
+  },
+  "review_tests_excluding_unchanged_task_service": {
+    "passed": 44,
+    "deselected": 3,
+    "seconds": 15.68
+  },
+  "selection_tests_before_freeze": {
+    "passed": 5,
+    "deselected": 33,
+    "seconds": 5.78
+  },
+  "openspec_strict": {
+    "change": "restore-company-profile-llm-led-generalization",
+    "exit_code": 0
+  },
+  "review": {
+    "blocking_fixed": [
+      "numeric_table_row_boundary",
+      "duplicate_review_target_loses_findings"
+    ],
+    "known_limited_followup": [
+      "supplemental_omission_withdraws_correct_fact",
+      "repair_response_contracts"
+    ],
+    "nonblocking_deferred": [
+      "fine_grained_supply_chain",
+      "minor_financial_details"
+    ],
+    "preexisting_changes": "preserved_not_included"
+  },
+  "formal_s1": "0/12",
+  "production_authorization": "not_authorized"
+}

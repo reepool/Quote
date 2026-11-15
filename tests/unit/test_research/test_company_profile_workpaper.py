@@ -142,6 +142,23 @@ def test_heading_joined_to_previous_paragraph_keeps_original_source_boundary():
     assert text[discussion.start_offset:discussion.end_offset] == "三、经营讨论\n公司收入增长。 "
 
 
+def test_decimal_table_continuations_do_not_terminate_operating_section():
+    pages = (
+        {"page": 13, "text": "第三节 管理层讨论与分析\n五、报告期内主要经营情况\n(一) 主营业务分析\n公司经营收入。\n"},
+        {"page": 14, "text": "000.00 自有资金\n1.47 -69.51\n本表续行。\n六、其他情况\n其他内容。\n"},
+    )
+    index = index_sections(pages)
+    operating = next(s for s in index if s.section_path[-1] == "五、报告期内主要经营情况")
+    assert operating.next_title == "六、其他情况"
+    assert not any(s.section_path[-1].startswith(("000.00", "1.47")) for s in index)
+    packet = build_section_packet(_report(), pages, index, SectionSelection(
+        selected_section_ids=(operating.section_id,), rationale="经营情况", stop_reason="集中阅读",
+    ), remap_layout=True)
+    text = packet.model_text()
+    assert "000.00 自有资金" in text and "1.47 -69.51" in text
+    assert "其他内容" not in text
+
+
 def _with_supply_chain(draft, packet, *, bad_input=False):
     raw = draft.model_dump(mode="json")
     raw["supply_chain"] = {
@@ -494,6 +511,10 @@ def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_repla
         assert "income-statement analysis" in selection_instructions
         assert "TOC-only duplicate" in selection_instructions
         assert "gross business receipts" in selection_instructions
+        assert "company operating discussion" in selection_instructions
+        assert "before pure industry background" in selection_instructions
+        assert "nonoverlapping company summary" in selection_instructions
+        assert "公司经营综述的收入总额" in selection_wire
         assert "600000" not in json.dumps(SECTION_GUIDE, ensure_ascii=False)
         extraction = transport.calls[1]["payload"]
         assert "100.00" in extraction["messages"][1]["content"]
@@ -505,7 +526,11 @@ def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_repla
         assert "not a completeness gate" in instructions
         assert "reading a section does not require copying all of its numbers" in instructions
         assert "Never infer zero from blank cells" in instructions
-        assert workpaper_processing_identity(real=False)["prompt_version"].endswith("compact-core.v14")
+        identity = workpaper_processing_identity(real=False)
+        assert identity["prompt_version"].endswith("operating-summary-first.v15")
+        assert identity["section_guide_version"].endswith("operating-summary.v3")
+        assert identity["workpaper_max_output_tokens"] == 12000
+        assert identity["source_binding_policy"] == "company_workpaper_source_literals.prose-numerals.v2"
         assert "conditional disclosure heading is not a fact" in instructions
         assert "denominator of each percentage" in instructions
         assert "preserve the displayed subtotal and elimination separately" in instructions

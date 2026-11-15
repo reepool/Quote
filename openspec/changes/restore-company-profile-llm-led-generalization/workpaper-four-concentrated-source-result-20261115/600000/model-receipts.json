@@ -1,0 +1,2884 @@
+[
+  {
+    "request_id": "bp-work-5309b2253247ce42c9e61beb:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "b3a32a948ef7bfdc296356cc452a56e27fe2400d260115816a06b790c410c900",
+    "response_hash": "6e55204476dd4d0c8a8eb52cc6f125954dba8f1a069341a7b8d52154a8c24ef1",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0071\",\"section-0101\",\"section-0103\",\"section-0104\",\"section-0105\",\"section-0106\",\"section-0107\",\"section-0108\"],\"rationale\":\"本行为银行，需优先覆盖公司总体经营、主要业务构成与收入来源。选取3.1公司总体经营情况（经营综述与规模）、3.6公司主要业务情况及其下公司金融、零售金融、金融市场与金融机构、跨境及境外机构业务四个实质子节（产品/服务、客户与经营模式），以及3.7利润表分析及3.7.1营业收入（收入总额与构成、主要业务权重）。这些子节共同解释业务结构、产品用途、盈利来源与本期变化，且互不重叠；未选父节与子节同时出现。\",\"stop_reason\":\"已覆盖经营综述、主要业务板块与营业收入构成，足以回答业务结构、产品服务、盈利来源与规模；行业背景、风险管理、治理与财务报告附注属次要或过细范围，不再扩展。\",\"deferred\":[\"3.6.1公司所处行业发展情况（纯行业背景，非公司层面必需）\",\"3.7.2利息净收入及3.7.3非利息净收入明细（收入构成已由3.7.1覆盖，明细属补充）\",\"3.10贷款质量分析、3.11监管指标、3.14风险管理（风险与监管细节，非业务经营主线）\",\"第八节财务报告及分部附注（仅在收入构成有缺口时定向补充，当前无需）\"]}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0071",
+        "section-0101",
+        "section-0103",
+        "section-0104",
+        "section-0105",
+        "section-0106",
+        "section-0107",
+        "section-0108"
+      ],
+      "rationale": "本行为银行，需优先覆盖公司总体经营、主要业务构成与收入来源。选取3.1公司总体经营情况（经营综述与规模）、3.6公司主要业务情况及其下公司金融、零售金融、金融市场与金融机构、跨境及境外机构业务四个实质子节（产品/服务、客户与经营模式），以及3.7利润表分析及3.7.1营业收入（收入总额与构成、主要业务权重）。这些子节共同解释业务结构、产品用途、盈利来源与本期变化，且互不重叠；未选父节与子节同时出现。",
+      "stop_reason": "已覆盖经营综述、主要业务板块与营业收入构成，足以回答业务结构、产品服务、盈利来源与规模；行业背景、风险管理、治理与财务报告附注属次要或过细范围，不再扩展。",
+      "deferred": [
+        "3.6.1公司所处行业发展情况（纯行业背景，非公司层面必需）",
+        "3.7.2利息净收入及3.7.3非利息净收入明细（收入构成已由3.7.1覆盖，明细属补充）",
+        "3.10贷款质量分析、3.11监管指标、3.14风险管理（风险与监管细节，非业务经营主线）",
+        "第八节财务报告及分部附注（仅在收入构成有缺口时定向补充，当前无需）"
+      ]
+    },
+    "usage": {
+      "input_tokens": 12463,
+      "output_tokens": 341,
+      "total_tokens": 12804
+    }
+  },
+  {
+    "request_id": "bp-work-5309b2253247ce42c9e61beb:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "9c119c2fbc13789954516df9aa4cb33750caae27740ec06a5cf1263c91020f03",
+    "response_hash": "516b8615c0e3e465832955777211d876b928f880deed38eee11c96d6671f6049",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"BS-01\",\"text\":\"公司为银行，主要业务分为公司金融业务、零售金融业务、金融市场与金融机构业务、跨境及境外机构业务四大板块。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0006\",\"source-0009\",\"source-0010\"]},{\"fact_id\":\"BS-02\",\"text\":\"公司金融业务涵盖商业信贷、交易银行、投资银行、电子银行、跨境业务、离岸业务等领域，并推进“四层四类”公司客户经营体系建设。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"BS-03\",\"text\":\"金融市场业务采取“自营投资交易+浦银避险代客”双核驱动经营模式，并经营资产托管业务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0010\"]},{\"fact_id\":\"BS-04\",\"text\":\"跨境及境外机构业务依托离岸银行、自贸金融、境外分行和海外投行等多平台协同，境外机构包括香港分行、新加坡分行、伦敦分行及浦银国际。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0011\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"PS-01\",\"text\":\"公司金融业务提供对公存款、对公贷款（含票据贴现）、投资银行（并购金融、债券承销）、交易银行、科技金融、普惠金融、绿色金融及机构客户服务等产品与服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\",\"source-0005\",\"source-0006\"]},{\"fact_id\":\"PS-02\",\"text\":\"零售金融业务提供零售客户经营、个人住房贷款、浦闪贷消费贷款、浦发i车贷、信用卡、财富管理、传承保障、借记卡及养老金融等服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\",\"source-0008\",\"source-0009\"]},{\"fact_id\":\"PS-03\",\"text\":\"金融市场与金融机构业务提供金融机构客户经营、投资交易、浦银避险及资产托管服务；浦银避险覆盖固定收益、外汇、贵金属及大宗商品等领域。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\",\"source-0010\"]},{\"fact_id\":\"PS-04\",\"text\":\"跨境及境外机构业务提供自贸业务、跨境电商、跨境避险、跨境资金管理、跨境并购、跨境贸易、跨境资产托管及跨境人民币等跨境金融场景服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\",\"source-0011\"]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"RM-01\",\"text\":\"本集团营业收入主要来源于利息净收入、手续费及佣金净收入和其他净收入；2025年利息净收入占营业收入69.26%，手续费及佣金净收入占13.06%，其他净收入占17.68%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\"],\"metrics\":[{\"name\":\"利息净收入占营业收入比例\",\"raw_value\":\"69.26\",\"value\":\"69.26\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"手续费及佣金净收入占营业收入比例\",\"raw_value\":\"13.06\",\"value\":\"13.06\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"其他净收入占营业收入比例\",\"raw_value\":\"17.68\",\"value\":\"17.68\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"RM-02\",\"text\":\"按业务总收入构成，贷款利息收入占57.26%，投资利息收入占17.57%，手续费及佣金收入占9.04%，存拆放同业和其他金融机构往来业务利息收入占5.20%，存放央行利息收入占1.48%，其他收入占9.45%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\",\"source-0014\"],\"metrics\":[{\"name\":\"贷款利息收入占业务总收入比例\",\"raw_value\":\"57.26\",\"value\":\"57.26\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"投资利息收入占业务总收入比例\",\"raw_value\":\"17.57\",\"value\":\"17.57\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"手续费及佣金收入占业务总收入比例\",\"raw_value\":\"9.04\",\"value\":\"9.04\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"存拆放同业和其他金融机构往来业务利息收入占业务总收入比例\",\"raw_value\":\"5.20\",\"value\":\"5.20\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"存放央行利息收入占业务总收入比例\",\"raw_value\":\"1.48\",\"value\":\"1.48\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"其他收入占业务总收入比例\",\"raw_value\":\"9.45\",\"value\":\"9.45\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"RM-03\",\"text\":\"报告期内本集团实现营业收入1,739.64亿元，同比增加32.16亿元，增长1.88%；实现利润总额533.74亿元，同比增长10.35%；归属于母公司股东的净利润500.17亿元，同比增长10.52%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0013\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"1,739.64\",\"value\":\"1739.64\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"营业收入同比增加额\",\"raw_value\":\"32.16\",\"value\":\"32.16\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"营业收入同比增长率\",\"raw_value\":\"1.88\",\"value\":\"1.88\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"利润总额\",\"raw_value\":\"533.74\",\"value\":\"533.74\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"利润总额同比增长率\",\"raw_value\":\"10.35\",\"value\":\"10.35\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"归属于母公司股东的净利润\",\"raw_value\":\"500.17\",\"value\":\"500.17\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"归属于母公司股东的净利润同比增长率\",\"raw_value\":\"10.52\",\"value\":\"10.52\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"RM-04\",\"text\":\"报告期内本集团实现利息净收入1,204.83亿元，同比增长5.03%；净利息收益率为1.42%，较上年同期持平。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[{\"name\":\"利息净收入\",\"raw_value\":\"1,204.83\",\"value\":\"1204.83\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"利息净收入同比增长率\",\"raw_value\":\"5.03\",\"value\":\"5.03\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"净利息收益率\",\"raw_value\":\"1.42\",\"value\":\"1.42\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"SM-01\",\"text\":\"报告期末本集团资产总额100,817.46亿元，较上年末增长6.55%；本外币贷款总额（含票据贴现）57,039.73亿元，增长5.80%；负债总额92,573.16亿元，增长6.20%；本外币存款总额55,824.35亿元，增长8.48%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"资产总额\",\"raw_value\":\"100,817.46\",\"value\":\"100817.46\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"资产总额较上年末增长率\",\"raw_value\":\"6.55\",\"value\":\"6.55\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"本外币贷款总额（含票据贴现）\",\"raw_value\":\"57,039.73\",\"value\":\"57039.73\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"本外币贷款总额较上年末增长率\",\"raw_value\":\"5.80\",\"value\":\"5.80\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"负债总额\",\"raw_value\":\"92,573.16\",\"value\":\"92573.16\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"负债总额较上年末增长率\",\"raw_value\":\"6.20\",\"value\":\"6.20\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"本外币存款总额\",\"raw_value\":\"55,824.35\",\"value\":\"55824.35\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"本外币存款总额较上年末增长率\",\"raw_value\":\"8.48\",\"value\":\"8.48\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"SM-02\",\"text\":\"报告期内实现对公业务营业净收入685.79亿元；报告期末公司客户数252.29万户，较上年末增长6.52%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"对公业务营业净收入\",\"raw_value\":\"685.79\",\"value\":\"685.79\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"公司客户数\",\"raw_value\":\"252.29\",\"value\":\"252.29\",\"unit\":\"万户\",\"source_unit\":\"万户\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"公司客户数较上年末增长率\",\"raw_value\":\"6.52\",\"value\":\"6.52\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"SM-03\",\"text\":\"报告期末母公司对公存款余额38,103.74亿元，较上年末增长7.78%；母公司对公贷款（含票据贴现）总额36,654.74亿元，较上年末增长8.23%。\",\"subject_scope\":\"issuer\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0003\",\"source-0004\"],\"metrics\":[{\"name\":\"母公司对公存款余额\",\"raw_value\":\"38,103.74\",\"value\":\"38103.74\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"issuer\",\"qualifier\":\"exact\"},{\"name\":\"母公司对公存款余额较上年末增长率\",\"raw_value\":\"7.78\",\"value\":\"7.78\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"issuer\",\"qualifier\":\"exact\"},{\"name\":\"母公司对公贷款（含票据贴现）总额\",\"raw_value\":\"36,654.74\",\"value\":\"36654.74\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"issuer\",\"qualifier\":\"exact\"},{\"name\":\"母公司对公贷款（含票据贴现）总额较上年末增长率\",\"raw_value\":\"8.23\",\"value\":\"8.23\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"issuer\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"SM-04\",\"text\":\"报告期末个人客户（含信用卡）1.71亿户，较上年末增加1,396.59万户；AUM个人金融资产余额（含市值）46,645.33亿元，较上年末增长20.26%；母公司个人存款余额17,177.05亿元，增长10.79%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0006\",\"source-0007\"],\"metrics\":[{\"name\":\"个人客户（含信用卡）数\",\"raw_value\":\"1.71\",\"value\":\"1.71\",\"unit\":\"亿户\",\"source_unit\":\"亿户\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"AUM个人金融资产余额（含市值）\",\"raw_value\":\"46,645.33\",\"value\":\"46645.33\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"AUM个人金融资产余额较上年末增长率\",\"raw_value\":\"20.26\",\"value\":\"20.26\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"母公司个人存款余额\",\"raw_value\":\"17,177.05\",\"value\":\"17177.05\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"issuer\",\"qualifier\":\"exact\"},{\"name\":\"母公司个人存款余额较上年末增长率\",\"raw_value\":\"10.79\",\"value\":\"10.79\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"issuer\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"SM-05\",\"text\":\"报告期末母公司零售贷款（不含个人经营贷款）余额15,137.37亿元，较上年末增长3.46%；个人住房贷款余额8,768.34亿元，增长2.04%；信用卡及透支余额3,893.27亿元，增长5.16%。\",\"subject_scope\":\"issuer\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0007\",\"source-0009\"],\"metrics\":[{\"name\":\"母公司零售贷款（不含个人经营贷款）余额\",\"raw_value\":\"15,137.37\",\"value\":\"15137.37\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"issuer\",\"qualifier\":\"exact\"},{\"name\":\"母公司零售贷款（不含个人经营贷款）余额较上年末增长率\",\"raw_value\":\"3.46\",\"value\":\"3.46\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"issuer\",\"qualifier\":\"exact\"},{\"name\":\"个人住房贷款余额\",\"raw_value\":\"8,768.34\",\"value\":\"8768.34\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"个人住房贷款余额较上年末增长率\",\"raw_value\":\"2.04\",\"value\":\"2.04\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"信用卡及透支余额\",\"raw_value\":\"3,893.27\",\"value\":\"3893.27\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"信用卡及透支余额较上年末增长率\",\"raw_value\":\"5.16\",\"value\":\"5.16\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"SM-06\",\"text\":\"报告期末托管规模20.21万亿元，较上年末增长11.45%；报告期内托管收入24.81亿元，同比增长7.23%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"托管规模\",\"raw_value\":\"20.21\",\"value\":\"20.21\",\"unit\":\"万亿元\",\"source_unit\":\"万亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"托管规模较上年末增长率\",\"raw_value\":\"11.45\",\"value\":\"11.45\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"托管收入\",\"raw_value\":\"24.81\",\"value\":\"24.81\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"托管收入同比增长率\",\"raw_value\":\"7.23\",\"value\":\"7.23\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"SM-07\",\"text\":\"按地区分部，总行营业收入566.29亿元占32.55%，长三角地区439.95亿元占25.29%，境外及附属机构164.79亿元占9.48%，其余地区合计占比较小。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[{\"name\":\"总行营业收入\",\"raw_value\":\"56,629\",\"value\":\"56629\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"总行营业收入占比\",\"raw_value\":\"32.55\",\"value\":\"32.55\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"长三角地区营业收入\",\"raw_value\":\"43,995\",\"value\":\"43995\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"长三角地区营业收入占比\",\"raw_value\":\"25.29\",\"value\":\"25.29\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"境外及附属机构营业收入\",\"raw_value\":\"16,479\",\"value\":\"16479\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"境外及附属机构营业收入占比\",\"raw_value\":\"9.48\",\"value\":\"9.48\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"OI-01\",\"text\":\"作为银行，公司经营投入主要为生息资产与计息负债：2025年生息资产平均余额8,514,479百万元，平均收益率3.11%；计息负债平均余额8,292,491百万元，平均成本率1.74%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"生息资产平均余额\",\"raw_value\":\"8,514,479\",\"value\":\"8514479\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"生息资产平均收益率\",\"raw_value\":\"3.11\",\"value\":\"3.11\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"计息负债平均余额\",\"raw_value\":\"8,292,491\",\"value\":\"8292491\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"计息负债平均成本率\",\"raw_value\":\"1.74\",\"value\":\"1.74\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"OI-02\",\"text\":\"生息资产中贷款及垫款平均余额5,553,061百万元、平均收益率3.35%；投资平均余额1,955,190百万元、平均收益率2.92%。计息负债中客户存款平均余额5,380,262百万元、平均成本率1.59%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"贷款及垫款平均余额\",\"raw_value\":\"5,553,061\",\"value\":\"5553061\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"贷款及垫款平均收益率\",\"raw_value\":\"3.35\",\"value\":\"3.35\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"投资平均余额\",\"raw_value\":\"1,955,190\",\"value\":\"1955190\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"投资平均收益率\",\"raw_value\":\"2.92\",\"value\":\"2.92\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"客户存款平均余额\",\"raw_value\":\"5,380,262\",\"value\":\"5380262\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"客户存款平均成本率\",\"raw_value\":\"1.59\",\"value\":\"1.59\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"OI-03\",\"text\":\"公司贷款、零售贷款平均收益率分别为3.15%、3.99%，分别同比下降0.46和0.77个百分点；票据贴现平均收益率1.19%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"公司贷款平均收益率\",\"raw_value\":\"3.15\",\"value\":\"3.15\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"公司贷款平均收益率同比变动\",\"raw_value\":\"0.46\",\"value\":\"0.46\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比下降\"},{\"name\":\"零售贷款平均收益率\",\"raw_value\":\"3.99\",\"value\":\"3.99\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"零售贷款平均收益率同比变动\",\"raw_value\":\"0.77\",\"value\":\"0.77\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"同比下降\"},{\"name\":\"票据贴现平均收益率\",\"raw_value\":\"1.19\",\"value\":\"1.19\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"OI-04\",\"text\":\"公司通过数字化手段优化存款客群结构，报告期内母公司对公存款付息率较上年度下降42bps；本集团负债付息率较上年下降46bps，本外币存款付息率较上年下降38bps。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0003\"],\"metrics\":[{\"name\":\"母公司对公存款付息率同比变动\",\"raw_value\":\"42\",\"value\":\"42\",\"unit\":\"bps\",\"source_unit\":\"bps\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"issuer\",\"qualifier\":\"exact\",\"comparison_basis\":\"较上年度下降\"},{\"name\":\"本集团负债付息率同比变动\",\"raw_value\":\"46\",\"value\":\"46\",\"unit\":\"bps\",\"source_unit\":\"bps\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"较上年下降\"},{\"name\":\"本外币存款付息率同比变动\",\"raw_value\":\"38\",\"value\":\"38\",\"unit\":\"bps\",\"source_unit\":\"bps\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"较上年下降\"}]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"CC-01\",\"text\":\"公司金融客户包括企业法人、政府机关、事业单位和社会组织等机构客户，并推进“四层四类”公司客户经营体系；报告期末公司客户数252.29万户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0006\"],\"metrics\":[{\"name\":\"公司客户数\",\"raw_value\":\"252.29\",\"value\":\"252.29\",\"unit\":\"万户\",\"source_unit\":\"万户\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"CC-02\",\"text\":\"零售客户通过个人客户经营体系服务，报告期末个人客户（含信用卡）1.71亿户；月日均金融资产5万元以上客户469.26万户，私人银行客户（月日均金融资产600万元以上）5.55万户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"个人客户（含信用卡）数\",\"raw_value\":\"1.71\",\"value\":\"1.71\",\"unit\":\"亿户\",\"source_unit\":\"亿户\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"月日均金融资产5万元以上客户数\",\"raw_value\":\"469.26\",\"value\":\"469.26\",\"unit\":\"万户\",\"source_unit\":\"万户\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"月日均金融资产600万元以上私人银行客户数\",\"raw_value\":\"5.55\",\"value\":\"5.55\",\"unit\":\"万户\",\"source_unit\":\"万户\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"CC-03\",\"text\":\"金融机构客户方面，报告期末合作金融机构一级法人客户约3,300家，与公募基金、保险资管、信托、银行理财、券商、期货等持牌非银资产管理机构合作覆盖度达80%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"合作金融机构一级法人客户数\",\"raw_value\":\"约3,300\",\"value\":\"3300\",\"unit\":\"家\",\"source_unit\":\"家\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"approximate\"},{\"name\":\"持牌非银资产管理机构合作覆盖度\",\"raw_value\":\"80\",\"value\":\"80\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"CC-04\",\"text\":\"跨境客户方面，报告期末跨境客户数近4.9万户，增长24%；跨境数字化渠道活跃客户2.8万户；总分行战略客户海外贷款余额1,884亿元人民币，增长48%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0011\"],\"metrics\":[{\"name\":\"跨境客户数\",\"raw_value\":\"近4.9\",\"value\":\"4.9\",\"unit\":\"万户\",\"source_unit\":\"万户\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"approximate\"},{\"name\":\"跨境客户数增长率\",\"raw_value\":\"24\",\"value\":\"24\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"跨境数字化渠道活跃客户数\",\"raw_value\":\"2.8\",\"value\":\"2.8\",\"unit\":\"万户\",\"source_unit\":\"万户\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"总分行战略客户海外贷款余额\",\"raw_value\":\"1,884\",\"value\":\"1884\",\"unit\":\"亿元\",\"source_unit\":\"亿元人民币\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"总分行战略客户海外贷款余额增长率\",\"raw_value\":\"48\",\"value\":\"48\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"CC-05\",\"text\":\"按地区分部，总行营业收入占比32.55%，长三角地区占25.29%，珠三角及海西地区占7.54%，环渤海地区占9.08%，中部地区占6.96%，西部地区占6.69%，东北地区占2.41%，境外及附属机构占9.48%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\"],\"metrics\":[{\"name\":\"珠三角及海西地区营业收入占比\",\"raw_value\":\"7.54\",\"value\":\"7.54\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"环渤海地区营业收入占比\",\"raw_value\":\"9.08\",\"value\":\"9.08\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"中部地区营业收入占比\",\"raw_value\":\"6.96\",\"value\":\"6.96\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"西部地区营业收入占比\",\"raw_value\":\"6.69\",\"value\":\"6.69\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"东北地区营业收入占比\",\"raw_value\":\"2.41\",\"value\":\"2.41\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"OD-01\",\"text\":\"报告期内公司聚焦中长期制造业发展和现代化产业体系等关键领域加大信贷投放，“五大赛道”业务成为公司贷款主要增长极；制造业中长期贷款总额3,599.26亿元，较上年末增长12.86%，高于整体贷款增速7个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"制造业中长期贷款总额\",\"raw_value\":\"3,599.26\",\"value\":\"3599.26\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"制造业中长期贷款总额较上年末增长率\",\"raw_value\":\"12.86\",\"value\":\"12.86\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"制造业中长期贷款增速高于整体贷款增速幅度\",\"raw_value\":\"7\",\"value\":\"7\",\"unit\":\"百分点\",\"source_unit\":\"个百分点\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"OD-02\",\"text\":\"报告期内公司加大高收益资产配置，2025年集团本外币贷款（不含票据贴现）在生息资产日均占比提升近2个百分点；存款在计息负债日均占比较上年提升近3个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"本外币贷款（不含票据贴现）在生息资产日均占比变动\",\"raw_value\":\"近2\",\"value\":\"2\",\"unit\":\"百分点\",\"source_unit\":\"个百分点\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"approximate\",\"comparison_basis\":\"较上年提升\"},{\"name\":\"存款在计息负债日均占比变动\",\"raw_value\":\"近3\",\"value\":\"3\",\"unit\":\"百分点\",\"source_unit\":\"个百分点\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"approximate\",\"comparison_basis\":\"较上年提升\"}]},{\"fact_id\":\"OD-03\",\"text\":\"报告期内公司不良贷款余额719.90亿元，较上年末减少11.64亿元；不良贷款率1.26%，较上年末下降0.10个百分点；拨备覆盖率200.72%，较上年末上升13.76个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"不良贷款余额\",\"raw_value\":\"719.90\",\"value\":\"719.90\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"不良贷款余额较上年末变动\",\"raw_value\":\"11.64\",\"value\":\"11.64\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"较上年末减少\"},{\"name\":\"不良贷款率\",\"raw_value\":\"1.26\",\"value\":\"1.26\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"不良贷款率较上年末变动\",\"raw_value\":\"0.10\",\"value\":\"0.10\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"较上年末下降\"},{\"name\":\"拨备覆盖率\",\"raw_value\":\"200.72\",\"value\":\"200.72\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"拨备覆盖率较上年末变动\",\"raw_value\":\"13.76\",\"value\":\"13.76\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"较上年末上升\"}]},{\"fact_id\":\"OD-04\",\"text\":\"报告期内公司完成498.37亿元可转债转股，发行500亿元无固定期限资本债券和200亿元二级资本债券；报告期末资本充足率12.47%，一级资本充足率9.99%，核心一级资本充足率8.99%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"],\"metrics\":[{\"name\":\"可转债转股金额\",\"raw_value\":\"498.37\",\"value\":\"498.37\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"无固定期限资本债券发行规模\",\"raw_value\":\"500\",\"value\":\"500\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"二级资本债券发行规模\",\"raw_value\":\"200\",\"value\":\"200\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"资本充足率\",\"raw_value\":\"12.47\",\"value\":\"12.47\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"一级资本充足率\",\"raw_value\":\"9.99\",\"value\":\"9.99\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"核心一级资本充足率\",\"raw_value\":\"8.99\",\"value\":\"8.99\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年末\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"OD-05\",\"text\":\"报告期内公司净息差1.42%，较上年持平；平均总资产收益率（ROA）0.52%，较上年上升0.02个百分点；加权平均净资产收益率（ROE）6.76%，较上年上升0.48个百分点；成本收入比28.50%，较上年下降0.66个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"净息差\",\"raw_value\":\"1.42\",\"value\":\"1.42\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"平均总资产收益率（ROA）\",\"raw_value\":\"0.52\",\"value\":\"0.52\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"平均总资产收益率（ROA）较上年变动\",\"raw_value\":\"0.02\",\"value\":\"0.02\",\"unit\":\"百分点\",\"source_unit\":\"个百分点\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"较上年上升\"},{\"name\":\"加权平均净资产收益率（ROE）\",\"raw_value\":\"6.76\",\"value\":\"6.76\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"加权平均净资产收益率（ROE）较上年变动\",\"raw_value\":\"0.48\",\"value\":\"0.48\",\"unit\":\"百分点\",\"source_unit\":\"个百分点\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"较上年上升\"},{\"name\":\"成本收入比\",\"raw_value\":\"28.50\",\"value\":\"28.50\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"成本收入比较上年变动\",\"raw_value\":\"0.66\",\"value\":\"0.66\",\"unit\":\"百分点\",\"source_unit\":\"个百分点\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\",\"comparison_basis\":\"较上年下降\"}]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"MC-01\",\"text\":\"报告期内公司完成498.37亿元可转债转股，创A股历史单笔最大规模转股纪录，并发行500亿元无固定期限资本债券和200亿元二级资本债券，资本实力有序扩充。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"MC-02\",\"text\":\"报告期内公司不良贷款余额和不良贷款率较上年实现“双降”，不良贷款额为2019年以来最低水平，不良贷款率为2015年以来最好水平，拨备覆盖率为2016年以来最优水平。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"MC-03\",\"text\":\"报告期内公司净息差逆势企稳，ROA、ROE回升，资产质量持续改善；负债付息率较上年下降46bps，存款在计息负债日均占比较上年提升近3个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0003\"]},{\"fact_id\":\"MC-04\",\"text\":\"报告期内公司首次开立中央非税收入收缴财政专户，并获取住建部商贷数据交换平台、公积金管理系统、组合贷数据交换平台、公积金数字人民币试点四项资格准入。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]}]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"SC-P1\",\"text\":\"公司为银行，在金融体系中承担资金融通与金融服务职能，通过吸收存款、发放贷款、投资交易及提供各类金融服务开展经营。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0013\",\"source-0015\"]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"SC-U1\",\"text\":\"银行经营的主要资金来源为计息负债，包括客户存款、同业及其他金融机构存拆放款项、已发行债务证券及向中央银行借款；2025年客户存款平均余额5,380,262百万元，平均成本率1.59%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"客户存款平均余额\",\"raw_value\":\"5,380,262\",\"value\":\"5380262\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"客户存款平均成本率\",\"raw_value\":\"1.59\",\"value\":\"1.59\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"SC-D1\",\"text\":\"公司服务对象包括企业法人、政府机关、事业单位、社会组织等机构客户，个人客户，金融机构客户及跨境客户；产品用途涵盖信贷融资、支付结算、财富管理、投资交易、避险及托管等。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0006\",\"source-0009\",\"source-0010\"]}]}},\"limitations\":[\"本工作底稿仅依据所选章节（3.1、3.6、3.7及3.7.1）编制，未覆盖行业背景、风险管理、监管指标及财务报告附注等未读章节。\",\"分部数据中总行、长三角等地区分部的营业收入与占比按报告披露列示，未对地区间抵销进行额外调整说明。\",\"部分指标（如跨境客户数、合作金融机构客户数）原文使用“近”“约”等约数，已保留原始表述及近似限定。\",\"本底稿未枚举附属机构资本、资产、利润等明细，亦未收录荣誉、次要系统等非核心经营信息。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "BS-01",
+              "text": "公司为银行，主要业务分为公司金融业务、零售金融业务、金融市场与金融机构业务、跨境及境外机构业务四大板块。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0006",
+                "source-0009",
+                "source-0010"
+              ]
+            },
+            {
+              "fact_id": "BS-02",
+              "text": "公司金融业务涵盖商业信贷、交易银行、投资银行、电子银行、跨境业务、离岸业务等领域，并推进“四层四类”公司客户经营体系建设。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "BS-03",
+              "text": "金融市场业务采取“自营投资交易+浦银避险代客”双核驱动经营模式，并经营资产托管业务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009",
+                "source-0010"
+              ]
+            },
+            {
+              "fact_id": "BS-04",
+              "text": "跨境及境外机构业务依托离岸银行、自贸金融、境外分行和海外投行等多平台协同，境外机构包括香港分行、新加坡分行、伦敦分行及浦银国际。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010",
+                "source-0011"
+              ]
+            }
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "PS-01",
+              "text": "公司金融业务提供对公存款、对公贷款（含票据贴现）、投资银行（并购金融、债券承销）、交易银行、科技金融、普惠金融、绿色金融及机构客户服务等产品与服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004",
+                "source-0005",
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "PS-02",
+              "text": "零售金融业务提供零售客户经营、个人住房贷款、浦闪贷消费贷款、浦发i车贷、信用卡、财富管理、传承保障、借记卡及养老金融等服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0007",
+                "source-0008",
+                "source-0009"
+              ]
+            },
+            {
+              "fact_id": "PS-03",
+              "text": "金融市场与金融机构业务提供金融机构客户经营、投资交易、浦银避险及资产托管服务；浦银避险覆盖固定收益、外汇、贵金属及大宗商品等领域。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009",
+                "source-0010"
+              ]
+            },
+            {
+              "fact_id": "PS-04",
+              "text": "跨境及境外机构业务提供自贸业务、跨境电商、跨境避险、跨境资金管理、跨境并购、跨境贸易、跨境资产托管及跨境人民币等跨境金融场景服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010",
+                "source-0011"
+              ]
+            }
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "RM-01",
+              "text": "本集团营业收入主要来源于利息净收入、手续费及佣金净收入和其他净收入；2025年利息净收入占营业收入69.26%，手续费及佣金净收入占13.06%，其他净收入占17.68%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "利息净收入占营业收入比例",
+                  "raw_value": "69.26",
+                  "value": "69.26",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "手续费及佣金净收入占营业收入比例",
+                  "raw_value": "13.06",
+                  "value": "13.06",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他净收入占营业收入比例",
+                  "raw_value": "17.68",
+                  "value": "17.68",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "RM-02",
+              "text": "按业务总收入构成，贷款利息收入占57.26%，投资利息收入占17.57%，手续费及佣金收入占9.04%，存拆放同业和其他金融机构往来业务利息收入占5.20%，存放央行利息收入占1.48%，其他收入占9.45%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013",
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "贷款利息收入占业务总收入比例",
+                  "raw_value": "57.26",
+                  "value": "57.26",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "投资利息收入占业务总收入比例",
+                  "raw_value": "17.57",
+                  "value": "17.57",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "手续费及佣金收入占业务总收入比例",
+                  "raw_value": "9.04",
+                  "value": "9.04",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "存拆放同业和其他金融机构往来业务利息收入占业务总收入比例",
+                  "raw_value": "5.20",
+                  "value": "5.20",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "存放央行利息收入占业务总收入比例",
+                  "raw_value": "1.48",
+                  "value": "1.48",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他收入占业务总收入比例",
+                  "raw_value": "9.45",
+                  "value": "9.45",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "RM-03",
+              "text": "报告期内本集团实现营业收入1,739.64亿元，同比增加32.16亿元，增长1.88%；实现利润总额533.74亿元，同比增长10.35%；归属于母公司股东的净利润500.17亿元，同比增长10.52%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0013"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "1,739.64",
+                  "value": "1739.64",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入同比增加额",
+                  "raw_value": "32.16",
+                  "value": "32.16",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入同比增长率",
+                  "raw_value": "1.88",
+                  "value": "1.88",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "利润总额",
+                  "raw_value": "533.74",
+                  "value": "533.74",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "利润总额同比增长率",
+                  "raw_value": "10.35",
+                  "value": "10.35",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于母公司股东的净利润",
+                  "raw_value": "500.17",
+                  "value": "500.17",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "归属于母公司股东的净利润同比增长率",
+                  "raw_value": "10.52",
+                  "value": "10.52",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "RM-04",
+              "text": "报告期内本集团实现利息净收入1,204.83亿元，同比增长5.03%；净利息收益率为1.42%，较上年同期持平。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "利息净收入",
+                  "raw_value": "1,204.83",
+                  "value": "1204.83",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "利息净收入同比增长率",
+                  "raw_value": "5.03",
+                  "value": "5.03",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "净利息收益率",
+                  "raw_value": "1.42",
+                  "value": "1.42",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "SM-01",
+              "text": "报告期末本集团资产总额100,817.46亿元，较上年末增长6.55%；本外币贷款总额（含票据贴现）57,039.73亿元，增长5.80%；负债总额92,573.16亿元，增长6.20%；本外币存款总额55,824.35亿元，增长8.48%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "资产总额",
+                  "raw_value": "100,817.46",
+                  "value": "100817.46",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "资产总额较上年末增长率",
+                  "raw_value": "6.55",
+                  "value": "6.55",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "本外币贷款总额（含票据贴现）",
+                  "raw_value": "57,039.73",
+                  "value": "57039.73",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "本外币贷款总额较上年末增长率",
+                  "raw_value": "5.80",
+                  "value": "5.80",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "负债总额",
+                  "raw_value": "92,573.16",
+                  "value": "92573.16",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "负债总额较上年末增长率",
+                  "raw_value": "6.20",
+                  "value": "6.20",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "本外币存款总额",
+                  "raw_value": "55,824.35",
+                  "value": "55824.35",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "本外币存款总额较上年末增长率",
+                  "raw_value": "8.48",
+                  "value": "8.48",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "SM-02",
+              "text": "报告期内实现对公业务营业净收入685.79亿元；报告期末公司客户数252.29万户，较上年末增长6.52%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "对公业务营业净收入",
+                  "raw_value": "685.79",
+                  "value": "685.79",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "公司客户数",
+                  "raw_value": "252.29",
+                  "value": "252.29",
+                  "unit": "万户",
+                  "source_unit": "万户",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "公司客户数较上年末增长率",
+                  "raw_value": "6.52",
+                  "value": "6.52",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "SM-03",
+              "text": "报告期末母公司对公存款余额38,103.74亿元，较上年末增长7.78%；母公司对公贷款（含票据贴现）总额36,654.74亿元，较上年末增长8.23%。",
+              "subject_scope": "issuer",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "母公司对公存款余额",
+                  "raw_value": "38,103.74",
+                  "value": "38103.74",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "issuer",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "母公司对公存款余额较上年末增长率",
+                  "raw_value": "7.78",
+                  "value": "7.78",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "issuer",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "母公司对公贷款（含票据贴现）总额",
+                  "raw_value": "36,654.74",
+                  "value": "36654.74",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "issuer",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "母公司对公贷款（含票据贴现）总额较上年末增长率",
+                  "raw_value": "8.23",
+                  "value": "8.23",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "issuer",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "SM-04",
+              "text": "报告期末个人客户（含信用卡）1.71亿户，较上年末增加1,396.59万户；AUM个人金融资产余额（含市值）46,645.33亿元，较上年末增长20.26%；母公司个人存款余额17,177.05亿元，增长10.79%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0006",
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "个人客户（含信用卡）数",
+                  "raw_value": "1.71",
+                  "value": "1.71",
+                  "unit": "亿户",
+                  "source_unit": "亿户",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "AUM个人金融资产余额（含市值）",
+                  "raw_value": "46,645.33",
+                  "value": "46645.33",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "AUM个人金融资产余额较上年末增长率",
+                  "raw_value": "20.26",
+                  "value": "20.26",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "母公司个人存款余额",
+                  "raw_value": "17,177.05",
+                  "value": "17177.05",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "issuer",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "母公司个人存款余额较上年末增长率",
+                  "raw_value": "10.79",
+                  "value": "10.79",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "issuer",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "SM-05",
+              "text": "报告期末母公司零售贷款（不含个人经营贷款）余额15,137.37亿元，较上年末增长3.46%；个人住房贷款余额8,768.34亿元，增长2.04%；信用卡及透支余额3,893.27亿元，增长5.16%。",
+              "subject_scope": "issuer",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0007",
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "母公司零售贷款（不含个人经营贷款）余额",
+                  "raw_value": "15,137.37",
+                  "value": "15137.37",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "issuer",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "母公司零售贷款（不含个人经营贷款）余额较上年末增长率",
+                  "raw_value": "3.46",
+                  "value": "3.46",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "issuer",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "个人住房贷款余额",
+                  "raw_value": "8,768.34",
+                  "value": "8768.34",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "个人住房贷款余额较上年末增长率",
+                  "raw_value": "2.04",
+                  "value": "2.04",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "信用卡及透支余额",
+                  "raw_value": "3,893.27",
+                  "value": "3893.27",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "信用卡及透支余额较上年末增长率",
+                  "raw_value": "5.16",
+                  "value": "5.16",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "SM-06",
+              "text": "报告期末托管规模20.21万亿元，较上年末增长11.45%；报告期内托管收入24.81亿元，同比增长7.23%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "托管规模",
+                  "raw_value": "20.21",
+                  "value": "20.21",
+                  "unit": "万亿元",
+                  "source_unit": "万亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "托管规模较上年末增长率",
+                  "raw_value": "11.45",
+                  "value": "11.45",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "托管收入",
+                  "raw_value": "24.81",
+                  "value": "24.81",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "托管收入同比增长率",
+                  "raw_value": "7.23",
+                  "value": "7.23",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "SM-07",
+              "text": "按地区分部，总行营业收入566.29亿元占32.55%，长三角地区439.95亿元占25.29%，境外及附属机构164.79亿元占9.48%，其余地区合计占比较小。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "总行营业收入",
+                  "raw_value": "56,629",
+                  "value": "56629",
+                  "unit": "百万元",
+                  "source_unit": "人民币百万元",
+                  "currency": "人民币",
+                  "period": "2025年",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "总行营业收入占比",
+                  "raw_value": "32.55",
+                  "value": "32.55",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "长三角地区营业收入",
+                  "raw_value": "43,995",
+                  "value": "43995",
+                  "unit": "百万元",
+                  "source_unit": "人民币百万元",
+                  "currency": "人民币",
+                  "period": "2025年",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "长三角地区营业收入占比",
+                  "raw_value": "25.29",
+                  "value": "25.29",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "境外及附属机构营业收入",
+                  "raw_value": "16,479",
+                  "value": "16479",
+                  "unit": "百万元",
+                  "source_unit": "人民币百万元",
+                  "currency": "人民币",
+                  "period": "2025年",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "境外及附属机构营业收入占比",
+                  "raw_value": "9.48",
+                  "value": "9.48",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "OI-01",
+              "text": "作为银行，公司经营投入主要为生息资产与计息负债：2025年生息资产平均余额8,514,479百万元，平均收益率3.11%；计息负债平均余额8,292,491百万元，平均成本率1.74%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "生息资产平均余额",
+                  "raw_value": "8,514,479",
+                  "value": "8514479",
+                  "unit": "百万元",
+                  "source_unit": "人民币百万元",
+                  "currency": "人民币",
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "生息资产平均收益率",
+                  "raw_value": "3.11",
+                  "value": "3.11",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "计息负债平均余额",
+                  "raw_value": "8,292,491",
+                  "value": "8292491",
+                  "unit": "百万元",
+                  "source_unit": "人民币百万元",
+                  "currency": "人民币",
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "计息负债平均成本率",
+                  "raw_value": "1.74",
+                  "value": "1.74",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "OI-02",
+              "text": "生息资产中贷款及垫款平均余额5,553,061百万元、平均收益率3.35%；投资平均余额1,955,190百万元、平均收益率2.92%。计息负债中客户存款平均余额5,380,262百万元、平均成本率1.59%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "贷款及垫款平均余额",
+                  "raw_value": "5,553,061",
+                  "value": "5553061",
+                  "unit": "百万元",
+                  "source_unit": "人民币百万元",
+                  "currency": "人民币",
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "贷款及垫款平均收益率",
+                  "raw_value": "3.35",
+                  "value": "3.35",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "投资平均余额",
+                  "raw_value": "1,955,190",
+                  "value": "1955190",
+                  "unit": "百万元",
+                  "source_unit": "人民币百万元",
+                  "currency": "人民币",
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "投资平均收益率",
+                  "raw_value": "2.92",
+                  "value": "2.92",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "客户存款平均余额",
+                  "raw_value": "5,380,262",
+                  "value": "5380262",
+                  "unit": "百万元",
+                  "source_unit": "人民币百万元",
+                  "currency": "人民币",
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "客户存款平均成本率",
+                  "raw_value": "1.59",
+                  "value": "1.59",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "OI-03",
+              "text": "公司贷款、零售贷款平均收益率分别为3.15%、3.99%，分别同比下降0.46和0.77个百分点；票据贴现平均收益率1.19%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "公司贷款平均收益率",
+                  "raw_value": "3.15",
+                  "value": "3.15",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "公司贷款平均收益率同比变动",
+                  "raw_value": "0.46",
+                  "value": "0.46",
+                  "unit": "百分点",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "comparison_basis": "同比下降"
+                },
+                {
+                  "name": "零售贷款平均收益率",
+                  "raw_value": "3.99",
+                  "value": "3.99",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "零售贷款平均收益率同比变动",
+                  "raw_value": "0.77",
+                  "value": "0.77",
+                  "unit": "百分点",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "comparison_basis": "同比下降"
+                },
+                {
+                  "name": "票据贴现平均收益率",
+                  "raw_value": "1.19",
+                  "value": "1.19",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "OI-04",
+              "text": "公司通过数字化手段优化存款客群结构，报告期内母公司对公存款付息率较上年度下降42bps；本集团负债付息率较上年下降46bps，本外币存款付息率较上年下降38bps。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "母公司对公存款付息率同比变动",
+                  "raw_value": "42",
+                  "value": "42",
+                  "unit": "bps",
+                  "source_unit": "bps",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "issuer",
+                  "qualifier": "exact",
+                  "comparison_basis": "较上年度下降"
+                },
+                {
+                  "name": "本集团负债付息率同比变动",
+                  "raw_value": "46",
+                  "value": "46",
+                  "unit": "bps",
+                  "source_unit": "bps",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "comparison_basis": "较上年下降"
+                },
+                {
+                  "name": "本外币存款付息率同比变动",
+                  "raw_value": "38",
+                  "value": "38",
+                  "unit": "bps",
+                  "source_unit": "bps",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "comparison_basis": "较上年下降"
+                }
+              ]
+            }
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "CC-01",
+              "text": "公司金融客户包括企业法人、政府机关、事业单位和社会组织等机构客户，并推进“四层四类”公司客户经营体系；报告期末公司客户数252.29万户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "公司客户数",
+                  "raw_value": "252.29",
+                  "value": "252.29",
+                  "unit": "万户",
+                  "source_unit": "万户",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "CC-02",
+              "text": "零售客户通过个人客户经营体系服务，报告期末个人客户（含信用卡）1.71亿户；月日均金融资产5万元以上客户469.26万户，私人银行客户（月日均金融资产600万元以上）5.55万户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "个人客户（含信用卡）数",
+                  "raw_value": "1.71",
+                  "value": "1.71",
+                  "unit": "亿户",
+                  "source_unit": "亿户",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "月日均金融资产5万元以上客户数",
+                  "raw_value": "469.26",
+                  "value": "469.26",
+                  "unit": "万户",
+                  "source_unit": "万户",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "月日均金融资产600万元以上私人银行客户数",
+                  "raw_value": "5.55",
+                  "value": "5.55",
+                  "unit": "万户",
+                  "source_unit": "万户",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "CC-03",
+              "text": "金融机构客户方面，报告期末合作金融机构一级法人客户约3,300家，与公募基金、保险资管、信托、银行理财、券商、期货等持牌非银资产管理机构合作覆盖度达80%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "合作金融机构一级法人客户数",
+                  "raw_value": "约3,300",
+                  "value": "3300",
+                  "unit": "家",
+                  "source_unit": "家",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "approximate"
+                },
+                {
+                  "name": "持牌非银资产管理机构合作覆盖度",
+                  "raw_value": "80",
+                  "value": "80",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "CC-04",
+              "text": "跨境客户方面，报告期末跨境客户数近4.9万户，增长24%；跨境数字化渠道活跃客户2.8万户；总分行战略客户海外贷款余额1,884亿元人民币，增长48%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0011"
+              ],
+              "metrics": [
+                {
+                  "name": "跨境客户数",
+                  "raw_value": "近4.9",
+                  "value": "4.9",
+                  "unit": "万户",
+                  "source_unit": "万户",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "approximate"
+                },
+                {
+                  "name": "跨境客户数增长率",
+                  "raw_value": "24",
+                  "value": "24",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "跨境数字化渠道活跃客户数",
+                  "raw_value": "2.8",
+                  "value": "2.8",
+                  "unit": "万户",
+                  "source_unit": "万户",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "总分行战略客户海外贷款余额",
+                  "raw_value": "1,884",
+                  "value": "1884",
+                  "unit": "亿元",
+                  "source_unit": "亿元人民币",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "总分行战略客户海外贷款余额增长率",
+                  "raw_value": "48",
+                  "value": "48",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "CC-05",
+              "text": "按地区分部，总行营业收入占比32.55%，长三角地区占25.29%，珠三角及海西地区占7.54%，环渤海地区占9.08%，中部地区占6.96%，西部地区占6.69%，东北地区占2.41%，境外及附属机构占9.48%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "珠三角及海西地区营业收入占比",
+                  "raw_value": "7.54",
+                  "value": "7.54",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "环渤海地区营业收入占比",
+                  "raw_value": "9.08",
+                  "value": "9.08",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "中部地区营业收入占比",
+                  "raw_value": "6.96",
+                  "value": "6.96",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "西部地区营业收入占比",
+                  "raw_value": "6.69",
+                  "value": "6.69",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "东北地区营业收入占比",
+                  "raw_value": "2.41",
+                  "value": "2.41",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "OD-01",
+              "text": "报告期内公司聚焦中长期制造业发展和现代化产业体系等关键领域加大信贷投放，“五大赛道”业务成为公司贷款主要增长极；制造业中长期贷款总额3,599.26亿元，较上年末增长12.86%，高于整体贷款增速7个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "制造业中长期贷款总额",
+                  "raw_value": "3,599.26",
+                  "value": "3599.26",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "制造业中长期贷款总额较上年末增长率",
+                  "raw_value": "12.86",
+                  "value": "12.86",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "制造业中长期贷款增速高于整体贷款增速幅度",
+                  "raw_value": "7",
+                  "value": "7",
+                  "unit": "百分点",
+                  "source_unit": "个百分点",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "OD-02",
+              "text": "报告期内公司加大高收益资产配置，2025年集团本外币贷款（不含票据贴现）在生息资产日均占比提升近2个百分点；存款在计息负债日均占比较上年提升近3个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "本外币贷款（不含票据贴现）在生息资产日均占比变动",
+                  "raw_value": "近2",
+                  "value": "2",
+                  "unit": "百分点",
+                  "source_unit": "个百分点",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "approximate",
+                  "comparison_basis": "较上年提升"
+                },
+                {
+                  "name": "存款在计息负债日均占比变动",
+                  "raw_value": "近3",
+                  "value": "3",
+                  "unit": "百分点",
+                  "source_unit": "个百分点",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "approximate",
+                  "comparison_basis": "较上年提升"
+                }
+              ]
+            },
+            {
+              "fact_id": "OD-03",
+              "text": "报告期内公司不良贷款余额719.90亿元，较上年末减少11.64亿元；不良贷款率1.26%，较上年末下降0.10个百分点；拨备覆盖率200.72%，较上年末上升13.76个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "不良贷款余额",
+                  "raw_value": "719.90",
+                  "value": "719.90",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "不良贷款余额较上年末变动",
+                  "raw_value": "11.64",
+                  "value": "11.64",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "comparison_basis": "较上年末减少"
+                },
+                {
+                  "name": "不良贷款率",
+                  "raw_value": "1.26",
+                  "value": "1.26",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "不良贷款率较上年末变动",
+                  "raw_value": "0.10",
+                  "value": "0.10",
+                  "unit": "百分点",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "comparison_basis": "较上年末下降"
+                },
+                {
+                  "name": "拨备覆盖率",
+                  "raw_value": "200.72",
+                  "value": "200.72",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "拨备覆盖率较上年末变动",
+                  "raw_value": "13.76",
+                  "value": "13.76",
+                  "unit": "百分点",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "comparison_basis": "较上年末上升"
+                }
+              ]
+            },
+            {
+              "fact_id": "OD-04",
+              "text": "报告期内公司完成498.37亿元可转债转股，发行500亿元无固定期限资本债券和200亿元二级资本债券；报告期末资本充足率12.47%，一级资本充足率9.99%，核心一级资本充足率8.99%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ],
+              "metrics": [
+                {
+                  "name": "可转债转股金额",
+                  "raw_value": "498.37",
+                  "value": "498.37",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "无固定期限资本债券发行规模",
+                  "raw_value": "500",
+                  "value": "500",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "二级资本债券发行规模",
+                  "raw_value": "200",
+                  "value": "200",
+                  "unit": "亿元",
+                  "source_unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "资本充足率",
+                  "raw_value": "12.47",
+                  "value": "12.47",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "一级资本充足率",
+                  "raw_value": "9.99",
+                  "value": "9.99",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "核心一级资本充足率",
+                  "raw_value": "8.99",
+                  "value": "8.99",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年末",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "OD-05",
+              "text": "报告期内公司净息差1.42%，较上年持平；平均总资产收益率（ROA）0.52%，较上年上升0.02个百分点；加权平均净资产收益率（ROE）6.76%，较上年上升0.48个百分点；成本收入比28.50%，较上年下降0.66个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "净息差",
+                  "raw_value": "1.42",
+                  "value": "1.42",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "平均总资产收益率（ROA）",
+                  "raw_value": "0.52",
+                  "value": "0.52",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "平均总资产收益率（ROA）较上年变动",
+                  "raw_value": "0.02",
+                  "value": "0.02",
+                  "unit": "百分点",
+                  "source_unit": "个百分点",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "comparison_basis": "较上年上升"
+                },
+                {
+                  "name": "加权平均净资产收益率（ROE）",
+                  "raw_value": "6.76",
+                  "value": "6.76",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "加权平均净资产收益率（ROE）较上年变动",
+                  "raw_value": "0.48",
+                  "value": "0.48",
+                  "unit": "百分点",
+                  "source_unit": "个百分点",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "comparison_basis": "较上年上升"
+                },
+                {
+                  "name": "成本收入比",
+                  "raw_value": "28.50",
+                  "value": "28.50",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "成本收入比较上年变动",
+                  "raw_value": "0.66",
+                  "value": "0.66",
+                  "unit": "百分点",
+                  "source_unit": "个百分点",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact",
+                  "comparison_basis": "较上年下降"
+                }
+              ]
+            }
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "MC-01",
+              "text": "报告期内公司完成498.37亿元可转债转股，创A股历史单笔最大规模转股纪录，并发行500亿元无固定期限资本债券和200亿元二级资本债券，资本实力有序扩充。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "MC-02",
+              "text": "报告期内公司不良贷款余额和不良贷款率较上年实现“双降”，不良贷款额为2019年以来最低水平，不良贷款率为2015年以来最好水平，拨备覆盖率为2016年以来最优水平。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "MC-03",
+              "text": "报告期内公司净息差逆势企稳，ROA、ROE回升，资产质量持续改善；负债付息率较上年下降46bps，存款在计息负债日均占比较上年提升近3个百分点。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "MC-04",
+              "text": "报告期内公司首次开立中央非税收入收缴财政专户，并获取住建部商贷数据交换平台、公积金管理系统、组合贷数据交换平台、公积金数字人民币试点四项资格准入。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            }
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "SC-P1",
+              "text": "公司为银行，在金融体系中承担资金融通与金融服务职能，通过吸收存款、发放贷款、投资交易及提供各类金融服务开展经营。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0013",
+                "source-0015"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "SC-U1",
+              "text": "银行经营的主要资金来源为计息负债，包括客户存款、同业及其他金融机构存拆放款项、已发行债务证券及向中央银行借款；2025年客户存款平均余额5,380,262百万元，平均成本率1.59%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "客户存款平均余额",
+                  "raw_value": "5,380,262",
+                  "value": "5380262",
+                  "unit": "百万元",
+                  "source_unit": "人民币百万元",
+                  "currency": "人民币",
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "客户存款平均成本率",
+                  "raw_value": "1.59",
+                  "value": "1.59",
+                  "unit": "%",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "SC-D1",
+              "text": "公司服务对象包括企业法人、政府机关、事业单位、社会组织等机构客户，个人客户，金融机构客户及跨境客户；产品用途涵盖信贷融资、支付结算、财富管理、投资交易、避险及托管等。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0006",
+                "source-0009",
+                "source-0010"
+              ]
+            }
+          ]
+        }
+      },
+      "limitations": [
+        "本工作底稿仅依据所选章节（3.1、3.6、3.7及3.7.1）编制，未覆盖行业背景、风险管理、监管指标及财务报告附注等未读章节。",
+        "分部数据中总行、长三角等地区分部的营业收入与占比按报告披露列示，未对地区间抵销进行额外调整说明。",
+        "部分指标（如跨境客户数、合作金融机构客户数）原文使用“近”“约”等约数，已保留原始表述及近似限定。",
+        "本底稿未枚举附属机构资本、资产、利润等明细，亦未收录荣誉、次要系统等非核心经营信息。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 14749,
+      "output_tokens": 10497,
+      "total_tokens": 25246
+    }
+  },
+  {
+    "request_id": "bp-work-5309b2253247ce42c9e61beb:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "5d231a33b60cd4770ffb8bb59be703344abc1d32ff983a7c077c9db48958a9cf",
+    "response_hash": "aea24b16e2ec7378c0f456c385d6d6b0296c2f457a8f30745180410e6287b2d6",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"BS-01\",\"BS-02\",\"BS-03\",\"BS-04\",\"PS-01\",\"PS-02\",\"PS-03\",\"PS-04\",\"RM-01\",\"RM-02\",\"RM-03\",\"RM-04\",\"SM-01\",\"SM-02\",\"SM-03\",\"SM-04\",\"SM-05\",\"SM-06\",\"OI-03\",\"OI-04\",\"CC-01\",\"CC-02\",\"CC-03\",\"CC-05\",\"OD-01\",\"OD-02\",\"OD-03\",\"OD-04\",\"OD-05\",\"MC-01\",\"MC-02\",\"MC-03\",\"MC-04\"],\"findings\":[{\"finding_id\":\"F-001\",\"element\":\"revenue_model\",\"affected_fact_id\":\"RM-02\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"evidence_ids\":[\"source-0013\",\"source-0014\"],\"explanation\":\"RM-02所列业务总收入占比与source-0013、source-0014一致，不必改数；但同表已披露合计及分项“比上年同期增减(%)”，草案未收录。业务总收入合计325,269百万元，同比下降7.36%；贷款利息收入-8.41%，投资利息收入-5.54%，手续费及佣金收入-1.31%，存拆放同业和其他金融机构往来业务利息收入-12.50%，存放央行利息收入-2.76%，其他收入-7.40%。仅保留占比、并与营业收入增长1.88%并列，会漏掉毛收入端普遍下降这一收入事实。\"},{\"finding_id\":\"F-002\",\"element\":\"revenue_model\",\"affected_fact_id\":\"RM-03\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"evidence_ids\":[\"source-0001\",\"source-0013\"],\"explanation\":\"RM-03的营业收入、利润总额、归母净利润及增速与source-0001、source-0013一致，但遗漏同一披露中的重要调整和利润驱动。source-0001载明归属于母公司股东的扣除非经常性损益的净利润501.44亿元，同比增加59.37亿元、增长13.43%，高于归母净利润增速10.52%。source-0013中信用减值损失及其他减值损失为-65,901百万元，上年同期-69,480百万元，减值支出减少35.79亿元，是利润总额增速10.35%明显高于营业收入增速1.88%的主要原因。缺失后会把利润高增误读为收入驱动。\"},{\"finding_id\":\"F-003\",\"element\":\"operating_drivers\",\"affected_fact_id\":null,\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"evidence_ids\":[\"source-0014\",\"source-0015\"],\"explanation\":\"已采纳事实只记录利息净收入增长5.03%、净利息收益率/净息差1.42%持平，以及公司贷款、零售贷款分项收益率。source-0014、source-0015另有未收录的核心驱动：集团利息收入2,651.16亿元，同比减少230.09亿元、下降7.99%；生息资产平均收益率3.11%，同比下降0.46个百分点；计息负债平均成本率1.74%，同比下降0.46个百分点；净利差1.37%，与上年持平。负债付息率下降46bps已见于OI-04，但资产收益率同步下降及利息收入下降未进入已采纳事实，无法说明息差持平来自收益率与成本率对冲。补录时须保留“集团”主体，并把0.46记为个百分点而非百分数。\"},{\"finding_id\":\"F-004\",\"element\":\"scale_and_mix\",\"affected_fact_id\":null,\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"evidence_ids\":[\"source-0004\",\"source-0005\",\"source-0011\"],\"explanation\":\"主要业务章节已披露、但规模要素未收录的大额结果包括：科技金融贷款（中国人民银行统计口径）10,470.92亿元（source-0005，主体为“公司”）；绿色信贷余额7,073.74亿元，较上年末增加1,366.80亿元、增长23.95%（source-0005，主体为“公司”）；境内外并购贷款余额2,431.43亿元、较上年末增长17.11%，新发放1,139.43亿元、同比增长47.05%（source-0004）；全行国内贸易融资总业务量突破2.8万亿元、同比增幅16.5%（source-0004）；跨境客户数近4.9万户、增长24%，总分行战略客户海外贷款余额1,884亿元人民币、增长48%（source-0011，须保留“近”）。上述规模显著大于草案已列的制造业中长期贷款3,599.26亿元，缺失会扭曲信贷与跨境主业画像。原文未写明母公司或本集团的，不得补写成母公司口径。\"},{\"finding_id\":\"F-005\",\"element\":\"operations_and_inputs\",\"affected_fact_id\":\"OI-03\",\"severity\":\"minor\",\"issue_type\":\"wrong_unit_or_denominator\",\"action\":\"correct\",\"evidence_ids\":[\"source-0015\"],\"explanation\":\"OI-03正文“同比下降0.46和0.77个百分点”与source-0015一致，数值和下降方向无误；但“公司贷款平均收益率同比变动”“零售贷款平均收益率同比变动”的source_unit写成“%”。原文单位是个百分点，不是百分数。source_unit应改为“个百分点”，避免把0.46个百分点读成0.46%的相对变动。\"},{\"finding_id\":\"F-006\",\"element\":\"operating_drivers\",\"affected_fact_id\":\"OD-03\",\"severity\":\"minor\",\"issue_type\":\"wrong_unit_or_denominator\",\"action\":\"correct\",\"evidence_ids\":[\"source-0001\"],\"explanation\":\"OD-03正文中不良贷款率下降0.10个百分点、拨备覆盖率上升13.76个百分点，与source-0001一致，金额类变动（不良贷款余额减少11.64亿元）单位也正确；但上述两项比率变动指标的source_unit为“%”。原文均为“个百分点”，source_unit应改为“个百分点”，不得与百分数混用。\"},{\"finding_id\":\"F-007\",\"element\":\"limitations\",\"affected_fact_id\":null,\"severity\":\"minor\",\"issue_type\":\"contradicts_source\",\"action\":\"correct\",\"evidence_ids\":[\"source-0014\",\"source-0015\"],\"explanation\":\"局限性称底稿仅依据3.1、3.6、3.7及3.7.1，但RM-04已采用source-0014的3.7.2利息净收入，OI-03已采用source-0015的3.7.2.1利息收入。该范围声明与已采纳事实及原文小节矛盾，不能作为3.7.2未被使用或未覆盖的依据。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "BS-01",
+        "BS-02",
+        "BS-03",
+        "BS-04",
+        "PS-01",
+        "PS-02",
+        "PS-03",
+        "PS-04",
+        "RM-01",
+        "RM-02",
+        "RM-03",
+        "RM-04",
+        "SM-01",
+        "SM-02",
+        "SM-03",
+        "SM-04",
+        "SM-05",
+        "SM-06",
+        "OI-03",
+        "OI-04",
+        "CC-01",
+        "CC-02",
+        "CC-03",
+        "CC-05",
+        "OD-01",
+        "OD-02",
+        "OD-03",
+        "OD-04",
+        "OD-05",
+        "MC-01",
+        "MC-02",
+        "MC-03",
+        "MC-04"
+      ],
+      "findings": [
+        {
+          "finding_id": "F-001",
+          "element": "revenue_model",
+          "affected_fact_id": "RM-02",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "evidence_ids": [
+            "source-0013",
+            "source-0014"
+          ],
+          "explanation": "RM-02所列业务总收入占比与source-0013、source-0014一致，不必改数；但同表已披露合计及分项“比上年同期增减(%)”，草案未收录。业务总收入合计325,269百万元，同比下降7.36%；贷款利息收入-8.41%，投资利息收入-5.54%，手续费及佣金收入-1.31%，存拆放同业和其他金融机构往来业务利息收入-12.50%，存放央行利息收入-2.76%，其他收入-7.40%。仅保留占比、并与营业收入增长1.88%并列，会漏掉毛收入端普遍下降这一收入事实。"
+        },
+        {
+          "finding_id": "F-002",
+          "element": "revenue_model",
+          "affected_fact_id": "RM-03",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "evidence_ids": [
+            "source-0001",
+            "source-0013"
+          ],
+          "explanation": "RM-03的营业收入、利润总额、归母净利润及增速与source-0001、source-0013一致，但遗漏同一披露中的重要调整和利润驱动。source-0001载明归属于母公司股东的扣除非经常性损益的净利润501.44亿元，同比增加59.37亿元、增长13.43%，高于归母净利润增速10.52%。source-0013中信用减值损失及其他减值损失为-65,901百万元，上年同期-69,480百万元，减值支出减少35.79亿元，是利润总额增速10.35%明显高于营业收入增速1.88%的主要原因。缺失后会把利润高增误读为收入驱动。"
+        },
+        {
+          "finding_id": "F-003",
+          "element": "operating_drivers",
+          "affected_fact_id": null,
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "evidence_ids": [
+            "source-0014",
+            "source-0015"
+          ],
+          "explanation": "已采纳事实只记录利息净收入增长5.03%、净利息收益率/净息差1.42%持平，以及公司贷款、零售贷款分项收益率。source-0014、source-0015另有未收录的核心驱动：集团利息收入2,651.16亿元，同比减少230.09亿元、下降7.99%；生息资产平均收益率3.11%，同比下降0.46个百分点；计息负债平均成本率1.74%，同比下降0.46个百分点；净利差1.37%，与上年持平。负债付息率下降46bps已见于OI-04，但资产收益率同步下降及利息收入下降未进入已采纳事实，无法说明息差持平来自收益率与成本率对冲。补录时须保留“集团”主体，并把0.46记为个百分点而非百分数。"
+        },
+        {
+          "finding_id": "F-004",
+          "element": "scale_and_mix",
+          "affected_fact_id": null,
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "evidence_ids": [
+            "source-0004",
+            "source-0005",
+            "source-0011"
+          ],
+          "explanation": "主要业务章节已披露、但规模要素未收录的大额结果包括：科技金融贷款（中国人民银行统计口径）10,470.92亿元（source-0005，主体为“公司”）；绿色信贷余额7,073.74亿元，较上年末增加1,366.80亿元、增长23.95%（source-0005，主体为“公司”）；境内外并购贷款余额2,431.43亿元、较上年末增长17.11%，新发放1,139.43亿元、同比增长47.05%（source-0004）；全行国内贸易融资总业务量突破2.8万亿元、同比增幅16.5%（source-0004）；跨境客户数近4.9万户、增长24%，总分行战略客户海外贷款余额1,884亿元人民币、增长48%（source-0011，须保留“近”）。上述规模显著大于草案已列的制造业中长期贷款3,599.26亿元，缺失会扭曲信贷与跨境主业画像。原文未写明母公司或本集团的，不得补写成母公司口径。"
+        },
+        {
+          "finding_id": "F-005",
+          "element": "operations_and_inputs",
+          "affected_fact_id": "OI-03",
+          "severity": "minor",
+          "issue_type": "wrong_unit_or_denominator",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0015"
+          ],
+          "explanation": "OI-03正文“同比下降0.46和0.77个百分点”与source-0015一致，数值和下降方向无误；但“公司贷款平均收益率同比变动”“零售贷款平均收益率同比变动”的source_unit写成“%”。原文单位是个百分点，不是百分数。source_unit应改为“个百分点”，避免把0.46个百分点读成0.46%的相对变动。"
+        },
+        {
+          "finding_id": "F-006",
+          "element": "operating_drivers",
+          "affected_fact_id": "OD-03",
+          "severity": "minor",
+          "issue_type": "wrong_unit_or_denominator",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "OD-03正文中不良贷款率下降0.10个百分点、拨备覆盖率上升13.76个百分点，与source-0001一致，金额类变动（不良贷款余额减少11.64亿元）单位也正确；但上述两项比率变动指标的source_unit为“%”。原文均为“个百分点”，source_unit应改为“个百分点”，不得与百分数混用。"
+        },
+        {
+          "finding_id": "F-007",
+          "element": "limitations",
+          "affected_fact_id": null,
+          "severity": "minor",
+          "issue_type": "contradicts_source",
+          "action": "correct",
+          "evidence_ids": [
+            "source-0014",
+            "source-0015"
+          ],
+          "explanation": "局限性称底稿仅依据3.1、3.6、3.7及3.7.1，但RM-04已采用source-0014的3.7.2利息净收入，OI-03已采用source-0015的3.7.2.1利息收入。该范围声明与已采纳事实及原文小节矛盾，不能作为3.7.2未被使用或未覆盖的依据。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 28084,
+      "output_tokens": 1609,
+      "total_tokens": 32650
+    }
+  },
+  {
+    "request_id": "bp-work-5309b2253247ce42c9e61beb:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "b8507d29c1bc81aefea989b45be77ad8fed17724e16145fea4ef1f58be7a22c0",
+    "response_hash": "e1075bd0b0b14c0736192ff3435403eb2ad9a3ff721eedeca81256f3c5daf1d5",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "rejected",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"RM-02\",\"text\":\"按业务总收入构成，贷款利息收入占57.26%，投资利息收入占17.57%，手续费及佣金收入占9.04%，存拆放同业和其他金融机构往来业务利息收入占5.20%，存放央行利息收入占1.48%，其他收入占9.45%；业务总收入合计325,269百万元，比上年同期下降7.36%，其中贷款利息收入下降8.41%，投资利息收入下降5.54%，手续费及佣金收入下降1.31%，存拆放同业和其他金融机构往来业务利息收入下降12.50%，存放央行利息收入下降2.76%，其他收入下降7.40%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\",\"source-0014\"],\"metrics\":[{\"name\":\"贷款利息收入占业务总收入比例\",\"raw_value\":\"57.26\",\"value\":\"57.26\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"投资利息收入占业务总收入比例\",\"raw_value\":\"17.57\",\"value\":\"17.57\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"手续费及佣金收入占业务总收入比例\",\"raw_value\":\"9.04\",\"value\":\"9.04\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"存拆放同业和其他金融机构往来业务利息收入占业务总收入比例\",\"raw_value\":\"5.20\",\"value\":\"5.20\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"存放央行利息收入占业务总收入比例\",\"raw_value\":\"1.48\",\"value\":\"1.48\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他收入占业务总收入比例\",\"raw_value\":\"9.45\",\"value\":\"9.45\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"业务总收入\",\"raw_value\":\"325,269\",\"value\":\"325269\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"业务总收入比上年同期增减\",\"raw_value\":\"-7.36\",\"value\":\"-7.36\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":\"比上年同期增减\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"贷款利息收入比上年同期增减\",\"raw_value\":\"-8.41\",\"value\":\"-8.41\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":\"比上年同期增减\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"投资利息收入比上年同期增减\",\"raw_value\":\"-5.54\",\"value\":\"-5.54\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":\"比上年同期增减\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"手续费及佣金收入比上年同期增减\",\"raw_value\":\"-1.31\",\"value\":\"-1.31\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":\"比上年同期增减\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"存拆放同业和其他金融机构往来业务利息收入比上年同期增减\",\"raw_value\":\"-12.50\",\"value\":\"-12.50\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":\"比上年同期增减\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"存放央行利息收入比上年同期增减\",\"raw_value\":\"-2.76\",\"value\":\"-2.76\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":\"比上年同期增减\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他收入比上年同期增减\",\"raw_value\":\"-7.40\",\"value\":\"-7.40\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":\"比上年同期增减\",\"qualifier\":\"exact\",\"uncertainty_reason\":null}]},{\"fact_id\":\"RM-03\",\"text\":\"报告期内本集团实现营业收入1,739.64亿元，同比增加32.16亿元，增长1.88%；实现利润总额533.74亿元，同比增加50.08亿元，增长10.35%；归属于母公司股东的净利润500.17亿元，同比增加47.60亿元，增长10.52%；归属于母公司股东的扣除非经常性损益的净利润501.44亿元，同比增加59.37亿元，增长13.43%。信用减值损失及其他减值损失为-65,901百万元，上年同期为-69,480百万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0013\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"1,739.64\",\"value\":\"1739.64\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"营业收入同比增加额\",\"raw_value\":\"32.16\",\"value\":\"32.16\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"营业收入同比增长率\",\"raw_value\":\"1.88\",\"value\":\"1.88\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"利润总额\",\"raw_value\":\"533.74\",\"value\":\"533.74\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"利润总额同比增加额\",\"raw_value\":\"50.08\",\"value\":\"50.08\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"利润总额同比增长率\",\"raw_value\":\"10.35\",\"value\":\"10.35\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"归属于母公司股东的净利润\",\"raw_value\":\"500.17\",\"value\":\"500.17\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"归属于母公司股东的净利润同比增加额\",\"raw_value\":\"47.60\",\"value\":\"47.60\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"归属于母公司股东的净利润同比增长率\",\"raw_value\":\"10.52\",\"value\":\"10.52\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"归属于母公司股东的扣除非经常性损益的净利润\",\"raw_value\":\"501.44\",\"value\":\"501.44\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"归属于母公司股东的扣除非经常性损益的净利润同比增加额\",\"raw_value\":\"59.37\",\"value\":\"59.37\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"归属于母公司股东的扣除非经常性损益的净利润同比增长率\",\"raw_value\":\"13.43\",\"value\":\"13.43\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"信用减值损失及其他减值损失\",\"raw_value\":\"-65,901\",\"value\":\"-65901\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"信用减值损失及其他减值损失上年同期\",\"raw_value\":\"-69,480\",\"value\":\"-69480\",\"unit\":\"百万元\",\"source_unit\":\"人民币百万元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}]},{\"fact_id\":\"review-add:F-003\",\"text\":\"报告期内，本集团实现利息收入2,651.16亿元，同比减少230.09亿元，下降7.99%；生息资产平均收益率3.11%，同比下降0.46个百分点；计息负债平均成本率1.74%，同比下降0.46个百分点；净利差1.37%，与上年持平。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0014\",\"source-0015\"],\"metrics\":[{\"name\":\"利息收入\",\"raw_value\":\"2,651.16\",\"value\":\"2651.16\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"利息收入同比减少额\",\"raw_value\":\"230.09\",\"value\":\"230.09\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":\"同比减少\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"利息收入同比变动率\",\"raw_value\":\"-7.99\",\"value\":\"-7.99\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":\"同比下降\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"生息资产平均收益率\",\"raw_value\":\"3.11\",\"value\":\"3.11\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"生息资产平均收益率同比变动\",\"raw_value\":\"0.46\",\"value\":\"0.46\",\"unit\":\"百分点\",\"source_unit\":\"个百分点\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":\"同比下降\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"计息负债平均成本率\",\"raw_value\":\"1.74\",\"value\":\"1.74\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"计息负债平均成本率同比变动\",\"raw_value\":\"0.46\",\"value\":\"0.46\",\"unit\":\"百分点\",\"source_unit\":\"个百分点\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":\"同比下降\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"净利差\",\"raw_value\":\"1.37\",\"value\":\"1.37\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":\"与上年持平\",\"qualifier\":\"exact\",\"uncertainty_reason\":null}]},{\"fact_id\":\"review-add:F-004\",\"text\":\"报告期末，公司科技金融贷款（中国人民银行统计口径）10,470.92亿元；绿色信贷余额7,073.74亿元，较上年末增加1,366.80亿元，增长23.95%；境内外并购贷款余额2,431.43亿元，较上年末增长17.11%，报告期内新发放并购贷款1,139.43亿元，同比增长47.05%；报告期内全行国内贸易融资总业务量突破2.8万亿元，同比增幅16.5%；跨境客户数近4.9万户，增长24%，总分行战略客户海外贷款余额1,884亿元人民币，增长48%。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0005\",\"source-0011\"],\"metrics\":[{\"name\":\"科技金融贷款（中国人民银行统计口径）\",\"raw_value\":\"10,470.92\",\"value\":\"10470.92\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"绿色信贷余额\",\"raw_value\":\"7,073.74\",\"value\":\"7073.74\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"绿色信贷余额较上年末增加额\",\"raw_value\":\"1,366.80\",\"value\":\"1366.80\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"issuer\",\"period\":\"2025年末\",\"comparison_basis\":\"较上年末增加\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"绿色信贷余额增长率\",\"raw_value\":\"23.95\",\"value\":\"23.95\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"issuer\",\"period\":\"2025年末\",\"comparison_basis\":\"较上年末增长\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"境内外并购贷款余额\",\"raw_value\":\"2,431.43\",\"value\":\"2431.43\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"unclear\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"原文未明确该余额为母公司口径还是本集团口径\"},{\"name\":\"境内外并购贷款余额较上年末增长率\",\"raw_value\":\"17.11\",\"value\":\"17.11\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年末\",\"comparison_basis\":\"较上年末增长\",\"qualifier\":\"exact\",\"uncertainty_reason\":\"原文未明确该余额为母公司口径还是本集团口径\"},{\"name\":\"新发放并购贷款\",\"raw_value\":\"1,139.43\",\"value\":\"1139.43\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"unclear\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"原文未明确该金额为母公司口径还是本集团口径\"},{\"name\":\"新发放并购贷款同比增长率\",\"raw_value\":\"47.05\",\"value\":\"47.05\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年\",\"comparison_basis\":\"同比增长\",\"qualifier\":\"exact\",\"uncertainty_reason\":\"原文未明确该金额为母公司口径还是本集团口径\"},{\"name\":\"国内贸易融资总业务量\",\"raw_value\":\"2.8\",\"value\":\"2.8\",\"unit\":\"万亿元\",\"source_unit\":\"万亿元\",\"currency\":\"人民币\",\"subject_scope\":\"unclear\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"greater_than\",\"uncertainty_reason\":\"原文为“突破2.8万亿元”，主体为“全行”，未明确母公司或本集团口径\"},{\"name\":\"国内贸易融资总业务量同比增幅\",\"raw_value\":\"16.5\",\"value\":\"16.5\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年\",\"comparison_basis\":\"同比增幅\",\"qualifier\":\"exact\",\"uncertainty_reason\":\"原文主体为“全行”，未明确母公司或本集团口径\"},{\"name\":\"跨境客户数\",\"raw_value\":\"近4.9\",\"value\":null,\"unit\":\"万户\",\"source_unit\":\"万户\",\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"approximate\",\"uncertainty_reason\":\"原文为“近4.9万户”，未明确母公司或本集团口径\"},{\"name\":\"跨境客户数增长率\",\"raw_value\":\"24\",\"value\":\"24\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年末\",\"comparison_basis\":\"增长\",\"qualifier\":\"exact\",\"uncertainty_reason\":\"原文未明确母公司或本集团口径\"},{\"name\":\"总分行战略客户海外贷款余额\",\"raw_value\":\"1,884\",\"value\":\"1884\",\"unit\":\"亿元\",\"source_unit\":\"亿元人民币\",\"currency\":\"人民币\",\"subject_scope\":\"unclear\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"原文未明确母公司或本集团口径\"},{\"name\":\"总分行战略客户海外贷款余额增长率\",\"raw_value\":\"48\",\"value\":\"48\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"unclear\",\"period\":\"2025年末\",\"comparison_basis\":\"增长\",\"qualifier\":\"exact\",\"uncertainty_reason\":\"原文未明确母公司或本集团口径\"}]},{\"fact_id\":\"OI-03\",\"text\":\"公司贷款、零售贷款平均收益率分别为3.15%、3.99%，分别同比下降0.46和0.77个百分点；票据贴现平均收益率1.19%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"公司贷款平均收益率\",\"raw_value\":\"3.15\",\"value\":\"3.15\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"公司贷款平均收益率同比变动\",\"raw_value\":\"0.46\",\"value\":\"0.46\",\"unit\":\"百分点\",\"source_unit\":\"个百分点\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":\"同比下降\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"零售贷款平均收益率\",\"raw_value\":\"3.99\",\"value\":\"3.99\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"零售贷款平均收益率同比变动\",\"raw_value\":\"0.77\",\"value\":\"0.77\",\"unit\":\"百分点\",\"source_unit\":\"个百分点\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":\"同比下降\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"票据贴现平均收益率\",\"raw_value\":\"1.19\",\"value\":\"1.19\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}]},{\"fact_id\":\"OD-03\",\"text\":\"报告期内公司不良贷款余额719.90亿元，较上年末减少11.64亿元；不良贷款率1.26%，较上年末下降0.10个百分点；拨备覆盖率200.72%，较上年末上升13.76个百分点。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"不良贷款余额\",\"raw_value\":\"719.90\",\"value\":\"719.90\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"不良贷款余额较上年末变动\",\"raw_value\":\"11.64\",\"value\":\"11.64\",\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"comparison_basis\":\"较上年末减少\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"不良贷款率\",\"raw_value\":\"1.26\",\"value\":\"1.26\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"不良贷款率较上年末变动\",\"raw_value\":\"0.10\",\"value\":\"0.10\",\"unit\":\"百分点\",\"source_unit\":\"个百分点\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"comparison_basis\":\"较上年末下降\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"拨备覆盖率\",\"raw_value\":\"200.72\",\"value\":\"200.72\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"拨备覆盖率较上年末变动\",\"raw_value\":\"13.76\",\"value\":\"13.76\",\"unit\":\"百分点\",\"source_unit\":\"个百分点\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"comparison_basis\":\"较上年末上升\",\"qualifier\":\"exact\",\"uncertainty_reason\":null}]}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "RM-02",
+          "text": "按业务总收入构成，贷款利息收入占57.26%，投资利息收入占17.57%，手续费及佣金收入占9.04%，存拆放同业和其他金融机构往来业务利息收入占5.20%，存放央行利息收入占1.48%，其他收入占9.45%；业务总收入合计325,269百万元，比上年同期下降7.36%，其中贷款利息收入下降8.41%，投资利息收入下降5.54%，手续费及佣金收入下降1.31%，存拆放同业和其他金融机构往来业务利息收入下降12.50%，存放央行利息收入下降2.76%，其他收入下降7.40%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0013",
+            "source-0014"
+          ],
+          "metrics": [
+            {
+              "name": "贷款利息收入占业务总收入比例",
+              "raw_value": "57.26",
+              "value": "57.26",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "投资利息收入占业务总收入比例",
+              "raw_value": "17.57",
+              "value": "17.57",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "手续费及佣金收入占业务总收入比例",
+              "raw_value": "9.04",
+              "value": "9.04",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "存拆放同业和其他金融机构往来业务利息收入占业务总收入比例",
+              "raw_value": "5.20",
+              "value": "5.20",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "存放央行利息收入占业务总收入比例",
+              "raw_value": "1.48",
+              "value": "1.48",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他收入占业务总收入比例",
+              "raw_value": "9.45",
+              "value": "9.45",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "业务总收入",
+              "raw_value": "325,269",
+              "value": "325269",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "业务总收入比上年同期增减",
+              "raw_value": "-7.36",
+              "value": "-7.36",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": "比上年同期增减",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "贷款利息收入比上年同期增减",
+              "raw_value": "-8.41",
+              "value": "-8.41",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": "比上年同期增减",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "投资利息收入比上年同期增减",
+              "raw_value": "-5.54",
+              "value": "-5.54",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": "比上年同期增减",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "手续费及佣金收入比上年同期增减",
+              "raw_value": "-1.31",
+              "value": "-1.31",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": "比上年同期增减",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "存拆放同业和其他金融机构往来业务利息收入比上年同期增减",
+              "raw_value": "-12.50",
+              "value": "-12.50",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": "比上年同期增减",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "存放央行利息收入比上年同期增减",
+              "raw_value": "-2.76",
+              "value": "-2.76",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": "比上年同期增减",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他收入比上年同期增减",
+              "raw_value": "-7.40",
+              "value": "-7.40",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": "比上年同期增减",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ]
+        },
+        {
+          "fact_id": "RM-03",
+          "text": "报告期内本集团实现营业收入1,739.64亿元，同比增加32.16亿元，增长1.88%；实现利润总额533.74亿元，同比增加50.08亿元，增长10.35%；归属于母公司股东的净利润500.17亿元，同比增加47.60亿元，增长10.52%；归属于母公司股东的扣除非经常性损益的净利润501.44亿元，同比增加59.37亿元，增长13.43%。信用减值损失及其他减值损失为-65,901百万元，上年同期为-69,480百万元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0013"
+          ],
+          "metrics": [
+            {
+              "name": "营业收入",
+              "raw_value": "1,739.64",
+              "value": "1739.64",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业收入同比增加额",
+              "raw_value": "32.16",
+              "value": "32.16",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "营业收入同比增长率",
+              "raw_value": "1.88",
+              "value": "1.88",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "利润总额",
+              "raw_value": "533.74",
+              "value": "533.74",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "利润总额同比增加额",
+              "raw_value": "50.08",
+              "value": "50.08",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "利润总额同比增长率",
+              "raw_value": "10.35",
+              "value": "10.35",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "归属于母公司股东的净利润",
+              "raw_value": "500.17",
+              "value": "500.17",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "归属于母公司股东的净利润同比增加额",
+              "raw_value": "47.60",
+              "value": "47.60",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "归属于母公司股东的净利润同比增长率",
+              "raw_value": "10.52",
+              "value": "10.52",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "归属于母公司股东的扣除非经常性损益的净利润",
+              "raw_value": "501.44",
+              "value": "501.44",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "归属于母公司股东的扣除非经常性损益的净利润同比增加额",
+              "raw_value": "59.37",
+              "value": "59.37",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "归属于母公司股东的扣除非经常性损益的净利润同比增长率",
+              "raw_value": "13.43",
+              "value": "13.43",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "信用减值损失及其他减值损失",
+              "raw_value": "-65,901",
+              "value": "-65901",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "信用减值损失及其他减值损失上年同期",
+              "raw_value": "-69,480",
+              "value": "-69480",
+              "unit": "百万元",
+              "source_unit": "人民币百万元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2024年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ]
+        },
+        {
+          "fact_id": "review-add:F-003",
+          "text": "报告期内，本集团实现利息收入2,651.16亿元，同比减少230.09亿元，下降7.99%；生息资产平均收益率3.11%，同比下降0.46个百分点；计息负债平均成本率1.74%，同比下降0.46个百分点；净利差1.37%，与上年持平。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0014",
+            "source-0015"
+          ],
+          "metrics": [
+            {
+              "name": "利息收入",
+              "raw_value": "2,651.16",
+              "value": "2651.16",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "利息收入同比减少额",
+              "raw_value": "230.09",
+              "value": "230.09",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": "同比减少",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "利息收入同比变动率",
+              "raw_value": "-7.99",
+              "value": "-7.99",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": "同比下降",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "生息资产平均收益率",
+              "raw_value": "3.11",
+              "value": "3.11",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "生息资产平均收益率同比变动",
+              "raw_value": "0.46",
+              "value": "0.46",
+              "unit": "百分点",
+              "source_unit": "个百分点",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": "同比下降",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "计息负债平均成本率",
+              "raw_value": "1.74",
+              "value": "1.74",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "计息负债平均成本率同比变动",
+              "raw_value": "0.46",
+              "value": "0.46",
+              "unit": "百分点",
+              "source_unit": "个百分点",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": "同比下降",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "净利差",
+              "raw_value": "1.37",
+              "value": "1.37",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": "与上年持平",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ]
+        },
+        {
+          "fact_id": "review-add:F-004",
+          "text": "报告期末，公司科技金融贷款（中国人民银行统计口径）10,470.92亿元；绿色信贷余额7,073.74亿元，较上年末增加1,366.80亿元，增长23.95%；境内外并购贷款余额2,431.43亿元，较上年末增长17.11%，报告期内新发放并购贷款1,139.43亿元，同比增长47.05%；报告期内全行国内贸易融资总业务量突破2.8万亿元，同比增幅16.5%；跨境客户数近4.9万户，增长24%，总分行战略客户海外贷款余额1,884亿元人民币，增长48%。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004",
+            "source-0005",
+            "source-0011"
+          ],
+          "metrics": [
+            {
+              "name": "科技金融贷款（中国人民银行统计口径）",
+              "raw_value": "10,470.92",
+              "value": "10470.92",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "issuer",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "绿色信贷余额",
+              "raw_value": "7,073.74",
+              "value": "7073.74",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "issuer",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "绿色信贷余额较上年末增加额",
+              "raw_value": "1,366.80",
+              "value": "1366.80",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "issuer",
+              "period": "2025年末",
+              "comparison_basis": "较上年末增加",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "绿色信贷余额增长率",
+              "raw_value": "23.95",
+              "value": "23.95",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "issuer",
+              "period": "2025年末",
+              "comparison_basis": "较上年末增长",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "境内外并购贷款余额",
+              "raw_value": "2,431.43",
+              "value": "2431.43",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "unclear",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "原文未明确该余额为母公司口径还是本集团口径"
+            },
+            {
+              "name": "境内外并购贷款余额较上年末增长率",
+              "raw_value": "17.11",
+              "value": "17.11",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年末",
+              "comparison_basis": "较上年末增长",
+              "qualifier": "exact",
+              "uncertainty_reason": "原文未明确该余额为母公司口径还是本集团口径"
+            },
+            {
+              "name": "新发放并购贷款",
+              "raw_value": "1,139.43",
+              "value": "1139.43",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "unclear",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "原文未明确该金额为母公司口径还是本集团口径"
+            },
+            {
+              "name": "新发放并购贷款同比增长率",
+              "raw_value": "47.05",
+              "value": "47.05",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年",
+              "comparison_basis": "同比增长",
+              "qualifier": "exact",
+              "uncertainty_reason": "原文未明确该金额为母公司口径还是本集团口径"
+            },
+            {
+              "name": "国内贸易融资总业务量",
+              "raw_value": "2.8",
+              "value": "2.8",
+              "unit": "万亿元",
+              "source_unit": "万亿元",
+              "currency": "人民币",
+              "subject_scope": "unclear",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "greater_than",
+              "uncertainty_reason": "原文为“突破2.8万亿元”，主体为“全行”，未明确母公司或本集团口径"
+            },
+            {
+              "name": "国内贸易融资总业务量同比增幅",
+              "raw_value": "16.5",
+              "value": "16.5",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年",
+              "comparison_basis": "同比增幅",
+              "qualifier": "exact",
+              "uncertainty_reason": "原文主体为“全行”，未明确母公司或本集团口径"
+            },
+            {
+              "name": "跨境客户数",
+              "raw_value": "近4.9",
+              "value": null,
+              "unit": "万户",
+              "source_unit": "万户",
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "approximate",
+              "uncertainty_reason": "原文为“近4.9万户”，未明确母公司或本集团口径"
+            },
+            {
+              "name": "跨境客户数增长率",
+              "raw_value": "24",
+              "value": "24",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年末",
+              "comparison_basis": "增长",
+              "qualifier": "exact",
+              "uncertainty_reason": "原文未明确母公司或本集团口径"
+            },
+            {
+              "name": "总分行战略客户海外贷款余额",
+              "raw_value": "1,884",
+              "value": "1884",
+              "unit": "亿元",
+              "source_unit": "亿元人民币",
+              "currency": "人民币",
+              "subject_scope": "unclear",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "原文未明确母公司或本集团口径"
+            },
+            {
+              "name": "总分行战略客户海外贷款余额增长率",
+              "raw_value": "48",
+              "value": "48",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "unclear",
+              "period": "2025年末",
+              "comparison_basis": "增长",
+              "qualifier": "exact",
+              "uncertainty_reason": "原文未明确母公司或本集团口径"
+            }
+          ]
+        },
+        {
+          "fact_id": "OI-03",
+          "text": "公司贷款、零售贷款平均收益率分别为3.15%、3.99%，分别同比下降0.46和0.77个百分点；票据贴现平均收益率1.19%。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0015"
+          ],
+          "metrics": [
+            {
+              "name": "公司贷款平均收益率",
+              "raw_value": "3.15",
+              "value": "3.15",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "公司贷款平均收益率同比变动",
+              "raw_value": "0.46",
+              "value": "0.46",
+              "unit": "百分点",
+              "source_unit": "个百分点",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": "同比下降",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "零售贷款平均收益率",
+              "raw_value": "3.99",
+              "value": "3.99",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "零售贷款平均收益率同比变动",
+              "raw_value": "0.77",
+              "value": "0.77",
+              "unit": "百分点",
+              "source_unit": "个百分点",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": "同比下降",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "票据贴现平均收益率",
+              "raw_value": "1.19",
+              "value": "1.19",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ]
+        },
+        {
+          "fact_id": "OD-03",
+          "text": "报告期内公司不良贷款余额719.90亿元，较上年末减少11.64亿元；不良贷款率1.26%，较上年末下降0.10个百分点；拨备覆盖率200.72%，较上年末上升13.76个百分点。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年末",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [
+            {
+              "name": "不良贷款余额",
+              "raw_value": "719.90",
+              "value": "719.90",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "不良贷款余额较上年末变动",
+              "raw_value": "11.64",
+              "value": "11.64",
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "comparison_basis": "较上年末减少",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "不良贷款率",
+              "raw_value": "1.26",
+              "value": "1.26",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "不良贷款率较上年末变动",
+              "raw_value": "0.10",
+              "value": "0.10",
+              "unit": "百分点",
+              "source_unit": "个百分点",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "comparison_basis": "较上年末下降",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "拨备覆盖率",
+              "raw_value": "200.72",
+              "value": "200.72",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "拨备覆盖率较上年末变动",
+              "raw_value": "13.76",
+              "value": "13.76",
+              "unit": "百分点",
+              "source_unit": "个百分点",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "comparison_basis": "较上年末上升",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ]
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 15719,
+      "output_tokens": 5307,
+      "total_tokens": 21026
+    },
+    "contract_error": "schema_validation_error"
+  }
+]

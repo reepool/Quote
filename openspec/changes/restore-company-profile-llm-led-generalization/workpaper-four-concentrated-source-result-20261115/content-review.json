@@ -1,0 +1,566 @@
+{
+  "reference_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-core-readiness-20261114/source-first-contract.json",
+  "reference_sha256": "1f52e5bbf76610a1dd156d2135b0b4276c03c1693a23467accc56e17bf307d62",
+  "scope": "44项窄核心的文字/限用可见性对照，不是全量事实准确率或全文召回；海泰按明确标注的零调用隔离投影，其他按本次真实最终稿。",
+  "independent_source_checks": [
+    {
+      "instrument_id": "600082.SH",
+      "pages": [
+        13,
+        15,
+        18
+      ],
+      "evidence_ids": [
+        "source-0006",
+        "source-0008",
+        "source-0011"
+      ],
+      "checked": "公司收入44924.06万元；行业表开发418710800.51/运营30105192.48/商品424569.35元及合计449240562.34元；毛利率减少方向；匿名客户与贸易范围。已错指标不因金额正确放行。"
+    },
+    {
+      "instrument_id": "600097.SH",
+      "pages": [
+        6,
+        8,
+        11,
+        12
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0003",
+        "source-0007",
+        "source-0008"
+      ],
+      "checked": "主营与合作磷虾、ALBO鱼柳、公司收入/主营合计、四板块表头金额/直销；内部原料转移在来源但最终稿未写；量价及分业务收入变动确有遗漏。"
+    },
+    {
+      "instrument_id": "600000.SH",
+      "pages": [
+        32,
+        71,
+        72
+      ],
+      "evidence_ids": [
+        "source-0001",
+        "source-0013",
+        "source-0014"
+      ],
+      "checked": "集团营收1739.64亿元/净利息120483/手续费净额22725/其他净额30756百万元及占比；业务总收入325269百万元不同。RM-03正确数字在初稿、最终被撤，不从原稿偷补为新采纳。"
+    }
+  ],
+  "observations": [
+    {
+      "condition_id": "600082-K01",
+      "instrument_id": "600082.SH",
+      "dimension": "business_structure",
+      "expected": "工业科技园区开发运营为核心，而非商品贸易主导。",
+      "content_observation": "partial",
+      "fact_ids": [
+        "ps-01",
+        "ps-02",
+        "rm-01"
+      ],
+      "explanation": "开发运营可读；原主营定位bs-01因主体意见在离线限用稿中隔离。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600082-K02",
+      "instrument_id": "600082.SH",
+      "dimension": "business_structure",
+      "expected": "产业投资和孵化服务属于披露业务。",
+      "content_observation": "withheld",
+      "fact_ids": [],
+      "explanation": "bs-02/ps-05主体待修；原真实稿有，但不作为限用结论采用。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600082-K03",
+      "instrument_id": "600082.SH",
+      "dimension": "products_services",
+      "expected": "园区载体、招商及园区运营服务。",
+      "content_observation": "partial",
+      "fact_ids": [
+        "ps-01",
+        "ps-02"
+      ],
+      "explanation": "载体销售/租赁物业在，招商细节cc-05暂隔离。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600082-K04",
+      "instrument_id": "600082.SH",
+      "dimension": "products_services",
+      "expected": "在孵企业咨询培训等专业服务。",
+      "content_observation": "present",
+      "fact_ids": [
+        "ps-04"
+      ],
+      "explanation": "咨询培训服务保留。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600082-K05",
+      "instrument_id": "600082.SH",
+      "dimension": "revenue_model",
+      "expected": "开发房产销售与租赁、物业运营收入分开。",
+      "content_observation": "present",
+      "fact_ids": [
+        "rm-01"
+      ],
+      "explanation": "开发销售与租赁物业运营区分。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600082-K06",
+      "instrument_id": "600082.SH",
+      "dimension": "revenue_model",
+      "expected": "产业投资追求长期投资回报，不将被投项目当本企业自产。",
+      "content_observation": "withheld",
+      "fact_ids": [],
+      "explanation": "sc-01含长期投资回报错写本期收入，离线限用投影撤回，未修订。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600082-K07",
+      "instrument_id": "600082.SH",
+      "dimension": "operations_and_inputs",
+      "expected": "商品销售仅代理人净额法贸易，与开发运营角色分开。",
+      "content_observation": "present",
+      "fact_ids": [
+        "ps-03"
+      ],
+      "explanation": "代理人净额法与开发运营分开。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600082-K08",
+      "instrument_id": "600082.SH",
+      "dimension": "scale_and_mix",
+      "expected": "2025公司营业收入449,240,562.34元，不是营业成本。",
+      "content_observation": "present",
+      "fact_ids": [
+        "rm-02",
+        "sm-05"
+      ],
+      "explanation": "公司总收入原万元表达及449240562.34元同在；不替代为成本。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600082-K09",
+      "instrument_id": "600082.SH",
+      "dimension": "scale_and_mix",
+      "expected": "园区开发收入418,710,800.51元、运营30,105,192.48元，保续行小数及列头。",
+      "content_observation": "withheld",
+      "fact_ids": [],
+      "explanation": "sm-01/02收入数字可定位，但附带百分点方向错误，整事实待修，未人工拆改。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600082-K10",
+      "instrument_id": "600082.SH",
+      "dimension": "scale_and_mix",
+      "expected": "商品销售424,569.35元，不扩大为主业规模。",
+      "content_observation": "withheld",
+      "fact_ids": [],
+      "explanation": "sm-03把横线写成未披露，整事实限用隔离；ps-03仅保业务性质。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600097-K01",
+      "instrument_id": "600097.SH",
+      "dimension": "business_structure",
+      "expected": "远洋捕捞、加工、贸易、运输一体化四板块。",
+      "content_observation": "present",
+      "fact_ids": [
+        "bs-01",
+        "bs-02"
+      ],
+      "explanation": "四板块在。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600097-K02",
+      "instrument_id": "600097.SH",
+      "dimension": "products_services",
+      "expected": "金枪鱼鲣鱼黄鳍等捕捞产品。",
+      "content_observation": "present",
+      "fact_ids": [
+        "ps-01"
+      ],
+      "explanation": "鲣鱼黄鳍在。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600097-K03",
+      "instrument_id": "600097.SH",
+      "dimension": "products_services",
+      "expected": "合作经营的南极磷虾冻虾/虾粉，不改成独立自产。",
+      "content_observation": "present",
+      "fact_ids": [
+        "ps-01"
+      ],
+      "explanation": "保合作经营，不写独立自产。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600097-K04",
+      "instrument_id": "600097.SH",
+      "dimension": "products_services",
+      "expected": "ALBO罐头及国内鱼柳加工产品。",
+      "content_observation": "present",
+      "fact_ids": [
+        "ps-02"
+      ],
+      "explanation": "ALBO及国内鱼柳在。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600097-K05",
+      "instrument_id": "600097.SH",
+      "dimension": "revenue_model",
+      "expected": "捕捞加工贸易产品销售和海上运输服务收入。",
+      "content_observation": "present",
+      "fact_ids": [
+        "rm-01"
+      ],
+      "explanation": "销售及配套运输机制在。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600097-K06",
+      "instrument_id": "600097.SH",
+      "dimension": "revenue_model",
+      "expected": "直销为主，国内外市场分开。",
+      "content_observation": "present",
+      "fact_ids": [
+        "rm-03",
+        "sm-04",
+        "cc-01"
+      ],
+      "explanation": "直销及境内外原口径保留，不强行统一不同产品市场描述。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600097-K07",
+      "instrument_id": "600097.SH",
+      "dimension": "operations_and_inputs",
+      "expected": "内部原料鱼转入鱼柳加工不变成新增对外销量或加工服务量。",
+      "content_observation": "missing",
+      "fact_ids": [],
+      "explanation": "本次最终稿未独立写金枪鱼转移至鱼柳加工关系；没有凭空新增加工服务量。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600097-K08",
+      "instrument_id": "600097.SH",
+      "dimension": "scale_and_mix",
+      "expected": "公司营业收入2,336,503,042.69元，非主营合计2,330,812,544.82元。",
+      "content_observation": "present",
+      "fact_ids": [
+        "sm-01",
+        "bs-02"
+      ],
+      "explanation": "公司收入和主营合计分开。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600097-K09",
+      "instrument_id": "600097.SH",
+      "dimension": "scale_and_mix",
+      "expected": "海洋捕捞950,763,559.03元、食品加工1,054,611,208.73元。",
+      "content_observation": "present",
+      "fact_ids": [
+        "sm-02"
+      ],
+      "explanation": "捕捞/加工分项在。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600097-K10",
+      "instrument_id": "600097.SH",
+      "dimension": "scale_and_mix",
+      "expected": "渔货贸易318,671,971.02元、海上运输6,765,806.04元。",
+      "content_observation": "present",
+      "fact_ids": [
+        "sm-02"
+      ],
+      "explanation": "贸易/运输分项在。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600054-K01",
+      "instrument_id": "600054.SH",
+      "dimension": "business_structure",
+      "expected": "景区、索道缆车、酒店、徽菜、旅行社、智慧旅游六业务。",
+      "content_observation": "no_profile",
+      "fact_ids": [],
+      "explanation": "本次在章节包边界失败，无画像，不拿旧稿补齐。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600054-K02",
+      "instrument_id": "600054.SH",
+      "dimension": "products_services",
+      "expected": "景区观光休闲服务。",
+      "content_observation": "no_profile",
+      "fact_ids": [],
+      "explanation": "本次在章节包边界失败，无画像，不拿旧稿补齐。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600054-K03",
+      "instrument_id": "600054.SH",
+      "dimension": "products_services",
+      "expected": "索道缆车客运服务。",
+      "content_observation": "no_profile",
+      "fact_ids": [],
+      "explanation": "本次在章节包边界失败，无画像，不拿旧稿补齐。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600054-K04",
+      "instrument_id": "600054.SH",
+      "dimension": "products_services",
+      "expected": "酒店住宿餐饮与徽菜服务。",
+      "content_observation": "no_profile",
+      "fact_ids": [],
+      "explanation": "本次在章节包边界失败，无画像，不拿旧稿补齐。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600054-K05",
+      "instrument_id": "600054.SH",
+      "dimension": "products_services",
+      "expected": "旅行社会展疗休养及智慧旅游/OTA服务。",
+      "content_observation": "no_profile",
+      "fact_ids": [],
+      "explanation": "本次在章节包边界失败，无画像，不拿旧稿补齐。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600054-K06",
+      "instrument_id": "600054.SH",
+      "dimension": "revenue_model",
+      "expected": "观光、客运、旅宿、餐饮、旅行等服务收费是变现来源。",
+      "content_observation": "no_profile",
+      "fact_ids": [],
+      "explanation": "本次在章节包边界失败，无画像，不拿旧稿补齐。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600054-K07",
+      "instrument_id": "600054.SH",
+      "dimension": "operations_and_inputs",
+      "expected": "公司经营景区/索道、旅宿餐饮和旅行服务；计划不写成已发生，不套制造角色。",
+      "content_observation": "no_profile",
+      "fact_ids": [],
+      "explanation": "本次在章节包边界失败，无画像，不拿旧稿补齐。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600054-K08",
+      "instrument_id": "600054.SH",
+      "dimension": "scale_and_mix",
+      "expected": "2025营业收入2,109,325,107.63元，可保210,932.51万元。",
+      "content_observation": "no_profile",
+      "fact_ids": [],
+      "explanation": "本次在章节包边界失败，无画像，不拿旧稿补齐。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600054-K09",
+      "instrument_id": "600054.SH",
+      "dimension": "scale_and_mix",
+      "expected": "酒店营业收入492,026,389.87元。",
+      "content_observation": "no_profile",
+      "fact_ids": [],
+      "explanation": "本次在章节包边界失败，无画像，不拿旧稿补齐。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600054-K10",
+      "instrument_id": "600054.SH",
+      "dimension": "scale_and_mix",
+      "expected": "索道营业收入842,155,363.75元。",
+      "content_observation": "no_profile",
+      "fact_ids": [],
+      "explanation": "本次在章节包边界失败，无画像，不拿旧稿补齐。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600054-K11",
+      "instrument_id": "600054.SH",
+      "dimension": "scale_and_mix",
+      "expected": "景区营业收入293,201,670.78元。",
+      "content_observation": "no_profile",
+      "fact_ids": [],
+      "explanation": "本次在章节包边界失败，无画像，不拿旧稿补齐。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600054-K12",
+      "instrument_id": "600054.SH",
+      "dimension": "scale_and_mix",
+      "expected": "旅游服务532,255,057.39元、徽菜245,296,390.79元。",
+      "content_observation": "no_profile",
+      "fact_ids": [],
+      "explanation": "本次在章节包边界失败，无画像，不拿旧稿补齐。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600054-K13",
+      "instrument_id": "600054.SH",
+      "dimension": "scale_and_mix",
+      "expected": "行业表未合并抵销，不能直接相加作集团收入或集团占比分母。",
+      "content_observation": "no_profile",
+      "fact_ids": [],
+      "explanation": "本次在章节包边界失败，无画像，不拿旧稿补齐。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600000-K01",
+      "instrument_id": "600000.SH",
+      "dimension": "business_structure",
+      "expected": "公司金融、零售、金融市场及机构、跨境境外四块，不与五大赛道强制互斥。",
+      "content_observation": "present",
+      "fact_ids": [
+        "BS-01"
+      ],
+      "explanation": "四业务板块与赛道不混。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600000-K02",
+      "instrument_id": "600000.SH",
+      "dimension": "products_services",
+      "expected": "公司信贷、结算交易银行、投行等企业金融服务。",
+      "content_observation": "present",
+      "fact_ids": [
+        "PS-01"
+      ],
+      "explanation": "企业金融服务在。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600000-K03",
+      "instrument_id": "600000.SH",
+      "dimension": "products_services",
+      "expected": "零售信贷、财富管理及个人金融服务。",
+      "content_observation": "present",
+      "fact_ids": [
+        "PS-02"
+      ],
+      "explanation": "零售服务在。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600000-K04",
+      "instrument_id": "600000.SH",
+      "dimension": "products_services",
+      "expected": "金融市场投资交易、风险管理及托管服务。",
+      "content_observation": "present",
+      "fact_ids": [
+        "PS-03"
+      ],
+      "explanation": "金融市场与托管在。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600000-K05",
+      "instrument_id": "600000.SH",
+      "dimension": "products_services",
+      "expected": "跨境/境外综合金融服务。",
+      "content_observation": "present",
+      "fact_ids": [
+        "PS-04"
+      ],
+      "explanation": "跨境服务在。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600000-K06",
+      "instrument_id": "600000.SH",
+      "dimension": "revenue_model",
+      "expected": "本集团2025利息净收入120,483百万元，占营业收入69.26%。",
+      "content_observation": "present",
+      "fact_ids": [
+        "RM-01",
+        "RM-04"
+      ],
+      "explanation": "净利息收入金额与占比同在。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600000-K07",
+      "instrument_id": "600000.SH",
+      "dimension": "revenue_model",
+      "expected": "本集团2025手续费及佣金净收入22,725百万元，占13.06%。",
+      "content_observation": "partial",
+      "fact_ids": [
+        "RM-01"
+      ],
+      "explanation": "13.06%在，22725百万元未独立入最终稿。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600000-K08",
+      "instrument_id": "600000.SH",
+      "dimension": "revenue_model",
+      "expected": "本集团2025其他净收入30,756百万元，占17.68%。",
+      "content_observation": "partial",
+      "fact_ids": [
+        "RM-01"
+      ],
+      "explanation": "17.68%在，30756百万元未独立入最终稿。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600000-K09",
+      "instrument_id": "600000.SH",
+      "dimension": "scale_and_mix",
+      "expected": "本集团2025营业收入173,964百万元/1,739.64亿元，与业务总收入325,269百万元不同。",
+      "content_observation": "withheld",
+      "fact_ids": [],
+      "explanation": "正确公司营收原在RM-03；重要补充遗漏被转为同ID修订，修订失败后整条撤回。不是原文没有或抽取模型没写。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600000-K10",
+      "instrument_id": "600000.SH",
+      "dimension": "scale_and_mix",
+      "expected": "集团期间营收、集团资产与母公司余额分开；AUM/托管规模不是收入。",
+      "content_observation": "partial",
+      "fact_ids": [
+        "SM-01",
+        "SM-03",
+        "SM-04",
+        "SM-06"
+      ],
+      "explanation": "集团资产、母公司余额、AUM/托管分开；期间公司营收因上述撤回缺失。",
+      "formal_acceptance_verdict": null
+    },
+    {
+      "condition_id": "600000-K11",
+      "instrument_id": "600000.SH",
+      "dimension": "operations_and_inputs",
+      "expected": "银行面向企业、个人、金融机构提供金融服务，不套制造原料。",
+      "content_observation": "present",
+      "fact_ids": [
+        "BS-01",
+        "PS-01",
+        "PS-02"
+      ],
+      "explanation": "按银行金融服务角色，不套制造。",
+      "formal_acceptance_verdict": null
+    }
+  ],
+  "formal_accuracy": null,
+  "formal_recall": null,
+  "unassessed": [
+    "非核心逐事实全量核源",
+    "正式补充抽样分母",
+    "六类风险整组实测",
+    "全报告漏项",
+    "生产发布"
+  ]
+}

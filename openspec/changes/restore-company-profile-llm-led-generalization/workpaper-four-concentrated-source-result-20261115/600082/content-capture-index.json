@@ -1,0 +1,42 @@
+{
+  "representation": "model_content_strings_not_http_bytes",
+  "responses": [
+    {
+      "physical_sequence": 1,
+      "content_sha256": "8cc0f087aecb714b39cda430449f61b657363779b43ac83496b08bb24342e071",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 19202,
+        "completion_tokens": 397,
+        "total_tokens": 19599
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 2,
+      "content_sha256": "80e82e56b74dab718312073650eb52a987f0477347db77cd833bf428413a29f2",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 13690,
+        "completion_tokens": 5790,
+        "total_tokens": 19480
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 3,
+      "content_sha256": "d567fd46d881615acc3f90b34d8932621bd09aff00857de76f663744b33a200e",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 20464,
+        "completion_tokens": 2122,
+        "total_tokens": 60137
+      },
+      "retained": false,
+      "retained_path": null
+    }
+  ],
+  "duplicates_not_copied": 3
+}

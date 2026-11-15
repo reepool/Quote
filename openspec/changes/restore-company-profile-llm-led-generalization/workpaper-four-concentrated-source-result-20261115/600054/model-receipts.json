@@ -1,0 +1,41 @@
+[
+  {
+    "request_id": "bp-work-09d3596e4ce2199d9851196f:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "feaa6b9ee939882c3cd1abc91d41a5f0181c097cfc9d69f88a67e3ebb8602bd0",
+    "response_hash": "a2384450fb8c411cf66ff03126b021eb9f83f30c927627e4d33d7525b3902bbf",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0036\",\"section-0044\",\"section-0059\",\"section-0061\",\"section-0023\",\"section-0024\",\"section-0058\"],\"rationale\":\"选择公司业务情况（section-0036）完整说明景区、索道、酒店、徽菜、旅行社、智慧旅游六大业务及经营模式；经营情况讨论与分析（section-0044）提供本期经营综述与变化；主营业务分析（section-0059）及其收入和成本分析（section-0061）给出营业收入构成、分业务收入与成本，是收入与主要业务权重的核心来源；主要经营情况（section-0058）作为经营与财务总览；近三年主要会计数据（section-0023）及主要会计数据（section-0024）提供公司层面营业收入、利润总额等总量指标，与明细表互补。未选行业背景、核心竞争力及治理章节，因其非公司经营实质或与收入解释重叠。\",\"stop_reason\":\"已覆盖业务结构、产品服务、收入构成与总量、经营变化等核心问题；行业背景与治理、财务附注细节对解释公司经营与收入权重边际贡献低，故在此停止，不追求全报告完整性。\",\"deferred\":[\"section-0043 行业情况：属行业背景，非公司层面经营解释\",\"section-0052 核心竞争力：泛化竞争优势，非收入与经营实质\",\"section-0124 未来发展讨论：前瞻性计划，非本期经营事实\",\"section-0352 财务报告及附注：仅在收入构成有缺口时定向补充，当前已由主营业务分析覆盖\"]}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0036",
+        "section-0044",
+        "section-0059",
+        "section-0061",
+        "section-0023",
+        "section-0024",
+        "section-0058"
+      ],
+      "rationale": "选择公司业务情况（section-0036）完整说明景区、索道、酒店、徽菜、旅行社、智慧旅游六大业务及经营模式；经营情况讨论与分析（section-0044）提供本期经营综述与变化；主营业务分析（section-0059）及其收入和成本分析（section-0061）给出营业收入构成、分业务收入与成本，是收入与主要业务权重的核心来源；主要经营情况（section-0058）作为经营与财务总览；近三年主要会计数据（section-0023）及主要会计数据（section-0024）提供公司层面营业收入、利润总额等总量指标，与明细表互补。未选行业背景、核心竞争力及治理章节，因其非公司经营实质或与收入解释重叠。",
+      "stop_reason": "已覆盖业务结构、产品服务、收入构成与总量、经营变化等核心问题；行业背景与治理、财务附注细节对解释公司经营与收入权重边际贡献低，故在此停止，不追求全报告完整性。",
+      "deferred": [
+        "section-0043 行业情况：属行业背景，非公司层面经营解释",
+        "section-0052 核心竞争力：泛化竞争优势，非收入与经营实质",
+        "section-0124 未来发展讨论：前瞻性计划，非本期经营事实",
+        "section-0352 财务报告及附注：仅在收入构成有缺口时定向补充，当前已由主营业务分析覆盖"
+      ]
+    },
+    "usage": {
+      "input_tokens": 21353,
+      "output_tokens": 346,
+      "total_tokens": 21699
+    }
+  }
+]

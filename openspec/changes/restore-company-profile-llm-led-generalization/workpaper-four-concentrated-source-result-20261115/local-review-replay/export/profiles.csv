@@ -1,0 +1,2 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600082.SH,2025-12-31,2026-04-28T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,controlled_fixture,,25,25,incomplete,14,deepseek-flash,

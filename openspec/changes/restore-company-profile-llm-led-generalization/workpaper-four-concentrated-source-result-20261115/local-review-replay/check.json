@@ -1,0 +1,29 @@
+{
+  "origin": "controlled_saved_response_replay",
+  "new_model_requests": 0,
+  "original_draft_hash_reconstructed": true,
+  "original_review_receipt_hash": "d567fd46d881615acc3f90b34d8932621bd09aff00857de76f663744b33a200e",
+  "source_and_original_results_not_modified": true,
+  "policy_version": "company_profile_workpaper_review.v4",
+  "findings_retained": 14,
+  "merged_repair_targets": 12,
+  "withheld_fact_ids": [
+    "bs-01",
+    "bs-02",
+    "bs-03",
+    "cc-05",
+    "mc-02",
+    "oi-03",
+    "ps-05",
+    "sc-01",
+    "sm-01",
+    "sm-02",
+    "sm-03",
+    "sm-04"
+  ],
+  "retained_facts": 25,
+  "unchanged_fact_objects": true,
+  "three_reads_equal": true,
+  "no_repair_candidates_or_final_verification": true,
+  "original_real_run_still_failed": true
+}

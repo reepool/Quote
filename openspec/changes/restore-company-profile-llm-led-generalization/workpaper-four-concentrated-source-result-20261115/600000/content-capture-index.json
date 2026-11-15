@@ -1,0 +1,66 @@
+{
+  "representation": "model_content_strings_not_http_bytes",
+  "responses": [
+    {
+      "physical_sequence": 1,
+      "content_sha256": "6e55204476dd4d0c8a8eb52cc6f125954dba8f1a069341a7b8d52154a8c24ef1",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 12463,
+        "completion_tokens": 341,
+        "total_tokens": 12804
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 2,
+      "content_sha256": "516b8615c0e3e465832955777211d876b928f880deed38eee11c96d6671f6049",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 14749,
+        "completion_tokens": 10497,
+        "total_tokens": 25246
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 3,
+      "content_sha256": "6ba89a9459d2ff40d78ac490a2e132864fd1675dad0584552ff751aa0dcd33c9",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 26510,
+        "completion_tokens": 1529,
+        "total_tokens": 63758
+      },
+      "retained": true,
+      "retained_path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-four-concentrated-source-result-20261115/600000/failed-model-content/content-003.json"
+    },
+    {
+      "physical_sequence": 4,
+      "content_sha256": "aea24b16e2ec7378c0f456c385d6d6b0296c2f457a8f30745180410e6287b2d6",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 28084,
+        "completion_tokens": 1609,
+        "total_tokens": 32650
+      },
+      "retained": false,
+      "retained_path": null
+    },
+    {
+      "physical_sequence": 5,
+      "content_sha256": "e1075bd0b0b14c0736192ff3435403eb2ad9a3ff721eedeca81256f3c5daf1d5",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 15719,
+        "completion_tokens": 5307,
+        "total_tokens": 21026
+      },
+      "retained": false,
+      "retained_path": null
+    }
+  ],
+  "duplicates_not_copied": 4
+}

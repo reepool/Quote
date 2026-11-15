@@ -1,0 +1,95 @@
+{
+  "task": "6.CK",
+  "attempts_used": "4/4",
+  "new_entries_or_calls_after_batch": 0,
+  "readable_real_profiles": 3,
+  "no_profile": [
+    "600054.SH"
+  ],
+  "completed_real_review_repair_loops": 0,
+  "original_real_fact_count_including_optional_supply_chain": 97,
+  "original_real_metric_count": 148,
+  "not_a_quality_rate": true,
+  "haitai_local_limited_projection_facts": 25,
+  "local_projection_is_not_real_success": true,
+  "physical_requests": 13,
+  "charged_tokens": 365532,
+  "recoveries": 1,
+  "cost": "unknown",
+  "providers": {
+    "deepseek:deepseek-flash": 9,
+    "scorpio:grok-4.7": 4
+  },
+  "business_wall_seconds": 680.71,
+  "per_company": [
+    {
+      "instrument_id": "600082.SH",
+      "readable": true,
+      "physical_requests": 3,
+      "charged_tokens": 99216,
+      "recoveries": 0,
+      "business_seconds": 579.081,
+      "supervision_seconds": 581.951,
+      "preparation_seconds": 40.51,
+      "cleanup_bytes": 1832857,
+      "review_status": "incomplete",
+      "review_error": "ValueError: multiple repairs target the same fact",
+      "exception": null
+    },
+    {
+      "instrument_id": "600097.SH",
+      "readable": true,
+      "physical_requests": 4,
+      "charged_tokens": 89133,
+      "recoveries": 0,
+      "business_seconds": 339.865,
+      "supervision_seconds": 342.537,
+      "preparation_seconds": 39.231,
+      "cleanup_bytes": 1742960,
+      "review_status": "incomplete",
+      "review_error": "SemanticProviderError: gateway response violates the schema: 4 validation errors for WorkpaperRepairResponse\nrepaired_facts.0.metrics.0\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '捕捞业务收...arison_basis': '同比'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error\nrepaired_facts.0.metrics.1\n  Value error, metric values must be decimal strings [type=value_error, input_value={'name': '食品加工营...arison_basis': '同比'}, input_type=dic",
+      "exception": null
+    },
+    {
+      "instrument_id": "600054.SH",
+      "readable": false,
+      "physical_requests": 1,
+      "charged_tokens": 21699,
+      "recoveries": 0,
+      "business_seconds": 24.172,
+      "supervision_seconds": 25.181,
+      "preparation_seconds": 40.853,
+      "cleanup_bytes": 1656150,
+      "review_status": null,
+      "review_error": null,
+      "exception": null
+    },
+    {
+      "instrument_id": "600000.SH",
+      "readable": true,
+      "physical_requests": 5,
+      "charged_tokens": 155484,
+      "recoveries": 1,
+      "business_seconds": 637.42,
+      "supervision_seconds": 640.421,
+      "preparation_seconds": 41.155,
+      "cleanup_bytes": 2128296,
+      "review_status": "incomplete",
+      "review_error": "SemanticProviderError: gateway response violates the schema: 5 validation errors for WorkpaperRepairResponse\nrepaired_facts.0.metrics.6\n  Value error, source_unit cannot relabel a numeric magnitude [type=value_error, input_value={'name': '业务总收入...certainty_reason': None}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error\nrepaired_facts.1.metrics.12\n  Value error, source_unit cannot relabel a numeric magnitude [type=value_error, input_value={'name': '信用减值损...certainty_rea",
+      "exception": null
+    }
+  ],
+  "s1": "0/12",
+  "production": "not_authorized",
+  "first_blockers": {
+    "600082": "local_duplicate_review_target",
+    "600097": "repair_decimal_string_contract",
+    "600054": "local_numeric_table_row_misindexed_as_heading",
+    "600000": "repair_unit_and_qualifier_contract"
+  },
+  "post_run_fixes": [
+    "v3 numeric-row section boundaries; source-only local check",
+    "review.v4 merge multiple issues per fact; saved-review-only isolation and original writer three reads"
+  ],
+  "next_priority": "先在保存响应上区分真实错误与补充遗漏，保正确原有收入；对齐局部修订请求合同及消费。有限验证后才裁小范围新真实观察，不扩大样本或补满供应链。"
+}

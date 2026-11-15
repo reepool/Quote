@@ -17,11 +17,11 @@ from .workpaper_sections import (
     extract_selected_layout, index_sections, selected_pages,
 )
 
-WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-15.compact-core.v14"
-SECTION_GUIDE_VERSION = "company_profile_section_guide.2026-11-14.income-composition.v2"
+WORKPAPER_PROMPT_VERSION = "company_profile_workpaper.2026-11-15.operating-summary-first.v15"
+SECTION_GUIDE_VERSION = "company_profile_section_guide.2026-11-15.operating-summary.v3"
 SECTION_GUIDE = (
-    {"questions": "做什么、产品/服务用途、怎么经营", "sources": "主要业务/经营模式/核心竞争力/业务回顾的实质子节", "priority": "primary"},
-    {"questions": "怎么赚钱、公司收入与主要业务权重", "sources": "主营业务分析/收入和成本分析/利润表分析/财务情况分析中的营业收入或收入构成子节；结合各业务板块经营情况", "priority": "primary"},
+    {"questions": "做什么、产品/服务用途、怎么经营", "sources": "公司业务/经营模式；公司经营讨论/经营综述/业务回顾的实质子节，优先于纯行业背景和泛化核心竞争力", "priority": "primary"},
+    {"questions": "怎么赚钱、公司收入与主要业务权重", "sources": "公司经营综述的收入总额；主营业务分析/收入和成本分析/利润表分析/财务情况分析中的营业收入或收入构成子节；结合各业务板块经营情况", "priority": "primary"},
     {"questions": "供应链位置、原材料/资源、客户领域（可选）", "sources": "经营模式/原料采购/生产销售/产品用途/客户与渠道", "priority": "optional_same_pack"},
     {"questions": "经营因素与本期重要变化", "sources": "管理层经营讨论/业务变化/重要风险/展望（保留计划限定）", "priority": "material_only"},
     {"questions": "主要业务仍有实质缺口时定向补充", "sources": "分部信息/收入附注/必要关联购销", "priority": "targeted_only"},
@@ -37,7 +37,7 @@ def workpaper_processing_identity(
         "reading_strategy": WORKPAPER_READING_STRATEGY,
         "prompt_version": WORKPAPER_PROMPT_VERSION,
         "section_guide_version": SECTION_GUIDE_VERSION,
-        "preprocessing_version": "toc_sections_native_layout.v2",
+        "preprocessing_version": "toc_sections_native_layout.v3.numeric-row-boundary",
         "source_binding_policy": "company_workpaper_source_literals.prose-numerals.v2",
         "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
         "execution_mode": "provider" if real else "offline_fake",
@@ -70,6 +70,12 @@ explain business structure, products/services and uses, monetization, scale and 
 operating roles and inputs/resources, customers/channels/markets, drivers and actual changes.
 Choose about 2-8 related useful sections. Prefer a compact parent subsection over many tiny
 items, but do not select an ancestor and its child together or selectable=false entries.
+Prioritize substantive company operating discussion, business review or operating overview
+for the business, main products and company-period revenue before pure industry background
+or generic competitiveness. Industry background is secondary unless it materially changes
+company-level interpretation. Do not drop a compact, nonoverlapping company summary merely
+because detailed financial analysis is selected elsewhere; summaries may carry the distinct
+company total revenue and main products that those tables do not explain.
 For monetization and main mix, seek substantive report-local revenue composition or
 income-statement analysis, not just business introductions or operating highlights.
 Assets, AUM, capacity or client counts cannot substitute for revenue sources. Keep net

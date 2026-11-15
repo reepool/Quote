@@ -1,0 +1,354 @@
+"""6.CK local-only closeout. Never constructs a network client."""
+import hashlib
+import json
+import sys
+import tempfile
+import shutil
+from collections import Counter
+from pathlib import Path
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0, str(ROOT))
+DEST = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-four-concentrated-source-result-20261115'
+PREPARED = ROOT / 'data/QuoteBak/workpaper-ck-prepared-hxztmudq'
+SYMBOLS = ('600082', '600097', '600054', '600000')
+
+
+def read(path):
+    return json.loads(path.read_text())
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def dump(path, value):
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+
+
+def freeze_results():
+    authorization = read(DEST / 'authorization.json')
+    assert all(sha(ROOT / p) == h for p, h in authorization['code_sha256'].items())
+    assert sha(ROOT / 'config/13_llm.json') == authorization['shared_config_sha256']
+    assert sha(DEST / 'operator-snapshot.txt') == authorization['operator_sha256']
+    rows, providers = [], Counter()
+    for symbol in SYMBOLS:
+        directory = DEST / symbol
+        summary, budget = read(directory / 'summary.json'), read(directory / 'budget.json')
+        assert summary['three_reads_equal']
+        assert summary['physical_requests'] == budget['physical_requests'] <= 10
+        assert summary['charged_tokens'] == budget['charged_tokens'] <= 500000
+        assert summary['business_seconds'] <= 1800
+        assert summary['recoveries'] <= 3
+        providers.update(a['source_label'] for a in budget['attempts'])
+        rows.append({k: summary.get(k) for k in ('instrument_id', 'readable', 'physical_requests', 'charged_tokens', 'recoveries', 'business_seconds', 'supervision_seconds', 'preparation_seconds', 'cleanup_bytes', 'review_status', 'review_error', 'exception')})
+    assert sum(r['physical_requests'] for r in rows) == 13
+    assert sum(r['charged_tokens'] for r in rows) == 365532
+    original_hashes = {str(p.relative_to(DEST)): sha(p) for p in sorted(DEST.rglob('*')) if p.is_file()}
+    dump(DEST / 'original-result-check.json', {
+        'task': '6.CK', 'checked_before_post_run_code_changes': True,
+        'frozen_source_and_configuration_equal': True,
+        'original_file_sha256': original_hashes, 'companies': rows,
+        'physical_requests': 13, 'charged_tokens': 365532, 'recoveries': 1,
+        'providers': dict(providers), 'cost': 'unknown',
+        'readable_profiles': 3, 'completed_review_repair_loops': 0,
+        's1': '0/12', 'production_authorization': 'not_authorized',
+    })
+    print(json.dumps({'frozen_originals': len(original_hashes), 'providers': dict(providers), 'companies': rows}, ensure_ascii=False))
+
+
+def local_checks():
+    from research.company_profile.models import ReportIdentity
+    from research.company_profile.workpaper import CompanyProfileWorkpaper, WorkpaperDraftResponse, bind_workpaper_draft
+    from research.company_profile.workpaper_llm import workpaper_processing_identity
+    from research.company_profile.workpaper_review import workpaper_hash
+    from research.company_profile.workpaper_sections import SectionSelection, IndexedSection, index_sections, selected_pages, extract_selected_layout, build_section_packet
+    from research.company_profile.runtime import CompanyProfileStageRuntime, CompanyProfileResearchWriter
+    from research.company_profile.reads import CompanyProfileReadService
+
+    original = read(DEST / 'original-result-check.json')
+    assert all(sha(DEST / p) == h for p, h in original['original_file_sha256'].items())
+    prepared = read(PREPARED / '600054.json')
+    report = ReportIdentity.model_validate(read(DEST / '600082/query.json')['profiles'][0]['report']).model_copy(update={
+        'instrument_id': '600054.SH', 'document_version': prepared['asset']['content_hash'],
+        'source_asset_id': prepared['asset']['source_asset_id'],
+    })
+    # This maps unchanged titles, NOT the new index IDs onto the old selection.
+    old = [IndexedSection.model_validate(i) for i in prepared['index']]
+    selection_raw = read(DEST / '600054/model-receipts.json')[0]['response_payload']
+    old_selection = SectionSelection.model_validate(selection_raw)
+    selected_paths = [s.section_path for s in old if s.section_id in old_selection.selected_section_ids]
+    fresh = index_sections(prepared['pages'])
+    mapping = {}
+    for path in selected_paths:
+        matches = [s for s in fresh if s.section_path == path]
+        assert len(matches) == 1, (path, len(matches))
+        mapping[path] = matches[0]
+    selection = old_selection.model_copy(update={'selected_section_ids': tuple(s.section_id for s in mapping.values())})
+    numbers = selected_pages(fresh, selection)
+    pdf = Path(prepared['asset']['archive_path'])
+    assert sha(pdf) == prepared['asset']['content_hash']
+    layout = extract_selected_layout(pdf.read_bytes(), numbers)
+    packet = build_section_packet(report, layout, fresh, selection, remap_layout=True, max_characters=500000)
+    assert '000.00 自有资金' not in [s.section_path[-1] for s in fresh]
+    check = {
+        'execution': 'post_run_local_source_packet_only', 'new_model_requests': 0,
+        'original_failure_retained': True, 'preprocessing_version': workpaper_processing_identity(real=False)['preprocessing_version'],
+        'source_sha256': sha(pdf), 'selected_title_paths_unique': True,
+        'selection_mapping': [{'path': list(path), 'old_id': next(s.section_id for s in old if s.section_path == path), 'new_id': s.section_id} for path, s in mapping.items()],
+        'packet_pages': sorted({sp.page for e in packet.evidence for sp in e.source_spans}),
+        'packet_characters': sum(len(sp.quote) for e in packet.evidence for sp in e.source_spans),
+        'all_packet_coordinates_equal': all(next(p['text'] for p in layout if p['page'] == sp.page)[sp.start:sp.end] == sp.quote for e in packet.evidence for sp in e.source_spans),
+        'not_a_new_huangshan_profile': True,
+    }
+    dump(DEST / 'huangshan-local-source-check.json', check)
+
+    receipts = read(DEST / '600082/model-receipts.json')
+    saved = read(DEST / '600082/query.json')['profiles'][0]['workpaper']
+    paper = CompanyProfileWorkpaper.model_validate(saved)
+    extraction = next(r for r in receipts if r['purpose'] == 'extract_profile_workpaper')
+    initial = next(r for r in receipts if r['purpose'] == 'review_profile_workpaper')
+    seed = bind_workpaper_draft(WorkpaperDraftResponse.model_validate(extraction['response_payload']), report=paper.report,
+        reading_scope=paper.reading_scope, evidence=paper.evidence, origin='llm_generated', generation=paper.generation)
+    assert workpaper_hash(seed) == paper.quality_review.original_draft_hash
+    seed = seed.model_copy(update={'origin': 'controlled_fixture'})
+    class SavedReviewOnly:
+        offline_only = True
+        workpaper_receipts = ()
+        def __init__(self):
+            self.calls = []
+        def workpaper_request(self, **kwargs):
+            self.calls.append(kwargs)
+            if kwargs['purpose'] == 'review_profile_workpaper':
+                return initial['response_payload']
+            raise ValueError('offline_stop_no_new_repair_or_network_authorized')
+
+    provider = SavedReviewOnly()
+    source_pdf = Path(read(PREPARED / '600082.json')['asset']['archive_path'])
+    seed_pages = extract_selected_layout(source_pdf.read_bytes(), sorted({sp.page for ev in seed.evidence for sp in ev.source_spans}))
+    root = Path(tempfile.mkdtemp(prefix='workpaper-ck-local-readback-'))
+    destination = DEST / 'local-review-replay'
+    destination.mkdir(exist_ok=True)
+    try:
+        runtime = CompanyProfileStageRuntime(writer=CompanyProfileResearchWriter(root), provider=provider)
+        identity = workpaper_processing_identity(real=False, review=True)
+        identity['review_existing_draft_hash'] = workpaper_hash(seed)
+        item = {'work_id': 'ck-local-review-replay', 'report': seed.report, 'review_seed': seed.model_dump(mode='json'),
+                'pages': seed_pages,
+                'source_pdf_path': str(source_pdf), 'processing_identity': identity}
+        for stage in ('acquire', 'parse', 'semantic', 'verify', 'publish'):
+            result = runtime.run_stage(stage, item)
+            assert result['status'] == 'success', (stage, result)
+        query = CompanyProfileReadService(root).query(('600082.SH',))
+        export = CompanyProfileReadService(root).export(('600082.SH',), export_directory=destination / 'export')
+        reread = CompanyProfileReadService(root).query(('600082.SH',))
+        assert query['profiles'] == export['profiles'] == reread['profiles']
+        safe = CompanyProfileWorkpaper.model_validate(query['profiles'][0]['workpaper'])
+        assert len(safe.quality_review.findings) == 14
+        assert not any(f.resolution == 'corrected_pending_trust' for f in safe.quality_review.findings)
+        assert safe.quality_review.status == 'incomplete'
+        targets = provider.calls[1]['payload']['repair_targets']
+        assert len(targets) == 12
+        target = next(t for t in targets if t['target_fact_id'] == 'sc-01')
+        assert len(target['additional_findings']) == 1
+        removed = {f.affected_fact_id for f in safe.quality_review.findings if f.original_fact}
+        originals = {f.fact_id: f.model_dump(mode='json') for e in (*seed.elements.model_dump().keys(),) for f in getattr(seed.elements, e).facts}
+        if seed.supply_chain:
+            originals.update({f.fact_id: f.model_dump(mode='json') for e in seed.supply_chain.model_dump().keys() for f in getattr(seed.supply_chain, e).facts})
+        retained = [f for e in safe.elements.model_dump().keys() for f in getattr(safe.elements, e).facts]
+        if safe.supply_chain:
+            retained += [f for e in safe.supply_chain.model_dump().keys() for f in getattr(safe.supply_chain, e).facts]
+        assert {f.fact_id for f in retained} == originals.keys() - removed
+        assert all(f.model_dump(mode='json') == originals[f.fact_id] for f in retained)
+        dump(destination / 'query.json', query)
+        dump(destination / 'check.json', {
+            'origin': 'controlled_saved_response_replay', 'new_model_requests': 0,
+            'original_draft_hash_reconstructed': True, 'original_review_receipt_hash': initial['response_hash'],
+            'source_and_original_results_not_modified': True, 'policy_version': safe.quality_review.policy_version,
+            'findings_retained': 14, 'merged_repair_targets': 12, 'withheld_fact_ids': sorted(removed),
+            'retained_facts': len(retained), 'unchanged_fact_objects': True, 'three_reads_equal': True,
+            'no_repair_candidates_or_final_verification': True, 'original_real_run_still_failed': True,
+        })
+    finally:
+        size = sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
+        shutil.rmtree(root)
+        cleanup_path = DEST / 'local-check-cleanup.json'
+        previous = read(cleanup_path) if cleanup_path.exists() else {}
+        runs = previous.get('removed_runs', [previous] if previous else [])
+        runs.append({'removed_root': str(root), 'removed_bytes': size, 'recoverable': 'rebuild from retained original responses and PDF'})
+        dump(cleanup_path, {'removed_runs': runs, 'removed_bytes': sum(r['removed_bytes'] for r in runs)})
+    print(json.dumps({'huangshan': check, 'haitai': read(destination / 'check.json')}, ensure_ascii=False))
+
+
+def content_closeout():
+    reference_path = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization/workpaper-core-readiness-20261114/source-first-contract.json'
+    reference = read(reference_path)
+    # Text availability against the pre-frozen reference is not semantic grading.
+    observations = {
+        '600082': [
+            ('partial', ['ps-01', 'ps-02', 'rm-01'], '开发运营可读；原主营定位bs-01因主体意见在离线限用稿中隔离。'),
+            ('withheld', [], 'bs-02/ps-05主体待修；原真实稿有，但不作为限用结论采用。'),
+            ('partial', ['ps-01', 'ps-02'], '载体销售/租赁物业在，招商细节cc-05暂隔离。'),
+            ('present', ['ps-04'], '咨询培训服务保留。'),
+            ('present', ['rm-01'], '开发销售与租赁物业运营区分。'),
+            ('withheld', [], 'sc-01含长期投资回报错写本期收入，离线限用投影撤回，未修订。'),
+            ('present', ['ps-03'], '代理人净额法与开发运营分开。'),
+            ('present', ['rm-02', 'sm-05'], '公司总收入原万元表达及449240562.34元同在；不替代为成本。'),
+            ('withheld', [], 'sm-01/02收入数字可定位，但附带百分点方向错误，整事实待修，未人工拆改。'),
+            ('withheld', [], 'sm-03把横线写成未披露，整事实限用隔离；ps-03仅保业务性质。'),
+        ],
+        '600097': [
+            ('present', ['bs-01', 'bs-02'], '四板块在。'),
+            ('present', ['ps-01'], '鲣鱼黄鳍在。'),
+            ('present', ['ps-01'], '保合作经营，不写独立自产。'),
+            ('present', ['ps-02'], 'ALBO及国内鱼柳在。'),
+            ('present', ['rm-01'], '销售及配套运输机制在。'),
+            ('present', ['rm-03', 'sm-04', 'cc-01'], '直销及境内外原口径保留，不强行统一不同产品市场描述。'),
+            ('missing', [], '本次最终稿未独立写金枪鱼转移至鱼柳加工关系；没有凭空新增加工服务量。'),
+            ('present', ['sm-01', 'bs-02'], '公司收入和主营合计分开。'),
+            ('present', ['sm-02'], '捕捞/加工分项在。'),
+            ('present', ['sm-02'], '贸易/运输分项在。'),
+        ],
+        '600000': [
+            ('present', ['BS-01'], '四业务板块与赛道不混。'),
+            ('present', ['PS-01'], '企业金融服务在。'),
+            ('present', ['PS-02'], '零售服务在。'),
+            ('present', ['PS-03'], '金融市场与托管在。'),
+            ('present', ['PS-04'], '跨境服务在。'),
+            ('present', ['RM-01', 'RM-04'], '净利息收入金额与占比同在。'),
+            ('partial', ['RM-01'], '13.06%在，22725百万元未独立入最终稿。'),
+            ('partial', ['RM-01'], '17.68%在，30756百万元未独立入最终稿。'),
+            ('withheld', [], '正确公司营收原在RM-03；重要补充遗漏被转为同ID修订，修订失败后整条撤回。不是原文没有或抽取模型没写。'),
+            ('partial', ['SM-01', 'SM-03', 'SM-04', 'SM-06'], '集团资产、母公司余额、AUM/托管分开；期间公司营收因上述撤回缺失。'),
+            ('present', ['BS-01', 'PS-01', 'PS-02'], '按银行金融服务角色，不套制造。'),
+        ],
+    }
+    rows = []
+    for company in reference['companies']:
+        symbol = company['instrument_id'][:6]
+        if symbol not in SYMBOLS:
+            continue
+        notes = observations.get(symbol, [('no_profile', [], '本次在章节包边界失败，无画像，不拿旧稿补齐。')] * len(company['core_conditions']))
+        assert len(notes) == len(company['core_conditions'])
+        for condition, (status, fact_ids, reason) in zip(company['core_conditions'], notes):
+            rows.append({'condition_id': condition['condition_id'], 'instrument_id': company['instrument_id'],
+                'dimension': condition['dimension'], 'expected': condition['expected'],
+                'content_observation': status, 'fact_ids': fact_ids, 'explanation': reason,
+                'formal_acceptance_verdict': None})
+    assert len(rows) == 44
+    dump(DEST / 'content-review.json', {
+        'reference_path': str(reference_path.relative_to(ROOT)), 'reference_sha256': sha(reference_path),
+        'scope': '44项窄核心的文字/限用可见性对照，不是全量事实准确率或全文召回；海泰按明确标注的零调用隔离投影，其他按本次真实最终稿。',
+        'independent_source_checks': [
+            {'instrument_id': '600082.SH', 'pages': [13, 15, 18], 'evidence_ids': ['source-0006', 'source-0008', 'source-0011'],
+             'checked': '公司收入44924.06万元；行业表开发418710800.51/运营30105192.48/商品424569.35元及合计449240562.34元；毛利率减少方向；匿名客户与贸易范围。已错指标不因金额正确放行。'},
+            {'instrument_id': '600097.SH', 'pages': [6, 8, 11, 12], 'evidence_ids': ['source-0001', 'source-0003', 'source-0007', 'source-0008'],
+             'checked': '主营与合作磷虾、ALBO鱼柳、公司收入/主营合计、四板块表头金额/直销；内部原料转移在来源但最终稿未写；量价及分业务收入变动确有遗漏。'},
+            {'instrument_id': '600000.SH', 'pages': [32, 71, 72], 'evidence_ids': ['source-0001', 'source-0013', 'source-0014'],
+             'checked': '集团营收1739.64亿元/净利息120483/手续费净额22725/其他净额30756百万元及占比；业务总收入325269百万元不同。RM-03正确数字在初稿、最终被撤，不从原稿偷补为新采纳。'},
+        ],
+        'observations': rows, 'formal_accuracy': None, 'formal_recall': None,
+        'unassessed': ['非核心逐事实全量核源', '正式补充抽样分母', '六类风险整组实测', '全报告漏项', '生产发布'],
+    })
+    snapshot = read(DEST / 'original-result-check.json')
+    clock = read(DEST / 'group-clock.json')
+    summaries = [read(DEST / symbol / 'summary.json') for symbol in SYMBOLS]
+    wall = max(s['business_ended_monotonic'] for s in summaries) - clock['started_monotonic']
+    original_facts = 0
+    original_metrics = 0
+    for symbol in ('600082', '600097', '600000'):
+        paper = read(DEST / symbol / 'query.json')['profiles'][0]['workpaper']
+        groups = list(paper['elements'].values()) + list((paper.get('supply_chain') or {}).values())
+        facts = [f for e in groups for f in e['facts']]
+        original_facts += len(facts)
+        original_metrics += sum(len(f['metrics']) for f in facts)
+    dump(DEST / 'result.json', {
+        'task': '6.CK', 'attempts_used': '4/4', 'new_entries_or_calls_after_batch': 0,
+        'readable_real_profiles': 3, 'no_profile': ['600054.SH'], 'completed_real_review_repair_loops': 0,
+        'original_real_fact_count_including_optional_supply_chain': original_facts,
+        'original_real_metric_count': original_metrics, 'not_a_quality_rate': True,
+        'haitai_local_limited_projection_facts': 25, 'local_projection_is_not_real_success': True,
+        'physical_requests': 13, 'charged_tokens': 365532, 'recoveries': 1, 'cost': 'unknown',
+        'providers': snapshot['providers'], 'business_wall_seconds': round(wall, 3),
+        'per_company': snapshot['companies'], 's1': '0/12', 'production': 'not_authorized',
+        'first_blockers': {'600082': 'local_duplicate_review_target', '600097': 'repair_decimal_string_contract',
+                           '600054': 'local_numeric_table_row_misindexed_as_heading', '600000': 'repair_unit_and_qualifier_contract'},
+        'post_run_fixes': ['v3 numeric-row section boundaries; source-only local check', 'review.v4 merge multiple issues per fact; saved-review-only isolation and original writer three reads'],
+        'next_priority': '先在保存响应上区分真实错误与补充遗漏，保正确原有收入；对齐局部修订请求合同及消费。有限验证后才裁小范围新真实观察，不扩大样本或补满供应链。',
+    })
+    print(json.dumps({'original_facts': original_facts, 'original_metrics': original_metrics, 'core_observations': len(rows), 'business_wall_seconds': round(wall, 3)}, ensure_ascii=False))
+
+
+def finish():
+    import re
+    original = read(DEST / 'original-result-check.json')
+    assert all(sha(DEST / p) == h for p, h in original['original_file_sha256'].items())
+    authorization = read(DEST / 'authorization.json')
+    assert sha(ROOT / 'config/13_llm.json') == authorization['shared_config_sha256']
+    changed = [p for p, h in authorization['code_sha256'].items() if sha(ROOT / p) != h]
+    assert set(changed) == {'research/company_profile/workpaper_llm.py', 'research/company_profile/workpaper_sections.py', 'research/company_profile/workpaper_review.py'}
+    for symbol in SYMBOLS:
+        for receipt in read(DEST / symbol / 'model-receipts.json'):
+            assert hashlib.sha256(receipt['raw_content'].encode()).hexdigest() == receipt['response_hash']
+            assert json.loads(receipt['raw_content']) == receipt['response_payload']
+        prepared = read(PREPARED / (symbol + '.json'))
+        assert sha(Path(prepared['asset']['archive_path'])) == prepared['asset']['content_hash']
+    snapshot = DEST / 'closeout-snapshot.txt'
+    shutil.copyfile(Path(__file__), snapshot)
+    verification = {
+        'original_results_and_raw_response_hashes_unchanged': True,
+        'shared_configuration_unchanged': True, 'source_pdfs_unchanged': True,
+        'post_run_changed_files': {p: sha(ROOT / p) for p in changed},
+        'closeout_snapshot_sha256': sha(snapshot),
+        'no_new_model_calls_after_original_batch': True,
+        'targeted_tests': {'passed': 18, 'deselected': 68, 'seconds': 8.17},
+        'review_tests_excluding_unchanged_task_service': {'passed': 44, 'deselected': 3, 'seconds': 15.68},
+        'selection_tests_before_freeze': {'passed': 5, 'deselected': 33, 'seconds': 5.78},
+        'openspec_strict': {'change': 'restore-company-profile-llm-led-generalization', 'exit_code': 0},
+        'review': {'blocking_fixed': ['numeric_table_row_boundary', 'duplicate_review_target_loses_findings'],
+                   'known_limited_followup': ['supplemental_omission_withdraws_correct_fact', 'repair_response_contracts'],
+                   'nonblocking_deferred': ['fine_grained_supply_chain', 'minor_financial_details'],
+                   'preexisting_changes': 'preserved_not_included'},
+        'formal_s1': '0/12', 'production_authorization': 'not_authorized',
+    }
+    dump(DEST / 'validation.json', verification)
+    expected = {symbol + suffix for symbol in SYMBOLS for suffix in ('.json', '-run.log')}
+    assert PREPARED.resolve() == Path(authorization['prepared_root']).resolve()
+    assert {p.name for p in PREPARED.iterdir()} == expected
+    assert all(p.is_file() and not p.is_symlink() for p in PREPARED.iterdir())
+    prepared_bytes = sum(p.stat().st_size for p in PREPARED.iterdir())
+    operator = ROOT / 'data/QuoteBak/workpaper_ck_run.py'
+    assert sha(operator) == authorization['operator_sha256'] == sha(DEST / 'operator-snapshot.txt')
+    script = Path(__file__).resolve()
+    assert script == ROOT / 'data/QuoteBak/workpaper_ck_finalize.py'
+    assert sha(script) == sha(snapshot)
+    script_bytes = operator.stat().st_size + script.stat().st_size
+    worker_bytes = sum(r['cleanup_bytes'] for r in original['companies'])
+    local_bytes = read(DEST / 'local-check-cleanup.json')['removed_bytes']
+    shutil.rmtree(PREPARED)
+    operator.unlink()
+    script.unlink()
+    cleanup = {
+        'active_real_workers': 0, 'active_worker_check': 'approved-network-environment pgrep exact CK Python operator returned no matches before cleanup',
+        'worker_roots_removed_bytes': worker_bytes,
+        'post_run_local_diagnostic_roots_removed_bytes': local_bytes,
+        'prepared_pages_and_logs_removed_path': str(PREPARED), 'prepared_pages_and_logs_removed_bytes': prepared_bytes,
+        'owned_operator_and_closeout_scripts_removed_bytes': script_bytes,
+        'released_bytes_this_task': worker_bytes + local_bytes + prepared_bytes + script_bytes,
+        'not_recounted': ['CJ', 'CI', 'CG', 'other_previous_tasks'],
+        'recovery': 'Rebuild from retained official PDFs, source cache, original responses and operator/closeout snapshots.',
+        'retained': ['one_authoritative_CK_evidence_set', 'official_PDFs', 'useful_shared_parse_cache', 'original_attempt_markers', 'previous_results', 'preexisting_and_parallel_worktree_changes'],
+    }
+    dump(DEST / 'cleanup.json', cleanup)
+    missing = []
+    for name in ('profiles.md', 'result.md'):
+        path = DEST / name
+        for link in re.findall(r'\]\(([^)#]+)(?:#[^)]*)?\)', path.read_text()):
+            if not (path.parent / link).exists():
+                missing.append(link)
+    assert not missing, missing
+    print(json.dumps({'validation': 'passed', 'cleanup': cleanup}, ensure_ascii=False))
+
+
+if __name__ == '__main__':
+    {'freeze': freeze_results, 'local': local_checks, 'content': content_closeout, 'finish': finish}[sys.argv[1]]()

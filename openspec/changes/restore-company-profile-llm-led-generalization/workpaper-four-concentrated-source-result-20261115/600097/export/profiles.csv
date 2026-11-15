@@ -1,0 +1,4 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600097.SH,2025-12-31,2026-03-27T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,llm_generated,"公司主要从事远洋渔业捕捞、水产品加工销售及相关贸易，围绕“一鱼一虾”（金枪鱼、南极磷虾）核心主业，形成捕捞、加工、贸易、运输一体化格局。
+主营业务按行业分为海洋捕捞、食品加工、渔货贸易、海上运输四个板块，合计主营业务收入2,330,812,544.82元。
+主要子公司覆盖远洋捕捞、食品加工、罐头食品加工、渔货贸易和海上运输等业务，如上海开创远洋渔业有限公司从事远洋捕捞，卡洛斯•阿尔博的孩子们有限公司从事罐头食品加工，康隆（香港）航运有限公司从事海上运输等。",31,41,incomplete,1,deepseek-flash,grok-4.7

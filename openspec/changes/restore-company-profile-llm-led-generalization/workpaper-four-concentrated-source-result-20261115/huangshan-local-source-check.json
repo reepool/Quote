@@ -1,0 +1,92 @@
+{
+  "execution": "post_run_local_source_packet_only",
+  "new_model_requests": 0,
+  "original_failure_retained": true,
+  "preprocessing_version": "toc_sections_native_layout.v3.numeric-row-boundary",
+  "source_sha256": "f8fa6356c3e7808d4ea70497aa057e7be5d6fe841c9dd6145e5f6c7ec7ebc63f",
+  "selected_title_paths_unique": true,
+  "selection_mapping": [
+    {
+      "path": [
+        "第二节 公司简介和主要财务指标",
+        "七、 近三年主要会计数据和财务指标"
+      ],
+      "old_id": "section-0023",
+      "new_id": "section-0023"
+    },
+    {
+      "path": [
+        "第二节 公司简介和主要财务指标",
+        "七、 近三年主要会计数据和财务指标",
+        "(一) 主要会计数据"
+      ],
+      "old_id": "section-0024",
+      "new_id": "section-0024"
+    },
+    {
+      "path": [
+        "第三节 管理层讨论与分析",
+        "一、报告期内公司从事的业务情况"
+      ],
+      "old_id": "section-0036",
+      "new_id": "section-0036"
+    },
+    {
+      "path": [
+        "第三节 管理层讨论与分析",
+        "三、经营情况讨论与分析"
+      ],
+      "old_id": "section-0044",
+      "new_id": "section-0044"
+    },
+    {
+      "path": [
+        "第三节 管理层讨论与分析",
+        "五、报告期内主要经营情况"
+      ],
+      "old_id": "section-0058",
+      "new_id": "section-0058"
+    },
+    {
+      "path": [
+        "第三节 管理层讨论与分析",
+        "五、报告期内主要经营情况",
+        "(一) 主营业务分析"
+      ],
+      "old_id": "section-0059",
+      "new_id": "section-0059"
+    },
+    {
+      "path": [
+        "第三节 管理层讨论与分析",
+        "五、报告期内主要经营情况",
+        "(一) 主营业务分析",
+        "2、 收入和成本分析"
+      ],
+      "old_id": "section-0061",
+      "new_id": "section-0061"
+    }
+  ],
+  "packet_pages": [
+    6,
+    7,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23
+  ],
+  "packet_characters": 31208,
+  "all_packet_coordinates_equal": true,
+  "not_a_new_huangshan_profile": true
+}
