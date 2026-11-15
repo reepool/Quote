@@ -1,0 +1,5 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600054.SH,2025-12-31,2026-04-17T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,llm_generated,"公司围绕旅游主业经营，报告期业务包括景区、索道及缆车、酒店、徽菜、旅行社和智慧旅游六类；财务报告按内部管理要求划分园林开发分部、旅游服务分部和其他分部三个报告分部。
+公司经营黄山景区、花山谜窟景区及太平湖景区，提供旅游观光和休闲度假等服务；索道及缆车业务拥有黄山云谷索道、玉屏索道、太平索道和西海观光缆车，提供客运观光服务。
+酒店业务拥有各类酒店十余家，黄山景区内分布雲麓北海宾馆、狮林大酒店、西海饭店、白云宾馆、玉屏楼宾馆等，景区外分布雲颐汤泉酒店、轩辕国际大酒店、昱城皇冠假日酒店、黄山国际大酒店等，形成“雲麓”酒管品牌及雲亼、雲麓、雲野、雲颐等品牌矩阵。
+徽菜业务以徽文化主题餐饮品牌在全国多地开设连锁主题餐饮门店；旅行社业务涵盖国内旅游、入境旅游、出境旅游、定制游、会展服务和疗休养等；智慧旅游业务涵盖黄山旅游官方平台运营、新媒体运营、OTA业务承接、旅游产品和活动策划、旅游服务接待和旅游商品在线销售等。",33,43,completed_with_open_findings,2,deepseek-flash,grok-4.7

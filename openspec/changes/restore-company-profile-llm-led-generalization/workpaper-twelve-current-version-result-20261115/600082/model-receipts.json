@@ -1,0 +1,42 @@
+[
+  {
+    "request_id": "bp-work-4b4ba31e7c35b71b4775fbc7:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "27cc4249649528ce39c3898de671bdb40abf268f7d31455fe46913fca96dcb0b",
+    "response_hash": "fd2afe51323bbb05e6615819bf4305ed7161ca9bb1796deb9e6a98f6bbfb78d3",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0049\",\"section-0051\",\"section-0063\",\"section-0064\",\"section-0066\",\"section-0094\",\"section-0112\",\"section-0125\"],\"rationale\":\"本报告为园区开发运营类公司。选择逻辑：section-0049说明公司从事的业务与经营模式；section-0051经营情况讨论与分析（含盘活存量资产、精耕园区运营、聚焦产业投资等实质子节）覆盖经营综述；section-0063报告期内主要经营情况为经营总览；section-0064主营业务分析及section-0066收入和成本分析提供营业收入构成、分业务/分产品收入与成本，是收入来源与主要业务权重的核心；section-0094为资产及负债状况分析，说明经营资源与财务结构；section-0112行业经营性信息分析含房地产储备、开发投资、销售结转、出租及财务融资，直接反映园区/房地产业务规模与经营节奏；section-0125主要控股参股公司分析补充子公司经营与投资平台情况。以上共同覆盖业务结构、产品服务、盈利来源、规模与主要构成、经营资源与本期变化。\",\"stop_reason\":\"已覆盖业务模式、经营综述、收入构成与成本、资产负债资源、行业经营性信息及主要子公司，足以回答做什么、怎么赚钱、收入权重与经营变化。行业背景（section-0050）与核心竞争力（section-0057）为次要泛化内容，未选；财务报告附注（section-0315及明细）仅在收入附注有实质缺口时定向补充，当前不展开；治理、股东、重要事项等与经营分析无关，不纳入。\",\"deferred\":[\"section-0050 行业情况：属行业背景，非公司层面经营实质，暂不选\",\"section-0057 核心竞争力分析：偏泛化竞争优势，非收入与经营数据，暂不选\",\"section-0315 财务报告及附注：仅在收入构成存在缺口时定向查阅，不整体展开\",\"section-0127 未来发展讨论：含计划性展望，非本期经营事实，暂不选\"]}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0049",
+        "section-0051",
+        "section-0063",
+        "section-0064",
+        "section-0066",
+        "section-0094",
+        "section-0112",
+        "section-0125"
+      ],
+      "rationale": "本报告为园区开发运营类公司。选择逻辑：section-0049说明公司从事的业务与经营模式；section-0051经营情况讨论与分析（含盘活存量资产、精耕园区运营、聚焦产业投资等实质子节）覆盖经营综述；section-0063报告期内主要经营情况为经营总览；section-0064主营业务分析及section-0066收入和成本分析提供营业收入构成、分业务/分产品收入与成本，是收入来源与主要业务权重的核心；section-0094为资产及负债状况分析，说明经营资源与财务结构；section-0112行业经营性信息分析含房地产储备、开发投资、销售结转、出租及财务融资，直接反映园区/房地产业务规模与经营节奏；section-0125主要控股参股公司分析补充子公司经营与投资平台情况。以上共同覆盖业务结构、产品服务、盈利来源、规模与主要构成、经营资源与本期变化。",
+      "stop_reason": "已覆盖业务模式、经营综述、收入构成与成本、资产负债资源、行业经营性信息及主要子公司，足以回答做什么、怎么赚钱、收入权重与经营变化。行业背景（section-0050）与核心竞争力（section-0057）为次要泛化内容，未选；财务报告附注（section-0315及明细）仅在收入附注有实质缺口时定向补充，当前不展开；治理、股东、重要事项等与经营分析无关，不纳入。",
+      "deferred": [
+        "section-0050 行业情况：属行业背景，非公司层面经营实质，暂不选",
+        "section-0057 核心竞争力分析：偏泛化竞争优势，非收入与经营数据，暂不选",
+        "section-0315 财务报告及附注：仅在收入构成存在缺口时定向查阅，不整体展开",
+        "section-0127 未来发展讨论：含计划性展望，非本期经营事实，暂不选"
+      ]
+    },
+    "usage": {
+      "input_tokens": 18953,
+      "output_tokens": 457,
+      "total_tokens": 19410
+    }
+  }
+]

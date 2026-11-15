@@ -1,0 +1,3 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600100.SH,2025-12-31,2026-04-28T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,llm_generated,"公司定位为“数智技术与核技术创新融合的高科技企业”，聚焦公共安全、数智产业、智慧能源三大产业领域，并设有科技成果转化平台、资产管理平台、海外投资协同平台。
+公司业务主要分为公共安全、数智产业、智慧能源业务领域；主营业务分板块表另列示其他业务、总部投资及科技园，并以业务板块间抵销调整后得出合计。",25,49,completed_with_open_findings,6,deepseek-flash,grok-4.7

@@ -1,0 +1,4 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600098.SH,2025-12-31,2026-04-14T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,llm_generated,"公司从事绿色低碳综合智慧能源、节能、环保、能源金融等业务投资开发和经营，是广东省重要的综合能源企业之一，以构建“大产业链”思路推动产能互融、多能互补、煤气电联动，形成产、购、销、储、运、用的综合能源产业链。
+公司业务按主营业务分行业划分为燃煤发电及供热、天然气发电及供热、能源物流、天然气、新能源及储能、其他产业六类，其中能源物流与天然气业务规模居前。
+公司主要子公司覆盖电力生产销售（东电公司、天然气发电公司、恒益热电公司、中电荔新公司、南沙电力公司）、燃料批发零售（能源物流集团）、燃气管网建设与燃气销售（燃气集团）、风力光伏发电及充电桩（新能源集团）、电力供应（储能集团）和非银金融（财务公司）；参股珠海金湾公司（液化天然气加工）和红海湾发电公司（电力、能源项目投资）。",43,119,completed_with_open_findings,1,deepseek-flash,grok-4.7

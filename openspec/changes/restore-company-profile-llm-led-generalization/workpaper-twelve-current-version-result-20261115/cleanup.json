@@ -1,0 +1,118 @@
+{
+  "task": "6.CO",
+  "pre_development_cleanup_bytes": 0,
+  "runtime_roots_removed_in_worker_finally_bytes": 22930683,
+  "closeout_deleted": [
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600094/export/600094.SH_2025-12-31.json",
+      "bytes": 294467,
+      "sha256": "85ece91a96eeb447153d0e77a68ec69e79b11d1069dc755a3272f1ca3fc574e5",
+      "reason": "identical profile object already in canonical query.json"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600103/export/600103.SH_2025-12-31.json",
+      "bytes": 325923,
+      "sha256": "fa0cd0b645396d9db7006d8719cb86d8cab52d5e50952c7630d64cf5c4152104",
+      "reason": "identical profile object already in canonical query.json"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600100/export/600100.SH_2025-12-31.json",
+      "bytes": 376758,
+      "sha256": "1d4f7d2ff74645c893a295f8b2ea0dd891cb4a3a9f17af11a6b506bd467cabcb",
+      "reason": "identical profile object already in canonical query.json"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600107/export/600107.SH_2025-12-31.json",
+      "bytes": 280821,
+      "sha256": "f670ae93a65233f3c4289a51035ae1fbc6c76895b93d4e09ddfd491f8f78e443",
+      "reason": "identical profile object already in canonical query.json"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600098/export/600098.SH_2025-12-31.json",
+      "bytes": 523084,
+      "sha256": "5edb8b310a99d71219b00c8ced763cabe3afd52dec8ca3901fd427cf30d84f98",
+      "reason": "identical profile object already in canonical query.json"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600104/export/600104.SH_2025-12-31.json",
+      "bytes": 349285,
+      "sha256": "af716cd9780a0543eb4c36289ca9909cd9eaa3dac17cf9aac71d1439d63eff14",
+      "reason": "identical profile object already in canonical query.json"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600088/export/600088.SH_2025-12-31.json",
+      "bytes": 326388,
+      "sha256": "48d3e76b82c4c3f9574b997f9eefd8ddb68002277ad6869715379ba0ff9601ce",
+      "reason": "identical profile object already in canonical query.json"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600099/export/600099.SH_2025-12-31.json",
+      "bytes": 313154,
+      "sha256": "bc23a2aa62fc1511576347f5dd7719eff7e3f6c1cbd12291c04ea1dbf94010fa",
+      "reason": "identical profile object already in canonical query.json"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600097/export/600097.SH_2025-12-31.json",
+      "bytes": 311151,
+      "sha256": "9d18e99f9d29b3e29c98fcf0ec4af342f9c628dcb9222e0eb30ed1f637244606",
+      "reason": "identical profile object already in canonical query.json"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600054/export/600054.SH_2025-12-31.json",
+      "bytes": 293543,
+      "sha256": "7541585f0c5a5858ca704c4df601121d310214c6e1bf1769fc14ab2537cc8ba1",
+      "reason": "identical profile object already in canonical query.json"
+    },
+    {
+      "path": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115/600000/export/600000.SH_2025-12-31.json",
+      "bytes": 393055,
+      "sha256": "fde3b5b4ea085862a4c883bec0e0b5ddcf57f52a3115fa5f376d781245c48b4a",
+      "reason": "identical profile object already in canonical query.json"
+    },
+    {
+      "path": "data/QuoteBak/workpaper-co-prepared-290nvju1",
+      "bytes": 12691937,
+      "reason": "source page/index copies and finished supervisor logs, all twelve receipts persisted"
+    },
+    {
+      "path": "data/QuoteBak/workpaper-co-operator.py",
+      "bytes": 28064,
+      "sha256": "17e2d739d64e0cf75b70cfdedba95580e3f6f02af2ee97210587e6ed57e77ca8",
+      "reason": "finished task-local script"
+    },
+    {
+      "path": "data/QuoteBak/workpaper-co-audit-packet.py",
+      "bytes": 3808,
+      "sha256": "fa436cc51a874dc6b82a4ac032baaa801076161f9835970cec5ccb3e9ef36caf",
+      "reason": "finished task-local script"
+    },
+    {
+      "path": "data/QuoteBak/workpaper-co-closeout.py",
+      "bytes": 10892,
+      "sha256": "dc68da839ebd5c12ae6aaa60c13d7ec7bb4a20be0aa8f1679a3982ef0d8bf8bd",
+      "reason": "finished task-local script"
+    },
+    {
+      "path": "data/QuoteBak/workpaper-co-cleanup.py",
+      "bytes": 3476,
+      "sha256": "b13311d76a0d6c735147b03cf2a4ed9f09bbda0f71c0eadc4ed92c5145a06cf2",
+      "reason": "finished task-local script"
+    },
+    {
+      "path": "data/QuoteBak/__pycache__/workpaper-co-operator.cpython-311.pyc",
+      "bytes": 58259,
+      "reason": "task-local compile cache"
+    }
+  ],
+  "closeout_deleted_bytes": 16584065,
+  "total_this_round_freed_bytes": 39514748,
+  "protected": [
+    "formal PDFs",
+    "valid shared parse/layout cache",
+    "original historical receipts",
+    "12 new attempt markers",
+    "unrelated existing and parallel changes"
+  ],
+  "canonical_result": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-twelve-current-version-result-20261115",
+  "recovery": "removed files are reconstructible; original query/model/source evidence retained"
+}

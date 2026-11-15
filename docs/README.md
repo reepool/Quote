@@ -32,7 +32,7 @@
 
 - `docs/development/research_data_engine_execution.md`：研究数据引擎实施与现状
 - [公司画像产品总需求](development/company_profile_product_and_industry_semantic_requirements.md)：唯一产品目标；全A股公司画像、产品暴露、供应链定位；真实LLM语义与程序硬约束分工。
-- [公司画像研究预览](development/company_profile_research_preview.md)：12家公司已有内容、章页来源、实际模型与限制；跨版本研究待核，不代表同版验收或生产发布。
+- [公司画像研究预览](development/company_profile_research_preview.md)：入口已接6.CO十二家同版真实观察，十一份新稿、实际复核及已知禁用；旧跨版本预览分开，不代表正式验收或生产发布。
 - [验收计划v2](development/company_profile_acceptance_program.md)：唯一数量、质量/成本门槛、容错/补救和实际进度；4家开发、12家新链回归、20家盲测、100家试运行，再全市场分波。
 - [交付路径与任务卡](development/company_profile_delivery_plan.md)：当前转向已有画像集中内容验收及同版12家回归；后续顺序、清理依赖和每次审核检查。
 - [当前实施change](../openspec/changes/restore-company-profile-llm-led-generalization/proposal.md)：目标delta和实施待办；文档具备不代表运行完成或生产授权。

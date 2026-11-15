@@ -1,0 +1,5 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600104.SH,2025-12-31,2026-04-01T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,llm_generated,"公司聚焦整车业务，并强化零部件、移动出行和服务、金融等业务协同，形成以整车为核心、多板块联动的业务结构。
+主营业务分行业包括汽车制造业与金融业；分产品包括整车业务、零部件业务、劳务及其他、金融业务。
+零部件业务主要由下属控股子公司华域汽车系统股份有限公司开展。
+报告期内撤销商用车事业部，将职能整合并入上汽大通，实施商用车业务扁平化管理。",37,43,completed_with_open_findings,1,deepseek-flash,grok-4.7

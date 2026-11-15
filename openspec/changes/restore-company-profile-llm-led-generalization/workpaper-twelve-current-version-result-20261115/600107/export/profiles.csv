@@ -1,0 +1,4 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600107.SH,2025-12-31,2026-04-29T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,llm_generated,"公司主营业务为服装服饰类产品的研发、设计、生产和销售，业务模式未发生重大变化；按面向市场和经营模式分为国外市场的外贸生产加工与国内市场品牌生产加工销售。
+公司在国内开展服装全链条业务，涵盖生产加工与终端销售，主营自主品牌男装、女装及各类配套服饰；外贸加工业务主要采用来料加工、进料加工和一般贸易三种运营模式，并以来料加工、进料加工为主。
+主要子公司中，湖北美尔雅服装集团有限公司为子公司，主要业务为精毛纺织制品、服装及辅料制造、加工、销售；美尔雅服饰有限公司为子公司，是生产中、高档西服的中日合资企业。",30,38,completed_with_open_findings,1,deepseek-flash,grok-4.7

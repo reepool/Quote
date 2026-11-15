@@ -1,0 +1,39 @@
+[
+  {
+    "call_type": "extract",
+    "semantic_request_id": "bp-work-4b4ba31e7c35b71b4775fbc7:workpaper:sections",
+    "gateway_request_id": "3476e625ec744c2da0d1d034ea171b0f",
+    "status": "success",
+    "profile": "semantic_extraction__deepseek",
+    "provider": "openai_compatible",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "source_label": "deepseek:deepseek-flash",
+    "failover_count": 0,
+    "attempts": [
+      {
+        "source_label": "deepseek:deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "model": "deepseek-flash",
+        "attempt_sequence": 1,
+        "request_id": "3476e625ec744c2da0d1d034ea171b0f",
+        "provider_request_id": "369fd36a-d56c-41c5-8cb2-3a7952324921",
+        "status": "success",
+        "attempt_count": 1,
+        "latency_ms": 4025
+      }
+    ],
+    "response_hash": "fd2afe51323bbb05e6615819bf4305ed7161ca9bb1796deb9e6a98f6bbfb78d3",
+    "latency_ms": 4025,
+    "input_tokens": 18953,
+    "output_tokens": 457,
+    "total_tokens": 19410,
+    "warnings": [],
+    "rejected_extract_items": [],
+    "error_code": null,
+    "error_detail": null,
+    "parent_semantic_request_id": null,
+    "partition_index": null,
+    "partition_count": null
+  }
+]

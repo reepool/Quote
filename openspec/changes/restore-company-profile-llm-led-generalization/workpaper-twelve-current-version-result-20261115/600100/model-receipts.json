@@ -1,0 +1,1823 @@
+[
+  {
+    "request_id": "bp-work-92862ffa7505ec6e48ddf906:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "e5694414bc03ddbcbb9cd13bf798e3f20c8c41453e7117411b35e6b8b0be6390",
+    "response_hash": "8f6d4df6596b04d8db5d17b962b14ae830063f6fdb4a5bfd78a53d0e1d7039d6",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0035\",\"section-0037\",\"section-0052\",\"section-0053\",\"section-0054\",\"section-0056\",\"section-0057\",\"section-0058\"],\"rationale\":\"优先选取管理层讨论与分析中公司业务情况、经营情况讨论与分析，以及主要经营情况下的主营业务分析、利润表及现金流量表变动分析、收入和成本分析，并覆盖公共安全、数智产业、智慧能源三大业务板块的经营情况，可完整说明公司业务结构、产品服务用途、收入来源与主要业务权重、经营规模及本期变化。未选纯行业背景、核心竞争力泛化描述及治理、债券、财务报告附注等非经营核心内容。\",\"deferred\":[\"section-0036 行业情况：属行业背景，非公司层面经营实质，暂不纳入\",\"section-0045 核心竞争力分析：偏泛化竞争优势，非收入与经营结构核心\",\"section-0100 主要控股参股公司分析：可在需要子公司层面补充时再定向读取\",\"section-1036 分部信息：财务附注层面，若三大板块收入权重仍有缺口再定向补充\"],\"stop_reason\":\"已覆盖公司业务、经营讨论、收入成本与三大业务板块经营情况，足以回答业务结构、产品用途、收入来源与主要业务权重及本期经营变化；行业背景与附注层面属次要或定向补充范围，无需扩展至整份财务报告。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0035",
+        "section-0037",
+        "section-0052",
+        "section-0053",
+        "section-0054",
+        "section-0056",
+        "section-0057",
+        "section-0058"
+      ],
+      "rationale": "优先选取管理层讨论与分析中公司业务情况、经营情况讨论与分析，以及主要经营情况下的主营业务分析、利润表及现金流量表变动分析、收入和成本分析，并覆盖公共安全、数智产业、智慧能源三大业务板块的经营情况，可完整说明公司业务结构、产品服务用途、收入来源与主要业务权重、经营规模及本期变化。未选纯行业背景、核心竞争力泛化描述及治理、债券、财务报告附注等非经营核心内容。",
+      "deferred": [
+        "section-0036 行业情况：属行业背景，非公司层面经营实质，暂不纳入",
+        "section-0045 核心竞争力分析：偏泛化竞争优势，非收入与经营结构核心",
+        "section-0100 主要控股参股公司分析：可在需要子公司层面补充时再定向读取",
+        "section-1036 分部信息：财务附注层面，若三大板块收入权重仍有缺口再定向补充"
+      ],
+      "stop_reason": "已覆盖公司业务、经营讨论、收入成本与三大业务板块经营情况，足以回答业务结构、产品用途、收入来源与主要业务权重及本期经营变化；行业背景与附注层面属次要或定向补充范围，无需扩展至整份财务报告。"
+    },
+    "usage": {
+      "input_tokens": 23579,
+      "output_tokens": 308,
+      "total_tokens": 23887
+    }
+  },
+  {
+    "request_id": "bp-work-92862ffa7505ec6e48ddf906:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "a0c0ce5fc19d4a02137f033b9cb487fc126c9c80745561c4ef12c8ceb9ff06a2",
+    "response_hash": "da99a710fa1d15c98e68ed1d7bfe6e55a26cf53bf8e400b4a87e06060f30d579",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"bs-01\",\"text\":\"公司定位为“数智技术与核技术创新融合的高科技企业”，聚焦公共安全、数智产业、智慧能源三大产业领域，并设有科技成果转化平台、资产管理平台、海外投资协同平台。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]},{\"fact_id\":\"bs-02\",\"text\":\"公司业务主要分为公共安全、数智产业、智慧能源业务领域；主营业务分板块表另列示其他业务、总部投资及科技园，并以业务板块间抵销调整后得出合计。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]}]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"ps-01\",\"text\":\"公共安全产业面向民航、海关、铁路、公路、轨道交通、邮政物流、公安司法、大型活动赛事等领域，提供基于辐射成像技术的智能检查系统、解决方案及全生命周期运维服务，并拓展无损检测、矿石分选、工业自动化、核安保等新兴领域。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"ps-02\",\"text\":\"数智产业知识服务领域依托CNKI平台，为机构及个人用户提供学术资源检索、知识管理及智能问答等服务，核心产品包括CNKI系列数据库、CNKI AI工具及知网AI+图书平台等。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"ps-03\",\"text\":\"数智产业数智转型服务领域以自研华知大模型为技术底座，面向政务、企业等行业提供智能化解决方案，核心产品包括定制化行业数智化解决方案、数字化转型方案与系统等。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"ps-04\",\"text\":\"智慧能源产业面向北方供暖、清洁供热、建筑园区、城市轨道交通、数据中心等城市主要用能场景，开发热泵装备、多种储冷/热/电系统、控制器产品、软件平台和能源系统算法，提供一体化解决方案与运维服务。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"rm-01\",\"text\":\"数智产业知识服务盈利模式以机构订阅为主，辅以个人按需付费等；数智转型服务盈利模式涵盖技术授权、软件设计与开发等。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"]},{\"fact_id\":\"rm-02\",\"text\":\"智慧能源产业通过规划咨询、产品供应、工程建设、节能服务、运维托管等方式，为用户提供一体化解决方案与运维服务。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"rm-03\",\"text\":\"公共安全产业以安检设备和综合安检解决方案等产品和服务获取收入，并配套全生命周期运维服务。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"]}]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sm-01\",\"text\":\"2025年公司实现营业收入150.65亿元；安检安保、数据治理、人工智能等优势业务收入实现较好增长，海外市场营收同比增长6.51亿元、增幅14.15%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"150.65\",\"value\":\"150.65\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"海外市场营收同比增加额\",\"raw_value\":\"6.51\",\"value\":\"6.51\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"海外市场营收同比增幅\",\"raw_value\":\"14.15\",\"value\":\"14.15\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-02\",\"text\":\"主营业务分板块：公共安全收入698,057.58万元、毛利率29.81%；数智产业收入275,072.20万元、毛利率46.67%；智慧能源收入450,419.69万元、毛利率10.79%；其他业务收入67,758.61万元；总部投资及科技园收入33,812.59万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"公共安全主营业务收入\",\"raw_value\":\"698,057.58\",\"value\":\"698057.58\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"公共安全毛利率\",\"raw_value\":\"29.81\",\"value\":\"29.81\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"数智产业主营业务收入\",\"raw_value\":\"275,072.20\",\"value\":\"275072.20\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"数智产业毛利率\",\"raw_value\":\"46.67\",\"value\":\"46.67\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"智慧能源主营业务收入\",\"raw_value\":\"450,419.69\",\"value\":\"450419.69\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"智慧能源毛利率\",\"raw_value\":\"10.79\",\"value\":\"10.79\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"其他业务主营业务收入\",\"raw_value\":\"67,758.61\",\"value\":\"67758.61\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"总部投资及科技园主营业务收入\",\"raw_value\":\"33,812.59\",\"value\":\"33812.59\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-03\",\"text\":\"主营业务分板块小计收入1,525,120.68万元，减业务板块间抵销-28,111.12万元后合计1,497,009.55万元，合计毛利率26.50%；合计数与各分项加总差异系四舍五入所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"主营业务分板块小计收入\",\"raw_value\":\"1,525,120.68\",\"value\":\"1525120.68\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"业务板块间抵销\",\"raw_value\":\"-28,111.12\",\"value\":\"-28111.12\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"主营业务收入合计\",\"raw_value\":\"1,497,009.55\",\"value\":\"1497009.55\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"主营业务毛利率合计\",\"raw_value\":\"26.50\",\"value\":\"26.50\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-04\",\"text\":\"按地区，2025年国内市场主营业务收入971,560.22万元、比重64.90%；国际市场525,449.33万元、比重35.10%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"国内市场主营业务收入\",\"raw_value\":\"971,560.22\",\"value\":\"971560.22\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"国内市场主营业务收入比重\",\"raw_value\":\"64.90\",\"value\":\"64.90\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"国际市场主营业务收入\",\"raw_value\":\"525,449.33\",\"value\":\"525449.33\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"国际市场主营业务收入比重\",\"raw_value\":\"35.10\",\"value\":\"35.10\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-05\",\"text\":\"公司实现归母净利润4.95亿元，扣非归母净利润2.88亿元、同比增长9.10亿元，整体毛利率同比提升2.35个百分点；经营现金流净额14.17亿元、同比增长8.34亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"归母净利润\",\"raw_value\":\"4.95\",\"value\":\"4.95\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"扣非归母净利润\",\"raw_value\":\"2.88\",\"value\":\"2.88\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"扣非归母净利润同比增加额\",\"raw_value\":\"9.10\",\"value\":\"9.10\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"整体毛利率同比变动\",\"raw_value\":\"2.35\",\"value\":\"2.35\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"经营现金流净额\",\"raw_value\":\"14.17\",\"value\":\"14.17\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"经营现金流净额同比增加额\",\"raw_value\":\"8.34\",\"value\":\"8.34\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]}]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"oi-01\",\"text\":\"公司研发投入合计1,500,030,364.93元，占营业收入比例9.96%，其中费用化765,446,381.73元、资本化734,583,983.20元，资本化比重48.97%；研发人员3,171人，占公司总人数28.84%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0016\"],\"metrics\":[{\"name\":\"研发投入合计\",\"raw_value\":\"1,500,030,364.93\",\"value\":\"1500030364.93\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"研发投入总额占营业收入比例\",\"raw_value\":\"9.96\",\"value\":\"9.96\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"本期费用化研发投入\",\"raw_value\":\"765,446,381.73\",\"value\":\"765446381.73\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"本期资本化研发投入\",\"raw_value\":\"734,583,983.20\",\"value\":\"734583983.20\",\"unit\":\"元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"研发投入资本化的比重\",\"raw_value\":\"48.97\",\"value\":\"48.97\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"研发人员数量\",\"raw_value\":\"3171\",\"value\":\"3171\",\"unit\":\"人\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"研发人员数量占公司总人数比例\",\"raw_value\":\"28.84\",\"value\":\"28.84\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"oi-02\",\"text\":\"公司设有集采中心、项目管理中心等专业化平台，持续加强项目全过程管理；智慧能源业务以热泵装备、能源管理技术为根本，提供贯穿能源生产、输配和消费全过程的综合智慧能源解决方案。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0013\"]}]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"cc-01\",\"text\":\"公共安全产品及服务遍及全球170多个国家和地区，自2011年起连续14年在全球货物及车辆安全检查系统市场份额第一（OMDIA截至2024年数据，2025年数据尚未发布）。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0010\"],\"metrics\":[{\"name\":\"产品及服务覆盖国家和地区数\",\"raw_value\":\"170\",\"value\":\"170\",\"unit\":\"个\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"greater_than\",\"uncertainty_reason\":\"原文为“170多个”，为下限表述\"}]},{\"fact_id\":\"cc-02\",\"text\":\"数智产业知识服务依托CNKI平台，为全球3.5万家机构及1.5亿个人用户提供学术资源检索、知识管理及智能问答等服务。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"CNKI平台服务机构数\",\"raw_value\":\"3.5万\",\"value\":\"3.5\",\"unit\":\"万家\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"CNKI平台服务个人用户数\",\"raw_value\":\"1.5亿\",\"value\":\"1.5\",\"unit\":\"亿人\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"cc-03\",\"text\":\"前五名客户销售额295,015.77万元，占年度销售总额19.58%，其中关联方销售额0万元、占年度销售总额0%；前五名供应商采购额89,780.00万元，占年度采购总额8.16%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0015\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"295,015.77\",\"value\":\"295015.77\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"19.58\",\"value\":\"19.58\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户中关联方销售额\",\"raw_value\":\"0\",\"value\":\"0\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户中关联方销售额占年度销售总额比例\",\"raw_value\":\"0\",\"value\":\"0\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商采购额\",\"raw_value\":\"89,780.00\",\"value\":\"89780.00\",\"unit\":\"万元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"8.16\",\"value\":\"8.16\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"cc-04\",\"text\":\"公司海外收入52.54亿元、创历史新高；CNKI AI产品在哈萨克斯坦实现境外首单突破，国内外累计拓展4000余家机构客户。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"海外收入\",\"raw_value\":\"52.54\",\"value\":\"52.54\",\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"},{\"name\":\"国内外累计拓展机构客户数\",\"raw_value\":\"4000余\",\"value\":\"4000\",\"unit\":\"家\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"greater_than\"}]}]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"od-01\",\"text\":\"公司主动收缩智慧能源等产业低毛利业务规模，且受上年计算机硬件业务出表影响，整体收入规模较上年下降；数智产业主营业务收入同比下降主要系上年转让计算机业务影响所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0004\",\"source-0008\"]},{\"fact_id\":\"od-02\",\"text\":\"公共安全产业持续深化“AI+核技术”融合创新，加速向无损检测、矿石分选、工业自动化、核安保等新兴领域拓展；智能分选业务覆盖煤矿、磷矿、银矿、铅锌矿等矿种，海外市场继南美后再获蒙古国订单。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0010\"]},{\"fact_id\":\"od-03\",\"text\":\"数智产业知识服务体系核心资源平均同比增长率13%，新签多家国际出版机构、引进36个新数据库；个人AI业务总体营收超亿元，智能研学工具网络平台服务2000多家机构、实现收入超亿元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0012\"],\"metrics\":[{\"name\":\"知识服务体系核心资源平均同比增长率\",\"raw_value\":\"13\",\"value\":\"13\",\"unit\":\"%\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"引进新数据库数\",\"raw_value\":\"36\",\"value\":\"36\",\"unit\":\"个\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"exact\"},{\"name\":\"个人AI业务总体营收\",\"raw_value\":\"超亿元\",\"value\":null,\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"greater_than\",\"uncertainty_reason\":\"原文仅表述“超亿元”，未给出具体金额\"},{\"name\":\"智能研学工具网络平台服务机构数\",\"raw_value\":\"2000多家\",\"value\":\"2000\",\"unit\":\"家\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"greater_than\"},{\"name\":\"智能研学工具网络平台收入\",\"raw_value\":\"超亿元\",\"value\":null,\"unit\":\"亿元\",\"currency\":\"人民币\",\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"greater_than\",\"uncertainty_reason\":\"原文仅表述“超亿元”，未给出具体金额\"}]},{\"fact_id\":\"od-04\",\"text\":\"智慧能源在智慧供热领域签约天河热电、林州热力等项目，在智慧机电领域为华为多个区域能源站项目提供核心解决方案，并签约中核汇能、福清核电相关项目；新签太原市集中供热联网、扩容改造工程等20余个项目。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0013\",\"source-0014\"],\"metrics\":[{\"name\":\"新签集中供热相关项目数\",\"raw_value\":\"20余\",\"value\":\"20\",\"unit\":\"个\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"business_segment\",\"qualifier\":\"greater_than\"}]}]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"mc-01\",\"text\":\"报告期内公司整合数智信息产业资源成立同方数科；全年退出控参股企业16户，产业布局持续优化。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\",\"source-0006\"],\"metrics\":[{\"name\":\"全年退出控参股企业数\",\"raw_value\":\"16\",\"value\":\"16\",\"unit\":\"户\",\"currency\":null,\"period\":\"2025年度\",\"subject_scope\":\"consolidated_group\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"mc-02\",\"text\":\"公司报告期内业务、产品或服务发生重大变化或调整有关情况勾选“不适用”；新增重要非主营业务说明亦勾选“不适用”。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0015\"]},{\"fact_id\":\"mc-03\",\"text\":\"公司完成“十五五”规划编制，明确“数智技术与核技术创新融合的高科技企业”战略定位，并针对公共安全、数智产业及智慧能源三个主干产业制定专项规划。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]}]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sc-01\",\"text\":\"公共安全产业定位为安检行业领导者，提供智能检查系统、解决方案及全生命周期运维服务；智慧能源产业定位为能源管控综合服务商，通过规划咨询、产品供应、工程建设、节能服务、运维托管等方式提供一体化解决方案与运维服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]}]},\"upstream_inputs\":{\"status\":\"not_disclosed\",\"facts\":[],\"limitations\":[\"选定章节未明确披露公司主要原材料、能源等具体采购品类及来源，仅列示前五名供应商采购额及占比，故不推断具体上游投入。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sc-02\",\"text\":\"公共安全产品及服务应用于民航、海关、铁路、公路、轨道交通、邮政物流、公安司法、大型活动赛事等领域；智慧能源面向北方供暖、清洁供热、建筑园区、城市轨道交通、数据中心等用能场景。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"]}]}},\"limitations\":[\"本工作底稿仅依据选定章节原文编制，未读取行业背景、核心竞争力、主要控股参股公司分析及分部信息附注等章节。\",\"部分指标原文为“超亿元”“2000多家”“20余个”等模糊表述，已保留限定词并将value置空或按下限记录，未推断精确值。\",\"公共安全全球市场份额排名数据为OMDIA截至2024年数据，2025年数据尚未发布，不代表2025年当期排名。\",\"上游具体原材料与能源投入未在选定章节明确披露，供应链上游部分标注为未披露。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "bs-01",
+              "text": "公司定位为“数智技术与核技术创新融合的高科技企业”，聚焦公共安全、数智产业、智慧能源三大产业领域，并设有科技成果转化平台、资产管理平台、海外投资协同平台。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "bs-02",
+              "text": "公司业务主要分为公共安全、数智产业、智慧能源业务领域；主营业务分板块表另列示其他业务、总部投资及科技园，并以业务板块间抵销调整后得出合计。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            }
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "ps-01",
+              "text": "公共安全产业面向民航、海关、铁路、公路、轨道交通、邮政物流、公安司法、大型活动赛事等领域，提供基于辐射成像技术的智能检查系统、解决方案及全生命周期运维服务，并拓展无损检测、矿石分选、工业自动化、核安保等新兴领域。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "ps-02",
+              "text": "数智产业知识服务领域依托CNKI平台，为机构及个人用户提供学术资源检索、知识管理及智能问答等服务，核心产品包括CNKI系列数据库、CNKI AI工具及知网AI+图书平台等。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "ps-03",
+              "text": "数智产业数智转型服务领域以自研华知大模型为技术底座，面向政务、企业等行业提供智能化解决方案，核心产品包括定制化行业数智化解决方案、数字化转型方案与系统等。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "ps-04",
+              "text": "智慧能源产业面向北方供暖、清洁供热、建筑园区、城市轨道交通、数据中心等城市主要用能场景，开发热泵装备、多种储冷/热/电系统、控制器产品、软件平台和能源系统算法，提供一体化解决方案与运维服务。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "rm-01",
+              "text": "数智产业知识服务盈利模式以机构订阅为主，辅以个人按需付费等；数智转型服务盈利模式涵盖技术授权、软件设计与开发等。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ]
+            },
+            {
+              "fact_id": "rm-02",
+              "text": "智慧能源产业通过规划咨询、产品供应、工程建设、节能服务、运维托管等方式，为用户提供一体化解决方案与运维服务。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "rm-03",
+              "text": "公共安全产业以安检设备和综合安检解决方案等产品和服务获取收入，并配套全生命周期运维服务。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ]
+            }
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "sm-01",
+              "text": "2025年公司实现营业收入150.65亿元；安检安保、数据治理、人工智能等优势业务收入实现较好增长，海外市场营收同比增长6.51亿元、增幅14.15%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "150.65",
+                  "value": "150.65",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "海外市场营收同比增加额",
+                  "raw_value": "6.51",
+                  "value": "6.51",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "海外市场营收同比增幅",
+                  "raw_value": "14.15",
+                  "value": "14.15",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "sm-02",
+              "text": "主营业务分板块：公共安全收入698,057.58万元、毛利率29.81%；数智产业收入275,072.20万元、毛利率46.67%；智慧能源收入450,419.69万元、毛利率10.79%；其他业务收入67,758.61万元；总部投资及科技园收入33,812.59万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "公共安全主营业务收入",
+                  "raw_value": "698,057.58",
+                  "value": "698057.58",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "公共安全毛利率",
+                  "raw_value": "29.81",
+                  "value": "29.81",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "数智产业主营业务收入",
+                  "raw_value": "275,072.20",
+                  "value": "275072.20",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "数智产业毛利率",
+                  "raw_value": "46.67",
+                  "value": "46.67",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "智慧能源主营业务收入",
+                  "raw_value": "450,419.69",
+                  "value": "450419.69",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "智慧能源毛利率",
+                  "raw_value": "10.79",
+                  "value": "10.79",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "其他业务主营业务收入",
+                  "raw_value": "67,758.61",
+                  "value": "67758.61",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "总部投资及科技园主营业务收入",
+                  "raw_value": "33,812.59",
+                  "value": "33812.59",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "sm-03",
+              "text": "主营业务分板块小计收入1,525,120.68万元，减业务板块间抵销-28,111.12万元后合计1,497,009.55万元，合计毛利率26.50%；合计数与各分项加总差异系四舍五入所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "主营业务分板块小计收入",
+                  "raw_value": "1,525,120.68",
+                  "value": "1525120.68",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "业务板块间抵销",
+                  "raw_value": "-28,111.12",
+                  "value": "-28111.12",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务收入合计",
+                  "raw_value": "1,497,009.55",
+                  "value": "1497009.55",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "主营业务毛利率合计",
+                  "raw_value": "26.50",
+                  "value": "26.50",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "sm-04",
+              "text": "按地区，2025年国内市场主营业务收入971,560.22万元、比重64.90%；国际市场525,449.33万元、比重35.10%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "国内市场主营业务收入",
+                  "raw_value": "971,560.22",
+                  "value": "971560.22",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "国内市场主营业务收入比重",
+                  "raw_value": "64.90",
+                  "value": "64.90",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "国际市场主营业务收入",
+                  "raw_value": "525,449.33",
+                  "value": "525449.33",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "国际市场主营业务收入比重",
+                  "raw_value": "35.10",
+                  "value": "35.10",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "sm-05",
+              "text": "公司实现归母净利润4.95亿元，扣非归母净利润2.88亿元、同比增长9.10亿元，整体毛利率同比提升2.35个百分点；经营现金流净额14.17亿元、同比增长8.34亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "归母净利润",
+                  "raw_value": "4.95",
+                  "value": "4.95",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "扣非归母净利润",
+                  "raw_value": "2.88",
+                  "value": "2.88",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "扣非归母净利润同比增加额",
+                  "raw_value": "9.10",
+                  "value": "9.10",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "整体毛利率同比变动",
+                  "raw_value": "2.35",
+                  "value": "2.35",
+                  "unit": "百分点",
+                  "source_unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "经营现金流净额",
+                  "raw_value": "14.17",
+                  "value": "14.17",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "经营现金流净额同比增加额",
+                  "raw_value": "8.34",
+                  "value": "8.34",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "oi-01",
+              "text": "公司研发投入合计1,500,030,364.93元，占营业收入比例9.96%，其中费用化765,446,381.73元、资本化734,583,983.20元，资本化比重48.97%；研发人员3,171人，占公司总人数28.84%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0016"
+              ],
+              "metrics": [
+                {
+                  "name": "研发投入合计",
+                  "raw_value": "1,500,030,364.93",
+                  "value": "1500030364.93",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发投入总额占营业收入比例",
+                  "raw_value": "9.96",
+                  "value": "9.96",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "本期费用化研发投入",
+                  "raw_value": "765,446,381.73",
+                  "value": "765446381.73",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "本期资本化研发投入",
+                  "raw_value": "734,583,983.20",
+                  "value": "734583983.20",
+                  "unit": "元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发投入资本化的比重",
+                  "raw_value": "48.97",
+                  "value": "48.97",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发人员数量",
+                  "raw_value": "3171",
+                  "value": "3171",
+                  "unit": "人",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "研发人员数量占公司总人数比例",
+                  "raw_value": "28.84",
+                  "value": "28.84",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "oi-02",
+              "text": "公司设有集采中心、项目管理中心等专业化平台，持续加强项目全过程管理；智慧能源业务以热泵装备、能源管理技术为根本，提供贯穿能源生产、输配和消费全过程的综合智慧能源解决方案。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0013"
+              ]
+            }
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "cc-01",
+              "text": "公共安全产品及服务遍及全球170多个国家和地区，自2011年起连续14年在全球货物及车辆安全检查系统市场份额第一（OMDIA截至2024年数据，2025年数据尚未发布）。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0010"
+              ],
+              "metrics": [
+                {
+                  "name": "产品及服务覆盖国家和地区数",
+                  "raw_value": "170",
+                  "value": "170",
+                  "unit": "个",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "greater_than",
+                  "uncertainty_reason": "原文为“170多个”，为下限表述"
+                }
+              ]
+            },
+            {
+              "fact_id": "cc-02",
+              "text": "数智产业知识服务依托CNKI平台，为全球3.5万家机构及1.5亿个人用户提供学术资源检索、知识管理及智能问答等服务。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001"
+              ],
+              "metrics": [
+                {
+                  "name": "CNKI平台服务机构数",
+                  "raw_value": "3.5万",
+                  "value": "3.5",
+                  "unit": "万家",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "CNKI平台服务个人用户数",
+                  "raw_value": "1.5亿",
+                  "value": "1.5",
+                  "unit": "亿人",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "cc-03",
+              "text": "前五名客户销售额295,015.77万元，占年度销售总额19.58%，其中关联方销售额0万元、占年度销售总额0%；前五名供应商采购额89,780.00万元，占年度采购总额8.16%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0015"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户销售额",
+                  "raw_value": "295,015.77",
+                  "value": "295015.77",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户销售额占年度销售总额比例",
+                  "raw_value": "19.58",
+                  "value": "19.58",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户中关联方销售额",
+                  "raw_value": "0",
+                  "value": "0",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户中关联方销售额占年度销售总额比例",
+                  "raw_value": "0",
+                  "value": "0",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商采购额",
+                  "raw_value": "89,780.00",
+                  "value": "89780.00",
+                  "unit": "万元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商采购额占年度采购总额比例",
+                  "raw_value": "8.16",
+                  "value": "8.16",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "cc-04",
+              "text": "公司海外收入52.54亿元、创历史新高；CNKI AI产品在哈萨克斯坦实现境外首单突破，国内外累计拓展4000余家机构客户。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "海外收入",
+                  "raw_value": "52.54",
+                  "value": "52.54",
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "国内外累计拓展机构客户数",
+                  "raw_value": "4000余",
+                  "value": "4000",
+                  "unit": "家",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "greater_than"
+                }
+              ]
+            }
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "od-01",
+              "text": "公司主动收缩智慧能源等产业低毛利业务规模，且受上年计算机硬件业务出表影响，整体收入规模较上年下降；数智产业主营业务收入同比下降主要系上年转让计算机业务影响所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0004",
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "od-02",
+              "text": "公共安全产业持续深化“AI+核技术”融合创新，加速向无损检测、矿石分选、工业自动化、核安保等新兴领域拓展；智能分选业务覆盖煤矿、磷矿、银矿、铅锌矿等矿种，海外市场继南美后再获蒙古国订单。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0010"
+              ]
+            },
+            {
+              "fact_id": "od-03",
+              "text": "数智产业知识服务体系核心资源平均同比增长率13%，新签多家国际出版机构、引进36个新数据库；个人AI业务总体营收超亿元，智能研学工具网络平台服务2000多家机构、实现收入超亿元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0012"
+              ],
+              "metrics": [
+                {
+                  "name": "知识服务体系核心资源平均同比增长率",
+                  "raw_value": "13",
+                  "value": "13",
+                  "unit": "%",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "引进新数据库数",
+                  "raw_value": "36",
+                  "value": "36",
+                  "unit": "个",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "个人AI业务总体营收",
+                  "raw_value": "超亿元",
+                  "value": null,
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "greater_than",
+                  "uncertainty_reason": "原文仅表述“超亿元”，未给出具体金额"
+                },
+                {
+                  "name": "智能研学工具网络平台服务机构数",
+                  "raw_value": "2000多家",
+                  "value": "2000",
+                  "unit": "家",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "greater_than"
+                },
+                {
+                  "name": "智能研学工具网络平台收入",
+                  "raw_value": "超亿元",
+                  "value": null,
+                  "unit": "亿元",
+                  "currency": "人民币",
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "greater_than",
+                  "uncertainty_reason": "原文仅表述“超亿元”，未给出具体金额"
+                }
+              ]
+            },
+            {
+              "fact_id": "od-04",
+              "text": "智慧能源在智慧供热领域签约天河热电、林州热力等项目，在智慧机电领域为华为多个区域能源站项目提供核心解决方案，并签约中核汇能、福清核电相关项目；新签太原市集中供热联网、扩容改造工程等20余个项目。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0013",
+                "source-0014"
+              ],
+              "metrics": [
+                {
+                  "name": "新签集中供热相关项目数",
+                  "raw_value": "20余",
+                  "value": "20",
+                  "unit": "个",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "business_segment",
+                  "qualifier": "greater_than"
+                }
+              ]
+            }
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "mc-01",
+              "text": "报告期内公司整合数智信息产业资源成立同方数科；全年退出控参股企业16户，产业布局持续优化。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005",
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "全年退出控参股企业数",
+                  "raw_value": "16",
+                  "value": "16",
+                  "unit": "户",
+                  "currency": null,
+                  "period": "2025年度",
+                  "subject_scope": "consolidated_group",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "mc-02",
+              "text": "公司报告期内业务、产品或服务发生重大变化或调整有关情况勾选“不适用”；新增重要非主营业务说明亦勾选“不适用”。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0015"
+              ]
+            },
+            {
+              "fact_id": "mc-03",
+              "text": "公司完成“十五五”规划编制，明确“数智技术与核技术创新融合的高科技企业”战略定位，并针对公共安全、数智产业及智慧能源三个主干产业制定专项规划。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            }
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "sc-01",
+              "text": "公共安全产业定位为安检行业领导者，提供智能检查系统、解决方案及全生命周期运维服务；智慧能源产业定位为能源管控综合服务商，通过规划咨询、产品供应、工程建设、节能服务、运维托管等方式提供一体化解决方案与运维服务。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "not_disclosed",
+          "facts": [],
+          "limitations": [
+            "选定章节未明确披露公司主要原材料、能源等具体采购品类及来源，仅列示前五名供应商采购额及占比，故不推断具体上游投入。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "sc-02",
+              "text": "公共安全产品及服务应用于民航、海关、铁路、公路、轨道交通、邮政物流、公安司法、大型活动赛事等领域；智慧能源面向北方供暖、清洁供热、建筑园区、城市轨道交通、数据中心等用能场景。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0002"
+              ]
+            }
+          ]
+        }
+      },
+      "limitations": [
+        "本工作底稿仅依据选定章节原文编制，未读取行业背景、核心竞争力、主要控股参股公司分析及分部信息附注等章节。",
+        "部分指标原文为“超亿元”“2000多家”“20余个”等模糊表述，已保留限定词并将value置空或按下限记录，未推断精确值。",
+        "公共安全全球市场份额排名数据为OMDIA截至2024年数据，2025年数据尚未发布，不代表2025年当期排名。",
+        "上游具体原材料与能源投入未在选定章节明确披露，供应链上游部分标注为未披露。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 13029,
+      "output_tokens": 5435,
+      "total_tokens": 18464
+    }
+  },
+  {
+    "request_id": "bp-work-92862ffa7505ec6e48ddf906:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "11a2fda7d259fdfaa1d8daa5759f9b54d0ee90650b9bf2cc32561dd4bf5d80bd",
+    "response_hash": "b83f39ece01d71bce086fbcee91dce71f26dff9ab4f9fbcb7817919e17632707",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"findings\":[{\"finding_id\":\"F001\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":\"sm-02\",\"evidence_ids\":[\"source-0008\"],\"explanation\":\"sm-02的本期分板块收入和毛利率与来源一致，但未记录主业收入、地区结构和毛利率的同比变动。source-0008主营业务收入变动（万元）为：公共安全增加60,481.61，数智产业减少118,490.59，智慧能源减少83,746.45，其他业务减少26,774.38，总部投资及科技园增加3,853.68，抵销后合计减少172,053.28（1,497,009.55对比1,669,062.84）。国内市场减少237,197.98、比重由72.42%降至64.90%；国际市场增加65,144.69、比重由27.58%升至35.10%。毛利率比上年增减列虽带百分号，实际是百分点差额：公共安全-1.13、数智产业+13.94、智慧能源+0.02、合计+2.19，不能写成相对增长率。数智产业毛利率由32.73%升至46.67%，应与“收入下降主要系上年转让计算机业务”一并理解。叙述中的整体毛利率提升2.35个百分点与主营业务合计毛利率提升2.19个百分点口径不同，不能互相替换。\"},{\"finding_id\":\"F002\",\"element\":\"operating_drivers\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0007\",\"source-0008\",\"source-0017\"],\"explanation\":\"选定章节已列明并影响利润质量和现金流可比性的重大调整，草稿未记录。公允价值变动收益本期-54,058,622.12元、上年同期415,194,943.39元、变动-113.02%，主要是证券价格波动及本年处置紫光股份等交易性金融资产。其他综合收益税后净额本期-1,350,447,548.96元、上年同期1,091,684,163.98元、变动-223.70%，主要是参股企业其他综合收益减少。投资活动现金流净额本期1,160,127,888.59元、上年2,425,061,436.44元、下降52.16%，主要是上期转让同方计算机硬件业务等取得大额股权转让款；od-01只写了收入影响。筹资活动现金流净额本期-1,961,690,834.34元、上年-3,654,021,761.50元，变动比例来源标为“不适用”，不能自行计算百分比；长短期借款净增加额-1,274,205,623.47元。原因应保留“主要是”。紫光股份事项是交易性金融资产处置，不是合并范围或注册资本变化。sm-05已列净利润和经营现金流本身与叙述一致。\"},{\"finding_id\":\"F003\",\"element\":\"products_services\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":\"ps-02\",\"evidence_ids\":[\"source-0001\"],\"explanation\":\"ps-02对知识服务产品和功能的描述与来源一致，但漏记source-0001的平台规模：依托CNKI为全球3.5万家机构及1.5亿个人用户提供服务。这是知识服务业务的主要规模事实。来源未单列统计截止日，补充时应照录原文，不得改成精确审计数或自行拆分。\"},{\"finding_id\":\"F004\",\"element\":\"customers_channels_markets\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0001\",\"source-0010\"],\"explanation\":\"公共安全市场地位和覆盖范围未进入事实。source-0001称连续9年全球EWC（爆炸物、武器和违禁品）市场份额第三，大型货物车辆检查系统全球市场份额连续14年第一；source-0010称自2011年起连续14年在全球货物及车辆安全检查系统市场份额第一，产品及服务遍及170多个国家和地区。两处“第一”的产品范围用词不完全相同，且均注明为OMDIA截至2024年数据、2025年数据尚未发布。应作为带不确定性说明的限定事实记录，不得写成2025年已发布排名，也不能因该限定而完全省略。\"},{\"finding_id\":\"F005\",\"element\":\"scale_and_mix\",\"severity\":\"minor\",\"issue_type\":\"other\",\"action\":\"correct\",\"affected_fact_id\":\"sm-03\",\"evidence_ids\":[\"source-0008\"],\"explanation\":\"sm-03的小计1,525,120.68万元、抵销-28,111.12万元、合计1,497,009.55万元及四舍五入说明均与source-0008单元格一致。但“减业务板块间抵销-28,111.12万元后合计”按字面是再减去负数，结果约为1,553,231.80万元，与所列合计矛盾。表内关系是小计加上已为负数的抵销行，或减去抵销绝对值28,111.12万元，约得1,497,009.56万元，与合计相差0.01万元，属于来源已说明的四舍五入。应改正运算符，避免对抵销重复取负。\"},{\"finding_id\":\"F006\",\"element\":\"customers_channels_markets\",\"severity\":\"minor\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":\"cc-03\",\"evidence_ids\":[\"source-0015\"],\"explanation\":\"cc-03对前五名客户销售额295,015.77万元、占年度销售总额19.58%及关联方销售额0的摘录与source-0015一致，但同一适用披露还列有前五名供应商关联方采购额31,805.83万元、占年度采购总额2.89%。只保留关联方销售为零、不保留非零关联方采购，使该组披露不完整。补充时应沿用年度采购总额口径，不要改成分母或推断供应商名称。\"},{\"finding_id\":\"F007\",\"element\":\"position\",\"severity\":\"minor\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"sc-01\",\"evidence_ids\":[\"source-0002\",\"source-0013\"],\"explanation\":\"sc-01把智慧能源写成“定位为能源管控综合服务商”。source-0002原文是“致力于成为‘国内领先的能源管控综合服务商’”，source-0013将其列为“目标使命”，属于目标而非已经实现的身份。这是计划与现状混用。公共安全“定位为”与source-0001一致，交付方式“规划咨询、产品供应、工程建设、节能服务、运维托管”也与来源一致，只需改正智慧能源条款的情态，不要把整句都作废。\"},{\"finding_id\":\"F008\",\"element\":\"limitations\",\"severity\":\"minor\",\"issue_type\":\"other\",\"action\":\"correct\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0015\",\"source-0006\"],\"explanation\":\"选定章节只给出前五名供应商采购额、关联方采购和集采中心等安排，没有列明主要原材料、能源的具体品类及来源。未纳入本次选定章节的文本是未知，不是“未披露”。将upstream_inputs标为not_disclosed，会把范围限制写成公司从未披露或不存在上游采购。应保留“选定章节未载明”，不能据此断言没有相关事项。\"},{\"finding_id\":\"F009\",\"element\":\"scale_and_mix\",\"severity\":\"minor\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0012\"],\"explanation\":\"source-0012写明个人AI业务总体营收超亿元，智能研学实现收入超亿元。这是数智业务中的收入规模，已列事实未记录。补充时应保留“超亿元”这一未给出精确值的限定，不得补成确定金额。2000多家机构及其他项目个数不属于必须补全的明细。局限性所称已保留“超亿元”等模糊表述，与当前已列事实不符，不能视为已经记录。\"}],\"reviewed_fact_ids\":[\"bs-01\",\"bs-02\",\"ps-01\",\"ps-02\",\"ps-03\",\"ps-04\",\"rm-01\",\"rm-02\",\"rm-03\",\"sm-01\",\"sm-02\",\"sm-03\",\"sm-04\",\"sm-05\",\"oi-01\",\"oi-02\",\"cc-03\",\"od-01\",\"od-02\",\"mc-01\",\"mc-02\",\"mc-03\",\"sc-01\",\"sc-02\"]}",
+    "response_payload": {
+      "findings": [
+        {
+          "finding_id": "F001",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": "sm-02",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "explanation": "sm-02的本期分板块收入和毛利率与来源一致，但未记录主业收入、地区结构和毛利率的同比变动。source-0008主营业务收入变动（万元）为：公共安全增加60,481.61，数智产业减少118,490.59，智慧能源减少83,746.45，其他业务减少26,774.38，总部投资及科技园增加3,853.68，抵销后合计减少172,053.28（1,497,009.55对比1,669,062.84）。国内市场减少237,197.98、比重由72.42%降至64.90%；国际市场增加65,144.69、比重由27.58%升至35.10%。毛利率比上年增减列虽带百分号，实际是百分点差额：公共安全-1.13、数智产业+13.94、智慧能源+0.02、合计+2.19，不能写成相对增长率。数智产业毛利率由32.73%升至46.67%，应与“收入下降主要系上年转让计算机业务”一并理解。叙述中的整体毛利率提升2.35个百分点与主营业务合计毛利率提升2.19个百分点口径不同，不能互相替换。"
+        },
+        {
+          "finding_id": "F002",
+          "element": "operating_drivers",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0007",
+            "source-0008",
+            "source-0017"
+          ],
+          "explanation": "选定章节已列明并影响利润质量和现金流可比性的重大调整，草稿未记录。公允价值变动收益本期-54,058,622.12元、上年同期415,194,943.39元、变动-113.02%，主要是证券价格波动及本年处置紫光股份等交易性金融资产。其他综合收益税后净额本期-1,350,447,548.96元、上年同期1,091,684,163.98元、变动-223.70%，主要是参股企业其他综合收益减少。投资活动现金流净额本期1,160,127,888.59元、上年2,425,061,436.44元、下降52.16%，主要是上期转让同方计算机硬件业务等取得大额股权转让款；od-01只写了收入影响。筹资活动现金流净额本期-1,961,690,834.34元、上年-3,654,021,761.50元，变动比例来源标为“不适用”，不能自行计算百分比；长短期借款净增加额-1,274,205,623.47元。原因应保留“主要是”。紫光股份事项是交易性金融资产处置，不是合并范围或注册资本变化。sm-05已列净利润和经营现金流本身与叙述一致。"
+        },
+        {
+          "finding_id": "F003",
+          "element": "products_services",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": "ps-02",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "ps-02对知识服务产品和功能的描述与来源一致，但漏记source-0001的平台规模：依托CNKI为全球3.5万家机构及1.5亿个人用户提供服务。这是知识服务业务的主要规模事实。来源未单列统计截止日，补充时应照录原文，不得改成精确审计数或自行拆分。"
+        },
+        {
+          "finding_id": "F004",
+          "element": "customers_channels_markets",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0001",
+            "source-0010"
+          ],
+          "explanation": "公共安全市场地位和覆盖范围未进入事实。source-0001称连续9年全球EWC（爆炸物、武器和违禁品）市场份额第三，大型货物车辆检查系统全球市场份额连续14年第一；source-0010称自2011年起连续14年在全球货物及车辆安全检查系统市场份额第一，产品及服务遍及170多个国家和地区。两处“第一”的产品范围用词不完全相同，且均注明为OMDIA截至2024年数据、2025年数据尚未发布。应作为带不确定性说明的限定事实记录，不得写成2025年已发布排名，也不能因该限定而完全省略。"
+        },
+        {
+          "finding_id": "F005",
+          "element": "scale_and_mix",
+          "severity": "minor",
+          "issue_type": "other",
+          "action": "correct",
+          "affected_fact_id": "sm-03",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "explanation": "sm-03的小计1,525,120.68万元、抵销-28,111.12万元、合计1,497,009.55万元及四舍五入说明均与source-0008单元格一致。但“减业务板块间抵销-28,111.12万元后合计”按字面是再减去负数，结果约为1,553,231.80万元，与所列合计矛盾。表内关系是小计加上已为负数的抵销行，或减去抵销绝对值28,111.12万元，约得1,497,009.56万元，与合计相差0.01万元，属于来源已说明的四舍五入。应改正运算符，避免对抵销重复取负。"
+        },
+        {
+          "finding_id": "F006",
+          "element": "customers_channels_markets",
+          "severity": "minor",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": "cc-03",
+          "evidence_ids": [
+            "source-0015"
+          ],
+          "explanation": "cc-03对前五名客户销售额295,015.77万元、占年度销售总额19.58%及关联方销售额0的摘录与source-0015一致，但同一适用披露还列有前五名供应商关联方采购额31,805.83万元、占年度采购总额2.89%。只保留关联方销售为零、不保留非零关联方采购，使该组披露不完整。补充时应沿用年度采购总额口径，不要改成分母或推断供应商名称。"
+        },
+        {
+          "finding_id": "F007",
+          "element": "position",
+          "severity": "minor",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "sc-01",
+          "evidence_ids": [
+            "source-0002",
+            "source-0013"
+          ],
+          "explanation": "sc-01把智慧能源写成“定位为能源管控综合服务商”。source-0002原文是“致力于成为‘国内领先的能源管控综合服务商’”，source-0013将其列为“目标使命”，属于目标而非已经实现的身份。这是计划与现状混用。公共安全“定位为”与source-0001一致，交付方式“规划咨询、产品供应、工程建设、节能服务、运维托管”也与来源一致，只需改正智慧能源条款的情态，不要把整句都作废。"
+        },
+        {
+          "finding_id": "F008",
+          "element": "limitations",
+          "severity": "minor",
+          "issue_type": "other",
+          "action": "correct",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0015",
+            "source-0006"
+          ],
+          "explanation": "选定章节只给出前五名供应商采购额、关联方采购和集采中心等安排，没有列明主要原材料、能源的具体品类及来源。未纳入本次选定章节的文本是未知，不是“未披露”。将upstream_inputs标为not_disclosed，会把范围限制写成公司从未披露或不存在上游采购。应保留“选定章节未载明”，不能据此断言没有相关事项。"
+        },
+        {
+          "finding_id": "F009",
+          "element": "scale_and_mix",
+          "severity": "minor",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0012"
+          ],
+          "explanation": "source-0012写明个人AI业务总体营收超亿元，智能研学实现收入超亿元。这是数智业务中的收入规模，已列事实未记录。补充时应保留“超亿元”这一未给出精确值的限定，不得补成确定金额。2000多家机构及其他项目个数不属于必须补全的明细。局限性所称已保留“超亿元”等模糊表述，与当前已列事实不符，不能视为已经记录。"
+        }
+      ],
+      "reviewed_fact_ids": [
+        "bs-01",
+        "bs-02",
+        "ps-01",
+        "ps-02",
+        "ps-03",
+        "ps-04",
+        "rm-01",
+        "rm-02",
+        "rm-03",
+        "sm-01",
+        "sm-02",
+        "sm-03",
+        "sm-04",
+        "sm-05",
+        "oi-01",
+        "oi-02",
+        "cc-03",
+        "od-01",
+        "od-02",
+        "mc-01",
+        "mc-02",
+        "mc-03",
+        "sc-01",
+        "sc-02"
+      ]
+    },
+    "usage": {
+      "input_tokens": 19154,
+      "output_tokens": 2040,
+      "total_tokens": 65412
+    }
+  },
+  {
+    "request_id": "bp-work-92862ffa7505ec6e48ddf906:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "7ba07b964df89aa4777ff1a442f092aa2c3d6452b64653543aa88a8723e6149b",
+    "response_hash": "2b52b84c46a2b31b3b358f0b8b30769ccd0f6e22616849430fdabb165b175568",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"review-add:F001\",\"text\":\"主营业务分板块收入同比变动：公共安全增加60,481.61万元，数智产业减少118,490.59万元，智慧能源减少83,746.45万元，其他业务减少26,774.38万元，总部投资及科技园增加3,853.68万元；抵销后合计减少172,053.28万元（1,497,009.55万元对比1,669,062.84万元）。地区结构：国内市场收入971,560.22万元，比重由72.42%降至64.90%，减少237,197.98万元；国际市场收入525,449.33万元，比重由27.58%升至35.10%，增加65,144.69万元。毛利率比上年增减（百分点）：公共安全-1.13、数智产业+13.94、智慧能源+0.02、合计+2.19；数智产业毛利率由32.73%升至46.67%，其收入下降主要系上年转让计算机业务影响所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"公共安全主营业务收入同比增减\",\"raw_value\":\"60,481.61\",\"value\":\"60481.61\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"同比增减\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"数智产业主营业务收入同比增减\",\"raw_value\":\"-118,490.59\",\"value\":\"-118490.59\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"同比增减\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"智慧能源主营业务收入同比增减\",\"raw_value\":\"-83,746.45\",\"value\":\"-83746.45\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"同比增减\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他业务主营业务收入同比增减\",\"raw_value\":\"-26,774.38\",\"value\":\"-26774.38\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"同比增减\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"总部投资及科技园主营业务收入同比增减\",\"raw_value\":\"3,853.68\",\"value\":\"3853.68\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"同比增减\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"主营业务收入合计同比增减\",\"raw_value\":\"-172,053.28\",\"value\":\"-172053.28\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"同比增减\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"主营业务收入合计\",\"raw_value\":\"1,497,009.55\",\"value\":\"1497009.55\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"上年主营业务收入合计\",\"raw_value\":\"1,669,062.84\",\"value\":\"1669062.84\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"国内市场主营业务收入\",\"raw_value\":\"971,560.22\",\"value\":\"971560.22\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"国内市场主营业务收入比重\",\"raw_value\":\"64.90\",\"value\":\"64.90\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"上年国内市场主营业务收入比重\",\"raw_value\":\"72.42\",\"value\":\"72.42\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"国内市场主营业务收入同比增减\",\"raw_value\":\"-237,197.98\",\"value\":\"-237197.98\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"同比增减\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"国际市场主营业务收入\",\"raw_value\":\"525,449.33\",\"value\":\"525449.33\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"国际市场主营业务收入比重\",\"raw_value\":\"35.10\",\"value\":\"35.10\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"上年国际市场主营业务收入比重\",\"raw_value\":\"27.58\",\"value\":\"27.58\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"国际市场主营业务收入同比增减\",\"raw_value\":\"65,144.69\",\"value\":\"65144.69\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"同比增减\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"公共安全毛利率比上年增减\",\"raw_value\":\"-1.13\",\"value\":\"-1.13\",\"unit\":\"百分点\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"比上年增减\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"数智产业毛利率比上年增减\",\"raw_value\":\"13.94\",\"value\":\"13.94\",\"unit\":\"百分点\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"比上年增减\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"智慧能源毛利率比上年增减\",\"raw_value\":\"0.02\",\"value\":\"0.02\",\"unit\":\"百分点\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":\"比上年增减\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"主营业务毛利率合计比上年增减\",\"raw_value\":\"2.19\",\"value\":\"2.19\",\"unit\":\"百分点\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"比上年增减\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"数智产业毛利率\",\"raw_value\":\"46.67\",\"value\":\"46.67\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"上年数智产业毛利率\",\"raw_value\":\"32.73\",\"value\":\"32.73\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2024年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:F002\",\"text\":\"公允价值变动收益本期-54,058,622.12元、上年同期415,194,943.39元、变动-113.02%，主要是公司持有的相关证券市场价格波动及本年处置了紫光股份等交易性金融资产所致。其他综合收益税后净额本期-1,350,447,548.96元、上年同期1,091,684,163.98元、变动-223.70%，主要是本期公司参股企业其他综合收益减少，公司相应确认其他综合收益减少所致。投资活动产生的现金流量净额本期1,160,127,888.59元、上年2,425,061,436.44元、下降52.16%，主要是公司上期转让同方计算机硬件业务等取得大额股权转让款流入所致。筹资活动产生的现金流量净额本期-1,961,690,834.34元、上年-3,654,021,761.50元，变动比例来源标为“不适用”；其中长短期借款净增加额-1,274,205,623.47元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\",\"source-0017\"],\"metrics\":[{\"name\":\"公允价值变动收益\",\"raw_value\":\"-54,058,622.12\",\"value\":\"-54058622.12\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"上年公允价值变动收益\",\"raw_value\":\"415,194,943.39\",\"value\":\"415194943.39\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"公允价值变动收益变动比例\",\"raw_value\":\"-113.02\",\"value\":\"-113.02\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"同比\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他综合收益税后净额\",\"raw_value\":\"-1,350,447,548.96\",\"value\":\"-1350447548.96\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"上年其他综合收益税后净额\",\"raw_value\":\"1,091,684,163.98\",\"value\":\"1091684163.98\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"其他综合收益税后净额变动比例\",\"raw_value\":\"-223.70\",\"value\":\"-223.70\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"同比\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"投资活动产生的现金流量净额\",\"raw_value\":\"1,160,127,888.59\",\"value\":\"1160127888.59\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"上年投资活动产生的现金流量净额\",\"raw_value\":\"2,425,061,436.44\",\"value\":\"2425061436.44\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"投资活动产生的现金流量净额变动比例\",\"raw_value\":\"-52.16\",\"value\":\"-52.16\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"同比\",\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"筹资活动产生的现金流量净额\",\"raw_value\":\"-1,961,690,834.34\",\"value\":\"-1961690834.34\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"上年筹资活动产生的现金流量净额\",\"raw_value\":\"-3,654,021,761.50\",\"value\":\"-3654021761.50\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"长短期借款净增加额\",\"raw_value\":\"-1,274,205,623.47\",\"value\":\"-1274205623.47\",\"unit\":\"元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:F003\",\"text\":\"数智产业知识服务领域依托CNKI平台，为全球3.5万家机构及1.5亿个人用户提供学术资源检索、知识管理及智能问答等服务；核心产品包括CNKI系列数据库、CNKI AI工具及知网AI+图书平台等。来源未单列统计截止日。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"CNKI平台服务机构数\",\"raw_value\":\"3.5万家\",\"value\":null,\"unit\":\"家\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"来源表述为“全球3.5万家机构”，未单列统计截止日，未拆分精确家数。\"},{\"name\":\"CNKI平台服务个人用户数\",\"raw_value\":\"1.5亿\",\"value\":null,\"unit\":\"人\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"来源表述为“1.5亿个人用户”，未单列统计截止日，未拆分精确人数。\"}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:F004\",\"text\":\"公共安全市场地位：公司连续9年全球稳居EWC（爆炸物、武器和违禁品）市场份额第三；大型货物车辆检查系统全球市场份额连续14年排名第一；自2011年起已连续14年在全球货物及车辆安全检查系统市场份额第一；产品及服务遍及全球170多个国家和地区。上述排名为OMDIA截至2024年数据，2025年数据尚未发布。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0010\"],\"metrics\":[{\"name\":\"EWC市场份额全球排名连续年数\",\"raw_value\":\"9年\",\"value\":\"9\",\"unit\":\"年\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"排名为OMDIA截至2024年数据，2025年数据尚未发布。\"},{\"name\":\"大型货物车辆检查系统全球市场份额第一连续年数\",\"raw_value\":\"14年\",\"value\":\"14\",\"unit\":\"年\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"排名为OMDIA截至2024年数据，2025年数据尚未发布。\"},{\"name\":\"全球货物及车辆安全检查系统市场份额第一连续年数\",\"raw_value\":\"14年\",\"value\":\"14\",\"unit\":\"年\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"自2011年起连续14年；排名为OMDIA截至2024年数据，2025年数据尚未发布。\"},{\"name\":\"产品及服务覆盖国家和地区数\",\"raw_value\":\"170多个\",\"value\":null,\"unit\":\"个\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"greater_than\",\"uncertainty_reason\":\"来源表述为“170多个国家和地区”，为约数。\"}],\"uncertainty_reason\":null},{\"fact_id\":\"sm-03\",\"text\":\"主营业务分板块小计收入1,525,120.68万元，加业务板块间抵销-28,111.12万元（即减去抵销绝对值28,111.12万元）后合计1,497,009.55万元，合计毛利率26.50%；合计数与各分项加总差异系四舍五入所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"主营业务分板块小计收入\",\"raw_value\":\"1,525,120.68\",\"value\":\"1525120.68\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"业务板块间抵销\",\"raw_value\":\"-28,111.12\",\"value\":\"-28111.12\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"主营业务收入合计\",\"raw_value\":\"1,497,009.55\",\"value\":\"1497009.55\",\"unit\":\"万元\",\"source_unit\":null,\"currency\":\"人民币\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"主营业务毛利率合计\",\"raw_value\":\"26.50\",\"value\":\"26.50\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"sc-01\",\"text\":\"公共安全产业定位为安检行业领导者，提供智能检查系统、解决方案及全生命周期运维服务；智慧能源产业致力于成为“国内领先的能源管控综合服务商”，通过规划咨询、产品供应、工程建设、节能服务、运维托管等方式提供一体化解决方案与运维服务。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0002\"],\"metrics\":[],\"uncertainty_reason\":null}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "review-add:F001",
+          "text": "主营业务分板块收入同比变动：公共安全增加60,481.61万元，数智产业减少118,490.59万元，智慧能源减少83,746.45万元，其他业务减少26,774.38万元，总部投资及科技园增加3,853.68万元；抵销后合计减少172,053.28万元（1,497,009.55万元对比1,669,062.84万元）。地区结构：国内市场收入971,560.22万元，比重由72.42%降至64.90%，减少237,197.98万元；国际市场收入525,449.33万元，比重由27.58%升至35.10%，增加65,144.69万元。毛利率比上年增减（百分点）：公共安全-1.13、数智产业+13.94、智慧能源+0.02、合计+2.19；数智产业毛利率由32.73%升至46.67%，其收入下降主要系上年转让计算机业务影响所致。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": [
+            {
+              "name": "公共安全主营业务收入同比增减",
+              "raw_value": "60,481.61",
+              "value": "60481.61",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "同比增减",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "数智产业主营业务收入同比增减",
+              "raw_value": "-118,490.59",
+              "value": "-118490.59",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "同比增减",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "智慧能源主营业务收入同比增减",
+              "raw_value": "-83,746.45",
+              "value": "-83746.45",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "同比增减",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他业务主营业务收入同比增减",
+              "raw_value": "-26,774.38",
+              "value": "-26774.38",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "同比增减",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "总部投资及科技园主营业务收入同比增减",
+              "raw_value": "3,853.68",
+              "value": "3853.68",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "同比增减",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务收入合计同比增减",
+              "raw_value": "-172,053.28",
+              "value": "-172053.28",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "同比增减",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务收入合计",
+              "raw_value": "1,497,009.55",
+              "value": "1497009.55",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "上年主营业务收入合计",
+              "raw_value": "1,669,062.84",
+              "value": "1669062.84",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2024年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "国内市场主营业务收入",
+              "raw_value": "971,560.22",
+              "value": "971560.22",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "国内市场主营业务收入比重",
+              "raw_value": "64.90",
+              "value": "64.90",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "上年国内市场主营业务收入比重",
+              "raw_value": "72.42",
+              "value": "72.42",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2024年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "国内市场主营业务收入同比增减",
+              "raw_value": "-237,197.98",
+              "value": "-237197.98",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "同比增减",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "国际市场主营业务收入",
+              "raw_value": "525,449.33",
+              "value": "525449.33",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "国际市场主营业务收入比重",
+              "raw_value": "35.10",
+              "value": "35.10",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "上年国际市场主营业务收入比重",
+              "raw_value": "27.58",
+              "value": "27.58",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2024年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "国际市场主营业务收入同比增减",
+              "raw_value": "65,144.69",
+              "value": "65144.69",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "同比增减",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "公共安全毛利率比上年增减",
+              "raw_value": "-1.13",
+              "value": "-1.13",
+              "unit": "百分点",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "比上年增减",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "数智产业毛利率比上年增减",
+              "raw_value": "13.94",
+              "value": "13.94",
+              "unit": "百分点",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "比上年增减",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "智慧能源毛利率比上年增减",
+              "raw_value": "0.02",
+              "value": "0.02",
+              "unit": "百分点",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": "比上年增减",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务毛利率合计比上年增减",
+              "raw_value": "2.19",
+              "value": "2.19",
+              "unit": "百分点",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "比上年增减",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "数智产业毛利率",
+              "raw_value": "46.67",
+              "value": "46.67",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "上年数智产业毛利率",
+              "raw_value": "32.73",
+              "value": "32.73",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2024年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:F002",
+          "text": "公允价值变动收益本期-54,058,622.12元、上年同期415,194,943.39元、变动-113.02%，主要是公司持有的相关证券市场价格波动及本年处置了紫光股份等交易性金融资产所致。其他综合收益税后净额本期-1,350,447,548.96元、上年同期1,091,684,163.98元、变动-223.70%，主要是本期公司参股企业其他综合收益减少，公司相应确认其他综合收益减少所致。投资活动产生的现金流量净额本期1,160,127,888.59元、上年2,425,061,436.44元、下降52.16%，主要是公司上期转让同方计算机硬件业务等取得大额股权转让款流入所致。筹资活动产生的现金流量净额本期-1,961,690,834.34元、上年-3,654,021,761.50元，变动比例来源标为“不适用”；其中长短期借款净增加额-1,274,205,623.47元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0007",
+            "source-0017"
+          ],
+          "metrics": [
+            {
+              "name": "公允价值变动收益",
+              "raw_value": "-54,058,622.12",
+              "value": "-54058622.12",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "上年公允价值变动收益",
+              "raw_value": "415,194,943.39",
+              "value": "415194943.39",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2024年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "公允价值变动收益变动比例",
+              "raw_value": "-113.02",
+              "value": "-113.02",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "同比",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他综合收益税后净额",
+              "raw_value": "-1,350,447,548.96",
+              "value": "-1350447548.96",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "上年其他综合收益税后净额",
+              "raw_value": "1,091,684,163.98",
+              "value": "1091684163.98",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2024年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "其他综合收益税后净额变动比例",
+              "raw_value": "-223.70",
+              "value": "-223.70",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "同比",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "投资活动产生的现金流量净额",
+              "raw_value": "1,160,127,888.59",
+              "value": "1160127888.59",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "上年投资活动产生的现金流量净额",
+              "raw_value": "2,425,061,436.44",
+              "value": "2425061436.44",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2024年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "投资活动产生的现金流量净额变动比例",
+              "raw_value": "-52.16",
+              "value": "-52.16",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "同比",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "筹资活动产生的现金流量净额",
+              "raw_value": "-1,961,690,834.34",
+              "value": "-1961690834.34",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "上年筹资活动产生的现金流量净额",
+              "raw_value": "-3,654,021,761.50",
+              "value": "-3654021761.50",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2024年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "长短期借款净增加额",
+              "raw_value": "-1,274,205,623.47",
+              "value": "-1274205623.47",
+              "unit": "元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:F003",
+          "text": "数智产业知识服务领域依托CNKI平台，为全球3.5万家机构及1.5亿个人用户提供学术资源检索、知识管理及智能问答等服务；核心产品包括CNKI系列数据库、CNKI AI工具及知网AI+图书平台等。来源未单列统计截止日。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [
+            {
+              "name": "CNKI平台服务机构数",
+              "raw_value": "3.5万家",
+              "value": null,
+              "unit": "家",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "来源表述为“全球3.5万家机构”，未单列统计截止日，未拆分精确家数。"
+            },
+            {
+              "name": "CNKI平台服务个人用户数",
+              "raw_value": "1.5亿",
+              "value": null,
+              "unit": "人",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "来源表述为“1.5亿个人用户”，未单列统计截止日，未拆分精确人数。"
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:F004",
+          "text": "公共安全市场地位：公司连续9年全球稳居EWC（爆炸物、武器和违禁品）市场份额第三；大型货物车辆检查系统全球市场份额连续14年排名第一；自2011年起已连续14年在全球货物及车辆安全检查系统市场份额第一；产品及服务遍及全球170多个国家和地区。上述排名为OMDIA截至2024年数据，2025年数据尚未发布。",
+          "subject_scope": "business_segment",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0010"
+          ],
+          "metrics": [
+            {
+              "name": "EWC市场份额全球排名连续年数",
+              "raw_value": "9年",
+              "value": "9",
+              "unit": "年",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "排名为OMDIA截至2024年数据，2025年数据尚未发布。"
+            },
+            {
+              "name": "大型货物车辆检查系统全球市场份额第一连续年数",
+              "raw_value": "14年",
+              "value": "14",
+              "unit": "年",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "排名为OMDIA截至2024年数据，2025年数据尚未发布。"
+            },
+            {
+              "name": "全球货物及车辆安全检查系统市场份额第一连续年数",
+              "raw_value": "14年",
+              "value": "14",
+              "unit": "年",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "自2011年起连续14年；排名为OMDIA截至2024年数据，2025年数据尚未发布。"
+            },
+            {
+              "name": "产品及服务覆盖国家和地区数",
+              "raw_value": "170多个",
+              "value": null,
+              "unit": "个",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "greater_than",
+              "uncertainty_reason": "来源表述为“170多个国家和地区”，为约数。"
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "sm-03",
+          "text": "主营业务分板块小计收入1,525,120.68万元，加业务板块间抵销-28,111.12万元（即减去抵销绝对值28,111.12万元）后合计1,497,009.55万元，合计毛利率26.50%；合计数与各分项加总差异系四舍五入所致。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0008"
+          ],
+          "metrics": [
+            {
+              "name": "主营业务分板块小计收入",
+              "raw_value": "1,525,120.68",
+              "value": "1525120.68",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "业务板块间抵销",
+              "raw_value": "-28,111.12",
+              "value": "-28111.12",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务收入合计",
+              "raw_value": "1,497,009.55",
+              "value": "1497009.55",
+              "unit": "万元",
+              "source_unit": null,
+              "currency": "人民币",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "主营业务毛利率合计",
+              "raw_value": "26.50",
+              "value": "26.50",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "sc-01",
+          "text": "公共安全产业定位为安检行业领导者，提供智能检查系统、解决方案及全生命周期运维服务；智慧能源产业致力于成为“国内领先的能源管控综合服务商”，通过规划咨询、产品供应、工程建设、节能服务、运维托管等方式提供一体化解决方案与运维服务。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001",
+            "source-0002"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 13138,
+      "output_tokens": 4400,
+      "total_tokens": 17538
+    }
+  },
+  {
+    "request_id": "bp-work-92862ffa7505ec6e48ddf906:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "3052ad5106205cd8b97f684d633d37436e3f4dc137990dcaadcf8abf8345a02e",
+    "response_hash": "3a1e27759b64b96ac650344c7087d6676f6f420e6da643ffa15072fbd836e6b0",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"review-add:F002\",\"review-add:F003\",\"sc-01\"],\"checks\":[{\"fact_id\":\"review-add:F002\",\"accepted\":true,\"evidence_ids\":[\"source-0007\",\"source-0008\",\"source-0017\"],\"explanation\":\"source-0007列示公允价值变动收益本期-54,058,622.12元、上年同期415,194,943.39元、变动-113.02%，其他综合收益税后净额本期-1,350,447,548.96元、上年同期1,091,684,163.98元、变动-223.70%，投资活动现金流量净额本期1,160,127,888.59元、上年2,425,061,436.44元、变动-52.16%，筹资活动现金流量净额本期-1,961,690,834.34元、上年-3,654,021,761.50元且变动比例原文为“不适用”；单位均为元，本期与上年同期列未混用。原因均保留“主要是”，紫光股份明确为交易性金融资产处置。source-0017的2025年长短期借款净增加额为-1,274,205,623.47元。候选未自行计算筹资活动变动百分比，实质补齐F002所述遗漏。\"},{\"fact_id\":\"review-add:F003\",\"accepted\":true,\"evidence_ids\":[\"source-0001\"],\"explanation\":\"source-0001原文为知识服务依托CNKI平台，为全球3.5万家机构及1.5亿个人用户提供学术资源检索、知识管理及智能问答等服务，核心产品包括CNKI系列数据库、CNKI AI工具及知网AI+图书平台等，且未单列统计截止日。候选照录规模与产品表述，未改成精确审计数或自行拆分，并保留截止日不明，实质解决F003遗漏。\"},{\"fact_id\":\"sc-01\",\"accepted\":true,\"evidence_ids\":[\"source-0001\",\"source-0002\",\"source-0013\"],\"explanation\":\"source-0001将公共安全表述为公司“定位为”并提供智能检查系统、解决方案及全生命周期运维服务，候选保持该已实现定位。source-0002智慧能源原文为“致力于成为‘国内领先的能源管控综合服务商’”，交付方式为规划咨询、产品供应、工程建设、节能服务、运维托管；source-0013亦将其列为目标使命。候选已把智慧能源从已实现身份改为目标情态，未废止其余相符内容，实质解决F007。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "review-add:F002",
+        "review-add:F003",
+        "sc-01"
+      ],
+      "checks": [
+        {
+          "fact_id": "review-add:F002",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0007",
+            "source-0008",
+            "source-0017"
+          ],
+          "explanation": "source-0007列示公允价值变动收益本期-54,058,622.12元、上年同期415,194,943.39元、变动-113.02%，其他综合收益税后净额本期-1,350,447,548.96元、上年同期1,091,684,163.98元、变动-223.70%，投资活动现金流量净额本期1,160,127,888.59元、上年2,425,061,436.44元、变动-52.16%，筹资活动现金流量净额本期-1,961,690,834.34元、上年-3,654,021,761.50元且变动比例原文为“不适用”；单位均为元，本期与上年同期列未混用。原因均保留“主要是”，紫光股份明确为交易性金融资产处置。source-0017的2025年长短期借款净增加额为-1,274,205,623.47元。候选未自行计算筹资活动变动百分比，实质补齐F002所述遗漏。"
+        },
+        {
+          "fact_id": "review-add:F003",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "source-0001原文为知识服务依托CNKI平台，为全球3.5万家机构及1.5亿个人用户提供学术资源检索、知识管理及智能问答等服务，核心产品包括CNKI系列数据库、CNKI AI工具及知网AI+图书平台等，且未单列统计截止日。候选照录规模与产品表述，未改成精确审计数或自行拆分，并保留截止日不明，实质解决F003遗漏。"
+        },
+        {
+          "fact_id": "sc-01",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001",
+            "source-0002",
+            "source-0013"
+          ],
+          "explanation": "source-0001将公共安全表述为公司“定位为”并提供智能检查系统、解决方案及全生命周期运维服务，候选保持该已实现定位。source-0002智慧能源原文为“致力于成为‘国内领先的能源管控综合服务商’”，交付方式为规划咨询、产品供应、工程建设、节能服务、运维托管；source-0013亦将其列为目标使命。候选已把智慧能源从已实现身份改为目标情态，未废止其余相符内容，实质解决F007。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 15024,
+      "output_tokens": 579,
+      "total_tokens": 23693
+    }
+  }
+]

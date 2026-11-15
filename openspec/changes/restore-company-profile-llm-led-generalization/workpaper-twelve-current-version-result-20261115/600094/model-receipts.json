@@ -1,0 +1,1489 @@
+[
+  {
+    "request_id": "bp-work-b0c2936a6069019a8bb2fa59:workpaper:sections",
+    "purpose": "select_profile_sections",
+    "request_hash": "e842b02cbc25aacf7c7ff57b937b7c9eb4dc089176d65a5f60ae1527821e3b61",
+    "response_hash": "5a2826e87f20677cef508ce52595e70250196cec10d12eee03d6d934b8428679",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"selected_section_ids\":[\"section-0035\",\"section-0044\",\"section-0053\",\"section-0055\",\"section-0057\",\"section-0058\",\"section-0021\",\"section-0022\"],\"rationale\":\"选择公司业务情况（section-0035）说明传统地产主业与转型业务布局；经营情况讨论与分析（section-0044）提供本期经营综述与转型进展；主营业务分析（section-0053）及其收入成本分析（section-0055）、房地产区域毛利率与收入占比（section-0057）、算力服务毛利率变化（section-0058）构成收入构成与主要业务权重的实质披露；近三年主要会计数据（section-0021）及主要会计数据（section-0022）提供公司层面营业收入总额与规模变化，避免仅依赖分部表。上述子节互不重叠且覆盖业务结构、产品服务、盈利来源、规模与本期变化。\",\"deferred\":[\"section-0038 行业情况：属行业背景，非公司层面经营实质，仅在影响公司解读时参考，故不纳入\",\"section-0048 核心竞争力：偏泛化竞争力描述，非收入与经营结构核心，暂缓\",\"section-0078 行业经营性信息分析：含房地产储备、投资、销售结转等，属补充性经营数据，可在需要时定向补充\",\"section-0085 投资状况分析：股权投资与金融资产，非主营收入构成，暂缓\",\"section-1205 分部信息：财务附注分部数据，与已选收入分析重叠，暂缓\"],\"stop_reason\":\"已覆盖业务结构、产品服务、收入构成与主要业务权重、规模及本期经营变化等核心问题；剩余为行业背景、竞争力泛述、投资与分部附注等次要或重叠内容，继续扩展收益有限，可在明确缺口时再定向补充。\"}",
+    "response_payload": {
+      "selected_section_ids": [
+        "section-0035",
+        "section-0044",
+        "section-0053",
+        "section-0055",
+        "section-0057",
+        "section-0058",
+        "section-0021",
+        "section-0022"
+      ],
+      "rationale": "选择公司业务情况（section-0035）说明传统地产主业与转型业务布局；经营情况讨论与分析（section-0044）提供本期经营综述与转型进展；主营业务分析（section-0053）及其收入成本分析（section-0055）、房地产区域毛利率与收入占比（section-0057）、算力服务毛利率变化（section-0058）构成收入构成与主要业务权重的实质披露；近三年主要会计数据（section-0021）及主要会计数据（section-0022）提供公司层面营业收入总额与规模变化，避免仅依赖分部表。上述子节互不重叠且覆盖业务结构、产品服务、盈利来源、规模与本期变化。",
+      "deferred": [
+        "section-0038 行业情况：属行业背景，非公司层面经营实质，仅在影响公司解读时参考，故不纳入",
+        "section-0048 核心竞争力：偏泛化竞争力描述，非收入与经营结构核心，暂缓",
+        "section-0078 行业经营性信息分析：含房地产储备、投资、销售结转等，属补充性经营数据，可在需要时定向补充",
+        "section-0085 投资状况分析：股权投资与金融资产，非主营收入构成，暂缓",
+        "section-1205 分部信息：财务附注分部数据，与已选收入分析重叠，暂缓"
+      ],
+      "stop_reason": "已覆盖业务结构、产品服务、收入构成与主要业务权重、规模及本期经营变化等核心问题；剩余为行业背景、竞争力泛述、投资与分部附注等次要或重叠内容，继续扩展收益有限，可在明确缺口时再定向补充。"
+    },
+    "usage": {
+      "input_tokens": 23604,
+      "output_tokens": 396,
+      "total_tokens": 24000
+    }
+  },
+  {
+    "request_id": "bp-work-b0c2936a6069019a8bb2fa59:workpaper:extract",
+    "purpose": "extract_profile_workpaper",
+    "request_hash": "98ffd84bf451ee7a1523b88dd9cdac7f178d8d70ad2278fd9b593c052a27b584",
+    "response_hash": "7f125fae16e777713a180cb1194057386ddfe5413696ba49dd9197f8b5d75ca1",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"schema_version\":\"company_profile_workpaper_draft.v1\",\"elements\":{\"business_structure\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"bs-01\",\"text\":\"报告期内公司传统主营业务构建“地产筑基、金控投资赋能”双轮驱动格局，地产板块承担销售回款、利润修复、资产运营与信用稳定职能，金控板块由传统金融实体投资与财务性投资平台转型为产业投资与资本运作平台。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"bs-02\",\"text\":\"公司同时推进转型业务布局，构建以未来通信、“空天地一体化”产业生态为核心支柱的新业务体系，涉及6G通信、低空经济与算力运营三大战略板块。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0003\"]},{\"fact_id\":\"bs-03\",\"text\":\"报告期内公司已形成“地产稳盘固基、新赛道协同发力”的战略发展格局，地产板块保障经营安全与现金流稳定，6G通信、低空经济、算力运营三大板块协同推动公司向科技引领型企业转型。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\"]},{\"fact_id\":\"bs-04\",\"text\":\"公司以控股子公司名城数字为核心载体开展AI算力基础设施运营与产业服务；通过全资子公司名城金控集团有限公司战略受让北京佰才邦技术股份有限公司股权布局6G通信；并战略投资上海峰飞航空科技有限公司母公司AutoFlightX Inc.切入eVTOL飞行器赛道。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"bs-05\",\"text\":\"公司设立全资子公司香港名城移动通信有限公司，注册资本1亿元港币，搭建海外通信信息行业投资管理平台，截至报告披露日尚处于前期筹备阶段。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"香港名城移动通信有限公司注册资本\",\"raw_value\":\"1亿元港币\",\"value\":\"1\",\"unit\":\"亿元港币\",\"currency\":\"HKD\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"金控板块在分行业表中未列示营业收入与营业成本金额，其收入贡献未在选定章节中量化。\"]},\"products_services\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"ps-01\",\"text\":\"公司主要产品与服务包括物业开发销售及运营（房地产板块）、算力服务以及金融投资（金控板块）；分产品表列示物业开发销售及运营与算力服务两项收入。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"ps-02\",\"text\":\"算力服务由控股子公司名城数字承载，聚焦AI算力基础设施运营与产业服务能力打造，报告期内算力服务已正常运营。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0008\"]},{\"fact_id\":\"ps-03\",\"text\":\"佰才邦为参股项目，重点布局天地融合通信、通感算一体及低空经济应用，依托自研6G卫星基带芯片与星载基站设备，面向无人机监管、应急通信、工业物联、车联网等场景提供6G解决方案；该投资未纳入合并报表范围。\",\"subject_scope\":\"named_subsidiary\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"ps-04\",\"text\":\"峰飞航空为eVTOL领域企业，致力于提供空中物流与出行解决方案，已实现飞行器量产线成功试产；公司通过战略投资其母公司AutoFlightX Inc.切入该赛道。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}],\"limitations\":[\"金融投资业务的具体产品形态与收益方式未在选定章节中详细披露。\"]},\"revenue_model\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"rm-01\",\"text\":\"公司收入主要来自房地产物业开发销售及运营，本期房地产板块营业收入22.31亿元，占主营业务收入主要部分；算力服务本期结转收入1,534.83万元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\",\"source-0008\"],\"metrics\":[{\"name\":\"房地产板块营业收入\",\"raw_value\":\"2,231,200,274.53\",\"value\":\"2231200274.53\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"算力服务板块营业收入\",\"raw_value\":\"15,348,294.98\",\"value\":\"15348294.98\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"rm-02\",\"text\":\"算力业务采用净额法核算，本期结转收入1,534.83万元，其中实际收入11,243.16万元、实际成本9,708.33万元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"算力服务结转收入\",\"raw_value\":\"1,534.83\",\"value\":\"1534.83\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"算力服务实际收入\",\"raw_value\":\"11,243.16\",\"value\":\"11243.16\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"算力服务实际成本\",\"raw_value\":\"9,708.33\",\"value\":\"9708.33\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"rm-03\",\"text\":\"房地产板块本期毛利率20.04%，较上年增加3.98个百分点；算力服务板块毛利率100.00%，较上年增加131.34个百分点。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"房地产板块毛利率\",\"raw_value\":\"20.04\",\"value\":\"20.04\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房地产板块毛利率比上年增减\",\"raw_value\":\"3.98\",\"value\":\"3.98\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"算力服务板块毛利率\",\"raw_value\":\"100.00\",\"value\":\"100.00\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"算力服务板块毛利率比上年增减\",\"raw_value\":\"131.34\",\"value\":\"131.34\",\"unit\":\"百分点\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"rm-04\",\"text\":\"金控板块国融证券股权投资的有序退出贡献了正向投资收益，是本期盈利改善的驱动之一；报告期内公司完成国融证券相关间接股权投资的有序退出。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\",\"source-0004\"]}],\"limitations\":[\"金控板块收入与投资收益金额未在选定章节中单独列示。\"]},\"scale_and_mix\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sm-01\",\"text\":\"公司2025年营业收入22.47亿元，较上年同期减少46.13%；营业成本17.84亿元，较上年同期减少49.09%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0006\"],\"metrics\":[{\"name\":\"营业收入\",\"raw_value\":\"2,246,548,569.51\",\"value\":\"2246548569.51\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业收入比上年同期增减\",\"raw_value\":\"-46.13\",\"value\":\"-46.13\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业成本\",\"raw_value\":\"1,784,045,409.69\",\"value\":\"1784045409.69\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"营业成本比上年同期增减\",\"raw_value\":\"-49.09\",\"value\":\"-49.09\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-02\",\"text\":\"公司实现总营业收入22.47亿元，其中主营业务收入中房地产本期实现营业收入22.31亿元，较上年同比减少46.42%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"房地产板块营业收入比上年增减\",\"raw_value\":\"-46.42\",\"value\":\"-46.42\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-03\",\"text\":\"房地产板块分区域收入：华东区域16.01亿元、东南区域3.74亿元、西北区域2.56亿元；收入占比分别为71.77%、16.75%、11.48%。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"],\"metrics\":[{\"name\":\"华东区域营业收入\",\"raw_value\":\"1,601,285,038.35\",\"value\":\"1601285038.35\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"东南区域营业收入\",\"raw_value\":\"373,786,834.45\",\"value\":\"373786834.45\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"西北区域营业收入\",\"raw_value\":\"256,128,401.73\",\"value\":\"256128401.73\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"华东区域收入占比\",\"raw_value\":\"71.77\",\"value\":\"71.77\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"东南区域收入占比\",\"raw_value\":\"16.75\",\"value\":\"16.75\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"西北区域收入占比\",\"raw_value\":\"11.48\",\"value\":\"11.48\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-04\",\"text\":\"公司2025年归属于上市公司股东的净利润1.43亿元，实现扭亏为盈；经营活动产生的现金流量净额6.49亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\",\"source-0004\"],\"metrics\":[{\"name\":\"归属于上市公司股东的净利润\",\"raw_value\":\"143,478,990.09\",\"value\":\"143478990.09\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"经营活动产生的现金流量净额\",\"raw_value\":\"648,795,247.52\",\"value\":\"648795247.52\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"sm-05\",\"text\":\"截至2025年末公司资产负债率35.08%，扣除预收账款后为32.83%，净负债率7.28%，现金短债比2.19倍。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"资产负债率\",\"raw_value\":\"35.08\",\"value\":\"35.08\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"扣除预收账款后资产负债率\",\"raw_value\":\"32.83\",\"value\":\"32.83\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"净负债率\",\"raw_value\":\"7.28\",\"value\":\"7.28\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"},{\"name\":\"现金短债比\",\"raw_value\":\"2.19\",\"value\":\"2.19\",\"unit\":\"倍\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年末\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"分行业表中金控板块未列示收入金额，故主营业务收入构成中金控板块权重无法量化。\"]},\"operations_and_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"oi-01\",\"text\":\"地产板块执行“稳健经营、降本增效”方针，以去库存、保现金流为核心经营目标，聚焦核心区域与重点城市，围绕项目去化、资产价值提升及经营性现金流管理实施精细化运营，现阶段不以高周转扩张为导向。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]},{\"fact_id\":\"oi-02\",\"text\":\"公司已连续四年暂停新增房地产投资，可结转项目规模逐年收缩，导致当期综合毛利额同比下降；本期营业收入与营业成本下降均主要系交付结转面积减少。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\",\"source-0007\"]},{\"fact_id\":\"oi-03\",\"text\":\"房地产板块成本构成为开发成本17.84亿元，占本期总成本100.00%，较上年同期减少48.96%；算力服务成本本期未列示金额，上年同期为891.82万元。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"],\"metrics\":[{\"name\":\"房地产板块开发成本\",\"raw_value\":\"1,784,045,409.69\",\"value\":\"1784045409.69\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房地产板块开发成本占本期总成本比例\",\"raw_value\":\"100.00\",\"value\":\"100.00\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"房地产板块开发成本比上年同期增减\",\"raw_value\":\"-48.96\",\"value\":\"-48.96\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"算力服务成本上年同期金额\",\"raw_value\":\"8,918,170.05\",\"value\":\"8918170.05\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"business_segment\",\"period\":\"2024年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"oi-04\",\"text\":\"公司本期研发投入情况表、研发人员情况表均标注不适用，产销量情况分析表亦标注不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]}],\"limitations\":[\"算力业务的具体资源投入（如机房、设备、能耗）未在选定章节中披露。\",\"房地产项目储备、土地获取等经营性信息未纳入本次阅读范围。\"]},\"customers_channels_markets\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"cc-01\",\"text\":\"前五名客户销售额19,775.32万元，占年度销售总额11.84%，其中关联方销售额0万元、占年度销售总额0%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"前五名客户销售额\",\"raw_value\":\"19,775.32\",\"value\":\"19775.32\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户销售额占年度销售总额比例\",\"raw_value\":\"11.84\",\"value\":\"11.84\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户中关联方销售额\",\"raw_value\":\"0\",\"value\":\"0\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名客户中关联方销售额占年度销售总额比例\",\"raw_value\":\"0\",\"value\":\"0\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"cc-02\",\"text\":\"前五名供应商采购额37,331.06万元，占年度采购总额55.45%，其中关联方采购额0万元、占年度采购总额0%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[{\"name\":\"前五名供应商采购额\",\"raw_value\":\"37,331.06\",\"value\":\"37331.06\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商采购额占年度采购总额比例\",\"raw_value\":\"55.45\",\"value\":\"55.45\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商中关联方采购额\",\"raw_value\":\"0\",\"value\":\"0\",\"unit\":\"万元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"前五名供应商中关联方采购额占年度采购总额比例\",\"raw_value\":\"0\",\"value\":\"0\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"cc-03\",\"text\":\"公司披露报告期内不存在向单个客户销售比例超过总额50%、前5名客户中存在新增客户或严重依赖少数客户的情形，亦不存在向单个供应商采购比例超过总额50%等情形。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"]},{\"fact_id\":\"cc-04\",\"text\":\"房地产板块区域市场以华东为主（收入占比71.77%），东南、西北次之；公司海外通信业务拟聚焦新兴市场及“一带一路”沿线国家，名城移动通信尚处前期筹备阶段。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0007\"]}],\"limitations\":[\"客户与供应商具体名称未披露，仅有集中度数据。\",\"算力服务与金控板块的客户结构未单独披露。\"]},\"operating_drivers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"od-01\",\"text\":\"本期盈利改善的核心驱动包括：过往年度已对存货及投资性房地产等核心资产充分计提减值准备，报告期内减值损失大幅收窄；以及金控板块国融证券股权投资有序退出贡献正向投资收益。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"]},{\"fact_id\":\"od-02\",\"text\":\"房地产板块毛利率较上年增长3.98个百分点，主要系华东区域毛利率提升：前期预售的映辰二期项目当期交付结转收入，且前期已交付项目完成工程结算，实际结算金额小于账面暂估金额，单方成本下降。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"od-03\",\"text\":\"西北区域毛利率较上年增长并由负转正，主要系上年同期已对区域内各项目成本计提减值准备，本报告期计提减值准备的因素不再持续恶化；东南区域毛利率略有下降，主要受存量房销售价格下降影响。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"od-04\",\"text\":\"开发物业租赁及运营业务本期受商务活动减少、市场租赁需求及价格双双下降影响，毛利率持续下降。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0007\"]},{\"fact_id\":\"od-05\",\"text\":\"财务费用本期1.94亿元，较上年同期增加60.36%，主要系项目完工在建项目减少，利息停止资本化转为费用化增加所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"财务费用\",\"raw_value\":\"194,132,969.83\",\"value\":\"194132969.83\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"财务费用比上年同期增减\",\"raw_value\":\"60.36\",\"value\":\"60.36\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"od-06\",\"text\":\"经营活动产生的现金流量净额较上年大幅增长，主要系上期存在大额一次性税金支出，上期缴纳了以前年度开发项目的土地增值税清算税金4.16亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"上期缴纳土地增值税清算税金\",\"raw_value\":\"4.16\",\"value\":\"4.16\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"qualifier\":\"exact\"}]}],\"limitations\":[\"减值损失具体金额未在选定章节中列示。\"]},\"material_changes\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"mc-01\",\"text\":\"公司本期营业收入22.47亿元，较上年同期减少46.13%，主要系本期交付结转面积减少；营业成本同步下降49.09%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"]},{\"fact_id\":\"mc-02\",\"text\":\"公司完成对佰才邦20.45%股份战略投资，投资总额7.24亿元，该项目为参股项目，未纳入合并报表范围，对2025年度财务状况及经营业绩暂无重大影响。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"对佰才邦战略投资持股比例\",\"raw_value\":\"20.45\",\"value\":\"20.45\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"对佰才邦战略投资总额\",\"raw_value\":\"7.24\",\"value\":\"7.24\",\"unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"mc-03\",\"text\":\"报告期内公司完成三次股份回购注销，累计金额530,130,843.75元，占本年度归属于上市公司股东净利润的369.48%。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0005\"],\"metrics\":[{\"name\":\"股份回购注销累计金额\",\"raw_value\":\"530,130,843.75\",\"value\":\"530130843.75\",\"unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"},{\"name\":\"股份回购注销金额占归属于上市公司股东净利润比例\",\"raw_value\":\"369.48\",\"value\":\"369.48\",\"unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"qualifier\":\"exact\"}]},{\"fact_id\":\"mc-04\",\"text\":\"公司披露本期业务类型、利润构成或利润来源未发生重大变动，业务、产品或服务亦未发生重大变化或调整；报告期内新增重要非主营业务说明标注不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0006\",\"source-0008\"]},{\"fact_id\":\"mc-05\",\"text\":\"公司报告期内新产业布局落地：6G通信领域战略受让佰才邦股权，低空经济领域战略投资AutoFlightX Inc.，算力业务领域优化重资产业务结构并以名城数字为核心载体。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}],\"limitations\":[\"新业务对本期收入与利润的具体贡献未量化，佰才邦投资明确对2025年度业绩暂无重大影响。\"]}},\"supply_chain\":{\"position\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sc-01\",\"text\":\"公司现阶段以房地产开发销售与物业运营为主业，同时以控股子公司名城数字开展AI算力基础设施运营与产业服务，属于资产运营与服务提供环节。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0002\"]}]},\"upstream_inputs\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sc-02\",\"text\":\"房地产板块成本构成为开发成本，本期金额17.84亿元，占本期总成本100.00%；公司未在选定章节中列示具体材料或供应商名称。\",\"subject_scope\":\"business_segment\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0008\"]}],\"limitations\":[\"算力服务的具体资源投入（设备、能耗、带宽等）未披露，无法确认其上游输入构成。\"]},\"downstream_customers\":{\"status\":\"observed\",\"facts\":[{\"fact_id\":\"sc-03\",\"text\":\"房地产板块面向购房客户销售物业，前五名客户销售额占年度销售总额11.84%；佰才邦的6G解决方案面向无人机监管、应急通信、工业物联、车联网等应用场景。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0009\"]}],\"limitations\":[\"未披露具体客户名称及算力服务下游客户类型。\"]}},\"limitations\":[\"本工作底稿仅基于选定章节（近三年主要会计数据、公司业务情况、经营情况讨论与分析、主营业务分析）编制，未阅读行业情况、核心竞争力、房地产储备与销售结转、投资状况及分部附注等章节，相关细节可能不完整。\",\"金控板块收入、投资收益及资产规模未在选定章节中量化，主营业务收入构成中金控板块权重无法确定。\",\"算力服务采用净额法核算，其结转收入与实际收入、成本口径不同，比较时需注意口径差异。\",\"部分表格（如分行业表）中算力服务营业成本与金控板块收入栏为空白，未据此推断为零。\"]}",
+    "response_payload": {
+      "schema_version": "company_profile_workpaper_draft.v1",
+      "elements": {
+        "business_structure": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "bs-01",
+              "text": "报告期内公司传统主营业务构建“地产筑基、金控投资赋能”双轮驱动格局，地产板块承担销售回款、利润修复、资产运营与信用稳定职能，金控板块由传统金融实体投资与财务性投资平台转型为产业投资与资本运作平台。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "bs-02",
+              "text": "公司同时推进转型业务布局，构建以未来通信、“空天地一体化”产业生态为核心支柱的新业务体系，涉及6G通信、低空经济与算力运营三大战略板块。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "bs-03",
+              "text": "报告期内公司已形成“地产稳盘固基、新赛道协同发力”的战略发展格局，地产板块保障经营安全与现金流稳定，6G通信、低空经济、算力运营三大板块协同推动公司向科技引领型企业转型。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003"
+              ]
+            },
+            {
+              "fact_id": "bs-04",
+              "text": "公司以控股子公司名城数字为核心载体开展AI算力基础设施运营与产业服务；通过全资子公司名城金控集团有限公司战略受让北京佰才邦技术股份有限公司股权布局6G通信；并战略投资上海峰飞航空科技有限公司母公司AutoFlightX Inc.切入eVTOL飞行器赛道。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "bs-05",
+              "text": "公司设立全资子公司香港名城移动通信有限公司，注册资本1亿元港币，搭建海外通信信息行业投资管理平台，截至报告披露日尚处于前期筹备阶段。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "香港名城移动通信有限公司注册资本",
+                  "raw_value": "1亿元港币",
+                  "value": "1",
+                  "unit": "亿元港币",
+                  "currency": "HKD",
+                  "subject_scope": "named_subsidiary",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "金控板块在分行业表中未列示营业收入与营业成本金额，其收入贡献未在选定章节中量化。"
+          ]
+        },
+        "products_services": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "ps-01",
+              "text": "公司主要产品与服务包括物业开发销售及运营（房地产板块）、算力服务以及金融投资（金控板块）；分产品表列示物业开发销售及运营与算力服务两项收入。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "ps-02",
+              "text": "算力服务由控股子公司名城数字承载，聚焦AI算力基础设施运营与产业服务能力打造，报告期内算力服务已正常运营。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "ps-03",
+              "text": "佰才邦为参股项目，重点布局天地融合通信、通感算一体及低空经济应用，依托自研6G卫星基带芯片与星载基站设备，面向无人机监管、应急通信、工业物联、车联网等场景提供6G解决方案；该投资未纳入合并报表范围。",
+              "subject_scope": "named_subsidiary",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "ps-04",
+              "text": "峰飞航空为eVTOL领域企业，致力于提供空中物流与出行解决方案，已实现飞行器量产线成功试产；公司通过战略投资其母公司AutoFlightX Inc.切入该赛道。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ],
+          "limitations": [
+            "金融投资业务的具体产品形态与收益方式未在选定章节中详细披露。"
+          ]
+        },
+        "revenue_model": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "rm-01",
+              "text": "公司收入主要来自房地产物业开发销售及运营，本期房地产板块营业收入22.31亿元，占主营业务收入主要部分；算力服务本期结转收入1,534.83万元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0007",
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "房地产板块营业收入",
+                  "raw_value": "2,231,200,274.53",
+                  "value": "2231200274.53",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "算力服务板块营业收入",
+                  "raw_value": "15,348,294.98",
+                  "value": "15348294.98",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "rm-02",
+              "text": "算力业务采用净额法核算，本期结转收入1,534.83万元，其中实际收入11,243.16万元、实际成本9,708.33万元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "算力服务结转收入",
+                  "raw_value": "1,534.83",
+                  "value": "1534.83",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "算力服务实际收入",
+                  "raw_value": "11,243.16",
+                  "value": "11243.16",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "算力服务实际成本",
+                  "raw_value": "9,708.33",
+                  "value": "9708.33",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "rm-03",
+              "text": "房地产板块本期毛利率20.04%，较上年增加3.98个百分点；算力服务板块毛利率100.00%，较上年增加131.34个百分点。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "房地产板块毛利率",
+                  "raw_value": "20.04",
+                  "value": "20.04",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房地产板块毛利率比上年增减",
+                  "raw_value": "3.98",
+                  "value": "3.98",
+                  "unit": "百分点",
+                  "source_unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "算力服务板块毛利率",
+                  "raw_value": "100.00",
+                  "value": "100.00",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "算力服务板块毛利率比上年增减",
+                  "raw_value": "131.34",
+                  "value": "131.34",
+                  "unit": "百分点",
+                  "source_unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "rm-04",
+              "text": "金控板块国融证券股权投资的有序退出贡献了正向投资收益，是本期盈利改善的驱动之一；报告期内公司完成国融证券相关间接股权投资的有序退出。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002",
+                "source-0004"
+              ]
+            }
+          ],
+          "limitations": [
+            "金控板块收入与投资收益金额未在选定章节中单独列示。"
+          ]
+        },
+        "scale_and_mix": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "sm-01",
+              "text": "公司2025年营业收入22.47亿元，较上年同期减少46.13%；营业成本17.84亿元，较上年同期减少49.09%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "营业收入",
+                  "raw_value": "2,246,548,569.51",
+                  "value": "2246548569.51",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业收入比上年同期增减",
+                  "raw_value": "-46.13",
+                  "value": "-46.13",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业成本",
+                  "raw_value": "1,784,045,409.69",
+                  "value": "1784045409.69",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "营业成本比上年同期增减",
+                  "raw_value": "-49.09",
+                  "value": "-49.09",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "sm-02",
+              "text": "公司实现总营业收入22.47亿元，其中主营业务收入中房地产本期实现营业收入22.31亿元，较上年同比减少46.42%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "房地产板块营业收入比上年增减",
+                  "raw_value": "-46.42",
+                  "value": "-46.42",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "sm-03",
+              "text": "房地产板块分区域收入：华东区域16.01亿元、东南区域3.74亿元、西北区域2.56亿元；收入占比分别为71.77%、16.75%、11.48%。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ],
+              "metrics": [
+                {
+                  "name": "华东区域营业收入",
+                  "raw_value": "1,601,285,038.35",
+                  "value": "1601285038.35",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "东南区域营业收入",
+                  "raw_value": "373,786,834.45",
+                  "value": "373786834.45",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "西北区域营业收入",
+                  "raw_value": "256,128,401.73",
+                  "value": "256128401.73",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "华东区域收入占比",
+                  "raw_value": "71.77",
+                  "value": "71.77",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "东南区域收入占比",
+                  "raw_value": "16.75",
+                  "value": "16.75",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "西北区域收入占比",
+                  "raw_value": "11.48",
+                  "value": "11.48",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "sm-04",
+              "text": "公司2025年归属于上市公司股东的净利润1.43亿元，实现扭亏为盈；经营活动产生的现金流量净额6.49亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0001",
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "归属于上市公司股东的净利润",
+                  "raw_value": "143,478,990.09",
+                  "value": "143478990.09",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "经营活动产生的现金流量净额",
+                  "raw_value": "648,795,247.52",
+                  "value": "648795247.52",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "sm-05",
+              "text": "截至2025年末公司资产负债率35.08%，扣除预收账款后为32.83%，净负债率7.28%，现金短债比2.19倍。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年末",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "资产负债率",
+                  "raw_value": "35.08",
+                  "value": "35.08",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "扣除预收账款后资产负债率",
+                  "raw_value": "32.83",
+                  "value": "32.83",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "净负债率",
+                  "raw_value": "7.28",
+                  "value": "7.28",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "现金短债比",
+                  "raw_value": "2.19",
+                  "value": "2.19",
+                  "unit": "倍",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年末",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "分行业表中金控板块未列示收入金额，故主营业务收入构成中金控板块权重无法量化。"
+          ]
+        },
+        "operations_and_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "oi-01",
+              "text": "地产板块执行“稳健经营、降本增效”方针，以去库存、保现金流为核心经营目标，聚焦核心区域与重点城市，围绕项目去化、资产价值提升及经营性现金流管理实施精细化运营，现阶段不以高周转扩张为导向。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            },
+            {
+              "fact_id": "oi-02",
+              "text": "公司已连续四年暂停新增房地产投资，可结转项目规模逐年收缩，导致当期综合毛利额同比下降；本期营业收入与营业成本下降均主要系交付结转面积减少。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006",
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "oi-03",
+              "text": "房地产板块成本构成为开发成本17.84亿元，占本期总成本100.00%，较上年同期减少48.96%；算力服务成本本期未列示金额，上年同期为891.82万元。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ],
+              "metrics": [
+                {
+                  "name": "房地产板块开发成本",
+                  "raw_value": "1,784,045,409.69",
+                  "value": "1784045409.69",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房地产板块开发成本占本期总成本比例",
+                  "raw_value": "100.00",
+                  "value": "100.00",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "房地产板块开发成本比上年同期增减",
+                  "raw_value": "-48.96",
+                  "value": "-48.96",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "business_segment",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "算力服务成本上年同期金额",
+                  "raw_value": "8,918,170.05",
+                  "value": "8918170.05",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "business_segment",
+                  "period": "2024年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "oi-04",
+              "text": "公司本期研发投入情况表、研发人员情况表均标注不适用，产销量情况分析表亦标注不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            }
+          ],
+          "limitations": [
+            "算力业务的具体资源投入（如机房、设备、能耗）未在选定章节中披露。",
+            "房地产项目储备、土地获取等经营性信息未纳入本次阅读范围。"
+          ]
+        },
+        "customers_channels_markets": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "cc-01",
+              "text": "前五名客户销售额19,775.32万元，占年度销售总额11.84%，其中关联方销售额0万元、占年度销售总额0%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名客户销售额",
+                  "raw_value": "19,775.32",
+                  "value": "19775.32",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户销售额占年度销售总额比例",
+                  "raw_value": "11.84",
+                  "value": "11.84",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户中关联方销售额",
+                  "raw_value": "0",
+                  "value": "0",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名客户中关联方销售额占年度销售总额比例",
+                  "raw_value": "0",
+                  "value": "0",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "cc-02",
+              "text": "前五名供应商采购额37,331.06万元，占年度采购总额55.45%，其中关联方采购额0万元、占年度采购总额0%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ],
+              "metrics": [
+                {
+                  "name": "前五名供应商采购额",
+                  "raw_value": "37,331.06",
+                  "value": "37331.06",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商采购额占年度采购总额比例",
+                  "raw_value": "55.45",
+                  "value": "55.45",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商中关联方采购额",
+                  "raw_value": "0",
+                  "value": "0",
+                  "unit": "万元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "前五名供应商中关联方采购额占年度采购总额比例",
+                  "raw_value": "0",
+                  "value": "0",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "cc-03",
+              "text": "公司披露报告期内不存在向单个客户销售比例超过总额50%、前5名客户中存在新增客户或严重依赖少数客户的情形，亦不存在向单个供应商采购比例超过总额50%等情形。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0009"
+              ]
+            },
+            {
+              "fact_id": "cc-04",
+              "text": "房地产板块区域市场以华东为主（收入占比71.77%），东南、西北次之；公司海外通信业务拟聚焦新兴市场及“一带一路”沿线国家，名城移动通信尚处前期筹备阶段。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004",
+                "source-0007"
+              ]
+            }
+          ],
+          "limitations": [
+            "客户与供应商具体名称未披露，仅有集中度数据。",
+            "算力服务与金控板块的客户结构未单独披露。"
+          ]
+        },
+        "operating_drivers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "od-01",
+              "text": "本期盈利改善的核心驱动包括：过往年度已对存货及投资性房地产等核心资产充分计提减值准备，报告期内减值损失大幅收窄；以及金控板块国融证券股权投资有序退出贡献正向投资收益。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ]
+            },
+            {
+              "fact_id": "od-02",
+              "text": "房地产板块毛利率较上年增长3.98个百分点，主要系华东区域毛利率提升：前期预售的映辰二期项目当期交付结转收入，且前期已交付项目完成工程结算，实际结算金额小于账面暂估金额，单方成本下降。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "od-03",
+              "text": "西北区域毛利率较上年增长并由负转正，主要系上年同期已对区域内各项目成本计提减值准备，本报告期计提减值准备的因素不再持续恶化；东南区域毛利率略有下降，主要受存量房销售价格下降影响。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "od-04",
+              "text": "开发物业租赁及运营业务本期受商务活动减少、市场租赁需求及价格双双下降影响，毛利率持续下降。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0007"
+              ]
+            },
+            {
+              "fact_id": "od-05",
+              "text": "财务费用本期1.94亿元，较上年同期增加60.36%，主要系项目完工在建项目减少，利息停止资本化转为费用化增加所致。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "财务费用",
+                  "raw_value": "194,132,969.83",
+                  "value": "194132969.83",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "财务费用比上年同期增减",
+                  "raw_value": "60.36",
+                  "value": "60.36",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "od-06",
+              "text": "经营活动产生的现金流量净额较上年大幅增长，主要系上期存在大额一次性税金支出，上期缴纳了以前年度开发项目的土地增值税清算税金4.16亿元。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ],
+              "metrics": [
+                {
+                  "name": "上期缴纳土地增值税清算税金",
+                  "raw_value": "4.16",
+                  "value": "4.16",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2024年度",
+                  "qualifier": "exact"
+                }
+              ]
+            }
+          ],
+          "limitations": [
+            "减值损失具体金额未在选定章节中列示。"
+          ]
+        },
+        "material_changes": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "mc-01",
+              "text": "公司本期营业收入22.47亿元，较上年同期减少46.13%，主要系本期交付结转面积减少；营业成本同步下降49.09%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0006"
+              ]
+            },
+            {
+              "fact_id": "mc-02",
+              "text": "公司完成对佰才邦20.45%股份战略投资，投资总额7.24亿元，该项目为参股项目，未纳入合并报表范围，对2025年度财务状况及经营业绩暂无重大影响。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004"
+              ],
+              "metrics": [
+                {
+                  "name": "对佰才邦战略投资持股比例",
+                  "raw_value": "20.45",
+                  "value": "20.45",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "对佰才邦战略投资总额",
+                  "raw_value": "7.24",
+                  "value": "7.24",
+                  "unit": "亿元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "mc-03",
+              "text": "报告期内公司完成三次股份回购注销，累计金额530,130,843.75元，占本年度归属于上市公司股东净利润的369.48%。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0005"
+              ],
+              "metrics": [
+                {
+                  "name": "股份回购注销累计金额",
+                  "raw_value": "530,130,843.75",
+                  "value": "530130843.75",
+                  "unit": "元",
+                  "currency": "CNY",
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                },
+                {
+                  "name": "股份回购注销金额占归属于上市公司股东净利润比例",
+                  "raw_value": "369.48",
+                  "value": "369.48",
+                  "unit": "%",
+                  "currency": null,
+                  "subject_scope": "consolidated_group",
+                  "period": "2025年度",
+                  "qualifier": "exact"
+                }
+              ]
+            },
+            {
+              "fact_id": "mc-04",
+              "text": "公司披露本期业务类型、利润构成或利润来源未发生重大变动，业务、产品或服务亦未发生重大变化或调整；报告期内新增重要非主营业务说明标注不适用。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0003",
+                "source-0006",
+                "source-0008"
+              ]
+            },
+            {
+              "fact_id": "mc-05",
+              "text": "公司报告期内新产业布局落地：6G通信领域战略受让佰才邦股权，低空经济领域战略投资AutoFlightX Inc.，算力业务领域优化重资产业务结构并以名城数字为核心载体。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ],
+          "limitations": [
+            "新业务对本期收入与利润的具体贡献未量化，佰才邦投资明确对2025年度业绩暂无重大影响。"
+          ]
+        }
+      },
+      "supply_chain": {
+        "position": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "sc-01",
+              "text": "公司现阶段以房地产开发销售与物业运营为主业，同时以控股子公司名城数字开展AI算力基础设施运营与产业服务，属于资产运营与服务提供环节。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0002"
+              ]
+            }
+          ]
+        },
+        "upstream_inputs": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "sc-02",
+              "text": "房地产板块成本构成为开发成本，本期金额17.84亿元，占本期总成本100.00%；公司未在选定章节中列示具体材料或供应商名称。",
+              "subject_scope": "business_segment",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0008"
+              ]
+            }
+          ],
+          "limitations": [
+            "算力服务的具体资源投入（设备、能耗、带宽等）未披露，无法确认其上游输入构成。"
+          ]
+        },
+        "downstream_customers": {
+          "status": "observed",
+          "facts": [
+            {
+              "fact_id": "sc-03",
+              "text": "房地产板块面向购房客户销售物业，前五名客户销售额占年度销售总额11.84%；佰才邦的6G解决方案面向无人机监管、应急通信、工业物联、车联网等应用场景。",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "evidence_ids": [
+                "source-0004",
+                "source-0009"
+              ]
+            }
+          ],
+          "limitations": [
+            "未披露具体客户名称及算力服务下游客户类型。"
+          ]
+        }
+      },
+      "limitations": [
+        "本工作底稿仅基于选定章节（近三年主要会计数据、公司业务情况、经营情况讨论与分析、主营业务分析）编制，未阅读行业情况、核心竞争力、房地产储备与销售结转、投资状况及分部附注等章节，相关细节可能不完整。",
+        "金控板块收入、投资收益及资产规模未在选定章节中量化，主营业务收入构成中金控板块权重无法确定。",
+        "算力服务采用净额法核算，其结转收入与实际收入、成本口径不同，比较时需注意口径差异。",
+        "部分表格（如分行业表）中算力服务营业成本与金控板块收入栏为空白，未据此推断为零。"
+      ]
+    },
+    "usage": {
+      "input_tokens": 9149,
+      "output_tokens": 6243,
+      "total_tokens": 15392
+    }
+  },
+  {
+    "request_id": "bp-work-b0c2936a6069019a8bb2fa59:workpaper:review",
+    "purpose": "review_profile_workpaper",
+    "request_hash": "5df0590ca0b522ab82e2cb3c6ba6af24e3204ac9b98e0baa03f404250c4cf924",
+    "response_hash": "dfddfe41a99c2e19271148547253e6b8692ddc8b8a257043ae9554e59abe1b3d",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"reviewed_fact_ids\":[\"bs-01\",\"bs-02\",\"bs-03\",\"bs-04\",\"bs-05\",\"ps-01\",\"ps-02\",\"ps-03\",\"ps-04\",\"rm-01\",\"rm-02\",\"rm-03\",\"rm-04\",\"sm-04\",\"sm-05\",\"oi-01\",\"oi-02\",\"oi-04\",\"cc-01\",\"cc-02\",\"cc-03\",\"cc-04\",\"od-01\",\"od-02\",\"od-03\",\"od-04\",\"mc-01\",\"mc-02\",\"mc-03\",\"mc-04\",\"mc-05\",\"sc-01\",\"sc-03\"],\"findings\":[{\"finding_id\":\"F-001\",\"element\":\"products_services\",\"severity\":\"material\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"ps-03\",\"evidence_ids\":[\"source-0004\"],\"explanation\":\"佰才邦在原文中为参股项目，且明确未纳入合并报表范围，不是公司子公司。事实正文已写未纳入合并，但主体范围标成named_subsidiary，会把未并表被投资方的芯片、基站及应用场景解决方案误当成子公司产品。应改为未并表参股投资主体，不能按子公司口径归集。\"},{\"finding_id\":\"F-002\",\"element\":\"customers_channels_markets\",\"severity\":\"material\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"cc-03\",\"evidence_ids\":[\"source-0009\"],\"explanation\":\"原文只是对“单个客户销售超过总额50%、前5名客户存在新增客户或严重依赖少数客户”以及供应商侧对应或列示项目勾选不适用，并未逐项确认每一条件均未发生。或列示标题勾选不适用，不能改写成每一情形都不存在。应保留该披露项目不适用的范围，不得断言报告期内不存在新增前五名客户、不存在严重依赖或供应商侧各项情形。\"},{\"finding_id\":\"F-003\",\"element\":\"material_changes\",\"severity\":\"material\",\"issue_type\":\"unsupported_claim\",\"action\":\"correct\",\"affected_fact_id\":\"mc-04\",\"evidence_ids\":[\"source-0003\",\"source-0006\",\"source-0008\"],\"explanation\":\"“业务类型、利润构成或利润来源发生重大变动的详细说明”以及“业务、产品或服务发生重大变化或调整有关情况”均为或列示披露项目，原文仅勾选不适用。这不能断言其中每一项都未发生重大变动。事实前两句把不适用写成未发生重大变动或重大变化；只有新增重要非主营业务一句保留了标注不适用。应整体改回披露项目不适用，而不是声称相关变化从未发生。\"},{\"finding_id\":\"F-004\",\"element\":\"material_changes\",\"severity\":\"material\",\"issue_type\":\"wrong_period\",\"action\":\"correct\",\"affected_fact_id\":\"mc-02\",\"evidence_ids\":[\"source-0004\"],\"explanation\":\"20.45%股份和投资总额7.24亿元在原文中限定为截至报告日完成，不是不加限定的2025年度内完成口径。事实期间写成2025年度并省略该时点，把报告日时点的量化完成情况当成报告期事实。应恢复截至报告日限定；报告期内战略受让的定性表述不能替代这一完成时点。\"},{\"finding_id\":\"F-005\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":\"sm-04\",\"evidence_ids\":[\"source-0001\"],\"explanation\":\"主要会计数据同时列示2025年归属于上市公司股东的扣除非经常性损益的净利润140,282,278.09元，上年同期为负。现有扭亏事实只保留归母净利润，未保留这一主要调整后利润。在股权退出被作为盈利驱动叙述时，缺少扣非口径，无法对照非经常性项目对利润的净影响。金额本身不必改写，但应补充该调整后利润。\"},{\"finding_id\":\"F-006\",\"element\":\"material_changes\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":null,\"evidence_ids\":[\"source-0006\"],\"explanation\":\"利润表变动分析列示财务费用194,132,969.83元，较上年同期增加60.36%，原因是完工在建项目减少、利息停止资本化并转为费用化。该费用大幅上升是与收入、成本下降方向相反的主要损益变动，选定章节已披露，但现有重大变动事实未覆盖该金额、增幅及原因。\"},{\"finding_id\":\"F-007\",\"element\":\"scale_and_mix\",\"severity\":\"material\",\"issue_type\":\"material_omission\",\"action\":\"possible_omission\",\"affected_fact_id\":\"sm-04\",\"evidence_ids\":[\"source-0006\"],\"explanation\":\"经营活动现金流量净额6.49亿元与原文金额一致，但变动原因说明主要系上期一次性缴纳以前年度开发项目土地增值税清算税金4.16亿元。缺少这一一次性税金，本期经营现金流的同比可比性和可持续性缺少关键调整背景。应作为既有现金流事实的补充口径，而不是改写6.49亿元。\"},{\"finding_id\":\"F-008\",\"element\":\"downstream_customers\",\"severity\":\"minor\",\"issue_type\":\"wrong_subject\",\"action\":\"correct\",\"affected_fact_id\":\"sc-03\",\"evidence_ids\":[\"source-0004\",\"source-0009\"],\"explanation\":\"前五名客户占年度销售总额11.84%属于公司销售集中度；无人机监管、应急通信、工业物联、车联网等是未并表参股方佰才邦解决方案的应用场景，不是公司合并范围下游客户。同一事实以consolidated_group概括两段主体。应拆分或标明佰才邦未纳入合并报表，避免把被投资方场景写成公司下游客户。\"}]}",
+    "response_payload": {
+      "reviewed_fact_ids": [
+        "bs-01",
+        "bs-02",
+        "bs-03",
+        "bs-04",
+        "bs-05",
+        "ps-01",
+        "ps-02",
+        "ps-03",
+        "ps-04",
+        "rm-01",
+        "rm-02",
+        "rm-03",
+        "rm-04",
+        "sm-04",
+        "sm-05",
+        "oi-01",
+        "oi-02",
+        "oi-04",
+        "cc-01",
+        "cc-02",
+        "cc-03",
+        "cc-04",
+        "od-01",
+        "od-02",
+        "od-03",
+        "od-04",
+        "mc-01",
+        "mc-02",
+        "mc-03",
+        "mc-04",
+        "mc-05",
+        "sc-01",
+        "sc-03"
+      ],
+      "findings": [
+        {
+          "finding_id": "F-001",
+          "element": "products_services",
+          "severity": "material",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "ps-03",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "佰才邦在原文中为参股项目，且明确未纳入合并报表范围，不是公司子公司。事实正文已写未纳入合并，但主体范围标成named_subsidiary，会把未并表被投资方的芯片、基站及应用场景解决方案误当成子公司产品。应改为未并表参股投资主体，不能按子公司口径归集。"
+        },
+        {
+          "finding_id": "F-002",
+          "element": "customers_channels_markets",
+          "severity": "material",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "cc-03",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "原文只是对“单个客户销售超过总额50%、前5名客户存在新增客户或严重依赖少数客户”以及供应商侧对应或列示项目勾选不适用，并未逐项确认每一条件均未发生。或列示标题勾选不适用，不能改写成每一情形都不存在。应保留该披露项目不适用的范围，不得断言报告期内不存在新增前五名客户、不存在严重依赖或供应商侧各项情形。"
+        },
+        {
+          "finding_id": "F-003",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "unsupported_claim",
+          "action": "correct",
+          "affected_fact_id": "mc-04",
+          "evidence_ids": [
+            "source-0003",
+            "source-0006",
+            "source-0008"
+          ],
+          "explanation": "“业务类型、利润构成或利润来源发生重大变动的详细说明”以及“业务、产品或服务发生重大变化或调整有关情况”均为或列示披露项目，原文仅勾选不适用。这不能断言其中每一项都未发生重大变动。事实前两句把不适用写成未发生重大变动或重大变化；只有新增重要非主营业务一句保留了标注不适用。应整体改回披露项目不适用，而不是声称相关变化从未发生。"
+        },
+        {
+          "finding_id": "F-004",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "wrong_period",
+          "action": "correct",
+          "affected_fact_id": "mc-02",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "20.45%股份和投资总额7.24亿元在原文中限定为截至报告日完成，不是不加限定的2025年度内完成口径。事实期间写成2025年度并省略该时点，把报告日时点的量化完成情况当成报告期事实。应恢复截至报告日限定；报告期内战略受让的定性表述不能替代这一完成时点。"
+        },
+        {
+          "finding_id": "F-005",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": "sm-04",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "主要会计数据同时列示2025年归属于上市公司股东的扣除非经常性损益的净利润140,282,278.09元，上年同期为负。现有扭亏事实只保留归母净利润，未保留这一主要调整后利润。在股权退出被作为盈利驱动叙述时，缺少扣非口径，无法对照非经常性项目对利润的净影响。金额本身不必改写，但应补充该调整后利润。"
+        },
+        {
+          "finding_id": "F-006",
+          "element": "material_changes",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": null,
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "利润表变动分析列示财务费用194,132,969.83元，较上年同期增加60.36%，原因是完工在建项目减少、利息停止资本化并转为费用化。该费用大幅上升是与收入、成本下降方向相反的主要损益变动，选定章节已披露，但现有重大变动事实未覆盖该金额、增幅及原因。"
+        },
+        {
+          "finding_id": "F-007",
+          "element": "scale_and_mix",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "action": "possible_omission",
+          "affected_fact_id": "sm-04",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "经营活动现金流量净额6.49亿元与原文金额一致，但变动原因说明主要系上期一次性缴纳以前年度开发项目土地增值税清算税金4.16亿元。缺少这一一次性税金，本期经营现金流的同比可比性和可持续性缺少关键调整背景。应作为既有现金流事实的补充口径，而不是改写6.49亿元。"
+        },
+        {
+          "finding_id": "F-008",
+          "element": "downstream_customers",
+          "severity": "minor",
+          "issue_type": "wrong_subject",
+          "action": "correct",
+          "affected_fact_id": "sc-03",
+          "evidence_ids": [
+            "source-0004",
+            "source-0009"
+          ],
+          "explanation": "前五名客户占年度销售总额11.84%属于公司销售集中度；无人机监管、应急通信、工业物联、车联网等是未并表参股方佰才邦解决方案的应用场景，不是公司合并范围下游客户。同一事实以consolidated_group概括两段主体。应拆分或标明佰才邦未纳入合并报表，避免把被投资方场景写成公司下游客户。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 14857,
+      "output_tokens": 1362,
+      "total_tokens": 44759
+    }
+  },
+  {
+    "request_id": "bp-work-b0c2936a6069019a8bb2fa59:workpaper:repair",
+    "purpose": "repair_profile_workpaper",
+    "request_hash": "682a40ea58d809877e806f2194211c11b359644b57349a550eff12f566eaae49",
+    "response_hash": "35d5e0456af8ec838472af27ee1e1307ddf01ffe72eb229f4081370246c5e8b9",
+    "finish_reason": "stop",
+    "source_label": "deepseek:deepseek-flash",
+    "model": "deepseek-flash",
+    "selected_profile": "semantic_extraction__deepseek",
+    "logical_profile": "semantic_extraction__deepseek",
+    "reasoning_effort": "high",
+    "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+    "contract_status": "accepted",
+    "raw_content": "{\"repaired_facts\":[{\"fact_id\":\"ps-03\",\"text\":\"佰才邦为参股项目，重点布局天地融合通信、通感算一体及低空经济应用，依托自研6G卫星基带芯片与星载基站设备，面向无人机监管、应急通信、工业物联、车联网等场景提供6G解决方案；该投资未纳入合并报表范围。\",\"subject_scope\":\"unclear\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[],\"uncertainty_reason\":\"佰才邦为未纳入合并报表范围的参股项目，非公司子公司，主体范围无法按子公司口径归集。\"},{\"fact_id\":\"cc-03\",\"text\":\"公司披露“报告期内向单个客户的销售比例超过总额的50%、前5名客户中存在新增客户的或严重依赖于少数客户的情形”及供应商侧对应披露项目均勾选不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0009\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"mc-04\",\"text\":\"公司披露“本期公司业务类型、利润构成或利润来源发生重大变动的详细说明”“公司报告期内业务、产品或服务发生重大变化或调整有关情况”及“报告期内公司新增重要非主营业务的说明”均勾选不适用。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0003\",\"source-0006\",\"source-0008\"],\"metrics\":[],\"uncertainty_reason\":null},{\"fact_id\":\"mc-02\",\"text\":\"截至报告日，公司完成对佰才邦20.45%股份战略投资，投资总额7.24亿元，该项目为参股项目，未纳入合并报表范围，对2025年度财务状况及经营业绩暂无重大影响。\",\"subject_scope\":\"consolidated_group\",\"period\":\"截至报告日\",\"evidence_ids\":[\"source-0004\"],\"metrics\":[{\"name\":\"对佰才邦战略投资持股比例\",\"raw_value\":\"20.45\",\"value\":\"20.45\",\"unit\":\"%\",\"source_unit\":null,\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"截至报告日\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"对佰才邦战略投资总额\",\"raw_value\":\"7.24\",\"value\":\"7.24\",\"unit\":\"亿元\",\"source_unit\":null,\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"截至报告日\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:F-005\",\"text\":\"公司2025年归属于上市公司股东的扣除非经常性损益的净利润为140,282,278.09元，上年同期为-2,345,454,583.78元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0001\"],\"metrics\":[{\"name\":\"归属于上市公司股东的扣除非经常性损益的净利润\",\"raw_value\":\"140,282,278.09\",\"value\":\"140282278.09\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"归属于上市公司股东的扣除非经常性损益的净利润\",\"raw_value\":\"-2,345,454,583.78\",\"value\":\"-2345454583.78\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:F-006\",\"text\":\"公司2025年财务费用194,132,969.83元，较上年同期增加60.36%，主要系项目完工在建项目减少，利息停止资本化转为费用化增加所致。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"财务费用\",\"raw_value\":\"194,132,969.83\",\"value\":\"194132969.83\",\"unit\":\"元\",\"source_unit\":\"元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":null},{\"name\":\"财务费用同比变动比例\",\"raw_value\":\"60.36\",\"value\":\"60.36\",\"unit\":\"%\",\"source_unit\":\"%\",\"currency\":null,\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"comparison_basis\":\"上年同期\",\"qualifier\":\"exact\",\"uncertainty_reason\":null}],\"uncertainty_reason\":null},{\"fact_id\":\"review-add:F-007\",\"text\":\"公司2025年经营活动产生的现金流量净额变动原因说明：主要系上期存在大额一次性税金支出，上期缴纳了以前年度开发项目的土地增值税清算税金4.16亿元。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0006\"],\"metrics\":[{\"name\":\"上期缴纳以前年度开发项目土地增值税清算税金\",\"raw_value\":\"4.16亿元\",\"value\":null,\"unit\":\"亿元\",\"source_unit\":\"亿元\",\"currency\":\"CNY\",\"subject_scope\":\"consolidated_group\",\"period\":\"2024年度\",\"comparison_basis\":null,\"qualifier\":\"exact\",\"uncertainty_reason\":\"原文以“4.16亿元”概括表述，未提供精确到元的金额。\"}],\"uncertainty_reason\":null},{\"fact_id\":\"sc-03\",\"text\":\"房地产板块面向购房客户销售物业，前五名客户销售额占年度销售总额11.84%；佰才邦（未纳入合并报表范围的参股项目）的6G解决方案面向无人机监管、应急通信、工业物联、车联网等应用场景。\",\"subject_scope\":\"consolidated_group\",\"period\":\"2025年度\",\"evidence_ids\":[\"source-0004\",\"source-0009\"],\"metrics\":[],\"uncertainty_reason\":\"前五名客户占比为公司合并口径；佰才邦应用场景属未并表参股方，非公司合并范围下游客户。\"}]}",
+    "response_payload": {
+      "repaired_facts": [
+        {
+          "fact_id": "ps-03",
+          "text": "佰才邦为参股项目，重点布局天地融合通信、通感算一体及低空经济应用，依托自研6G卫星基带芯片与星载基站设备，面向无人机监管、应急通信、工业物联、车联网等场景提供6G解决方案；该投资未纳入合并报表范围。",
+          "subject_scope": "unclear",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "佰才邦为未纳入合并报表范围的参股项目，非公司子公司，主体范围无法按子公司口径归集。"
+        },
+        {
+          "fact_id": "cc-03",
+          "text": "公司披露“报告期内向单个客户的销售比例超过总额的50%、前5名客户中存在新增客户的或严重依赖于少数客户的情形”及供应商侧对应披露项目均勾选不适用。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "mc-04",
+          "text": "公司披露“本期公司业务类型、利润构成或利润来源发生重大变动的详细说明”“公司报告期内业务、产品或服务发生重大变化或调整有关情况”及“报告期内公司新增重要非主营业务的说明”均勾选不适用。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0003",
+            "source-0006",
+            "source-0008"
+          ],
+          "metrics": [],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "mc-02",
+          "text": "截至报告日，公司完成对佰才邦20.45%股份战略投资，投资总额7.24亿元，该项目为参股项目，未纳入合并报表范围，对2025年度财务状况及经营业绩暂无重大影响。",
+          "subject_scope": "consolidated_group",
+          "period": "截至报告日",
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "metrics": [
+            {
+              "name": "对佰才邦战略投资持股比例",
+              "raw_value": "20.45",
+              "value": "20.45",
+              "unit": "%",
+              "source_unit": null,
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "截至报告日",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "对佰才邦战略投资总额",
+              "raw_value": "7.24",
+              "value": "7.24",
+              "unit": "亿元",
+              "source_unit": null,
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "截至报告日",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:F-005",
+          "text": "公司2025年归属于上市公司股东的扣除非经常性损益的净利润为140,282,278.09元，上年同期为-2,345,454,583.78元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "metrics": [
+            {
+              "name": "归属于上市公司股东的扣除非经常性损益的净利润",
+              "raw_value": "140,282,278.09",
+              "value": "140282278.09",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "归属于上市公司股东的扣除非经常性损益的净利润",
+              "raw_value": "-2,345,454,583.78",
+              "value": "-2345454583.78",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2024年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:F-006",
+          "text": "公司2025年财务费用194,132,969.83元，较上年同期增加60.36%，主要系项目完工在建项目减少，利息停止资本化转为费用化增加所致。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "财务费用",
+              "raw_value": "194,132,969.83",
+              "value": "194132969.83",
+              "unit": "元",
+              "source_unit": "元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            },
+            {
+              "name": "财务费用同比变动比例",
+              "raw_value": "60.36",
+              "value": "60.36",
+              "unit": "%",
+              "source_unit": "%",
+              "currency": null,
+              "subject_scope": "consolidated_group",
+              "period": "2025年度",
+              "comparison_basis": "上年同期",
+              "qualifier": "exact",
+              "uncertainty_reason": null
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "review-add:F-007",
+          "text": "公司2025年经营活动产生的现金流量净额变动原因说明：主要系上期存在大额一次性税金支出，上期缴纳了以前年度开发项目的土地增值税清算税金4.16亿元。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "metrics": [
+            {
+              "name": "上期缴纳以前年度开发项目土地增值税清算税金",
+              "raw_value": "4.16亿元",
+              "value": null,
+              "unit": "亿元",
+              "source_unit": "亿元",
+              "currency": "CNY",
+              "subject_scope": "consolidated_group",
+              "period": "2024年度",
+              "comparison_basis": null,
+              "qualifier": "exact",
+              "uncertainty_reason": "原文以“4.16亿元”概括表述，未提供精确到元的金额。"
+            }
+          ],
+          "uncertainty_reason": null
+        },
+        {
+          "fact_id": "sc-03",
+          "text": "房地产板块面向购房客户销售物业，前五名客户销售额占年度销售总额11.84%；佰才邦（未纳入合并报表范围的参股项目）的6G解决方案面向无人机监管、应急通信、工业物联、车联网等应用场景。",
+          "subject_scope": "consolidated_group",
+          "period": "2025年度",
+          "evidence_ids": [
+            "source-0004",
+            "source-0009"
+          ],
+          "metrics": [],
+          "uncertainty_reason": "前五名客户占比为公司合并口径；佰才邦应用场景属未并表参股方，非公司合并范围下游客户。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 8920,
+      "output_tokens": 1402,
+      "total_tokens": 10322
+    }
+  },
+  {
+    "request_id": "bp-work-b0c2936a6069019a8bb2fa59:workpaper:repair-verify",
+    "purpose": "verify_profile_workpaper_repair",
+    "request_hash": "c4cb785d20e10cbf11a30e05069c64a4161a65fd4ac1797632a96464fa4a6951",
+    "response_hash": "edaacfef575e0d920fe462fdc884503c63173744c1789d32e889f9299e6e4375",
+    "finish_reason": "stop",
+    "source_label": "scorpio:grok-4.7",
+    "model": "grok-4.7",
+    "selected_profile": "semantic_extraction__scorpio_grok",
+    "logical_profile": "semantic_extraction__scorpio_grok",
+    "reasoning_effort": "high",
+    "route_fingerprint": "3de7e94723def798f11467166002a5061647847f2efa09a313ab43d3a6aaff21",
+    "contract_status": "accepted",
+    "raw_content": "{\"checked_fact_ids\":[\"ps-03\",\"cc-03\",\"mc-04\",\"mc-02\",\"review-add:F-005\",\"review-add:F-006\",\"sc-03\"],\"checks\":[{\"fact_id\":\"ps-03\",\"accepted\":true,\"evidence_ids\":[\"source-0004\"],\"explanation\":\"原文明确佰才邦为参股项目且未纳入合并报表范围，并以其自身名义表述天地融合通信、通感算一体、低空经济应用及自研6G卫星基带芯片、星载基站和相关场景解决方案。候选正文不再按子公司归集，并保留未并表参股及主体不能按子公司口径归集的限定，实质性纠正了主体错误。\"},{\"fact_id\":\"cc-03\",\"accepted\":true,\"evidence_ids\":[\"source-0009\"],\"explanation\":\"原文仅对单个客户销售超过50%、前五名客户新增或严重依赖少数客户这一或列示项目，以及供应商侧对应或列示项目勾选不适用。候选只复述披露项目勾选不适用，没有改写成各项情形均未发生，主体、期间和披露范围正确。\"},{\"fact_id\":\"mc-04\",\"accepted\":true,\"evidence_ids\":[\"source-0003\",\"source-0006\",\"source-0008\"],\"explanation\":\"三处原文均是对业务类型、利润构成或利润来源重大变动，业务、产品或服务重大变化或调整，以及新增重要非主营业务等或列示披露项目勾选不适用。候选整体恢复为披露项目不适用，未把勾选结果断言为相关变化均未发生。\"},{\"fact_id\":\"mc-02\",\"accepted\":true,\"evidence_ids\":[\"source-0004\"],\"explanation\":\"20.45%股份和投资总额7.24亿元在原文均限定为截至报告日，并同时说明系参股、未纳入合并报表、对2025年度财务状况及经营业绩暂无重大影响。候选恢复了截至报告日时点、正确金额单位及暂无重大影响限定，没有改成无限定的2025年度内完成口径。\"},{\"fact_id\":\"review-add:F-005\",\"accepted\":true,\"evidence_ids\":[\"source-0001\"],\"explanation\":\"主要会计数据表2025年列示归属于上市公司股东的扣除非经常性损益的净利润140,282,278.09元，2024年对应列为-2,345,454,583.78元，单位为人民币元。候选补入了正确的扣非口径、年度列和上年同期负数，未误用归母净利润或把不适用的增减比例改写成确定变动。\"},{\"fact_id\":\"review-add:F-006\",\"accepted\":true,\"evidence_ids\":[\"source-0006\"],\"explanation\":\"利润表变动分析的本期财务费用为194,132,969.83元，较上年同期变动比例为60.36%，原因原文为项目完工在建项目减少、利息停止资本化转为费用化增加。候选的金额、单位、比较期间、增幅和原因均与该表及说明一致。\"},{\"fact_id\":\"sc-03\",\"accepted\":false,\"evidence_ids\":[\"source-0004\",\"source-0009\"],\"explanation\":\"前五名客户11.84%的分母是公司年度销售总额，原文并未将其限定为房地产板块或购房客户，也未表述房地产板块仅面向购房客户销售物业。候选新增了无来源的客户主体，并把公司销售集中度与该主体并列；事实级主体仍标为合并集团，未干净拆分未并表佰才邦的应用场景。\"}]}",
+    "response_payload": {
+      "checked_fact_ids": [
+        "ps-03",
+        "cc-03",
+        "mc-04",
+        "mc-02",
+        "review-add:F-005",
+        "review-add:F-006",
+        "sc-03"
+      ],
+      "checks": [
+        {
+          "fact_id": "ps-03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "原文明确佰才邦为参股项目且未纳入合并报表范围，并以其自身名义表述天地融合通信、通感算一体、低空经济应用及自研6G卫星基带芯片、星载基站和相关场景解决方案。候选正文不再按子公司归集，并保留未并表参股及主体不能按子公司口径归集的限定，实质性纠正了主体错误。"
+        },
+        {
+          "fact_id": "cc-03",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0009"
+          ],
+          "explanation": "原文仅对单个客户销售超过50%、前五名客户新增或严重依赖少数客户这一或列示项目，以及供应商侧对应或列示项目勾选不适用。候选只复述披露项目勾选不适用，没有改写成各项情形均未发生，主体、期间和披露范围正确。"
+        },
+        {
+          "fact_id": "mc-04",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0003",
+            "source-0006",
+            "source-0008"
+          ],
+          "explanation": "三处原文均是对业务类型、利润构成或利润来源重大变动，业务、产品或服务重大变化或调整，以及新增重要非主营业务等或列示披露项目勾选不适用。候选整体恢复为披露项目不适用，未把勾选结果断言为相关变化均未发生。"
+        },
+        {
+          "fact_id": "mc-02",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0004"
+          ],
+          "explanation": "20.45%股份和投资总额7.24亿元在原文均限定为截至报告日，并同时说明系参股、未纳入合并报表、对2025年度财务状况及经营业绩暂无重大影响。候选恢复了截至报告日时点、正确金额单位及暂无重大影响限定，没有改成无限定的2025年度内完成口径。"
+        },
+        {
+          "fact_id": "review-add:F-005",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0001"
+          ],
+          "explanation": "主要会计数据表2025年列示归属于上市公司股东的扣除非经常性损益的净利润140,282,278.09元，2024年对应列为-2,345,454,583.78元，单位为人民币元。候选补入了正确的扣非口径、年度列和上年同期负数，未误用归母净利润或把不适用的增减比例改写成确定变动。"
+        },
+        {
+          "fact_id": "review-add:F-006",
+          "accepted": true,
+          "evidence_ids": [
+            "source-0006"
+          ],
+          "explanation": "利润表变动分析的本期财务费用为194,132,969.83元，较上年同期变动比例为60.36%，原因原文为项目完工在建项目减少、利息停止资本化转为费用化增加。候选的金额、单位、比较期间、增幅和原因均与该表及说明一致。"
+        },
+        {
+          "fact_id": "sc-03",
+          "accepted": false,
+          "evidence_ids": [
+            "source-0004",
+            "source-0009"
+          ],
+          "explanation": "前五名客户11.84%的分母是公司年度销售总额，原文并未将其限定为房地产板块或购房客户，也未表述房地产板块仅面向购房客户销售物业。候选新增了无来源的客户主体，并把公司销售集中度与该主体并列；事实级主体仍标为合并集团，未干净拆分未并表佰才邦的应用场景。"
+        }
+      ]
+    },
+    "usage": {
+      "input_tokens": 10516,
+      "output_tokens": 803,
+      "total_tokens": 22795
+    }
+  }
+]

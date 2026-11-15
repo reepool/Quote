@@ -1,0 +1,49 @@
+{
+  "openspec_strict_validation": "passed",
+  "derived_profile_local_links": "passed",
+  "independent_withheld_sm_02_not_in_research_fact_ids": true,
+  "all_12_three_reads_equal": true,
+  "retained_evidence_coordinates_valid": 11,
+  "code_and_shared_config_unchanged": true,
+  "operator_snapshot_matches_frozen_sha256": true,
+  "model_input_old_semantics": false,
+  "reference_not_model_input": true,
+  "each_budget_and_group_bounds_checked": true,
+  "all_57_attempts_settled": true,
+  "no_new_pytest_required_for_unchanged_business_code": true,
+  "formal_accuracy_recall_and_negatives_pass": false,
+  "totals": {
+    "physical_requests": 57,
+    "charged_tokens": 1519919,
+    "recoveries": 1,
+    "element_facts": 330,
+    "element_metrics": 583,
+    "all_objects": 365,
+    "all_metrics": 596,
+    "independent_withheld_objects": 1,
+    "readable": 11,
+    "review_statuses": {
+      "completed_with_open_findings": 9,
+      "completed": 2,
+      "no_workpaper": 1
+    },
+    "models": {
+      "deepseek:deepseek-flash": 35,
+      "scorpio:grok-4.7": 22
+    },
+    "finish_reasons": {
+      "stop": 57
+    },
+    "review_resolutions": {
+      "corrected_pending_trust": 42,
+      "repair_rejected": 12,
+      "omission_candidate": 2,
+      "unresolved": 2,
+      "quarantined": 2
+    },
+    "company_business_median_seconds": 546.425,
+    "business_wall_seconds": 2007.124,
+    "supervision_wall_seconds": 2054.452,
+    "cost": "unknown"
+  }
+}
