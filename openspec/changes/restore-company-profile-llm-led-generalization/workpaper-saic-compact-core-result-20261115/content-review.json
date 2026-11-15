@@ -1,0 +1,151 @@
+{
+  "task": "6.CJ",
+  "reference": "openspec/changes/restore-company-profile-llm-led-generalization/workpaper-core-readiness-20261114/source-first-contract.json",
+  "not_model_input": true,
+  "scope": "固定10项主要内容的有限源对照；不是35条全事实准确率或全报告召回。",
+  "summary": {
+    "conditions": 10,
+    "source_supported": 4,
+    "partial": 6,
+    "formal_accuracy": null,
+    "formal_recall": null,
+    "full_fact_audit": "not_completed",
+    "six_risk_group_complete": false
+  },
+  "core_comparison": [
+    {
+      "condition_id": "600104-K01",
+      "status": "source_supported",
+      "actual_fact_ids": [
+        "bs-01",
+        "bs-02",
+        "bs-03",
+        "od-04"
+      ],
+      "source_verdict": "整车、零部件、劳务及其他、金融已写；移动出行/服务以Robotaxi和安吉物流的实际业务呈现，不把所有劳务收入等同出行。"
+    },
+    {
+      "condition_id": "600104-K02",
+      "status": "partial",
+      "actual_fact_ids": [
+        "ps-01",
+        "ps-02",
+        "od-02",
+        "review-add:f-jv-earnings"
+      ],
+      "source_verdict": "车型类别、新能源两类和尚界H5有源；自主/合资的具体新车型未完整展开，不要求补全车型清单。"
+    },
+    {
+      "condition_id": "600104-K03",
+      "status": "partial",
+      "actual_fact_ids": [
+        "bs-02"
+      ],
+      "source_verdict": "已说明零部件主要由华域开展；所选17页指向华域另份年报，当前未给柴油机/汽车电子等具体产品，不把未读当未披露。"
+    },
+    {
+      "condition_id": "600104-K04",
+      "status": "partial",
+      "actual_fact_ids": [
+        "bs-03",
+        "rm-03"
+      ],
+      "source_verdict": "金融板块、子公司及收入保留；带无据客户范围的贷款主张ps-04已整条隔离，当前未完整解释贷款服务，不据常识补借款人。"
+    },
+    {
+      "condition_id": "600104-K05",
+      "status": "source_supported",
+      "actual_fact_ids": [
+        "rm-01",
+        "rm-02",
+        "rm-03"
+      ],
+      "source_verdict": "整车/零部件、劳务及其他、金融收入来源分别呈现；不推断利息与手续费明细。"
+    },
+    {
+      "condition_id": "600104-K06",
+      "status": "partial",
+      "actual_fact_ids": [
+        "oi-04",
+        "sc-01",
+        "cc-04",
+        "od-04"
+      ],
+      "source_verdict": "制造/柔性生产、贸易及物流角色有源；海外代工/CKD和完整渠道描述没有收齐，不把海外销量推成海外制造。"
+    },
+    {
+      "condition_id": "600104-K07",
+      "status": "partial",
+      "actual_fact_ids": [
+        "rm-04",
+        "rm-01"
+      ],
+      "source_verdict": "公司营业收入646152101889.30元已给；原文营业总收入未独立入稿，已发送证据无该标签，不能把主营表合计自动改叫营业总收入。"
+    },
+    {
+      "condition_id": "600104-K08",
+      "status": "partial",
+      "actual_fact_ids": [
+        "rm-01",
+        "rm-03",
+        "rm-04"
+      ],
+      "source_verdict": "金融金额和主营合计、公司营业收入数值均正确；汽车制造业行业额未独立标注，不能仅凭数值相等冒充完整归属。"
+    },
+    {
+      "condition_id": "600104-K09",
+      "status": "source_supported",
+      "actual_fact_ids": [
+        "rm-01",
+        "rm-02",
+        "rm-03"
+      ],
+      "source_verdict": "四类主要产品收入按11页表头保留，销量未替代收入。"
+    },
+    {
+      "condition_id": "600104-K10",
+      "status": "source_supported",
+      "actual_fact_ids": [
+        "sm-01"
+      ],
+      "source_verdict": "450.7万辆沿8页原文舍入表达，未强改成精确辆数。"
+    }
+  ],
+  "independent_not_adopted": [
+    {
+      "fact_id": "mc-02",
+      "status": "do_not_use_as_conclusion",
+      "evidence_ids": [
+        "source-0006",
+        "source-0008"
+      ],
+      "physical_pages": [
+        11,
+        13
+      ],
+      "reason": "所引事项勾选不适用，不足以作确定无重大变化结论；原始模型稿仅审查保留，未写回原query或模型checked集合。"
+    }
+  ],
+  "model_review_effect": {
+    "accepted_candidates": 5,
+    "replaced": [
+      "ps-03"
+    ],
+    "added": [
+      "review-add:f-earnings-adjustments",
+      "review-add:f-jv-earnings",
+      "review-add:f-nev-revenue",
+      "review-add:f-vehicle-margin"
+    ],
+    "quarantined": [
+      "ps-04",
+      "sc-03"
+    ],
+    "unaffected_fact_objects_equal": 30
+  },
+  "program_isolations": [
+    "cc-03:指标qualifier与raw不符",
+    "oi-01:设计产能合计无源数值"
+  ],
+  "limitations": "主干可阅读且纠错链跑通，不称核心10/10、35条全准确、正式S1或可生产发布；可选供应链不补精细度。"
+}

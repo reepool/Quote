@@ -1,0 +1,16 @@
+{
+  "task": "6.CJ",
+  "actual_code_config_source_match_freeze": true,
+  "actual_query_export_original_new_reader_equal": true,
+  "all_retained_source_coordinates_validated_by_original_owner": true,
+  "five_actual_stop_receipts_and_usage": 128669,
+  "five_candidates_real_recheck_accepted": true,
+  "unaffected_fact_objects_identical": 30,
+  "original_query_sha256": "b9021fe5f4356f8ecdfb84bfb069ae1458e13bf8c82ff21622aa320e0d27b057",
+  "independent_not_adopted": "mc-02; raw query and model checked set unchanged; reader must use independent restrictions",
+  "formal_accuracy": null,
+  "formal_recall": null,
+  "s1_changed": false,
+  "production_authorization": "not_authorized",
+  "pytest": "no business code change; reuse five v14 gateway tests (6.50 seconds), not rerun"
+}

@@ -1,0 +1,110 @@
+{
+  "task": "6.CJ",
+  "outcome": "real_readable_workpaper_and_bounded_review_flow_with_limits",
+  "entries_used": 1,
+  "entries_authorized": 1,
+  "readable": true,
+  "fact_count_including_optional_supply_chain": 35,
+  "metric_count": 64,
+  "eight_element_facts": 33,
+  "review_status": "completed_with_open_findings",
+  "physical_requests": 5,
+  "recoveries": 0,
+  "actual_supplier_total_usage": 128669,
+  "fee": "unknown",
+  "preparation_seconds": 25.036,
+  "business_seconds": 642.618,
+  "supervision_seconds": 645.486,
+  "extraction_output_tokens": 6022,
+  "extraction_output_limit": 12000,
+  "actual_calls": [
+    {
+      "purpose": "select_profile_sections",
+      "model": "deepseek-flash",
+      "source_label": "deepseek:deepseek-flash",
+      "finish_reason": "stop",
+      "usage": {
+        "input_tokens": 24161,
+        "output_tokens": 326,
+        "total_tokens": 24487
+      }
+    },
+    {
+      "purpose": "extract_profile_workpaper",
+      "model": "deepseek-flash",
+      "source_label": "deepseek:deepseek-flash",
+      "finish_reason": "stop",
+      "usage": {
+        "input_tokens": 12400,
+        "output_tokens": 6022,
+        "total_tokens": 18422
+      }
+    },
+    {
+      "purpose": "review_profile_workpaper",
+      "model": "grok-4.7",
+      "source_label": "scorpio:grok-4.7",
+      "finish_reason": "stop",
+      "usage": {
+        "input_tokens": 19959,
+        "output_tokens": 1303,
+        "total_tokens": 50524
+      }
+    },
+    {
+      "purpose": "repair_profile_workpaper",
+      "model": "deepseek-flash",
+      "source_label": "deepseek:deepseek-flash",
+      "finish_reason": "stop",
+      "usage": {
+        "input_tokens": 10582,
+        "output_tokens": 1622,
+        "total_tokens": 12204
+      }
+    },
+    {
+      "purpose": "verify_profile_workpaper_repair",
+      "model": "grok-4.7",
+      "source_label": "scorpio:grok-4.7",
+      "finish_reason": "stop",
+      "usage": {
+        "input_tokens": 14761,
+        "output_tokens": 752,
+        "total_tokens": 23032
+      }
+    }
+  ],
+  "model_review_effect": {
+    "accepted_candidates": 5,
+    "replaced": [
+      "ps-03"
+    ],
+    "added": [
+      "review-add:f-earnings-adjustments",
+      "review-add:f-jv-earnings",
+      "review-add:f-nev-revenue",
+      "review-add:f-vehicle-margin"
+    ],
+    "quarantined": [
+      "ps-04",
+      "sc-03"
+    ],
+    "unaffected_fact_objects_equal": 30
+  },
+  "source_check_and_three_reads": true,
+  "code_config_source_and_prior_results_unchanged": true,
+  "original_query_sha256": "b9021fe5f4356f8ecdfb84bfb069ae1458e13bf8c82ff21622aa320e0d27b057",
+  "all_source_quotes_contain_total_operating_revenue_label": false,
+  "independent_not_adopted": [
+    {
+      "fact_id": "mc-02",
+      "reason": "所引原文勾选不适用，不据此作确定无重大变化结论；原query/模型checked集合不改。"
+    }
+  ],
+  "formal_accuracy": null,
+  "formal_recall": null,
+  "formal_regular_budget_pass": false,
+  "s1_changed": false,
+  "production_authorization": "not_authorized",
+  "runtime_cleanup_bytes": 1913824
+}

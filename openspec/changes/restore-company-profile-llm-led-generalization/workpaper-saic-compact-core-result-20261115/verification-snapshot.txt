@@ -1,0 +1,65 @@
+from pathlib import Path
+import hashlib,json,subprocess
+from research.company_profile.workpaper import CompanyProfileWorkpaper,WorkpaperDraftResponse,bind_workpaper_draft,normalize_workpaper_draft
+R=Path("/home/python/Quote");C=R/"openspec/changes/restore-company-profile-llm-led-generalization";D=C/"workpaper-saic-compact-core-result-20261115";P=D/"600104"
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+a=json.loads((D/"authorization.json").read_text());b=json.loads((P/"budget.json").read_text());s=json.loads((P/"summary.json").read_text())
+q=json.loads((P/"query.json").read_text());w=CompanyProfileWorkpaper.model_validate(q["profiles"][0]["workpaper"])
+rs=json.loads((P/"model-receipts.json").read_text())
+assert all(sha(R/p)==v for p,v in a["code_sha256"].items())
+assert sha(R/"config/13_llm.json")==a["shared_config_sha256"]
+assert sha(R/"data/QuoteBak/workpaper_cj_run.py")==sha(D/"operator-snapshot.txt")==a["operator_sha256"]
+assert sha(D/"network-preflight.json")==a["network_preflight_sha256"]
+assert json.loads((P/"binding.json").read_text())["network_context"]==a["network_context"]
+assert w.generation.prompt_version.endswith("compact-core.v14")
+assert s["state"]=="completed" and s["three_reads_equal"] and not s["exception"]
+assert json.loads((P/"export/600104.SH_2025-12-31.json").read_text())==q["profiles"][0]
+assert sha(P/"query.json")==s["query_sha256"]
+assert len(rs)==b["physical_requests"]==5
+assert all(r["finish_reason"]=="stop" and r["contract_status"]=="accepted" for r in rs)
+assert all(x["status"]=="success" and x["usage"] for x in b["attempts"])
+assert sum(x["usage"]["total_tokens"] for x in b["attempts"])==b["charged_tokens"]==128669
+assert b["charged_cost_cny"]=="unknown" and s["recoveries"]==0 and s["stopped_reason"] is None
+assert json.loads((P/"source-check.json").read_text())["all_retained_evidence_coordinates_equal"]
+assert sha(Path(json.loads((P/"binding.json").read_text())["asset"]["archive_path"]))==w.report.document_version
+assert json.loads((R/"data/QuoteBak/s1-attempts/workpaper-cj-600104-20261115.json").read_text())["binding_sha256"]==sha(P/"binding.json")
+initial=next(r["response_payload"] for r in rs if r["purpose"]=="extract_profile_workpaper")
+before=bind_workpaper_draft(WorkpaperDraftResponse.model_validate(normalize_workpaper_draft(initial)),report=w.report,reading_scope=w.reading_scope,evidence=w.evidence,origin="llm_generated",generation=w.generation)
+def fm(p):
+ es=[getattr(p.elements,k) for k in p.elements.model_fields]+([getattr(p.supply_chain,k) for k in p.supply_chain.model_fields] if p.supply_chain else [])
+ return {f.fact_id:f.model_dump(mode="json") for e in es for f in e.facts}
+old,new=fm(before),fm(w)
+changed=[k for k in old.keys() & new.keys() if old[k]!=new[k]]
+assert set(changed)=={"ps-03"}
+assert set(old)-set(new)=={"ps-04","sc-03"}
+added=sorted(set(new)-set(old));assert len(added)==4
+checks=next(r["response_payload"] for r in rs if r["purpose"]=="verify_profile_workpaper_repair")["checks"]
+assert len(checks)==5 and all(c["accepted"] for c in checks)
+assert len(new)==35 and sum(len(f["metrics"]) for f in new.values())==64
+assert not q["profiles"][0].get("real_semantic_complete")
+assert q["profiles"][0]["production_authorization"]=="not_authorized"
+ref=json.loads((C/"workpaper-core-readiness-20261114/source-first-contract.json").read_text())
+for co in ref["companies"]:
+ assert sha(R/co["current_query"])==co["current_query_sha256"]
+ assert sha(Path(co["source_pdf"]))==co["document_version"]
+prior=C/"workpaper-remaining-eight-result-20261115"
+assert subprocess.run(["git","diff","--quiet","HEAD","--",str(prior)],cwd=R).returncode==0
+assert not list((R/"data/QuoteBak").glob("workpaper-cj-600104-*"))
+evidence={e.evidence_id:e for e in w.evidence}
+mc=new["mc-02"];quoted="\n".join(s.quote for eid in mc["evidence_ids"] for s in evidence[eid].source_spans)
+assert "不适用" in quoted
+all_quotes="\n".join(s.quote for e in w.evidence for s in e.source_spans)
+capture=json.loads((P/"content-capture-index.json").read_text());hashes={hashlib.sha256(r["raw_content"].encode()).hexdigest() for r in rs}
+assert len(capture["responses"])==5 and all(c["content_sha256"] in hashes and not c["retained"] for c in capture["responses"])
+result={"task":"6.CJ","outcome":"real_readable_workpaper_and_bounded_review_flow_with_limits","entries_used":1,"entries_authorized":1,"readable":True,
+ "fact_count_including_optional_supply_chain":len(new),"metric_count":64,"eight_element_facts":s["facts"],"review_status":s["review_status"],
+ "physical_requests":5,"recoveries":0,"actual_supplier_total_usage":128669,"fee":"unknown","preparation_seconds":s["preparation_seconds"],
+ "business_seconds":s["business_seconds"],"supervision_seconds":s["supervision_seconds"],"extraction_output_tokens":6022,"extraction_output_limit":12000,
+ "actual_calls":[{"purpose":r["purpose"],"model":r["model"],"source_label":r["source_label"],"finish_reason":r["finish_reason"],"usage":r["usage"]} for r in rs],
+ "model_review_effect":{"accepted_candidates":5,"replaced":changed,"added":added,"quarantined":["ps-04","sc-03"],"unaffected_fact_objects_equal":sum(old[k]==new[k] for k in old.keys() & new.keys())},
+ "source_check_and_three_reads":True,"code_config_source_and_prior_results_unchanged":True,"original_query_sha256":sha(P/"query.json"),
+ "all_source_quotes_contain_total_operating_revenue_label":"营业总收入" in all_quotes,
+ "independent_not_adopted":[{"fact_id":"mc-02","reason":"所引原文勾选不适用，不据此作确定无重大变化结论；原query/模型checked集合不改。"}],
+ "formal_accuracy":None,"formal_recall":None,"formal_regular_budget_pass":False,"s1_changed":False,"production_authorization":"not_authorized",
+ "runtime_cleanup_bytes":s["cleanup_bytes"]}
+print("CJ_RESULT_JSON="+json.dumps(result,ensure_ascii=False))
