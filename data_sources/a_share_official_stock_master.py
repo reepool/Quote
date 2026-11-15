@@ -470,7 +470,10 @@ class AShareOfficialStockMasterSource(BaseDataSource):
     ) -> List[Dict[str, Any]]:
         normalized: List[Dict[str, Any]] = []
         seen = set()
+        raw_count, rejected_count, duplicate_count = 0, 0, 0
+        rejected_samples: List[Dict[str, Any]] = []
         for row in records:
+            raw_count += 1
             item = self._normalize_stock_row(
                 row,
                 exchange=exchange,
@@ -478,12 +481,33 @@ class AShareOfficialStockMasterSource(BaseDataSource):
                 raw_hashes=raw_hashes,
             )
             if not item:
+                rejected_count += 1
+                if len(rejected_samples) < 20:
+                    rejected_samples.append({
+                        "symbol": _first_text(row, _symbol_keys(exchange)) or None,
+                        "reason": "invalid_or_missing_security_code_or_name",
+                    })
                 continue
             instrument_id = item["instrument_id"]
             if instrument_id in seen:
+                duplicate_count += 1
                 continue
             seen.add(instrument_id)
             normalized.append(item)
+        coverage = self.current_list_coverage.setdefault(exchange, {"complete": False})
+        coverage.update(
+            complete=bool(coverage.get("complete") and normalized and not rejected_count),
+            raw_row_count=raw_count,
+            normalized_row_count=len(normalized),
+            rejected_row_count=rejected_count,
+            duplicate_row_count=duplicate_count,
+            rejected_samples=rejected_samples,
+        )
+        if rejected_count:
+            ds_logger.warning(
+                "[A-share official master] %s current-list normalization rejected %s/%s rows; coverage incomplete",
+                exchange, rejected_count, raw_count,
+            )
         return normalized
 
 

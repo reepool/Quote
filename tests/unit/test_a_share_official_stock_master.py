@@ -106,6 +106,75 @@ async def test_official_source_normalizes_exchange_stock_lists(tmp_path):
     assert bse[0]["official_lifecycle_source"] == "bse_official"
 
 
+@pytest.mark.asyncio
+@pytest.mark.parametrize("exchange", ["SSE", "SZSE"])
+@pytest.mark.parametrize("bad_row", ["missing_name", "missing_code", "duplicate"])
+async def test_current_coverage_tracks_rejected_rows_and_recovers_without_sticky_state(
+    tmp_path,
+    exchange,
+    bad_row,
+):
+    symbols = [
+        f"600{number:03d}" if exchange == "SSE" else f"{number:06d}"
+        for number in range(100, 160)
+    ]
+    valid = [f"{symbol},样本{symbol},1992-03-27" for symbol in symbols]
+    target = "600016" if exchange == "SSE" else "000016"
+    bad = {
+        "missing_name": f"{target},,1992-03-27",
+        "missing_code": ",缺少代码,1992-03-27",
+        "duplicate": valid[0],
+    }[bad_row]
+    path = tmp_path / f"{exchange}.csv"
+    _csv(path, "证券代码,证券简称,上市日期\n" + "\n".join([*valid, bad]) + "\n")
+    config = {exchange.lower(): {"current_list_file": str(path)}}
+    if exchange == "SSE":
+        config["sse"]["stock_types"] = [{"stock_type": "1", "board": "main_board"}]
+    source = AShareOfficialStockMasterSource("exchange_official_a_stock", config=config)
+    db_ops = Mock()
+    db_ops.save_instrument_list = AsyncMock()
+    factory = DataSourceFactory(db_ops)
+    factory.routing = {"instrument_list": {"a_stock": ["exchange_official"]}}
+    factory.source_instances_by_region = {"a_stock": {"exchange_official": source}}
+    rows = await factory.get_instrument_list(
+        exchange,
+        force_refresh=True,
+        instrument_types=["stock"],
+        enrich_from_backup_sources=False,
+        persist=False,
+    )
+    assert len(rows) == 60
+    diagnostics = factory.get_last_instrument_list_diagnostics(exchange, ["stock"])
+    coverage = diagnostics["official_current_list_coverage"]
+    rejected = bad_row != "duplicate"
+    assert diagnostics["official_current_list_complete"] is not rejected
+    assert coverage["raw_row_count"] == 61
+    assert coverage["normalized_row_count"] == 60
+    assert coverage["rejected_row_count"] == int(rejected)
+    assert coverage["duplicate_row_count"] == int(not rejected)
+    assert len(coverage["rejected_samples"]) == int(rejected)
+    db_ops.save_instrument_list.assert_not_awaited()
+
+    _csv(
+        path,
+        "证券代码,证券简称,上市日期\n"
+        + "\n".join([*valid, f"{target},恢复后的样本,1992-03-27"])
+        + "\n",
+    )
+    rows = await factory.get_instrument_list(
+        exchange,
+        force_refresh=True,
+        instrument_types=["stock"],
+        enrich_from_backup_sources=False,
+        persist=False,
+    )
+    coverage = factory.get_last_instrument_list_diagnostics(exchange, ["stock"])[
+        "official_current_list_coverage"
+    ]
+    assert coverage["complete"] is True and len(rows) == 61
+    assert coverage["rejected_row_count"] == coverage["duplicate_row_count"] == 0
+
+
 class _InstrumentSource:
     def __init__(self, name, rows, *, official=False):
         self.name = name

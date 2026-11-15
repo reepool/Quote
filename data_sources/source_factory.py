@@ -1215,6 +1215,9 @@ class DataSourceFactory:
                             diagnostics['selected_source_authority'] = selected_base
                         diagnostics['source_usage'] = self._summarize_instrument_source_usage(instruments)
                         coverage = getattr(primary_source, 'current_list_coverage', {})
+                        diagnostics['official_current_list_coverage'] = dict(
+                            coverage.get(exchange) or {}
+                        ) if primary_is_official and isinstance(coverage, dict) else {}
                         diagnostics['official_current_list_complete'] = bool(
                             primary_is_official and isinstance(coverage, dict)
                             and (coverage.get(exchange) or {}).get('complete')

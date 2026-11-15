@@ -16711,7 +16711,11 @@ class DataManager:
             if item.get('instrument_id')
         }
         rows: List[Dict[str, Any]] = []
-        for instrument_id in sorted((before.get('active_ids') or set()) - official_ids):
+        missing_ids = (
+            (before.get('active_ids') or set()) - official_ids
+            if diagnostics.get('official_current_list_complete') else set()
+        )
+        for instrument_id in sorted(missing_ids):
             rows.append({
                 'instrument_id': instrument_id,
                 'reason': 'official_current_list_missing_no_terminal_evidence',

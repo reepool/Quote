@@ -15,6 +15,7 @@ from database.instrument_lifecycle import APPLIED, FUTURE, VERIFICATION
 from database.models import InstrumentDB
 from database.operations import DatabaseOperations
 from instrument_master_delisting import (
+    ANNOUNCEMENT_PARSER_VERSION,
     AShareDelistingReconciler,
     reusable_terminal_verifications,
 )
@@ -683,6 +684,76 @@ async def test_empty_current_target_skips_announcement_and_repair_providers(owne
             "证券代码：000016、200016。深圳证券交易所决定终止公司A股股票上市。A股摘牌日期：2026年10月23日。B股摘牌日期：2026年10月30日。",
             "2026-10-23",
         ),
+        (
+            "关于股票终止上市决定的公告",
+            "证券代码：000016。深圳证券交易所决定终止公司股票上市。预计摘牌日期为2026年10月23日，实际摘牌日期将另行公告。",
+            "unconfirmed",
+        ),
+        (
+            "关于股票终止上市决定的公告",
+            "证券代码：000016。深圳证券交易所决定终止公司股票上市。预计股票将于2026年10月23日摘牌。",
+            "unconfirmed",
+        ),
+        (
+            "关于股票终止上市决定的公告",
+            "证券代码：000016。深圳证券交易所决定终止公司股票上市。暂定摘牌日期为2026年10月23日。",
+            "unconfirmed",
+        ),
+        (
+            "关于股票终止上市决定的公告",
+            "证券代码：000016。深圳证券交易所决定终止公司股票上市。股票将于2026年10月23日摘牌，具体日期以交易所后续公告为准。",
+            "unconfirmed",
+        ),
+        (
+            "关于股票终止上市决定的公告",
+            "证券代码：000016。深圳证券交易所决定终止公司股票上市。股票将于2026年10月23日摘牌。实际摘牌日期将另行公告。",
+            "unconfirmed",
+        ),
+        (
+            "关于股票终止上市暨摘牌的公告",
+            "证券代码：000016。公司股票已摘牌。预计摘牌日期为2026年10月23日，实际摘牌日期尚未确认。",
+            None,
+        ),
+        (
+            "关于股票终止上市暨摘牌的公告",
+            "证券代码：000016。公司股票已摘牌，实际摘牌日期尚未确认。",
+            None,
+        ),
+        (
+            "关于股票终止上市决定的公告",
+            "证券代码：000016。深圳证券交易所决定终止公司股票上市。预计公司股票已摘牌。",
+            "unconfirmed",
+        ),
+        (
+            "关于股票终止上市暨摘牌的公告",
+            "证券代码：000016。深圳证券交易所决定终止公司股票上市。预计摘牌日期为2026年10月23日。现确定实际摘牌日期为2026年10月24日。",
+            "2026-10-24",
+        ),
+        (
+            "关于股票终止上市暨摘牌的公告",
+            "证券代码：000016。深圳证券交易所决定终止公司股票上市。股票将于2026年10月23日摘牌。预计该事项不会影响公司经营。",
+            "2026-10-23",
+        ),
+        (
+            "关于股票终止上市决定的公告",
+            "证券代码：000016。深圳证券交易所决定终止公司股票上市。预估摘牌日期为2026年10月23日。",
+            "unconfirmed",
+        ),
+        (
+            "关于股票终止上市决定的公告",
+            "证券代码：000016。深圳证券交易所决定终止公司股票上市。预估公司股票将于2026年10月23日摘牌。",
+            "unconfirmed",
+        ),
+        (
+            "关于股票终止上市决定的公告",
+            "证券代码：000016。深圳证券交易所决定终止公司股票上市。摘牌日期为2026年10月23日前后。",
+            "unconfirmed",
+        ),
+        (
+            "关于股票终止上市暨摘牌的公告",
+            "证券代码：000016。深圳证券交易所决定终止公司股票上市。本公司股票终止上市暨摘牌日期为2026年10月23日（星期五）。",
+            "2026-10-23",
+        ),
     ],
 )
 def test_announcement_requires_stock_identity_and_actual_completion(
@@ -955,14 +1026,19 @@ async def test_conflict_persistence_failure_cannot_form_healthy_verification(
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "old_parser", ["official_stock_terminal_body.v1", "official_stock_terminal_body.v2"]
+)
 async def test_old_announcement_parser_plan_requires_fresh_reverification(
-    owner, monkeypatch
+    owner,
+    monkeypatch,
+    old_parser,
 ):
     now = get_shanghai_time()
     assert await owner.save_instruments_batch([KONKA])
     old = evidence(
         delisted_date=(now.date() + timedelta(days=1)).isoformat(),
-        parser_version="official_stock_terminal_body.v1",
+        parser_version=old_parser,
         source="cninfo_szse_delisting",
         announcement_id="legacy-plan",
     )
@@ -977,7 +1053,7 @@ async def test_old_announcement_parser_plan_requires_fresh_reverification(
     assert (await local_record(owner))["is_active"]
     fresh = {
         **old,
-        "parser_version": "official_stock_terminal_body.v2",
+        "parser_version": ANNOUNCEMENT_PARSER_VERSION,
         "observed_at": later.isoformat(),
     }
     result = await reconcile(owner, [fresh])
@@ -1099,3 +1175,136 @@ async def test_bse_manager_honors_configured_scan_bound_and_can_reach_third_page
     assert (
         date.fromisoformat(scope.end_date) - date.fromisoformat(scope.start_date)
     ).days == 90
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("exchange,symbol", [("SZSE", "000016"), ("BSE", "920680")])
+@pytest.mark.parametrize("offset", [-1, 1])
+async def test_estimated_date_never_writes_terminal_or_durable_plan(
+    owner, exchange, symbol, offset
+):
+    from types import SimpleNamespace
+    from research.announcements import AnnouncementRecord, build_announcement_key
+    from instrument_master_delisting import scan_terminal_announcements
+
+    iid = f"{symbol}.{'SZ' if exchange == 'SZSE' else 'BJ'}"
+    local = {
+        **KONKA,
+        "instrument_id": iid,
+        "symbol": symbol,
+        "exchange": exchange,
+        "source": f"{exchange.lower()}_official",
+    }
+    assert await owner.save_instruments_batch([local])
+    estimated = get_shanghai_time().date() + timedelta(days=offset)
+    record = AnnouncementRecord(
+        source="cninfo",
+        source_announcement_id="synthetic-estimate",
+        announcement_key=build_announcement_key("cninfo", "synthetic-estimate"),
+        title="关于公司股票终止上市决定的公告",
+        exchange=exchange,
+        published_at=get_shanghai_time().isoformat(),
+        symbols=(symbol,),
+        raw_payload={
+            "body_text": f"证券代码：{symbol}。证券交易所决定终止公司股票上市。预计摘牌日期为{estimated:%Y年%m月%d日}，实际摘牌日期将另行公告。"
+        },
+    )
+    service = Mock()
+    service.config.provider_configs = {}
+    service.acquire.return_value = SimpleNamespace(
+        scan_result=SimpleNamespace(
+            records=[record],
+            status="success",
+            is_complete=True,
+            errors=(),
+            stop_reason="completed",
+        )
+    )
+    snapshot = scan_terminal_announcements(service, exchange, [iid])
+    loader = AsyncMock(return_value=snapshot)
+    result = await AShareDelistingReconciler(owner, None, loader).reconcile(
+        exchange,
+        {"rows_by_id": {iid: local}},
+        [],
+        {"official_current_list_complete": True},
+        snapshot={"rows": [], "complete": True, "errors": []},
+    )
+    assert result["deactivated_count"] == result["future_effective_count"] == 0
+    assert result["unconfirmed_count"] == 1
+    assert (await owner.get_instruments_by_exchange(exchange))[0]["status"] == "active"
+    assert not (await owner.load_a_share_delisting_state([exchange]))["plans"]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("has_terminal", [False, True])
+async def test_partial_current_parse_never_creates_absence_but_accepts_positive_evidence(
+    owner,
+    tmp_path,
+    has_terminal,
+):
+    from data_manager import DataManager
+    from data_sources.source_factory import DataSourceFactory
+    from instrument_master_governance import (
+        AShareStockPolicy,
+        MasterGovernanceRequirement,
+    )
+
+    assert await owner.save_instruments_batch([KONKA])
+    path = tmp_path / "partial.csv"
+    path.write_text(
+        "证券代码,证券简称,上市日期\n"
+        + "\n".join(
+            [f"{number:06d},正常样本{number},1992-03-27" for number in range(100, 160)]
+            + ["000016,,1992-03-27"]
+        )
+        + "\n"
+    )
+    source = AShareOfficialStockMasterSource(
+        "exchange_official_a_stock",
+        config={"szse": {"current_list_file": str(path)}},
+    )
+    source.get_delisting_snapshot = AsyncMock(
+        return_value={
+            "rows": [evidence()] if has_terminal else [],
+            "complete": True,
+            "errors": [],
+        }
+    )
+    factory = DataSourceFactory(owner)
+    factory.routing = {"instrument_list": {"a_stock": ["exchange_official"]}}
+    factory.source_instances_by_region = {"a_stock": {"exchange_official": source}}
+    manager = DataManager.__new__(DataManager)
+    manager.db_ops, manager.source_factory = owner, factory
+    manager._get_instrument_master_sync_config = lambda: {
+        "pytdx_validation_enabled": False
+    }
+    manager._load_a_share_terminal_announcements = AsyncMock(
+        side_effect=AssertionError(
+            "partial parse cannot establish current-list absence"
+        )
+    )
+    result = await AShareStockPolicy(manager, {}).execute(
+        MasterGovernanceRequirement(
+            scope="a_share_stock",
+            exchanges=["SZSE"],
+            instrument_types=["stock"],
+            mode="force_refresh",
+            include_pytdx_validation=False,
+        )
+    )
+    manager._load_a_share_terminal_announcements.assert_not_awaited()
+    terminal = result["exchanges"]["SZSE"]["delisting_reconciliation"]
+    assert result["status"] == "warning"
+    assert terminal["deactivated_count"] == int(has_terminal)
+    assert terminal["unconfirmed_count"] == 0
+    assert (await local_record(owner))["is_active"] is not has_terminal
+    async with owner.get_async_session() as session:
+        count = (
+            await session.execute(
+                text(
+                    "SELECT count(*) FROM instrument_master_discrepancies "
+                    "WHERE reason='official_current_list_missing_no_terminal_evidence'"
+                )
+            )
+        ).scalar_one()
+    assert count == 0

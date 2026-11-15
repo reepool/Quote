@@ -18,6 +18,9 @@ from database.instrument_lifecycle import FUTURE, VERIFICATION, lifecycle_date
 from utils.date_utils import get_shanghai_time
 
 
+ANNOUNCEMENT_PARSER_VERSION = "official_stock_terminal_body.v3"
+
+
 def _explicit_stock_scope(text: str) -> str | None:
     """Identify explicit A-share, other-security or combined stock wording."""
     text = re.sub(r"A[、/及和与]B股", "A股B股", text, flags=re.IGNORECASE)
@@ -52,38 +55,86 @@ def announcement_terminal_evidence(
     # class unless the terminal clauses also explicitly cover A shares.
     if _explicit_stock_scope(title) == "other":
         return None
-    clauses = re.split(r"[。；;，,！？!?]", compact)
+    sentences = re.split(r"[。；;！？!?]", compact)
+    clauses = [
+        clause for sentence in sentences for clause in re.split(r"[，,]", sentence)
+    ]
     terminal_clauses = [
         clause for clause in clauses if re.search(r"终止.{0,12}上市|摘牌", clause)
     ]
     scopes = {_explicit_stock_scope(clause) for clause in terminal_clauses}
     if "other" in scopes and "a_share" not in scopes:
         return None
-    terminal_text = "。".join(
-        clause for clause in clauses if _explicit_stock_scope(clause) != "other"
-    )
+    terminal_sentences = [
+        "，".join(
+            clause
+            for clause in re.split(r"[，,]", sentence)
+            if _explicit_stock_scope(clause) != "other"
+        )
+        for sentence in sentences
+    ]
+    terminal_text = "。".join(terminal_sentences)
     formal = re.search(
         r"(?:交易所|深交所|上交所|北交所|本所).{0,180}(?:决定|同意).{0,100}终止.{0,12}上市",
         terminal_text,
     ) or re.search(r"(?:交易所|深交所|上交所|北交所).{0,100}股票终止上市的决定", terminal_text)
-    completed = bool(re.search(r"股票已(?:完成)?(?:终止上市|摘牌)", terminal_text))
+    provisional = r"(?:预计|预期|暂定|拟定|预定|可能|拟)[^，,。；;]*(?:摘牌|终止上市)"
+    pending_date = (
+        r"(?:(?:实际|具体|最终)(?:摘牌|终止上市)?(?:日期|时间|安排)"
+        r"|(?:摘牌|终止上市)(?:日期|时间|安排))"
+        r"[^。；;]*(?:另行(?:确定|公告|通知)|待定|待确认|(?:尚未|暂未)(?:确定|明确|确认)"
+        r"|以[^。；;]*为准)"
+        r"|具体以[^。；;]*公告[^。；;]*为准"
+    )
+    # Qualifiers after a comma still govern that sentence's date. Keep an
+    # explicit completed fact even when its precise date remains unknown.
+    certain_sentences = [
+        sentence
+        for sentence in terminal_sentences
+        if not re.search(provisional, sentence)
+        and not re.search(pending_date, sentence)
+    ]
+    completed = any(
+        _explicit_stock_scope(clause) != "other"
+        and not re.search(provisional, clause)
+        and re.search(r"股票已(?:完成)?(?:终止上市|摘牌)", clause)
+        for clause in clauses
+    )
     if not formal and not completed:
         return None
     date_pattern = r"(\d{4})[年/-](\d{1,2})[月/-](\d{1,2})日?"
+    assertion_start = (
+        r"(?:^|[，,])(?:现(?:已)?(?:确认|确定))?(?:(?:本公司|公司)(?:的)?)?"
+    )
+    subject = r"(?:A股股票|A股|股票|证券)"
+    assertion_end = r"(?:[（(](?:星期|周)[一二三四五六日天][）)])?(?=$|[，,])"
     patterns = [
-        r"(?:摘牌日期|摘牌日|终止上市日期)[为是：:]*" + date_pattern,
-        r"(?:股票|A股|证券)(?:将于|将在|将自|自|于)"
+        assertion_start
+        + subject
+        + r"?(?:的)?(?:实际|最终|正式)?"
+        + r"(?:摘牌日期|摘牌日|终止上市日期|终止上市(?:暨|及|并)摘牌(?:日期|日))[为是：:]*"
+        + date_pattern
+        + assertion_end,
+        assertion_start
+        + subject
+        + r"(?:将于|将在|将自|自|于)"
         + date_pattern
         + r"(?:起)?(?:(?:在|从)(?:深圳证券交易所|上海证券交易所|北京证券交易所|深交所|上交所|北交所))?"
-        + r"(?:被)?(?:摘牌|终止上市)",
+        + r"(?:被)?(?:摘牌|终止上市)(?:(?:并|暨)摘牌)?"
+        + assertion_end,
     ]
     dates = set()
-    for pattern in patterns:
-        for match in re.finditer(pattern, terminal_text):
-            try:
-                dates.add(date(*(int(value) for value in match.groups())).isoformat())
-            except ValueError:
-                return None
+    for sentence in certain_sentences:
+        for pattern in patterns:
+            for match in re.finditer(pattern, sentence):
+                try:
+                    dates.add(
+                        date(*(int(value) for value in match.groups())).isoformat()
+                    )
+                except ValueError:
+                    return None
+    if re.search(pending_date, terminal_text):
+        dates.clear()
     if len(dates) > 1 or (not dates and not completed):
         return None
     effective = next(iter(dates), None)
@@ -110,7 +161,7 @@ def announcement_terminal_evidence(
         ).hexdigest(),
         "hash_kind": "canonical_announcement_record",
         "body_text_hash": hashlib.sha256(body.encode()).hexdigest(),
-        "parser_version": "official_stock_terminal_body.v2",
+        "parser_version": ANNOUNCEMENT_PARSER_VERSION,
         "observed_at": get_shanghai_time().isoformat(),
         "evidence_excerpt": compact[:1200],
     }
@@ -462,7 +513,12 @@ class AShareDelistingReconciler:
                 # Expired plans still participate in conflict checks and retain
                 # their closure identity, but cannot establish a positive write.
                 if (
-                    evidence.get("parser_version") != "official_stock_terminal_body.v1"
+                    (
+                        not str(evidence.get("parser_version") or "").startswith(
+                            "official_stock_terminal_body."
+                        )
+                        or evidence["parser_version"] == ANNOUNCEMENT_PARSER_VERSION
+                    )
                     and verified.tzinfo is not None
                     and now - verified <= timedelta(hours=freshness_hours)
                 ):
