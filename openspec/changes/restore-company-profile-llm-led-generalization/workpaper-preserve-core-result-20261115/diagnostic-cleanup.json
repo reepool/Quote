@@ -1,0 +1,15 @@
+{
+  "removed": [
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-cl-600097-fqu8660p",
+      "bytes": 1163264,
+      "reason": "owned aborted local diagnostic; no model or unique evidence"
+    },
+    {
+      "path": "/home/python/Quote/data/QuoteBak/workpaper-cl-600097-zdaq_r5g",
+      "bytes": 1163264,
+      "reason": "owned aborted local diagnostic; no model or unique evidence"
+    }
+  ],
+  "bytes": 2326528
+}

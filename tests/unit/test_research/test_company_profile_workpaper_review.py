@@ -180,7 +180,7 @@ def test_invalid_or_unconfirmed_repair_never_revives_bad_fact(failure):
         assert any("修订源检查隔离：revenue" in note for note in result.standardization_notes)
 
 
-@pytest.mark.parametrize("bad_source", ["number", "unit", "evidence"])
+@pytest.mark.parametrize("bad_source", ["number", "unit", "evidence", "typed"])
 @pytest.mark.parametrize("confirmed", [True, False])
 def test_invalid_repair_is_isolated_without_blocking_independent_final_candidate(bad_source, confirmed):
     # The original fixture is a cross-page table without a repeated unit header;
@@ -194,6 +194,8 @@ def test_invalid_repair_is_isolated_without_blocking_independent_final_candidate
         omitted["metrics"][0].update(raw_value="777", value="777")
     elif bad_source == "unit":
         omitted["metrics"][0].update(unit="万元", source_unit="万元")
+    elif bad_source == 'typed':
+        omitted["metrics"][0]["value"] = "not-a-decimal"
     else:
         omitted["evidence_ids"] = ["not-a-source"]
     review["findings"].append({**review["findings"][0], "finding_id": "bad-extra",
@@ -212,7 +214,8 @@ def test_invalid_repair_is_isolated_without_blocking_independent_final_candidate
     assert result.elements.business_structure == original.elements.business_structure
     assert bool(result.elements.scale_and_mix.facts) is confirmed
     rejected = result.quality_review.findings[1]
-    assert rejected.resolution == "repair_rejected" and rejected.revised_fact.fact_id == omitted["fact_id"]
+    assert rejected.resolution == "repair_rejected"
+    assert (rejected.revised_fact is None if bad_source == 'typed' else rejected.revised_fact.fact_id == omitted['fact_id'])
     assert result.quality_review.findings[0].resolution == (
         "corrected_pending_trust" if confirmed else "verification_failed")
     assert result.quality_review.status == ("completed_with_open_findings" if confirmed else "incomplete")
@@ -447,17 +450,25 @@ def test_revalidated_repair_still_fails_before_final_send_for_invalid_history(fa
     assert provider.calls == []
 
 
-def test_runtime_seed_review_gateway_writer_and_three_reads():
+@pytest.mark.parametrize('bad_neighbor', [False, True])
+def test_runtime_seed_review_gateway_writer_and_three_reads(bad_neighbor):
     from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
     from tests.unit.test_utils.test_llm_gateway import _config, _response
     from tests.unit.test_utils.test_llm_physical_budget import _budget, _client
     from utils.llm.testing import ScriptedTransport
 
     paper, _, fixed, review, verify = material()
+    repaired = [fixed]
+    if bad_neighbor:
+        review['findings'].append({**review['findings'][0], 'finding_id': 'bad-typed',
+            'affected_fact_id': None, 'action': 'possible_omission', 'issue_type': 'material_omission'})
+        bad = {**fixed, 'fact_id': 'review-add:bad-typed',
+               'metrics': [{**fixed['metrics'][0], 'value': 'not-a-decimal'}]}
+        repaired.append(bad)
     config = _config(max_schema_repair_attempts=0)
     reviewer = replace(config.profiles["test"], name="review", reasoning_effort="high")
     config = replace(config, profiles={**config.profiles, "review": reviewer})
-    transport = ScriptedTransport([_response(review), _response({"repaired_facts": [fixed]}), _response(verify)])
+    transport = ScriptedTransport([_response(review), _response({"repaired_facts": repaired}), _response(verify)])
     client = _client(transport, _budget(), config)
     provider = CommonGatewaySemanticProvider(
         client=client, profile="test", max_output_tokens=2500, timeout_seconds=10,
@@ -482,14 +493,44 @@ def test_runtime_seed_review_gateway_writer_and_three_reads():
             assert query["profiles"] == export["profiles"] == reload["profiles"]
             profile = query["profiles"][0]
             assert profile["core_complete"] is False
-            assert profile["workpaper_status"] == "model_reviewed_pending_verification"
-            assert profile["workpaper"]["quality_review"]["status"] == "completed"
+            assert profile["workpaper_status"] == ('review_limited_pending_verification' if bad_neighbor else 'model_reviewed_pending_verification')
+            assert profile["workpaper"]["quality_review"]["status"] == ('completed_with_open_findings' if bad_neighbor else 'completed')
+            if bad_neighbor:
+                assert profile['workpaper']['quality_review']['findings'][1]['resolution'] == 'repair_rejected'
+                assert profile['workpaper']['elements']['scale_and_mix']['facts'][0]['fact_id'] == 'revenue'
             assert len(profile["workpaper_receipts"]) == 3
             assert transport.calls[0]["payload"]["reasoning_effort"] == "high"
             assert "reasoning_effort" not in transport.calls[1]["payload"]
             assert len(transport.calls) == 3
+            repair_wire = json.dumps(transport.calls[1]['payload'],ensure_ascii=False)
+            assert 'WorkpaperMetric' in repair_wire and 'raw_value' in repair_wire
+            assert 'subject_scope' in repair_wire and 'source_unit' in repair_wire
     finally:
         asyncio.run(client.close())
+
+
+@pytest.mark.parametrize('wrong_original', [False, True])
+def test_omission_cannot_withdraw_correct_original_or_clear_separate_error(wrong_original):
+    paper, packet, _, review, _ = material()
+    if not wrong_original:
+        paper = bind_workpaper_draft(_draft(packet), report=_report(),
+            reading_scope=packet.reading_scope, evidence=packet.evidence)
+    issue = {**review['findings'][0], 'finding_id': 'missing-context',
+             'issue_type': 'material_omission', 'action': 'possible_omission'}
+    review['findings'] = [issue, *review['findings']] if wrong_original else [issue]
+    provider = Provider([review, ValueError('offline repair unavailable')])
+    result, _ = review_workpaper(paper, packet=packet, provider=provider, work_id='preserve-correct',
+        identity=workpaper_processing_identity(real=False, review=True))
+    assert result.elements.business_structure == paper.elements.business_structure
+    if wrong_original:
+        assert not result.elements.scale_and_mix.facts
+        assert result.quality_review.findings[1].resolution == 'quarantined'
+    else:
+        assert result.elements.scale_and_mix == paper.elements.scale_and_mix
+    supplement = result.quality_review.findings[0]
+    assert supplement.affected_fact_id is None and supplement.related_fact_id == 'revenue'
+    assert supplement.resolution == 'omission_candidate'
+    assert result.quality_review.status == 'incomplete'
 
 
 @pytest.mark.parametrize(('resume_prior', 'revalidate_rejected'), [

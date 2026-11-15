@@ -1,0 +1,234 @@
+"""6.CL saved-response local verification; no real model transport or final pass."""
+import asyncio
+import hashlib
+import json
+import shutil
+import sys
+import tempfile
+import time
+import types
+import subprocess
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import replace
+from pathlib import Path
+from unittest.mock import patch
+
+ROOT = Path('/home/python/Quote')
+sys.path.insert(0, str(ROOT))
+CHANGE = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+SOURCE = CHANGE / 'workpaper-four-concentrated-source-result-20261115'
+DEST = CHANGE / 'workpaper-preserve-core-result-20261115'
+
+
+def read(path):
+    return json.loads(path.read_text())
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def dump(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+
+
+def all_facts(paper):
+    groups = [*paper['elements'].values(), *(paper.get('supply_chain') or {}).values()]
+    return {f['fact_id']: f for e in groups for f in e['facts']}
+
+
+def run_one(symbol):
+    from research.company_profile.workpaper import (
+        CompanyProfileWorkpaper, WorkpaperDraftResponse, WorkpaperRepairResponse,
+        WorkpaperFact, bind_workpaper_draft, normalize_workpaper_draft, _check_fact_source,
+    )
+    from research.company_profile.workpaper_review import workpaper_hash
+    from research.company_profile.workpaper_llm import workpaper_processing_identity
+    from research.company_profile.workpaper_sections import extract_selected_layout
+    from research.company_profile.operations import CompanyProfileTaskService
+    from research.company_profile.reads import CompanyProfileReadService
+    from research.company_profile.stage5_provider import CommonGatewaySemanticProvider
+    from research.business_profile_production_operations import BusinessProfileAnnouncementFrontierRepository
+    from research.storage import ResearchStorageManager
+    from tests.unit.test_research.test_business_profile_production_operations import _announcement
+    from tests.unit.test_utils.test_llm_gateway import _config, _response
+    from tests.unit.test_utils.test_llm_physical_budget import _budget, _client
+    from utils.config_manager import ResearchConfig, ResearchStorageConfig
+    from utils.llm.testing import ScriptedTransport
+
+    old_dir = SOURCE / symbol
+    receipts = read(old_dir / 'model-receipts.json')
+    by_purpose = {r['purpose']: r for r in receipts}
+    old = read(old_dir / 'query.json')['profiles'][0]['workpaper']
+    paper = CompanyProfileWorkpaper.model_validate(old)
+    original_hashes = {p.name: sha(p) for p in old_dir.iterdir() if p.is_file()}
+    assert all(hashlib.sha256(r['raw_content'].encode()).hexdigest() == r['response_hash']
+               and json.loads(r['raw_content']) == r['response_payload'] for r in receipts)
+    seed = bind_workpaper_draft(WorkpaperDraftResponse.model_validate(normalize_workpaper_draft(
+        by_purpose['extract_profile_workpaper']['response_payload'])),
+        report=paper.report, reading_scope=paper.reading_scope, evidence=paper.evidence,
+        generation=paper.generation, origin='llm_generated')
+    if workpaper_hash(seed) != paper.quality_review.original_draft_hash:
+        # New unit spelling support admits additional old raw objects. Rebuild
+        # the EXACT input of the saved review using its frozen original decoder;
+        # do not silently assign that old review to those extra objects.
+        module_name = 'research.company_profile._cl_frozen_workpaper'
+        legacy = types.ModuleType(module_name)
+        legacy.__package__ = 'research.company_profile'
+        sys.modules[module_name] = legacy
+        frozen_code = subprocess.check_output(['git', 'show', 'ceb86d8f:research/company_profile/workpaper.py'])
+        expected = read(SOURCE / 'authorization.json')['code_sha256']['research/company_profile/workpaper.py']
+        assert hashlib.sha256(frozen_code).hexdigest() == expected
+        exec(compile(frozen_code, '<CK-frozen-workpaper-decoder>', 'exec'), legacy.__dict__)
+        old_seed = legacy.bind_workpaper_draft(
+            legacy.WorkpaperDraftResponse.model_validate(legacy.normalize_workpaper_draft(by_purpose['extract_profile_workpaper']['response_payload'])),
+            report=paper.report, reading_scope=legacy.WorkpaperReadingScope.model_validate(paper.reading_scope.model_dump(mode='json')),
+            evidence=tuple(legacy.WorkpaperEvidence.model_validate(e.model_dump(mode='json')) for e in paper.evidence),
+            generation=legacy.WorkpaperGenerationMetadata.model_validate(paper.generation.model_dump(mode='json')), origin='llm_generated')
+        seed = CompanyProfileWorkpaper.model_validate(old_seed.model_dump(mode='json'))
+        assert workpaper_hash(seed) == paper.quality_review.original_draft_hash, 'original reviewed seed differs'
+    initial_facts = all_facts(seed.model_dump(mode='json'))
+    seed = seed.model_copy(update={'origin': 'controlled_fixture'})
+    contract = read(CHANGE / 'workpaper-core-readiness-20261114/source-first-contract.json')
+    entry = next(c for c in contract['companies'] if c['instrument_id'] == paper.report.instrument_id)
+    pdf = Path(entry['source_pdf'])
+    assert sha(pdf) == paper.report.document_version
+    pages = extract_selected_layout(pdf.read_bytes(), sorted({s.page for ev in paper.evidence for s in ev.source_spans}))
+
+    # Diagnose unchanged candidates separately; target IDs are NEVER silently
+    # translated from the old same-ID correction contract to new supplements.
+    proposals = WorkpaperRepairResponse.model_validate(by_purpose['repair_profile_workpaper']['response_payload'])
+    local_candidates = []
+    for raw in proposals.repaired_facts:
+        try:
+            fact = WorkpaperFact.model_validate(raw)
+            _check_fact_source(fact, {e.evidence_id: e for e in paper.evidence}, check_units=True)
+        except (ValueError, TypeError) as exc:
+            local_candidates.append({'fact_id': raw.get('fact_id'), 'source_valid': False, 'reason': str(exc)[:600]})
+        else:
+            local_candidates.append({'fact_id': fact.fact_id, 'source_valid': True, 'metrics': len(fact.metrics)})
+
+    root = Path(tempfile.mkdtemp(prefix='workpaper-cl-' + symbol + '-'))
+    client = storage = None
+    started = time.monotonic()
+    destination = DEST / symbol
+    destination.mkdir(parents=True, exist_ok=True)
+    try:
+        db = str(root / 'research.db')
+        storage = ResearchStorageManager(ResearchConfig(storage=ResearchStorageConfig(
+            db_path=db, financials_db_path=db, valuation_db_path=db, interests_db_path=db,
+            quotes_db_path=str(root / 'quotes.db'), attach_quotes_db=False)))
+        storage.initialize()
+        BusinessProfileAnnouncementFrontierRepository(storage).upsert_record(
+            instrument={'instrument_id': paper.report.instrument_id, 'symbol': symbol, 'exchange': 'SSE'},
+            record=_announcement('cl-' + symbol, '公司2025年年度报告', published_at='2026-04-01T16:00:00+00:00'))
+        config = _config(max_schema_repair_attempts=0, timeout_seconds=60)
+        config = replace(config, profiles={**config.profiles, 'review': replace(
+            config.profiles['test'], name='review', reasoning_effort='high')})
+        replies = [_response(by_purpose['review_profile_workpaper']['response_payload'])]
+        if symbol == '600097':
+            replies.append(_response(by_purpose['repair_profile_workpaper']['response_payload']))
+        transport = ScriptedTransport(replies)
+        budget = _budget(deadline=time.monotonic() + 300, max_tokens=500000, max_requests=5,
+                         run_authorization='company_profile_workpaper_development.2026-11-11')
+        client = _client(transport, budget, config)
+
+        class SavedOnly(CommonGatewaySemanticProvider):
+            offline_only = True
+            def __init__(self, **kwargs):
+                super().__init__(**kwargs)
+                self.final_boundary = None
+                self.repair_targets = None
+            def workpaper_request(self, **kwargs):
+                if kwargs['purpose'] == 'repair_profile_workpaper':
+                    self.repair_targets = kwargs['payload']['repair_targets']
+                    if symbol == '600000':
+                        raise ValueError('offline_repair_stopped_preserve_correct_original_no_new_model')
+                if kwargs['purpose'] == 'verify_profile_workpaper_repair':
+                    self.final_boundary = kwargs['payload']['candidates']
+                    raise ValueError('offline_final_not_authorized_no_candidate_adopted')
+                return super().workpaper_request(**kwargs)
+
+        provider = SavedOnly(client=client, profile='test', max_output_tokens=16384, timeout_seconds=60)
+        identity = workpaper_processing_identity(real=False, review=True)
+        identity.update(quality_review_profile='review', repair_profile='test',
+                        review_existing_draft_hash=workpaper_hash(seed))
+        service = CompanyProfileTaskService(storage=storage, output_root=root / 'output',
+            checkpoint_root=root / 'checkpoints', provider=provider, execution_budget=budget,
+            processing_identity=identity,
+            page_source=lambda _: {'report': seed.report, 'pages': pages, 'review_seed': seed})
+        ran = asyncio.run(service.execute('run', knowledge_cutoff='2026-11-15',
+            instrument_ids=(paper.report.instrument_id,), max_items=1, max_elapsed_seconds=300))
+        assert ran['state'] == 'completed', ran
+        query = asyncio.run(service.execute('query', instrument_ids=(paper.report.instrument_id,)))
+        export = asyncio.run(service.execute('export', instrument_ids=(paper.report.instrument_id,),
+            output_directory=destination / 'export'))
+        reload = CompanyProfileReadService(root / 'output').query((paper.report.instrument_id,))
+        assert query['profiles'] == export['profiles'] == reload['profiles']
+        result = query['profiles'][0]['workpaper']
+        current = all_facts(result)
+        assert all(value == initial_facts[key] for key, value in current.items())
+        assert not any(f['resolution'] == 'corrected_pending_trust' for f in result['quality_review']['findings'])
+        assert result['quality_review']['status'] == 'incomplete'
+        if symbol == '600000':
+            assert {'RM-02', 'RM-03'} <= current.keys()
+            assert '1,739.64' in current['RM-03']['text']
+            assert 'OI-03' not in current and 'OD-03' not in current
+            assert provider.final_boundary is None
+            assert {'review-add:F-001', 'review-add:F-002'} <= {t['target_fact_id'] for t in provider.repair_targets}
+        else:
+            assert len(provider.final_boundary) == 1
+            assert provider.final_boundary[0]['fact_id'] == 'review-add:F001'
+            assert any(m['raw_value'] == '减少2,805万元' and m['value'] is None
+                       for m in provider.final_boundary[0]['metrics'])
+            assert current.keys() == initial_facts.keys()
+        dump(destination / 'query.json', query)
+        dump(destination / 'check.json', {
+            'origin': 'controlled_saved_response_replay', 'new_model_calls': 0,
+            'entry': 'CompanyProfileTaskService.execute(run)', 'gateway': 'CommonGatewaySemanticProvider with ScriptedTransport',
+            'original_draft_hash_reconstructed': True, 'source_pdf_sha256': sha(pdf),
+            'original_file_hashes_unchanged': original_hashes, 'three_reads_equal': True,
+            'retained_fact_count': len(current), 'removed_fact_ids': sorted(initial_facts.keys() - current.keys()),
+            'unchanged_retained_fact_objects': True,
+            'restored_from_original_vs_previous_limited_query': sorted(current.keys() - all_facts(old).keys()),
+            'saved_repair_candidates_local_source_check': local_candidates,
+            'final_candidate_ids_at_offline_stop': [f['fact_id'] for f in provider.final_boundary or ()],
+            'repaired_candidates_adopted': 0, 'review_status': result['quality_review']['status'],
+            'identity': identity, 'seconds_including_local_database_initialization': round(time.monotonic() - started, 3),
+            'not_a_supplier_latency_cost_or_quality_score': True,
+        })
+        assert all(sha(old_dir / name) == value for name, value in original_hashes.items())
+        print(json.dumps({'symbol': symbol, 'facts': len(current), 'final_candidates_pending': len(provider.final_boundary or ()), 'seconds': round(time.monotonic()-started,3)}, ensure_ascii=False), flush=True)
+    finally:
+        if client is not None:
+            asyncio.run(client.close())
+        size = sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
+        shutil.rmtree(root)
+        dump(destination / 'cleanup.json', {'removed_root': str(root), 'removed_bytes': size, 'rebuild_from_saved_sources_and_responses': True})
+
+
+if __name__ == '__main__':
+    removed = []
+    for name in ('workpaper-cl-600097-fqu8660p', 'workpaper-cl-600097-zdaq_r5g'):
+        path = ROOT / 'data/QuoteBak' / name
+        if path.exists():
+            assert path.is_dir() and not path.is_symlink()
+            size = sum(p.stat().st_size for p in path.rglob('*') if p.is_file())
+            shutil.rmtree(path)
+            removed.append({'path': str(path), 'bytes': size, 'reason': 'owned aborted local diagnostic; no model or unique evidence'})
+    if removed:
+        dump(DEST / 'diagnostic-cleanup.json', {'removed': removed, 'bytes': sum(r['bytes'] for r in removed)})
+    # No accidental fallback to a real socket, even if the fixture is exhausted.
+    with patch('socket.socket.connect', side_effect=AssertionError('network_forbidden_in_CL_local_replay')):
+        if len(sys.argv) > 1:
+            run_one(sys.argv[1])
+        else:
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                futures = {s: executor.submit(run_one, s) for s in ('600000', '600097')}
+                for symbol, future in futures.items():
+                    try:
+                        future.result()
+                    except Exception as exc:
+                        print(symbol + ': ' + repr(exc), flush=True)
+                        raise

@@ -1,0 +1,16 @@
+{
+  "owned_successful_local_entry_roots_removed_bytes": 3560948,
+  "owned_aborted_local_diagnostic_roots_removed_bytes": 2326528,
+  "owned_scripts_removed_bytes": 18756,
+  "released_bytes_this_task": 5906232,
+  "recovery": "rebuild from original PDF/cache, retained original responses and operation snapshots",
+  "retained": [
+    "one_CL_result_set",
+    "official_PDFs",
+    "useful_shared_cache",
+    "original_CK_results",
+    "old_attempt_markers",
+    "preexisting_and_parallel_changes"
+  ],
+  "not_recounted": "all CK and earlier releases"
+}

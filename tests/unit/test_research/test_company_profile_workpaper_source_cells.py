@@ -81,6 +81,36 @@ def test_point_alias_preserves_raw_direction_and_source_unit(raw, value):
         WorkpaperMetric.model_validate({**data, "value": str(-float(value))})
 
 
+@pytest.mark.parametrize('raw,value', [('减少2,805万元','-2805'),('增加8,196万元','8196')])
+def test_monetary_change_wording_is_preserved_without_guessing_signed_balance(raw,value):
+    data=metric(name='业务收入变动额',raw_value=raw,value=value,unit='万元',source_unit='万元')
+    before=copy.deepcopy(data)
+    actual,_=source_check(data,'捕捞业务收入'+raw+'。')
+    assert actual.metrics[0].value is None and actual.metrics[0].raw_value==raw
+    assert actual.metrics[0].uncertainty_reason and data==before
+    with pytest.raises(ValueError):
+        WorkpaperMetric.model_validate({**data,'value':str(-int(value))})
+    with pytest.raises(ValueError,match='wording is absent'):
+        source_check(data,'另一业务收入100万元。')
+
+
+@pytest.mark.parametrize('unit,source_unit', [('百万元','人民币百万元'),('亿元','亿元人民币')])
+def test_currency_decorated_unit_keeps_same_value_and_original_spelling(unit,source_unit):
+    data=metric(raw_value='325,269',value='325269',unit=unit,source_unit=source_unit)
+    actual=WorkpaperMetric.model_validate(data)
+    assert actual.source_unit==source_unit and actual.value=='325269'
+    with pytest.raises(ValueError,match='magnitude'):
+        WorkpaperMetric.model_validate({**data,'unit':'元'})
+    with pytest.raises(ValueError,match='currency'):
+        WorkpaperMetric.model_validate({**data,'currency':'USD'})
+
+
+@pytest.mark.parametrize('unit', [12, ['万元']])
+def test_malformed_monetary_change_unit_remains_a_typed_rejection(unit):
+    with pytest.raises(ValueError):
+        WorkpaperMetric.model_validate(metric(raw_value='减少2万元', value='-2', unit=unit))
+
+
 def test_wrapped_point_wording_has_its_own_source_support():
     fact, _ = source_check(metric(name="毛利率变动", raw_value="减少29.68个百分点",
         value="-29.68", unit="个百分点", source_unit="个百分点", currency=None))
@@ -122,7 +152,7 @@ def test_new_processing_identity_versions_signed_source_rate_binding():
 
     for real in (False, True):
         identity = workpaper_processing_identity(real=real)
-        assert identity["source_binding_policy"] == "company_workpaper_source_literals.prose-numerals.v2"
+        assert identity["source_binding_policy"] == "company_workpaper_source_literals.directional-money.v3"
         assert identity["semantic_reuse"] is False
 
 

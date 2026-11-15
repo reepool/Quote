@@ -4207,6 +4207,10 @@ class CommonGatewaySemanticProvider:
 
             wire_schema = workpaper_draft_wire_schema()
             normalizer = normalize_workpaper_draft
+        elif purpose == "repair_profile_workpaper":
+            from .workpaper import workpaper_repair_wire_schema
+
+            wire_schema = workpaper_repair_wire_schema()
         return self._execute(
             call_type="verify" if purpose in {"review_profile_workpaper", "verify_profile_workpaper_repair"} else "extract",
             semantic_request_id=request_id,

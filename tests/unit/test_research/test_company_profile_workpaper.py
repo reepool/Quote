@@ -530,7 +530,7 @@ def test_workpaper_contract_passes_real_gateway_schema_with_only_transport_repla
         assert identity["prompt_version"].endswith("operating-summary-first.v15")
         assert identity["section_guide_version"].endswith("operating-summary.v3")
         assert identity["workpaper_max_output_tokens"] == 12000
-        assert identity["source_binding_policy"] == "company_workpaper_source_literals.prose-numerals.v2"
+        assert identity["source_binding_policy"] == "company_workpaper_source_literals.directional-money.v3"
         assert "conditional disclosure heading is not a fact" in instructions
         assert "denominator of each percentage" in instructions
         assert "preserve the displayed subtotal and elimination separately" in instructions

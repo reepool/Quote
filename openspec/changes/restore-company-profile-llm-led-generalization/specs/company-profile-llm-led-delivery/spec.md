@@ -92,7 +92,12 @@ The reviewer MUST identify checked fact IDs/elements and source-cited errors, am
 #### Scenario: A valid unique fact ID has a mismatched element hint
 - **WHEN** a finding cites an existing unique draft fact and valid source IDs but supplies a different known element hint
 - **THEN** local consumption binds that ID to its actual draft element and records the original-to-bound mapping without rewriting the raw review receipt
-- **AND** an important omission attached to that existing ID becomes a correction of that ID, not a new fact; it still requires a confirmed source recheck before adoption, while unknown IDs/elements/evidence remain invalid
+- **AND** a pure possible_omission/material_omission attached to that existing ID becomes a separately identified supplement with an explicit related-original ID, not a withdrawal or replacement of the correct original; the supplement still requires confirmed source recheck, while unknown IDs/elements/evidence remain invalid
+
+#### Scenario: A supplement cannot complete but the original fact is correct
+- **WHEN** an initial review requests additional material context without flagging the existing fact itself as wrong, and the supplement is absent, rejected or unverified
+- **THEN** that original fact remains unchanged and readable, the omitted context remains unresolved, and no supplement is adopted
+- **AND** a separate correct/quarantine finding still withdraws the erroneous original; an omission label alone cannot override that finding
 
 #### Scenario: A review identifies a scope limitation without a fact ID
 - **WHEN** an otherwise valid review flags limitations or an element-level ambiguity without an affected fact
@@ -113,6 +118,12 @@ The reviewer MUST identify checked fact IDs/elements and source-cited errors, am
 - **WHEN** a combined repair has unique known target IDs but one candidate fails its existing source, number or unit checks
 - **THEN** only that candidate is rejected with its original proposal and concrete local reason retained, while independent valid candidates may reach the single bounded final source verification
 - **AND** unknown target IDs or duplicate targets still reject the batch before any final send; invalid candidates are never verified or adopted, no valid candidates means no final request, and local validity never substitutes for an explicit final check
+- **AND** candidate-local typed metric errors are isolated under the same rule; the transmitted schema still describes complete typed facts, and raw proposals plus concrete local rejection reasons remain auditable
+
+#### Scenario: A repair quotes a source-native monetary change or currency-decorated unit
+- **WHEN** a same-unit metric retains an explicit source phrase such as 增加8196万元 or 减少2805万元 and its proposed signed value agrees, or source_unit spells 人民币百万元 while unit is 百万元
+- **THEN** the owner may retain the exact directional wording with a null normalized value and uncertainty note, or accept the same-currency same-magnitude unit spelling without converting the amount
+- **AND** a changed sign, magnitude, incompatible currency/unit or missing source qualifier remains invalid; the unchanged wording must still bind to source and a proposed correction still requires final source review
 
 #### Scenario: A source table has a missing consolidation adjustment
 - **WHEN** review discovers a materially omitted subtotal/elimination in supplied source text

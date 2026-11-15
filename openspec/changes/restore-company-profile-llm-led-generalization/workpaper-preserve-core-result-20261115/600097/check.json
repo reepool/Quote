@@ -1,0 +1,58 @@
+{
+  "origin": "controlled_saved_response_replay",
+  "new_model_calls": 0,
+  "entry": "CompanyProfileTaskService.execute(run)",
+  "gateway": "CommonGatewaySemanticProvider with ScriptedTransport",
+  "original_draft_hash_reconstructed": true,
+  "source_pdf_sha256": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+  "original_file_hashes_unchanged": {
+    "execution.json": "e12cbe6b83e0543c5cac5b8ce6d500757bd64e9db1e0b8c5372201ca4e8eeecb",
+    "entry-timing.json": "5ff273bac4f698ecec3ba4564b46519c5567085e0bc3cd7072c4845261bc0215",
+    "provider-traces.json": "a4e8ff237874b6a46c5b04740a3a67a8ae201139f62f9a2822e24c552d66b768",
+    "source-check.json": "9917fbf7ea81d5abc2da8b4c5b6eded086a5bc44133b228abb7d51208d062caf",
+    "binding.json": "7fd33a0208373ba9a4971c833a1750393e6cb39a0064e79a05ebe7cf270b497c",
+    "model-receipts.json": "4044ad34b0acf9f7b1cb65b0d0ed98f4c483c6b7eb9b69cca69c31bf1567d8d6",
+    "content-capture-index.json": "2277cd8239f31d9a41062f46a4a1324ea324cd0822ec2f5ec5c6bce7deb9bc43",
+    "summary.json": "d8e86fc370ddca1ef25e21649ac824817782d166ae6d45ae0cd483a9a85434f3",
+    "budget.json": "41d5c320fdc9c2f712381404c2aec0bdbade5a89c219e1cc28a4e30228c45650",
+    "query.json": "0a1edb2ef25dd20bc7ef09bbf9086a414f14692abfe0a422e7966ac3b266ff15"
+  },
+  "three_reads_equal": true,
+  "retained_fact_count": 31,
+  "removed_fact_ids": [],
+  "unchanged_retained_fact_objects": true,
+  "restored_from_original_vs_previous_limited_query": [],
+  "saved_repair_candidates_local_source_check": [
+    {
+      "fact_id": "review-add:F001",
+      "source_valid": true,
+      "metrics": 13
+    }
+  ],
+  "final_candidate_ids_at_offline_stop": [
+    "review-add:F001"
+  ],
+  "repaired_candidates_adopted": 0,
+  "review_status": "incomplete",
+  "identity": {
+    "semantic_policy": "company_profile_llm_led.v2",
+    "reading_strategy": "chapter_workpaper_v1",
+    "prompt_version": "company_profile_workpaper.2026-11-15.operating-summary-first.v15",
+    "section_guide_version": "company_profile_section_guide.2026-11-15.operating-summary.v3",
+    "preprocessing_version": "toc_sections_native_layout.v3.numeric-row-boundary",
+    "source_binding_policy": "company_workpaper_source_literals.directional-money.v3",
+    "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+    "execution_mode": "offline_fake",
+    "semantic_reuse": false,
+    "max_section_characters": 160000,
+    "max_layout_characters": 500000,
+    "workpaper_max_output_tokens": 12000,
+    "logical_request_timeout_seconds": 620,
+    "workpaper_review_policy": "company_profile_workpaper_review.v5",
+    "quality_review_profile": "review",
+    "repair_profile": "test",
+    "review_existing_draft_hash": "7a013b5a626c80af55de2dc7bcc94479202501b0ef668e27760dbcc0b6a3568b"
+  },
+  "seconds_including_local_database_initialization": 58.934,
+  "not_a_supplier_latency_cost_or_quality_score": true
+}

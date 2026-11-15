@@ -1,0 +1,84 @@
+"""Local-only 6.CL evidence verification and owned-artifact retirement."""
+import hashlib
+import json
+import shutil
+from pathlib import Path
+
+ROOT = Path('/home/python/Quote')
+CHANGE = ROOT / 'openspec/changes/restore-company-profile-llm-led-generalization'
+SOURCE = CHANGE / 'workpaper-four-concentrated-source-result-20261115'
+DEST = CHANGE / 'workpaper-preserve-core-result-20261115'
+
+
+def read(path):
+    return json.loads(path.read_text())
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def dump(path, data):
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+
+
+original = read(SOURCE / 'original-result-check.json')
+assert all(sha(SOURCE / p) == value for p, value in original['original_file_sha256'].items())
+assert sha(ROOT / 'config/13_llm.json') == read(SOURCE / 'authorization.json')['shared_config_sha256']
+checks = {}
+for symbol in ('600000', '600097'):
+    check = read(DEST / symbol / 'check.json')
+    assert check['three_reads_equal'] and check['original_draft_hash_reconstructed']
+    assert check['repaired_candidates_adopted'] == check['new_model_calls'] == 0
+    assert check['unchanged_retained_fact_objects']
+    assert all(sha(SOURCE / symbol / p) == value for p, value in check['original_file_hashes_unchanged'].items())
+    checks[symbol] = {key: check[key] for key in (
+        'retained_fact_count', 'removed_fact_ids', 'restored_from_original_vs_previous_limited_query',
+        'final_candidate_ids_at_offline_stop', 'seconds_including_local_database_initialization')}
+operator = ROOT / 'data/QuoteBak/workpaper_cl_observe.py'
+finalizer = Path(__file__).resolve()
+assert finalizer == ROOT / 'data/QuoteBak/workpaper_cl_finalize.py'
+assert operator.is_file() and not operator.is_symlink() and not finalizer.is_symlink()
+shutil.copyfile(operator, DEST / 'operator-snapshot.txt')
+shutil.copyfile(finalizer, DEST / 'closeout-snapshot.txt')
+code_paths = [
+    'research/company_profile/workpaper.py', 'research/company_profile/workpaper_review.py',
+    'research/company_profile/workpaper_llm.py', 'research/company_profile/stage5_provider.py',
+]
+dump(DEST / 'validation.json', {
+    'task': '6.CL', 'base_commit': 'ceb86d8f', 'new_model_calls': 0,
+    'source_and_original_result_hashes_unchanged': True,
+    'shared_llm_configuration_unchanged': True,
+    'local_replay_prohibits_socket_connect': True,
+    'per_company': checks,
+    'direct_regression': {'passed': 108, 'deselected': 3, 'seconds': 23.81},
+    'post_review_typed_input_guard_tests': {'passed': 6, 'deselected': 42, 'seconds': 3.92},
+    'post_review_guard_does_not_change_valid_replay_inputs': True,
+    'openspec_strict': 'passed',
+    'code_sha256': {p: sha(ROOT / p) for p in code_paths},
+    'operator_snapshot_sha256': sha(DEST / 'operator-snapshot.txt'),
+    'closeout_snapshot_sha256': sha(DEST / 'closeout-snapshot.txt'),
+    'formal_accuracy': None, 'formal_recall': None, 's1': '0/12', 'production': 'not_authorized',
+    'review': {'blocking_fixed': ['supplement_withdrawal_of_correct_original', 'directional_monetary_wording',
+        'same_currency_unit_decoration', 'typed_bad_neighbor_blocks_valid_candidate'],
+        'deferred_nonblocking': ['fine_supply_chain', 'bank_supplement_completeness'],
+        'preexisting_parallel_changes': 'untouched_and_not_included'},
+})
+for path in DEST.rglob('*.json'):
+    read(path)
+script_bytes = operator.stat().st_size + finalizer.stat().st_size
+worker_bytes = sum(read(DEST / symbol / 'cleanup.json')['removed_bytes'] for symbol in checks)
+diagnostic_bytes = read(DEST / 'diagnostic-cleanup.json')['bytes']
+operator.unlink()
+finalizer.unlink()
+dump(DEST / 'cleanup.json', {
+    'owned_successful_local_entry_roots_removed_bytes': worker_bytes,
+    'owned_aborted_local_diagnostic_roots_removed_bytes': diagnostic_bytes,
+    'owned_scripts_removed_bytes': script_bytes,
+    'released_bytes_this_task': worker_bytes + diagnostic_bytes + script_bytes,
+    'recovery': 'rebuild from original PDF/cache, retained original responses and operation snapshots',
+    'retained': ['one_CL_result_set', 'official_PDFs', 'useful_shared_cache', 'original_CK_results',
+                 'old_attempt_markers', 'preexisting_and_parallel_changes'],
+    'not_recounted': 'all CK and earlier releases',
+})
+print(json.dumps({'validation': 'passed', 'checks': checks, 'cleanup': read(DEST / 'cleanup.json')}, ensure_ascii=False))

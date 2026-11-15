@@ -1,0 +1,87 @@
+{
+  "origin": "controlled_saved_response_replay",
+  "new_model_calls": 0,
+  "entry": "CompanyProfileTaskService.execute(run)",
+  "gateway": "CommonGatewaySemanticProvider with ScriptedTransport",
+  "original_draft_hash_reconstructed": true,
+  "source_pdf_sha256": "e4d1cff0461c0ef24d26551ca68e31ad323a1b3eadd8a3c03f00feada364de22",
+  "original_file_hashes_unchanged": {
+    "execution.json": "af641b45249ca79fd1cc8837f417ac628b038056d38cbb9e7e7426f4c3d1f8cc",
+    "entry-timing.json": "2550033b58e8f41602e9aa55ad8fbfd5a35fab71bce533b7b3c81e637b1e99ef",
+    "provider-traces.json": "46c4446d76449d20433f838fe7360e49c791bbf0ff4e55bca42c4f0f52070be0",
+    "source-check.json": "0f2fd49a256c566f79287050ebbfe92e6d23f300eedfed18fdd5172095638c60",
+    "binding.json": "460d319066102f901cc5319159c08b0f25f7bd90ba13c13855ffc99b8ce39be9",
+    "model-receipts.json": "24225067f6609ed98b65db5e1236000874352404ad26819e56c8f86a2a658a84",
+    "content-capture-index.json": "1e8981cc78e90b9b0366bf1c3d835dcd26cfb24af5ac3b6e45ab613f9bc49bed",
+    "summary.json": "e58356ef22c91857f03612c93a8ae8957f50d18281352efcf01060bf3cc4a1bd",
+    "budget.json": "01de6a9062a3682178176950f936837f19efb91fac6f6228f37a51fc31446252",
+    "query.json": "1d786e209c650622ab3163c2eaa9bfeda0cc2021c40f5bad2d6554edda350686"
+  },
+  "three_reads_equal": true,
+  "retained_fact_count": 31,
+  "removed_fact_ids": [
+    "OD-03",
+    "OI-03"
+  ],
+  "unchanged_retained_fact_objects": true,
+  "restored_from_original_vs_previous_limited_query": [
+    "RM-02",
+    "RM-03"
+  ],
+  "saved_repair_candidates_local_source_check": [
+    {
+      "fact_id": "RM-02",
+      "source_valid": true,
+      "metrics": 14
+    },
+    {
+      "fact_id": "RM-03",
+      "source_valid": true,
+      "metrics": 14
+    },
+    {
+      "fact_id": "review-add:F-003",
+      "source_valid": false,
+      "reason": "metric number is absent from cited source: 利息收入同比变动率"
+    },
+    {
+      "fact_id": "review-add:F-004",
+      "source_valid": false,
+      "reason": "1 validation error for WorkpaperFact\nmetrics.8\n  Value error, metric qualifier must match original raw value [type=value_error, input_value={'name': '国内贸易融...司或本集团口径'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/value_error"
+    },
+    {
+      "fact_id": "OI-03",
+      "source_valid": true,
+      "metrics": 5
+    },
+    {
+      "fact_id": "OD-03",
+      "source_valid": true,
+      "metrics": 6
+    }
+  ],
+  "final_candidate_ids_at_offline_stop": [],
+  "repaired_candidates_adopted": 0,
+  "review_status": "incomplete",
+  "identity": {
+    "semantic_policy": "company_profile_llm_led.v2",
+    "reading_strategy": "chapter_workpaper_v1",
+    "prompt_version": "company_profile_workpaper.2026-11-15.operating-summary-first.v15",
+    "section_guide_version": "company_profile_section_guide.2026-11-15.operating-summary.v3",
+    "preprocessing_version": "toc_sections_native_layout.v3.numeric-row-boundary",
+    "source_binding_policy": "company_workpaper_source_literals.directional-money.v3",
+    "product_contract": "company_profile_product_contract.2026-11-11.chapter-workpaper.v9",
+    "execution_mode": "offline_fake",
+    "semantic_reuse": false,
+    "max_section_characters": 160000,
+    "max_layout_characters": 500000,
+    "workpaper_max_output_tokens": 12000,
+    "logical_request_timeout_seconds": 620,
+    "workpaper_review_policy": "company_profile_workpaper_review.v5",
+    "quality_review_profile": "review",
+    "repair_profile": "test",
+    "review_existing_draft_hash": "2840b457327f1a08bc0f3ce96e095a67a155c2761f937585aec8bbe1e68a9c67"
+  },
+  "seconds_including_local_database_initialization": 59.129,
+  "not_a_supplier_latency_cost_or_quality_score": true
+}

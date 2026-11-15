@@ -1,0 +1,69 @@
+{
+  "task": "6.CL",
+  "base_commit": "ceb86d8f",
+  "new_model_calls": 0,
+  "source_and_original_result_hashes_unchanged": true,
+  "shared_llm_configuration_unchanged": true,
+  "local_replay_prohibits_socket_connect": true,
+  "per_company": {
+    "600000": {
+      "retained_fact_count": 31,
+      "removed_fact_ids": [
+        "OD-03",
+        "OI-03"
+      ],
+      "restored_from_original_vs_previous_limited_query": [
+        "RM-02",
+        "RM-03"
+      ],
+      "final_candidate_ids_at_offline_stop": [],
+      "seconds_including_local_database_initialization": 59.129
+    },
+    "600097": {
+      "retained_fact_count": 31,
+      "removed_fact_ids": [],
+      "restored_from_original_vs_previous_limited_query": [],
+      "final_candidate_ids_at_offline_stop": [
+        "review-add:F001"
+      ],
+      "seconds_including_local_database_initialization": 58.934
+    }
+  },
+  "direct_regression": {
+    "passed": 108,
+    "deselected": 3,
+    "seconds": 23.81
+  },
+  "post_review_typed_input_guard_tests": {
+    "passed": 6,
+    "deselected": 42,
+    "seconds": 3.92
+  },
+  "post_review_guard_does_not_change_valid_replay_inputs": true,
+  "openspec_strict": "passed",
+  "code_sha256": {
+    "research/company_profile/workpaper.py": "889d408ac391371fe4bacbc2a0ade98d8a1c2773501795c5e1fd42ba33c483b8",
+    "research/company_profile/workpaper_review.py": "855b05ae643d91f8554821550c732ba2cdcd26955d3f811e04ebb67402a19780",
+    "research/company_profile/workpaper_llm.py": "666fed40ae6feb9b597f0034d4ee12d7b7f9febbd9b5e238a10a1ec08761e830",
+    "research/company_profile/stage5_provider.py": "6bddf98f98801b92cff703a4642cb2af9599742eb483e43fd3748598e8082832"
+  },
+  "operator_snapshot_sha256": "34588ddb830ab3c40869bc0aa4ac8ae4a40761a370b9c6855efe6755f2dac005",
+  "closeout_snapshot_sha256": "10b7c00e781c9404cf0eee50cf08794f989d6d828473a46e9d1fd9d6c19bfdc1",
+  "formal_accuracy": null,
+  "formal_recall": null,
+  "s1": "0/12",
+  "production": "not_authorized",
+  "review": {
+    "blocking_fixed": [
+      "supplement_withdrawal_of_correct_original",
+      "directional_monetary_wording",
+      "same_currency_unit_decoration",
+      "typed_bad_neighbor_blocks_valid_candidate"
+    ],
+    "deferred_nonblocking": [
+      "fine_supply_chain",
+      "bank_supplement_completeness"
+    ],
+    "preexisting_parallel_changes": "untouched_and_not_included"
+  }
+}

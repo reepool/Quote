@@ -9,7 +9,7 @@ from __future__ import annotations
 import re
 from collections.abc import Mapping, Sequence
 from decimal import Decimal, InvalidOperation
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
@@ -84,6 +84,14 @@ class WorkpaperEvidence(_Model):
         )
 
 
+def _money_unit_spelling(unit: str | None) -> str | None:
+    """Currency decoration is not a magnitude conversion."""
+    if not isinstance(unit, str):
+        return None
+    bare = (unit or "").removeprefix("人民币").removesuffix("人民币").strip()
+    return bare if bare in {"元", "千元", "万元", "百万元", "亿元", "万亿元"} else None
+
+
 class WorkpaperMetric(_Model):
     name: str = Field(min_length=1)
     raw_value: str = Field(min_length=1)
@@ -110,6 +118,21 @@ class WorkpaperMetric(_Model):
         result = {**data, "qualifier": qualifier}
         if qualifier != "exact" and data.get("value") is None and not data.get("uncertainty_reason"):
             result["uncertainty_reason"] = "程序说明：保留原文限定，未作精确数值标准化。"
+        change = re.fullmatch(r"(增加|减少)\s*(\d[\d,，]*(?:\.\d+)?)\s*(.+)", raw)
+        if change and data.get("value") is not None:
+            unit = _money_unit_spelling(data.get("unit"))
+            source_unit = _money_unit_spelling(data.get("source_unit") or data.get("unit"))
+            if unit and unit == source_unit == _money_unit_spelling(change[3]):
+                try:
+                    amount = Decimal(change[2].replace(",", "").replace("，", ""))
+                    reference = Decimal(str(data["value"]))
+                except InvalidOperation:
+                    pass
+                else:
+                    signed = -amount if change[1] == "减少" else amount
+                    if amount.is_finite() and reference.is_finite() and signed == reference:
+                        result.update(value=None, uncertainty_reason=data.get("uncertainty_reason") or
+                                      "原文带增减方向及金额单位；保留原文，不参与精确加总。")
         # Preserve a real returned source phrase rather than forcing a signed
         # number onto it. Only an agreeing same-unit reference can fall back;
         # a wrong sign/unit/value is still an error, not "uncertainty".
@@ -131,6 +154,9 @@ class WorkpaperMetric(_Model):
 
     @model_validator(mode="after")
     def decimal_value(self):
+        decorated = any("人民币" in (unit or "") for unit in (self.unit, self.source_unit))
+        if decorated and self.currency not in (None, "人民币", "CNY", "RMB"):
+            raise ValueError("currency conflicts with the explicit source unit")
         if self.value is None:
             if not self.uncertainty_reason:
                 raise ValueError("unnormalized metric requires an uncertainty reason")
@@ -139,7 +165,10 @@ class WorkpaperMetric(_Model):
             raise ValueError("unknown unit requires a null normalized value")
         if self.source_unit and self.source_unit != self.unit and (
             self.source_unit, self.unit
-        ) not in {("%", "百分点"), ("％", "百分点"), ("个百分点", "百分点")}:
+        ) not in {("%", "百分点"), ("％", "百分点"), ("个百分点", "百分点")} and not (
+            _money_unit_spelling(self.unit)
+            and _money_unit_spelling(self.unit) == _money_unit_spelling(self.source_unit)
+        ):
             raise ValueError("source_unit cannot relabel a numeric magnitude")
         raw_number = self.raw_value.strip()
         if self.qualifier != "exact":
@@ -463,7 +492,19 @@ class WorkpaperReviewResponse(_Model):
 
 
 class WorkpaperRepairResponse(_Model):
-    repaired_facts: tuple[WorkpaperFact, ...]
+    """Raw candidates: identities first, then each full fact is validated locally."""
+
+    repaired_facts: tuple[dict[str, Any], ...]
+
+
+def workpaper_repair_wire_schema() -> dict:
+    """Request full typed facts even though local consumption isolates bad ones."""
+    schema = WorkpaperRepairResponse.model_json_schema()
+    fact_schema = WorkpaperFact.model_json_schema()
+    schema["$defs"] = fact_schema.pop("$defs", {})
+    schema["$defs"]["WorkpaperFact"] = fact_schema
+    schema["properties"]["repaired_facts"]["items"] = {"$ref": "#/$defs/WorkpaperFact"}
+    return schema
 
 
 class WorkpaperRepairCheck(_Model):
@@ -488,6 +529,7 @@ class WorkpaperReviewFinding(_Model):
         "material_omission", "other",
     ]
     affected_fact_id: str | None = None
+    related_fact_id: str | None = None
     evidence_ids: tuple[str, ...]
     explanation: str = Field(min_length=1)
     resolution: Literal[
@@ -844,6 +886,8 @@ def render_workpaper(workpaper: CompanyProfileWorkpaper) -> str:
             out.append(f"- {finding.severity} / {finding.issue_type} / {finding.resolution}：{finding.explanation}（{refs}）")
             if finding.original_fact is not None:
                 out.append(f"  - 原事实（已保留审计）：{finding.original_fact.text}")
+            if finding.related_fact_id is not None:
+                out.append(f"  - 补充关联原事实：{finding.related_fact_id}；本意见不撤回或替换该原事实，其他纠错意见仍有效。")
             if finding.revised_fact is not None:
                 out.append(f"  - 修订候选（尚非可信发布）：{finding.revised_fact.text}")
         if review.error:

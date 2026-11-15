@@ -1,0 +1,5 @@
+instrument_id,report_period,published_at,core_complete,principal_business,products_services,revenue_model,accepted_fact_count,gap_count,workpaper_status,workpaper_origin,workpaper_business_description,workpaper_fact_count,workpaper_metric_count,workpaper_review_status,workpaper_open_finding_count,workpaper_extraction_model,workpaper_review_model
+600000.SH,2025-12-31,2026-03-30T16:00:00+00:00,False,False,False,False,0,0,review_limited_pending_verification,controlled_fixture,"公司为银行，主要业务分为公司金融业务、零售金融业务、金融市场与金融机构业务、跨境及境外机构业务四大板块。
+公司金融业务涵盖商业信贷、交易银行、投资银行、电子银行、跨境业务、离岸业务等领域，并推进“四层四类”公司客户经营体系建设。
+金融市场业务采取“自营投资交易+浦银避险代客”双核驱动经营模式，并经营资产托管业务。
+跨境及境外机构业务依托离岸银行、自贸金融、境外分行和海外投行等多平台协同，境外机构包括香港分行、新加坡分行、伦敦分行及浦银国际。",31,81,incomplete,7,deepseek-flash,test-model

@@ -92,16 +92,27 @@ def test_known_fact_id_binds_actual_element_without_approving_it():
 
 
 @pytest.mark.parametrize('verified', [False,True])
-def test_existing_fact_omission_corrects_same_id_and_still_requires_final(verified):
-    _,_,fixed,review,verification=material()
+def test_existing_fact_omission_adds_separate_supplement_and_still_requires_final(verified):
+    from tests.unit.test_research.test_company_profile_workpaper_review import Provider
+    from research.company_profile.workpaper_review import review_workpaper
+    from research.company_profile.workpaper_llm import workpaper_processing_identity
+    _,packet,fixed,review,verification=material()
+    paper=bind_workpaper_draft(_draft(packet),report=_report(),reading_scope=packet.reading_scope,evidence=packet.evidence)
     review['findings'][0].update(element='business_structure',action='possible_omission',issue_type='material_omission')
+    fixed={**fixed,'fact_id':'review-add:wrong-profit-column'}
+    verification['checked_fact_ids']=[fixed['fact_id']]
+    verification['checks'][0]['fact_id']=fixed['fact_id']
     final=verification if verified else ValueError('offline: no real final response')
-    _,result,provider,_=invoke([review,{'repaired_facts':[fixed]},final])
+    provider=Provider([review,{'repaired_facts':[fixed]},final])
+    result,_=review_workpaper(paper,packet=packet,provider=provider,work_id='supplement',
+        identity=workpaper_processing_identity(real=False,review=True))
     repair=provider.calls[1]['payload']['repair_targets'][0]
-    assert repair['target_fact_id']=='revenue' and repair['finding']['element']=='scale_and_mix'
-    assert repair['finding']['action']=='correct'
-    assert any('按原编号修订' in note for note in result.standardization_notes)
-    assert bool(result.elements.scale_and_mix.facts)==verified
+    assert repair['target_fact_id']==fixed['fact_id'] and repair['finding']['element']=='scale_and_mix'
+    assert repair['finding']['action']=='possible_omission'
+    assert repair['original_fact'] is None and repair['related_fact']['fact_id']=='revenue'
+    assert result.elements.scale_and_mix.facts[0]==paper.elements.scale_and_mix.facts[0]
+    assert len(result.elements.scale_and_mix.facts)==1+int(verified)
+    assert result.quality_review.findings[0].related_fact_id=='revenue'
     assert result.quality_review.findings[0].resolution==('corrected_pending_trust' if verified else 'verification_failed')
 
 
@@ -118,7 +129,7 @@ def test_minor_omission_of_existing_fact_does_not_withdraw_or_request_repair():
     assert result.elements==paper.elements and len(provider.calls)==1
     assert result.quality_review.findings[0].resolution=='omission_candidate'
     assert result.quality_review.findings[0].affected_fact_id is None
-    assert any('不撤回原事实或触发修订' in note for note in result.standardization_notes)
+    assert result.quality_review.findings[0].related_fact_id=='revenue'
 
 
 def test_new_seed_review_rebinds_narrative_without_mutating_old_seed():

@@ -1,0 +1,2874 @@
+{
+  "schema_version": "company_profile_common_core_profile.v3",
+  "production_authorization": "not_authorized",
+  "storage_namespace": "company_profile_common_core.v1",
+  "writer": "company_profile_research_writer.v1",
+  "work_id": "bp-work-766c167d2ee5fbc844a0a4ba",
+  "instrument_id": "600097.SH",
+  "report": {
+    "instrument_id": "600097.SH",
+    "report_id": "1225039976",
+    "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-27T16:00:00+00:00",
+    "document_type": "annual_report"
+  },
+  "freshness": {
+    "report_period": "2025-12-31",
+    "published_at": "2026-03-27T16:00:00+00:00",
+    "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+    "knowledge_time": "2026-03-27T16:00:00+00:00"
+  },
+  "core_complete": false,
+  "dimensions": [
+    {
+      "dimension_id": "principal_business",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    {
+      "dimension_id": "products_services",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    },
+    {
+      "dimension_id": "revenue_model",
+      "answered": false,
+      "excerpt": null,
+      "supporting_record_ids": [],
+      "evidence_ids": [],
+      "anchor": null,
+      "missing_reason": "no_accepted_evidence"
+    }
+  ],
+  "accepted_facts": [],
+  "gaps": [],
+  "evidence_gap_codes": [],
+  "commodity_exposure": {
+    "assessment": {
+      "schema_version": "company_profile_commodity_exposure.v1",
+      "production_authorization": "not_authorized",
+      "report": {
+        "instrument_id": "600097.SH",
+        "report_id": "1225039976",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "report_period": "2025-12-31",
+        "published_at": "2026-03-27T16:00:00+00:00",
+        "document_type": "annual_report"
+      },
+      "assessment_status": "not_assessed",
+      "checked_evidence_ids": [],
+      "exposures": []
+    },
+    "reported_period": "2025-12-31",
+    "knowledge_time": "2026-03-27T16:00:00+00:00",
+    "consumer_authorization": {
+      "dcf": false,
+      "trading": false,
+      "price_sensitivity": false
+    }
+  },
+  "workpaper": {
+    "schema_version": "company_profile_workpaper.v1",
+    "origin": "controlled_fixture",
+    "report": {
+      "instrument_id": "600097.SH",
+      "report_id": "1225039976",
+      "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+      "report_period": "2025-12-31",
+      "published_at": "2026-03-27T16:00:00+00:00",
+      "document_type": "annual_report"
+    },
+    "reading_scope": {
+      "sections": [
+        {
+          "section_id": "section-0021",
+          "section_path": [
+            "第二节 公司简介和主要财务指标",
+            "七、 近三年主要会计数据和财务指标"
+          ],
+          "start_page": 6,
+          "end_page": 7,
+          "rationale": "优先选取能完整说明公司业务结构、经营模式、收入来源与本期经营变化的实质子节：section-0034说明公司从事的业务情况，section-0036为经营情况讨论与分析，section-0042与section-0044提供主营业务分析及收入成本构成（含收入拆分与主要业务权重），section-0080为主要控股参股公司分析以补充业务板块经营，section-0021/0022提供公司层面近三年主要会计数据与营业收入总额，section-0085为经营计划以说明经营因素与展望。未选行业背景与核心竞争力等泛化内容，也未选纯财务附注与治理章节。"
+        },
+        {
+          "section_id": "section-0034",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "一、报告期内公司从事的业务情况"
+          ],
+          "start_page": 8,
+          "end_page": 9,
+          "rationale": "优先选取能完整说明公司业务结构、经营模式、收入来源与本期经营变化的实质子节：section-0034说明公司从事的业务情况，section-0036为经营情况讨论与分析，section-0042与section-0044提供主营业务分析及收入成本构成（含收入拆分与主要业务权重），section-0080为主要控股参股公司分析以补充业务板块经营，section-0021/0022提供公司层面近三年主要会计数据与营业收入总额，section-0085为经营计划以说明经营因素与展望。未选行业背景与核心竞争力等泛化内容，也未选纯财务附注与治理章节。"
+        },
+        {
+          "section_id": "section-0036",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "三、经营情况讨论与分析"
+          ],
+          "start_page": 9,
+          "end_page": 9,
+          "rationale": "优先选取能完整说明公司业务结构、经营模式、收入来源与本期经营变化的实质子节：section-0034说明公司从事的业务情况，section-0036为经营情况讨论与分析，section-0042与section-0044提供主营业务分析及收入成本构成（含收入拆分与主要业务权重），section-0080为主要控股参股公司分析以补充业务板块经营，section-0021/0022提供公司层面近三年主要会计数据与营业收入总额，section-0085为经营计划以说明经营因素与展望。未选行业背景与核心竞争力等泛化内容，也未选纯财务附注与治理章节。"
+        },
+        {
+          "section_id": "section-0042",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(一) 主营业务分析"
+          ],
+          "start_page": 10,
+          "end_page": 15,
+          "rationale": "优先选取能完整说明公司业务结构、经营模式、收入来源与本期经营变化的实质子节：section-0034说明公司从事的业务情况，section-0036为经营情况讨论与分析，section-0042与section-0044提供主营业务分析及收入成本构成（含收入拆分与主要业务权重），section-0080为主要控股参股公司分析以补充业务板块经营，section-0021/0022提供公司层面近三年主要会计数据与营业收入总额，section-0085为经营计划以说明经营因素与展望。未选行业背景与核心竞争力等泛化内容，也未选纯财务附注与治理章节。"
+        },
+        {
+          "section_id": "section-0080",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "五、报告期内主要经营情况",
+            "(七) 主要控股参股公司分析"
+          ],
+          "start_page": 18,
+          "end_page": 19,
+          "rationale": "优先选取能完整说明公司业务结构、经营模式、收入来源与本期经营变化的实质子节：section-0034说明公司从事的业务情况，section-0036为经营情况讨论与分析，section-0042与section-0044提供主营业务分析及收入成本构成（含收入拆分与主要业务权重），section-0080为主要控股参股公司分析以补充业务板块经营，section-0021/0022提供公司层面近三年主要会计数据与营业收入总额，section-0085为经营计划以说明经营因素与展望。未选行业背景与核心竞争力等泛化内容，也未选纯财务附注与治理章节。"
+        },
+        {
+          "section_id": "section-0085",
+          "section_path": [
+            "第三节 管理层讨论与分析",
+            "六、公司关于公司未来发展的讨论与分析",
+            "(三)经营计划"
+          ],
+          "start_page": 20,
+          "end_page": 21,
+          "rationale": "优先选取能完整说明公司业务结构、经营模式、收入来源与本期经营变化的实质子节：section-0034说明公司从事的业务情况，section-0036为经营情况讨论与分析，section-0042与section-0044提供主营业务分析及收入成本构成（含收入拆分与主要业务权重），section-0080为主要控股参股公司分析以补充业务板块经营，section-0021/0022提供公司层面近三年主要会计数据与营业收入总额，section-0085为经营计划以说明经营因素与展望。未选行业背景与核心竞争力等泛化内容，也未选纯财务附注与治理章节。"
+        }
+      ],
+      "unread_or_deferred": [
+        "section-0035 行业情况：属行业背景，非公司层面经营实质，暂不展开",
+        "section-0037 核心竞争力分析：偏泛化竞争力描述，非收入与经营结构核心",
+        "section-0070 行业经营性信息分析：多为资质与政府补助，非收入来源说明",
+        "section-0847 营业收入和营业成本附注：与section-0044收入成本分析重叠，暂不重复选取"
+      ],
+      "selection_rationale": "优先选取能完整说明公司业务结构、经营模式、收入来源与本期经营变化的实质子节：section-0034说明公司从事的业务情况，section-0036为经营情况讨论与分析，section-0042与section-0044提供主营业务分析及收入成本构成（含收入拆分与主要业务权重），section-0080为主要控股参股公司分析以补充业务板块经营，section-0021/0022提供公司层面近三年主要会计数据与营业收入总额，section-0085为经营计划以说明经营因素与展望。未选行业背景与核心竞争力等泛化内容，也未选纯财务附注与治理章节。",
+      "stop_reason": "已覆盖业务、经营模式、收入构成与主要业务权重、公司层面收入总额及经营计划等核心问题；行业背景与核心竞争力为次要信息，财务附注仅在存在实质缺口时定向补充，故可在此停止。",
+      "transcription_version": "shared-pdf-pypdf-layout.v1"
+    },
+    "elements": {
+      "business_structure": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "bs-01",
+            "text": "公司主要从事远洋渔业捕捞、水产品加工销售及相关贸易，围绕“一鱼一虾”（金枪鱼、南极磷虾）核心主业，形成捕捞、加工、贸易、运输一体化格局。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "bs-02",
+            "text": "主营业务按行业分为海洋捕捞、食品加工、渔货贸易、海上运输四个板块，合计主营业务收入2,330,812,544.82元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "主营业务收入合计",
+                "raw_value": "2,330,812,544.82",
+                "value": "2330812544.82",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "bs-03",
+            "text": "主要子公司覆盖远洋捕捞、食品加工、罐头食品加工、渔货贸易和海上运输等业务，如上海开创远洋渔业有限公司从事远洋捕捞，卡洛斯•阿尔博的孩子们有限公司从事罐头食品加工，康隆（香港）航运有限公司从事海上运输等。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0012",
+              "source-0013"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "products_services": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "ps-01",
+            "text": "远洋捕捞业务：金枪鱼围网船队11艘船舶全负荷运营，在中西太平洋作业，产品以鲣鱼、黄鳍为主；同时与江苏深蓝远洋渔业有限公司合作经营，在南极海域捕捞磷虾，产品以冻虾和虾粉为主。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ps-02",
+            "text": "加工业务：西班牙ALBO公司加工产品以金枪鱼罐头和罐头方便食品为主，部分产品在当地具有较高市场占有率及品牌知名度；国内岱山加工厂加工金枪鱼原料鱼，产品以鱼柳为主，主要销往国外市场。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ps-03",
+            "text": "海上运输业务：冷藏运输船队主要与金枪鱼围网船队作业配套，承担冷冻金枪鱼运输、人员和物资等转运，并积极拓展其他运输业务。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ps-04",
+            "text": "贸易业务以远洋渔货及水产品加工品为核心，外销主要面向国际市场，依托“捕捞—加工—贸易”全产业链开展运营。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "ps-05",
+            "text": "分产品收入：金枪鱼销售796,979,841.53元，零星鱼种销售153,783,717.50元，罐头食品销售816,352,061.87元，鱼柳加工销售238,259,146.86元，渔货贸易318,671,971.02元，海上运输6,765,806.04元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "金枪鱼销售收入",
+                "raw_value": "796,979,841.53",
+                "value": "796979841.53",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "零星鱼种销售收入",
+                "raw_value": "153,783,717.50",
+                "value": "153783717.50",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "罐头食品销售收入",
+                "raw_value": "816,352,061.87",
+                "value": "816352061.87",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "鱼柳加工销售收入",
+                "raw_value": "238,259,146.86",
+                "value": "238259146.86",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "渔货贸易收入",
+                "raw_value": "318,671,971.02",
+                "value": "318671971.02",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "海上运输收入",
+                "raw_value": "6,765,806.04",
+                "value": "6765806.04",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "revenue_model": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "rm-01",
+            "text": "公司通过远洋捕捞获取金枪鱼、磷虾等渔获，经加工（罐头、鱼柳、虾粉等）后销售，并开展渔货贸易和配套海上运输，形成捕捞、加工、贸易、运输一体化收入来源。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "rm-02",
+            "text": "分行业毛利率：海洋捕捞32.51%，食品加工34.65%，渔货贸易5.18%，海上运输6.07%；主营业务综合毛利率29.67%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "海洋捕捞毛利率",
+                "raw_value": "32.51",
+                "value": "32.51",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "食品加工毛利率",
+                "raw_value": "34.65",
+                "value": "34.65",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "渔货贸易毛利率",
+                "raw_value": "5.18",
+                "value": "5.18",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "海上运输毛利率",
+                "raw_value": "6.07",
+                "value": "6.07",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "主营业务综合毛利率",
+                "raw_value": "29.67",
+                "value": "29.67",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "rm-03",
+            "text": "公司销售模式为直销，直销收入2,330,812,544.82元，占主营业务收入全部。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0008"
+            ],
+            "metrics": [
+              {
+                "name": "直销收入",
+                "raw_value": "2,330,812,544.82",
+                "value": "2330812544.82",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "scale_and_mix": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "sm-01",
+            "text": "2025年公司营业收入2,336,503,042.69元，较上年增长0.90%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0001"
+            ],
+            "metrics": [
+              {
+                "name": "营业收入",
+                "raw_value": "2,336,503,042.69",
+                "value": "2336503042.69",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "营业收入比上年同期增减",
+                "raw_value": "0.90",
+                "value": "0.90",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": "上年同期",
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-02",
+            "text": "分行业主营业务收入：海洋捕捞950,763,559.03元，食品加工1,054,611,208.73元，渔货贸易318,671,971.02元，海上运输6,765,806.04元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "海洋捕捞收入",
+                "raw_value": "950,763,559.03",
+                "value": "950763559.03",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "食品加工收入",
+                "raw_value": "1,054,611,208.73",
+                "value": "1054611208.73",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "渔货贸易收入",
+                "raw_value": "318,671,971.02",
+                "value": "318671971.02",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "海上运输收入",
+                "raw_value": "6,765,806.04",
+                "value": "6765806.04",
+                "unit": "元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-03",
+            "text": "2025年公司金枪鱼船队共捕捞金枪鱼88,561吨，销售金枪鱼67,096吨，实现销售收入79,698万元；“深蓝轮”加工磷虾粉9,041吨（捕捞磷虾70,092吨），实现销售收入15,378万元；罐头食品营业收入81,635万元；鱼柳加工营业收入23,826万元；渔货贸易营业收入31,867万元。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "金枪鱼捕捞量",
+                "raw_value": "88,561",
+                "value": "88561",
+                "unit": "吨",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "金枪鱼销售量",
+                "raw_value": "67,096",
+                "value": "67096",
+                "unit": "吨",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "金枪鱼销售收入",
+                "raw_value": "79,698",
+                "value": "79698",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "磷虾粉产量",
+                "raw_value": "9,041",
+                "value": "9041",
+                "unit": "吨",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "磷虾捕捞量",
+                "raw_value": "70,092",
+                "value": "70092",
+                "unit": "吨",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "磷虾粉销售收入",
+                "raw_value": "15,378",
+                "value": "15378",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "罐头食品营业收入",
+                "raw_value": "81,635",
+                "value": "81635",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "鱼柳加工营业收入",
+                "raw_value": "23,826",
+                "value": "23826",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "渔货贸易营业收入",
+                "raw_value": "31,867",
+                "value": "31867",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "sm-04",
+            "text": "2025年公司境外销售130,245万元，占公司全部营业收入56%；国内销售102,836万元，占44%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "境外销售收入",
+                "raw_value": "130,245",
+                "value": "130245",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "境外销售占营业收入比例",
+                "raw_value": "56",
+                "value": "56",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "国内销售收入",
+                "raw_value": "102,836",
+                "value": "102836",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "国内销售占营业收入比例",
+                "raw_value": "44",
+                "value": "44",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "operations_and_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "oi-01",
+            "text": "海洋捕捞板块主要成本构成包括燃料、许可证配额费、渔用物资、船舶修理费、人工成本等。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "oi-02",
+            "text": "食品加工板块主要成本构成包括原料鱼、辅料、铁罐头、燃料及动力、人工成本、折旧费、其他加工成本。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "oi-03",
+            "text": "渔货贸易板块主要成本构成包括原料鱼、运输费等；海上运输板块主要成本构成包括船舶租金、燃料、船用物资、人工成本、货物保险等。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "oi-04",
+            "text": "金枪鱼围网船队11艘船舶投入生产，实现满负荷运营；2026年计划有序推进2艘船舶更新建造工作。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005",
+              "source-0014"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "customers_channels_markets": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "cc-01",
+            "text": "公司捕捞的金枪鱼部分在海外销售，ALBO公司产品销售基本在境外销售；国内部分金枪鱼、磷虾粉、鱼柳等销售以国内客户为主。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "cc-02",
+            "text": "前五名客户销售额90,078.38万元，占年度销售总额38.55%；其中前五名客户销售额中关联方销售额0万元，占年度销售总额0%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "metrics": [
+              {
+                "name": "前五名客户销售额",
+                "raw_value": "90,078.38",
+                "value": "90078.38",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "前五名客户销售额占年度销售总额比例",
+                "raw_value": "38.55",
+                "value": "38.55",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "cc-03",
+            "text": "前五名供应商采购额63,005.62万元，占年度采购总额30.15%；其中前五名供应商采购额中关联方采购额0万元，占年度采购总额0%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "metrics": [
+              {
+                "name": "前五名供应商采购额",
+                "raw_value": "63,005.62",
+                "value": "63005.62",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "前五名供应商采购额占年度采购总额比例",
+                "raw_value": "30.15",
+                "value": "30.15",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "cc-04",
+            "text": "ALBO公司沙丁鱼、鱿鱼等罐头产品保持西班牙市占率第一；黄鳍金枪鱼品类罐头品牌市占率提升，稳定在第二位；国际市场销售额增幅126%，其中北美市场成为最大增长点。",
+            "subject_scope": "named_subsidiary",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [
+              {
+                "name": "ALBO国际市场销售额增幅",
+                "raw_value": "126",
+                "value": "126",
+                "unit": "%",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "named_subsidiary",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "operating_drivers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "od-01",
+            "text": "营业收入变动主要系食品加工营业收入同比增加；营业成本变动主要系海洋捕捞营业成本同比减少。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0006"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "od-03",
+            "text": "贸易业务受关税政策冲击、资源环境变化等多重因素影响，业务成本上升，利润有所下滑；康隆公司面临船舶效率偏低、燃油成本上升等不利因素，整体经营业绩出现下滑。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0005"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "od-04",
+            "text": "2025年度销售费用49,440万元，较上年42,838万元增加6,602万元，主要系广告宣传费、运输费同比增加，职工薪酬同比减少。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0010"
+            ],
+            "metrics": [
+              {
+                "name": "销售费用",
+                "raw_value": "49,440",
+                "value": "49440",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "销售费用较上年增加额",
+                "raw_value": "6,602",
+                "value": "6602",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": [
+          "事实od-02已隔离，未作为结论采用：metric number is absent from cited source: 捕捞业务收入变动"
+        ]
+      },
+      "material_changes": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "mc-01",
+            "text": "报告期内公司新增重要非主营业务的说明为“不适用”；公司报告期内业务、产品或服务发生重大变化或调整有关情况为“不适用”；报告期主要子公司股权变动导致合并范围变化为“不适用”。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003",
+              "source-0009"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          },
+          {
+            "fact_id": "mc-02",
+            "text": "2026年度经营计划：力争实现营业收入27.25亿元，归属于上市公司股东净利润1.17亿元。",
+            "subject_scope": "consolidated_group",
+            "period": "2026年度（计划）",
+            "evidence_ids": [
+              "source-0014"
+            ],
+            "metrics": [
+              {
+                "name": "2026年营业收入目标",
+                "raw_value": "27.25",
+                "value": "27.25",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2026年度（计划）",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "2026年归母净利润目标",
+                "raw_value": "1.17",
+                "value": "1.17",
+                "unit": "亿元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "consolidated_group",
+                "period": "2026年度（计划）",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      }
+    },
+    "evidence": [
+      {
+        "evidence_id": "source-0001",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "section_path": [
+          "第二节 公司简介和主要财务指标",
+          "七、 近三年主要会计数据和财务指标"
+        ],
+        "physical_pages": [
+          6
+        ],
+        "source_spans": [
+          {
+            "page": 6,
+            "start": 962,
+            "end": 3485,
+            "quote": "七、     近三年主要会计数据和财务指标\n\n          (一)    主要会计数据\n\n                                                                                             单位：元         币种：人民币\n          主要会计数据                              2025年                     2024年             本期比上年                   2023年\n                                                                                         同期增减(%)\n营业收入                                    2,336,503,042.69         2,315,558,903.89                  0.90      2,014,553,819.25\n利润总额                                        81,254,877.27            79,359,379.10                 2.39        167,359,424.09\n归属于上市公司股东的净利润                               73,894,019.42            61,190,936.77                20.76        148,363,220.94\n归属于上市公司股东的扣除非                               69,249,173.69            59,722,936.91                15.95          97,410,626.57\n经常性损益的净利润\n经营活动产生的现金流量净额                              167,990,623.18           335,334,342.35              -49.90         107,416,745.32\n                                                                                          本期末比上\n                                             2025年末                   2024年末              年同期末增                  2023年末\n                                                                                            减（%）\n归属于上市公司股东的净资产                           2,319,151,944.42         2,242,412,195.88                  3.42      2,242,263,093.51\n总资产                                     3,430,891,629.87         3,348,883,475.86                  2.45      3,402,941,792.06\n\n          (二)    主要财务指标\n\n                     主要财务指标                                   2025年         2024年        本期比上年同期增减(%)                     2023年\n基本每股收益（元／股）                                                        0.31         0.25                            24.00        0.62\n稀释每股收益（元／股）                                                        0.31         0.25                            24.00        0.62\n扣除非经常性损益后的基本每股收益（元／股）                                              0.29         0.25                            16.00        0.40\n加权平均净资产收益率（%）                                                      3.24         2.67              增加0.57个百分点                 6.74\n扣除非经常性损益后的加权平均净资产收益率（%                                             3.04         2.60              增加0.44个百分点                 4.43\n）\n\n          报告期末公司前三年主要会计数据和财务指标的说明\n          □适用       √不适用\n\n\n\n\n                                                               6 /158"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0002",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "section_path": [
+          "第二节 公司简介和主要财务指标",
+          "七、 近三年主要会计数据和财务指标"
+        ],
+        "physical_pages": [
+          7
+        ],
+        "source_spans": [
+          {
+            "page": 7,
+            "start": 0,
+            "end": 98,
+            "quote": "                                       上海开创国际海洋资源股份有限公司2025                     年年度报告\n\n\n          "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0003",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        "physical_pages": [
+          8
+        ],
+        "source_spans": [
+          {
+            "page": 8,
+            "start": 939,
+            "end": 1567,
+            "quote": "一、报告期内公司从事的业务情况\n       公司主要从事远洋渔业捕捞、水产品加工销售及相关贸易，围绕“一鱼一虾”（金枪鱼、南\n  极磷虾）核心主业，深耕远洋捕捞，构建金枪鱼产业链发展，形成捕捞、加工、贸易、运输一体\n  化格局。\n       远洋捕捞：报告期内，公司金枪鱼围网船队                     11 艘船舶全负荷运营，在中西太平洋开展生产作\n  业，产品以鲣鱼、黄鳍为主，船队规模以及捕捞产量位居国内领先水平；与江苏深蓝远洋渔业有\n  限公司开展合作经营，在南极海域捕捞磷虾，产品以冻虾和虾粉为主。\n       加工业务：西班牙         ALBO 公司加工产品主要以金枪鱼罐头和罐头方便食品为主，且部分产品在\n  当地具有较高的市场占有率以及品牌知名度。公司国内岱山加工厂加工金枪鱼原料鱼，产品以鱼\n  柳为主，主要销往国外市场。\n       海上运输：冷藏运输船队主要与金枪鱼围网船队作业配套，承担了冷冻金枪鱼运输、人员和\n  物资等转运，并积极拓展其他运输业务。\n       贸易业务：公司贸易业务以远洋渔货及水产品加工品为核心，外销主要面向国际市场，依托\n  “捕捞—加工—贸易”全产业链开展运营，持续拓展水产品贸易业务。\n\n  报告期内公司新增重要非主营业务的说明\n  □适用     √不适用\n\n\n\n                                             8/158"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0004",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "一、报告期内公司从事的业务情况"
+        ],
+        "physical_pages": [
+          9
+        ],
+        "source_spans": [
+          {
+            "page": 9,
+            "start": 0,
+            "end": 62,
+            "quote": "                      上海开创国际海洋资源股份有限公司2025            年年度报告\n\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0005",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "三、经营情况讨论与分析"
+        ],
+        "physical_pages": [
+          9
+        ],
+        "source_spans": [
+          {
+            "page": 9,
+            "start": 330,
+            "end": 1168,
+            "quote": "三、经营情况讨论与分析\n    2025年，金枪鱼围网船队作为公司捕捞业务的核心力量，11                        艘船舶投入生产，实现满负荷运\n营，船队全员凝心聚力，优化作业流程，强化技术应用，全力弥补各类不利因素带来的影响，力\n求稳定捕捞产量与经营效益。“深蓝轮”精准把控磷虾中心渔场，优化捕捞作业流程，发挥传统\n拖网的优势，超额完成年度目标任务，并创下该项目捕捞量的新纪录。\n    ALBO公司围绕品牌升级与产品创新持续发力，优化金枪鱼、沙丁鱼等核心产品结构，强化品\n质管控和可持续渔业标准，提升生产效率与供应链稳定性。同时积极拓展欧洲及海外市场，加强\n与美国市场合作，进一步巩固百年海产品罐头品牌的国际影响力和市场竞争力。沙丁鱼、鱿鱼等\n罐头产品保持西班牙市占率第一；黄鳍金枪鱼品类罐头品牌市占率提升，稳定在第二位；国际市\n场销售额增幅      126%，其中北美市场成为最大增长点。环太公司在关税战带来的外部冲击下，市场\n环境持续波动，产品销售受到一定影响，公司通过持续提升加工能力，实现平稳运营。\n    贸易业务受关税政策冲击、资源环境变化等多重因素影响，业务成本上升，利润有所下滑。\n加拿大   FCS 公司优化供应链管理，积极拓展采购销售渠道，推进多品类拓展，部分核心产品规模\n有所增长；Estelas     贸易公司依托母公司海产品资源优势，继续发挥欧洲贸易平台桥头堡作用，\n持续推进金枪鱼等水产品的国际贸易业务，强化与舟山环太食品等生产企业及终端市场的协同合\n作。公司不断优化供应链管理，拓展北非及亚洲市场渠道，推动金枪鱼、鲭鱼等原料产品的跨境\n流通，实现贸易规模和市场覆盖的稳步增长。\n    康隆公司聚焦远洋渔业配套服务，全力保障渔获运输、后勤保障等核心需求，通过强化运营\n合作、优化舱位运用等措施，加强各板块业务联动性，但仍面临船舶效率偏低、燃油成本上升等\n多重不利因素影响，整体经营业绩出现下滑，经营压力持续凸显。\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0006",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(一) 主营业务分析"
+        ],
+        "physical_pages": [
+          10
+        ],
+        "source_spans": [
+          {
+            "page": 10,
+            "start": 659,
+            "end": 2229,
+            "quote": "(一)   主营业务分析\n\n1、  利润表及现金流量表相关科目变动分析表\n                                                                          单位：元        币种：人民币\n              科目                          本期数                    上年同期数                变动比例（%）\n营业收入                                 2,336,503,042.69           2,315,558,903.89                  0.90\n营业成本                                 1,642,264,864.02           1,664,195,121.66                -1.32\n销售费用                                    494,403,591.50            428,381,779.51                15.41\n管理费用                                    114,494,175.61            109,927,307.62                  4.15\n财务费用                                     10,829,387.69             27,875,949.34               -61.15\n研发费用                                      4,138,549.88               1,227,955.52              237.03\n经营活动产生的现金流量净额                           167,990,623.18            335,334,342.35               -49.90\n投资活动产生的现金流量净额                          -185,274,514.23           -118,672,333.91               不适用\n筹资活动产生的现金流量净额                           -85,728,400.00           -198,569,764.64               不适用\n营业收入变动原因说明：主要系食品加工营业收入同比增加。\n营业成本变动原因说明：主要系海洋捕捞营业成本同比减少。\n销售费用变动原因说明：主要系食品加工的广告促销费用同比增加。\n管理费用变动原因说明：主要系保险费同比增加。\n财务费用变动原因说明：主要系汇兑损失同比减少。\n研发费用变动原因说明：主要系海洋捕捞研发费用同比增加。\n经营活动产生的现金流量净额变动原因说明：主要系购买商品、接受劳务支付的现金同比增加。\n投资活动产生的现金流量净额变动原因说明：主要系购建固定资产支付的现金同比增加。\n筹资活动产生的现金流量净额变动原因说明：主要系分配股利、偿付利息支付的现金同比减少。\n\n本期公司业务类型、利润构成或利润来源发生重大变动的详细说明\n□适用     √不适用\n\n2、  收入和成本分析\n√适用     □不适用\n（1）驱动业务收入变化的因素分析\n\n\n\n\n                                               10/158"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0007",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(一) 主营业务分析"
+        ],
+        "physical_pages": [
+          11
+        ],
+        "source_spans": [
+          {
+            "page": 11,
+            "start": 0,
+            "end": 4862,
+            "quote": "                                            上海开创国际海洋资源股份有限公司2025                        年年度报告\n\n\n                  驱动业务收入增加的主要原因：公司金枪鱼围网全年销售价较上一年度有所上涨，销售量减\n             少，捕捞业务收入减少                 2,805   万元。罐头食品销售量较上一年度上涨，食品加工营业收入增加                                                8,196\n             万元。渔货贸易收入减少                    3,262   万元。海上运输营业收入减少                        276  万元。\n             （2）以实物销售为主的公司产品收入影响因素分析\n                  公司金枪鱼船队共捕捞金枪鱼                        88,561   吨，较上年相比增加                755 吨，增幅       1%，销售金枪鱼           67,096\n             吨，较上年相比减少                 7,814  吨，减幅        10%，实现销售收入               79,698   万元，较上年相比减少                  2,947   万\n             元，减幅        4%；“深蓝轮”加工磷虾粉                     9,041  吨（捕捞磷虾            70,092   吨），捕捞量增幅               97%，实现销\n             售收入      15,378   万元，增幅          14%；罐头食品实现营业收入                     81,635   万元，增幅          23%；鱼柳加工实现营\n             业收入      23,826   万元，减幅          23%；渔货贸易实现营业收入                      31,867   万元，减幅          9%。\n             （3）主要销售客户的情况\n                  公司捕捞的金枪鱼部分在海外销售，ALBO                               公司产品销售基本在境外销售。2025                            年，公司境外\n             销售    130,245    万元，占公司全部营业收入                      56%；国内部分金枪鱼、磷虾粉、鱼柳等销售以国内客\n             户为主，实现营业收入                   102,836   万元，占公司全部营业收入                       44%。\n\n\n             (1).   主营业务分行业、分产品、分地区、分销售模式情况\n                                                                                                    单位：元          币种：人民币\n                                                     主营业务分行业情况\n                                                                          毛利率          营业收入           营业成本             毛利率比\n    分行业                    营业收入                      营业成本                  （%）         比上年增           比上年增             上年增减\n                                                                                       减（%）            减（%）              （%）\n海洋捕捞                    950,763,559.03             641,633,535.49            32.51         -2.87           -5.08             1.57\n食品加工                  1,054,611,208.73             689,161,314.09            34.65          8.43             7.10            0.80\n渔货贸易                    318,671,971.02             302,165,778.08             5.18         -9.29           -6.94            -2.39\n海上运输                       6,765,806.04               6,355,307.65            6.07        -28.98          -65.01            96.75\n      合计              2,330,812,544.82          1,639,315,935.31             29.67          0.80           -1.38             1.56\n                                                     主营业务分产品情况\n                                                                          毛利率          营业收入           营业成本             毛利率比\n    分产品                    营业收入                      营业成本                  （%）         比上年增           比上年增             上年增减\n                                                                                       减（%）            减（%）              （%）\n金枪鱼销售                   796,979,841.53             511,327,237.04            35.84         -3.57           -3.49            -0.05\n零星鱼种销售                  153,783,717.50             130,306,298.45            15.27          0.93          -10.81            11.16\n罐头食品销售                  816,352,061.87             453,440,105.44            44.46         22.92           25.57            -1.17\n鱼柳加工销售                  238,259,146.86             235,721,208.65             1.07        -22.77          -16.51            -7.41\n渔货贸易                    318,671,971.02             302,165,778.08             5.18         -9.29           -6.94            -2.39\n海上运输                       6,765,806.04               6,355,307.65            6.07        -28.98          -65.01            96.75\n      合计              2,330,812,544.82          1,639,315,935.31             29.67          0.80           -1.38             1.56\n                                                     主营业务分地区情况\n                                                                          毛利率          营业收入           营业成本             毛利率比\n    分地区                    营业收入                      营业成本                  （%）         比上年增           比上年增             上年增减\n                                                                                       减（%）            减（%）              （%）\n国内                    1,028,359,860.15             714,416,964.96            30.53         -1.70           -4.16             1.78\n国外                    1,302,452,684.67             924,898,970.35            28.99          2.87             0.88            1.40\n      合计              2,330,812,544.82          1,639,315,935.31             29.67          0.80           -1.38             1.56\n\n                                                                    11 /158"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0008",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(一) 主营业务分析"
+        ],
+        "physical_pages": [
+          12
+        ],
+        "source_spans": [
+          {
+            "page": 12,
+            "start": 0,
+            "end": 4808,
+            "quote": "                                              上海开创国际海洋资源股份有限公司2025                           年年度报告\n\n\n                                                     主营业务分销售模式情况\n                                                                               毛利率          营业收入            营业成本              毛利率比\n   销售模式                     营业收入                        营业成本                    （%）         比上年增            比上年增              上年增减\n                                                                                             减（%）            减（%）               （%）\n直销                     2,330,812,544.82            1,639,315,935.31               29.67           0.80            -1.38              1.56\n合计                     2,330,812,544.82            1,639,315,935.31               29.67           0.80            -1.38              1.56\n\n              (2).    产销量情况分析表\n              √适用       □不适用\n                                                                                              生产量比            销售量比            库存量比\n       主要产品              单位             生产量                销售量                库存量             上年增减            上年增减            上年增减\n                                                                                                （%）             （%）             （%）\n      金枪鱼                  吨           88,560.73         67,096.02           10,781.66               0.86         -10.43          -20.82\n      罐头食品               万罐              5,808.97          6,049.62            2,865.95              6.09          19.28           -7.75\n      鱼柳                   吨           10,968.47         11,017.20             2,750.98            -6.17             3.62          -1.74\n\n              产销量情况说明：\n              金枪鱼转移          24,300.45     吨至后续鱼柳加工\n\n              (3).    重大采购合同、重大销售合同的履行情况\n\n              □适用       √不适用\n\n              (4).    成本分析表\n\n                                                                                                          单位：元           币种：人民币\n                                                                    分行业情况\n                           成本构成                                        本期占                                        上年同期            本期金额较\n          分行业                 项目                 本期金额                  总成本              上年同期金额                    占总成本            上年同期变\n                                                                      比例(%)                                        比例(%)           动比例(%)\n      海洋捕捞                 营业成本               641,633,535.49             39.14           675,940,491.97                 31.47             -5.08\n      食品加工                 营业成本               689,161,314.09             42.04           643,452,073.09                 47.26              7.10\n      渔货贸易                 营业成本               302,165,778.08             18.43           324,703,612.20                 20.98             -6.94\n      海上运输                 营业成本                  6,355,307.65              0.39            18,164,036.79                 0.29           -65.01\n            合计                             1,639,315,935.31             100.00        1,662,260,214.05                100.00              -1.38\n                                                                    分产品情况\n                           成本构成                                        本期占                                        上年同期            本期金额较\n          分产品                 项目                 本期金额                  总成本              上年同期金额                    占总成本            上年同期变\n                                                                      比例(%)                                        比例(%)           动比例(%)\n      金枪鱼销售                营业成本               511,327,237.04             31.19           529,836,191.85                 29.93             -3.49\n      零星鱼种销售               营业成本               130,306,298.45               7.95          146,104,300.12                  1.54           -10.81\n      罐头食品销售               营业成本               453,440,105.44             27.66           361,112,566.18                 26.49             25.57\n      鱼柳加工销售               营业成本               235,721,208.65             14.38           282,339,506.91                 20.77           -16.51\n      渔货贸易                 营业成本               302,165,778.08             18.43           324,703,612.20                 20.98             -6.94\n      运输                   营业成本                  6,355,307.65              0.39            18,164,036.79                 0.29           -65.01\n            合计                             1,639,315,935.31             100.00        1,662,260,214.05                100.00              -1.38\n\n\n              成本分析其他情况说明\n\n                                                                        12 / 158"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0009",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(一) 主营业务分析"
+        ],
+        "physical_pages": [
+          13
+        ],
+        "source_spans": [
+          {
+            "page": 13,
+            "start": 0,
+            "end": 1325,
+            "quote": "                       上海开创国际海洋资源股份有限公司2025              年年度报告\n\n\n   海洋捕捞板块主要成本构成：燃料、许可证配额费、渔用物资、船舶修理费、人工成本等。\n   食品加工板块主要成本构成：原料鱼、辅料、铁罐头、燃料及动力、人工成本、折旧费、其\n    他加工成本。\n   渔货贸易板块主要成本构成：原料鱼、运输费等。\n   海上运输板块主要成本构成：船舶租金、燃料、船用物资、人工成本、货物保险等。\n\n(5). 报告期主要子公司股权变动导致合并范围变化\n\n□适用    √不适用\n(6). 公司报告期内业务、产品或服务发生重大变化或调整有关情况\n□适用    √不适用\n(7). 主要销售客户及主要供应商情况\n\n属于同一控制人控制的客户或供应商视为同一客户或供应商合并列示，受同一国有资产管理机构\n实际控制的除外。\n下列客户及供应商信息按照同一控制口径合并计算列示的情况说明\n不适用\n\nA.公司主要销售客户及主要供应商情况\n√适用    □不适用\n前五名客户销售额90,078.38万元，占年度销售总额38.55%；其中前五名客户销售额中关联方销售\n额0万元，占年度销售总额0%              。\n前五名供应商采购额63,005.62万元，占年度采购总额30.15%；其中前五名供应商采购额中关联方\n采购额0万元，占年度采购总额0%。\n\nB.报告期内向单个客户的销售比例超过总额的                      50%、前    5 名客户中存在新增客户的或严重依赖于\n少数客户的情形\n□适用    √不适用\n\n报告期内向单个供应商的采购比例超过总额的                        50%、前   5 名供应商中存在新增供应商的或严重依\n赖于少数供应商的情形\n□适用    √不适用\n\nC. 报告期内公司股票被实施退市风险警示或其他风险警示\n前五名销售客户\n□适用    √不适用\n\n前五名供应商\n□适用    √不适用\n\nD. 报告期内公司存在贸易业务收入\n√适用    □不适用\n                                                               单位：元       币种：人民币\n  贸易业务开展情况                 本期营业收入                 上期营业收入              本期营业收入比上年同\n                                                                           期增减（%）\n渔货贸易                         318,671,971.02         351,289,993.49                      -9.29\n\n贸易业务占营业收入比例超过               10%前五名销售客户\n\n                                          13/158"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0010",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(一) 主营业务分析"
+        ],
+        "physical_pages": [
+          14
+        ],
+        "source_spans": [
+          {
+            "page": 14,
+            "start": 0,
+            "end": 3368,
+            "quote": "                                 上海开创国际海洋资源股份有限公司2025                         年年度报告\n\n\n  √适用       □不适用\n                                                                                           单位：元          币种：人民币\n   序号                     客户名称                                   销售额                    占年度销售总额比例（%）\n     1       FRINSA    DEL   NOROESTE,     S.A.                  71,290,942.81                                      3.05\n     2       TRIMARINE     INTER                                 42,185,735.14                                      1.81\n     3       COLDFISH     SEAFOOD    CO.   LTD.                  25,079,727.32                                      1.07\n     4       CALKINS     AND  BURKE                              18,953,039.19                                      0.81\n     5       GENERALE     CONSERVE                               13,940,141.65                                      0.60\n   合计                          /                                171,449,586.11                                      7.34\n\n  贸易业务收入占营业收入比例超过                             10%前五名供应商\n  √适用       □不适用\n                                                                                           单位：元          币种：人民币\n序号                                 供应商名称                                             采购额                 占年度采购总\n                                                                                                         额比例（%）\n  1       ZHEJIANG    QIRUN    FOOD   CO.,   LTD                                   87,513,731.38                    4.19\n  2       PROVEEDORES      VARIOS    PENDIENTES     FRA.                           52,898,200.93                    2.53\n  3       OCEAN   PIONEER     INTERNATIONAL       CO.,   LTD                       17,866,340.03                    0.85\n  4       FISHHAWK    FISHERIES      INC.                                          15,316,625.93                    0.73\n  5       TROPICAL    FOOD   MANUFACTURING       (ZHOUSHAN)CO.,       LTD           5,984,177.82                    0.29\n合计        /                                                                      179,579,076.08                     8.59\n\n  3、    费用\n\n  √适用       □不适用\n        2025  年度发生销售费用                49,440   万元，较上年            42,838   万元相比，增加             6,602   万元，主要系广\n  告宣传费、运输费同比增加，职工薪酬同比减少。\n        2025  年度发生管理费用                11,449   万元，同上年            10,993   万元相比，增加             456   万元，主要系保险\n  费、专业服务费同期增加。\n        2025  年度发生财务费用                1,083   万元，较上年           2,788   万元相比，减少              1,705   万元，未确认融资\n  费用减少        439  万元，利息收入减少                  230  万元，汇兑损失减少                 1,094   万元。\n\n\n  4、    研发投入\n\n  (1).研发投入情况表\n  √适用        □不适用\n                                                                                           单位：元          币种：人民币\n  本期费用化研发投入                                                                                              4,138,549.88\n  本期资本化研发投入\n  研发投入合计                                                                                                 4,138,549.88\n  研发投入总额占营业收入比例（%）                                                                                                  0.18\n  研发投入资本化的比重（%）\n  (2).研发人员情况表\n  □适用       √不适用\n  (3).情况说明\n  □适用       √不适用\n  (4).研发人员构成发生重大变化的原因及对公司未来发展的影响\n\n                                                          14 /158"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0011",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(一) 主营业务分析"
+        ],
+        "physical_pages": [
+          15
+        ],
+        "source_spans": [
+          {
+            "page": 15,
+            "start": 0,
+            "end": 1205,
+            "quote": "                                    上海开创国际海洋资源股份有限公司2025                     年年度报告\n\n\n       □适用      √不适用\n\n\n       5、   现金流\n       √适用      □不适用\n            2025  年度公司现金净流出               9,707   万元，其中经营活动现金净流入                       16,799   万元，投资活动现\n       金净流出       18,527  万元，筹资活动现金净流出                    8,573  万元，汇率变动对现金的影响                      595 万元。2025\n       年度公司经营净流入现金                  16,799   万元，与上年          33,533  万元相比，减少            16,734  万元，主要系          2025\n       年度销售商品、提供劳务收到现金较上年增加                                 10,197   万元，2025       年度购买商品接受劳务支付现\n       金较上年增加          31,149   万元，2025      年度收到其他与经营活动有关的现金增加                              975  万元，2025       年度\n       支付其他与经营活动有关的现金较上年增加                               2,150  万元。2025       年度投资活动净流出               18,527   万元，\n       与上年净流出          11,867   万元相比，增加           6,660  万元，主要是本年度公司购建固定资产支付的现金较\n       上年增加       6,743  万元。2025       年度公司筹资活动净流出                   8,573  万元，与上年同期净流出                   19,857  万\n       元相比，减少          11,284  万元，主要系年内分配股利、利润或偿付利息支付的现金较上年减少                                                  4,863\n       万元，支付其他与筹资活动有关的现金较上年减少                                    4,053  万元。\n\n\n       "
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0012",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(七) 主要控股参股公司分析"
+        ],
+        "physical_pages": [
+          18
+        ],
+        "source_spans": [
+          {
+            "page": 18,
+            "start": 293,
+            "end": 2388,
+            "quote": "(七)    主要控股参股公司分析\n\n√适用       □不适用\n主要子公司及对公司净利润影响达                                10%以上的参股公司情况\n√适用       □不适用\n                                                                                                                                                                           单位：元           币种：人民币\n          公司名称                    公司类型                主要业务                   注册资本                 总资产                    净资产                  营业收入                   营业利润                     净利润\n上海开创远洋渔业有限公司                       子公司                远洋捕捞                   41,000万元       2,285,441,824.09       1,256,665,939.84      1,175,618,816.17            6,221,355.66            5,751,113.30\n泛太食品（马绍尔群岛）有                       子公司         远洋捕捞及食品加工                     USD800万元           48,323,536.72        -14,548,944.19          75,194,260.04               51,747.47               11,314.46\n限公司                                                       业\n泛太渔业（马绍尔群岛）有                       子公司                远洋捕捞                   USD200万元          851,620,998.36        760,709,687.97         497,631,583.01          54,525,033.44           53,819,378.64\n限公司\n文森特（密克罗尼西亚）渔                       子公司                远洋捕捞                      USD5万元          36,129,238.63          32,209,367.54                3,554.30              1,426.06                1,426.06\n业有限公司\n亚太金枪鱼私人有限公司                        子公司           交易鱼类和鱼产品                    USD100万元           10,397,188.91           9,420,447.60             355,430.00              67,030.47               64,788.20\n舟山环太海洋食品有限公司                       子公司           水产品加工及销售                    10,000万元          402,580,718.20        180,125,259.17         422,469,539.59              299,915.77              568,536.50\n卡洛斯•阿尔博的孩子们有                       子公司             罐头食品加工                    EUR180万元          873,176,191.32        462,143,432.72         818,099,682.13          22,342,384.89           19,242,607.54\n限公司\n\n                                                                                                  18 / 158"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0013",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "五、报告期内主要经营情况",
+          "(七) 主要控股参股公司分析"
+        ],
+        "physical_pages": [
+          19
+        ],
+        "source_spans": [
+          {
+            "page": 19,
+            "start": 0,
+            "end": 826,
+            "quote": "                                                                           上海开创国际海洋资源股份有限公司2025                               年年度报告\n\n\n\n\n康隆（香港）航运有限公司                         子公司               海上运输等                        USD1万元         158,330,969.72           50,999,867.67           65,305,692.59            8,483,778.57             8,413,720.47\n法国小溪海鲜公司                             子公司          海鲜加工和批发业务                     92.34万加元             42,144,503.09          39,905,477.23          100,605,939.19               350,953.83               218,290.96\n艾斯特拉斯贸易有限公司                          子公司                 渔货贸易                   EUR3,000.00        115,561,454.01           11,237,905.20          202,368,570.79            2,318,210.49             1,854,461.53\n\n报告期内取得和处置子公司的情况\n□适用        √不适用\n\n其他说明\n□适用        √不适用\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0014",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "六、公司关于公司未来发展的讨论与分析",
+          "(三)经营计划"
+        ],
+        "physical_pages": [
+          20
+        ],
+        "source_spans": [
+          {
+            "page": 20,
+            "start": 315,
+            "end": 1497,
+            "quote": "(三)经营计划\n\n√适用     □不适用\n    2026年度，公司将继续围绕“一鱼一虾”开展各项工作，深化四大板块协同联动，依托数字\n化转型与科技创新，培育高附加值产品矩阵，提升全链条运营效率，增强企业核心竞争力与可持续\n发展能力，力争实现营业收入              27.25亿元，归属于上市公司股东净利润                 1.17亿元的经济指标，推\n动主业利润稳步提升。\n    远洋捕捞业务：金枪鱼围网船队严格执行远洋渔业履约管理，合理安排作业天数，完善船队联\n动与渔场布局，强化渔汛研判与信息共享，提升鱼获质量，有序推进                               2 艘船舶更新建造工作。南极\n磷虾项目压实目标管理，精准锁定渔场，灵活调整生产模式，强化设备运行和维护，优化加工生产\n线效能，提升鲜虾出粉率。船队坚持执行成本预算管理，降本增效，努力完成全年捕捞计划。\n    食品加工业务：ALBO        公司在巩固当地核心市场前提下，继续拓展全球市场，拓展软包装产品\n及健康轻食产品，强化供应链协同，坚守质量底线，保持                          IFS“卓越级”认证，提升品牌知名度。\n环太公司深化数智化赋能，扩大              MSC 认证原料采购与销售渠道，优化产能结构，继续保持加工出成\n率，培育新盈利点。泛太食品将降低成本，优化岗位设置，加强员工技能培训，提升生产效率与产\n品质量；通过参加行业展会与论坛，拓宽销售渠道，提升持续盈利能力。\n    贸易业务：FCS     公司将推进市场精细化运营，开展“产品-区域”双维度分析；强化内部协同，\n深耕大众消费市场，发挥核心优势，升级北美地区战略定位，打造外汇运作平台与区域贸易中转站。\nEstelas公司积极应对国际贸易、成本汇率波动等风险，采取市场多元化布局，加强内部协调，强\n化原料追溯体系，与          MSC认证体系接轨，提升          MSC 原料贸易数量，提升国际客户信任度。\n    运输配套业务：康隆公司合理优化运力，拓展业务规模，加强船员队伍建设，继续做好金枪鱼\n转载、托运渔需生产物资等配套服务工作，根据产量情况，适时调整舱位安排，提高运输效率，并\n做好后勤保障工作。\n    风险防控与管理提升：持续筑牢风险防控屏障，全面提升经营管理效能，强化安全生产与环保\n合规管理，严守合规经营底线，加快推动财务共享与数字化平台建设，提升数据支撑和决策赋能能\n力，加强专业人才引进与培养，不断锤炼团队执行效能与创新活力，建立健全长期有效的薪酬激励\n机制，为企业高质量发展提供坚实保障。\n\n\n                                        20/158"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      },
+      {
+        "evidence_id": "source-0015",
+        "document_version": "4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c",
+        "section_path": [
+          "第三节 管理层讨论与分析",
+          "六、公司关于公司未来发展的讨论与分析",
+          "(三)经营计划"
+        ],
+        "physical_pages": [
+          21
+        ],
+        "source_spans": [
+          {
+            "page": 21,
+            "start": 0,
+            "end": 62,
+            "quote": "                      上海开创国际海洋资源股份有限公司2025            年年度报告\n\n\n"
+          }
+        ],
+        "table_context": "相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。"
+      }
+    ],
+    "limitations": [
+      "未归类要素字段未作结论采用，原内容保留在模型回执：limitations"
+    ],
+    "supply_chain": {
+      "position": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "sc-pos-01",
+            "text": "公司处于远洋渔业捕捞、水产品加工、贸易及配套海上运输环节，形成“捕捞—加工—贸易”一体化经营。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0003"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "upstream_inputs": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "sc-up-01",
+            "text": "海洋捕捞主要投入燃料、许可证配额费、渔用物资、船舶修理费、人工成本等；食品加工主要投入原料鱼、辅料、铁罐头、燃料及动力、人工成本、折旧费等；渔货贸易主要投入原料鱼、运输费等；海上运输主要投入船舶租金、燃料、船用物资、人工成本、货物保险等。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0009"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      },
+      "downstream_customers": {
+        "status": "observed",
+        "facts": [
+          {
+            "fact_id": "sc-down-01",
+            "text": "公司产品下游包括金枪鱼、磷虾粉、鱼柳等国内客户以及境外金枪鱼和ALBO罐头食品客户；前五名客户销售额占年度销售总额38.55%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007",
+              "source-0009"
+            ],
+            "metrics": [],
+            "uncertainty_reason": null
+          }
+        ],
+        "limitations": []
+      }
+    },
+    "generation": {
+      "prompt_version": "company_profile_workpaper.2026-11-15.operating-summary-first.v15",
+      "preprocessing_version": "toc_sections_native_layout.v2",
+      "section_guide_version": "company_profile_section_guide.2026-11-15.operating-summary.v3",
+      "selection": {
+        "purpose": "select_profile_sections",
+        "request_id": "bp-work-3ace7e526a6072ff3aea9f0f:workpaper:sections",
+        "request_hash": "9577c7680d11e9fc605e6c7528520637c561ed2583d742c1bf70522707ff1e1a",
+        "response_hash": "0ded7d6230b36845c50ab10ada0a4a8da75af73add25264c93e6337cfac20c4c",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 20893,
+          "output_tokens": 339,
+          "total_tokens": 21232
+        },
+        "scope_kind": "report_heading_index",
+        "heading_count": 761,
+        "section_ids": [
+          "section-0001",
+          "section-0002",
+          "section-0003",
+          "section-0004",
+          "section-0005",
+          "section-0006",
+          "section-0007",
+          "section-0008",
+          "section-0009",
+          "section-0010",
+          "section-0011",
+          "section-0012",
+          "section-0013",
+          "section-0014",
+          "section-0015",
+          "section-0016",
+          "section-0017",
+          "section-0018",
+          "section-0019",
+          "section-0020",
+          "section-0021",
+          "section-0022",
+          "section-0023",
+          "section-0024",
+          "section-0025",
+          "section-0026",
+          "section-0027",
+          "section-0028",
+          "section-0029",
+          "section-0030",
+          "section-0031",
+          "section-0032",
+          "section-0033",
+          "section-0034",
+          "section-0035",
+          "section-0036",
+          "section-0037",
+          "section-0038",
+          "section-0039",
+          "section-0040",
+          "section-0041",
+          "section-0042",
+          "section-0043",
+          "section-0044",
+          "section-0055",
+          "section-0056",
+          "section-0061",
+          "section-0062",
+          "section-0063",
+          "section-0064",
+          "section-0065",
+          "section-0068",
+          "section-0069",
+          "section-0070",
+          "section-0071",
+          "section-0072",
+          "section-0073",
+          "section-0074",
+          "section-0075",
+          "section-0076",
+          "section-0077",
+          "section-0078",
+          "section-0079",
+          "section-0080",
+          "section-0081",
+          "section-0082",
+          "section-0083",
+          "section-0084",
+          "section-0085",
+          "section-0086",
+          "section-0087",
+          "section-0088",
+          "section-0089",
+          "section-0090",
+          "section-0091",
+          "section-0092",
+          "section-0093",
+          "section-0094",
+          "section-0095",
+          "section-0096",
+          "section-0097",
+          "section-0098",
+          "section-0099",
+          "section-0100",
+          "section-0101",
+          "section-0102",
+          "section-0103",
+          "section-0104",
+          "section-0105",
+          "section-0106",
+          "section-0107",
+          "section-0108",
+          "section-0109",
+          "section-0110",
+          "section-0111",
+          "section-0112",
+          "section-0113",
+          "section-0114",
+          "section-0115",
+          "section-0116",
+          "section-0117",
+          "section-0118",
+          "section-0119",
+          "section-0120",
+          "section-0121",
+          "section-0122",
+          "section-0123",
+          "section-0124",
+          "section-0125",
+          "section-0126",
+          "section-0127",
+          "section-0128",
+          "section-0129",
+          "section-0130",
+          "section-0131",
+          "section-0132",
+          "section-0133",
+          "section-0134",
+          "section-0135",
+          "section-0136",
+          "section-0137",
+          "section-0138",
+          "section-0139",
+          "section-0140",
+          "section-0141",
+          "section-0142",
+          "section-0143",
+          "section-0144",
+          "section-0145",
+          "section-0146",
+          "section-0147",
+          "section-0148",
+          "section-0149",
+          "section-0150",
+          "section-0151",
+          "section-0152",
+          "section-0153",
+          "section-0154",
+          "section-0155",
+          "section-0156",
+          "section-0157",
+          "section-0158",
+          "section-0159",
+          "section-0160",
+          "section-0161",
+          "section-0162",
+          "section-0163",
+          "section-0164",
+          "section-0165",
+          "section-0166",
+          "section-0167",
+          "section-0168",
+          "section-0169",
+          "section-0170",
+          "section-0171",
+          "section-0172",
+          "section-0173",
+          "section-0174",
+          "section-0175",
+          "section-0176",
+          "section-0177",
+          "section-0178",
+          "section-0179",
+          "section-0180",
+          "section-0181",
+          "section-0182",
+          "section-0183",
+          "section-0184",
+          "section-0185",
+          "section-0186",
+          "section-0187",
+          "section-0188",
+          "section-0189",
+          "section-0190",
+          "section-0191",
+          "section-0192",
+          "section-0193",
+          "section-0194",
+          "section-0195",
+          "section-0196",
+          "section-0197",
+          "section-0198",
+          "section-0199",
+          "section-0200",
+          "section-0201",
+          "section-0202",
+          "section-0203",
+          "section-0204",
+          "section-0205",
+          "section-0209",
+          "section-0213",
+          "section-0214",
+          "section-0215",
+          "section-0216",
+          "section-0217",
+          "section-0218",
+          "section-0219",
+          "section-0220",
+          "section-0221",
+          "section-0222",
+          "section-0223",
+          "section-0224",
+          "section-0225",
+          "section-0226",
+          "section-0227",
+          "section-0228",
+          "section-0229",
+          "section-0230",
+          "section-0231",
+          "section-0232",
+          "section-0233",
+          "section-0234",
+          "section-0235",
+          "section-0236",
+          "section-0237",
+          "section-0238",
+          "section-0239",
+          "section-0240",
+          "section-0241",
+          "section-0242",
+          "section-0243",
+          "section-0244",
+          "section-0245",
+          "section-0246",
+          "section-0247",
+          "section-0248",
+          "section-0249",
+          "section-0250",
+          "section-0251",
+          "section-0252",
+          "section-0253",
+          "section-0254",
+          "section-0255",
+          "section-0256",
+          "section-0257",
+          "section-0258",
+          "section-0259",
+          "section-0260",
+          "section-0261",
+          "section-0262",
+          "section-0263",
+          "section-0270",
+          "section-0271",
+          "section-0272",
+          "section-0277",
+          "section-0278",
+          "section-0279",
+          "section-0286",
+          "section-0287",
+          "section-0288",
+          "section-0289",
+          "section-0290",
+          "section-0291",
+          "section-0292",
+          "section-0293",
+          "section-0294",
+          "section-0295",
+          "section-0296",
+          "section-0297",
+          "section-0298",
+          "section-0299",
+          "section-0300",
+          "section-0305",
+          "section-0313",
+          "section-0314",
+          "section-0315",
+          "section-0316",
+          "section-0317",
+          "section-0318",
+          "section-0319",
+          "section-0320",
+          "section-0321",
+          "section-0322",
+          "section-0323",
+          "section-0324",
+          "section-0325",
+          "section-0326",
+          "section-0327",
+          "section-0328",
+          "section-0329",
+          "section-0330",
+          "section-0331",
+          "section-0332",
+          "section-0333",
+          "section-0334",
+          "section-0335",
+          "section-0336",
+          "section-0337",
+          "section-0338",
+          "section-0339",
+          "section-0340",
+          "section-0341",
+          "section-0342",
+          "section-0343",
+          "section-0344",
+          "section-0345",
+          "section-0346",
+          "section-0347",
+          "section-0348",
+          "section-0349",
+          "section-0350",
+          "section-0351",
+          "section-0352",
+          "section-0353",
+          "section-0354",
+          "section-0355",
+          "section-0356",
+          "section-0357",
+          "section-0358",
+          "section-0359",
+          "section-0360",
+          "section-0361",
+          "section-0362",
+          "section-0363",
+          "section-0364",
+          "section-0365",
+          "section-0366",
+          "section-0367",
+          "section-0368",
+          "section-0369",
+          "section-0370",
+          "section-0371",
+          "section-0372",
+          "section-0373",
+          "section-0374",
+          "section-0375",
+          "section-0376",
+          "section-0377",
+          "section-0378",
+          "section-0379",
+          "section-0380",
+          "section-0381",
+          "section-0382",
+          "section-0383",
+          "section-0384",
+          "section-0385",
+          "section-0386",
+          "section-0387",
+          "section-0388",
+          "section-0389",
+          "section-0390",
+          "section-0391",
+          "section-0392",
+          "section-0393",
+          "section-0394",
+          "section-0395",
+          "section-0396",
+          "section-0397",
+          "section-0398",
+          "section-0399",
+          "section-0400",
+          "section-0401",
+          "section-0402",
+          "section-0403",
+          "section-0404",
+          "section-0405",
+          "section-0406",
+          "section-0407",
+          "section-0408",
+          "section-0409",
+          "section-0410",
+          "section-0411",
+          "section-0412",
+          "section-0413",
+          "section-0414",
+          "section-0415",
+          "section-0416",
+          "section-0417",
+          "section-0418",
+          "section-0419",
+          "section-0420",
+          "section-0421",
+          "section-0422",
+          "section-0423",
+          "section-0424",
+          "section-0425",
+          "section-0426",
+          "section-0427",
+          "section-0428",
+          "section-0429",
+          "section-0430",
+          "section-0431",
+          "section-0432",
+          "section-0433",
+          "section-0434",
+          "section-0435",
+          "section-0436",
+          "section-0437",
+          "section-0438",
+          "section-0439",
+          "section-0440",
+          "section-0441",
+          "section-0442",
+          "section-0443",
+          "section-0444",
+          "section-0445",
+          "section-0446",
+          "section-0447",
+          "section-0448",
+          "section-0449",
+          "section-0450",
+          "section-0451",
+          "section-0452",
+          "section-0453",
+          "section-0454",
+          "section-0455",
+          "section-0456",
+          "section-0457",
+          "section-0458",
+          "section-0459",
+          "section-0460",
+          "section-0461",
+          "section-0462",
+          "section-0463",
+          "section-0464",
+          "section-0465",
+          "section-0466",
+          "section-0467",
+          "section-0473",
+          "section-0474",
+          "section-0475",
+          "section-0476",
+          "section-0477",
+          "section-0486",
+          "section-0487",
+          "section-0488",
+          "section-0489",
+          "section-0490",
+          "section-0491",
+          "section-0492",
+          "section-0495",
+          "section-0501",
+          "section-0502",
+          "section-0505",
+          "section-0506",
+          "section-0507",
+          "section-0508",
+          "section-0509",
+          "section-0512",
+          "section-0513",
+          "section-0514",
+          "section-0515",
+          "section-0520",
+          "section-0524",
+          "section-0525",
+          "section-0526",
+          "section-0529",
+          "section-0530",
+          "section-0531",
+          "section-0538",
+          "section-0542",
+          "section-0543",
+          "section-0544",
+          "section-0545",
+          "section-0546",
+          "section-0547",
+          "section-0548",
+          "section-0549",
+          "section-0550",
+          "section-0551",
+          "section-0552",
+          "section-0553",
+          "section-0554",
+          "section-0555",
+          "section-0556",
+          "section-0563",
+          "section-0569",
+          "section-0575",
+          "section-0584",
+          "section-0587",
+          "section-0607",
+          "section-0613",
+          "section-0614",
+          "section-0615",
+          "section-0616",
+          "section-0621",
+          "section-0626",
+          "section-0632",
+          "section-0635",
+          "section-0638",
+          "section-0639",
+          "section-0640",
+          "section-0642",
+          "section-0643",
+          "section-0644",
+          "section-0648",
+          "section-0651",
+          "section-0652",
+          "section-0653",
+          "section-0656",
+          "section-0657",
+          "section-0658",
+          "section-0659",
+          "section-0661",
+          "section-0663",
+          "section-0664",
+          "section-0665",
+          "section-0670",
+          "section-0676",
+          "section-0680",
+          "section-0683",
+          "section-0685",
+          "section-0686",
+          "section-0687",
+          "section-0691",
+          "section-0694",
+          "section-0695",
+          "section-0696",
+          "section-0697",
+          "section-0700",
+          "section-0703",
+          "section-0704",
+          "section-0705",
+          "section-0706",
+          "section-0708",
+          "section-0710",
+          "section-0711",
+          "section-0712",
+          "section-0713",
+          "section-0715",
+          "section-0717",
+          "section-0718",
+          "section-0719",
+          "section-0724",
+          "section-0726",
+          "section-0727",
+          "section-0728",
+          "section-0729",
+          "section-0732",
+          "section-0734",
+          "section-0735",
+          "section-0736",
+          "section-0737",
+          "section-0739",
+          "section-0741",
+          "section-0742",
+          "section-0743",
+          "section-0744",
+          "section-0748",
+          "section-0754",
+          "section-0755",
+          "section-0761",
+          "section-0762",
+          "section-0763",
+          "section-0766",
+          "section-0767",
+          "section-0768",
+          "section-0770",
+          "section-0773",
+          "section-0777",
+          "section-0781",
+          "section-0783",
+          "section-0784",
+          "section-0785",
+          "section-0786",
+          "section-0788",
+          "section-0789",
+          "section-0790",
+          "section-0791",
+          "section-0792",
+          "section-0793",
+          "section-0794",
+          "section-0796",
+          "section-0797",
+          "section-0798",
+          "section-0799",
+          "section-0800",
+          "section-0805",
+          "section-0806",
+          "section-0807",
+          "section-0808",
+          "section-0810",
+          "section-0815",
+          "section-0816",
+          "section-0819",
+          "section-0821",
+          "section-0822",
+          "section-0823",
+          "section-0825",
+          "section-0826",
+          "section-0827",
+          "section-0828",
+          "section-0829",
+          "section-0830",
+          "section-0831",
+          "section-0834",
+          "section-0835",
+          "section-0836",
+          "section-0837",
+          "section-0838",
+          "section-0839",
+          "section-0840",
+          "section-0841",
+          "section-0842",
+          "section-0843",
+          "section-0844",
+          "section-0845",
+          "section-0846",
+          "section-0847",
+          "section-0853",
+          "section-0854",
+          "section-0855",
+          "section-0856",
+          "section-0857",
+          "section-0858",
+          "section-0859",
+          "section-0860",
+          "section-0861",
+          "section-0862",
+          "section-0863",
+          "section-0864",
+          "section-0865",
+          "section-0866",
+          "section-0867",
+          "section-0868",
+          "section-0869",
+          "section-0870",
+          "section-0871",
+          "section-0872",
+          "section-0873",
+          "section-0874",
+          "section-0875",
+          "section-0876",
+          "section-0877",
+          "section-0878",
+          "section-0879",
+          "section-0882",
+          "section-0883",
+          "section-0889",
+          "section-0891",
+          "section-0892",
+          "section-0893",
+          "section-0897",
+          "section-0898",
+          "section-0899",
+          "section-0902",
+          "section-0903",
+          "section-0906",
+          "section-0910",
+          "section-0911",
+          "section-0912",
+          "section-0913",
+          "section-0914",
+          "section-0915",
+          "section-0916",
+          "section-0917",
+          "section-0918",
+          "section-0919",
+          "section-0920",
+          "section-0921",
+          "section-0922",
+          "section-0923",
+          "section-0924",
+          "section-0926",
+          "section-0927",
+          "section-0928",
+          "section-0929",
+          "section-0930",
+          "section-0934",
+          "section-0935",
+          "section-0936",
+          "section-0937",
+          "section-0938",
+          "section-0939",
+          "section-0940",
+          "section-0941",
+          "section-0942",
+          "section-0943",
+          "section-0944",
+          "section-0947",
+          "section-0951",
+          "section-0955",
+          "section-0956",
+          "section-0957",
+          "section-0958",
+          "section-0959",
+          "section-0963",
+          "section-0966",
+          "section-0967",
+          "section-0968",
+          "section-0969",
+          "section-0970",
+          "section-0971",
+          "section-0972",
+          "section-0973",
+          "section-0974",
+          "section-0975",
+          "section-0976",
+          "section-0977",
+          "section-0978",
+          "section-0979",
+          "section-0980",
+          "section-0981",
+          "section-0982",
+          "section-0983",
+          "section-0984",
+          "section-0985",
+          "section-0986",
+          "section-0987",
+          "section-0988",
+          "section-0989",
+          "section-0990",
+          "section-0991",
+          "section-0992",
+          "section-0993",
+          "section-0997",
+          "section-1003",
+          "section-1007",
+          "section-1008",
+          "section-1009",
+          "section-1010",
+          "section-1013",
+          "section-1014",
+          "section-1015",
+          "section-1016",
+          "section-1017",
+          "section-1018",
+          "section-1019",
+          "section-1020",
+          "section-1023",
+          "section-1024",
+          "section-1025",
+          "section-1026",
+          "section-1027",
+          "section-1028",
+          "section-1029",
+          "section-1030",
+          "section-1031",
+          "section-1032",
+          "section-1035",
+          "section-1036",
+          "section-1037",
+          "section-1044",
+          "section-1045",
+          "section-1046",
+          "section-1047",
+          "section-1048",
+          "section-1049",
+          "section-1050",
+          "section-1051",
+          "section-1052",
+          "section-1053",
+          "section-1054",
+          "section-1055",
+          "section-1056",
+          "section-1057",
+          "section-1058",
+          "section-1061",
+          "section-1062",
+          "section-1063",
+          "section-1064",
+          "section-1070",
+          "section-1090",
+          "section-1094",
+          "section-1100",
+          "section-1101",
+          "section-1102",
+          "section-1103",
+          "section-1104",
+          "section-1105",
+          "section-1106"
+        ],
+        "physical_pages": []
+      },
+      "extraction": {
+        "purpose": "extract_profile_workpaper",
+        "request_id": "bp-work-3ace7e526a6072ff3aea9f0f:workpaper:extract",
+        "request_hash": "ce42d90dc818f407ec371011769051a64f1bc007b6c051bd77e9f24065ddc85d",
+        "response_hash": "97153af43239b505bf602a97fa35a67e9dd725be017ec6dca932c238fc8da66e",
+        "source_label": "deepseek:deepseek-flash",
+        "model": "deepseek-flash",
+        "selected_profile": "semantic_extraction__deepseek",
+        "logical_profile": "semantic_extraction__deepseek",
+        "route_fingerprint": "25839152881005d14088dd6263452efe80d8d2305852de2f711385e5230b84d8",
+        "finish_reason": "stop",
+        "reasoning_effort": "high",
+        "contract_status": "accepted",
+        "usage": {
+          "input_tokens": 11756,
+          "output_tokens": 5219,
+          "total_tokens": 16975
+        },
+        "scope_kind": "selected_source_sections",
+        "heading_count": null,
+        "section_ids": [
+          "section-0021",
+          "section-0034",
+          "section-0036",
+          "section-0042",
+          "section-0080",
+          "section-0085"
+        ],
+        "physical_pages": [
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          18,
+          19,
+          20,
+          21
+        ]
+      }
+    },
+    "quality_review": {
+      "status": "incomplete",
+      "policy_version": "company_profile_workpaper_review.v5",
+      "original_draft_hash": "7a013b5a626c80af55de2dc7bcc94479202501b0ef668e27760dbcc0b6a3568b",
+      "findings": [
+        {
+          "finding_id": "F001",
+          "element": "operating_drivers",
+          "severity": "material",
+          "issue_type": "material_omission",
+          "affected_fact_id": null,
+          "related_fact_id": null,
+          "evidence_ids": [
+            "source-0007"
+          ],
+          "explanation": "草稿仅保留营业收入微增及食品加工收入增加的定性原因，未纳入source-0007“驱动业务收入变化”中的主要量化调整：金枪鱼围网销售价上涨、销售量减少，捕捞业务收入减少2,805万元；罐头食品销售量上涨，食品加工营业收入增加8,196万元；渔货贸易收入减少3,262万元；海上运输营业收入减少276万元。同段还披露金枪鱼销售量减少7,814吨、减幅10%，销售收入减少2,947万元、减幅4%；磷虾捕捞量增幅97%，磷虾粉销售收入增幅14%；罐头、鱼柳、渔货贸易营业收入变动幅度分别为增23%、减23%、减9%。上述抵消性变动是理解本期主营收入近乎持平的重要收入调整，不属于可选细节。",
+          "resolution": "verification_failed",
+          "original_fact": null,
+          "revised_fact": {
+            "fact_id": "review-add:F001",
+            "text": "驱动业务收入变化的主要原因：公司金枪鱼围网全年销售价较上一年度有所上涨，销售量减少，捕捞业务收入减少2,805万元；罐头食品销售量较上一年度上涨，食品加工营业收入增加8,196万元；渔货贸易收入减少3,262万元；海上运输营业收入减少276万元。公司金枪鱼船队共捕捞金枪鱼88,561吨，较上年相比增加755吨，增幅1%；销售金枪鱼67,096吨，较上年相比减少7,814吨，减幅10%；实现销售收入79,698万元，较上年相比减少2,947万元，减幅4%。“深蓝轮”加工磷虾粉9,041吨（捕捞磷虾70,092吨），捕捞量增幅97%，实现销售收入15,378万元，增幅14%；罐头食品实现营业收入81,635万元，增幅23%；鱼柳加工实现营业收入23,826万元，减幅23%；渔货贸易实现营业收入31,867万元，减幅9%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "捕捞业务收入变动额",
+                "raw_value": "减少2,805万元",
+                "value": null,
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": "原文带增减方向及金额单位；保留原文，不参与精确加总。"
+              },
+              {
+                "name": "食品加工营业收入变动额",
+                "raw_value": "增加8,196万元",
+                "value": null,
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": "原文带增减方向及金额单位；保留原文，不参与精确加总。"
+              },
+              {
+                "name": "渔货贸易收入变动额",
+                "raw_value": "减少3,262万元",
+                "value": null,
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": "原文带增减方向及金额单位；保留原文，不参与精确加总。"
+              },
+              {
+                "name": "海上运输营业收入变动额",
+                "raw_value": "减少276万元",
+                "value": null,
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": "同比",
+                "qualifier": "exact",
+                "uncertainty_reason": "原文带增减方向及金额单位；保留原文，不参与精确加总。"
+              },
+              {
+                "name": "金枪鱼捕捞量",
+                "raw_value": "88,561吨",
+                "value": "88561",
+                "unit": "吨",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "金枪鱼销售量",
+                "raw_value": "67,096吨",
+                "value": "67096",
+                "unit": "吨",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "金枪鱼销售收入",
+                "raw_value": "79,698万元",
+                "value": "79698",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "磷虾粉加工量",
+                "raw_value": "9,041吨",
+                "value": "9041",
+                "unit": "吨",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "磷虾捕捞量",
+                "raw_value": "70,092吨",
+                "value": "70092",
+                "unit": "吨",
+                "source_unit": null,
+                "currency": null,
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "磷虾粉销售收入",
+                "raw_value": "15,378万元",
+                "value": "15378",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "罐头食品营业收入",
+                "raw_value": "81,635万元",
+                "value": "81635",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "鱼柳加工营业收入",
+                "raw_value": "23,826万元",
+                "value": "23826",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              },
+              {
+                "name": "渔货贸易营业收入",
+                "raw_value": "31,867万元",
+                "value": "31867",
+                "unit": "万元",
+                "source_unit": null,
+                "currency": "CNY",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "comparison_basis": null,
+                "qualifier": "exact",
+                "uncertainty_reason": null
+              }
+            ],
+            "uncertainty_reason": null
+          }
+        }
+      ],
+      "checked_fact_ids": [
+        "bs-01",
+        "bs-02",
+        "bs-03",
+        "ps-01",
+        "ps-02",
+        "ps-03",
+        "ps-04",
+        "ps-05",
+        "rm-01",
+        "rm-02",
+        "rm-03",
+        "sm-01",
+        "sm-02",
+        "sm-03",
+        "sm-04",
+        "oi-01",
+        "oi-02",
+        "oi-03",
+        "oi-04",
+        "cc-01",
+        "cc-02",
+        "cc-03",
+        "cc-04",
+        "od-01",
+        "od-03",
+        "od-04",
+        "mc-01",
+        "mc-02",
+        "sc-pos-01",
+        "sc-up-01",
+        "sc-down-01"
+      ],
+      "calls": [
+        {
+          "purpose": "review_profile_workpaper",
+          "request_id": "bp-work-766c167d2ee5fbc844a0a4ba:workpaper:review",
+          "request_hash": "549dae866ba47fc08da5b8704a4d6d3f3b46264b76b4b9e04768e17fcc066535",
+          "response_hash": "9b681ed4cbca412ba5c332bc26157f9b6ca8d40f1eff81056cb3b3f9900c8f0e",
+          "source_label": "openai_compatible:test-model",
+          "model": "test-model",
+          "selected_profile": "review",
+          "logical_profile": "review",
+          "route_fingerprint": "307fd2a4bdb6a01dfb6f175e9423073a73cfc5c88368cb3866684c5d2719b369",
+          "finish_reason": "stop",
+          "reasoning_effort": "high",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": null,
+            "output_tokens": null,
+            "total_tokens": null
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0021",
+            "section-0034",
+            "section-0036",
+            "section-0042",
+            "section-0080",
+            "section-0085"
+          ],
+          "physical_pages": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            18,
+            19,
+            20,
+            21
+          ]
+        },
+        {
+          "purpose": "repair_profile_workpaper",
+          "request_id": "bp-work-766c167d2ee5fbc844a0a4ba:workpaper:repair",
+          "request_hash": "a23f9176ec2901021432237a4acba983561067f5ad5ff167cc2fc86cd307a737",
+          "response_hash": "f59b0a2beea765f5606abaaf67273b2e7456c23a9db93fa22617930f7f25ef5e",
+          "source_label": "openai_compatible:test-model",
+          "model": "test-model",
+          "selected_profile": "test",
+          "logical_profile": "test",
+          "route_fingerprint": "02d87aaf56c0e035c02457ea6ac2a956a7148aa851439a3d55344426562f9923",
+          "finish_reason": "stop",
+          "reasoning_effort": "",
+          "contract_status": "accepted",
+          "usage": {
+            "input_tokens": null,
+            "output_tokens": null,
+            "total_tokens": null
+          },
+          "scope_kind": "selected_source_sections",
+          "heading_count": null,
+          "section_ids": [
+            "section-0021",
+            "section-0034",
+            "section-0036",
+            "section-0042",
+            "section-0080",
+            "section-0085"
+          ],
+          "physical_pages": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            18,
+            19,
+            20,
+            21
+          ]
+        }
+      ],
+      "retained_request_ids": [],
+      "locally_revalidated_request_ids": [],
+      "error": "ValueError: offline_final_not_authorized_no_candidate_adopted"
+    },
+    "standardization_notes": [
+      "事实od-02已隔离，未作为结论采用：metric number is absent from cited source: 捕捞业务收入变动"
+    ]
+  },
+  "workpaper_markdown": "# 600097.SH｜2025-12-31 公司画像底稿\n\n受控工程输入（非真实模型结果）\n\n来源版本：`4c7b6d2b1c3748faa6e35b7375399e059d2caa684be6a87a09f86b64266df58c`。发布时点：2026-03-27T16:00:00+00:00。\n\n## 业务结构\n\n- 公司主要从事远洋渔业捕捞、水产品加工销售及相关贸易，围绕“一鱼一虾”（金枪鱼、南极磷虾）核心主业，形成捕捞、加工、贸易、运输一体化格局。（[source-0003](#source-0003)）\n- 主营业务按行业分为海洋捕捞、食品加工、渔货贸易、海上运输四个板块，合计主营业务收入2,330,812,544.82元。（[source-0007](#source-0007)）\n  - 主营业务收入合计：2,330,812,544.82 元；2025年度，consolidated_group。\n- 主要子公司覆盖远洋捕捞、食品加工、罐头食品加工、渔货贸易和海上运输等业务，如上海开创远洋渔业有限公司从事远洋捕捞，卡洛斯•阿尔博的孩子们有限公司从事罐头食品加工，康隆（香港）航运有限公司从事海上运输等。（[source-0012](#source-0012)、[source-0013](#source-0013)）\n\n## 产品、服务及用途\n\n- 远洋捕捞业务：金枪鱼围网船队11艘船舶全负荷运营，在中西太平洋作业，产品以鲣鱼、黄鳍为主；同时与江苏深蓝远洋渔业有限公司合作经营，在南极海域捕捞磷虾，产品以冻虾和虾粉为主。（[source-0003](#source-0003)）\n- 加工业务：西班牙ALBO公司加工产品以金枪鱼罐头和罐头方便食品为主，部分产品在当地具有较高市场占有率及品牌知名度；国内岱山加工厂加工金枪鱼原料鱼，产品以鱼柳为主，主要销往国外市场。（[source-0003](#source-0003)）\n- 海上运输业务：冷藏运输船队主要与金枪鱼围网船队作业配套，承担冷冻金枪鱼运输、人员和物资等转运，并积极拓展其他运输业务。（[source-0003](#source-0003)）\n- 贸易业务以远洋渔货及水产品加工品为核心，外销主要面向国际市场，依托“捕捞—加工—贸易”全产业链开展运营。（[source-0003](#source-0003)）\n- 分产品收入：金枪鱼销售796,979,841.53元，零星鱼种销售153,783,717.50元，罐头食品销售816,352,061.87元，鱼柳加工销售238,259,146.86元，渔货贸易318,671,971.02元，海上运输6,765,806.04元。（[source-0007](#source-0007)）\n  - 金枪鱼销售收入：796,979,841.53 元；2025年度，consolidated_group。\n  - 零星鱼种销售收入：153,783,717.50 元；2025年度，consolidated_group。\n  - 罐头食品销售收入：816,352,061.87 元；2025年度，consolidated_group。\n  - 鱼柳加工销售收入：238,259,146.86 元；2025年度，consolidated_group。\n  - 渔货贸易收入：318,671,971.02 元；2025年度，consolidated_group。\n  - 海上运输收入：6,765,806.04 元；2025年度，consolidated_group。\n\n## 怎么赚钱\n\n- 公司通过远洋捕捞获取金枪鱼、磷虾等渔获，经加工（罐头、鱼柳、虾粉等）后销售，并开展渔货贸易和配套海上运输，形成捕捞、加工、贸易、运输一体化收入来源。（[source-0003](#source-0003)）\n- 分行业毛利率：海洋捕捞32.51%，食品加工34.65%，渔货贸易5.18%，海上运输6.07%；主营业务综合毛利率29.67%。（[source-0007](#source-0007)）\n  - 海洋捕捞毛利率：32.51 %；2025年度，consolidated_group。\n  - 食品加工毛利率：34.65 %；2025年度，consolidated_group。\n  - 渔货贸易毛利率：5.18 %；2025年度，consolidated_group。\n  - 海上运输毛利率：6.07 %；2025年度，consolidated_group。\n  - 主营业务综合毛利率：29.67 %；2025年度，consolidated_group。\n- 公司销售模式为直销，直销收入2,330,812,544.82元，占主营业务收入全部。（[source-0008](#source-0008)）\n  - 直销收入：2,330,812,544.82 元；2025年度，consolidated_group。\n\n## 规模与业务权重\n\n- 2025年公司营业收入2,336,503,042.69元，较上年增长0.90%。（[source-0001](#source-0001)）\n  - 营业收入：2,336,503,042.69 元；2025年度，consolidated_group。\n  - 营业收入比上年同期增减：0.90 %；2025年度，consolidated_group。\n- 分行业主营业务收入：海洋捕捞950,763,559.03元，食品加工1,054,611,208.73元，渔货贸易318,671,971.02元，海上运输6,765,806.04元。（[source-0007](#source-0007)）\n  - 海洋捕捞收入：950,763,559.03 元；2025年度，consolidated_group。\n  - 食品加工收入：1,054,611,208.73 元；2025年度，consolidated_group。\n  - 渔货贸易收入：318,671,971.02 元；2025年度，consolidated_group。\n  - 海上运输收入：6,765,806.04 元；2025年度，consolidated_group。\n- 2025年公司金枪鱼船队共捕捞金枪鱼88,561吨，销售金枪鱼67,096吨，实现销售收入79,698万元；“深蓝轮”加工磷虾粉9,041吨（捕捞磷虾70,092吨），实现销售收入15,378万元；罐头食品营业收入81,635万元；鱼柳加工营业收入23,826万元；渔货贸易营业收入31,867万元。（[source-0007](#source-0007)）\n  - 金枪鱼捕捞量：88,561 吨；2025年度，consolidated_group。\n  - 金枪鱼销售量：67,096 吨；2025年度，consolidated_group。\n  - 金枪鱼销售收入：79,698 万元；2025年度，consolidated_group。\n  - 磷虾粉产量：9,041 吨；2025年度，consolidated_group。\n  - 磷虾捕捞量：70,092 吨；2025年度，consolidated_group。\n  - 磷虾粉销售收入：15,378 万元；2025年度，consolidated_group。\n  - 罐头食品营业收入：81,635 万元；2025年度，consolidated_group。\n  - 鱼柳加工营业收入：23,826 万元；2025年度，consolidated_group。\n  - 渔货贸易营业收入：31,867 万元；2025年度，consolidated_group。\n- 2025年公司境外销售130,245万元，占公司全部营业收入56%；国内销售102,836万元，占44%。（[source-0007](#source-0007)）\n  - 境外销售收入：130,245 万元；2025年度，consolidated_group。\n  - 境外销售占营业收入比例：56 %；2025年度，consolidated_group。\n  - 国内销售收入：102,836 万元；2025年度，consolidated_group。\n  - 国内销售占营业收入比例：44 %；2025年度，consolidated_group。\n\n## 经营方式与关键投入\n\n- 海洋捕捞板块主要成本构成包括燃料、许可证配额费、渔用物资、船舶修理费、人工成本等。（[source-0009](#source-0009)）\n- 食品加工板块主要成本构成包括原料鱼、辅料、铁罐头、燃料及动力、人工成本、折旧费、其他加工成本。（[source-0009](#source-0009)）\n- 渔货贸易板块主要成本构成包括原料鱼、运输费等；海上运输板块主要成本构成包括船舶租金、燃料、船用物资、人工成本、货物保险等。（[source-0009](#source-0009)）\n- 金枪鱼围网船队11艘船舶投入生产，实现满负荷运营；2026年计划有序推进2艘船舶更新建造工作。（[source-0005](#source-0005)、[source-0014](#source-0014)）\n\n## 客户、渠道与市场\n\n- 公司捕捞的金枪鱼部分在海外销售，ALBO公司产品销售基本在境外销售；国内部分金枪鱼、磷虾粉、鱼柳等销售以国内客户为主。（[source-0007](#source-0007)）\n- 前五名客户销售额90,078.38万元，占年度销售总额38.55%；其中前五名客户销售额中关联方销售额0万元，占年度销售总额0%。（[source-0009](#source-0009)）\n  - 前五名客户销售额：90,078.38 万元；2025年度，consolidated_group。\n  - 前五名客户销售额占年度销售总额比例：38.55 %；2025年度，consolidated_group。\n- 前五名供应商采购额63,005.62万元，占年度采购总额30.15%；其中前五名供应商采购额中关联方采购额0万元，占年度采购总额0%。（[source-0009](#source-0009)）\n  - 前五名供应商采购额：63,005.62 万元；2025年度，consolidated_group。\n  - 前五名供应商采购额占年度采购总额比例：30.15 %；2025年度，consolidated_group。\n- ALBO公司沙丁鱼、鱿鱼等罐头产品保持西班牙市占率第一；黄鳍金枪鱼品类罐头品牌市占率提升，稳定在第二位；国际市场销售额增幅126%，其中北美市场成为最大增长点。（[source-0005](#source-0005)）\n  - ALBO国际市场销售额增幅：126 %；2025年度，named_subsidiary。\n\n## 关键经营影响因素\n\n- 营业收入变动主要系食品加工营业收入同比增加；营业成本变动主要系海洋捕捞营业成本同比减少。（[source-0006](#source-0006)）\n- 贸易业务受关税政策冲击、资源环境变化等多重因素影响，业务成本上升，利润有所下滑；康隆公司面临船舶效率偏低、燃油成本上升等不利因素，整体经营业绩出现下滑。（[source-0005](#source-0005)）\n- 2025年度销售费用49,440万元，较上年42,838万元增加6,602万元，主要系广告宣传费、运输费同比增加，职工薪酬同比减少。（[source-0010](#source-0010)）\n  - 销售费用：49,440 万元；2025年度，consolidated_group。\n  - 销售费用较上年增加额：6,602 万元；2025年度，consolidated_group。\n- 限制：事实od-02已隔离，未作为结论采用：metric number is absent from cited source: 捕捞业务收入变动\n\n## 近期重要变化\n\n- 报告期内公司新增重要非主营业务的说明为“不适用”；公司报告期内业务、产品或服务发生重大变化或调整有关情况为“不适用”；报告期主要子公司股权变动导致合并范围变化为“不适用”。（[source-0003](#source-0003)、[source-0009](#source-0009)）\n- 2026年度经营计划：力争实现营业收入27.25亿元，归属于上市公司股东净利润1.17亿元。（[source-0014](#source-0014)）\n  - 2026年营业收入目标：27.25 亿元；2026年度（计划），consolidated_group。\n  - 2026年归母净利润目标：1.17 亿元；2026年度（计划），consolidated_group。\n\n## 供应链信息（可选加分项）\n\n未获取到的信息不影响基础画像交付；以下内容仍待核。\n\n### 公司所处环节\n\n- 公司处于远洋渔业捕捞、水产品加工、贸易及配套海上运输环节，形成“捕捞—加工—贸易”一体化经营。（[source-0003](#source-0003)）\n\n### 上游原材料与资源\n\n- 海洋捕捞主要投入燃料、许可证配额费、渔用物资、船舶修理费、人工成本等；食品加工主要投入原料鱼、辅料、铁罐头、燃料及动力、人工成本、折旧费等；渔货贸易主要投入原料鱼、运输费等；海上运输主要投入船舶租金、燃料、船用物资、人工成本、货物保险等。（[source-0009](#source-0009)）\n\n### 下游用途与客户领域\n\n- 公司产品下游包括金枪鱼、磷虾粉、鱼柳等国内客户以及境外金枪鱼和ALBO罐头食品客户；前五名客户销售额占年度销售总额38.55%。（[source-0007](#source-0007)、[source-0009](#source-0009)）\n\n## 阅读范围与取舍\n\n优先选取能完整说明公司业务结构、经营模式、收入来源与本期经营变化的实质子节：section-0034说明公司从事的业务情况，section-0036为经营情况讨论与分析，section-0042与section-0044提供主营业务分析及收入成本构成（含收入拆分与主要业务权重），section-0080为主要控股参股公司分析以补充业务板块经营，section-0021/0022提供公司层面近三年主要会计数据与营业收入总额，section-0085为经营计划以说明经营因素与展望。未选行业背景与核心竞争力等泛化内容，也未选纯财务附注与治理章节。\n\n- 第二节 公司简介和主要财务指标 / 七、 近三年主要会计数据和财务指标，物理页6—7：优先选取能完整说明公司业务结构、经营模式、收入来源与本期经营变化的实质子节：section-0034说明公司从事的业务情况，section-0036为经营情况讨论与分析，section-0042与section-0044提供主营业务分析及收入成本构成（含收入拆分与主要业务权重），section-0080为主要控股参股公司分析以补充业务板块经营，section-0021/0022提供公司层面近三年主要会计数据与营业收入总额，section-0085为经营计划以说明经营因素与展望。未选行业背景与核心竞争力等泛化内容，也未选纯财务附注与治理章节。\n- 第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况，物理页8—9：优先选取能完整说明公司业务结构、经营模式、收入来源与本期经营变化的实质子节：section-0034说明公司从事的业务情况，section-0036为经营情况讨论与分析，section-0042与section-0044提供主营业务分析及收入成本构成（含收入拆分与主要业务权重），section-0080为主要控股参股公司分析以补充业务板块经营，section-0021/0022提供公司层面近三年主要会计数据与营业收入总额，section-0085为经营计划以说明经营因素与展望。未选行业背景与核心竞争力等泛化内容，也未选纯财务附注与治理章节。\n- 第三节 管理层讨论与分析 / 三、经营情况讨论与分析，物理页9—9：优先选取能完整说明公司业务结构、经营模式、收入来源与本期经营变化的实质子节：section-0034说明公司从事的业务情况，section-0036为经营情况讨论与分析，section-0042与section-0044提供主营业务分析及收入成本构成（含收入拆分与主要业务权重），section-0080为主要控股参股公司分析以补充业务板块经营，section-0021/0022提供公司层面近三年主要会计数据与营业收入总额，section-0085为经营计划以说明经营因素与展望。未选行业背景与核心竞争力等泛化内容，也未选纯财务附注与治理章节。\n- 第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (一) 主营业务分析，物理页10—15：优先选取能完整说明公司业务结构、经营模式、收入来源与本期经营变化的实质子节：section-0034说明公司从事的业务情况，section-0036为经营情况讨论与分析，section-0042与section-0044提供主营业务分析及收入成本构成（含收入拆分与主要业务权重），section-0080为主要控股参股公司分析以补充业务板块经营，section-0021/0022提供公司层面近三年主要会计数据与营业收入总额，section-0085为经营计划以说明经营因素与展望。未选行业背景与核心竞争力等泛化内容，也未选纯财务附注与治理章节。\n- 第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (七) 主要控股参股公司分析，物理页18—19：优先选取能完整说明公司业务结构、经营模式、收入来源与本期经营变化的实质子节：section-0034说明公司从事的业务情况，section-0036为经营情况讨论与分析，section-0042与section-0044提供主营业务分析及收入成本构成（含收入拆分与主要业务权重），section-0080为主要控股参股公司分析以补充业务板块经营，section-0021/0022提供公司层面近三年主要会计数据与营业收入总额，section-0085为经营计划以说明经营因素与展望。未选行业背景与核心竞争力等泛化内容，也未选纯财务附注与治理章节。\n- 第三节 管理层讨论与分析 / 六、公司关于公司未来发展的讨论与分析 / (三)经营计划，物理页20—21：优先选取能完整说明公司业务结构、经营模式、收入来源与本期经营变化的实质子节：section-0034说明公司从事的业务情况，section-0036为经营情况讨论与分析，section-0042与section-0044提供主营业务分析及收入成本构成（含收入拆分与主要业务权重），section-0080为主要控股参股公司分析以补充业务板块经营，section-0021/0022提供公司层面近三年主要会计数据与营业收入总额，section-0085为经营计划以说明经营因素与展望。未选行业背景与核心竞争力等泛化内容，也未选纯财务附注与治理章节。\n\n停止理由：已覆盖业务、经营模式、收入构成与主要业务权重、公司层面收入总额及经营计划等核心问题；行业背景与核心竞争力为次要信息，财务附注仅在存在实质缺口时定向补充，故可在此停止。\n\n- 未读/后置：section-0035 行业情况：属行业背景，非公司层面经营实质，暂不展开\n- 未读/后置：section-0037 核心竞争力分析：偏泛化竞争力描述，非收入与经营结构核心\n- 未读/后置：section-0070 行业经营性信息分析：多为资质与政府补助，非收入来源说明\n- 未读/后置：section-0847 营业收入和营业成本附注：与section-0044收入成本分析重叠，暂不重复选取\n- 限制：未归类要素字段未作结论采用，原内容保留在模型回执：limitations\n\n## 模型处理记录\n\n- 选章：deepseek-flash（deepseek:deepseek-flash，semantic_extraction__deepseek），报告标题索引（761个候选章节）；输入/输出/合计 20893/339/21232；finish=stop；requested_reasoning=high。\n- 正文抽取：deepseek-flash（deepseek:deepseek-flash，semantic_extraction__deepseek），章节 section-0021, section-0034, section-0036, section-0042, section-0080, section-0085；物理页 6,7,8,9,10,11,12,13,14,15,18,19,20,21；输入/输出/合计 11756/5219/16975；finish=stop；requested_reasoning=high。\n- 提示版本：`company_profile_workpaper.2026-11-15.operating-summary-first.v15`；预处理：`toc_sections_native_layout.v2`。\n\n## 原文复核（开发结果仍待正式核验）\n\n复核状态：`incomplete`。\n- 已检查原事实：31条；范围限于本次所选原文，不是全报告完整性保证。\n- 原始底稿哈希：`7a013b5a626c80af55de2dc7bcc94479202501b0ef668e27760dbcc0b6a3568b`。\n- review_profile_workpaper：test-model（openai_compatible:test-model）；requested_reasoning=high；usage=None；本次调用。\n- repair_profile_workpaper：test-model（openai_compatible:test-model）；requested_reasoning=未知；usage=None；本次调用。\n- material / material_omission / verification_failed：草稿仅保留营业收入微增及食品加工收入增加的定性原因，未纳入source-0007“驱动业务收入变化”中的主要量化调整：金枪鱼围网销售价上涨、销售量减少，捕捞业务收入减少2,805万元；罐头食品销售量上涨，食品加工营业收入增加8,196万元；渔货贸易收入减少3,262万元；海上运输营业收入减少276万元。同段还披露金枪鱼销售量减少7,814吨、减幅10%，销售收入减少2,947万元、减幅4%；磷虾捕捞量增幅97%，磷虾粉销售收入增幅14%；罐头、鱼柳、渔货贸易营业收入变动幅度分别为增23%、减23%、减9%。上述抵消性变动是理解本期主营收入近乎持平的重要收入调整，不属于可选细节。（[source-0007](#source-0007)）\n  - 修订候选（尚非可信发布）：驱动业务收入变化的主要原因：公司金枪鱼围网全年销售价较上一年度有所上涨，销售量减少，捕捞业务收入减少2,805万元；罐头食品销售量较上一年度上涨，食品加工营业收入增加8,196万元；渔货贸易收入减少3,262万元；海上运输营业收入减少276万元。公司金枪鱼船队共捕捞金枪鱼88,561吨，较上年相比增加755吨，增幅1%；销售金枪鱼67,096吨，较上年相比减少7,814吨，减幅10%；实现销售收入79,698万元，较上年相比减少2,947万元，减幅4%。“深蓝轮”加工磷虾粉9,041吨（捕捞磷虾70,092吨），捕捞量增幅97%，实现销售收入15,378万元，增幅14%；罐头食品实现营业收入81,635万元，增幅23%；鱼柳加工实现营业收入23,826万元，减幅23%；渔货贸易实现营业收入31,867万元，减幅9%。\n- 复核未完成：ValueError: offline_final_not_authorized_no_candidate_adopted\n\n## 程序处理说明\n\n- 事实od-02已隔离，未作为结论采用：metric number is absent from cited source: 捕捞业务收入变动\n\n## 来源\n\n### source-0001\n\n第二节 公司简介和主要财务指标 / 七、 近三年主要会计数据和财务指标\n\n物理页6，字符962—3485：\n\n> 七、 近三年主要会计数据和财务指标 (一) 主要会计数据 单位：元 币种：人民币 主要会计数据 2025年 2024年 本期比上年 2023年 同期增减(%) 营业收入 2,336,503,042.69 2,315,558,903.89 0.90 2,014,553,819.25 利润总额 81,254,877.27 79,359,379.10 2.39 167,359,424.09 归属于上市公司股东的净利润 73,894,019.42 61,190,936.77 20.76 148,363,220.94 归属于上市公司股东的扣除非 69,249,173.69 59,722,936.91 15.95 97,410,626.57 经常性损益的净利润 经营活动产生的现金流量净额 167,990,623.18 335,334,342.35 -49.90 107,416,745.32 本期末比上 2025年末 2024年末 年同期末增 2023年末 减（%） 归属于上市公司股东的净资产 2,319,151,944.42 2,242,412,195.88 3.42 2,242,263,093.51 总资产 3,430,891,629.87 3,348,883,475.86 2.45 3,402,941,792.06 (二) 主要财务指标 主要财务指标 2025年 2024年 本期比上年同期增减(%) 2023年 基本每股收益（元／股） 0.31 0.25 24.00 0.62 稀释每股收益（元／股） 0.31 0.25 24.00 0.62 扣除非经常性损益后的基本每股收益（元／股） 0.29 0.25 16.00 0.40 加权平均净资产收益率（%） 3.24 2.67 增加0.57个百分点 6.74 扣除非经常性损益后的加权平均净资产收益率（% 3.04 2.60 增加0.44个百分点 4.43 ） 报告期末公司前三年主要会计数据和财务指标的说明 □适用 √不适用 6 /158\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0002\n\n第二节 公司简介和主要财务指标 / 七、 近三年主要会计数据和财务指标\n\n物理页7，字符0—98：\n\n> 上海开创国际海洋资源股份有限公司2025 年年度报告\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0003\n\n第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况\n\n物理页8，字符939—1567：\n\n> 一、报告期内公司从事的业务情况 公司主要从事远洋渔业捕捞、水产品加工销售及相关贸易，围绕“一鱼一虾”（金枪鱼、南 极磷虾）核心主业，深耕远洋捕捞，构建金枪鱼产业链发展，形成捕捞、加工、贸易、运输一体 化格局。 远洋捕捞：报告期内，公司金枪鱼围网船队 11 艘船舶全负荷运营，在中西太平洋开展生产作 业，产品以鲣鱼、黄鳍为主，船队规模以及捕捞产量位居国内领先水平；与江苏深蓝远洋渔业有 限公司开展合作经营，在南极海域捕捞磷虾，产品以冻虾和虾粉为主。 加工业务：西班牙 ALBO 公司加工产品主要以金枪鱼罐头和罐头方便食品为主，且部分产品在 当地具有较高的市场占有率以及品牌知名度。公司国内岱山加工厂加工金枪鱼原料鱼，产品以鱼 柳为主，主要销往国外市场。 海上运输：冷藏运输船队主要与金枪鱼围网船队作业配套，承担了冷冻金枪鱼运输、人员和 物资等转运，并积极拓展其他运输业务。 贸易业务：公司贸易业务以远洋渔货及水产品加工品为核心，外销主要面向国际市场，依托 “捕捞—加工—贸易”全产业链开展运营，持续拓展水产品贸易业务。 报告期内公司新增重要非主营业务的说明 □适用 √不适用 8/158\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0004\n\n第三节 管理层讨论与分析 / 一、报告期内公司从事的业务情况\n\n物理页9，字符0—62：\n\n> 上海开创国际海洋资源股份有限公司2025 年年度报告\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0005\n\n第三节 管理层讨论与分析 / 三、经营情况讨论与分析\n\n物理页9，字符330—1168：\n\n> 三、经营情况讨论与分析 2025年，金枪鱼围网船队作为公司捕捞业务的核心力量，11 艘船舶投入生产，实现满负荷运 营，船队全员凝心聚力，优化作业流程，强化技术应用，全力弥补各类不利因素带来的影响，力 求稳定捕捞产量与经营效益。“深蓝轮”精准把控磷虾中心渔场，优化捕捞作业流程，发挥传统 拖网的优势，超额完成年度目标任务，并创下该项目捕捞量的新纪录。 ALBO公司围绕品牌升级与产品创新持续发力，优化金枪鱼、沙丁鱼等核心产品结构，强化品 质管控和可持续渔业标准，提升生产效率与供应链稳定性。同时积极拓展欧洲及海外市场，加强 与美国市场合作，进一步巩固百年海产品罐头品牌的国际影响力和市场竞争力。沙丁鱼、鱿鱼等 罐头产品保持西班牙市占率第一；黄鳍金枪鱼品类罐头品牌市占率提升，稳定在第二位；国际市 场销售额增幅 126%，其中北美市场成为最大增长点。环太公司在关税战带来的外部冲击下，市场 环境持续波动，产品销售受到一定影响，公司通过持续提升加工能力，实现平稳运营。 贸易业务受关税政策冲击、资源环境变化等多重因素影响，业务成本上升，利润有所下滑。 加拿大 FCS 公司优化供应链管理，积极拓展采购销售渠道，推进多品类拓展，部分核心产品规模 有所增长；Estelas 贸易公司依托母公司海产品资源优势，继续发挥欧洲贸易平台桥头堡作用， 持续推进金枪鱼等水产品的国际贸易业务，强化与舟山环太食品等生产企业及终端市场的协同合 作。公司不断优化供应链管理，拓展北非及亚洲市场渠道，推动金枪鱼、鲭鱼等原料产品的跨境 流通，实现贸易规模和市场覆盖的稳步增长。 康隆公司聚焦远洋渔业配套服务，全力保障渔获运输、后勤保障等核心需求，通过强化运营 合作、优化舱位运用等措施，加强各板块业务联动性，但仍面临船舶效率偏低、燃油成本上升等 多重不利因素影响，整体经营业绩出现下滑，经营压力持续凸显。\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0006\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (一) 主营业务分析\n\n物理页10，字符659—2229：\n\n> (一) 主营业务分析 1、 利润表及现金流量表相关科目变动分析表 单位：元 币种：人民币 科目 本期数 上年同期数 变动比例（%） 营业收入 2,336,503,042.69 2,315,558,903.89 0.90 营业成本 1,642,264,864.02 1,664,195,121.66 -1.32 销售费用 494,403,591.50 428,381,779.51 15.41 管理费用 114,494,175.61 109,927,307.62 4.15 财务费用 10,829,387.69 27,875,949.34 -61.15 研发费用 4,138,549.88 1,227,955.52 237.03 经营活动产生的现金流量净额 167,990,623.18 335,334,342.35 -49.90 投资活动产生的现金流量净额 -185,274,514.23 -118,672,333.91 不适用 筹资活动产生的现金流量净额 -85,728,400.00 -198,569,764.64 不适用 营业收入变动原因说明：主要系食品加工营业收入同比增加。 营业成本变动原因说明：主要系海洋捕捞营业成本同比减少。 销售费用变动原因说明：主要系食品加工的广告促销费用同比增加。 管理费用变动原因说明：主要系保险费同比增加。 财务费用变动原因说明：主要系汇兑损失同比减少。 研发费用变动原因说明：主要系海洋捕捞研发费用同比增加。 经营活动产生的现金流量净额变动原因说明：主要系购买商品、接受劳务支付的现金同比增加。 投资活动产生的现金流量净额变动原因说明：主要系购建固定资产支付的现金同比增加。 筹资活动产生的现金流量净额变动原因说明：主要系分配股利、偿付利息支付的现金同比减少。 本期公司业务类型、利润构成或利润来源发生重大变动的详细说明 □适用 √不适用 2、 收入和成本分析 √适用 □不适用 （1）驱动业务收入变化的因素分析 10/158\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0007\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (一) 主营业务分析\n\n物理页11，字符0—4862：\n\n> 上海开创国际海洋资源股份有限公司2025 年年度报告 驱动业务收入增加的主要原因：公司金枪鱼围网全年销售价较上一年度有所上涨，销售量减 少，捕捞业务收入减少 2,805 万元。罐头食品销售量较上一年度上涨，食品加工营业收入增加 8,196 万元。渔货贸易收入减少 3,262 万元。海上运输营业收入减少 276 万元。 （2）以实物销售为主的公司产品收入影响因素分析 公司金枪鱼船队共捕捞金枪鱼 88,561 吨，较上年相比增加 755 吨，增幅 1%，销售金枪鱼 67,096 吨，较上年相比减少 7,814 吨，减幅 10%，实现销售收入 79,698 万元，较上年相比减少 2,947 万 元，减幅 4%；“深蓝轮”加工磷虾粉 9,041 吨（捕捞磷虾 70,092 吨），捕捞量增幅 97%，实现销 售收入 15,378 万元，增幅 14%；罐头食品实现营业收入 81,635 万元，增幅 23%；鱼柳加工实现营 业收入 23,826 万元，减幅 23%；渔货贸易实现营业收入 31,867 万元，减幅 9%。 （3）主要销售客户的情况 公司捕捞的金枪鱼部分在海外销售，ALBO 公司产品销售基本在境外销售。2025 年，公司境外 销售 130,245 万元，占公司全部营业收入 56%；国内部分金枪鱼、磷虾粉、鱼柳等销售以国内客 户为主，实现营业收入 102,836 万元，占公司全部营业收入 44%。 (1). 主营业务分行业、分产品、分地区、分销售模式情况 单位：元 币种：人民币 主营业务分行业情况 毛利率 营业收入 营业成本 毛利率比 分行业 营业收入 营业成本 （%） 比上年增 比上年增 上年增减 减（%） 减（%） （%） 海洋捕捞 950,763,559.03 641,633,535.49 32.51 -2.87 -5.08 1.57 食品加工 1,054,611,208.73 689,161,314.09 34.65 8.43 7.10 0.80 渔货贸易 318,671,971.02 302,165,778.08 5.18 -9.29 -6.94 -2.39 海上运输 6,765,806.04 6,355,307.65 6.07 -28.98 -65.01 96.75 合计 2,330,812,544.82 1,639,315,935.31 29.67 0.80 -1.38 1.56 主营业务分产品情况 毛利率 营业收入 营业成本 毛利率比 分产品 营业收入 营业成本 （%） 比上年增 比上年增 上年增减 减（%） 减（%） （%） 金枪鱼销售 796,979,841.53 511,327,237.04 35.84 -3.57 -3.49 -0.05 零星鱼种销售 153,783,717.50 130,306,298.45 15.27 0.93 -10.81 11.16 罐头食品销售 816,352,061.87 453,440,105.44 44.46 22.92 25.57 -1.17 鱼柳加工销售 238,259,146.86 235,721,208.65 1.07 -22.77 -16.51 -7.41 渔货贸易 318,671,971.02 302,165,778.08 5.18 -9.29 -6.94 -2.39 海上运输 6,765,806.04 6,355,307.65 6.07 -28.98 -65.01 96.75 合计 2,330,812,544.82 1,639,315,935.31 29.67 0.80 -1.38 1.56 主营业务分地区情况 毛利率 营业收入 营业成本 毛利率比 分地区 营业收入 营业成本 （%） 比上年增 比上年增 上年增减 减（%） 减（%） （%） 国内 1,028,359,860.15 714,416,964.96 30.53 -1.70 -4.16 1.78 国外 1,302,452,684.67 924,898,970.35 28.99 2.87 0.88 1.40 合计 2,330,812,544.82 1,639,315,935.31 29.67 0.80 -1.38 1.56 11 /158\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0008\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (一) 主营业务分析\n\n物理页12，字符0—4808：\n\n> 上海开创国际海洋资源股份有限公司2025 年年度报告 主营业务分销售模式情况 毛利率 营业收入 营业成本 毛利率比 销售模式 营业收入 营业成本 （%） 比上年增 比上年增 上年增减 减（%） 减（%） （%） 直销 2,330,812,544.82 1,639,315,935.31 29.67 0.80 -1.38 1.56 合计 2,330,812,544.82 1,639,315,935.31 29.67 0.80 -1.38 1.56 (2). 产销量情况分析表 √适用 □不适用 生产量比 销售量比 库存量比 主要产品 单位 生产量 销售量 库存量 上年增减 上年增减 上年增减 （%） （%） （%） 金枪鱼 吨 88,560.73 67,096.02 10,781.66 0.86 -10.43 -20.82 罐头食品 万罐 5,808.97 6,049.62 2,865.95 6.09 19.28 -7.75 鱼柳 吨 10,968.47 11,017.20 2,750.98 -6.17 3.62 -1.74 产销量情况说明： 金枪鱼转移 24,300.45 吨至后续鱼柳加工 (3). 重大采购合同、重大销售合同的履行情况 □适用 √不适用 (4). 成本分析表 单位：元 币种：人民币 分行业情况 成本构成 本期占 上年同期 本期金额较 分行业 项目 本期金额 总成本 上年同期金额 占总成本 上年同期变 比例(%) 比例(%) 动比例(%) 海洋捕捞 营业成本 641,633,535.49 39.14 675,940,491.97 31.47 -5.08 食品加工 营业成本 689,161,314.09 42.04 643,452,073.09 47.26 7.10 渔货贸易 营业成本 302,165,778.08 18.43 324,703,612.20 20.98 -6.94 海上运输 营业成本 6,355,307.65 0.39 18,164,036.79 0.29 -65.01 合计 1,639,315,935.31 100.00 1,662,260,214.05 100.00 -1.38 分产品情况 成本构成 本期占 上年同期 本期金额较 分产品 项目 本期金额 总成本 上年同期金额 占总成本 上年同期变 比例(%) 比例(%) 动比例(%) 金枪鱼销售 营业成本 511,327,237.04 31.19 529,836,191.85 29.93 -3.49 零星鱼种销售 营业成本 130,306,298.45 7.95 146,104,300.12 1.54 -10.81 罐头食品销售 营业成本 453,440,105.44 27.66 361,112,566.18 26.49 25.57 鱼柳加工销售 营业成本 235,721,208.65 14.38 282,339,506.91 20.77 -16.51 渔货贸易 营业成本 302,165,778.08 18.43 324,703,612.20 20.98 -6.94 运输 营业成本 6,355,307.65 0.39 18,164,036.79 0.29 -65.01 合计 1,639,315,935.31 100.00 1,662,260,214.05 100.00 -1.38 成本分析其他情况说明 12 / 158\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0009\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (一) 主营业务分析\n\n物理页13，字符0—1325：\n\n> 上海开创国际海洋资源股份有限公司2025 年年度报告  海洋捕捞板块主要成本构成：燃料、许可证配额费、渔用物资、船舶修理费、人工成本等。  食品加工板块主要成本构成：原料鱼、辅料、铁罐头、燃料及动力、人工成本、折旧费、其 他加工成本。  渔货贸易板块主要成本构成：原料鱼、运输费等。  海上运输板块主要成本构成：船舶租金、燃料、船用物资、人工成本、货物保险等。 (5). 报告期主要子公司股权变动导致合并范围变化 □适用 √不适用 (6). 公司报告期内业务、产品或服务发生重大变化或调整有关情况 □适用 √不适用 (7). 主要销售客户及主要供应商情况 属于同一控制人控制的客户或供应商视为同一客户或供应商合并列示，受同一国有资产管理机构 实际控制的除外。 下列客户及供应商信息按照同一控制口径合并计算列示的情况说明 不适用 A.公司主要销售客户及主要供应商情况 √适用 □不适用 前五名客户销售额90,078.38万元，占年度销售总额38.55%；其中前五名客户销售额中关联方销售 额0万元，占年度销售总额0% 。 前五名供应商采购额63,005.62万元，占年度采购总额30.15%；其中前五名供应商采购额中关联方 采购额0万元，占年度采购总额0%。 B.报告期内向单个客户的销售比例超过总额的 50%、前 5 名客户中存在新增客户的或严重依赖于 少数客户的情形 □适用 √不适用 报告期内向单个供应商的采购比例超过总额的 50%、前 5 名供应商中存在新增供应商的或严重依 赖于少数供应商的情形 □适用 √不适用 C. 报告期内公司股票被实施退市风险警示或其他风险警示 前五名销售客户 □适用 √不适用 前五名供应商 □适用 √不适用 D. 报告期内公司存在贸易业务收入 √适用 □不适用 单位：元 币种：人民币 贸易业务开展情况 本期营业收入 上期营业收入 本期营业收入比上年同 期增减（%） 渔货贸易 318,671,971.02 351,289,993.49 -9.29 贸易业务占营业收入比例超过 10%前五名销售客户 13/158\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0010\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (一) 主营业务分析\n\n物理页14，字符0—3368：\n\n> 上海开创国际海洋资源股份有限公司2025 年年度报告 √适用 □不适用 单位：元 币种：人民币 序号 客户名称 销售额 占年度销售总额比例（%） 1 FRINSA DEL NOROESTE, S.A. 71,290,942.81 3.05 2 TRIMARINE INTER 42,185,735.14 1.81 3 COLDFISH SEAFOOD CO. LTD. 25,079,727.32 1.07 4 CALKINS AND BURKE 18,953,039.19 0.81 5 GENERALE CONSERVE 13,940,141.65 0.60 合计 / 171,449,586.11 7.34 贸易业务收入占营业收入比例超过 10%前五名供应商 √适用 □不适用 单位：元 币种：人民币 序号 供应商名称 采购额 占年度采购总 额比例（%） 1 ZHEJIANG QIRUN FOOD CO., LTD 87,513,731.38 4.19 2 PROVEEDORES VARIOS PENDIENTES FRA. 52,898,200.93 2.53 3 OCEAN PIONEER INTERNATIONAL CO., LTD 17,866,340.03 0.85 4 FISHHAWK FISHERIES INC. 15,316,625.93 0.73 5 TROPICAL FOOD MANUFACTURING (ZHOUSHAN)CO., LTD 5,984,177.82 0.29 合计 / 179,579,076.08 8.59 3、 费用 √适用 □不适用 2025 年度发生销售费用 49,440 万元，较上年 42,838 万元相比，增加 6,602 万元，主要系广 告宣传费、运输费同比增加，职工薪酬同比减少。 2025 年度发生管理费用 11,449 万元，同上年 10,993 万元相比，增加 456 万元，主要系保险 费、专业服务费同期增加。 2025 年度发生财务费用 1,083 万元，较上年 2,788 万元相比，减少 1,705 万元，未确认融资 费用减少 439 万元，利息收入减少 230 万元，汇兑损失减少 1,094 万元。 4、 研发投入 (1).研发投入情况表 √适用 □不适用 单位：元 币种：人民币 本期费用化研发投入 4,138,549.88 本期资本化研发投入 研发投入合计 4,138,549.88 研发投入总额占营业收入比例（%） 0.18 研发投入资本化的比重（%） (2).研发人员情况表 □适用 √不适用 (3).情况说明 □适用 √不适用 (4).研发人员构成发生重大变化的原因及对公司未来发展的影响 14 /158\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0011\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (一) 主营业务分析\n\n物理页15，字符0—1205：\n\n> 上海开创国际海洋资源股份有限公司2025 年年度报告 □适用 √不适用 5、 现金流 √适用 □不适用 2025 年度公司现金净流出 9,707 万元，其中经营活动现金净流入 16,799 万元，投资活动现 金净流出 18,527 万元，筹资活动现金净流出 8,573 万元，汇率变动对现金的影响 595 万元。2025 年度公司经营净流入现金 16,799 万元，与上年 33,533 万元相比，减少 16,734 万元，主要系 2025 年度销售商品、提供劳务收到现金较上年增加 10,197 万元，2025 年度购买商品接受劳务支付现 金较上年增加 31,149 万元，2025 年度收到其他与经营活动有关的现金增加 975 万元，2025 年度 支付其他与经营活动有关的现金较上年增加 2,150 万元。2025 年度投资活动净流出 18,527 万元， 与上年净流出 11,867 万元相比，增加 6,660 万元，主要是本年度公司购建固定资产支付的现金较 上年增加 6,743 万元。2025 年度公司筹资活动净流出 8,573 万元，与上年同期净流出 19,857 万 元相比，减少 11,284 万元，主要系年内分配股利、利润或偿付利息支付的现金较上年减少 4,863 万元，支付其他与筹资活动有关的现金较上年减少 4,053 万元。\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0012\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (七) 主要控股参股公司分析\n\n物理页18，字符293—2388：\n\n> (七) 主要控股参股公司分析 √适用 □不适用 主要子公司及对公司净利润影响达 10%以上的参股公司情况 √适用 □不适用 单位：元 币种：人民币 公司名称 公司类型 主要业务 注册资本 总资产 净资产 营业收入 营业利润 净利润 上海开创远洋渔业有限公司 子公司 远洋捕捞 41,000万元 2,285,441,824.09 1,256,665,939.84 1,175,618,816.17 6,221,355.66 5,751,113.30 泛太食品（马绍尔群岛）有 子公司 远洋捕捞及食品加工 USD800万元 48,323,536.72 -14,548,944.19 75,194,260.04 51,747.47 11,314.46 限公司 业 泛太渔业（马绍尔群岛）有 子公司 远洋捕捞 USD200万元 851,620,998.36 760,709,687.97 497,631,583.01 54,525,033.44 53,819,378.64 限公司 文森特（密克罗尼西亚）渔 子公司 远洋捕捞 USD5万元 36,129,238.63 32,209,367.54 3,554.30 1,426.06 1,426.06 业有限公司 亚太金枪鱼私人有限公司 子公司 交易鱼类和鱼产品 USD100万元 10,397,188.91 9,420,447.60 355,430.00 67,030.47 64,788.20 舟山环太海洋食品有限公司 子公司 水产品加工及销售 10,000万元 402,580,718.20 180,125,259.17 422,469,539.59 299,915.77 568,536.50 卡洛斯•阿尔博的孩子们有 子公司 罐头食品加工 EUR180万元 873,176,191.32 462,143,432.72 818,099,682.13 22,342,384.89 19,242,607.54 限公司 18 / 158\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0013\n\n第三节 管理层讨论与分析 / 五、报告期内主要经营情况 / (七) 主要控股参股公司分析\n\n物理页19，字符0—826：\n\n> 上海开创国际海洋资源股份有限公司2025 年年度报告 康隆（香港）航运有限公司 子公司 海上运输等 USD1万元 158,330,969.72 50,999,867.67 65,305,692.59 8,483,778.57 8,413,720.47 法国小溪海鲜公司 子公司 海鲜加工和批发业务 92.34万加元 42,144,503.09 39,905,477.23 100,605,939.19 350,953.83 218,290.96 艾斯特拉斯贸易有限公司 子公司 渔货贸易 EUR3,000.00 115,561,454.01 11,237,905.20 202,368,570.79 2,318,210.49 1,854,461.53 报告期内取得和处置子公司的情况 □适用 √不适用 其他说明 □适用 √不适用\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0014\n\n第三节 管理层讨论与分析 / 六、公司关于公司未来发展的讨论与分析 / (三)经营计划\n\n物理页20，字符315—1497：\n\n> (三)经营计划 √适用 □不适用 2026年度，公司将继续围绕“一鱼一虾”开展各项工作，深化四大板块协同联动，依托数字 化转型与科技创新，培育高附加值产品矩阵，提升全链条运营效率，增强企业核心竞争力与可持续 发展能力，力争实现营业收入 27.25亿元，归属于上市公司股东净利润 1.17亿元的经济指标，推 动主业利润稳步提升。 远洋捕捞业务：金枪鱼围网船队严格执行远洋渔业履约管理，合理安排作业天数，完善船队联 动与渔场布局，强化渔汛研判与信息共享，提升鱼获质量，有序推进 2 艘船舶更新建造工作。南极 磷虾项目压实目标管理，精准锁定渔场，灵活调整生产模式，强化设备运行和维护，优化加工生产 线效能，提升鲜虾出粉率。船队坚持执行成本预算管理，降本增效，努力完成全年捕捞计划。 食品加工业务：ALBO 公司在巩固当地核心市场前提下，继续拓展全球市场，拓展软包装产品 及健康轻食产品，强化供应链协同，坚守质量底线，保持 IFS“卓越级”认证，提升品牌知名度。 环太公司深化数智化赋能，扩大 MSC 认证原料采购与销售渠道，优化产能结构，继续保持加工出成 率，培育新盈利点。泛太食品将降低成本，优化岗位设置，加强员工技能培训，提升生产效率与产 品质量；通过参加行业展会与论坛，拓宽销售渠道，提升持续盈利能力。 贸易业务：FCS 公司将推进市场精细化运营，开展“产品-区域”双维度分析；强化内部协同， 深耕大众消费市场，发挥核心优势，升级北美地区战略定位，打造外汇运作平台与区域贸易中转站。 Estelas公司积极应对国际贸易、成本汇率波动等风险，采取市场多元化布局，加强内部协调，强 化原料追溯体系，与 MSC认证体系接轨，提升 MSC 原料贸易数量，提升国际客户信任度。 运输配套业务：康隆公司合理优化运力，拓展业务规模，加强船员队伍建设，继续做好金枪鱼 转载、托运渔需生产物资等配套服务工作，根据产量情况，适时调整舱位安排，提高运输效率，并 做好后勤保障工作。 风险防控与管理提升：持续筑牢风险防控屏障，全面提升经营管理效能，强化安全生产与环保 合规管理，严守合规经营底线，加快推动财务共享与数字化平台建设，提升数据支撑和决策赋能能 力，加强专业人才引进与培养，不断锤炼团队执行效能与创新活力，建立健全长期有效的薪酬激励 机制，为企业高质量发展提供坚实保障。 20/158\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n\n### source-0015\n\n第三节 管理层讨论与分析 / 六、公司关于公司未来发展的讨论与分析 / (三)经营计划\n\n物理页21，字符0—62：\n\n> 上海开创国际海洋资源股份有限公司2025 年年度报告\n\n表格口径：相邻片段按原页顺序保留；续表的表头、单位与数据须共同引用。\n",
+  "workpaper_status": "review_limited_pending_verification",
+  "workpaper_receipts": [
+    {
+      "request_id": "bp-work-766c167d2ee5fbc844a0a4ba:workpaper:review",
+      "purpose": "review_profile_workpaper",
+      "request_hash": "549dae866ba47fc08da5b8704a4d6d3f3b46264b76b4b9e04768e17fcc066535",
+      "response_hash": "9b681ed4cbca412ba5c332bc26157f9b6ca8d40f1eff81056cb3b3f9900c8f0e",
+      "finish_reason": "stop",
+      "source_label": "openai_compatible:test-model",
+      "model": "test-model",
+      "selected_profile": "review",
+      "logical_profile": "review",
+      "reasoning_effort": "high",
+      "route_fingerprint": "307fd2a4bdb6a01dfb6f175e9423073a73cfc5c88368cb3866684c5d2719b369",
+      "contract_status": "accepted",
+      "raw_content": "{\"findings\": [{\"finding_id\": \"F001\", \"element\": \"operating_drivers\", \"severity\": \"material\", \"issue_type\": \"material_omission\", \"action\": \"possible_omission\", \"affected_fact_id\": null, \"evidence_ids\": [\"source-0007\"], \"explanation\": \"\\u8349\\u7a3f\\u4ec5\\u4fdd\\u7559\\u8425\\u4e1a\\u6536\\u5165\\u5fae\\u589e\\u53ca\\u98df\\u54c1\\u52a0\\u5de5\\u6536\\u5165\\u589e\\u52a0\\u7684\\u5b9a\\u6027\\u539f\\u56e0\\uff0c\\u672a\\u7eb3\\u5165source-0007\\u201c\\u9a71\\u52a8\\u4e1a\\u52a1\\u6536\\u5165\\u53d8\\u5316\\u201d\\u4e2d\\u7684\\u4e3b\\u8981\\u91cf\\u5316\\u8c03\\u6574\\uff1a\\u91d1\\u67aa\\u9c7c\\u56f4\\u7f51\\u9500\\u552e\\u4ef7\\u4e0a\\u6da8\\u3001\\u9500\\u552e\\u91cf\\u51cf\\u5c11\\uff0c\\u6355\\u635e\\u4e1a\\u52a1\\u6536\\u5165\\u51cf\\u5c112,805\\u4e07\\u5143\\uff1b\\u7f50\\u5934\\u98df\\u54c1\\u9500\\u552e\\u91cf\\u4e0a\\u6da8\\uff0c\\u98df\\u54c1\\u52a0\\u5de5\\u8425\\u4e1a\\u6536\\u5165\\u589e\\u52a08,196\\u4e07\\u5143\\uff1b\\u6e14\\u8d27\\u8d38\\u6613\\u6536\\u5165\\u51cf\\u5c113,262\\u4e07\\u5143\\uff1b\\u6d77\\u4e0a\\u8fd0\\u8f93\\u8425\\u4e1a\\u6536\\u5165\\u51cf\\u5c11276\\u4e07\\u5143\\u3002\\u540c\\u6bb5\\u8fd8\\u62ab\\u9732\\u91d1\\u67aa\\u9c7c\\u9500\\u552e\\u91cf\\u51cf\\u5c117,814\\u5428\\u3001\\u51cf\\u5e4510%\\uff0c\\u9500\\u552e\\u6536\\u5165\\u51cf\\u5c112,947\\u4e07\\u5143\\u3001\\u51cf\\u5e454%\\uff1b\\u78f7\\u867e\\u6355\\u635e\\u91cf\\u589e\\u5e4597%\\uff0c\\u78f7\\u867e\\u7c89\\u9500\\u552e\\u6536\\u5165\\u589e\\u5e4514%\\uff1b\\u7f50\\u5934\\u3001\\u9c7c\\u67f3\\u3001\\u6e14\\u8d27\\u8d38\\u6613\\u8425\\u4e1a\\u6536\\u5165\\u53d8\\u52a8\\u5e45\\u5ea6\\u5206\\u522b\\u4e3a\\u589e23%\\u3001\\u51cf23%\\u3001\\u51cf9%\\u3002\\u4e0a\\u8ff0\\u62b5\\u6d88\\u6027\\u53d8\\u52a8\\u662f\\u7406\\u89e3\\u672c\\u671f\\u4e3b\\u8425\\u6536\\u5165\\u8fd1\\u4e4e\\u6301\\u5e73\\u7684\\u91cd\\u8981\\u6536\\u5165\\u8c03\\u6574\\uff0c\\u4e0d\\u5c5e\\u4e8e\\u53ef\\u9009\\u7ec6\\u8282\\u3002\"}], \"reviewed_fact_ids\": [\"bs-01\", \"bs-02\", \"bs-03\", \"ps-01\", \"ps-02\", \"ps-03\", \"ps-04\", \"ps-05\", \"rm-01\", \"rm-02\", \"rm-03\", \"sm-01\", \"sm-02\", \"sm-03\", \"sm-04\", \"oi-01\", \"oi-02\", \"oi-03\", \"oi-04\", \"cc-01\", \"cc-02\", \"cc-03\", \"cc-04\", \"od-01\", \"od-03\", \"od-04\", \"mc-01\", \"mc-02\", \"sc-pos-01\", \"sc-up-01\", \"sc-down-01\"]}",
+      "response_payload": {
+        "findings": [
+          {
+            "finding_id": "F001",
+            "element": "operating_drivers",
+            "severity": "material",
+            "issue_type": "material_omission",
+            "action": "possible_omission",
+            "affected_fact_id": null,
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "explanation": "草稿仅保留营业收入微增及食品加工收入增加的定性原因，未纳入source-0007“驱动业务收入变化”中的主要量化调整：金枪鱼围网销售价上涨、销售量减少，捕捞业务收入减少2,805万元；罐头食品销售量上涨，食品加工营业收入增加8,196万元；渔货贸易收入减少3,262万元；海上运输营业收入减少276万元。同段还披露金枪鱼销售量减少7,814吨、减幅10%，销售收入减少2,947万元、减幅4%；磷虾捕捞量增幅97%，磷虾粉销售收入增幅14%；罐头、鱼柳、渔货贸易营业收入变动幅度分别为增23%、减23%、减9%。上述抵消性变动是理解本期主营收入近乎持平的重要收入调整，不属于可选细节。"
+          }
+        ],
+        "reviewed_fact_ids": [
+          "bs-01",
+          "bs-02",
+          "bs-03",
+          "ps-01",
+          "ps-02",
+          "ps-03",
+          "ps-04",
+          "ps-05",
+          "rm-01",
+          "rm-02",
+          "rm-03",
+          "sm-01",
+          "sm-02",
+          "sm-03",
+          "sm-04",
+          "oi-01",
+          "oi-02",
+          "oi-03",
+          "oi-04",
+          "cc-01",
+          "cc-02",
+          "cc-03",
+          "cc-04",
+          "od-01",
+          "od-03",
+          "od-04",
+          "mc-01",
+          "mc-02",
+          "sc-pos-01",
+          "sc-up-01",
+          "sc-down-01"
+        ]
+      },
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      }
+    },
+    {
+      "request_id": "bp-work-766c167d2ee5fbc844a0a4ba:workpaper:repair",
+      "purpose": "repair_profile_workpaper",
+      "request_hash": "a23f9176ec2901021432237a4acba983561067f5ad5ff167cc2fc86cd307a737",
+      "response_hash": "f59b0a2beea765f5606abaaf67273b2e7456c23a9db93fa22617930f7f25ef5e",
+      "finish_reason": "stop",
+      "source_label": "openai_compatible:test-model",
+      "model": "test-model",
+      "selected_profile": "test",
+      "logical_profile": "test",
+      "reasoning_effort": "",
+      "route_fingerprint": "02d87aaf56c0e035c02457ea6ac2a956a7148aa851439a3d55344426562f9923",
+      "contract_status": "accepted",
+      "raw_content": "{\"repaired_facts\": [{\"fact_id\": \"review-add:F001\", \"text\": \"\\u9a71\\u52a8\\u4e1a\\u52a1\\u6536\\u5165\\u53d8\\u5316\\u7684\\u4e3b\\u8981\\u539f\\u56e0\\uff1a\\u516c\\u53f8\\u91d1\\u67aa\\u9c7c\\u56f4\\u7f51\\u5168\\u5e74\\u9500\\u552e\\u4ef7\\u8f83\\u4e0a\\u4e00\\u5e74\\u5ea6\\u6709\\u6240\\u4e0a\\u6da8\\uff0c\\u9500\\u552e\\u91cf\\u51cf\\u5c11\\uff0c\\u6355\\u635e\\u4e1a\\u52a1\\u6536\\u5165\\u51cf\\u5c112,805\\u4e07\\u5143\\uff1b\\u7f50\\u5934\\u98df\\u54c1\\u9500\\u552e\\u91cf\\u8f83\\u4e0a\\u4e00\\u5e74\\u5ea6\\u4e0a\\u6da8\\uff0c\\u98df\\u54c1\\u52a0\\u5de5\\u8425\\u4e1a\\u6536\\u5165\\u589e\\u52a08,196\\u4e07\\u5143\\uff1b\\u6e14\\u8d27\\u8d38\\u6613\\u6536\\u5165\\u51cf\\u5c113,262\\u4e07\\u5143\\uff1b\\u6d77\\u4e0a\\u8fd0\\u8f93\\u8425\\u4e1a\\u6536\\u5165\\u51cf\\u5c11276\\u4e07\\u5143\\u3002\\u516c\\u53f8\\u91d1\\u67aa\\u9c7c\\u8239\\u961f\\u5171\\u6355\\u635e\\u91d1\\u67aa\\u9c7c88,561\\u5428\\uff0c\\u8f83\\u4e0a\\u5e74\\u76f8\\u6bd4\\u589e\\u52a0755\\u5428\\uff0c\\u589e\\u5e451%\\uff1b\\u9500\\u552e\\u91d1\\u67aa\\u9c7c67,096\\u5428\\uff0c\\u8f83\\u4e0a\\u5e74\\u76f8\\u6bd4\\u51cf\\u5c117,814\\u5428\\uff0c\\u51cf\\u5e4510%\\uff1b\\u5b9e\\u73b0\\u9500\\u552e\\u6536\\u516579,698\\u4e07\\u5143\\uff0c\\u8f83\\u4e0a\\u5e74\\u76f8\\u6bd4\\u51cf\\u5c112,947\\u4e07\\u5143\\uff0c\\u51cf\\u5e454%\\u3002\\u201c\\u6df1\\u84dd\\u8f6e\\u201d\\u52a0\\u5de5\\u78f7\\u867e\\u7c899,041\\u5428\\uff08\\u6355\\u635e\\u78f7\\u867e70,092\\u5428\\uff09\\uff0c\\u6355\\u635e\\u91cf\\u589e\\u5e4597%\\uff0c\\u5b9e\\u73b0\\u9500\\u552e\\u6536\\u516515,378\\u4e07\\u5143\\uff0c\\u589e\\u5e4514%\\uff1b\\u7f50\\u5934\\u98df\\u54c1\\u5b9e\\u73b0\\u8425\\u4e1a\\u6536\\u516581,635\\u4e07\\u5143\\uff0c\\u589e\\u5e4523%\\uff1b\\u9c7c\\u67f3\\u52a0\\u5de5\\u5b9e\\u73b0\\u8425\\u4e1a\\u6536\\u516523,826\\u4e07\\u5143\\uff0c\\u51cf\\u5e4523%\\uff1b\\u6e14\\u8d27\\u8d38\\u6613\\u5b9e\\u73b0\\u8425\\u4e1a\\u6536\\u516531,867\\u4e07\\u5143\\uff0c\\u51cf\\u5e459%\\u3002\", \"subject_scope\": \"consolidated_group\", \"period\": \"2025\\u5e74\\u5ea6\", \"evidence_ids\": [\"source-0007\"], \"metrics\": [{\"name\": \"\\u6355\\u635e\\u4e1a\\u52a1\\u6536\\u5165\\u53d8\\u52a8\\u989d\", \"raw_value\": \"\\u51cf\\u5c112,805\\u4e07\\u5143\", \"subject_scope\": \"business_segment\", \"period\": \"2025\\u5e74\\u5ea6\", \"value\": \"-2805\", \"unit\": \"\\u4e07\\u5143\", \"currency\": \"CNY\", \"qualifier\": \"exact\", \"comparison_basis\": \"\\u540c\\u6bd4\"}, {\"name\": \"\\u98df\\u54c1\\u52a0\\u5de5\\u8425\\u4e1a\\u6536\\u5165\\u53d8\\u52a8\\u989d\", \"raw_value\": \"\\u589e\\u52a08,196\\u4e07\\u5143\", \"subject_scope\": \"business_segment\", \"period\": \"2025\\u5e74\\u5ea6\", \"value\": \"8196\", \"unit\": \"\\u4e07\\u5143\", \"currency\": \"CNY\", \"qualifier\": \"exact\", \"comparison_basis\": \"\\u540c\\u6bd4\"}, {\"name\": \"\\u6e14\\u8d27\\u8d38\\u6613\\u6536\\u5165\\u53d8\\u52a8\\u989d\", \"raw_value\": \"\\u51cf\\u5c113,262\\u4e07\\u5143\", \"subject_scope\": \"business_segment\", \"period\": \"2025\\u5e74\\u5ea6\", \"value\": \"-3262\", \"unit\": \"\\u4e07\\u5143\", \"currency\": \"CNY\", \"qualifier\": \"exact\", \"comparison_basis\": \"\\u540c\\u6bd4\"}, {\"name\": \"\\u6d77\\u4e0a\\u8fd0\\u8f93\\u8425\\u4e1a\\u6536\\u5165\\u53d8\\u52a8\\u989d\", \"raw_value\": \"\\u51cf\\u5c11276\\u4e07\\u5143\", \"subject_scope\": \"business_segment\", \"period\": \"2025\\u5e74\\u5ea6\", \"value\": \"-276\", \"unit\": \"\\u4e07\\u5143\", \"currency\": \"CNY\", \"qualifier\": \"exact\", \"comparison_basis\": \"\\u540c\\u6bd4\"}, {\"name\": \"\\u91d1\\u67aa\\u9c7c\\u6355\\u635e\\u91cf\", \"raw_value\": \"88,561\\u5428\", \"subject_scope\": \"business_segment\", \"period\": \"2025\\u5e74\\u5ea6\", \"value\": \"88561\", \"unit\": \"\\u5428\", \"qualifier\": \"exact\"}, {\"name\": \"\\u91d1\\u67aa\\u9c7c\\u9500\\u552e\\u91cf\", \"raw_value\": \"67,096\\u5428\", \"subject_scope\": \"business_segment\", \"period\": \"2025\\u5e74\\u5ea6\", \"value\": \"67096\", \"unit\": \"\\u5428\", \"qualifier\": \"exact\"}, {\"name\": \"\\u91d1\\u67aa\\u9c7c\\u9500\\u552e\\u6536\\u5165\", \"raw_value\": \"79,698\\u4e07\\u5143\", \"subject_scope\": \"business_segment\", \"period\": \"2025\\u5e74\\u5ea6\", \"value\": \"79698\", \"unit\": \"\\u4e07\\u5143\", \"currency\": \"CNY\", \"qualifier\": \"exact\"}, {\"name\": \"\\u78f7\\u867e\\u7c89\\u52a0\\u5de5\\u91cf\", \"raw_value\": \"9,041\\u5428\", \"subject_scope\": \"business_segment\", \"period\": \"2025\\u5e74\\u5ea6\", \"value\": \"9041\", \"unit\": \"\\u5428\", \"qualifier\": \"exact\"}, {\"name\": \"\\u78f7\\u867e\\u6355\\u635e\\u91cf\", \"raw_value\": \"70,092\\u5428\", \"subject_scope\": \"business_segment\", \"period\": \"2025\\u5e74\\u5ea6\", \"value\": \"70092\", \"unit\": \"\\u5428\", \"qualifier\": \"exact\"}, {\"name\": \"\\u78f7\\u867e\\u7c89\\u9500\\u552e\\u6536\\u5165\", \"raw_value\": \"15,378\\u4e07\\u5143\", \"subject_scope\": \"business_segment\", \"period\": \"2025\\u5e74\\u5ea6\", \"value\": \"15378\", \"unit\": \"\\u4e07\\u5143\", \"currency\": \"CNY\", \"qualifier\": \"exact\"}, {\"name\": \"\\u7f50\\u5934\\u98df\\u54c1\\u8425\\u4e1a\\u6536\\u5165\", \"raw_value\": \"81,635\\u4e07\\u5143\", \"subject_scope\": \"business_segment\", \"period\": \"2025\\u5e74\\u5ea6\", \"value\": \"81635\", \"unit\": \"\\u4e07\\u5143\", \"currency\": \"CNY\", \"qualifier\": \"exact\"}, {\"name\": \"\\u9c7c\\u67f3\\u52a0\\u5de5\\u8425\\u4e1a\\u6536\\u5165\", \"raw_value\": \"23,826\\u4e07\\u5143\", \"subject_scope\": \"business_segment\", \"period\": \"2025\\u5e74\\u5ea6\", \"value\": \"23826\", \"unit\": \"\\u4e07\\u5143\", \"currency\": \"CNY\", \"qualifier\": \"exact\"}, {\"name\": \"\\u6e14\\u8d27\\u8d38\\u6613\\u8425\\u4e1a\\u6536\\u5165\", \"raw_value\": \"31,867\\u4e07\\u5143\", \"subject_scope\": \"business_segment\", \"period\": \"2025\\u5e74\\u5ea6\", \"value\": \"31867\", \"unit\": \"\\u4e07\\u5143\", \"currency\": \"CNY\", \"qualifier\": \"exact\"}]}]}",
+      "response_payload": {
+        "repaired_facts": [
+          {
+            "fact_id": "review-add:F001",
+            "text": "驱动业务收入变化的主要原因：公司金枪鱼围网全年销售价较上一年度有所上涨，销售量减少，捕捞业务收入减少2,805万元；罐头食品销售量较上一年度上涨，食品加工营业收入增加8,196万元；渔货贸易收入减少3,262万元；海上运输营业收入减少276万元。公司金枪鱼船队共捕捞金枪鱼88,561吨，较上年相比增加755吨，增幅1%；销售金枪鱼67,096吨，较上年相比减少7,814吨，减幅10%；实现销售收入79,698万元，较上年相比减少2,947万元，减幅4%。“深蓝轮”加工磷虾粉9,041吨（捕捞磷虾70,092吨），捕捞量增幅97%，实现销售收入15,378万元，增幅14%；罐头食品实现营业收入81,635万元，增幅23%；鱼柳加工实现营业收入23,826万元，减幅23%；渔货贸易实现营业收入31,867万元，减幅9%。",
+            "subject_scope": "consolidated_group",
+            "period": "2025年度",
+            "evidence_ids": [
+              "source-0007"
+            ],
+            "metrics": [
+              {
+                "name": "捕捞业务收入变动额",
+                "raw_value": "减少2,805万元",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "value": "-2805",
+                "unit": "万元",
+                "currency": "CNY",
+                "qualifier": "exact",
+                "comparison_basis": "同比"
+              },
+              {
+                "name": "食品加工营业收入变动额",
+                "raw_value": "增加8,196万元",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "value": "8196",
+                "unit": "万元",
+                "currency": "CNY",
+                "qualifier": "exact",
+                "comparison_basis": "同比"
+              },
+              {
+                "name": "渔货贸易收入变动额",
+                "raw_value": "减少3,262万元",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "value": "-3262",
+                "unit": "万元",
+                "currency": "CNY",
+                "qualifier": "exact",
+                "comparison_basis": "同比"
+              },
+              {
+                "name": "海上运输营业收入变动额",
+                "raw_value": "减少276万元",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "value": "-276",
+                "unit": "万元",
+                "currency": "CNY",
+                "qualifier": "exact",
+                "comparison_basis": "同比"
+              },
+              {
+                "name": "金枪鱼捕捞量",
+                "raw_value": "88,561吨",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "value": "88561",
+                "unit": "吨",
+                "qualifier": "exact"
+              },
+              {
+                "name": "金枪鱼销售量",
+                "raw_value": "67,096吨",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "value": "67096",
+                "unit": "吨",
+                "qualifier": "exact"
+              },
+              {
+                "name": "金枪鱼销售收入",
+                "raw_value": "79,698万元",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "value": "79698",
+                "unit": "万元",
+                "currency": "CNY",
+                "qualifier": "exact"
+              },
+              {
+                "name": "磷虾粉加工量",
+                "raw_value": "9,041吨",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "value": "9041",
+                "unit": "吨",
+                "qualifier": "exact"
+              },
+              {
+                "name": "磷虾捕捞量",
+                "raw_value": "70,092吨",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "value": "70092",
+                "unit": "吨",
+                "qualifier": "exact"
+              },
+              {
+                "name": "磷虾粉销售收入",
+                "raw_value": "15,378万元",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "value": "15378",
+                "unit": "万元",
+                "currency": "CNY",
+                "qualifier": "exact"
+              },
+              {
+                "name": "罐头食品营业收入",
+                "raw_value": "81,635万元",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "value": "81635",
+                "unit": "万元",
+                "currency": "CNY",
+                "qualifier": "exact"
+              },
+              {
+                "name": "鱼柳加工营业收入",
+                "raw_value": "23,826万元",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "value": "23826",
+                "unit": "万元",
+                "currency": "CNY",
+                "qualifier": "exact"
+              },
+              {
+                "name": "渔货贸易营业收入",
+                "raw_value": "31,867万元",
+                "subject_scope": "business_segment",
+                "period": "2025年度",
+                "value": "31867",
+                "unit": "万元",
+                "currency": "CNY",
+                "qualifier": "exact"
+              }
+            ]
+          }
+        ]
+      },
+      "usage": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      }
+    }
+  ],
+  "workpaper_summary": {
+    "origin": "controlled_fixture",
+    "business_description": "公司主要从事远洋渔业捕捞、水产品加工销售及相关贸易，围绕“一鱼一虾”（金枪鱼、南极磷虾）核心主业，形成捕捞、加工、贸易、运输一体化格局。\n主营业务按行业分为海洋捕捞、食品加工、渔货贸易、海上运输四个板块，合计主营业务收入2,330,812,544.82元。\n主要子公司覆盖远洋捕捞、食品加工、罐头食品加工、渔货贸易和海上运输等业务，如上海开创远洋渔业有限公司从事远洋捕捞，卡洛斯•阿尔博的孩子们有限公司从事罐头食品加工，康隆（香港）航运有限公司从事海上运输等。",
+    "fact_count": 31,
+    "metric_count": 41,
+    "element_fact_counts": {
+      "business_structure": 3,
+      "products_services": 5,
+      "revenue_model": 3,
+      "scale_and_mix": 4,
+      "operations_and_inputs": 4,
+      "customers_channels_markets": 4,
+      "operating_drivers": 3,
+      "material_changes": 2,
+      "position": 1,
+      "upstream_inputs": 1,
+      "downstream_customers": 1
+    },
+    "review_status": "incomplete",
+    "open_finding_count": 1,
+    "extraction_model": "deepseek-flash",
+    "review_model": "test-model"
+  }
+}
